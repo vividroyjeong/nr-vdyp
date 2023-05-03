@@ -222,10 +222,38 @@ public class ControlFileParserTest {
 		}
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	void testParseToMap() throws Exception {
 		var parser = makeParser();
+		String file = 
+				  "097 coe\\vetdq2.dat                                    DQ for Vet layer           RD_YDQV\n"
+				+ "098 coe\\REGBAV01.coe                                  VET BA, IPSJF168.doc       RD_E098\n"
+				+ "\n"
+				+ "197    5.0   0.0   2.0                                Minimum Height, Minimum BA, Min BA fully stocked.\n"
+				+ "\n"
+				+ "198 coe\\MOD19813.prm                                  Modifier file (IPSJF155, XII) RD_E198\n"
+				+ "199  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 Debug switches (0 by default) See IPSJF155  App IX                              Debug switches (25) 0=default See IPSJF155, App IX\n"
+				+ "                                                      1st:  1: Do NOT apply BA limits from SEQ043\n"
+				+ "                                                      2nd:  1: Do NOT apply DQ limits from SEQ043\n";
+		try(
+			var is = new ByteArrayInputStream(file.getBytes());
+		) {
+			var result = parser.parseToMap(is);
+
+			
+			assertThat(result, hasEntry(equalTo("097"), equalTo("coe\\vetdq2.dat")));
+			
+			assertThat(result, hasEntry(equalTo("098"), equalTo("coe\\REGBAV01.coe")));
+			assertThat(result, hasEntry(equalTo("197"), equalTo("5.0   0.0   2.0")));
+			assertThat(result, hasEntry(equalTo("198"), equalTo("coe\\MOD19813.prm")));
+			assertThat(result, hasEntry(equalTo("199"), equalTo("0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0")));
+		}
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Test
+	void testParseToMapWithConfiguration() throws Exception {
+		var parser = makeConfiguredParser();
 		String file = 
 				  "097 coe\\vetdq2.dat                                    DQ for Vet layer           RD_YDQV\n"
 				+ "098 coe\\REGBAV01.coe                                  VET BA, IPSJF168.doc       RD_E098\n"
@@ -256,6 +284,12 @@ public class ControlFileParserTest {
 	}
 
 	private ControlFileParser makeParser() {
+		return new ControlFileParser();
+	}
+	
+	private ControlFileParser makeConfiguredParser() {
+		var parser = makeParser();
+		
 		var identifiers = new HashMap<Integer, String>();
 		var parsers = new HashMap<Integer, Function<String, ?>>();
 
@@ -267,7 +301,10 @@ public class ControlFileParserTest {
 		identifiers.put(199, "debugSwitches");
 		parsers.put(199, (String s) -> Arrays.stream(s.strip().split("\s+")).map(Integer::valueOf).collect(Collectors.toList()));
 
-		return new ControlFileParser(identifiers, parsers);
+		parser.setIdentifiers(identifiers);
+		parser.setValueParsers(parsers);
+		
+		return parser;
 	}
 
 }
