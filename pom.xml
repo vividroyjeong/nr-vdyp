@@ -1,37 +1,36 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-	
-  <groupId>ca.bc.gov.nrs.vdyp</groupId>
-  <artifactId>vdyp-parent</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>pom</packaging>
-	
-  <name>Variable Density Yield Project Parent</name>
-  <url>http://maven.apache.org</url>
-	
-  <properties>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>ca.bc.gov.nrs.vdyp</groupId>
+	<artifactId>vdyp-parent</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>Variable Density Yield Project Parent</name>
+	<url>http://maven.apache.org</url>
+
+	<properties>
 
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
 		
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<junit.version>5.9.2</junit.version>
-    <hamcrest.version>2.2</hamcrest.version>
-    <easymock.version>5.1.0</easymock.version>
-		
-  </properties>
+		<hamcrest.version>2.2</hamcrest.version>
+		<easymock.version>5.1.0</easymock.version>
+
+	</properties>
 
 	<modules>
 		<module>vdyp-core</module>
 		<module>vdyp-fip</module>
 		<module>vdyp-buildtools</module>
 	</modules>
-	
+
 	<dependencyManagement>
 		<dependencies>
-			
+
 			<dependency>
 				<groupId>org.junit.jupiter</groupId>
 				<artifactId>junit-jupiter-engine</artifactId>
@@ -90,10 +89,10 @@
 
 				<plugin>
 					<groupId>net.revelc.code.formatter</groupId>
-          <artifactId>formatter-maven-plugin</artifactId>
-          <version>2.22.0</version>
+					<artifactId>formatter-maven-plugin</artifactId>
+					<version>2.22.0</version>
 				</plugin>
-				
+
 			</plugins>
 		</pluginManagement>
 
@@ -101,19 +100,19 @@
 
 			<plugin>
 				<groupId>net.revelc.code.formatter</groupId>
-        <artifactId>formatter-maven-plugin</artifactId>
+				<artifactId>formatter-maven-plugin</artifactId>
 				<executions>
-          <execution>
-            <goals>
-              <goal>format</goal>
-            </goals>
-            <configuration>
-              <configFile>eclipse/formatter.xml</configFile>
-            </configuration>
-          </execution>
-        </executions>
+					<execution>
+						<goals>
+							<goal>format</goal>
+						</goals>
+						<configuration>
+							<configFile>eclipse/formatter.xml</configFile>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
-			
+
 		</plugins>
 		
 	</build>
