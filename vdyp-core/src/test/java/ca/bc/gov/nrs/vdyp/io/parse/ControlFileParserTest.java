@@ -32,6 +32,17 @@ public class ControlFileParserTest {
 			assertThat(result, contains(controlEntry(equalTo(1), equalTo(" "), equalTo("Control"))));
 		}
 	}
+	
+	@Test
+	void testParsesEntriesSpacePadding() throws Exception {
+		var parser = makeParser();
+
+		try (InputStream is = new ByteArrayInputStream("  1 Control".getBytes()); var stream = parser.parseEntries(is);) {
+			var result = stream.collect(Collectors.toList());
+
+			assertThat(result, contains(controlEntry(equalTo(1), equalTo(" "), equalTo("Control"))));
+		}
+	}
 
 	@Test
 	void testParsesEntriesExtended() throws Exception {
@@ -278,7 +289,24 @@ public class ControlFileParserTest {
 			assertThat(result, hasEntry(equalTo("debugSwitches"), (Matcher)contains(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0)));
 		}
 	}
+	
+	@Test
+	void testParseToMapLastOfDuplicates() throws Exception {
+		var parser = makeParser();
+		String file = 
+				  "097 value1\n"
+				+ "097 value2\n";
+		try(
+			var is = new ByteArrayInputStream(file.getBytes());
+		) {
+			var result = parser.parseToMap(is);
 
+			
+			assertThat(result, hasEntry(equalTo("097"), equalTo("value2")));
+		}
+	}
+
+	
 	private static Matcher<Entry> controlEntry(Matcher<Integer> index, Matcher<String> extend, Matcher<String> control) {
 		return allOf(hasProperty("index", index), hasProperty("extend", extend), hasProperty("control", control));
 	}

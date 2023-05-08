@@ -101,7 +101,7 @@ public class ControlFileParser {
 				if (indexString.isBlank()) {
 					return Stream.empty();
 				} else {
-					index = Integer.valueOf(indexString);
+					index = Integer.valueOf(indexString.strip());
 				}
 				// Ignore comment marked with index 0
 				if(index==0) {
@@ -137,9 +137,9 @@ public class ControlFileParser {
 			return parseEntries.collect(
 					Collectors.toMap(
 							e->identifiers.getOrDefault(e.getIndex(), String.format("%03d", e.getIndex())), 
-							e->{
-									return valueParsers.getOrDefault(e.getIndex(), defaultValueParser).apply(e.getControl());
-							} ));
+							e->valueParsers.getOrDefault(e.getIndex(), defaultValueParser).apply(e.getControl()),
+						  (x,y)->y // On duplicates, keep the last value
+							));
 		}
 	}
 	
