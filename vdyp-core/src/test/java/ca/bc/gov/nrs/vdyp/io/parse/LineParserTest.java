@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 public class LineParserTest {
@@ -139,10 +138,24 @@ public class LineParserTest {
 			.string(4, "part1")
 			.string("part2");
 		
-		var result1 = parser.parse("1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890");
+		var result1 = parser.parse("123  67890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 ");
 		
-		assertThat(result1, hasEntry("part1", "1234"));
-		assertThat(result1, hasEntry("part2", "567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"));
+		assertThat(result1, hasEntry("part1", "123 "));
+		assertThat(result1, hasEntry("part2", " 67890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 "));
+		
+	}
+	
+	@Test
+	public void testStripped() throws Exception {
+		var parser = new LineParser();
+		parser
+			.strippedString(4, "part1")
+			.strippedString("part2");
+		
+		var result1 = parser.parse("123  67890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 ");
+		
+		assertThat(result1, hasEntry("part1", "123"));
+		assertThat(result1, hasEntry("part2", "67890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"));
 		
 	}
 
@@ -285,6 +298,110 @@ public class LineParserTest {
 				allOf(
 						(Matcher)hasEntry("part1", 42),
 						(Matcher)hasEntry("part2", "Value1")
+				)
+			));
+	}
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Test
+	public void testMultiLineWithIgnoredEntry() throws Exception {
+		var parser = new LineParser() {
+			
+			@Override
+			public boolean isIgnoredEntry(Map<String, Object> entry) {
+				return 0 == (int) entry.get("part1");
+			}
+			
+		};
+		parser
+			.integer(4, "part1")
+			.space(1)
+			.string("part2");
+		
+		List<Map<String, Object>> result = new ArrayList<>();
+		try(
+			var is = new ByteArrayInputStream("0042 Value1\r\n0000\r\n0043 Value2".getBytes());
+		) {
+			result = parser.parse(is);
+		}
+		
+		assertThat(result, contains(
+				allOf(
+						(Matcher)hasEntry("part1", 42),
+						(Matcher)hasEntry("part2", "Value1")
+				),
+				allOf(
+						(Matcher)hasEntry("part1", 43),
+						(Matcher)hasEntry("part2", "Value2")
+				)
+			));
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Test
+	public void testMultiLineWithIgnoredLine() throws Exception {
+		var parser = new LineParser() {
+			
+			@Override
+			public boolean isIgnoredLine(String line) {
+				return line.length()>4 && 'X' == Character.toUpperCase(line.charAt(4));
+			}
+			
+		};
+		parser
+			.integer(4, "part1")
+			.space(1)
+			.string("part2");
+		
+		List<Map<String, Object>> result = new ArrayList<>();
+		try(
+			var is = new ByteArrayInputStream("0042 Value1\r\n0000X\r\n0043 Value2".getBytes());
+		) {
+			result = parser.parse(is);
+		}
+		
+		assertThat(result, contains(
+				allOf(
+						(Matcher)hasEntry("part1", 42),
+						(Matcher)hasEntry("part2", "Value1")
+				),
+				allOf(
+						(Matcher)hasEntry("part1", 43),
+						(Matcher)hasEntry("part2", "Value2")
+				)
+			));
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Test
+	public void testMultiLineWithIgnoredSegment() throws Exception {
+		var parser = new LineParser() {
+			
+			@Override
+			public boolean isIgnoredSegment(List<String> segments) {
+				return 'X' == Character.toUpperCase(segments.get(1).charAt(0));
+			}
+			
+		};
+		parser
+			.integer(4, "part1")
+			.space(1)
+			.string("part2");
+		
+		List<Map<String, Object>> result = new ArrayList<>();
+		try(
+			var is = new ByteArrayInputStream("0042 Value1\r\n0000X\r\n0043 Value2".getBytes());
+		) {
+			result = parser.parse(is);
+		}
+		
+		assertThat(result, contains(
+				allOf(
+						(Matcher)hasEntry("part1", 42),
+						(Matcher)hasEntry("part2", "Value1")
+				),
+				allOf(
+						(Matcher)hasEntry("part1", 43),
+						(Matcher)hasEntry("part2", "Value2")
 				)
 			));
 	}

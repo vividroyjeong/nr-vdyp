@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 
 public class LineParser {
 	
@@ -108,7 +107,7 @@ public class LineParser {
 			
 			@Override
 			String parse(String value) throws ValueParseException {
-				return value.strip();
+				return value;
 			}
 			
 		});
@@ -120,6 +119,18 @@ public class LineParser {
 			
 			@Override
 			String parse(String value) throws ValueParseException {
+				return value;
+			}
+			
+		});
+		return this;
+	}
+	
+	public LineParser strippedString(int length, String name) {
+		segments.add(new LineParserValueSegment<String>(length, name) {
+			
+			@Override
+			String parse(String value) throws ValueParseException {
 				return value.strip();
 			}
 			
@@ -127,6 +138,18 @@ public class LineParser {
 		return this;
 	}
 	
+	public LineParser strippedString(String name) {
+		segments.add(new LineParserValueSegment<String>(-1, name) {
+			
+			@Override
+			String parse(String value) throws ValueParseException {
+				return value.strip();
+			}
+			
+		});
+		return this;
+	}
+
 	public <T> LineParser parse(int length, String name, ValueParser<T> parser) {
 		segments.add(new LineParserValueSegment<T>(length, name) {
 			
@@ -196,7 +219,7 @@ public class LineParser {
 		return result;
 	}
 	
-	public <T> T parse (InputStream is, T result, BiFunction<Map<String, Object>, T, T> addToResult) throws IOException, ResourceParseException {
+	public <T> T parse (InputStream is, T result, ParseEntryHandler<Map<String, Object>, T> addToResult) throws IOException, ResourceParseException {
 		var reader = new BufferedReader(new InputStreamReader(is, charset));
 		String line;
 		int lineNumber = 0;
@@ -206,15 +229,24 @@ public class LineParser {
 				if(isStopLine(line)) {
 					break;
 				}
+				if(isIgnoredLine(line)) {
+					continue;
+				}
 				var segments = segmentize(line);
 				if(isStopSegment(segments)) {
 					break;
+				}
+				if(isIgnoredSegment(segments)) {
+					continue;
 				}
 				var entry = parse(segments);
 				if(isStopEntry(entry)) {
 					break;
 				}
-				result = addToResult.apply(entry, result);
+				if(isIgnoredEntry(entry)) {
+					continue;
+				}
+				result = addToResult.addTo(entry, result);
 			} catch (ValueParseException ex) {
 				throw new ResourceParseException(lineNumber, ex);
 			}
@@ -237,6 +269,18 @@ public class LineParser {
 	}
 
 	public boolean isStopLine(String line) {
+		return false;
+	}
+	
+	public boolean isIgnoredEntry(Map<String, Object> entry) {
+		return false;
+	}
+	
+	public boolean isIgnoredSegment(List<String> entry) {
+		return false;
+	}
+
+	public boolean isIgnoredLine(String line) {
 		return false;
 	}
 }

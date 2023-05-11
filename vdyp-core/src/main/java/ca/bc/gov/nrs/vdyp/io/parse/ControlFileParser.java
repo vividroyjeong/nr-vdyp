@@ -1,16 +1,13 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
-import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Parser for control files
@@ -24,9 +21,6 @@ public class ControlFileParser {
 	public static final int EXTEND_LENGTH = 1;
 	public static final int CONTROL_LENGTH_EXTENDED = 120;
 	public static final int CONTROL_LENGTH = 50;
-	public static final int NEWLINE_LENGTH = 2;
-
-	public static final int RECORD_BUFFER_LENGTH = INDEX_LENGTH + EXTEND_LENGTH + CONTROL_LENGTH + NEWLINE_LENGTH;
 	
 	public static final List<String> EXTEND_FLAGS = Arrays.asList("X", ">");
 	public static final List<String> COMMENT_FLAGS = Arrays.asList("C");
@@ -36,30 +30,21 @@ public class ControlFileParser {
 	private Map<Integer, Function<String, ?>> valueParsers;
 	private Function<String, ?> defaultValueParser;
 	
-	public static class Entry {
-		public final int index;
-		public final String extend;
-		public final String control;
+	LineParser lineParser = new LineParser() {
 
-		public int getIndex() {
-			return index;
+		@Override
+		public boolean isIgnoredLine(String line) {
+			return line.isBlank();
 		}
-
-		public String getExtend() {
-			return extend;
+		@Override
+		public boolean isIgnoredSegment(List<String> segments) {
+			return segments.get(0).isBlank();
 		}
-
-		public String getControl() {
-			return control;
-		}
-
-		public Entry(int index, String extend, String control) {
-			super();
-			this.index = index;
-			this.extend = extend;
-			this.control = control;
-		}
+		
 	}
+		.integer(3, "index")
+		.string(1, "extend")
+		.string("restOfLine");
 
 	/**
 	 * 
@@ -82,65 +67,43 @@ public class ControlFileParser {
 		this(Collections.emptyMap(), Collections.emptyMap(), String::strip);
 	}
 
-	public Stream<Entry> parseEntries(InputStream input) {
-		return new BufferedReader(new InputStreamReader(input, StandardCharsets.US_ASCII), RECORD_BUFFER_LENGTH).lines()
-			.flatMap(line -> {
-				// 
-				if(line.isBlank()) {
-					return Stream.empty();
-				}
-				final String indexString = line.substring(0, INDEX_LENGTH);
-				final String extendString = line.substring(INDEX_LENGTH, INDEX_LENGTH + EXTEND_LENGTH);
-				
-				// Ignore comments marked with exend flag C
-				if(COMMENT_FLAGS.contains(extendString)) {
-					return Stream.empty();
-				}
-				// Ignore comments marked with  a blank index
-				final int index;
-				if (indexString.isBlank()) {
-					return Stream.empty();
-				} else {
-					index = Integer.valueOf(indexString.strip());
-				}
-				// Ignore comment marked with index 0
-				if(index==0) {
-					return Stream.empty();
-				}
-				
-				// How long is the control value
-				int controlLength = Math.min(
-						EXTEND_FLAGS.contains(extendString) ? 
-								CONTROL_LENGTH_EXTENDED : 
-								CONTROL_LENGTH, 
-						line.length( ) - (INDEX_LENGTH + EXTEND_LENGTH));
-				String controlString = line
-						.substring(INDEX_LENGTH + EXTEND_LENGTH, INDEX_LENGTH + EXTEND_LENGTH + controlLength);
-				
-				// Inline comments marked with !
-				int startOfComment = controlString.indexOf(COMMENT_MARKER);
-				if(startOfComment>-1) {
-					controlString = controlString.substring(0,startOfComment);
-				}
-				
-				return Stream.of(new Entry(index, extendString, controlString));
-			});
-	}
-
-	/**
-	 * Parse a control file into a map.  Known index values will be replaced with meaningful identifiers.  
-	 * @param input
-	 * @return
-	 */
-	public Map<String, ?> parseToMap(InputStream input) {
-		try(Stream<Entry> parseEntries = parseEntries(input);) {
-			return parseEntries.collect(
-					Collectors.toMap(
-							e->identifiers.getOrDefault(e.getIndex(), String.format("%03d", e.getIndex())), 
-							e->valueParsers.getOrDefault(e.getIndex(), defaultValueParser).apply(e.getControl()),
-						  (x,y)->y // On duplicates, keep the last value
-							));
-		}
+	public Map<String, Object> parse(InputStream input) throws IOException, ResourceParseException {
+		Map<String, Object> result = new HashMap<>();
+		return lineParser.parse(input, result, (map,r)->{
+			Integer index = (Integer) map.get("index");
+			String extend = (String) map.get("extend");
+			String restOfLine = (String) map.get("restOfLine");
+			// Ignore comments marked with exend flag C
+			if(COMMENT_FLAGS.contains(extend)) return r;
+			// Ignore comments marked with  a blank index
+			if(index==null) return r;
+			// Ignore comment marked with index 0
+			if(index==0) return r;
+			
+			// How long is the control value
+			int controlLength = Math.min(
+					EXTEND_FLAGS.contains(extend) ? 
+							CONTROL_LENGTH_EXTENDED : 
+							CONTROL_LENGTH, 
+							restOfLine.length( ));
+			
+			// Trim inline comments
+			int commentMarkerPosition = restOfLine.indexOf(COMMENT_MARKER);
+			if(commentMarkerPosition>=0) {
+				controlLength = Math.min(controlLength, commentMarkerPosition);
+			}
+			
+			// Find the string representation of the value of the control
+			String controlString = restOfLine
+					.substring(0, controlLength);
+			
+			String key = identifiers.getOrDefault(index, String.format("%03d", index));
+			Object value = valueParsers.getOrDefault(index, defaultValueParser).apply(controlString);
+			
+			result.put(key, value);
+			
+			return result;
+		});
 	}
 	
 	/**

@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
+import static ca.bc.gov.nrs.vdyp.test.VydpMatchers.parseAs;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
@@ -12,24 +13,24 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.io.parse.ControlFileParser.Entry;
-
 public class ControlFileParserTest {
 
 	@Test
 	void testParsesEntriesSimple() throws Exception {
 		var parser = makeParser();
+		
+		String file = "001 Control";
+		try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
+			var result = parser.parse(is);
 
-		try (InputStream is = new ByteArrayInputStream("001 Control".getBytes()); var stream = parser.parseEntries(is);) {
-			var result = stream.collect(Collectors.toList());
-
-			assertThat(result, contains(controlEntry(equalTo(1), equalTo(" "), equalTo("Control"))));
+			assertThat(result.entrySet(), contains(controlEntry(equalTo(1), equalTo(" "), equalTo("Control"))));
 		}
 	}
 	
@@ -37,10 +38,11 @@ public class ControlFileParserTest {
 	void testParsesEntriesSpacePadding() throws Exception {
 		var parser = makeParser();
 
-		try (InputStream is = new ByteArrayInputStream("  1 Control".getBytes()); var stream = parser.parseEntries(is);) {
-			var result = stream.collect(Collectors.toList());
+		String file = "  1 Control";
+		try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
+			var result = parser.parse(is);
 
-			assertThat(result, contains(controlEntry(equalTo(1), equalTo(" "), equalTo("Control"))));
+			assertThat(result.entrySet(), contains(controlEntry(equalTo(1), equalTo(" "), equalTo("Control"))));
 		}
 	}
 
@@ -48,16 +50,12 @@ public class ControlFileParserTest {
 	void testParsesEntriesExtended() throws Exception {
 		var parser = makeParser();
 
-		try (
-				InputStream is = new ByteArrayInputStream(
-						"001XControl that is longer than 50 characters. Blah Blah Blah Blah.".getBytes()
-				);
-				var stream = parser.parseEntries(is)
-		) {
-			var result = stream.collect(Collectors.toList());
+		String file = "001XControl that is longer than 50 characters. Blah Blah Blah Blah.";
+		try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
+			var result = parser.parse(is);
 
 			assertThat(
-					result,
+					result.entrySet(),
 					contains(
 							controlEntry(
 									equalTo(1), equalTo("X"), equalTo("Control that is longer than 50 characters. Blah Blah Blah Blah.")
@@ -71,16 +69,12 @@ public class ControlFileParserTest {
 	void testParsesEntriesExtendedAlternate() throws Exception {
 		var parser = makeParser();
 
-		try (
-				InputStream is = new ByteArrayInputStream(
-						"001>Control that is longer than 50 characters. Blah Blah Blah Blah.".getBytes()
-				);
-				var stream = parser.parseEntries(is)
-		) {
-			var result = stream.collect(Collectors.toList());
+		String file = "001>Control that is longer than 50 characters. Blah Blah Blah Blah.";
+		try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
+			var result = parser.parse(is);
 
 			assertThat(
-					result,
+					result.entrySet(),
 					contains(
 							controlEntry(
 									equalTo(1), equalTo(">"), equalTo("Control that is longer than 50 characters. Blah Blah Blah Blah.")
@@ -94,18 +88,14 @@ public class ControlFileParserTest {
 	void testParsesEntriesWithDistantComment() throws Exception {
 		var parser = makeParser();
 
-		try (
-				InputStream is = new ByteArrayInputStream(
-						"001 Control                                           Comment".getBytes()
-				);
-				var stream = parser.parseEntries(is)
-		) {
-			var result = stream.collect(Collectors.toList());
+		String file = "001 Control                                           Comment";
+		try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
+			var result = parser.parse(is);
 
 			assertThat(
-					result,
+					result.entrySet(),
 					contains(
-							controlEntry(equalTo(1), equalTo(" "), equalTo("Control                                           "))
+							controlEntry(equalTo(1), equalTo(" "), equalTo("Control"))
 					)
 			);
 		}
@@ -115,22 +105,17 @@ public class ControlFileParserTest {
 	void testParsesEntriesExtendedWithDistantComment() throws Exception {
 		var parser = makeParser();
 
-		try (
-				InputStream is = new ByteArrayInputStream(
-						"001XControl                                                                                                                 Comment"
-								.getBytes()
-				);
-				var stream = parser.parseEntries(is)
-		) {
-			var result = stream.collect(Collectors.toList());
+		String file = "001XControl                                                                                                                 Comment";
+		try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
+			var result = parser.parse(is);
 
 			assertThat(
-					result,
+					result.entrySet(),
 					contains(
 							controlEntry(
 									equalTo(1), equalTo("X"),
 									equalTo(
-											"Control                                                                                                                 "
+											"Control"
 									)
 							)
 					)
@@ -142,13 +127,11 @@ public class ControlFileParserTest {
 	void testParsesEntriesWithMarkedComment() throws Exception {
 		var parser = makeParser();
 
-		try (
-				InputStream is = new ByteArrayInputStream("001 Control!Comment".getBytes());
-				var stream = parser.parseEntries(is)
-		) {
-			var result = stream.collect(Collectors.toList());
+		String file = "001 Control!Comment";
+		try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
+			var result = parser.parse(is);
 
-			assertThat(result, contains(controlEntry(equalTo(1), equalTo(" "), equalTo("Control"))));
+			assertThat(result.entrySet(), contains(controlEntry(equalTo(1), equalTo(" "), equalTo("Control"))));
 		}
 	}
 
@@ -156,13 +139,11 @@ public class ControlFileParserTest {
 	void testParsesEntriesExtendedWithMarkedComment() throws Exception {
 		var parser = makeParser();
 
-		try (
-				InputStream is = new ByteArrayInputStream("001XControl!Comment".getBytes());
-				var stream = parser.parseEntries(is)
-		) {
-			var result = stream.collect(Collectors.toList());
+		String file = "001XControl!Comment";
+		try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
+			var result = parser.parse(is);
 
-			assertThat(result, contains(controlEntry(equalTo(1), equalTo("X"), equalTo("Control"))));
+			assertThat(result.entrySet(), contains(controlEntry(equalTo(1), equalTo("X"), equalTo("Control"))));
 		}
 	}
 
@@ -170,10 +151,11 @@ public class ControlFileParserTest {
 	void testParsesEntriesIgnoreCommentLinesByExtendedMarker() throws Exception {
 		var parser = makeParser();
 
-		try (InputStream is = new ByteArrayInputStream("001CComment".getBytes()); var stream = parser.parseEntries(is)) {
-			var result = stream.collect(Collectors.toList());
+		String file = "001CComment";
+		try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
+			var result = parser.parse(is);
 
-			assertThat(result, empty());
+			assertThat(result.entrySet(), empty());
 		}
 	}
 
@@ -181,10 +163,11 @@ public class ControlFileParserTest {
 	void testParsesEntriesIgnoreCommentLinesByZeroIndex() throws Exception {
 		var parser = makeParser();
 
-		try (InputStream is = new ByteArrayInputStream("000 Comment".getBytes()); var stream = parser.parseEntries(is);) {
-			var result = stream.collect(Collectors.toList());
+		String file = "000 Comment";
+		try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
+			var result = parser.parse(is);
 
-			assertThat(result, empty());
+			assertThat(result.entrySet(), empty());
 		}
 	}
 
@@ -192,10 +175,11 @@ public class ControlFileParserTest {
 	void testParsesEntriesIgnoreCommentLinesByNullIndex() throws Exception {
 		var parser = makeParser();
 
-		try (InputStream is = new ByteArrayInputStream("    Comment".getBytes()); var stream = parser.parseEntries(is);) {
-			var result = stream.collect(Collectors.toList());
+		String file = "    Comment";
+		try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
+			var result = parser.parse(is);
 
-			assertThat(result, empty());
+			assertThat(result.entrySet(), empty());
 		}
 	}
 
@@ -203,13 +187,11 @@ public class ControlFileParserTest {
 	void testParsesEntriesIgnoreEmptyLines() throws Exception {
 		var parser = makeParser();
 
-		try (
-				InputStream is = new ByteArrayInputStream("\n \n  \n   \n    ".getBytes());
-				var stream = parser.parseEntries(is);
-		) {
-			var result = stream.collect(Collectors.toList());
+		String file = "\n \n  \n   \n    ";
+		try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
+			var result = parser.parse(is);
 
-			assertThat(result, empty());
+			assertThat(result.entrySet(), empty());
 		}
 	}
 
@@ -217,14 +199,12 @@ public class ControlFileParserTest {
 	void testParsesMultipleEntries() throws Exception {
 		var parser = makeParser();
 
-		try (
-				var is = new ByteArrayInputStream("001 Control 1\n002 Control 2".getBytes());
-				var stream = parser.parseEntries(is);
-		) {
-			var result = stream.collect(Collectors.toList());
+		String file = "001 Control 1\n002 Control 2";
+		try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
+			var result = parser.parse(is);
 
 			assertThat(
-					result,
+					result.entrySet(),
 					contains(
 							controlEntry(equalTo(1), equalTo(" "), equalTo("Control 1")),
 							controlEntry(equalTo(2), equalTo(" "), equalTo("Control 2"))
@@ -249,7 +229,7 @@ public class ControlFileParserTest {
 		try(
 			var is = new ByteArrayInputStream(file.getBytes());
 		) {
-			var result = parser.parseToMap(is);
+			var result = parser.parse(is);
 
 			
 			assertThat(result, hasEntry(equalTo("097"), equalTo("coe\\vetdq2.dat")));
@@ -278,7 +258,7 @@ public class ControlFileParserTest {
 		try(
 			var is = new ByteArrayInputStream(file.getBytes());
 		) {
-			var result = parser.parseToMap(is);
+			var result = parser.parse(is);
 
 			
 			assertThat(result, hasEntry(equalTo("097"), equalTo("coe\\vetdq2.dat")));
@@ -299,7 +279,7 @@ public class ControlFileParserTest {
 		try(
 			var is = new ByteArrayInputStream(file.getBytes());
 		) {
-			var result = parser.parseToMap(is);
+			var result = parser.parse(is);
 
 			
 			assertThat(result, hasEntry(equalTo("097"), equalTo("value2")));
@@ -307,8 +287,9 @@ public class ControlFileParserTest {
 	}
 
 	
-	private static Matcher<Entry> controlEntry(Matcher<Integer> index, Matcher<String> extend, Matcher<String> control) {
-		return allOf(hasProperty("index", index), hasProperty("extend", extend), hasProperty("control", control));
+	private static Matcher<Map.Entry<String, Object>> controlEntry(Matcher<Integer> index, Matcher<String> extend, Matcher<String> control) {
+		
+		return allOf(hasProperty("key", parseAs(index, Integer::valueOf)), hasProperty("value", control));
 	}
 
 	private ControlFileParser makeParser() {
