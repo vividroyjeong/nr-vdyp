@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import ca.bc.gov.nrs.vdyp.io.parse.ControlFileParser;
+import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
 
 /**
  * Parser for FIP control files
@@ -31,8 +32,8 @@ public class FipControlParser {
 		}
 	}
 	
-	Map<String, ?> parse(InputStream is, FileResolver fileResolver) {
-		var map = controlParser.parseToMap(is);
+	Map<String, ?> parse(InputStream is, FileResolver fileResolver) throws IOException, ResourceParseException {
+		var map = controlParser.parse(is);
 		return map;
 	}
 	

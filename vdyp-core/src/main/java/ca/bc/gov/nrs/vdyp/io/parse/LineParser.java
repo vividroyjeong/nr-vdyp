@@ -11,12 +11,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Parse a file with records consisting of lines with fixed width fields.
+ * 
+ * @author Kevin Smith, Vivid Solutions
+ *
+ */
 public class LineParser {
 	
-	List<LineParserSegment> segments = new ArrayList<>();
-	Charset charset = StandardCharsets.US_ASCII;
+	private List<LineParserSegment> segments = new ArrayList<>();
+	public static final Charset charset = StandardCharsets.US_ASCII;
 	
-	static abstract class LineParserSegment {
+	static private abstract class LineParserSegment {
 		int length;
 		
 		public int getLength() {
@@ -31,7 +37,7 @@ public class LineParser {
 		public abstract void parseIntoMap(String toParse, Map<String, Object> map) throws ValueParseException;
 	}
 		
-	static class LineParserNullSegment extends LineParserSegment {
+	static private class LineParserNullSegment extends LineParserSegment {
 		
 		public LineParserNullSegment(int length) {
 			super(length);
@@ -63,94 +69,84 @@ public class LineParser {
 		}
 	}
 	
+	/**
+	 * ignore a segment of characters
+	 * @param length
+	 * @return
+	 */
 	public LineParser space(int length) {
 		segments.add(new LineParserNullSegment(length));
 		return this;
 	}
 	
+	/**
+	 * A decimal integer segment
+	 */
 	public LineParser integer(int length, String name) {
-		segments.add(new LineParserValueSegment<Integer>(length, name) {
-			
-			@Override
-			Integer parse(String value) throws ValueParseException {
-				String stripped = value.strip();
-				try {
-					return Integer.parseInt(stripped);
-				} catch (NumberFormatException ex) {
-					throw new ValueParseException(stripped, ex);
-				}
-			}
-			
-		});
-		return this;
+		return this.value(length, name, ValueParser.INTEGER);
 	}
 	
+	/**
+	 * A floating point segment
+	 */
 	public LineParser floating(int length, String name) {
-		segments.add(new LineParserValueSegment<Float>(length, name) {
-			
-			@Override
-			Float parse(String value) throws ValueParseException {
-				String stripped = value.strip();
-				try {
-					return Float.parseFloat(stripped);
-				} catch (NumberFormatException ex) {
-					throw new ValueParseException(stripped, ex);
-				}
-			}
-			
-		});
-		return this;
+		return this.value(length, name, ValueParser.FLOAT);
 	}
 	
+	/**
+	 * A string segment
+	 */
 	public LineParser string(int length, String name) {
-		segments.add(new LineParserValueSegment<String>(length, name) {
-			
-			@Override
-			String parse(String value) throws ValueParseException {
-				return value;
-			}
-			
-		});
-		return this;
+		return this.value(length, name, s->s);
 	}
 	
+	/**
+	 * A string segment with no bounds.  No further segments may be added.
+	 */
 	public LineParser string(String name) {
-		segments.add(new LineParserValueSegment<String>(-1, name) {
-			
-			@Override
-			String parse(String value) throws ValueParseException {
-				return value;
-			}
-			
-		});
-		return this;
+		return this.value(name, s->s);
 	}
 	
+	/**
+	 * A string segment stripped of leading and trailing whitespace.
+	 */
 	public LineParser strippedString(int length, String name) {
-		segments.add(new LineParserValueSegment<String>(length, name) {
-			
-			@Override
-			String parse(String value) throws ValueParseException {
-				return value.strip();
-			}
-			
-		});
-		return this;
+		return this.value(length, name, String::strip);
 	}
 	
+	/**
+	 * A string segment stripped of leading and trailing whitespace with no bounds.  No further segments may be added.
+	 */
 	public LineParser strippedString(String name) {
-		segments.add(new LineParserValueSegment<String>(-1, name) {
-			
-			@Override
-			String parse(String value) throws ValueParseException {
-				return value.strip();
-			}
-			
-		});
-		return this;
+		return this.value(name, String::strip);
 	}
 
-	public <T> LineParser parse(int length, String name, ValueParser<T> parser) {
+	/**
+	 * Add a segment
+	 * @param <T> type the segment will be parsed too
+	 * @param length length of the segment
+	 * @param name name of the segment
+	 * @param parser parser to convert the string
+	 */
+	public <T> LineParser value(int length, String name, ValueParser<T> parser) {
+		if (length<0) throw new IllegalArgumentException("length can not be negative");
+		return doValue(length, name, parser);
+	}
+	
+	/**
+	 * Add an unbounded segment. No further segments may be added.
+	 * @param <T> type the segment will be parsed too
+	 * @param length length of the segment
+	 * @param name name of the segment
+	 * @param parser parser to convert the string
+	 */
+	public <T> LineParser value(String name, ValueParser<T> parser) {
+		return doValue(-1, name, parser);	
+	}
+	
+	private <T> LineParser doValue(int length, String name, ValueParser<T> parser) {
+		if (segments.size()>0 && segments.get(segments.size()-1).length<0)
+			throw new IllegalStateException("Can not add a segment after an unbounded segment");
 		segments.add(new LineParserValueSegment<T>(length, name) {
 			
 			@Override
@@ -161,20 +157,8 @@ public class LineParser {
 		});
 		return this;
 	}
-	
-	public <T> LineParser parse(String name, ValueParser<T> parser) {
-		segments.add(new LineParserValueSegment<T>(-1, name) {
-			
-			@Override
-			T parse(String value) throws ValueParseException {
-				return parser.parse(value);
-			}
-			
-		});
-		return this;
-	}
 
-	List<String> segmentize(String line) {
+	private List<String> segmentize(String line) {
 		List<String> result = new ArrayList<>(segments.size());
 		
 		int i = 0;
@@ -196,7 +180,13 @@ public class LineParser {
 		return result;
 	}
 	
-	public Map<String,Object> parse(String line) throws ValueParseException {
+	/**
+	 * Parse an individual line
+	 * @param line
+	 * @return
+	 * @throws ValueParseException
+	 */
+	public Map<String,Object> parseLine(String line) throws ValueParseException {
 		var segments = segmentize(line);
 		return parse(segments);
 	}
@@ -219,7 +209,17 @@ public class LineParser {
 		return result;
 	}
 	
-	public <T> T parse (InputStream is, T result, ParseEntryHandler<Map<String, Object>, T> addToResult) throws IOException, ResourceParseException {
+	/**
+	 * Parse an input stream
+	 * @param <T> Type of the resulting object
+	 * @param is Input stream to parse
+	 * @param result Starting state for the resulting object
+	 * @param addToResult Add a record from the file to the result object and return it
+	 * @return The result object after parsing
+	 * @throws IOException if an error occurs while reading from the stream
+	 * @throws ResourceParseException if the content of the stream could not be parsed
+	 */
+	public <T> T parse(InputStream is, T result, ParseEntryHandler<Map<String, Object>, T> addToResult) throws IOException, ResourceParseException {
 		var reader = new BufferedReader(new InputStreamReader(is, charset));
 		String line;
 		int lineNumber = 0;
@@ -254,32 +254,57 @@ public class LineParser {
 		return result;
 	}
 	
+	/**
+	 * Parse an input stream into a list of maps
+	 * @param is Input stream to parse
+	 * @return A list of maps, one per line of the stream
+	 * @throws IOException if an error occurs while reading from the stream
+	 * @throws ResourceParseException if the content of the stream could not be parsed
+	 */
 	public List<Map<String, Object>> parse (InputStream is) throws IOException, ResourceParseException {
 		var result = new ArrayList<Map<String, Object>> ();
 		result = this.parse(is, result, (v, r)->{r.add(v); return r;});
 		return result;
 	}
 	
-	public boolean isStopEntry(Map<String, Object> entry) {
+	/**
+	 * If this returns true for a parsed line, parsing will stop and that line will not be included in the result.
+	 */
+	protected boolean isStopEntry(Map<String, Object> entry) {
 		return false;
 	}
 	
+	/**
+	 * If this returns true for a segmented line, parsing will stop and that line will not be included in the result.
+	 */
 	public boolean isStopSegment(List<String> entry) {
 		return false;
 	}
 
+	/**
+	 * If this returns true for an unparsed line, parsing will stop and that line will not be included in the result.
+	 */
 	public boolean isStopLine(String line) {
 		return false;
 	}
 	
+	/**
+	 * If this returns true for a parsed line, that line will not be included in the result.
+	 */
 	public boolean isIgnoredEntry(Map<String, Object> entry) {
 		return false;
 	}
 	
+	/**
+	 * If this returns true for a segmented line, that line will not be included in the result.
+	 */
 	public boolean isIgnoredSegment(List<String> entry) {
 		return false;
 	}
 
+	/**
+	 * If this returns true for an unparsed line, that line will not be included in the result.
+	 */
 	public boolean isIgnoredLine(String line) {
 		return false;
 	}

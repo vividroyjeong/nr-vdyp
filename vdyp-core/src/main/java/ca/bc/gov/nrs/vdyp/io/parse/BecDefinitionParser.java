@@ -10,6 +10,12 @@ import java.util.Map;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Region;
 
+/**
+ * Parser for a BEC Definition data file
+ * 
+ * @author Kevin Smith, Vivid Solutions
+ *
+ */
 public class BecDefinitionParser implements ResourceParser<Map<String, BecDefinition>>{
 	
 	LineParser lineParser = new LineParser() {
@@ -22,7 +28,7 @@ public class BecDefinitionParser implements ResourceParser<Map<String, BecDefini
 	}
 		.strippedString(4, "alias")
 		.space(1)
-		.parse(1, "region", (s)->{
+		.value(1, "region", (s)->{
 			return Region.fromAlias(Character.toUpperCase(s.charAt(0)))
 					.orElseThrow(()->new ValueParseException(s, s+" is not a valid region identifier"));
 		})

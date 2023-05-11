@@ -29,7 +29,7 @@ public class LineParserTest {
 			.space(1)
 			.string(4, "part2");
 		
-		var result1 = parser.parse("042 Blah");
+		var result1 = parser.parseLine("042 Blah");
 		
 		assertThat(result1, hasEntry("part1", "042"));
 		assertThat(result1, hasEntry("part2", "Blah"));
@@ -44,7 +44,7 @@ public class LineParserTest {
 			.space(1)
 			.floating(5, "part2");
 		
-		var result1 = parser.parse(" 4   0.5  ");
+		var result1 = parser.parseLine(" 4   0.5  ");
 		
 		assertThat(result1, hasEntry("part1", 4));
 		assertThat(result1, hasEntry("part2", 0.5f));
@@ -59,7 +59,7 @@ public class LineParserTest {
 			.space(1)
 			.floating(5, "part2");
 		
-		var result1 = parser.parse(" 4  ");
+		var result1 = parser.parseLine(" 4  ");
 		
 		assertThat(result1, hasEntry("part1", 4));
 		assertThat(result1, not(hasKey("part2")));
@@ -74,7 +74,7 @@ public class LineParserTest {
 			.space(1)
 			.floating(5, "part2");
 		
-		var result1 = parser.parse(" 4   5.0");
+		var result1 = parser.parseLine(" 4   5.0");
 		
 		assertThat(result1, hasEntry("part1", 4));
 		assertThat(result1, hasEntry("part2", 5.0f));
@@ -89,12 +89,12 @@ public class LineParserTest {
 			.space(1)
 			.floating(5, "part2");
 		
-		var ex1 = assertThrows(ValueParseException.class, ()->parser.parse(" X   0.5  "));
+		var ex1 = assertThrows(ValueParseException.class, ()->parser.parseLine(" X   0.5  "));
 		
 		assertThat(ex1, hasProperty("value", is("X")));
 		assertThat(ex1, hasProperty("cause", isA(NumberFormatException.class)));
 		
-		var ex2 = assertThrows(ValueParseException.class, ()->parser.parse(" 4   0.x  "));
+		var ex2 = assertThrows(ValueParseException.class, ()->parser.parseLine(" 4   0.x  "));
 		
 		assertThat(ex2, hasProperty("value", is("0.x")));
 		assertThat(ex2, hasProperty("cause", isA(NumberFormatException.class)));
@@ -106,11 +106,11 @@ public class LineParserTest {
 	public void testValueParser() throws Exception {
 		var parser = new LineParser();
 		parser
-			.parse(4, "part1", (s)->Integer.valueOf(s.strip())+1)
+			.value(4, "part1", (s)->Integer.valueOf(s.strip())+1)
 			.space(1)
-			.parse("part2", (s)->Float.valueOf(s.strip())+1);
+			.value("part2", (s)->Float.valueOf(s.strip())+1);
 		
-		var result1 = parser.parse(" 4   0.5  ");
+		var result1 = parser.parseLine(" 4   0.5  ");
 		
 		assertThat(result1, hasEntry("part1", 5));
 		assertThat(result1, hasEntry("part2", 1.5f));
@@ -121,11 +121,11 @@ public class LineParserTest {
 	public void testValueParserError() throws Exception {
 		var parser = new LineParser();
 		parser
-			.parse(4, "part1", (s)->{throw new ValueParseException(s, "Testing");})
+			.value(4, "part1", (s)->{throw new ValueParseException(s, "Testing");})
 			.space(1)
-			.parse(4, "part2", (s)->Float.valueOf(s.strip())+1);
+			.value(4, "part2", (s)->Float.valueOf(s.strip())+1);
 		
-		var ex1 = assertThrows(ValueParseException.class, ()->parser.parse(" X   0.5  "));
+		var ex1 = assertThrows(ValueParseException.class, ()->parser.parseLine(" X   0.5  "));
 		assertThat(ex1, hasProperty("value", is(" X  ")));
 		assertThat(ex1, hasProperty("message", is("Testing")));
 		
@@ -138,7 +138,7 @@ public class LineParserTest {
 			.string(4, "part1")
 			.string("part2");
 		
-		var result1 = parser.parse("123  67890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 ");
+		var result1 = parser.parseLine("123  67890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 ");
 		
 		assertThat(result1, hasEntry("part1", "123 "));
 		assertThat(result1, hasEntry("part2", " 67890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 "));
@@ -152,7 +152,7 @@ public class LineParserTest {
 			.strippedString(4, "part1")
 			.strippedString("part2");
 		
-		var result1 = parser.parse("123  67890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 ");
+		var result1 = parser.parseLine("123  67890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 ");
 		
 		assertThat(result1, hasEntry("part1", "123"));
 		assertThat(result1, hasEntry("part2", "67890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"));

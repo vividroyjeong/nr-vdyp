@@ -1,5 +1,11 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
+/**
+ * An error while parsing a simple value from a string.
+ * 
+ * @author Kevin Smith, Vivid Solutions
+ *
+ */
 public class ValueParseException extends Exception {
 	
 	private static final long serialVersionUID = 4181384333196602044L;

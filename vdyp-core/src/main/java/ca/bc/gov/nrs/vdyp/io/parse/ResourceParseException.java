@@ -1,5 +1,11 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
+/**
+ * An error parsing a particular line of a multi-line resource
+ * 
+ * @author Kevin Smith, Vivid Solutions
+ *
+ */
 public class ResourceParseException extends Exception {
 
 	private static final long serialVersionUID = 5188546056230073563L;

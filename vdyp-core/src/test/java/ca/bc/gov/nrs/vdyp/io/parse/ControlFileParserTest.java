@@ -8,16 +8,18 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.stringContainsInOrder;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.hamcrest.Matcher;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class ControlFileParserTest {
@@ -212,6 +214,38 @@ public class ControlFileParserTest {
 			);
 		}
 	}
+	
+	@Test
+	void testException() throws Exception {
+		var parser = makeParser();
+
+		String file = "00X Control 1\n002 Control 2";
+		try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
+			ResourceParseException ex1 = Assertions.assertThrows(ResourceParseException.class, ()->parser.parse(is));
+			
+			assertThat(ex1, hasProperty("line", is(1)));
+			assertThat(ex1, hasProperty("cause", instanceOf(ValueParseException.class)));
+			assertThat(ex1, hasProperty("cause", hasProperty("cause", instanceOf(NumberFormatException.class))));
+			assertThat(ex1, hasProperty("cause", hasProperty("value", is("00X"))));
+			assertThat(ex1, hasProperty("message", stringContainsInOrder("line 1", "00X")));
+		}
+	}
+	
+	@Test
+	void testExceptionInControlValueParser() throws Exception {
+		var parser = makeParser();
+		parser.setValueParsers(Collections.singletonMap(2, s->{throw new ValueParseException(s,"Test Exception");}));
+		
+		String file = "001 Control 1\n002 Control 2";
+		try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
+			ResourceParseException ex1 = Assertions.assertThrows(ResourceParseException.class, ()->parser.parse(is));
+			
+			assertThat(ex1, hasProperty("line", is(2)));
+			assertThat(ex1, hasProperty("cause", instanceOf(ValueParseException.class)));
+			assertThat(ex1, hasProperty("cause", hasProperty("value", is("Control 2"))));
+			assertThat(ex1, hasProperty("message", stringContainsInOrder("line 2", "Test Exception")));
+		}
+	}
 
 	@Test
 	void testParseToMap() throws Exception {
@@ -300,15 +334,15 @@ public class ControlFileParserTest {
 		var parser = makeParser();
 		
 		var identifiers = new HashMap<Integer, String>();
-		var parsers = new HashMap<Integer, Function<String, ?>>();
+		var parsers = new HashMap<Integer, ValueParser<?>>();
 
 		identifiers.put(197, "minimums");
-		parsers.put(197, (String s) -> Arrays.stream(s.strip().split("\s+")).map(Float::valueOf).collect(Collectors.toList()));
+		parsers.put(197, ValueParser.list(ValueParser.FLOAT));
 
 		identifiers.put(198, "modifier_file");
 
 		identifiers.put(199, "debugSwitches");
-		parsers.put(199, (String s) -> Arrays.stream(s.strip().split("\s+")).map(Integer::valueOf).collect(Collectors.toList()));
+		parsers.put(199, ValueParser.list(ValueParser.INTEGER));
 
 		parser.setIdentifiers(identifiers);
 		parser.setValueParsers(parsers);

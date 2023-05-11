@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * Parser for control files
@@ -15,7 +14,7 @@ import java.util.function.Function;
  * @author Kevin Smith, Vivid Solutions
  *
  */
-public class ControlFileParser {
+public class ControlFileParser implements ResourceParser<Map<String, Object>> {
 
 	public static final int INDEX_LENGTH = 3;
 	public static final int EXTEND_LENGTH = 1;
@@ -27,8 +26,8 @@ public class ControlFileParser {
 	public static final String COMMENT_MARKER = "!";
 
 	private Map<Integer, String> identifiers;
-	private Map<Integer, Function<String, ?>> valueParsers;
-	private Function<String, ?> defaultValueParser;
+	private Map<Integer, ValueParser<?>> valueParsers;
+	private ValueParser<?> defaultValueParser;
 	
 	LineParser lineParser = new LineParser() {
 
@@ -39,6 +38,10 @@ public class ControlFileParser {
 		@Override
 		public boolean isIgnoredSegment(List<String> segments) {
 			return segments.get(0).isBlank();
+		}
+		@Override
+		public boolean isIgnoredEntry(Map<String, Object> segments) {
+			return 0==(Integer)segments.get("index") || COMMENT_FLAGS.contains(segments.get("extend"));
 		}
 		
 	}
@@ -53,7 +56,7 @@ public class ControlFileParser {
 	 * @param defaultParser a default value parser to use when one can't be found in the value parser map
 	 */
 	public ControlFileParser(
-			Map<Integer, String> identifiers, Map<Integer, Function<String, ?>> parsers, Function<String, ?> defaultParser
+			Map<Integer, String> identifiers, Map<Integer, ValueParser<?>> parsers, ValueParser<?> defaultParser
 	) {
 		this.identifiers = identifiers;
 		this.valueParsers = parsers;
@@ -66,19 +69,14 @@ public class ControlFileParser {
 	public ControlFileParser() {
 		this(Collections.emptyMap(), Collections.emptyMap(), String::strip);
 	}
-
+	
+	@Override
 	public Map<String, Object> parse(InputStream input) throws IOException, ResourceParseException {
 		Map<String, Object> result = new HashMap<>();
 		return lineParser.parse(input, result, (map,r)->{
 			Integer index = (Integer) map.get("index");
 			String extend = (String) map.get("extend");
 			String restOfLine = (String) map.get("restOfLine");
-			// Ignore comments marked with exend flag C
-			if(COMMENT_FLAGS.contains(extend)) return r;
-			// Ignore comments marked with  a blank index
-			if(index==null) return r;
-			// Ignore comment marked with index 0
-			if(index==0) return r;
 			
 			// How long is the control value
 			int controlLength = Math.min(
@@ -98,7 +96,7 @@ public class ControlFileParser {
 					.substring(0, controlLength);
 			
 			String key = identifiers.getOrDefault(index, String.format("%03d", index));
-			Object value = valueParsers.getOrDefault(index, defaultValueParser).apply(controlString);
+			Object value = valueParsers.getOrDefault(index, defaultValueParser).parse(controlString);
 			
 			result.put(key, value);
 			
@@ -116,14 +114,14 @@ public class ControlFileParser {
 	/**
 	 * Set a map of parsers for control values based on the sequence index
 	 */
-	public void setValueParsers(Map<Integer, Function<String, ?>> parsers) {
+	public void setValueParsers(Map<Integer, ValueParser<?>> parsers) {
 		this.valueParsers = parsers;
 	}
 
 	/**
 	 * Set a default value parser to use when one can't be found in the parser map
 	 */
-	public void setDefaultValueParser(Function<String, ?> defaultParser) {
+	public void setDefaultValueParser(ValueParser<?> defaultParser) {
 		this.defaultValueParser = defaultParser;
 	}
 	
