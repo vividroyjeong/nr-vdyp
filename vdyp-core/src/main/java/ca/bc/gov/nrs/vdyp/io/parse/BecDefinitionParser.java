@@ -20,14 +20,14 @@ public class BecDefinitionParser implements ResourceParser<Map<String, BecDefini
 		}
 		
 	}
-		.string(4, "alias")
+		.strippedString(4, "alias")
 		.space(1)
 		.parse(1, "region", (s)->{
 			return Region.fromAlias(Character.toUpperCase(s.charAt(0)))
 					.orElseThrow(()->new ValueParseException(s, s+" is not a valid region identifier"));
 		})
 		.space(1)
-		.string("name");
+		.strippedString("name");
 	
 	@Override
 	public Map<String, BecDefinition> parse(InputStream is) throws IOException, ResourceParseException {
