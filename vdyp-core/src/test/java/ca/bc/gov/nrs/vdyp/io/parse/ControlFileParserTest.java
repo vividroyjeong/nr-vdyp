@@ -234,7 +234,7 @@ public class ControlFileParserTest {
 	@Test
 	void testExceptionInControlValueParser() throws Exception {
 		var parser = makeParser();
-		parser.setValueParsers(Collections.singletonMap(2, s->{throw new ValueParseException(s,"Test Exception");}));
+		parser.record(2, s->{throw new ValueParseException(s,"Test Exception");});
 		
 		String file = "001 Control 1\n002 Control 2";
 		try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
@@ -333,19 +333,10 @@ public class ControlFileParserTest {
 	private ControlFileParser makeConfiguredParser() {
 		var parser = makeParser();
 		
-		var identifiers = new HashMap<Integer, String>();
-		var parsers = new HashMap<Integer, ValueParser<?>>();
-
-		identifiers.put(197, "minimums");
-		parsers.put(197, ValueParser.list(ValueParser.FLOAT));
-
-		identifiers.put(198, "modifier_file");
-
-		identifiers.put(199, "debugSwitches");
-		parsers.put(199, ValueParser.list(ValueParser.INTEGER));
-
-		parser.setIdentifiers(identifiers);
-		parser.setValueParsers(parsers);
+		parser
+			.record(197, "minimums", ValueParser.list(ValueParser.FLOAT))
+			.record(198, "modifier_file")
+			.record(199, "debugSwitches", ValueParser.list(ValueParser.INTEGER));
 		
 		return parser;
 	}

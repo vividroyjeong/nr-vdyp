@@ -50,25 +50,14 @@ public class ControlFileParser implements ResourceParser<Map<String, Object>> {
 		.string("restOfLine");
 
 	/**
-	 * 
-	 * @param identifiers a map from control file sequence index to meaningful names
-	 * @param parsers a map of parsers for control values based on the sequence index
-	 * @param defaultParser a default value parser to use when one can't be found in the value parser map
-	 */
-	public ControlFileParser(
-			Map<Integer, String> identifiers, Map<Integer, ValueParser<?>> parsers, ValueParser<?> defaultParser
-	) {
-		this.identifiers = identifiers;
-		this.valueParsers = parsers;
-		this.defaultValueParser = defaultParser;
-	}
-	
-	/**
-	 * Create a control file parser which does not remap control sequence indexes and which strips leading and trailing whitepsace from values.
+	 * Create a control file parser.
 	 */
 	public ControlFileParser() {
-		this(Collections.emptyMap(), Collections.emptyMap(), String::strip);
+		this.identifiers = new HashMap<>();
+		this.valueParsers = new HashMap<>();
+		this.defaultValueParser = String::strip;
 	}
+
 	
 	@Override
 	public Map<String, Object> parse(InputStream input) throws IOException, ResourceParseException {
@@ -103,20 +92,6 @@ public class ControlFileParser implements ResourceParser<Map<String, Object>> {
 			return result;
 		});
 	}
-	
-	/**
-	 * Set a map from control file sequence index to meaningful names
-	 */
-	public void setIdentifiers(Map<Integer, String> identifiers) {
-		this.identifiers = identifiers;
-	}
-
-	/**
-	 * Set a map of parsers for control values based on the sequence index
-	 */
-	public void setValueParsers(Map<Integer, ValueParser<?>> parsers) {
-		this.valueParsers = parsers;
-	}
 
 	/**
 	 * Set a default value parser to use when one can't be found in the parser map
@@ -125,5 +100,40 @@ public class ControlFileParser implements ResourceParser<Map<String, Object>> {
 		this.defaultValueParser = defaultParser;
 	}
 	
+	/**
+	 * Remap a record index with a meaningful name and parse its value
+	 * @param index
+	 * @param name
+	 * @param parser
+	 * @return
+	 */
+	public ControlFileParser record(int index, String name, ValueParser<?> parser) {
+		record(index, name);
+		record(index, parser);
+		return this;
+	}
 	
+	/**
+	 * Remap a record index with a meaningful name
+	 * @param index
+	 * @param name
+	 * @param parser
+	 * @return
+	 */
+	public ControlFileParser record(int index, String name) {
+		this.identifiers.put(index, name);
+		return this;
+	}
+	
+	/**
+	 * Parse the value of records with the given index
+	 * @param index
+	 * @param name
+	 * @param parser
+	 * @return
+	 */
+	public ControlFileParser record(int index, ValueParser<?> parser) {
+		this.valueParsers.put(index, parser);
+		return this;
+	}
 }
