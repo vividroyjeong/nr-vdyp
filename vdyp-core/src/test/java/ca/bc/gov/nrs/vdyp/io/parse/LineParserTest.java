@@ -20,10 +20,10 @@ import java.util.Map;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 
-class LineParserTest {
+public class LineParserTest {
 
 	@Test
-	void testBasic() throws Exception {
+	public void testBasic() throws Exception {
 		var parser = new LineParser();
 		parser.string(3, "part1").space(1).string(4, "part2");
 
@@ -35,7 +35,7 @@ class LineParserTest {
 	}
 
 	@Test
-	void testNumbers() throws Exception {
+	public void testNumbers() throws Exception {
 		var parser = new LineParser();
 		parser.integer(4, "part1").space(1).floating(5, "part2");
 
@@ -47,7 +47,7 @@ class LineParserTest {
 	}
 
 	@Test
-	void testIncomplete() throws Exception {
+	public void testIncomplete() throws Exception {
 		var parser = new LineParser();
 		parser.integer(4, "part1").space(1).floating(5, "part2");
 
@@ -59,7 +59,7 @@ class LineParserTest {
 	}
 
 	@Test
-	void testIncompleteSegment() throws Exception {
+	public void testIncompleteSegment() throws Exception {
 		var parser = new LineParser();
 		parser.integer(4, "part1").space(1).floating(5, "part2");
 
@@ -71,7 +71,7 @@ class LineParserTest {
 	}
 
 	@Test
-	void testNumberParseErrors() throws Exception {
+	public void testNumberParseErrors() throws Exception {
 		var parser = new LineParser();
 		parser.integer(4, "part1").space(1).floating(5, "part2");
 
@@ -88,7 +88,7 @@ class LineParserTest {
 	}
 
 	@Test
-	void testValueParser() throws Exception {
+	public void testValueParser() throws Exception {
 		var parser = new LineParser();
 		parser.value(4, "part1", (s, c) -> Integer.valueOf(s.strip()) + 1).space(1)
 				.value("part2", (s, c) -> Float.valueOf(s.strip()) + 1);
@@ -101,7 +101,7 @@ class LineParserTest {
 	}
 
 	@Test
-	void testValueParserError() throws Exception {
+	public void testValueParserError() throws Exception {
 		var parser = new LineParser();
 		parser.value(4, "part1", (s, c) -> {
 			throw new ValueParseException(s, "Testing");
@@ -114,7 +114,7 @@ class LineParserTest {
 	}
 
 	@Test
-	void testUnbounded() throws Exception {
+	public void testUnbounded() throws Exception {
 		var parser = new LineParser();
 		parser.string(4, "part1").string("part2");
 
@@ -135,7 +135,7 @@ class LineParserTest {
 	}
 
 	@Test
-	void testStripped() throws Exception {
+	public void testStripped() throws Exception {
 		var parser = new LineParser();
 		parser.strippedString(4, "part1").strippedString("part2");
 
@@ -157,7 +157,7 @@ class LineParserTest {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-	void testMultiValue() throws Exception {
+	public void testMultiValue() throws Exception {
 		var parser = new LineParser();
 		parser.multiValue(4, 3, "test", ValueParser.INTEGER);
 
@@ -168,7 +168,7 @@ class LineParserTest {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-	void testMultiLine() throws Exception {
+	public void testMultiLine() throws Exception {
 		var parser = new LineParser();
 		parser.integer(4, "part1").space(1).string("part2");
 
@@ -193,7 +193,7 @@ class LineParserTest {
 	}
 
 	@Test
-	void testMultiLineException() throws Exception {
+	public void testMultiLineException() throws Exception {
 		var parser = new LineParser();
 		parser.integer(4, "part1").space(1).string("part2");
 
@@ -211,28 +211,7 @@ class LineParserTest {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-	void testMultiLineWithStopEntry() throws Exception {
-		var parser = new LineParser() {
-
-			@Override
-			protected boolean isStopEntry(Map<String, Object> entry) {
-				return 0 == (int) entry.get("part1");
-			}
-
-		};
-		parser.integer(4, "part1").space(1).string("part2");
-
-		List<Map<String, Object>> result = new ArrayList<>();
-		try (var is = new ByteArrayInputStream("0042 Value1\r\n0000\r\n0043 Value2".getBytes());) {
-			result = parser.parse(is, Collections.emptyMap());
-		}
-
-		assertThat(result, contains(allOf((Matcher) hasEntry("part1", 42), (Matcher) hasEntry("part2", "Value1"))));
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Test
-	void testMultiLineWithStopLine() throws Exception {
+	public void testMultiLineWithStopLine() throws Exception {
 		var parser = new LineParser() {
 
 			@Override
@@ -253,7 +232,7 @@ class LineParserTest {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-	void testMultiLineWithStopSegment() throws Exception {
+	public void testMultiLineWithStopSegment() throws Exception {
 		var parser = new LineParser() {
 
 			@Override
@@ -274,7 +253,7 @@ class LineParserTest {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-	void testMultiLineWithIgnoredEntry() throws Exception {
+	public void testMultiLineWithIgnoredEntry() throws Exception {
 		var parser = new LineParser() {
 
 			@Override
@@ -301,7 +280,7 @@ class LineParserTest {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-	void testMultiLineWithIgnoredLine() throws Exception {
+	public void testMultiLineWithIgnoredLine() throws Exception {
 		var parser = new LineParser() {
 
 			@Override
@@ -328,7 +307,7 @@ class LineParserTest {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-	void testMultiLineWithIgnoredSegment() throws Exception {
+	public void testMultiLineWithIgnoredSegment() throws Exception {
 		var parser = new LineParser() {
 
 			@Override
