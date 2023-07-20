@@ -22,8 +22,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
@@ -43,13 +41,12 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
     - name: Build with Maven
-      run: mvn -Pcoverage package verify
+      run: mvn package
     - name: Run Sonar Analysis
       run: mvn sonar:sonar
-        -Pcoverage
+        -Dsonar.login=${{ secrets.SONAR_TOKEN }}
         -Dsonar.host.url=https://sonarcloud.io
         -Dsonar.organization=bcgov-sonarcloud
         -Dsonar.projectKey=bcgov_VDYP
       env:
         GITHUB_TOKEN: ${{ github.token }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
