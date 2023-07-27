@@ -802,7 +802,7 @@ public class Sindxdll {
 							+ "Cent, For. Manage. Note 51, Edmonton, Alberta.",
 					"The height-age (site index) curves were developed from stem analysis of 276 "
 							+ "dominant and co-dominant trembling aspen trees located throughout Alberta. Site "
-							+ "index ranged from about 8 to 25 m at 50 years breast-height age and included trees "
+							+ "index ranged from about 8 to 25m at 50 years breast-height age and included trees "
 							+ "up to 140 years old.", },
 			{
 					/* SI_AT_GOUDIE */
