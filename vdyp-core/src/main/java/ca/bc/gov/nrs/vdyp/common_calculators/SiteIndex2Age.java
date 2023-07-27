@@ -181,6 +181,9 @@ public class SiteIndex2Age {
 			x1 = site_index / 30.48;
 			x2 = -0.477762 + x1 * (-0.894427 + x1 * (0.793548 - x1 * 0.171666));
 			x3 = ppow(50.0 + y2bh, x2);
+			if((ppow(y2bh, x2) - x3)== 0){
+				throw new ArithmeticException("Attempted Division by zero");
+			}
 			x4 = llog(1.372 / site_index) / (ppow(y2bh, x2) - x3);
 
 			x1 = llog(site_height / site_index) / x4 + x3;
@@ -365,6 +368,7 @@ public class SiteIndex2Age {
 					age = SI_ERR_NO_ANS;
 				}
 			}
+			break;
 			// Couldn't find constant
 			/*
 			 * case SI_PF_GOUDIE_DRY: if (site_height < 1.3){ age = y2bh * ppow (site_height
@@ -434,6 +438,7 @@ public class SiteIndex2Age {
 					age = SI_ERR_NO_ANS;
 				}
 			}
+			break;
 			// Couldn't find constant
 			/*
 			 * case SI_SE_GOUDIE_PLA: if (site_height < 1.3){ age = y2bh * ppow (site_height
@@ -501,6 +506,7 @@ public class SiteIndex2Age {
 					age = SI_ERR_NO_ANS;
 				}
 			}
+			break;
 
 		case SI_SW_GOUDIE_NAT:
 			if (site_height < 1.3) {
@@ -533,6 +539,7 @@ public class SiteIndex2Age {
 					age = SI_ERR_NO_ANS;
 				}
 			}
+			break;
 		case SI_BL_THROWERGI:
 			age = gi_iterate(cu_index, site_height, age_type, site_index);
 			break;
@@ -583,13 +590,15 @@ public class SiteIndex2Age {
 				try {
 					// Open the file for writing
 					File testfile = new File("si2age.tst");
-					FileWriter fileWriter = new FileWriter(testfile);
+
+					try(FileWriter fileWriter = new FileWriter(testfile)){
 
 					// Write to the file
 					fileWriter.write("before iterate()\n");
 
 					// Close the file
 					fileWriter.close();
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -601,14 +610,16 @@ public class SiteIndex2Age {
 		if (TEST) {
 			try {
 				File testfile = new File("si2age.tst");
+				
 				// Open the file for writing
-				FileWriter fileWriter = new FileWriter(testfile, true);
+				try(FileWriter fileWriter = new FileWriter(testfile, true)){
 
 				// Write the final age to the file
 				fileWriter.write("final age: " + age);
 
 				// Close the file
 				fileWriter.close();
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -642,7 +653,8 @@ public class SiteIndex2Age {
 				try {
 					// Open the file for writing
 					File testfile = new File("si2age.tst");
-					FileWriter fileWriter = new FileWriter(testfile, true);
+
+					try(FileWriter fileWriter = new FileWriter(testfile, true)){
 
 					// Write to the file
 					fileWriter.write(
@@ -654,6 +666,7 @@ public class SiteIndex2Age {
 
 					// Close the file
 					fileWriter.close();
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -670,13 +683,14 @@ public class SiteIndex2Age {
 					try {
 						// Open the file for writing
 						File testfile = new File("si2age.tst");
-						FileWriter fileWriter = new FileWriter(testfile, true);
+						try(FileWriter fileWriter = new FileWriter(testfile, true)){
 
 						// Write to the file
 						fileWriter.write(String.format("index_to_height()=%.2f%n", test_ht));
 
 						// Close the file
 						fileWriter.close();
+						}
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -723,13 +737,14 @@ public class SiteIndex2Age {
 					try {
 						// Open the file for writing
 						File testfile = new File("si2age.tst");
-						FileWriter fileWriter = new FileWriter(testfile, true);
+						try(FileWriter fileWriter = new FileWriter(testfile, true)){
 
 						// Write to the file
 						fileWriter.write(String.format("Failed due to age too high (> 999).\n"));
 
 						// Close the file
 						fileWriter.close();
+						}
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -776,7 +791,7 @@ public class SiteIndex2Age {
 				try {
 					// Open the file for writing
 					File testfile = new File("si2age.tst");
-					FileWriter fileWriter = new FileWriter(testfile, true);
+					try(FileWriter fileWriter = new FileWriter(testfile, true)){
 
 					// Write to the file
 					fileWriter
@@ -784,6 +799,7 @@ public class SiteIndex2Age {
 
 					// Close the file
 					fileWriter.close();
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -796,13 +812,14 @@ public class SiteIndex2Age {
 				try {
 					// Open the file for writing
 					File testfile = new File("si2age.tst");
-					FileWriter fileWriter = new FileWriter(testfile, true);
+					try(FileWriter fileWriter = new FileWriter(testfile, true)){
 
 					// Write to the file
 					fileWriter.write(String.format("height_to_index()=%f\n", test_site));
 
 					// Close the file
 					fileWriter.close();
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
