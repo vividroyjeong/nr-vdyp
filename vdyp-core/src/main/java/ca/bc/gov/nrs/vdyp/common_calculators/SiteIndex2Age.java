@@ -181,10 +181,11 @@ public class SiteIndex2Age {
 			x1 = site_index / 30.48;
 			x2 = -0.477762 + x1 * (-0.894427 + x1 * (0.793548 - x1 * 0.171666));
 			x3 = ppow(50.0 + y2bh, x2);
-			if((ppow(y2bh, x2) - x3)== 0){
+			double x4Denominator = ppow(y2bh, x2) - x3;
+			if(x4Denominator == 0){
 				throw new ArithmeticException("Attempted Division by zero");
 			}
-			x4 = llog(1.372 / site_index) / (ppow(y2bh, x2) - x3);
+			x4 = llog(1.372 / site_index) / x4Denominator;
 
 			x1 = llog(site_height / site_index) / x4 + x3;
 			if (x1 < 0) {
@@ -600,7 +601,7 @@ public class SiteIndex2Age {
 					fileWriter.close();
 					}
 				} catch (IOException e) {
-					e.printStackTrace();
+					throw new RuntimeException("An error occurred while writing to the file.", e);
 				}
 			}
 			age = iterate(cu_index, site_height, age_type, site_index, y2bh);
@@ -621,7 +622,7 @@ public class SiteIndex2Age {
 				fileWriter.close();
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				throw new RuntimeException("An error occurred while writing to the file.", e);
 			}
 		}
 		if (age == SI_ERR_NO_ANS) {
@@ -668,7 +669,7 @@ public class SiteIndex2Age {
 					fileWriter.close();
 					}
 				} catch (IOException e) {
-					e.printStackTrace();
+					throw new RuntimeException("An error occurred while writing to the file.", e);
 				}
 			}
 
@@ -692,7 +693,7 @@ public class SiteIndex2Age {
 						fileWriter.close();
 						}
 					} catch (IOException e) {
-						e.printStackTrace();
+						throw new RuntimeException("An error occurred while writing to the file.", e);
 					}
 				}
 			} catch (NoAnswerException e) { /* height > 999 */
@@ -746,7 +747,7 @@ public class SiteIndex2Age {
 						fileWriter.close();
 						}
 					} catch (IOException e) {
-						e.printStackTrace();
+						throw new RuntimeException("An error occurred while writing to the file.", e);
 					}
 				}
 				break;
@@ -801,7 +802,7 @@ public class SiteIndex2Age {
 					fileWriter.close();
 					}
 				} catch (IOException e) {
-					e.printStackTrace();
+					throw new RuntimeException("An error occurred while writing to the file.", e);
 				}
 
 			}
@@ -821,7 +822,7 @@ public class SiteIndex2Age {
 					fileWriter.close();
 					}
 				} catch (IOException e) {
-					e.printStackTrace();
+					throw new RuntimeException("An error occurred while writing to the file.", e);
 				}
 			}
 
