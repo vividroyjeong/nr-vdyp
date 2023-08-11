@@ -182,7 +182,7 @@ public class SiteIndex2Age {
 			x2 = -0.477762 + x1 * (-0.894427 + x1 * (0.793548 - x1 * 0.171666));
 			x3 = ppow(50.0 + y2bh, x2);
 			double x4Denominator = ppow(y2bh, x2) - x3;
-			if(x4Denominator == 0){
+			if (x4Denominator == 0) {
 				throw new ArithmeticException("Attempted Division by zero");
 			}
 			x4 = llog(1.372 / site_index) / x4Denominator;
@@ -370,44 +370,44 @@ public class SiteIndex2Age {
 				}
 			}
 			break;
-			// Couldn't find constant
-			/*
-			 * case SI_PF_GOUDIE_DRY: if (site_height < 1.3){ age = y2bh * ppow (site_height
-			 * / 1.3, 0.5);
-			 *
-			 * if (age_type == SI_AT_BREAST){ age -= y2bh; }
-			 *
-			 * if (age < 0.0){ age = 0.0; } } else{ x1 = -1.00726; x2 = 7.81498; x3 =
-			 * -1.28517;
-			 *
-			 * a = (site_index - 1.3) * (1 + Math.exp (x2 + x1 * llog (site_index - 1.3) +
-			 * x3 * Math.log(50.0))); b = x2 + x1 * llog (site_index - 1.3);
-			 *
-			 * age = Math.exp ((llog (a / (site_height - 1.3) - 1) - b) / x3);
-			 *
-			 * if (age_type == SI_AT_TOTAL){ age += y2bh; }
-			 *
-			 * if (age < 0){ age = 0; } else if (age > MAX_AGE){ age = SI_ERR_NO_ANS; } }
-			 */
-			// Couldn't find constant
-			/*
-			 * case SI_PF_GOUDIE_WET: if (site_height < 1.3){ age = y2bh * ppow (site_height
-			 * / 1.3, 0.5);
-			 *
-			 * if (age_type == SI_AT_BREAST){ age -= y2bh; }
-			 *
-			 * if (age < 0.0){ age = 0.0; } } else{ x1 = -0.935; x2 = 7.81498; x3 =
-			 * -1.28517;
-			 *
-			 * a = (site_index - 1.3) * (1 + Math.exp (x2 + x1 * llog (site_index - 1.3) +
-			 * x3 * Math.log(50.0))); b = x2 + x1 * llog (site_index - 1.3);
-			 *
-			 * age = Math.exp ((llog (a / (site_height - 1.3) - 1) - b) / x3);
-			 *
-			 * if (age_type == SI_AT_TOTAL){ age += y2bh; }
-			 *
-			 * if (age < 0){ age = 0; } else if (age > MAX_AGE){ age = SI_ERR_NO_ANS; } }
-			 */
+		// Couldn't find constant
+		/*
+		 * case SI_PF_GOUDIE_DRY: if (site_height < 1.3){ age = y2bh * ppow (site_height
+		 * / 1.3, 0.5);
+		 *
+		 * if (age_type == SI_AT_BREAST){ age -= y2bh; }
+		 *
+		 * if (age < 0.0){ age = 0.0; } } else{ x1 = -1.00726; x2 = 7.81498; x3 =
+		 * -1.28517;
+		 *
+		 * a = (site_index - 1.3) * (1 + Math.exp (x2 + x1 * llog (site_index - 1.3) +
+		 * x3 * Math.log(50.0))); b = x2 + x1 * llog (site_index - 1.3);
+		 *
+		 * age = Math.exp ((llog (a / (site_height - 1.3) - 1) - b) / x3);
+		 *
+		 * if (age_type == SI_AT_TOTAL){ age += y2bh; }
+		 *
+		 * if (age < 0){ age = 0; } else if (age > MAX_AGE){ age = SI_ERR_NO_ANS; } }
+		 */
+		// Couldn't find constant
+		/*
+		 * case SI_PF_GOUDIE_WET: if (site_height < 1.3){ age = y2bh * ppow (site_height
+		 * / 1.3, 0.5);
+		 *
+		 * if (age_type == SI_AT_BREAST){ age -= y2bh; }
+		 *
+		 * if (age < 0.0){ age = 0.0; } } else{ x1 = -0.935; x2 = 7.81498; x3 =
+		 * -1.28517;
+		 *
+		 * a = (site_index - 1.3) * (1 + Math.exp (x2 + x1 * llog (site_index - 1.3) +
+		 * x3 * Math.log(50.0))); b = x2 + x1 * llog (site_index - 1.3);
+		 *
+		 * age = Math.exp ((llog (a / (site_height - 1.3) - 1) - b) / x3);
+		 *
+		 * if (age_type == SI_AT_TOTAL){ age += y2bh; }
+		 *
+		 * if (age < 0){ age = 0; } else if (age > MAX_AGE){ age = SI_ERR_NO_ANS; } }
+		 */
 		case SI_SS_GOUDIE:
 			if (site_height < 1.3) {
 				age = y2bh * ppow(site_height / 1.3, 0.5);
@@ -440,42 +440,42 @@ public class SiteIndex2Age {
 				}
 			}
 			break;
-			// Couldn't find constant
-			/*
-			 * case SI_SE_GOUDIE_PLA: if (site_height < 1.3){ age = y2bh * ppow (site_height
-			 * / 1.3, 0.5);
-			 *
-			 * if (age_type == SI_AT_BREAST){ age -= y2bh; }
-			 *
-			 * if (age < 0.0){ age = 0.0; } } else{ x1 = -1.2866; x2 = 9.7936; x3 = -1.4661;
-			 *
-			 * a = (site_index - 1.3) * (1 + Math.exp (x2 + x1 * llog (site_index - 1.3) +
-			 * x3 * Math.log(50.0))); b = x2 + x1 * llog (site_index - 1.3);
-			 *
-			 * age = Math.exp ((llog (a / (site_height - 1.3) - 1) - b) / x3);
-			 *
-			 * if (age_type == SI_AT_TOTAL){ age += y2bh; }
-			 *
-			 * if (age < 0){ age = 0; } else if (age > MAX_AGE){ age = SI_ERR_NO_ANS; } }
-			 */
-			// Couldn't find constant
-			/*
-			 * case SI_SE_GOUDIE_NAT: if (site_height < 1.3){ age = y2bh * ppow (site_height
-			 * / 1.3, 0.5);
-			 *
-			 * if (age_type == SI_AT_BREAST){ age -= y2bh; }
-			 *
-			 * if (age < 0.0){ age = 0.0; } } else{ x1 = -1.2866; x2 = 9.7936; x3 = -1.4661;
-			 *
-			 * a = (site_index - 1.3) * (1 + Math.exp (x2 + x1 * llog (site_index - 1.3) +
-			 * x3 * Math.log(50.0))); b = x2 + x1 * llog (site_index - 1.3);
-			 *
-			 * age = Math.exp ((llog (a / (site_height - 1.3) - 1) - b) / x3);
-			 *
-			 * if (age_type == SI_AT_TOTAL){ age += y2bh; }
-			 *
-			 * if (age < 0){ age = 0; } else if (age > MAX_AGE){ age = SI_ERR_NO_ANS; } }
-			 */
+		// Couldn't find constant
+		/*
+		 * case SI_SE_GOUDIE_PLA: if (site_height < 1.3){ age = y2bh * ppow (site_height
+		 * / 1.3, 0.5);
+		 *
+		 * if (age_type == SI_AT_BREAST){ age -= y2bh; }
+		 *
+		 * if (age < 0.0){ age = 0.0; } } else{ x1 = -1.2866; x2 = 9.7936; x3 = -1.4661;
+		 *
+		 * a = (site_index - 1.3) * (1 + Math.exp (x2 + x1 * llog (site_index - 1.3) +
+		 * x3 * Math.log(50.0))); b = x2 + x1 * llog (site_index - 1.3);
+		 *
+		 * age = Math.exp ((llog (a / (site_height - 1.3) - 1) - b) / x3);
+		 *
+		 * if (age_type == SI_AT_TOTAL){ age += y2bh; }
+		 *
+		 * if (age < 0){ age = 0; } else if (age > MAX_AGE){ age = SI_ERR_NO_ANS; } }
+		 */
+		// Couldn't find constant
+		/*
+		 * case SI_SE_GOUDIE_NAT: if (site_height < 1.3){ age = y2bh * ppow (site_height
+		 * / 1.3, 0.5);
+		 *
+		 * if (age_type == SI_AT_BREAST){ age -= y2bh; }
+		 *
+		 * if (age < 0.0){ age = 0.0; } } else{ x1 = -1.2866; x2 = 9.7936; x3 = -1.4661;
+		 *
+		 * a = (site_index - 1.3) * (1 + Math.exp (x2 + x1 * llog (site_index - 1.3) +
+		 * x3 * Math.log(50.0))); b = x2 + x1 * llog (site_index - 1.3);
+		 *
+		 * age = Math.exp ((llog (a / (site_height - 1.3) - 1) - b) / x3);
+		 *
+		 * if (age_type == SI_AT_TOTAL){ age += y2bh; }
+		 *
+		 * if (age < 0){ age = 0; } else if (age > MAX_AGE){ age = SI_ERR_NO_ANS; } }
+		 */
 		case SI_SW_GOUDIE_PLA:
 			if (site_height < 1.3) {
 				age = y2bh * ppow(site_height / 1.3, 0.5);
@@ -592,13 +592,13 @@ public class SiteIndex2Age {
 					// Open the file for writing
 					File testfile = new File("si2age.tst");
 
-					try(FileWriter fileWriter = new FileWriter(testfile)){
+					try (FileWriter fileWriter = new FileWriter(testfile)) {
 
-					// Write to the file
-					fileWriter.write("before iterate()\n");
+						// Write to the file
+						fileWriter.write("before iterate()\n");
 
-					// Close the file
-					fileWriter.close();
+						// Close the file
+						fileWriter.close();
 					}
 				} catch (IOException e) {
 					throw new RuntimeException("An error occurred while writing to the file.", e);
@@ -611,15 +611,15 @@ public class SiteIndex2Age {
 		if (TEST) {
 			try {
 				File testfile = new File("si2age.tst");
-				
+
 				// Open the file for writing
-				try(FileWriter fileWriter = new FileWriter(testfile, true)){
+				try (FileWriter fileWriter = new FileWriter(testfile, true)) {
 
-				// Write the final age to the file
-				fileWriter.write("final age: " + age);
+					// Write the final age to the file
+					fileWriter.write("final age: " + age);
 
-				// Close the file
-				fileWriter.close();
+					// Close the file
+					fileWriter.close();
 				}
 			} catch (IOException e) {
 				throw new RuntimeException("An error occurred while writing to the file.", e);
@@ -655,18 +655,18 @@ public class SiteIndex2Age {
 					// Open the file for writing
 					File testfile = new File("si2age.tst");
 
-					try(FileWriter fileWriter = new FileWriter(testfile, true)){
+					try (FileWriter fileWriter = new FileWriter(testfile, true)) {
 
-					// Write to the file
-					fileWriter.write(
-							String.format(
-									"before index_to_height(age=%.2f, age_type=%d, site_index=%.2f, y2bh=%.2f)%n",
-									si2age, age_type, site_index, y2bh
-							)
-					);
+						// Write to the file
+						fileWriter.write(
+								String.format(
+										"before index_to_height(age=%.2f, age_type=%d, site_index=%.2f, y2bh=%.2f)%n",
+										si2age, age_type, site_index, y2bh
+								)
+						);
 
-					// Close the file
-					fileWriter.close();
+						// Close the file
+						fileWriter.close();
 					}
 				} catch (IOException e) {
 					throw new RuntimeException("An error occurred while writing to the file.", e);
@@ -684,13 +684,13 @@ public class SiteIndex2Age {
 					try {
 						// Open the file for writing
 						File testfile = new File("si2age.tst");
-						try(FileWriter fileWriter = new FileWriter(testfile, true)){
+						try (FileWriter fileWriter = new FileWriter(testfile, true)) {
 
-						// Write to the file
-						fileWriter.write(String.format("index_to_height()=%.2f%n", test_ht));
+							// Write to the file
+							fileWriter.write(String.format("index_to_height()=%.2f%n", test_ht));
 
-						// Close the file
-						fileWriter.close();
+							// Close the file
+							fileWriter.close();
 						}
 					} catch (IOException e) {
 						throw new RuntimeException("An error occurred while writing to the file.", e);
@@ -738,13 +738,13 @@ public class SiteIndex2Age {
 					try {
 						// Open the file for writing
 						File testfile = new File("si2age.tst");
-						try(FileWriter fileWriter = new FileWriter(testfile, true)){
+						try (FileWriter fileWriter = new FileWriter(testfile, true)) {
 
-						// Write to the file
-						fileWriter.write(String.format("Failed due to age too high (> 999).\n"));
+							// Write to the file
+							fileWriter.write(String.format("Failed due to age too high (> 999).\n"));
 
-						// Close the file
-						fileWriter.close();
+							// Close the file
+							fileWriter.close();
 						}
 					} catch (IOException e) {
 						throw new RuntimeException("An error occurred while writing to the file.", e);
@@ -792,14 +792,15 @@ public class SiteIndex2Age {
 				try {
 					// Open the file for writing
 					File testfile = new File("si2age.tst");
-					try(FileWriter fileWriter = new FileWriter(testfile, true)){
+					try (FileWriter fileWriter = new FileWriter(testfile, true)) {
 
-					// Write to the file
-					fileWriter
-							.write(String.format("before height_to_index(age=%f, site_height=%f)\n", age, site_height));
+						// Write to the file
+						fileWriter.write(
+								String.format("before height_to_index(age=%f, site_height=%f)\n", age, site_height)
+						);
 
-					// Close the file
-					fileWriter.close();
+						// Close the file
+						fileWriter.close();
 					}
 				} catch (IOException e) {
 					throw new RuntimeException("An error occurred while writing to the file.", e);
@@ -813,13 +814,13 @@ public class SiteIndex2Age {
 				try {
 					// Open the file for writing
 					File testfile = new File("si2age.tst");
-					try(FileWriter fileWriter = new FileWriter(testfile, true)){
+					try (FileWriter fileWriter = new FileWriter(testfile, true)) {
 
-					// Write to the file
-					fileWriter.write(String.format("height_to_index()=%f\n", test_site));
+						// Write to the file
+						fileWriter.write(String.format("height_to_index()=%f\n", test_site));
 
-					// Close the file
-					fileWriter.close();
+						// Close the file
+						fileWriter.close();
 					}
 				} catch (IOException e) {
 					throw new RuntimeException("An error occurred while writing to the file.", e);
