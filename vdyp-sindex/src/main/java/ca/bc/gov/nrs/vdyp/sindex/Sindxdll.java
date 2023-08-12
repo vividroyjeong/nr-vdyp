@@ -2558,7 +2558,7 @@ public class Sindxdll {
 		case SI_SPEC_ZH:
 			return 0x00;
 		}
-		throw new SpeciesErrorException("Input parameter is not a valid species index: " + sp_index);
+		throw new SpeciesErrorException("Input parameter is not a valid species index: " + sp_index); // not reachable?
 
 	}
 
