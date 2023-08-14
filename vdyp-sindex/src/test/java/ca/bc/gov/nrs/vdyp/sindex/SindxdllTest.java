@@ -5,9 +5,9 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
-public class SindxdllTest {
+class SindxdllTest {
 	/*
 	 * establishment types
 	 */
@@ -307,899 +307,942 @@ public class SindxdllTest {
 		assertEquals(expectedValue, actualValue);
 	}
 
-	@Test
-	void testNextSpeciesValidIndex() {
-		short inputIndex = 2; // Choose a valid index for testing
-		short expectedOutput = (short) (inputIndex + 1);
-
-		short actualOutput = Sindxdll.NextSpecies(inputIndex);
-
-		assertEquals(expectedOutput, actualOutput, "NextSpecies should return the next species index");
-	}
-
-	@Test
-	void testNextSpeciesTooSmallIndex() {
-		short invalidIndex = -1; // Choose an invalid index for testing
-		assertThrows(
-				SpeciesErrorException.class, () -> Sindxdll.NextSpecies(invalidIndex),
-				"NextSpecies should throw SpeciesErrorException for invalid index"
-		);
-	}
-
-	@Test
-	void testNextSpeciesTooBigIndex() {
-		short invalidIndex = 135; // Choose an invalid index for testing
-		assertThrows(
-				SpeciesErrorException.class, () -> Sindxdll.NextSpecies(invalidIndex),
-				"NextSpecies should throw SpeciesErrorException for invalid index"
-		);
-	}
-
-	@Test
-	void testNextSpeciesLastIndex() {
-		short lastIndex = 134; // Use the value of SI_SPEC_END for testing
-		assertThrows(
-				NoAnswerException.class, () -> Sindxdll.NextSpecies(lastIndex),
-				"NextSpecies should throw NoAnswerException for last defined species index"
-		);
-	}
-
-	@Test
-	void testSpecCodeTooSmallIndex() {
-		short invalidIndex = -1; // Choose an invalid index for testing
-		assertThrows(
-				IllegalArgumentException.class, () -> Sindxdll.SpecCode(invalidIndex),
-				"SpecCode should throw IllegalArgumentException for invalid index"
-		);
-	}
-
-	@Test
-	void testSpecCodeTooBigIndex() {
-		short invalidIndex = 135; // Choose an invalid index for testing
-		assertThrows(
-				IllegalArgumentException.class, () -> Sindxdll.SpecCode(invalidIndex),
-				"SpecCode should throw IllegalArgumentException for invalid index"
-		);
-	}
-
-	@Test
-	void testSpecUseTooSmallIndex() {
-		short invalidIndex = -1; // Choose an invalid index for testing
-		assertThrows(
-				SpeciesErrorException.class, () -> Sindxdll.SpecUse(invalidIndex),
-				"SpecUse should throw SpeciesErrorException for invalid index"
-		);
-	}
-
-	@Test
-	void testSpecUseTooBigIndex() {
-		short invalidIndex = 135; // Choose an invalid index for testing
-		assertThrows(
-				SpeciesErrorException.class, () -> Sindxdll.SpecUse(invalidIndex),
-				"SpecUse should throw SpeciesErrorException for invalid index"
-		);
-	}
-
-	private void testSpecUseHelper(int inputIndex, int expectedValue) { // helper function to reduce repetive code
-		short actualValue = Sindxdll.SpecUse((short) inputIndex);
-		assertEquals((int) actualValue, expectedValue);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_A() {
-		testSpecUseHelper(SI_SPEC_A, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_ABAL() {
-		testSpecUseHelper(SI_SPEC_ABAL, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_ABCO() {
-		testSpecUseHelper(SI_SPEC_ABCO, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_AC() {
-		testSpecUseHelper(SI_SPEC_AC, 0x04);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_ACB() {
-		testSpecUseHelper(SI_SPEC_ACB, 0x07);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_ACT() {
-		testSpecUseHelper(SI_SPEC_ACT, 0x04);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_AD() {
-		testSpecUseHelper(SI_SPEC_AD, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_AH() {
-		testSpecUseHelper(SI_SPEC_AH, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_AT() {
-		testSpecUseHelper(SI_SPEC_AT, 0x06);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_AX() {
-		testSpecUseHelper(SI_SPEC_AX, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_B() {
-		testSpecUseHelper(SI_SPEC_B, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_BA() {
-		testSpecUseHelper(SI_SPEC_BA, 0x05);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_BB() {
-		testSpecUseHelper(SI_SPEC_BB, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_BC() {
-		testSpecUseHelper(SI_SPEC_BC, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_BG() {
-		testSpecUseHelper(SI_SPEC_BG, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_BI() {
-		testSpecUseHelper(SI_SPEC_BI, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_BL() {
-		testSpecUseHelper(SI_SPEC_BL, 0x06);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_BM() {
-		testSpecUseHelper(SI_SPEC_BM, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_BP() {
-		testSpecUseHelper(SI_SPEC_BP, 0x05);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_C() {
-		testSpecUseHelper(SI_SPEC_C, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_CI() {
-		testSpecUseHelper(SI_SPEC_CI, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_CP() {
-		testSpecUseHelper(SI_SPEC_CP, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_CW() {
-		testSpecUseHelper(SI_SPEC_CW, 0x05);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_CWC() {
-		testSpecUseHelper(SI_SPEC_CWC, 0x05);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_CWI() {
-		testSpecUseHelper(SI_SPEC_CWI, 0x06);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_CY() {
-		testSpecUseHelper(SI_SPEC_CY, 0x01);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_D() {
-		testSpecUseHelper(SI_SPEC_D, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_DG() {
-		testSpecUseHelper(SI_SPEC_DG, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_DM() {
-		testSpecUseHelper(SI_SPEC_DM, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_DR() {
-		testSpecUseHelper(SI_SPEC_DR, 0x05);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_E() {
-		testSpecUseHelper(SI_SPEC_E, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_EA() {
-		testSpecUseHelper(SI_SPEC_EA, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_EB() {
-		testSpecUseHelper(SI_SPEC_EB, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_EE() {
-		testSpecUseHelper(SI_SPEC_EE, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_EP() {
-		testSpecUseHelper(SI_SPEC_EP, 0x06);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_ES() {
-		testSpecUseHelper(SI_SPEC_ES, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_EW() {
-		testSpecUseHelper(SI_SPEC_EW, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_EXP() {
-		testSpecUseHelper(SI_SPEC_EXP, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_FD() {
-		testSpecUseHelper(SI_SPEC_FD, 0x05);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_FDC() {
-		testSpecUseHelper(SI_SPEC_FDC, 0x05);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_FDI() {
-		testSpecUseHelper(SI_SPEC_FDI, 0x06);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_G() {
-		testSpecUseHelper(SI_SPEC_G, 0x01);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_GP() {
-		testSpecUseHelper(SI_SPEC_GP, 0x01);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_GR() {
-		testSpecUseHelper(SI_SPEC_GR, 0x01);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_H() { // TODO: shorten these like others
-		testSpecUseHelper(SI_SPEC_H, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_HM() {
-		testSpecUseHelper(SI_SPEC_HM, 0x05);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_HW() {
-		testSpecUseHelper(SI_SPEC_HW, 0x05);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_HWC() {
-		testSpecUseHelper(SI_SPEC_HWC, 0x05);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_HWI() {
-		testSpecUseHelper(SI_SPEC_HWI, 0x06);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_HXM() {
-		testSpecUseHelper(SI_SPEC_HXM, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_IG() {
-		testSpecUseHelper(SI_SPEC_IG, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_IS() {
-		testSpecUseHelper(SI_SPEC_IS, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_J() {
-		testSpecUseHelper(SI_SPEC_J, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_JR() {
-		testSpecUseHelper(SI_SPEC_JR, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_K() {
-		testSpecUseHelper(SI_SPEC_K, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_KC() {
-		testSpecUseHelper(SI_SPEC_KC, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_L() {
-		testSpecUseHelper(SI_SPEC_L, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_LA() {
-		testSpecUseHelper(SI_SPEC_LA, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_LE() {
-		testSpecUseHelper(SI_SPEC_LE, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_LT() {
-		testSpecUseHelper(SI_SPEC_LT, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_LW() {
-		testSpecUseHelper(SI_SPEC_LW, 0x06);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_M() {
-		testSpecUseHelper(SI_SPEC_M, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_MB() {
-		testSpecUseHelper(SI_SPEC_MB, 0x01);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_ME() {
-		testSpecUseHelper(SI_SPEC_ME, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_MN() {
-		testSpecUseHelper(SI_SPEC_MN, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_MR() {
-		testSpecUseHelper(SI_SPEC_MR, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_MS() {
-		testSpecUseHelper(SI_SPEC_MS, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_MV() {
-		testSpecUseHelper(SI_SPEC_MV, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_OA() {
-		testSpecUseHelper(SI_SPEC_OA, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_OB() {
-		testSpecUseHelper(SI_SPEC_OB, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_OC() {
-		testSpecUseHelper(SI_SPEC_OC, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_OD() {
-		testSpecUseHelper(SI_SPEC_OD, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_OE() {
-		testSpecUseHelper(SI_SPEC_OE, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_OF() {
-		testSpecUseHelper(SI_SPEC_OF, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_OG() {
-		testSpecUseHelper(SI_SPEC_OG, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_P() {
-		testSpecUseHelper(SI_SPEC_P, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_PA() {
-		testSpecUseHelper(SI_SPEC_PA, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_PF() {
-		testSpecUseHelper(SI_SPEC_PF, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_PJ() {
-		testSpecUseHelper(SI_SPEC_PJ, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_PL() {
-		testSpecUseHelper(SI_SPEC_PL, 0x06);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_PLC() {
-		testSpecUseHelper(SI_SPEC_PLC, 0x01);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_PLI() {
-		testSpecUseHelper(SI_SPEC_PLI, 0x06);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_PM() {
-		testSpecUseHelper(SI_SPEC_PM, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_PR() {
-		testSpecUseHelper(SI_SPEC_PR, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_PS() {
-		testSpecUseHelper(SI_SPEC_PS, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_PW() {
-		testSpecUseHelper(SI_SPEC_PW, 0x04);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_PXJ() {
-		testSpecUseHelper(SI_SPEC_PXJ, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_PY() {
-		testSpecUseHelper(SI_SPEC_PY, 0x06);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_Q() {
-		testSpecUseHelper(SI_SPEC_Q, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_QE() {
-		testSpecUseHelper(SI_SPEC_QE, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_QG() {
-		testSpecUseHelper(SI_SPEC_QG, 0x01);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_R() {
-		testSpecUseHelper(SI_SPEC_R, 0x01);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_RA() {
-		testSpecUseHelper(SI_SPEC_RA, 0x01);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_S() {
-		testSpecUseHelper(SI_SPEC_S, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_SA() {
-		testSpecUseHelper(SI_SPEC_SA, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_SB() {
-		testSpecUseHelper(SI_SPEC_SB, 0x06);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_SE() {
-		testSpecUseHelper(SI_SPEC_SE, 0x06);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_SI() {
-		testSpecUseHelper(SI_SPEC_SI, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_SN() {
-		testSpecUseHelper(SI_SPEC_SN, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_SS() {
-		testSpecUseHelper(SI_SPEC_SS, 0x05);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_SW() {
-		testSpecUseHelper(SI_SPEC_SW, 0x06);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_SX() {
-		testSpecUseHelper(SI_SPEC_SX, 0x06);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_SXB() {
-		testSpecUseHelper(SI_SPEC_SXB, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_SXE() {
-		testSpecUseHelper(SI_SPEC_SXE, 0x01);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_SXL() {
-		testSpecUseHelper(SI_SPEC_SXL, 0x01);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_SXS() {
-		testSpecUseHelper(SI_SPEC_SXS, 0x01);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_SXW() {
-		testSpecUseHelper(SI_SPEC_SXW, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_SXX() {
-		testSpecUseHelper(SI_SPEC_SXX, 0x02);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_T() {
-		testSpecUseHelper(SI_SPEC_T, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_TW() {
-		testSpecUseHelper(SI_SPEC_TW, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_U() {
-		testSpecUseHelper(SI_SPEC_U, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_UA() {
-		testSpecUseHelper(SI_SPEC_UA, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_UP() {
-		testSpecUseHelper(SI_SPEC_UP, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_V() {
-		testSpecUseHelper(SI_SPEC_V, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_VB() {
-		testSpecUseHelper(SI_SPEC_VB, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_VP() {
-		testSpecUseHelper(SI_SPEC_VP, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_VS() {
-		testSpecUseHelper(SI_SPEC_VS, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_VV() {
-		testSpecUseHelper(SI_SPEC_VV, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_W() {
-		testSpecUseHelper(SI_SPEC_W, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_WA() {
-		testSpecUseHelper(SI_SPEC_WA, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_WB() {
-		testSpecUseHelper(SI_SPEC_WB, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_WD() {
-		testSpecUseHelper(SI_SPEC_WD, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_WI() {
-		testSpecUseHelper(SI_SPEC_WI, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_WP() {
-		testSpecUseHelper(SI_SPEC_WP, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_WS() {
-		testSpecUseHelper(SI_SPEC_WS, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_WT() {
-		testSpecUseHelper(SI_SPEC_WT, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_X() {
-		testSpecUseHelper(SI_SPEC_X, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_XC() {
-		testSpecUseHelper(SI_SPEC_XC, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_XH() {
-		testSpecUseHelper(SI_SPEC_XH, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_Y() {
-		testSpecUseHelper(SI_SPEC_Y, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_YC() {
-		testSpecUseHelper(SI_SPEC_YC, 0x01);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_YP() {
-		testSpecUseHelper(SI_SPEC_YP, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_Z() {
-		testSpecUseHelper(SI_SPEC_Z, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_ZC() {
-		testSpecUseHelper(SI_SPEC_ZC, 0x00);
-	}
-
-	@Test
-	void testSpecUseSI_SPEC_ZH() {
-		testSpecUseHelper(SI_SPEC_ZH, 0x00);
-	}
-
-	@Test
-	void testDefCurveTooSmallIndex() {
-		short invalidIndex = -1; // Choose an invalid index for testing
-		assertThrows(
-				SpeciesErrorException.class, () -> Sindxdll.DefCurve(invalidIndex),
-				"DefCurve should throw SpeciesErrorException for invalid index"
-		);
-	}
-
-	@Test
-	void testDefCurveTooBigIndex() {
-		short invalidIndex = 135; // Choose an invalid index for testing
-		assertThrows(
-				SpeciesErrorException.class, () -> Sindxdll.DefCurve(invalidIndex),
-				"DefCurve should throw SpeciesErrorException for invalid index"
-		);
-	}
-
-	@Test
-	void testDefCurveLastSpeciesIndex() {
-		short lastIndex = 134; // Choose the last index for testing
-		assertThrows(
-				NoAnswerException.class, () -> Sindxdll.DefCurve(lastIndex),
-				"DefCurve should throw NoAnswerException for last index"
-		);
-	}
-
-	@Test
-	void testDefCurveValidIndex() {
-		short validIndex = 0;
-		short expectValue = -4; // SI_ERR_NO_ANS
-		short actualOutput = Sindxdll.DefCurve(validIndex);
-
-		assertEquals(actualOutput, expectValue);
-	}
-
-	@Test
-	void testDefGICurveTooSmallIndex() {
-		short invalidIndex = -1; // Choose an invalid index for testing
-		assertThrows(
-				SpeciesErrorException.class, () -> Sindxdll.DefGICurve(invalidIndex),
-				"DefGICurve should throw SpeciesErrorException for invalid index"
-		);
-	}
-
-	@Test
-	void testDefGICurveTooBigIndex() {
-		short invalidIndex = 135; // Choose an invalid index for testing
-		assertThrows(
-				SpeciesErrorException.class, () -> Sindxdll.DefGICurve(invalidIndex),
-				"DefGICurve should throw SpeciesErrorException for invalid index"
-		);
-	}
-
-	private void testDefGICurveHelper(int inputIndex, int expectedValue) { // helper function to reduce repetive
-																			// code
-		short actualValue = Sindxdll.DefGICurve((short) inputIndex);
-		assertEquals(actualValue, expectedValue);
-	}
-
-	@Test
-	void testDefGICurveSI_SPEC_BA() {
-		testDefGICurveHelper(SI_SPEC_BA, SI_BA_NIGHGI);
-	}
-
-	@Test
-	void testDefGICurveBL() {
-		testDefGICurveHelper(SI_SPEC_BL, SI_BL_THROWERGI);
-	}
-
-	@Test
-	void testDefGICurveCWI() {
-		testDefGICurveHelper(SI_SPEC_CWI, SI_CWI_NIGHGI);
-	}
-
-	@Test
-	void testDefGICurveFDC() {
-		testDefGICurveHelper(SI_SPEC_FDC, SI_FDC_NIGHGI);
-	}
-
-	@Test
-	void testDefGICurveFDI() {
-		testDefGICurveHelper(SI_SPEC_FDI, SI_FDI_NIGHGI);
-	}
-
-	@Test
-	void testDefGICurveHWC() {
-		testDefGICurveHelper(SI_SPEC_HWC, SI_HWC_NIGHGI99);
-	}
-
-	@Test
-	void testDefGICurveHWI() {
-		testDefGICurveHelper(SI_SPEC_HWI, SI_HWI_NIGHGI);
-	}
-
-	@Test
-	void testDefGICurveLW() {
-		testDefGICurveHelper(SI_SPEC_LW, SI_LW_NIGHGI);
-	}
-
-	@Test
-	void testDefGICurvePLI() {
-		testDefGICurveHelper(SI_SPEC_PLI, SI_PLI_NIGHGI97);
-	}
-
-	@Test
-	void testDefGICurvePY() {
-		testDefGICurveHelper(SI_SPEC_PY, SI_PY_NIGHGI);
-	}
-
-	@Test
-	void testDefGICurveSE() {
-		testDefGICurveHelper(SI_SPEC_SE, SI_SE_NIGHGI);
-	}
-
-	@Test
-	void testDefGICurveSS() {
-		testDefGICurveHelper(SI_SPEC_SS, SI_SS_NIGHGI99);
-	}
-
-	@Test
-	void testDefGICurveSW() {
-		testDefGICurveHelper(SI_SPEC_SW, SI_SW_NIGHGI2004);
-	}
-
-	@Test
-	void testDefGICurveIndexNotInSwitch() {
-		short invalidIndex = 10; // Choose an index that could feasibly exist but isn't in the switch for testing
-		assertThrows(
-				NoAnswerException.class, () -> Sindxdll.DefGICurve(invalidIndex),
-				"DefGICurve should throw NoAnswerException for invalid index"
-		);
-	}
-
-	public static class DefCurveEstTest {
+	@Nested
+	@DisplayName("Tests for NextSpecies code method")
+	class NextSpeciesTest {
+		@Test
+		void testValidIndex() {
+			short inputIndex = 2; // Choose a valid index for testing
+			short expectedOutput = (short) (inputIndex + 1);
+
+			short actualOutput = Sindxdll.NextSpecies(inputIndex);
+
+			assertEquals(expectedOutput, actualOutput, "NextSpecies should return the next species index");
+		}
 
 		@Test
-		public void testValidSpeciesIndexAndEstab() {
-			short result = Sindxdll.DefCurveEst((short) 0, (short) SI_ESTAB_NAT);
-			assertEquals(SI_SW_GOUDIE_NATAC, result);
+		void testTooSmallIndex() {
+			short invalidIndex = -1; // Choose an invalid index for testing
+			assertThrows(
+					SpeciesErrorException.class, () -> Sindxdll.NextSpecies(invalidIndex),
+					"NextSpecies should throw SpeciesErrorException for invalid index"
+			);
+		}
+
+		@Test
+		void testTooBigIndex() {
+			short invalidIndex = 135; // Choose an invalid index for testing
+			assertThrows(
+					SpeciesErrorException.class, () -> Sindxdll.NextSpecies(invalidIndex),
+					"NextSpecies should throw SpeciesErrorException for invalid index"
+			);
+		}
+
+		@Test
+		void testLastIndex() {
+			short lastIndex = 134; // Use the value of SI_SPEC_END for testing
+			assertThrows(
+					NoAnswerException.class, () -> Sindxdll.NextSpecies(lastIndex),
+					"NextSpecies should throw NoAnswerException for last defined species index"
+			);
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for SpecCode method")
+	class SpecCodeTest {
+		@Test
+		void testTooSmallIndex() {
+			short invalidIndex = -1; // Choose an invalid index for testing
+			assertThrows(
+					IllegalArgumentException.class, () -> Sindxdll.SpecCode(invalidIndex),
+					"SpecCode should throw IllegalArgumentException for invalid index"
+			);
+		}
+
+		@Test
+		void testTooBigIndex() {
+			short invalidIndex = 135; // Choose an invalid index for testing
+			assertThrows(
+					IllegalArgumentException.class, () -> Sindxdll.SpecCode(invalidIndex),
+					"SpecCode should throw IllegalArgumentException for invalid index"
+			);
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for SpecUse method")
+	class SpecUseTest {
+		@Test
+		void testTooSmallIndex() {
+			short invalidIndex = -1; // Choose an invalid index for testing
+			assertThrows(
+					SpeciesErrorException.class, () -> Sindxdll.SpecUse(invalidIndex),
+					"SpecUse should throw SpeciesErrorException for invalid index"
+			);
+		}
+
+		@Test
+		void testTooBigIndex() {
+			short invalidIndex = 135; // Choose an invalid index for testing
+			assertThrows(
+					SpeciesErrorException.class, () -> Sindxdll.SpecUse(invalidIndex),
+					"SpecUse should throw SpeciesErrorException for invalid index"
+			);
+		}
+
+		private void testHelper(int inputIndex, int expectedValue) { // helper function to reduce repetive code
+			short actualValue = Sindxdll.SpecUse((short) inputIndex);
+			assertEquals((int) actualValue, expectedValue);
+		}
+
+		@Test
+		void testSI_SPEC_A() {
+			testHelper(SI_SPEC_A, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_ABAL() {
+			testHelper(SI_SPEC_ABAL, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_ABCO() {
+			testHelper(SI_SPEC_ABCO, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_AC() {
+			testHelper(SI_SPEC_AC, 0x04);
+		}
+
+		@Test
+		void testSI_SPEC_ACB() {
+			testHelper(SI_SPEC_ACB, 0x07);
+		}
+
+		@Test
+		void testSI_SPEC_ACT() {
+			testHelper(SI_SPEC_ACT, 0x04);
+		}
+
+		@Test
+		void testSI_SPEC_AD() {
+			testHelper(SI_SPEC_AD, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_AH() {
+			testHelper(SI_SPEC_AH, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_AT() {
+			testHelper(SI_SPEC_AT, 0x06);
+		}
+
+		@Test
+		void testSI_SPEC_AX() {
+			testHelper(SI_SPEC_AX, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_B() {
+			testHelper(SI_SPEC_B, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_BA() {
+			testHelper(SI_SPEC_BA, 0x05);
+		}
+
+		@Test
+		void testSI_SPEC_BB() {
+			testHelper(SI_SPEC_BB, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_BC() {
+			testHelper(SI_SPEC_BC, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_BG() {
+			testHelper(SI_SPEC_BG, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_BI() {
+			testHelper(SI_SPEC_BI, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_BL() {
+			testHelper(SI_SPEC_BL, 0x06);
+		}
+
+		@Test
+		void testSI_SPEC_BM() {
+			testHelper(SI_SPEC_BM, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_BP() {
+			testHelper(SI_SPEC_BP, 0x05);
+		}
+
+		@Test
+		void testSI_SPEC_C() {
+			testHelper(SI_SPEC_C, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_CI() {
+			testHelper(SI_SPEC_CI, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_CP() {
+			testHelper(SI_SPEC_CP, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_CW() {
+			testHelper(SI_SPEC_CW, 0x05);
+		}
+
+		@Test
+		void testSI_SPEC_CWC() {
+			testHelper(SI_SPEC_CWC, 0x05);
+		}
+
+		@Test
+		void testSI_SPEC_CWI() {
+			testHelper(SI_SPEC_CWI, 0x06);
+		}
+
+		@Test
+		void testSI_SPEC_CY() {
+			testHelper(SI_SPEC_CY, 0x01);
+		}
+
+		@Test
+		void testSI_SPEC_D() {
+			testHelper(SI_SPEC_D, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_DG() {
+			testHelper(SI_SPEC_DG, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_DM() {
+			testHelper(SI_SPEC_DM, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_DR() {
+			testHelper(SI_SPEC_DR, 0x05);
+		}
+
+		@Test
+		void testSI_SPEC_E() {
+			testHelper(SI_SPEC_E, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_EA() {
+			testHelper(SI_SPEC_EA, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_EB() {
+			testHelper(SI_SPEC_EB, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_EE() {
+			testHelper(SI_SPEC_EE, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_EP() {
+			testHelper(SI_SPEC_EP, 0x06);
+		}
+
+		@Test
+		void testSI_SPEC_ES() {
+			testHelper(SI_SPEC_ES, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_EW() {
+			testHelper(SI_SPEC_EW, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_EXP() {
+			testHelper(SI_SPEC_EXP, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_FD() {
+			testHelper(SI_SPEC_FD, 0x05);
+		}
+
+		@Test
+		void testSI_SPEC_FDC() {
+			testHelper(SI_SPEC_FDC, 0x05);
+		}
+
+		@Test
+		void testSI_SPEC_FDI() {
+			testHelper(SI_SPEC_FDI, 0x06);
+		}
+
+		@Test
+		void testSI_SPEC_G() {
+			testHelper(SI_SPEC_G, 0x01);
+		}
+
+		@Test
+		void testSI_SPEC_GP() {
+			testHelper(SI_SPEC_GP, 0x01);
+		}
+
+		@Test
+		void testSI_SPEC_GR() {
+			testHelper(SI_SPEC_GR, 0x01);
+		}
+
+		@Test
+		void testSI_SPEC_H() { // TODO: shorten these like others
+			testHelper(SI_SPEC_H, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_HM() {
+			testHelper(SI_SPEC_HM, 0x05);
+		}
+
+		@Test
+		void testSI_SPEC_HW() {
+			testHelper(SI_SPEC_HW, 0x05);
+		}
+
+		@Test
+		void testSI_SPEC_HWC() {
+			testHelper(SI_SPEC_HWC, 0x05);
+		}
+
+		@Test
+		void testSI_SPEC_HWI() {
+			testHelper(SI_SPEC_HWI, 0x06);
+		}
+
+		@Test
+		void testSI_SPEC_HXM() {
+			testHelper(SI_SPEC_HXM, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_IG() {
+			testHelper(SI_SPEC_IG, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_IS() {
+			testHelper(SI_SPEC_IS, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_J() {
+			testHelper(SI_SPEC_J, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_JR() {
+			testHelper(SI_SPEC_JR, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_K() {
+			testHelper(SI_SPEC_K, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_KC() {
+			testHelper(SI_SPEC_KC, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_L() {
+			testHelper(SI_SPEC_L, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_LA() {
+			testHelper(SI_SPEC_LA, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_LE() {
+			testHelper(SI_SPEC_LE, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_LT() {
+			testHelper(SI_SPEC_LT, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_LW() {
+			testHelper(SI_SPEC_LW, 0x06);
+		}
+
+		@Test
+		void testSI_SPEC_M() {
+			testHelper(SI_SPEC_M, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_MB() {
+			testHelper(SI_SPEC_MB, 0x01);
+		}
+
+		@Test
+		void testSI_SPEC_ME() {
+			testHelper(SI_SPEC_ME, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_MN() {
+			testHelper(SI_SPEC_MN, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_MR() {
+			testHelper(SI_SPEC_MR, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_MS() {
+			testHelper(SI_SPEC_MS, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_MV() {
+			testHelper(SI_SPEC_MV, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_OA() {
+			testHelper(SI_SPEC_OA, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_OB() {
+			testHelper(SI_SPEC_OB, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_OC() {
+			testHelper(SI_SPEC_OC, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_OD() {
+			testHelper(SI_SPEC_OD, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_OE() {
+			testHelper(SI_SPEC_OE, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_OF() {
+			testHelper(SI_SPEC_OF, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_OG() {
+			testHelper(SI_SPEC_OG, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_P() {
+			testHelper(SI_SPEC_P, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_PA() {
+			testHelper(SI_SPEC_PA, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_PF() {
+			testHelper(SI_SPEC_PF, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_PJ() {
+			testHelper(SI_SPEC_PJ, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_PL() {
+			testHelper(SI_SPEC_PL, 0x06);
+		}
+
+		@Test
+		void testSI_SPEC_PLC() {
+			testHelper(SI_SPEC_PLC, 0x01);
+		}
+
+		@Test
+		void testSI_SPEC_PLI() {
+			testHelper(SI_SPEC_PLI, 0x06);
+		}
+
+		@Test
+		void testSI_SPEC_PM() {
+			testHelper(SI_SPEC_PM, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_PR() {
+			testHelper(SI_SPEC_PR, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_PS() {
+			testHelper(SI_SPEC_PS, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_PW() {
+			testHelper(SI_SPEC_PW, 0x04);
+		}
+
+		@Test
+		void testSI_SPEC_PXJ() {
+			testHelper(SI_SPEC_PXJ, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_PY() {
+			testHelper(SI_SPEC_PY, 0x06);
+		}
+
+		@Test
+		void testSI_SPEC_Q() {
+			testHelper(SI_SPEC_Q, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_QE() {
+			testHelper(SI_SPEC_QE, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_QG() {
+			testHelper(SI_SPEC_QG, 0x01);
+		}
+
+		@Test
+		void testSI_SPEC_R() {
+			testHelper(SI_SPEC_R, 0x01);
+		}
+
+		@Test
+		void testSI_SPEC_RA() {
+			testHelper(SI_SPEC_RA, 0x01);
+		}
+
+		@Test
+		void testSI_SPEC_S() {
+			testHelper(SI_SPEC_S, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_SA() {
+			testHelper(SI_SPEC_SA, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_SB() {
+			testHelper(SI_SPEC_SB, 0x06);
+		}
+
+		@Test
+		void testSI_SPEC_SE() {
+			testHelper(SI_SPEC_SE, 0x06);
+		}
+
+		@Test
+		void testSI_SPEC_SI() {
+			testHelper(SI_SPEC_SI, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_SN() {
+			testHelper(SI_SPEC_SN, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_SS() {
+			testHelper(SI_SPEC_SS, 0x05);
+		}
+
+		@Test
+		void testSI_SPEC_SW() {
+			testHelper(SI_SPEC_SW, 0x06);
+		}
+
+		@Test
+		void testSI_SPEC_SX() {
+			testHelper(SI_SPEC_SX, 0x06);
+		}
+
+		@Test
+		void testSI_SPEC_SXB() {
+			testHelper(SI_SPEC_SXB, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_SXE() {
+			testHelper(SI_SPEC_SXE, 0x01);
+		}
+
+		@Test
+		void testSI_SPEC_SXL() {
+			testHelper(SI_SPEC_SXL, 0x01);
+		}
+
+		@Test
+		void testSI_SPEC_SXS() {
+			testHelper(SI_SPEC_SXS, 0x01);
+		}
+
+		@Test
+		void testSI_SPEC_SXW() {
+			testHelper(SI_SPEC_SXW, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_SXX() {
+			testHelper(SI_SPEC_SXX, 0x02);
+		}
+
+		@Test
+		void testSI_SPEC_T() {
+			testHelper(SI_SPEC_T, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_TW() {
+			testHelper(SI_SPEC_TW, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_U() {
+			testHelper(SI_SPEC_U, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_UA() {
+			testHelper(SI_SPEC_UA, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_UP() {
+			testHelper(SI_SPEC_UP, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_V() {
+			testHelper(SI_SPEC_V, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_VB() {
+			testHelper(SI_SPEC_VB, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_VP() {
+			testHelper(SI_SPEC_VP, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_VS() {
+			testHelper(SI_SPEC_VS, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_VV() {
+			testHelper(SI_SPEC_VV, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_W() {
+			testHelper(SI_SPEC_W, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_WA() {
+			testHelper(SI_SPEC_WA, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_WB() {
+			testHelper(SI_SPEC_WB, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_WD() {
+			testHelper(SI_SPEC_WD, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_WI() {
+			testHelper(SI_SPEC_WI, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_WP() {
+			testHelper(SI_SPEC_WP, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_WS() {
+			testHelper(SI_SPEC_WS, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_WT() {
+			testHelper(SI_SPEC_WT, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_X() {
+			testHelper(SI_SPEC_X, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_XC() {
+			testHelper(SI_SPEC_XC, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_XH() {
+			testHelper(SI_SPEC_XH, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_Y() {
+			testHelper(SI_SPEC_Y, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_YC() {
+			testHelper(SI_SPEC_YC, 0x01);
+		}
+
+		@Test
+		void testSI_SPEC_YP() {
+			testHelper(SI_SPEC_YP, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_Z() {
+			testHelper(SI_SPEC_Z, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_ZC() {
+			testHelper(SI_SPEC_ZC, 0x00);
+		}
+
+		@Test
+		void testSI_SPEC_ZH() {
+			testHelper(SI_SPEC_ZH, 0x00);
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for DefCurve method")
+	class DefCurveTest {
+		@Test
+		void testTooSmallIndex() {
+			short invalidIndex = -1; // Choose an invalid index for testing
+			assertThrows(
+					SpeciesErrorException.class, () -> Sindxdll.DefCurve(invalidIndex),
+					"DefCurve should throw SpeciesErrorException for invalid index"
+			);
+		}
+
+		@Test
+		void testTooBigIndex() {
+			short invalidIndex = 135; // Choose an invalid index for testing
+			assertThrows(
+					SpeciesErrorException.class, () -> Sindxdll.DefCurve(invalidIndex),
+					"DefCurve should throw SpeciesErrorException for invalid index"
+			);
+		}
+
+		@Test
+		void testLastSpeciesIndex() {
+			short lastIndex = 134; // Choose the last index for testing
+			assertThrows(
+					NoAnswerException.class, () -> Sindxdll.DefCurve(lastIndex),
+					"DefCurve should throw NoAnswerException for last index"
+			);
+		}
+
+		@Test
+		void testValidIndex() {
+			short validIndex = 0;
+			short expectValue = -4; // SI_ERR_NO_ANS
+			short actualOutput = Sindxdll.DefCurve(validIndex);
+
+			assertEquals(actualOutput, expectValue);
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for DefGICurve method")
+	class DefGICurveTest {
+		@Test
+		void testTooSmallIndex() {
+			short invalidIndex = -1; // Choose an invalid index for testing
+			assertThrows(
+					SpeciesErrorException.class, () -> Sindxdll.DefGICurve(invalidIndex),
+					"DefGICurve should throw SpeciesErrorException for invalid index"
+			);
+		}
+
+		@Test
+		void testTooBigIndex() {
+			short invalidIndex = 135; // Choose an invalid index for testing
+			assertThrows(
+					SpeciesErrorException.class, () -> Sindxdll.DefGICurve(invalidIndex),
+					"DefGICurve should throw SpeciesErrorException for invalid index"
+			);
+		}
+
+		private void testHelper(int inputIndex, int expectedValue) { // helper function to reduce repetive
+																		// code
+			short actualValue = Sindxdll.DefGICurve((short) inputIndex);
+			assertEquals(actualValue, expectedValue);
+		}
+
+		@Test
+		void testSI_SPEC_BA() {
+			testHelper(SI_SPEC_BA, SI_BA_NIGHGI);
+		}
+
+		@Test
+		void testBL() {
+			testHelper(SI_SPEC_BL, SI_BL_THROWERGI);
+		}
+
+		@Test
+		void testCWI() {
+			testHelper(SI_SPEC_CWI, SI_CWI_NIGHGI);
+		}
+
+		@Test
+		void testFDC() {
+			testHelper(SI_SPEC_FDC, SI_FDC_NIGHGI);
+		}
+
+		@Test
+		void testFDI() {
+			testHelper(SI_SPEC_FDI, SI_FDI_NIGHGI);
+		}
+
+		@Test
+		void testHWC() {
+			testHelper(SI_SPEC_HWC, SI_HWC_NIGHGI99);
+		}
+
+		@Test
+		void testHWI() {
+			testHelper(SI_SPEC_HWI, SI_HWI_NIGHGI);
+		}
+
+		@Test
+		void testLW() {
+			testHelper(SI_SPEC_LW, SI_LW_NIGHGI);
+		}
+
+		@Test
+		void testPLI() {
+			testHelper(SI_SPEC_PLI, SI_PLI_NIGHGI97);
+		}
+
+		@Test
+		void testPY() {
+			testHelper(SI_SPEC_PY, SI_PY_NIGHGI);
+		}
+
+		@Test
+		void testSE() {
+			testHelper(SI_SPEC_SE, SI_SE_NIGHGI);
+		}
+
+		@Test
+		void testSS() {
+			testHelper(SI_SPEC_SS, SI_SS_NIGHGI99);
+		}
+
+		@Test
+		void testSW() {
+			testHelper(SI_SPEC_SW, SI_SW_NIGHGI2004);
+		}
+
+		@Test
+		void testIndexNotInSwitch() {
+			short invalidIndex = 10; // Choose an index that could feasibly exist but isn't in the switch for testing
+			assertThrows(
+					NoAnswerException.class, () -> Sindxdll.DefGICurve(invalidIndex),
+					"DefGICurve should throw NoAnswerException for invalid index"
+			);
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for DefCurveEst method")
+	class DefCurveEstTest {
+		@BeforeAll
+		static void beforeAll() {
+			System.out.println("Before all tests of DefCurveEst");
+		}
+
+		@AfterAll
+		static void afterAll() {
+			System.out.println("After all tests of DefCurveEst");
+		}
+
+		@Test
+		void testEstTooSmallIndex() {
+			short invalidIndex = -1; // Choose an invalid index for testing
+			assertThrows(
+					SpeciesErrorException.class, () -> Sindxdll.DefCurveEst(invalidIndex, (short) 0),
+					"DefCurveEst should throw SpeciesErrorException for invalid index"
+			);
+		}
+
+		@Test
+		void testTooBigIndex() {
+			short invalidIndex = 135; // Choose an invalid index for testing
+			assertThrows(
+					SpeciesErrorException.class, () -> Sindxdll.DefCurveEst(invalidIndex, (short) 0),
+					"DefGICurve should throw SpeciesErrorException for invalid index"
+			);
 		}
 
 		@Test
@@ -1207,6 +1250,18 @@ public class SindxdllTest {
 			assertThrows(SpeciesErrorException.class, () -> {
 				Sindxdll.DefCurveEst((short) SI_MAX_SPECIES, (short) SI_ESTAB_NAT);
 			});
+		}
+
+		@Test
+		public void testValidSpeciesIndexAndEstabSI_ESTAB_NAT() {
+			short result = Sindxdll.DefCurveEst((short) 100, (short) SI_ESTAB_NAT);
+			assertEquals(SI_SW_GOUDIE_NATAC, result);
+		}
+
+		@Test
+		public void testValidSpeciesIndexAndEstabSI_ESTAB_PLA() {
+			short result = Sindxdll.DefCurveEst((short) 100, (short) SI_ESTAB_PLA);
+			assertEquals(SI_SW_GOUDIE_PLAAC, result);
 		}
 
 		@Test
@@ -1225,8 +1280,113 @@ public class SindxdllTest {
 
 		@Test
 		public void testDefaultCase() {
-			short result = Sindxdll.DefCurveEst((short) 0, (short) SI_ESTAB_NAT);
-			assertEquals(SI_ERR_NO_ANS, result);
+			short result = Sindxdll.DefCurveEst((short) 4, (short) 0);
+			assertEquals(SI_ACB_HUANGAC, result);
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for FirstCurves method")
+	class FirstCurveTest {
+		@Test
+		void testTooSmallIndex() {
+			short invalidIndex = -1; // Choose an invalid index for testing
+			assertThrows(
+					SpeciesErrorException.class, () -> Sindxdll.FirstCurve(invalidIndex),
+					"FirstCurve should throw SpeciesErrorException for invalid index"
+			);
+		}
+
+		@Test
+		void testTooBigIndex() {
+			short invalidIndex = 135; // Choose an invalid index for testing
+			assertThrows(
+					SpeciesErrorException.class, () -> Sindxdll.FirstCurve(invalidIndex),
+					"FirstCurve should throw SpeciesErrorException for invalid index"
+			);
+		}
+
+		@Test
+		void testNoCurvesDefined() {
+			short invalidIndex = 0;
+			assertThrows(
+					NoAnswerException.class, () -> Sindxdll.FirstCurve(invalidIndex),
+					"FirstCurve should throw NoAnswerException for invalid index"
+			);
+		}
+
+		@Test
+		void testDefaultCase() {
+			short validIndex = 4;
+			short result = Sindxdll.FirstCurve(validIndex);
+			assertEquals(result, 97); // SI_ACB_START
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for NextCurve method")
+	class NextCurveTest {
+		@Test
+		void testTooSmallSPIndex() {
+			short invalidIndex = -1; // Choose an invalid index for testing
+			assertThrows(
+					SpeciesErrorException.class, () -> Sindxdll.NextCurve(invalidIndex, (short) 0),
+					"NextCurve should throw SpeciesErrorException for invalid index"
+			);
+		}
+
+		@Test
+		void testTooBigSPIndex() {
+			short invalidIndex = 135; // Choose an invalid index for testing
+			assertThrows(
+					SpeciesErrorException.class, () -> Sindxdll.NextCurve(invalidIndex, (short) 0),
+					"NextCurve should throw SpeciesErrorException for invalid index"
+			);
+		}
+
+		@Test
+		void testTooSmallCUIndex() {
+			short invalidIndex = -1; // Choose an invalid index for testing
+			assertThrows(
+					CurveErrorException.class, () -> Sindxdll.NextCurve((short) 0, invalidIndex),
+					"NextCurve should throw CurveErrorException for invalid index"
+			);
+		}
+
+		@Test
+		void testTooBigCUIndex() {
+			short invalidIndex = SI_MAX_CURVES; // Choose an invalid index for testing
+			assertThrows(
+					CurveErrorException.class, () -> Sindxdll.NextCurve((short) 0, invalidIndex),
+					"NextCurve should throw CurveErrorException for invalid index"
+			);
+		}
+
+		@Test
+		void testCurveSpeciesMismatch() {
+			short spIndex = 0;
+			short cuIndex = 0;
+			assertThrows(CurveErrorException.class, () -> Sindxdll.NextCurve(spIndex, cuIndex));
+		}
+	}
+
+	@Nested
+	@DisplayName("Tests for CurveName method")
+	class CurveNameTest {
+	}
+
+	@Nested
+	@DisplayName("Tests for CurveUse method")
+	class CurveUseTest {
+	}
+
+	@Nested
+	@DisplayName("Tests for HtAgeToSI method")
+	class HtAgeToSITest {
+
+		@Test
+		void testInvalidHeightForBreastHeightAge() {
+
 		}
 	}
 }

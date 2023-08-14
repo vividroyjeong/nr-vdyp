@@ -2660,7 +2660,7 @@ public class Sindxdll {
 				return SI_SW_GOUDIE_PLAAC;
 			// break; This is unreachable not sure why it was included in the C program
 			default:
-				throw new EstablishmentErrorException("Input parameter is not a valid establishment type: " + estab);// estab
+				throw new EstablishmentErrorException("Input parameter is not a valid establishment type: " + estab);
 			}
 		} else if (si_curve_default[sp_index] == SI_ERR_NO_ANS) {
 			throw new NoAnswerException("No curves defined for this species: " + sp_index);
