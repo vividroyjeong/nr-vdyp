@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.sindex;
 
+import ca.bc.gov.nrs.vdyp.common_calculators.Height2SiteIndex;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -617,7 +618,7 @@ class SindxdllTest {
 		}
 
 		@Test
-		void testSI_SPEC_H() { // TODO: shorten these like others
+		void testSI_SPEC_H() {
 			testHelper(SI_SPEC_H, 0x00);
 		}
 
@@ -1384,9 +1385,5 @@ class SindxdllTest {
 	@DisplayName("Tests for HtAgeToSI method")
 	class HtAgeToSITest {
 
-		@Test
-		void testInvalidHeightForBreastHeightAge() {
-
-		}
 	}
 }
