@@ -318,19 +318,5 @@ class Height2SiteIndexTest {
 		}
         @formatter:on
         */
-
-		@Test
-		void testValidSI_SW_HU_GARCIA() {
-			double height = 1;
-			double bhage = 1;
-
-			double actualResult = Height2SiteIndex
-					.ba_height_to_index((short) SI_SW_HU_GARCIA, bhage, height, (short) SI_EST_DIRECT);
-
-			// double q = Height2SiteIndex.hu_garcia_q(height, bhage);
-			// double expectedResult = Height2SiteIndex.hu_garcia_h(q, 50.0);
-
-			// assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
-		}
 	}
 }
