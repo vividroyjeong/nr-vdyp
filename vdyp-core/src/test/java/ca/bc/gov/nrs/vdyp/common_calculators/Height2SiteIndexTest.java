@@ -121,6 +121,18 @@ class Height2SiteIndexTest {
 			);
 		}
 
+		@Test
+		void testAgeTypeIsSI_AT_BREAST() {
+			double height = 2;
+			double age = 1;
+
+			double expectedResult = 0.39 + 0.3104 * height + 33.3828 * height / age;
+
+			double actualResult = Height2SiteIndex
+					.height_to_index((short) SI_FDI_THROWER, age, (short) SI_AT_BREAST, height, (short) SI_EST_DIRECT);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
 	}
 
 	@Nested
