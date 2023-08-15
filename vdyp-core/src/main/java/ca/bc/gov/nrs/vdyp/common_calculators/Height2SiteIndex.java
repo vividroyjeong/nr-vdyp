@@ -970,7 +970,8 @@ public class Height2SiteIndex {
 					/* later, we divide by age-0.5, so check it now */
 					if (bhage < 0.5) {
 						throw new GrowthInterceptMinimumException("Bhage < 0.5 years: " + bhage);
-					}
+					} // this (and following checks like it) seem unreachable since this is checked at
+						// the beginning of the function and bhage is never changed
 
 					switch ((short) bhage) {
 					case 1:
@@ -4059,8 +4060,9 @@ public class Height2SiteIndex {
 
 		/* initial guess */
 		site = height;
-		if (site < 1.3)
+		if (site < 1.3){
 			site = 1.3;
+		}
 		step = site / 2.0;
 
 		/* loop until real close, or other end condition */
@@ -4177,13 +4179,15 @@ public class Height2SiteIndex {
 			if (diff > 0.0000001) {
 				if (lastdiff < 0) {
 					step = step / 2.0;
-					q += step;
 				}
+				q += step;
+
 			} else if (diff < -0.0000001) {
 				if (lastdiff > 0) {
 					step = step / 2.0;
-					q -= step;
 				}
+				q -= step;
+
 				if (q <= 0) {
 					q = 0.0000001;
 				}
