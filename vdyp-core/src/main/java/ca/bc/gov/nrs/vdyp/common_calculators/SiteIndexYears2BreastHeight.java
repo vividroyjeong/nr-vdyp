@@ -310,7 +310,6 @@ public class SiteIndexYears2BreastHeight {
 		switch (cu_index) {
 		case SI_FDC_NIGHGI:
 			throw new GrowthInterceptTotalException("Cannot use with GI equations, case SI_FDC_NIGHGI" + cu_index);
-		// break; Unreachable code
 
 		case SI_FDC_BRUCE:
 			/* from seed */
@@ -340,7 +339,7 @@ public class SiteIndexYears2BreastHeight {
 			/* changed 2002 AUG 20 */
 			if (site_index <= 15) {
 				y2bh = 13.25 - site_index / 6.096;
-				if (y2bh < 1) {
+				if (y2bh < 1) { // TODO impossible to reach???
 					y2bh = 1;
 				}
 			} else {

@@ -136,7 +136,26 @@ class Height2SiteIndexTest {
 
 		@Test
 		void testAgeTypeIsNotSI_AT_BREAST() {
+			double height = 2;
+			double age = 1;
 
+			double expectedResult = 1.3;
+
+			double actualResult = Height2SiteIndex
+					.height_to_index((short) SI_FDI_THROWER, age, (short) 2, height, (short) SI_EST_DIRECT);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+
+			age = 5;
+
+			double x1 = (age - 4) * (0.39 + 0.3104 * height);
+			double x2 = 33.3828 * height + x1 + 99;
+			expectedResult = (x2 + Math.sqrt(x2 * x2 - 4 * 99 * x1)) / (2 * (age - 4));
+
+			actualResult = Height2SiteIndex
+					.height_to_index((short) SI_FDI_THROWER, age, (short) 2, height, (short) SI_EST_DIRECT);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 		}
 	}
 
@@ -4344,11 +4363,15 @@ class Height2SiteIndexTest {
 							.ba_height_to_index((short) SI_BL_THROWERGI, 51, height, (short) SI_EST_DIRECT)
 			);
 		}
-	
 
 		// TODO test case for switch statement default if SI_BL_THROWERGI+1
 		// TODO test else statment ie SI_EST_DIRECT != si_estab
-		
+
+	}
+
+	@Nested
+	class site_iterateTest {
+
 	}
 
 	// TODO edge cases? for example if 1 is pased in as site index loops forever

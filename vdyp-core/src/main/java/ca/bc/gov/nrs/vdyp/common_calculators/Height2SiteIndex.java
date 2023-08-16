@@ -708,7 +708,6 @@ public class Height2SiteIndex {
 						x1 = 0;
 						x2 = 0;
 						break;
-					// break; Unreachable
 					}
 					if (x1 == 0) {
 						throw new GrowthInterceptMaximumException(
@@ -1902,7 +1901,7 @@ public class Height2SiteIndex {
 						x1 = 0;
 						x2 = 0;
 						break;
-					// break;
+
 					}
 					if (x1 == 0) {
 						throw new GrowthInterceptMaximumException(
@@ -2119,7 +2118,7 @@ public class Height2SiteIndex {
 						x1 = 0;
 						x2 = 0;
 						break;
-					// break;
+
 					}
 					if (x1 == 0) {
 						throw new GrowthInterceptMaximumException(
@@ -2341,7 +2340,6 @@ public class Height2SiteIndex {
 						x1 = 0;
 						x2 = 0;
 						break;
-					// break;
 					}
 					if (x1 == 0) {
 						throw new GrowthInterceptMaximumException(
@@ -2558,7 +2556,6 @@ public class Height2SiteIndex {
 						x1 = 0;
 						x2 = 0;
 						break;
-					// break;
 					}
 					if (x1 == 0) {
 						throw new GrowthInterceptMaximumException(
@@ -2700,7 +2697,7 @@ public class Height2SiteIndex {
 						x1 = 0;
 						x2 = 0;
 						break;
-					// break;
+
 					}
 					if (x1 == 0) {
 						throw new GrowthInterceptMaximumException(
@@ -2921,7 +2918,6 @@ public class Height2SiteIndex {
 						x1 = 0;
 						x2 = 0;
 						break;
-					// break;
 					}
 					if (x1 == 0) {
 						throw new GrowthInterceptMaximumException(
@@ -3143,7 +3139,6 @@ public class Height2SiteIndex {
 						x1 = 0;
 						x2 = 0;
 						break;
-					// break;
 					}
 					if (x1 == 0) {
 						throw new GrowthInterceptMaximumException(
@@ -3365,7 +3360,6 @@ public class Height2SiteIndex {
 						x1 = 0;
 						x2 = 0;
 						break;
-					// break;
 					}
 					if (x1 == 0) {
 						throw new GrowthInterceptMaximumException(
@@ -3587,7 +3581,6 @@ public class Height2SiteIndex {
 						x1 = 0;
 						x2 = 0;
 						break;
-					// break;
 					}
 					if (x1 == 0)
 						throw new GrowthInterceptMaximumException(
@@ -3809,7 +3802,6 @@ public class Height2SiteIndex {
 						x1 = 0;
 						x2 = 0;
 						break;
-					// break;
 					}
 					if (x1 == 0) {
 						throw new GrowthInterceptMaximumException(
@@ -4031,7 +4023,6 @@ public class Height2SiteIndex {
 						x1 = 0;
 						x2 = 0;
 						break;
-					// break;
 					}
 					if (x1 == 0) {
 						throw new GrowthInterceptMaximumException(
@@ -4060,7 +4051,7 @@ public class Height2SiteIndex {
 
 		/* initial guess */
 		site = height;
-		if (site < 1.3){
+		if (site < 1.3) {
 			site = 1.3;
 		}
 		step = site / 2.0;
