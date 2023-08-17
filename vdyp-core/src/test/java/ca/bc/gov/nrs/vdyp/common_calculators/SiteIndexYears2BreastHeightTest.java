@@ -2,7 +2,6 @@ package ca.bc.gov.nrs.vdyp.common_calculators;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
@@ -1320,5 +1319,476 @@ public class SiteIndexYears2BreastHeightTest {
 
 			assertThrows(GrowthInterceptTotalException.class, () -> SiteIndexYears2BreastHeight.si_y2bh(cu_index, 2.0));
 		}
+
+		@Test
+		void testSI_BL_KURUCZ82() {
+			short cu_index = SI_BL_KURUCZ82;
+			double site_index = 2;
+
+			double expectedResult = 42.25 - 10.66 * SiteIndexYears2BreastHeight.llog(site_index);
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+
+			site_index = 600;
+			expectedResult = 5;
+			actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_FDI_NIGHGI() {
+			short cu_index = SI_FDI_NIGHGI;
+
+			assertThrows(GrowthInterceptTotalException.class, () -> SiteIndexYears2BreastHeight.si_y2bh(cu_index, 2.0));
+		}
+
+		@Test
+		void testSI_FDI_HUANG_PLA() {
+			short cu_index = SI_FDI_HUANG_PLA;
+			double site_index = 2;
+
+			double expectedResult = 6.5 + 5.276585 + 38.968242 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_FDI_HUANG_NAT() {
+			short cu_index = SI_FDI_HUANG_NAT;
+			double site_index = 2;
+
+			double expectedResult = 8.0 + 5.276585 + 38.968242 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_FDI_MILNER() {
+			short cu_index = SI_FDI_MILNER;
+			double site_index = 2;
+
+			double expectedResult = 4.0 + 99.0 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_FDI_THROWER() {
+			short cu_index = SI_FDI_THROWER;
+			double site_index = 2;
+
+			double expectedResult = 4.0 + 99.0 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_FDI_THROWERAC() {
+			short cu_index = SI_FDI_THROWERAC;
+			double site_index = 2;
+
+			double expectedResult = 4.0 + 99.0 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_FDI_VDP_MONT() {
+			short cu_index = SI_FDI_VDP_MONT;
+			double site_index = 2;
+
+			double expectedResult = 4.0 + 99.0 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_FDI_VDP_WASH() {
+			short cu_index = SI_FDI_VDP_WASH;
+			double site_index = 2;
+
+			double expectedResult = 4.0 + 99.0 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_FDI_MONS_DF() {
+			short cu_index = SI_FDI_MONS_DF;
+			double site_index = 2;
+
+			double expectedResult = 16.0 - site_index / 3.0;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+
+			site_index = 600;
+			expectedResult = 8;
+			actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_FDI_MONS_GF() {
+			short cu_index = SI_FDI_MONS_GF;
+			double site_index = 2;
+
+			double expectedResult = 16.0 - site_index / 3.0;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+
+			site_index = 600;
+			expectedResult = 8;
+			actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_FDI_MONS_WRC() {
+			short cu_index = SI_FDI_MONS_WRC;
+			double site_index = 2;
+
+			double expectedResult = 16.0 - site_index / 3.0;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+
+			site_index = 600;
+			expectedResult = 8;
+			actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_FDI_MONS_WH() {
+			short cu_index = SI_FDI_MONS_WH;
+			double site_index = 2;
+
+			double expectedResult = 16.0 - site_index / 3.0;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+
+			site_index = 600;
+			expectedResult = 8;
+			actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_FDI_MONS_SAF() {
+			short cu_index = SI_FDI_MONS_SAF;
+			double site_index = 2;
+
+			double expectedResult = 16.0 - site_index / 3.0;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+
+			site_index = 600;
+			expectedResult = 8;
+			actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_AT_NIGH() {
+			short cu_index = SI_AT_NIGH;
+			double site_index = 3.5;
+
+			double expectedResult = 1.331 + 38.56 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_AT_CHEN() {
+			short cu_index = SI_AT_CHEN;
+			double site_index = 3.5;
+
+			double expectedResult = 1.331 + 38.56 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_AT_HUANG() {
+			short cu_index = SI_AT_HUANG;
+			double site_index = 5.0;
+
+			double expectedResult = 1 + 2.184066 + 50.788746 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_AT_GOUDIE() {
+			short cu_index = SI_AT_GOUDIE;
+			double site_index = 4.0;
+
+			double expectedResult = 1.331 + 38.56 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_ACB_HUANGAC() {
+			short cu_index = SI_ACB_HUANGAC;
+			double site_index = 2;
+
+			double expectedResult = 1 - 1.196472 + 104.124205 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+
+			site_index = 600;
+			expectedResult = 1;
+			actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_ACB_HUANG() {
+			short cu_index = SI_ACB_HUANG;
+			double site_index = 2;
+
+			double expectedResult = 1 - 1.196472 + 104.124205 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+
+			site_index = 600;
+			expectedResult = 1;
+			actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_ACT_THROWER() {
+			short cu_index = SI_ACT_THROWER;
+			double site_index = 4.0;
+
+			double expectedResult = 2;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_ACT_THROWERAC() {
+			short cu_index = SI_ACT_THROWERAC;
+			double site_index = 4.0;
+
+			double expectedResult = 2;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_AT_CIESZEWSKI() {
+			short cu_index = SI_AT_CIESZEWSKI;
+			double site_index = 4.0;
+
+			double expectedResult = 1.331 + 38.56 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_DR_HARRING() {
+			short cu_index = SI_DR_HARRING;
+			double site_index = 2;
+
+			double expectedResult = 2;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+
+			site_index = 600;
+			expectedResult = 1;
+			actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_DR_CHEN() {
+			short cu_index = SI_DR_CHEN;
+			double site_index = 2;
+
+			double expectedResult = 2;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+
+			site_index = 600;
+			expectedResult = 1;
+			actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_DR_NIGH() {
+			short cu_index = SI_DR_NIGH;
+			double site_index = 2;
+
+			double expectedResult = 5.494 - 0.1789 * (0.3094 + 0.7616 * site_index);
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+
+			site_index = 600;
+			expectedResult = 1;
+			actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_PY_NIGHGI() {
+			short cu_index = SI_PY_NIGHGI;
+
+			assertThrows(GrowthInterceptTotalException.class, () -> SiteIndexYears2BreastHeight.si_y2bh(cu_index, 2.0));
+		}
+
+		@Test
+		void testSI_PY_NIGH() {
+			short cu_index = SI_PY_NIGH;
+			double site_index = 3.5;
+
+			double expectedResult = 36.35 * Math.pow(0.9318, site_index);
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_PY_HANN() {
+			short cu_index = SI_PY_HANN;
+			double site_index = 3.5;
+
+			double expectedResult = 2 + 3.6 + 42.64 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_PY_HANNAC() {
+			short cu_index = SI_PY_HANNAC;
+			double site_index = 3.5;
+
+			double expectedResult = 2 + 3.6 + 42.64 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_PY_MILNER() {
+			short cu_index = SI_PY_MILNER;
+			double site_index = 3.5;
+
+			double expectedResult = 2 + 3.6 + 42.64 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_LW_MILNER() {
+			short cu_index = SI_LW_MILNER;
+			double site_index = 3.5;
+
+			double expectedResult = 3.36 + 87.18 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_LW_NIGH() {
+			short cu_index = SI_LW_NIGH;
+			double site_index = 3.5;
+
+			double expectedResult = 3.36 + 87.18 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_EP_NIGH() {
+			short cu_index = SI_EP_NIGH;
+			double site_index = 3.5;
+
+			double expectedResult = 1.331 + 38.56 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_PW_CURTIS() {
+			short cu_index = SI_PW_CURTIS;
+			double site_index = 3.5;
+
+			double expectedResult = 2.0 + 2.1578 + 110.76 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSI_PW_CURTISAC() {
+			short cu_index = SI_PW_CURTISAC;
+			double site_index = 2;
+
+			double expectedResult = 2.0 + 2.1578 + 110.76 / site_index;
+			double actualResult = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site_index);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testSwitchDefault() {
+			short cu_index = 200;
+			assertThrows(CurveErrorException.class, () -> SiteIndexYears2BreastHeight.si_y2bh(cu_index, 2.0));
+		}
+	}
+
+	@Test
+	void testSi_y2bh05() {
+		short cu_index = SI_PW_CURTIS;
+		double site_index = 3.5;
+
+		double expectedResult = ((int) (2.0 + 2.1578 + 110.76 / site_index)) + 0.5;
+		double actualResult = SiteIndexYears2BreastHeight.si_y2bh05(cu_index, site_index);
+
+		assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 	}
 }
