@@ -4076,6 +4076,7 @@ public class Height2SiteIndex {
 						site, y2bh, 0.5
 				); // 0.5 may have to change
 			}
+
 			/*
 			 * System.out.
 			 * printf("age=%.0f, height=%.1f, test_top=%.1f, site=%.2f, step=%.7f%n", age,
@@ -4124,8 +4125,13 @@ public class Height2SiteIndex {
 			}
 		} while (true);
 
+		if (site == SI_ERR_NO_ANS) {
+			throw new NoAnswerException("Iteration could not converge (projected site index > 999), site: " + site);
+		} else {
 			return site;
 		}
+
+	}
 
 	public static double hu_garcia_q(double site_index, double bhage) {
 		double h, q, step, diff, lastdiff;
