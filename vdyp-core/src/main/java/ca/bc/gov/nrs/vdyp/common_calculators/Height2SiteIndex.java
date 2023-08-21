@@ -146,12 +146,8 @@ public class Height2SiteIndex {
 	/*
 	 * error codes
 	 */
-	private static final int SI_ERR_GI_MIN = -2;
-	private static final int SI_ERR_GI_MAX = -3;
 	private static final int SI_ERR_NO_ANS = -4;
-	private static final int SI_ERR_CURVE = -5;
-	private static final int SI_ERR_GI_TOT = -9;
-
+	
 	/* define species and equation indices */
 	private static final int SI_AT_GOUDIE = 4;
 	private static final int SI_BA_DILUCCA = 5;
@@ -966,12 +962,6 @@ public class Height2SiteIndex {
 				 * 0.5); index = x1 * ppow(index, x2); } break;
 				 */
 				case SI_SW_NIGHGI:
-					/* later, we divide by age-0.5, so check it now */
-					if (bhage < 0.5) {
-						throw new GrowthInterceptMinimumException("Bhage < 0.5 years: " + bhage);
-					} // this (and following checks like it) seem unreachable since this is checked at
-						// the beginning of the function and bhage is never changed
-
 					switch ((short) bhage) {
 					case 1:
 						x1 = 7.867;
@@ -1108,11 +1098,6 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_SW_NIGHGI99:
-					/* later, we divide by age-0.5, so check it now */
-					if (bhage < 0.5) {
-						throw new GrowthInterceptMinimumException("Bhage < 0.5 years: " + bhage);
-					}
-
 					switch ((short) bhage) {
 					case 1:
 						x1 = 4.050;
@@ -1329,11 +1314,6 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_SW_NIGHGI2004:
-					/* later, we divide by age-0.5, so check it now */
-					if (bhage < 0.5) {
-						throw new GrowthInterceptMinimumException("Bhage < 0.5 years: " + bhage);
-					}
-
 					switch ((short) bhage) {
 					case 1:
 						x1 = 4.7650;
@@ -1550,11 +1530,6 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_HWC_NIGHGI99:
-					/* later, we divide by age-0.5, so check it now */
-					if (bhage < 0.5) {
-						throw new GrowthInterceptMinimumException("Bhage < 0.5 years: " + bhage);
-					}
-
 					switch ((short) bhage) {
 					case 1:
 						x1 = 4.361;
@@ -1771,11 +1746,6 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_HWC_NIGHGI:
-					/* later, we divide by age-0.5, so check it now */
-					if (bhage < 0.5) {
-						throw new GrowthInterceptMinimumException("Bhage < 0.5 years: " + bhage);
-					}
-
 					switch ((short) bhage) {
 					case 1:
 						x1 = 4.957;
@@ -2130,11 +2100,6 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_FDC_NIGHGI:
-					/* later, we divide by age-0.5, so check it now */
-					if (bhage < 0.5) {
-						throw new GrowthInterceptMinimumException("Bhage < 0.5 years: " + bhage);
-					}
-
 					switch ((short) bhage) {
 					case 1:
 						x1 = 3.894;
@@ -2567,11 +2532,6 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_SS_NIGHGI:
-					/* later, we divide by age-0.5, so check it now */
-					if (bhage < 0.5) {
-						throw new GrowthInterceptMinimumException("Bhage < 0.5 years: " + bhage);
-					}
-
 					switch ((short) bhage) {
 					case 1:
 						x1 = 3.317;
@@ -2709,10 +2669,6 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_SS_NIGHGI99:
-					/* later, we divide by age-0.5, so check it now */
-					if (bhage < 0.5) {
-						throw new GrowthInterceptMinimumException("Bhage < 0.5 years: " + bhage);
-					}
 					switch ((short) bhage) {
 					case 1:
 						x1 = 4.367;
@@ -2929,11 +2885,6 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_CWI_NIGHGI:
-					/* later, we divide by age-0.5, so check it now */
-					if (bhage < 0.5) {
-						throw new GrowthInterceptMinimumException("Bhage < 0.5 years: " + bhage);
-					}
-
 					switch ((short) bhage) {
 					case 1:
 						x1 = 3.744;
@@ -3150,11 +3101,6 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_LW_NIGHGI:
-					/* later, we divide by age-0.5, so check it now */
-					if (bhage < 0.5) {
-						throw new GrowthInterceptMinimumException("Bhage < 0.5 years: " + bhage);
-					}
-
 					switch ((short) bhage) {
 					case 1:
 						x1 = 6.347;
@@ -3371,11 +3317,6 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_PY_NIGHGI:
-					/* later, we divide by age-0.5, so check it now */
-					if (bhage < 0.5) {
-						throw new GrowthInterceptMinimumException("Bhage < 0.5 years: " + bhage);
-					}
-
 					switch ((short) bhage) {
 					case 1:
 						x1 = 5.631;
@@ -3592,11 +3533,6 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_BA_NIGHGI:
-					/* later, we divide by age-0.5, so check it now */
-					if (bhage < 0.5) {
-						throw new GrowthInterceptMinimumException("Bhage < 0.5 years: " + bhage);
-					}
-
 					switch ((short) bhage) {
 					case 1:
 						x1 = 12.14;
@@ -3813,11 +3749,6 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_BL_THROWERGI:
-					/* later, we divide by age-0.5, so check it now */
-					if (bhage < 0.5) {
-						throw new GrowthInterceptMinimumException("Bhage < 0.5 years: " + bhage);
-					}
-
 					switch ((short) bhage) {
 					case 1:
 						x1 = 2.4623;

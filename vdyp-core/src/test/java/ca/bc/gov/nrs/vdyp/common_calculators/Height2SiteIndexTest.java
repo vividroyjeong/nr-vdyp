@@ -20,15 +20,6 @@ class Height2SiteIndexTest {
 	 */
 	private static final int SI_EST_DIRECT = 1;
 
-	/*
-	 * error codes
-	 */
-	private static final int SI_ERR_GI_MIN = -2;
-	private static final int SI_ERR_GI_MAX = -3;
-	private static final int SI_ERR_NO_ANS = -4;
-	private static final int SI_ERR_CURVE = -5;
-	private static final int SI_ERR_GI_TOT = -9;
-
 	/* define species and equation indices */
 	private static final int SI_AT_GOUDIE = 4;
 	private static final int SI_BA_DILUCCA = 5;
@@ -37,7 +28,6 @@ class Height2SiteIndexTest {
 	private static final int SI_CWI_NIGHGI = 84;
 	private static final int SI_DR_NIGH = 13;
 	private static final int SI_FDC_NIGHGI = 15;
-	private static final int SI_FDI_MILNER = 22;
 	private static final int SI_FDI_MONS_DF = 26;
 	private static final int SI_FDI_MONS_GF = 27;
 	private static final int SI_FDI_MONS_SAF = 30;
