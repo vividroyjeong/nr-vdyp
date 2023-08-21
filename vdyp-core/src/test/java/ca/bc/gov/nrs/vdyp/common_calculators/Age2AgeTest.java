@@ -8,7 +8,7 @@ import static org.hamcrest.Matchers.closeTo;
 
 import org.junit.jupiter.api.*;
 
-public class Age2AgeTest {
+ class Age2AgeTest {
 	// Taken from sindex.h
 	/*
 	 * age types
@@ -23,38 +23,7 @@ public class Age2AgeTest {
 	private static final int SI_BA_KURUCZ82AC = 102;
 	private static final int SI_BA_NIGH = 118;
 	private static final int SI_BL_CHENAC = 93;
-	private static final int SI_BP_CURTISAC = 94;
-	private static final int SI_CWC_KURUCZAC = 101;
-	private static final int SI_CWI_NIGH = 77;
-	private static final int SI_DR_NIGH = 13;
-	private static final int SI_EP_NIGH = 116;
-	private static final int SI_FDC_BRUCEAC = 100;
-	private static final int SI_FDC_NIGHTA = 88;
-	private static final int SI_FDI_THROWERAC = 96;
-	private static final int SI_HM_MEANSAC = 95;
-	private static final int SI_HWC_WILEYAC = 99;
-	private static final int SI_HWI_NIGH = 37;
-	private static final int SI_LW_NIGH = 90;
-	private static final int SI_PJ_HUANG = 113;
-	private static final int SI_PJ_HUANGAC = 114;
-	private static final int SI_PLI_NIGHTA98 = 41;
-	private static final int SI_PLI_THROWER = 45;
-	private static final int SI_PLI_THROWNIGH = 40;
-	private static final int SI_PW_CURTISAC = 98;
-	private static final int SI_PY_HANNAC = 104;
-	private static final int SI_PY_NIGH = 107;
-	private static final int SI_SB_NIGH = 91;
-	private static final int SI_SE_CHENAC = 105;
 	private static final int SI_SS_NIGH = 59;
-	private static final int SI_FDC_BRUCENIGH = 89;
-	private static final int SI_SW_GOUDIE_NATAC = 106;
-	private static final int SI_SW_GOUDIE_PLAAC = 112;
-	private static final int SI_SW_GOUDNIGH = 85;
-	private static final int SI_SW_NIGHTA = 83;
-	/* not used, but must be defined for array positioning */
-	private static final int SI_SE_NIGHTA = 110;
-	private static final int SI_SW_NIGHTA2004 = 111;
-	private static final int SI_PLI_NIGHTA2004 = 109;
 
 	private static final double ERROR_TOLERANCE = 0.00001;
 

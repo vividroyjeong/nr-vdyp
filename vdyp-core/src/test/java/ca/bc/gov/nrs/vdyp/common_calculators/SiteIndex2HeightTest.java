@@ -8,7 +8,7 @@ import static org.hamcrest.Matchers.closeTo;
 
 import org.junit.jupiter.api.*;
 
-public class SiteIndex2HeightTest {
+ class SiteIndex2HeightTest {
 	// Taken from sindex.h
 	/*
 	 * age types
@@ -162,18 +162,18 @@ public class SiteIndex2HeightTest {
 	}
 
 	@Test
-	public void testPpowZero() {
+	 void testPpowZero() {
 		assertThat(0.0, closeTo(SiteIndex2Height.ppow(0.0, 3.0), ERROR_TOLERANCE));
 	}
 
 	@Test
-	public void testLlogPositive() {
+	 void testLlogPositive() {
 		assertThat(1.60943, closeTo(SiteIndex2Height.llog(5.0), ERROR_TOLERANCE));
 		assertThat(11.51293, closeTo(SiteIndex2Height.llog(100000.0), ERROR_TOLERANCE));
 	}
 
 	@Test
-	public void testLlogZero() {
+	 void testLlogZero() {
 		assertThat(-11.51293, closeTo(SiteIndex2Height.llog(0.0), ERROR_TOLERANCE));
 	}
 
@@ -189,7 +189,7 @@ public class SiteIndex2HeightTest {
 	}
 
 	@Test
-	public void testHuGarciaQ() { // the way I've done these tests is to validate them with the orginal C code and
+	 void testHuGarciaQ() { // the way I've done these tests is to validate them with the orginal C code and
 									// compare them with the output of the java code
 		// Test case 1
 		double siteIndex1 = 20.0;

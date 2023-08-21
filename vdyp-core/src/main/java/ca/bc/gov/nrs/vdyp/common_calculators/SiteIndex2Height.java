@@ -1509,8 +1509,7 @@ public static double index_to_height (
         height = tage * tage * 1.3 / y2bh / y2bh;
       }
       break;
-    case SI_SW_KER_PLA:
-    case SI_SW_KER_NAT:
+    case SI_SW_KER_PLA, SI_SW_KER_NAT:
       if (bhage > 0.0){
         x2 = 0.02081;
         x3 = 11.1515;
@@ -1776,8 +1775,7 @@ public static double index_to_height (
         height = tage * tage * 1.3 / y2bh / y2bh;
       }
       break;
-    case SI_BA_KURUCZ82:
-    case SI_BL_KURUCZ82:
+    case SI_BA_KURUCZ82, SI_BL_KURUCZ82:
     //case SI_BG_KURUCZ82: Cannot find constants
       if (bhage > 0.0){
         if (site_index > 60 + 1.667 * bhage){
@@ -2664,24 +2662,9 @@ public static double index_to_height (
       */
 
 
-    case SI_BA_NIGHGI:
-    case SI_BL_THROWERGI:
-    case SI_PY_NIGHGI:
-    case SI_CWI_NIGHGI:
-    case SI_FDC_NIGHGI:
-    case SI_FDI_NIGHGI:
-    case SI_HWC_NIGHGI:
-    case SI_HWC_NIGHGI99:
-    case SI_HWI_NIGHGI:
-    case SI_LW_NIGHGI:
+    case SI_BA_NIGHGI, SI_BL_THROWERGI, SI_PY_NIGHGI,  SI_CWI_NIGHGI, SI_FDC_NIGHGI, SI_FDI_NIGHGI, SI_HWC_NIGHGI, SI_HWC_NIGHGI99, SI_HWI_NIGHGI, SI_LW_NIGHGI,
     //case SI_PLI_NIGHGI: Couldnt Find constant
-    case SI_PLI_NIGHGI97:
-    case SI_SE_NIGHGI:
-    case SI_SS_NIGHGI:
-    case SI_SS_NIGHGI99:
-    case SI_SW_NIGHGI:
-    case SI_SW_NIGHGI99:
-    case SI_SW_NIGHGI2004:
+    SI_PLI_NIGHGI97, SI_SE_NIGHGI,  SI_SS_NIGHGI, SI_SS_NIGHGI99,  SI_SW_NIGHGI, SI_SW_NIGHGI99, SI_SW_NIGHGI2004:
 
 
       height = gi_si2ht (cu_index, bhage, site_index);

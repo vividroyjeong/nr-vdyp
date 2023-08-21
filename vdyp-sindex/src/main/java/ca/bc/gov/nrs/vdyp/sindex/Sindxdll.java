@@ -3586,31 +3586,19 @@ public class Sindxdll {
 			cu_index = SI_CWI_NIGH;
 			break;
 
-		case SI_AT_HUANG:
-		case SI_SB_HUANG:
-		case SI_FDI_HUANG_PLA:
-		case SI_FDI_HUANG_NAT:
-		case SI_PLI_HUANG_PLA:
-		case SI_PLI_HUANG_NAT:
-		case SI_SW_HUANG_PLA:
-		case SI_SW_HUANG_NAT:
+		case SI_AT_HUANG, SI_SB_HUANG, SI_FDI_HUANG_PLA, SI_FDI_HUANG_NAT, SI_PLI_HUANG_PLA, SI_PLI_HUANG_NAT, SI_SW_HUANG_PLA, SI_SW_HUANG_NAT:
 			cu_index = SI_ACB_HUANG;
 			break;
 
-		case SI_PLI_CIESZEWSKI:
-		case SI_SB_CIESZEWSKI:
-		case SI_SW_CIESZEWSKI:
+		case SI_PLI_CIESZEWSKI, SI_SB_CIESZEWSKI, SI_SW_CIESZEWSKI:
 			cu_index = SI_AT_CIESZEWSKI;
 			break;
 
-		case SI_PLI_DEMPSTER:
-		case SI_SB_DEMPSTER:
-		case SI_SW_DEMPSTER:
+		case SI_PLI_DEMPSTER, SI_SB_DEMPSTER, SI_SW_DEMPSTER:
 			cu_index = SI_AT_GOUDIE;
 			break;
 
-		case SI_SW_KER_PLA:
-		case SI_SW_KER_NAT:
+		case SI_SW_KER_PLA, SI_SW_KER_NAT:
 			cu_index = SI_SB_KER;
 			break;
 
@@ -3618,14 +3606,11 @@ public class Sindxdll {
 			cu_index = SI_BA_KURUCZ82;
 			break;
 
-		case SI_HWC_BARKER:
-		case SI_SS_BARKER:
+		case SI_HWC_BARKER, SI_SS_BARKER:
 			cu_index = SI_CWC_BARKER;
 			break;
 
-		case SI_LW_MILNER:
-		case SI_PLI_MILNER:
-		case SI_PY_MILNER:
+		case SI_LW_MILNER, SI_PLI_MILNER, SI_PY_MILNER:
 			cu_index = SI_FDI_MILNER;
 			break;
 
@@ -3633,10 +3618,7 @@ public class Sindxdll {
 			cu_index = SI_FDI_VDP_MONT;
 			break;
 
-		case SI_FDI_MONS_GF:
-		case SI_FDI_MONS_WRC:
-		case SI_FDI_MONS_WH:
-		case SI_FDI_MONS_SAF:
+		case SI_FDI_MONS_GF, SI_FDI_MONS_WRC, SI_FDI_MONS_WH, SI_FDI_MONS_SAF:
 			cu_index = SI_FDI_MONS_DF;
 			break;
 
@@ -3644,8 +3626,7 @@ public class Sindxdll {
 			cu_index = SI_HWC_FARR;
 			break;
 
-		case SI_HWC_WILEY_BC:
-		case SI_HWC_WILEY_MB:
+		case SI_HWC_WILEY_BC, SI_HWC_WILEY_MB:
 			cu_index = SI_HWC_WILEY;
 			break;
 
@@ -3653,9 +3634,7 @@ public class Sindxdll {
 			cu_index = SI_PLI_THROWER;
 			break;
 
-		case SI_PLI_GOUDIE_WET:
-		case SI_SW_GOUDIE_PLA:
-		case SI_SW_GOUDIE_NAT:
+		case SI_PLI_GOUDIE_WET, SI_SW_GOUDIE_PLA, SI_SW_GOUDIE_NAT:
 			cu_index = SI_PLI_GOUDIE_DRY;
 			break;
 		}
@@ -3709,10 +3688,7 @@ public class Sindxdll {
 			cu_index = SI_FDI_VDP_MONT;
 			break;
 
-		case SI_FDI_MONS_GF:
-		case SI_FDI_MONS_WRC:
-		case SI_FDI_MONS_WH:
-		case SI_FDI_MONS_SAF:
+		case SI_FDI_MONS_GF, SI_FDI_MONS_WRC, SI_FDI_MONS_WH, SI_FDI_MONS_SAF:
 			cu_index = SI_FDI_MONS_DF;
 			break;
 

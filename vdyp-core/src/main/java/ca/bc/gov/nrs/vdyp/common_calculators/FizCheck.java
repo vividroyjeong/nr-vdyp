@@ -20,19 +20,9 @@ public class FizCheck {
 
 	public static short fiz_check(char fiz) {
 		switch (fiz) {
-		case 'A':
-		case 'B':
-		case 'C':
+		case 'A', 'B', 'C':
 			return FIZ_COAST;
-		case 'D':
-		case 'E':
-		case 'F':
-		case 'G':
-		case 'H':
-		case 'I':
-		case 'J':
-		case 'K':
-		case 'L':
+		case 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L':
 			return FIZ_INTERIOR;
 		default:
 			return FIZ_UNKNOWN;

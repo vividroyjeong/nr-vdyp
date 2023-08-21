@@ -86,8 +86,7 @@ public class SiteClassCode2SiteIndex {
 		}
 
 		switch (sp_index) {
-		case SI_SPEC_ACT:
-		case SI_SPEC_MB:
+		case SI_SPEC_ACT, SI_SPEC_MB:
 			switch (sitecl) {
 			case 'G':
 				return (double) 26;
@@ -99,9 +98,7 @@ public class SiteClassCode2SiteIndex {
 				return (double) 3;
 			}
 			break;
-		case SI_SPEC_AT:
-		case SI_SPEC_EA:
-		case SI_SPEC_EP:
+		case SI_SPEC_AT, SI_SPEC_EA, SI_SPEC_EP:
 			switch (sitecl) {
 			case 'G':
 				return (double) 27;
@@ -137,8 +134,7 @@ public class SiteClassCode2SiteIndex {
 				return (double) 5;
 			}
 			break;
-		case SI_SPEC_CWC:
-		case SI_SPEC_YC:
+		case SI_SPEC_CWC, SI_SPEC_YC:
 			switch (sitecl) {
 			case 'G':
 				return (double) 29;
@@ -241,9 +237,7 @@ public class SiteClassCode2SiteIndex {
 				return (double) 4;
 			}
 			break;
-		case SI_SPEC_LA:
-		case SI_SPEC_LT:
-		case SI_SPEC_LW:
+		case SI_SPEC_LA, SI_SPEC_LT, SI_SPEC_LW:
 			switch (sitecl) {
 			case 'G':
 				return (double) 20;
@@ -255,9 +249,7 @@ public class SiteClassCode2SiteIndex {
 				return (double) 3;
 			}
 			break;
-		case SI_SPEC_PLI:
-		case SI_SPEC_PA:
-		case SI_SPEC_PF:
+		case SI_SPEC_PLI, SI_SPEC_PA, SI_SPEC_PF:
 			switch (sitecl) {
 			case 'G':
 				return (double) 20;
@@ -305,9 +297,7 @@ public class SiteClassCode2SiteIndex {
 				return (double) 4;
 			}
 			break;
-		case SI_SPEC_SB:
-		case SI_SPEC_SW:
-		case SI_SPEC_SE:
+		case SI_SPEC_SB, SI_SPEC_SW, SI_SPEC_SE:
 			switch (sitecl) {
 			case 'G':
 				return (double) 19;
