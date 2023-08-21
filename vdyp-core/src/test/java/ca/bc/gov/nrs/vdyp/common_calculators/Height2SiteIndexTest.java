@@ -2,7 +2,6 @@ package ca.bc.gov.nrs.vdyp.common_calculators;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
@@ -154,6 +153,34 @@ class Height2SiteIndexTest {
 
 			actualResult = Height2SiteIndex
 					.height_to_index((short) SI_FDI_THROWER, age, (short) 2, height, (short) SI_EST_DIRECT);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testAgeTypeIsNotSI_AT_BREASTDefaultCase() {
+			double height = 2;
+			double age = 4;
+			short cu_index = SI_PLI_THROWER;
+
+			double expectedResult = Height2SiteIndex.site_iterate(cu_index, age, SI_AT_TOTAL, height);
+
+			double actualResult = Height2SiteIndex
+					.height_to_index(cu_index, age, (short) 2, height, (short) SI_EST_DIRECT);
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
+
+		@Test
+		void testAgeTypeIsNotSI_AT_BREASTNotSI_EST_DIRECT() {
+			double height = 2;
+			double age = 4;
+			short cu_index = SI_PLI_THROWER;
+
+			double expectedResult = Height2SiteIndex.site_iterate(cu_index, age, SI_AT_TOTAL, height);
+
+			double actualResult = Height2SiteIndex
+					.height_to_index(cu_index, age, (short) 2, height, (short) (SI_EST_DIRECT + 1));
 
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 		}
@@ -4364,6 +4391,19 @@ class Height2SiteIndexTest {
 			);
 		}
 
+		@Test
+		void testSwitchDefault() {
+			double height = 1.3;
+
+			for (int bhage = 1; bhage <= 50; bhage++) {
+				double actualResult = Height2SiteIndex
+						.ba_height_to_index((short) SI_BL_THROWERGI, bhage, height, (short) SI_EST_DIRECT);
+
+				double expectedResult = calculateExpectedResultSI_BL_THROWERGI(bhage, height);
+
+				assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+			}
+		}
 		// TODO test case for switch statement default if SI_BL_THROWERGI+1
 		// TODO test else statment ie SI_EST_DIRECT != si_estab
 
@@ -4371,7 +4411,36 @@ class Height2SiteIndexTest {
 
 	@Nested
 	class site_iterateTest {
+		@Test
+		void testAgeTypeIsSI_AT_BREAST() {
+			short cu_index = SI_PLI_THROWER;
+			double age = 4.0; // we are passing this value in so that we have the SI_PLI_THOWER case where
+								// bhage > pi within SiteIndex2Height
+			short age_type = SI_AT_BREAST;
+			double height = 1.31;
+			// Site index is set to height as a first guess so
+			double site = 1.31;
 
+			double y2bh = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site);
+
+			// Meaning that this call within Height2SiteIndex
+			double test_topCallActual = SiteIndex2Height.index_to_height(cu_index, age, SI_AT_BREAST, site, y2bh, 0.5);
+
+			// Should return
+			double test_topCallExpected = 1.3 + (site - 1.3) * ( ( (1.0
+					+ Math.exp(7.6298 - 0.8940 * SiteIndex2Height.llog(site - 1.3) - 1.3563 * Math.log(50 - 0.5)))
+					/ (1.0 + Math
+							.exp(7.6298 - 0.8940 * SiteIndex2Height.llog(site - 1.3) - 1.3563 * Math.log(age - 0.5)))));
+
+			assertThat(test_topCallActual, closeTo(test_topCallExpected, ERROR_TOLERANCE)); // this should be 1.31 (or
+																							// close to it)
+
+			double actualFinalResult = Height2SiteIndex.site_iterate(cu_index, age, age_type, height);
+
+			assertThat(actualFinalResult, closeTo(test_topCallExpected, 0.01)); // since it is not altered and has an
+																				// error tolerance of 0.01
+
+		}
 	}
 
 	// TODO edge cases? for example if 1 is pased in as site index loops forever

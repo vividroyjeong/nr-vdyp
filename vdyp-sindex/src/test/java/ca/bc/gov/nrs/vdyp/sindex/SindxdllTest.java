@@ -1369,6 +1369,1165 @@ class SindxdllTest {
 			short cuIndex = 0;
 			assertThrows(CurveErrorException.class, () -> Sindxdll.NextCurve(spIndex, cuIndex));
 		}
+
+		@Test
+		void testSI_ACB_HUANGAC() {
+			short sp_index = SI_SPEC_ACB;
+			short cu_index = SI_ACB_HUANGAC;
+
+			short expectResut = SI_ACB_HUANG;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_ACB_HUANG() {
+			short cu_index = SI_ACB_HUANG;
+			short sp_index = SI_SPEC_ACB;
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_ACT_THROWERAC() {
+			short sp_index = SI_SPEC_ACT;
+			short cu_index = SI_ACT_THROWERAC;
+
+			short expectResut = SI_ACT_THROWER;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_ACT_THROWER() {
+			short sp_index = SI_SPEC_ACT;
+			short cu_index = SI_ACT_THROWER;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_AT_NIGH() {
+			short sp_index = SI_SPEC_AT;
+			short cu_index = SI_AT_NIGH;
+
+			short expectResut = SI_AT_CHEN;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_AT_CHEN() {
+			short sp_index = SI_SPEC_AT;
+			short cu_index = SI_AT_CHEN;
+
+			short expectResut = SI_AT_HUANG;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_AT_HUANG() {
+			short sp_index = SI_SPEC_AT;
+			short cu_index = SI_AT_HUANG;
+
+			short expectResut = SI_AT_CIESZEWSKI;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_AT_CIESZEWSKI() {
+			short sp_index = SI_SPEC_AT;
+			short cu_index = SI_AT_CIESZEWSKI;
+
+			short expectResut = SI_AT_GOUDIE;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_AT_GOUDIE() {
+			short sp_index = SI_SPEC_AT;
+			short index = SI_AT_GOUDIE;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, index));
+		}
+
+		@Test
+		void testSI_BA_NIGHGI() {
+			short sp_index = SI_SPEC_BA;
+			short cu_index = SI_BA_NIGHGI;
+
+			short expectResut = SI_BA_NIGH;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_BA_NIGH() {
+			short sp_index = SI_SPEC_BA;
+			short cu_index = SI_BA_NIGH;
+
+			short expectResut = SI_BA_KURUCZ82AC;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_BA_KURUCZ82AC() {
+			short sp_index = SI_SPEC_BA;
+			short cu_index = SI_BA_KURUCZ82AC;
+
+			short expectResut = SI_BA_DILUCCA;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_BA_DILUCCA() {
+			short sp_index = SI_SPEC_BA;
+			short cu_index = SI_BA_DILUCCA;
+
+			short expectResut = SI_BA_KURUCZ86;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_BA_KURUCZ86() {
+			short sp_index = SI_SPEC_BA;
+			short cu_index = SI_BA_KURUCZ86;
+
+			short expectResut = SI_BA_KURUCZ82;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_BA_KURUCZ82() {
+			short sp_index = SI_SPEC_BA;
+			short cu_index = SI_BA_KURUCZ82;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_BL_CHENAC() {
+			short sp_index = SI_SPEC_BL;
+			short cu_index = SI_BL_CHENAC;
+
+			short expectResut = SI_BL_CHEN;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_BL_CHEN() {
+			short sp_index = SI_SPEC_BL;
+			short cu_index = SI_BL_CHEN;
+
+			short expectResut = SI_BL_THROWERGI;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_BL_THROWERGI() {
+			short sp_index = SI_SPEC_BL;
+			short cu_index = SI_BL_THROWERGI;
+
+			short expectResut = SI_BL_KURUCZ82;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_BL_KURUCZ82() {
+			short sp_index = SI_SPEC_BL;
+			short cu_index = SI_BL_KURUCZ82;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_BP_CURTISAC() {
+			short sp_index = SI_SPEC_BP;
+			short cu_index = SI_BP_CURTISAC;
+
+			short expectResut = SI_BP_CURTIS;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_BP_CURTIS() {
+			short sp_index = SI_SPEC_BP;
+			short cu_index = SI_BP_CURTIS;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_CWC_NIGH() {
+			short sp_index = SI_SPEC_CWC;
+			short cu_index = SI_CWC_NIGH;
+
+			short expectResut = SI_CWC_KURUCZAC;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_CWC_KURUCZAC() {
+			short sp_index = SI_SPEC_CWC;
+			short cu_index = SI_CWC_KURUCZAC;
+
+			short expectResut = SI_CWC_KURUCZ;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_CWC_KURUCZ() {
+			short sp_index = SI_SPEC_CWC;
+			short cu_index = SI_CWC_KURUCZ;
+
+			short expectResut = SI_CWC_BARKER;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_CWC_BARKER() {
+			short sp_index = SI_SPEC_CWC;
+			short cu_index = SI_CWC_BARKER;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_CWI_NIGH() {
+			short sp_index = SI_SPEC_CWI;
+			short cu_index = SI_CWI_NIGH;
+
+			short expectResut = SI_CWI_NIGHGI;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_CWI_NIGHGI() {
+			short sp_index = SI_SPEC_CWI;
+			short cu_index = SI_CWI_NIGHGI;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_DR_NIGH() {
+			short sp_index = SI_SPEC_DR;
+			short cu_index = SI_DR_NIGH;
+
+			short expectResut = SI_DR_HARRING;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_DR_HARRING() {
+			short sp_index = SI_SPEC_DR;
+			short cu_index = SI_DR_HARRING;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_EP_NIGH() {
+			short sp_index = SI_SPEC_EP;
+			short cu_index = SI_EP_NIGH;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_FDC_BRUCEAC() {
+			short sp_index = SI_SPEC_FDC;
+			short cu_index = SI_FDC_BRUCEAC;
+
+			short expectResut = SI_FDC_NIGHTA;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_FDC_NIGHTA() {
+			short sp_index = SI_SPEC_FDC;
+			short cu_index = SI_FDC_NIGHTA;
+
+			short expectResut = SI_FDC_NIGHGI;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_FDC_NIGHGI() {
+			short sp_index = SI_SPEC_FDC;
+			short cu_index = SI_FDC_NIGHGI;
+
+			short expectResut = SI_FDC_BRUCE;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_FDC_BRUCE() {
+			short sp_index = SI_SPEC_FDC;
+			short cu_index = SI_FDC_BRUCE;
+
+			short expectResut = SI_FDC_COCHRAN;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_FDC_COCHRAN() {
+			short sp_index = SI_SPEC_FDC;
+			short cu_index = SI_FDC_COCHRAN;
+
+			short expectResut = SI_FDC_KING;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_FDC_KING() {
+			short sp_index = SI_SPEC_FDC;
+			short cu_index = SI_FDC_KING;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_FDI_THROWERAC() {
+			short sp_index = SI_SPEC_FDI;
+			short cu_index = SI_FDI_THROWERAC;
+
+			short expectResut = SI_FDI_NIGHGI;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_FDI_NIGHGI() {
+			short sp_index = SI_SPEC_FDI;
+			short cu_index = SI_FDI_NIGHGI;
+
+			short expectResut = SI_FDI_HUANG_PLA;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_FDI_HUANG_PLA() {
+			short sp_index = SI_SPEC_FDI;
+			short cu_index = SI_FDI_HUANG_PLA;
+
+			short expectResut = SI_FDI_HUANG_NAT;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_FDI_HUANG_NAT() {
+			short sp_index = SI_SPEC_FDI;
+			short cu_index = SI_FDI_HUANG_NAT;
+
+			short expectResut = SI_FDI_MILNER;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_FDI_MILNER() {
+			short sp_index = SI_SPEC_FDI;
+			short cu_index = SI_FDI_MILNER;
+
+			short expectResut = SI_FDI_THROWER;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_FDI_THROWER() {
+			short sp_index = SI_SPEC_FDI;
+			short cu_index = SI_FDI_THROWER;
+
+			short expectResut = SI_FDI_VDP_MONT;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_FDI_VDP_MONT() {
+			short sp_index = SI_SPEC_FDI;
+			short cu_index = SI_FDI_VDP_MONT;
+
+			short expectResut = SI_FDI_VDP_WASH;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_FDI_VDP_WASH() {
+			short sp_index = SI_SPEC_FDI;
+			short cu_index = SI_FDI_VDP_WASH;
+
+			short expectResut = SI_FDI_MONS_DF;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_FDI_MONS_DF() {
+			short sp_index = SI_SPEC_FDI;
+			short cu_index = SI_FDI_MONS_DF;
+
+			short expectResut = SI_FDI_MONS_GF;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_FDI_MONS_GF() {
+			short sp_index = SI_SPEC_FDI;
+			short cu_index = SI_FDI_MONS_GF;
+
+			short expectResut = SI_FDI_MONS_WRC;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_FDI_MONS_WRC() {
+			short sp_index = SI_SPEC_FDI;
+			short cu_index = SI_FDI_MONS_WRC;
+
+			short expectResut = SI_FDI_MONS_WH;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_FDI_MONS_WH() {
+			short sp_index = SI_SPEC_FDI;
+			short cu_index = SI_FDI_MONS_WH;
+
+			short expectResut = SI_FDI_MONS_SAF;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_FDI_MONS_SAF() {
+			short sp_index = SI_SPEC_FDI;
+			short cu_index = SI_FDI_MONS_SAF;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_HM_MEANSAC() {
+			short sp_index = SI_SPEC_HM;
+			short cu_index = SI_HM_MEANSAC;
+
+			short expectResut = SI_HM_MEANS;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_HM_MEANS() {
+			short sp_index = SI_SPEC_HM;
+			short cu_index = SI_HM_MEANS;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_HWC_WILEYAC() {
+			short sp_index = SI_SPEC_HWC;
+			short cu_index = SI_HWC_WILEYAC;
+
+			short expectResut = SI_HWC_NIGHGI99;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_HWC_NIGHGI99() {
+			short sp_index = SI_SPEC_HWC;
+			short cu_index = SI_HWC_NIGHGI99;
+
+			short expectResut = SI_HWC_FARR;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_HWC_FARR() {
+			short sp_index = SI_SPEC_HWC;
+			short cu_index = SI_HWC_FARR;
+
+			short expectResut = SI_HWC_BARKER;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_HWC_BARKER() {
+			short sp_index = SI_SPEC_HWC;
+			short cu_index = SI_HWC_BARKER;
+
+			short expectResut = SI_HWC_WILEY;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_HWC_WILEY() {
+			short sp_index = SI_SPEC_HWC;
+			short cu_index = SI_HWC_WILEY;
+
+			short expectResut = SI_HWC_WILEY_BC;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_HWC_WILEY_BC() {
+			short sp_index = SI_SPEC_HWC;
+			short cu_index = SI_HWC_WILEY_BC;
+
+			short expectResut = SI_HWC_WILEY_MB;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_HWC_WILEY_MB() {
+			short sp_index = SI_SPEC_HWC;
+			short cu_index = SI_HWC_WILEY_MB;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_HWI_NIGH() {
+			short sp_index = SI_SPEC_HWI;
+			short cu_index = SI_HWI_NIGH;
+
+			short expectResut = SI_HWI_NIGHGI;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_HWI_NIGHGI() {
+			short sp_index = SI_SPEC_HWI;
+			short cu_index = SI_HWI_NIGHGI;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_LW_NIGH() {
+			short sp_index = SI_SPEC_LW;
+			short cu_index = SI_LW_NIGH;
+
+			short expectResut = SI_LW_NIGHGI;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_LW_NIGHGI() {
+			short sp_index = SI_SPEC_LW;
+			short cu_index = SI_LW_NIGHGI;
+
+			short expectResut = SI_LW_MILNER;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_LW_MILNER() {
+			short sp_index = SI_SPEC_LW;
+			short cu_index = SI_LW_MILNER;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_PJ_HUANG() {
+			short sp_index = SI_SPEC_PJ;
+			short cu_index = SI_PJ_HUANG;
+
+			short expectResut = SI_PJ_HUANGAC;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_PJ_HUANGAC() {
+			short sp_index = SI_SPEC_PJ;
+			short cu_index = SI_PJ_HUANGAC;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_PL_CHEN() {
+			short sp_index = SI_SPEC_PLI;
+			short cu_index = SI_PL_CHEN;
+
+			short expectResut = SI_PLI_THROWNIGH;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_PLI_THROWNIGH() {
+			short sp_index = SI_SPEC_PLI;
+			short cu_index = SI_PLI_THROWNIGH;
+
+			short expectResut = SI_PLI_NIGHTA98;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_PLI_NIGHTA98() {
+			short sp_index = SI_SPEC_PLI;
+			short cu_index = SI_PLI_NIGHTA98;
+
+			short expectResut = SI_PLI_NIGHGI97;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_PLI_NIGHGI97() {
+			short sp_index = SI_SPEC_PLI;
+			short cu_index = SI_PLI_NIGHGI97;
+
+			short expectResut = SI_PLI_HUANG_PLA;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_PLI_HUANG_PLA() {
+			short sp_index = SI_SPEC_PLI;
+			short cu_index = SI_PLI_HUANG_PLA;
+
+			short expectResut = SI_PLI_HUANG_NAT;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_PLI_HUANG_NAT() {
+			short sp_index = SI_SPEC_PLI;
+			short cu_index = SI_PLI_HUANG_NAT;
+
+			short expectResut = SI_PLI_THROWER;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_PLI_THROWER() {
+			short sp_index = SI_SPEC_PLI;
+			short cu_index = SI_PLI_THROWER;
+
+			short expectResut = SI_PLI_MILNER;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_PLI_MILNER() {
+			short sp_index = SI_SPEC_PLI;
+			short cu_index = SI_PLI_MILNER;
+
+			short expectResut = SI_PLI_CIESZEWSKI;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_PLI_CIESZEWSKI() {
+			short sp_index = SI_SPEC_PLI;
+			short cu_index = SI_PLI_CIESZEWSKI;
+
+			short expectResut = SI_PLI_GOUDIE_DRY;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_PLI_GOUDIE_DRY() {
+			short sp_index = SI_SPEC_PLI;
+			short cu_index = SI_PLI_GOUDIE_DRY;
+
+			short expectResut = SI_PLI_GOUDIE_WET;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_PLI_GOUDIE_WET() {
+			short sp_index = SI_SPEC_PLI;
+			short cu_index = SI_PLI_GOUDIE_WET;
+
+			short expectResut = SI_PLI_DEMPSTER;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_PLI_DEMPSTER() {
+			short sp_index = SI_SPEC_PLI;
+			short cu_index = SI_PLI_DEMPSTER;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_PW_CURTISAC() {
+			short sp_index = SI_SPEC_PW;
+			short cu_index = SI_PW_CURTISAC;
+
+			short expectResut = SI_PW_CURTIS;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_PW_CURTIS() {
+			short sp_index = SI_SPEC_PW;
+			short cu_index = SI_PW_CURTIS;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_PY_NIGH() {
+			short sp_index = SI_SPEC_PY;
+			short cu_index = SI_PY_NIGH;
+
+			short expectResut = SI_PY_NIGHGI;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_PY_NIGHGI() {
+			short sp_index = SI_SPEC_PY;
+			short cu_index = SI_PY_NIGHGI;
+
+			short expectResut = SI_PY_HANNAC;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_PY_HANNAC() {
+			short sp_index = SI_SPEC_PY;
+			short cu_index = SI_PY_HANNAC;
+
+			short expectResut = SI_PY_MILNER;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_PY_MILNER() {
+			short sp_index = SI_SPEC_PY;
+			short cu_index = SI_PY_MILNER;
+
+			short expectResut = SI_PY_HANN;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_PY_HANN() {
+			short sp_index = SI_SPEC_PY;
+			short cu_index = SI_PY_HANN;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_SB_NIGH() {
+			short sp_index = SI_SPEC_SB;
+			short cu_index = SI_SB_NIGH;
+
+			short expectResut = SI_SB_HUANG;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SB_HUANG() {
+			short sp_index = SI_SPEC_SB;
+			short cu_index = SI_SB_HUANG;
+
+			short expectResut = SI_SB_CIESZEWSKI;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SB_CIESZEWSKI() {
+			short sp_index = SI_SPEC_SB;
+			short cu_index = SI_SB_CIESZEWSKI;
+
+			short expectResut = SI_SB_KER;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SB_KER() {
+			short sp_index = SI_SPEC_SB;
+			short cu_index = SI_SB_KER;
+
+			short expectResut = SI_SB_DEMPSTER;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SB_DEMPSTER() {
+			short sp_index = SI_SPEC_SB;
+			short cu_index = SI_SB_DEMPSTER;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_SE_CHENAC() {
+			short sp_index = SI_SPEC_SE;
+			short cu_index = SI_SE_CHENAC;
+
+			short expectResut = SI_SE_CHEN;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SE_CHEN() {
+			short sp_index = SI_SPEC_SE;
+			short cu_index = SI_SE_CHEN;
+
+			short expectResut = SI_SE_NIGHGI;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SE_NIGHGI() {
+			short sp_index = SI_SPEC_SE;
+			short cu_index = SI_SE_NIGHGI;
+
+			short expectResut = SI_SE_NIGH;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SE_NIGH() {
+			short sp_index = SI_SPEC_SE;
+			short cu_index = SI_SE_NIGH;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_SS_NIGHGI99() {
+			short sp_index = SI_SPEC_SS;
+			short cu_index = SI_SS_NIGHGI99;
+
+			short expectResut = SI_SS_NIGH;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SS_NIGH() {
+			short sp_index = SI_SPEC_SS;
+			short cu_index = SI_SS_NIGH;
+
+			short expectResut = SI_SS_GOUDIE;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SS_GOUDIE() {
+			short sp_index = SI_SPEC_SS;
+			short cu_index = SI_SS_GOUDIE;
+
+			short expectResut = SI_SS_FARR;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SS_FARR() {
+			short sp_index = SI_SPEC_SS;
+			short cu_index = SI_SS_FARR;
+
+			short expectResut = SI_SS_BARKER;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SS_BARKER() {
+			short sp_index = SI_SPEC_SS;
+			short cu_index = SI_SS_BARKER;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
+
+		@Test
+		void testSI_SW_GOUDNIGH() {
+			short sp_index = SI_SPEC_SW;
+			short cu_index = SI_SW_GOUDNIGH;
+
+			short expectResut = SI_SW_HU_GARCIA;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SW_HU_GARCIA() {
+			short sp_index = SI_SPEC_SW;
+			short cu_index = SI_SW_HU_GARCIA;
+
+			short expectResut = SI_SW_NIGHTA;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SW_NIGHTA() {
+			short sp_index = SI_SPEC_SW;
+			short cu_index = SI_SW_NIGHTA;
+
+			short expectResut = SI_SW_NIGHGI2004;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SW_NIGHGI2004() {
+			short sp_index = SI_SPEC_SW;
+			short cu_index = SI_SW_NIGHGI2004;
+
+			short expectResut = SI_SW_HUANG_PLA;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SW_HUANG_PLA() {
+			short sp_index = SI_SPEC_SW;
+			short cu_index = SI_SW_HUANG_PLA;
+
+			short expectResut = SI_SW_HUANG_NAT;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SW_HUANG_NAT() {
+			short sp_index = SI_SPEC_SW;
+			short cu_index = SI_SW_HUANG_NAT;
+
+			short expectResut = SI_SW_THROWER;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SW_THROWER() {
+			short sp_index = SI_SPEC_SW;
+			short cu_index = SI_SW_THROWER;
+
+			short expectResut = SI_SW_CIESZEWSKI;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SW_CIESZEWSKI() {
+			short sp_index = SI_SPEC_SW;
+			short cu_index = SI_SW_CIESZEWSKI;
+
+			short expectResut = SI_SW_KER_PLA;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SW_KER_PLA() {
+			short sp_index = SI_SPEC_SW;
+			short cu_index = SI_SW_KER_PLA;
+
+			short expectResut = SI_SW_KER_NAT;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SW_KER_NAT() {
+			short sp_index = SI_SPEC_SW;
+			short cu_index = SI_SW_KER_NAT;
+
+			short expectResut = SI_SW_GOUDIE_PLAAC;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SW_GOUDIE_PLAAC() {
+			short sp_index = SI_SPEC_SW;
+			short cu_index = SI_SW_GOUDIE_PLAAC;
+
+			short expectResut = SI_SW_GOUDIE_PLA;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SW_GOUDIE_PLA() {
+			short sp_index = SI_SPEC_SW;
+			short cu_index = SI_SW_GOUDIE_PLA;
+
+			short expectResut = SI_SW_GOUDIE_NATAC;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SW_GOUDIE_NATAC() {
+			short sp_index = SI_SPEC_SW;
+			short cu_index = SI_SW_GOUDIE_NATAC;
+
+			short expectResut = SI_SW_GOUDIE_NAT;
+			short actualResult = Sindxdll.NextCurve(sp_index, cu_index);
+
+			assertEquals(actualResult, expectResut);
+		}
+
+		@Test
+		void testSI_SW_GOUDIE_NAT() {
+			short sp_index = SI_SPEC_SW;
+			short cu_index = SI_SW_GOUDIE_NAT;
+
+			assertThrows(NoAnswerException.class, () -> Sindxdll.NextCurve(sp_index, cu_index));
+		}
 	}
 
 	@Nested
