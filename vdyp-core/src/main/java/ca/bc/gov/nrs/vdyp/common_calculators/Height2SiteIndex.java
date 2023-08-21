@@ -4070,31 +4070,12 @@ public class Height2SiteIndex {
 																											// have to
 																											// change
 			} else {
-				if (y2bh == SI_ERR_GI_TOT) {
-					/* cannot do this for GI equations */
-					site = SI_ERR_GI_TOT;
-					break;
-				}
 				/* was age - y2bh */
 				test_top = SiteIndex2Height.index_to_height(
 						cu_index, Age2Age.age_to_age(cu_index, age, SI_AT_TOTAL, SI_AT_BREAST, y2bh), SI_AT_BREAST,
 						site, y2bh, 0.5
 				); // 0.5 may have to change
 			}
-
-			if (test_top == SI_ERR_CURVE) /* unknown cu_index */ {
-				site = test_top;
-				break;
-			} else if (test_top == SI_ERR_NO_ANS) { /* height > 999 */
-				site = 1000; /* should force an error code */
-			} else if (test_top == SI_ERR_GI_MAX) { /* bhage > range for GI model */
-				site = test_top;
-				break;
-			} else if (test_top == SI_ERR_GI_MIN) { /* bhage < 0.5 for GI model */
-				site = test_top;
-				break;
-			}
-
 			/*
 			 * System.out.
 			 * printf("age=%.0f, height=%.1f, test_top=%.1f, site=%.2f, step=%.7f%n", age,
@@ -4143,25 +4124,8 @@ public class Height2SiteIndex {
 			}
 		} while (true);
 
-		if (site == SI_ERR_GI_MIN) {
-			throw new GrowthInterceptMinimumException("Bhage < 0.5 years, site: " + site);
-		} else if (site == SI_ERR_GI_MAX) {
-			throw new GrowthInterceptMaximumException(
-					"Variable height growth intercept formulation; bhage > range, site: " + site
-			);
-		} else if (site == SI_ERR_NO_ANS) {
-			throw new NoAnswerException("Iteration could not converge (projected site index > 999), site: " + site);
-		} else if (site == SI_ERR_CURVE) {
-			throw new CurveErrorException("Unknown curve index, site: " + site);
-		} else if (site == SI_ERR_GI_TOT) {
-			throw new GrowthInterceptTotalException(
-					"Cannot compute growth intercept when using total age, site: " + site
-			);
-		} else {
 			return site;
 		}
-
-	}
 
 	public static double hu_garcia_q(double site_index, double bhage) {
 		double h, q, step, diff, lastdiff;

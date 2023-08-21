@@ -4394,18 +4394,29 @@ class Height2SiteIndexTest {
 		@Test
 		void testSwitchDefault() {
 			double height = 1.3;
+			double bhage = 4;
 
-			for (int bhage = 1; bhage <= 50; bhage++) {
-				double actualResult = Height2SiteIndex
-						.ba_height_to_index((short) SI_BL_THROWERGI, bhage, height, (short) SI_EST_DIRECT);
+			double actualResult = Height2SiteIndex
+					.ba_height_to_index((short) (SI_BL_THROWERGI + 1), bhage, height, (short) SI_EST_DIRECT);
 
-				double expectedResult = calculateExpectedResultSI_BL_THROWERGI(bhage, height);
+			double expectedResult = Height2SiteIndex
+					.site_iterate((short) (SI_BL_THROWERGI + 1), bhage, SI_AT_BREAST, height);
 
-				assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
-			}
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 		}
-		// TODO test case for switch statement default if SI_BL_THROWERGI+1
-		// TODO test else statment ie SI_EST_DIRECT != si_estab
+
+		@Test
+		void testNeitherIfStatement() {
+			double height = 1.31;
+			double bhage = 4;
+
+			double actualResult = Height2SiteIndex
+					.ba_height_to_index((short) SI_PLI_THROWER, bhage, height, (short) (SI_EST_DIRECT + 1));
+
+			double expectedResult = 1.31; // site_iterate call
+
+			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		}
 
 	}
 
