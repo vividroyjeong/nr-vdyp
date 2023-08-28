@@ -471,9 +471,6 @@ public class Sindxdll {
 	private static final int SI_SW_THROWER = 66;
 	private static final int SI_MAX_CURVES = 123;
 
-	public static String[] si_spec_code = new String[SI_MAX_SPECIES]; /* species codes */
-	public static String[] si_spec_name = new String[SI_MAX_SPECIES]; /* species name */
-	public static String[] si_curve_name = new String[SI_MAX_CURVES]; /* curve names */
 
 	/*
 	 * Site index conversion between species. Here's how to use the following array:
@@ -487,11 +484,7 @@ public class Sindxdll {
 	private static final int SI_MAX_CONVERT = 29;
 	public static double[][] si_convert = new double[SI_MAX_CONVERT][4];
 
-	/*
-	 * indicates what equations are available (additive): 1: ht = fn (si, age) 2: si
-	 * = fn (ht, age) 4: y2bh = fn (si) 8: si = fn (ht, age) growth intercept
-	 */
-	public static char[] si_curve_types = new char[SI_MAX_CURVES]; /* curve types available */
+
 
 //From sindxdll.c
 	private static final int SI_SPEC_START = SI_SPEC_A;
@@ -2244,7 +2237,7 @@ public class Sindxdll {
 			throw new IllegalArgumentException("Input parameter is not a valid species index: " + sp_index);
 		}
 
-		return si_spec_code[sp_index];
+		return SiteIndexNames.si_spec_code[sp_index];
 	}
 
 	/**
@@ -2262,7 +2255,7 @@ public class Sindxdll {
 			throw new IllegalArgumentException("Input parameter is not a valid species index: " + sp_index);
 		}
 
-		return si_spec_name[sp_index];
+		return SiteIndexNames.si_spec_name[sp_index];
 	}
 
 	/**
@@ -2574,9 +2567,9 @@ public class Sindxdll {
 	 *                               species index.
 	 */
 	public static short DefCurve(short sp_index) {
-		if (sp_index < 0 || sp_index >= SI_MAX_SPECIES) { // spec
+		if (sp_index < 0 || sp_index >= SI_MAX_SPECIES) { 
 			throw new SpeciesErrorException("Input parameter is not a valid species index: " + sp_index);
-		} else if (sp_index == SI_SPEC_END) { // none, removE???
+		} else if (sp_index == SI_SPEC_END) { 
 			throw new NoAnswerException("Input parameter is the last defined species index: " + sp_index);
 		}
 
@@ -3106,7 +3099,7 @@ public class Sindxdll {
 	 */
 	public static String CurveName(short cu_index) {
 		if (cu_index >= 0 && cu_index < SI_MAX_CURVES) {
-			return si_curve_name[cu_index];
+			return SiteIndexNames.si_curve_name[cu_index];
 		}
 
 		throw new CurveErrorException("Input parameter is not a valid curve index: " + cu_index);
@@ -3127,7 +3120,7 @@ public class Sindxdll {
 	 */
 	public static short CurveUse(short cu_index) {
 		if (cu_index >= 0 && cu_index < SI_MAX_CURVES) {
-			return (short) (si_curve_types[cu_index]);
+			return (short) (SiteIndexNames.si_curve_types[cu_index]);
 		}
 		throw new CurveErrorException("If input curve is not a valid curve index: " + cu_index);
 	}

@@ -370,6 +370,45 @@ class SindxdllTest {
 					"SpecCode should throw IllegalArgumentException for invalid index"
 			);
 		}
+		
+		@Test 
+		void testValidIndex() {
+			short validIndex = 0;
+			String expectedResult = "A";
+			String actualResult = Sindxdll.SpecCode(validIndex);
+			
+			assertEquals(actualResult, expectedResult);
+		}
+	}
+	
+	@Nested
+	class SpecNameTest {
+		@Test
+		void testTooSmallIndex() {
+			short invalidIndex = -1; // Choose an invalid index for testing
+			assertThrows(
+					IllegalArgumentException.class, () -> Sindxdll.SpecName(invalidIndex),
+					"SpecName should throw IllegalArgumentException for invalid index"
+			);
+		}
+
+		@Test
+		void testTooBigIndex() {
+			short invalidIndex = 135; // Choose an invalid index for testing
+			assertThrows(
+					IllegalArgumentException.class, () -> Sindxdll.SpecName(invalidIndex),
+					"SpecName should throw IllegalArgumentException for invalid index"
+			);
+		}
+		
+		@Test 
+		void testValidIndex() {
+			short validIndex = 0;
+			String expectedResult = "Aspen";
+			String actualResult = Sindxdll.SpecName(validIndex);
+			
+			assertEquals(actualResult, expectedResult);
+		}
 	}
 
 	@Nested
@@ -2534,11 +2573,46 @@ class SindxdllTest {
 	@Nested
 	@DisplayName("Tests for CurveName method")
 	class CurveNameTest {
+
+		@Test
+		void testInvalidIndex() {
+			short invalidIndex = 135; // Choose an invalid index for testing
+			assertThrows(
+					CurveErrorException.class, () -> Sindxdll.CurveName(invalidIndex),
+					"CurveName should throw IllegalArgumentException for invalid index"
+			);
+		}
+		
+		@Test 
+		void testValidIndex() {
+			short validIndex = 0;
+			String expectedResult = "Huang, Titus, and Lakusta (1994)";
+			String actualResult = Sindxdll.CurveName(validIndex);
+			
+			assertEquals(actualResult, expectedResult);
+		}
 	}
 
 	@Nested
 	@DisplayName("Tests for CurveUse method")
 	class CurveUseTest {
+		@Test
+		void testInvalidIndex() {
+			short invalidIndex = 135; // Choose an invalid index for testing
+			assertThrows(
+					CurveErrorException.class, () -> Sindxdll.CurveUse(invalidIndex),
+					"CurveUse should throw IllegalArgumentException for invalid index"
+			);
+		}
+		
+		@Test 
+		void testValidIndex() {
+			short validIndex = 0;
+			short expectedResult = 5;
+			short actualResult = Sindxdll.CurveUse(validIndex);
+			
+			assertEquals(actualResult, expectedResult);
+		}
 	}
 
 	@Test
