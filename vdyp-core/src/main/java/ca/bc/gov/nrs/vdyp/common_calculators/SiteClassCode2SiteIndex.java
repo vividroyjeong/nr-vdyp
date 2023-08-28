@@ -80,7 +80,6 @@ public class SiteClassCode2SiteIndex {
 
 	public static double class_to_index(short sp_index, char sitecl, char fiz) throws IllegalArgumentException {
 		if (sitecl != 'G' && sitecl != 'M' && sitecl != 'P' && sitecl != 'L') {
-			// return SI_ERR_CLASS;
 			throw new ClassErrorException("Unknown site class code: " + sitecl);
 
 		}

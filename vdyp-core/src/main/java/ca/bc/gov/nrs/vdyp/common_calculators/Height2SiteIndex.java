@@ -147,7 +147,7 @@ public class Height2SiteIndex {
 	 * error codes
 	 */
 	private static final int SI_ERR_NO_ANS = -4;
-	
+
 	/* define species and equation indices */
 	private static final int SI_AT_GOUDIE = 4;
 	private static final int SI_BA_DILUCCA = 5;

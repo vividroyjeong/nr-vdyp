@@ -60,7 +60,7 @@ public class SpecRMap {
  * 2015 apr 9  - Removed species code "Bv".
  */
 /* @formatter:on */
-//Taken from sindex.h
+	// Taken from sindex.h
 	/* define species and equation indices */
 	private static final int SI_SPEC_A = 0;
 	private static final int SI_SPEC_ABAL = 1;
@@ -217,7 +217,7 @@ public class SpecRMap {
 		 */
 
 		// This could be improved with a switch statement or even an if/else. But I have
-		// left it since it's like 4 like
+		// left it since it's like for like
 		if (sc2.equals("A")) {
 			return SI_SPEC_A;
 		}

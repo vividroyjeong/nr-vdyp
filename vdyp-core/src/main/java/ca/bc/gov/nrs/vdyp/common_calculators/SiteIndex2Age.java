@@ -188,6 +188,7 @@ public class SiteIndex2Age {
 			x4 = llog(1.372 / site_index) / x4Denominator;
 
 			x1 = llog(site_height / site_index) / x4 + x3;
+
 			if (x1 < 0) {
 				age = SI_ERR_NO_ANS;
 			} else {

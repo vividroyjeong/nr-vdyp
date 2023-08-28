@@ -3167,21 +3167,7 @@ public class Sindxdll {
 	 */
 	public static short HtAgeToSI(short curve, double age, short ageType, double height, short estType, double[] site) {
 		// Here the original uses a pointer. I have replaced all pointers with arrays.
-		site[0] = Height2SiteIndex.height_to_index(curve, age, ageType, height, estType); // This is from ht2si.c
-		if (site[0] < 0) {
-			switch ((short) site[0]) {
-			case SI_ERR_CURVE:
-				throw new CurveErrorException("Input curve is not a valid curve index.");
-			case SI_ERR_GI_MIN:
-				throw new GrowthInterceptMinimumException("bhage is less than 0.5");
-			case SI_ERR_GI_MAX:
-				throw new GrowthInterceptMaximumException("Nhage is greater than GI range");
-			case SI_ERR_NO_ANS:
-				throw new NoAnswerException("Computed site index is greater than 999.");
-			case SI_ERR_GI_TOT:
-				throw new GrowthInterceptTotalException("Total age and GI curve");
-			}
-		}
+		site[0] = Height2SiteIndex.height_to_index(curve, age, ageType, height, estType);
 
 		return 0;
 	}
@@ -3217,22 +3203,6 @@ public class Sindxdll {
 	public static short
 			HtSIToAge(short curve, double height, short ageType, double siteIndex, double y2bh, double[] age) {
 		age[0] = SiteIndex2Age.index_to_age(curve, height, ageType, siteIndex, y2bh);
-		if (age[0] < 0) {
-			switch ((short) age[0]) {
-			case SI_ERR_CURVE:
-				throw new CurveErrorException("Input curve is not a valid curve index.");
-			case SI_ERR_GI_MIN:
-				throw new GrowthInterceptMinimumException("bhage is less than 0.5");
-			case SI_ERR_GI_MAX:
-				throw new GrowthInterceptMaximumException("bhage is greater than GI range");
-			case SI_ERR_NO_ANS:
-				throw new NoAnswerException("Computed site index is greater than 999.");
-			case SI_ERR_GI_TOT:
-				throw new GrowthInterceptTotalException("Total age and GI curve");
-			case SI_ERR_LT13:
-				throw new LessThan13Exception("Site index is less than or equal to 1.3");
-			}
-		}
 
 		return 0;
 	}
@@ -3586,7 +3556,8 @@ public class Sindxdll {
 			cu_index = SI_CWI_NIGH;
 			break;
 
-		case SI_AT_HUANG, SI_SB_HUANG, SI_FDI_HUANG_PLA, SI_FDI_HUANG_NAT, SI_PLI_HUANG_PLA, SI_PLI_HUANG_NAT, SI_SW_HUANG_PLA, SI_SW_HUANG_NAT:
+		case SI_AT_HUANG, SI_SB_HUANG, SI_FDI_HUANG_PLA, SI_FDI_HUANG_NAT, SI_PLI_HUANG_PLA, SI_PLI_HUANG_NAT,
+				SI_SW_HUANG_PLA, SI_SW_HUANG_NAT:
 			cu_index = SI_ACB_HUANG;
 			break;
 

@@ -69,18 +69,18 @@ class Height2SiteIndexTest {
 	}
 
 	@Test
-	 void testPpowZero() {
+	void testPpowZero() {
 		assertThat(0.0, closeTo(Height2SiteIndex.ppow(0.0, 3.0), ERROR_TOLERANCE));
 	}
 
 	@Test
-	 void testLlogPositive() {
+	void testLlogPositive() {
 		assertThat(1.60943, closeTo(Height2SiteIndex.llog(5.0), ERROR_TOLERANCE));
 		assertThat(11.51293, closeTo(Height2SiteIndex.llog(100000.0), ERROR_TOLERANCE));
 	}
 
 	@Test
-	 void testLlogZero() {
+	void testLlogZero() {
 		assertThat(-11.51293, closeTo(Height2SiteIndex.llog(0.0), ERROR_TOLERANCE));
 	}
 
@@ -4446,8 +4446,8 @@ class Height2SiteIndexTest {
 
 	// TODO edge cases? for example if 1 is pased in as site index loops forever
 	@Test
-	 void testHuGarciaQ() { // the way I've done these tests is to validate them with the orginal C code and
-									// compare them with the output of the java code
+	void testHuGarciaQ() { // the way I've done these tests is to validate them with the orginal C code and
+							// compare them with the output of the java code
 		// Test case 1
 		double siteIndex1 = 20.0;
 		double bhAge1 = 30.0;

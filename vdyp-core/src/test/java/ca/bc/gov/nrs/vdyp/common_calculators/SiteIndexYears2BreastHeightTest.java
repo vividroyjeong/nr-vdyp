@@ -8,7 +8,7 @@ import static org.hamcrest.Matchers.closeTo;
 
 import org.junit.jupiter.api.*;
 
- class SiteIndexYears2BreastHeightTest {
+class SiteIndexYears2BreastHeightTest {
 
 	// Taken from sindex.h
 	/* define species and equation indices */
@@ -147,18 +147,18 @@ import org.junit.jupiter.api.*;
 	}
 
 	@Test
-	 void testPpowZero() {
+	void testPpowZero() {
 		assertThat(0.0, closeTo(SiteIndexYears2BreastHeight.ppow(0.0, 3.0), ERROR_TOLERANCE));
 	}
 
 	@Test
-	 void testLlogPositive() {
+	void testLlogPositive() {
 		assertThat(1.60943, closeTo(SiteIndexYears2BreastHeight.llog(5.0), ERROR_TOLERANCE));
 		assertThat(11.51293, closeTo(SiteIndexYears2BreastHeight.llog(100000.0), ERROR_TOLERANCE));
 	}
 
 	@Test
-	 void testLlogZero() {
+	void testLlogZero() {
 		assertThat(-11.51293, closeTo(SiteIndexYears2BreastHeight.llog(0.0), ERROR_TOLERANCE));
 	}
 

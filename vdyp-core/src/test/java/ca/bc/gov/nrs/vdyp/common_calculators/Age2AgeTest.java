@@ -8,7 +8,7 @@ import static org.hamcrest.Matchers.closeTo;
 
 import org.junit.jupiter.api.*;
 
- class Age2AgeTest {
+class Age2AgeTest {
 	// Taken from sindex.h
 	/*
 	 * age types

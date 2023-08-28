@@ -5,6 +5,8 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
 
 import org.junit.jupiter.api.*;
 
@@ -309,7 +311,6 @@ class SindxdllTest {
 	}
 
 	@Nested
-	@DisplayName("Tests for NextSpecies code method")
 	class NextSpeciesTest {
 		@Test
 		void testValidIndex() {
@@ -1247,40 +1248,40 @@ class SindxdllTest {
 		}
 
 		@Test
-		public void testInvalidSpeciesIndex() {
+		void testInvalidSpeciesIndex() {
 			assertThrows(SpeciesErrorException.class, () -> {
 				Sindxdll.DefCurveEst((short) SI_MAX_SPECIES, (short) SI_ESTAB_NAT);
 			});
 		}
 
 		@Test
-		public void testValidSpeciesIndexAndEstabSI_ESTAB_NAT() {
+		void testValidSpeciesIndexAndEstabSI_ESTAB_NAT() {
 			short result = Sindxdll.DefCurveEst((short) 100, (short) SI_ESTAB_NAT);
 			assertEquals(SI_SW_GOUDIE_NATAC, result);
 		}
 
 		@Test
-		public void testValidSpeciesIndexAndEstabSI_ESTAB_PLA() {
+		void testValidSpeciesIndexAndEstabSI_ESTAB_PLA() {
 			short result = Sindxdll.DefCurveEst((short) 100, (short) SI_ESTAB_PLA);
 			assertEquals(SI_SW_GOUDIE_PLAAC, result);
 		}
 
 		@Test
-		public void testInvalidEstablishment() {
+		void testInvalidEstablishment() {
 			assertThrows(EstablishmentErrorException.class, () -> {
 				Sindxdll.DefCurveEst((short) SI_SPEC_SW, (short) -1);
 			});
 		}
 
 		@Test
-		public void testNoCurvesDefined() {
+		void testNoCurvesDefined() {
 			assertThrows(NoAnswerException.class, () -> {
 				Sindxdll.DefCurveEst((short) 1, (short) SI_ESTAB_NAT);
 			});
 		}
 
 		@Test
-		public void testDefaultCase() {
+		void testDefaultCase() {
 			short result = Sindxdll.DefCurveEst((short) 4, (short) 0);
 			assertEquals(SI_ACB_HUANGAC, result);
 		}
@@ -2540,9 +2541,26 @@ class SindxdllTest {
 	class CurveUseTest {
 	}
 
-	@Nested
-	@DisplayName("Tests for HtAgeToSI method")
-	class HtAgeToSITest {
-
+	@Test
+	void testHtAgeToSIError() {
+		double[] site = new double[2];
+		assertThrows(
+				LessThan13Exception.class, () -> Sindxdll.HtAgeToSI((short) 0, 0.0, (short) 1, 1.2, (short) 0, site)
+		);
 	}
+
+	@Test
+	void testHtAgeToSIDefault() {
+		double[] site = new double[2];
+		double height = 2;
+		double age = 1;
+
+		double expectedResult = 0;
+		double actualResult = Sindxdll.HtAgeToSI((short) SI_FDI_THROWER, age, (short) 1, height, (short) 1, site);
+		double expectedSiteValue = 0.39 + 0.3104 * height + 33.3828 * height / age;
+
+		assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
+		assertThat(site[0], closeTo(expectedSiteValue, ERROR_TOLERANCE));
+	}
+
 }
