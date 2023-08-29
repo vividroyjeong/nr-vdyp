@@ -480,10 +480,9 @@ public class Sindxdll {
 	 * When looping through the array, reject entries that have 0 for both reference
 	 * and target species.
 	 */
-	private static final int SI_MAX_CONVERT = 29;
-	public static double[][] si_convert = new double[SI_MAX_CONVERT][4];
+	private static final int SI_MAX_CONVERT = 28;
 
-//From sindxdll.c
+	//From sindxdll.c
 	private static final int SI_SPEC_START = SI_SPEC_A;
 	private static final int SI_SPEC_END = SI_SPEC_ZH;
 
@@ -3231,22 +3230,6 @@ public class Sindxdll {
 	public static short
 			AgeSIToHt(short curve, double age, short ageType, double siteIndex, double y2bh, double[] height) {
 		height[0] = SiteIndex2Height.index_to_height(curve, age, ageType, siteIndex, y2bh, 0.5);
-		if (height[0] < 0) {
-			switch ((short) height[0]) {
-			case SI_ERR_CURVE:
-				throw new CurveErrorException("Input curve is not a valid curve index.");
-			case SI_ERR_GI_MIN:
-				throw new GrowthInterceptMinimumException("bhage is less than 0.5");
-			case SI_ERR_GI_MAX:
-				throw new GrowthInterceptMaximumException("bhage is greater than GI range");
-			case SI_ERR_NO_ANS:
-				throw new NoAnswerException("Computed site index is greater than 999.");
-			case SI_ERR_GI_TOT:
-				throw new GrowthInterceptTotalException("Total age and GI curve");
-			case SI_ERR_LT13:
-				throw new LessThan13Exception("Site index is less than or equal to 1.3");
-			}
-		}
 
 		return 0;
 	}
@@ -3333,17 +3316,6 @@ public class Sindxdll {
 	 */
 	public static short Y2BH05(short curve, double siteIndex, double[] y2bh) {
 		y2bh[0] = SiteIndexYears2BreastHeight.si_y2bh05(curve, siteIndex);
-		if (y2bh[0] < 0) {
-			switch ((short) y2bh[0]) {
-			case SI_ERR_CURVE:
-				throw new CurveErrorException("Input curve is not a valid curve index");
-			case SI_ERR_GI_TOT:
-				throw new GrowthInterceptTotalException("GI curve");
-			case SI_ERR_LT13:
-				throw new LessThan13Exception("Site index is less than or equal to 1.3");
-			}
-
-		}
 
 		return 0;
 	}
@@ -3368,16 +3340,6 @@ public class Sindxdll {
 	 */
 	public static short Y2BH(short curve, double siteIndex, double[] y2bh) {
 		y2bh[0] = SiteIndexYears2BreastHeight.si_y2bh(curve, siteIndex);
-		if (y2bh[0] < 0) {
-			switch ((short) y2bh[0]) {
-			case SI_ERR_CURVE:
-				throw new CurveErrorException("Input curve is not a valid curve index");
-			case SI_ERR_GI_TOT:
-				throw new GrowthInterceptTotalException("GI curve");
-			case SI_ERR_LT13:
-				throw new LessThan13Exception("Site index is less than or equal to 1.3");
-			}
-		}
 
 		return 0;
 	}
@@ -3412,9 +3374,9 @@ public class Sindxdll {
 		}
 
 		for (i = 0; i < SI_MAX_CONVERT; i++) {
-			if (si_convert[i][0] == sp_index1)
-				if (si_convert[i][1] == sp_index2) {
-					site2[0] = si_convert[i][2] + si_convert[i][3] * site;
+			if (SiteIndexNames.si_convert[i][0] == sp_index1)
+				if (SiteIndexNames.si_convert[i][1] == sp_index2) {
+					site2[0] = SiteIndexNames.si_convert[i][2] + SiteIndexNames.si_convert[i][3] * site;
 					return 0;
 				}
 		}
@@ -3444,16 +3406,6 @@ public class Sindxdll {
 	 */
 	public static short SCToSI(short sp_index, char sitecl, char fiz, double[] site) {
 		site[0] = SiteClassCode2SiteIndex.class_to_index(sp_index, sitecl, fiz);
-		if (site[0] < 0) {
-			switch ((short) site[0]) {
-			case SI_ERR_SPEC:
-				throw new SpeciesErrorException("Source species index is not valid, or no conversion");
-			case SI_ERR_CLASS:
-				throw new ClassErrorException("Site class is unknown");
-			case SI_ERR_FIZ:
-				throw new ForestInventoryZoneException("FIZ code is unknown");
-			}
-		}
 
 		return 0;
 	}
@@ -3461,7 +3413,6 @@ public class Sindxdll {
 	/*
 	 * determine species index from species code
 	 */
-
 	/**
 	 * SpecMap ============== Determine species index from species code
 	 *
@@ -3598,6 +3549,7 @@ public class Sindxdll {
 		case SI_PLI_GOUDIE_WET, SI_SW_GOUDIE_PLA, SI_SW_GOUDIE_NAT:
 			cu_index = SI_PLI_GOUDIE_DRY;
 			break;
+			
 		}
 		return si_curve_notes[cu_index][0];
 	}
@@ -3692,14 +3644,6 @@ public class Sindxdll {
 	public static short
 			AgeToAge(short cu_index, double age1, short age_type1, double y2bh, double[] age2, short age_type2) {
 		age2[0] = Age2Age.age_to_age(cu_index, age1, age_type1, age_type2, y2bh);
-		if (age2[0] < 0) {
-			switch ((short) age2[0]) {
-			case SI_ERR_CURVE:
-				throw new CurveErrorException("Input curve is not a valid curve index for this species");
-			case SI_ERR_AGE_TYPE:
-				throw new AgeTypeErrorException("Unknown age type");
-			}
-		}
 
 		return 0;
 	}
