@@ -482,7 +482,7 @@ public class Sindxdll {
 	 */
 	private static final int SI_MAX_CONVERT = 28;
 
-	//From sindxdll.c
+	// From sindxdll.c
 	private static final int SI_SPEC_START = SI_SPEC_A;
 	private static final int SI_SPEC_END = SI_SPEC_ZH;
 
@@ -3549,7 +3549,7 @@ public class Sindxdll {
 		case SI_PLI_GOUDIE_WET, SI_SW_GOUDIE_PLA, SI_SW_GOUDIE_NAT:
 			cu_index = SI_PLI_GOUDIE_DRY;
 			break;
-			
+
 		}
 		return si_curve_notes[cu_index][0];
 	}
