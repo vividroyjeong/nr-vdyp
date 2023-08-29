@@ -370,17 +370,17 @@ class SindxdllTest {
 					"SpecCode should throw IllegalArgumentException for invalid index"
 			);
 		}
-		
-		@Test 
+
+		@Test
 		void testValidIndex() {
 			short validIndex = 0;
 			String expectedResult = "A";
 			String actualResult = Sindxdll.SpecCode(validIndex);
-			
+
 			assertEquals(actualResult, expectedResult);
 		}
 	}
-	
+
 	@Nested
 	class SpecNameTest {
 		@Test
@@ -400,13 +400,13 @@ class SindxdllTest {
 					"SpecName should throw IllegalArgumentException for invalid index"
 			);
 		}
-		
-		@Test 
+
+		@Test
 		void testValidIndex() {
 			short validIndex = 0;
 			String expectedResult = "Aspen";
 			String actualResult = Sindxdll.SpecName(validIndex);
-			
+
 			assertEquals(actualResult, expectedResult);
 		}
 	}
@@ -2582,13 +2582,13 @@ class SindxdllTest {
 					"CurveName should throw IllegalArgumentException for invalid index"
 			);
 		}
-		
-		@Test 
+
+		@Test
 		void testValidIndex() {
 			short validIndex = 0;
 			String expectedResult = "Huang, Titus, and Lakusta (1994)";
 			String actualResult = Sindxdll.CurveName(validIndex);
-			
+
 			assertEquals(actualResult, expectedResult);
 		}
 	}
@@ -2604,13 +2604,13 @@ class SindxdllTest {
 					"CurveUse should throw IllegalArgumentException for invalid index"
 			);
 		}
-		
-		@Test 
+
+		@Test
 		void testValidIndex() {
 			short validIndex = 0;
 			short expectedResult = 5;
 			short actualResult = Sindxdll.CurveUse(validIndex);
-			
+
 			assertEquals(actualResult, expectedResult);
 		}
 	}

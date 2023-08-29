@@ -24,7 +24,7 @@ public class FizCheckTest {
 			assertEquals(FIZ_INTERIOR, result);
 		}
 	}
-gh
+
 	@Test
 	public void testUnknownFiz() {
 		char fiz = 'X'; // Replace with any unknown fiz value

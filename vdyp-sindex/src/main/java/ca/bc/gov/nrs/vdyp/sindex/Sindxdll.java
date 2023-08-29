@@ -471,7 +471,6 @@ public class Sindxdll {
 	private static final int SI_SW_THROWER = 66;
 	private static final int SI_MAX_CURVES = 123;
 
-
 	/*
 	 * Site index conversion between species. Here's how to use the following array:
 	 * The four elements are: reference species, target species, coeff_a, coeff_b.
@@ -483,8 +482,6 @@ public class Sindxdll {
 	 */
 	private static final int SI_MAX_CONVERT = 29;
 	public static double[][] si_convert = new double[SI_MAX_CONVERT][4];
-
-
 
 //From sindxdll.c
 	private static final int SI_SPEC_START = SI_SPEC_A;
@@ -2567,9 +2564,9 @@ public class Sindxdll {
 	 *                               species index.
 	 */
 	public static short DefCurve(short sp_index) {
-		if (sp_index < 0 || sp_index >= SI_MAX_SPECIES) { 
+		if (sp_index < 0 || sp_index >= SI_MAX_SPECIES) {
 			throw new SpeciesErrorException("Input parameter is not a valid species index: " + sp_index);
-		} else if (sp_index == SI_SPEC_END) { 
+		} else if (sp_index == SI_SPEC_END) {
 			throw new NoAnswerException("Input parameter is the last defined species index: " + sp_index);
 		}
 
