@@ -203,17 +203,17 @@ public class Sindxdll {
 	/*
 	 * error codes as return values from functions
 	 */
-	private static final int SI_ERR_LT13 = -1;
-	private static final int SI_ERR_GI_MIN = -2;
-	private static final int SI_ERR_GI_MAX = -3;
-	private static final int SI_ERR_NO_ANS = -4;
-	private static final int SI_ERR_CURVE = -5;
-	private static final int SI_ERR_CLASS = -6;
-	private static final int SI_ERR_FIZ = -7;
-	private static final int SI_ERR_CODE = -8;
-	private static final int SI_ERR_GI_TOT = -9;
+	//private static final int SI_ERR_LT13 = -1;  Replaced with Java exception
+	//private static final int SI_ERR_GI_MIN = -2;  Replaced with Java exception
+	//private static final int SI_ERR_GI_MAX = -3;  Replaced with Java exception
+	private static final int SI_ERR_NO_ANS = -4; 
+	//private static final int SI_ERR_CURVE = -5;  Replaced with Java exception
+	//private static final int SI_ERR_CLASS = -6;  Replaced with Java exception
+	//private static final int SI_ERR_FIZ = -7;  Replaced with Java exception
+	//private static final int SI_ERR_CODE = -8;  Replaced with Java exception
+	//private static final int SI_ERR_GI_TOT = -9;  Replaced with Java exception
 	private static final int SI_ERR_SPEC = -10;
-	private static final int SI_ERR_AGE_TYPE = -11;
+	// private static final int SI_ERR_AGE_TYPE = -11; Replaced with Java exception
 // private static final int SI_ERR_ESTAB     = -12; Replaced with Java exception
 
 //These are taken from sindex.h (since it was missing everywhere else). These were not defined in the orginal sindxdll.c
@@ -3277,22 +3277,7 @@ public class Sindxdll {
 	) {
 		height[0] = SiteIndex2HeightSmoothed
 				.index_to_height_smoothed(curve, age, ageType, siteIndex, y2bh, seedling_age, seedling_ht);
-		if (height[0] < 0) {
-			switch ((short) height[0]) {
-			case SI_ERR_CURVE:
-				throw new CurveErrorException("Input curve is not a valid curve index.");
-			case SI_ERR_GI_MIN:
-				throw new GrowthInterceptMinimumException("bhage is less than 0.5");
-			case SI_ERR_GI_MAX:
-				throw new GrowthInterceptMaximumException("bhage is greater than GI range");
-			case SI_ERR_NO_ANS:
-				throw new NoAnswerException("Computed site index is greater than 999.");
-			case SI_ERR_GI_TOT:
-				throw new GrowthInterceptTotalException("Total age and GI curve");
-			case SI_ERR_LT13:
-				throw new LessThan13Exception("Site index is less than or equal to 1.3");
-			}
-		}
+
 		return 0;
 	}
 
@@ -3427,9 +3412,6 @@ public class Sindxdll {
 	 */
 	public static short SpecMap(String sc) {
 		short speciesIndex = SpecRMap.species_map(sc);
-		if (speciesIndex == SI_ERR_CODE) {
-			throw new CodeErrorException("Species code is unknown: " + sc);
-		}
 
 		return speciesIndex;
 	}
@@ -3456,16 +3438,6 @@ public class Sindxdll {
 	 */
 	public static short SpecRemap(String sc, char fiz) {
 		short speciesIndex = SpecRMap.species_remap(sc, fiz);
-
-		if (speciesIndex == SI_ERR_CODE) {
-			throw new CodeErrorException("Character string species code: " + sc);
-		}
-
-		if (speciesIndex == SI_ERR_FIZ) {
-			throw new ForestInventoryZoneException(
-					"Character FIZ code (A,B,C)=coast, (D,E,F,G,H,I,J,K,L)=interior" + fiz
-			);
-		}
 
 		return speciesIndex;
 	}

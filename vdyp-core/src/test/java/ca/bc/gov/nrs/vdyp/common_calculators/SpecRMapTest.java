@@ -148,7 +148,7 @@ public class SpecRMapTest {
 	private static final int SI_SPEC_ZH = 134;
 
 	@Test
-	void testSpeciesMap() {
+	void testSpeciesMapUppercase() {
 		for (short i = 0; i < SiteIndexNames.si_spec_code.length; i++) { // test all normal cases
 			short expectedResult = i;
 			short actualResult = SpecRMap.species_map(SiteIndexNames.si_spec_code[i]);
@@ -159,7 +159,46 @@ public class SpecRMapTest {
 	}
 
 	@Test
-	void testSpeciesRemap() {
+	void testSpeciesMapLowercase() {
+		short actualResult = SpecRMap.species_map("abal");
+		short expectedResult = SI_SPEC_ABAL;
 
+		assertEquals(expectedResult, actualResult);
+	}
+
+	@Test
+	void testSpeciesMapMixedcase() {
+		short actualResult = SpecRMap.species_map("AbCo");
+		short expectedResult = SI_SPEC_ABCO;
+
+		assertEquals(expectedResult, actualResult);
+	}
+
+	@Test
+	void testSpeciesRemapLowercase() {
+		short actualResult = SpecRMap.species_remap("a", 'X');
+		assertEquals(actualResult, SI_SPEC_AT);
+	}
+
+	@Test
+	void testSpeciesRemapUppercase() {
+		short actualResult = SpecRMap.species_remap("AbAL", 'X');
+		assertEquals(actualResult, SI_SPEC_BA);
+	}
+
+	@Test
+	void testSpeciesRemapFizCases() {
+		short actualResult = SpecRMap.species_remap("b ", 'A'); // coastal
+		assertEquals(actualResult, SI_SPEC_BA);
+
+		actualResult = SpecRMap.species_remap("B", 'D'); // interior
+		assertEquals(actualResult, SI_SPEC_BL);
+
+		assertThrows(CodeErrorException.class, () -> SpecRMap.species_remap("B", 'X'));
+	}
+
+	@Test
+	void testSpeciesRemapError() {
+		assertThrows(CodeErrorException.class, () -> SpecRMap.species_remap("Error causer", 'A'));
 	}
 }

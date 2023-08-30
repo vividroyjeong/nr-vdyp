@@ -1,16 +1,13 @@
 package ca.bc.gov.nrs.vdyp.sindex;
 
-import ca.bc.gov.nrs.vdyp.common_calculators.Age2Age;
-import ca.bc.gov.nrs.vdyp.common_calculators.Height2SiteIndex;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndex2Age;
-import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexYears2BreastHeight;
+import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexNames;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.hamcrest.Matchers.closeTo;
+
 import org.junit.jupiter.api.*;
 
 class SindxdllTest {
@@ -21,26 +18,11 @@ class SindxdllTest {
 	private static final int SI_ESTAB_PLA = 1;
 
 	/*
-	 * site index estimation (from height and age) types
-	 */
-// private static final int SI_EST_ITERATE = 0; Unused
-// private static final int SI_EST_DIRECT  = 1; Unused
-
-	/*
 	 * error codes as return values from functions
 	 */
-	private static final int SI_ERR_LT13 = -1;
-	private static final int SI_ERR_GI_MIN = -2;
-	private static final int SI_ERR_GI_MAX = -3;
 	private static final int SI_ERR_NO_ANS = -4;
-	private static final int SI_ERR_CURVE = -5;
-	private static final int SI_ERR_CLASS = -6;
-	private static final int SI_ERR_FIZ = -7;
-	private static final int SI_ERR_CODE = -8;
-	private static final int SI_ERR_GI_TOT = -9;
 	private static final int SI_ERR_SPEC = -10;
-	private static final int SI_ERR_AGE_TYPE = -11;
-// private static final int SI_ERR_ESTAB     = -12; Replaced with Java exception
+
 
 //These are taken from sindex.h (since it was missing everywhere else). These were not defined in the orginal sindxdll.c
 
@@ -3800,7 +3782,27 @@ class SindxdllTest {
 
 	@Nested
 	class AgeSIToHtSmoothTest {
-		// TODO Empty
+		@Test
+		void testAgeSIToHtError() {
+			double[] height = new double[1];
+			assertThrows(
+					LessThan13Exception.class,
+					() -> Sindxdll.AgeSIToHtSmooth((short) 0, 0.0, (short) 0, 1.2, 0.0, 0.0, 0.0, height)
+			);
+		}
+
+		@Test
+		void testAgeSIToHtValid() {
+			double[] height = new double[1];
+
+			double expectedHeightValue = 1.3 / 3.1 * 3;
+			double actualResult = Sindxdll.AgeSIToHtSmooth((short) 21, 3.0, (short) 0, 16.0, 4.0, 3.1, 1.3, height);
+			double expectedResult = 0;
+
+			assertEquals(actualResult, expectedResult);
+			assertEquals(height[0], expectedHeightValue, ERROR_TOLERANCE);
+		}
+
 	}
 
 	@Nested
@@ -3919,12 +3921,32 @@ class SindxdllTest {
 
 	@Nested
 	class SpecMapTest {
-		// TODO Empty
+		@Test
+		void testValidInput() {
+			short expectedResult = 0;
+			short actualResult = Sindxdll.SpecMap(SiteIndexNames.si_spec_code[0]);
+			assertEquals(expectedResult, actualResult);
+		}
+
+		@Test
+		void testErrorCode() {
+			assertThrows(CodeErrorException.class, () -> Sindxdll.SpecMap("Error causer"));
+		}
 	}
 
 	@Nested
 	class SpecRemapTest {
-		// TODO Empty
+		@Test
+		void testValidInput() {
+			short expectedResult = SI_SPEC_AT;
+			short actualResult = Sindxdll.SpecRemap(SiteIndexNames.si_spec_code[0], 'A');
+			assertEquals(expectedResult, actualResult);
+		}
+
+		@Test
+		void testErrorCode() {
+			assertThrows(CodeErrorException.class, () -> Sindxdll.SpecRemap("Error causer", 'A'));
+		}
 	}
 
 	@Nested
@@ -4207,131 +4229,6 @@ class SindxdllTest {
 
 	@Nested
 	class CurveToSpeciesTest {
-		private static final int[] si_curve_intend = { SI_SPEC_ACB, /* SI_ACB_HUANG */
-				SI_SPEC_ACT, /* SI_ACT_THROWER */
-				SI_SPEC_AT, /* SI_AT_HUANG */
-				SI_SPEC_AT, /* SI_AT_CIESZEWSKI */
-				SI_SPEC_AT, /* SI_AT_GOUDIE */
-				SI_SPEC_BA, /* SI_BA_DILUCCA */
-				SI_SPEC_BA, /* should be SI_SPEC_BB */ /* SI_BB_KER */
-				SI_SPEC_BA, /* SI_BA_KURUCZ86 */
-				SI_SPEC_BA, /* SI_BA_KURUCZ82 */
-				SI_SPEC_BL, /* SI_BL_THROWERGI */
-				SI_SPEC_BL, /* SI_BL_KURUCZ82 */
-				SI_SPEC_CWC, /* SI_CWC_KURUCZ */
-				SI_SPEC_CWC, /* SI_CWC_BARKER */
-				SI_SPEC_DR, /* SI_DR_NIGH */
-				SI_SPEC_DR, /* SI_DR_HARRING */
-				SI_SPEC_FDC, /* SI_FDC_NIGHGI */
-				SI_SPEC_FDC, /* SI_FDC_BRUCE */
-				SI_SPEC_FDC, /* SI_FDC_COCHRAN */
-				SI_SPEC_FDC, /* SI_FDC_KING */
-				SI_SPEC_FDI, /* SI_FDI_NIGHGI */
-				SI_SPEC_FDI, /* SI_FDI_HUANG_PLA */
-				SI_SPEC_FDI, /* SI_FDI_HUANG_NAT */
-				SI_SPEC_FDI, /* SI_FDI_MILNER */
-				SI_SPEC_FDI, /* SI_FDI_THROWER */
-				SI_SPEC_FDI, /* SI_FDI_VDP_MONT */
-				SI_SPEC_FDI, /* SI_FDI_VDP_WASH */
-				SI_SPEC_FDI, /* SI_FDI_MONS_DF */
-				SI_SPEC_FDI, /* SI_FDI_MONS_GF */
-				SI_SPEC_FDI, /* SI_FDI_MONS_WRC */
-				SI_SPEC_FDI, /* SI_FDI_MONS_WH */
-				SI_SPEC_FDI, /* SI_FDI_MONS_SAF */
-				SI_SPEC_HWC, /* SI_HWC_NIGHGI */
-				SI_SPEC_HWC, /* SI_HWC_FARR */
-				SI_SPEC_HWC, /* SI_HWC_BARKER */
-				SI_SPEC_HWC, /* SI_HWC_WILEY */
-				SI_SPEC_HWC, /* SI_HWC_WILEY_BC */
-				SI_SPEC_HWC, /* SI_HWC_WILEY_MB */
-				SI_SPEC_HWI, /* SI_HWI_NIGH */
-				SI_SPEC_HWI, /* SI_HWI_NIGHGI */
-				SI_SPEC_LW, /* SI_LW_MILNER */
-				SI_SPEC_PLI, /* SI_PLI_THROWNIGH */
-				SI_SPEC_PLI, /* SI_PLI_NIGHTA98 */
-				SI_SPEC_PLI, /* SI_PLI_NIGHGI97 */
-				SI_SPEC_PLI, /* SI_PLI_HUANG_PLA */
-				SI_SPEC_PLI, /* SI_PLI_HUANG_NAT */
-				SI_SPEC_PLI, /* SI_PLI_THROWER */
-				SI_SPEC_PLI, /* SI_PLI_MILNER */
-				SI_SPEC_PLI, /* SI_PLI_CIESZEWSKI */
-				SI_SPEC_PLI, /* SI_PLI_GOUDIE_DRY */
-				SI_SPEC_PLI, /* SI_PLI_GOUDIE_WET */
-				SI_SPEC_PLI, /* SI_PLI_DEMPSTER */
-				SI_SPEC_PW, /* SI_PW_CURTIS */
-				SI_SPEC_PY, /* SI_PY_MILNER */
-				SI_SPEC_PY, /* SI_PY_HANN */
-				SI_SPEC_SB, /* SI_SB_HUANG */
-				SI_SPEC_SB, /* SI_SB_CIESZEWSKI */
-				SI_SPEC_SB, /* SI_SB_KER */
-				SI_SPEC_SB, /* SI_SB_DEMPSTER */
-				SI_SPEC_SS, /* SI_SS_NIGHGI */
-				SI_SPEC_SS, /* SI_SS_NIGH */
-				SI_SPEC_SS, /* SI_SS_GOUDIE */
-				SI_SPEC_SS, /* SI_SS_FARR */
-				SI_SPEC_SS, /* SI_SS_BARKER */
-				SI_SPEC_SW, /* SI_SW_NIGHGI */
-				SI_SPEC_SW, /* SI_SW_HUANG_PLA */
-				SI_SPEC_SW, /* SI_SW_HUANG_NAT */
-				SI_SPEC_SW, /* SI_SW_THROWER */
-				SI_SPEC_SW, /* SI_SW_CIESZEWSKI */
-				SI_SPEC_SW, /* SI_SW_KER_PLA */
-				SI_SPEC_SW, /* SI_SW_KER_NAT */
-				SI_SPEC_SW, /* SI_SW_GOUDIE_PLA */
-				SI_SPEC_SW, /* SI_SW_GOUDIE_NAT */
-				SI_SPEC_SW, /* SI_SW_DEMPSTER */
-				SI_SPEC_BL, /* SI_BL_CHEN */
-				SI_SPEC_AT, /* SI_AT_CHEN */
-				SI_SPEC_DR, /* SI_DR_CHEN */
-				SI_SPEC_PLI, /* SI_PL_CHEN */
-				SI_SPEC_CWI, /* SI_CWI_NIGH */
-				SI_SPEC_BP, /* SI_BP_CURTIS */
-				SI_SPEC_HWC, /* SI_HWC_NIGHGI99 */
-				SI_SPEC_SS, /* SI_SS_NIGHGI99 */
-				SI_SPEC_SW, /* SI_SW_NIGHGI99 */
-				SI_SPEC_LW, /* SI_LW_NIGHGI */
-				SI_SPEC_SW, /* SI_SW_NIGHTA */
-				SI_SPEC_CWI, /* SI_CWI_NIGHGI */
-				SI_SPEC_SW, /* SI_SW_GOUDNIGH */
-				SI_SPEC_HM, /* SI_HM_MEANS */
-				SI_SPEC_SE, /* SI_SE_CHEN */
-				SI_SPEC_FDC, /* SI_FDC_NIGHTA */
-				SI_SPEC_FDC, /* SI_FDC_BRUCENIGH */
-				SI_SPEC_LW, /* SI_LW_NIGH */
-				SI_SPEC_SB, /* SI_SB_NIGH */
-				SI_SPEC_AT, /* SI_AT_NIGH */
-				SI_SPEC_BL, /* SI_BL_CHENAC */
-				SI_SPEC_BP, /* SI_BP_CURTISAC */
-				SI_SPEC_HM, /* SI_HM_MEANSAC */
-				SI_SPEC_FDI, /* SI_FDI_THROWERAC */
-				SI_SPEC_ACB, /* SI_ACB_HUANGAC */
-				SI_SPEC_PW, /* SI_PW_CURTISAC */
-				SI_SPEC_HWC, /* SI_HWC_WILEYAC */
-				SI_SPEC_FDC, /* SI_FDC_BRUCEAC */
-				SI_SPEC_CWC, /* SI_CWC_KURUCZAC */
-				SI_SPEC_BA, /* SI_BA_KURUCZ82AC */
-				SI_SPEC_ACT, /* SI_ACT_THROWERAC */
-				SI_SPEC_PY, /* SI_PY_HANNAC */
-				SI_SPEC_SE, /* SI_SE_CHENAC */
-				SI_SPEC_SW, /* SI_SW_GOUDIE_NATAC */
-				SI_SPEC_PY, /* SI_PY_NIGH */
-				SI_SPEC_PY, /* SI_PY_NIGHGI */
-				SI_SPEC_PLI, /* SI_PLI_NIGHTA2004 */
-				SI_SPEC_SE, /* SI_NIGHTA */
-				SI_SPEC_SW, /* SI_NIGHTA2004 */
-				SI_SPEC_SW, /* SI_GOUDIE_PLAAC */
-				SI_SPEC_PJ, /* SI_HUANG */
-				SI_SPEC_PJ, /* SI_HUANGAC */
-				SI_SPEC_SW, /* SI_SW_NIGHGI2004 */
-				SI_SPEC_EP, /* SI_EP_NIGH */
-				SI_SPEC_BA, /* SI_BA_NIGHGI */
-				SI_SPEC_BA, /* SI_BA_NIGH */
-				SI_SPEC_SW, /* SI_SW_HU_GARCIA */
-				SI_SPEC_SE, /* SI_SE_NIGHGI */
-				SI_SPEC_SE, /* SI_SE_NIGH */
-				SI_SPEC_CWC /* SI_CWC_NIGH */
-		};
-
 		@Test
 		void testCurveToSpeciesError() {
 			assertThrows(CurveErrorException.class, () -> Sindxdll.CurveToSpecies((short) 140));

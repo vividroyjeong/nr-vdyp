@@ -293,7 +293,7 @@ class SiteIndex2HeightTest {
 
 		@Test
 		void testSI_HWC_FARRBhageLessThanZero() { // LessThanOrEqual is meant but omitted
-			double actualResult = SiteIndex2Height.index_to_height(SI_HWC_FARR, 0.0, SI_AT_BREAST, 1.31, 1.0, 0.0);
+			double actualResult = SiteIndex2Height.index_to_height(SI_HWC_FARR, 0.0, SI_AT_BREAST, 1.31, 2.0, 0.0);
 			double expectedResult = 1.37;
 
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE)); // bhage <= 0
