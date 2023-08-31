@@ -528,7 +528,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		public void testSI_SW_GOUDNIGHBhageGreaterThanHalf() {
+		void testSI_SW_GOUDNIGHBhageGreaterThanHalf() {
 			double site_index = 18.0;
 			double bhage = 1.0;
 			double y2bh = 1.5;
@@ -546,7 +546,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		public void testSI_BA_NIGHGI() {
+		void testSI_BA_NIGHGI() {
 			double site_index = 1.31;
 
 			double expectedResult = SiteIndex2Height.gi_si2ht(SI_BA_NIGHGI, 5, site_index);
@@ -556,7 +556,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		public void testDefaultSwitchStatement() {
+		void testDefaultSwitchStatement() {
 			assertThrows(
 					CurveErrorException.class,
 					() -> SiteIndex2Height.index_to_height((short) 300, 5, SI_AT_BREAST, 1.31, 1.5, 0.0)
@@ -573,23 +573,23 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		public void testValidInput() {
+		void testValidInput() {
 			double actualResult = SiteIndex2Height.gi_si2ht(SI_FDC_COCHRAN, 1, 1.31);
 
-			double expectedResult = 1.965; // TODO double check this trace
+			double expectedResult = 1.965; 
 
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 		}
 
 		@Test
-		public void testConvergenceError() {
+		void testConvergenceError() {
 			assertThrows(NoAnswerException.class, () -> {
 				SiteIndex2Height.gi_si2ht(SI_FDC_COCHRAN, 5.0, 2000.0);
 			});
 		}
 
 		@Test
-		public void testNegativeSiteIndex() {
+		void testNegativeSiteIndex() {
 			double actualResult = SiteIndex2Height.gi_si2ht((short) 1, 3.0, -5.0);
 			assertThat(actualResult, closeTo(1.3, ERROR_TOLERANCE));
 		}

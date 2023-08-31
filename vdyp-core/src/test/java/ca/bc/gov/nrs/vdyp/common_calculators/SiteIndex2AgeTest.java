@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 
-public class SiteIndex2AgeTest {
+class SiteIndex2AgeTest {
 	// Taken from sindex.h
 	/*
 	 * age types

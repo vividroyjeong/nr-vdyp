@@ -4444,7 +4444,6 @@ class Height2SiteIndexTest {
 		}
 	}
 
-	// TODO edge cases? for example if 1 is pased in as site index loops forever
 	@Test
 	void testHuGarciaQ() { // the way I've done these tests is to validate them with the orginal C code and
 							// compare them with the output of the java code

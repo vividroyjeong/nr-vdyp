@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 
-public class SiteIndex2HeightSmoothedTest {
+class SiteIndex2HeightSmoothedTest {
 	// Taken from sindex.h
 	/*
 	 * age types

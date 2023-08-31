@@ -9,7 +9,7 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ClassErrorExcepti
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ForestInventoryZoneException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.SpeciesErrorException;
 
-public class SiteClassCode2SiteIndexTest {
+class SiteClassCode2SiteIndexTest {
 	// Taken from sindex.h
 	/* define species and equation indices */
 	private static final short SI_SPEC_ACT = 5;

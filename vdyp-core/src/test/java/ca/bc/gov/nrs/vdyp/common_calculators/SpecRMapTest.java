@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CodeErrorException;
 
-public class SpecRMapTest {
+class SpecRMapTest {
 	// Taken from sindex.h
 	/* define species and equation indices */
 	private static final int SI_SPEC_ABAL = 1;
