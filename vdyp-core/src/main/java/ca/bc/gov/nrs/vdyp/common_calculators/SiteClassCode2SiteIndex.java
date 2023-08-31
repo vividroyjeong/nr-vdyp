@@ -98,6 +98,7 @@ public class SiteClassCode2SiteIndex {
 			default:
 				break;
 			}
+			break;
 		case SI_SPEC_AT, SI_SPEC_EA, SI_SPEC_EP:
 			switch (sitecl) {
 			case 'G':
@@ -111,6 +112,7 @@ public class SiteClassCode2SiteIndex {
 			default:
 				break;
 			}
+			break;
 		case SI_SPEC_BA:
 			switch (sitecl) {
 			case 'G':
@@ -124,7 +126,7 @@ public class SiteClassCode2SiteIndex {
 			default:
 				break;
 			}
-
+			break;
 		case SI_SPEC_BL:
 			switch (sitecl) {
 			case 'G':
@@ -138,7 +140,7 @@ public class SiteClassCode2SiteIndex {
 			default:
 				break;
 			}
-
+			break;
 		case SI_SPEC_CWC, SI_SPEC_YC:
 			switch (sitecl) {
 			case 'G':
@@ -152,7 +154,7 @@ public class SiteClassCode2SiteIndex {
 			default:
 				break;
 			}
-
+			break;
 		case SI_SPEC_CWI:
 			switch (sitecl) {
 			case 'G':
@@ -166,7 +168,7 @@ public class SiteClassCode2SiteIndex {
 			default:
 				break;
 			}
-
+			break;
 		case SI_SPEC_DR:
 			switch (sitecl) {
 			case 'G':
@@ -180,7 +182,7 @@ public class SiteClassCode2SiteIndex {
 			default:
 				break;
 			}
-
+			break;
 		case SI_SPEC_FDC:
 			switch (sitecl) {
 			case 'G':
@@ -194,7 +196,7 @@ public class SiteClassCode2SiteIndex {
 			default:
 				break;
 			}
-
+			break;
 		case SI_SPEC_FDI:
 			switch (sitecl) {
 			case 'G':
@@ -208,7 +210,7 @@ public class SiteClassCode2SiteIndex {
 			default:
 				break;
 			}
-
+			break;
 		case SI_SPEC_HWC:
 			switch (FizCheck.fiz_check(fiz)) {
 			case FIZ_COAST:
@@ -224,7 +226,7 @@ public class SiteClassCode2SiteIndex {
 				default:
 					break;
 				}
-
+				break;
 			case FIZ_INTERIOR:
 				switch (sitecl) {
 				case 'G':
@@ -255,7 +257,7 @@ public class SiteClassCode2SiteIndex {
 			default:
 				break;
 			}
-
+			break;
 		case SI_SPEC_LA, SI_SPEC_LT, SI_SPEC_LW:
 			switch (sitecl) {
 			case 'G':
@@ -269,7 +271,7 @@ public class SiteClassCode2SiteIndex {
 			default:
 				break;
 			}
-
+			break;
 		case SI_SPEC_PLI, SI_SPEC_PA, SI_SPEC_PF:
 			switch (sitecl) {
 			case 'G':
@@ -283,7 +285,7 @@ public class SiteClassCode2SiteIndex {
 			default:
 				break;
 			}
-
+			break;
 		case SI_SPEC_PY:
 			switch (sitecl) {
 			case 'G':
@@ -297,7 +299,7 @@ public class SiteClassCode2SiteIndex {
 			default:
 				break;
 			}
-
+			break;
 		case SI_SPEC_PW:
 			switch (sitecl) {
 			case 'G':
@@ -311,7 +313,7 @@ public class SiteClassCode2SiteIndex {
 			default:
 				break;
 			}
-
+			break;
 		case SI_SPEC_SS:
 			switch (sitecl) {
 			case 'G':
@@ -325,6 +327,7 @@ public class SiteClassCode2SiteIndex {
 			default:
 				break;
 			}
+			break;
 
 		case SI_SPEC_SB, SI_SPEC_SW, SI_SPEC_SE:
 			switch (sitecl) {
