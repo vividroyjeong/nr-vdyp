@@ -23,7 +23,6 @@ class SindxdllTest {
 	private static final int SI_ERR_NO_ANS = -4;
 	private static final int SI_ERR_SPEC = -10;
 
-
 //These are taken from sindex.h (since it was missing everywhere else). These were not defined in the orginal sindxdll.c
 
 	/* define species and equation indices */

@@ -203,15 +203,15 @@ public class Sindxdll {
 	/*
 	 * error codes as return values from functions
 	 */
-	//private static final int SI_ERR_LT13 = -1;  Replaced with Java exception
-	//private static final int SI_ERR_GI_MIN = -2;  Replaced with Java exception
-	//private static final int SI_ERR_GI_MAX = -3;  Replaced with Java exception
-	private static final int SI_ERR_NO_ANS = -4; 
-	//private static final int SI_ERR_CURVE = -5;  Replaced with Java exception
-	//private static final int SI_ERR_CLASS = -6;  Replaced with Java exception
-	//private static final int SI_ERR_FIZ = -7;  Replaced with Java exception
-	//private static final int SI_ERR_CODE = -8;  Replaced with Java exception
-	//private static final int SI_ERR_GI_TOT = -9;  Replaced with Java exception
+	// private static final int SI_ERR_LT13 = -1; Replaced with Java exception
+	// private static final int SI_ERR_GI_MIN = -2; Replaced with Java exception
+	// private static final int SI_ERR_GI_MAX = -3; Replaced with Java exception
+	private static final int SI_ERR_NO_ANS = -4;
+	// private static final int SI_ERR_CURVE = -5; Replaced with Java exception
+	// private static final int SI_ERR_CLASS = -6; Replaced with Java exception
+	// private static final int SI_ERR_FIZ = -7; Replaced with Java exception
+	// private static final int SI_ERR_CODE = -8; Replaced with Java exception
+	// private static final int SI_ERR_GI_TOT = -9; Replaced with Java exception
 	private static final int SI_ERR_SPEC = -10;
 	// private static final int SI_ERR_AGE_TYPE = -11; Replaced with Java exception
 // private static final int SI_ERR_ESTAB     = -12; Replaced with Java exception

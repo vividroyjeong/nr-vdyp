@@ -1084,7 +1084,7 @@ public class SpecRMap {
 		if (sc2.equals("RA")) {
 			return SI_SPEC_DR;
 		}
-		if (sc2.equals("S")) {
+		if (sc2.equals("S")) { // Duplicate case? Unreachable
 			switch (FizCheck.fiz_check(fiz)) {
 			case FIZ_COAST:
 				return SI_SPEC_SS;
@@ -1094,7 +1094,7 @@ public class SpecRMap {
 				throw new CodeErrorException("Unknown species code: " + sc2);
 			}
 		}
-		if (sc2.equals("SA")) {
+		if (sc2.equals("SA")) { // Duplicate case? Unreachable
 			return SI_SPEC_SW;
 		}
 		if (sc2.equals("SB")) {
