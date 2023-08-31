@@ -88,226 +88,259 @@ public class SiteClassCode2SiteIndex {
 		case SI_SPEC_ACT, SI_SPEC_MB:
 			switch (sitecl) {
 			case 'G':
-				return (double) 26;
+				return 26;
 			case 'M':
-				return (double) 18;
+				return 18;
 			case 'P':
-				return (double) 9;
+				return 9;
 			case 'L':
-				return (double) 3;
+				return 3;
+			default:
+				break;
 			}
-			break;
 		case SI_SPEC_AT, SI_SPEC_EA, SI_SPEC_EP:
 			switch (sitecl) {
 			case 'G':
-				return (double) 27;
+				return 27;
 			case 'M':
-				return (double) 20;
+				return 20;
 			case 'P':
-				return (double) 12;
+				return 12;
 			case 'L':
-				return (double) 4;
+				return 4;
+			default:
+				break;
 			}
-			break;
 		case SI_SPEC_BA:
 			switch (sitecl) {
 			case 'G':
-				return (double) 29;
+				return 29;
 			case 'M':
-				return (double) 23;
+				return 23;
 			case 'P':
-				return (double) 14;
+				return 14;
 			case 'L':
-				return (double) 5;
+				return 5;
+			default:
+				break;
 			}
-			break;
+
 		case SI_SPEC_BL:
 			switch (sitecl) {
 			case 'G':
-				return (double) 18;
+				return 18;
 			case 'M':
-				return (double) 15;
+				return 15;
 			case 'P':
-				return (double) 11;
+				return 11;
 			case 'L':
-				return (double) 5;
+				return 5;
+			default:
+				break;
 			}
-			break;
+
 		case SI_SPEC_CWC, SI_SPEC_YC:
 			switch (sitecl) {
 			case 'G':
-				return (double) 29;
+				return 29;
 			case 'M':
-				return (double) 23;
+				return 23;
 			case 'P':
-				return (double) 15;
+				return 15;
 			case 'L':
-				return (double) 6;
+				return 6;
+			default:
+				break;
 			}
-			break;
+
 		case SI_SPEC_CWI:
 			switch (sitecl) {
 			case 'G':
-				return (double) 22;
+				return 22;
 			case 'M':
-				return (double) 19;
+				return 19;
 			case 'P':
-				return (double) 13;
+				return 13;
 			case 'L':
-				return (double) 5;
+				return 5;
+			default:
+				break;
 			}
-			break;
+
 		case SI_SPEC_DR:
 			switch (sitecl) {
 			case 'G':
-				return (double) 33;
+				return 33;
 			case 'M':
-				return (double) 23;
+				return 23;
 			case 'P':
-				return (double) 13;
+				return 13;
 			case 'L':
-				return (double) 6;
+				return 6;
+			default:
+				break;
 			}
-			break;
+
 		case SI_SPEC_FDC:
 			switch (sitecl) {
 			case 'G':
-				return (double) 32;
+				return 32;
 			case 'M':
-				return (double) 27;
+				return 27;
 			case 'P':
-				return (double) 18;
+				return 18;
 			case 'L':
-				return (double) 7;
+				return 7;
+			default:
+				break;
 			}
-			break;
+
 		case SI_SPEC_FDI:
 			switch (sitecl) {
 			case 'G':
-				return (double) 20;
+				return 20;
 			case 'M':
-				return (double) 17;
+				return 17;
 			case 'P':
-				return (double) 12;
+				return 12;
 			case 'L':
-				return (double) 5;
+				return 5;
+			default:
+				break;
 			}
-			break;
+
 		case SI_SPEC_HWC:
 			switch (FizCheck.fiz_check(fiz)) {
 			case FIZ_COAST:
 				switch (sitecl) {
 				case 'G':
-					return (double) 28;
+					return 28;
 				case 'M':
-					return (double) 22;
+					return 22;
 				case 'P':
-					return (double) 14;
+					return 14;
 				case 'L':
-					return (double) 5;
+					return 5;
+				default:
+					break;
 				}
-				break;
+
 			case FIZ_INTERIOR:
 				switch (sitecl) {
 				case 'G':
-					return (double) 21;
+					return 21;
 				case 'M':
-					return (double) 18;
+					return 18;
 				case 'P':
-					return (double) 12;
+					return 12;
 				case 'L':
-					return (double) 4;
+					return 4;
 				}
-				break;
+
 			default:
 				throw new ForestInventoryZoneException("Unknown FIZ code: " + fiz);
 
 			}
-			break;
+
 		case SI_SPEC_HWI:
 			switch (sitecl) {
 			case 'G':
-				return (double) 21;
+				return 21;
 			case 'M':
-				return (double) 18;
+				return 18;
 			case 'P':
-				return (double) 12;
+				return 12;
 			case 'L':
-				return (double) 4;
+				return 4;
+			default:
+				break;
 			}
-			break;
+
 		case SI_SPEC_LA, SI_SPEC_LT, SI_SPEC_LW:
 			switch (sitecl) {
 			case 'G':
-				return (double) 20;
+				return 20;
 			case 'M':
-				return (double) 16;
+				return 16;
 			case 'P':
-				return (double) 10;
+				return 10;
 			case 'L':
-				return (double) 3;
+				return 3;
+			default:
+				break;
 			}
-			break;
+
 		case SI_SPEC_PLI, SI_SPEC_PA, SI_SPEC_PF:
 			switch (sitecl) {
 			case 'G':
-				return (double) 20;
+				return 20;
 			case 'M':
-				return (double) 16;
+				return 16;
 			case 'P':
-				return (double) 11;
+				return 11;
 			case 'L':
-				return (double) 4;
+				return 4;
+			default:
+				break;
 			}
-			break;
+
 		case SI_SPEC_PY:
 			switch (sitecl) {
 			case 'G':
-				return (double) 17;
+				return 17;
 			case 'M':
-				return (double) 14;
+				return 14;
 			case 'P':
-				return (double) 10;
+				return 10;
 			case 'L':
-				return (double) 4;
+				return 4;
+			default:
+				break;
 			}
-			break;
+
 		case SI_SPEC_PW:
 			switch (sitecl) {
 			case 'G':
-				return (double) 28;
+				return 28;
 			case 'M':
-				return (double) 22;
+				return 22;
 			case 'P':
-				return (double) 12;
+				return 12;
 			case 'L':
-				return (double) 4;
+				return 4;
+			default:
+				break;
 			}
-			break;
+
 		case SI_SPEC_SS:
 			switch (sitecl) {
 			case 'G':
-				return (double) 28;
+				return 28;
 			case 'M':
-				return (double) 21;
+				return 21;
 			case 'P':
-				return (double) 11;
+				return 11;
 			case 'L':
-				return (double) 4;
+				return 4;
+			default:
+				break;
 			}
-			break;
+
 		case SI_SPEC_SB, SI_SPEC_SW, SI_SPEC_SE:
 			switch (sitecl) {
 			case 'G':
-				return (double) 19;
+				return 19;
 			case 'M':
-				return (double) 15;
+				return 15;
 			case 'P':
-				return (double) 10;
+				return 10;
 			case 'L':
-				return (double) 5;
+				return 5;
+			default:
+				break;
 			}
 			break;
+
 		}
 		throw new SpeciesErrorException("Unknown species index: " + sitecl);
 	}

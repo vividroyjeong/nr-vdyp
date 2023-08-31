@@ -1,8 +1,6 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.*;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Nested;
@@ -19,39 +17,10 @@ class SiteIndex2AgeTest {
 	private static final short SI_AT_TOTAL = 0;
 	private static final short SI_AT_BREAST = 1;
 
-	/*
-	 * site index estimation (from height and age) types
-	 */
-	private static final short SI_EST_DIRECT = 1;
-
-	/*
-	 * error codes as return values from functions
-	 */
-	private static final short SI_ERR_GI_MAX = -3;
-	private static final short SI_ERR_NO_ANS = -4;
-
 	/* define species and equation indices */
 	private static final short SI_BL_THROWERGI = 9;
-	private static final short SI_CWI_NIGHGI = 84;
 	private static final short SI_FDC_BRUCE = 16;
-	private static final short SI_FDC_NIGHGI = 15;
-	private static final short SI_FDI_NIGHGI = 19;
-	private static final short SI_HWC_NIGHGI = 31;
-	private static final short SI_HWC_NIGHGI99 = 79;
-	private static final short SI_HWC_WILEY = 34;
-	private static final short SI_HWI_NIGHGI = 38;
-	private static final short SI_LW_NIGHGI = 82;
-	private static final short SI_PLI_GOUDIE_DRY = 48;
-	private static final short SI_PLI_GOUDIE_WET = 49;
-	private static final short SI_PLI_NIGHGI97 = 42;
-	private static final short SI_SS_GOUDIE = 60;
-	private static final short SI_SS_NIGHGI = 58;
-	private static final short SI_SS_NIGHGI99 = 80;
-	private static final short SI_SW_GOUDIE_NAT = 71;
-	private static final short SI_SW_GOUDIE_PLA = 70;
 	private static final short SI_SW_HU_GARCIA = 119;
-	private static final short SI_SW_NIGHGI = 63;
-	private static final short SI_SW_NIGHGI99 = 81;
 
 	private static final double ERROR_TOLERANCE = 0.00001;
 
@@ -141,18 +110,6 @@ class SiteIndex2AgeTest {
 					() -> SiteIndex2Age.index_to_age(SI_FDC_BRUCE, site_height, SI_AT_BREAST, site_index, 12.0)
 			);
 		}
-
-		// TODO figure out if this is possible (dont think so)
-		/*
-		 * @Test void testSI_FDC_BRUCEAgeTooSmall() { double site_index = 1.38; double
-		 * site_height = 0.0001000009;
-		 *
-		 * double expectedResult = 0; double actualResult =
-		 * SiteIndex2Age.index_to_age(SI_FDC_BRUCE, site_height,
-		 * SI_FDC_BRUCE,site_index, 12);
-		 *
-		 * assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE)); }
-		 */
 
 		@Test
 		void testSI_FDC_BRUCEAgeTooBig() {

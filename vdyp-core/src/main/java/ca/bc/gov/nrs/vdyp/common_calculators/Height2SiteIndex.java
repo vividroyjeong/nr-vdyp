@@ -3988,11 +3988,8 @@ public class Height2SiteIndex {
 		step = site / 2.0;
 
 		/* loop until real close, or other end condition */
-		int x = 0; // TODO for testing remove
 		do {
-			x++;
-			System.out.println("We have run the loop: " + x + " times");
-			System.out.println("The site value is: " + site);
+
 			/* estimate y2bh */
 			y2bh = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site);
 
@@ -4028,10 +4025,6 @@ public class Height2SiteIndex {
 				}
 				site += step;
 			} else {
-				System.out.println(
-						"The test top value: " + test_top + " The height: " + height + " The difference "
-								+ (test_top - height)
-				);
 				/* done */
 				break;
 			}
