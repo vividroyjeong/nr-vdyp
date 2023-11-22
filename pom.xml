@@ -1,6 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>ca.bc.gov.nrs.vdyp</groupId>
@@ -20,18 +18,14 @@
 		<junit.version>5.9.2</junit.version>
 		<hamcrest.version>2.2</hamcrest.version>
 		<easymock.version>5.1.0</easymock.version>
-		
-		<sonar.coverage.jacoco.xmlReportPaths>
-			${project.basedir}/report-aggregate/target/site/
-      jacoco-aggregate/jacoco.xml
-		</sonar.coverage.jacoco.xmlReportPaths>
+
 	</properties>
 
 	<modules>
 		<module>vdyp-core</module>
 		<module>vdyp-fip</module>
 		<module>vdyp-buildtools</module>
-		<module>report-aggregate</module>
+		<module>vdyp-sindex</module>
 	</modules>
 
 	<dependencyManagement>
@@ -127,7 +121,11 @@
 					<artifactId>formatter-maven-plugin</artifactId>
 					<version>2.22.0</version>
 				</plugin>
-
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>0.8.9</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 
@@ -149,7 +147,7 @@
 			</plugin>
 
 		</plugins>
-
+		
 	</build>
 	<profiles>
 		<profile>
@@ -159,7 +157,6 @@
 					<plugin>
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>
-						<version>0.8.9</version>
 						<executions>
 							<execution>
 								<id>prepare-agent</id>
