@@ -591,8 +591,7 @@ public class FipStart {
 					Coefficients layerVector = (Coefficients) accessors.getReadMethod().invoke(result);
 					specVector.setCoe(UTIL_ALL, layerVector.getCoe(UTIL_ALL));
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new IllegalStateException(e);
 				}
 			}
 
@@ -706,7 +705,6 @@ public class FipStart {
 				}
 			}
 
-			float volumeSum = 0;
 			float loreyHeightSum = 0;
 			treesPerHectareSum = 0;
 

@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
-import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 
 class StockingClassFactorParserTest {
 

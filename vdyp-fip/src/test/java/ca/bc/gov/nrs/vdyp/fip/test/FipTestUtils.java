@@ -1,7 +1,5 @@
 package ca.bc.gov.nrs.vdyp.fip.test;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;

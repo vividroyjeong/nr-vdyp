@@ -79,7 +79,7 @@ public class FipLayerParser implements ControlMapValueReplacer<StreamingParserFa
 					is, lineParser, control
 			) {
 
-				@SuppressWarnings("unchecked")
+				@SuppressWarnings({ "unchecked", "deprecation" })
 				@Override
 				protected ValueOrMarker<Optional<FipLayer>, EndOfRecord> convert(Map<String, Object> entry) {
 					var polygonId = (String) entry.get(POLYGON_IDENTIFIER);

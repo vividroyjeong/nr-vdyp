@@ -8,11 +8,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-
 import org.hamcrest.Matchers;
 
 import static org.hamcrest.Matchers.equalTo;

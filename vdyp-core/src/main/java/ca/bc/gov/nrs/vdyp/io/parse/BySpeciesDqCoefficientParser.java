@@ -2,15 +2,10 @@ package ca.bc.gov.nrs.vdyp.io.parse;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import ca.bc.gov.nrs.vdyp.common.HoldFirst;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 

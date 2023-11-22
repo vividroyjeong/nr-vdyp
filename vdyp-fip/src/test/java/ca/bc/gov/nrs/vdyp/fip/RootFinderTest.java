@@ -1,35 +1,22 @@
 package ca.bc.gov.nrs.vdyp.fip;
 
 import static ca.bc.gov.nrs.vdyp.fip.FipStart.UTIL_ALL;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.closeTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.array;
 import static org.hamcrest.Matchers.contains;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
-
 import org.apache.commons.math3.analysis.MultivariateMatrixFunction;
 import org.apache.commons.math3.analysis.MultivariateVectorFunction;
-import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
-import org.apache.commons.math3.analysis.differentiation.MultivariateDifferentiableVectorFunction;
-import org.apache.commons.math3.exception.MathIllegalArgumentException;
-import org.apache.commons.math3.fitting.leastsquares.LeastSquaresFactory;
-import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
-import org.apache.commons.math3.fitting.leastsquares.LeastSquaresProblem;
-import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.linear.DiagonalMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.util.FastMath;
 import org.hamcrest.CustomTypeSafeMatcher;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
-import org.hamcrest.TypeSafeMatcher;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.fip.test.FipTestUtils;
