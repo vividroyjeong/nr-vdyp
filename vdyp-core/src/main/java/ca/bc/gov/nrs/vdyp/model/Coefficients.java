@@ -3,7 +3,6 @@ package ca.bc.gov.nrs.vdyp.model;
 import java.util.AbstractList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.UnaryOperator;
 import java.util.stream.DoubleStream;
 
 import ca.bc.gov.nrs.vdyp.common.FloatBinaryOperator;

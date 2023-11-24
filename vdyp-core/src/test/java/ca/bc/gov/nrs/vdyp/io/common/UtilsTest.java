@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.Utils;
 
-public class UtilsTest {
+class UtilsTest {
 
 	@Test
 	void testSingletonOrEmptyForNull() {

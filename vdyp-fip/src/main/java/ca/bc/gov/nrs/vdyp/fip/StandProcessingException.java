@@ -5,6 +5,8 @@ package ca.bc.gov.nrs.vdyp.fip;
  */
 public class StandProcessingException extends ProcessingException {
 
+	private static final long serialVersionUID = -3844954593240011442L;
+
 	public StandProcessingException() {
 		super();
 	}

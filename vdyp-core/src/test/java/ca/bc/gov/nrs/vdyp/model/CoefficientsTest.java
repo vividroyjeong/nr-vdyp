@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 
-public class CoefficientsTest {
+class CoefficientsTest {
 
 	@Test
 	void testGetCoe() {

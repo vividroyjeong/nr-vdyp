@@ -13,6 +13,9 @@ import javax.annotation.Nullable;
 
 public class Utils {
 
+	private Utils() {
+	}
+
 	/**
 	 * Returns a singleton set containing the value if it's not null, otherwise an
 	 * empty set

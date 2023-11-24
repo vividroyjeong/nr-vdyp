@@ -3038,7 +3038,7 @@ class FipStartTest {
 	}
 
 	@Test
-	public void testEstimateWholeStemVolumeByUtilizationClass() throws ProcessingException {
+	void testEstimateWholeStemVolumeByUtilizationClass() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		var app = new FipStart();
 		app.setControlMap(controlMap);
@@ -3068,7 +3068,7 @@ class FipStartTest {
 	}
 
 	@Test
-	public void testComputeUtilizationComponentsPrimaryByUtilNoCV() throws ProcessingException {
+	void testComputeUtilizationComponentsPrimaryByUtilNoCV() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		var app = new FipStart();
 		app.setControlMap(controlMap);
@@ -3245,7 +3245,7 @@ class FipStartTest {
 	}
 
 	@Test
-	public void testCreateVdypPolygon() throws ProcessingException {
+	void testCreateVdypPolygon() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		var app = new FipStart();
 		app.setControlMap(controlMap);
@@ -3295,7 +3295,7 @@ class FipStartTest {
 	}
 
 	@Test
-	public void testCreateVdypPolygonPercentForestLandGiven() throws ProcessingException {
+	void testCreateVdypPolygonPercentForestLandGiven() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		var app = new FipStart();
 		app.setControlMap(controlMap);
@@ -3345,7 +3345,7 @@ class FipStartTest {
 	}
 
 	@Test
-	public void testCreateVdypPolygonFipYoung() throws ProcessingException {
+	void testCreateVdypPolygonFipYoung() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		var app = new FipStart();
 		app.setControlMap(controlMap);
@@ -3395,7 +3395,7 @@ class FipStartTest {
 	}
 
 	@Test
-	public void testApplyStockingFactor() throws ProcessingException {
+	void testApplyStockingFactor() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		@SuppressWarnings("unchecked")
 		var stockingClassMap = (MatrixMap2<Character, Region, Optional<StockingClassFactor>>) controlMap
@@ -3497,7 +3497,7 @@ class FipStartTest {
 	}
 
 	@Test
-	public void testApplyStockingFactorNoFactorForLayer() throws ProcessingException {
+	void testApplyStockingFactorNoFactorForLayer() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		@SuppressWarnings("unchecked")
 		var stockingClassMap = (MatrixMap2<Character, Region, StockingClassFactor>) controlMap
@@ -3609,7 +3609,7 @@ class FipStartTest {
 	}
 
 	@Test
-	public void testApplyStockingFactorNoFactorForClass() throws ProcessingException {
+	void testApplyStockingFactorNoFactorForClass() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		@SuppressWarnings("unchecked")
 		var stockingClassMap = (MatrixMap2<Character, Region, StockingClassFactor>) controlMap

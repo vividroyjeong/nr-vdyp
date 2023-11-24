@@ -25,11 +25,11 @@ import ca.bc.gov.nrs.vdyp.model.Layer;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 
-public class RootFinderTest {
+class RootFinderTest {
 	private final double epsilon = 0.00001;
 
 	@Test
-	public void testRootFunction() {
+	void testRootFunction() {
 		var control = FipTestUtils.loadControlMap();
 		var app = new FipStart();
 		app.setControlMap(control);
@@ -53,7 +53,7 @@ public class RootFinderTest {
 	}
 
 	@Test
-	public void testRootFunctionJacobian() {
+	void testRootFunctionJacobian() {
 		var control = FipTestUtils.loadControlMap();
 		var app = new FipStart();
 		app.setControlMap(control);
@@ -90,7 +90,7 @@ public class RootFinderTest {
 	}
 
 	@Test
-	public void testRootFunctionSolve() {
+	void testRootFunctionSolve() {
 		var control = FipTestUtils.loadControlMap();
 		var app = new FipStart();
 		app.setControlMap(control);

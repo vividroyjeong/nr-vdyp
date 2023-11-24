@@ -473,6 +473,7 @@ public class VdypMatchers {
 		);
 	}
 
+	@SafeVarargs
 	public static Matcher<Coefficients> coe(int indexFrom, Matcher<Float>... contentsMatchers) {
 		return coe(indexFrom, contains(contentsMatchers));
 	}

@@ -23,10 +23,10 @@ import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.Layer;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
-public class FipLayerParserTest {
+class FipLayerParserTest {
 
 	@Test
-	public void testParseEmpty() throws Exception {
+	void testParseEmpty() throws Exception {
 
 		var parser = new FipLayerParser();
 
@@ -52,7 +52,7 @@ public class FipLayerParserTest {
 	}
 
 	@Test
-	public void testParseLayer() throws Exception {
+	void testParseLayer() throws Exception {
 
 		var parser = new FipLayerParser();
 
@@ -105,7 +105,7 @@ public class FipLayerParserTest {
 	}
 
 	@Test
-	public void testParseTwoLayers() throws Exception {
+	void testParseTwoLayers() throws Exception {
 
 		var parser = new FipLayerParser();
 
@@ -175,7 +175,7 @@ public class FipLayerParserTest {
 	}
 
 	@Test
-	public void testIgnoreLayerIfHeightZero() throws Exception {
+	void testIgnoreLayerIfHeightZero() throws Exception {
 
 		var parser = new FipLayerParser();
 
@@ -229,7 +229,7 @@ public class FipLayerParserTest {
 	}
 
 	@Test
-	public void testIgnoreLayerIfCrownClosureZero() throws Exception {
+	void testIgnoreLayerIfCrownClosureZero() throws Exception {
 
 		var parser = new FipLayerParser();
 

@@ -767,7 +767,21 @@ public class FipStart {
 	}
 
 	// EMP060
-	//
+	/**
+	 * Estimate DQ for a species (primary or not). Using eqn in jf125.doc.
+	 *
+	 * Enforces mins and maxes from EMP061.
+	 *
+	 * @param spec                  Species of insterest
+	 * @param allSpecies            Collection of all species on the layer
+	 * @param region                BEC Region of the stand
+	 * @param standQuadMeanDiameter Quadratic mean diameter of the stand
+	 * @param standBaseArea         Base area of the stand
+	 * @param standTreesPerHectare  Density opf the stand
+	 * @param standLoreyHeight      Lorey height of the stand
+	 * @return Quadratic mean diameter of the species of interest
+	 * @throws ProcessingException
+	 */
 	float estimateQuadMeanDiameterForSpecies(
 			VdypSpecies spec, // ISP, HLsp, DQsp
 			Map<String, VdypSpecies> allSpecies, // FR

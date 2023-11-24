@@ -2,7 +2,7 @@ package ca.bc.gov.nrs.vdyp.model;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 public class BaseVdypPolygon<L extends BaseVdypLayer<?>, PA> {
@@ -34,7 +34,7 @@ public class BaseVdypPolygon<L extends BaseVdypLayer<?>, PA> {
 	}
 
 	public void setLayers(Collection<L> layers) {
-		this.layers = new HashMap<>();
+		this.layers = new EnumMap<>(Layer.class);
 		layers.forEach(spec -> this.layers.put(spec.getLayer(), spec));
 	}
 

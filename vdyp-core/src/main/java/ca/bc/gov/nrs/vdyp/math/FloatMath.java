@@ -4,6 +4,9 @@ import java.io.IOException;
 
 public class FloatMath {
 
+	private FloatMath() {
+	}
+
 	// wrap standard library double math functions to work with floats so equations
 	// aren't littered with explicit casts
 

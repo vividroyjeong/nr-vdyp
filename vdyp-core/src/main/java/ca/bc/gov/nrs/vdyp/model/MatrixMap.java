@@ -131,7 +131,7 @@ public interface MatrixMap<T> {
 	 */
 	public default void setAll(T value) {
 		setAll(k -> value);
-	};
+	}
 
 	/**
 	 * Set all cells to the generated value
@@ -142,5 +142,5 @@ public interface MatrixMap<T> {
 		eachKey((k) -> {
 			putM(generator.apply(k), k);
 		});
-	};
+	}
 }
