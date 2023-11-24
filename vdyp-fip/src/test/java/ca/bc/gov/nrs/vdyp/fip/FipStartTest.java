@@ -563,7 +563,9 @@ class FipStartTest {
 
 		var fipPolygon = getTestPolygon(polygonId, valid());
 		var fipLayer = getTestVeteranLayer(polygonId, valid());
-		var fipSpecies = getTestSpecies(polygonId, Layer.VETERAN, valid());
+		var fipSpecies = getTestSpecies(polygonId, Layer.VETERAN, x -> {
+			x.setSpeciesPercent(Collections.emptyMap());
+		});
 		fipPolygon.setLayers(Collections.singletonMap(Layer.VETERAN, fipLayer));
 		fipLayer.setSpecies(Collections.singletonMap(fipSpecies.getGenus(), fipSpecies));
 
@@ -741,6 +743,357 @@ class FipStartTest {
 		assertThat(distributionResult, hasEntry("S1", 75f));
 		assertThat(distributionResult, hasEntry("S2", 25f));
 
+	}
+
+	@Test
+	void testProcessPrimary() throws Exception {
+
+		var polygonId = polygonId("Test Polygon", 2023);
+
+		var fipPolygon = getTestPolygon(polygonId, x -> {
+			x.setBiogeoclimaticZone("CWH");
+			x.setForestInventoryZone("A");
+		});
+		var fipLayer = getTestPrimaryLayer(polygonId, x -> {
+			x.setAgeTotal(55f);
+			x.setHeight(35.3f);
+			x.setSiteIndex(35f);
+			x.setCrownClosure(87.4f);
+			x.setSiteGenus("D");
+			x.setSiteSpecies("D");
+			x.setYearsToBreastHeight(1f);
+			x.setPrimaryGenus("H");
+			x.setInventoryTypeGroup(13);
+		});
+		var fipSpecies1 = getTestSpecies(polygonId, Layer.PRIMARY, "B", x -> {
+			x.setPercentGenus(1f);
+		});
+		var fipSpecies2 = getTestSpecies(polygonId, Layer.PRIMARY, "C", x -> {
+			x.setPercentGenus(7f);
+		});
+		var fipSpecies3 = getTestSpecies(polygonId, Layer.PRIMARY, "D", x -> {
+			x.setPercentGenus(74f);
+		});
+		var fipSpecies4 = getTestSpecies(polygonId, Layer.PRIMARY, "H", x -> {
+			x.setPercentGenus(9f);
+		});
+		var fipSpecies5 = getTestSpecies(polygonId, Layer.PRIMARY, "S", x -> {
+			x.setPercentGenus(9f);
+		});
+		fipPolygon.setLayers(List.of(fipLayer));
+		fipLayer.setSpecies(List.of(fipSpecies1, fipSpecies2, fipSpecies3, fipSpecies4, fipSpecies5));
+
+		var controlMap = FipTestUtils.loadControlMap();
+
+		var app = new FipStart();
+		app.setControlMap(controlMap);
+
+		var result = app.processLayerAsPrimary(fipPolygon, fipLayer, 0f);
+
+		assertThat(result, notNullValue());
+
+		assertThat(result, hasProperty("polygonIdentifier", is(polygonId)));
+		assertThat(result, hasProperty("layer", is(Layer.PRIMARY)));
+
+		assertThat(result, hasProperty("ageTotal", is(55f)));
+		assertThat(result, hasProperty("height", is(35.3f)));
+		assertThat(result, hasProperty("yearsToBreastHeight", is(1f)));
+
+		assertThat(result, hasProperty("breastHeightAge", is(54f)));
+
+		assertThat(
+				result,
+				allOf(
+						hasProperty("loreyHeightByUtilization", coe(-1, 7.14446497f, 31.3307228f)),
+						hasProperty(
+								"baseAreaByUtilization",
+								utilization(
+										0.0153773092f, 44.6249809f, 0.513127923f, 1.26773751f, 2.5276401f, 40.3164787f
+								)
+						),
+						hasProperty(
+								"quadraticMeanDiameterByUtilization",
+								utilization(6.05058956f, 30.2606678f, 10.208025f, 15.0549212f, 20.11759f, 35.5117531f)
+						),
+						hasProperty(
+								"treesPerHectareByUtilization",
+								utilization(5.34804535f, 620.484802f, 62.6977997f, 71.2168045f, 79.5194702f, 407.05072f)
+						),
+						hasProperty(
+								"wholeStemVolumeByUtilization",
+								utilization(
+										0.0666879341f, 635.659668f, 2.66822577f, 9.68201256f, 26.5469246f, 596.762512f
+								)
+						),
+
+						// Ignore intermediate close volumes, if they are wrong,
+						// closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization should also be
+						// wrong
+
+						hasProperty(
+								"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+								utilization(0f, 563.218933f, 0.414062887f, 7.01947737f, 22.6179276f, 533.16748f)
+						)
+
+				)
+		);
+
+		assertThat(
+				result, hasProperty(
+						"species", allOf(
+								aMapWithSize(5), //
+								hasEntry(is("B"), instanceOf(VdypSpecies.class)), //
+								hasEntry(is("C"), instanceOf(VdypSpecies.class)), //
+								hasEntry(is("D"), instanceOf(VdypSpecies.class)), //
+								hasEntry(is("H"), instanceOf(VdypSpecies.class)), //
+								hasEntry(is("S"), instanceOf(VdypSpecies.class))//
+						)
+				)
+		);
+		var speciesResult = result.getSpecies().get("B");
+
+		assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
+		assertThat(speciesResult, hasProperty("layer", is(Layer.PRIMARY)));
+		assertThat(speciesResult, hasProperty("genus", is("B")));
+
+		assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.00890319888f)));
+
+		assertThat(speciesResult, hasProperty("speciesPercent", aMapWithSize(1)));
+
+		assertThat(
+				speciesResult,
+				allOf(
+						hasProperty("loreyHeightByUtilization", coe(-1, 8.39441967f, 38.6004372f)),
+						hasProperty(
+								"baseAreaByUtilization",
+								utilization(
+										0f, 0.397305071f, 0.00485289097f, 0.0131751001f, 0.0221586525f, 0.357118428f
+								)
+						),
+						hasProperty(
+								"quadraticMeanDiameterByUtilization",
+								utilization(
+										6.13586617f, 31.6622887f, 9.17939758f, 13.6573782f, 18.2005272f, 42.1307297f
+								)
+						),
+						hasProperty(
+								"treesPerHectareByUtilization",
+								utilization(0f, 5.04602766f, 0.733301044f, 0.899351299f, 0.851697803f, 2.56167722f)
+						),
+						hasProperty(
+								"wholeStemVolumeByUtilization",
+								utilization(0f, 6.35662031f, 0.0182443243f, 0.0747248605f, 0.172960356f, 6.09069061f)
+						),
+
+						// Ignore intermediate close volumes, if they are wrong,
+						// closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization should also be
+						// wrong
+
+						hasProperty(
+								"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+								utilization(0f, 5.65764236f, 0.000855736958f, 0.046797853f, 0.143031254f, 5.46695757f)
+						)
+
+				)
+		);
+
+		speciesResult = result.getSpecies().get("C");
+
+		assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
+		assertThat(speciesResult, hasProperty("layer", is(Layer.PRIMARY)));
+		assertThat(speciesResult, hasProperty("genus", is("C")));
+
+		assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.114011094f)));
+
+		assertThat(speciesResult, hasProperty("speciesPercent", aMapWithSize(1)));
+
+		assertThat(
+				speciesResult,
+				allOf(
+						hasProperty("loreyHeightByUtilization", coe(-1, 6.61517191f, 22.8001652f)),
+						hasProperty(
+								"baseAreaByUtilization",
+								utilization(
+										0.0131671466f, 5.08774281f, 0.157695293f, 0.365746498f, 0.565057278f,
+										3.99924374f
+								)
+						),
+						hasProperty(
+								"quadraticMeanDiameterByUtilization",
+								utilization(5.99067688f, 26.4735165f, 10.1137667f, 14.9345293f, 19.964777f, 38.7725677f)
+						),
+						hasProperty(
+								"treesPerHectareByUtilization",
+								utilization(
+										4.67143154f, 92.4298019f, 19.6292171f, 20.8788815f, 18.0498524f, 33.8718452f
+								)
+						),
+						hasProperty(
+								"wholeStemVolumeByUtilization",
+								utilization(
+										0.0556972362f, 44.496151f, 0.78884691f, 2.40446854f, 4.43335152f, 36.8694839f
+								)
+						),
+
+						// Ignore intermediate close volumes, if they are wrong,
+						// closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization should also be
+						// wrong
+
+						hasProperty(
+								"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+								utilization(0f, 33.6030083f, 0.138336331f, 1.6231581f, 3.49037051f, 28.3511429f)
+						)
+
+				)
+		);
+
+		speciesResult = result.getSpecies().get("D");
+
+		assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
+		assertThat(speciesResult, hasProperty("layer", is(Layer.PRIMARY)));
+		assertThat(speciesResult, hasProperty("genus", is("D")));
+
+		assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.661987007f)));
+
+		assertThat(speciesResult, hasProperty("speciesPercent", aMapWithSize(1)));
+
+		assertThat(
+				speciesResult,
+				allOf(
+						hasProperty("loreyHeightByUtilization", coe(-1, 10.8831682f, 33.5375252f)),
+						hasProperty(
+								"baseAreaByUtilization",
+								utilization(
+										0.00163476227f, 29.5411568f, 0.0225830078f, 0.0963115692f, 0.748186111f,
+										28.6740761f
+								)
+						),
+						hasProperty(
+								"quadraticMeanDiameterByUtilization",
+								utilization(
+										6.46009731f, 33.9255791f, 10.4784775f, 15.5708427f, 20.4805717f, 35.0954628f
+								)
+						),
+						hasProperty(
+								"treesPerHectareByUtilization",
+								utilization(
+										0.498754263f, 326.800781f, 2.61875916f, 5.05783129f, 22.7109661f, 296.413239f
+								)
+						),
+						hasProperty(
+								"wholeStemVolumeByUtilization",
+								utilization(
+										0.0085867513f, 470.388489f, 0.182312608f, 1.08978188f, 10.1118069f, 459.004578f
+								)
+						),
+
+						// Ignore intermediate close volumes, if they are wrong,
+						// closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization should also be
+						// wrong
+
+						hasProperty(
+								"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+								utilization(0f, 424.163849f, 0.0895428956f, 0.929004371f, 8.9712553f, 414.174042f)
+						)
+
+				)
+		);
+
+		speciesResult = result.getSpecies().get("H");
+
+		assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
+		assertThat(speciesResult, hasProperty("layer", is(Layer.PRIMARY)));
+		assertThat(speciesResult, hasProperty("genus", is("H")));
+
+		assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.123297341f)));
+
+		assertThat(speciesResult, hasProperty("speciesPercent", aMapWithSize(1)));
+
+		assertThat(
+				speciesResult,
+				allOf(
+						hasProperty("loreyHeightByUtilization", coe(-1, 7.93716192f, 24.3451157f)),
+						hasProperty(
+								"baseAreaByUtilization",
+								utilization(0f, 5.50214148f, 0.311808586f, 0.736046314f, 0.988982677f, 3.4653039f)
+						),
+						hasProperty(
+								"quadraticMeanDiameterByUtilization",
+								utilization(6.03505516f, 21.4343796f, 10.260808f, 15.0888424f, 20.0664616f, 32.2813988f)
+						),
+						hasProperty(
+								"treesPerHectareByUtilization",
+								utilization(0f, 152.482513f, 37.7081375f, 41.1626587f, 31.2721119f, 42.3395996f)
+						),
+						hasProperty(
+								"wholeStemVolumeByUtilization",
+								utilization(0f, 57.2091446f, 1.57991886f, 5.59581661f, 9.53606987f, 40.4973412f)
+						),
+
+						// Ignore intermediate close volumes, if they are wrong,
+						// closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization should also be
+						// wrong
+
+						hasProperty(
+								"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+								utilization(0f, 48.1333618f, 0.168331802f, 4.01862335f, 8.05745506f, 35.8889503f)
+						)
+
+				)
+		);
+
+		speciesResult = result.getSpecies().get("S");
+
+		assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
+		assertThat(speciesResult, hasProperty("layer", is(Layer.PRIMARY)));
+		assertThat(speciesResult, hasProperty("genus", is("S")));
+
+		assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.0918014571f)));
+
+		assertThat(speciesResult, hasProperty("speciesPercent", aMapWithSize(1)));
+
+		assertThat(
+				speciesResult,
+				allOf(
+						hasProperty("loreyHeightByUtilization", coe(-1, 8.63455391f, 34.6888771f)),
+						hasProperty(
+								"baseAreaByUtilization",
+								utilization(
+										0.000575399841f, 4.0966382f, 0.0161881447f, 0.0564579964f, 0.203255415f,
+										3.82073665f
+								)
+						),
+						hasProperty(
+								"quadraticMeanDiameterByUtilization",
+								utilization(
+										6.41802597f, 34.5382729f, 10.1304808f, 14.9457884f, 19.7497196f, 39.0729332f
+								)
+						),
+						hasProperty(
+								"treesPerHectareByUtilization",
+								utilization(
+										0.17785944f, 43.7256737f, 2.00838566f, 3.21808815f, 6.63483906f, 31.8643608f
+								)
+						),
+						hasProperty(
+								"wholeStemVolumeByUtilization",
+								utilization(
+										0.00240394124f, 57.2092552f, 0.0989032984f, 0.517220974f, 2.29273605f,
+										54.300396f
+								)
+						),
+
+						// Ignore intermediate close volumes, if they are wrong,
+						// closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization should also be
+						// wrong
+
+						hasProperty(
+								"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+								utilization(0f, 51.6610985f, 0.0169961192f, 0.401893795f, 1.95581412f, 49.286396f)
+						)
+
+				)
+		);
 	}
 
 	@Test
@@ -2107,7 +2460,7 @@ class FipStartTest {
 	}
 
 	@Test
-	void testFindRootsForPrimaryLayerDiameterAndAreaMultipleSpecies() throws Exception {
+	void testFindRootsForPrimaryLayerDiameterAndAreaMultipleSpeciesPass1() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		var app = new FipStart();
 		app.setControlMap(controlMap);
@@ -3532,7 +3885,7 @@ class FipStartTest {
 				genusId // genus
 		);
 		result.setPercentGenus(100.0f);
-		result.setSpeciesPercent(Collections.emptyMap());
+		result.setSpeciesPercent(Collections.singletonMap(genusId, 100f));
 		mutator.accept(result);
 		return result;
 	};

@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -109,16 +110,16 @@ public class FipStart {
 	private static final Comparator<FipSpecies> PERCENT_GENUS_DESCENDING = Utils
 			.compareUsing(FipSpecies::getPercentGenus).reversed();
 
-	static private final Logger log = LoggerFactory.getLogger(FipStart.class);
+	private static final Logger log = LoggerFactory.getLogger(FipStart.class);
 
 	public static final int CONFIG_LOAD_ERROR = 1; // TODO check what Fortran FIPStart would exit with.
 	public static final int PROCESSING_ERROR = 2; // TODO check what Fortran FIPStart would exit with.
 
-	public final static int UTIL_ALL = UtilizationClass.ALL.index;
-	public final static int UTIL_LARGEST = UtilizationClass.OVER225.index;
-	public final static int UTIL_SMALL = UtilizationClass.SMALL.index;
+	public static final int UTIL_ALL = UtilizationClass.ALL.index;
+	public static final int UTIL_LARGEST = UtilizationClass.OVER225.index;
+	public static final int UTIL_SMALL = UtilizationClass.SMALL.index;
 
-	public final static float TOLERANCE = 2.0e-3f;
+	public static final float TOLERANCE = 2.0e-3f;
 
 	int jprogram = 1; // FIPSTART only TODO Track this down
 
@@ -269,7 +270,7 @@ public class FipStart {
 					// CALL FIPCALCV( BAV, IER)
 					// CALL FIPCALC1( BAV, BA_TOTL1, IER)
 
-					Map<Layer, VdypLayer> processedLayers = new HashMap<>();
+					Map<Layer, VdypLayer> processedLayers = new EnumMap<>(Layer.class);
 
 					var fipLayers = polygon.getLayers();
 					var fipVetLayer = Optional.ofNullable(fipLayers.get(Layer.VETERAN));
@@ -322,7 +323,6 @@ public class FipStart {
 
 					log.atWarn().setMessage("Polygon {} bypassed").addArgument(polygon.getPolygonIdentifier())
 							.setCause(ex);
-					continue;
 				}
 
 			}
@@ -334,18 +334,14 @@ public class FipStart {
 	// FIPSTK
 	void adjustForStocking(VdypLayer vdypLayer, FipLayerPrimary fipLayerPrimary, BecDefinition bec) {
 
-		if (!fipLayerPrimary.getStockingClass().isPresent()) {
-			return;
-		}
-		var stockingClass = fipLayerPrimary.getStockingClass().get();
-
 		@SuppressWarnings("unchecked")
 		var stockingClassMap = (MatrixMap2<Character, Region, Optional<StockingClassFactor>>) controlMap
 				.get(StockingClassFactorParser.CONTROL_KEY);
 
 		Region region = bec.getRegion();
 
-		var factorEntry = stockingClassMap.get(stockingClass, region);
+		var factorEntry = fipLayerPrimary.getStockingClass()
+				.flatMap(stockingClass -> stockingClassMap.get(stockingClass, region));
 
 		if (!factorEntry.isPresent()) {
 			return;
@@ -356,7 +352,7 @@ public class FipStart {
 		scaleAllSummableUtilization(vdypLayer, factor);
 		vdypLayer.getSpecies().values().forEach(spec -> scaleAllSummableUtilization(spec, factor));
 
-		log.atInfo().addArgument(stockingClass).addArgument(factor).setMessage(
+		log.atInfo().addArgument(fipLayerPrimary.getStockingClass()).addArgument(factor).setMessage(
 				"Foregoing Primary Layer has stocking class {} Yield values will be multiplied by {}  before being written to output file."
 		);
 	}
@@ -375,7 +371,7 @@ public class FipStart {
 
 	// FIPLAND
 	float estimatePercentForestLand(FipPolygon fipPolygon, FipLayer fipVetLayer, FipLayerPrimary fipPrimaryLayer)
-			throws ProcessingException, LowValueException {
+			throws ProcessingException {
 		if (fipPolygon.getPercentAvailable().isPresent()) {
 			return fipPolygon.getPercentAvailable().get();
 		} else {
@@ -465,8 +461,6 @@ public class FipStart {
 				() -> new IllegalStateException("Could not find BEC " + fipPolygon.getBiogeoclimaticZone())
 		);
 
-		var baseAreaGroup = findBaseAreaGroup(primarySpecies.get(0), bec, itg);
-
 		var result = new VdypLayer(fipLayer.getPolygonIdentifier(), fipLayer.getLayer());
 
 		result.setAgeTotal(fipLayer.getAgeTotal());
@@ -474,21 +468,22 @@ public class FipStart {
 		result.setBreastHeightAge(fipLayer.getAgeTotal() - fipLayer.getYearsToBreastHeight());
 		result.setHeight(fipLayer.getHeight());
 
+		// EMP040
 		var baseArea = estimatePrimaryBaseArea(
 				fipLayer, bec, fipPolygon.getYieldFactor(), result.getBreastHeightAge(), baseAreaOverstory
-		);
+		); // BA_TOT
 
-		result.getBaseAreaByUtilization().set(UTIL_ALL, baseArea);
+		result.getBaseAreaByUtilization().setCoe(UTIL_ALL, baseArea);
 
 		var quadMeanDiameter = estimatePrimaryQuadMeanDiameter(
 				fipLayer, bec, result.getBreastHeightAge(), baseAreaOverstory
 		);
 
-		result.getQuadraticMeanDiameterByUtilization().set(UTIL_ALL, quadMeanDiameter);
+		result.getQuadraticMeanDiameterByUtilization().setCoe(UTIL_ALL, quadMeanDiameter);
 
 		var tphTotal = treesPerHectare(baseArea, quadMeanDiameter);
 
-		result.getTreesPerHectareByUtilization().set(UTIL_ALL, tphTotal);
+		result.getTreesPerHectareByUtilization().setCoe(UTIL_ALL, tphTotal);
 
 		// Copy over Species entries.
 		// LVCOM/ISPL1=ISPV
@@ -496,7 +491,7 @@ public class FipStart {
 		// LVCOM4/SP64DISTL1=FIPSA/VDISTRV
 		// LVCOM1/PCLT1=FIPS/PCTVOLV
 		var vdypSpecies = fipLayer.getSpecies().values().stream() //
-				.map(fipSpec -> new VdypSpecies(fipSpec)) //
+				.map(VdypSpecies::new) //
 				.collect(Collectors.toMap(VdypSpecies::getGenus, Function.identity()));
 
 		var vdypPrimarySpecies = vdypSpecies.get(primarySpecies.get(0).getGenus());
@@ -523,7 +518,9 @@ public class FipStart {
 
 		var maxPass = fipLayer.getSpecies().size() > 1 ? 2 : 1;
 
-		float primaryHeight = 0f;
+		result.setSpecies(vdypSpecies);
+
+		float primaryHeight;
 		float leadHeight = fipLayer.getHeight();
 		for (var iPass = 1; iPass <= maxPass; iPass++) {
 			if (iPass == 2) {
@@ -531,7 +528,7 @@ public class FipStart {
 					vSpec.setPercentGenus(targetPercentages.get(vSpec.getGenus()));
 				}
 			}
-
+			// Estimate lorey height for primary species
 			if (iPass == 1 && vdypSpecies.size() == 1) {
 				primaryHeight = primaryHeightFromLeadHeight(
 						leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion(), tphTotal
@@ -546,6 +543,7 @@ public class FipStart {
 						vdypPrimarySpecies.getTreesPerHectareByUtilization().getCoe(UTIL_ALL)
 				);
 			}
+			vdypPrimarySpecies.getLoreyHeightByUtilization().setCoe(UTIL_ALL, primaryHeight);
 
 			// Estimate lorey height for non-primary species
 			for (var vspec : vdypSpecies.values()) {
@@ -559,13 +557,14 @@ public class FipStart {
 				);
 			}
 
+			// ROOTF01
 			findRootsForDiameterAndBaseArea(result, fipLayer, bec, iPass + 1);
 		}
 
 		estimateSmallComponents(fipPolygon, result);
 
 		// YUC1
-		computeUtilizationComponentsPrimary(bec, result, VolumeComputeMode.ZERO, CompatibilityVariableMode.NONE);
+		computeUtilizationComponentsPrimary(bec, result, VolumeComputeMode.BY_UTIL, CompatibilityVariableMode.NONE);
 
 		return result;
 	}
@@ -581,6 +580,8 @@ public class FipStart {
 		Map<String, Float> xMap = new LinkedHashMap<>(); // X
 
 		float treesPerHectareSum;
+
+		assert result.getSpecies().size() > 0;
 
 		if (result.getSpecies().size() == 1) {
 			var spec = result.getSpecies().values().iterator().next();
@@ -616,9 +617,7 @@ public class FipStart {
 				accessor = x -> x.getPercentGenus();
 				break;
 			case 2:
-				accessor = x -> {
-					return x.getPercentGenus() / x.getLoreyHeightByUtilization().getCoe(UTIL_ALL);
-				};
+				accessor = x -> x.getPercentGenus() / x.getLoreyHeightByUtilization().getCoe(UTIL_ALL);
 				break;
 			case 3:
 				accessor = x -> x.getBaseAreaByUtilization().getCoe(UTIL_ALL);
@@ -1339,8 +1338,8 @@ public class FipStart {
 
 	}
 
-	private final IndexedFloatBinaryOperator COPY_IF_BAND = (oldX, newX, i) -> i <= UTIL_ALL ? oldX : newX;
-	private final IndexedFloatBinaryOperator COPY_IF_NOT_TOTAL = (oldX, newX, i) -> i < UTIL_ALL ? oldX : newX;
+	private static final IndexedFloatBinaryOperator COPY_IF_BAND = (oldX, newX, i) -> i <= UTIL_ALL ? oldX : newX;
+	private static final IndexedFloatBinaryOperator COPY_IF_NOT_TOTAL = (oldX, newX, i) -> i < UTIL_ALL ? oldX : newX;
 
 	// YUCV
 	private void computeUtilizationComponentsVeteran(VdypLayer vdypLayer, BecDefinition bec)
@@ -1560,7 +1559,7 @@ public class FipStart {
 
 	}
 
-	private final static List<UtilizationClass> MODE_1_RECONCILE_AVAILABILITY_CLASSES = List
+	private static final List<UtilizationClass> MODE_1_RECONCILE_AVAILABILITY_CLASSES = List
 			.of(UtilizationClass.OVER225, UtilizationClass.U175TO225, UtilizationClass.U125TO175);
 
 	void reconcileComponentsMode1(
@@ -1881,8 +1880,7 @@ public class FipStart {
 		if (logit > 88f) {
 			throw new ProcessingException("logit " + logit + " exceeds 88");
 		}
-		float exp = exp(logit);
-		return exp;
+		return exp(logit);
 	}
 
 	/**
@@ -2119,7 +2117,7 @@ public class FipStart {
 				controlMap, HLCoefficientParser.CONTROL_KEY_P2, MatrixMap2.class
 		);
 		var coe = coeMap.get(genus, region).orElse(Coefficients.empty(HLCoefficientParser.NUM_COEFFICIENTS_P2, 1));
-		return 1.3f + coe.getCoe(0) * pow(leadHeight - 1.3f, coe.getCoe(1));
+		return 1.3f + coe.getCoe(1) * pow(leadHeight - 1.3f, coe.getCoe(2));
 	}
 
 	/**
@@ -2377,8 +2375,6 @@ public class FipStart {
 				controlMap, ModifierParser.CONTROL_KEY_MOD301_WASTE, MatrixMap2.class
 		);
 
-		final var ageTr = (float) Math.log(Math.max(20.0, ageBreastHeight));
-
 		estimateUtilization(
 				closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil, utilizationClass,
 				(i, netDecay) -> {
@@ -2390,7 +2386,7 @@ public class FipStart {
 					if (netWasteCoe == null) {
 						throw new ProcessingException("Could not find net waste coefficients for genus " + genus);
 					}
-					;
+
 					var a0 = netWasteCoe.getCoe(0);
 					var a1 = netWasteCoe.getCoe(1);
 					var a2 = netWasteCoe.getCoe(2);
@@ -2835,8 +2831,7 @@ public class FipStart {
 	}
 
 	// EMP098
-	float estimateVeteranBaseArea(float height, float crownClosure, String genus, Region region)
-			throws ProcessingException {
+	float estimateVeteranBaseArea(float height, float crownClosure, String genus, Region region) {
 		@SuppressWarnings("unchecked")
 		var coefficients = ((MatrixMap2<String, Region, Coefficients>) controlMap.get(VeteranBQParser.CONTROL_KEY))
 				.getM(genus, region);
@@ -3211,8 +3206,7 @@ public class FipStart {
 
 	Coefficients getCoeForSpec(VdypSpecies spec, String controlKey) {
 		var coeMap = Utils.<Map<String, Coefficients>>expectParsedControl(controlMap, controlKey, Map.class);
-		Coefficients coe = coeMap.get(spec.getGenus());
-		return coe;
+		return coeMap.get(spec.getGenus());
 	}
 
 	/**
@@ -3269,9 +3263,9 @@ public class FipStart {
 	}
 
 	RealVector findRoot(double[] diameterBase, double[] goal, double[] x, VdypLayer layer, double tolerance) {
-		MultivariateVectorFunction func = (point) -> rootFinderFunction(point, layer, diameterBase);
+		MultivariateVectorFunction func = point -> rootFinderFunction(point, layer, diameterBase);
 
-		MultivariateMatrixFunction jacFunc = (point) -> estimateJacobian(point, func);
+		MultivariateMatrixFunction jacFunc = point -> estimateJacobian(point, func);
 
 		LevenbergMarquardtOptimizer optimizer = new LevenbergMarquardtOptimizer();
 
