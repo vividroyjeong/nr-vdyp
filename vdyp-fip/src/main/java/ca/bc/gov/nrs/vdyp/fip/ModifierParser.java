@@ -14,6 +14,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.HLNonprimaryCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.OptionalResourceControlMapModifier;
 import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.common.FloatUnaryOperator;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.ValueParseException;
@@ -159,11 +160,11 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 
 					if (coastalMod != 0.0) {
 						var coe = vetBqMap.get(sp0Alias, Region.COASTAL);
-						coe.modifyCoe(1, x -> x * coastalMod);
+						coe.scalarInPlace(1, (FloatUnaryOperator) x -> x * coastalMod);
 					}
 					if (interiorMod != 0.0) {
 						var coe = vetBqMap.get(sp0Alias, Region.INTERIOR);
-						coe.modifyCoe(1, x -> x * interiorMod);
+						coe.scalarInPlace(1, (FloatUnaryOperator) x -> x * interiorMod);
 					}
 				}
 			} else if (sequence >= 200 && sequence <= 299) {
@@ -199,16 +200,16 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 
 					modsByRegions(mods, 0, (m, r) -> {
 						var coe = hlP1Map.get(sp0Alias, r);
-						coe.modifyCoe(1, x -> x * m);
-						coe.modifyCoe(2, x -> x * m);
+						coe.scalarInPlace(1, (FloatUnaryOperator) x -> x * m);
+						coe.scalarInPlace(2, (FloatUnaryOperator) x -> x * m);
 					});
 					modsByRegions(mods, 0, (m, r) -> {
 						var coe = hlP2Map.get(sp0Alias, r);
-						coe.modifyCoe(1, x -> x * m);
+						coe.scalarInPlace(1, (FloatUnaryOperator) x -> x * m);
 					});
 					modsByRegions(mods, 0, (m, r) -> {
 						var coe = hlP3Map.get(sp0Alias, r);
-						coe.modifyCoe(1, x -> {
+						coe.scalarInPlace(1, (FloatUnaryOperator) x -> {
 							if (x > 0.0f && x < 1.0e06f) {
 								return x * m;
 							}
@@ -219,7 +220,7 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 						modsByRegions(mods, 2, (m, r) -> {
 							var coe = hlNPMap.get(sp0Alias, primarySp, r);
 							if (coe.getEquationIndex() == 1) {
-								coe.modifyCoe(1, x -> x * m);
+								coe.scalarInPlace(1, (FloatUnaryOperator) x -> x * m);
 							}
 						});
 					}

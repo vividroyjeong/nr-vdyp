@@ -49,10 +49,6 @@ public class Coefficients extends AbstractList<Float> implements List<Float> {
 		return coe[getRealIndex(i)];
 	}
 
-	public void modifyCoe(int i, UnaryOperator<Float> op) {
-		setCoe(i, op.apply(getCoe(i)));
-	}
-
 	public void setCoe(int i, float value) {
 		coe[getRealIndex(i)] = value;
 	}
