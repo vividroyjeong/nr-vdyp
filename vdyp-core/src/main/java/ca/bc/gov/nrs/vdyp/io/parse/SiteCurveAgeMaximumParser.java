@@ -43,18 +43,20 @@ public class SiteCurveAgeMaximumParser
 	}.value(3, SC_KEY, PARSE_SC).value(7, COASTAL_KEY, PARSE_AGE).value(7, INTERIOR_KEY, PARSE_AGE)
 			.value(7, T1_KEY, PARSE_AGE).value(7, T2_KEY, PARSE_AGE);
 
-	static ControlledValueParser<Integer> PARSE_SC = ControlledValueParser.validate(ValueParser.INTEGER, (v, c) -> {
-		if (v < -1 || v > MAX_SC) {
-			return Optional.of("Site curve number must be in the range -1 to " + MAX_SC + " inclusive");
-		}
-		return Optional.empty();
-	});
+	static final ControlledValueParser<Integer> PARSE_SC = ControlledValueParser
+			.validate(ValueParser.INTEGER, (v, c) -> {
+				if (v < -1 || v > MAX_SC) {
+					return Optional.of("Site curve number must be in the range -1 to " + MAX_SC + " inclusive");
+				}
+				return Optional.empty();
+			});
 
-	static ValueParser<Float> PARSE_AGE = s -> {
+	static final ValueParser<Float> PARSE_AGE = s -> {
 		var value = ValueParser.FLOAT.parse(s);
 		return value <= 0.0 ? MAX_AGE : value;
 	};
 
+	@Override
 	@SuppressWarnings("serial")
 	public Map<Integer, SiteCurveAgeMaximum> defaultResult() {
 		return new HashMap<>() {

@@ -300,17 +300,16 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 	 *                     return empty if the string is not a marker.
 	 * @return a ValueOrMarker
 	 */
-	public static <Value, Marker> ValueParser<ValueOrMarker<Value, Marker>>
-			valueOrMarker(ValueParser<Value> valueParser, ValueParser<Optional<Marker>> markerParser) {
+	public static <V, M> ValueParser<ValueOrMarker<V, M>>
+			valueOrMarker(ValueParser<V> valueParser, ValueParser<Optional<M>> markerParser) {
 		return s -> {
-			var builder = new ValueOrMarker.Builder<Value, Marker>();
+			var builder = new ValueOrMarker.Builder<V, M>();
 			var marker = markerParser.parse(s).map(builder::marker);
 			if (marker.isPresent()) {
 				return marker.get();
 			}
 
-			var value = builder.value(valueParser.parse(s));
-			return value;
+			return builder.value(valueParser.parse(s));
 		};
 	}
 
@@ -331,11 +330,9 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 	 */
 	public static ValueParser<Optional<Layer>> LAYER = s -> {
 		switch (s.toUpperCase()) {
-		case "1":
-		case "P":
+		case "1", "P":
 			return Optional.of(Layer.PRIMARY);
-		case "2":
-		case "S":
+		case "2", "S":
 			return Optional.of(Layer.SECONDARY);
 		case "V":
 			return Optional.of(Layer.VETERAN);
