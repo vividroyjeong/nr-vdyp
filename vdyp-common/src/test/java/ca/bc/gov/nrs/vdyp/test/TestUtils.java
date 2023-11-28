@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -46,7 +47,7 @@ public class TestUtils {
 	/**
 	 * Create a stream returning the given sequence of lines.
 	 */
-	public static InputStream makeStream(String... lines) {
+	public static InputStream makeInputStream(String... lines) {
 		return new ByteArrayInputStream(String.join("\r\n", lines).getBytes());
 	}
 
@@ -62,7 +63,7 @@ public class TestUtils {
 		return new FileResolver() {
 
 			@Override
-			public InputStream resolve(String filename) throws IOException {
+			public InputStream resolveForInput(String filename) throws IOException {
 				if (filename.equals(expectedFilename)) {
 					return is;
 				} else {
@@ -74,6 +75,12 @@ public class TestUtils {
 			@Override
 			public String toString(String filename) throws IOException {
 				return "TEST:" + filename;
+			}
+
+			@Override
+			public OutputStream resolveForOutput(String filename) throws IOException {
+				fail("Unexpected attempt to open expectedFileName for output");
+				return null;
 			}
 
 		};

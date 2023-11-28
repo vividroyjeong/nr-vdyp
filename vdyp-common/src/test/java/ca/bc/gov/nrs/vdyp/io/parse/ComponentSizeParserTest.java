@@ -19,7 +19,7 @@ class ComponentSizeParserTest {
 	@Test
 	void testParseSimpleP1() throws Exception {
 
-		var is = TestUtils.makeStream("S1 C  49.4 153.3 0.726 3.647");
+		var is = TestUtils.makeInputStream("S1 C  49.4 153.3 0.726 3.647");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -35,7 +35,7 @@ class ComponentSizeParserTest {
 	@Test
 	void testParseBadSpecies() throws Exception {
 
-		var is = TestUtils.makeStream("SX C  49.4 153.3 0.726 3.647");
+		var is = TestUtils.makeInputStream("SX C  49.4 153.3 0.726 3.647");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -51,7 +51,7 @@ class ComponentSizeParserTest {
 	@Test
 	void testParseBadRegion() throws Exception {
 
-		var is = TestUtils.makeStream("S1 X  49.4 153.3 0.726 3.647");
+		var is = TestUtils.makeInputStream("S1 X  49.4 153.3 0.726 3.647");
 
 		Map<String, Object> controlMap = new HashMap<>();
 

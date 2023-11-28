@@ -26,7 +26,7 @@ public class HLNonprimaryCoefficientParserTest {
 
 		var parser = new HLNonprimaryCoefficientParser();
 
-		var is = TestUtils.makeStream("S1 S2 C 1   0.86323   1.00505");
+		var is = TestUtils.makeInputStream("S1 S2 C 1   0.86323   1.00505");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -42,7 +42,7 @@ public class HLNonprimaryCoefficientParserTest {
 
 		var parser = new HLNonprimaryCoefficientParser();
 
-		var is = TestUtils.makeStream("SX S2 C 1   0.86323   1.00505");
+		var is = TestUtils.makeInputStream("SX S2 C 1   0.86323   1.00505");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -57,7 +57,7 @@ public class HLNonprimaryCoefficientParserTest {
 
 		var parser = new HLNonprimaryCoefficientParser();
 
-		var is = TestUtils.makeStream("S1 SX C 1   0.86323   1.00505");
+		var is = TestUtils.makeInputStream("S1 SX C 1   0.86323   1.00505");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -72,7 +72,7 @@ public class HLNonprimaryCoefficientParserTest {
 
 		var parser = new HLNonprimaryCoefficientParser();
 
-		var is = TestUtils.makeStream("S1 S2 X 1   0.86323   1.00505");
+		var is = TestUtils.makeInputStream("S1 S2 X 1   0.86323   1.00505");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -87,7 +87,7 @@ public class HLNonprimaryCoefficientParserTest {
 
 		var parser = new HLNonprimaryCoefficientParser();
 
-		var is = TestUtils.makeStream("S1 S2 C 1   0.86323");
+		var is = TestUtils.makeInputStream("S1 S2 C 1   0.86323");
 
 		Map<String, Object> controlMap = new HashMap<>();
 

@@ -21,7 +21,7 @@ class HLCoefficientParserTest {
 
 		var parser = new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P1, "TEST");
 
-		var is = TestUtils.makeStream("S1 I   1.00160   0.20508-0.0013743");
+		var is = TestUtils.makeInputStream("S1 I   1.00160   0.20508-0.0013743");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -37,7 +37,7 @@ class HLCoefficientParserTest {
 
 		var parser = new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P2, "TEST");
 
-		var is = TestUtils.makeStream("S1 C   0.49722   1.18403");
+		var is = TestUtils.makeInputStream("S1 C   0.49722   1.18403");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -53,7 +53,7 @@ class HLCoefficientParserTest {
 
 		var parser = new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P3, "TEST");
 
-		var is = TestUtils.makeStream("S1 I   1.04422   0.93010  -0.05745  -2.50000");
+		var is = TestUtils.makeInputStream("S1 I   1.04422   0.93010  -0.05745  -2.50000");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -71,7 +71,7 @@ class HLCoefficientParserTest {
 
 		var parser = new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P1, "TEST");
 
-		var is = TestUtils.makeStream("SX I   1.00160   0.20508-0.0013743");
+		var is = TestUtils.makeInputStream("SX I   1.00160   0.20508-0.0013743");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -86,7 +86,7 @@ class HLCoefficientParserTest {
 
 		var parser = new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P1, "TEST");
 
-		var is = TestUtils.makeStream("S1 X   1.00160   0.20508-0.0013743");
+		var is = TestUtils.makeInputStream("S1 X   1.00160   0.20508-0.0013743");
 
 		Map<String, Object> controlMap = new HashMap<>();
 

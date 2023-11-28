@@ -19,7 +19,7 @@ class EquationModifierParserTest {
 
 		var parser = new EquationModifierParser();
 
-		var is = TestUtils.makeStream(" 25  18  26");
+		var is = TestUtils.makeInputStream(" 25  18  26");
 
 		Map<String, Object> controlMap = new HashMap<>();
 

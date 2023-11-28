@@ -20,7 +20,7 @@ class StockingClassFactorParserTest {
 	@Test
 	void testEmpty() throws Exception {
 		var parser = new StockingClassFactorParser();
-		var is = TestUtils.makeStream("");
+		var is = TestUtils.makeInputStream("");
 
 		var result = parser.parse(is, Collections.emptyMap());
 
@@ -30,7 +30,7 @@ class StockingClassFactorParserTest {
 	@Test
 	void testSimple() throws Exception {
 		var parser = new StockingClassFactorParser();
-		var is = TestUtils.makeStream("R I P  0  1.00  100", "Z Z P  0  1.00  100");
+		var is = TestUtils.makeInputStream("R I P  0  1.00  100", "Z Z P  0  1.00  100");
 
 		var result = parser.parse(is, Collections.emptyMap());
 

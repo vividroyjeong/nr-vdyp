@@ -24,7 +24,7 @@ public class SiteCurveAgeMaximumParserTest {
 	@Test
 	void testSimple() throws Exception {
 		var parser = new SiteCurveAgeMaximumParser();
-		var is = TestUtils.makeStream(" 16  150.0  150.0   20.0   60.0");
+		var is = TestUtils.makeInputStream(" 16  150.0  150.0   20.0   60.0");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -45,7 +45,7 @@ public class SiteCurveAgeMaximumParserTest {
 	@Test
 	void testDefault() throws Exception {
 		var parser = new SiteCurveAgeMaximumParser();
-		var is = TestUtils.makeStream(" -1  150.0  150.0   20.0   60.0");
+		var is = TestUtils.makeInputStream(" -1  150.0  150.0   20.0   60.0");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -66,7 +66,7 @@ public class SiteCurveAgeMaximumParserTest {
 	@Test
 	void testEndLine() throws Exception {
 		var parser = new SiteCurveAgeMaximumParser();
-		var is = TestUtils.makeStream(
+		var is = TestUtils.makeInputStream(
 				" -1  150.0  150.0   20.0   60.0", "999                                End of usuable info",
 				" 42  160.0  145.0   25.0   65.0"
 		);
@@ -92,7 +92,7 @@ public class SiteCurveAgeMaximumParserTest {
 	@Test
 	void testDefaultValue() throws Exception {
 		var parser = new SiteCurveAgeMaximumParser();
-		var is = TestUtils.makeStream(" 16  150.0  150.0   20.0   60.0");
+		var is = TestUtils.makeInputStream(" 16  150.0  150.0   20.0   60.0");
 
 		Map<String, Object> controlMap = new HashMap<>();
 

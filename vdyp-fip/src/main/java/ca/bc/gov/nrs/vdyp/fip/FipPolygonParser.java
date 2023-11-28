@@ -43,7 +43,7 @@ public class FipPolygonParser implements ControlMapValueReplacer<StreamingParser
 					.value(5, NONPRODUCTIVE_DESCRIPTION, ValueParser.optional(ValueParser.STRING))
 					.value(5, YIELD_FACTOR, ValueParser.optional(ValueParser.FLOAT));
 
-			var is = fileResolver.resolve(fileName);
+			var is = fileResolver.resolveForInput(fileName);
 
 			return new AbstractStreamingParser<FipPolygon>(is, lineParser, control) {
 

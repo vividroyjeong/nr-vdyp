@@ -73,7 +73,7 @@ public class FipLayerParser implements ControlMapValueReplacer<StreamingParserFa
 					.value(6, BREAST_HEIGHT_AGE, ValueParser.optional(ValueParser.FLOAT)) //
 					.value(3, SITE_CURVE_NUMBER, ValueParser.optional(ValueParser.INTEGER));
 
-			var is = fileResolver.resolve(fileName);
+			var is = fileResolver.resolveForInput(fileName);
 
 			var delegateStream = new AbstractStreamingParser<ValueOrMarker<Optional<FipLayer>, EndOfRecord>>(
 					is, lineParser, control

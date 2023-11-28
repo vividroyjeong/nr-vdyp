@@ -35,7 +35,7 @@ class FipLayerParserTest {
 		controlMap.put(FipLayerParser.CONTROL_KEY, "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
-		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeStream(/* empty */));
+		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeInputStream(/* empty */));
 
 		parser.modify(controlMap, fileResolver);
 
@@ -63,7 +63,7 @@ class FipLayerParserTest {
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
-				TestUtils.makeStream(
+				TestUtils.makeInputStream(
 						"01002 S000001 00     1970 1  55 35.3 35.0 87.4   D  D  1.0 0              13",
 						"01002 S000001 00     1970 Z  55  0.0  0.0  0.0         0.0"
 				)
@@ -116,7 +116,7 @@ class FipLayerParserTest {
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
-				TestUtils.makeStream(
+				TestUtils.makeInputStream(
 						"01002 S000004 00     1970 V 195 45.2 22.3  4.0   B  B  9.4 2               8",
 						"01002 S000004 00     1970 1  85 42.3 31.9 82.8   H  H  4.9 0              34",
 						"01002 S000004 00     1970 Z  85  0.0  0.0  0.0         0.0"
@@ -186,7 +186,7 @@ class FipLayerParserTest {
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
-				TestUtils.makeStream(
+				TestUtils.makeInputStream(
 						"01002 S000004 00     1970 V 195 45.2 22.3  0.0   B  B  9.4 2               8",
 						"01002 S000004 00     1970 1  85 42.3 31.9 82.8   H  H  4.9 0              34",
 						"01002 S000004 00     1970 Z  85  0.0  0.0  0.0         0.0"
@@ -240,7 +240,7 @@ class FipLayerParserTest {
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
-				TestUtils.makeStream(
+				TestUtils.makeInputStream(
 						"01002 S000004 00     1970 V 195  0.0 22.3  4.0   B  B  9.4 2               8",
 						"01002 S000004 00     1970 1  85 42.3 31.9 82.8   H  H  4.9 0              34",
 						"01002 S000004 00     1970 Z  85  0.0  0.0  0.0         0.0"

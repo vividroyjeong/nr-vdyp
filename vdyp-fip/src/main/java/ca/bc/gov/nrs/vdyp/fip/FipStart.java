@@ -94,6 +94,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayParser;
 import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayWasteParser;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.JProgram;
 import ca.bc.gov.nrs.vdyp.model.Layer;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
@@ -121,7 +122,7 @@ public class FipStart {
 
 	public static final float TOLERANCE = 2.0e-3f;
 
-	int jprogram = 1; // FIPSTART only TODO Track this down
+	JProgram jprogram = JProgram.FIP_START; // FIPSTART only TODO Track this down
 
 	public static final float PI_40K = 0.78539816E-04f;
 
@@ -171,7 +172,7 @@ public class FipStart {
 		// Load the control map
 
 		var parser = new FipControlParser();
-		try (var is = resolver.resolve(controlFilePath)) {
+		try (var is = resolver.resolveForInput(controlFilePath)) {
 			setControlMap(parser.parse(is, resolver));
 		}
 
@@ -378,10 +379,11 @@ public class FipStart {
 
 			boolean veteran = fipVetLayer != null && fipVetLayer.getHeight() > 0f && fipVetLayer.getCrownClosure() > 0f; // LAYERV
 
-			if (jprogram == 1 && fipPolygon.getModeFip().map(mode -> mode == FipMode.FIPYOUNG).orElse(false)) {
+			if (jprogram == JProgram.FIP_START
+					&& fipPolygon.getModeFip().map(mode -> mode == FipMode.FIPYOUNG).orElse(false)) {
 				return 100f;
 			}
-			if (jprogram == 3) {
+			if (jprogram == JProgram.VRI_START) {
 				veteran = fipVetLayer != null;
 			}
 
@@ -1273,7 +1275,7 @@ public class FipStart {
 						closeVolumeNetDecayWasteUtil
 				);
 
-				if (jprogram < 6) {
+				if (jprogram.isStart()) {
 					// EMP095
 					estimateNetDecayWasteAndBreakageVolume(
 							UtilizationClass.ALL, spec.getBreakageGroup(), quadMeanDiameterUtil, closeVolumeUtil,
@@ -1432,7 +1434,7 @@ public class FipStart {
 						closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
 				);
 
-				if (jprogram < 6) {
+				if (jprogram.isStart()) {
 					// EMP095
 					estimateNetDecayWasteAndBreakageVolume(
 							utilizationClass, vdypSpecies.getBreakageGroup(), quadMeanDiameterUtil,

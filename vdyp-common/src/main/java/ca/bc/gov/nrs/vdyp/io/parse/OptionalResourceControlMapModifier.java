@@ -22,7 +22,7 @@ public interface OptionalResourceControlMapModifier extends ResourceControlMapMo
 		@SuppressWarnings("unchecked")
 		var filename = (Optional<String>) control.get(getControlKey());
 		if (filename.isPresent()) {
-			try (InputStream data = fileResolver.resolve(filename.get())) {
+			try (InputStream data = fileResolver.resolveForInput(filename.get())) {
 				modify(control, data);
 			}
 		} else {

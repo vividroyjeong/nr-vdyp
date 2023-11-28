@@ -22,7 +22,7 @@ class SiteCurveParserTest {
 	@Test
 	void testSimple() throws Exception {
 		var parser = new SiteCurveParser();
-		var is = TestUtils.makeStream("S1 001002");
+		var is = TestUtils.makeInputStream("S1 001002");
 
 		Map<String, Object> controlMap = new HashMap<>();
 		List<GenusDefinition> sp0List = new ArrayList<>();
@@ -39,7 +39,7 @@ class SiteCurveParserTest {
 	@Test
 	void testExtraSpecies() throws Exception {
 		var parser = new SiteCurveParser();
-		var is = TestUtils.makeStream("S1 001002", "X2 003004");
+		var is = TestUtils.makeInputStream("S1 001002", "X2 003004");
 
 		Map<String, Object> controlMap = new HashMap<>();
 		List<GenusDefinition> sp0List = new ArrayList<>();
@@ -57,7 +57,7 @@ class SiteCurveParserTest {
 	@Test
 	void testMissingSpecies() throws Exception {
 		var parser = new SiteCurveParser();
-		var is = TestUtils.makeStream("S1 001002");
+		var is = TestUtils.makeInputStream("S1 001002");
 
 		Map<String, Object> controlMap = new HashMap<>();
 		List<GenusDefinition> sp0List = new ArrayList<>();
@@ -75,7 +75,7 @@ class SiteCurveParserTest {
 	@Test
 	void testHashComment() throws Exception {
 		var parser = new SiteCurveParser();
-		var is = TestUtils.makeStream("# Foo", "S1 001002");
+		var is = TestUtils.makeInputStream("# Foo", "S1 001002");
 
 		Map<String, Object> controlMap = new HashMap<>();
 		List<GenusDefinition> sp0List = new ArrayList<>();
@@ -92,7 +92,7 @@ class SiteCurveParserTest {
 	@Test
 	void testSpaceComment() throws Exception {
 		var parser = new SiteCurveParser();
-		var is = TestUtils.makeStream("  Foo", "S1 001002");
+		var is = TestUtils.makeInputStream("  Foo", "S1 001002");
 
 		Map<String, Object> controlMap = new HashMap<>();
 		List<GenusDefinition> sp0List = new ArrayList<>();
@@ -109,7 +109,7 @@ class SiteCurveParserTest {
 	@Test
 	void testEndFileLine() throws Exception {
 		var parser = new SiteCurveParser();
-		var is = TestUtils.makeStream("S1 001002", "##", "S2 003004");
+		var is = TestUtils.makeInputStream("S1 001002", "##", "S2 003004");
 
 		Map<String, Object> controlMap = new HashMap<>();
 		List<GenusDefinition> sp0List = new ArrayList<>();

@@ -29,7 +29,7 @@ public interface ResourceControlMapModifier extends ControlMapModifier, KeyedCon
 	default void modify(Map<String, Object> control, FileResolver fileResolver)
 			throws IOException, ResourceParseException {
 		var filename = (String) control.get(getControlKey());
-		try (InputStream data = fileResolver.resolve(filename)) {
+		try (InputStream data = fileResolver.resolveForInput(filename)) {
 			modify(control, data);
 		}
 	}
