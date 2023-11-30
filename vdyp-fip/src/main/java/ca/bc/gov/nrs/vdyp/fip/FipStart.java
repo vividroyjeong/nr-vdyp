@@ -54,7 +54,6 @@ import ca.bc.gov.nrs.vdyp.common.IndexedFloatBinaryOperator;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayer;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayerPrimary;
-import ca.bc.gov.nrs.vdyp.fip.model.FipMode;
 import ca.bc.gov.nrs.vdyp.fip.model.FipPolygon;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
@@ -94,6 +93,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayParser;
 import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayWasteParser;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.FipMode;
 import ca.bc.gov.nrs.vdyp.model.JProgram;
 import ca.bc.gov.nrs.vdyp.model.Layer;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
@@ -365,7 +365,7 @@ public class FipStart {
 
 		float percentAvailable = estimatePercentForestLand(fipPolygon, fipVetLayer, fipPrimaryLayer);
 
-		var vdypPolygon = new VdypPolygon(fipPolygon.getPolygonIdentifier(), percentAvailable);
+		var vdypPolygon = new VdypPolygon(fipPolygon, x -> percentAvailable);
 		vdypPolygon.setLayers(processedLayers);
 		return vdypPolygon;
 	}
@@ -377,7 +377,8 @@ public class FipStart {
 			return fipPolygon.getPercentAvailable().get();
 		} else {
 
-			boolean veteran = fipVetLayer != null && fipVetLayer.getHeight() > 0f && fipVetLayer.getCrownClosure() > 0f; // LAYERV
+			boolean veteran = fipVetLayer != null && fipVetLayer.getHeight().orElse(0f) > 0f
+					&& fipVetLayer.getCrownClosure() > 0f; // LAYERV
 
 			if (jprogram == JProgram.FIP_START
 					&& fipPolygon.getModeFip().map(mode -> mode == FipMode.FIPYOUNG).orElse(false)) {
@@ -392,8 +393,8 @@ public class FipStart {
 			float crownClosure = fipPrimaryLayer.getCrownClosure();
 
 			// Assume crown closure linear with age, to 25.
-			if (fipPrimaryLayer.getAgeTotal() < 25f) {
-				crownClosure *= 25f / fipPrimaryLayer.getAgeTotal();
+			if (fipPrimaryLayer.getAgeTotalSafe() < 25f) {
+				crownClosure *= 25f / fipPrimaryLayer.getAgeTotalSafe();
 			}
 			// define crown closure as the SUM of two layers
 			if (veteran) {
@@ -409,7 +410,7 @@ public class FipStart {
 			// Obtain the percent yield (in comparison with CC = 90%)
 
 			float crownClosureTop = 90f;
-			float breastHeightAge = fipPrimaryLayer.getAgeTotal() - fipPrimaryLayer.getYearsToBreastHeight();
+			float breastHeightAge = fipPrimaryLayer.getAgeTotalSafe() - fipPrimaryLayer.getYearsToBreastHeightSafe();
 
 			float yieldFactor = fipPolygon.getYieldFactor();
 
@@ -435,13 +436,13 @@ public class FipStart {
 			}
 
 			float gainMax;
-			if (fipPrimaryLayer.getAgeTotal() > 125f) {
+			if (fipPrimaryLayer.getAgeTotalSafe() > 125f) {
 				gainMax = 0f;
-			} else if (fipPrimaryLayer.getAgeTotal() < 25f) {
+			} else if (fipPrimaryLayer.getAgeTotalSafe() < 25f) {
 				gainMax = max(90f - percentYield, 0);
 			} else {
 				gainMax = max(90f - percentYield, 0);
-				gainMax = min(gainMax, 125 - fipPrimaryLayer.getAgeTotal());
+				gainMax = min(gainMax, 125 - fipPrimaryLayer.getAgeTotalSafe());
 			}
 
 			return floor(min(percentYield + gainMax, 100f));
@@ -467,18 +468,20 @@ public class FipStart {
 
 		result.setAgeTotal(fipLayer.getAgeTotal());
 		result.setYearsToBreastHeight(fipLayer.getYearsToBreastHeight());
-		result.setBreastHeightAge(fipLayer.getAgeTotal() - fipLayer.getYearsToBreastHeight());
+		result.setBreastHeightAge(
+				fipLayer.getAgeTotal().flatMap(at -> fipLayer.getYearsToBreastHeight().map(ytbh -> at - ytbh))
+		);
 		result.setHeight(fipLayer.getHeight());
 
 		// EMP040
 		var baseArea = estimatePrimaryBaseArea(
-				fipLayer, bec, fipPolygon.getYieldFactor(), result.getBreastHeightAge(), baseAreaOverstory
+				fipLayer, bec, fipPolygon.getYieldFactor(), result.getBreastHeightAge().orElse(0f), baseAreaOverstory
 		); // BA_TOT
 
 		result.getBaseAreaByUtilization().setCoe(UTIL_ALL, baseArea);
 
 		var quadMeanDiameter = estimatePrimaryQuadMeanDiameter(
-				fipLayer, bec, result.getBreastHeightAge(), baseAreaOverstory
+				fipLayer, bec, result.getBreastHeightAge().orElse(0f), baseAreaOverstory
 		);
 
 		result.getQuadraticMeanDiameterByUtilization().setCoe(UTIL_ALL, quadMeanDiameter);
@@ -523,7 +526,7 @@ public class FipStart {
 		result.setSpecies(vdypSpecies);
 
 		float primaryHeight;
-		float leadHeight = fipLayer.getHeight();
+		float leadHeight = fipLayer.getHeight().orElse(0f);
 		for (var iPass = 1; iPass <= maxPass; iPass++) {
 			if (iPass == 2) {
 				for (var vSpec : vdypSpecies.values()) {
@@ -1004,17 +1007,17 @@ public class FipStart {
 				.getGenus();
 
 		// ageTotal copy, LVCOM3/AGETOTLV copied from FIPL_V/AGETOT_LV
-		var ageTotal = fipLayer.getAgeTotal();
+		var ageTotal = fipLayer.getAgeTotal().orElse(0f);
 
 		// yearsToBreastHeight copy, minimum 6.0, LVCOM3/YTBHLV copied from
 		// FIPL_V/YTBH_L
-		var yearsToBreastHeight = Math.max(fipLayer.getYearsToBreastHeight(), 6.0f);
+		var yearsToBreastHeight = Math.max(fipLayer.getYearsToBreastHeight().orElse(0f), 6.0f);
 
 		// breastHeightAge LVCOM3/AGEBHLV ageTotal-yearsToBreastHeight
 		var breastHeightAge = ageTotal - yearsToBreastHeight;
 
 		// height? copy LVCOM3/HDLV = FIPL_V/HT_LV
-		var height = fipLayer.getHeight();
+		var height = fipLayer.getHeight().orElse(0f);
 
 		var crownClosure = fipLayer.getCrownClosure();
 
@@ -1089,10 +1092,10 @@ public class FipStart {
 		}
 
 		var vdypLayer = new VdypLayer(polygonIdentifier, layer);
-		vdypLayer.setAgeTotal(ageTotal);
-		vdypLayer.setHeight(height);
-		vdypLayer.setYearsToBreastHeight(yearsToBreastHeight);
-		vdypLayer.setBreastHeightAge(breastHeightAge);
+		vdypLayer.setAgeTotal(Optional.of(ageTotal));
+		vdypLayer.setHeight(Optional.of(height));
+		vdypLayer.setYearsToBreastHeight(Optional.of(yearsToBreastHeight));
+		vdypLayer.setBreastHeightAge(Optional.of(breastHeightAge));
 		vdypLayer.setSpecies(vdypSpecies);
 		// vdypLayer.setPrimaryGenus(primaryGenus);
 		vdypLayer.setBaseAreaByUtilization(baseAreaByUtilization);
@@ -1264,15 +1267,15 @@ public class FipStart {
 				// EMP093
 				estimateNetDecayVolume(
 						spec.getGenus(), bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec.getDecayGroup(),
-						loreyHeightSpec, vdypLayer.getBreastHeightAge(), quadMeanDiameterUtil, closeVolumeUtil,
-						closeVolumeNetDecayUtil
+						loreyHeightSpec, vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil,
+						closeVolumeUtil, closeVolumeNetDecayUtil
 				);
 
 				// EMP094
 				estimateNetDecayAndWasteVolume(
 						bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec.getGenus(), loreyHeightSpec,
-						vdypLayer.getBreastHeightAge(), quadMeanDiameterUtil, closeVolumeUtil, closeVolumeNetDecayUtil,
-						closeVolumeNetDecayWasteUtil
+						vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil, closeVolumeUtil,
+						closeVolumeNetDecayUtil, closeVolumeNetDecayWasteUtil
 				);
 
 				if (jprogram.isStart()) {
@@ -1422,15 +1425,15 @@ public class FipStart {
 				// EMP093
 				estimateNetDecayVolume(
 						vdypSpecies.getGenus(), bec.getRegion(), utilizationClass, adjust, vdypSpecies.getDecayGroup(),
-						hlSp, vdypLayer.getBreastHeightAge(), quadMeanDiameterUtil, closeUtilizationVolumeUtil,
-						closeUtilizationNetOfDecayUtil
+						hlSp, vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil,
+						closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil
 				);
 
 				adjust.setCoe(4, volumeAdjustCoe.getCoe(4));
 				// EMP094
 				estimateNetDecayAndWasteVolume(
 						bec.getRegion(), utilizationClass, adjust, vdypSpecies.getGenus(), hlSp,
-						vdypLayer.getBreastHeightAge(), quadMeanDiameterUtil, closeUtilizationVolumeUtil,
+						vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil, closeUtilizationVolumeUtil,
 						closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
 				);
 
@@ -2627,7 +2630,7 @@ public class FipStart {
 		// error that total age is "less than" YTBH. Replicating that for now but
 		// consider changing it.
 
-		if (primaryLayer.getAgeTotal() - primaryLayer.getYearsToBreastHeight() < 0.5f) {
+		if (primaryLayer.getAgeTotal().orElse(0f) - primaryLayer.getYearsToBreastHeight().orElse(0f) < 0.5f) {
 			throw validationError(
 					"Polygon %s has %s layer where total age is less than YTBH.", polygon.getPolygonIdentifier(),
 					Layer.PRIMARY
@@ -2641,13 +2644,13 @@ public class FipStart {
 		// layers.
 
 		for (FipLayer layer : polygon.getLayers().values()) {
-			var height = layer.getHeight();
+			var height = layer.getHeight().orElse(0f);
 
 			throwIfPresent(
 					heightMinimum(layer.getLayer()).filter(minimum -> height < minimum).map(
 							minimum -> validationError(
 									"Polygon %s has %s layer where height %.1f is less than minimum %.1f.",
-									polygon.getPolygonIdentifier(), layer.getLayer(), layer.getHeight(), minimum
+									polygon.getPolygonIdentifier(), layer.getLayer(), layer.getHeightSafe(), minimum
 							)
 					)
 			);
@@ -2659,17 +2662,18 @@ public class FipStart {
 			);
 		}
 
-		if (primaryLayer.getYearsToBreastHeight() < 0.5) {
+		if (primaryLayer.getYearsToBreastHeight().orElse(0f) < 0.5) {
 			throw validationError(
 					"Polygon %s has %s layer where years to breast height %.1f is less than minimum %.1f years.",
-					polygon.getPolygonIdentifier(), Layer.PRIMARY, primaryLayer.getYearsToBreastHeight(), 0.5f
+					polygon.getPolygonIdentifier(), Layer.PRIMARY, primaryLayer.getYearsToBreastHeightSafe(), 0.5f
 			);
 		}
 
-		if (primaryLayer.getSiteIndex() < 0.5) {
+		if (primaryLayer.getSiteIndex().orElse(0f) < 0.5) {
 			throw validationError(
-					"Polygon %s has %s layer where site index %.1f is less than minimum %.1f years.",
-					polygon.getPolygonIdentifier(), Layer.PRIMARY, primaryLayer.getSiteIndex(), 0.5f
+					"Polygon %s has %s layer where site index %s is less than minimum %.1f years.",
+					polygon.getPolygonIdentifier(), Layer.PRIMARY,
+					primaryLayer.getSiteIndex().map(x -> String.format("%.1f", x)).orElse("N/A"), 0.5f
 			);
 		}
 
@@ -2734,7 +2738,7 @@ public class FipStart {
 
 		var baseArea = 0f;
 
-		float height = fipLayer.getHeight();
+		float height = fipLayer.getHeight().orElse(0f);
 		if (height > coe.getCoe(2) - 3f) {
 			/* @formatter:off */
 			//  if (HD .le. A(2) - 3.0) then
@@ -2889,7 +2893,7 @@ public class FipStart {
 		);
 
 		var trAge = log(clamp(breastHeightAge, 5f, 350f));
-		var height = fipLayer.getHeight();
+		var height = fipLayer.getHeight().orElse(0f);
 
 		if (height <= coe.getCoe(5)) {
 			return 7.6f;
@@ -3214,7 +3218,7 @@ public class FipStart {
 		float logit = //
 				a0 + //
 						a1 * coast + //
-						a2 * layer.getBreastHeightAge() + //
+						a2 * layer.getBreastHeightAge().orElse(0f) + //
 						a3 * spec.getLoreyHeightByUtilization().getCoe(FipStart.UTIL_ALL);
 
 		return exp(logit) / (1.0f + exp(logit));

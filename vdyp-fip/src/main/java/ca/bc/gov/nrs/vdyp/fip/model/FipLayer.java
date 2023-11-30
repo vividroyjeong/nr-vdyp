@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.vdyp.fip.model;
 
 import java.util.Optional;
 
+import ca.bc.gov.nrs.vdyp.common.Computed;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
 import ca.bc.gov.nrs.vdyp.model.Layer;
 
@@ -19,7 +20,6 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 	static final String INVENTORY_TYPE_GROUP = "INVENTORY_TYPE_GROUP"; // ITGFIP
 	static final String BREAST_HEIGHT_AGE = "BREAST_HEIGHT_AGE"; // AGEBH
 
-	float siteIndex; // FIPL_1/SI_L1 or FIPL_V/SI_V1
 	float crownClosure; // FIPL_1/CC_L1 or FIP:_V/CC_V1
 	String siteGenus; // FIPL_1A/SITESP0_L1 or FIPL_VA/SITESP0_L1
 	String siteSpecies; // FIPL_1A/SITESP64_L1 or FIPL_VA/SITESP64_L1
@@ -31,10 +31,6 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 
 	public FipLayer(String polygonIdentifier, Layer layer) {
 		super(polygonIdentifier, layer);
-	}
-
-	public float getSiteIndex() {
-		return siteIndex;
 	}
 
 	public float getCrownClosure() {
@@ -54,10 +50,6 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 		return breastHeightAge;
 	}
 
-	public void setSiteIndex(float siteIndex) {
-		this.siteIndex = siteIndex;
-	}
-
 	public void setCrownClosure(float crownClosure) {
 		this.crownClosure = crownClosure;
 	}
@@ -73,6 +65,54 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 	@Deprecated
 	public void setBreastHeightAge(Optional<Float> breastHeightAge) {
 		this.breastHeightAge = breastHeightAge;
+	}
+
+	@Computed
+	public float getAgeTotalSafe() {
+		return super.getAgeTotal().orElseThrow(() -> new IllegalStateException());
+	}
+
+	@Computed
+	public float getHeightSafe() {
+		return super.getHeight().orElseThrow(() -> new IllegalStateException());
+	}
+
+	@Computed
+	public float getYearsToBreastHeightSafe() {
+		return super.getYearsToBreastHeight().orElseThrow(() -> new IllegalStateException());
+	}
+
+	@Computed
+	public void setAgeTotalSafe(float ageTotal) {
+		super.setAgeTotal(Optional.of(ageTotal));
+	}
+
+	@Computed
+	public void setHeightSafe(float height) {
+		super.setHeight(Optional.of(height));
+	}
+
+	@Computed
+	public void setYearsToBreastHeightSafe(float yearsToBreastHeight) {
+		super.setYearsToBreastHeight(Optional.of(yearsToBreastHeight));
+	}
+
+	@Override
+	public void setAgeTotal(Optional<Float> ageTotal) {
+		ageTotal.orElseThrow(() -> new IllegalArgumentException());
+		super.setAgeTotal(ageTotal);
+	}
+
+	@Override
+	public void setHeight(Optional<Float> height) {
+		height.orElseThrow(() -> new IllegalArgumentException());
+		super.setHeight(height);
+	}
+
+	@Override
+	public void setYearsToBreastHeight(Optional<Float> yearsToBreastHeight) {
+		yearsToBreastHeight.orElseThrow(() -> new IllegalArgumentException());
+		super.setYearsToBreastHeight(yearsToBreastHeight);
 	}
 
 }

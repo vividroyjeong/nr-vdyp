@@ -8,6 +8,7 @@ import java.util.Map;
 import ca.bc.gov.nrs.vdyp.common.ControlKeys;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
+import ca.bc.gov.nrs.vdyp.model.FipMode;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
@@ -65,8 +66,21 @@ public class VriAdjustInputWriter implements Closeable {
 	}
 
 	// V7W_AIP
-	void writePolygon(VdypPolygon polygon) {
+	void writePolygon(VdypPolygon polygon) throws IOException {
+		this.polygonFile.write(
+				String.format(
+						// FORMAT(A25, 1x,A4,1x,A1,I6, I3, I3 , I3 )
+						"%-25s %-4s %1s%6d%3d%3d%3d", //
+						polygon.getPolygonIdentifier(), //
+						polygon.getBiogeoclimaticZone(), //
+						polygon.getForestInventoryZone(), //
 
+						polygon.getPercentAvailable().intValue(), //
+						polygon.getItg(), //
+						polygon.getGrpBa1(), //
+						polygon.getModeFip().map(FipMode::getCode).orElse(0)
+				).getBytes()
+		);
 	}
 
 	// V7W_AIS

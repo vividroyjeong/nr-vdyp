@@ -101,27 +101,27 @@ public class FipLayerParser implements ControlMapValueReplacer<StreamingParserFa
 						switch (l.orElse(null)) {
 						case PRIMARY:
 							FipLayerPrimary fipLayerPrimary = new FipLayerPrimary(polygonId);
-							fipLayerPrimary.setAgeTotal(ageTotal);
-							fipLayerPrimary.setHeight(height);
-							fipLayerPrimary.setSiteIndex(siteIndex);
+							fipLayerPrimary.setAgeTotalSafe(ageTotal);
+							fipLayerPrimary.setHeightSafe(height);
+							fipLayerPrimary.setSiteIndex(Optional.of(siteIndex));
 							fipLayerPrimary.setCrownClosure(crownClosure);
 							fipLayerPrimary.setSiteGenus(siteSp0.get());
 							fipLayerPrimary.setSiteSpecies(siteSp64.get());
-							fipLayerPrimary.setYearsToBreastHeight(yearsToBreastHeight);
+							fipLayerPrimary.setYearsToBreastHeightSafe(yearsToBreastHeight);
 							fipLayerPrimary.setStockingClass(stockingClass);
-							fipLayerPrimary.setInventoryTypeGroup(inventoryTypeGroup.orElse(0));
+							fipLayerPrimary.setInventoryTypeGroup(inventoryTypeGroup);
 							fipLayerPrimary.setBreastHeightAge(breastHeightAge);
 							fipLayerPrimary.setSiteCurveNumber(siteCurveNumber);
 							return builder.value(Optional.of(fipLayerPrimary));
 						case VETERAN:
 							FipLayer fipLayerVeteran = new FipLayer(polygonId, Layer.VETERAN);
-							fipLayerVeteran.setAgeTotal(ageTotal);
-							fipLayerVeteran.setHeight(height);
-							fipLayerVeteran.setSiteIndex(siteIndex);
+							fipLayerVeteran.setAgeTotalSafe(ageTotal);
+							fipLayerVeteran.setHeightSafe(height);
+							fipLayerVeteran.setSiteIndex(Optional.of(siteIndex));
 							fipLayerVeteran.setCrownClosure(crownClosure);
 							fipLayerVeteran.setSiteGenus(siteSp0.get());
 							fipLayerVeteran.setSiteSpecies(siteSp64.get());
-							fipLayerVeteran.setYearsToBreastHeight(yearsToBreastHeight);
+							fipLayerVeteran.setYearsToBreastHeightSafe(yearsToBreastHeight);
 							fipLayerVeteran.setBreastHeightAge(breastHeightAge);
 							return builder.value(Optional.of(fipLayerVeteran));
 
@@ -142,7 +142,7 @@ public class FipLayerParser implements ControlMapValueReplacer<StreamingParserFa
 					return nextChild.getValue().map(x -> x.map(layer -> {
 						// TODO log this
 						// If the layer is present but has height or closure that's not positive, ignore
-						return layer.getHeight() <= 0f || layer.getCrownClosure() <= 0f;
+						return layer.getHeightSafe() <= 0f || layer.getCrownClosure() <= 0f;
 					}).orElse(true)) // If the layer is not present (Unknown layer type) ignore
 							.orElse(false); // If it's a marker, let it through so the stop method can see it.
 				}

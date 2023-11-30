@@ -1,10 +1,11 @@
 package ca.bc.gov.nrs.vdyp.model;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtilizationHolder {
 
-	float breastHeightAge; // LVCOM3/AGEBHLV +
+	Optional<Float> breastHeightAge; // LVCOM3/AGEBHLV +
 
 	Coefficients baseAreaByUtilization = new Coefficients(
 			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
@@ -39,11 +40,11 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 		super(polygonIdentifier, layer);
 	}
 
-	public float getBreastHeightAge() {
+	public Optional<Float> getBreastHeightAge() {
 		return breastHeightAge;
 	}
 
-	public void setBreastHeightAge(float breastHeightAge) {
+	public void setBreastHeightAge(Optional<Float> breastHeightAge) {
 		this.breastHeightAge = breastHeightAge;
 	}
 

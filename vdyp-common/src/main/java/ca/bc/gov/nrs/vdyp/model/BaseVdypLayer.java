@@ -3,17 +3,19 @@ package ca.bc.gov.nrs.vdyp.model;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class BaseVdypLayer<S extends BaseVdypSpecies> {
 
-	// TODO I think polygonidentifier and layer might be FIP specific so possibly
-	// push them down to FipLayer?
-	protected final String polygonIdentifier;
-	protected final Layer layer;
-	protected float ageTotal; // LVCOM3/AGETOTLV, L1COM3/AGETOTL1
-	protected float height; // LVCOM3/HDLV, L1COM3/HDL1
-	protected float yearsToBreastHeight; // LVCOM3/YTBHLV, L1COM3/YTBHL1
-	LinkedHashMap<String, S> species = new LinkedHashMap<>();
+	private final String polygonIdentifier;
+	private final Layer layer;
+	private Optional<Float> ageTotal = Optional.empty(); // LVCOM3/AGETOTLV, L1COM3/AGETOTL1
+	private Optional<Float> height = Optional.empty(); // LVCOM3/HDLV, L1COM3/HDL1
+	private Optional<Float> yearsToBreastHeight = Optional.empty(); // LVCOM3/YTBHLV, L1COM3/YTBHL1
+	private LinkedHashMap<String, S> species = new LinkedHashMap<>();
+	private Optional<Float> siteIndex = Optional.empty();
+	private Optional<Integer> siteCurveNumber = Optional.empty();
+	private Optional<Integer> inventoryTypeGroup = Optional.empty();
 
 	public BaseVdypLayer(String polygonIdentifier, Layer layer) {
 		super();
@@ -29,27 +31,27 @@ public class BaseVdypLayer<S extends BaseVdypSpecies> {
 		return layer;
 	}
 
-	public float getAgeTotal() {
+	public Optional<Float> getAgeTotal() {
 		return ageTotal;
 	}
 
-	public float getHeight() {
+	public Optional<Float> getHeight() {
 		return height;
 	}
 
-	public float getYearsToBreastHeight() {
+	public Optional<Float> getYearsToBreastHeight() {
 		return yearsToBreastHeight;
 	}
 
-	public void setAgeTotal(float ageTotal) {
+	public void setAgeTotal(Optional<Float> ageTotal) {
 		this.ageTotal = ageTotal;
 	}
 
-	public void setHeight(float height) {
+	public void setHeight(Optional<Float> height) {
 		this.height = height;
 	}
 
-	public void setYearsToBreastHeight(float yearsToBreastHeight) {
+	public void setYearsToBreastHeight(Optional<Float> yearsToBreastHeight) {
 		this.yearsToBreastHeight = yearsToBreastHeight;
 	}
 
@@ -65,6 +67,30 @@ public class BaseVdypLayer<S extends BaseVdypSpecies> {
 	public void setSpecies(Collection<S> species) {
 		this.species.clear();
 		species.forEach(spec -> this.species.put(spec.getGenus(), spec));
+	}
+
+	public Optional<Float> getSiteIndex() {
+		return siteIndex;
+	}
+
+	public void setSiteIndex(Optional<Float> siteIndex) {
+		this.siteIndex = siteIndex;
+	}
+
+	public Optional<Integer> getSiteCurveNumber() {
+		return siteCurveNumber;
+	}
+
+	public void setSiteCurveNumber(Optional<Integer> siteCurveNumber) {
+		this.siteCurveNumber = siteCurveNumber;
+	}
+
+	public Optional<Integer> getInventoryTypeGroup() {
+		return inventoryTypeGroup;
+	}
+
+	public void setInventoryTypeGroup(Optional<Integer> inventoryTypeGroup) {
+		this.inventoryTypeGroup = inventoryTypeGroup;
 	}
 
 }
