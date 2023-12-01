@@ -5,7 +5,7 @@ import java.util.Optional;
 
 public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtilizationHolder {
 
-	Optional<Float> breastHeightAge; // LVCOM3/AGEBHLV +
+	Optional<Float> breastHeightAge = Optional.empty(); // LVCOM3/AGEBHLV +
 
 	Coefficients baseAreaByUtilization = new Coefficients(
 			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
@@ -36,6 +36,8 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
 	); // LVCOM/VOL_DWB species 0
 
+	Optional<String> dominantSpecies; // FIPL_1A/SITESP0_L1 (FIP common is used for output from FIPStart)
+	
 	public VdypLayer(String polygonIdentifier, Layer layer) {
 		super(polygonIdentifier, layer);
 	}
@@ -144,4 +146,13 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 		this.closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization;
 	}
 
+	public Optional<String> getDominantSpecies() {
+		return dominantSpecies;
+	}
+
+	public void setDominantSpecies(Optional<String> dominantSpecies) {
+		this.dominantSpecies = dominantSpecies;
+	}
+
+	
 }

@@ -3850,7 +3850,7 @@ class FipStartTest {
 		result.setHeight(Optional.of(6f));
 		result.setSiteIndex(Optional.of(5f));
 		result.setCrownClosure(0.9f);
-		result.setSiteGenus("B");
+		result.setSiteGenus("B", result);
 		result.setSiteSpecies("B");
 		result.setYearsToBreastHeight(Optional.of(7f));
 
@@ -3867,7 +3867,7 @@ class FipStartTest {
 		result.setHeight(Optional.of(6f));
 		result.setSiteIndex(Optional.of(5f));
 		result.setCrownClosure(0.9f);
-		result.setSiteGenus("B");
+		result.setSiteGenus("B", result);
 		result.setSiteSpecies("B");
 		result.setYearsToBreastHeight(Optional.of(7f));
 

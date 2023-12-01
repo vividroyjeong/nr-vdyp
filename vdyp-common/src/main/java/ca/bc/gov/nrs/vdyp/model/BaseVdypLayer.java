@@ -16,6 +16,7 @@ public class BaseVdypLayer<S extends BaseVdypSpecies> {
 	private Optional<Float> siteIndex = Optional.empty();
 	private Optional<Integer> siteCurveNumber = Optional.empty();
 	private Optional<Integer> inventoryTypeGroup = Optional.empty();
+	private Optional<String> siteGenus = Optional.empty(); // FIPL_1A/SITESP0_L1
 
 	public BaseVdypLayer(String polygonIdentifier, Layer layer) {
 		super();
@@ -91,6 +92,14 @@ public class BaseVdypLayer<S extends BaseVdypSpecies> {
 
 	public void setInventoryTypeGroup(Optional<Integer> inventoryTypeGroup) {
 		this.inventoryTypeGroup = inventoryTypeGroup;
+	}
+
+	public Optional<String> getSiteGenus() {
+		return siteGenus;
+	}
+
+	public void setSiteGenus(Optional<String> siteGenus) {
+		this.siteGenus = siteGenus;
 	}
 
 }

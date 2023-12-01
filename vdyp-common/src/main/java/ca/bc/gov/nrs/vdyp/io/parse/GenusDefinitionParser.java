@@ -111,6 +111,10 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<List<G
 		return getSpecies(controlMap).get(index - 1);
 	}
 
+	public static Optional<Integer> getIndex(final String alias, final Map<String, Object> controlMap) {
+		return Optional.of(getSpeciesAliases(controlMap).indexOf(alias)+1).filter(x -> x != 0);
+	}
+
 	@Override
 	public String getControlKey() {
 		return CONTROL_KEY;

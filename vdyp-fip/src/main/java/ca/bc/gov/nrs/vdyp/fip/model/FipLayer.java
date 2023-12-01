@@ -21,7 +21,6 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 	static final String BREAST_HEIGHT_AGE = "BREAST_HEIGHT_AGE"; // AGEBH
 
 	float crownClosure; // FIPL_1/CC_L1 or FIP:_V/CC_V1
-	String siteGenus; // FIPL_1A/SITESP0_L1 or FIPL_VA/SITESP0_L1
 	String siteSpecies; // FIPL_1A/SITESP64_L1 or FIPL_VA/SITESP64_L1
 
 	// In VDYP7 These are read but not stored in common variables.
@@ -37,11 +36,7 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 		return crownClosure;
 	}
 
-	public String getSiteSp0() {
-		return siteGenus;
-	}
-
-	public String getSiteSp64() {
+	public String getSiteSpecies() {
 		return siteSpecies;
 	}
 
@@ -52,10 +47,6 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 
 	public void setCrownClosure(float crownClosure) {
 		this.crownClosure = crownClosure;
-	}
-
-	public void setSiteGenus(String sireSp0) {
-		this.siteGenus = sireSp0;
 	}
 
 	public void setSiteSpecies(String siteSp64) {

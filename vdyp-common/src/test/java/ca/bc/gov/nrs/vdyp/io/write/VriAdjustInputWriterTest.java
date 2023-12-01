@@ -41,6 +41,7 @@ class VriAdjustInputWriterTest {
 	@BeforeEach
 	void initStreams() {
 		controlMap = new HashMap<String, Object>();
+		TestUtils.populateControlMapGenusReal(controlMap);
 
 		polyStream = new TestUtils.MockOutputStream("polygons");
 		specStream = new TestUtils.MockOutputStream("species");
@@ -133,7 +134,6 @@ class VriAdjustInputWriterTest {
 	}
 
 	@Test
-	@Disabled
 	void testWriteSpecies() throws IOException {
 		var unit = new VriAdjustInputWriter(controlMap, fileResolver);
 
@@ -147,15 +147,23 @@ class VriAdjustInputWriterTest {
 		species.setSpeciesPercent(Collections.singletonMap("PL", 100f));
 
 		layer.setSpecies(List.of(species));
+		
+		layer.setSiteIndex(Optional.of(14.7f));
+		layer.setHeight(Optional.of(15f));
+		layer.setAgeTotal(Optional.of(60f));
+		layer.setBreastHeightAge(Optional.of(51.5f));
+		layer.setYearsToBreastHeight(Optional.of(8.5f));
+		layer.setSiteGenus(Optional.of("PL"));
+		layer.setSiteCurveNumber(Optional.of(0));
 
 		unit.writeSpecies(polygon, layer, species);
 
-		polyStream.assertContent(
+		specStream.assertContent(
 				is(
 						"082E004    615       1988 P 12 PL PL 100.0     0.0     0.0     0.0 14.70 15.00  60.0  51.5   8.5 1  0"
 				)
 		);
-		specStream.assertContent(emptyString());
+		polyStream.assertContent(emptyString());
 		utilStream.assertContent(emptyString());
 	}
 }
