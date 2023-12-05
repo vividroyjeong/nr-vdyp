@@ -287,4 +287,111 @@ class VriAdjustInputWriterTest {
 		polyStream.assertContent(emptyString());
 		specStream.assertContent(emptyString());
 	}
+	
+	@Test
+	void testWritePolygonWithChildren() throws IOException {
+		var unit = new VriAdjustInputWriter(controlMap, fileResolver);
+
+		VdypPolygon polygon = new VdypPolygon(
+				"082E004    615       1988", 90f, "D", "IDF", Optional.of(FipMode.FIPSTART)
+		);
+
+		polygon.setItg(28);
+		polygon.setGrpBa1(119);
+		
+		var layer = new VdypLayer("082E004    615       1988", Layer.PRIMARY);
+
+		var species = new VdypSpecies("082E004    615       1988", Layer.PRIMARY, "PL");
+		species.setSpeciesPercent(Collections.singletonMap("PL", 100f));
+
+		layer.setSpecies(List.of(species));
+		polygon.setLayers(List.of(layer));
+
+		layer.setSiteIndex(Optional.of(14.7f));
+		layer.setHeight(Optional.of(15f));
+		layer.setAgeTotal(Optional.of(60f));
+		layer.setBreastHeightAge(Optional.of(51.5f));
+		layer.setYearsToBreastHeight(Optional.of(8.5f));
+		layer.setSiteGenus(Optional.of("PL"));
+		layer.setSiteCurveNumber(Optional.of(0));
+		
+		layer.setBaseAreaByUtilization(
+				Utils.utilizationVector(0.02865f, 19.97867f, 6.79731f, 8.54690f, 3.63577f, 0.99869f)
+		);
+		layer.setTreesPerHectareByUtilization(
+				Utils.utilizationVector(9.29f, 1485.82f, 834.25f, 509.09f, 123.56f, 18.92f)
+		);
+		layer.setLoreyHeightByUtilization(new Coefficients(new float[] { 7.8377f, 13.0660f }, -1));
+
+		layer.setWholeStemVolumeByUtilization(
+				Utils.utilizationVector(0.1077f, 117.9938f, 33.3680f, 52.4308f, 25.2296f, 6.9654f)
+		);
+		layer.setCloseUtilizationVolumeByUtilization(
+				Utils.utilizationVector(0f, 67.7539f, 2.4174f, 36.8751f, 22.0156f, 6.4459f)
+		);
+		layer.setCloseUtilizationVolumeNetOfDecayByUtilization(
+				Utils.utilizationVector(0f, 67.0665f, 2.3990f, 36.5664f, 21.7930f, 6.3080f)
+		);
+		layer.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(
+				Utils.utilizationVector(0f, 66.8413f, 2.3951f, 36.4803f, 21.7218f, 6.2442f)
+		);
+		layer.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
+				Utils.utilizationVector(0f, 65.4214f, 2.3464f, 35.7128f, 21.2592f, 6.1030f)
+		);
+
+		layer.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f)); // Should be ignored and computed from BA and TPH
+		
+		species.setBaseAreaByUtilization(
+				Utils.utilizationVector(0.02865f, 19.97867f, 6.79731f, 8.54690f, 3.63577f, 0f)
+		);
+		species.setTreesPerHectareByUtilization(
+				Utils.utilizationVector(9.29f, 1485.82f, 834.25f, 509.09f, 123.56f, 18.92f)
+		);
+		species.setLoreyHeightByUtilization(new Coefficients(new float[] { 7.8377f, 13.0660f }, -1));
+
+		species.setWholeStemVolumeByUtilization(
+				Utils.utilizationVector(0.1077f, 117.9938f, 33.3680f, 52.4308f, 25.2296f, 6.9654f)
+		);
+		species.setCloseUtilizationVolumeByUtilization(
+				Utils.utilizationVector(0f, 67.7539f, 2.4174f, 36.8751f, 22.0156f, 6.4459f)
+		);
+		species.setCloseUtilizationVolumeNetOfDecayByUtilization(
+				Utils.utilizationVector(0f, 67.0665f, 2.3990f, 36.5664f, 21.7930f, 6.3080f)
+		);
+		species.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(
+				Utils.utilizationVector(0f, 66.8413f, 2.3951f, 36.4803f, 21.7218f, 6.2442f)
+		);
+		species.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
+				Utils.utilizationVector(0f, 65.4214f, 2.3464f, 35.7128f, 21.2592f, 6.1030f)
+		);
+
+		species.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f)); // Should be ignored and computed from BA and TPH
+
+		unit.writePolygonWithSpeciesAndUtilization(polygon);
+
+		polyStream.assertContent(is("082E004    615       1988 IDF  D    90 28119  1\n"));
+		utilStream.assertContent(
+				VdypMatchers.hasLines(
+						"082E004    615       1988 P  0    -1  0.02865     9.29   7.8377   0.1077   0.0000   0.0000   0.0000   0.0000   6.3",
+						"082E004    615       1988 P  0     0 19.97867  1485.82  13.0660 117.9938  67.7539  67.0665  66.8413  65.4214  13.1",
+						"082E004    615       1988 P  0     1  6.79731   834.25  -9.0000  33.3680   2.4174   2.3990   2.3951   2.3464  10.2",
+						"082E004    615       1988 P  0     2  8.54690   509.09  -9.0000  52.4308  36.8751  36.5664  36.4803  35.7128  14.6",
+						"082E004    615       1988 P  0     3  3.63577   123.56  -9.0000  25.2296  22.0156  21.7930  21.7218  21.2592  19.4",
+						"082E004    615       1988 P  0     4  0.99869    18.92  -9.0000   6.9654   6.4459   6.3080   6.2442   6.1030  25.9",
+						"082E004    615       1988 P 12 PL -1  0.02865     9.29   7.8377   0.1077   0.0000   0.0000   0.0000   0.0000   6.3",
+						"082E004    615       1988 P 12 PL  0 19.97867  1485.82  13.0660 117.9938  67.7539  67.0665  66.8413  65.4214  13.1",
+						"082E004    615       1988 P 12 PL  1  6.79731   834.25  -9.0000  33.3680   2.4174   2.3990   2.3951   2.3464  10.2",
+						"082E004    615       1988 P 12 PL  2  8.54690   509.09  -9.0000  52.4308  36.8751  36.5664  36.4803  35.7128  14.6",
+						"082E004    615       1988 P 12 PL  3  3.63577   123.56  -9.0000  25.2296  22.0156  21.7930  21.7218  21.2592  19.4",
+						"082E004    615       1988 P 12 PL  4  0.00000    18.92  -9.0000   6.9654   6.4459   6.3080   6.2442   6.1030  -9.0",
+						"082E004    615       1988  "
+				)
+		);
+		specStream.assertContent(
+				VdypMatchers.hasLines(
+						"082E004    615       1988 P 12 PL PL 100.0     0.0     0.0     0.0 14.70 15.00  60.0  51.5   8.5 1  0",
+						"082E004    615       1988  "
+				)
+		);
+	}
 }

@@ -57,6 +57,8 @@ public class VriAdjustInputWriter implements Closeable {
 	static final String UTIL_FORMAT = POLY_IDENTIFIER_FORMAT + " " + LAYER_TYPE_FORMAT + " " + SPEC_INDEX_FORMAT + " "
 			+ SPEC_IDENTIFIER_FORMAT + "%3d%9.5f%9.2f%9.4f%9.4f%9.4f%9.4f%9.4f%9.4f%6.1f\n";
 
+	static final String END_RECORD_FORMAT = POLY_IDENTIFIER_FORMAT + "  ";
+	
 	/**
 	 * Create a writer for VRI Adjust input files using provided OutputStreams. The
 	 * Streams will be closed when the writer is closed.
@@ -100,6 +102,11 @@ public class VriAdjustInputWriter implements Closeable {
 	}
 
 	// V7W_AIP
+	/**
+	 * Write a polygon record to the polygon file 
+	 * @param polygon
+	 * @throws IOException
+	 */
 	void writePolygon(VdypPolygon polygon) throws IOException {
 		writeFormat(
 				polygonFile, //
@@ -116,6 +123,12 @@ public class VriAdjustInputWriter implements Closeable {
 		);
 	}
 
+	/**
+	 * Write a species record to the species file
+	 * @param layer
+	 * @param spec
+	 * @throws IOException
+	 */
 	void writeSpecies(VdypLayer layer, VdypSpecies spec) throws IOException {
 
 		// Ensure we have a list of 4 distribution entries
@@ -156,6 +169,12 @@ public class VriAdjustInputWriter implements Closeable {
 
 	}
 
+	/**
+	 * Write the utilization records for a layer or species to the utilization file.
+	 * @param layer
+	 * @param utils
+	 * @throws IOException
+	 */
 	// V7W_AIU Internalized loop over utilization classes
 	void writeUtilization(VdypLayer layer, VdypUtilizationHolder utils) throws IOException {
 		Optional<String> specId = Optional.empty();
@@ -207,9 +226,36 @@ public class VriAdjustInputWriter implements Closeable {
 		}
 	}
 
+	/**
+	 * Output a polygon and its children.
+	 * @param polygon
+	 * @throws IOException
+	 */
 	// VDYP_OUT when JPROGRAM = 1 (FIPSTART) or 3 (VRISTART)
-	public void write() {
+	public void writePolygonWithSpeciesAndUtilization(VdypPolygon polygon) throws IOException {
+		
+		writePolygon(polygon);
+		for(var layer: polygon.getLayers().values()) {
+			writeUtilization(layer, layer);
+			for(var species: layer.getSpecies().values()) {
+				writeSpecies(layer, species);
+				writeUtilization(layer, species);
+			}
+		}
+		writeSpeciesEndRecord(polygon);
+		writeUtilizationEndRecord(polygon);
+	}
 
+	private void writeEndRecord(OutputStream os, VdypPolygon polygon) throws IOException {
+		writeFormat(os, END_RECORD_FORMAT, polygon.getPolygonIdentifier());
+	}
+	
+	private void writeUtilizationEndRecord(VdypPolygon polygon) throws IOException {
+		writeEndRecord(utilizationFile, polygon);
+	}
+
+	private void writeSpeciesEndRecord(VdypPolygon polygon) throws IOException {
+		writeEndRecord(speciesFile, polygon);
 	}
 
 	void writeFormat(OutputStream os, String format, Object... params) throws IOException {
