@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.fip;
+package ca.bc.gov.nrs.vdyp.model;
 
 import java.util.Optional;
 
@@ -32,11 +32,11 @@ public enum UtilizationClass {
 		this.highBound = highBound;
 	}
 
-	Optional<UtilizationClass> next() {
+	public Optional<UtilizationClass> next() {
 		return this.next;
 	}
 
-	Optional<UtilizationClass> previous() {
+	public Optional<UtilizationClass> previous() {
 		return this.previous;
 	}
 }

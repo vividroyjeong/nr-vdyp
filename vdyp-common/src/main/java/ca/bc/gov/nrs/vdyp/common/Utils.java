@@ -11,6 +11,8 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
+import ca.bc.gov.nrs.vdyp.model.Coefficients;
+
 public class Utils {
 
 	private Utils() {
@@ -76,4 +78,18 @@ public class Utils {
 		body.accept(map);
 		return Collections.unmodifiableMap(map);
 	}
+	
+	
+	public static Coefficients utilizationVector(float small, float all, float u1, float u2, float u3, float u4) {
+		return new Coefficients(new float[] { small, all, u1, u2, u3, u4 }, -1);
+	}
+
+	public static Coefficients utilizationVector(float small, float u1, float u2, float u3, float u4) {
+		return new Coefficients(new float[] { small, u1 + u2 + u3 + u4, u1, u2, u3, u4 }, -1);
+	}
+
+	public static Coefficients utilizationVector() {
+		return new Coefficients(new float[] { 0f, 0f, 0f, 0f, 0f, 0f }, -1);
+	}
+	
 }
