@@ -37,7 +37,7 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 	); // LVCOM/VOL_DWB species 0
 
 	Optional<String> dominantSpecies; // FIPL_1A/SITESP0_L1 (FIP common is used for output from FIPStart)
-	
+
 	public VdypLayer(String polygonIdentifier, Layer layer) {
 		super(polygonIdentifier, layer);
 	}
@@ -154,5 +154,4 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 		this.dominantSpecies = dominantSpecies;
 	}
 
-	
 }

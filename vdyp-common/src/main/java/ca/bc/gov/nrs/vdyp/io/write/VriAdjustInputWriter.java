@@ -58,7 +58,7 @@ public class VriAdjustInputWriter implements Closeable {
 			+ SPEC_IDENTIFIER_FORMAT + "%3d%9.5f%9.2f%9.4f%9.4f%9.4f%9.4f%9.4f%9.4f%6.1f\n";
 
 	static final String END_RECORD_FORMAT = POLY_IDENTIFIER_FORMAT + "  ";
-	
+
 	/**
 	 * Create a writer for VRI Adjust input files using provided OutputStreams. The
 	 * Streams will be closed when the writer is closed.
@@ -103,7 +103,8 @@ public class VriAdjustInputWriter implements Closeable {
 
 	// V7W_AIP
 	/**
-	 * Write a polygon record to the polygon file 
+	 * Write a polygon record to the polygon file
+	 *
 	 * @param polygon
 	 * @throws IOException
 	 */
@@ -125,6 +126,7 @@ public class VriAdjustInputWriter implements Closeable {
 
 	/**
 	 * Write a species record to the species file
+	 *
 	 * @param layer
 	 * @param spec
 	 * @throws IOException
@@ -133,7 +135,7 @@ public class VriAdjustInputWriter implements Closeable {
 
 		// Ensure we have a list of 4 distribution entries
 		var specDistributionEntries = Stream.concat(
-				spec.getSpeciesPercent().entrySet().stream().sorted(Utils.compareUsing(x -> x.getValue())),
+				spec.getSpeciesPercent().entrySet().stream().sorted(Utils.compareUsing(Entry::getValue)),
 				Stream.generate(() -> new AbstractMap.SimpleEntry<String, Float>("", 0f))
 		).limit(4).toList();
 		// 082E004 615 1988 P 9 L LW 100.0 0.0 0.0 0.0 -9.00 -9.00 -9.0 -9.0 -9.0 0 -9
@@ -171,6 +173,7 @@ public class VriAdjustInputWriter implements Closeable {
 
 	/**
 	 * Write the utilization records for a layer or species to the utilization file.
+	 *
 	 * @param layer
 	 * @param utils
 	 * @throws IOException
@@ -228,16 +231,17 @@ public class VriAdjustInputWriter implements Closeable {
 
 	/**
 	 * Output a polygon and its children.
+	 *
 	 * @param polygon
 	 * @throws IOException
 	 */
 	// VDYP_OUT when JPROGRAM = 1 (FIPSTART) or 3 (VRISTART)
 	public void writePolygonWithSpeciesAndUtilization(VdypPolygon polygon) throws IOException {
-		
+
 		writePolygon(polygon);
-		for(var layer: polygon.getLayers().values()) {
+		for (var layer : polygon.getLayers().values()) {
 			writeUtilization(layer, layer);
-			for(var species: layer.getSpecies().values()) {
+			for (var species : layer.getSpecies().values()) {
 				writeSpecies(layer, species);
 				writeUtilization(layer, species);
 			}
@@ -249,7 +253,7 @@ public class VriAdjustInputWriter implements Closeable {
 	private void writeEndRecord(OutputStream os, VdypPolygon polygon) throws IOException {
 		writeFormat(os, END_RECORD_FORMAT, polygon.getPolygonIdentifier());
 	}
-	
+
 	private void writeUtilizationEndRecord(VdypPolygon polygon) throws IOException {
 		writeEndRecord(utilizationFile, polygon);
 	}

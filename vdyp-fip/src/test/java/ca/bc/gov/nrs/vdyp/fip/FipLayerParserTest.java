@@ -94,8 +94,8 @@ class FipLayerParserTest {
 								hasProperty("heightSafe", is(35.3f)), //
 								hasProperty("siteIndex", present(is(35.0f))), //
 								hasProperty("crownClosure", is(87.4f)), //
-								hasProperty("siteSp0", is("D")), //
-								hasProperty("siteSp64", is("D")), //
+								hasProperty("siteGenus", present(is("D"))), //
+								hasProperty("siteSpecies", is("D")), //
 								hasProperty("yearsToBreastHeightSafe", is(1.0f)), //
 								hasProperty("stockingClass", present(is('0'))), //
 								hasProperty("inventoryTypeGroup", notPresent()), //
@@ -152,8 +152,8 @@ class FipLayerParserTest {
 								hasProperty("heightSafe", is(42.3f)), //
 								hasProperty("siteIndex", present(is(31.9f))), //
 								hasProperty("crownClosure", is(82.8f)), //
-								hasProperty("siteSp0", is("H")), //
-								hasProperty("siteSp64", is("H")), //
+								hasProperty("siteGenus", present(is("H"))), //
+								hasProperty("siteSpecies", is("H")), //
 								hasProperty("yearsToBreastHeightSafe", is(4.9f)), //
 								hasProperty("stockingClass", present(is('0'))), //
 								hasProperty("inventoryTypeGroup", notPresent()), //
@@ -172,7 +172,8 @@ class FipLayerParserTest {
 								hasProperty("heightSafe", is(45.2f)), //
 								hasProperty("siteIndex", present(is(22.3f))), //
 								hasProperty("crownClosure", is(4.0f)), //
-								hasProperty("siteSp0", is("B")), hasProperty("siteSp64", is("B")), //
+								hasProperty("siteGenus", present(is("B"))), //
+								hasProperty("siteSpecies", is("B")), //
 								hasProperty("yearsToBreastHeightSafe", is(9.4f)),
 								// hasProperty("stockingClass", present(is("2"))),
 								hasProperty("breastHeightAge", notPresent()) //
@@ -228,8 +229,8 @@ class FipLayerParserTest {
 								hasProperty("heightSafe", is(42.3f)), //
 								hasProperty("siteIndex", present(is(31.9f))), //
 								hasProperty("crownClosure", is(82.8f)), //
-								hasProperty("siteSp0", is("H")), //
-								hasProperty("siteSp64", is("H")), //
+								hasProperty("siteGenus", present(is("H"))), //
+								hasProperty("siteSpecies", is("H")), //
 								hasProperty("yearsToBreastHeightSafe", is(4.9f)), //
 								hasProperty("stockingClass", present(is('0'))), //
 								hasProperty("inventoryTypeGroup", notPresent()), //
@@ -286,8 +287,8 @@ class FipLayerParserTest {
 								hasProperty("heightSafe", is(42.3f)), //
 								hasProperty("siteIndex", present(is(31.9f))), //
 								hasProperty("crownClosure", is(82.8f)), //
-								hasProperty("siteSp0", is("H")), //
-								hasProperty("siteSp64", is("H")), //
+								hasProperty("siteGenus", present(is("H"))), //
+								hasProperty("siteSpecies", is("H")), //
 								hasProperty("yearsToBreastHeightSafe", is(4.9f)),
 								hasProperty("stockingClass", present(is('0'))), //
 								hasProperty("inventoryTypeGroup", notPresent()), //

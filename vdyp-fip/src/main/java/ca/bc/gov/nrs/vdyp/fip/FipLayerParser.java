@@ -105,7 +105,7 @@ public class FipLayerParser implements ControlMapValueReplacer<StreamingParserFa
 							fipLayerPrimary.setHeightSafe(height);
 							fipLayerPrimary.setSiteIndex(Optional.of(siteIndex));
 							fipLayerPrimary.setCrownClosure(crownClosure);
-							fipLayerPrimary.setSiteGenus(siteSp0.get());
+							fipLayerPrimary.setSiteGenus(Optional.of(siteSp0.get()));
 							fipLayerPrimary.setSiteSpecies(siteSp64.get());
 							fipLayerPrimary.setYearsToBreastHeightSafe(yearsToBreastHeight);
 							fipLayerPrimary.setStockingClass(stockingClass);
@@ -119,7 +119,7 @@ public class FipLayerParser implements ControlMapValueReplacer<StreamingParserFa
 							fipLayerVeteran.setHeightSafe(height);
 							fipLayerVeteran.setSiteIndex(Optional.of(siteIndex));
 							fipLayerVeteran.setCrownClosure(crownClosure);
-							fipLayerVeteran.setSiteGenus(siteSp0.get());
+							fipLayerVeteran.setSiteGenus(Optional.of(siteSp0.get()));
 							fipLayerVeteran.setSiteSpecies(siteSp64.get());
 							fipLayerVeteran.setYearsToBreastHeightSafe(yearsToBreastHeight);
 							fipLayerVeteran.setBreastHeightAge(breastHeightAge);

@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -513,11 +512,11 @@ public class VdypMatchers {
 		float epsilon = Float.max(EPSILON * expected, Float.MIN_VALUE);
 		return asFloat(Matchers.closeTo(expected, epsilon));
 	}
-	
+
 	public static Matcher<String> hasLines(String... expectedLines) {
 		return hasLines(Matchers.contains(expectedLines));
 	}
-	
+
 	public static Matcher<String> hasLines(Matcher<Iterable<? extends String>> lineMatcher) {
 		return new TypeSafeDiagnosingMatcher<String>() {
 
@@ -530,15 +529,15 @@ public class VdypMatchers {
 			@Override
 			protected boolean matchesSafely(String item, Description mismatchDescription) {
 				var lines = List.of(item.split("\n"));
-				
+
 				if (lineMatcher.matches(lines)) {
 					return true;
-				} else  {
+				} else {
 					lineMatcher.describeMismatch(lines, mismatchDescription);
 					return false;
 				}
 			}
-			
+
 		};
 
 	}

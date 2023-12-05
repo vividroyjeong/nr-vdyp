@@ -21,7 +21,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.easymock.EasyMock;
 import org.hamcrest.Matcher;
 
 import ca.bc.gov.nrs.vdyp.io.FileResolver;

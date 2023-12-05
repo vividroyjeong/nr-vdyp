@@ -2,7 +2,6 @@ package ca.bc.gov.nrs.vdyp.io.parse;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -24,8 +23,8 @@ public class ControlFileParser implements ResourceParser<Map<String, Object>> {
 	public static final int CONTROL_LENGTH_EXTENDED = 120;
 	public static final int CONTROL_LENGTH = 50;
 
-	public static final List<String> EXTEND_FLAGS = Arrays.asList("X", ">");
-	public static final List<String> COMMENT_FLAGS = Arrays.asList("C");
+	public static final List<String> EXTEND_FLAGS = List.of("X", ">");
+	public static final List<String> COMMENT_FLAGS = List.of("C");
 	public static final String COMMENT_MARKER = "!";
 
 	private Map<Integer, String> identifiers;

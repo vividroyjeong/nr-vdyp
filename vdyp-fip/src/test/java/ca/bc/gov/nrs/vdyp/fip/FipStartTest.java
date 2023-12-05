@@ -3428,9 +3428,7 @@ class FipStartTest {
 		vdypLayer.setWholeStemVolumeByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
 		vdypLayer.setCloseUtilizationVolumeByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
 		vdypLayer.setCloseUtilizationVolumeNetOfDecayByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(
-				Utils.utilizationVector(1f, 1f, 1f, 1f, 1f)
-		);
+		vdypLayer.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
 		vdypLayer.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
 				Utils.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
@@ -3529,9 +3527,7 @@ class FipStartTest {
 		vdypLayer.setWholeStemVolumeByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
 		vdypLayer.setCloseUtilizationVolumeByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
 		vdypLayer.setCloseUtilizationVolumeNetOfDecayByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(
-				Utils.utilizationVector(1f, 1f, 1f, 1f, 1f)
-		);
+		vdypLayer.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
 		vdypLayer.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
 				Utils.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
@@ -3641,9 +3637,7 @@ class FipStartTest {
 		vdypLayer.setWholeStemVolumeByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
 		vdypLayer.setCloseUtilizationVolumeByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
 		vdypLayer.setCloseUtilizationVolumeNetOfDecayByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(
-				Utils.utilizationVector(1f, 1f, 1f, 1f, 1f)
-		);
+		vdypLayer.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
 		vdypLayer.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
 				Utils.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);

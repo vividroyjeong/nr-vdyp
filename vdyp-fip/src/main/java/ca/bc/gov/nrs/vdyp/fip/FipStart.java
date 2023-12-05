@@ -1087,8 +1087,11 @@ public class FipStart {
 			float hl = vSpec.getLoreyHeightByUtilization().getCoe(0);
 			float dq = max(a0 + a1 * pow(hl, a2), 22.5f);
 			vSpec.getQuadraticMeanDiameterByUtilization().setCoe(UTIL_LARGEST, dq);
-			vSpec.getTreesPerHectareByUtilization()
-					.setCoe(UTIL_LARGEST, BaseAreaTreeDensityDiameter.treesPerHectare(vSpec.getBaseAreaByUtilization().getCoe(UTIL_LARGEST), dq));
+			vSpec.getTreesPerHectareByUtilization().setCoe(
+					UTIL_LARGEST,
+					BaseAreaTreeDensityDiameter
+							.treesPerHectare(vSpec.getBaseAreaByUtilization().getCoe(UTIL_LARGEST), dq)
+			);
 		}
 
 		var vdypLayer = new VdypLayer(polygonIdentifier, layer);
@@ -1197,7 +1200,9 @@ public class FipStart {
 			// Calculate tree density components
 			for (var uc : UTIL_CLASSES) {
 				treesPerHectareUtil.setCoe(
-						uc.index, BaseAreaTreeDensityDiameter.treesPerHectare(baseAreaUtil.getCoe(uc.index), quadMeanDiameterUtil.getCoe(uc.index))
+						uc.index,
+						BaseAreaTreeDensityDiameter
+								.treesPerHectare(baseAreaUtil.getCoe(uc.index), quadMeanDiameterUtil.getCoe(uc.index))
 				);
 			}
 
@@ -1214,7 +1219,9 @@ public class FipStart {
 
 			for (var uc : UTIL_CLASSES) {
 				treesPerHectareUtil.setCoe(
-						uc.index, BaseAreaTreeDensityDiameter.treesPerHectare(baseAreaUtil.getCoe(uc.index), quadMeanDiameterUtil.getCoe(uc.index))
+						uc.index,
+						BaseAreaTreeDensityDiameter
+								.treesPerHectare(baseAreaUtil.getCoe(uc.index), quadMeanDiameterUtil.getCoe(uc.index))
 				);
 			}
 
@@ -1482,8 +1489,9 @@ public class FipStart {
 		// Quadratic mean diameter for the layer is computed from the BA and TPH after
 		// they have been found from the species
 		{
-			var utilVector = vdypLayer.getBaseAreaByUtilization()
-					.pairwise(vdypLayer.getTreesPerHectareByUtilization(), BaseAreaTreeDensityDiameter::quadMeanDiameter);
+			var utilVector = vdypLayer.getBaseAreaByUtilization().pairwise(
+					vdypLayer.getTreesPerHectareByUtilization(), BaseAreaTreeDensityDiameter::quadMeanDiameter
+			);
 			vdypLayer.setQuadraticMeanDiameterByUtilization(utilVector);
 		}
 	}
@@ -1547,7 +1555,8 @@ public class FipStart {
 			throw new ProcessingException("Computed base areas for 7.5+ components do not sum to expected total");
 		}
 
-		float dq0 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseAreaUtil.getCoe(UTIL_ALL), treesPerHectareUtil.getCoe(UTIL_ALL));
+		float dq0 = BaseAreaTreeDensityDiameter
+				.quadMeanDiameter(baseAreaUtil.getCoe(UTIL_ALL), treesPerHectareUtil.getCoe(UTIL_ALL));
 
 		if (dq0 < 7.5f) {
 			throw new ProcessingException(
@@ -1556,7 +1565,9 @@ public class FipStart {
 		}
 
 		float tphSumHigh = (float) UTIL_CLASSES.stream()
-				.mapToDouble(uc -> BaseAreaTreeDensityDiameter.treesPerHectare(baseAreaUtil.getCoe(uc.index), uc.lowBound)).sum();
+				.mapToDouble(
+						uc -> BaseAreaTreeDensityDiameter.treesPerHectare(baseAreaUtil.getCoe(uc.index), uc.lowBound)
+				).sum();
 
 		if (tphSumHigh < treesPerHectareUtil.getCoe(UTIL_ALL)) {
 			reconcileComponentsMode1(baseAreaUtil, treesPerHectareUtil, quadMeanDiameterUtil, tphSumHigh);
@@ -1584,7 +1595,8 @@ public class FipStart {
 		UTIL_CLASSES.forEach(uc -> quadMeanDiameterUtil.setCoe(uc.index, uc.lowBound));
 
 		for (var uc : MODE_1_RECONCILE_AVAILABILITY_CLASSES) {
-			float tphAvail = BaseAreaTreeDensityDiameter.treesPerHectare(baseAreaUtil.getCoe(uc.index), uc.previous().get().lowBound)
+			float tphAvail = BaseAreaTreeDensityDiameter
+					.treesPerHectare(baseAreaUtil.getCoe(uc.index), uc.previous().get().lowBound)
 					- BaseAreaTreeDensityDiameter.treesPerHectare(baseAreaUtil.getCoe(uc.index), uc.lowBound);
 
 			if (tphAvail < tphNeed) {
@@ -1600,7 +1612,9 @@ public class FipStart {
 		}
 		UTIL_CLASSES.forEach(
 				uc -> treesPerHectareUtil.setCoe(
-						uc.index, BaseAreaTreeDensityDiameter.treesPerHectare(baseAreaUtil.getCoe(uc.index), quadMeanDiameterUtil.getCoe(uc.index))
+						uc.index,
+						BaseAreaTreeDensityDiameter
+								.treesPerHectare(baseAreaUtil.getCoe(uc.index), quadMeanDiameterUtil.getCoe(uc.index))
 				)
 		);
 	}
@@ -1622,7 +1636,8 @@ public class FipStart {
 					reconcileComponentsMode2(baseAreaUtil, treesPerHectareUtil, quadMeanDiameterUtil);
 					return;
 				}
-				float dWant = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseAreaUtil.getCoe(uc.index), treesPerHectareUtil.getCoe(uc.index));
+				float dWant = BaseAreaTreeDensityDiameter
+						.quadMeanDiameter(baseAreaUtil.getCoe(uc.index), treesPerHectareUtil.getCoe(uc.index));
 				float dqI = quadMeanDiameterUtil.getCoe(uc.index);
 				if (dqI >= uc.lowBound && dqI <= uc.highBound && abs(dWant - dqI) < 0.00001) {
 					return;
@@ -1707,16 +1722,17 @@ public class FipStart {
 
 			quadMeanDiameterLimit[violateClass.index] = true;
 			baseAreaFixed += baseAreaUtil.getCoe(violateClass.index);
-			treesPerHectareFixed += BaseAreaTreeDensityDiameter.treesPerHectare(
-					baseAreaUtil.getCoe(violateClass.index), dqTrial.getCoe(violateClass.index)
-			);
+			treesPerHectareFixed += BaseAreaTreeDensityDiameter
+					.treesPerHectare(baseAreaUtil.getCoe(violateClass.index), dqTrial.getCoe(violateClass.index));
 		}
 
 		// Make BA's agree with DQ's and TPH's
 		for (var uc : UTIL_CLASSES) {
 			quadMeanDiameterUtil.setCoe(uc.index, dqTrial.getCoe(uc.index));
 			treesPerHectareUtil.setCoe(
-					uc.index, BaseAreaTreeDensityDiameter.treesPerHectare(baseAreaUtil.getCoe(uc.index), quadMeanDiameterUtil.getCoe(uc.index))
+					uc.index,
+					BaseAreaTreeDensityDiameter
+							.treesPerHectare(baseAreaUtil.getCoe(uc.index), quadMeanDiameterUtil.getCoe(uc.index))
 			);
 		}
 		// RE VERIFY That sums are correct
@@ -3072,7 +3088,8 @@ public class FipStart {
 			// TODO Apply Compatibility Variables, not needed for FIPSTART
 
 			spec.getLoreyHeightByUtilization().setCoe(UTIL_SMALL, loreyHeightSpecSmall);
-			float treesPerHectareSpecSmall = BaseAreaTreeDensityDiameter.treesPerHectare(baseAreaSpecSmall, quadMeanDiameterSpecSmall); // TPHSMsp
+			float treesPerHectareSpecSmall = BaseAreaTreeDensityDiameter
+					.treesPerHectare(baseAreaSpecSmall, quadMeanDiameterSpecSmall); // TPHSMsp
 			spec.getBaseAreaByUtilization().setCoe(UTIL_SMALL, baseAreaSpecSmall);
 			spec.getTreesPerHectareByUtilization().setCoe(UTIL_SMALL, treesPerHectareSpecSmall);
 			spec.getQuadraticMeanDiameterByUtilization().setCoe(UTIL_SMALL, quadMeanDiameterSpecSmall);
