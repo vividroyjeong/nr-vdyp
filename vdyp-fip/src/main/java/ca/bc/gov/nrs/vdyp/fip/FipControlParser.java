@@ -194,10 +194,10 @@ public class FipControlParser {
 
 	}
 
-	Map<String, ?> parse(Path inputFile) throws IOException, ResourceParseException {
+	void parse(Path inputFile, Map<String, Object> map) throws IOException, ResourceParseException {
 		try (var is = Files.newInputStream(inputFile)) {
 
-			return parse(is, new FileResolver() {
+			parse(is, new FileResolver() {
 
 				@Override
 				public InputStream resolveForInput(String filename) throws IOException {
@@ -213,7 +213,7 @@ public class FipControlParser {
 				public String toString(String filename) throws IOException {
 					return inputFile.resolveSibling(filename).toString();
 				}
-			});
+			}, map);
 		}
 	}
 
@@ -382,9 +382,8 @@ public class FipControlParser {
 		}
 	}
 
-	public Map<String, Object> parse(InputStream is, FileResolver fileResolver)
+	public Map<String, Object> parse(InputStream is, FileResolver fileResolver, Map<String, Object> map)
 			throws IOException, ResourceParseException {
-		var map = controlParser.parse(is, Collections.emptyMap());
 
 		applyModifiers(map, BASIC_DEFINITIONS, fileResolver);
 

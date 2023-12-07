@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.fip;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -92,6 +93,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.VeteranLayerVolumeAdjustParser;
 import ca.bc.gov.nrs.vdyp.io.parse.VolumeEquationGroupParser;
 import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayParser;
 import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayWasteParser;
+import ca.bc.gov.nrs.vdyp.io.write.VriAdjustInputWriter;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.FipMode;
@@ -108,7 +110,7 @@ import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 
-public class FipStart {
+public class FipStart implements Closeable {
 
 	private static final Comparator<FipSpecies> PERCENT_GENUS_DESCENDING = Utils
 			.compareUsing(FipSpecies::getPercentGenus).reversed();
@@ -125,6 +127,8 @@ public class FipStart {
 	public static final float TOLERANCE = 2.0e-3f;
 
 	JProgram jprogram = JProgram.FIP_START; // FIPSTART only TODO Track this down
+
+	VriAdjustInputWriter vriWriter;
 
 	static final Collection<UtilizationClass> UTIL_CLASSES = List.of(
 			UtilizationClass.U75TO125, UtilizationClass.U125TO175, UtilizationClass.U175TO225, UtilizationClass.OVER225
@@ -167,41 +171,52 @@ public class FipStart {
 	 * @throws IOException
 	 * @throws ResourceParseException
 	 */
-	void init(FileResolver resolver, String controlFilePath) throws IOException, ResourceParseException {
+	void init(FileResolver resolver, String... controlFilePaths) throws IOException, ResourceParseException {
 
 		// Load the control map
 
 		var parser = new FipControlParser();
-		try (var is = resolver.resolveForInput(controlFilePath)) {
-			setControlMap(parser.parse(is, resolver));
+		Map<String, Object> controlMap = new HashMap<>();
+		for(String controlFilePath: controlFilePaths) {
+			try (var is = resolver.resolveForInput(controlFilePath)) {
+				setControlMap(parser.parse(is, resolver, controlMap));
+			}
 		}
 
+		closeVriWriter();
+		vriWriter = new VriAdjustInputWriter(controlMap, resolver);
+	}
+
+	void closeVriWriter() throws IOException {
+		if (vriWriter != null) {
+			vriWriter.close();
+			vriWriter = null;
+		}
 	}
 
 	void setControlMap(Map<String, Object> controlMap) {
 		this.controlMap = controlMap;
 	}
 
-	public static void main(final String... args) {
+	public static void main(final String... args) throws IOException {
 
-		var app = new FipStart();
+		try (var app = new FipStart();) {
 
-		var resolver = new FileSystemFileResolver();
+			var resolver = new FileSystemFileResolver();
 
-		var controlFileName = args[0];
+			try {
+				app.init(resolver, args);
+			} catch (Exception ex) {
+				log.error("Error during initialization", ex);
+				System.exit(CONFIG_LOAD_ERROR);
+			}
 
-		try {
-			app.init(resolver, controlFileName);
-		} catch (Exception ex) {
-			log.error("Error during initialization", ex);
-			System.exit(CONFIG_LOAD_ERROR);
-		}
-
-		try {
-			app.process();
-		} catch (Exception ex) {
-			log.error("Error during processing", ex);
-			System.exit(PROCESSING_ERROR);
+			try {
+				app.process();
+			} catch (Exception ex) {
+				log.error("Error during processing", ex);
+				System.exit(PROCESSING_ERROR);
+			}
 		}
 	}
 
@@ -318,6 +333,10 @@ public class FipStart {
 							);
 					// FIPSTK
 					adjustForStocking(resultPoly.getLayers().get(Layer.PRIMARY), fipPrimeLayer, bec);
+
+					// Output
+					vriWriter.writePolygonWithSpeciesAndUtilization(resultPoly);
+
 				} catch (StandProcessingException ex) {
 					// TODO include some sort of hook for different forms of user output
 					// TODO Implement single stand mode that propagates the exception
@@ -3307,5 +3326,10 @@ public class FipStart {
 				lastBody.accept(value);
 			}
 		}
+	}
+
+	@Override
+	public void close() throws IOException {
+		closeVriWriter();
 	}
 }
