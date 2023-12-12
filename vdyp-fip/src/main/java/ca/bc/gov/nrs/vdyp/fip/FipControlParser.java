@@ -2,13 +2,13 @@ package ca.bc.gov.nrs.vdyp.fip;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKeys;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
@@ -57,6 +57,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
  *
  */
 public class FipControlParser {
+	private static final Logger log = LoggerFactory.getLogger(FipControlParser.class);
 
 	public static final String FIP_YIELD_POLY_INPUT = FipPolygonParser.CONTROL_KEY;
 	public static final String FIP_YIELD_LAYER_INPUT = FipLayerParser.CONTROL_KEY;
@@ -192,29 +193,6 @@ public class FipControlParser {
 
 	public FipControlParser() {
 
-	}
-
-	void parse(Path inputFile, Map<String, Object> map) throws IOException, ResourceParseException {
-		try (var is = Files.newInputStream(inputFile)) {
-
-			parse(is, new FileResolver() {
-
-				@Override
-				public InputStream resolveForInput(String filename) throws IOException {
-					return Files.newInputStream(inputFile.resolveSibling(filename));
-				}
-
-				@Override
-				public OutputStream resolveForOutput(String filename) throws IOException {
-					return Files.newOutputStream(inputFile.resolveSibling(filename));
-				}
-
-				@Override
-				public String toString(String filename) throws IOException {
-					return inputFile.resolveSibling(filename).toString();
-				}
-			}, map);
-		}
 	}
 
 	List<ControlMapModifier> DATA_FILES = Arrays.asList(
@@ -384,6 +362,15 @@ public class FipControlParser {
 
 	public Map<String, Object> parse(InputStream is, FileResolver fileResolver, Map<String, Object> map)
 			throws IOException, ResourceParseException {
+		return parse(List.of(is), fileResolver, map);
+	}
+
+	public Map<String, Object> parse(List<InputStream> resources, FileResolver fileResolver, Map<String, Object> map)
+			throws IOException, ResourceParseException {
+
+		for (var is : resources) {
+			map.putAll(controlParser.parse(is, map));
+		}
 
 		applyModifiers(map, BASIC_DEFINITIONS, fileResolver);
 

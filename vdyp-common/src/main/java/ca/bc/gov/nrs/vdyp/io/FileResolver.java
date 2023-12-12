@@ -10,4 +10,14 @@ public interface FileResolver {
 	OutputStream resolveForOutput(String filename) throws IOException;
 
 	String toString(String filename) throws IOException;
+
+	/**
+	 * Create a FileResolver that resolves relative to a given path
+	 *
+	 * @param path
+	 * @return
+	 * @throws IOException
+	 */
+	public FileResolver relative(String path) throws IOException;
+
 }

@@ -37,6 +37,7 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3Impl;
 import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
 import ca.bc.gov.nrs.vdyp.model.Region;
+import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -50,27 +51,7 @@ class ModifierParserTest {
 		controlMap.put(ModifierParser.CONTROL_KEY, Optional.empty());
 		TestUtils.populateControlMapGenusReal(controlMap);
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				fail("Should not call FileResolver::resolve");
-				return null;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				fail("Should not call FileResolver::resolve");
-				return null;
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				fail("Should not call FileResolver::toString");
-				return filename;
-			}
-
-		};
+		var fileResolver = new MockFileResolver("TEST");
 
 		parser.modify(controlMap, fileResolver);
 
@@ -85,28 +66,8 @@ class ModifierParserTest {
 		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
 		TestUtils.populateControlMapBec(controlMap);
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat(filename, is("testFilename"));
-
-				throw new IOException();
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				fail("Should not call FileResolver::resolve");
-				return null;
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				fail("Should not call FileResolver::toString");
-				return filename;
-			}
-
-		};
+		var fileResolver = new MockFileResolver("TEST");
+		fileResolver.addError("testFilename", () -> new IOException());
 
 		var ex = Assertions.assertThrows(IOException.class, () -> parser.modify(controlMap, fileResolver));
 
@@ -129,27 +90,8 @@ class ModifierParserTest {
 
 		var is = TestUtils.makeInputStream();
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat(filename, is("testFilename"));
-
-				return is;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				fail("Should not call FileResolver::resolve");
-				return null;
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return filename;
-			}
-
-		};
+		var fileResolver = new MockFileResolver("TEST");
+		fileResolver.addStream("testFilename", is);
 
 		parser.modify(controlMap, fileResolver);
 
@@ -211,27 +153,8 @@ class ModifierParserTest {
 
 		var is = TestUtils.makeInputStream("201 1 0 0 0 0 0 2.000 3.000 4.000 5.000");
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat(filename, is("testFilename"));
-
-				return is;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				fail("Should not call FileResolver::resolve");
-				return null;
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return filename;
-			}
-
-		};
+		var fileResolver = new MockFileResolver("TEST");
+		fileResolver.addStream("testFilename", is);
 
 		parser.modify(controlMap, fileResolver);
 
@@ -276,27 +199,8 @@ class ModifierParserTest {
 
 		var is = TestUtils.makeInputStream("201 1 0 0 0 0 0 0.000 0.000 0.000 0.000");
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat(filename, is("testFilename"));
-
-				return is;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				fail("Should not call FileResolver::resolve");
-				return null;
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return filename;
-			}
-
-		};
+		var fileResolver = new MockFileResolver("TEST");
+		fileResolver.addStream("testFilename", is);
 
 		parser.modify(controlMap, fileResolver);
 
@@ -318,27 +222,8 @@ class ModifierParserTest {
 
 		var is = TestUtils.makeInputStream("999", "201 1 0 0 0 0 0 0.000 0.000 0.000 0.000");
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat(filename, is("testFilename"));
-
-				return is;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				fail("Should not call FileResolver::resolve");
-				return null;
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return filename;
-			}
-
-		};
+		var fileResolver = new MockFileResolver("TEST");
+		fileResolver.addStream("testFilename", is);
 
 		parser.modify(controlMap, fileResolver);
 
@@ -360,27 +245,8 @@ class ModifierParserTest {
 
 		var is = TestUtils.makeInputStream("", "    x", "000 x", "201 1 0 0 0 0 0 2.000 3.000 4.000 5.000");
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat(filename, is("testFilename"));
-
-				return is;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				fail("Should not call FileResolver::resolve");
-				return null;
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return filename;
-			}
-
-		};
+		var fileResolver = new MockFileResolver("TEST");
+		fileResolver.addStream("testFilename", is);
 
 		parser.modify(controlMap, fileResolver);
 
@@ -425,27 +291,8 @@ class ModifierParserTest {
 
 		var is = TestUtils.makeInputStream("200 1 0 0 0 0 0 2.000 3.000 4.000 5.000");
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat(filename, is("testFilename"));
-
-				return is;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				fail("Should not call FileResolver::resolve");
-				return null;
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return filename;
-			}
-
-		};
+		var fileResolver = new MockFileResolver("TEST");
+		fileResolver.addStream("testFilename", is);
 
 		parser.modify(controlMap, fileResolver);
 
@@ -482,27 +329,8 @@ class ModifierParserTest {
 
 		var is = TestUtils.makeInputStream("098 1 0 0 0 0 0 0.200 0.300");
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat(filename, is("testFilename"));
-
-				return is;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				fail("Should not call FileResolver::resolve");
-				return null;
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return filename;
-			}
-
-		};
+		var fileResolver = new MockFileResolver("TEST");
+		fileResolver.addStream("testFilename", is);
 
 		parser.modify(controlMap, fileResolver);
 
@@ -539,27 +367,8 @@ class ModifierParserTest {
 
 		var is = TestUtils.makeInputStream("301 1 0 0 0 0 0 2.000 3.000 4.000 5.000");
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat(filename, is("testFilename"));
-
-				return is;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				fail("Should not call FileResolver::resolve");
-				return null;
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return filename;
-			}
-
-		};
+		var fileResolver = new MockFileResolver("TEST");
+		fileResolver.addStream("testFilename", is);
 
 		parser.modify(controlMap, fileResolver);
 
@@ -605,27 +414,8 @@ class ModifierParserTest {
 
 		var is = TestUtils.makeInputStream("401 1 0 0 0 0 0 0.200 0.300 0.500 0.700");
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat(filename, is("testFilename"));
-
-				return is;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				fail("Should not call FileResolver::resolve");
-				return null;
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return filename;
-			}
-
-		};
+		var fileResolver = new MockFileResolver("TEST");
+		fileResolver.addStream("testFilename", is);
 
 		parser.modify(controlMap, fileResolver);
 

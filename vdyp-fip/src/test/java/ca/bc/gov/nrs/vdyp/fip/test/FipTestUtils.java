@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.fip.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+import org.hamcrest.Matchers;
 import org.opentest4j.AssertionFailedError;
 
 import ca.bc.gov.nrs.vdyp.fip.FipControlParser;
@@ -64,7 +66,7 @@ public class FipTestUtils {
 			throws IOException, ResourceParseException {
 		try (var is = klazz.getResourceAsStream(resourceName)) {
 
-			return parser.parse(is, FipTestUtils.fileResolver(klazz));
+			return parser.parse(is, FipTestUtils.fileResolver(klazz), new HashMap<>());
 		}
 	}
 
@@ -87,6 +89,7 @@ public class FipTestUtils {
 
 			@Override
 			public InputStream resolveForInput(String filename) throws IOException {
+				assertThat("Attempt to resolve a null filename for input", filename, Matchers.notNullValue());
 				InputStream resourceAsStream = klazz.getResourceAsStream(filename);
 				if (resourceAsStream == null)
 					throw new IOException("Could not load " + filename);
@@ -102,6 +105,12 @@ public class FipTestUtils {
 			@Override
 			public String toString(String filename) throws IOException {
 				return klazz.getResource(filename).toString();
+			}
+
+			@Override
+			public FileResolver relative(String path) throws IOException {
+				fail("Should not be requesting relative file resolver " + path);
+				return null;
 			}
 
 		};

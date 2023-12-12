@@ -70,7 +70,7 @@ import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
-class FipStartTest {
+public class FipStartTest {
 
 	@Test
 	void testProcessEmpty() throws Exception {
@@ -219,7 +219,6 @@ class FipStartTest {
 						)
 				)
 		);
-
 	}
 
 	@Test

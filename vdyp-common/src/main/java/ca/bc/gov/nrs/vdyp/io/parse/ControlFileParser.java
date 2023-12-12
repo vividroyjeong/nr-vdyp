@@ -67,7 +67,7 @@ public class ControlFileParser implements ResourceParser<Map<String, Object>> {
 	@Override
 	public Map<String, Object> parse(InputStream input, Map<String, Object> control)
 			throws IOException, ResourceParseException {
-		Map<String, Object> result = new HashMap<>();
+		Map<String, Object> result = control;
 		result = lineParser.parse(input, result, (map, r) -> {
 			Integer index = (Integer) map.get("index");
 			String extend = (String) map.get("extend");
@@ -180,7 +180,7 @@ public class ControlFileParser implements ResourceParser<Map<String, Object>> {
 	}
 
 	public Map<String, Object> parse(InputStream is) throws IOException, ResourceParseException {
-		return this.parse(is, Collections.emptyMap());
+		return this.parse(is, new HashMap<>());
 	}
 
 }

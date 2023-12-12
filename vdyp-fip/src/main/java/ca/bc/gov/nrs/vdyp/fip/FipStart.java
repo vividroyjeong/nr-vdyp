@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.vdyp.fip;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -112,6 +113,8 @@ import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 
 public class FipStart implements Closeable {
 
+	private static final FipMode DEFAULT_MODE = FipMode.FIPSTART;
+
 	private static final Comparator<FipSpecies> PERCENT_GENUS_DESCENDING = Utils
 			.compareUsing(FipSpecies::getPercentGenus).reversed();
 
@@ -161,7 +164,7 @@ public class FipStart implements Closeable {
 	static final Collection<Collection<String>> PRIMARY_SPECIES_TO_COMBINE = Arrays
 			.asList(Arrays.asList("PL", "PA"), Arrays.asList("C", "Y"));
 
-	private Map<String, Object> controlMap = Collections.emptyMap();
+	private Map<String, Object> controlMap = new HashMap<>();
 
 	/**
 	 * Initialize FipStart
@@ -171,18 +174,28 @@ public class FipStart implements Closeable {
 	 * @throws IOException
 	 * @throws ResourceParseException
 	 */
-	void init(FileResolver resolver, String... controlFilePaths) throws IOException, ResourceParseException {
+	public void init(FileSystemFileResolver resolver, String... controlFilePaths)
+			throws IOException, ResourceParseException {
 
 		// Load the control map
 
-		var parser = new FipControlParser();
-		Map<String, Object> controlMap = new HashMap<>();
-		for(String controlFilePath: controlFilePaths) {
-			try (var is = resolver.resolveForInput(controlFilePath)) {
-				setControlMap(parser.parse(is, resolver, controlMap));
-			}
+		if (controlFilePaths.length < 1) {
+			throw new IllegalArgumentException("At least one control file must be specifiec.");
 		}
 
+		var parser = new FipControlParser();
+		List<InputStream> resources = new ArrayList<>(controlFilePaths.length);
+		try {
+			for (String path : controlFilePaths) {
+				resources.add(resolver.resolveForInput(path));
+			}
+
+			setControlMap(parser.parse(resources, resolver, controlMap));
+		} finally {
+			for (var resource : resources) {
+				resource.close();
+			}
+		}
 		closeVriWriter();
 		vriWriter = new VriAdjustInputWriter(controlMap, resolver);
 	}
@@ -237,7 +250,7 @@ public class FipStart implements Closeable {
 	// TODO Fortran takes a vector of flags (FIPPASS) controlling which stages are
 	// implemented. FIPSTART always uses the same vector so far now that's not
 	// implemented.
-	void process() throws ProcessingException {
+	public void process() throws ProcessingException {
 		try (
 				var polyStream = this.<FipPolygon>getStreamingParser(FipPolygonParser.CONTROL_KEY);
 				var layerStream = this.<Map<Layer, FipLayer>>getStreamingParser(FipLayerParser.CONTROL_KEY);
@@ -260,7 +273,7 @@ public class FipStart implements Closeable {
 
 					// if (MODE .eq. -1) go to 100
 
-					final var mode = polygon.getModeFip().orElse(FipMode.DONT_PROCESS);
+					final var mode = polygon.getModeFip().orElse(DEFAULT_MODE);
 
 					if (mode == FipMode.DONT_PROCESS) {
 						log.atInfo().setMessage("Skipping polygon with mode {}").addArgument(mode).log();

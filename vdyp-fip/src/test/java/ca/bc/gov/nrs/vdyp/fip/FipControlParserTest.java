@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +46,7 @@ import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
 import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
 
 @SuppressWarnings({ "unused", "unchecked", "rawtypes" })
-class FipControlParserTest {
+public class FipControlParserTest {
 
 	@Test
 	void testParseBec() throws Exception {
@@ -558,7 +559,7 @@ class FipControlParserTest {
 	}
 
 	@Test
-	public void testParseMinima() throws Exception {
+	void testParseMinima() throws Exception {
 		var parser = new FipControlParser();
 		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
@@ -576,7 +577,7 @@ class FipControlParserTest {
 	}
 
 	@Test
-	public void testParseV7O_FIP() throws Exception {
+	void testParseV7O_FIP() throws Exception {
 		var parser = new FipControlParser();
 		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
@@ -586,7 +587,7 @@ class FipControlParserTest {
 	}
 
 	@Test
-	public void testParseV7O_FIL() throws Exception {
+	void testParseV7O_FIL() throws Exception {
 		var parser = new FipControlParser();
 		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
@@ -595,7 +596,7 @@ class FipControlParserTest {
 	}
 
 	@Test
-	public void testParseV7O_FIS() throws Exception {
+	void testParseV7O_FIS() throws Exception {
 		var parser = new FipControlParser();
 		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
@@ -617,7 +618,7 @@ class FipControlParserTest {
 				InputStream baseIs = ControlFileParserTest.class.getResourceAsStream("FIPSTART.CTR");
 				InputStream is = addToEnd(baseIs, lines);
 		) {
-			return parser.parse(is, resolver);
+			return parser.parse(is, resolver, new HashMap<>());
 		}
 	}
 
@@ -625,7 +626,7 @@ class FipControlParserTest {
 			throws IOException, ResourceParseException {
 		try (var is = klazz.getResourceAsStream(resourceName)) {
 
-			return parser.parse(is, FipTestUtils.fileResolver(klazz));
+			return parser.parse(is, FipTestUtils.fileResolver(klazz), new HashMap<>());
 		}
 	}
 }

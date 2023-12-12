@@ -114,30 +114,9 @@ public class TestUtils {
 	 * @return
 	 */
 	public static FileResolver fileResolver(String expectedFilename, InputStream is) {
-		return new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				if (filename.equals(expectedFilename)) {
-					return is;
-				} else {
-					fail("Attempted to resolve unexpected filename " + filename);
-					return null;
-				}
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return "TEST:" + filename;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				fail("Unexpected attempt to open expectedFileName for output");
-				return null;
-			}
-
-		};
+		var result = new MockFileResolver("TEST");
+		result.addStream(expectedFilename, is);
+		return result;
 	}
 
 	/**
