@@ -764,7 +764,7 @@ public class FipStartTest {
 			x.setSiteGenus(Optional.of("D"));
 			x.setSiteSpecies("D");
 			x.setYearsToBreastHeight(Optional.of(1f));
-			x.setPrimaryGenus("H");
+			x.setPrimaryGenus(null);
 			x.setInventoryTypeGroup(Optional.of(13));
 		});
 		var fipSpecies1 = getTestSpecies(polygonId, Layer.PRIMARY, "B", x -> {
@@ -852,6 +852,10 @@ public class FipStartTest {
 						)
 				)
 		);
+
+		// Setting the primaryGenus on the FIP layer is a necessary side effect
+		assertThat(fipLayer, hasProperty("primaryGenus", equalTo("D")));
+
 		var speciesResult = result.getSpecies().get("B");
 
 		assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));

@@ -488,6 +488,10 @@ public class FipStart implements Closeable {
 
 		var lookup = BecDefinitionParser.getBecs(controlMap);
 		var primarySpecies = findPrimarySpecies(fipLayer.getSpecies());
+
+		// There's always at least one entry and we want the first.
+		fipLayer.setPrimaryGenus(primarySpecies.iterator().next().getGenus());
+
 		// VDYP7 stores this in the common FIPL_1C/ITGL1 but only seems to use it
 		// locally
 		var itg = findItg(primarySpecies);
