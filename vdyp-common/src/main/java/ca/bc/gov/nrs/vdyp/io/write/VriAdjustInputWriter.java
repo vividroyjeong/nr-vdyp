@@ -15,6 +15,7 @@ import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.model.FipMode;
+import ca.bc.gov.nrs.vdyp.model.Layer;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
@@ -57,7 +58,7 @@ public class VriAdjustInputWriter implements Closeable {
 	static final String UTIL_FORMAT = POLY_IDENTIFIER_FORMAT + " " + LAYER_TYPE_FORMAT + " " + SPEC_INDEX_FORMAT + " "
 			+ SPEC_IDENTIFIER_FORMAT + "%3d%9.5f%9.2f%9.4f%9.4f%9.4f%9.4f%9.4f%9.4f%6.1f\n";
 
-	static final String END_RECORD_FORMAT = POLY_IDENTIFIER_FORMAT + "  ";
+	static final String END_RECORD_FORMAT = POLY_IDENTIFIER_FORMAT + "  \n";
 
 	/**
 	 * Create a writer for VRI Adjust input files using provided OutputStreams. The
@@ -118,9 +119,9 @@ public class VriAdjustInputWriter implements Closeable {
 				polygon.getForestInventoryZone(), //
 
 				polygon.getPercentAvailable().intValue(), //
-				polygon.getItg(), //
-				polygon.getGrpBa1(), //
-				polygon.getModeFip().map(FipMode::getCode).orElse(0)
+				polygon.getLayers().get(Layer.PRIMARY).getInventoryTypeGroup().orElse(EMPTY_INT), //
+				polygon.getLayers().get(Layer.PRIMARY).getEmpericalRelationshipParameterIndex().orElse(EMPTY_INT), //
+				polygon.getModeFip().orElse(FipMode.FIPSTART).getCode()
 		);
 	}
 

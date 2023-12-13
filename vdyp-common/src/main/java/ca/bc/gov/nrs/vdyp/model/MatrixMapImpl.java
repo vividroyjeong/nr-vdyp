@@ -5,10 +5,12 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * A mapping from the cartesian product of a set of arbitrary identifiers to a
@@ -60,6 +62,14 @@ public class MatrixMapImpl<T> implements MatrixMap<T> {
 	}
 
 	protected int getIndex(Object... params) {
+		return getIndexSafe(params).orElseThrow(() -> {
+			String keyString = Arrays.stream(params).map(Object::toString)
+					.collect(Collectors.joining(", ", "[ ", " ]"));
+			return new IllegalArgumentException("Key " + keyString + "is invalid for this MatrixMap");
+		});
+	}
+
+	protected Optional<Integer> getIndexSafe(Object... params) {
 		if (params.length != maps.size()) {
 			throw new IllegalArgumentException("MatrixMap requires parameters to equal the number of dimensions");
 		}
@@ -70,14 +80,14 @@ public class MatrixMapImpl<T> implements MatrixMap<T> {
 			var dim = maps.get(i);
 			Integer dimIndex = dim.get(o);
 			if (dimIndex == null) {
-				throw new IllegalArgumentException("Key is invalid for this MatrixMap");
+				return Optional.empty();
 			}
 			index += step * dimIndex;
 
 			step *= dim.size();
 			i++;
 		}
-		return index;
+		return Optional.of(index);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -143,5 +153,10 @@ public class MatrixMapImpl<T> implements MatrixMap<T> {
 		var old = (T) matrix[getIndex(params)];
 		matrix[getIndex(params)] = defaultMapper.apply(params);
 		return old;
+	}
+
+	@Override
+	public boolean hasM(Object... params) {
+		return this.getIndexSafe(params).isPresent();
 	}
 }

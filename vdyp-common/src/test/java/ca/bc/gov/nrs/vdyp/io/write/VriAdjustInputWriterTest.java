@@ -97,8 +97,11 @@ class VriAdjustInputWriterTest {
 					"082E004    615       1988", 90f, "D", "IDF", Optional.of(FipMode.FIPSTART)
 			);
 
-			polygon.setItg(28);
-			polygon.setGrpBa1(119);
+			VdypLayer primeLayer = new VdypLayer("082E004    615       1988", Layer.PRIMARY);
+			polygon.setLayers(List.of(primeLayer));
+
+			primeLayer.setInventoryTypeGroup(Optional.of(28));
+			primeLayer.setEmpericalRelationshipParameterIndex(Optional.of(119));
 
 			unit.writePolygon(polygon);
 		}
@@ -283,10 +286,9 @@ class VriAdjustInputWriterTest {
 					"082E004    615       1988", 90f, "D", "IDF", Optional.of(FipMode.FIPSTART)
 			);
 
-			polygon.setItg(28);
-			polygon.setGrpBa1(119);
-
 			var layer = new VdypLayer("082E004    615       1988", Layer.PRIMARY);
+			layer.setInventoryTypeGroup(Optional.of(28));
+			layer.setEmpericalRelationshipParameterIndex(Optional.of(119));
 
 			var species = new VdypSpecies("082E004    615       1988", Layer.PRIMARY, "PL");
 			species.setSpeciesPercent(Collections.singletonMap("PL", 100f));

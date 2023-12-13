@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.fip.integeration;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -10,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.BiPredicate;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
@@ -41,13 +43,19 @@ class ITFipStart {
 	private Path ioControlFile;
 
 	static Path copyResource(Class<?> klazz, String path, Path destination) throws IOException {
+		Path source = testResourcePath(klazz, path);
+		Path result = destination.resolve(path);
+		Files.copy(source, result);
+		return result;
+
+	}
+
+	private static Path testResourcePath(Class<?> klazz, String path) {
 		try {
 			var resourceUri = klazz.getResource(path);
 			assertThat("Could not find resource " + path, resourceUri, notNullValue());
 			Path source = Paths.get(resourceUri.toURI());
-			Path result = destination.resolve(path);
-			Files.copy(source, result);
-			return result;
+			return source;
 		} catch (URISyntaxException e) {
 			Assumptions.abort(e.getMessage());
 			return null;
@@ -126,6 +134,45 @@ class ITFipStart {
 		assertTrue(Files.exists(path), path + " does not exist");
 	}
 
+	public void assertFileMatches(Path path, Path expected, BiPredicate<String, String> compare) throws IOException {
+		try (
+				var testStream = Files.newBufferedReader(path); //
+				var expectedStream = Files.newBufferedReader(expected);
+		) {
+			for (int i = 1; true; i++) {
+				String testLine = testStream.readLine();
+				String expectedLine = expectedStream.readLine();
+
+				if (testLine == null && expectedLine == null) {
+					return;
+				}
+				if (testLine == null) {
+					fail(
+							"File " + path + " did not match " + expected
+									+ ". Missing expected lines. The first missing line (" + i + ") was:\n"
+									+ expectedLine
+					);
+				}
+				if (expectedLine == null) {
+					fail(
+							"File " + path + " did not match " + expected
+									+ ". Unexpected lines at the end. The first unexpected line (" + i + ") was:\n"
+									+ testLine
+					);
+				}
+
+				if (!compare.test(testLine, expectedLine)) {
+					fail(
+							"File " + path + " did not match " + expected + ". The first line (" + i
+									+ ") to not match was: \n [Expected]: " + expectedLine + "\n   [Actual]: "
+									+ testLine
+					);
+				}
+
+			}
+		}
+	}
+
 	@Test
 	void controlFile() throws IOException, ResourceParseException, ProcessingException {
 		try (var app = new FipStart();) {
@@ -139,6 +186,20 @@ class ITFipStart {
 			assertFileExists(outputDir.resolve(POLYGON_OUTPUT_NAME));
 			assertFileExists(outputDir.resolve(SPECIES_OUTPUT_NAME));
 			assertFileExists(outputDir.resolve(UTILIZATION_OUTPUT_NAME));
+
+			assertFileMatches(
+					outputDir.resolve(POLYGON_OUTPUT_NAME), testResourcePath(FipControlParserTest.class, "vp_1.dat"),
+					String::equals
+			);
+			assertFileMatches(
+					outputDir.resolve(SPECIES_OUTPUT_NAME), testResourcePath(FipControlParserTest.class, "vs_1.dat"),
+					String::equals
+			);
+			assertFileMatches(
+					outputDir.resolve(UTILIZATION_OUTPUT_NAME),
+					testResourcePath(FipControlParserTest.class, "vu_1.dat"), String::equals
+			);
+
 		}
 	}
 }

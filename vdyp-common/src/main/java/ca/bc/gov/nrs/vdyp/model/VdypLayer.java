@@ -36,7 +36,10 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
 	); // LVCOM/VOL_DWB species 0
 
-	Optional<String> dominantSpecies; // FIPL_1A/SITESP0_L1 (FIP common is used for output from FIPStart)
+	Optional<String> dominantSpecies = Optional.empty(); // FIPL_1A/SITESP0_L1 (FIP common is used for output from
+															// FIPStart)
+
+	private Optional<Integer> empericalRelationshipParameterIndex = Optional.empty(); // INXL1/GRPBA1
 
 	public VdypLayer(String polygonIdentifier, Layer layer) {
 		super(polygonIdentifier, layer);
@@ -152,6 +155,15 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 
 	public void setDominantSpecies(Optional<String> dominantSpecies) {
 		this.dominantSpecies = dominantSpecies;
+	}
+
+	public Optional<Integer> getEmpericalRelationshipParameterIndex() {
+		return empericalRelationshipParameterIndex;
+	}
+
+	public void setEmpericalRelationshipParameterIndex(Optional<Integer> empericalRelationshipParameterIndex) {
+		this.empericalRelationshipParameterIndex = empericalRelationshipParameterIndex;
+
 	}
 
 }

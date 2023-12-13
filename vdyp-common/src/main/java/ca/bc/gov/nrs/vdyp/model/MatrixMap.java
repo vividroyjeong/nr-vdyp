@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.model;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -20,6 +21,8 @@ import java.util.stream.Collectors;
 public interface MatrixMap<T> {
 
 	public T getM(Object... params);
+
+	public boolean hasM(Object... params);
 
 	public void putM(T value, Object... params);
 
@@ -142,5 +145,12 @@ public interface MatrixMap<T> {
 		eachKey((k) -> {
 			putM(generator.apply(k), k);
 		});
+	}
+
+	public static <U> Optional<U> safeGet(MatrixMap<Optional<U>> map, Object... params) {
+		if (map.hasM(params)) {
+			return map.getM(params);
+		}
+		return Optional.empty();
 	}
 }

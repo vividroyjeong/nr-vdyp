@@ -58,6 +58,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.StockingClassFactorParser;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.VeteranLayerVolumeAdjustParser;
+import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.FipMode;
 import ca.bc.gov.nrs.vdyp.model.Layer;
@@ -1989,6 +1990,12 @@ public class FipStartTest {
 		assertItgMixed(app, 10, "Y", /* */ "PL", "PA", "PY", "L", "PW");
 		assertItgMixed(app, 10, "Y", /* */ FipStart.HARDWOODS);
 
+		assertItgMixed(app, 14, "H", /* */ "C", "Y");
+		assertItgMixed(app, 15, "H", /* */ "B");
+		assertItgMixed(app, 16, "H", /* */ "S");
+		assertItgMixed(app, 17, "H", /* */ FipStart.HARDWOODS);
+		assertItgMixed(app, 13, "H", /* */ "F", "L", "PA", "PL", "PY");
+
 		assertItgMixed(app, 19, "B", /* */ "C", "Y", "H");
 		assertItgMixed(app, 20, "B", /* */ "S", "PL", "PA", "PY", "L", "PW");
 		assertItgMixed(app, 20, "B", /* */ FipStart.HARDWOODS);
@@ -2725,6 +2732,20 @@ public class FipStartTest {
 				)
 		);
 
+	}
+
+	@Test
+	void testFindEmpericalRelationshipParameterIndex() throws Exception {
+		var controlMap = FipTestUtils.loadControlMap();
+		try (var app = new FipStart();) {
+			app.setControlMap(controlMap);
+
+			var bec = BecDefinitionParser.getBecs(controlMap).get("CWH").get();
+
+			int result = app.findEmpericalRelationshipParameterIndex("D", bec, 37);
+
+			assertThat(result, is(1));
+		}
 	}
 
 	@Test

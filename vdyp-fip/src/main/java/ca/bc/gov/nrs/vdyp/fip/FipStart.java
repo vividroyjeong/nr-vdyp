@@ -100,6 +100,7 @@ import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.FipMode;
 import ca.bc.gov.nrs.vdyp.model.JProgram;
 import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
@@ -374,7 +375,7 @@ public class FipStart implements Closeable {
 		Region region = bec.getRegion();
 
 		var factorEntry = fipLayerPrimary.getStockingClass()
-				.flatMap(stockingClass -> stockingClassMap.get(stockingClass, region));
+				.flatMap(stockingClass -> MatrixMap.safeGet(stockingClassMap, stockingClass, region));
 
 		if (!factorEntry.isPresent()) {
 			return;
@@ -487,6 +488,7 @@ public class FipStart implements Closeable {
 			throws ProcessingException {
 
 		var lookup = BecDefinitionParser.getBecs(controlMap);
+		// PRIMFIND
 		var primarySpecies = findPrimarySpecies(fipLayer.getSpecies());
 
 		// There's always at least one entry and we want the first.
@@ -501,6 +503,7 @@ public class FipStart implements Closeable {
 		);
 
 		var result = new VdypLayer(fipLayer.getPolygonIdentifier(), fipLayer.getLayer());
+		result.setInventoryTypeGroup(Optional.of(itg));
 
 		result.setAgeTotal(fipLayer.getAgeTotal());
 		result.setYearsToBreastHeight(fipLayer.getYearsToBreastHeight());
@@ -508,6 +511,13 @@ public class FipStart implements Closeable {
 				fipLayer.getAgeTotal().flatMap(at -> fipLayer.getYearsToBreastHeight().map(ytbh -> at - ytbh))
 		);
 		result.setHeight(fipLayer.getHeight());
+
+		// GRPBA1FD
+		int empericalRelationshipParameterIndex = findEmpericalRelationshipParameterIndex(
+				primarySpecies.get(0).getGenus(), bec, itg
+		);
+
+		result.setEmpericalRelationshipParameterIndex(Optional.of(empericalRelationshipParameterIndex));
 
 		// EMP040
 		var baseArea = estimatePrimaryBaseArea(
@@ -608,6 +618,19 @@ public class FipStart implements Closeable {
 		computeUtilizationComponentsPrimary(bec, result, VolumeComputeMode.BY_UTIL, CompatibilityVariableMode.NONE);
 
 		return result;
+	}
+
+	int findEmpericalRelationshipParameterIndex(String specAlias, BecDefinition bec, int itg)
+			throws ProcessingException {
+		var groupMap = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
+				controlMap, DefaultEquationNumberParser.CONTROL_KEY, MatrixMap2.class
+		);
+		var modMap = Utils.<MatrixMap2<Integer, Integer, Optional<Integer>>>expectParsedControl(
+				controlMap, EquationModifierParser.CONTROL_KEY, MatrixMap2.class
+		);
+		var group = groupMap.get(specAlias, bec.getGrowthBec().getAlias());
+		group = MatrixMap.safeGet(modMap, group, itg).orElse(group);
+		return group;
 	}
 
 	// ROOTF01
@@ -2045,6 +2068,20 @@ public class FipStart implements Closeable {
 				return 19;
 			default:
 				return 20;
+			}
+		case "H":
+			switch (secondary.getGenus()) {
+			case "C", "Y":
+				return 14;
+			case "B":
+				return 15;
+			case "S":
+				return 16;
+			default:
+				if (HARDWOODS.contains(secondary.getGenus())) {
+					return 17;
+				}
+				return 13;
 			}
 		case "S":
 			switch (secondary.getGenus()) {
