@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
 import ca.bc.gov.nrs.vdyp.fip.FipControlParserTest;
@@ -36,7 +37,7 @@ class ITFipStart {
 	@TempDir
 	Path inputDir;
 
-	@TempDir
+	@TempDir(cleanup = CleanupMode.ON_SUCCESS)
 	Path outputDir;
 
 	private Path baseControlFile;
@@ -135,6 +136,10 @@ class ITFipStart {
 	}
 
 	public void assertFileMatches(Path path, Path expected, BiPredicate<String, String> compare) throws IOException {
+		if (Files.mismatch(path, expected) == -1) {
+			return;
+		}
+		;
 		try (
 				var testStream = Files.newBufferedReader(path); //
 				var expectedStream = Files.newBufferedReader(expected);
@@ -182,24 +187,24 @@ class ITFipStart {
 			app.init(resolver, baseControlFile.toString(), ioControlFile.toString());
 
 			app.process();
-
-			assertFileExists(outputDir.resolve(POLYGON_OUTPUT_NAME));
-			assertFileExists(outputDir.resolve(SPECIES_OUTPUT_NAME));
-			assertFileExists(outputDir.resolve(UTILIZATION_OUTPUT_NAME));
-
-			assertFileMatches(
-					outputDir.resolve(POLYGON_OUTPUT_NAME), testResourcePath(FipControlParserTest.class, "vp_1.dat"),
-					String::equals
-			);
-			assertFileMatches(
-					outputDir.resolve(SPECIES_OUTPUT_NAME), testResourcePath(FipControlParserTest.class, "vs_1.dat"),
-					String::equals
-			);
-			assertFileMatches(
-					outputDir.resolve(UTILIZATION_OUTPUT_NAME),
-					testResourcePath(FipControlParserTest.class, "vu_1.dat"), String::equals
-			);
-
 		}
+
+		assertFileExists(outputDir.resolve(POLYGON_OUTPUT_NAME));
+		assertFileExists(outputDir.resolve(SPECIES_OUTPUT_NAME));
+		assertFileExists(outputDir.resolve(UTILIZATION_OUTPUT_NAME));
+
+		assertFileMatches(
+				outputDir.resolve(POLYGON_OUTPUT_NAME), testResourcePath(FipControlParserTest.class, "vp_1.dat"),
+				String::equals
+		);
+		assertFileMatches(
+				outputDir.resolve(SPECIES_OUTPUT_NAME), testResourcePath(FipControlParserTest.class, "vs_1.dat"),
+				String::equals
+		);
+		assertFileMatches(
+				outputDir.resolve(UTILIZATION_OUTPUT_NAME), testResourcePath(FipControlParserTest.class, "vu_1.dat"),
+				String::equals
+		);
+
 	}
 }

@@ -504,6 +504,9 @@ public class FipStart implements Closeable {
 
 		var result = new VdypLayer(fipLayer.getPolygonIdentifier(), fipLayer.getLayer());
 		result.setInventoryTypeGroup(Optional.of(itg));
+		result.setSiteGenus(fipLayer.getSiteGenus());
+		result.setSiteCurveNumber(fipLayer.getSiteCurveNumber());
+		result.setSiteIndex(fipLayer.getSiteIndex());
 
 		result.setAgeTotal(fipLayer.getAgeTotal());
 		result.setYearsToBreastHeight(fipLayer.getYearsToBreastHeight());
@@ -1159,7 +1162,10 @@ public class FipStart implements Closeable {
 		vdypLayer.setYearsToBreastHeight(Optional.of(yearsToBreastHeight));
 		vdypLayer.setBreastHeightAge(Optional.of(breastHeightAge));
 		vdypLayer.setSpecies(vdypSpecies);
-		// vdypLayer.setPrimaryGenus(primaryGenus);
+
+		vdypLayer.setSiteGenus(fipLayer.getSiteGenus());
+		vdypLayer.setSiteIndex(fipLayer.getSiteIndex());
+
 		vdypLayer.setBaseAreaByUtilization(baseAreaByUtilization);
 
 		computeUtilizationComponentsVeteran(vdypLayer, bec);

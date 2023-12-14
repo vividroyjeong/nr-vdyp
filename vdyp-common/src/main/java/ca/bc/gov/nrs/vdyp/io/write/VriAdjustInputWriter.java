@@ -4,6 +4,8 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -59,6 +61,8 @@ public class VriAdjustInputWriter implements Closeable {
 			+ SPEC_IDENTIFIER_FORMAT + "%3d%9.5f%9.2f%9.4f%9.4f%9.4f%9.4f%9.4f%9.4f%6.1f\n";
 
 	static final String END_RECORD_FORMAT = POLY_IDENTIFIER_FORMAT + "  \n";
+
+	boolean haveWrittenSpec = false;
 
 	/**
 	 * Create a writer for VRI Adjust input files using provided OutputStreams. The
@@ -133,7 +137,7 @@ public class VriAdjustInputWriter implements Closeable {
 	 * @throws IOException
 	 */
 	void writeSpecies(VdypLayer layer, VdypSpecies spec) throws IOException {
-
+		haveWrittenSpec = true;
 		// Ensure we have a list of 4 distribution entries
 		var specDistributionEntries = Stream.concat(
 				spec.getSpeciesPercent().entrySet().stream().sorted(Utils.compareUsing(Entry::getValue)),
@@ -141,6 +145,7 @@ public class VriAdjustInputWriter implements Closeable {
 		).limit(4).toList();
 		// 082E004 615 1988 P 9 L LW 100.0 0.0 0.0 0.0 -9.00 -9.00 -9.0 -9.0 -9.0 0 -9
 		var specIndex = GenusDefinitionParser.getIndex(spec.getGenus(), controlMap);
+		boolean isSiteSpec = layer.getSiteGenus().map(spec.getGenus()::equals).orElse(false);
 		writeFormat(
 				speciesFile, //
 				SPEC_FORMAT, //
@@ -160,13 +165,14 @@ public class VriAdjustInputWriter implements Closeable {
 				specDistributionEntries.get(3).getKey(), //
 				specDistributionEntries.get(3).getValue(), //
 
-				layer.getSiteIndex().orElse(EMPTY_FLOAT), //
-				layer.getHeight().orElse(EMPTY_FLOAT), //
-				layer.getAgeTotal().orElse(EMPTY_FLOAT), //
-				layer.getBreastHeightAge().orElse(EMPTY_FLOAT), //
-				layer.getYearsToBreastHeight().orElse(EMPTY_FLOAT), //
-				layer.getSiteGenus().map(id -> id.equals(spec.getGenus())).orElse(false) ? 1 : 0, //
-				layer.getSiteCurveNumber().orElse(EMPTY_INT)
+				layer.getSiteIndex().filter(x -> isSiteSpec).orElse(EMPTY_FLOAT), //
+				layer.getHeight().filter(x -> isSiteSpec).orElse(EMPTY_FLOAT), //
+				layer.getAgeTotal().filter(x -> isSiteSpec).orElse(EMPTY_FLOAT), //
+				layer.getBreastHeightAge().filter(x -> isSiteSpec).orElse(EMPTY_FLOAT), //
+				layer.getYearsToBreastHeight().filter(x -> isSiteSpec).orElse(EMPTY_FLOAT), //
+				layer.getSiteGenus().filter(x -> isSiteSpec).map(id -> id.equals(spec.getGenus())).orElse(false) ? 1
+						: 0, //
+				layer.getSiteCurveNumber().filter(x -> isSiteSpec).orElse(EMPTY_INT)
 
 		);
 
@@ -240,9 +246,13 @@ public class VriAdjustInputWriter implements Closeable {
 	public void writePolygonWithSpeciesAndUtilization(VdypPolygon polygon) throws IOException {
 
 		writePolygon(polygon);
+		polygon.getLayers().values();
 		for (var layer : polygon.getLayers().values()) {
 			writeUtilization(layer, layer);
-			for (var species : layer.getSpecies().values()) {
+			List<VdypSpecies> specs = new ArrayList<>(layer.getSpecies().size());
+			specs.addAll(layer.getSpecies().values());
+			specs.sort(Utils.compareUsing((VdypSpecies x) -> x.getGenus()));
+			for (var species : specs) {
 				writeSpecies(layer, species);
 				writeUtilization(layer, species);
 			}
@@ -270,6 +280,9 @@ public class VriAdjustInputWriter implements Closeable {
 	@Override
 	public void close() throws IOException {
 		polygonFile.close();
+		if (haveWrittenSpec) {
+			writeFormat(speciesFile, "\n");
+		}
 		speciesFile.close();
 		utilizationFile.close();
 	}

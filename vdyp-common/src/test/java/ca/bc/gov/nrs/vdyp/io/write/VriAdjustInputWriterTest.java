@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKeys;
 import ca.bc.gov.nrs.vdyp.common.Utils;
-import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.FipMode;
 import ca.bc.gov.nrs.vdyp.model.Layer;
@@ -134,7 +133,12 @@ class VriAdjustInputWriterTest {
 		}
 		specStream.assertContent(
 				is(
-						"082E004    615       1988 P 12 PL PL 100.0     0.0     0.0     0.0 14.70 15.00  60.0  51.5   8.5 1  0\n"
+						"082E004    615       1988 P 12 PL PL 100.0     0.0     0.0     0.0 14.70 15.00  60.0  51.5   8.5 1  0\n\n" // VDYP7
+																																	// adds
+																																	// an
+																																	// extra
+																																	// newline
+																																	// here
 				)
 		);
 		polyStream.assertContent(emptyString());
