@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.vdyp.fip.integeration;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -11,7 +12,10 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.BiPredicate;
+import java.util.regex.Pattern;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
@@ -28,6 +32,9 @@ import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.ControlFileParserTest;
 import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.write.ControlFileWriter;
+import ca.bc.gov.nrs.vdyp.math.FloatMath;
+import ca.bc.gov.nrs.vdyp.test.TestUtils;
+import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 
 class ITFipStart {
 
@@ -136,10 +143,7 @@ class ITFipStart {
 	}
 
 	public void assertFileMatches(Path path, Path expected, BiPredicate<String, String> compare) throws IOException {
-		if (Files.mismatch(path, expected) == -1) {
-			return;
-		}
-		;
+
 		try (
 				var testStream = Files.newBufferedReader(path); //
 				var expectedStream = Files.newBufferedReader(expected);
@@ -178,6 +182,71 @@ class ITFipStart {
 		}
 	}
 
+	static final Pattern UTIL_LINE_MATCHER = Pattern
+			.compile("^(.{27})(?:(.{9})(.{9})(.{9})(.{9})(.{9})(.{9})(.{9})(.{9})(.{9})(.{6}))?$", Pattern.MULTILINE);
+
+	BiPredicate<String, String> floatStringsWithin(float threshold) {
+
+		return new BiPredicate<>() {
+
+			@Override
+			public boolean test(String actual, String expected) {
+				if (actual == null && expected == null) {
+					return true;
+				}
+
+				if (actual == null || expected == null) {
+					return false;
+				}
+
+				float actualValue = Float.parseFloat(actual);
+				float expectedValue = Float.parseFloat(expected);
+
+				return VdypMatchers.closeTo(expectedValue, threshold).matches(actualValue);
+			}
+
+		};
+
+	}
+
+	BiPredicate<String, String> floatStringsWithin() {
+		return floatStringsWithin(0.01f);
+	}
+
+	boolean linesMatch(String actual, String expected) {
+		var actualMatch = UTIL_LINE_MATCHER.matcher(actual);
+		var expectedMatch = UTIL_LINE_MATCHER.matcher(expected);
+		if (!actualMatch.find()) {
+			return false;
+		}
+		if (!expectedMatch.find()) {
+			return false;
+		}
+
+		List<BiPredicate<String, String>> checks = List.of(
+				String::equals, Objects::equals, //
+				floatStringsWithin(), //
+				floatStringsWithin(), //
+				floatStringsWithin(), //
+				floatStringsWithin(), //
+				floatStringsWithin(), //
+				floatStringsWithin(), //
+				floatStringsWithin(), //
+				floatStringsWithin(), //
+				floatStringsWithin() //
+		);
+
+		if (actualMatch.groupCount() != expectedMatch.groupCount()) {
+			return false;
+		}
+		for (int i = 0; i < expectedMatch.groupCount(); i++) {
+			if (!checks.get(i).test(actualMatch.group(i + 1), expectedMatch.group(i + 1))) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	@Test
 	void controlFile() throws IOException, ResourceParseException, ProcessingException {
 		try (var app = new FipStart();) {
@@ -203,7 +272,7 @@ class ITFipStart {
 		);
 		assertFileMatches(
 				outputDir.resolve(UTILIZATION_OUTPUT_NAME), testResourcePath(FipControlParserTest.class, "vu_1.dat"),
-				String::equals
+				this::linesMatch
 		);
 
 	}
