@@ -197,7 +197,7 @@ public class VriAdjustInputWriter implements Closeable {
 		for (var uc : UtilizationClass.values()) {
 			Optional<Float> height = Optional.empty();
 			if (uc.index < 1) {
-				height = Optional.of(utils.getLoreyHeightByUtilization().getCoe(uc.index));
+				height = Optional.of(utils.getLoreyHeightByUtilization().getCoe(uc.index)).filter(x -> x > 0f);
 			}
 			Optional<Float> quadMeanDiameter = Optional.empty();
 			if (utils.getBaseAreaByUtilization().getCoe(uc.index) > 0) {
@@ -231,7 +231,9 @@ public class VriAdjustInputWriter implements Closeable {
 					utils.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization().getCoe(uc.index), //
 					utils.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization().getCoe(uc.index), //
 
-					quadMeanDiameter.orElse(EMPTY_FLOAT)
+					quadMeanDiameter.orElse(layer.getLayer() == Layer.PRIMARY ? //
+							EMPTY_FLOAT : 0f
+					) // FIXME: VDYP7 is being inconsistent. Should consider using -9 for both.
 			);
 		}
 	}
