@@ -1,27 +1,9 @@
 package ca.bc.gov.nrs.vdyp.fip;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.ToDoubleFunction;
+import java.util.*;
+import java.util.function.*;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.min;
@@ -30,87 +12,23 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.abs;
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.clamp;
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.exp;
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.floor;
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.log;
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.pow;
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.ratio;
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.sqrt;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.*;
 import static java.lang.Math.max;
 
-import org.apache.commons.math3.analysis.MultivariateMatrixFunction;
-import org.apache.commons.math3.analysis.MultivariateVectorFunction;
-import org.apache.commons.math3.fitting.leastsquares.LeastSquaresFactory;
-import org.apache.commons.math3.fitting.leastsquares.LeastSquaresProblem;
-import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer;
-import org.apache.commons.math3.linear.DiagonalMatrix;
-import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.RealVector;
+import org.apache.commons.math3.analysis.*;
+import org.apache.commons.math3.fitting.leastsquares.*;
+import org.apache.commons.math3.linear.*;
 import org.apache.commons.math3.util.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.bc.gov.nrs.vdyp.common.IndexedFloatBinaryOperator;
-import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.common.*;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
-import ca.bc.gov.nrs.vdyp.fip.model.FipLayer;
-import ca.bc.gov.nrs.vdyp.fip.model.FipLayerPrimary;
-import ca.bc.gov.nrs.vdyp.fip.model.FipPolygon;
-import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
-import ca.bc.gov.nrs.vdyp.io.FileResolver;
+import ca.bc.gov.nrs.vdyp.fip.model.*;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.BecDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.BreakageEquationGroupParser;
-import ca.bc.gov.nrs.vdyp.io.parse.BreakageParser;
-import ca.bc.gov.nrs.vdyp.io.parse.BySpeciesDqCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.CloseUtilVolumeParser;
-import ca.bc.gov.nrs.vdyp.io.parse.CoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ComponentSizeParser;
-import ca.bc.gov.nrs.vdyp.io.parse.DecayEquationGroupParser;
-import ca.bc.gov.nrs.vdyp.io.parse.DefaultEquationNumberParser;
-import ca.bc.gov.nrs.vdyp.io.parse.EquationModifierParser;
-import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.HLCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.HLNonprimaryCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentBaseAreaParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentDQParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentHLParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentProbabilityParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentWSVolumeParser;
-import ca.bc.gov.nrs.vdyp.io.parse.StockingClassFactorParser;
-import ca.bc.gov.nrs.vdyp.io.parse.StreamingParser;
-import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
-import ca.bc.gov.nrs.vdyp.io.parse.TotalStandWholeStemParser;
-import ca.bc.gov.nrs.vdyp.io.parse.UpperCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.UtilComponentBaseAreaParser;
-import ca.bc.gov.nrs.vdyp.io.parse.UtilComponentDQParser;
-import ca.bc.gov.nrs.vdyp.io.parse.UtilComponentWSVolumeParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VeteranBQParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VeteranDQParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VeteranLayerVolumeAdjustParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VolumeEquationGroupParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayWasteParser;
+import ca.bc.gov.nrs.vdyp.io.parse.*;
 import ca.bc.gov.nrs.vdyp.io.write.VriAdjustInputWriter;
-import ca.bc.gov.nrs.vdyp.model.BecDefinition;
-import ca.bc.gov.nrs.vdyp.model.Coefficients;
-import ca.bc.gov.nrs.vdyp.model.FipMode;
-import ca.bc.gov.nrs.vdyp.model.JProgram;
-import ca.bc.gov.nrs.vdyp.model.Layer;
-import ca.bc.gov.nrs.vdyp.model.MatrixMap;
-import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
-import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
-import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
-import ca.bc.gov.nrs.vdyp.model.Region;
-import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
-import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
-import ca.bc.gov.nrs.vdyp.model.VdypLayer;
-import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
-import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
-import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
+import ca.bc.gov.nrs.vdyp.model.*;
 
 public class FipStart implements Closeable {
 
@@ -1551,6 +1469,16 @@ public class FipStart implements Closeable {
 		// sums of those of their species
 		sumSpeciesUtilizationVectorsToLayer(vdypLayer);
 
+		{
+			var hlVector = new Coefficients(new float[] { 0f, 0f }, -1);
+			vdypLayer.getSpecies().values().stream().forEach(spec -> {
+				var ba = spec.getBaseAreaByUtilization();
+				hlVector.pairwiseInPlace(spec.getLoreyHeightByUtilization(), (x, y, i) -> x + y * ba.getCoe(i));
+			});
+			var ba = vdypLayer.getBaseAreaByUtilization();
+			hlVector.scalarInPlace((x, i) -> ba.getCoe(i) > 0 ? x / ba.getCoe(i) : x);
+			vdypLayer.setLoreyHeightByUtilization(hlVector);
+		}
 		// Quadratic mean diameter for the layer is computed from the BA and TPH after
 		// they have been found from the species
 		{

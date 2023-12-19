@@ -1,38 +1,13 @@
 package ca.bc.gov.nrs.vdyp.fip;
 
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.closeTo;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.aMapWithSize;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.anEmptyMap;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.describedAs;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.*;
+import java.util.function.*;
 import java.util.stream.Collectors;
 
 import org.easymock.EasyMock;
@@ -46,29 +21,10 @@ import org.junit.jupiter.api.Test;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.fip.FipStart.CompatibilityVariableMode;
 import ca.bc.gov.nrs.vdyp.fip.FipStart.VolumeComputeMode;
-import ca.bc.gov.nrs.vdyp.fip.model.FipLayer;
-import ca.bc.gov.nrs.vdyp.fip.model.FipLayerPrimary;
-import ca.bc.gov.nrs.vdyp.fip.model.FipPolygon;
-import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
+import ca.bc.gov.nrs.vdyp.fip.model.*;
 import ca.bc.gov.nrs.vdyp.fip.test.FipTestUtils;
-import ca.bc.gov.nrs.vdyp.io.parse.BecDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.MockStreamingParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.StockingClassFactorParser;
-import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
-import ca.bc.gov.nrs.vdyp.io.parse.VeteranLayerVolumeAdjustParser;
-import ca.bc.gov.nrs.vdyp.model.BecDefinition;
-import ca.bc.gov.nrs.vdyp.model.Coefficients;
-import ca.bc.gov.nrs.vdyp.model.FipMode;
-import ca.bc.gov.nrs.vdyp.model.Layer;
-import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
-import ca.bc.gov.nrs.vdyp.model.Region;
-import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
-import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
-import ca.bc.gov.nrs.vdyp.model.VdypLayer;
-import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
-import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
+import ca.bc.gov.nrs.vdyp.io.parse.*;
+import ca.bc.gov.nrs.vdyp.model.*;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 public class FipStartTest {
@@ -630,6 +586,274 @@ public class FipStartTest {
 
 		// Species distribution
 		assertThat(speciesResult, hasProperty("speciesPercent", anEmptyMap())); // Test map was empty
+	}
+
+	@Test
+	void testProcessVeteranUtilization() throws Exception {
+
+		var polygonId = polygonId("Test Polygon", 2023);
+
+		var fipPolygon = getTestPolygon(polygonId, x -> {
+			x.setBiogeoclimaticZone("CWH");
+			x.setForestInventoryZone("A");
+			x.setYieldFactor(1f);
+		});
+		var fipLayer = getTestVeteranLayer(polygonId, x -> {
+			x.setSiteCurveNumber(Optional.of(34));
+			x.setHeightSafe(26.2f);
+			x.setSiteIndex(Optional.of(16.7f));
+			x.setCrownClosure(4f);
+			x.setYearsToBreastHeightSafe(7.1f);
+			x.setAgeTotalSafe(97.9f + 7.1f);
+			x.setSiteSpecies("H");
+			x.setSiteGenus(Optional.of("H"));
+		});
+		var fipSpecies1 = getTestSpecies(polygonId, Layer.VETERAN, "B", x -> {
+			x.setPercentGenus(22f);
+		});
+		var fipSpecies2 = getTestSpecies(polygonId, Layer.VETERAN, "H", x -> {
+			x.setPercentGenus(60f);
+		});
+		var fipSpecies3 = getTestSpecies(polygonId, Layer.VETERAN, "S", x -> {
+			x.setPercentGenus(18f);
+		});
+		fipPolygon.setLayers(Collections.singletonMap(Layer.VETERAN, fipLayer));
+		fipLayer.setSpecies(List.of(fipSpecies1, fipSpecies2, fipSpecies3));
+
+		var controlMap = FipTestUtils.loadControlMap();
+
+		VdypLayer result;
+		try (var app = new FipStart();) {
+			app.setControlMap(controlMap);
+
+			result = app.processLayerAsVeteran(fipPolygon, fipLayer);
+		}
+
+		assertThat(result, notNullValue());
+
+		// Keys
+		assertThat(result, hasProperty("polygonIdentifier", is(polygonId)));
+		assertThat(result, hasProperty("layer", is(Layer.VETERAN)));
+
+		// Direct Copy
+		assertThat(result, hasProperty("ageTotal", present(is(105f))));
+		assertThat(result, hasProperty("height", present(is(26.2f))));
+		assertThat(result, hasProperty("yearsToBreastHeight", present(is(7.1f))));
+
+		// Computed
+		assertThat(result, hasProperty("breastHeightAge", present(closeTo(97.9f))));
+
+		// Remap species
+		assertThat(
+				result, hasProperty(
+						"species", allOf(
+								aMapWithSize(3), //
+								hasEntry(is("B"), instanceOf(VdypSpecies.class)), //
+								hasEntry(is("H"), instanceOf(VdypSpecies.class)), //
+								hasEntry(is("S"), instanceOf(VdypSpecies.class))//
+						)
+				)
+		);
+
+		var speciesResult1 = result.getSpecies().get("B");
+
+		// Keys
+		assertThat(speciesResult1, hasProperty("polygonIdentifier", is(polygonId)));
+		assertThat(speciesResult1, hasProperty("layer", is(Layer.VETERAN)));
+		assertThat(speciesResult1, hasProperty("genus", is("B")));
+
+		// Copied
+		assertThat(speciesResult1, hasProperty("percentGenus", is(22f)));
+
+		// Species distribution
+		assertThat(speciesResult1, hasProperty("speciesPercent", aMapWithSize(1)));
+
+		var speciesResult2 = result.getSpecies().get("H");
+
+		// Keys
+		assertThat(speciesResult2, hasProperty("polygonIdentifier", is(polygonId)));
+		assertThat(speciesResult2, hasProperty("layer", is(Layer.VETERAN)));
+		assertThat(speciesResult2, hasProperty("genus", is("H")));
+
+		// Copied
+		assertThat(speciesResult2, hasProperty("percentGenus", is(60f)));
+
+		// Species distribution
+		assertThat(speciesResult2, hasProperty("speciesPercent", aMapWithSize(1)));
+
+		var speciesResult3 = result.getSpecies().get("S");
+
+		// Keys
+		assertThat(speciesResult3, hasProperty("polygonIdentifier", is(polygonId)));
+		assertThat(speciesResult3, hasProperty("layer", is(Layer.VETERAN)));
+		assertThat(speciesResult3, hasProperty("genus", is("S")));
+
+		// Copied
+		assertThat(speciesResult3, hasProperty("percentGenus", is(18f)));
+
+		// Species distribution
+		assertThat(speciesResult3, hasProperty("speciesPercent", aMapWithSize(1)));
+
+		// These Utilizations should differ between the layer and each genus
+
+		{
+			var holder = speciesResult1;
+			String reason = "Genus " + holder.getGenus();
+			assertThat(reason, holder, hasProperty("baseAreaByUtilization", utilizationAllAndBiggest(0.492921442f)));
+			assertThat(
+					reason, holder, hasProperty("treesPerHectareByUtilization", utilizationAllAndBiggest(2.3357718f))
+			);
+			assertThat(
+					reason, holder, hasProperty("wholeStemVolumeByUtilization", utilizationAllAndBiggest(6.11904192f))
+			);
+			assertThat(
+					reason, holder,
+					hasProperty("closeUtilizationVolumeByUtilization", utilizationAllAndBiggest(5.86088896f))
+			);
+			assertThat(
+					reason, holder,
+					hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", utilizationAllAndBiggest(5.64048958f))
+			);
+			assertThat(
+					reason, holder,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization",
+							utilizationAllAndBiggest(5.57935333f)
+					)
+			);
+			assertThat(
+					reason, holder,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+							utilizationAllAndBiggest(5.27515411f)
+					)
+			);
+			assertThat(
+					reason, holder,
+					hasProperty("quadraticMeanDiameterByUtilization", utilizationAllAndBiggest(51.8356705f))
+			);
+		}
+		{
+			var holder = speciesResult2;
+			String reason = "Genus " + holder.getGenus();
+			assertThat(reason, holder, hasProperty("baseAreaByUtilization", utilizationAllAndBiggest(1.34433115f)));
+			assertThat(
+					reason, holder, hasProperty("treesPerHectareByUtilization", utilizationAllAndBiggest(5.95467329f))
+			);
+			assertThat(
+					reason, holder, hasProperty("wholeStemVolumeByUtilization", utilizationAllAndBiggest(14.5863571f))
+			);
+			assertThat(
+					reason, holder,
+					hasProperty("closeUtilizationVolumeByUtilization", utilizationAllAndBiggest(13.9343023f))
+			);
+			assertThat(
+					reason, holder,
+					hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", utilizationAllAndBiggest(13.3831034f))
+			);
+			assertThat(
+					reason, holder,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization",
+							utilizationAllAndBiggest(13.2065458f)
+					)
+			);
+			assertThat(
+					reason, holder,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+							utilizationAllAndBiggest(12.4877129f)
+					)
+			);
+			assertThat(
+					reason, holder,
+					hasProperty("quadraticMeanDiameterByUtilization", utilizationAllAndBiggest(53.6141243f))
+			);
+		}
+		{
+			var holder = speciesResult3;
+			String reason = "Genus " + holder.getGenus();
+			assertThat(reason, holder, hasProperty("baseAreaByUtilization", utilizationAllAndBiggest(0.403299361f)));
+			assertThat(
+					reason, holder, hasProperty("treesPerHectareByUtilization", utilizationAllAndBiggest(2.38468361f))
+			);
+			assertThat(
+					reason, holder, hasProperty("wholeStemVolumeByUtilization", utilizationAllAndBiggest(4.04864883f))
+			);
+			assertThat(
+					reason, holder,
+					hasProperty("closeUtilizationVolumeByUtilization", utilizationAllAndBiggest(3.81141663f))
+			);
+			assertThat(
+					reason, holder,
+					hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", utilizationAllAndBiggest(3.75043678f))
+			);
+			assertThat(
+					reason, holder,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization",
+							utilizationAllAndBiggest(3.72647476f)
+					)
+			);
+			assertThat(
+					reason, holder,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+							utilizationAllAndBiggest(3.56433797f)
+					)
+			);
+			assertThat(
+					reason, holder,
+					hasProperty("quadraticMeanDiameterByUtilization", utilizationAllAndBiggest(46.4037895f))
+			);
+		}
+		{
+			var holder = result;
+			String reason = "Layer";
+			assertThat(reason, holder, hasProperty("baseAreaByUtilization", utilizationAllAndBiggest(2.24055195f)));
+			assertThat(
+					reason, holder, hasProperty("treesPerHectareByUtilization", utilizationAllAndBiggest(10.6751289f))
+			);
+			assertThat(
+					reason, holder, hasProperty("wholeStemVolumeByUtilization", utilizationAllAndBiggest(24.7540474f))
+			);
+			assertThat(
+					reason, holder,
+					hasProperty("closeUtilizationVolumeByUtilization", utilizationAllAndBiggest(23.6066074f))
+			);
+			assertThat(
+					reason, holder,
+					hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", utilizationAllAndBiggest(22.7740307f))
+			);
+			assertThat(
+					reason, holder,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization",
+							utilizationAllAndBiggest(22.5123749f)
+					)
+			);
+			assertThat(
+					reason, holder,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+							utilizationAllAndBiggest(21.3272057f)
+					)
+			);
+			assertThat(
+					reason, holder,
+					hasProperty("quadraticMeanDiameterByUtilization", utilizationAllAndBiggest(51.6946983f))
+			);
+		}
+		// Lorey Height should be the same across layer and each species
+		for (var holder : List.of(speciesResult1, speciesResult2, speciesResult3, result)) {
+			String reason;
+			if (holder instanceof VdypLayer) {
+				reason = "Layer";
+			} else {
+				reason = "Genus " + ((VdypSpecies) holder).getGenus();
+			}
+			assertThat(reason, holder, hasProperty("loreyHeightByUtilization", coe(-1, 0f, 26.2f)));
+		}
 	}
 
 	@Test
@@ -3914,6 +4138,10 @@ public class FipStartTest {
 	@FunctionalInterface
 	private static interface TestConsumer<T> {
 		public void accept(T unit, Map<String, Object> controlMap) throws Exception;
+	}
+
+	Matcher<Coefficients> utilizationAllAndBiggest(float all) {
+		return utilization(0f, all, 0f, 0f, 0f, all);
 	}
 
 	Matcher<Coefficients> utilization(float small, float all, float util1, float util2, float util3, float util4) {

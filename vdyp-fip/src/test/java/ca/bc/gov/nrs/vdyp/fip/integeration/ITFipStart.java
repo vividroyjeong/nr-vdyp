@@ -1,40 +1,25 @@
 package ca.bc.gov.nrs.vdyp.fip.integeration;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.BiPredicate;
+import java.nio.file.*;
+import java.util.*;
+import java.util.function.*;
 import java.util.regex.Pattern;
 
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.CleanupMode;
-import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.io.*;
 
-import ca.bc.gov.nrs.vdyp.fip.FipControlParserTest;
-import ca.bc.gov.nrs.vdyp.fip.FipStart;
-import ca.bc.gov.nrs.vdyp.fip.ProcessingException;
+import ca.bc.gov.nrs.vdyp.fip.*;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.ControlFileParserTest;
-import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.*;
 import ca.bc.gov.nrs.vdyp.io.write.ControlFileWriter;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
-import ca.bc.gov.nrs.vdyp.test.TestUtils;
-import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
+import ca.bc.gov.nrs.vdyp.test.*;
 
 class ITFipStart {
 
