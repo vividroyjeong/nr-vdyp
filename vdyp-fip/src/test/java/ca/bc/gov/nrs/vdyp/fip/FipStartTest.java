@@ -1326,6 +1326,159 @@ public class FipStartTest {
 				)
 		);
 	}
+	@Test
+	void testProcessPrimary2() throws Exception {
+
+		var polygonId = polygonId("01002 S000002 00", 1970);
+
+		var fipPolygon = getTestPolygon(polygonId, x -> {
+			x.setBiogeoclimaticZone("CWH");
+			x.setForestInventoryZone("A");
+		});
+		var fipLayer = getTestPrimaryLayer(polygonId, x -> {
+			x.setAgeTotalSafe(45f);
+			x.setHeight(Optional.of(24.3f));
+			x.setSiteIndex(Optional.of(28.7f));
+			x.setCrownClosure(82.8f);
+			x.setSiteGenus(Optional.of("H"));
+			x.setSiteSpecies("H");
+			x.setYearsToBreastHeight(Optional.of(5.4f));
+			x.setPrimaryGenus(null);
+			x.setInventoryTypeGroup(Optional.empty());
+			x.setSiteCurveNumber(Optional.of(34));
+		});
+		var fipSpecies1 = getTestSpecies(polygonId, Layer.PRIMARY, "B", x -> {
+			x.setPercentGenus(15f);
+		});
+		var fipSpecies2 = getTestSpecies(polygonId, Layer.PRIMARY, "D", x -> {
+			x.setPercentGenus(7f);
+		});
+		var fipSpecies3 = getTestSpecies(polygonId, Layer.PRIMARY, "H", x -> {
+			x.setPercentGenus(77f);
+		});
+		var fipSpecies4 = getTestSpecies(polygonId, Layer.PRIMARY, "S", x -> {
+			x.setPercentGenus(1f);
+		});
+		fipPolygon.setLayers(List.of(fipLayer));
+		fipLayer.setSpecies(List.of(fipSpecies1, fipSpecies2, fipSpecies3, fipSpecies4));
+
+		var controlMap = FipTestUtils.loadControlMap();
+
+		var app = new FipStart();
+		app.setControlMap(controlMap);
+
+		var result = app.processLayerAsPrimary(fipPolygon, fipLayer, 0f);
+
+		assertThat(result, notNullValue());
+
+		assertThat(result, hasProperty("polygonIdentifier", is(polygonId)));
+		assertThat(result, hasProperty("layer", is(Layer.PRIMARY)));
+
+		assertThat(result, hasProperty("ageTotal", present(is(45f))));
+		assertThat(result, hasProperty("height", present(is(24.3f))));
+		assertThat(result, hasProperty("yearsToBreastHeight", present(is(5.4f))));
+
+		assertThat(result, hasProperty("breastHeightAge", present(is(45f-5.4f))));
+
+		assertThat(
+				result, hasProperty(
+						"species", allOf(
+								aMapWithSize(4), //
+								hasEntry(is("B"), instanceOf(VdypSpecies.class)), //
+								hasEntry(is("D"), instanceOf(VdypSpecies.class)), //
+								hasEntry(is("H"), instanceOf(VdypSpecies.class)), //
+								hasEntry(is("S"), instanceOf(VdypSpecies.class))
+						)
+				)
+		);
+
+		// Setting the primaryGenus on the FIP layer is a necessary side effect
+		assertThat(fipLayer, hasProperty("primaryGenus", equalTo("H")));
+
+		var speciesResult = result.getSpecies().get("H");
+
+		assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
+		assertThat(speciesResult, hasProperty("layer", is(Layer.PRIMARY)));
+		assertThat(speciesResult, hasProperty("genus", is("H")));
+
+		assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.787526369f)));
+
+		assertThat(speciesResult, hasProperty("speciesPercent", aMapWithSize(1)));
+
+		assertThat(
+				speciesResult,
+				allOf(
+						hasProperty("loreyHeightByUtilization", coe(-1, 7.00809479f, 20.9070625f)),
+						hasProperty(
+								"baseAreaByUtilization",
+								utilization(
+										0.512469947f, 35.401783f, 2.32033157f, 5.18892097f, 6.6573391f, 21.2351913f
+								)
+						),
+						hasProperty(
+								"quadraticMeanDiameterByUtilization",
+								utilization(
+										6.13586617f, 31.6622887f, 9.17939758f, 13.6573782f, 18.2005272f, 42.1307297f
+								)
+						),
+						hasProperty(
+								"treesPerHectareByUtilization",
+								utilization(0f, 5.04602766f, 0.733301044f, 0.899351299f, 0.851697803f, 2.56167722f)
+						),
+						hasProperty(
+								"wholeStemVolumeByUtilization",
+								utilization(0f, 6.35662031f, 0.0182443243f, 0.0747248605f, 0.172960356f, 6.09069061f)
+						),
+
+						// Ignore intermediate close volumes, if they are wrong,
+						// closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization should also be
+						// wrong
+
+						hasProperty(
+								"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+								utilization(0f, 5.65764236f, 0.000855736958f, 0.046797853f, 0.143031254f, 5.46695757f)
+						)
+
+				)
+		);
+		
+		assertThat(
+				result,
+				allOf(
+						hasProperty("loreyHeightByUtilization", coe(-1, 7.01034021f, 21.1241722f)),
+						hasProperty(
+								"baseAreaByUtilization",
+								utilization(
+										0.553745031f, 44.9531403f, 2.83213019f, 6.17823505f, 8.11753464f, 27.8252392f
+								)
+						),
+						hasProperty(
+								"quadraticMeanDiameterByUtilization",
+								utilization(5.9399271f, 21.0548763f, 10.235322f, 15.0843554f, 20.0680523f, 32.0662689f)
+						),
+						hasProperty(
+								"treesPerHectareByUtilization",
+								utilization(199.828629f, 1291.1145f, 344.207489f, 345.717224f, 256.639709f, 344.549957f)
+						),
+						hasProperty(
+								"wholeStemVolumeByUtilization",
+								utilization(
+										0.0666879341f, 635.659668f, 2.66822577f, 9.68201256f, 26.5469246f, 596.762512f
+								)
+						),
+
+						// Ignore intermediate close volumes, if they are wrong,
+						// closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization should also be
+						// wrong
+
+						hasProperty(
+								"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+								utilization(0f, 563.218933f, 0.414062887f, 7.01947737f, 22.6179276f, 533.16748f)
+						)
+
+				)
+		);
+	}
 
 	@Test
 	void testEstimateVeteranLayerBaseArea() throws Exception {

@@ -3069,7 +3069,7 @@ public class FipStart implements Closeable {
 		for (VdypSpecies spec : layer.getSpecies().values()) {
 			float loreyHeightSpec = spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL); // HLsp
 			float baseAreaSpec = spec.getBaseAreaByUtilization().getCoe(UTIL_ALL); // BAsp
-			float quadMeanDiameterSpec = spec.getBaseAreaByUtilization().getCoe(UTIL_ALL); // DQsp
+			float quadMeanDiameterSpec = spec.getQuadraticMeanDiameterByUtilization().getCoe(UTIL_ALL); // DQsp
 
 			// EMP080
 			float smallComponentProbability = smallComponentProbability(layer, spec, region); // PROBsp
