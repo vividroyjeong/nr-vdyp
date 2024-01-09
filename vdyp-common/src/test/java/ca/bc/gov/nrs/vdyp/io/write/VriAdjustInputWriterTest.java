@@ -133,12 +133,7 @@ class VriAdjustInputWriterTest {
 		}
 		specStream.assertContent(
 				is(
-						"082E004    615       1988 P 12 PL PL 100.0     0.0     0.0     0.0 14.70 15.00  60.0  51.5   8.5 1  0\n\n" // VDYP7
-																																	// adds
-																																	// an
-																																	// extra
-																																	// newline
-																																	// here
+						"082E004    615       1988 P 12 PL PL 100.0     0.0     0.0     0.0 14.70 15.00  60.0  51.5   8.5 1  0\n"
 				)
 		);
 		polyStream.assertContent(emptyString());

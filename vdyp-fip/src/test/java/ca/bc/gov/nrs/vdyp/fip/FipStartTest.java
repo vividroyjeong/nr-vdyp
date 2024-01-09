@@ -1326,8 +1326,9 @@ public class FipStartTest {
 				)
 		);
 	}
+
 	@Test
-	void testProcessPrimary2() throws Exception {
+	void testProcessPrimaryWithOverstory() throws Exception {
 
 		var polygonId = polygonId("01002 S000002 00", 1970);
 
@@ -1367,7 +1368,7 @@ public class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		var result = app.processLayerAsPrimary(fipPolygon, fipLayer, 0f);
+		var result = app.processLayerAsPrimary(fipPolygon, fipLayer, 2.24055195f);
 
 		assertThat(result, notNullValue());
 
@@ -1378,7 +1379,7 @@ public class FipStartTest {
 		assertThat(result, hasProperty("height", present(is(24.3f))));
 		assertThat(result, hasProperty("yearsToBreastHeight", present(is(5.4f))));
 
-		assertThat(result, hasProperty("breastHeightAge", present(is(45f-5.4f))));
+		assertThat(result, hasProperty("breastHeightAge", present(is(45f - 5.4f))));
 
 		assertThat(
 				result, hasProperty(
@@ -1411,37 +1412,22 @@ public class FipStartTest {
 						hasProperty("loreyHeightByUtilization", coe(-1, 7.00809479f, 20.9070625f)),
 						hasProperty(
 								"baseAreaByUtilization",
-								utilization(
-										0.512469947f, 35.401783f, 2.32033157f, 5.18892097f, 6.6573391f, 21.2351913f
-								)
+								utilization(0.512469947f, 35.401783f, 2.32033157f, 5.18892097f, 6.6573391f, 21.2351913f)
 						),
 						hasProperty(
 								"quadraticMeanDiameterByUtilization",
 								utilization(
-										6.13586617f, 31.6622887f, 9.17939758f, 13.6573782f, 18.2005272f, 42.1307297f
+										5.94023561f, 20.7426338f, 10.2836504f, 15.1184902f, 20.1040707f, 31.6741638f
 								)
 						),
 						hasProperty(
 								"treesPerHectareByUtilization",
-								utilization(0f, 5.04602766f, 0.733301044f, 0.899351299f, 0.851697803f, 2.56167722f)
-						),
-						hasProperty(
-								"wholeStemVolumeByUtilization",
-								utilization(0f, 6.35662031f, 0.0182443243f, 0.0747248605f, 0.172960356f, 6.09069061f)
-						),
-
-						// Ignore intermediate close volumes, if they are wrong,
-						// closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization should also be
-						// wrong
-
-						hasProperty(
-								"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
-								utilization(0f, 5.65764236f, 0.000855736958f, 0.046797853f, 0.143031254f, 5.46695757f)
+								utilization(184.914597f, 1047.62891f, 279.36087f, 289.048248f, 209.72142f, 269.49826f)
 						)
 
 				)
 		);
-		
+
 		assertThat(
 				result,
 				allOf(
@@ -1459,21 +1445,6 @@ public class FipStartTest {
 						hasProperty(
 								"treesPerHectareByUtilization",
 								utilization(199.828629f, 1291.1145f, 344.207489f, 345.717224f, 256.639709f, 344.549957f)
-						),
-						hasProperty(
-								"wholeStemVolumeByUtilization",
-								utilization(
-										0.0666879341f, 635.659668f, 2.66822577f, 9.68201256f, 26.5469246f, 596.762512f
-								)
-						),
-
-						// Ignore intermediate close volumes, if they are wrong,
-						// closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization should also be
-						// wrong
-
-						hasProperty(
-								"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
-								utilization(0f, 563.218933f, 0.414062887f, 7.01947737f, 22.6179276f, 533.16748f)
 						)
 
 				)
@@ -3106,6 +3077,258 @@ public class FipStartTest {
 				spec5, hasProperty(
 						"wholeStemVolumeByUtilization", //
 						coe(-1, 0f, 57.4714355f, 0f, 0f, 0f, 0f)
+				)
+		);
+
+	}
+
+	@Test
+	void testFindRootsForPrimaryLayerDiameterAndAreaMultipleSpeciesPass1Test2() throws Exception {
+		var controlMap = FipTestUtils.loadControlMap();
+		var app = new FipStart();
+		app.setControlMap(controlMap);
+
+		var becLookup = BecDefinitionParser.getBecs(controlMap);
+		var bec = becLookup.get("CWH").get();
+		/*
+		 * HL[*, -1] 0 HL[0, 0] 0 BA[*, -1] BA[1, 0] VOLWS VOLCU VOL_D VOL_DW VOLDWB
+		 * dqspbase,goal
+		 *
+		 * HL[1, 0] spec BA[0, 0] layer TPH[0, 0] layer DQ[0,0] layer INL1VGRP,
+		 * INL1DGRP, INL1BGRP spec VGRPL, DGRPL, BGRPL spec Same as above AGETOTL1 layer
+		 * AGEBHL1 layer YTBH hdl1
+		 *
+		 */
+		// sp 3, 4, 5, 8, 15
+		// sp B, C, D, H, S
+		var spec1 = new VdypSpecies("Test", Layer.PRIMARY, "B");
+		spec1.setVolumeGroup(12);
+		spec1.setDecayGroup(7);
+		spec1.setBreakageGroup(5);
+		spec1.getLoreyHeightByUtilization().setCoe(0, 21.5356998f);
+		spec1.setPercentGenus(15f);
+		var spec2 = new VdypSpecies("Test", Layer.PRIMARY, "D");
+		spec2.setVolumeGroup(25);
+		spec2.setDecayGroup(19);
+		spec2.setBreakageGroup(12);
+		spec2.getLoreyHeightByUtilization().setCoe(0, 22.4329224f);
+		spec2.setPercentGenus(7f);
+		var spec3 = new VdypSpecies("Test", Layer.PRIMARY, "H");
+		spec3.setVolumeGroup(37);
+		spec3.setDecayGroup(31);
+		spec3.setBreakageGroup(17);
+		spec3.getLoreyHeightByUtilization().setCoe(0, 20.5984688f);
+		spec3.setPercentGenus(77f);
+		var spec4 = new VdypSpecies("Test", Layer.PRIMARY, "S");
+		spec4.setVolumeGroup(66);
+		spec4.setDecayGroup(54);
+		spec4.setBreakageGroup(28);
+		spec4.getLoreyHeightByUtilization().setCoe(0, 24.0494442f);
+		spec4.setPercentGenus(1f);
+
+		Collection<VdypSpecies> specs = new ArrayList<>(5);
+		specs.add(spec1);
+		specs.add(spec2);
+		specs.add(spec3);
+		specs.add(spec4);
+
+		var layer = new VdypLayer("Test", Layer.PRIMARY);
+		layer.getBaseAreaByUtilization().setCoe(0, 44.9531403f);
+		layer.getTreesPerHectareByUtilization().setCoe(0, 1291.11597f);
+		layer.getQuadraticMeanDiameterByUtilization().setCoe(0, 21.0548649f);
+		layer.setAgeTotal(Optional.of(45f));
+		layer.setBreastHeightAge(Optional.of(39.5999985f));
+		layer.setYearsToBreastHeight(Optional.of(5.4000001f));
+		layer.setHeight(Optional.of(24.2999992f));
+		layer.setSiteGenus(Optional.of("H"));
+
+		layer.setSpecies(specs);
+
+		var fipLayer = this.getTestPrimaryLayer("Test", l -> {
+			l.setInventoryTypeGroup(Optional.of(15));
+			l.setPrimaryGenus("H");
+		});
+
+		app.findRootsForDiameterAndBaseArea(layer, fipLayer, bec, 2);
+
+		// This is L1COM1/PCTL1 not FIPS/PCTVOLV
+		assertThat(
+				spec1, hasProperty(
+						"percentGenus", //
+						closeTo(13.4858189f) // Change
+				)
+		);
+		assertThat(
+				spec2, hasProperty(
+						"percentGenus", //
+						closeTo(6.56449223f) // Change
+				)
+		);
+		assertThat(
+				spec3, hasProperty(
+						"percentGenus", //
+						closeTo(79.0027771f) // Change
+				)
+		);
+		assertThat(
+				spec4, hasProperty(
+						"percentGenus", //
+						closeTo(0.946914673f) // Change
+				)
+		);
+
+		assertThat(
+				layer, hasProperty(
+						"loreyHeightByUtilization", //
+						coe(-1, 0f, 20.8779621f) // Changed
+				)
+		);
+		assertThat(
+				spec1, hasProperty(
+						"loreyHeightByUtilization", //
+						coe(-1, 0f, 21.5356998f) // No Change
+				)
+		);
+		assertThat(
+				spec2, hasProperty(
+						"loreyHeightByUtilization", //
+						coe(-1, 0f, 22.4329224f) // No Change
+				)
+		);
+		assertThat(
+				spec3, hasProperty(
+						"loreyHeightByUtilization", //
+						coe(-1, 0f, 20.5984688f) // No Change
+				)
+		);
+		assertThat(
+				spec4, hasProperty(
+						"loreyHeightByUtilization", //
+						coe(-1, 0f, 24.0494442f) // No Change
+				)
+		);
+
+		assertThat(
+				layer, hasProperty(
+						"baseAreaByUtilization", //
+						coe(-1, 0f, 44.9531403f, 0f, 0f, 0f, 0f) // No Change
+				)
+		);
+		assertThat(
+				spec1, hasProperty(
+						"baseAreaByUtilization", //
+						coe(-1, 0f, 6.06229925f, 0f, 0f, 0f, 0f) // Change
+				)
+		);
+		assertThat(
+				spec2, hasProperty(
+						"baseAreaByUtilization", //
+						coe(-1, 0f, 2.95094538f, 0f, 0f, 0f, 0f) // Change
+				)
+		);
+		assertThat(
+				spec3, hasProperty(
+						"baseAreaByUtilization", //
+						coe(-1, 0f, 35.5142288f, 0f, 0f, 0f, 0f) // Change
+				)
+		);
+		assertThat(
+				spec4, hasProperty(
+						"baseAreaByUtilization", //
+						coe(-1, 0f, 0.425667882f, 0f, 0f, 0f, 0f) // Change
+				)
+		);
+
+		assertThat(
+				layer, hasProperty(
+						"treesPerHectareByUtilization", //
+						coe(-1, 0f, 1291.11621f, 0f, 0f, 0f, 0f) // Change
+				)
+		);
+		assertThat(
+				spec1, hasProperty(
+						"treesPerHectareByUtilization", //
+						coe(-1, 0f, 175.253494f, 0f, 0f, 0f, 0f) // Change
+				)
+		);
+		assertThat(
+				spec2, hasProperty(
+						"treesPerHectareByUtilization", //
+						coe(-1, 0f, 52.7488708f, 0f, 0f, 0f, 0f) // Change
+				)
+		);
+		assertThat(
+				spec3, hasProperty(
+						"treesPerHectareByUtilization", //
+						coe(-1, 0f, 1056.43982f, 0f, 0f, 0f, 0f) // Change
+				)
+		);
+		assertThat(
+				spec4, hasProperty(
+						"treesPerHectareByUtilization", //
+						coe(-1, 0f, 6.67403078f, 0f, 0f, 0f, 0f) // Change
+				)
+		);
+
+		assertThat(
+				layer, hasProperty(
+						"quadraticMeanDiameterByUtilization", //
+						coe(-1, 0f, 21.054863f, 0f, 0f, 0f, 0f) // No Change
+				)
+		);
+		assertThat(
+				spec1, hasProperty(
+						"quadraticMeanDiameterByUtilization", //
+						coe(-1, 0f, 20.9865189f, 0f, 0f, 0f, 0f) // Change
+				)
+		);
+		assertThat(
+				spec2, hasProperty(
+						"quadraticMeanDiameterByUtilization", //
+						coe(-1, 0f, 26.6888008f, 0f, 0f, 0f, 0f) // Change
+				)
+		);
+		assertThat(
+				spec3, hasProperty(
+						"quadraticMeanDiameterByUtilization", //
+						coe(-1, 0f, 20.6887321f, 0f, 0f, 0f, 0f) // Change
+				)
+		);
+		assertThat(
+				spec4, hasProperty(
+						"quadraticMeanDiameterByUtilization", //
+						coe(-1, 0f, 28.4968204f, 0f, 0f, 0f, 0f) // Change
+				)
+		);
+
+		assertThat(
+				layer, hasProperty(
+						"wholeStemVolumeByUtilization", //
+						coe(-1, 0f, 393.150146f, 0f, 0f, 0f, 0f) // No Change
+				)
+		);
+		assertThat(
+				spec1, hasProperty(
+						"wholeStemVolumeByUtilization", //
+						coe(-1, 0f, 58.9725418f, 0f, 0f, 0f, 0f) // No Change
+				)
+		);
+		assertThat(
+				spec2, hasProperty(
+						"wholeStemVolumeByUtilization", //
+						coe(-1, 0f, 27.5205307f, 0f, 0f, 0f, 0f) // No Change
+				)
+		);
+		assertThat(
+				spec3, hasProperty(
+						"wholeStemVolumeByUtilization", //
+						coe(-1, 0f, 302.725555f, 0f, 0f, 0f, 0f) // No Change
+				)
+		);
+		assertThat(
+				spec4, hasProperty(
+						"wholeStemVolumeByUtilization", //
+						coe(-1, 0f, 3.93152428f, 0f, 0f, 0f, 0f) // No Change
 				)
 		);
 

@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.Math.min;
 
@@ -234,7 +235,7 @@ public class FipStart implements Closeable {
 					assert fipPrimeLayer != null;
 					var resultPrimeLayer = processLayerAsPrimary(
 							polygon, fipPrimeLayer,
-							resultVetLayer.map(VdypLayer::getBaseAreaByUtilization).map(coe -> coe.get(UTIL_ALL))
+							resultVetLayer.map(VdypLayer::getBaseAreaByUtilization).map(coe -> coe.getCoe(UTIL_ALL))
 									.orElse(0f)
 					);
 					processedLayers.put(Layer.PRIMARY, resultPrimeLayer);
@@ -539,6 +540,10 @@ public class FipStart implements Closeable {
 		computeUtilizationComponentsPrimary(bec, result, VolumeComputeMode.BY_UTIL, CompatibilityVariableMode.NONE);
 
 		return result;
+	}
+
+	public static <T> List<T> utilizationArray(VdypLayer layer, Function<VdypUtilizationHolder, T> accessor) {
+		return Stream.concat(Stream.of(layer), layer.getSpecies().values().stream()).map(accessor).toList();
 	}
 
 	int findEmpericalRelationshipParameterIndex(String specAlias, BecDefinition bec, int itg)
@@ -2899,7 +2904,7 @@ public class FipStart implements Closeable {
 
 		var decayBecAlias = bec.getDecayBec().getAlias();
 		Coefficients coe = weightedCoefficientSum(
-				List.of(0, 1, 2, 3, 4), 9, 0, fipLayer.getSpecies().values(), FipSpecies::getFractionGenus,
+				List.of(0, 1, 2, 3, 4), 8, 0, fipLayer.getSpecies().values(), FipSpecies::getFractionGenus,
 				s -> coeMap.get(decayBecAlias, s.getGenus())
 		);
 

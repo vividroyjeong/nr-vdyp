@@ -271,7 +271,7 @@ public class VriAdjustInputWriter implements Closeable {
 	public void close() throws IOException {
 		polygonFile.close();
 		if (haveWrittenSpec) {
-			writeFormat(speciesFile, "\n");
+			// writeFormat(speciesFile, "\n");
 		}
 		speciesFile.close();
 		utilizationFile.close();

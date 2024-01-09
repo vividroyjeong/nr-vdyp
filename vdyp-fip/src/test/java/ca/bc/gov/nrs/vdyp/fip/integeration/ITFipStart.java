@@ -170,7 +170,7 @@ class ITFipStart {
 	static final Pattern UTIL_LINE_MATCHER = Pattern
 			.compile("^(.{27})(?:(.{9})(.{9})(.{9})(.{9})(.{9})(.{9})(.{9})(.{9})(.{9})(.{6}))?$", Pattern.MULTILINE);
 
-	BiPredicate<String, String> floatStringsWithin(float threshold) {
+	BiPredicate<String, String> floatStringsWithin(float relativeThreshold, float absoluteThreshold) {
 
 		return new BiPredicate<>() {
 
@@ -187,7 +187,9 @@ class ITFipStart {
 				float actualValue = Float.parseFloat(actual);
 				float expectedValue = Float.parseFloat(expected);
 
-				return VdypMatchers.closeTo(expectedValue, threshold).matches(actualValue);
+				float threshold = Math.max(expectedValue * relativeThreshold, absoluteThreshold);
+
+				return FloatMath.abs(actualValue - expectedValue) < threshold;
 			}
 
 		};
@@ -195,7 +197,7 @@ class ITFipStart {
 	}
 
 	BiPredicate<String, String> floatStringsWithin() {
-		return floatStringsWithin(0.01f);
+		return floatStringsWithin(0.01f, 0.0001f);
 	}
 
 	boolean linesMatch(String actual, String expected) {
@@ -258,6 +260,17 @@ class ITFipStart {
 		assertFileMatches(
 				outputDir.resolve(UTILIZATION_OUTPUT_NAME), testResourcePath(FipControlParserTest.class, "vu_1.dat"),
 				this::linesMatch
+		);
+
+	}
+
+	@Test
+	void utilizationFileLineMatcherSelfTest() {
+		assertTrue(
+				linesMatch(
+						"01004 S000037 00     1957 P 12 PL  1  0.00775     0.98  -9.0000   0.0363   0.0079   0.0074   0.0073   0.0071  10.0",
+						"01004 S000037 00     1957 P 12 PL  1  0.00774     0.98  -9.0000   0.0363   0.0079   0.0073   0.0073   0.0071  10.0"
+				)
 		);
 
 	}
