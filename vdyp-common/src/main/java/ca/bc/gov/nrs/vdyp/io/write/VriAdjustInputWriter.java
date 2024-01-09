@@ -1,8 +1,14 @@
 package ca.bc.gov.nrs.vdyp.io.write;
 
-import java.io.*;
-import java.util.*;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKeys;
@@ -10,7 +16,14 @@ import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
-import ca.bc.gov.nrs.vdyp.model.*;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
+import ca.bc.gov.nrs.vdyp.model.FipMode;
+import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.VdypLayer;
+import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
+import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 
 /**
  * Write files to be input into VRI Adjust.
@@ -49,8 +62,6 @@ public class VriAdjustInputWriter implements Closeable {
 			+ SPEC_IDENTIFIER_FORMAT + "%3d%9.5f%9.2f%9.4f%9.4f%9.4f%9.4f%9.4f%9.4f%6.1f\n";
 
 	static final String END_RECORD_FORMAT = POLY_IDENTIFIER_FORMAT + "  \n";
-
-	boolean haveWrittenSpec = false;
 
 	/**
 	 * Create a writer for VRI Adjust input files using provided OutputStreams. The
@@ -125,7 +136,6 @@ public class VriAdjustInputWriter implements Closeable {
 	 * @throws IOException
 	 */
 	void writeSpecies(VdypLayer layer, VdypSpecies spec) throws IOException {
-		haveWrittenSpec = true;
 		// Ensure we have a list of 4 distribution entries
 		var specDistributionEntries = Stream.concat(
 				spec.getSpeciesPercent().entrySet().stream().sorted(Utils.compareUsing(Entry::getValue)),
@@ -236,12 +246,11 @@ public class VriAdjustInputWriter implements Closeable {
 	public void writePolygonWithSpeciesAndUtilization(VdypPolygon polygon) throws IOException {
 
 		writePolygon(polygon);
-		polygon.getLayers().values();
 		for (var layer : polygon.getLayers().values()) {
 			writeUtilization(layer, layer);
 			List<VdypSpecies> specs = new ArrayList<>(layer.getSpecies().size());
 			specs.addAll(layer.getSpecies().values());
-			specs.sort(Utils.compareUsing((VdypSpecies x) -> x.getGenus()));
+			specs.sort(Utils.compareUsing(BaseVdypSpecies::getGenus));
 			for (var species : specs) {
 				writeSpecies(layer, species);
 				writeUtilization(layer, species);
@@ -270,9 +279,6 @@ public class VriAdjustInputWriter implements Closeable {
 	@Override
 	public void close() throws IOException {
 		polygonFile.close();
-		if (haveWrittenSpec) {
-			// writeFormat(speciesFile, "\n");
-		}
 		speciesFile.close();
 		utilizationFile.close();
 	}

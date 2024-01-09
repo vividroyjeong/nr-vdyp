@@ -42,11 +42,13 @@ public class FipLayerPrimary extends FipLayer {
 		super.setAgeTotal(value);
 	}
 
+	@Override
 	@Computed
 	public float getAgeTotalSafe() {
 		return super.getAgeTotal().get();
 	}
 
+	@Override
 	@Computed
 	public void setAgeTotalSafe(float value) {
 		setAgeTotal(Optional.of(value));
@@ -58,11 +60,13 @@ public class FipLayerPrimary extends FipLayer {
 		super.setYearsToBreastHeight(value);
 	}
 
+	@Override
 	@Computed
 	public float getYearsToBreastHeightSafe() {
 		return super.getYearsToBreastHeight().get();
 	}
 
+	@Override
 	@Computed
 	public void setYearsToBreastHeightSafe(float value) {
 		setYearsToBreastHeight(Optional.of(value));

@@ -3,7 +3,6 @@ package ca.bc.gov.nrs.vdyp.fip;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.util.Arrays;
@@ -16,7 +15,6 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.*;
 import ca.bc.gov.nrs.vdyp.model.*;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;

@@ -19,7 +19,6 @@ import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.*;
 import ca.bc.gov.nrs.vdyp.io.write.ControlFileWriter;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
-import ca.bc.gov.nrs.vdyp.test.*;
 
 class ITFipStart {
 

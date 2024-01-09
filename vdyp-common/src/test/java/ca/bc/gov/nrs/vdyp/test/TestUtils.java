@@ -151,6 +151,7 @@ public class TestUtils {
 		populateControlMapBec(controlMap, "B1", "B2");
 	}
 
+	@SuppressWarnings("unused")
 	private static BecDefinition makeBec(String id, Region region, String name) {
 		return new BecDefinition(id, region, name);
 	}

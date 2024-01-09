@@ -23,7 +23,11 @@ import ca.bc.gov.nrs.vdyp.io.parse.ControlFileParser;
 import ca.bc.gov.nrs.vdyp.io.parse.ControlMapModifier;
 import ca.bc.gov.nrs.vdyp.io.parse.DecayEquationGroupParser;
 import ca.bc.gov.nrs.vdyp.io.parse.DefaultEquationNumberParser;
+import ca.bc.gov.nrs.vdyp.io.parse.EquationModifierParser;
 import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.HLCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.HLNonprimaryCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.SiteCurveAgeMaximumParser;
 import ca.bc.gov.nrs.vdyp.io.parse.SiteCurveParser;
 import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentBaseAreaParser;
@@ -45,10 +49,6 @@ import ca.bc.gov.nrs.vdyp.io.parse.VolumeEquationGroupParser;
 import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayParser;
 import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayWasteParser;
 import ca.bc.gov.nrs.vdyp.model.JProgram;
-import ca.bc.gov.nrs.vdyp.io.parse.EquationModifierParser;
-import ca.bc.gov.nrs.vdyp.io.parse.HLCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.HLNonprimaryCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
 
 /**
  * Parser for FIP control files
@@ -57,6 +57,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
  *
  */
 public class FipControlParser {
+	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(FipControlParser.class);
 
 	public static final String FIP_YIELD_POLY_INPUT = FipPolygonParser.CONTROL_KEY;

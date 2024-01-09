@@ -1,35 +1,113 @@
 package ca.bc.gov.nrs.vdyp.fip;
 
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.abs;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.clamp;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.exp;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.floor;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.log;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.pow;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.ratio;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.sqrt;
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.*;
-import static java.lang.Math.max;
-
-import org.apache.commons.math3.analysis.*;
-import org.apache.commons.math3.fitting.leastsquares.*;
-import org.apache.commons.math3.linear.*;
+import org.apache.commons.math3.analysis.MultivariateMatrixFunction;
+import org.apache.commons.math3.analysis.MultivariateVectorFunction;
+import org.apache.commons.math3.fitting.leastsquares.LeastSquaresFactory;
+import org.apache.commons.math3.fitting.leastsquares.LeastSquaresProblem;
+import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer;
+import org.apache.commons.math3.linear.DiagonalMatrix;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.util.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.bc.gov.nrs.vdyp.common.*;
+import ca.bc.gov.nrs.vdyp.common.IndexedFloatBinaryOperator;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
-import ca.bc.gov.nrs.vdyp.fip.model.*;
+import ca.bc.gov.nrs.vdyp.fip.model.FipLayer;
+import ca.bc.gov.nrs.vdyp.fip.model.FipLayerPrimary;
+import ca.bc.gov.nrs.vdyp.fip.model.FipPolygon;
+import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.*;
+import ca.bc.gov.nrs.vdyp.io.parse.BecDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.BreakageEquationGroupParser;
+import ca.bc.gov.nrs.vdyp.io.parse.BreakageParser;
+import ca.bc.gov.nrs.vdyp.io.parse.BySpeciesDqCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.CloseUtilVolumeParser;
+import ca.bc.gov.nrs.vdyp.io.parse.CoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.ComponentSizeParser;
+import ca.bc.gov.nrs.vdyp.io.parse.DecayEquationGroupParser;
+import ca.bc.gov.nrs.vdyp.io.parse.DefaultEquationNumberParser;
+import ca.bc.gov.nrs.vdyp.io.parse.EquationModifierParser;
+import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.HLCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.HLNonprimaryCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentBaseAreaParser;
+import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentDQParser;
+import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentHLParser;
+import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentProbabilityParser;
+import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentWSVolumeParser;
+import ca.bc.gov.nrs.vdyp.io.parse.StockingClassFactorParser;
+import ca.bc.gov.nrs.vdyp.io.parse.StreamingParser;
+import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
+import ca.bc.gov.nrs.vdyp.io.parse.TotalStandWholeStemParser;
+import ca.bc.gov.nrs.vdyp.io.parse.UpperCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.UtilComponentBaseAreaParser;
+import ca.bc.gov.nrs.vdyp.io.parse.UtilComponentDQParser;
+import ca.bc.gov.nrs.vdyp.io.parse.UtilComponentWSVolumeParser;
+import ca.bc.gov.nrs.vdyp.io.parse.VeteranBQParser;
+import ca.bc.gov.nrs.vdyp.io.parse.VeteranDQParser;
+import ca.bc.gov.nrs.vdyp.io.parse.VeteranLayerVolumeAdjustParser;
+import ca.bc.gov.nrs.vdyp.io.parse.VolumeEquationGroupParser;
+import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayParser;
+import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayWasteParser;
 import ca.bc.gov.nrs.vdyp.io.write.VriAdjustInputWriter;
-import ca.bc.gov.nrs.vdyp.model.*;
+import ca.bc.gov.nrs.vdyp.model.BecDefinition;
+import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.FipMode;
+import ca.bc.gov.nrs.vdyp.model.JProgram;
+import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
+import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
+import ca.bc.gov.nrs.vdyp.model.Region;
+import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
+import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.VdypLayer;
+import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
+import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 
 public class FipStart implements Closeable {
 
@@ -171,14 +249,14 @@ public class FipStart implements Closeable {
 	// implemented. FIPSTART always uses the same vector so far now that's not
 	// implemented.
 	public void process() throws ProcessingException {
+		int polygonsRead = 0;
+		int polygonsWritten = 0;
 		try (
 				var polyStream = this.<FipPolygon>getStreamingParser(FipPolygonParser.CONTROL_KEY);
 				var layerStream = this.<Map<Layer, FipLayer>>getStreamingParser(FipLayerParser.CONTROL_KEY);
 				var speciesStream = this.<Collection<FipSpecies>>getStreamingParser(FipSpeciesParser.CONTROL_KEY);
 		) {
 			log.atDebug().setMessage("Start Stand processing").log();
-			int polygonsRead = 0;
-			int polygonsWritten = 0;
 
 			while (polyStream.hasNext()) {
 
@@ -270,6 +348,8 @@ public class FipStart implements Closeable {
 					// Output
 					vriWriter.writePolygonWithSpeciesAndUtilization(resultPoly);
 
+					polygonsWritten++;
+
 				} catch (StandProcessingException ex) {
 					// TODO include some sort of hook for different forms of user output
 					// TODO Implement single stand mode that propagates the exception
@@ -282,6 +362,7 @@ public class FipStart implements Closeable {
 		} catch (IOException | ResourceParseException ex) {
 			throw new ProcessingException("Error while reading or writing data.", ex);
 		}
+		log.atInfo().setMessage("Read {} polygons and wrote {}").addArgument(polygonsRead).addArgument(polygonsWritten);
 	}
 
 	// FIPSTK
@@ -1176,7 +1257,9 @@ public class FipStart implements Closeable {
 			wholeStemVolumeUtil.setCoe(UTIL_ALL, wholeStemVolumeSpec); // WSU
 
 			var adjustCloseUtil = Utils.utilizationVector(); // ADJVCU
+			@SuppressWarnings("unused")
 			var adjustDecayUtil = Utils.utilizationVector(); // ADJVD
+			@SuppressWarnings("unused")
 			var adjustDecayWasteUtil = Utils.utilizationVector(); // ADJVDW
 
 			// EMP071
@@ -1231,11 +1314,9 @@ public class FipStart implements Closeable {
 
 				if (compatibilityVariableMode == CompatibilityVariableMode.ALL) {
 					// apply compatibity variables to WS volume
-					throw new UnsupportedOperationException("TODO");
-				}
-				// TODO Combine this with IF above
-				if (compatibilityVariableMode == CompatibilityVariableMode.ALL) {
+
 					// Set the adjustment factors for next three volume types
+
 					throw new UnsupportedOperationException("TODO");
 				} else {
 					// Do nothing as the adjustment vectors are already set to 0
@@ -1542,6 +1623,7 @@ public class FipStart implements Closeable {
 			return;
 		}
 
+		@SuppressWarnings("unused")
 		float tphSum = 0f;
 		float baSum = 0f;
 		for (var uc : UTIL_CLASSES) {
@@ -1694,14 +1776,13 @@ public class FipStart implements Closeable {
 			boolean violateLow = false;
 
 			for (var uc : UTIL_CLASSES) {
-				if (baseAreaUtil.getCoe(uc.index) > 0f) {
-					if (dqTrial.getCoe(uc.index) < uc.lowBound) {
-						float vi = 1f - dqTrial.getCoe(uc.index) / uc.lowBound;
-						if (vi > violate) {
-							violate = vi;
-							violateClass = uc;
-							violateLow = true;
-						}
+				if (baseAreaUtil.getCoe(uc.index) > 0f && dqTrial.getCoe(uc.index) < uc.lowBound) {
+					float vi = 1f - dqTrial.getCoe(uc.index) / uc.lowBound;
+					if (vi > violate) {
+						violate = vi;
+						violateClass = uc;
+						violateLow = true;
+
 					}
 				}
 				if (dqTrial.getCoe(uc.index) > uc.highBound) {
@@ -1918,9 +1999,7 @@ public class FipStart implements Closeable {
 		// Start with a deep copy of the species map so there are no side effects from
 		// the manipulation this method does.
 		var combined = new HashMap<String, FipSpecies>(allSpecies.size());
-		allSpecies.entrySet().stream().forEach(spec -> {
-			combined.put(spec.getKey(), new FipSpecies(spec.getValue()));
-		});
+		allSpecies.entrySet().stream().forEach(spec -> combined.put(spec.getKey(), new FipSpecies(spec.getValue())));
 
 		for (var combinationGroup : PRIMARY_SPECIES_TO_COMBINE) {
 			var groupSpecies = combinationGroup.stream().map(combined::get).filter(Objects::nonNull).toList();
@@ -2250,7 +2329,6 @@ public class FipStart implements Closeable {
 			UtilizationClass utilizationClass, Coefficients aAdjust, int volumeGroup, float hlSp,
 			Coefficients quadMeanDiameterUtil, Coefficients wholeStemVolumeUtil, Coefficients closeUtilizationVolumeUtil
 	) throws ProcessingException {
-		var dqSp = quadMeanDiameterUtil.getCoe(UTIL_ALL);
 		final var closeUtilizationCoeMap = Utils
 				.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
 						controlMap, CloseUtilVolumeParser.CONTROL_KEY, MatrixMap2.class
@@ -2539,9 +2617,7 @@ public class FipStart implements Closeable {
 		if (sum <= 0f) {
 			throw new ProcessingException("Total volume " + sum + " was not positive.");
 		}
-		UTIL_CLASSES.forEach(uc -> {
-			components.setCoe(uc.index, components.getCoe(uc.index) * k);
-		});
+		UTIL_CLASSES.forEach(uc -> components.setCoe(uc.index, components.getCoe(uc.index) * k));
 		return k;
 	}
 
@@ -3072,8 +3148,10 @@ public class FipStart implements Closeable {
 		Region region = BecDefinitionParser.getBecs(controlMap).get(fPoly.getBiogeoclimaticZone()).get().getRegion();
 
 		for (VdypSpecies spec : layer.getSpecies().values()) {
+			@SuppressWarnings("unused")
 			float loreyHeightSpec = spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL); // HLsp
 			float baseAreaSpec = spec.getBaseAreaByUtilization().getCoe(UTIL_ALL); // BAsp
+			@SuppressWarnings("unused")
 			float quadMeanDiameterSpec = spec.getQuadraticMeanDiameterByUtilization().getCoe(UTIL_ALL); // DQsp
 
 			// EMP080
