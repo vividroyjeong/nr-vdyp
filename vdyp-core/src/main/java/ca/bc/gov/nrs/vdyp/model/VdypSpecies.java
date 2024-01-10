@@ -25,7 +25,7 @@ public class VdypSpecies extends BaseVdypSpecies implements VdypUtilizationHolde
 	int decayGroup;
 	int breakageGroup;
 
-	public VdypSpecies(String polygonIdentifier, Layer layer, String genus) {
+	public VdypSpecies(String polygonIdentifier, LayerType layer, String genus) {
 		super(polygonIdentifier, layer, genus);
 	}
 

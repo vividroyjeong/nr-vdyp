@@ -6,7 +6,7 @@ import ca.bc.gov.nrs.vdyp.common.Computed;
 
 public abstract class BaseVdypSpecies {
 	final String polygonIdentifier; // FIP_P/POLYDESC
-	final Layer layer; // This is also represents the distinction between data stored in
+	final LayerType layer; // This is also represents the distinction between data stored in
 	// FIPL_1(A) and FIP_V(A). Where VDYP7 stores both and looks at certain values
 	// to determine if a layer is "present". VDYP8 stores them in a map keyed by
 	// this value
@@ -22,7 +22,7 @@ public abstract class BaseVdypSpecies {
 
 	Map<String, Float> speciesPercent; // Map from
 
-	protected BaseVdypSpecies(String polygonIdentifier, Layer layer, String genus) {
+	protected BaseVdypSpecies(String polygonIdentifier, LayerType layer, String genus) {
 		this.polygonIdentifier = polygonIdentifier;
 		this.layer = layer;
 		this.genus = genus;
@@ -43,7 +43,7 @@ public abstract class BaseVdypSpecies {
 		return polygonIdentifier;
 	}
 
-	public Layer getLayer() {
+	public LayerType getLayer() {
 		return layer;
 	}
 

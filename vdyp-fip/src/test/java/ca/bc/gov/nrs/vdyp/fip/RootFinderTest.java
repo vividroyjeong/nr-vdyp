@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.fip.test.FipTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 
@@ -111,23 +111,23 @@ class RootFinderTest {
 
 	VdypLayer mockLayer1(Map<String, Object> control) {
 
-		final var layer = new VdypLayer("Test", Layer.PRIMARY);
+		final var layer = new VdypLayer("Test", LayerType.PRIMARY);
 		final var specMap = new LinkedHashMap<String, VdypSpecies>();
 
 		var spec3 = new VdypSpecies(
-				"Test", Layer.PRIMARY, GenusDefinitionParser.getSpeciesByIndex(3, control).getAlias()
+				"Test", LayerType.PRIMARY, GenusDefinitionParser.getSpeciesByIndex(3, control).getAlias()
 		);
 		var spec4 = new VdypSpecies(
-				"Test", Layer.PRIMARY, GenusDefinitionParser.getSpeciesByIndex(4, control).getAlias()
+				"Test", LayerType.PRIMARY, GenusDefinitionParser.getSpeciesByIndex(4, control).getAlias()
 		);
 		var spec5 = new VdypSpecies(
-				"Test", Layer.PRIMARY, GenusDefinitionParser.getSpeciesByIndex(5, control).getAlias()
+				"Test", LayerType.PRIMARY, GenusDefinitionParser.getSpeciesByIndex(5, control).getAlias()
 		);
 		var spec8 = new VdypSpecies(
-				"Test", Layer.PRIMARY, GenusDefinitionParser.getSpeciesByIndex(8, control).getAlias()
+				"Test", LayerType.PRIMARY, GenusDefinitionParser.getSpeciesByIndex(8, control).getAlias()
 		);
 		var spec15 = new VdypSpecies(
-				"Test", Layer.PRIMARY, GenusDefinitionParser.getSpeciesByIndex(15, control).getAlias()
+				"Test", LayerType.PRIMARY, GenusDefinitionParser.getSpeciesByIndex(15, control).getAlias()
 		);
 
 		spec3.getLoreyHeightByUtilization().setCoe(UTIL_ALL, 38.7456512f);

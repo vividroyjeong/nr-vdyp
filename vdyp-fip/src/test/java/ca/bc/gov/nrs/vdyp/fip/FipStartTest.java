@@ -58,7 +58,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.StockingClassFactorParser;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.VeteranLayerVolumeAdjustParser;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
@@ -81,7 +81,7 @@ class FipStartTest {
 	void testProcessSimple() throws Exception {
 
 		var polygonId = polygonId("Test Polygon", 2023);
-		var layer = Layer.PRIMARY;
+		var layer = LayerType.PRIMARY;
 
 		// One polygon with one primary layer with one species entry
 		testWith(
@@ -154,7 +154,7 @@ class FipStartTest {
 				hasProperty(
 						"message",
 						is(
-								"Polygon " + polygonId + " has no " + Layer.PRIMARY
+								"Polygon " + polygonId + " has no " + LayerType.PRIMARY
 										+ " layer, or that layer has non-positive height or crown closure."
 						)
 				)
@@ -174,7 +174,7 @@ class FipStartTest {
 		var layer = this.getTestPrimaryLayer("Test Polygon", x -> {
 			x.setHeight(4f);
 		});
-		polygon.setLayers(Collections.singletonMap(Layer.PRIMARY, layer));
+		polygon.setLayers(Collections.singletonMap(LayerType.PRIMARY, layer));
 
 		var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygon(polygon));
 		assertThat(
@@ -182,7 +182,7 @@ class FipStartTest {
 				hasProperty(
 						"message",
 						is(
-								"Polygon " + polygonId + " has " + Layer.PRIMARY
+								"Polygon " + polygonId + " has " + LayerType.PRIMARY
 										+ " layer where height 4.0 is less than minimum 5.0."
 						)
 				)
@@ -211,7 +211,7 @@ class FipStartTest {
 				hasProperty(
 						"message",
 						is(
-								"Polygon " + polygonId + " has " + Layer.VETERAN
+								"Polygon " + polygonId + " has " + LayerType.VETERAN
 										+ " layer where height 9.0 is less than minimum 10.0."
 						)
 				)
@@ -240,7 +240,7 @@ class FipStartTest {
 				hasProperty(
 						"message",
 						is(
-								"Polygon " + polygonId + " has " + Layer.PRIMARY
+								"Polygon " + polygonId + " has " + LayerType.PRIMARY
 										+ " layer where years to breast height 0.2 is less than minimum 0.5 years."
 						)
 				)
@@ -273,7 +273,7 @@ class FipStartTest {
 				hasProperty(
 						"message",
 						is(
-								"Polygon " + polygonId + " has " + Layer.PRIMARY
+								"Polygon " + polygonId + " has " + LayerType.PRIMARY
 										+ " layer where total age is less than YTBH."
 						)
 				)
@@ -293,7 +293,7 @@ class FipStartTest {
 		var layer = this.getTestPrimaryLayer("Test Polygon", x -> {
 			x.setSiteIndex(0.2f);
 		});
-		polygon.setLayers(Collections.singletonMap(Layer.PRIMARY, layer));
+		polygon.setLayers(Collections.singletonMap(LayerType.PRIMARY, layer));
 
 		var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygon(polygon));
 		assertThat(
@@ -301,7 +301,7 @@ class FipStartTest {
 				hasProperty(
 						"message",
 						is(
-								"Polygon " + polygonId + " has " + Layer.PRIMARY
+								"Polygon " + polygonId + " has " + LayerType.PRIMARY
 										+ " layer where site index 0.2 is less than minimum 0.5 years."
 						)
 				)
@@ -344,7 +344,7 @@ class FipStartTest {
 
 		var polygon = getTestPolygon(polygonId, valid());
 		var layer = this.getTestPrimaryLayer(polygonId, valid());
-		var spec = getTestSpecies(polygonId, Layer.PRIMARY, x -> {
+		var spec = getTestSpecies(polygonId, LayerType.PRIMARY, x -> {
 			x.setPercentGenus(99f);
 		});
 		layer.setSpecies(List.of(spec));
@@ -375,7 +375,7 @@ class FipStartTest {
 
 		var polygon = getTestPolygon(polygonId, valid());
 		var layer = this.getTestPrimaryLayer(polygonId, valid());
-		var spec = getTestSpecies(polygonId, Layer.PRIMARY, x -> {
+		var spec = getTestSpecies(polygonId, LayerType.PRIMARY, x -> {
 			x.setPercentGenus(101f);
 		});
 		layer.setSpecies(List.of(spec));
@@ -406,10 +406,10 @@ class FipStartTest {
 
 		var polygon = getTestPolygon(polygonId, valid());
 		var layer = this.getTestPrimaryLayer(polygonId, valid());
-		var spec1 = getTestSpecies(polygonId, Layer.PRIMARY, "B", x -> {
+		var spec1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", x -> {
 			x.setPercentGenus(75f);
 		});
-		var spec2 = getTestSpecies(polygonId, Layer.PRIMARY, "C", x -> {
+		var spec2 = getTestSpecies(polygonId, LayerType.PRIMARY, "C", x -> {
 			x.setPercentGenus(25f);
 		});
 		layer.setSpecies(List.of(spec1, spec2));
@@ -429,10 +429,10 @@ class FipStartTest {
 
 		var polygon = getTestPolygon(polygonId, valid());
 		var layer = this.getTestPrimaryLayer(polygonId, valid());
-		var spec1 = getTestSpecies(polygonId, Layer.PRIMARY, "B", x -> {
+		var spec1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", x -> {
 			x.setPercentGenus(75f - 1f);
 		});
-		var spec2 = getTestSpecies(polygonId, Layer.PRIMARY, "C", x -> {
+		var spec2 = getTestSpecies(polygonId, LayerType.PRIMARY, "C", x -> {
 			x.setPercentGenus(25f);
 		});
 		layer.setSpecies(List.of(spec1, spec2));
@@ -463,10 +463,10 @@ class FipStartTest {
 
 		var polygon = getTestPolygon(polygonId, valid());
 		var layer = this.getTestPrimaryLayer(polygonId, valid());
-		var spec1 = getTestSpecies(polygonId, Layer.PRIMARY, "B", x -> {
+		var spec1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", x -> {
 			x.setPercentGenus(75f + 1f);
 		});
-		var spec2 = getTestSpecies(polygonId, Layer.PRIMARY, "C", x -> {
+		var spec2 = getTestSpecies(polygonId, LayerType.PRIMARY, "C", x -> {
 			x.setPercentGenus(25f);
 		});
 		layer.setSpecies(List.of(spec1, spec2));
@@ -490,7 +490,7 @@ class FipStartTest {
 	void testFractionGenusCalculation() throws Exception {
 
 		var polygonId = polygonId("Test Polygon", 2023);
-		var layer = Layer.PRIMARY;
+		var layer = LayerType.PRIMARY;
 
 		final var speciesList = Arrays.asList(
 				//
@@ -525,7 +525,7 @@ class FipStartTest {
 	void testFractionGenusCalculationWithSlightError() throws Exception {
 
 		var polygonId = polygonId("Test Polygon", 2023);
-		var layer = Layer.PRIMARY;
+		var layer = LayerType.PRIMARY;
 
 		final var speciesList = Arrays.asList(
 				//
@@ -563,10 +563,10 @@ class FipStartTest {
 
 		var fipPolygon = getTestPolygon(polygonId, valid());
 		var fipLayer = getTestVeteranLayer(polygonId, valid());
-		var fipSpecies = getTestSpecies(polygonId, Layer.VETERAN, x -> {
+		var fipSpecies = getTestSpecies(polygonId, LayerType.VETERAN, x -> {
 			x.setSpeciesPercent(Collections.emptyMap());
 		});
-		fipPolygon.setLayers(Collections.singletonMap(Layer.VETERAN, fipLayer));
+		fipPolygon.setLayers(Collections.singletonMap(LayerType.VETERAN, fipLayer));
 		fipLayer.setSpecies(Collections.singletonMap(fipSpecies.getGenus(), fipSpecies));
 
 		var controlMap = new HashMap<String, Object>();
@@ -596,7 +596,7 @@ class FipStartTest {
 
 		// Keys
 		assertThat(result, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(result, hasProperty("layer", is(Layer.VETERAN)));
+		assertThat(result, hasProperty("layer", is(LayerType.VETERAN)));
 
 		// Direct Copy
 		assertThat(result, hasProperty("ageTotal", is(8f)));
@@ -619,7 +619,7 @@ class FipStartTest {
 
 		// Keys
 		assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(speciesResult, hasProperty("layer", is(Layer.VETERAN)));
+		assertThat(speciesResult, hasProperty("layer", is(LayerType.VETERAN)));
 		assertThat(speciesResult, hasProperty("genus", is("B")));
 
 		// Copied
@@ -638,8 +638,8 @@ class FipStartTest {
 		var fipLayer = getTestVeteranLayer(polygonId, (l) -> {
 			l.setYearsToBreastHeight(5.0f);
 		});
-		var fipSpecies = getTestSpecies(polygonId, Layer.VETERAN, valid());
-		fipPolygon.setLayers(Collections.singletonMap(Layer.VETERAN, fipLayer));
+		var fipSpecies = getTestSpecies(polygonId, LayerType.VETERAN, valid());
+		fipPolygon.setLayers(Collections.singletonMap(LayerType.VETERAN, fipLayer));
 		fipLayer.setSpecies(Collections.singletonMap(fipSpecies.getGenus(), fipSpecies));
 
 		var controlMap = new HashMap<String, Object>();
@@ -682,13 +682,13 @@ class FipStartTest {
 
 		var fipPolygon = getTestPolygon(polygonId, valid());
 		var fipLayer = getTestVeteranLayer(polygonId, valid());
-		var fipSpecies = getTestSpecies(polygonId, Layer.VETERAN, x -> {
+		var fipSpecies = getTestSpecies(polygonId, LayerType.VETERAN, x -> {
 			var map = new LinkedHashMap<String, Float>();
 			map.put("S1", 75f);
 			map.put("S2", 25f);
 			x.setSpeciesPercent(map);
 		});
-		fipPolygon.setLayers(Collections.singletonMap(Layer.VETERAN, fipLayer));
+		fipPolygon.setLayers(Collections.singletonMap(LayerType.VETERAN, fipLayer));
 		fipLayer.setSpecies(Collections.singletonMap(fipSpecies.getGenus(), fipSpecies));
 
 		var controlMap = new HashMap<String, Object>();
@@ -729,7 +729,7 @@ class FipStartTest {
 
 		// Keys
 		assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(speciesResult, hasProperty("layer", is(Layer.VETERAN)));
+		assertThat(speciesResult, hasProperty("layer", is(LayerType.VETERAN)));
 		assertThat(speciesResult, hasProperty("genus", is("B")));
 
 		// Copied
@@ -765,19 +765,19 @@ class FipStartTest {
 			x.setPrimaryGenus("H");
 			x.setInventoryTypeGroup(13);
 		});
-		var fipSpecies1 = getTestSpecies(polygonId, Layer.PRIMARY, "B", x -> {
+		var fipSpecies1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", x -> {
 			x.setPercentGenus(1f);
 		});
-		var fipSpecies2 = getTestSpecies(polygonId, Layer.PRIMARY, "C", x -> {
+		var fipSpecies2 = getTestSpecies(polygonId, LayerType.PRIMARY, "C", x -> {
 			x.setPercentGenus(7f);
 		});
-		var fipSpecies3 = getTestSpecies(polygonId, Layer.PRIMARY, "D", x -> {
+		var fipSpecies3 = getTestSpecies(polygonId, LayerType.PRIMARY, "D", x -> {
 			x.setPercentGenus(74f);
 		});
-		var fipSpecies4 = getTestSpecies(polygonId, Layer.PRIMARY, "H", x -> {
+		var fipSpecies4 = getTestSpecies(polygonId, LayerType.PRIMARY, "H", x -> {
 			x.setPercentGenus(9f);
 		});
-		var fipSpecies5 = getTestSpecies(polygonId, Layer.PRIMARY, "S", x -> {
+		var fipSpecies5 = getTestSpecies(polygonId, LayerType.PRIMARY, "S", x -> {
 			x.setPercentGenus(9f);
 		});
 		fipPolygon.setLayers(List.of(fipLayer));
@@ -793,7 +793,7 @@ class FipStartTest {
 		assertThat(result, notNullValue());
 
 		assertThat(result, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(result, hasProperty("layer", is(Layer.PRIMARY)));
+		assertThat(result, hasProperty("layer", is(LayerType.PRIMARY)));
 
 		assertThat(result, hasProperty("ageTotal", is(55f)));
 		assertThat(result, hasProperty("height", is(35.3f)));
@@ -853,7 +853,7 @@ class FipStartTest {
 		var speciesResult = result.getSpecies().get("B");
 
 		assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(speciesResult, hasProperty("layer", is(Layer.PRIMARY)));
+		assertThat(speciesResult, hasProperty("layer", is(LayerType.PRIMARY)));
 		assertThat(speciesResult, hasProperty("genus", is("B")));
 
 		assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.00890319888f)));
@@ -900,7 +900,7 @@ class FipStartTest {
 		speciesResult = result.getSpecies().get("C");
 
 		assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(speciesResult, hasProperty("layer", is(Layer.PRIMARY)));
+		assertThat(speciesResult, hasProperty("layer", is(LayerType.PRIMARY)));
 		assertThat(speciesResult, hasProperty("genus", is("C")));
 
 		assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.114011094f)));
@@ -950,7 +950,7 @@ class FipStartTest {
 		speciesResult = result.getSpecies().get("D");
 
 		assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(speciesResult, hasProperty("layer", is(Layer.PRIMARY)));
+		assertThat(speciesResult, hasProperty("layer", is(LayerType.PRIMARY)));
 		assertThat(speciesResult, hasProperty("genus", is("D")));
 
 		assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.661987007f)));
@@ -1002,7 +1002,7 @@ class FipStartTest {
 		speciesResult = result.getSpecies().get("H");
 
 		assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(speciesResult, hasProperty("layer", is(Layer.PRIMARY)));
+		assertThat(speciesResult, hasProperty("layer", is(LayerType.PRIMARY)));
 		assertThat(speciesResult, hasProperty("genus", is("H")));
 
 		assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.123297341f)));
@@ -1045,7 +1045,7 @@ class FipStartTest {
 		speciesResult = result.getSpecies().get("S");
 
 		assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(speciesResult, hasProperty("layer", is(Layer.PRIMARY)));
+		assertThat(speciesResult, hasProperty("layer", is(LayerType.PRIMARY)));
 		assertThat(speciesResult, hasProperty("genus", is("S")));
 
 		assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.0918014571f)));
@@ -1123,12 +1123,12 @@ class FipStartTest {
 
 		var fipPolygon = getTestPolygon(polygonId, valid());
 		var fipLayer = getTestVeteranLayer(polygonId, valid());
-		var fipSpecies = getTestSpecies(polygonId, Layer.VETERAN, x -> {
+		var fipSpecies = getTestSpecies(polygonId, LayerType.VETERAN, x -> {
 			var map = new LinkedHashMap<String, Float>();
 			map.put("B", 100f);
 			x.setSpeciesPercent(map);
 		});
-		fipPolygon.setLayers(Collections.singletonMap(Layer.VETERAN, fipLayer));
+		fipPolygon.setLayers(Collections.singletonMap(LayerType.VETERAN, fipLayer));
 		fipLayer.setSpecies(Collections.singletonMap(fipSpecies.getGenus(), fipSpecies));
 
 		var controlMap = new HashMap<String, Object>();
@@ -1174,12 +1174,12 @@ class FipStartTest {
 
 		var fipPolygon = getTestPolygon(polygonId, valid());
 		var fipLayer = getTestVeteranLayer(polygonId, valid());
-		var fipSpecies = getTestSpecies(polygonId, Layer.VETERAN, x -> {
+		var fipSpecies = getTestSpecies(polygonId, LayerType.VETERAN, x -> {
 			var map = new LinkedHashMap<String, Float>();
 			map.put("B", 100f);
 			x.setSpeciesPercent(map);
 		});
-		fipPolygon.setLayers(Collections.singletonMap(Layer.VETERAN, fipLayer));
+		fipPolygon.setLayers(Collections.singletonMap(LayerType.VETERAN, fipLayer));
 		fipLayer.setSpecies(Collections.singletonMap(fipSpecies.getGenus(), fipSpecies));
 
 		var controlMap = new HashMap<String, Object>();
@@ -1222,21 +1222,21 @@ class FipStartTest {
 		var fipLayer = getTestVeteranLayer(polygonId, x -> {
 			x.setHeight(10f);
 		});
-		var fipSpecies1 = getTestSpecies(polygonId, Layer.VETERAN, "B", x -> {
+		var fipSpecies1 = getTestSpecies(polygonId, LayerType.VETERAN, "B", x -> {
 			var map = new LinkedHashMap<String, Float>();
 			map.put("S1", 75f);
 			map.put("S2", 25f);
 			x.setSpeciesPercent(map);
 			x.setPercentGenus(60f);
 		});
-		var fipSpecies2 = getTestSpecies(polygonId, Layer.VETERAN, "C", x -> {
+		var fipSpecies2 = getTestSpecies(polygonId, LayerType.VETERAN, "C", x -> {
 			var map = new LinkedHashMap<String, Float>();
 			map.put("S3", 75f);
 			map.put("S4", 25f);
 			x.setSpeciesPercent(map);
 			x.setPercentGenus(40f);
 		});
-		fipPolygon.setLayers(Collections.singletonMap(Layer.VETERAN, fipLayer));
+		fipPolygon.setLayers(Collections.singletonMap(LayerType.VETERAN, fipLayer));
 		var speciesMap = new HashMap<String, FipSpecies>();
 		speciesMap.put("B", fipSpecies1);
 		speciesMap.put("C", fipSpecies2);
@@ -1395,8 +1395,8 @@ class FipStartTest {
 
 		var fipPolygon = getTestPolygon(polygonId, valid());
 		var fipLayer = getTestVeteranLayer(polygonId, valid());
-		var fipSpecies = getTestSpecies(polygonId, Layer.VETERAN, valid());
-		fipPolygon.setLayers(Collections.singletonMap(Layer.VETERAN, fipLayer));
+		var fipSpecies = getTestSpecies(polygonId, LayerType.VETERAN, valid());
+		fipPolygon.setLayers(Collections.singletonMap(LayerType.VETERAN, fipLayer));
 		fipLayer.setSpecies(Collections.singletonMap(fipSpecies.getGenus(), fipSpecies));
 
 		var controlMap = new HashMap<String, Object>();
@@ -1428,8 +1428,8 @@ class FipStartTest {
 
 		var fipPolygon = getTestPolygon(polygonId, valid());
 		var fipLayer = getTestVeteranLayer(polygonId, valid());
-		var fipSpecies = getTestSpecies(polygonId, Layer.VETERAN, valid());
-		fipPolygon.setLayers(Collections.singletonMap(Layer.VETERAN, fipLayer));
+		var fipSpecies = getTestSpecies(polygonId, LayerType.VETERAN, valid());
+		fipPolygon.setLayers(Collections.singletonMap(LayerType.VETERAN, fipLayer));
 		fipLayer.setSpecies(Collections.singletonMap(fipSpecies.getGenus(), fipSpecies));
 
 		var controlMap = new HashMap<String, Object>();
@@ -1462,9 +1462,9 @@ class FipStartTest {
 
 		var fipPolygon = getTestPolygon(polygonId, valid());
 		var fipLayer = getTestVeteranLayer(polygonId, valid());
-		var fipSpecies = getTestSpecies(polygonId, Layer.VETERAN, s -> {
+		var fipSpecies = getTestSpecies(polygonId, LayerType.VETERAN, s -> {
 		});
-		fipPolygon.setLayers(Collections.singletonMap(Layer.VETERAN, fipLayer));
+		fipPolygon.setLayers(Collections.singletonMap(LayerType.VETERAN, fipLayer));
 		fipLayer.setSpecies(Collections.singletonMap(fipSpecies.getGenus(), fipSpecies));
 
 		var controlMap = new HashMap<String, Object>();
@@ -1503,9 +1503,9 @@ class FipStartTest {
 
 		var fipPolygon = getTestPolygon(polygonId, valid());
 		var fipLayer = getTestVeteranLayer(polygonId, valid());
-		var fipSpecies = getTestSpecies(polygonId, Layer.VETERAN, s -> {
+		var fipSpecies = getTestSpecies(polygonId, LayerType.VETERAN, s -> {
 		});
-		fipPolygon.setLayers(Collections.singletonMap(Layer.VETERAN, fipLayer));
+		fipPolygon.setLayers(Collections.singletonMap(LayerType.VETERAN, fipLayer));
 		fipLayer.setSpecies(Collections.singletonMap(fipSpecies.getGenus(), fipSpecies));
 
 		var controlMap = new HashMap<String, Object>();
@@ -1552,9 +1552,9 @@ class FipStartTest {
 
 		var fipPolygon = getTestPolygon(polygonId, valid());
 		var fipLayer = getTestVeteranLayer(polygonId, valid());
-		var fipSpecies = getTestSpecies(polygonId, Layer.VETERAN, s -> {
+		var fipSpecies = getTestSpecies(polygonId, LayerType.VETERAN, s -> {
 		});
-		fipPolygon.setLayers(Collections.singletonMap(Layer.VETERAN, fipLayer));
+		fipPolygon.setLayers(Collections.singletonMap(LayerType.VETERAN, fipLayer));
 		fipLayer.setSpecies(Collections.singletonMap(fipSpecies.getGenus(), fipSpecies));
 
 		var controlMap = new HashMap<String, Object>();
@@ -1639,22 +1639,22 @@ class FipStartTest {
 			x.setSiteSpecies("H");
 			x.setYearsToBreastHeight(7.1f);
 		});
-		var fipSpecies1 = getTestSpecies(polygonId, Layer.VETERAN, "B", x -> {
+		var fipSpecies1 = getTestSpecies(polygonId, LayerType.VETERAN, "B", x -> {
 			var map = new LinkedHashMap<String, Float>();
 			x.setSpeciesPercent(map);
 			x.setPercentGenus(22f);
 		});
-		var fipSpecies2 = getTestSpecies(polygonId, Layer.VETERAN, "H", x -> {
+		var fipSpecies2 = getTestSpecies(polygonId, LayerType.VETERAN, "H", x -> {
 			var map = new LinkedHashMap<String, Float>();
 			x.setSpeciesPercent(map);
 			x.setPercentGenus(60f);
 		});
-		var fipSpecies3 = getTestSpecies(polygonId, Layer.VETERAN, "S", x -> {
+		var fipSpecies3 = getTestSpecies(polygonId, LayerType.VETERAN, "S", x -> {
 			var map = new LinkedHashMap<String, Float>();
 			x.setSpeciesPercent(map);
 			x.setPercentGenus(18f);
 		});
-		fipPolygon.setLayers(Collections.singletonMap(Layer.VETERAN, fipLayer));
+		fipPolygon.setLayers(Collections.singletonMap(LayerType.VETERAN, fipLayer));
 		var speciesMap = new HashMap<String, FipSpecies>();
 		speciesMap.put("B", fipSpecies1);
 		speciesMap.put("H", fipSpecies2);
@@ -1669,7 +1669,7 @@ class FipStartTest {
 		var result = app.processLayerAsVeteran(fipPolygon, fipLayer);
 
 		assertThat(result, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(result, hasProperty("layer", is(Layer.VETERAN)));
+		assertThat(result, hasProperty("layer", is(LayerType.VETERAN)));
 
 		assertThat(result, hasProperty("ageTotal", closeTo(105f))); // LVCOM3/AGETOTLV
 		assertThat(result, hasProperty("breastHeightAge", closeTo(97.9000015f))); // LVCOM3/AGEBHLV
@@ -1758,7 +1758,7 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		var spec = this.getTestSpecies("test polygon", Layer.PRIMARY, "B", valid());
+		var spec = this.getTestSpecies("test polygon", LayerType.PRIMARY, "B", valid());
 
 		Map<String, FipSpecies> allSpecies = Collections.singletonMap("B", spec);
 		var result = app.findPrimarySpecies(allSpecies);
@@ -1773,10 +1773,10 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		var spec1 = this.getTestSpecies("test polygon", Layer.PRIMARY, "PA", spec -> {
+		var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "PA", spec -> {
 			spec.setPercentGenus(25);
 		});
-		var spec2 = this.getTestSpecies("test polygon", Layer.PRIMARY, "PL", spec -> {
+		var spec2 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "PL", spec -> {
 			spec.setPercentGenus(75);
 		});
 
@@ -1796,10 +1796,10 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		var spec1 = this.getTestSpecies("test polygon", Layer.PRIMARY, "PA", spec -> {
+		var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "PA", spec -> {
 			spec.setPercentGenus(75);
 		});
-		var spec2 = this.getTestSpecies("test polygon", Layer.PRIMARY, "PL", spec -> {
+		var spec2 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "PL", spec -> {
 			spec.setPercentGenus(25);
 		});
 
@@ -1819,10 +1819,10 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		var spec1 = this.getTestSpecies("test polygon", Layer.PRIMARY, "C", spec -> {
+		var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "C", spec -> {
 			spec.setPercentGenus(25);
 		});
-		var spec2 = this.getTestSpecies("test polygon", Layer.PRIMARY, "Y", spec -> {
+		var spec2 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "Y", spec -> {
 			spec.setPercentGenus(75);
 		});
 
@@ -1842,10 +1842,10 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		var spec1 = this.getTestSpecies("test polygon", Layer.PRIMARY, "C", spec -> {
+		var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "C", spec -> {
 			spec.setPercentGenus(75);
 		});
-		var spec2 = this.getTestSpecies("test polygon", Layer.PRIMARY, "Y", spec -> {
+		var spec2 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "Y", spec -> {
 			spec.setPercentGenus(25);
 		});
 
@@ -1865,13 +1865,13 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		var spec1 = this.getTestSpecies("test polygon", Layer.PRIMARY, "B", spec -> {
+		var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "B", spec -> {
 			spec.setPercentGenus(20);
 		});
-		var spec2 = this.getTestSpecies("test polygon", Layer.PRIMARY, "H", spec -> {
+		var spec2 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "H", spec -> {
 			spec.setPercentGenus(70);
 		});
-		var spec3 = this.getTestSpecies("test polygon", Layer.PRIMARY, "MB", spec -> {
+		var spec3 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "MB", spec -> {
 			spec.setPercentGenus(10);
 		});
 
@@ -1897,10 +1897,10 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		var spec1 = this.getTestSpecies("test polygon", Layer.PRIMARY, "F", spec -> {
+		var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "F", spec -> {
 			spec.setPercentGenus(80);
 		});
-		var spec2 = this.getTestSpecies("test polygon", Layer.PRIMARY, "C", spec -> {
+		var spec2 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "C", spec -> {
 			spec.setPercentGenus(20);
 		});
 
@@ -1917,7 +1917,7 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		var spec1 = this.getTestSpecies("test polygon", Layer.PRIMARY, "F", spec -> {
+		var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "F", spec -> {
 			spec.setPercentGenus(100);
 		});
 
@@ -1929,10 +1929,10 @@ class FipStartTest {
 	}
 
 	List<FipSpecies> primarySecondarySpecies(String primary, String secondary) {
-		var spec1 = this.getTestSpecies("test polygon", Layer.PRIMARY, primary, spec -> {
+		var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, primary, spec -> {
 			spec.setPercentGenus(70);
 		});
-		var spec2 = this.getTestSpecies("test polygon", Layer.PRIMARY, secondary, spec -> {
+		var spec2 = this.getTestSpecies("test polygon", LayerType.PRIMARY, secondary, spec -> {
 			spec.setPercentGenus(20);
 		});
 
@@ -2039,7 +2039,7 @@ class FipStartTest {
 		var becLookup = BecDefinitionParser.getBecs(controlMap);
 		var bec = becLookup.get("ESSF").get();
 
-		var spec1 = this.getTestSpecies("test polygon", Layer.PRIMARY, "F", valid());
+		var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "F", valid());
 
 		var result = app.findBaseAreaGroup(spec1, bec, 3);
 
@@ -2055,7 +2055,7 @@ class FipStartTest {
 		var becLookup = BecDefinitionParser.getBecs(controlMap);
 		var bec = becLookup.get("PP").get();
 
-		var spec1 = this.getTestSpecies("test polygon", Layer.PRIMARY, "F", valid());
+		var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "F", valid());
 
 		var result = app.findBaseAreaGroup(spec1, bec, 2);
 
@@ -2082,11 +2082,11 @@ class FipStartTest {
 			l.setSiteSpecies("H");
 		});
 
-		var spec1 = this.getTestSpecies("test polygon", Layer.PRIMARY, "B", s -> {
+		var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "B", s -> {
 			s.setPercentGenus(33f);
 			s.setFractionGenus(0.330000013f);
 		});
-		var spec2 = this.getTestSpecies("test polygon", Layer.PRIMARY, "H", s -> {
+		var spec2 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "H", s -> {
 			s.setPercentGenus(67f);
 			s.setFractionGenus(0.670000017f);
 		});
@@ -2122,11 +2122,11 @@ class FipStartTest {
 			l.setSiteSpecies("H");
 		});
 
-		var spec1 = this.getTestSpecies("test polygon", Layer.PRIMARY, "B", s -> {
+		var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "B", s -> {
 			s.setPercentGenus(33f);
 			s.setFractionGenus(0.330000013f);
 		});
-		var spec2 = this.getTestSpecies("test polygon", Layer.PRIMARY, "H", s -> {
+		var spec2 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "H", s -> {
 			s.setPercentGenus(67f);
 			s.setFractionGenus(0.670000017f);
 		});
@@ -2162,11 +2162,11 @@ class FipStartTest {
 			l.setSiteSpecies("H");
 		});
 
-		var spec1 = this.getTestSpecies("test polygon", Layer.PRIMARY, "B", s -> {
+		var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "B", s -> {
 			s.setPercentGenus(33f);
 			s.setFractionGenus(0.330000013f);
 		});
-		var spec2 = this.getTestSpecies("test polygon", Layer.PRIMARY, "H", s -> {
+		var spec2 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "H", s -> {
 			s.setPercentGenus(67f);
 			s.setFractionGenus(0.670000017f);
 		});
@@ -2202,11 +2202,11 @@ class FipStartTest {
 			l.setSiteSpecies("H");
 		});
 
-		var spec1 = this.getTestSpecies("test polygon", Layer.PRIMARY, "B", s -> {
+		var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "B", s -> {
 			s.setPercentGenus(33f);
 			s.setFractionGenus(0.330000013f);
 		});
-		var spec2 = this.getTestSpecies("test polygon", Layer.PRIMARY, "H", s -> {
+		var spec2 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "H", s -> {
 			s.setPercentGenus(67f);
 			s.setFractionGenus(0.670000017f);
 		});
@@ -2245,11 +2245,11 @@ class FipStartTest {
 			l.setSiteSpecies("H");
 		});
 
-		var spec1 = this.getTestSpecies("test polygon", Layer.PRIMARY, "B", s -> {
+		var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "B", s -> {
 			s.setPercentGenus(33f);
 			s.setFractionGenus(0.330000013f);
 		});
-		var spec2 = this.getTestSpecies("test polygon", Layer.PRIMARY, "H", s -> {
+		var spec2 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "H", s -> {
 			s.setPercentGenus(67f);
 			s.setFractionGenus(0.670000017f);
 		});
@@ -2285,11 +2285,11 @@ class FipStartTest {
 			l.setSiteSpecies("H");
 		});
 
-		var spec1 = this.getTestSpecies("test polygon", Layer.PRIMARY, "B", s -> {
+		var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "B", s -> {
 			s.setPercentGenus(33f);
 			s.setFractionGenus(0.330000013f);
 		});
-		var spec2 = this.getTestSpecies("test polygon", Layer.PRIMARY, "H", s -> {
+		var spec2 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "H", s -> {
 			s.setPercentGenus(67f);
 			s.setFractionGenus(0.670000017f);
 		});
@@ -2326,11 +2326,11 @@ class FipStartTest {
 			l.setSiteSpecies("H");
 		});
 
-		var spec1 = this.getTestSpecies("test polygon", Layer.PRIMARY, "B", s -> {
+		var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "B", s -> {
 			s.setPercentGenus(33f);
 			s.setFractionGenus(0.330000013f);
 		});
-		var spec2 = this.getTestSpecies("test polygon", Layer.PRIMARY, "H", s -> {
+		var spec2 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "H", s -> {
 			s.setPercentGenus(67f);
 			s.setFractionGenus(0.670000017f);
 		});
@@ -2356,8 +2356,8 @@ class FipStartTest {
 		var becLookup = BecDefinitionParser.getBecs(controlMap);
 		var bec = becLookup.get("CWH").get();
 
-		var spec = new VdypSpecies("Test", Layer.PRIMARY, "B");
-		var specPrime = new VdypSpecies("Test", Layer.PRIMARY, "H");
+		var spec = new VdypSpecies("Test", LayerType.PRIMARY, "B");
+		var specPrime = new VdypSpecies("Test", LayerType.PRIMARY, "H");
 
 		var result = app.estimateNonPrimaryLoreyHeight(spec, specPrime, bec, 24.2999992f, 20.5984688f);
 
@@ -2373,8 +2373,8 @@ class FipStartTest {
 		var becLookup = BecDefinitionParser.getBecs(controlMap);
 		var bec = becLookup.get("ESSF").get();
 
-		var spec = new VdypSpecies("Test", Layer.PRIMARY, "B");
-		var specPrime = new VdypSpecies("Test", Layer.PRIMARY, "D");
+		var spec = new VdypSpecies("Test", LayerType.PRIMARY, "B");
+		var specPrime = new VdypSpecies("Test", LayerType.PRIMARY, "D");
 
 		var result = app.estimateNonPrimaryLoreyHeight(spec, specPrime, bec, 35.2999992f, 33.6889763f);
 
@@ -2397,12 +2397,12 @@ class FipStartTest {
 		var becLookup = BecDefinitionParser.getBecs(controlMap);
 		var bec = becLookup.get("CWH").get();
 
-		var spec = new VdypSpecies("Test", Layer.PRIMARY, "Y");
+		var spec = new VdypSpecies("Test", LayerType.PRIMARY, "Y");
 		spec.setVolumeGroup(74);
 		spec.setDecayGroup(63);
 		spec.setBreakageGroup(31);
 		spec.getLoreyHeightByUtilization().setCoe(0, 19.9850883f);
-		var layer = new VdypLayer("Test", Layer.PRIMARY);
+		var layer = new VdypLayer("Test", LayerType.PRIMARY);
 		layer.getBaseAreaByUtilization().setCoe(0, 76.5122147f);
 		layer.getTreesPerHectareByUtilization().setCoe(0, 845.805969f);
 		layer.getQuadraticMeanDiameterByUtilization().setCoe(0, 33.9379082f);
@@ -2478,31 +2478,31 @@ class FipStartTest {
 		 */
 		// sp 3, 4, 5, 8, 15
 		// sp B, C, D, H, S
-		var spec1 = new VdypSpecies("Test", Layer.PRIMARY, "B");
+		var spec1 = new VdypSpecies("Test", LayerType.PRIMARY, "B");
 		spec1.setVolumeGroup(12);
 		spec1.setDecayGroup(7);
 		spec1.setBreakageGroup(5);
 		spec1.getLoreyHeightByUtilization().setCoe(0, 38.7456512f);
 		spec1.setPercentGenus(1f);
-		var spec2 = new VdypSpecies("Test", Layer.PRIMARY, "C");
+		var spec2 = new VdypSpecies("Test", LayerType.PRIMARY, "C");
 		spec2.setVolumeGroup(20);
 		spec2.setDecayGroup(14);
 		spec2.setBreakageGroup(6);
 		spec2.getLoreyHeightByUtilization().setCoe(0, 22.8001652f);
 		spec2.setPercentGenus(7f);
-		var spec3 = new VdypSpecies("Test", Layer.PRIMARY, "D");
+		var spec3 = new VdypSpecies("Test", LayerType.PRIMARY, "D");
 		spec3.setVolumeGroup(25);
 		spec3.setDecayGroup(19);
 		spec3.setBreakageGroup(12);
 		spec3.getLoreyHeightByUtilization().setCoe(0, 33.6889763f);
 		spec3.setPercentGenus(74f);
-		var spec4 = new VdypSpecies("Test", Layer.PRIMARY, "H");
+		var spec4 = new VdypSpecies("Test", LayerType.PRIMARY, "H");
 		spec4.setVolumeGroup(37);
 		spec4.setDecayGroup(31);
 		spec4.setBreakageGroup(17);
 		spec4.getLoreyHeightByUtilization().setCoe(0, 24.3451157f);
 		spec4.setPercentGenus(9f);
-		var spec5 = new VdypSpecies("Test", Layer.PRIMARY, "S");
+		var spec5 = new VdypSpecies("Test", LayerType.PRIMARY, "S");
 		spec5.setVolumeGroup(66);
 		spec5.setDecayGroup(54);
 		spec5.setBreakageGroup(28);
@@ -2516,7 +2516,7 @@ class FipStartTest {
 		specs.add(spec4);
 		specs.add(spec5);
 
-		var layer = new VdypLayer("Test", Layer.PRIMARY);
+		var layer = new VdypLayer("Test", LayerType.PRIMARY);
 		layer.getBaseAreaByUtilization().setCoe(0, 44.6249847f);
 		layer.getTreesPerHectareByUtilization().setCoe(0, 620.504883f);
 		layer.getQuadraticMeanDiameterByUtilization().setCoe(0, 30.2601795f);
@@ -2729,35 +2729,35 @@ class FipStartTest {
 
 		// sp 3, 4, 5, 8, 15
 		// sp B, C, D, H, S
-		var spec1 = new VdypSpecies("Test", Layer.PRIMARY, "B");
+		var spec1 = new VdypSpecies("Test", LayerType.PRIMARY, "B");
 		spec1.setVolumeGroup(12);
 		spec1.setDecayGroup(7);
 		spec1.setBreakageGroup(5);
 		spec1.getLoreyHeightByUtilization().setCoe(0, 38.7456512f);
 		spec1.setPercentGenus(1f);
 		spec1.setFractionGenus(0.00817133673f);
-		var spec2 = new VdypSpecies("Test", Layer.PRIMARY, "C");
+		var spec2 = new VdypSpecies("Test", LayerType.PRIMARY, "C");
 		spec2.setVolumeGroup(20);
 		spec2.setDecayGroup(14);
 		spec2.setBreakageGroup(6);
 		spec2.getLoreyHeightByUtilization().setCoe(0, 22.8001652f);
 		spec2.setPercentGenus(7f);
 		spec2.setFractionGenus(0.0972022042f);
-		var spec3 = new VdypSpecies("Test", Layer.PRIMARY, "D");
+		var spec3 = new VdypSpecies("Test", LayerType.PRIMARY, "D");
 		spec3.setVolumeGroup(25);
 		spec3.setDecayGroup(19);
 		spec3.setBreakageGroup(12);
 		spec3.getLoreyHeightByUtilization().setCoe(0, 33.6889763f);
 		spec3.setPercentGenus(74f);
 		spec3.setFractionGenus(0.695440531f);
-		var spec4 = new VdypSpecies("Test", Layer.PRIMARY, "H");
+		var spec4 = new VdypSpecies("Test", LayerType.PRIMARY, "H");
 		spec4.setVolumeGroup(37);
 		spec4.setDecayGroup(31);
 		spec4.setBreakageGroup(17);
 		spec4.getLoreyHeightByUtilization().setCoe(0, 24.3451157f);
 		spec4.setPercentGenus(9f);
 		spec4.setFractionGenus(0.117043354f);
-		var spec5 = new VdypSpecies("Test", Layer.PRIMARY, "S");
+		var spec5 = new VdypSpecies("Test", LayerType.PRIMARY, "S");
 		spec5.setVolumeGroup(66);
 		spec5.setDecayGroup(54);
 		spec5.setBreakageGroup(28);
@@ -2786,7 +2786,7 @@ class FipStartTest {
 		app.setControlMap(controlMap);
 
 		FipPolygon fPoly = new FipPolygon("Test", "A", "CWH", Optional.empty(), Optional.empty(), Optional.empty(), 0);
-		VdypLayer layer = new VdypLayer("Test", Layer.PRIMARY);
+		VdypLayer layer = new VdypLayer("Test", LayerType.PRIMARY);
 
 		layer.setBreastHeightAge(54f);
 
@@ -2796,31 +2796,31 @@ class FipStartTest {
 		layer.getQuadraticMeanDiameterByUtilization().setCoe(FipStart.UTIL_ALL, 30.2606697f);
 		layer.getWholeStemVolumeByUtilization().setCoe(FipStart.UTIL_ALL, 635.659668f);
 
-		var spec1 = new VdypSpecies("Test", Layer.PRIMARY, "B");
+		var spec1 = new VdypSpecies("Test", LayerType.PRIMARY, "B");
 		spec1.getLoreyHeightByUtilization().setCoe(FipStart.UTIL_ALL, 38.6004372f);
 		spec1.getBaseAreaByUtilization().setCoe(FipStart.UTIL_ALL, 0.397305071f);
 		spec1.getTreesPerHectareByUtilization().setCoe(FipStart.UTIL_ALL, 5.04602766f);
 		spec1.getQuadraticMeanDiameterByUtilization().setCoe(FipStart.UTIL_ALL, 31.6622887f);
 		spec1.getWholeStemVolumeByUtilization().setCoe(FipStart.UTIL_ALL, 635.659668f);
-		var spec2 = new VdypSpecies("Test", Layer.PRIMARY, "C");
+		var spec2 = new VdypSpecies("Test", LayerType.PRIMARY, "C");
 		spec2.getLoreyHeightByUtilization().setCoe(FipStart.UTIL_ALL, 22.8001652f);
 		spec2.getBaseAreaByUtilization().setCoe(FipStart.UTIL_ALL, 5.08774281f);
 		spec2.getTreesPerHectareByUtilization().setCoe(FipStart.UTIL_ALL, 92.4298019f);
 		spec2.getQuadraticMeanDiameterByUtilization().setCoe(FipStart.UTIL_ALL, 26.4735165f);
 		spec2.getWholeStemVolumeByUtilization().setCoe(FipStart.UTIL_ALL, 6.35662031f);
-		var spec3 = new VdypSpecies("Test", Layer.PRIMARY, "D");
+		var spec3 = new VdypSpecies("Test", LayerType.PRIMARY, "D");
 		spec3.getLoreyHeightByUtilization().setCoe(FipStart.UTIL_ALL, 33.5375252f);
 		spec3.getBaseAreaByUtilization().setCoe(FipStart.UTIL_ALL, 29.5411568f);
 		spec3.getTreesPerHectareByUtilization().setCoe(FipStart.UTIL_ALL, 326.800781f);
 		spec3.getQuadraticMeanDiameterByUtilization().setCoe(FipStart.UTIL_ALL, 33.9255791f);
 		spec3.getWholeStemVolumeByUtilization().setCoe(FipStart.UTIL_ALL, 44.496151f);
-		var spec4 = new VdypSpecies("Test", Layer.PRIMARY, "H");
+		var spec4 = new VdypSpecies("Test", LayerType.PRIMARY, "H");
 		spec4.getLoreyHeightByUtilization().setCoe(FipStart.UTIL_ALL, 24.3451157f);
 		spec4.getBaseAreaByUtilization().setCoe(FipStart.UTIL_ALL, 5.50214148f);
 		spec4.getTreesPerHectareByUtilization().setCoe(FipStart.UTIL_ALL, 152.482513f);
 		spec4.getQuadraticMeanDiameterByUtilization().setCoe(FipStart.UTIL_ALL, 21.4343796f);
 		spec4.getWholeStemVolumeByUtilization().setCoe(FipStart.UTIL_ALL, 470.388489f);
-		var spec5 = new VdypSpecies("Test", Layer.PRIMARY, "S");
+		var spec5 = new VdypSpecies("Test", LayerType.PRIMARY, "S");
 		spec5.getLoreyHeightByUtilization().setCoe(FipStart.UTIL_ALL, 34.6888771f);
 		spec5.getBaseAreaByUtilization().setCoe(FipStart.UTIL_ALL, 4.0966382f);
 		spec5.getTreesPerHectareByUtilization().setCoe(FipStart.UTIL_ALL, 43.7256737f);
@@ -2878,7 +2878,7 @@ class FipStartTest {
 
 		var bec = BecDefinitionParser.getBecs(controlMap).get("CWH").get();
 
-		var spec1 = new VdypSpecies("Test", Layer.PRIMARY, "B");
+		var spec1 = new VdypSpecies("Test", LayerType.PRIMARY, "B");
 
 		app.estimateQuadMeanDiameterByUtilization(bec, coe, spec1);
 
@@ -2896,7 +2896,7 @@ class FipStartTest {
 
 		var bec = BecDefinitionParser.getBecs(controlMap).get("MH").get();
 
-		var spec1 = new VdypSpecies("Test", Layer.PRIMARY, "L");
+		var spec1 = new VdypSpecies("Test", LayerType.PRIMARY, "L");
 
 		app.estimateQuadMeanDiameterByUtilization(bec, coe, spec1);
 
@@ -2921,7 +2921,7 @@ class FipStartTest {
 
 		var bec = BecDefinitionParser.getBecs(controlMap).get("CWH").get();
 
-		var spec1 = new VdypSpecies("Test", Layer.PRIMARY, "B");
+		var spec1 = new VdypSpecies("Test", LayerType.PRIMARY, "B");
 
 		app.estimateBaseAreaByUtilization(bec, dq, ba, spec1);
 
@@ -3075,7 +3075,7 @@ class FipStartTest {
 
 		var bec = BecDefinitionParser.getBecs(controlMap).get("IDF").get();
 
-		var layer = new VdypLayer("Test", Layer.PRIMARY);
+		var layer = new VdypLayer("Test", LayerType.PRIMARY);
 
 		layer.setBreastHeightAge(51.5f);
 
@@ -3091,7 +3091,7 @@ class FipStartTest {
 		layer.getQuadraticMeanDiameterByUtilization().setCoe(FipStart.UTIL_SMALL, 6.26608753f);
 		layer.getWholeStemVolumeByUtilization().setCoe(FipStart.UTIL_SMALL, 0.107688069f);
 
-		var spec1 = new VdypSpecies("Test", Layer.PRIMARY, "L");
+		var spec1 = new VdypSpecies("Test", LayerType.PRIMARY, "L");
 		spec1.getLoreyHeightByUtilization().setCoe(FipStart.UTIL_ALL, 14.2597857f);
 		spec1.getBaseAreaByUtilization().setCoe(FipStart.UTIL_ALL, 2.20898318f);
 		spec1.getTreesPerHectareByUtilization().setCoe(FipStart.UTIL_ALL, 154.454025f);
@@ -3110,7 +3110,7 @@ class FipStartTest {
 		spec1.getQuadraticMeanDiameterByUtilization().setCoe(FipStart.UTIL_SMALL, 6.60561657f);
 		spec1.getWholeStemVolumeByUtilization().setCoe(FipStart.UTIL_SMALL, 0.0411359742f);
 
-		var spec2 = new VdypSpecies("Test", Layer.PRIMARY, "PL");
+		var spec2 = new VdypSpecies("Test", LayerType.PRIMARY, "PL");
 		spec2.getLoreyHeightByUtilization().setCoe(FipStart.UTIL_ALL, 12.9176102f);
 		spec2.getBaseAreaByUtilization().setCoe(FipStart.UTIL_ALL, 17.7696857f);
 		spec2.getTreesPerHectareByUtilization().setCoe(FipStart.UTIL_ALL, 1331.36682f);
@@ -3260,32 +3260,32 @@ class FipStartTest {
 				1f // FIP_P4/YLDFACT
 		);
 
-		// var fipVeteranLayer = new FipLayer("Test", Layer.VETERAN);
+		// var fipVeteranLayer = new FipLayer("Test", LayerType.VETERAN);
 		var fipPrimaryLayer = new FipLayerPrimary("Test");
 
-		// fipPolygon.getLayers().put(Layer.VETERAN, fipVeteranLayer);
+		// fipPolygon.getLayers().put(LayerType.VETERAN, fipVeteranLayer);
 		fipPolygon.setLayers(new HashMap<>());
-		fipPolygon.getLayers().put(Layer.PRIMARY, fipPrimaryLayer);
+		fipPolygon.getLayers().put(LayerType.PRIMARY, fipPrimaryLayer);
 
-		var processedLayers = new HashMap<Layer, VdypLayer>();
-		processedLayers.put(Layer.PRIMARY, new VdypLayer("Test", Layer.PRIMARY));
+		var processedLayers = new HashMap<LayerType, VdypLayer>();
+		processedLayers.put(LayerType.PRIMARY, new VdypLayer("Test", LayerType.PRIMARY));
 
 		fipPrimaryLayer.setAgeTotal(60f);
 		fipPrimaryLayer.setHeight(15f);
 		fipPrimaryLayer.setCrownClosure(60f);
 		fipPrimaryLayer.setYearsToBreastHeight(8.5f);
 
-		var spec1 = new FipSpecies("Test", Layer.PRIMARY, "L");
+		var spec1 = new FipSpecies("Test", LayerType.PRIMARY, "L");
 		spec1.setFractionGenus(0.1f);
-		var spec2 = new FipSpecies("Test", Layer.PRIMARY, "PL");
+		var spec2 = new FipSpecies("Test", LayerType.PRIMARY, "PL");
 		spec2.setFractionGenus(0.9f);
 		fipPrimaryLayer.getSpecies().put("L", spec1);
 		fipPrimaryLayer.getSpecies().put("PL", spec2);
 
-		processedLayers.get(Layer.PRIMARY).setAgeTotal(60f);
-		processedLayers.get(Layer.PRIMARY).setHeight(15f);
-		// processedLayers.get(Layer.PRIMARY).setCrownClosure(60f);
-		processedLayers.get(Layer.PRIMARY).setYearsToBreastHeight(8.5f);
+		processedLayers.get(LayerType.PRIMARY).setAgeTotal(60f);
+		processedLayers.get(LayerType.PRIMARY).setHeight(15f);
+		// processedLayers.get(LayerType.PRIMARY).setCrownClosure(60f);
+		processedLayers.get(LayerType.PRIMARY).setYearsToBreastHeight(8.5f);
 
 		var vdypPolygon = app.createVdypPolygon(fipPolygon, processedLayers);
 
@@ -3310,32 +3310,32 @@ class FipStartTest {
 				1f // FIP_P4/YLDFACT
 		);
 
-		// var fipVeteranLayer = new FipLayer("Test", Layer.VETERAN);
+		// var fipVeteranLayer = new FipLayer("Test", LayerType.VETERAN);
 		var fipPrimaryLayer = new FipLayerPrimary("Test");
 
-		// fipPolygon.getLayers().put(Layer.VETERAN, fipVeteranLayer);
+		// fipPolygon.getLayers().put(LayerType.VETERAN, fipVeteranLayer);
 		fipPolygon.setLayers(new HashMap<>());
-		fipPolygon.getLayers().put(Layer.PRIMARY, fipPrimaryLayer);
+		fipPolygon.getLayers().put(LayerType.PRIMARY, fipPrimaryLayer);
 
-		var processedLayers = new HashMap<Layer, VdypLayer>();
-		processedLayers.put(Layer.PRIMARY, new VdypLayer("Test", Layer.PRIMARY));
+		var processedLayers = new HashMap<LayerType, VdypLayer>();
+		processedLayers.put(LayerType.PRIMARY, new VdypLayer("Test", LayerType.PRIMARY));
 
 		fipPrimaryLayer.setAgeTotal(60f);
 		fipPrimaryLayer.setHeight(15f);
 		fipPrimaryLayer.setCrownClosure(60f);
 		fipPrimaryLayer.setYearsToBreastHeight(8.5f);
 
-		var spec1 = new FipSpecies("Test", Layer.PRIMARY, "L");
+		var spec1 = new FipSpecies("Test", LayerType.PRIMARY, "L");
 		spec1.setFractionGenus(0.1f);
-		var spec2 = new FipSpecies("Test", Layer.PRIMARY, "PL");
+		var spec2 = new FipSpecies("Test", LayerType.PRIMARY, "PL");
 		spec2.setFractionGenus(0.9f);
 		fipPrimaryLayer.getSpecies().put("L", spec1);
 		fipPrimaryLayer.getSpecies().put("PL", spec2);
 
-		processedLayers.get(Layer.PRIMARY).setAgeTotal(60f);
-		processedLayers.get(Layer.PRIMARY).setHeight(15f);
-		// processedLayers.get(Layer.PRIMARY).setCrownClosure(60f);
-		processedLayers.get(Layer.PRIMARY).setYearsToBreastHeight(8.5f);
+		processedLayers.get(LayerType.PRIMARY).setAgeTotal(60f);
+		processedLayers.get(LayerType.PRIMARY).setHeight(15f);
+		// processedLayers.get(LayerType.PRIMARY).setCrownClosure(60f);
+		processedLayers.get(LayerType.PRIMARY).setYearsToBreastHeight(8.5f);
 
 		var vdypPolygon = app.createVdypPolygon(fipPolygon, processedLayers);
 
@@ -3360,32 +3360,32 @@ class FipStartTest {
 				1f // FIP_P4/YLDFACT
 		);
 
-		// var fipVeteranLayer = new FipLayer("Test", Layer.VETERAN);
+		// var fipVeteranLayer = new FipLayer("Test", LayerType.VETERAN);
 		var fipPrimaryLayer = new FipLayerPrimary("Test");
 
-		// fipPolygon.getLayers().put(Layer.VETERAN, fipVeteranLayer);
+		// fipPolygon.getLayers().put(LayerType.VETERAN, fipVeteranLayer);
 		fipPolygon.setLayers(new HashMap<>());
-		fipPolygon.getLayers().put(Layer.PRIMARY, fipPrimaryLayer);
+		fipPolygon.getLayers().put(LayerType.PRIMARY, fipPrimaryLayer);
 
-		var processedLayers = new HashMap<Layer, VdypLayer>();
-		processedLayers.put(Layer.PRIMARY, new VdypLayer("Test", Layer.PRIMARY));
+		var processedLayers = new HashMap<LayerType, VdypLayer>();
+		processedLayers.put(LayerType.PRIMARY, new VdypLayer("Test", LayerType.PRIMARY));
 
 		fipPrimaryLayer.setAgeTotal(60f);
 		fipPrimaryLayer.setHeight(15f);
 		fipPrimaryLayer.setCrownClosure(60f);
 		fipPrimaryLayer.setYearsToBreastHeight(8.5f);
 
-		var spec1 = new FipSpecies("Test", Layer.PRIMARY, "L");
+		var spec1 = new FipSpecies("Test", LayerType.PRIMARY, "L");
 		spec1.setFractionGenus(0.1f);
-		var spec2 = new FipSpecies("Test", Layer.PRIMARY, "PL");
+		var spec2 = new FipSpecies("Test", LayerType.PRIMARY, "PL");
 		spec2.setFractionGenus(0.9f);
 		fipPrimaryLayer.getSpecies().put("L", spec1);
 		fipPrimaryLayer.getSpecies().put("PL", spec2);
 
-		processedLayers.get(Layer.PRIMARY).setAgeTotal(60f);
-		processedLayers.get(Layer.PRIMARY).setHeight(15f);
-		// processedLayers.get(Layer.PRIMARY).setCrownClosure(60f);
-		processedLayers.get(Layer.PRIMARY).setYearsToBreastHeight(8.5f);
+		processedLayers.get(LayerType.PRIMARY).setAgeTotal(60f);
+		processedLayers.get(LayerType.PRIMARY).setHeight(15f);
+		// processedLayers.get(LayerType.PRIMARY).setCrownClosure(60f);
+		processedLayers.get(LayerType.PRIMARY).setYearsToBreastHeight(8.5f);
 
 		var vdypPolygon = app.createVdypPolygon(fipPolygon, processedLayers);
 
@@ -3407,15 +3407,15 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		// var fipVeteranLayer = new FipLayer("Test", Layer.VETERAN);
+		// var fipVeteranLayer = new FipLayer("Test", LayerType.VETERAN);
 		var fipPrimaryLayer = new FipLayerPrimary("Test");
 
-		var processedLayers = new HashMap<Layer, VdypLayer>();
-		processedLayers.put(Layer.PRIMARY, new VdypLayer("Test", Layer.PRIMARY));
+		var processedLayers = new HashMap<LayerType, VdypLayer>();
+		processedLayers.put(LayerType.PRIMARY, new VdypLayer("Test", LayerType.PRIMARY));
 
 		fipPrimaryLayer.setStockingClass(Optional.of('R'));
 
-		var vdypLayer = new VdypLayer("Test", Layer.PRIMARY);
+		var vdypLayer = new VdypLayer("Test", LayerType.PRIMARY);
 
 		vdypLayer.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 		vdypLayer.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
@@ -3432,7 +3432,7 @@ class FipStartTest {
 				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
-		var spec1 = new VdypSpecies("Test", Layer.PRIMARY, "L");
+		var spec1 = new VdypSpecies("Test", LayerType.PRIMARY, "L");
 
 		spec1.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 		spec1.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
@@ -3446,7 +3446,7 @@ class FipStartTest {
 				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
-		var spec2 = new VdypSpecies("Test", Layer.PRIMARY, "PL");
+		var spec2 = new VdypSpecies("Test", LayerType.PRIMARY, "PL");
 
 		spec2.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 		spec2.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
@@ -3508,15 +3508,15 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		// var fipVeteranLayer = new FipLayer("Test", Layer.VETERAN);
+		// var fipVeteranLayer = new FipLayer("Test", LayerType.VETERAN);
 		var fipPrimaryLayer = new FipLayerPrimary("Test");
 
-		var processedLayers = new HashMap<Layer, VdypLayer>();
-		processedLayers.put(Layer.PRIMARY, new VdypLayer("Test", Layer.PRIMARY));
+		var processedLayers = new HashMap<LayerType, VdypLayer>();
+		processedLayers.put(LayerType.PRIMARY, new VdypLayer("Test", LayerType.PRIMARY));
 
 		fipPrimaryLayer.setStockingClass(Optional.empty());
 
-		var vdypLayer = new VdypLayer("Test", Layer.PRIMARY);
+		var vdypLayer = new VdypLayer("Test", LayerType.PRIMARY);
 
 		vdypLayer.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 		vdypLayer.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
@@ -3533,7 +3533,7 @@ class FipStartTest {
 				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
-		var spec1 = new VdypSpecies("Test", Layer.PRIMARY, "L");
+		var spec1 = new VdypSpecies("Test", LayerType.PRIMARY, "L");
 
 		spec1.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 		spec1.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
@@ -3547,7 +3547,7 @@ class FipStartTest {
 				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
-		var spec2 = new VdypSpecies("Test", Layer.PRIMARY, "PL");
+		var spec2 = new VdypSpecies("Test", LayerType.PRIMARY, "PL");
 
 		spec2.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 		spec2.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
@@ -3620,15 +3620,15 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		// var fipVeteranLayer = new FipLayer("Test", Layer.VETERAN);
+		// var fipVeteranLayer = new FipLayer("Test", LayerType.VETERAN);
 		var fipPrimaryLayer = new FipLayerPrimary("Test");
 
-		var processedLayers = new HashMap<Layer, VdypLayer>();
-		processedLayers.put(Layer.PRIMARY, new VdypLayer("Test", Layer.PRIMARY));
+		var processedLayers = new HashMap<LayerType, VdypLayer>();
+		processedLayers.put(LayerType.PRIMARY, new VdypLayer("Test", LayerType.PRIMARY));
 
 		fipPrimaryLayer.setStockingClass(Optional.of('R'));
 
-		var vdypLayer = new VdypLayer("Test", Layer.PRIMARY);
+		var vdypLayer = new VdypLayer("Test", LayerType.PRIMARY);
 
 		vdypLayer.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 		vdypLayer.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
@@ -3645,7 +3645,7 @@ class FipStartTest {
 				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
-		var spec1 = new VdypSpecies("Test", Layer.PRIMARY, "L");
+		var spec1 = new VdypSpecies("Test", LayerType.PRIMARY, "L");
 
 		spec1.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 		spec1.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
@@ -3659,7 +3659,7 @@ class FipStartTest {
 				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
-		var spec2 = new VdypSpecies("Test", Layer.PRIMARY, "PL");
+		var spec2 = new VdypSpecies("Test", LayerType.PRIMARY, "PL");
 
 		spec2.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 		spec2.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
@@ -3759,14 +3759,14 @@ class FipStartTest {
 	}
 
 	private static final void testWith(
-			List<FipPolygon> polygons, List<Map<Layer, FipLayer>> layers, List<Collection<FipSpecies>> species,
+			List<FipPolygon> polygons, List<Map<LayerType, FipLayer>> layers, List<Collection<FipSpecies>> species,
 			TestConsumer<FipStart> test
 	) throws Exception {
 		testWith(new HashMap<>(), polygons, layers, species, test);
 	}
 
 	private static final void testWith(
-			Map<String, Object> myControlMap, List<FipPolygon> polygons, List<Map<Layer, FipLayer>> layers,
+			Map<String, Object> myControlMap, List<FipPolygon> polygons, List<Map<LayerType, FipLayer>> layers,
 			List<Collection<FipSpecies>> species, TestConsumer<FipStart> test
 	) throws Exception {
 
@@ -3790,7 +3790,7 @@ class FipStartTest {
 		MockStreamingParser<FipPolygon> polygonStream = mockStream(
 				control, controlMap, FipPolygonParser.CONTROL_KEY, "polygonStream"
 		);
-		MockStreamingParser<Map<Layer, FipLayer>> layerStream = mockStream(
+		MockStreamingParser<Map<LayerType, FipLayer>> layerStream = mockStream(
 				control, controlMap, FipLayerParser.CONTROL_KEY, "layerStream"
 		);
 		MockStreamingParser<Collection<FipSpecies>> speciesStream = mockStream(
@@ -3821,8 +3821,8 @@ class FipStartTest {
 		};
 	};
 
-	static Map<Layer, FipLayer> layerMap(FipLayer... layers) {
-		Map<Layer, FipLayer> result = new HashMap<>();
+	static Map<LayerType, FipLayer> layerMap(FipLayer... layers) {
+		Map<LayerType, FipLayer> result = new HashMap<>();
 		for (var layer : layers) {
 			result.put(layer.getLayer(), layer);
 		}
@@ -3860,7 +3860,7 @@ class FipStartTest {
 	FipLayer getTestVeteranLayer(String polygonId, Consumer<FipLayer> mutator) {
 		var result = new FipLayer(
 				polygonId, // polygonIdentifier
-				Layer.VETERAN // layer
+				LayerType.VETERAN // layer
 		);
 		result.setAgeTotal(8f);
 		result.setHeight(6f);
@@ -3874,11 +3874,11 @@ class FipStartTest {
 		return result;
 	};
 
-	FipSpecies getTestSpecies(String polygonId, Layer layer, Consumer<FipSpecies> mutator) {
+	FipSpecies getTestSpecies(String polygonId, LayerType layer, Consumer<FipSpecies> mutator) {
 		return getTestSpecies(polygonId, layer, "B", mutator);
 	};
 
-	FipSpecies getTestSpecies(String polygonId, Layer layer, String genusId, Consumer<FipSpecies> mutator) {
+	FipSpecies getTestSpecies(String polygonId, LayerType layer, String genusId, Consumer<FipSpecies> mutator) {
 		var result = new FipSpecies(
 				polygonId, // polygonIdentifier
 				layer, // layer

@@ -3,7 +3,7 @@ package ca.bc.gov.nrs.vdyp.fip.model;
 import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.common.Computed;
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 public class FipLayerPrimary extends FipLayer {
 
@@ -21,7 +21,7 @@ public class FipLayerPrimary extends FipLayer {
 	private int inventoryTypeGroup = 0;
 
 	public FipLayerPrimary(String polygonIdentifier) {
-		super(polygonIdentifier, Layer.PRIMARY);
+		super(polygonIdentifier, LayerType.PRIMARY);
 	}
 
 	public Optional<Integer> getSiteCurveNumber() {

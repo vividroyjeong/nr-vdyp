@@ -19,9 +19,10 @@ import ca.bc.gov.nrs.vdyp.io.parse.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.ValueParser;
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 
-public class FipLayerParser implements ControlMapValueReplacer<StreamingParserFactory<Map<Layer, FipLayer>>, String> {
+public class FipLayerParser
+		implements ControlMapValueReplacer<StreamingParserFactory<Map<LayerType, FipLayer>>, String> {
 
 	public static final String CONTROL_KEY = "FIP_LAYERS";
 
@@ -45,7 +46,7 @@ public class FipLayerParser implements ControlMapValueReplacer<StreamingParserFa
 	}
 
 	@Override
-	public StreamingParserFactory<Map<Layer, FipLayer>>
+	public StreamingParserFactory<Map<LayerType, FipLayer>>
 			map(String fileName, FileResolver fileResolver, Map<String, Object> control)
 					throws IOException, ResourceParseException {
 		return () -> {
@@ -83,7 +84,7 @@ public class FipLayerParser implements ControlMapValueReplacer<StreamingParserFa
 				@Override
 				protected ValueOrMarker<Optional<FipLayer>, EndOfRecord> convert(Map<String, Object> entry) {
 					var polygonId = (String) entry.get(POLYGON_IDENTIFIER);
-					var layer = (ValueOrMarker<Optional<Layer>, EndOfRecord>) entry.get(LAYER);
+					var layer = (ValueOrMarker<Optional<LayerType>, EndOfRecord>) entry.get(LAYER);
 					var ageTotal = (float) entry.get(AGE_TOTAL);
 					var height = (float) entry.get(HEIGHT);
 					var siteIndex = (float) entry.get(SITE_INDEX);
@@ -114,7 +115,7 @@ public class FipLayerParser implements ControlMapValueReplacer<StreamingParserFa
 							fipLayerPrimary.setSiteCurveNumber(siteCurveNumber);
 							return builder.value(Optional.of(fipLayerPrimary));
 						case VETERAN:
-							FipLayer fipLayerVeteran = new FipLayer(polygonId, Layer.VETERAN);
+							FipLayer fipLayerVeteran = new FipLayer(polygonId, LayerType.VETERAN);
 							fipLayerVeteran.setAgeTotal(ageTotal);
 							fipLayerVeteran.setHeight(height);
 							fipLayerVeteran.setSiteIndex(siteIndex);
@@ -133,7 +134,7 @@ public class FipLayerParser implements ControlMapValueReplacer<StreamingParserFa
 
 			};
 
-			return new GroupingStreamingParser<Map<Layer, FipLayer>, ValueOrMarker<Optional<FipLayer>, EndOfRecord>>(
+			return new GroupingStreamingParser<Map<LayerType, FipLayer>, ValueOrMarker<Optional<FipLayer>, EndOfRecord>>(
 					delegateStream
 			) {
 
@@ -153,7 +154,8 @@ public class FipLayerParser implements ControlMapValueReplacer<StreamingParserFa
 				}
 
 				@Override
-				protected Map<Layer, FipLayer> convert(List<ValueOrMarker<Optional<FipLayer>, EndOfRecord>> children) {
+				protected Map<LayerType, FipLayer>
+						convert(List<ValueOrMarker<Optional<FipLayer>, EndOfRecord>> children) {
 					return children.stream().map(ValueOrMarker::getValue).map(Optional::get) // Should never be empty as
 							// we've filtered out
 							// markers

@@ -1,15 +1,14 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.stringContainsInOrder;
+import static org.hamcrest.Matchers.*;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
 import org.hamcrest.Matchers;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -19,7 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 
-class GenusDefinitionParserTest {
+public class GenusDefinitionParserTest {
 
 	@Test
 	void testParse() throws Exception {
@@ -114,7 +113,7 @@ class GenusDefinitionParserTest {
 	}
 
 	@Test
-	public void testOrderByPreference() throws Exception {
+	void testOrderByPreference() throws Exception {
 		var parser = new GenusDefinitionParser(2);
 
 		List<GenusDefinition> result;
@@ -142,7 +141,7 @@ class GenusDefinitionParserTest {
 	}
 
 	@Test
-	public void testOrderByLinesBlank() throws Exception {
+	void testOrderByLinesBlank() throws Exception {
 		var parser = new GenusDefinitionParser(2);
 
 		List<GenusDefinition> result;
@@ -170,7 +169,7 @@ class GenusDefinitionParserTest {
 	}
 
 	@Test
-	public void testOrderByLinesZero() throws Exception {
+	void testOrderByLinesZero() throws Exception {
 		var parser = new GenusDefinitionParser(2);
 
 		List<GenusDefinition> result;
@@ -216,7 +215,7 @@ class GenusDefinitionParserTest {
 	}
 
 	@Test
-	public void testErrorPreferenceOutOfBoundsLow() throws Exception {
+	void testErrorPreferenceOutOfBoundsLow() throws Exception {
 		var parser = new GenusDefinitionParser(2);
 
 		Exception ex1;
@@ -234,7 +233,7 @@ class GenusDefinitionParserTest {
 	}
 
 	@Test
-	public void testErrorPreferenceDuplicate() throws Exception {
+	void testErrorPreferenceDuplicate() throws Exception {
 		var parser = new GenusDefinitionParser(2);
 
 		Exception ex1;
@@ -249,5 +248,41 @@ class GenusDefinitionParserTest {
 		}
 		assertThat(ex1, hasProperty("line", is(2)));
 		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 2", "Preference 1", "set to AT")));
+	}
+
+// TODO Confirm if following methods are still needed after merge
+	/**
+	 * Add a mock control map entry for SP0 parse results with species "S1" and "S2"
+	 */
+	public static void populateControlMap(Map<String, Object> controlMap) {
+		populateControlMap(controlMap, "S1", "S2");
+	}
+
+	/**
+	 * Add a mock control map entry for SP0 parse results with 16 species
+	 */
+	public static void populateControlMapReal(Map<String, Object> controlMap) {
+		populateControlMap(controlMap, getSpeciesAliases());
+	}
+
+	/**
+	 * Get the species aliases expected
+	 */
+	public static String[] getSpeciesAliases() {
+		return new String[] { "AC", "AT", "B", "C", "D", "E", "F", "H", "L", "MB", "PA", "PL", "PW", "PY", "S", "Y" };
+	}
+
+	/**
+	 * Add a mock control map entry for SP0 parse results
+	 */
+	public static void populateControlMap(Map<String, Object> controlMap, String... aliases) {
+
+		List<GenusDefinition> sp0List = new ArrayList<>();
+
+		for (var alias : aliases) {
+			sp0List.add(new GenusDefinition(alias, java.util.Optional.empty(), "Test " + alias));
+		}
+
+		controlMap.put(GenusDefinitionParser.CONTROL_KEY, sp0List);
 	}
 }

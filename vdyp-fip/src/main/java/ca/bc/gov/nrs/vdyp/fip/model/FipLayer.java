@@ -3,7 +3,7 @@ package ca.bc.gov.nrs.vdyp.fip.model;
 import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 public class FipLayer extends BaseVdypLayer<FipSpecies> {
 
@@ -29,7 +29,7 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 	@Deprecated
 	Optional<Float> breastHeightAge = Optional.empty();
 
-	public FipLayer(String polygonIdentifier, Layer layer) {
+	public FipLayer(String polygonIdentifier, LayerType layer) {
 		super(polygonIdentifier, layer);
 	}
 

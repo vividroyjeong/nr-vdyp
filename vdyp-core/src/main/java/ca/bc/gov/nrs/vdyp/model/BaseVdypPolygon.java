@@ -9,7 +9,7 @@ public class BaseVdypPolygon<L extends BaseVdypLayer<?>, PA> {
 
 	String polygonIdentifier; // FIP_P/POLYDESC
 	PA percentAvailable; // FIP_P2/PCTFLAND
-	Map<Layer, L> layers = Collections.emptyMap();
+	Map<LayerType, L> layers = Collections.emptyMap();
 
 	public BaseVdypPolygon(String polygonIdentifier, PA percentAvailable) {
 		super();
@@ -25,16 +25,16 @@ public class BaseVdypPolygon<L extends BaseVdypLayer<?>, PA> {
 		this.polygonIdentifier = polygonIdentifier;
 	}
 
-	public Map<Layer, L> getLayers() {
+	public Map<LayerType, L> getLayers() {
 		return layers;
 	}
 
-	public void setLayers(Map<Layer, L> layers) {
+	public void setLayers(Map<LayerType, L> layers) {
 		this.layers = layers;
 	}
 
 	public void setLayers(Collection<L> layers) {
-		this.layers = new EnumMap<>(Layer.class);
+		this.layers = new EnumMap<>(LayerType.class);
 		layers.forEach(spec -> this.layers.put(spec.getLayer(), spec));
 	}
 

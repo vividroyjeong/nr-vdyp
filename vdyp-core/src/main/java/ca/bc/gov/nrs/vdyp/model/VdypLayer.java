@@ -35,7 +35,7 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
 	); // LVCOM/VOL_DWB species 0
 
-	public VdypLayer(String polygonIdentifier, Layer layer) {
+	public VdypLayer(String polygonIdentifier, LayerType layer) {
 		super(polygonIdentifier, layer);
 	}
 
