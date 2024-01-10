@@ -7,10 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
-public class ValueParserTest {
+class ValueParserTest {
 
 	@Test
-	public void rangeParserTest() throws Exception {
+	void rangeParserTest() throws Exception {
 		var exclusiveParser = ValueParser.range(ValueParser.INTEGER, 10, false, 20, false, "Test");
 
 		var result = exclusiveParser.parse("11");
@@ -53,4 +53,25 @@ public class ValueParserTest {
 
 	}
 
+	static enum TestEnum {
+		VALUE1,
+		VALUE2
+	}
+	
+	@Test
+	void enumParserTest() throws Exception {
+		var parser = ValueParser.enumParser(TestEnum.class);
+		
+		assertThat(parser.parse("VALUE1"), is(TestEnum.VALUE1));
+		assertThat(parser.parse("VALUE2"), is(TestEnum.VALUE2));
+		
+		var ex = assertThrows(ValueParseException.class, ()->parser.parse("FAKE"));
+		assertThat(ex.getMessage(), is("\"FAKE\" is not a valid TestEnum"));
+		
+		ex = assertThrows(ValueParseException.class, ()->parser.parse(""));
+		assertThat(ex.getMessage(), is("\"\" is not a valid TestEnum"));
+		
+		ex = assertThrows(ValueParseException.class, ()->parser.parse(" "));
+		assertThat(ex.getMessage(), is("\"\" is not a valid TestEnum"));
+	}
 }
