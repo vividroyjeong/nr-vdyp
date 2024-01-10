@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 
 class ValueParserTest {
@@ -97,6 +98,24 @@ class ValueParserTest {
 
 		var ex = assertThrows(ValueParseException.class, () -> parser.parse("X"));
 		assertThat(ex.getMessage(), is("\"X\" is not a valid Integer"));
+	}
+
+	@Test
+	void testLayerTypeParser() throws Exception {
+		var parser = ValueParser.LAYER;
+
+		assertThat(parser.parse("1"), present(is(LayerType.PRIMARY)));
+		assertThat(parser.parse("P"), present(is(LayerType.PRIMARY)));
+
+		assertThat(parser.parse("2"), present(is(LayerType.SECONDARY)));
+		assertThat(parser.parse("S"), present(is(LayerType.SECONDARY)));
+
+		assertThat(parser.parse("V"), present(is(LayerType.VETERAN)));
+
+		assertThat(parser.parse("X"), notPresent());
+		assertThat(parser.parse(""), notPresent());
+		assertThat(parser.parse(" "), notPresent());
+
 	}
 
 }
