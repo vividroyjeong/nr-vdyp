@@ -361,17 +361,25 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 			var list = parser.parse(s);
 
 			Map<K, V> result = new LinkedHashMap<>();
+			if (defaultValues.isEmpty() && list.size() != keys.length) {
+				throw new ValueParseException(
+						s, "Expected exactly " + requiredFinal + " values but there were " + list.size()
+				);
+			}
+			if (list.size() < requiredFinal || list.size() > keys.length) {
+				throw new ValueParseException(
+						s,
+						"Expected between " + requiredFinal + " and " + keys.length + " values but there were "
+								+ list.size()
+				);
+			}
 			var it = list.iterator();
 			for (int i = 0; i < keys.length; i++) {
 				K key = keys[i];
 				if (it.hasNext()) {
 					result.put(key, it.next());
 				} else {
-					if (!defaultValues.containsKey(key)) {
-						throw new ValueParseException(
-								s, "Expected at least " + requiredFinal + " values but there were only " + list.size()
-						);
-					}
+					assert defaultValues.containsKey(key);
 					result.put(key, defaultValues.get(key)); // should never be null due to preceding checks
 				}
 			}
