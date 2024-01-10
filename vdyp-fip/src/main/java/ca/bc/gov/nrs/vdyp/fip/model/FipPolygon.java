@@ -1,16 +1,22 @@
 package ca.bc.gov.nrs.vdyp.fip.model;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
+
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 public class FipPolygon {
 
-	String polygonIdentifier; // POLYDESC
-	String forestInventoryZone; // FIZ
-	String biogeoclimaticZone; // BEC
-	Optional<Float> percentAvailable; // PCTFLAND
-	Optional<FipMode> modeFip; // MODEfip
-	Optional<String> nonproductiveDescription; // NPDESC
-	float yieldFactor; // YLDFACT
+	String polygonIdentifier; // FIP_P/POLYDESC
+	String forestInventoryZone; // FIP_P/FIZ
+	String biogeoclimaticZone; // FIP_P/BEC
+	Optional<Float> percentAvailable; // FIP_P2/PCTFLAND
+	Optional<FipMode> modeFip; // FIP_P2/MODE / MODEfip
+	Optional<String> nonproductiveDescription; // FIP_P3/NPDESC
+	float yieldFactor; // FIP_P4/YLDFACT
+
+	Map<LayerType, FipLayer> layers = Collections.emptyMap();
 
 	public FipPolygon(
 			String polygonIdentifier, String fiz, String becIdentifier, Optional<Float> percentAvailable,
@@ -80,6 +86,14 @@ public class FipPolygon {
 
 	public void setYieldFactor(float yieldFactor) {
 		this.yieldFactor = yieldFactor;
+	}
+
+	public Map<LayerType, FipLayer> getLayers() {
+		return layers;
+	}
+
+	public void setLayers(Map<LayerType, FipLayer> layers) {
+		this.layers = layers;
 	}
 
 }

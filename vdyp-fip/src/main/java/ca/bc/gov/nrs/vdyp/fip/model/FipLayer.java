@@ -1,8 +1,10 @@
 package ca.bc.gov.nrs.vdyp.fip.model;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 public class FipLayer {
 
@@ -18,22 +20,31 @@ public class FipLayer {
 	static final String INVENTORY_TYPE_GROUP = "INVENTORY_TYPE_GROUP"; // ITGFIP
 	static final String BREAST_HEIGHT_AGE = "BREAST_HEIGHT_AGE"; // AGEBH
 
-	String polygonIdentifier; // POLYDESC
-	final Layer layer;
-	float ageTotal;
-	float height;
-	float siteIndex;
-	float crownClosure;
-	String siteSp0;
-	String siteSp64;
-	float yearsToBreastHeight;
+	String polygonIdentifier; // FIP_P/POLYDESC
+	final LayerType layer; // This is also represents the distinction between data stored in FIPL_1(A) and
+							// FIP_V(A). Where VDYP7 stores both and looks at certain values to determine if
+							// a layer is "present". VDYP8 stores them in a map keyed by this value
+	float ageTotal; // FIPL_1/AGETOT_L1 or FIPL_V/AGETOT_V1
+	float height; // FIPL_1/HT_L1 or FIPL_V/HT_V1
+	float siteIndex; // FIPL_1/SI_L1 or FIPL_V/SI_V1
+	float crownClosure; // FIPL_1/CC_L1 or FIP:_V/CC_V1
+	String siteGenus; // FIPL_1A/SITESP0_L1 or FIPL_VA/SITESP0_L1
+	String siteSpecies; // FIPL_1A/SITESP64_L1 or FIPL_VA/SITESP64_L1
+	float yearsToBreastHeight; // FIPL_1/YTBH_L1 or FIP:_V/YTBH_V1
+
+	// In VDYP7 These are read but not stored in common variables.
+	// Marked as Deprecated for now but I think we can just remove them.
+	@Deprecated
 	Optional<Integer> inventoryTypeGroup;
+	@Deprecated
 	Optional<Float> breastHeightAge;
 
+	Map<String, FipSpecies> species = Collections.emptyMap();
+
 	public FipLayer(
-			String polygonIdentifier, Layer layer, float ageTotal, float height, float siteIndex, float crownClosure,
-			String siteSp0, String siteSp64, float yearsToBreastHeight, Optional<Integer> inventoryTypeGroup,
-			Optional<Float> breastHeightAge
+			String polygonIdentifier, LayerType layer, float ageTotal, float height, float siteIndex,
+			float crownClosure, String siteGenus, String siteSpecies, float yearsToBreastHeight,
+			Optional<Integer> inventoryTypeGroup, Optional<Float> breastHeightAge
 	) {
 		super();
 		this.polygonIdentifier = polygonIdentifier;
@@ -42,8 +53,8 @@ public class FipLayer {
 		this.height = height;
 		this.siteIndex = siteIndex;
 		this.crownClosure = crownClosure;
-		this.siteSp0 = siteSp0;
-		this.siteSp64 = siteSp64;
+		this.siteGenus = siteGenus;
+		this.siteSpecies = siteSpecies;
 		this.yearsToBreastHeight = yearsToBreastHeight;
 		this.inventoryTypeGroup = inventoryTypeGroup;
 		this.breastHeightAge = breastHeightAge;
@@ -53,7 +64,7 @@ public class FipLayer {
 		return polygonIdentifier;
 	}
 
-	public Layer getLayer() {
+	public LayerType getLayer() {
 		return layer;
 	}
 
@@ -74,21 +85,23 @@ public class FipLayer {
 	}
 
 	public String getSiteSp0() {
-		return siteSp0;
+		return siteGenus;
 	}
 
 	public String getSiteSp64() {
-		return siteSp64;
+		return siteSpecies;
 	}
 
 	public float getYearsToBreastHeight() {
 		return yearsToBreastHeight;
 	}
 
+	@Deprecated
 	public Optional<Integer> getInventoryTypeGroup() {
 		return inventoryTypeGroup;
 	}
 
+	@Deprecated
 	public Optional<Float> getBreastHeightAge() {
 		return breastHeightAge;
 	}
@@ -113,24 +126,34 @@ public class FipLayer {
 		this.crownClosure = crownClosure;
 	}
 
-	public void setSireSp0(String sireSp0) {
-		this.siteSp0 = sireSp0;
+	public void setSiteSp0(String sireSp0) {
+		this.siteGenus = sireSp0;
 	}
 
 	public void setSiteSp64(String siteSp64) {
-		this.siteSp64 = siteSp64;
+		this.siteSpecies = siteSp64;
 	}
 
 	public void setYearsToBreastHeight(float yearsToBreastHeight) {
 		this.yearsToBreastHeight = yearsToBreastHeight;
 	}
 
+	@Deprecated
 	public void setInventoryTypeGroup(Optional<Integer> inventoryTypeGroup) {
 		this.inventoryTypeGroup = inventoryTypeGroup;
 	}
 
+	@Deprecated
 	public void setBreastHeightAge(Optional<Float> breastHeightAge) {
 		this.breastHeightAge = breastHeightAge;
+	}
+
+	public Map<String, FipSpecies> getSpecies() {
+		return species;
+	}
+
+	public void setSpecies(Map<String, FipSpecies> species) {
+		this.species = species;
 	}
 
 }
