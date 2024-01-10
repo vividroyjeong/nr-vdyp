@@ -22,7 +22,7 @@ import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 public class FipStart {
 
@@ -95,7 +95,7 @@ public class FipStart {
 	void process() throws ProcessingException {
 		try (
 				var polyStream = this.<FipPolygon>getStreamingParser(FipPolygonParser.CONTROL_KEY);
-				var layerStream = this.<Map<Layer, FipLayer>>getStreamingParser(FipLayerParser.CONTROL_KEY);
+				var layerStream = this.<Map<LayerType, FipLayer>>getStreamingParser(FipLayerParser.CONTROL_KEY);
 				var speciesStream = this.<Collection<FipSpecies>>getStreamingParser(FipSpeciesParser.CONTROL_KEY);
 		) {
 
@@ -145,7 +145,7 @@ public class FipStart {
 	}
 
 	private FipPolygon getPolygon(
-			StreamingParser<FipPolygon> polyStream, StreamingParser<Map<Layer, FipLayer>> layerStream,
+			StreamingParser<FipPolygon> polyStream, StreamingParser<Map<LayerType, FipLayer>> layerStream,
 			StreamingParser<Collection<FipSpecies>> speciesStream
 	) throws ProcessingException, IOException, ResourceParseException {
 
@@ -153,7 +153,7 @@ public class FipStart {
 		var polygon = polyStream.next();
 
 		log.trace("Getting layers for polygon {}", polygon.getPolygonIdentifier());
-		Map<Layer, FipLayer> layers;
+		Map<LayerType, FipLayer> layers;
 		try {
 			layers = layerStream.next();
 		} catch (NoSuchElementException ex) {
@@ -202,7 +202,7 @@ public class FipStart {
 		return polygon;
 	}
 
-	private Optional<Float> heightMinimum(Layer layer, Map<String, Object> controlMap) {
+	private Optional<Float> heightMinimum(LayerType layer, Map<String, Object> controlMap) {
 		@SuppressWarnings("unchecked")
 		var minima = (Map<String, Float>) controlMap.get(FipControlParser.MINIMA);
 		switch (layer) {
@@ -217,14 +217,14 @@ public class FipStart {
 
 	private void checkPolygon(FipPolygon polygon) throws ProcessingException {
 
-		if (!polygon.getLayers().containsKey(Layer.PRIMARY)) {
+		if (!polygon.getLayers().containsKey(LayerType.PRIMARY)) {
 			throw validationError(
 					"Polygon %s has no %s layer, or that layer has non-positive height or crown closure.",
-					polygon.getPolygonIdentifier(), Layer.PRIMARY
+					polygon.getPolygonIdentifier(), LayerType.PRIMARY
 			);
 		}
 
-		var primaryLayer = (FipLayerPrimary) polygon.getLayers().get(Layer.PRIMARY);
+		var primaryLayer = (FipLayerPrimary) polygon.getLayers().get(LayerType.PRIMARY);
 
 		// FIXME VDYP7 actually tests if total age - YTBH is less than 0.5 but gives an
 		// error that total age is "less than" YTBH. Replicating that for now but
@@ -233,7 +233,7 @@ public class FipStart {
 		if (primaryLayer.getAgeTotal() - primaryLayer.getYearsToBreastHeight() < 0.5f) {
 			throw validationError(
 					"Polygon %s has %s layer where total age is less than YTBH.", polygon.getPolygonIdentifier(),
-					Layer.PRIMARY
+					LayerType.PRIMARY
 			);
 		}
 
@@ -265,14 +265,14 @@ public class FipStart {
 		if (primaryLayer.getYearsToBreastHeight() < 0.5) {
 			throw validationError(
 					"Polygon %s has %s layer where years to breast height %.1f is less than minimum %.1f years.",
-					polygon.getPolygonIdentifier(), Layer.PRIMARY, primaryLayer.getYearsToBreastHeight(), 0.5f
+					polygon.getPolygonIdentifier(), LayerType.PRIMARY, primaryLayer.getYearsToBreastHeight(), 0.5f
 			);
 		}
 
 		if (primaryLayer.getSiteIndex() < 0.5) {
 			throw validationError(
 					"Polygon %s has %s layer where site index %.1f is less than minimum %.1f years.",
-					polygon.getPolygonIdentifier(), Layer.PRIMARY, primaryLayer.getSiteIndex(), 0.5f
+					polygon.getPolygonIdentifier(), LayerType.PRIMARY, primaryLayer.getSiteIndex(), 0.5f
 			);
 		}
 
@@ -283,12 +283,12 @@ public class FipStart {
 			if (Math.abs(percentTotal - 100f) > 0.01f) {
 				throw validationError(
 						"Polygon %s has %s layer where species entries have a percentage total that does not sum to 100%%.",
-						polygon.getPolygonIdentifier(), Layer.PRIMARY
+						polygon.getPolygonIdentifier(), LayerType.PRIMARY
 				);
 			}
 			// VDYP7 performs this step which should be negligible but might have a small
 			// impact due to the 0.01 percent variation and floating point errors.
-			if (layer.getLayer() == Layer.PRIMARY) {
+			if (layer.getLayer() == LayerType.PRIMARY) {
 				layer.getSpecies().values().forEach(species -> {
 					species.setFractionGenus(species.getPercentGenus() / percentTotal);
 				});

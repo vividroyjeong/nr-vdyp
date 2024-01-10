@@ -30,7 +30,7 @@ import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
 import ca.bc.gov.nrs.vdyp.io.parse.MockStreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 public class FipStartTest {
 
@@ -46,7 +46,7 @@ public class FipStartTest {
 	public void testProcessSimple() throws Exception {
 
 		var polygonId = polygonId("Test Polygon", 2023);
-		var layer = Layer.PRIMARY;
+		var layer = LayerType.PRIMARY;
 
 		// One polygon with one primary layer with one species entry
 
@@ -101,7 +101,7 @@ public class FipStartTest {
 	public void testPolygonWithNoPrimaryLayer() throws Exception {
 
 		var polygonId = polygonId("Test Polygon", 2023);
-		var layer = Layer.VETERAN;
+		var layer = LayerType.VETERAN;
 
 		// One polygon with one layer with one species entry, and type is VETERAN
 		testWith(
@@ -116,7 +116,7 @@ public class FipStartTest {
 							hasProperty(
 									"message",
 									is(
-											"Polygon " + polygonId + " has no " + Layer.PRIMARY
+											"Polygon " + polygonId + " has no " + LayerType.PRIMARY
 													+ " layer, or that layer has non-positive height or crown closure."
 									)
 							)
@@ -131,7 +131,7 @@ public class FipStartTest {
 	public void testPrimaryLayerHeightLessThanMinimum() throws Exception {
 
 		var polygonId = polygonId("Test Polygon", 2023);
-		var layer = Layer.PRIMARY;
+		var layer = LayerType.PRIMARY;
 
 		testWith(
 				Arrays.asList(getTestPolygon(polygonId, valid())), //
@@ -147,7 +147,7 @@ public class FipStartTest {
 							hasProperty(
 									"message",
 									is(
-											"Polygon " + polygonId + " has " + Layer.PRIMARY
+											"Polygon " + polygonId + " has " + LayerType.PRIMARY
 													+ " layer where height 4.0 is less than minimum 5.0."
 									)
 							)
@@ -162,7 +162,7 @@ public class FipStartTest {
 	public void testVeteranLayerHeightLessThanMinimum() throws Exception {
 
 		var polygonId = polygonId("Test Polygon", 2023);
-		var layer = Layer.VETERAN;
+		var layer = LayerType.VETERAN;
 
 		testWith(
 				Arrays.asList(getTestPolygon(polygonId, valid())), //
@@ -183,7 +183,7 @@ public class FipStartTest {
 							hasProperty(
 									"message",
 									is(
-											"Polygon " + polygonId + " has " + Layer.VETERAN
+											"Polygon " + polygonId + " has " + LayerType.VETERAN
 													+ " layer where height 9.0 is less than minimum 10.0."
 									)
 							)
@@ -198,7 +198,7 @@ public class FipStartTest {
 	public void testPrimaryLayerYearsToBreastHeightLessThanMinimum() throws Exception {
 
 		var polygonId = polygonId("Test Polygon", 2023);
-		var layer = Layer.PRIMARY;
+		var layer = LayerType.PRIMARY;
 
 		testWith(
 				Arrays.asList(getTestPolygon(polygonId, valid())), //
@@ -214,7 +214,7 @@ public class FipStartTest {
 							hasProperty(
 									"message",
 									is(
-											"Polygon " + polygonId + " has " + Layer.PRIMARY
+											"Polygon " + polygonId + " has " + LayerType.PRIMARY
 													+ " layer where years to breast height 0.2 is less than minimum 0.5 years."
 									)
 							)
@@ -229,7 +229,7 @@ public class FipStartTest {
 	public void testPrimaryLayerTotalAgeLessThanYearsToBreastHeight() throws Exception {
 
 		var polygonId = polygonId("Test Polygon", 2023);
-		var layer = Layer.PRIMARY;
+		var layer = LayerType.PRIMARY;
 
 		// FIXME VDYP7 actually tests if total age - YTBH is less than 0.5 but gives an
 		// error that total age is "less than" YTBH. Replicating that for now but
@@ -251,7 +251,7 @@ public class FipStartTest {
 							hasProperty(
 									"message",
 									is(
-											"Polygon " + polygonId + " has " + Layer.PRIMARY
+											"Polygon " + polygonId + " has " + LayerType.PRIMARY
 													+ " layer where total age is less than YTBH."
 									)
 							)
@@ -265,7 +265,7 @@ public class FipStartTest {
 	public void testPrimaryLayerSiteIndexLessThanMinimum() throws Exception {
 
 		var polygonId = polygonId("Test Polygon", 2023);
-		var layer = Layer.PRIMARY;
+		var layer = LayerType.PRIMARY;
 
 		testWith(
 				Arrays.asList(getTestPolygon(polygonId, valid())), //
@@ -281,7 +281,7 @@ public class FipStartTest {
 							hasProperty(
 									"message",
 									is(
-											"Polygon " + polygonId + " has " + Layer.PRIMARY
+											"Polygon " + polygonId + " has " + LayerType.PRIMARY
 													+ " layer where site index 0.2 is less than minimum 0.5 years."
 									)
 							)
@@ -296,7 +296,7 @@ public class FipStartTest {
 	public void testPolygonWithModeFipYoung() throws Exception {
 
 		var polygonId = polygonId("Test Polygon", 2023);
-		var layer = Layer.PRIMARY;
+		var layer = LayerType.PRIMARY;
 
 		testWith(Arrays.asList(getTestPolygon(polygonId, x -> {
 			x.setModeFip(Optional.of(FipMode.FIPYOUNG));
@@ -323,7 +323,7 @@ public class FipStartTest {
 	public void testOneSpeciesLessThan100Percent() throws Exception {
 
 		var polygonId = polygonId("Test Polygon", 2023);
-		var layer = Layer.PRIMARY;
+		var layer = LayerType.PRIMARY;
 
 		testWith(
 				Arrays.asList(getTestPolygon(polygonId, valid())), //
@@ -354,7 +354,7 @@ public class FipStartTest {
 	public void testOneSpeciesMoreThan100Percent() throws Exception {
 
 		var polygonId = polygonId("Test Polygon", 2023);
-		var layer = Layer.PRIMARY;
+		var layer = LayerType.PRIMARY;
 
 		testWith(
 				Arrays.asList(getTestPolygon(polygonId, valid())), //
@@ -385,7 +385,7 @@ public class FipStartTest {
 	public void testTwoSpeciesSumTo100Percent() throws Exception {
 
 		var polygonId = polygonId("Test Polygon", 2023);
-		var layer = Layer.PRIMARY;
+		var layer = LayerType.PRIMARY;
 
 		testWith(
 				Arrays.asList(getTestPolygon(polygonId, valid())), //
@@ -413,7 +413,7 @@ public class FipStartTest {
 	public void testTwoSpeciesSumToLessThan100Percent() throws Exception {
 
 		var polygonId = polygonId("Test Polygon", 2023);
-		var layer = Layer.PRIMARY;
+		var layer = LayerType.PRIMARY;
 
 		testWith(
 				Arrays.asList(getTestPolygon(polygonId, valid())), //
@@ -451,7 +451,7 @@ public class FipStartTest {
 	public void testTwoSpeciesSumToMoreThan100Percent() throws Exception {
 
 		var polygonId = polygonId("Test Polygon", 2023);
-		var layer = Layer.PRIMARY;
+		var layer = LayerType.PRIMARY;
 
 		testWith(
 				Arrays.asList(getTestPolygon(polygonId, valid())), //
@@ -489,7 +489,7 @@ public class FipStartTest {
 	public void testFractionGenusCalculation() throws Exception {
 
 		var polygonId = polygonId("Test Polygon", 2023);
-		var layer = Layer.PRIMARY;
+		var layer = LayerType.PRIMARY;
 
 		final var speciesList = Arrays.asList(
 				//
@@ -524,7 +524,7 @@ public class FipStartTest {
 	public void testFractionGenusCalculationWithSlightError() throws Exception {
 
 		var polygonId = polygonId("Test Polygon", 2023);
-		var layer = Layer.PRIMARY;
+		var layer = LayerType.PRIMARY;
 
 		final var speciesList = Arrays.asList(
 				//
@@ -590,14 +590,14 @@ public class FipStartTest {
 	}
 
 	private static final void testWith(
-			List<FipPolygon> polygons, List<Map<Layer, FipLayer>> layers, List<Collection<FipSpecies>> species,
+			List<FipPolygon> polygons, List<Map<LayerType, FipLayer>> layers, List<Collection<FipSpecies>> species,
 			TestConsumer<FipStart> test
 	) throws Exception {
 		testWith(new HashMap<>(), polygons, layers, species, test);
 	}
 
 	private static final void testWith(
-			Map<String, Object> myControlMap, List<FipPolygon> polygons, List<Map<Layer, FipLayer>> layers,
+			Map<String, Object> myControlMap, List<FipPolygon> polygons, List<Map<LayerType, FipLayer>> layers,
 			List<Collection<FipSpecies>> species, TestConsumer<FipStart> test
 	) throws Exception {
 
@@ -621,7 +621,7 @@ public class FipStartTest {
 		MockStreamingParser<FipPolygon> polygonStream = mockStream(
 				control, controlMap, FipPolygonParser.CONTROL_KEY, "polygonStream"
 		);
-		MockStreamingParser<Map<Layer, FipLayer>> layerStream = mockStream(
+		MockStreamingParser<Map<LayerType, FipLayer>> layerStream = mockStream(
 				control, controlMap, FipLayerParser.CONTROL_KEY, "layerStream"
 		);
 		MockStreamingParser<Collection<FipSpecies>> speciesStream = mockStream(
@@ -652,8 +652,8 @@ public class FipStartTest {
 		};
 	};
 
-	static Map<Layer, FipLayer> layerMap(FipLayer... layers) {
-		Map<Layer, FipLayer> result = new HashMap<>();
+	static Map<LayerType, FipLayer> layerMap(FipLayer... layers) {
+		Map<LayerType, FipLayer> result = new HashMap<>();
 		for (var layer : layers) {
 			result.put(layer.getLayer(), layer);
 		}
@@ -696,7 +696,7 @@ public class FipStartTest {
 	FipLayer getTestVeteranLayer(String polygonId, Consumer<FipLayer> mutator) {
 		var result = new FipLayer(
 				polygonId, // polygonIdentifier
-				Layer.VETERAN, // layer
+				LayerType.VETERAN, // layer
 				8f, // ageTotal
 				6f, // height
 				5.0f, // siteIndex
@@ -711,11 +711,11 @@ public class FipStartTest {
 		return result;
 	};
 
-	FipSpecies getTestSpecies(String polygonId, Layer layer, Consumer<FipSpecies> mutator) {
+	FipSpecies getTestSpecies(String polygonId, LayerType layer, Consumer<FipSpecies> mutator) {
 		return getTestSpecies(polygonId, layer, "B", mutator);
 	};
 
-	FipSpecies getTestSpecies(String polygonId, Layer layer, String genusId, Consumer<FipSpecies> mutator) {
+	FipSpecies getTestSpecies(String polygonId, LayerType layer, String genusId, Consumer<FipSpecies> mutator) {
 		var result = new FipSpecies(
 				polygonId, // polygonIdentifier
 				layer, // layer

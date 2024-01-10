@@ -21,7 +21,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseValidException;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.ValueParser;
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 public class FipSpeciesParser
 		implements ControlMapValueReplacer<StreamingParserFactory<Collection<FipSpecies>>, String> {
@@ -80,7 +80,7 @@ public class FipSpeciesParser
 				protected ValueOrMarker<Optional<FipSpecies>, EndOfRecord> convert(Map<String, Object> entry)
 						throws ResourceParseException {
 					var polygonId = (String) entry.get(POLYGON_IDENTIFIER);
-					var layer = (ValueOrMarker<Optional<Layer>, EndOfRecord>) entry.get(LAYER);
+					var layer = (ValueOrMarker<Optional<LayerType>, EndOfRecord>) entry.get(LAYER);
 					String genus;
 					if (layer.isValue()) {
 						genus = ((Optional<String>) entry.get(GENUS)).orElseThrow(

@@ -11,7 +11,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.Region;
 
 /**
@@ -308,16 +308,16 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 	/**
 	 * Parser for a layer identifier
 	 */
-	public static ValueParser<Optional<Layer>> LAYER = s -> {
+	public static ValueParser<Optional<LayerType>> LAYER = s -> {
 		switch (s.toUpperCase()) {
 		case "1":
 		case "P":
-			return Optional.of(Layer.PRIMARY);
+			return Optional.of(LayerType.PRIMARY);
 		case "2":
 		case "S":
-			return Optional.of(Layer.SECONDARY);
+			return Optional.of(LayerType.SECONDARY);
 		case "V":
-			return Optional.of(Layer.VETERAN);
+			return Optional.of(LayerType.VETERAN);
 		default:
 			return Optional.empty(); // Unknown
 		}

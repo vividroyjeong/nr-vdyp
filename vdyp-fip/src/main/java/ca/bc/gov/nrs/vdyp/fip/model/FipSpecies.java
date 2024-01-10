@@ -2,7 +2,7 @@ package ca.bc.gov.nrs.vdyp.fip.model;
 
 import java.util.Map;
 
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 public class FipSpecies {
 
@@ -10,7 +10,7 @@ public class FipSpecies {
 	static final String LAYER = "LAYER"; // LAYER
 
 	final String polygonIdentifier; // FIP_P/POLYDESC
-	final Layer layer; // This is also represents the distinction between data stored in
+	final LayerType layer; // This is also represents the distinction between data stored in
 						// FIPL_1(A) and FIP_V(A). Where VDYP7 stores both and looks at certain values
 						// to determine if a layer is "present". VDYP8 stores them in a map keyed by
 						// this value
@@ -26,7 +26,7 @@ public class FipSpecies {
 	Map<String, Float> speciesPercent; // Map from
 
 	public FipSpecies(
-			String polygonIdentifier, Layer layer, String genus, float percentGenus, Map<String, Float> speciesPercent
+			String polygonIdentifier, LayerType layer, String genus, float percentGenus, Map<String, Float> speciesPercent
 	) {
 		super();
 		this.polygonIdentifier = polygonIdentifier;
@@ -42,7 +42,7 @@ public class FipSpecies {
 		return polygonIdentifier;
 	}
 
-	public Layer getLayer() {
+	public LayerType getLayer() {
 		return layer;
 	}
 

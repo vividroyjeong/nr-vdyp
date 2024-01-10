@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 public class FipLayer {
 
@@ -21,7 +21,7 @@ public class FipLayer {
 	static final String BREAST_HEIGHT_AGE = "BREAST_HEIGHT_AGE"; // AGEBH
 
 	String polygonIdentifier; // FIP_P/POLYDESC
-	final Layer layer; // This is also represents the distinction between data stored in FIPL_1(A) and
+	final LayerType layer; // This is also represents the distinction between data stored in FIPL_1(A) and
 						// FIP_V(A). Where VDYP7 stores both and looks at certain values to determine if
 						// a layer is "present". VDYP8 stores them in a map keyed by this value
 	float ageTotal; // FIPL_1/AGETOT_L1 or FIPL_V/AGETOT_V1
@@ -42,7 +42,7 @@ public class FipLayer {
 	Map<String, FipSpecies> species = Collections.emptyMap();
 
 	public FipLayer(
-			String polygonIdentifier, Layer layer, float ageTotal, float height, float siteIndex, float crownClosure,
+			String polygonIdentifier, LayerType layer, float ageTotal, float height, float siteIndex, float crownClosure,
 			String siteGenus, String siteSpecies, float yearsToBreastHeight, Optional<Integer> inventoryTypeGroup,
 			Optional<Float> breastHeightAge
 	) {
@@ -64,7 +64,7 @@ public class FipLayer {
 		return polygonIdentifier;
 	}
 
-	public Layer getLayer() {
+	public LayerType getLayer() {
 		return layer;
 	}
 

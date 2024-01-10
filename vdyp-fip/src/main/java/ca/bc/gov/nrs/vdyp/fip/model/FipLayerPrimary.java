@@ -2,7 +2,7 @@ package ca.bc.gov.nrs.vdyp.fip.model;
 
 import java.util.Optional;
 
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 public class FipLayerPrimary extends FipLayer {
 
@@ -21,7 +21,7 @@ public class FipLayerPrimary extends FipLayer {
 			Optional<Integer> inventoryTypeGroup, Optional<Float> breastHeightAge, Optional<Integer> siteCurveNumber
 	) {
 		super(
-				polygonIdentifier, Layer.PRIMARY, ageTotal, height, siteIndex, crownClosure, siteGenus, siteSpecies,
+				polygonIdentifier, LayerType.PRIMARY, ageTotal, height, siteIndex, crownClosure, siteGenus, siteSpecies,
 				yearsToBreastHeight, inventoryTypeGroup, breastHeightAge
 		);
 		this.siteCurveNumber = siteCurveNumber;
