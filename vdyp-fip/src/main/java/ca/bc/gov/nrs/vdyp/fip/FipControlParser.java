@@ -20,7 +20,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.ControlFileParser;
 import ca.bc.gov.nrs.vdyp.io.parse.ControlMapModifier;
 import ca.bc.gov.nrs.vdyp.io.parse.DecayEquationGroupParser;
 import ca.bc.gov.nrs.vdyp.io.parse.DefaultEquationNumberParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SP0DefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.SiteCurveAgeMaximumParser;
 import ca.bc.gov.nrs.vdyp.io.parse.SiteCurveParser;
 import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentBaseAreaParser;
@@ -54,9 +54,9 @@ import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
  */
 public class FipControlParser {
 
-	public static final String FIP_YIELD_POLY_INPUT = "FIP_YIELD_POLY_INPUT";
-	public static final String FIP_YIELD_LAYER_INPUT = "FIP_YIELD_LAYER_INPUT";
-	public static final String FIP_YIELD_LX_SP0_INPUT = "FIP_YIELD_LxSP0_INPUT";
+	public static final String FIP_YIELD_POLY_INPUT = FipPolygonParser.CONTROL_KEY;
+	public static final String FIP_YIELD_LAYER_INPUT = FipLayerParser.CONTROL_KEY;
+	public static final String FIP_YIELD_LX_SP0_INPUT = FipSpeciesParser.CONTROL_KEY;
 	public static final String VDYP_POLYGON = "VDYP_POLYGON";
 	public static final String VDYP_LAYER_BY_SPECIES = "VDYP_LAYER_BY_SPECIES";
 	public static final String VDYP_LAYER_BY_SP0_BY_UTIL = "VDYP_LAYER_BY_SP0_BY_UTIL";
@@ -98,7 +98,7 @@ public class FipControlParser {
 	public static final String DEBUG_SWITCHES = "DEBUG_SWITCHES";
 	public static final String MAX_NUM_POLY = "MAX_NUM_POLY";
 	public static final String BEC_DEF = BecDefinitionParser.CONTROL_KEY;
-	public static final String SP0_DEF = SP0DefinitionParser.CONTROL_KEY;
+	public static final String SP0_DEF = GenusDefinitionParser.CONTROL_KEY;
 
 	static final ValueParser<String> FILENAME = String::strip;
 
@@ -223,6 +223,18 @@ public class FipControlParser {
 		};
 	}
 
+	List<ControlMapModifier> DATA_FILES = Arrays.asList(
+
+			// V7O_FIP
+			new FipPolygonParser(),
+
+			// V7O_FIL
+			new FipLayerParser(),
+
+			// V7O_FIS
+			new FipSpeciesParser()
+	);
+
 	List<ControlMapModifier> BASIC_DEFINITIONS = Arrays.asList(
 
 			// RD_BEC
@@ -232,7 +244,7 @@ public class FipControlParser {
 			// Superseded by BecLookup.getGrowthBecs
 
 			// RD_SP0
-			new SP0DefinitionParser()
+			new GenusDefinitionParser()
 	);
 
 	List<ControlMapModifier> GROUP_DEFINITIONS = Arrays.asList(
@@ -384,6 +396,10 @@ public class FipControlParser {
 		// Read Groups
 
 		applyModifiers(map, GROUP_DEFINITIONS, fileResolver);
+
+		// Initialize data file parser factories
+
+		applyModifiers(map, DATA_FILES, fileResolver);
 
 		if (jprogram == 1) {
 			applyModifiers(map, FIPSTART_ONLY, fileResolver);
