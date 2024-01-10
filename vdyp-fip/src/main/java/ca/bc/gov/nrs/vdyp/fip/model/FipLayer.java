@@ -22,8 +22,8 @@ public class FipLayer {
 
 	String polygonIdentifier; // FIP_P/POLYDESC
 	final LayerType layer; // This is also represents the distinction between data stored in FIPL_1(A) and
-						// FIP_V(A). Where VDYP7 stores both and looks at certain values to determine if
-						// a layer is "present". VDYP8 stores them in a map keyed by this value
+							// FIP_V(A). Where VDYP7 stores both and looks at certain values to determine if
+							// a layer is "present". VDYP8 stores them in a map keyed by this value
 	float ageTotal; // FIPL_1/AGETOT_L1 or FIPL_V/AGETOT_V1
 	float height; // FIPL_1/HT_L1 or FIPL_V/HT_V1
 	float siteIndex; // FIPL_1/SI_L1 or FIPL_V/SI_V1
@@ -42,9 +42,9 @@ public class FipLayer {
 	Map<String, FipSpecies> species = Collections.emptyMap();
 
 	public FipLayer(
-			String polygonIdentifier, LayerType layer, float ageTotal, float height, float siteIndex, float crownClosure,
-			String siteGenus, String siteSpecies, float yearsToBreastHeight, Optional<Integer> inventoryTypeGroup,
-			Optional<Float> breastHeightAge
+			String polygonIdentifier, LayerType layer, float ageTotal, float height, float siteIndex,
+			float crownClosure, String siteGenus, String siteSpecies, float yearsToBreastHeight,
+			Optional<Integer> inventoryTypeGroup, Optional<Float> breastHeightAge
 	) {
 		super();
 		this.polygonIdentifier = polygonIdentifier;

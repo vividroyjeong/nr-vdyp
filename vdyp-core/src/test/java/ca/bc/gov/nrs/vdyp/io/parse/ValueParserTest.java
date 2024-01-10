@@ -1,11 +1,17 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
+
+import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 
 class ValueParserTest {
 
@@ -54,24 +60,43 @@ class ValueParserTest {
 	}
 
 	static enum TestEnum {
-		VALUE1,
-		VALUE2
+		VALUE1, VALUE2
 	}
-	
+
 	@Test
 	void enumParserTest() throws Exception {
 		var parser = ValueParser.enumParser(TestEnum.class);
-		
+
 		assertThat(parser.parse("VALUE1"), is(TestEnum.VALUE1));
 		assertThat(parser.parse("VALUE2"), is(TestEnum.VALUE2));
-		
-		var ex = assertThrows(ValueParseException.class, ()->parser.parse("FAKE"));
+
+		var ex = assertThrows(ValueParseException.class, () -> parser.parse("FAKE"));
 		assertThat(ex.getMessage(), is("\"FAKE\" is not a valid TestEnum"));
-		
-		ex = assertThrows(ValueParseException.class, ()->parser.parse(""));
+
+		ex = assertThrows(ValueParseException.class, () -> parser.parse(""));
 		assertThat(ex.getMessage(), is("\"\" is not a valid TestEnum"));
-		
-		ex = assertThrows(ValueParseException.class, ()->parser.parse(" "));
+
+		ex = assertThrows(ValueParseException.class, () -> parser.parse(" "));
 		assertThat(ex.getMessage(), is("\"\" is not a valid TestEnum"));
 	}
+
+	@Test
+	void testValueOrMarkerParser() throws Exception {
+		var parser = ValueParser.valueOrMarker(ValueParser.INTEGER, (s) -> {
+			if ("MARK".equals(s)) {
+				return Optional.of("MARK");
+			}
+			return Optional.empty();
+		});
+
+		assertThat(parser.parse("MARK").getMarker(), present(is("MARK")));
+		assertThat(parser.parse("MARK").getValue(), notPresent());
+
+		assertThat(parser.parse("1").getValue(), present(is(1)));
+		assertThat(parser.parse("1").getMarker(), notPresent());
+
+		var ex = assertThrows(ValueParseException.class, () -> parser.parse("X"));
+		assertThat(ex.getMessage(), is("\"X\" is not a valid Integer"));
+	}
+
 }

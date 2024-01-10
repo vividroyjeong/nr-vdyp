@@ -21,7 +21,8 @@ import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 
-public class FipLayerParser implements ControlMapValueReplacer<StreamingParserFactory<Map<LayerType, FipLayer>>, String> {
+public class FipLayerParser
+		implements ControlMapValueReplacer<StreamingParserFactory<Map<LayerType, FipLayer>>, String> {
 
 	public static final String CONTROL_KEY = "FIP_LAYERS";
 
@@ -103,8 +104,8 @@ public class FipLayerParser implements ControlMapValueReplacer<StreamingParserFa
 							return builder.value(
 									Optional.of(
 											new FipLayer(
-													polygonId, LayerType.VETERAN, ageTotal, height, siteIndex, crownClosure,
-													siteSp0.get(), siteSp64.get(), yearsToBreastHeight,
+													polygonId, LayerType.VETERAN, ageTotal, height, siteIndex,
+													crownClosure, siteSp0.get(), siteSp64.get(), yearsToBreastHeight,
 													inventoryTypeGroup, breastHeightAge
 											)
 									)
@@ -141,7 +142,8 @@ public class FipLayerParser implements ControlMapValueReplacer<StreamingParserFa
 				}
 
 				@Override
-				protected Map<LayerType, FipLayer> convert(List<ValueOrMarker<Optional<FipLayer>, EndOfRecord>> children) {
+				protected Map<LayerType, FipLayer>
+						convert(List<ValueOrMarker<Optional<FipLayer>, EndOfRecord>> children) {
 					return children.stream().map(ValueOrMarker::getValue).map(Optional::get) // Should never be empty as
 																								// we've filtered out
 																								// markers

@@ -11,9 +11,9 @@ public class FipSpecies {
 
 	final String polygonIdentifier; // FIP_P/POLYDESC
 	final LayerType layer; // This is also represents the distinction between data stored in
-						// FIPL_1(A) and FIP_V(A). Where VDYP7 stores both and looks at certain values
-						// to determine if a layer is "present". VDYP8 stores them in a map keyed by
-						// this value
+							// FIPL_1(A) and FIP_V(A). Where VDYP7 stores both and looks at certain values
+							// to determine if a layer is "present". VDYP8 stores them in a map keyed by
+							// this value
 
 	final String genus; // FIPSA/SP0V
 
@@ -26,7 +26,8 @@ public class FipSpecies {
 	Map<String, Float> speciesPercent; // Map from
 
 	public FipSpecies(
-			String polygonIdentifier, LayerType layer, String genus, float percentGenus, Map<String, Float> speciesPercent
+			String polygonIdentifier, LayerType layer, String genus, float percentGenus,
+			Map<String, Float> speciesPercent
 	) {
 		super();
 		this.polygonIdentifier = polygonIdentifier;
