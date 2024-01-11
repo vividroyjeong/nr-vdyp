@@ -48,7 +48,7 @@ public class CoefficientParser implements ControlMapSubResourceParser<MatrixMap2
 	@Override
 	public MatrixMap2<String, String, Coefficients> parse(InputStream is, Map<String, Object> control)
 			throws IOException, ResourceParseException {
-		var becAliases = BecDefinitionParser.getBecAliases(control);
+		var becAliases = BecDefinitionParser.getBecs(control).getBecAliases();
 		var speciesIndecies = GenusDefinitionParser.getSpeciesAliases(control);
 		MatrixMap2<String, String, Coefficients> result = new MatrixMap2Impl<>(
 				becAliases, speciesIndecies, (k1, k2) -> Coefficients.empty(NUM_COEFFICIENTS, 0)

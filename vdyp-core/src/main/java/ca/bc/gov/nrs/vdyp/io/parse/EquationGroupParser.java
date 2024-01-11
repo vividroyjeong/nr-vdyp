@@ -49,7 +49,7 @@ public abstract class EquationGroupParser implements ControlMapSubResourceParser
 
 		final var sp0Keys = GenusDefinitionParser.getSpeciesAliases(control);
 
-		final var becKeys = BecDefinitionParser.getBecAliases(control);
+		final var becKeys = BecDefinitionParser.getBecs(control).getBecAliases();
 
 		Map<String, Map<String, Integer>> resultMap = lineParser.parse(is, new HashMap<>(), (v, r) -> {
 			final String sp0Alias = (String) v.get("sp0Alias");

@@ -91,39 +91,6 @@ public class BecDefinitionParser implements ControlMapSubResourceParser<BecLooku
 		return Utils.expectParsedControl(control, CONTROL_KEY, BecLookup.class);
 	}
 
-	/**
-	 * Get all the BECs in the specified region
-	 *
-	 * @param control Control map containing the parsed BEC definitions.
-	 * @return
-	 */
-	public static Collection<BecDefinition> getBecsByRegion(Map<String, Object> control, Region region) {
-		return getBecs(control).getBecsForRegion(region);
-	}
-
-	/**
-	 * Get all the aliases for defined BECs
-	 *
-	 * @param control Control map containing the parsed BEC definitions.
-	 * @return
-	 */
-	public static Collection<String> getBecAliases(Map<String, Object> control) {
-		return getBecs(control).getBecs().stream().map(BecDefinition::getAlias).toList();
-	}
-
-	/**
-	 * Find a set of BECs for the given scope. If the scope is blank, that's all
-	 * BECs, if it's a Region alias, it's all BECs for that region, otherwise its
-	 * treated as a BEC alias and the BEC matching it is returned.
-	 *
-	 * @param control Control map containing the parsed BEC definitions.
-	 * @param scope   The scope to match
-	 * @return A collection of matching BECs, or the empty set if none match.
-	 */
-	public static Collection<BecDefinition> getBecsByScope(Map<String, Object> control, String scope) {
-		return getBecs(control).getBecsForScope(scope);
-	}
-
 	@Override
 	public String getControlKey() {
 		return CONTROL_KEY;
