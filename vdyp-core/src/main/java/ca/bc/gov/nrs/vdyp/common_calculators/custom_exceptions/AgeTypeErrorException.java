@@ -6,6 +6,8 @@ package ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions;
  * age type is unknown, not valid or a similar issue
  */
 public class AgeTypeErrorException extends RuntimeException {
+	private static final long serialVersionUID = 5707778478154161902L;
+
 	public AgeTypeErrorException() {
 	}
 

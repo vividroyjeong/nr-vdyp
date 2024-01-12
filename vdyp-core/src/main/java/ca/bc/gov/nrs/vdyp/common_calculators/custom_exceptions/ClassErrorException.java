@@ -6,6 +6,8 @@ package ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions;
  * class is unknown, not valid or a similar issue
  */
 public class ClassErrorException extends RuntimeException {
+	private static final long serialVersionUID = 2202772153292611121L;
+
 	public ClassErrorException() {
 	}
 

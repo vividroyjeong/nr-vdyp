@@ -6,6 +6,8 @@ package ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions;
  * index is less than or equal to 1.3
  */
 public class LessThan13Exception extends RuntimeException {
+	private static final long serialVersionUID = -3600838566709610305L;
+
 	public LessThan13Exception() {
 	}
 

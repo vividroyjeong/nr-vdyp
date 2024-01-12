@@ -55,6 +55,7 @@ public class SiteCurveAgeMaximumParser
 		return value <= 0.0 ? MAX_AGE : value;
 	};
 
+	@Override
 	@SuppressWarnings("serial")
 	public Map<Integer, SiteCurveAgeMaximum> defaultResult() {
 		return new HashMap<>() {

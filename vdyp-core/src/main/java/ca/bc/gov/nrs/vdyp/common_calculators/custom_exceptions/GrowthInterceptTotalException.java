@@ -6,6 +6,8 @@ package ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions;
  * when there is an issue growth intercept(GI) curve or total age
  */
 public class GrowthInterceptTotalException extends RuntimeException {
+	private static final long serialVersionUID = -7405583989672039218L;
+
 	public GrowthInterceptTotalException() {
 	}
 

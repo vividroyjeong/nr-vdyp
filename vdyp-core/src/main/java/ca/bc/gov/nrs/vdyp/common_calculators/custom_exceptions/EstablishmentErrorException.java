@@ -6,6 +6,8 @@ package ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions;
  * establisment type is unknown, not valid or a similar issue
  */
 public class EstablishmentErrorException extends RuntimeException {
+	private static final long serialVersionUID = -8624818896380599810L;
+
 	public EstablishmentErrorException() {
 	}
 

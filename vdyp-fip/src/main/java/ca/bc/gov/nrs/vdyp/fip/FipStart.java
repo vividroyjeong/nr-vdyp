@@ -100,7 +100,6 @@ public class FipStart {
 		) {
 
 			int polygonsRead = 0;
-			int polygonsWritten = 0;
 
 			while (polyStream.hasNext()) {
 
