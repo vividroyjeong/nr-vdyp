@@ -28,7 +28,7 @@ public class CoefficientParser implements ControlMapSubResourceParser<MatrixMap2
 	public static final int NUM_COEFFICIENTS = 10;
 	public static final int NUM_SPECIES = 16;
 
-	final String controlKey;
+	private final String controlKey;
 
 	public CoefficientParser(String controlKey) {
 		this.controlKey = controlKey;

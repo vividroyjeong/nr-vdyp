@@ -19,7 +19,7 @@ class LazyValueTest {
 		assertThat(unit.get(), is(42));
 		EasyMock.verify(supplier);
 	}
-	
+
 	@Test
 	void testOnlyCallsSupplierOnceForMultipleCalls() {
 		Supplier<Integer> supplier = EasyMock.createMock(Supplier.class);
@@ -30,7 +30,7 @@ class LazyValueTest {
 		assertThat(unit.get(), is(42));
 		EasyMock.verify(supplier);
 	}
-	
+
 	@Test
 	void testDoesNotCallSupplierUntilGet() {
 		Supplier<Integer> supplier = EasyMock.createMock(Supplier.class);

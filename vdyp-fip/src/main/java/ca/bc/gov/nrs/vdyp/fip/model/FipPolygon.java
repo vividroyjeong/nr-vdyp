@@ -6,11 +6,11 @@ import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
 
 public class FipPolygon extends BaseVdypPolygon<FipLayer, Optional<Float>> {
 
-	String forestInventoryZone; // FIP_P/FIZ
-	String biogeoclimaticZone; // FIP_P/BEC
-	Optional<FipMode> modeFip; // FIP_P2/MODE / MODEfip
-	Optional<String> nonproductiveDescription; // FIP_P3/NPDESC
-	float yieldFactor; // FIP_P4/YLDFACT
+	private String forestInventoryZone; // FIP_P/FIZ
+	private String biogeoclimaticZone; // FIP_P/BEC
+	private Optional<FipMode> modeFip; // FIP_P2/MODE / MODEfip
+	private Optional<String> nonproductiveDescription; // FIP_P3/NPDESC
+	private float yieldFactor; // FIP_P4/YLDFACT
 
 	public FipPolygon(
 			String polygonIdentifier, String fiz, String becIdentifier, Optional<Float> percentAvailable,

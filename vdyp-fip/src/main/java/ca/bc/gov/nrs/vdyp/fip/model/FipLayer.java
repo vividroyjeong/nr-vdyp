@@ -19,10 +19,10 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 	static final String INVENTORY_TYPE_GROUP = "INVENTORY_TYPE_GROUP"; // ITGFIP
 	static final String BREAST_HEIGHT_AGE = "BREAST_HEIGHT_AGE"; // AGEBH
 
-	float siteIndex; // FIPL_1/SI_L1 or FIPL_V/SI_V1
-	float crownClosure; // FIPL_1/CC_L1 or FIP:_V/CC_V1
-	String siteGenus; // FIPL_1A/SITESP0_L1 or FIPL_VA/SITESP0_L1
-	String siteSpecies; // FIPL_1A/SITESP64_L1 or FIPL_VA/SITESP64_L1
+	private float siteIndex; // FIPL_1/SI_L1 or FIPL_V/SI_V1
+	private float crownClosure; // FIPL_1/CC_L1 or FIP:_V/CC_V1
+	private String siteGenus; // FIPL_1A/SITESP0_L1 or FIPL_VA/SITESP0_L1
+	private String siteSpecies; // FIPL_1A/SITESP64_L1 or FIPL_VA/SITESP64_L1
 
 	// In VDYP7 These are read but not stored in common variables.
 	// Marked as Deprecated for now but I think we can just remove them.

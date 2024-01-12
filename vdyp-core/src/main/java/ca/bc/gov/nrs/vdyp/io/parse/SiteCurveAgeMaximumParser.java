@@ -33,7 +33,7 @@ public class SiteCurveAgeMaximumParser
 
 	public static final int DEFAULT_SC = 140;
 
-	LineParser lineParser = new LineParser() {
+	private LineParser lineParser = new LineParser() {
 
 		@Override
 		public boolean isStopLine(String line) {

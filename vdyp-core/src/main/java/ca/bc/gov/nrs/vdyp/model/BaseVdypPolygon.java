@@ -7,12 +7,11 @@ import java.util.Map;
 
 public class BaseVdypPolygon<L extends BaseVdypLayer<?>, PA> {
 
-	String polygonIdentifier; // FIP_P/POLYDESC
-	PA percentAvailable; // FIP_P2/PCTFLAND
-	Map<LayerType, L> layers = Collections.emptyMap();
+	private String polygonIdentifier; // FIP_P/POLYDESC
+	private PA percentAvailable; // FIP_P2/PCTFLAND
+	private Map<LayerType, L> layers = Collections.emptyMap();
 
 	public BaseVdypPolygon(String polygonIdentifier, PA percentAvailable) {
-		super();
 		this.polygonIdentifier = polygonIdentifier;
 		this.percentAvailable = percentAvailable;
 	}

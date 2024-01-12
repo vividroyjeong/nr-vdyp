@@ -25,7 +25,7 @@ public abstract class EquationGroupParser implements ControlMapSubResourceParser
 	public static final int MIN_GROUP = 1;
 	public static final int MAX_GROUP = 180;
 
-	LineParser lineParser;
+	private LineParser lineParser;
 
 	private Collection<String> hiddenBecs = Collections.emptyList();
 

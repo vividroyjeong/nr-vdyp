@@ -4,20 +4,24 @@ import java.util.Arrays;
 
 public class VdypSpecies extends BaseVdypSpecies implements VdypUtilizationHolder {
 
-	Coefficients baseAreaByUtilization = new Coefficients(Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1); // LVCOM/BA
-	Coefficients loreyHeightByUtilization = new Coefficients(Arrays.asList(0f, 0f), -1); // LVCOM/HL
-	Coefficients quadraticMeanDiameterByUtilization = new Coefficients(Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1); // LVCOM/DQ
-	Coefficients treesPerHectareByUtilization = new Coefficients(Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1); // LVCOM/TPH
+	private Coefficients baseAreaByUtilization = new Coefficients(Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1); // LVCOM/BA
+	private Coefficients loreyHeightByUtilization = new Coefficients(Arrays.asList(0f, 0f), -1); // LVCOM/HL
+	private Coefficients quadraticMeanDiameterByUtilization = new Coefficients(
+			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1
+	); // LVCOM/DQ
+	private Coefficients treesPerHectareByUtilization = new Coefficients(Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1); // LVCOM/TPH
 
-	Coefficients wholeStemVolumeByUtilization = new Coefficients(Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1); // LVCOM/VOLWS
-	Coefficients closeUtilizationVolumeByUtilization = new Coefficients(Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1); // LVCOM/VOLCU
-	Coefficients closeUtilizationNetVolumeOfDecayByUtilization = new Coefficients(
+	private Coefficients wholeStemVolumeByUtilization = new Coefficients(Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1); // LVCOM/VOLWS
+	private Coefficients closeUtilizationVolumeByUtilization = new Coefficients(
+			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1
+	); // LVCOM/VOLCU
+	private Coefficients closeUtilizationNetVolumeOfDecayByUtilization = new Coefficients(
 			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1
 	); // LVCOM/VOL_D
-	Coefficients closeUtilizationVolumeNetOfDecayAndWasteByUtilization = new Coefficients(
+	private Coefficients closeUtilizationVolumeNetOfDecayAndWasteByUtilization = new Coefficients(
 			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1
 	); // LVCOM/VOL_DW
-	Coefficients closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = new Coefficients(
+	private Coefficients closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = new Coefficients(
 			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1
 	); // LVCOM/VOL_DWB
 

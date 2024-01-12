@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtilizationHolder {
 
-	float breastHeightAge; // LVCOM3/AGEBHLV +
+	private float breastHeightAge; // LVCOM3/AGEBHLV +
 
 	Coefficients baseAreaByUtilization = new Coefficients(
 			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //

@@ -24,8 +24,8 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<List<G
 
 	private int num_sp0;
 
-	LineParser lineParser = new LineParser().strippedString(2, "alias").space(1).strippedString(32, "name").space(1)
-			.value(
+	private LineParser lineParser = new LineParser().strippedString(2, "alias").space(1).strippedString(32, "name")
+			.space(1).value(
 					2, "preference",
 					(s, c) -> ValueParser.optional(ValueParser.INTEGER).parse(s)
 							.flatMap(v -> v == 0 ? Optional.empty() : Optional.of(v))

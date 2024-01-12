@@ -4,7 +4,7 @@ import java.util.Optional;
 
 public class GenusDefinition extends AliasedEntity {
 
-	final Optional<Integer> preference;
+	private final Optional<Integer> preference;
 
 	public GenusDefinition(String alias, Optional<Integer> preference, String name) {
 		super(alias, name);

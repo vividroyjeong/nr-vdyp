@@ -12,9 +12,9 @@ public class FipLayerPrimary extends FipLayer {
 
 	// TODO Confirm if these should be required instead of optional if we know it's
 	// a Primary layer.
-	Optional<Integer> siteCurveNumber = Optional.empty(); // FIPL_1/SCN_L1
+	private Optional<Integer> siteCurveNumber = Optional.empty(); // FIPL_1/SCN_L1
 
-	Optional<Character> stockingClass = Optional.empty(); // FIPL_1ST/STK_L1
+	private Optional<Character> stockingClass = Optional.empty(); // FIPL_1ST/STK_L1
 
 	private String primaryGenus; // FIPL_1C/JPRIME
 

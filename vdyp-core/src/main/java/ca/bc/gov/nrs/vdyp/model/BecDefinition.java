@@ -6,11 +6,11 @@ import ca.bc.gov.nrs.vdyp.common.Computed;
 
 public class BecDefinition extends AliasedEntity {
 
-	final Region region;
+	private final Region region;
 
-	final Optional<BecDefinition> growthBec;
-	final Optional<BecDefinition> volumeBec;
-	final Optional<BecDefinition> decayBec;
+	private final Optional<BecDefinition> growthBec;
+	private final Optional<BecDefinition> volumeBec;
+	private final Optional<BecDefinition> decayBec;
 
 	public BecDefinition(String alias, Region region, String name) {
 		this(alias, region, name, Optional.empty(), Optional.empty(), Optional.empty());
@@ -31,7 +31,7 @@ public class BecDefinition extends AliasedEntity {
 			BecDefinition baseBec, BecDefinition defaultBec, boolean isGrowth, boolean isVolume, boolean isDecay
 	) {
 		this(
-				baseBec.getAlias(), baseBec.region, baseBec.name,
+				baseBec.getAlias(), baseBec.region, baseBec.getName(),
 				isGrowth ? baseBec.growthBec : Optional.of(defaultBec),
 				isVolume ? baseBec.volumeBec : Optional.of(defaultBec),
 				isDecay ? baseBec.decayBec : Optional.of(defaultBec)

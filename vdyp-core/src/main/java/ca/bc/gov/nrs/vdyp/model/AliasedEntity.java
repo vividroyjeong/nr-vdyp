@@ -2,8 +2,8 @@ package ca.bc.gov.nrs.vdyp.model;
 
 public class AliasedEntity {
 
-	final String alias;
-	final String name;
+	private final String alias;
+	private final String name;
 
 	protected AliasedEntity(String alias, String name) {
 		this.alias = alias;

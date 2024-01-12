@@ -31,7 +31,7 @@ public class StockingClassFactorParser implements
 	private static final String FACTOR_KEY = "factor";
 	private static final String NPCT_KEY = "npct";
 
-	LineParser lineParser = new LineParser() {
+	private LineParser lineParser = new LineParser() {
 
 		@Override
 		public boolean isIgnoredLine(String line) {

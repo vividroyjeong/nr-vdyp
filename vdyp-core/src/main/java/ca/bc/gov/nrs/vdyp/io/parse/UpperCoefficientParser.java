@@ -32,7 +32,7 @@ public class UpperCoefficientParser implements ControlMapSubResourceParser<Matri
 
 	public static final int NUM_COEFFICIENTS = 2;
 
-	LineParser lineParser = new LineParser() {
+	private LineParser lineParser = new LineParser() {
 
 		@Override
 		public boolean isStopLine(String line) {

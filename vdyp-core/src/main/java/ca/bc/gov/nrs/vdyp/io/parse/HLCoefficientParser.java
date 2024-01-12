@@ -33,12 +33,10 @@ public class HLCoefficientParser
 	public static final String REGION_KEY = "region";
 	public static final String COEFFICIENT_KEY = "coefficient";
 
-	int numCoefficients;
 	private String controlKey;
 
 	public HLCoefficientParser(int numCoefficients, String controlKey) {
 		super();
-		this.numCoefficients = numCoefficients;
 		this.lineParser = new LineParser() {
 
 			@Override
