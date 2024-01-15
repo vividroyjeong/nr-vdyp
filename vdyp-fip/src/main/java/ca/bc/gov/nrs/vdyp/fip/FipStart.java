@@ -465,7 +465,8 @@ public class FipStart {
 				fipLayer.getPolygonIdentifier(), //
 				fipLayer.getLayer(), //
 				fipLayer.getAgeTotal(), //
-				fipLayer.getYearsToBreastHeight()
+				fipLayer.getYearsToBreastHeight(), //
+				fipLayer.getHeight()
 		);
 
 		result.setYearsToBreastHeight(fipLayer.getYearsToBreastHeight());
@@ -1090,8 +1091,7 @@ public class FipStart {
 					.setCoe(UTIL_LARGEST, treesPerHectare(vSpec.getBaseAreaByUtilization().getCoe(UTIL_LARGEST), dq));
 		}
 
-		var vdypLayer = new VdypLayer(polygonIdentifier, layer, ageTotal, yearsToBreastHeight);
-		vdypLayer.setHeight(height);
+		var vdypLayer = new VdypLayer(polygonIdentifier, layer, ageTotal, yearsToBreastHeight, height);
 		vdypLayer.setBreastHeightAge(breastHeightAge);
 		vdypLayer.setSpecies(vdypSpecies);
 		// vdypLayer.setPrimaryGenus(primaryGenus);

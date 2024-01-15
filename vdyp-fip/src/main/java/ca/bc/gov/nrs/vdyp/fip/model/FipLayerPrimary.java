@@ -20,8 +20,8 @@ public class FipLayerPrimary extends FipLayer {
 
 	private int inventoryTypeGroup = 0;
 
-	public FipLayerPrimary(String polygonIdentifier, float ageTotal, float yearsToBreastHeight) {
-		super(polygonIdentifier, LayerType.PRIMARY, ageTotal, yearsToBreastHeight);
+	public FipLayerPrimary(String polygonIdentifier, float ageTotal, float yearsToBreastHeight, float height) {
+		super(polygonIdentifier, LayerType.PRIMARY, ageTotal, yearsToBreastHeight, height);
 	}
 
 	public Optional<Integer> getSiteCurveNumber() {

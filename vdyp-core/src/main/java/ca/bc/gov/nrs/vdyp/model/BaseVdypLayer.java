@@ -13,11 +13,14 @@ public class BaseVdypLayer<S extends BaseVdypSpecies> {
 	private float yearsToBreastHeight; // LVCOM3/YTBHLV, L1COM3/YTBHL1
 	private LinkedHashMap<String, S> species = new LinkedHashMap<>();
 
-	public BaseVdypLayer(String polygonIdentifier, LayerType layer, float ageTotal, float yearsToBreastHeight) {
+	public BaseVdypLayer(
+			String polygonIdentifier, LayerType layer, float ageTotal, float yearsToBreastHeight, float height
+	) {
 		this.polygonIdentifier = polygonIdentifier;
 		this.layer = layer;
 		this.ageTotal = ageTotal;
 		this.yearsToBreastHeight = yearsToBreastHeight;
+		this.height = height;
 	}
 
 	public String getPolygonIdentifier() {

@@ -102,9 +102,8 @@ public class FipLayerParser
 						switch (l.orElse(null)) {
 						case PRIMARY:
 							FipLayerPrimary fipLayerPrimary = new FipLayerPrimary(
-									polygonId, ageTotal, yearsToBreastHeight
+									polygonId, ageTotal, yearsToBreastHeight, height
 							);
-							fipLayerPrimary.setHeight(height);
 							fipLayerPrimary.setSiteIndex(siteIndex);
 							fipLayerPrimary.setCrownClosure(crownClosure);
 							fipLayerPrimary.setSiteGenus(siteSp0.get());
@@ -116,7 +115,7 @@ public class FipLayerParser
 							return builder.value(Optional.of(fipLayerPrimary));
 						case VETERAN:
 							FipLayer fipLayerVeteran = new FipLayer(
-									polygonId, LayerType.VETERAN, ageTotal, yearsToBreastHeight
+									polygonId, LayerType.VETERAN, ageTotal, yearsToBreastHeight, height
 							);
 							fipLayerVeteran.setHeight(height);
 							fipLayerVeteran.setSiteIndex(siteIndex);

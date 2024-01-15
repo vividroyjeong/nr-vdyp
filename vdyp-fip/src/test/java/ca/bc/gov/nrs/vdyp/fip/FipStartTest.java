@@ -2406,14 +2406,14 @@ class FipStartTest {
 				"Test", //
 				LayerType.PRIMARY, //
 				285f, // ageTotal
-				11.3999996f // yearsToBreastHeight
+				11.3999996f, // yearsToBreastHeight
+				24.3999996f // height
 		);
 		layer.getBaseAreaByUtilization().setCoe(0, 76.5122147f);
 		layer.getTreesPerHectareByUtilization().setCoe(0, 845.805969f);
 		layer.getQuadraticMeanDiameterByUtilization().setCoe(0, 33.9379082f);
 		layer.setAgeTotal(285f);
 		layer.setBreastHeightAge(273.600006f);
-		layer.setHeight(24.3999996f);
 		layer.setSpecies(Collections.singletonMap("Y", spec));
 
 		var fipLayer = this.getTestPrimaryLayer("Test", l -> {
@@ -2524,13 +2524,14 @@ class FipStartTest {
 				"Test", //
 				LayerType.PRIMARY, //
 				55f, // ageTotal
-				1f // yearsToBreastHeight
+				1f, // yearsToBreastHeight
+				35.2999992f // height
+
 		);
 		layer.getBaseAreaByUtilization().setCoe(0, 44.6249847f);
 		layer.getTreesPerHectareByUtilization().setCoe(0, 620.504883f);
 		layer.getQuadraticMeanDiameterByUtilization().setCoe(0, 30.2601795f);
 		layer.setBreastHeightAge(54f);
-		layer.setHeight(35.2999992f);
 
 		layer.setSpecies(specs);
 
@@ -2797,7 +2798,8 @@ class FipStartTest {
 				"Test", //
 				LayerType.PRIMARY, //
 				55f, // ageTotal
-				1f // yearsToBreastHeight
+				1f, // yearsToBreastHeight
+				31f // height
 		);
 
 		layer.setBreastHeightAge(54f);
@@ -3091,7 +3093,8 @@ class FipStartTest {
 				"Test", //
 				LayerType.PRIMARY, //
 				55f, // ageTotal
-				3.5f // yearsToBreastHeight
+				3.5f, // yearsToBreastHeight
+				20f // height
 		);
 
 		layer.setBreastHeightAge(51.5f);
@@ -3281,7 +3284,8 @@ class FipStartTest {
 		var fipPrimaryLayer = new FipLayerPrimary(
 				"Test", //
 				60f, // ageTotal
-				8.5f // yearsToBreastHeight
+				8.5f, // yearsToBreastHeight
+				20f // height
 		);
 
 		// fipPolygon.getLayers().put(LayerType.VETERAN, fipVeteranLayer);
@@ -3293,7 +3297,8 @@ class FipStartTest {
 				LayerType.PRIMARY, new VdypLayer(
 						"Test", LayerType.PRIMARY, //
 						60f, //
-						8.5f // yearsToBreastHeight
+						8.5f, // yearsToBreastHeight
+						20f // height
 				)
 		);
 
@@ -3337,7 +3342,8 @@ class FipStartTest {
 		var fipPrimaryLayer = new FipLayerPrimary(
 				"Test", //
 				60f, // ageTotal
-				8.5f // yearsToBreastHeight
+				8.5f, // yearsToBreastHeight
+				20f // height
 		);
 
 		// fipPolygon.getLayers().put(LayerType.VETERAN, fipVeteranLayer);
@@ -3350,7 +3356,8 @@ class FipStartTest {
 						"Test", //
 						LayerType.PRIMARY, //
 						60f, // ageTotal
-						8.5f // yearsToBreastHeight
+						8.5f, // yearsToBreastHeight
+						20f // height
 				)
 		);
 
@@ -3394,7 +3401,8 @@ class FipStartTest {
 		var fipPrimaryLayer = new FipLayerPrimary(
 				"Test", //
 				60f, // ageTotal
-				8.5f // yearsToBreastHeight
+				8.5f, // yearsToBreastHeight
+				20f // height
 		);
 		// fipPolygon.getLayers().put(LayerType.VETERAN, fipVeteranLayer);
 		fipPolygon.setLayers(new HashMap<>());
@@ -3406,7 +3414,8 @@ class FipStartTest {
 						"Test", //
 						LayerType.PRIMARY, //
 						60f, // ageTotal
-						8.5f // yearsToBreastHeight
+						8.5f, // yearsToBreastHeight
+						20f // height
 				)
 		);
 
@@ -3447,7 +3456,8 @@ class FipStartTest {
 		var fipPrimaryLayer = new FipLayerPrimary(
 				"Test", //
 				60f, // ageTotal
-				8.5f // yearsToBreastHeight
+				8.5f, // yearsToBreastHeight
+				20f // height
 		);
 		var processedLayers = new HashMap<LayerType, VdypLayer>();
 		processedLayers.put(
@@ -3455,7 +3465,8 @@ class FipStartTest {
 						"Test", //
 						LayerType.PRIMARY, //
 						60f, // ageTotal
-						8.5f // yearsToBreastHeight
+						8.5f, // yearsToBreastHeight
+						20f // height
 				)
 		);
 		fipPrimaryLayer.setStockingClass(Optional.of('R'));
@@ -3464,7 +3475,8 @@ class FipStartTest {
 				"Test", //
 				LayerType.PRIMARY, //
 				60f, // ageTotal
-				8.5f // yearsToBreastHeight
+				8.5f, // yearsToBreastHeight
+				20f // height
 		);
 
 		vdypLayer.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
@@ -3562,7 +3574,8 @@ class FipStartTest {
 		var fipPrimaryLayer = new FipLayerPrimary(
 				"Test", //
 				60f, // ageTotal
-				8.5f // yearsToBreastHeight
+				8.5f, // yearsToBreastHeight
+				20f // height
 		);
 		var processedLayers = new HashMap<LayerType, VdypLayer>();
 		processedLayers.put(
@@ -3570,7 +3583,8 @@ class FipStartTest {
 						"Test", //
 						LayerType.PRIMARY, //
 						60f, // ageTotal
-						8.5f // yearsToBreastHeight
+						8.5f, // yearsToBreastHeight
+						20f // height
 				)
 		);
 
@@ -3580,7 +3594,8 @@ class FipStartTest {
 				"Test", //
 				LayerType.PRIMARY, //
 				60f, // ageTotal
-				8.5f // yearsToBreastHeight
+				8.5f, // yearsToBreastHeight
+				20f // height
 		);
 		vdypLayer.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 		vdypLayer.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
@@ -3688,7 +3703,8 @@ class FipStartTest {
 		var fipPrimaryLayer = new FipLayerPrimary(
 				"Test", //
 				60f, // ageTotal
-				8.5f // yearsToBreastHeight
+				8.5f, // yearsToBreastHeight
+				20f // height
 		);
 		var processedLayers = new HashMap<LayerType, VdypLayer>();
 		processedLayers.put(
@@ -3696,7 +3712,8 @@ class FipStartTest {
 						"Test", //
 						LayerType.PRIMARY, //
 						60f, // ageTotal
-						8.5f // yearsToBreastHeight
+						8.5f, // yearsToBreastHeight
+						20f // height
 				)
 		);
 
@@ -3706,7 +3723,8 @@ class FipStartTest {
 				"Test", //
 				LayerType.PRIMARY, //
 				60f, // ageTotal
-				8.5f // yearsToBreastHeight
+				8.5f, // yearsToBreastHeight
+				20f // height
 		);
 		vdypLayer.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 		vdypLayer.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
@@ -3925,7 +3943,8 @@ class FipStartTest {
 		var result = new FipLayerPrimary(
 				polygonId, //
 				8f, // ageTotal
-				7f // yearsToBreastHeight
+				7f, // yearsToBreastHeight
+				6f // height
 		);
 		result.setHeight(6f);
 		result.setSiteIndex(5f);
@@ -3942,7 +3961,8 @@ class FipStartTest {
 				polygonId, // polygonIdentifier
 				LayerType.VETERAN, // layer
 				8f, // ageTotal
-				7f // yearsToBreastHeight
+				7f, // yearsToBreastHeight
+				6f // height
 		);
 		result.setHeight(6f);
 		result.setSiteIndex(5f);
