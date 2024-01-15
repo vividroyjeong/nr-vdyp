@@ -29,8 +29,8 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 	@Deprecated
 	Optional<Float> breastHeightAge = Optional.empty();
 
-	public FipLayer(String polygonIdentifier, LayerType layer) {
-		super(polygonIdentifier, layer);
+	public FipLayer(String polygonIdentifier, LayerType layer, float ageTotal) {
+		super(polygonIdentifier, layer, ageTotal);
 	}
 
 	public float getSiteIndex() {

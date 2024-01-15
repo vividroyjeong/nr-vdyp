@@ -111,7 +111,7 @@ class RootFinderTest {
 
 	VdypLayer mockLayer1(Map<String, Object> control) {
 
-		final var layer = new VdypLayer("Test", LayerType.PRIMARY);
+		final var layer = new VdypLayer("Test", LayerType.PRIMARY, 50f);
 		final var specMap = new LinkedHashMap<String, VdypSpecies>();
 
 		var spec3 = new VdypSpecies(
