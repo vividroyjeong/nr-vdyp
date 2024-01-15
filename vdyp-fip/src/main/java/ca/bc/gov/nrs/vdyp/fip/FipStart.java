@@ -461,7 +461,12 @@ public class FipStart {
 				() -> new IllegalStateException("Could not find BEC " + fipPolygon.getBiogeoclimaticZone())
 		);
 
-		var result = new VdypLayer(fipLayer.getPolygonIdentifier(), fipLayer.getLayer(), fipLayer.getAgeTotal());
+		var result = new VdypLayer(
+				fipLayer.getPolygonIdentifier(), //
+				fipLayer.getLayer(), //
+				fipLayer.getAgeTotal(), //
+				fipLayer.getYearsToBreastHeight()
+		);
 
 		result.setYearsToBreastHeight(fipLayer.getYearsToBreastHeight());
 		result.setBreastHeightAge(fipLayer.getAgeTotal() - fipLayer.getYearsToBreastHeight());
@@ -1085,9 +1090,8 @@ public class FipStart {
 					.setCoe(UTIL_LARGEST, treesPerHectare(vSpec.getBaseAreaByUtilization().getCoe(UTIL_LARGEST), dq));
 		}
 
-		var vdypLayer = new VdypLayer(polygonIdentifier, layer, ageTotal);
+		var vdypLayer = new VdypLayer(polygonIdentifier, layer, ageTotal, yearsToBreastHeight);
 		vdypLayer.setHeight(height);
-		vdypLayer.setYearsToBreastHeight(yearsToBreastHeight);
 		vdypLayer.setBreastHeightAge(breastHeightAge);
 		vdypLayer.setSpecies(vdypSpecies);
 		// vdypLayer.setPrimaryGenus(primaryGenus);

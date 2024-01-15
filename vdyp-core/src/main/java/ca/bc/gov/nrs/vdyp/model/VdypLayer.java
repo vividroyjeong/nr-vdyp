@@ -35,8 +35,8 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
 	); // LVCOM/VOL_DWB species 0
 
-	public VdypLayer(String polygonIdentifier, LayerType layer, float ageTotal) {
-		super(polygonIdentifier, layer, ageTotal);
+	public VdypLayer(String polygonIdentifier, LayerType layer, float ageTotal, float yearsToBreastHeight) {
+		super(polygonIdentifier, layer, ageTotal, yearsToBreastHeight);
 	}
 
 	public float getBreastHeightAge() {

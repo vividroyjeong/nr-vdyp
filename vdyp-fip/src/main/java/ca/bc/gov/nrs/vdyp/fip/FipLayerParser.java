@@ -101,26 +101,28 @@ public class FipLayerParser
 					return layer.handle(l -> {
 						switch (l.orElse(null)) {
 						case PRIMARY:
-							FipLayerPrimary fipLayerPrimary = new FipLayerPrimary(polygonId, ageTotal);
+							FipLayerPrimary fipLayerPrimary = new FipLayerPrimary(
+									polygonId, ageTotal, yearsToBreastHeight
+							);
 							fipLayerPrimary.setHeight(height);
 							fipLayerPrimary.setSiteIndex(siteIndex);
 							fipLayerPrimary.setCrownClosure(crownClosure);
 							fipLayerPrimary.setSiteGenus(siteSp0.get());
 							fipLayerPrimary.setSiteSpecies(siteSp64.get());
-							fipLayerPrimary.setYearsToBreastHeight(yearsToBreastHeight);
 							fipLayerPrimary.setStockingClass(stockingClass);
 							fipLayerPrimary.setInventoryTypeGroup(inventoryTypeGroup.orElse(0));
 							fipLayerPrimary.setBreastHeightAge(breastHeightAge);
 							fipLayerPrimary.setSiteCurveNumber(siteCurveNumber);
 							return builder.value(Optional.of(fipLayerPrimary));
 						case VETERAN:
-							FipLayer fipLayerVeteran = new FipLayer(polygonId, LayerType.VETERAN, ageTotal);
+							FipLayer fipLayerVeteran = new FipLayer(
+									polygonId, LayerType.VETERAN, ageTotal, yearsToBreastHeight
+							);
 							fipLayerVeteran.setHeight(height);
 							fipLayerVeteran.setSiteIndex(siteIndex);
 							fipLayerVeteran.setCrownClosure(crownClosure);
 							fipLayerVeteran.setSiteGenus(siteSp0.get());
 							fipLayerVeteran.setSiteSpecies(siteSp64.get());
-							fipLayerVeteran.setYearsToBreastHeight(yearsToBreastHeight);
 							fipLayerVeteran.setBreastHeightAge(breastHeightAge);
 							return builder.value(Optional.of(fipLayerVeteran));
 
