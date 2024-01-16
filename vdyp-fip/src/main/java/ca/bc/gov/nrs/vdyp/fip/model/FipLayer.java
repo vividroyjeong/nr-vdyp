@@ -98,7 +98,7 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 		return builder.build();
 	}
 
-	public static class Builder extends BaseVdypLayer.Builder<FipLayer> {
+	public static class Builder extends BaseVdypLayer.Builder<FipLayer, FipSpecies> {
 		protected Optional<Float> siteIndex = Optional.empty();
 		protected Optional<Float> crownClosure = Optional.empty();
 		protected Optional<String> siteGenus = Optional.empty();

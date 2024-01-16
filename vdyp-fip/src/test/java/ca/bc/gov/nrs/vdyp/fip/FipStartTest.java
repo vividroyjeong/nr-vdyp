@@ -2402,18 +2402,17 @@ class FipStartTest {
 		spec.setDecayGroup(63);
 		spec.setBreakageGroup(31);
 		spec.getLoreyHeightByUtilization().setCoe(0, 19.9850883f);
-		var layer = new VdypLayer(
-				"Test", //
-				LayerType.PRIMARY, //
-				285f, // ageTotal
-				11.3999996f, // yearsToBreastHeight
-				24.3999996f // height
-		);
+		var layer = VdypLayer.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.ageTotal(285f);
+			builder.yearsToBreastHeight(11.3999996f);
+			builder.height(24.3999996f);
+		});
 		layer.getBaseAreaByUtilization().setCoe(0, 76.5122147f);
 		layer.getTreesPerHectareByUtilization().setCoe(0, 845.805969f);
 		layer.getQuadraticMeanDiameterByUtilization().setCoe(0, 33.9379082f);
 		layer.setAgeTotal(285f);
-		layer.setBreastHeightAge(273.600006f);
 		layer.setSpecies(Collections.singletonMap("Y", spec));
 
 		var fipLayer = this.getTestPrimaryLayer("Test", l -> {
@@ -2520,18 +2519,16 @@ class FipStartTest {
 		specs.add(spec4);
 		specs.add(spec5);
 
-		var layer = new VdypLayer(
-				"Test", //
-				LayerType.PRIMARY, //
-				55f, // ageTotal
-				1f, // yearsToBreastHeight
-				35.2999992f // height
-
-		);
+		var layer = VdypLayer.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.ageTotal(55f);
+			builder.yearsToBreastHeight(1f);
+			builder.height(35.2999992f);
+		});
 		layer.getBaseAreaByUtilization().setCoe(0, 44.6249847f);
 		layer.getTreesPerHectareByUtilization().setCoe(0, 620.504883f);
 		layer.getQuadraticMeanDiameterByUtilization().setCoe(0, 30.2601795f);
-		layer.setBreastHeightAge(54f);
 
 		layer.setSpecies(specs);
 
@@ -2794,15 +2791,13 @@ class FipStartTest {
 		app.setControlMap(controlMap);
 
 		FipPolygon fPoly = new FipPolygon("Test", "A", "CWH", Optional.empty(), Optional.empty(), Optional.empty(), 0);
-		VdypLayer layer = new VdypLayer(
-				"Test", //
-				LayerType.PRIMARY, //
-				55f, // ageTotal
-				1f, // yearsToBreastHeight
-				31f // height
-		);
-
-		layer.setBreastHeightAge(54f);
+		VdypLayer layer = VdypLayer.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.ageTotal(55f);
+			builder.yearsToBreastHeight(1f);
+			builder.height(31f);
+		});
 
 		layer.getLoreyHeightByUtilization().setCoe(FipStart.UTIL_ALL, 31.3307209f);
 		layer.getBaseAreaByUtilization().setCoe(FipStart.UTIL_ALL, 44.6249847f);
@@ -3089,15 +3084,13 @@ class FipStartTest {
 
 		var bec = BecDefinitionParser.getBecs(controlMap).get("IDF").get();
 
-		var layer = new VdypLayer(
-				"Test", //
-				LayerType.PRIMARY, //
-				55f, // ageTotal
-				3.5f, // yearsToBreastHeight
-				20f // height
-		);
-
-		layer.setBreastHeightAge(51.5f);
+		var layer = VdypLayer.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.ageTotal(55f);
+			builder.yearsToBreastHeight(3.5f);
+			builder.height(20f);
+		});
 
 		layer.getLoreyHeightByUtilization().setCoe(FipStart.UTIL_ALL, 13.0660105f);
 		layer.getBaseAreaByUtilization().setCoe(FipStart.UTIL_ALL, 19.9786701f);
@@ -3298,14 +3291,13 @@ class FipStartTest {
 		fipPolygon.getLayers().put(LayerType.PRIMARY, fipPrimaryLayer);
 
 		var processedLayers = new HashMap<LayerType, VdypLayer>();
-		processedLayers.put(
-				LayerType.PRIMARY, new VdypLayer(
-						"Test", LayerType.PRIMARY, //
-						60f, //
-						8.5f, // yearsToBreastHeight
-						20f // height
-				)
-		);
+		processedLayers.put(LayerType.PRIMARY, VdypLayer.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.ageTotal(60f);
+			builder.yearsToBreastHeight(8.5f);
+			builder.height(20f);
+		}));
 
 		var spec1 = new FipSpecies("Test", LayerType.PRIMARY, "L");
 		spec1.setFractionGenus(0.1f);
@@ -3358,15 +3350,13 @@ class FipStartTest {
 		fipPolygon.getLayers().put(LayerType.PRIMARY, fipPrimaryLayer);
 
 		var processedLayers = new HashMap<LayerType, VdypLayer>();
-		processedLayers.put(
-				LayerType.PRIMARY, new VdypLayer(
-						"Test", //
-						LayerType.PRIMARY, //
-						60f, // ageTotal
-						8.5f, // yearsToBreastHeight
-						20f // height
-				)
-		);
+		processedLayers.put(LayerType.PRIMARY, VdypLayer.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.ageTotal(60f);
+			builder.yearsToBreastHeight(8.5f);
+			builder.height(20f);
+		}));
 
 		var spec1 = new FipSpecies("Test", LayerType.PRIMARY, "L");
 		spec1.setFractionGenus(0.1f);
@@ -3419,15 +3409,13 @@ class FipStartTest {
 		fipPolygon.getLayers().put(LayerType.PRIMARY, fipPrimaryLayer);
 
 		var processedLayers = new HashMap<LayerType, VdypLayer>();
-		processedLayers.put(
-				LayerType.PRIMARY, new VdypLayer(
-						"Test", //
-						LayerType.PRIMARY, //
-						60f, // ageTotal
-						8.5f, // yearsToBreastHeight
-						20f // height
-				)
-		);
+		processedLayers.put(LayerType.PRIMARY, VdypLayer.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.ageTotal(60f);
+			builder.yearsToBreastHeight(8.5f);
+			builder.height(20f);
+		}));
 
 		var spec1 = new FipSpecies("Test", LayerType.PRIMARY, "L");
 		spec1.setFractionGenus(0.1f);
@@ -3475,23 +3463,21 @@ class FipStartTest {
 		});
 
 		var processedLayers = new HashMap<LayerType, VdypLayer>();
-		processedLayers.put(
-				LayerType.PRIMARY, new VdypLayer(
-						"Test", //
-						LayerType.PRIMARY, //
-						60f, // ageTotal
-						8.5f, // yearsToBreastHeight
-						20f // height
-				)
-		);
+		processedLayers.put(LayerType.PRIMARY, VdypLayer.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.ageTotal(60f);
+			builder.yearsToBreastHeight(8.5f);
+			builder.height(20f);
+		}));
 
-		var vdypLayer = new VdypLayer(
-				"Test", //
-				LayerType.PRIMARY, //
-				60f, // ageTotal
-				8.5f, // yearsToBreastHeight
-				20f // height
-		);
+		var vdypLayer = VdypLayer.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.ageTotal(60f);
+			builder.yearsToBreastHeight(8.5f);
+			builder.height(20f);
+		});
 
 		vdypLayer.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 		vdypLayer.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
@@ -3598,25 +3584,23 @@ class FipStartTest {
 		});
 
 		var processedLayers = new HashMap<LayerType, VdypLayer>();
-		processedLayers.put(
-				LayerType.PRIMARY, new VdypLayer(
-						"Test", //
-						LayerType.PRIMARY, //
-						60f, // ageTotal
-						8.5f, // yearsToBreastHeight
-						20f // height
-				)
-		);
+		processedLayers.put(LayerType.PRIMARY, VdypLayer.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.ageTotal(60f);
+			builder.yearsToBreastHeight(8.5f);
+			builder.height(20f);
+		}));
 
 		fipPrimaryLayer.setStockingClass(Optional.empty());
 
-		var vdypLayer = new VdypLayer(
-				"Test", //
-				LayerType.PRIMARY, //
-				60f, // ageTotal
-				8.5f, // yearsToBreastHeight
-				20f // height
-		);
+		var vdypLayer = VdypLayer.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.ageTotal(60f);
+			builder.yearsToBreastHeight(8.5f);
+			builder.height(20f);
+		});
 		vdypLayer.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 		vdypLayer.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 
@@ -3733,25 +3717,24 @@ class FipStartTest {
 		});
 
 		var processedLayers = new HashMap<LayerType, VdypLayer>();
-		processedLayers.put(
-				LayerType.PRIMARY, new VdypLayer(
-						"Test", //
-						LayerType.PRIMARY, //
-						60f, // ageTotal
-						8.5f, // yearsToBreastHeight
-						20f // height
-				)
-		);
+		processedLayers.put(LayerType.PRIMARY, VdypLayer.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.ageTotal(60f);
+			builder.yearsToBreastHeight(3.5f);
+			builder.height(20f);
+		}));
 
 		fipPrimaryLayer.setStockingClass(Optional.of('R'));
 
-		var vdypLayer = new VdypLayer(
-				"Test", //
-				LayerType.PRIMARY, //
-				60f, // ageTotal
-				8.5f, // yearsToBreastHeight
-				20f // height
-		);
+		var vdypLayer = VdypLayer.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.ageTotal(60f);
+			builder.yearsToBreastHeight(3.5f);
+			builder.height(20f);
+		});
+
 		vdypLayer.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 		vdypLayer.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 

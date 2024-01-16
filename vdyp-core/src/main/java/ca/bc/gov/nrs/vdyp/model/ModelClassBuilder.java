@@ -45,11 +45,20 @@ public abstract class ModelClassBuilder<T> {
 		if (!errors.isEmpty()) {
 			throw new IllegalStateException(String.join(", ", errors));
 		}
-		return doBuild();
+		var result = doBuild();
+		postProcess(result);
+		return result;
 	}
 
 	/**
 	 * Run the constructor, assuming all required properties are present
 	 */
 	protected abstract T doBuild();
+
+	/**
+	 * Additional steps after building.
+	 */
+	protected void postProcess(T result) {
+		// Do nothing
+	};
 }

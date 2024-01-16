@@ -1,39 +1,30 @@
 package ca.bc.gov.nrs.vdyp.model;
 
-import java.util.Arrays;
+import java.util.function.Consumer;
+
+import ca.bc.gov.nrs.vdyp.common.Computed;
 
 public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtilizationHolder {
 
-	private float breastHeightAge; // LVCOM3/AGEBHLV +
+	Coefficients baseAreaByUtilization = //
+			VdypUtilizationHolder.emptyUtilization(); // LVCOM/BA species 0
+	Coefficients loreyHeightByUtilization = //
+			VdypUtilizationHolder.emptyLoreyHeightUtilization(); // LVCOM/HL species 0
+	Coefficients quadraticMeanDiameterByUtilization = //
+			VdypUtilizationHolder.emptyUtilization(); // LVCOM/DQ species 0
+	Coefficients treesPerHectareByUtilization = //
+			VdypUtilizationHolder.emptyUtilization(); // LVCOM/TPH species 0
 
-	Coefficients baseAreaByUtilization = new Coefficients(
-			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
-	); // LVCOM/BA species 0
-	Coefficients loreyHeightByUtilization = new Coefficients(
-			Arrays.asList(0f, 0f), -1 //
-	); // LVCOM/HL species 0
-	Coefficients quadraticMeanDiameterByUtilization = new Coefficients(
-			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
-	); // LVCOM/DQ species 0
-	Coefficients treesPerHectareByUtilization = new Coefficients(
-			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
-	); // LVCOM/TPH species 0
-
-	Coefficients wholeStemVolumeByUtilization = new Coefficients(
-			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
-	); // LVCOM/VOLWS species 0
-	Coefficients closeUtilizationVolumeByUtilization = new Coefficients(
-			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
-	); // LVCOM/VOLCU species 0
-	Coefficients closeUtilizationVolumeNetOfDecayByUtilization = new Coefficients(
-			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
-	); // LVCOM/VOL_D species 0
-	Coefficients closeUtilizationVolumeNetOfDecayAndWasteByUtilization = new Coefficients(
-			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
-	); // LVCOM/VOL_DW species 0
-	Coefficients closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = new Coefficients(
-			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
-	); // LVCOM/VOL_DWB species 0
+	Coefficients wholeStemVolumeByUtilization = //
+			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOLWS species 0
+	Coefficients closeUtilizationVolumeByUtilization = //
+			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOLCU species/ 0
+	Coefficients closeUtilizationVolumeNetOfDecayByUtilization = //
+			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOL_D species 0
+	Coefficients closeUtilizationVolumeNetOfDecayAndWasteByUtilization = //
+			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOL_DW species 0
+	Coefficients closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = //
+			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOL_DWB species 0
 
 	public VdypLayer(
 			String polygonIdentifier, LayerType layer, float ageTotal, float yearsToBreastHeight, float height
@@ -41,12 +32,9 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 		super(polygonIdentifier, layer, ageTotal, yearsToBreastHeight, height);
 	}
 
+	@Computed
 	public float getBreastHeightAge() {
-		return breastHeightAge;
-	}
-
-	public void setBreastHeightAge(float breastHeightAge) {
-		this.breastHeightAge = breastHeightAge;
+		return this.getAgeTotal() - this.getYearsToBreastHeight();
 	}
 
 	@Override
@@ -145,4 +133,47 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 		this.closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization;
 	}
 
+	/**
+	 * Accepts a configuration function that accepts a builder to configure.
+	 *
+	 * <pre>
+	 * FipLayer myLayer = FipLayer.build(builder-&gt; {
+			builder.polygonIdentifier(polygonId);
+			builder.layerType(LayerType.VETERAN);
+			builder.ageTotal(8f);
+			builder.yearsToBreastHeight(7f);
+			builder.height(6f);
+
+			builder.siteIndex(5f);
+			builder.crownClosure(0.9f);
+			builder.siteGenus("B");
+			builder.siteSpecies("B");
+	 * })
+	 * </pre>
+	 *
+	 * @param config The configuration function
+	 * @return The object built by the configured builder.
+	 * @throws IllegalStateException if any required properties have not been set by
+	 *                               the configuration function.
+	 */
+	public static VdypLayer build(Consumer<Builder> config) {
+		var builder = new Builder();
+		config.accept(builder);
+		return builder.build();
+	}
+
+	public static class Builder extends BaseVdypLayer.Builder<VdypLayer, VdypSpecies> {
+
+		@Override
+		protected VdypLayer doBuild() {
+			return (new VdypLayer(
+					polygonIdentifier.get(), //
+					layer.get(), //
+					ageTotal.get(), //
+					yearsToBreastHeight.get(), //
+					height.get()
+			));
+		}
+
+	}
 }
