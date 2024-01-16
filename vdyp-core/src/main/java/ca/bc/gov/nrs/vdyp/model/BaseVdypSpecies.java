@@ -1,6 +1,9 @@
 package ca.bc.gov.nrs.vdyp.model;
 
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.common.Computed;
 
@@ -76,6 +79,70 @@ public abstract class BaseVdypSpecies {
 
 	public String getGenus() {
 		return genus;
+	}
+
+
+	protected abstract static class Builder<T extends BaseVdypSpecies>
+			extends ModelClassBuilder<T> {
+		protected Optional<String> polygonIdentifier = Optional.empty();
+		protected Optional<LayerType> layer = Optional.empty();
+		protected Optional<String> genus = Optional.empty();
+		protected Optional<Float> percentGenus = Optional.empty();
+		protected Map<String, Float> speciesPercent = new LinkedHashMap<>();
+
+		public Builder<T> polygonIdentifier(String polygonIdentifier) {
+			this.polygonIdentifier = Optional.of(polygonIdentifier);
+			return this;
+		}
+
+		public Builder<T> layerType(LayerType layer) {
+			this.layer = Optional.of(layer);
+			return this;
+		}
+
+		public Builder<T> genus(String genus) {
+			this.genus = Optional.of(genus);
+			return this;
+		}
+		
+		public Builder<T> percentGenus(float percentGenus) {
+			this.percentGenus = Optional.of(percentGenus);
+			return this;
+		}
+
+		public Builder<T> addSpecies(String id, float percent) {
+			this.speciesPercent.put(id, percent);
+			return this;
+		}
+
+		public Builder<T> addSpecies(Map<String, Float> toAdd) {
+			this.speciesPercent.putAll(toAdd);
+			return this;
+		}
+
+		public Builder<T> copy(BaseVdypSpecies toCopy) {
+			polygonIdentifier(toCopy.getPolygonIdentifier());
+			layerType(toCopy.getLayer());
+			genus(toCopy.getGenus());
+			percentGenus(toCopy.getPercentGenus());
+			return this;
+		}
+
+		@Override
+		protected void check(Collection<String> errors) {
+			requirePresent(polygonIdentifier, "polygonIdentifier", errors);
+			requirePresent(layer, "layer", errors);
+			requirePresent(genus, "genus", errors);
+			requirePresent(percentGenus, "percentGenus", errors);
+		}
+
+		@Override
+		protected void postProcess(T result) {
+			super.postProcess(result);
+
+			result.getSpeciesPercent().putAll(speciesPercent);
+		}
+
 	}
 
 }
