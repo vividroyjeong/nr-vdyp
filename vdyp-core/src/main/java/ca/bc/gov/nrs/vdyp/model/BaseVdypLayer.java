@@ -2,7 +2,9 @@ package ca.bc.gov.nrs.vdyp.model;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Optional;
 
 public class BaseVdypLayer<S extends BaseVdypSpecies> {
 
@@ -68,5 +70,48 @@ public class BaseVdypLayer<S extends BaseVdypSpecies> {
 		this.species.clear();
 		species.forEach(spec -> this.species.put(spec.getGenus(), spec));
 	}
+
+	protected abstract static class Builder<T extends BaseVdypLayer<?>> extends ModelClassBuilder<T> {
+		protected Optional<String> polygonIdentifier = Optional.empty();
+		protected Optional<LayerType> layer = Optional.empty();
+		protected Optional<Float> ageTotal = Optional.empty();
+		protected Optional<Float> height = Optional.empty();
+		protected Optional<Float> yearsToBreastHeight = Optional.empty();
+
+		public Builder<T> polygonIdentifier(String polygonIdentifier) {
+			this.polygonIdentifier = Optional.of(polygonIdentifier);
+			return this;
+		}
+
+		public Builder<T> layerType(LayerType layer) {
+			this.layer = Optional.of(layer);
+			return this;
+		}
+
+		public Builder<T> ageTotal(float ageTotal) {
+			this.ageTotal = Optional.of(ageTotal);
+			return this;
+		}
+
+		public Builder<T> height(float height) {
+			this.height = Optional.of(height);
+			return this;
+		}
+
+		public Builder<T> yearsToBreastHeight(float yearsToBreastHeight) {
+			this.yearsToBreastHeight = Optional.of(yearsToBreastHeight);
+			return this;
+		}
+
+		@Override
+		protected void check(Collection<String> errors) {
+			requirePresent(polygonIdentifier, "polygonIdentifier", errors);
+			requirePresent(layer, "layer", errors);
+			requirePresent(ageTotal, "ageTotal", errors);
+			requirePresent(yearsToBreastHeight, "yearsToBreastHeight", errors);
+			requirePresent(height, "height", errors);
+		}
+
+	};
 
 }

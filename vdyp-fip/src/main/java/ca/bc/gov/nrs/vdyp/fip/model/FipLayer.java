@@ -1,6 +1,8 @@
 package ca.bc.gov.nrs.vdyp.fip.model;
 
+import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
@@ -24,15 +26,15 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 	private String siteGenus; // FIPL_1A/SITESP0_L1 or FIPL_VA/SITESP0_L1
 	private String siteSpecies; // FIPL_1A/SITESP64_L1 or FIPL_VA/SITESP64_L1
 
-	// In VDYP7 These are read but not stored in common variables.
-	// Marked as Deprecated for now but I think we can just remove them.
-	@Deprecated
-	Optional<Float> breastHeightAge = Optional.empty();
-
 	public FipLayer(
-			String polygonIdentifier, LayerType layer, float ageTotal, float yearsToBreastHeight, float height
+			String polygonIdentifier, LayerType layer, float ageTotal, float yearsToBreastHeight, float height,
+			float siteIndex, float crownClosure, String siteGenus, String siteSpecies
 	) {
 		super(polygonIdentifier, layer, ageTotal, yearsToBreastHeight, height);
+		this.siteIndex = siteIndex;
+		this.crownClosure = crownClosure;
+		this.siteGenus = siteGenus;
+		this.siteSpecies = siteGenus;
 	}
 
 	public float getSiteIndex() {
@@ -51,11 +53,6 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 		return siteSpecies;
 	}
 
-	@Deprecated
-	public Optional<Float> getBreastHeightAge() {
-		return breastHeightAge;
-	}
-
 	public void setSiteIndex(float siteIndex) {
 		this.siteIndex = siteIndex;
 	}
@@ -72,9 +69,85 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 		this.siteSpecies = siteSp64;
 	}
 
-	@Deprecated
-	public void setBreastHeightAge(Optional<Float> breastHeightAge) {
-		this.breastHeightAge = breastHeightAge;
+	/**
+	 * Accepts a configuration function that accepts a builder to configure.
+	 *
+	 * <pre>
+	 * FipLayer myLayer = FipLayer.build(builder-&gt; {
+			builder.polygonIdentifier(polygonId);
+			builder.layerType(LayerType.VETERAN);
+			builder.ageTotal(8f);
+			builder.yearsToBreastHeight(7f);
+			builder.height(6f);
+
+			builder.siteIndex(5f);
+			builder.crownClosure(0.9f);
+			builder.siteGenus("B");
+			builder.siteSpecies("B");
+	 * })
+	 * </pre>
+	 *
+	 * @param config The configuration function
+	 * @return The object built by the configured builder.
+	 * @throws IllegalStateException if any required properties have not been set by
+	 *                               the configuration function.
+	 */
+	public static FipLayer build(Consumer<Builder> config) {
+		var builder = new Builder();
+		config.accept(builder);
+		return builder.build();
 	}
 
+	public static class Builder extends BaseVdypLayer.Builder<FipLayer> {
+		protected Optional<Float> siteIndex = Optional.empty();
+		protected Optional<Float> crownClosure = Optional.empty();
+		protected Optional<String> siteGenus = Optional.empty();
+		protected Optional<String> siteSpecies = Optional.empty();
+
+		public Builder siteIndex(float siteIndex) {
+			this.siteIndex = Optional.of(siteIndex);
+			return this;
+		}
+
+		public Builder crownClosure(float crownClosure) {
+			this.crownClosure = Optional.of(crownClosure);
+			return this;
+		}
+
+		public Builder siteGenus(String siteGenus) {
+			this.siteGenus = Optional.of(siteGenus);
+			return this;
+		}
+
+		public Builder siteSpecies(String siteSpecies) {
+			this.siteSpecies = Optional.of(siteSpecies);
+			return this;
+		}
+
+		@Override
+		protected void check(Collection<String> errors) {
+			super.check(errors);
+			requirePresent(siteIndex, "siteIndex", errors);
+			requirePresent(crownClosure, "crownClosure", errors);
+			requirePresent(siteGenus, "siteGenus", errors);
+			requirePresent(siteSpecies, "siteSpecies", errors);
+
+		}
+
+		@Override
+		protected FipLayer doBuild() {
+			return (new FipLayer(
+					polygonIdentifier.get(), //
+					layer.get(), //
+					ageTotal.get(), //
+					yearsToBreastHeight.get(), //
+					height.get(), //
+					siteIndex.get(), //
+					crownClosure.get(), //
+					siteGenus.get(), //
+					siteSpecies.get()
+			));
+		}
+
+	}
 }

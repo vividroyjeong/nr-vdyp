@@ -610,7 +610,9 @@ public class FipStart {
 
 				Coefficients limitCoe = getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
 
-				final float maxHeightMultiplier = fipLayer.getPrimaryGenus().equals(spec.getGenus()) ? 1.5f : 1.0f;
+				final float maxHeightMultiplier = fipLayer.getPrimaryGenus()
+						.orElseThrow(() -> new IllegalStateException("primaryGenus has not been set"))
+						.equals(spec.getGenus()) ? 1.5f : 1.0f;
 				final float heightMax = limitCoe.getCoe(1) * maxHeightMultiplier;
 
 				spec.getLoreyHeightByUtilization().scalarInPlace(UTIL_ALL, x -> min(x, heightMax));

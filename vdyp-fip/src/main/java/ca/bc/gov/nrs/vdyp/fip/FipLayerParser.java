@@ -80,7 +80,7 @@ public class FipLayerParser
 					is, lineParser, control
 			) {
 
-				@SuppressWarnings({ "unchecked", "deprecation" })
+				@SuppressWarnings({ "unchecked" })
 				@Override
 				protected ValueOrMarker<Optional<FipLayer>, EndOfRecord> convert(Map<String, Object> entry) {
 					var polygonId = (String) entry.get(POLYGON_IDENTIFIER);
@@ -94,41 +94,48 @@ public class FipLayerParser
 					var yearsToBreastHeight = (float) entry.get(YEARS_TO_BREAST_HEIGHT);
 					var stockingClass = (Optional<Character>) entry.get(STOCKING_CLASS);
 					var inventoryTypeGroup = (Optional<Integer>) entry.get(INVENTORY_TYPE_GROUP);
-					var breastHeightAge = (Optional<Float>) entry.get(BREAST_HEIGHT_AGE);
 					var siteCurveNumber = (Optional<Integer>) entry.get(SITE_CURVE_NUMBER);
 
-					var builder = new ValueOrMarker.Builder<Optional<FipLayer>, EndOfRecord>();
+					var vmBuilder = new ValueOrMarker.Builder<Optional<FipLayer>, EndOfRecord>();
 					return layer.handle(l -> {
 						switch (l.orElse(null)) {
 						case PRIMARY:
-							FipLayerPrimary fipLayerPrimary = new FipLayerPrimary(
-									polygonId, ageTotal, yearsToBreastHeight, height
-							);
-							fipLayerPrimary.setSiteIndex(siteIndex);
-							fipLayerPrimary.setCrownClosure(crownClosure);
-							fipLayerPrimary.setSiteGenus(siteSp0.get());
-							fipLayerPrimary.setSiteSpecies(siteSp64.get());
-							fipLayerPrimary.setStockingClass(stockingClass);
-							fipLayerPrimary.setInventoryTypeGroup(inventoryTypeGroup.orElse(0));
-							fipLayerPrimary.setBreastHeightAge(breastHeightAge);
-							fipLayerPrimary.setSiteCurveNumber(siteCurveNumber);
-							return builder.value(Optional.of(fipLayerPrimary));
+							FipLayerPrimary fipLayerPrimary = FipLayerPrimary.buildPrimary(flBuilder -> {
+								flBuilder.polygonIdentifier(polygonId);
+								flBuilder.ageTotal(ageTotal);
+								flBuilder.yearsToBreastHeight(yearsToBreastHeight);
+								flBuilder.height(height);
+
+								flBuilder.siteIndex(siteIndex);
+								flBuilder.crownClosure(crownClosure);
+								flBuilder.siteGenus(siteSp0.get());
+								flBuilder.siteSpecies(siteSp64.get());
+
+								flBuilder.stockingClass(stockingClass);
+								flBuilder.inventoryTypeGroup(inventoryTypeGroup);
+								flBuilder.siteCurveNumber(siteCurveNumber);
+							});
+							return vmBuilder.value(Optional.of(fipLayerPrimary));
 						case VETERAN:
-							FipLayer fipLayerVeteran = new FipLayer(
-									polygonId, LayerType.VETERAN, ageTotal, yearsToBreastHeight, height
-							);
-							fipLayerVeteran.setHeight(height);
-							fipLayerVeteran.setSiteIndex(siteIndex);
-							fipLayerVeteran.setCrownClosure(crownClosure);
-							fipLayerVeteran.setSiteGenus(siteSp0.get());
-							fipLayerVeteran.setSiteSpecies(siteSp64.get());
-							fipLayerVeteran.setBreastHeightAge(breastHeightAge);
-							return builder.value(Optional.of(fipLayerVeteran));
+							FipLayer fipLayerVeteran = FipLayer.build(flBuilder -> {
+								flBuilder.polygonIdentifier(polygonId);
+								flBuilder.layerType(LayerType.VETERAN);
+								flBuilder.ageTotal(ageTotal);
+								flBuilder.yearsToBreastHeight(yearsToBreastHeight);
+								flBuilder.height(height);
+
+								flBuilder.siteIndex(siteIndex);
+								flBuilder.crownClosure(crownClosure);
+								flBuilder.siteGenus(siteSp0.get());
+								flBuilder.siteSpecies(siteSp64.get());
+							});
+
+							return vmBuilder.value(Optional.of(fipLayerVeteran));
 
 						default:
-							return builder.value(Optional.empty());
+							return vmBuilder.value(Optional.empty());
 						}
-					}, builder::marker);
+					}, vmBuilder::marker);
 				}
 
 			};
