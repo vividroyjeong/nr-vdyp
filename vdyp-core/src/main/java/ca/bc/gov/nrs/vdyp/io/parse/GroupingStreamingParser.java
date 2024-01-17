@@ -18,7 +18,7 @@ public abstract class GroupingStreamingParser<T, U> implements StreamingParser<T
 
 	final StreamingParser<U> delegate;
 
-	Optional<List<U>> next = Optional.empty();
+	private Optional<List<U>> next = Optional.empty();
 
 	protected GroupingStreamingParser(StreamingParser<U> delegate) {
 		super();

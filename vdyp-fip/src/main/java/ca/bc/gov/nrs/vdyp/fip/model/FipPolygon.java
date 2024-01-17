@@ -1,43 +1,27 @@
 package ca.bc.gov.nrs.vdyp.fip.model;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 
-import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
 
-public class FipPolygon {
+public class FipPolygon extends BaseVdypPolygon<FipLayer, Optional<Float>> {
 
-	String polygonIdentifier; // FIP_P/POLYDESC
-	String forestInventoryZone; // FIP_P/FIZ
-	String biogeoclimaticZone; // FIP_P/BEC
-	Optional<Float> percentAvailable; // FIP_P2/PCTFLAND
-	Optional<FipMode> modeFip; // FIP_P2/MODE / MODEfip
-	Optional<String> nonproductiveDescription; // FIP_P3/NPDESC
-	float yieldFactor; // FIP_P4/YLDFACT
-
-	Map<LayerType, FipLayer> layers = Collections.emptyMap();
+	private String forestInventoryZone; // FIP_P/FIZ
+	private String biogeoclimaticZone; // FIP_P/BEC
+	private Optional<FipMode> modeFip; // FIP_P2/MODE / MODEfip
+	private Optional<String> nonproductiveDescription; // FIP_P3/NPDESC
+	private float yieldFactor; // FIP_P4/YLDFACT
 
 	public FipPolygon(
 			String polygonIdentifier, String fiz, String becIdentifier, Optional<Float> percentAvailable,
 			Optional<FipMode> modeFip, Optional<String> nonproductiveDescription, float yieldFactor
 	) {
-		super();
-		this.polygonIdentifier = polygonIdentifier;
+		super(polygonIdentifier, percentAvailable);
 		this.forestInventoryZone = fiz;
 		this.biogeoclimaticZone = becIdentifier;
-		this.percentAvailable = percentAvailable;
 		this.modeFip = modeFip;
 		this.nonproductiveDescription = nonproductiveDescription;
 		this.yieldFactor = yieldFactor;
-	}
-
-	public String getPolygonIdentifier() {
-		return polygonIdentifier;
-	}
-
-	public void setPolygonIdentifier(String polygonIdentifier) {
-		this.polygonIdentifier = polygonIdentifier;
 	}
 
 	public String getForestInventoryZone() {
@@ -54,14 +38,6 @@ public class FipPolygon {
 
 	public void setBiogeoclimaticZone(String biogeoclimaticZone) {
 		this.biogeoclimaticZone = biogeoclimaticZone;
-	}
-
-	public Optional<Float> getPercentAvailable() {
-		return percentAvailable;
-	}
-
-	public void setPercentAvailable(Optional<Float> percentAvailable) {
-		this.percentAvailable = percentAvailable;
 	}
 
 	public Optional<FipMode> getModeFip() {
@@ -86,14 +62,6 @@ public class FipPolygon {
 
 	public void setYieldFactor(float yieldFactor) {
 		this.yieldFactor = yieldFactor;
-	}
-
-	public Map<LayerType, FipLayer> getLayers() {
-		return layers;
-	}
-
-	public void setLayers(Map<LayerType, FipLayer> layers) {
-		this.layers = layers;
 	}
 
 }

@@ -8,7 +8,7 @@ package ca.bc.gov.nrs.vdyp.fip;
  */
 public class ProcessingException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -8378498069335308044L;
 
 	public ProcessingException() {
 		super();

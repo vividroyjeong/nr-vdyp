@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.fip;
 
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.hasBec;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.hasSpecificEntry;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.mmHasEntry;
@@ -26,6 +27,7 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.fip.test.FipTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.ControlFileParserTest;
 import ca.bc.gov.nrs.vdyp.io.parse.HLNonprimaryCoefficientParserTest;
@@ -37,6 +39,7 @@ import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.SiteCurve;
 import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
 import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
@@ -47,7 +50,7 @@ class FipControlParserTest {
 	@Test
 	void testParseBec() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -60,7 +63,7 @@ class FipControlParserTest {
 	@Test
 	void testParseSP0() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -73,20 +76,11 @@ class FipControlParserTest {
 	@Test
 	void testParseVGRP() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
-				result, (Matcher) hasSpecificEntry(
-						FipControlParser.VOLUME_EQN_GROUPS, allOf(
-								// Map of SP0 Aliases
-								isA(Map.class), hasEntry(
-										isA(String.class), allOf(
-												// Map of BEC aliases
-												isA(Map.class), hasEntry(
-														isA(String.class), isA(Integer.class) // Equation Identifier
-												)
-										)
-								)
-						)
+				result,
+				(Matcher) hasSpecificEntry(
+						FipControlParser.VOLUME_EQN_GROUPS, allOf(isA(MatrixMap2.class), mmHasEntry(is(7), "AT", "CDF"))
 				)
 		);
 	}
@@ -94,20 +88,11 @@ class FipControlParserTest {
 	@Test
 	void testParseDGRP() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
-				result, (Matcher) hasSpecificEntry(
-						FipControlParser.DECAY_GROUPS, allOf(
-								// Map of SP0 Aliases
-								isA(Map.class), hasEntry(
-										isA(String.class), allOf(
-												// Map of BEC aliases
-												isA(Map.class), hasEntry(
-														isA(String.class), isA(Integer.class) // Equation Identifier
-												)
-										)
-								)
-						)
+				result,
+				(Matcher) hasSpecificEntry(
+						FipControlParser.DECAY_GROUPS, allOf(isA(MatrixMap2.class), mmHasEntry(is(5), "AT", "CDF"))
 				)
 		);
 	}
@@ -115,20 +100,11 @@ class FipControlParserTest {
 	@Test
 	void testParseBGRP() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
-				result, (Matcher) hasSpecificEntry(
-						FipControlParser.BREAKAGE_GROUPS, allOf(
-								// Map of SP0 Aliases
-								isA(Map.class), hasEntry(
-										isA(String.class), allOf(
-												// Map of BEC aliases
-												isA(Map.class), hasEntry(
-														isA(String.class), isA(Integer.class) // Equation Identifier
-												)
-										)
-								)
-						)
+				result,
+				(Matcher) hasSpecificEntry(
+						FipControlParser.BREAKAGE_GROUPS, allOf(isA(MatrixMap2.class), mmHasEntry(is(3), "AT", "CDF"))
 				)
 		);
 	}
@@ -136,20 +112,11 @@ class FipControlParserTest {
 	@Test
 	void testParseGRBA1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
-				result, (Matcher) hasSpecificEntry(
-						FipControlParser.DEFAULT_EQ_NUM, allOf(
-								// Map of SP0 Aliases
-								isA(Map.class), hasEntry(
-										isA(String.class), allOf(
-												// Map of BEC aliases
-												isA(Map.class), hasEntry(
-														isA(String.class), isA(Integer.class) // Equation Identifier
-												)
-										)
-								)
-						)
+				result,
+				(Matcher) hasSpecificEntry(
+						FipControlParser.DEFAULT_EQ_NUM, allOf(isA(MatrixMap2.class), mmHasEntry(is(11), "AT", "CDF"))
 				)
 		);
 	}
@@ -157,19 +124,12 @@ class FipControlParserTest {
 	@Test
 	void testParseGMBA1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result, (Matcher) hasSpecificEntry(
 						FipControlParser.EQN_MODIFIERS, allOf(
 								// Default Equation
-								isA(Map.class), hasEntry(
-										isA(Integer.class), allOf(
-												// ITG
-												isA(Map.class), hasEntry(
-														isA(Integer.class), isA(Integer.class) // Reassigned Equation
-												)
-										)
-								)
+								isA(MatrixMap2.class), mmHasEntry(present(is(34)), 33, 9)
 						)
 				)
 		);
@@ -178,20 +138,13 @@ class FipControlParserTest {
 	@Test
 	void testParseSTK33() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result, (Matcher) hasSpecificEntry(
 						FipControlParser.STOCKING_CLASS_FACTORS, allOf(
 								// STK
-								isA(Map.class), hasEntry(
-										isA(Character.class), allOf(
-												// Region
-												isA(Map.class),
-												hasEntry(
-														isA(Region.class), isA(StockingClassFactor.class) // Factors
-												)
-										)
-								)
+								isA(MatrixMap2.class),
+								mmHasEntry(present(isA(StockingClassFactor.class)), 'R', Region.COASTAL)
 						)
 				)
 		);
@@ -214,14 +167,14 @@ class FipControlParserTest {
 	@Test
 	void testParseE025Empty() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(result, (Matcher) hasSpecificEntry(FipControlParser.SITE_CURVE_NUMBERS, Matchers.anEmptyMap()));
 	}
 
 	@Test
 	void testParseE026() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result, (Matcher) hasSpecificEntry(
 						FipControlParser.SITE_CURVE_AGE_MAX, allOf(
@@ -248,32 +201,57 @@ class FipControlParserTest {
 	@Test
 	void testParseE040() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
-				(Matcher) hasSpecificEntry(FipControlParser.COE_BA, allOf(mmHasEntry(present(is(2.0028f)), 0, "AT", 1)))
+				(Matcher) hasSpecificEntry(
+						FipControlParser.COE_BA,
+						allOf(
+								mmHasEntry(
+										coe(
+												0,
+												contains(
+														2.0028f, 0.2426f, 10.1668f, -0.9042f, -5.0012f, -0.0068f,
+														-0.0095f, 1.1938f, -0.2749f, 0f
+												)
+										), "AT", "AC"
+								)
+						)
+				)
 		);
 	}
 
 	@Test
 	void testParseE041() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
-				(Matcher) hasSpecificEntry(FipControlParser.COE_DQ, allOf(mmHasEntry(present(is(6.6190f)), 0, "AT", 1)))
+				(Matcher) hasSpecificEntry(
+						FipControlParser.COE_DQ,
+						allOf(
+								mmHasEntry(
+										coe(
+												0,
+												contains(
+														6.6190f, -0.5579f, -1.9421f, -0.7092f, -5.2290f, 4.8473f,
+														0.2629f, -0.0062f, 0f, 0f
+												)
+										), "AT", "AC"
+								)
+						)
+				)
 		);
 	}
 
 	@Test
 	void testParseE043() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
-						FipControlParser.UPPER_BA_BY_CI_S0_P,
-						allOf(mmHasEntry(present(is(109.27f)), Region.COASTAL, "AC", 1))
+						FipControlParser.UPPER_BA_BY_CI_S0_P, allOf(mmHasEntry(is(109.27f), Region.COASTAL, "AC", 1))
 				)
 		);
 	}
@@ -281,12 +259,16 @@ class FipControlParserTest {
 	@Test
 	void testParseE050() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
 						FipControlParser.HL_PRIMARY_SP_EQN_P1,
-						allOf(mmHasEntry(present(contains(1.00160f, 0.20508f, -0.0013743f)), "AC", Region.COASTAL))
+						allOf(
+								mmHasEntry(
+										present(coe(1, contains(1.00160f, 0.20508f, -0.0013743f))), "AC", Region.COASTAL
+								)
+						)
 				)
 		);
 	}
@@ -294,12 +276,12 @@ class FipControlParserTest {
 	@Test
 	void testParseE051() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
 						FipControlParser.HL_PRIMARY_SP_EQN_P2,
-						allOf(mmHasEntry(present(contains(0.49722f, 1.18403f)), "AC", Region.COASTAL))
+						allOf(mmHasEntry(present(coe(1, contains(0.49722f, 1.18403f))), "AC", Region.COASTAL))
 				)
 		);
 	}
@@ -307,14 +289,14 @@ class FipControlParserTest {
 	@Test
 	void testParseE052() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
 						FipControlParser.HL_PRIMARY_SP_EQN_P3,
 						allOf(
 								mmHasEntry(
-										present(contains(1.04422f, 0.93010f, -0.05745f, -2.50000f)), "AC",
+										present(coe(1, contains(1.04422f, 0.93010f, -0.05745f, -2.50000f))), "AC",
 										Region.COASTAL
 								)
 						)
@@ -325,7 +307,7 @@ class FipControlParserTest {
 	@Test
 	void testParseE053() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -343,27 +325,11 @@ class FipControlParserTest {
 	@Test
 	void testParseE060() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
-						FipControlParser.BY_SPECIES_DQ,
-						contains(
-								contains(
-										-0.65484f, -0.48275f, -0.75134f, 0.04482f, -0.31195f, -0.53012f, -0.12645f,
-										-0.64668f, -0.43538f, -0.31134f, -0.03435f, -0.27833f, -0.32476f, 0.10819f,
-										-0.38103f, -0.12273f
-								),
-								contains(
-										2.26389f, 0.19886f, -0.25704f, 0.18579f, -0.38547f, -0.14115f, -0.10146f,
-										0.09067f, 0.54304f, -0.02947f, 0.08473f, -0.39934f, 0.02206f, -0.18235f,
-										0.01411f, -0.21683f
-								),
-								contains(
-										0.23162f, 0.23162f, 0.23162f, 0.23162f, 0.23162f, 0.23162f, 0.23162f, 0.23162f,
-										0.23162f, 0.23162f, 0.23162f, 0.23162f, 0.23162f, 0.23162f, 0.23162f, 0.23162f
-								)
-						)
+						FipControlParser.BY_SPECIES_DQ, hasEntry(is("AT"), coe(0, -0.48275f, 0.19886f, 0.23162f))
 				)
 		);
 	}
@@ -371,12 +337,12 @@ class FipControlParserTest {
 	@Test
 	void testParseE061() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
 						FipControlParser.SPECIES_COMPONENT_SIZE_LIMIT,
-						allOf(mmHasEntry(present(contains(49.4f, 153.3f, 0.726f, 3.647f)), "AC", Region.COASTAL))
+						allOf(mmHasEntry(coe(1, contains(49.4f, 153.3f, 0.726f, 3.647f)), "AC", Region.COASTAL))
 				)
 		);
 	}
@@ -384,12 +350,12 @@ class FipControlParserTest {
 	@Test
 	void testParseUBA1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
 						FipControlParser.UTIL_COMP_BA,
-						allOf(mmHasEntry(present(contains(-26.68771f, 14.38811f)), 2, "AT", "ICH"))
+						allOf(mmHasEntry(coe(1, contains(-26.68771f, 14.38811f)), 1, "AT", "ICH"))
 				)
 		);
 	}
@@ -397,12 +363,12 @@ class FipControlParserTest {
 	@Test
 	void testParseYVC1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
 						FipControlParser.CLOSE_UTIL_VOLUME,
-						allOf(mmHasEntry(present(contains(-3.249f, 0.2426f, 0.04621f)), 2, 53))
+						allOf(mmHasEntry(present(coe(1, contains(-3.249f, 0.2426f, 0.04621f))), 2, 53))
 				)
 		);
 	}
@@ -410,12 +376,12 @@ class FipControlParserTest {
 	@Test
 	void testParseYVD1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
 						FipControlParser.VOLUME_NET_DECAY,
-						allOf(mmHasEntry(present(contains(12.7054f, 0.14984f, -1.73471f)), 2, 53))
+						allOf(mmHasEntry(present(coe(1, contains(12.7054f, 0.14984f, -1.73471f))), 2, 53))
 				)
 		);
 	}
@@ -423,7 +389,7 @@ class FipControlParserTest {
 	@Test
 	void testParseSBA1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -436,7 +402,7 @@ class FipControlParserTest {
 	@Test
 	void testParseSBA2() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -449,7 +415,7 @@ class FipControlParserTest {
 	@Test
 	void testParseSDQ1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -461,7 +427,7 @@ class FipControlParserTest {
 	@Test
 	void testParseSHL1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -473,7 +439,7 @@ class FipControlParserTest {
 	@Test
 	void testParseSVT1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -486,7 +452,7 @@ class FipControlParserTest {
 	@Test
 	void testParseYVT1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -507,7 +473,7 @@ class FipControlParserTest {
 	@Test
 	void testParseYVT2() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -520,7 +486,7 @@ class FipControlParserTest {
 	@Test
 	void testParseYVW1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -533,7 +499,7 @@ class FipControlParserTest {
 	@Test
 	void testParseE095() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -545,7 +511,7 @@ class FipControlParserTest {
 	@Test
 	void testParseYVVET() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -558,16 +524,16 @@ class FipControlParserTest {
 	@Test
 	void testParseYDQV() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
 						FipControlParser.VETERAN_LAYER_DQ,
 						allOf(
-								mmHasEntry(present(contains(22.500f, 0.24855f, 1.46089f)), "B", Region.COASTAL),
-								mmHasEntry(present(contains(19.417f, 0.04354f, 1.96395f)), "B", Region.INTERIOR),
-								mmHasEntry(present(contains(22.500f, 0.80260f, 1.00000f)), "D", Region.COASTAL),
-								mmHasEntry(present(contains(22.500f, 0.80260f, 1.00000f)), "D", Region.INTERIOR)
+								mmHasEntry(coe(1, contains(22.500f, 0.24855f, 1.46089f)), "B", Region.COASTAL),
+								mmHasEntry(coe(1, contains(19.417f, 0.04354f, 1.96395f)), "B", Region.INTERIOR),
+								mmHasEntry(coe(1, contains(22.500f, 0.80260f, 1.00000f)), "D", Region.COASTAL),
+								mmHasEntry(coe(1, contains(22.500f, 0.80260f, 1.00000f)), "D", Region.INTERIOR)
 						)
 				)
 		);
@@ -576,24 +542,16 @@ class FipControlParserTest {
 	@Test
 	void testParseE098() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result, (Matcher) hasSpecificEntry(
 						FipControlParser.VETERAN_BQ,
 						// Includes modifiers from 198
 						allOf(
-								mmHasEntry(
-										present(contains(0.12874f * 0.311f, 8.00000f, 1.26982f)), "B", Region.COASTAL
-								),
-								mmHasEntry(
-										present(contains(0.70932f * 0.374f, 7.63269f, 0.62545f)), "B", Region.INTERIOR
-								),
-								mmHasEntry(
-										present(contains(0.07962f * 0.311f, 6.60231f, 1.37998f)), "D", Region.COASTAL
-								),
-								mmHasEntry(
-										present(contains(0.07962f * 0.374f, 6.60231f, 1.37998f)), "D", Region.INTERIOR
-								)
+								mmHasEntry(contains(0.12874f * 0.311f, 8.00000f, 1.26982f), "B", Region.COASTAL),
+								mmHasEntry(contains(0.70932f * 0.374f, 7.63269f, 0.62545f), "B", Region.INTERIOR),
+								mmHasEntry(contains(0.07962f * 0.311f, 6.60231f, 1.37998f), "D", Region.COASTAL),
+								mmHasEntry(contains(0.07962f * 0.374f, 6.60231f, 1.37998f), "D", Region.INTERIOR)
 						)
 				)
 		);
@@ -602,7 +560,7 @@ class FipControlParserTest {
 	@Test
 	public void testParseMinima() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result, (Matcher) hasSpecificEntry(
 						FipControlParser.MINIMA,
@@ -620,7 +578,7 @@ class FipControlParserTest {
 	@Test
 	public void testParseV7O_FIP() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(FipPolygonParser.CONTROL_KEY, instanceOf(StreamingParserFactory.class))
@@ -630,7 +588,7 @@ class FipControlParserTest {
 	@Test
 	public void testParseV7O_FIL() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result, (Matcher) hasSpecificEntry(FipLayerParser.CONTROL_KEY, instanceOf(StreamingParserFactory.class))
 		);
@@ -639,7 +597,7 @@ class FipControlParserTest {
 	@Test
 	public void testParseV7O_FIS() throws Exception {
 		var parser = new FipControlParser();
-		var result = parser.parse(ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(FipSpeciesParser.CONTROL_KEY, instanceOf(StreamingParserFactory.class))
@@ -654,12 +612,20 @@ class FipControlParserTest {
 
 	static Map<String, ?> parseWithAppendix(FipControlParser parser, String... lines)
 			throws IOException, ResourceParseException {
-		var resolver = FipControlParser.fileResolver(ControlFileParserTest.class);
+		var resolver = FipTestUtils.fileResolver(ControlFileParserTest.class);
 		try (
 				InputStream baseIs = ControlFileParserTest.class.getResourceAsStream("FIPSTART.CTR");
 				InputStream is = addToEnd(baseIs, lines);
 		) {
 			return parser.parse(is, resolver);
+		}
+	}
+
+	Map<String, ?> parse(FipControlParser parser, Class<?> klazz, String resourceName)
+			throws IOException, ResourceParseException {
+		try (var is = klazz.getResourceAsStream(resourceName)) {
+
+			return parser.parse(is, FipTestUtils.fileResolver(klazz));
 		}
 	}
 }

@@ -6,7 +6,7 @@ import java.util.Optional;
 public enum Region {
 	COASTAL('C'), INTERIOR('I');
 
-	final char characterAlias;
+	private final char characterAlias;
 
 	private Region(char characterAlias) {
 		this.characterAlias = characterAlias;

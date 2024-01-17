@@ -229,6 +229,27 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 	}
 
 	/**
+	 * Creates a validator function for an inclusive range. See {@link validate}.
+	 *
+	 * @param <U>  A comparable type
+	 * @param min  Minimum value allowed
+	 * @param max  Maximum value allowed
+	 * @param name Name of the field being validated to use in errors
+	 */
+	public static <U extends Comparable<U>> Function<U, Optional<String>>
+			validateRangeInclusive(U min, U max, String name) {
+		if (min.compareTo(max) > 0) {
+			throw new IllegalArgumentException("min " + min + " is greater than max " + max);
+		}
+		return value -> {
+			if (min.compareTo(value) > 0 || max.compareTo(value) < 0) {
+				return Optional.of(name + " is expected to be between " + min + " and " + max + " but was " + value);
+			}
+			return Optional.empty();
+		};
+	}
+
+	/**
 	 * Makes a parser that parses if the string is not blank, and returns an empty
 	 * Optional otherwise.
 	 *
@@ -292,17 +313,16 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 	 *                     return empty if the string is not a marker.
 	 * @return a ValueOrMarker
 	 */
-	public static <Value, Marker> ValueParser<ValueOrMarker<Value, Marker>>
-			valueOrMarker(ValueParser<Value> valueParser, ValueParser<Optional<Marker>> markerParser) {
+	public static <V, M> ValueParser<ValueOrMarker<V, M>>
+			valueOrMarker(ValueParser<V> valueParser, ValueParser<Optional<M>> markerParser) {
 		return s -> {
-			var builder = new ValueOrMarker.Builder<Value, Marker>();
+			var builder = new ValueOrMarker.Builder<V, M>();
 			var marker = markerParser.parse(s).map(builder::marker);
 			if (marker.isPresent()) {
 				return marker.get();
 			}
 
-			var value = builder.value(valueParser.parse(s));
-			return value;
+			return builder.value(valueParser.parse(s));
 		};
 	}
 
@@ -323,11 +343,9 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 	 */
 	public static ValueParser<Optional<LayerType>> LAYER = s -> {
 		switch (s.toUpperCase()) {
-		case "1":
-		case "P":
+		case "1", "P":
 			return Optional.of(LayerType.PRIMARY);
-		case "2":
-		case "S":
+		case "2", "S":
 			return Optional.of(LayerType.SECONDARY);
 		case "V":
 			return Optional.of(LayerType.VETERAN);

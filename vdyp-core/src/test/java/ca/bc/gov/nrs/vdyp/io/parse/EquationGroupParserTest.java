@@ -1,6 +1,6 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.causedBy;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasProperty;
@@ -31,7 +31,7 @@ class EquationGroupParserTest {
 		var is = TestUtils.makeStream(lines);
 		var result = parser.parse(is, Collections.unmodifiableMap(controlMap));
 
-		assertThat(result, hasEntry(is("S1"), hasEntry(is("B1"), is(1))));
+		assertThat(result, mmHasEntry(is(1), "S1", "B1"));
 	}
 
 	@Test
@@ -83,7 +83,7 @@ class EquationGroupParserTest {
 		var is = TestUtils.makeStream(lines);
 		var result = parser.parse(is, Collections.unmodifiableMap(controlMap));
 
-		assertThat(result, hasEntry(is("S1"), hasEntry(is("B1"), is(2))));
+		assertThat(result, mmHasEntry(is(2), "S1", "B1"));
 	}
 
 	@Test
@@ -97,14 +97,15 @@ class EquationGroupParserTest {
 		var is = TestUtils.makeStream(lines);
 		var result = parser.parse(is, Collections.unmodifiableMap(controlMap));
 
-		assertThat(result, hasEntry(is("S1"), hasEntry(is("B1"), is(11))));
-		assertThat(result, hasEntry(is("S1"), hasEntry(is("B2"), is(12))));
-		assertThat(result, hasEntry(is("S1"), hasEntry(is("B3"), is(13))));
-		assertThat(result, hasEntry(is("S1"), hasEntry(is("B4"), is(14))));
-		assertThat(result, hasEntry(is("S2"), hasEntry(is("B1"), is(21))));
-		assertThat(result, hasEntry(is("S2"), hasEntry(is("B2"), is(22))));
-		assertThat(result, hasEntry(is("S2"), hasEntry(is("B3"), is(23))));
-		assertThat(result, hasEntry(is("S2"), hasEntry(is("B4"), is(24))));
+		assertThat(result, mmHasEntry(is(11), "S1", "B1"));
+		assertThat(result, mmHasEntry(is(12), "S1", "B2"));
+		assertThat(result, mmHasEntry(is(13), "S1", "B3"));
+		assertThat(result, mmHasEntry(is(14), "S1", "B4"));
+		assertThat(result, mmHasEntry(is(21), "S2", "B1"));
+		assertThat(result, mmHasEntry(is(22), "S2", "B2"));
+		assertThat(result, mmHasEntry(is(23), "S2", "B3"));
+		assertThat(result, mmHasEntry(is(24), "S2", "B4"));
+
 	}
 
 	@Test
@@ -173,16 +174,16 @@ class EquationGroupParserTest {
 	private HashMap<String, Object> makeControlMapSingle() {
 		var controlMap = new HashMap<String, Object>();
 
-		BecDefinitionParserTest.populateControlMap(controlMap, "B1");
-		GenusDefinitionParserTest.populateControlMap(controlMap, "S1");
+		TestUtils.populateControlMapBec(controlMap, "B1");
+		TestUtils.populateControlMapGenus(controlMap, "S1");
 		return controlMap;
 	}
 
 	private HashMap<String, Object> makeControlMap() {
 		var controlMap = new HashMap<String, Object>();
 
-		BecDefinitionParserTest.populateControlMap(controlMap, "B1", "B2", "B3", "B4");
-		GenusDefinitionParserTest.populateControlMap(controlMap, "S1", "S2");
+		TestUtils.populateControlMapBec(controlMap, "B1", "B2", "B3", "B4");
+		TestUtils.populateControlMapGenus(controlMap, "S1", "S2");
 		return controlMap;
 	}
 }

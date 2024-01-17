@@ -1,7 +1,6 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.mmHasEntry;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -23,13 +22,13 @@ class ComponentSizeParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		GenusDefinitionParserTest.populateControlMap(controlMap);
+		TestUtils.populateControlMapGenus(controlMap);
 
 		var parser = new ComponentSizeParser();
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, mmHasEntry(present(contains(49.4f, 153.3f, 0.726f, 3.647f)), "S1", Region.COASTAL));
+		assertThat(result, mmHasEntry(coe(1, contains(49.4f, 153.3f, 0.726f, 3.647f)), "S1", Region.COASTAL));
 	}
 
 	@Test
@@ -39,7 +38,7 @@ class ComponentSizeParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		GenusDefinitionParserTest.populateControlMap(controlMap);
+		TestUtils.populateControlMapGenus(controlMap);
 
 		var parser = new ComponentSizeParser();
 
@@ -55,7 +54,7 @@ class ComponentSizeParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		GenusDefinitionParserTest.populateControlMap(controlMap);
+		TestUtils.populateControlMapGenus(controlMap);
 
 		var parser = new ComponentSizeParser();
 

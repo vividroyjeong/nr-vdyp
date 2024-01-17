@@ -16,7 +16,7 @@ public class SiteCurveParser implements OptionalControlMapSubResourceParser<Map<
 	public static final String VALUE_1_KEY = "value1";
 	public static final String VALUE_2_KEY = "value2";
 
-	LineParser lineParser = new LineParser() {
+	private LineParser lineParser = new LineParser() {
 
 		@Override
 		public boolean isStopLine(String line) {

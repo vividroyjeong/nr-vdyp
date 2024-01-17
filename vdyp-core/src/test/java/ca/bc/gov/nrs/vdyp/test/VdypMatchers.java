@@ -1,18 +1,20 @@
 package ca.bc.gov.nrs.vdyp.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -27,7 +29,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.ValueParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
-import ca.bc.gov.nrs.vdyp.model.BecLookup.Substitution;
+import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 
 /**
@@ -37,6 +39,8 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap;
  *
  */
 public class VdypMatchers {
+
+	static final float EPSILON = 0.001f;
 
 	/**
 	 * Matches a string if when parsed by the parser method it matches the given
@@ -158,6 +162,10 @@ public class VdypMatchers {
 
 			@Override
 			public void describeMismatch(Object item, Description description) {
+				if (item == null) {
+					description.appendText("was null");
+					return;
+				}
 				if (! (item instanceof Optional)) {
 					description.appendText("was not an Optional");
 					return;
@@ -171,7 +179,7 @@ public class VdypMatchers {
 		};
 	}
 
-	public static <T> Matcher<MatrixMap<T>> mmHasEntry(Matcher<Optional<T>> valueMatcher, Object... keys) {
+	public static <T> Matcher<MatrixMap<T>> mmHasEntry(Matcher<T> valueMatcher, Object... keys) {
 		return new BaseMatcher<MatrixMap<T>>() {
 
 			@Override
@@ -205,6 +213,10 @@ public class VdypMatchers {
 
 		};
 
+	}
+
+	public static <T> Matcher<MatrixMap<Optional<T>>> mmEmpty() {
+		return mmAll(notPresent());
 	}
 
 	/**
@@ -316,13 +328,12 @@ public class VdypMatchers {
 	 * Matches a BecLookup that contains a bec with the specified alias that matches
 	 * the given matcher.
 	 */
-	public static Matcher<BecLookup>
-			hasBec(String alias, Matcher<Optional<BecDefinition>> valueMatcher, Substitution sub) {
+	public static Matcher<BecLookup> hasBec(String alias, Matcher<Optional<BecDefinition>> valueMatcher) {
 		return new TypeSafeDiagnosingMatcher<BecLookup>() {
 
 			@Override
 			protected boolean matchesSafely(BecLookup map, Description mismatchDescription) {
-				var result = map.get(alias, sub);
+				var result = map.get(alias);
 				if (Objects.isNull(result)) {
 					mismatchDescription.appendText("entry for ").appendValue(alias).appendText(" was not present");
 					return false;
@@ -344,14 +355,6 @@ public class VdypMatchers {
 
 		};
 
-	}
-
-	/**
-	 * Matches a BecLookup that contains a bec with the specified alias that matches
-	 * the given matcher.
-	 */
-	public static Matcher<BecLookup> hasBec(String alias, Matcher<Optional<BecDefinition>> valueMatcher) {
-		return hasBec(alias, valueMatcher, Substitution.PARTIAL_FILL_OK);
 	}
 
 	/**
@@ -450,5 +453,58 @@ public class VdypMatchers {
 		var hasNext = assertDoesNotThrow(() -> stream.hasNext());
 		assertThat(hasNext, is(false));
 		assertThrows(NoSuchElementException.class, () -> stream.next());
+	}
+
+	public static Matcher<Coefficients> coe(int indexFrom, Matcher<? super List<Float>> contentsMatcher) {
+		return describedAs(
+				"A Coefficients indexed from %0 that %1", //
+				allOf(
+						isA(Coefficients.class), //
+						hasProperty("indexFrom", is(indexFrom)), //
+						contentsMatcher
+				), //
+				indexFrom, //
+				contentsMatcher
+		);
+	}
+
+	@SafeVarargs
+	public static Matcher<Coefficients> coe(int indexFrom, Matcher<Float>... contentsMatchers) {
+		return coe(indexFrom, contains(contentsMatchers));
+	}
+
+	public static Matcher<Coefficients>
+			coe(int indexFrom, Function<Float, Matcher<? super Float>> matcherGenerator, Float... contents) {
+		List<Matcher<? super Float>> contentsMatchers = Arrays.stream(contents).map(matcherGenerator).toList();
+		return coe(indexFrom, contains(contentsMatchers));
+	}
+
+	public static Matcher<Coefficients> coe(int indexFrom, Float... contents) {
+		return coe(indexFrom, VdypMatchers::closeTo, contents);
+	}
+
+	public static Matcher<Float> asFloat(Matcher<Double> doubleMatcher) {
+		return new TypeSafeDiagnosingMatcher<Float>() {
+
+			@Override
+			public void describeTo(Description description) {
+				doubleMatcher.describeTo(description);
+			}
+
+			@Override
+			protected boolean matchesSafely(Float item, Description mismatchDescription) {
+				if (!doubleMatcher.matches((double) item)) {
+					doubleMatcher.describeMismatch(item, mismatchDescription);
+					return false;
+				}
+				return true;
+			}
+
+		};
+	}
+
+	public static Matcher<Float> closeTo(float expected) {
+		float epsilon = Float.max(EPSILON * expected, Float.MIN_VALUE);
+		return asFloat(Matchers.closeTo(expected, epsilon));
 	}
 }

@@ -92,7 +92,7 @@ public class FipControlParser {
 	public static final String VOLUME_NET_DECAY_WASTE = VolumeNetDecayWasteParser.CONTROL_KEY;
 	public static final String BREAKAGE = BreakageParser.CONTROL_KEY;
 	public static final String VETERAN_LAYER_VOLUME_ADJUST = VeteranLayerVolumeAdjustParser.CONTROL_KEY;
-	public static final String VETERAN_LAYER_DQ = "VETERAN_LAYER_DQ";
+	public static final String VETERAN_LAYER_DQ = VeteranDQParser.CONTROL_KEY;
 	public static final String VETERAN_BQ = VeteranBQParser.CONTROL_KEY;
 	public static final String MINIMA = "MINIMA";
 	public static final String MODIFIER_FILE = ModifierParser.CONTROL_KEY;
@@ -402,7 +402,8 @@ public class FipControlParser {
 		}
 	}
 
-	Map<String, Object> parse(InputStream is, FileResolver fileResolver) throws IOException, ResourceParseException {
+	public Map<String, Object> parse(InputStream is, FileResolver fileResolver)
+			throws IOException, ResourceParseException {
 		var map = controlParser.parse(is, Collections.emptyMap());
 
 		applyModifiers(map, BASIC_DEFINITIONS, fileResolver);

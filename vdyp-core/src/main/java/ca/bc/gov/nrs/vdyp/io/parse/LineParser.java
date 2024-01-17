@@ -26,7 +26,7 @@ public class LineParser {
 	public static final Charset charset = StandardCharsets.US_ASCII;
 	public static final String LINE_NUMBER_KEY = "_PARSER_LINE_NUMBER";
 
-	static private abstract class LineParserSegment {
+	private abstract static class LineParserSegment {
 		int length;
 
 		public int getLength() {
@@ -42,7 +42,7 @@ public class LineParser {
 				throws ValueParseException;
 	}
 
-	static private class LineParserNullSegment extends LineParserSegment {
+	private static class LineParserNullSegment extends LineParserSegment {
 
 		public LineParserNullSegment(int length) {
 			super(length);
@@ -54,7 +54,7 @@ public class LineParser {
 		}
 	}
 
-	static abstract class LineParserValueSegment<T> extends LineParserSegment {
+	abstract static class LineParserValueSegment<T> extends LineParserSegment {
 		String name;
 
 		abstract T parse(String value, Map<String, Object> control) throws ValueParseException;
@@ -174,7 +174,7 @@ public class LineParser {
 	}
 
 	private <T> LineParser doValue(int length, String name, ControlledValueParser<T> parser) {
-		if (segments.size() > 0 && segments.get(segments.size() - 1).length < 0)
+		if (!segments.isEmpty() && segments.get(segments.size() - 1).length < 0)
 			throw new IllegalStateException("Can not add a segment after an unbounded segment");
 		segments.add(new LineParserValueSegment<T>(length, name) {
 
