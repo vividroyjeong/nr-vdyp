@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.io.parse;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.stringContainsInOrder;
@@ -14,9 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.hamcrest.Matchers;
-
-import static org.hamcrest.Matchers.equalTo;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

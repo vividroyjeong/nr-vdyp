@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
+import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+
 @FunctionalInterface
 public interface ControlledValueParser<T> {
 
@@ -118,5 +120,17 @@ public interface ControlledValueParser<T> {
 		}
 		return result;
 	};
-
+	
+	/**
+	 * Parser that strips whitespace and validates that the string is a Genus (SP0)
+	 * ID
+	 */
+	static final ControlledValueParser<UtilizationClass> UTILIZATION_CLASS = (string, control) -> {
+		try {
+			return UtilizationClass.getByIndex(string.strip());
+		}
+		catch (IllegalArgumentException e) {
+			throw new ValueParseException(string, string + " is not a valid Utilization Class");
+		}
+	};
 }

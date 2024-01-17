@@ -10,8 +10,8 @@ import java.util.Map;
 
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
-import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.BecLookup.Substitution;
+import ca.bc.gov.nrs.vdyp.model.Region;
 
 /**
  * Parser for a BEC Definition data file

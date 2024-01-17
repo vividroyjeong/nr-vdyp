@@ -1,12 +1,12 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
-import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.*;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
+
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.AgeTypeErrorException;
 
 class Age2AgeTest {
 	/*
