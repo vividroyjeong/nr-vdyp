@@ -24,7 +24,7 @@ public class GenusDefinitionParserTest {
 	void testParse() throws Exception {
 		var parser = new GenusDefinitionParser();
 
-		var result = parser.parse(ControlFileParserTest.class, "coe/SP0DEF_v0.dat", Collections.emptyMap());
+		var result = parser.parse(GenusDefinitionParserTest.class, "coe/SP0DEF_v0.dat", Collections.emptyMap());
 
 		assertThat(
 				result, contains(

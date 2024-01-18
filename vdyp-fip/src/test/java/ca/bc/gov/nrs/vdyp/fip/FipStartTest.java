@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+import org.easymock.bytebuddy.agent.builder.AgentBuilder;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -2356,8 +2357,24 @@ class FipStartTest {
 		var becLookup = BecDefinitionParser.getBecs(controlMap);
 		var bec = becLookup.get("CWH").get();
 
-		var spec = new VdypSpecies("Test", LayerType.PRIMARY, "B");
-		var specPrime = new VdypSpecies("Test", LayerType.PRIMARY, "H");
+		var spec = VdypSpecies.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.genus("B");
+			builder.percentGenus(50f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
+		var specPrime = VdypSpecies.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.genus("H");
+			builder.percentGenus(50f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 
 		var result = app.estimateNonPrimaryLoreyHeight(spec, specPrime, bec, 24.2999992f, 20.5984688f);
 
@@ -2373,8 +2390,24 @@ class FipStartTest {
 		var becLookup = BecDefinitionParser.getBecs(controlMap);
 		var bec = becLookup.get("ESSF").get();
 
-		var spec = new VdypSpecies("Test", LayerType.PRIMARY, "B");
-		var specPrime = new VdypSpecies("Test", LayerType.PRIMARY, "D");
+		var spec = VdypSpecies.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.genus("B");
+			builder.percentGenus(50f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
+		var specPrime = VdypSpecies.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.genus("D");
+			builder.percentGenus(50f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 
 		var result = app.estimateNonPrimaryLoreyHeight(spec, specPrime, bec, 35.2999992f, 33.6889763f);
 
@@ -2397,11 +2430,6 @@ class FipStartTest {
 		var becLookup = BecDefinitionParser.getBecs(controlMap);
 		var bec = becLookup.get("CWH").get();
 
-		var spec = new VdypSpecies("Test", LayerType.PRIMARY, "Y");
-		spec.setVolumeGroup(74);
-		spec.setDecayGroup(63);
-		spec.setBreakageGroup(31);
-		spec.getLoreyHeightByUtilization().setCoe(0, 19.9850883f);
 		var layer = VdypLayer.build(builder -> {
 			builder.polygonIdentifier("Test");
 			builder.layerType(LayerType.PRIMARY);
@@ -2413,7 +2441,18 @@ class FipStartTest {
 		layer.getTreesPerHectareByUtilization().setCoe(0, 845.805969f);
 		layer.getQuadraticMeanDiameterByUtilization().setCoe(0, 33.9379082f);
 		layer.setAgeTotal(285f);
-		layer.setSpecies(Collections.singletonMap("Y", spec));
+
+		var spec = VdypSpecies.build(layer, builder -> {
+			builder.genus("Y");
+			builder.percentGenus(100f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
+		spec.setVolumeGroup(74);
+		spec.setDecayGroup(63);
+		spec.setBreakageGroup(31);
+		spec.getLoreyHeightByUtilization().setCoe(0, 19.9850883f);
 
 		var fipLayer = this.getTestPrimaryLayer("Test", l -> {
 			l.setInventoryTypeGroup(Optional.of(9));
@@ -2470,54 +2509,6 @@ class FipStartTest {
 
 		var becLookup = BecDefinitionParser.getBecs(controlMap);
 		var bec = becLookup.get("CWH").get();
-		/*
-		 * HL[*, -1] 0 HL[0, 0] 0 BA[*, -1] BA[1, 0] VOLWS VOLCU VOL_D VOL_DW VOLDWB
-		 * dqspbase,goal
-		 *
-		 * HL[1, 0] spec BA[0, 0] layer TPH[0, 0] layer DQ[0,0] layer INL1VGRP,
-		 * INL1DGRP, INL1BGRP spec VGRPL, DGRPL, BGRPL spec Same as above AGETOTL1 layer
-		 * AGEBHL1 layer YTBH hdl1
-		 *
-		 */
-		// sp 3, 4, 5, 8, 15
-		// sp B, C, D, H, S
-		var spec1 = new VdypSpecies("Test", LayerType.PRIMARY, "B");
-		spec1.setVolumeGroup(12);
-		spec1.setDecayGroup(7);
-		spec1.setBreakageGroup(5);
-		spec1.getLoreyHeightByUtilization().setCoe(0, 38.7456512f);
-		spec1.setPercentGenus(1f);
-		var spec2 = new VdypSpecies("Test", LayerType.PRIMARY, "C");
-		spec2.setVolumeGroup(20);
-		spec2.setDecayGroup(14);
-		spec2.setBreakageGroup(6);
-		spec2.getLoreyHeightByUtilization().setCoe(0, 22.8001652f);
-		spec2.setPercentGenus(7f);
-		var spec3 = new VdypSpecies("Test", LayerType.PRIMARY, "D");
-		spec3.setVolumeGroup(25);
-		spec3.setDecayGroup(19);
-		spec3.setBreakageGroup(12);
-		spec3.getLoreyHeightByUtilization().setCoe(0, 33.6889763f);
-		spec3.setPercentGenus(74f);
-		var spec4 = new VdypSpecies("Test", LayerType.PRIMARY, "H");
-		spec4.setVolumeGroup(37);
-		spec4.setDecayGroup(31);
-		spec4.setBreakageGroup(17);
-		spec4.getLoreyHeightByUtilization().setCoe(0, 24.3451157f);
-		spec4.setPercentGenus(9f);
-		var spec5 = new VdypSpecies("Test", LayerType.PRIMARY, "S");
-		spec5.setVolumeGroup(66);
-		spec5.setDecayGroup(54);
-		spec5.setBreakageGroup(28);
-		spec5.getLoreyHeightByUtilization().setCoe(0, 34.6888771f);
-		spec5.setPercentGenus(9f);
-
-		Collection<VdypSpecies> specs = new ArrayList<>(5);
-		specs.add(spec1);
-		specs.add(spec2);
-		specs.add(spec3);
-		specs.add(spec4);
-		specs.add(spec5);
 
 		var layer = VdypLayer.build(builder -> {
 			builder.polygonIdentifier("Test");
@@ -2529,6 +2520,66 @@ class FipStartTest {
 		layer.getBaseAreaByUtilization().setCoe(0, 44.6249847f);
 		layer.getTreesPerHectareByUtilization().setCoe(0, 620.504883f);
 		layer.getQuadraticMeanDiameterByUtilization().setCoe(0, 30.2601795f);
+
+		/*
+		 * HL[*, -1] 0 HL[0, 0] 0 BA[*, -1] BA[1, 0] VOLWS VOLCU VOL_D VOL_DW VOLDWB
+		 * dqspbase,goal
+		 *
+		 * HL[1, 0] spec BA[0, 0] layer TPH[0, 0] layer DQ[0,0] layer INL1VGRP,
+		 * INL1DGRP, INL1BGRP spec VGRPL, DGRPL, BGRPL spec Same as above AGETOTL1 layer
+		 * AGEBHL1 layer YTBH hdl1
+		 *
+		 */
+		// sp 3, 4, 5, 8, 15
+		// sp B, C, D, H, S
+		var spec1 = VdypSpecies.build(layer, builder -> {
+			builder.genus("B");
+			builder.percentGenus(1f);
+			builder.volumeGroup(12);
+			builder.decayGroup(7);
+			builder.breakageGroup(5);
+		});
+		spec1.getLoreyHeightByUtilization().setCoe(0, 38.7456512f);
+		var spec2 = VdypSpecies.build(layer, builder -> {
+			builder.genus("C");
+			builder.percentGenus(7f);
+			builder.volumeGroup(20);
+			builder.decayGroup(14);
+			builder.breakageGroup(6);
+		});
+
+		spec2.getLoreyHeightByUtilization().setCoe(0, 22.8001652f);
+		var spec3 = VdypSpecies.build(layer, builder -> {
+			builder.genus("D");
+			builder.percentGenus(74f);
+			builder.volumeGroup(25);
+			builder.decayGroup(19);
+			builder.breakageGroup(12);
+		});
+		spec3.getLoreyHeightByUtilization().setCoe(0, 33.6889763f);
+		var spec4 = VdypSpecies.build(layer, builder -> {
+			builder.genus("H");
+			builder.percentGenus(9f);
+			builder.volumeGroup(37);
+			builder.decayGroup(31);
+			builder.breakageGroup(17);
+		});
+		spec4.getLoreyHeightByUtilization().setCoe(0, 24.3451157f);
+		var spec5 = VdypSpecies.build(layer, builder -> {
+			builder.genus("S");
+			builder.percentGenus(9f);
+			builder.volumeGroup(66);
+			builder.decayGroup(54);
+			builder.breakageGroup(28);
+		});
+		spec5.getLoreyHeightByUtilization().setCoe(0, 34.6888771f);
+
+		Collection<VdypSpecies> specs = new ArrayList<>(5);
+		specs.add(spec1);
+		specs.add(spec2);
+		specs.add(spec3);
+		specs.add(spec4);
+		specs.add(spec5);
 
 		layer.setSpecies(specs);
 
@@ -2732,42 +2783,64 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
+		var layer = VdypLayer.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.ageTotal(55f);
+			builder.yearsToBreastHeight(1f);
+			builder.height(35.2999992f);
+		});
+
 		// sp 3, 4, 5, 8, 15
 		// sp B, C, D, H, S
-		var spec1 = new VdypSpecies("Test", LayerType.PRIMARY, "B");
-		spec1.setVolumeGroup(12);
-		spec1.setDecayGroup(7);
-		spec1.setBreakageGroup(5);
+		var spec1 = VdypSpecies.build(layer, builder -> {
+			builder.genus("B");
+			builder.volumeGroup(12);
+			builder.decayGroup(7);
+			builder.breakageGroup(5);
+			builder.percentGenus(1f);
+		});
 		spec1.getLoreyHeightByUtilization().setCoe(0, 38.7456512f);
-		spec1.setPercentGenus(1f);
 		spec1.setFractionGenus(0.00817133673f);
-		var spec2 = new VdypSpecies("Test", LayerType.PRIMARY, "C");
-		spec2.setVolumeGroup(20);
-		spec2.setDecayGroup(14);
-		spec2.setBreakageGroup(6);
+
+		var spec2 = VdypSpecies.build(layer, builder -> {
+			builder.genus("C");
+			builder.volumeGroup(20);
+			builder.decayGroup(14);
+			builder.breakageGroup(6);
+			builder.percentGenus(7f);
+		});
 		spec2.getLoreyHeightByUtilization().setCoe(0, 22.8001652f);
-		spec2.setPercentGenus(7f);
 		spec2.setFractionGenus(0.0972022042f);
-		var spec3 = new VdypSpecies("Test", LayerType.PRIMARY, "D");
-		spec3.setVolumeGroup(25);
-		spec3.setDecayGroup(19);
-		spec3.setBreakageGroup(12);
+
+		var spec3 = VdypSpecies.build(layer, builder -> {
+			builder.genus("D");
+			builder.volumeGroup(25);
+			builder.decayGroup(19);
+			builder.breakageGroup(12);
+			builder.percentGenus(74f);
+		});
 		spec3.getLoreyHeightByUtilization().setCoe(0, 33.6889763f);
-		spec3.setPercentGenus(74f);
 		spec3.setFractionGenus(0.695440531f);
-		var spec4 = new VdypSpecies("Test", LayerType.PRIMARY, "H");
-		spec4.setVolumeGroup(37);
-		spec4.setDecayGroup(31);
-		spec4.setBreakageGroup(17);
+
+		var spec4 = VdypSpecies.build(layer, builder -> {
+			builder.genus("H");
+			builder.volumeGroup(37);
+			builder.decayGroup(31);
+			builder.breakageGroup(17);
+			builder.percentGenus(9f);
+		});
 		spec4.getLoreyHeightByUtilization().setCoe(0, 24.3451157f);
-		spec4.setPercentGenus(9f);
 		spec4.setFractionGenus(0.117043354f);
-		var spec5 = new VdypSpecies("Test", LayerType.PRIMARY, "S");
-		spec5.setVolumeGroup(66);
-		spec5.setDecayGroup(54);
-		spec5.setBreakageGroup(28);
+
+		var spec5 = VdypSpecies.build(layer, builder -> {
+			builder.genus("S");
+			builder.volumeGroup(66);
+			builder.decayGroup(54);
+			builder.breakageGroup(28);
+			builder.percentGenus(9f);
+		});
 		spec5.getLoreyHeightByUtilization().setCoe(0, 34.6888771f);
-		spec5.setPercentGenus(9f);
 		spec5.setFractionGenus(0.082142584f);
 
 		Map<String, VdypSpecies> specs = new HashMap<>();
@@ -2805,31 +2878,61 @@ class FipStartTest {
 		layer.getQuadraticMeanDiameterByUtilization().setCoe(FipStart.UTIL_ALL, 30.2606697f);
 		layer.getWholeStemVolumeByUtilization().setCoe(FipStart.UTIL_ALL, 635.659668f);
 
-		var spec1 = new VdypSpecies("Test", LayerType.PRIMARY, "B");
+		var spec1 = VdypSpecies.build(layer, builder -> {
+			builder.genus("B");
+			builder.percentGenus(20f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 		spec1.getLoreyHeightByUtilization().setCoe(FipStart.UTIL_ALL, 38.6004372f);
 		spec1.getBaseAreaByUtilization().setCoe(FipStart.UTIL_ALL, 0.397305071f);
 		spec1.getTreesPerHectareByUtilization().setCoe(FipStart.UTIL_ALL, 5.04602766f);
 		spec1.getQuadraticMeanDiameterByUtilization().setCoe(FipStart.UTIL_ALL, 31.6622887f);
 		spec1.getWholeStemVolumeByUtilization().setCoe(FipStart.UTIL_ALL, 635.659668f);
-		var spec2 = new VdypSpecies("Test", LayerType.PRIMARY, "C");
+		var spec2 = VdypSpecies.build(layer, builder -> {
+			builder.genus("C");
+			builder.percentGenus(20f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 		spec2.getLoreyHeightByUtilization().setCoe(FipStart.UTIL_ALL, 22.8001652f);
 		spec2.getBaseAreaByUtilization().setCoe(FipStart.UTIL_ALL, 5.08774281f);
 		spec2.getTreesPerHectareByUtilization().setCoe(FipStart.UTIL_ALL, 92.4298019f);
 		spec2.getQuadraticMeanDiameterByUtilization().setCoe(FipStart.UTIL_ALL, 26.4735165f);
 		spec2.getWholeStemVolumeByUtilization().setCoe(FipStart.UTIL_ALL, 6.35662031f);
-		var spec3 = new VdypSpecies("Test", LayerType.PRIMARY, "D");
+		var spec3 = VdypSpecies.build(layer, builder -> {
+			builder.genus("D");
+			builder.percentGenus(20f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 		spec3.getLoreyHeightByUtilization().setCoe(FipStart.UTIL_ALL, 33.5375252f);
 		spec3.getBaseAreaByUtilization().setCoe(FipStart.UTIL_ALL, 29.5411568f);
 		spec3.getTreesPerHectareByUtilization().setCoe(FipStart.UTIL_ALL, 326.800781f);
 		spec3.getQuadraticMeanDiameterByUtilization().setCoe(FipStart.UTIL_ALL, 33.9255791f);
 		spec3.getWholeStemVolumeByUtilization().setCoe(FipStart.UTIL_ALL, 44.496151f);
-		var spec4 = new VdypSpecies("Test", LayerType.PRIMARY, "H");
+		var spec4 = VdypSpecies.build(layer, builder -> {
+			builder.genus("H");
+			builder.percentGenus(20f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 		spec4.getLoreyHeightByUtilization().setCoe(FipStart.UTIL_ALL, 24.3451157f);
 		spec4.getBaseAreaByUtilization().setCoe(FipStart.UTIL_ALL, 5.50214148f);
 		spec4.getTreesPerHectareByUtilization().setCoe(FipStart.UTIL_ALL, 152.482513f);
 		spec4.getQuadraticMeanDiameterByUtilization().setCoe(FipStart.UTIL_ALL, 21.4343796f);
 		spec4.getWholeStemVolumeByUtilization().setCoe(FipStart.UTIL_ALL, 470.388489f);
-		var spec5 = new VdypSpecies("Test", LayerType.PRIMARY, "S");
+		var spec5 = VdypSpecies.build(layer, builder -> {
+			builder.genus("S");
+			builder.percentGenus(20f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 		spec5.getLoreyHeightByUtilization().setCoe(FipStart.UTIL_ALL, 34.6888771f);
 		spec5.getBaseAreaByUtilization().setCoe(FipStart.UTIL_ALL, 4.0966382f);
 		spec5.getTreesPerHectareByUtilization().setCoe(FipStart.UTIL_ALL, 43.7256737f);
@@ -2887,7 +2990,15 @@ class FipStartTest {
 
 		var bec = BecDefinitionParser.getBecs(controlMap).get("CWH").get();
 
-		var spec1 = new VdypSpecies("Test", LayerType.PRIMARY, "B");
+		var spec1 = VdypSpecies.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.genus("B");
+			builder.percentGenus(100f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 
 		app.estimateQuadMeanDiameterByUtilization(bec, coe, spec1);
 
@@ -2905,7 +3016,15 @@ class FipStartTest {
 
 		var bec = BecDefinitionParser.getBecs(controlMap).get("MH").get();
 
-		var spec1 = new VdypSpecies("Test", LayerType.PRIMARY, "L");
+		var spec1 = VdypSpecies.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.genus("L");
+			builder.percentGenus(100f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 
 		app.estimateQuadMeanDiameterByUtilization(bec, coe, spec1);
 
@@ -2930,7 +3049,15 @@ class FipStartTest {
 
 		var bec = BecDefinitionParser.getBecs(controlMap).get("CWH").get();
 
-		var spec1 = new VdypSpecies("Test", LayerType.PRIMARY, "B");
+		var spec1 = VdypSpecies.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.genus("B");
+			builder.percentGenus(100f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 
 		app.estimateBaseAreaByUtilization(bec, dq, ba, spec1);
 
@@ -3104,18 +3231,19 @@ class FipStartTest {
 		layer.getQuadraticMeanDiameterByUtilization().setCoe(FipStart.UTIL_SMALL, 6.26608753f);
 		layer.getWholeStemVolumeByUtilization().setCoe(FipStart.UTIL_SMALL, 0.107688069f);
 
-		var spec1 = new VdypSpecies("Test", LayerType.PRIMARY, "L");
+		var spec1 = VdypSpecies.build(layer, builder -> {
+			builder.genus("L");
+			builder.percentGenus(11.0567074f);
+			builder.volumeGroup(46);
+			builder.decayGroup(38);
+			builder.breakageGroup(20);
+		});
+
 		spec1.getLoreyHeightByUtilization().setCoe(FipStart.UTIL_ALL, 14.2597857f);
 		spec1.getBaseAreaByUtilization().setCoe(FipStart.UTIL_ALL, 2.20898318f);
 		spec1.getTreesPerHectareByUtilization().setCoe(FipStart.UTIL_ALL, 154.454025f);
 		spec1.getQuadraticMeanDiameterByUtilization().setCoe(FipStart.UTIL_ALL, 13.4943399f);
 		spec1.getWholeStemVolumeByUtilization().setCoe(FipStart.UTIL_ALL, 11.7993851f);
-
-		spec1.setVolumeGroup(46);
-		spec1.setDecayGroup(38);
-		spec1.setBreakageGroup(20);
-
-		spec1.setPercentGenus(11.0567074f);
 
 		spec1.getLoreyHeightByUtilization().setCoe(FipStart.UTIL_SMALL, 7.86393309f);
 		spec1.getBaseAreaByUtilization().setCoe(FipStart.UTIL_SMALL, 0.012636207f);
@@ -3123,18 +3251,19 @@ class FipStartTest {
 		spec1.getQuadraticMeanDiameterByUtilization().setCoe(FipStart.UTIL_SMALL, 6.60561657f);
 		spec1.getWholeStemVolumeByUtilization().setCoe(FipStart.UTIL_SMALL, 0.0411359742f);
 
-		var spec2 = new VdypSpecies("Test", LayerType.PRIMARY, "PL");
+		var spec2 = VdypSpecies.build(layer, builder -> {
+			builder.genus("PL");
+			builder.percentGenus(88.9432907f);
+			builder.volumeGroup(54);
+			builder.decayGroup(42);
+			builder.breakageGroup(24);
+		});
+
 		spec2.getLoreyHeightByUtilization().setCoe(FipStart.UTIL_ALL, 12.9176102f);
 		spec2.getBaseAreaByUtilization().setCoe(FipStart.UTIL_ALL, 17.7696857f);
 		spec2.getTreesPerHectareByUtilization().setCoe(FipStart.UTIL_ALL, 1331.36682f);
 		spec2.getQuadraticMeanDiameterByUtilization().setCoe(FipStart.UTIL_ALL, 13.0360518f);
 		spec2.getWholeStemVolumeByUtilization().setCoe(FipStart.UTIL_ALL, 106.194412f);
-
-		spec2.setVolumeGroup(54);
-		spec2.setDecayGroup(42);
-		spec2.setBreakageGroup(24);
-
-		spec2.setPercentGenus(88.9432907f);
 
 		spec2.getLoreyHeightByUtilization().setCoe(FipStart.UTIL_SMALL, 7.81696558f);
 		spec2.getBaseAreaByUtilization().setCoe(FipStart.UTIL_SMALL, 0.0160128288f);
@@ -3299,10 +3428,18 @@ class FipStartTest {
 			builder.height(20f);
 		}));
 
-		var spec1 = new FipSpecies("Test", LayerType.PRIMARY, "L");
-		spec1.setFractionGenus(0.1f);
-		var spec2 = new FipSpecies("Test", LayerType.PRIMARY, "PL");
-		spec2.setFractionGenus(0.9f);
+		var spec1 = FipSpecies.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.genus("L");
+			builder.percentGenus(10f);
+		});
+		var spec2 = FipSpecies.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.genus("PL");
+			builder.percentGenus(90f);
+		});
 		fipPrimaryLayer.getSpecies().put("L", spec1);
 		fipPrimaryLayer.getSpecies().put("PL", spec2);
 
@@ -3358,10 +3495,18 @@ class FipStartTest {
 			builder.height(20f);
 		}));
 
-		var spec1 = new FipSpecies("Test", LayerType.PRIMARY, "L");
-		spec1.setFractionGenus(0.1f);
-		var spec2 = new FipSpecies("Test", LayerType.PRIMARY, "PL");
-		spec2.setFractionGenus(0.9f);
+		var spec1 = FipSpecies.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.genus("L");
+			builder.percentGenus(10f);
+		});
+		var spec2 = FipSpecies.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.genus("PL");
+			builder.percentGenus(90f);
+		});
 		fipPrimaryLayer.getSpecies().put("L", spec1);
 		fipPrimaryLayer.getSpecies().put("PL", spec2);
 
@@ -3417,12 +3562,14 @@ class FipStartTest {
 			builder.height(20f);
 		}));
 
-		var spec1 = new FipSpecies("Test", LayerType.PRIMARY, "L");
-		spec1.setFractionGenus(0.1f);
-		var spec2 = new FipSpecies("Test", LayerType.PRIMARY, "PL");
-		spec2.setFractionGenus(0.9f);
-		fipPrimaryLayer.getSpecies().put("L", spec1);
-		fipPrimaryLayer.getSpecies().put("PL", spec2);
+		FipSpecies.build(fipPrimaryLayer, builder -> {
+			builder.genus("L");
+			builder.percentGenus(10f);
+		});
+		FipSpecies.build(fipPrimaryLayer, builder -> {
+			builder.genus("PL");
+			builder.percentGenus(90f);
+		});
 
 		processedLayers.get(LayerType.PRIMARY).setHeight(15f);
 		// processedLayers.get(LayerType.PRIMARY).setCrownClosure(60f);
@@ -3494,7 +3641,13 @@ class FipStartTest {
 				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
-		var spec1 = new VdypSpecies("Test", LayerType.PRIMARY, "L");
+		var spec1 = VdypSpecies.build(vdypLayer, builder -> {
+			builder.genus("L");
+			builder.percentGenus(50f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 
 		spec1.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 		spec1.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
@@ -3508,7 +3661,13 @@ class FipStartTest {
 				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
-		var spec2 = new VdypSpecies("Test", LayerType.PRIMARY, "PL");
+		var spec2 = VdypSpecies.build(vdypLayer, builder -> {
+			builder.genus("PL");
+			builder.percentGenus(50f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 
 		spec2.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 		spec2.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
@@ -3521,8 +3680,6 @@ class FipStartTest {
 		spec2.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
 				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
-
-		vdypLayer.setSpecies(List.of(spec1, spec2));
 
 		app.adjustForStocking(vdypLayer, fipPrimaryLayer, BecDefinitionParser.getBecs(controlMap).get("IDF").get());
 
@@ -3616,7 +3773,13 @@ class FipStartTest {
 				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
-		var spec1 = new VdypSpecies("Test", LayerType.PRIMARY, "L");
+		var spec1 = VdypSpecies.build(vdypLayer, builder -> {
+			builder.genus("L");
+			builder.percentGenus(50f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 
 		spec1.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 		spec1.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
@@ -3630,7 +3793,13 @@ class FipStartTest {
 				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
-		var spec2 = new VdypSpecies("Test", LayerType.PRIMARY, "PL");
+		var spec2 = VdypSpecies.build(vdypLayer, builder -> {
+			builder.genus("PL");
+			builder.percentGenus(50f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 
 		spec2.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 		spec2.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
@@ -3643,8 +3812,6 @@ class FipStartTest {
 		spec2.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
 				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
-
-		vdypLayer.setSpecies(List.of(spec1, spec2));
 
 		app.adjustForStocking(vdypLayer, fipPrimaryLayer, BecDefinitionParser.getBecs(controlMap).get("IDF").get());
 
@@ -3750,7 +3917,13 @@ class FipStartTest {
 				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
-		var spec1 = new VdypSpecies("Test", LayerType.PRIMARY, "L");
+		var spec1 = VdypSpecies.build(vdypLayer, builder -> {
+			builder.genus("L");
+			builder.percentGenus(50f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 
 		spec1.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 		spec1.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
@@ -3764,7 +3937,13 @@ class FipStartTest {
 				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
-		var spec2 = new VdypSpecies("Test", LayerType.PRIMARY, "PL");
+		var spec2 = VdypSpecies.build(vdypLayer, builder -> {
+			builder.genus("PL");
+			builder.percentGenus(50f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 
 		spec2.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 		spec2.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
@@ -3777,8 +3956,6 @@ class FipStartTest {
 		spec2.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
 				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
-
-		vdypLayer.setSpecies(List.of(spec1, spec2));
 
 		app.adjustForStocking(vdypLayer, fipPrimaryLayer, BecDefinitionParser.getBecs(controlMap).get("IDF").get());
 
@@ -3989,13 +4166,13 @@ class FipStartTest {
 	};
 
 	FipSpecies getTestSpecies(String polygonId, LayerType layer, String genusId, Consumer<FipSpecies> mutator) {
-		var result = new FipSpecies(
-				polygonId, // polygonIdentifier
-				layer, // layer
-				genusId // genus
-		);
-		result.setPercentGenus(100.0f);
-		result.setSpeciesPercent(Collections.singletonMap(genusId, 100f));
+		var result = FipSpecies.build(builder -> {
+			builder.polygonIdentifier(polygonId);
+			builder.layerType(layer);
+			builder.genus(genusId);
+			builder.percentGenus(100.0f);
+			builder.addSpecies(genusId, 100f);
+		});
 		mutator.accept(result);
 		return result;
 	};

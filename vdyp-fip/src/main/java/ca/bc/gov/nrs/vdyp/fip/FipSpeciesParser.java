@@ -100,20 +100,23 @@ public class FipSpeciesParser
 					var species4 = (Optional<String>) entry.get(SPECIES_4);
 					var percentSpecies4 = (Float) entry.get(PERCENT_SPECIES_4);
 
-					var builder = new ValueOrMarker.Builder<Optional<FipSpecies>, EndOfRecord>();
+					var layerBuilder = new ValueOrMarker.Builder<Optional<FipSpecies>, EndOfRecord>();
 					return layer.handle(l -> {
-						return builder.value(l.map(layerType -> {
+						return layerBuilder.value(l.map(layerType -> {
 							Map<String, Float> speciesPercent = new LinkedHashMap<>();
 							species1.ifPresent((sp) -> speciesPercent.put(sp, percentSpecies1));
 							species2.ifPresent((sp) -> speciesPercent.put(sp, percentSpecies2));
 							species3.ifPresent((sp) -> speciesPercent.put(sp, percentSpecies3));
 							species4.ifPresent((sp) -> speciesPercent.put(sp, percentSpecies4));
-							var species = new FipSpecies(polygonId, layerType, genus);
-							species.setPercentGenus(percentGenus);
-							species.setSpeciesPercent(speciesPercent);
-							return species;
+							return FipSpecies.build(specBuilder -> {
+								specBuilder.polygonIdentifier(polygonId);
+								specBuilder.layerType(layerType);
+								specBuilder.genus(genus);
+								specBuilder.percentGenus(percentGenus);
+								specBuilder.addSpecies(speciesPercent);
+							});
 						}));
-					}, builder::marker);
+					}, layerBuilder::marker);
 				}
 
 			};

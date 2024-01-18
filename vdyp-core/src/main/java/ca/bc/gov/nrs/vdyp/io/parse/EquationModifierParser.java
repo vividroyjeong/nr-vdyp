@@ -11,8 +11,8 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 
 /**
- * Parser for an equation modifier mapping data file. This file contains a list of integer
- * triples (3 chars, 4 chars, 4 chars)
+ * Parser for an equation modifier mapping data file. This file contains a list
+ * of integer triples (3 chars, 4 chars, 4 chars)
  * <ol>
  * <li>default equation number (range: 1 - 180)
  * <li>an ITG number (range: 1 - 45)
@@ -23,7 +23,7 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
  * FIP Control index: 031
  * <p>
  * Example: coe/GMODBA1.DAT
- * 
+ *
  * @see ControlMapSubResourceParser
  * @author Kevin Smith, Vivid Solutions
  */

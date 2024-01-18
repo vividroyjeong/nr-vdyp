@@ -25,20 +25,20 @@ public abstract class BaseVdypSpecies {
 
 	private Map<String, Float> speciesPercent; // Map from
 
-	protected BaseVdypSpecies(String polygonIdentifier, LayerType layer, String genus) {
+	protected BaseVdypSpecies(String polygonIdentifier, LayerType layer, String genus, float percentGenus) {
 		this.polygonIdentifier = polygonIdentifier;
 		this.layer = layer;
 		this.genus = genus;
-
+		this.setPercentGenus(percentGenus);
 	}
 
 	protected BaseVdypSpecies(BaseVdypSpecies toCopy) {
 		this(
 				toCopy.getPolygonIdentifier(), //
 				toCopy.getLayer(), //
-				toCopy.getGenus() //
+				toCopy.getGenus(), //
+				toCopy.getPercentGenus()
 		);
-		setPercentGenus(toCopy.getPercentGenus());
 		setSpeciesPercent(toCopy.getSpeciesPercent());
 	}
 
@@ -81,9 +81,7 @@ public abstract class BaseVdypSpecies {
 		return genus;
 	}
 
-
-	protected abstract static class Builder<T extends BaseVdypSpecies>
-			extends ModelClassBuilder<T> {
+	protected abstract static class Builder<T extends BaseVdypSpecies> extends ModelClassBuilder<T> {
 		protected Optional<String> polygonIdentifier = Optional.empty();
 		protected Optional<LayerType> layer = Optional.empty();
 		protected Optional<String> genus = Optional.empty();
@@ -104,7 +102,7 @@ public abstract class BaseVdypSpecies {
 			this.genus = Optional.of(genus);
 			return this;
 		}
-		
+
 		public Builder<T> percentGenus(float percentGenus) {
 			this.percentGenus = Optional.of(percentGenus);
 			return this;
@@ -139,8 +137,7 @@ public abstract class BaseVdypSpecies {
 		@Override
 		protected void postProcess(T result) {
 			super.postProcess(result);
-
-			result.getSpeciesPercent().putAll(speciesPercent);
+			result.setSpeciesPercent(speciesPercent);
 		}
 
 	}

@@ -30,7 +30,7 @@ class BecDefinitionParserTest {
 	void testParse() throws Exception {
 		var parser = new BecDefinitionParser();
 
-		var result = parser.parse(ControlFileParserTest.class, "coe/Becdef.dat", Collections.emptyMap());
+		var result = parser.parse(BecDefinitionParserTest.class, "coe/Becdef.dat", Collections.emptyMap());
 
 		assertThat(
 				result,

@@ -149,5 +149,10 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 			));
 		}
 
+		@Override
+		protected FipSpecies.Builder getSpeciesBuilder() {
+			return new FipSpecies.Builder();
+		}
+
 	}
 }

@@ -503,9 +503,9 @@ public class FipStart {
 		Map<String, Float> targetPercentages = new HashMap<>(vdypSpecies.size());
 
 		for (var vSpec : vdypSpecies.values()) {
-			var volumeGroup = getGroup(fipPolygon, volumeGroupMap, vSpec);
-			var decayGroup = getGroup(fipPolygon, decayGroupMap, vSpec);
-			var breakageGroup = getGroup(fipPolygon, breakageGroupMap, vSpec);
+			var volumeGroup = getGroup(fipPolygon, volumeGroupMap, vSpec.getGenus());
+			var decayGroup = getGroup(fipPolygon, decayGroupMap, vSpec.getGenus());
+			var breakageGroup = getGroup(fipPolygon, breakageGroupMap, vSpec.getGenus());
 
 			vSpec.setVolumeGroup(volumeGroup);
 			vSpec.setDecayGroup(decayGroup);
@@ -1044,9 +1044,9 @@ public class FipStart {
 		var decayGroupMap = getGroupMap(DecayEquationGroupParser.CONTROL_KEY);
 		var breakageGroupMap = getGroupMap(BreakageEquationGroupParser.CONTROL_KEY);
 		for (var vSpec : vdypSpecies.values()) {
-			var volumeGroup = getGroup(fipPolygon, volumeGroupMap, vSpec);
-			var decayGroup = getGroup(fipPolygon, decayGroupMap, vSpec);
-			var breakageGroup = getGroup(fipPolygon, breakageGroupMap, vSpec);
+			var volumeGroup = getGroup(fipPolygon, volumeGroupMap, vSpec.getGenus());
+			var decayGroup = getGroup(fipPolygon, decayGroupMap, vSpec.getGenus());
+			var breakageGroup = getGroup(fipPolygon, breakageGroupMap, vSpec.getGenus());
 
 			vSpec.setVolumeGroup(volumeGroup);
 			vSpec.setDecayGroup(decayGroup);
@@ -2523,8 +2523,8 @@ public class FipStart {
 		return k;
 	}
 
-	int getGroup(FipPolygon fipPolygon, MatrixMap2<String, String, Integer> volumeGroupMap, VdypSpecies vSpec) {
-		return volumeGroupMap.get(vSpec.getGenus(), fipPolygon.getBiogeoclimaticZone());
+	int getGroup(FipPolygon fipPolygon, MatrixMap2<String, String, Integer> volumeGroupMap, String genus) {
+		return volumeGroupMap.get(genus, fipPolygon.getBiogeoclimaticZone());
 	}
 
 	MatrixMap2<String, String, Integer> getGroupMap(String key) {

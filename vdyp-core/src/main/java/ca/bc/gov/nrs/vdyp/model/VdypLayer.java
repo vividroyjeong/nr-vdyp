@@ -137,7 +137,7 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 	 * Accepts a configuration function that accepts a builder to configure.
 	 *
 	 * <pre>
-	 * FipLayer myLayer = FipLayer.build(builder-&gt; {
+	 * VdypLayer myLayer = VdypLayer.build(builder-&gt; {
 			builder.polygonIdentifier(polygonId);
 			builder.layerType(LayerType.VETERAN);
 			builder.ageTotal(8f);
@@ -173,6 +173,11 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 					yearsToBreastHeight.get(), //
 					height.get()
 			));
+		}
+
+		@Override
+		protected VdypSpecies.Builder getSpeciesBuilder() {
+			return new VdypSpecies.Builder();
 		}
 
 	}

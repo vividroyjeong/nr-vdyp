@@ -3,16 +3,18 @@ package ca.bc.gov.nrs.vdyp.io.parse;
 import java.util.Map;
 
 /**
- * Parser for a Total Stand Whole Stem data file. Each line contains a Volume Group id
- * and an array of nine coefficients (zero-based). It is ended by a blank line.
+ * Parser for a Total Stand Whole Stem data file. Each line contains a Volume
+ * Group id and an array of nine coefficients (zero-based). It is ended by a
+ * blank line.
  * <ol>
  * <li>(cols 0-2) integer - a Volume Group id (1 - 80)</li>
  * <li>(col 3-12, 13-22, ...) - float * 10 - coefficients</li>
  * </ol>
- * Lines with an empty Volume Group id are considered blank and are skipped. All lines in
- * the file are parsed.
+ * Lines with an empty Volume Group id are considered blank and are skipped. All
+ * lines in the file are parsed.
  * <p>
- * The result of the parse is a {@link Map} of Volume Group ids to a set of nine coefficients.
+ * The result of the parse is a {@link Map} of Volume Group ids to a set of nine
+ * coefficients.
  * <p>
  * FIP Control index: 090
  * <p>

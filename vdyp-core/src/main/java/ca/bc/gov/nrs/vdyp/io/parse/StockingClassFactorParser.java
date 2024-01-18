@@ -14,7 +14,7 @@ import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
 
 /**
- * Parser for a Stocking Class Factor data file. 
+ * Parser for a Stocking Class Factor data file.
  * <ol>
  * <li>(col 0) stocking class code</li>
  * <li>(col 2) region code ('C' or 'I')</li>
@@ -23,11 +23,13 @@ import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
  * <li>(cols 10-15) - float - stocking factopr</li>
  * <li>(cols 16-20) - int - percentage</li>
  * </ol>
- * The result of the parse is a {@link MatrixMap2} from Stocking Class and Region to a {@link StockingClassFactor}.
+ * The result of the parse is a {@link MatrixMap2} from Stocking Class and
+ * Region to a {@link StockingClassFactor}.
  * <p>
- * A line with stocking class 'Z' terminates the parse. There is no provision for blank lines prior to this
- * line. It is legal to have multiple definitions for a given stocking class factor; the last one in the file 
- * wins. There can be no more than ten stocking classes with definitions.
+ * A line with stocking class 'Z' terminates the parse. There is no provision
+ * for blank lines prior to this line. It is legal to have multiple definitions
+ * for a given stocking class factor; the last one in the file wins. There can
+ * be no more than ten stocking classes with definitions.
  * <p>
  * FIP Control index: 033
  * <p>
