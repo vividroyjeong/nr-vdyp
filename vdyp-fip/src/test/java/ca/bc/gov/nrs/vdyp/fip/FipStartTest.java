@@ -2863,7 +2863,12 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		FipPolygon fPoly = new FipPolygon("Test", "A", "CWH", Optional.empty(), Optional.empty(), Optional.empty(), 0);
+		var fPoly = FipPolygon.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.forestInventoryZone("A");
+			builder.biogeoclimaticZone("CWH");
+			builder.yieldFactor(1f);
+		});
 		VdypLayer layer = VdypLayer.build(builder -> {
 			builder.polygonIdentifier("Test");
 			builder.layerType(LayerType.PRIMARY);
@@ -3392,19 +3397,16 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		var fipPolygon = new FipPolygon(
-				"Test", // FIP_P/FIZ
-				"D", // FIP_P/FIZ
-				"IDF", // FIP_P/BEC
-				Optional.empty(), // FIP_P2/PCTFLAND = 0
-				Optional.of(FipMode.FIPSTART), // FIP_P2/MODE = 1
-				Optional.empty(), // FIP_P3/NPDESC = ' '
-				1f // FIP_P4/YLDFACT
-		);
+		var fipPolygon = FipPolygon.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.forestInventoryZone("D");
+			builder.biogeoclimaticZone("IDF");
+			builder.modeFip(FipMode.FIPSTART);
+			builder.yieldFactor(1f);
+		});
 
 		// var fipVeteranLayer = new FipLayer("Test", LayerType.VETERAN);
-		var fipPrimaryLayer = FipLayerPrimary.buildPrimary(builder -> {
-			builder.polygonIdentifier("Test");
+		var fipPrimaryLayer = FipLayerPrimary.buildPrimary(fipPolygon, builder -> {
 			builder.ageTotal(60f);
 			builder.yearsToBreastHeight(8.5f);
 			builder.height(15f);
@@ -3415,10 +3417,6 @@ class FipStartTest {
 			builder.siteSpecies("L");
 		});
 
-		// fipPolygon.getLayers().put(LayerType.VETERAN, fipVeteranLayer);
-		fipPolygon.setLayers(new HashMap<>());
-		fipPolygon.getLayers().put(LayerType.PRIMARY, fipPrimaryLayer);
-
 		var processedLayers = new HashMap<LayerType, VdypLayer>();
 		processedLayers.put(LayerType.PRIMARY, VdypLayer.build(builder -> {
 			builder.polygonIdentifier("Test");
@@ -3428,20 +3426,14 @@ class FipStartTest {
 			builder.height(20f);
 		}));
 
-		var spec1 = FipSpecies.build(builder -> {
-			builder.polygonIdentifier("Test");
-			builder.layerType(LayerType.PRIMARY);
+		FipSpecies.build(fipPrimaryLayer, builder -> {
 			builder.genus("L");
 			builder.percentGenus(10f);
 		});
-		var spec2 = FipSpecies.build(builder -> {
-			builder.polygonIdentifier("Test");
-			builder.layerType(LayerType.PRIMARY);
+		FipSpecies.build(fipPrimaryLayer, builder -> {
 			builder.genus("PL");
 			builder.percentGenus(90f);
 		});
-		fipPrimaryLayer.getSpecies().put("L", spec1);
-		fipPrimaryLayer.getSpecies().put("PL", spec2);
 
 		processedLayers.get(LayerType.PRIMARY).setHeight(15f);
 		// processedLayers.get(LayerType.PRIMARY).setCrownClosure(60f);
@@ -3459,19 +3451,18 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		var fipPolygon = new FipPolygon(
-				"Test", // FIP_P/FIZ
-				"D", // FIP_P/FIZ
-				"IDF", // FIP_P/BEC
-				Optional.of(42f), // FIP_P2/PCTFLAND = 42
-				Optional.of(FipMode.FIPSTART), // FIP_P2/MODE = 1
-				Optional.empty(), // FIP_P3/NPDESC = ' '
-				1f // FIP_P4/YLDFACT
-		);
+		var fipPolygon = FipPolygon.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.forestInventoryZone("D");
+			builder.biogeoclimaticZone("IDF");
+			builder.modeFip(FipMode.FIPSTART);
+			builder.yieldFactor(1f);
+
+			builder.percentAvailable(42f);
+		});
 
 		// var fipVeteranLayer = new FipLayer("Test", LayerType.VETERAN);
-		var fipPrimaryLayer = FipLayerPrimary.buildPrimary(builder -> {
-			builder.polygonIdentifier("Test");
+		var fipPrimaryLayer = FipLayerPrimary.buildPrimary(fipPolygon, builder -> {
 			builder.ageTotal(60f);
 			builder.yearsToBreastHeight(8.5f);
 			builder.height(15f);
@@ -3482,10 +3473,6 @@ class FipStartTest {
 			builder.siteSpecies("L");
 		});
 
-		// fipPolygon.getLayers().put(LayerType.VETERAN, fipVeteranLayer);
-		fipPolygon.setLayers(new HashMap<>());
-		fipPolygon.getLayers().put(LayerType.PRIMARY, fipPrimaryLayer);
-
 		var processedLayers = new HashMap<LayerType, VdypLayer>();
 		processedLayers.put(LayerType.PRIMARY, VdypLayer.build(builder -> {
 			builder.polygonIdentifier("Test");
@@ -3495,20 +3482,18 @@ class FipStartTest {
 			builder.height(20f);
 		}));
 
-		var spec1 = FipSpecies.build(builder -> {
+		FipSpecies.build(fipPrimaryLayer, builder -> {
 			builder.polygonIdentifier("Test");
 			builder.layerType(LayerType.PRIMARY);
 			builder.genus("L");
 			builder.percentGenus(10f);
 		});
-		var spec2 = FipSpecies.build(builder -> {
+		FipSpecies.build(fipPrimaryLayer, builder -> {
 			builder.polygonIdentifier("Test");
 			builder.layerType(LayerType.PRIMARY);
 			builder.genus("PL");
 			builder.percentGenus(90f);
 		});
-		fipPrimaryLayer.getSpecies().put("L", spec1);
-		fipPrimaryLayer.getSpecies().put("PL", spec2);
 
 		processedLayers.get(LayerType.PRIMARY).setHeight(15f);
 		// processedLayers.get(LayerType.PRIMARY).setCrownClosure(60f);
@@ -3526,19 +3511,16 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		var fipPolygon = new FipPolygon(
-				"Test", // FIP_P/FIZ
-				"D", // FIP_P/FIZ
-				"IDF", // FIP_P/BEC
-				Optional.empty(), // FIP_P2/PCTFLAND = 0
-				Optional.of(FipMode.FIPYOUNG), // FIP_P2/MODE = 2
-				Optional.empty(), // FIP_P3/NPDESC = ' '
-				1f // FIP_P4/YLDFACT
-		);
+		var fipPolygon = FipPolygon.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.forestInventoryZone("D");
+			builder.biogeoclimaticZone("IDF");
+			builder.modeFip(FipMode.FIPYOUNG);
+			builder.yieldFactor(1f);
+		});
 
 		// var fipVeteranLayer = new FipLayer("Test", LayerType.VETERAN);
-		var fipPrimaryLayer = FipLayerPrimary.buildPrimary(builder -> {
-			builder.polygonIdentifier("Test");
+		var fipPrimaryLayer = FipLayerPrimary.buildPrimary(fipPolygon, builder -> {
 			builder.ageTotal(60f);
 			builder.yearsToBreastHeight(8.5f);
 			builder.height(15f);
@@ -3548,10 +3530,6 @@ class FipStartTest {
 			builder.siteGenus("L");
 			builder.siteSpecies("L");
 		});
-
-		// fipPolygon.getLayers().put(LayerType.VETERAN, fipVeteranLayer);
-		fipPolygon.setLayers(new HashMap<>());
-		fipPolygon.getLayers().put(LayerType.PRIMARY, fipPrimaryLayer);
 
 		var processedLayers = new HashMap<LayerType, VdypLayer>();
 		processedLayers.put(LayerType.PRIMARY, VdypLayer.build(builder -> {
@@ -4112,15 +4090,13 @@ class FipStartTest {
 	}
 
 	FipPolygon getTestPolygon(String polygonId, Consumer<FipPolygon> mutator) {
-		var result = new FipPolygon(
-				polygonId, // polygonIdentifier
-				"0", // fiz
-				"BG", // becIdentifier
-				Optional.empty(), // percentAvailable
-				Optional.of(FipMode.FIPSTART), // modeFip
-				Optional.empty(), // nonproductiveDescription
-				1.0f // yieldFactor
-		);
+		var result = FipPolygon.build(builder -> {
+			builder.polygonIdentifier(polygonId);
+			builder.forestInventoryZone("0");
+			builder.biogeoclimaticZone("BG");
+			builder.modeFip(FipMode.FIPSTART);
+			builder.yieldFactor(1.0f);
+		});
 		mutator.accept(result);
 		return result;
 	};

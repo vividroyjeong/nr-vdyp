@@ -96,6 +96,15 @@ public class FipLayerPrimary extends FipLayer {
 		return (FipLayerPrimary) builder.build();
 	}
 
+	public static FipLayerPrimary buildPrimary(FipPolygon polygon, Consumer<PrimaryBuilder> config) {
+		var layer = buildPrimary(builder -> {
+			builder.polygonIdentifier(polygon.getPolygonIdentifier());
+			config.accept(builder);
+		});
+		polygon.getLayers().put(layer.getLayer(), layer);
+		return layer;
+	}
+
 	public static class PrimaryBuilder extends Builder {
 		private Optional<Integer> siteCurveNumber = Optional.empty();
 

@@ -364,7 +364,10 @@ public class FipStart {
 
 		float percentAvailable = estimatePercentForestLand(fipPolygon, fipVetLayer, fipPrimaryLayer);
 
-		var vdypPolygon = new VdypPolygon(fipPolygon.getPolygonIdentifier(), percentAvailable);
+		var vdypPolygon = VdypPolygon.build(builder -> {
+			builder.polygonIdentifier(fipPolygon.getPolygonIdentifier());
+			builder.percentAvailable(percentAvailable);
+		});
 		vdypPolygon.setLayers(processedLayers);
 		return vdypPolygon;
 	}

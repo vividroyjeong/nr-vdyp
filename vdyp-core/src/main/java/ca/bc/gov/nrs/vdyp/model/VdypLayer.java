@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.model;
 import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.common.Computed;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies.Builder;
 
 public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtilizationHolder {
 
@@ -160,6 +161,23 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 		var builder = new Builder();
 		config.accept(builder);
 		return builder.build();
+	}
+
+	/**
+	 * Builds a layer and adds it to the polygon.
+	 *
+	 * @param layer  Layer to create the species for.
+	 * @param config Configuration function for the builder.
+	 * @return the new species.
+	 */
+	public static VdypLayer build(VdypPolygon polygon, Consumer<Builder> config) {
+		var result = build(builder -> {
+			builder.polygonIdentifier(polygon.getPolygonIdentifier());
+
+			config.accept(builder);
+		});
+		polygon.getLayers().put(result.getLayer(), result);
+		return result;
 	}
 
 	public static class Builder extends BaseVdypLayer.Builder<VdypLayer, VdypSpecies> {

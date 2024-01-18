@@ -98,6 +98,15 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 		return builder.build();
 	}
 
+	public static FipLayer build(FipPolygon polygon, Consumer<Builder> config) {
+		var layer = build(builder -> {
+			builder.polygonIdentifier(polygon.getPolygonIdentifier());
+			config.accept(builder);
+		});
+		polygon.getLayers().put(layer.getLayer(), layer);
+		return layer;
+	}
+
 	public static class Builder extends BaseVdypLayer.Builder<FipLayer, FipSpecies> {
 		protected Optional<Float> siteIndex = Optional.empty();
 		protected Optional<Float> crownClosure = Optional.empty();
