@@ -2,10 +2,12 @@ package ca.bc.gov.nrs.vdyp.fip;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.closeTo;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
+import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.describedAs;
 import static org.hamcrest.Matchers.equalTo;
@@ -64,6 +66,7 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
+import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
@@ -3982,6 +3985,42 @@ class FipStartTest {
 				hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", MODIFIABLE_NOT_MODIFIED)
 		);
 
+	}
+
+	@Test
+	void testProcessPolygon() throws ProcessingException {
+		var controlMap = FipTestUtils.loadControlMap();
+
+		var poly = FipPolygon.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.biogeoclimaticZone("CWH");
+			builder.yieldFactor(1f);
+			builder.forestInventoryZone("0");
+			builder.modeFip(FipMode.FIPSTART);
+		});
+
+		var layer = FipLayerPrimary.buildPrimary(poly, builder -> {
+			builder.ageTotal(50f);
+			builder.yearsToBreastHeight(2f);
+			builder.siteIndex(1f);
+			builder.crownClosure(0.9f);
+			builder.siteCurveNumber(1);
+			builder.siteGenus("B");
+			builder.siteSpecies("B");
+			builder.height(20f);
+		});
+
+		var spec = FipSpecies.build(layer, builder -> {
+			builder.genus("B");
+			builder.percentGenus(100f);
+		});
+
+		var app = new FipStart();
+		app.setControlMap(controlMap);
+
+		var result = app.processPolygon(0, poly);
+
+		assertThat(result, present(any(VdypPolygon.class)));
 	}
 
 	private static <T> MockStreamingParser<T>

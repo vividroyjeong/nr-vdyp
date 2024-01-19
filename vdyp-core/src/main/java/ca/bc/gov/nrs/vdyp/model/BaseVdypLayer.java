@@ -117,17 +117,6 @@ public class BaseVdypLayer<S extends BaseVdypSpecies> {
 			return this;
 		}
 
-		public Builder<T, S> buildSpecies(Consumer<BaseVdypSpecies.Builder<S>> specConfig) {
-			var specBuilder = getSpeciesBuilder();
-			specBuilder.polygonIdentifier(this.polygonIdentifier.get());
-			specBuilder.layerType(this.layer.get());
-			specConfig.accept(specBuilder);
-			this.species.add(specBuilder.build());
-			return this;
-		}
-
-		protected abstract BaseVdypSpecies.Builder<S> getSpeciesBuilder();
-
 		public Builder<T, S> copy(BaseVdypLayer<?> toCopy) {
 			polygonIdentifier(toCopy.getPolygonIdentifier());
 			layerType(toCopy.getLayer());

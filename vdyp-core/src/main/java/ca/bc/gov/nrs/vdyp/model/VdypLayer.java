@@ -193,10 +193,5 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 			));
 		}
 
-		@Override
-		protected VdypSpecies.Builder getSpeciesBuilder() {
-			return new VdypSpecies.Builder();
-		}
-
 	}
 }
