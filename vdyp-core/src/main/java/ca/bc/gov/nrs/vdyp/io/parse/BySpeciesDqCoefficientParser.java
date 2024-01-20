@@ -48,8 +48,8 @@ public class BySpeciesDqCoefficientParser implements ControlMapSubResourceParser
 	public static final String COEFFICIENTS_KEY = "coefficients";
 	public static final String INDICATOR_KEY = "indicator";
 
-	private int NUM_COEFFICIENTS = 3;
-	private int NUM_SPECIES = 16;
+	private final int NUM_COEFFICIENTS = 3;
+	private final int NUM_SPECIES = 16;
 
 	public BySpeciesDqCoefficientParser() {
 		super();
