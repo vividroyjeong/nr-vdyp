@@ -26,7 +26,6 @@ public class FipLayerParser
 
 	public static final String CONTROL_KEY = "FIP_LAYERS";
 
-	static final String POLYGON_IDENTIFIER = "POLYGON_IDENTIFIER"; // POLYDESC
 	static final String LAYER = "LAYER"; // LAYER
 	static final String AGE_TOTAL = "AGE_TOTAL"; // AGETOT
 	static final String HEIGHT = "HEIGHT"; // HT
@@ -51,7 +50,7 @@ public class FipLayerParser
 					throws IOException, ResourceParseException {
 		return () -> {
 			var lineParser = new LineParser() //
-					.strippedString(25, POLYGON_IDENTIFIER).space(1) //
+					.strippedString(25, FipPolygonParser.POLYGON_IDENTIFIER).space(1) //
 					.value(
 							1, LAYER,
 							ValueParser.valueOrMarker(
@@ -83,7 +82,7 @@ public class FipLayerParser
 				@SuppressWarnings({ "unchecked" })
 				@Override
 				protected ValueOrMarker<Optional<FipLayer>, EndOfRecord> convert(Map<String, Object> entry) {
-					var polygonId = (String) entry.get(POLYGON_IDENTIFIER);
+					var polygonId = (String) entry.get(FipPolygonParser.POLYGON_IDENTIFIER);
 					var layer = (ValueOrMarker<Optional<LayerType>, EndOfRecord>) entry.get(LAYER);
 					var ageTotal = (float) entry.get(AGE_TOTAL);
 					var height = (float) entry.get(HEIGHT);
