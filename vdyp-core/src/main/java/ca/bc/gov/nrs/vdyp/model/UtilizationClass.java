@@ -31,25 +31,25 @@ public enum UtilizationClass {
 		this.lowBound = lowBound;
 		this.highBound = highBound;
 	}
-	
+
 	public static UtilizationClass getByIndex(String indexText) {
 		try {
 			return getByIndex(Integer.parseInt(indexText.strip()));
-		}
-		catch (NullPointerException | NumberFormatException e) {
+		} catch (NullPointerException | NumberFormatException e) {
 			throw new IllegalArgumentException("UtilizationClass index " + indexText + " is not recognized");
 		}
 	}
 
 	public static UtilizationClass getByIndex(int index) {
-		for (UtilizationClass uc: values()) {
+
+		for (UtilizationClass uc : values()) {
 			if (uc.index == index)
 				return uc;
 		}
-		
+
 		throw new IllegalArgumentException("UtilizationClass index " + index + " is not recognized");
 	}
-	
+
 	Optional<UtilizationClass> next() {
 		return this.next;
 	}

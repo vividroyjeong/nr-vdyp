@@ -8,10 +8,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Properties;
 
-public class VDYPComponent
-{
+public class VdypComponent {
 	private Properties properties = loadProperties();
-	
+
 	private final String COMPANY_NAME = getProperty("COMPANY_NAME");
 	private final String BINARY_PRODUCT = getProperty("BINARY_PRODUCT");
 	private final String BINARY_EXTENSION = getProperty("BINARY_EXTENSION");
@@ -36,28 +35,23 @@ public class VDYPComponent
 	private final String ENV_BUILD_CONFIG = getProperty("ENV_BUILD_CONFIG");
 	private final String ENV_OS = getProperty("ENV_OS");
 	private final String ENV_ARCH = getProperty("ENV_ARCH");
-	
-	private Properties loadProperties()
-	{
+
+	private Properties loadProperties() {
 		Properties properties = new Properties();
 
-		try
-		{
-			ClassLoader loader = Thread.currentThread().getContextClassLoader();           
+		try {
+			ClassLoader loader = Thread.currentThread().getContextClassLoader();
 			InputStream stream = loader.getResourceAsStream("application.properties");
-			
+
 			properties.load(stream);
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		return properties;
 	}
-	
-	private String getProperty(String propertyName)
-	{
+
+	private String getProperty(String propertyName) {
 		return properties.getProperty(propertyName);
 	}
 
@@ -117,31 +111,31 @@ public class VDYPComponent
 	public final String RESOURCE_COMPILE_DATE = getRESOURCE_COMPILE_DATE();
 	public final String RESOURCE_COMPILE_TIME = getRESOURCE_COMPILE_TIME();
 	public final String AVERSION = getAVERSION();
-	
+
 	private String getAVERSION() {
 		return RESOURCE_SHORT_VERSION + " " + RESOURCE_VERSION_DATE;
 	}
-	
+
 	private String getRESOURCE_COMMENTS() {
 		return RESOURCE_BINARY_NAME + " " + RESOURCE_FULL_VERSION + " " + RESOURCE_VERSION_DATE;
 	}
-	
+
 	private String getRESOURCE_COMPANY_NAME() {
 		return COMPANY_NAME;
 	}
-	
+
 	private String getRESOURCE_VERSION_CSV() {
 		return VERSION_MAJOR + "," + VERSION_MINOR + "," + VERSION_INC + "," + VERSION_BUILD;
 	}
-	
+
 	private String getRESOURCE_VERSION_DOT() {
 		return VERSION_MAJOR + "." + VERSION_MINOR + "." + VERSION_INC + "." + VERSION_BUILD;
 	}
-	
-	private String getRESOURCE_VERSION_FMT(){
+
+	private String getRESOURCE_VERSION_FMT() {
 		return VERSION_MAJOR + ", " + VERSION_MINOR + ", " + VERSION_INC + ", " + VERSION_BUILD;
 	}
-	
+
 	private String getRESOURCE_SHORT_VERSION() {
 		// VERSION_INC is one-based.
 		return VERSION_MAJOR + ", " + VERSION_MINOR + (Character.toString('a' + (Integer.parseInt(VERSION_INC))));
@@ -156,7 +150,9 @@ public class VDYPComponent
 	}
 
 	private String getRESOURCE_VERSION_DATE() {
-		return VERSION_YEAR + "-" + new DateFormatSymbols().getShortMonths()[Integer.parseInt(VERSION_MONTH) - 1].substring(0, 3) + "-" + VERSION_DAY;
+		return VERSION_YEAR + "-"
+				+ new DateFormatSymbols().getShortMonths()[Integer.parseInt(VERSION_MONTH) - 1].substring(0, 3) + "-"
+				+ VERSION_DAY;
 	}
 
 	private String getRESOURCE_VERSION_YYYY() {
@@ -208,8 +204,8 @@ public class VDYPComponent
 	}
 
 	private String getRESOURCE_FILE_DESCRIPTION() {
-		return BINARY_PRODUCT + " " + RESOURCE_SHORT_VERSION + " (Compiler: " + ENV_COMPILER + ", Build: " + ENV_BUILD_CONFIG 
-				+ ", Branch: " + BRANCH_NAME + ", Commit: " + LAST_COMMIT_REFERENCE;
+		return BINARY_PRODUCT + " " + RESOURCE_SHORT_VERSION + " (Compiler: " + ENV_COMPILER + ", Build: "
+				+ ENV_BUILD_CONFIG + ", Branch: " + BRANCH_NAME + ", Commit: " + LAST_COMMIT_REFERENCE;
 	}
 
 	private String getRESOURCE_FILE_VERSION() {

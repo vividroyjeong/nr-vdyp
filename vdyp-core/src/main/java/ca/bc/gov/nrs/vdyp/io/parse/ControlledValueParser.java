@@ -53,7 +53,7 @@ public interface ControlledValueParser<T> {
 	 */
 	public static <U> ControlledValueParser<Optional<U>> optional(ControlledValueParser<U> delegate) {
 		Objects.requireNonNull(delegate, "delegate must not be null");
-		return pretestOptional(delegate, s -> !s.isBlank());
+		return pretestOptional(delegate, s -> s != null && !s.isBlank());
 	}
 
 	/**
@@ -120,7 +120,7 @@ public interface ControlledValueParser<T> {
 		}
 		return result;
 	};
-	
+
 	/**
 	 * Parser that strips whitespace and validates that the string is a Genus (SP0)
 	 * ID
@@ -128,8 +128,7 @@ public interface ControlledValueParser<T> {
 	static final ControlledValueParser<UtilizationClass> UTILIZATION_CLASS = (string, control) -> {
 		try {
 			return UtilizationClass.getByIndex(string.strip());
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			throw new ValueParseException(string, string + " is not a valid Utilization Class");
 		}
 	};

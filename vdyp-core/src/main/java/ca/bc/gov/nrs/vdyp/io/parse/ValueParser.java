@@ -166,7 +166,8 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 	public static final ValueParser<Boolean> LOGICAL = s -> INTEGER.parse(s) != 0;
 
 	/**
-	 * Parser for integers as booleans restricted to the values 1 (true) and 0 (false)
+	 * Parser for integers as booleans restricted to the values 1 (true) and 0
+	 * (false)
 	 */
 	public static final ValueParser<Boolean> LOGICAL_0_1 = s -> {
 		int v = INTEGER.parse(s);
