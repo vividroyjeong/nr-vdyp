@@ -23,7 +23,7 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.SpeciesDistribution;
 import ca.bc.gov.nrs.vdyp.model.SpeciesDistributionSet;
 
-public class VdypLayerBySpeciesParser
+public class VdypSpeciesParser
 		implements ControlMapValueReplacer<StreamingParserFactory<Collection<VdypLayerSpecies>>, String> {
 
 	public static final String CONTROL_KEY = "VDYP_SPECIES";
@@ -41,7 +41,7 @@ public class VdypLayerBySpeciesParser
 	private static final String PERCENT_SPECIES_3 = "PERCENT_SPECIES_3"; // PCT3
 	private static final String SPECIES_4 = "SPECIES_4"; // SP644
 	private static final String PERCENT_SPECIES_4 = "PERCENT_SPECIES_4"; // PCT4
-	
+
 	private static final String SITE_INDEX = "SITE_INDEX"; // SI
 	private static final String DOMINANT_HEIGHT = "DOMINANT_HEIGHT"; // HD
 	private static final String TOTAL_AGE = "TOTAL_AGE"; // AGETOT
@@ -60,30 +60,30 @@ public class VdypLayerBySpeciesParser
 			map(String fileName, FileResolver fileResolver, Map<String, Object> control)
 					throws IOException, ResourceParseException {
 		return () -> {
-			var lineParser = new LineParser()
-					.strippedString(25, DESCRIPTION).space(1)
-					.value(1, LAYER_TYPE,
+			var lineParser = new LineParser().strippedString(25, DESCRIPTION).space(1)
+					.value(
+							1, LAYER_TYPE,
 							ValueParser.valueOrMarker(
-									ValueParser.LAYER, ValueParser.optionalSingleton(
-											x -> "".equals(x) || "Z".equals(x), EndOfRecord.END_OF_RECORD)
-							)).space(1)
-					.value(2, GENUS_INDEX, ValueParser.INTEGER).space(1)
-					.value(2, GENUS, ValueParser.GENUS).space(1)
-					.value(3, SPECIES_1, ValueParser.SPECIES)
-					.value(5, PERCENT_SPECIES_1, ValueParser.PERCENTAGE)
+									ValueParser.LAYER,
+									ValueParser.optionalSingleton(
+											x -> x == null || x.trim().length() == 0 || x.trim().equals("Z"),
+											EndOfRecord.END_OF_RECORD
+									)
+							)
+					).space(1).value(2, GENUS_INDEX, ValueParser.INTEGER).space(1)
+					.value(2, GENUS, ControlledValueParser.optional(ValueParser.GENUS)).space(1)
+					.value(3, SPECIES_1, ValueParser.SPECIES).value(5, PERCENT_SPECIES_1, ValueParser.PERCENTAGE)
 					.value(3, SPECIES_2, ControlledValueParser.optional(ValueParser.SPECIES))
 					.value(5, PERCENT_SPECIES_2, ControlledValueParser.optional(ValueParser.PERCENTAGE))
 					.value(3, SPECIES_3, ControlledValueParser.optional(ValueParser.SPECIES))
 					.value(5, PERCENT_SPECIES_3, ControlledValueParser.optional(ValueParser.PERCENTAGE))
 					.value(3, SPECIES_4, ControlledValueParser.optional(ValueParser.SPECIES))
 					.value(5, PERCENT_SPECIES_4, ControlledValueParser.optional(ValueParser.PERCENTAGE))
-					.value(6, SITE_INDEX, ValueParser.FLOAT)
-					.value(6, DOMINANT_HEIGHT, ValueParser.FLOAT)
-					.value(6, TOTAL_AGE, ValueParser.FLOAT)
-					.value(6, AGE_AT_BREAST_HEIGHT, ValueParser.FLOAT)
+					.value(6, SITE_INDEX, ValueParser.FLOAT).value(6, DOMINANT_HEIGHT, ValueParser.FLOAT)
+					.value(6, TOTAL_AGE, ValueParser.FLOAT).value(6, AGE_AT_BREAST_HEIGHT, ValueParser.FLOAT)
 					.value(6, YEARS_TO_BREAST_HEIGHT, ValueParser.FLOAT)
-					.value(2, IS_PRIMARY_SPECIES, ValueParser.LOGICAL_0_1)
-					.value(3, SITE_CURVE_NUMBER, ValueParser.INTEGER);
+					.value(2, IS_PRIMARY_SPECIES, ControlledValueParser.optional(ValueParser.LOGICAL_0_1))
+					.value(3, SITE_CURVE_NUMBER, ControlledValueParser.optional(ValueParser.INTEGER));
 
 			var is = fileResolver.resolve(fileName);
 
@@ -94,11 +94,15 @@ public class VdypLayerBySpeciesParser
 				@Override
 				protected ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord> convert(Map<String, Object> entry)
 						throws ResourceParseException {
-					
+
 					var polygonId = (String) entry.get(DESCRIPTION);
 					var layerType = (ValueOrMarker<Optional<LayerType>, EndOfRecord>) entry.get(LAYER_TYPE);
+					if (layerType == null) {
+						var builder = new ValueOrMarker.Builder<Optional<LayerType>, EndOfRecord>();
+						layerType = builder.marker(EndOfRecord.END_OF_RECORD);
+					}
 					var genusIndex = (Integer) entry.get(GENUS_INDEX);
-					var genus = (String) entry.get(GENUS);
+					var genus = (Optional<String>) entry.get(GENUS);
 					var species1 = (String) entry.get(SPECIES_1);
 					var percentSpecies1 = (Float) entry.get(PERCENT_SPECIES_1);
 					var species2 = (Optional<String>) entry.get(SPECIES_2);
@@ -112,30 +116,34 @@ public class VdypLayerBySpeciesParser
 					var totalAge = (Float) entry.get(TOTAL_AGE);
 					var ageAtBreastHeight = (Float) entry.get(AGE_AT_BREAST_HEIGHT);
 					var yearsToBreastHeight = (Float) entry.get(YEARS_TO_BREAST_HEIGHT);
-					var isPrimarySpecies = (Optional<Boolean>) entry.get(IS_PRIMARY_SPECIES);
-					var siteCurveNumber = (Optional<Integer>) entry.get(SITE_CURVE_NUMBER);
-					
+					var isPrimarySpeciesValue = (Optional<Boolean>) entry.get(IS_PRIMARY_SPECIES);
+					Optional<Boolean> isPrimarySpecies = (isPrimarySpeciesValue == null) ? Optional.empty()
+							: isPrimarySpeciesValue;
+					var siteCurveNumberValue = (Optional<Integer>) entry.get(SITE_CURVE_NUMBER);
+					Optional<Integer> siteCurveNumber = (siteCurveNumberValue == null) ? Optional.of(9)
+							: siteCurveNumberValue;
+
 					var builder = new ValueOrMarker.Builder<Optional<VdypLayerSpecies>, EndOfRecord>();
 					var result = layerType.handle(l -> {
-						
-						List<SpeciesDistribution> sdList = new ArrayList<>();
-						sdList.add(new SpeciesDistribution(species1, percentSpecies1));
-						if (species2.isPresent() && percentSpecies2.isPresent())
-							sdList.add(new SpeciesDistribution(species2.get(), percentSpecies2.get()));
-						if (species3.isPresent() && percentSpecies3.isPresent())
-							sdList.add(new SpeciesDistribution(species3.get(), percentSpecies3.get()));
-						if (species4.isPresent() && percentSpecies4.isPresent())
-							sdList.add(new SpeciesDistribution(species4.get(), percentSpecies4.get()));
-						SpeciesDistributionSet speciesDistributionSet = new SpeciesDistributionSet(sdList);
-						
-						return builder.value(
-								Optional.of(new VdypLayerSpecies(polygonId, layerType.getValue().get().get(), genusIndex, genus
-										, speciesDistributionSet, siteIndex, dominantHeight, totalAge, ageAtBreastHeight
-										, yearsToBreastHeight, isPrimarySpecies, siteCurveNumber)));
-					}, m -> {
-						return builder.marker(m);
-					});
-					
+						return builder.value(l.map(lt -> {
+
+							List<SpeciesDistribution> sdList = new ArrayList<>();
+							sdList.add(new SpeciesDistribution(species1, percentSpecies1));
+							if (species2.isPresent() && percentSpecies2.isPresent())
+								sdList.add(new SpeciesDistribution(species2.get(), percentSpecies2.get()));
+							if (species3.isPresent() && percentSpecies3.isPresent())
+								sdList.add(new SpeciesDistribution(species3.get(), percentSpecies3.get()));
+							if (species4.isPresent() && percentSpecies4.isPresent())
+								sdList.add(new SpeciesDistribution(species4.get(), percentSpecies4.get()));
+							SpeciesDistributionSet speciesDistributionSet = new SpeciesDistributionSet(sdList);
+
+							return new VdypLayerSpecies(
+									polygonId, lt, genusIndex, genus, speciesDistributionSet, siteIndex, dominantHeight,
+									totalAge, ageAtBreastHeight, yearsToBreastHeight, isPrimarySpecies, siteCurveNumber
+							);
+						}));
+					}, builder::marker);
+
 					return result;
 				}
 			};
@@ -157,8 +165,13 @@ public class VdypLayerBySpeciesParser
 				@Override
 				protected Collection<VdypLayerSpecies>
 						convert(List<ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord>> children) {
-					return children.stream().map(ValueOrMarker::getValue).map(Optional::get) 
-							.flatMap(Optional::stream) // Skip if empty (and unknown layer type)
+					return children.stream().map(ValueOrMarker::getValue).map(Optional::get).flatMap(Optional::stream) // Skip
+																														// if
+																														// empty
+																														// (and
+																														// unknown
+																														// layer
+																														// type)
 							.toList();
 				}
 

@@ -17,10 +17,10 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.bc.gov.nrs.vdyp.application.VDYPApplication;
-import ca.bc.gov.nrs.vdyp.application.VDYPApplicationIdentifier;
+import ca.bc.gov.nrs.vdyp.application.VdypApplication;
+import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 
-public class VdypForwardApplication extends VDYPApplication {
+public class VdypForwardApplication extends VdypApplication {
 
 	private static final Logger log = LoggerFactory.getLogger(VdypForwardApplication.class);
 
@@ -28,36 +28,36 @@ public class VdypForwardApplication extends VDYPApplication {
 	public static final int PROCESSING_ERROR = 2; // TODO check what Fortran VDYP Forward would exit with.
 
 	public static final String DEFAULT_VDYP_CONTROL_FILE_NAME = "vdyp.ctr";
-	
-	private static Set<VdypPass> vdypPassSet = new HashSet<>(Arrays.asList(new VdypPass[] { Pass1, Pass2, Pass3, Pass4, Pass5 } ));
+
+	private static Set<VdypPass> vdypPassSet = new HashSet<>(
+			Arrays.asList(new VdypPass[] { Pass1, Pass2, Pass3, Pass4, Pass5 })
+	);
 
 	public static void main(final String... args) {
 
 		var app = new VdypForwardApplication();
-		
+
 		app.logVersionInformation();
 
 		List<String> controlFileNames = null;
-		
+
 		try {
 			if (args.length == 0) {
 				System.out.print("Enter name of VDYP control file (or RETURN for vdyp.ctr) or *name for both): ");
-				
+
 				controlFileNames = new ArrayList<>();
 				try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
 					String userResponse = br.readLine();
 					if (userResponse.length() == 0) {
 						controlFileNames.add(DEFAULT_VDYP_CONTROL_FILE_NAME);
-					}
-					else if (userResponse.startsWith("*")) {
+					} else if (userResponse.startsWith("*")) {
 						controlFileNames.add(DEFAULT_VDYP_CONTROL_FILE_NAME);
-						
+
 						userResponse = userResponse.substring(1);
 						controlFileNames.addAll(Arrays.asList(userResponse.split("[[:space:]]+")));
 					}
 				}
-			}
-			else {
+			} else {
 				controlFileNames = Arrays.asList(args);
 			}
 		} catch (Exception ex) {
@@ -74,17 +74,15 @@ public class VdypForwardApplication extends VDYPApplication {
 		}
 	}
 
-	private void logVersionInformation()
-	{
+	private void logVersionInformation() {
 		log.info(RESOURCE_SHORT_VERSION + " " + RESOURCE_VERSION_DATE);
-	    log.info(RESOURCE_BINARY_NAME + " Ver:" + RESOURCE_SHORT_VERSION + " " + RESOURCE_VERSION_DATE);
-	    log.info("VDYP7 Support Ver: " + AVERSION);
+		log.info(RESOURCE_BINARY_NAME + " Ver:" + RESOURCE_SHORT_VERSION + " " + RESOURCE_VERSION_DATE);
+		log.info("VDYP7 Support Ver: " + AVERSION);
 	}
 
 	@Override
-	public VDYPApplicationIdentifier getIdentifier()
-	{
-		return VDYPApplicationIdentifier.VDYPForward;
+	public VdypApplicationIdentifier getIdentifier() {
+		return VdypApplicationIdentifier.VDYPForward;
 	}
 
 //	public static final float PI_40K = 0.78539816E-04f;

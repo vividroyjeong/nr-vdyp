@@ -59,7 +59,7 @@
 
 	<build>
 		<filters>
-			<filter>application.properties</filter>
+			<filter>src/main/resources/application.properties</filter>
 		</filters>
    		<resources>
 			<resource>

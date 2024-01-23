@@ -8,48 +8,36 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 public class VdypPolygonLayer {
 
 	// See IPSJF155.doc
-	
-	private LayerType layerType; // LAYERG
 
-	private VdypPolygon parent;
-	
+	private final LayerType layerType; // LAYERG
+
 	// Set after construction
+	private VdypPolygon parent;
 	private Map<GenusDefinition, VdypLayerSpecies> genus;
 
-	public VdypPolygonLayer(LayerType layerType, VdypPolygon parent)
-	{
+	public VdypPolygonLayer(LayerType layerType, VdypPolygon parent) {
 		super();
 		this.layerType = layerType;
 		this.parent = parent;
 	}
 
-	LayerType getLayerType()
-	{
+	LayerType getLayerType() {
 		return layerType;
 	}
 
-	void setLayerType(LayerType layerType)
-	{
-		this.layerType = layerType;
-	}
-
-	VdypPolygon getParent()
-	{
+	VdypPolygon getParent() {
 		return parent;
 	}
 
-	public void setParent(VdypPolygon parent)
-	{
+	public void setParent(VdypPolygon parent) {
 		this.parent = parent;
 	}
 
-	public Map<GenusDefinition, VdypLayerSpecies> getGenus()
-	{
+	public Map<GenusDefinition, VdypLayerSpecies> getGenus() {
 		return genus;
 	}
 
-	public void setGenus(Map<GenusDefinition, VdypLayerSpecies> genus)
-	{
+	public void setGenus(Map<GenusDefinition, VdypLayerSpecies> genus) {
 		this.genus = genus;
 	}
 }

@@ -7,131 +7,83 @@ import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 public class VdypPolygon {
 
 	// See IPSJF155.doc
-	
-	private String description; // POLYDESC
-	private Integer year; // derived - last four characters of POLYDESC
-	private BecDefinition biogeoclimaticZone; // BEC
-	private Character forestInventoryZone; // FIZ
-	private Float percentForestLand; // PCTFLAND
-	private Optional<Integer> inventoryTypeGroup; // ITG
-	private Optional<Integer> basalAreaGroup; // GRPBA1
-	private Optional<FipMode> modeFip; // MODE
+
+	private final String description; // POLYDESC
+	private final Integer year; // derived - last four characters of POLYDESC
+	private final BecDefinition biogeoclimaticZone; // BEC
+	private final Character forestInventoryZone; // FIZ
+	private final Float percentForestLand; // PCTFLAND
+	private final Optional<Integer> inventoryTypeGroup; // ITG
+	private final Optional<Integer> basalAreaGroup; // GRPBA1
+	private final Optional<FipMode> fipMode; // MODE
 
 	// Set after construction
 	private VdypPolygonLayer primaryLayer;
 	private Optional<VdypPolygonLayer> veteranLayer;
-	
-	public VdypPolygon(String description, Integer year, BecDefinition biogeoclimaticZone, Character fizId, Float percentForestLand,
-			Optional<Integer> inventoryTypeGroup, Optional<Integer> basalAreaGroup, Optional<FipMode> modeFip)
-	{
+
+	public VdypPolygon(
+			String description, Integer year, BecDefinition bec, Character fizId, Float percentForestLand,
+			Optional<Integer> inventoryTypeGroup, Optional<Integer> basalAreaGroup, Optional<FipMode> fipMode
+	) {
 		super();
 		this.description = description;
 		this.year = year;
-		this.biogeoclimaticZone = biogeoclimaticZone;
+		this.biogeoclimaticZone = bec;
 		this.forestInventoryZone = fizId;
-		this.percentForestLand = percentForestLand;
+		if (percentForestLand <= 0.0)
+			this.percentForestLand = 90.0f;
+		else
+			this.percentForestLand = percentForestLand;
 		this.inventoryTypeGroup = inventoryTypeGroup;
 		this.basalAreaGroup = basalAreaGroup;
-		this.modeFip = modeFip;
+		this.fipMode = fipMode;
 	}
-	
-	void setDescription(String description)
-	{
-		this.description = description;
-	}
-	
-	void setYear(Integer year)
-	{
-		this.year = year;
-	}
-	
-	void setBiogeoclimaticZone(BecDefinition biogeoclimaticZone)
-	{
-		this.biogeoclimaticZone = biogeoclimaticZone;
-	}
-	
-	void setForestInventoryZone(Character forestInventoryZone)
-	{
-		this.forestInventoryZone = forestInventoryZone;
-	}
-	
-	void setPercentForestLand(Float percentForestLand)
-	{
-		this.percentForestLand = percentForestLand;
-	}
-	
-	void setInventoryTypeGroup(Optional<Integer> inventoryTypeGroup)
-	{
-		this.inventoryTypeGroup = inventoryTypeGroup;
-	}
-	
-	void setBasalAreaGroup(Optional<Integer> basalAreaGroup)
-	{
-		this.basalAreaGroup = basalAreaGroup;
-	}
-	
-	void setModeFip(Optional<FipMode> modeFip)
-	{
-		this.modeFip = modeFip;
-	}
-	
-	public void setPrimaryLayer(VdypPolygonLayer primaryLayer)
-	{
+
+	public void setPrimaryLayer(VdypPolygonLayer primaryLayer) {
 		this.primaryLayer = primaryLayer;
 	}
 
-	public void setVeteranLayer(Optional<VdypPolygonLayer> veteranLayer)
-	{
+	public void setVeteranLayer(Optional<VdypPolygonLayer> veteranLayer) {
 		this.veteranLayer = veteranLayer;
 	}
-	
-	public String getDescription()
-	{
+
+	public String getDescription() {
 		return description;
 	}
-	
-	public Integer getYear()
-	{
+
+	public Integer getYear() {
 		return year;
 	}
-	
-	public BecDefinition getBiogeoclimaticZone()
-	{
+
+	public BecDefinition getBiogeoclimaticZone() {
 		return biogeoclimaticZone;
 	}
-	
-	public Character getForestInventoryZone()
-	{
+
+	public Character getForestInventoryZone() {
 		return forestInventoryZone;
 	}
-	
-	public Float getPercentForestLand()
-	{
+
+	public Float getPercentForestLand() {
 		return percentForestLand;
 	}
-	
-	public Optional<Integer> getInventoryTypeGroup()
-	{
+
+	public Optional<Integer> getInventoryTypeGroup() {
 		return inventoryTypeGroup;
 	}
-	
-	public Optional<Integer> getBasalAreaGroup()
-	{
+
+	public Optional<Integer> getBasalAreaGroup() {
 		return basalAreaGroup;
 	}
-	
-	public Optional<FipMode> getModeFip()
-	{
-		return modeFip;
+
+	public Optional<FipMode> getFipMode() {
+		return fipMode;
 	}
-	
-	public VdypPolygonLayer getPrimaryLayer()
-	{
+
+	public VdypPolygonLayer getPrimaryLayer() {
 		return primaryLayer;
 	}
-	
-	public Optional<VdypPolygonLayer> getVeteranLayer()
-	{
+
+	public Optional<VdypPolygonLayer> getVeteranLayer() {
 		return veteranLayer;
 	}
 }

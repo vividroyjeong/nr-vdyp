@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.hasSpecificEntry;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.mmAll;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.mmDimensions;

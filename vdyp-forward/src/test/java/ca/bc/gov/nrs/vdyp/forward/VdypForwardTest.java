@@ -1,6 +1,6 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
-class VDYPForwardStartTest {
+class VdypForwardTest {
 
 //	@Test
 //	void testProcessEmpty() throws Exception {

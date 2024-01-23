@@ -9,6 +9,8 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,8 +24,9 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.forward.test.VDYPForwardControlParserTestApplication;
-import ca.bc.gov.nrs.vdyp.forward.test.VDYPForwardTestUtils;
+import ca.bc.gov.nrs.vdyp.application.VdypApplication;
+import ca.bc.gov.nrs.vdyp.forward.test.VdypForwardControlParserTestApplication;
+import ca.bc.gov.nrs.vdyp.forward.test.VdypForwardTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.ControlFileParserTest;
 import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
@@ -41,20 +44,19 @@ import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
 import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
-class VDYPForwardControlParserTest {
+class VdypForwardControlParserTest {
 
-	private VdypForwardApplication app;
-	
+	private static VdypApplication app;
+
 	@BeforeAll
-	private void beforeAll()
-	{
-		app = new VDYPForwardControlParserTestApplication();
+	public static void beforeAll() {
+		app = new VdypForwardControlParserTestApplication();
 	}
-	
+
 	@Test
 	void testParseBec() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -67,7 +69,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseSP0() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -80,11 +82,12 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseVGRP() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
-						VdypForwardControlParser.VOLUME_EQN_GROUPS_20, allOf(isA(MatrixMap2.class), mmHasEntry(is(7), "AT", "CDF"))
+						VdypForwardControlParser.VOLUME_EQN_GROUPS_20,
+						allOf(isA(MatrixMap2.class), mmHasEntry(is(7), "AT", "CDF"))
 				)
 		);
 	}
@@ -92,11 +95,12 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseDGRP() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
-						VdypForwardControlParser.DECAY_GROUPS, allOf(isA(MatrixMap2.class), mmHasEntry(is(5), "AT", "CDF"))
+						VdypForwardControlParser.DECAY_GROUPS,
+						allOf(isA(MatrixMap2.class), mmHasEntry(is(5), "AT", "CDF"))
 				)
 		);
 	}
@@ -104,11 +108,12 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseBGRP() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
-						VdypForwardControlParser.BREAKAGE_GROUPS, allOf(isA(MatrixMap2.class), mmHasEntry(is(3), "AT", "CDF"))
+						VdypForwardControlParser.BREAKAGE_GROUPS,
+						allOf(isA(MatrixMap2.class), mmHasEntry(is(3), "AT", "CDF"))
 				)
 		);
 	}
@@ -116,11 +121,12 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseGRBA1() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
-						VdypForwardControlParser.DEFAULT_EQ_NUM, allOf(isA(MatrixMap2.class), mmHasEntry(is(11), "AT", "CDF"))
+						VdypForwardControlParser.DEFAULT_EQ_NUM,
+						allOf(isA(MatrixMap2.class), mmHasEntry(is(11), "AT", "CDF"))
 				)
 		);
 	}
@@ -128,7 +134,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseGMBA1() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result, (Matcher) hasSpecificEntry(
 						VdypForwardControlParser.EQN_MODIFIERS, allOf(
@@ -142,7 +148,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseSTK33() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result, (Matcher) hasSpecificEntry(
 						VdypForwardControlParser.STOCKING_CLASS_FACTORS, allOf(
@@ -171,14 +177,16 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseE025Empty() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
-		assertThat(result, (Matcher) hasSpecificEntry(VdypForwardControlParser.SITE_CURVE_NUMBERS, Matchers.anEmptyMap()));
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
+		assertThat(
+				result, (Matcher) hasSpecificEntry(VdypForwardControlParser.SITE_CURVE_NUMBERS, Matchers.anEmptyMap())
+		);
 	}
 
 	@Test
 	void testParseE026() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result, (Matcher) hasSpecificEntry(
 						VdypForwardControlParser.SITE_CURVE_AGE_MAX, allOf(
@@ -195,7 +203,9 @@ class VDYPForwardControlParserTest {
 		var parser = new VdypForwardControlParser(app);
 		var result = parseWithAppendix(parser, "026  ");
 		// Map is empty but gives appropriate default values
-		assertThat(result, (Matcher) hasSpecificEntry(VdypForwardControlParser.SITE_CURVE_AGE_MAX, Matchers.anEmptyMap()));
+		assertThat(
+				result, (Matcher) hasSpecificEntry(VdypForwardControlParser.SITE_CURVE_AGE_MAX, Matchers.anEmptyMap())
+		);
 		assertThat(
 				((Map<Integer, SiteCurveAgeMaximum>) result.get(VdypForwardControlParser.SITE_CURVE_AGE_MAX)).get(1),
 				(Matcher) allOf(SiteCurveAgeMaximumParserTest.hasAge(Region.COASTAL, is(140.f)))
@@ -205,7 +215,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseE040() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -228,7 +238,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseE041() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -251,11 +261,12 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseE043() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
-						VdypForwardControlParser.UPPER_BA_BY_CI_S0_P, allOf(mmHasEntry(is(109.27f), Region.COASTAL, "AC", 1))
+						VdypForwardControlParser.UPPER_BA_BY_CI_S0_P,
+						allOf(mmHasEntry(is(109.27f), Region.COASTAL, "AC", 1))
 				)
 		);
 	}
@@ -263,7 +274,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseE050() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -280,7 +291,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseE051() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -293,7 +304,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseE052() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -311,7 +322,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseE053() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -329,11 +340,12 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseE060() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
-						VdypForwardControlParser.BY_SPECIES_DQ, hasEntry(is("AT"), coe(0, -0.48275f, 0.19886f, 0.23162f))
+						VdypForwardControlParser.BY_SPECIES_DQ,
+						hasEntry(is("AT"), coe(0, -0.48275f, 0.19886f, 0.23162f))
 				)
 		);
 	}
@@ -341,7 +353,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseE061() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -354,7 +366,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseUBA1() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -367,7 +379,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseYVC1() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -380,7 +392,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseYVD1() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -393,7 +405,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseSBA1() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -406,7 +418,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseSBA2() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -419,7 +431,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseSDQ1() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -431,7 +443,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseSHL1() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -443,7 +455,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseSVT1() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -456,7 +468,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseYVT1() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -477,7 +489,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseYVT2() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -490,7 +502,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseYVW1() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -503,11 +515,12 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseE095() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
-						VdypForwardControlParser.BREAKAGE, allOf(hasEntry(is(10), contains(-0.7153f, 2.0108f, 4.00f, 8.00f)))
+						VdypForwardControlParser.BREAKAGE,
+						allOf(hasEntry(is(10), contains(-0.7153f, 2.0108f, 4.00f, 8.00f)))
 				)
 		);
 	}
@@ -515,7 +528,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseYVVET() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -528,7 +541,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	void testParseYDQV() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(
@@ -544,27 +557,9 @@ class VDYPForwardControlParserTest {
 	}
 
 	@Test
-	void testParseE098() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
-		assertThat(
-				result, (Matcher) hasSpecificEntry(
-						VdypForwardControlParser.VETERAN_BQ,
-						// Includes modifiers from 198
-						allOf(
-								mmHasEntry(contains(0.12874f * 0.311f, 8.00000f, 1.26982f), "B", Region.COASTAL),
-								mmHasEntry(contains(0.70932f * 0.374f, 7.63269f, 0.62545f), "B", Region.INTERIOR),
-								mmHasEntry(contains(0.07962f * 0.311f, 6.60231f, 1.37998f), "D", Region.COASTAL),
-								mmHasEntry(contains(0.07962f * 0.374f, 6.60231f, 1.37998f), "D", Region.INTERIOR)
-						)
-				)
-		);
-	}
-
-	@Test
 	public void testParseMinima() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result, (Matcher) hasSpecificEntry(
 						VdypForwardControlParser.MINIMA,
@@ -582,7 +577,7 @@ class VDYPForwardControlParserTest {
 	@Test
 	public void testParseV7O_FIP() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
 				(Matcher) hasSpecificEntry(VdypPolygonParser.CONTROL_KEY, instanceOf(StreamingParserFactory.class))
@@ -592,19 +587,20 @@ class VDYPForwardControlParserTest {
 	@Test
 	public void testParseV7O_FIL() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
-				result, (Matcher) hasSpecificEntry(FipLayerParser.CONTROL_KEY, instanceOf(StreamingParserFactory.class))
+				result,
+				(Matcher) hasSpecificEntry(VdypUtilizationParser.CONTROL_KEY, instanceOf(StreamingParserFactory.class))
 		);
 	}
 
 	@Test
 	public void testParseV7O_FIS() throws Exception {
 		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
 				result,
-				(Matcher) hasSpecificEntry(VdypLayerBySpeciesParser.CONTROL_KEY, instanceOf(StreamingParserFactory.class))
+				(Matcher) hasSpecificEntry(VdypSpeciesParser.CONTROL_KEY, instanceOf(StreamingParserFactory.class))
 		);
 	}
 
@@ -616,9 +612,9 @@ class VDYPForwardControlParserTest {
 
 	static Map<String, ?> parseWithAppendix(VdypForwardControlParser parser, String... lines)
 			throws IOException, ResourceParseException {
-		var resolver = VDYPForwardTestUtils.fileResolver(ControlFileParserTest.class);
+		var resolver = VdypForwardTestUtils.fileResolver(ControlFileParserTest.class);
 		try (
-				InputStream baseIs = ControlFileParserTest.class.getResourceAsStream("FIPSTART.CTR");
+				InputStream baseIs = ControlFileParserTest.class.getResourceAsStream("VDYP.CTR");
 				InputStream is = addToEnd(baseIs, lines);
 		) {
 			return parser.parse(is, resolver);
@@ -629,7 +625,7 @@ class VDYPForwardControlParserTest {
 			throws IOException, ResourceParseException {
 		try (var is = klazz.getResourceAsStream(resourceName)) {
 
-			return parser.parse(is, VDYPForwardTestUtils.fileResolver(klazz));
+			return parser.parse(is, VdypForwardTestUtils.fileResolver(klazz));
 		}
 	}
 }

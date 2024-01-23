@@ -9,6 +9,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import ca.bc.gov.nrs.vdyp.application.VdypApplication;
+import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.BasalAreaGrowthEmpiricalParser;
 import ca.bc.gov.nrs.vdyp.io.parse.BasalAreaGrowthFiatParser;
@@ -53,7 +55,6 @@ import ca.bc.gov.nrs.vdyp.io.parse.UtilComponentBaseAreaParser;
 import ca.bc.gov.nrs.vdyp.io.parse.UtilComponentDQParser;
 import ca.bc.gov.nrs.vdyp.io.parse.UtilComponentWSVolumeParser;
 import ca.bc.gov.nrs.vdyp.io.parse.ValueParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VeteranBQParser;
 import ca.bc.gov.nrs.vdyp.io.parse.VeteranDQParser;
 import ca.bc.gov.nrs.vdyp.io.parse.VeteranLayerVolumeAdjustParser;
 import ca.bc.gov.nrs.vdyp.io.parse.VolumeEquationGroupParser;
@@ -110,13 +111,12 @@ public class VdypForwardControlParser {
 	public static final String UTIL_COMP_BA = UtilComponentBaseAreaParser.CONTROL_KEY;
 	public static final String UTIL_COMP_DQ = UtilComponentDQParser.CONTROL_KEY;
 	public static final String UTIL_COMP_WS_VOLUME = UtilComponentWSVolumeParser.CONTROL_KEY;
-	public static final String VETERAN_BQ = VeteranBQParser.CONTROL_KEY;
 	public static final String VETERAN_LAYER_DQ = VeteranDQParser.CONTROL_KEY;
 	public static final String VETERAN_LAYER_VOLUME_ADJUST = VeteranLayerVolumeAdjustParser.CONTROL_KEY;
 	public static final String VOLUME_EQN_GROUPS_20 = VolumeEquationGroupParser.CONTROL_KEY;
 	public static final String VOLUME_NET_DECAY = VolumeNetDecayParser.CONTROL_KEY;
 	public static final String VOLUME_NET_DECAY_WASTE = VolumeNetDecayWasteParser.CONTROL_KEY;
-	
+
 	public static final String VDYP_POLYGON = "VDYP_POLYGON";
 	public static final String VDYP_LAYER_BY_SPECIES = "VDYP_LAYER_BY_SPECIES";
 	public static final String VDYP_LAYER_BY_SP0_BY_UTIL = "VDYP_LAYER_BY_SP0_BY_UTIL";
@@ -133,11 +133,11 @@ public class VdypForwardControlParser {
 	public static final float DEFAULT_MINIMUM_VETERAN_HEIGHT = 10.0f;
 
 	private static final ValueParser<String> FILENAME = String::strip;
-	
-	private final VdypForwardApplication app;
+
+	private final VdypApplication app;
 
 	ControlFileParser controlParser = new ControlFileParser()
-			
+
 			.record(1, MAX_NUM_POLY, ValueParser.INTEGER)
 
 			.record(9, BEC_DEF, FILENAME) // RD_BECD
@@ -160,8 +160,6 @@ public class VdypForwardControlParser {
 			.record(31, EQN_MODIFIERS, FILENAME) // RD_GMBA1
 			.record(33, STOCKING_CLASS_FACTORS, FILENAME) // -- RD_STK33
 
-			.record(40, COE_BA, FILENAME) // -- RD_E040 IPSJF128
-			.record(41, COE_DQ, FILENAME) // -- RD_E041 IPSJF129
 			.record(43, UPPER_BA_BY_CI_S0_P, FILENAME) // RD_E043 IPSJF128
 
 			.record(50, HL_PRIMARY_SP_EQN_P1, FILENAME) // RD_YHL1
@@ -190,21 +188,20 @@ public class VdypForwardControlParser {
 
 			.record(96, VETERAN_LAYER_VOLUME_ADJUST, FILENAME) // RD_YVET
 			.record(97, VETERAN_LAYER_DQ, FILENAME) // RD_YDQV
-			.record(98, VETERAN_BQ, FILENAME) // RD_E098
-			
-			// 101
-			
+
+			 // TODO: 101
+
 			.record(106, BA_YIELD, FILENAME) // RD_E106
 			.record(107, DQ_YIELD, FILENAME) // RD_E107
 			.record(108, BA_DQ_UPPER_BOUNDS, FILENAME) // RD_E108
-			
+
 			.record(111, BA_GROWTH_FIAT, FILENAME) // RD_E111
 			.record(117, DQ_GROWTH_FIAT, FILENAME) // RD_E117
-			
+
 			.record(121, BA_GROWTH_EMPIRICAL, FILENAME) // RD_E121
 			.record(122, DQ_GROWTH_EMPIRICAL, FILENAME) // RD_E122
 			.record(123, DQ_GROWTH_EMPIRICAL_LIMITS, FILENAME) // RD_E123
-			
+
 			.record(148, PRIMARY_SP_BA_GROWTH, FILENAME) // RD_E148
 			.record(149, NON_PRIMARY_SP_BA_GROWTH, FILENAME) // RD_E149
 			.record(150, PRIMARY_SP_DQ_GROWTH, FILENAME) // RD_E150
@@ -218,10 +215,9 @@ public class VdypForwardControlParser {
 				// Development. Choice of upper limits 9th: 0: Normal - Suppress MATH77 error
 				// messages. 1: show some MATH77 errors; 2: show all. 22nd 1: extra preference
 				// for preferred sp (SEQ 010).
-			;
+				;
 
-	public VdypForwardControlParser(VdypForwardApplication app) 
-	{	
+	public VdypForwardControlParser(VdypApplication app) {
 		this.app = app;
 	}
 
@@ -245,14 +241,14 @@ public class VdypForwardControlParser {
 
 	List<ControlMapModifier> DATA_FILES = Arrays.asList(
 
-//			// V7O_FIP
-//			new FipPolygonParser(),
-//
-//			// V7O_FIL
-//			new FipLayerParser(),
-//
-//			// V7O_FIS
-//			new FipSpeciesParser()
+			// V7O_FIP
+			new VdypPolygonParser(),
+
+			// V7O_FIL
+			new VdypSpeciesParser(),
+
+			// V7O_FIS
+			new VdypUtilizationParser()
 	);
 
 	List<ControlMapModifier> BASIC_DEFINITIONS = Arrays.asList(
@@ -261,7 +257,7 @@ public class VdypForwardControlParser {
 			new BecDefinitionParser(),
 
 			// DEF_BEC
-			
+
 			// RD_SP0
 			new GenusDefinitionParser()
 	);
@@ -288,13 +284,8 @@ public class VdypForwardControlParser {
 
 			// RD_STK33
 			new StockingClassFactorParser()
-
-	// TODO minima?
-	/*
-	 * READ(CNTRV(197), 197, ERR= 912 ) FMINH, FMINBA, FMINBAF,FMINVetH IF (FMINVetH
-	 * .le. 0.0) FMINVetH=10.0
-	 */
 	);
+
 	List<ControlMapModifier> SITE_CURVES = Arrays.asList(
 
 			// User-assigned SC's (Site Curve Numbers)
@@ -309,12 +300,6 @@ public class VdypForwardControlParser {
 	);
 
 	List<ControlMapModifier> COEFFICIENTS = Arrays.asList(
-			// RD_E040
-			new CoefficientParser(COE_BA),
-
-			// RD_E041
-			new CoefficientParser(COE_DQ),
-
 			// RD_E043
 			new UpperCoefficientParser(),
 
@@ -387,22 +372,74 @@ public class VdypForwardControlParser {
 			new VeteranLayerVolumeAdjustParser(),
 
 			// RD_YDQV
-			new VeteranDQParser(),
-
-			// RD_E098
-			new VeteranBQParser()
+			new VeteranDQParser()
 	);
+
+	List<ControlMapModifier> FORWARD_DEFINITIONS = Arrays.asList(
+
+//			.record(106, BA_YIELD, FILENAME) // RD_E106
+//			.record(107, DQ_YIELD, FILENAME) // RD_E107
+//			.record(108, BA_DQ_UPPER_BOUNDS, FILENAME) // RD_E108
+//
+//			.record(111, BA_GROWTH_FIAT, FILENAME) // RD_E111
+//			.record(117, DQ_GROWTH_FIAT, FILENAME) // RD_E117
+//
+//			.record(121, BA_GROWTH_EMPIRICAL, FILENAME) // RD_E121
+//			.record(122, DQ_GROWTH_EMPIRICAL, FILENAME) // RD_E122
+//			.record(123, DQ_GROWTH_EMPIRICAL_LIMITS, FILENAME) // RD_E123
+//
+//			.record(148, PRIMARY_SP_BA_GROWTH, FILENAME) // RD_E148
+//			.record(149, NON_PRIMARY_SP_BA_GROWTH, FILENAME) // RD_E149
+//			.record(150, PRIMARY_SP_DQ_GROWTH, FILENAME) // RD_E150
+//			.record(151, NON_PRIMARY_SP_DQ_GROWTH, FILENAME) // RD_E151
+
+			// RD_E106
+			new BasalAreaYieldParser(),
+
+			// RD_E107
+			new QuadraticMeanDiameterYieldParser(),
+
+			// RD_E108
+			new UpperBoundsParser(),
+
+			// RD_E111
+			new BasalAreaGrowthFiatParser(),
+
+			// RD_E117
+			new DqGrowthFiatParser(),
+
+			// RD_E121
+			new BasalAreaGrowthEmpiricalParser(),
+
+			// RD_E122
+			new DqGrowthEmpiricalParser(),
+
+			// RD_E123
+			new DqGrowthEmpiricalLimitsParser(),
+
+			// RD_E148
+			new PrimarySpeciesBasalAreaGrowthParser(),
+
+			// RD_E149
+			new NonPrimarySpeciesBasalAreaGrowthParser(),
+
+			// RD_E150
+			new PrimarySpeciesDqGrowthParser(),
+
+			// RD_E151
+			new NonPrimarySpeciesDqGrowthParser()
+	);
+
 
 	List<ControlMapModifier> ADDITIONAL_MODIFIERS = Arrays.asList(
 
 			// RD_E198
-//			new ModifierParser(jprogram)
+			new ModifierParser(VdypApplicationIdentifier.VDYPForward.getId())
 	);
 
-	private void applyModifiers(Map<String, Object> control, List<ControlMapModifier> modifiers
-			, FileResolver fileResolver)
-		throws ResourceParseException, IOException {
-		
+	private void applyModifiers(Map<String, Object> control, List<ControlMapModifier> modifiers, FileResolver fileResolver)
+					throws ResourceParseException, IOException {
+
 		for (var modifier : modifiers) {
 			modifier.modify(control, fileResolver);
 		}
@@ -410,7 +447,7 @@ public class VdypForwardControlParser {
 
 	public Map<String, Object> parse(InputStream is, FileResolver fileResolver)
 			throws IOException, ResourceParseException {
-		
+
 		var map = controlParser.parse(is, Collections.emptyMap());
 
 		applyModifiers(map, BASIC_DEFINITIONS, fileResolver);
@@ -432,34 +469,6 @@ public class VdypForwardControlParser {
 		// Coeff for Empirical relationships
 
 		applyModifiers(map, COEFFICIENTS, fileResolver);
-
-		// Initiation items NOT for FIPSTART
-		if (app.getId() > 1) {
-
-			throw new UnsupportedOperationException();
-			// RD_E106
-			// TODO
-
-			// RD_E107
-			// TODO
-
-			// RD_E108
-			// TODO
-
-			// Minima again, differently?
-			// TODO
-
-			/*
-			 * READ(CNTRV(197), 197, ERR= 912 ) VMINH, VMINBA, VMINBAeqn,VMINvetH IF
-			 * (VMINVetH .le. 0.0) VMINVetH=10.0
-			 */
-
-			// RD_E112
-			// Was commented out in Fortran
-
-			// RD_E116
-			// Was commented out in Fortran
-		}
 
 		// Modifiers, IPSJF155-Appendix XII
 

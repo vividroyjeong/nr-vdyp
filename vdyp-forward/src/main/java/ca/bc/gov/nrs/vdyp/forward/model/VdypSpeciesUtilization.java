@@ -1,5 +1,7 @@
 package ca.bc.gov.nrs.vdyp.forward.model;
 
+import java.util.Optional;
+
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
@@ -7,30 +9,30 @@ public class VdypSpeciesUtilization {
 
 	// See IPSJF155.doc
 
-	private String polygonId; // POLYDESC
-	private LayerType layerType; // LAYERG
-	private Integer genusIndex; // ISP
-	private String genus; // SP0
-	private UtilizationClass ucIndex; // J
-	private Float basalArea; // SP0
-	private Float liveTreesPerHectare; 
-	private Float loreyHeight;
-	private Float wholeStemVolume;
-	private Float closeUtilizationVolume;
-	private Float cuVolumeMinusDecay;
-	private Float cuVolumeMinusDecayWastage;
-	private Float cuVolumeMinusDecayWastageBreakage;
-	private Float quadraticMeanDiameterAtBH;
-	
+	private final String polygonId; // POLYDESC
+	private final LayerType layerType; // LAYERG
+	private final Integer genusIndex; // ISP
+	private final Optional<String> genus; // SP0
+	private final UtilizationClass ucIndex; // J
+	private final Float basalArea; // SP0
+	private final Float liveTreesPerHectare;
+	private final Float loreyHeight;
+	private final Float wholeStemVolume;
+	private final Float closeUtilizationVolume;
+	private final Float cuVolumeMinusDecay;
+	private final Float cuVolumeMinusDecayWastage;
+	private final Float cuVolumeMinusDecayWastageBreakage;
+	private final Float quadraticMeanDiameterAtBH;
+
 	// Set after construction
 	private VdypLayerSpecies parent;
 
-	public VdypSpeciesUtilization(String polygonId, LayerType layerType, Integer genusIndex
-			, String genus, UtilizationClass ucIndex, Float basalArea, Float liveTreesPerHectare
-			, Float loreyHeight, Float wholeStemVolume, Float closeUtilizationVolume
-			, Float cuVolumeMinusDecay, Float cuVolumeMinusDecayWastage, Float cuVolumeMinusDecayWastageBreakage
-			, Float quadraticMeanDiameterAtBH)
-	{
+	public VdypSpeciesUtilization(
+			String polygonId, LayerType layerType, Integer genusIndex, Optional<String> genus, UtilizationClass ucIndex,
+			Float basalArea, Float liveTreesPerHectare, Float loreyHeight, Float wholeStemVolume,
+			Float closeUtilizationVolume, Float cuVolumeMinusDecay, Float cuVolumeMinusDecayWastage,
+			Float cuVolumeMinusDecayWastageBreakage, Float quadraticMeanDiameterAtBH
+	) {
 		this.polygonId = polygonId;
 		this.layerType = layerType;
 		this.genusIndex = genusIndex;
@@ -47,83 +49,67 @@ public class VdypSpeciesUtilization {
 		this.quadraticMeanDiameterAtBH = quadraticMeanDiameterAtBH;
 	}
 
-	void setParent(VdypLayerSpecies parent)
-	{
+	void setParent(VdypLayerSpecies parent) {
 		this.parent = parent;
 	}
 
-	public String getPolygonId()
-	{
+	public String getPolygonId() {
 		return polygonId;
 	}
 
-	public LayerType getLayerType()
-	{
+	public LayerType getLayerType() {
 		return layerType;
 	}
 
-	Integer getGenusIndex()
-	{
+	public Integer getGenusIndex() {
 		return genusIndex;
 	}
 
-	public String getGenus()
-	{
+	public Optional<String> getGenus() {
 		return genus;
 	}
 
-	public UtilizationClass getUcIndex()
-	{
+	public UtilizationClass getUcIndex() {
 		return ucIndex;
 	}
 
-	public Float getBasalArea()
-	{
+	public Float getBasalArea() {
 		return basalArea;
 	}
 
-	public Float getLiveTreesPerHectare()
-	{
+	public Float getLiveTreesPerHectare() {
 		return liveTreesPerHectare;
 	}
 
-	public Float getLoreyHeight()
-	{
+	public Float getLoreyHeight() {
 		return loreyHeight;
 	}
 
-	public Float getWholeStemVolume()
-	{
+	public Float getWholeStemVolume() {
 		return wholeStemVolume;
 	}
 
-	public Float getCloseUtilizationVolume()
-	{
+	public Float getCloseUtilizationVolume() {
 		return closeUtilizationVolume;
 	}
 
-	public Float getCuVolumeMinusDecay()
-	{
+	public Float getCuVolumeMinusDecay() {
 		return cuVolumeMinusDecay;
 	}
 
-	public Float getCuVolumeMinusDecayWastage()
-	{
+	public Float getCuVolumeMinusDecayWastage() {
 		return cuVolumeMinusDecayWastage;
 	}
 
-	public Float getCuVolumeMinusDecayWastageBreakage()
-	{
+	public Float getCuVolumeMinusDecayWastageBreakage() {
 		return cuVolumeMinusDecayWastageBreakage;
 	}
 
-	public Float getQuadraticMeanDiameterAtBH()
-	{
+	public Float getQuadraticMeanDiameterAtBH() {
 		return quadraticMeanDiameterAtBH;
 	}
 
-	public VdypLayerSpecies getParent()
-	{
+	public VdypLayerSpecies getParent() {
 		return parent;
 	}
 }

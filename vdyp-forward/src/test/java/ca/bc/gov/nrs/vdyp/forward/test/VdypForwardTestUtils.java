@@ -9,15 +9,15 @@ import java.util.function.BiFunction;
 
 import org.opentest4j.AssertionFailedError;
 
-import ca.bc.gov.nrs.vdyp.application.support.VDYPForwardControlParser;
 import ca.bc.gov.nrs.vdyp.forward.ModifierParser;
+import ca.bc.gov.nrs.vdyp.forward.VdypForwardControlParser;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.ControlFileParserTest;
 import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
-public class VDYPForwardTestUtils {
+public class VdypForwardTestUtils {
 
 	/**
 	 * Fill in the decay modifiers in a control map with mock data for testing.
@@ -25,8 +25,8 @@ public class VDYPForwardTestUtils {
 	 * @param controlMap
 	 * @param mapper
 	 */
-	public static void populateControlMapDecayModifiers(Map<String, Object> controlMap
-			, BiFunction<String, Region, Float> mapper) {
+	public static void
+			populateControlMapDecayModifiers(Map<String, Object> controlMap, BiFunction<String, Region, Float> mapper) {
 		var spec = Arrays.asList(TestUtils.getSpeciesAliases());
 		var regions = Arrays.asList(Region.values());
 		TestUtils.populateControlMap2(controlMap, ModifierParser.CONTROL_KEY_MOD301_DECAY, spec, regions, mapper);
@@ -38,8 +38,8 @@ public class VDYPForwardTestUtils {
 	 * @param controlMap
 	 * @param mapper
 	 */
-	public static void populateControlMapWasteModifiers(Map<String, Object> controlMap
-			, BiFunction<String, Region, Float> mapper) {
+	public static void
+			populateControlMapWasteModifiers(Map<String, Object> controlMap, BiFunction<String, Region, Float> mapper) {
 		var spec = Arrays.asList(TestUtils.getSpeciesAliases());
 		var regions = Arrays.asList(Region.values());
 		TestUtils.populateControlMap2(controlMap, ModifierParser.CONTROL_KEY_MOD301_WASTE, spec, regions, mapper);
@@ -56,11 +56,12 @@ public class VDYPForwardTestUtils {
 
 	}
 
-	public static Map<String, Object> loadControlMap(VdypForwardControlParser parser, Class<?> klazz, String resourceName)
-			throws IOException, ResourceParseException {
+	public static Map<String, Object>
+			loadControlMap(VdypForwardControlParser parser, Class<?> klazz, String resourceName)
+					throws IOException, ResourceParseException {
 		try (var is = klazz.getResourceAsStream(resourceName)) {
 
-			return parser.parse(is, VDYPForwardTestUtils.fileResolver(klazz));
+			return parser.parse(is, VdypForwardTestUtils.fileResolver(klazz));
 		}
 	}
 
@@ -69,7 +70,7 @@ public class VDYPForwardTestUtils {
 	 * control map parser.
 	 */
 	public static Map<String, Object> loadControlMap() {
-		var parser = new VdypForwardControlParser(new VDYPForwardControlParserTestApplication());
+		var parser = new VdypForwardControlParser(new VdypForwardControlParserTestApplication());
 		try {
 			return loadControlMap(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		} catch (IOException | ResourceParseException ex) {
