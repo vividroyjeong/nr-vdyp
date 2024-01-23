@@ -396,8 +396,8 @@ public class VdypForwardControlParser {
 			// RD_E106
 			new BasalAreaYieldParser(),
 
-//			// RD_E107
-//			new QuadraticMeanDiameterYieldParser(),
+			// RD_E107
+			new QuadraticMeanDiameterYieldParser(),
 
 //			// RD_E108
 //			new UpperBoundsParser(),
