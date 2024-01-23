@@ -12,7 +12,7 @@
 	<properties>
 
 		<maven.compiler.release>17</maven.compiler.release>
-		
+
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<junit.version>5.9.2</junit.version>
@@ -52,7 +52,7 @@
 				<artifactId>slf4j-jdk14</artifactId>
 				<version>2.0.7</version>
 			</dependency>
-
+			
 			<dependency>
 				<groupId>org.junit.jupiter</groupId>
 				<artifactId>junit-jupiter-engine</artifactId>

@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayer;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 class FipLayerParserTest {
@@ -76,7 +76,7 @@ class FipLayerParserTest {
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
 		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<Map<Layer, FipLayer>>) parserFactory).get();
+		var stream = ((StreamingParserFactory<Map<LayerType, FipLayer>>) parserFactory).get();
 
 		assertThat(stream, instanceOf(StreamingParser.class));
 
@@ -87,7 +87,7 @@ class FipLayerParserTest {
 		assertThat(
 				layers,
 				hasSpecificEntry(
-						Layer.PRIMARY, allOf(
+						LayerType.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")), //
 								hasProperty("layer", is(Layer.PRIMARY)), //
 								hasProperty("ageTotalSafe", is(55f)), //
@@ -99,7 +99,6 @@ class FipLayerParserTest {
 								hasProperty("yearsToBreastHeightSafe", is(1.0f)), //
 								hasProperty("stockingClass", present(is('0'))), //
 								hasProperty("inventoryTypeGroup", notPresent()), //
-								hasProperty("breastHeightAge", notPresent()), //
 								hasProperty("siteCurveNumber", present(is(13)))
 						)
 				)
@@ -134,7 +133,7 @@ class FipLayerParserTest {
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
 		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<Map<Layer, FipLayer>>) parserFactory).get();
+		var stream = ((StreamingParserFactory<Map<LayerType, FipLayer>>) parserFactory).get();
 
 		assertThat(stream, instanceOf(StreamingParser.class));
 
@@ -147,7 +146,7 @@ class FipLayerParserTest {
 				hasSpecificEntry(
 						Layer.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
-								hasProperty("layer", is(Layer.PRIMARY)), //
+								hasProperty("layer", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotalSafe", is(85f)), //
 								hasProperty("heightSafe", is(42.3f)), //
 								hasProperty("siteIndex", present(is(31.9f))), //
@@ -157,7 +156,6 @@ class FipLayerParserTest {
 								hasProperty("yearsToBreastHeightSafe", is(4.9f)), //
 								hasProperty("stockingClass", present(is('0'))), //
 								hasProperty("inventoryTypeGroup", notPresent()), //
-								hasProperty("breastHeightAge", notPresent()), //
 								hasProperty("siteCurveNumber", present(is(34)))
 						)
 				)
@@ -167,7 +165,7 @@ class FipLayerParserTest {
 				hasSpecificEntry(
 						Layer.VETERAN, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
-								hasProperty("layer", is(Layer.VETERAN)), //
+								hasProperty("layer", is(LayerType.VETERAN)), //
 								hasProperty("ageTotalSafe", is(195f)), //
 								hasProperty("heightSafe", is(45.2f)), //
 								hasProperty("siteIndex", present(is(22.3f))), //
@@ -176,7 +174,6 @@ class FipLayerParserTest {
 								hasProperty("siteSpecies", is("B")), //
 								hasProperty("yearsToBreastHeightSafe", is(9.4f)),
 								// hasProperty("stockingClass", present(is("2"))),
-								hasProperty("breastHeightAge", notPresent()) //
 								// hasProperty("siteCurveNumber", present(is(8)))
 						)
 				)
@@ -211,7 +208,7 @@ class FipLayerParserTest {
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
 		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<Map<Layer, FipLayer>>) parserFactory).get();
+		var stream = ((StreamingParserFactory<Map<LayerType, FipLayer>>) parserFactory).get();
 
 		assertThat(stream, instanceOf(StreamingParser.class));
 
@@ -224,7 +221,7 @@ class FipLayerParserTest {
 				hasSpecificEntry(
 						Layer.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
-								hasProperty("layer", is(Layer.PRIMARY)), //
+								hasProperty("layer", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotalSafe", is(85f)), //
 								hasProperty("heightSafe", is(42.3f)), //
 								hasProperty("siteIndex", present(is(31.9f))), //
@@ -234,7 +231,6 @@ class FipLayerParserTest {
 								hasProperty("yearsToBreastHeightSafe", is(4.9f)), //
 								hasProperty("stockingClass", present(is('0'))), //
 								hasProperty("inventoryTypeGroup", notPresent()), //
-								hasProperty("breastHeightAge", notPresent()), //
 								hasProperty("siteCurveNumber", present(is(34)))
 						)
 				)
@@ -269,7 +265,7 @@ class FipLayerParserTest {
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
 		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<Map<Layer, FipLayer>>) parserFactory).get();
+		var stream = ((StreamingParserFactory<Map<LayerType, FipLayer>>) parserFactory).get();
 
 		assertThat(stream, instanceOf(StreamingParser.class));
 
@@ -282,7 +278,7 @@ class FipLayerParserTest {
 				hasSpecificEntry(
 						Layer.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
-								hasProperty("layer", is(Layer.PRIMARY)), //
+								hasProperty("layer", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotalSafe", is(85f)), //
 								hasProperty("heightSafe", is(42.3f)), //
 								hasProperty("siteIndex", present(is(31.9f))), //
@@ -292,7 +288,6 @@ class FipLayerParserTest {
 								hasProperty("yearsToBreastHeightSafe", is(4.9f)),
 								hasProperty("stockingClass", present(is('0'))), //
 								hasProperty("inventoryTypeGroup", notPresent()), //
-								hasProperty("breastHeightAge", notPresent()), //
 								hasProperty("siteCurveNumber", present(is(34)))
 						)
 				)

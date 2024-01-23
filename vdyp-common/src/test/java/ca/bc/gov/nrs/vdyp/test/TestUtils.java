@@ -219,7 +219,7 @@ public class TestUtils {
 			BiFunction<String, String, int[]> mapper
 	) {
 
-		var becAliases = BecDefinitionParser.getBecAliases(controlMap);
+		var becAliases = BecDefinitionParser.getBecs(controlMap).getBecAliases();
 		var genusAliases = GenusDefinitionParser.getSpeciesAliases(controlMap);
 
 		var volume = new MatrixMap2Impl<String, String, Integer>(genusAliases, becAliases, mapper.andThen(x -> x[0]));

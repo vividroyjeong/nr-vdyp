@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SiteCurveAgeMaximum {
-	final Map<Region, Float> ageMaximums;
-	final float t1;
-	final float t2;
+	private final Map<Region, Float> ageMaximums;
+	private final float t1;
+	private final float t2;
 
 	public SiteCurveAgeMaximum(float ageCoast, float ageInt, float t1, float t2) {
 		this(maximums(ageCoast, ageInt), t1, t2);

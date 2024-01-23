@@ -11,10 +11,32 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * Parser for control files
+ * Parser for control files.
+ *
+ * A control file is primarily a list of files of specific types. Lines of this
+ * type have contain:
+ * <ol>
+ * <li>(cols 0-2) - int - Index (up to three digits)</li>
+ * <li>(col 3) an optional Extension indicator (1 character) ('C', 'X' or '>' ->
+ * file name length of 120)</li>
+ * <li>(cols 4-54 (124)) a file name (50 or 120 characters)</li>
+ * <li>(cols 55 (125) onwards) an optional comment (unlimited)</li>
+ * </ol>
+ * Control files can contain other configuration values, parsed out of the
+ * characters following the extension indicator (column 5 and onward).
+ * <p>
+ * Lines with an empty Index, or Index 0, are considered blank (or comments) and
+ * are skipped, as are lines with a 'C' Extension indicator.
+ * <p>
+ * Each "index" value indicates the type of the file (or configuration value) on
+ * the remainder of the line.
+ * <p>
+ * FIP Control index: n/a
+ * <p>
+ * Example file: FIPSTART.CTR
  *
  * @author Kevin Smith, Vivid Solutions
- *
+ * @see ResourceParser
  */
 public class ControlFileParser implements ResourceParser<Map<String, Object>> {
 

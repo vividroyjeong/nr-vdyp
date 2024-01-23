@@ -24,7 +24,7 @@ public class ValueOrMarker<Value, Marker> {
 	}
 
 	/**
-	 * Is there a value
+	 * Is there a marker
 	 *
 	 * @return
 	 */
@@ -33,7 +33,7 @@ public class ValueOrMarker<Value, Marker> {
 	}
 
 	/**
-	 * Is there a marker
+	 * Is there a value
 	 *
 	 * @return
 	 */

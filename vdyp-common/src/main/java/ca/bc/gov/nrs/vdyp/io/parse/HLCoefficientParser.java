@@ -15,8 +15,28 @@ import ca.bc.gov.nrs.vdyp.model.Region;
 /**
  * Parses an HL Coefficient data file.
  *
- * @author Kevin Smith, Vivid Solutions
+ * These files each contain a complete mapping of species aliases and regions to
+ * a (one-based) list of coefficients, and therefore has 32 lines. Each row
+ * contains:
+ * <ol>
+ * <li>(cols 0-1) Species alias</li>
+ * <li>(col 3) Region ('I' or 'C')</li>
+ * <li>(cols 4-13, 14-23, ...) two - four floats in 10 character fields.
+ * </ol>
+ * All lines are read; there is no provision for blank lines. There may be
+ * multiple lines with the same Species and Region values; the last one wins.
+ * <p>
+ * The file must populate #Species * #Regions (currently 32) values.
+ * <p>
+ * The result of the parse is a {@link MatrixMap2} of Coefficients indexed by
+ * first species, then region.
+ * <p>
+ * FIP Control indices: 050, 051, 052
+ * <p>
+ * Examples: coe/REGYHLP.COE, coe/REGYHLPA.COE, coe/REGYHLPB.DAT (respectively)
  *
+ * @author Kevin Smith, Vivid Solutions
+ * @see ControlMapSubResourceParser
  */
 public class HLCoefficientParser
 		implements ControlMapSubResourceParser<MatrixMap2<String, Region, Optional<Coefficients>>> {
@@ -33,12 +53,10 @@ public class HLCoefficientParser
 	public static final String REGION_KEY = "region";
 	public static final String COEFFICIENT_KEY = "coefficient";
 
-	int numCoefficients;
 	private String controlKey;
 
 	public HLCoefficientParser(int numCoefficients, String controlKey) {
 		super();
-		this.numCoefficients = numCoefficients;
 		this.lineParser = new LineParser() {
 
 			@Override

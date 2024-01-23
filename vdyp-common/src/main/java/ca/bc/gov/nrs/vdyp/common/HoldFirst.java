@@ -4,7 +4,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * A value that can be set once but not changed.
+ * A value that can be set once but not changed. Subsequent attempts to change
+ * it are ignored silently.
  *
  * @author Kevin Smith, Vivid Solutions
  *
