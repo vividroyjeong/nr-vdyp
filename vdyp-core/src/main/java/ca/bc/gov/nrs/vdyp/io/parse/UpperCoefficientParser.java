@@ -13,10 +13,23 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap3Impl;
 import ca.bc.gov.nrs.vdyp.model.Region;
 
 /**
- * Parses a Coefficient data file.
+ * Parses an Upper Percentiles data file. Each line contains:
+ * <ol>
+ * <li>(cols 0-1) - a species code</li>
+ * <li>(col 3) - a region indicator ('C' or 'I')</li>
+ * <li>(col 4-10) - float - percentage value for BA (Basal Area)</li>
+ * <li>(col 11-16) - float - percentage value for DQ (Quadratic Mean Diameter)</li>
+ * </ol>
+ * The result of the parse is a {@link MatrixMap3} indexed by Species Code, then Region, then either
+ * one (BA percentage) or two (DQ percentage). Multiple lines with the same indices are legal, with 
+ * the last entry winning.
+ * <p>
+ * FIP Control index: 043
+ * <p>
+ * Example file: coe/UPPERB02.COE
  *
  * @author Kevin Smith, Vivid Solutions
- *
+ * @see ControlMapSubResourceParser
  */
 public class UpperCoefficientParser implements ControlMapSubResourceParser<MatrixMap3<Region, String, Integer, Float>> {
 	// TODO use a Coefficients object
