@@ -1,5 +1,7 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
+import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
+
 /**
  * Parse a datafile with volume net decay coefficients.
  *

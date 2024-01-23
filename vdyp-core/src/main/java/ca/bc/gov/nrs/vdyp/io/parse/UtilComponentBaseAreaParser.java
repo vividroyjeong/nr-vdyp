@@ -1,5 +1,7 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
+import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
+
 /**
  * Parses an Utilization Component Basal Area data file. Each line contains:
  * <ol>

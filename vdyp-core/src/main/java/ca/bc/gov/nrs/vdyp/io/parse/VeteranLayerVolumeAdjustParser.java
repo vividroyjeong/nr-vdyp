@@ -1,5 +1,7 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
+import java.util.Map;
+
 /**
  * Parser for a Veteran Layer Volume Adjust data file. Each line contains a Species code
  * and an array of four coefficients (one-based).

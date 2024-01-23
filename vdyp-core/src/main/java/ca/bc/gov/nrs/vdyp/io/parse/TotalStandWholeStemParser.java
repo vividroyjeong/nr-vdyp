@@ -1,5 +1,7 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
+import java.util.Map;
+
 /**
  * Parser for a Total Stand Whole Stem data file. Each line contains a Volume Group id
  * and an array of nine coefficients (zero-based). It is ended by a blank line.

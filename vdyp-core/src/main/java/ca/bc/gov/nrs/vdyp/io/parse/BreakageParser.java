@@ -1,5 +1,7 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
+import java.util.Map;
+
 /**
  * Parser for a Breakage data file. Each line contains an index (an integer from 1 to 40)
  * and an array of four coefficients (one-based):

@@ -1,5 +1,7 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
+import java.util.Map;
+
 /**
  * Parser for a Small Component Probability data file. Each line contains a species code
  * and an array of four coefficients (one-based).
