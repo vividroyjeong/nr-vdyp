@@ -396,38 +396,38 @@ public class VdypForwardControlParser {
 			// RD_E106
 			new BasalAreaYieldParser(),
 
-			// RD_E107
-			new QuadraticMeanDiameterYieldParser(),
+//			// RD_E107
+//			new QuadraticMeanDiameterYieldParser(),
 
-			// RD_E108
-			new UpperBoundsParser(),
+//			// RD_E108
+//			new UpperBoundsParser(),
 
-			// RD_E111
-			new BasalAreaGrowthFiatParser(),
+//			// RD_E111
+//			new BasalAreaGrowthFiatParser(),
 
-			// RD_E117
-			new DqGrowthFiatParser(),
+//			// RD_E117
+//			new DqGrowthFiatParser(),
 
 			// RD_E121
-			new BasalAreaGrowthEmpiricalParser(),
+			new BasalAreaGrowthEmpiricalParser()
 
-			// RD_E122
-			new DqGrowthEmpiricalParser(),
-
-			// RD_E123
-			new DqGrowthEmpiricalLimitsParser(),
-
-			// RD_E148
-			new PrimarySpeciesBasalAreaGrowthParser(),
-
-			// RD_E149
-			new NonPrimarySpeciesBasalAreaGrowthParser(),
-
-			// RD_E150
-			new PrimarySpeciesDqGrowthParser(),
-
-			// RD_E151
-			new NonPrimarySpeciesDqGrowthParser()
+//			// RD_E122
+//			new DqGrowthEmpiricalParser(),
+//
+//			// RD_E123
+//			new DqGrowthEmpiricalLimitsParser(),
+//
+//			// RD_E148
+//			new PrimarySpeciesBasalAreaGrowthParser(),
+//
+//			// RD_E149
+//			new NonPrimarySpeciesBasalAreaGrowthParser(),
+//
+//			// RD_E150
+//			new PrimarySpeciesDqGrowthParser(),
+//
+//			// RD_E151
+//			new NonPrimarySpeciesDqGrowthParser()
 	);
 
 

@@ -21,7 +21,7 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
  * <p>
  * The result of the parse is a map from BEC Zone Alias and Species to a (zero-based) eight-element coefficient array.
  * <p>
- * FIP Control index: 121
+ * Control index: 121
  * <p>
  * Example file: coe/GROWBA27.COE
  *
@@ -77,7 +77,7 @@ public class BasalAreaGrowthEmpiricalParser implements ControlMapSubResourcePars
 			var specCoefficients = (List<Float>) v.get(COEFFICIENTS_KEY);
 
 			if (index < 0 || index >= NUM_COEFFICIENTS) {
-				throw new ValueParseException("Index value " + index + " is out of range; expecting a value from 0 to 7");
+				throw new ValueParseException("Index value " + index + " is out of range; expecting a value from 0 to " + NUM_COEFFICIENTS);
 			}
 			
 			if (indicator < 0 || indicator > 1) {
