@@ -43,6 +43,11 @@ public interface ResourceParser<T> {
 	default T parse(Class<?> klazz, String resourcePath, Map<String, Object> control)
 			throws IOException, ResourceParseException {
 		try (var is = klazz.getResourceAsStream(resourcePath)) {
+			if (is == null) {
+				throw new IllegalStateException(
+						String.format("Could not find %s in %s", resourcePath, klazz.getPackage())
+				);
+			}
 			return parse(is, control);
 		}
 	}
@@ -62,25 +67,5 @@ public interface ResourceParser<T> {
 		try (InputStream is = Files.newInputStream(resourcePath)) {
 			return parse(is, control);
 		}
-	}
-
-	@SuppressWarnings("unchecked")
-	static <U> U expectParsedControl(Map<String, Object> control, String key, Class<? super U> clazz) {
-		var value = control.get(key);
-		if (value == null) {
-			throw new IllegalStateException("Expected control map to have " + key);
-		}
-		if (clazz != String.class && value instanceof String) {
-			throw new IllegalStateException(
-					"Expected control map entry " + key + " to be parsed but was still a String " + value
-			);
-		}
-		if (!clazz.isInstance(value)) {
-			throw new IllegalStateException(
-					"Expected control map entry " + key + " to be a " + clazz.getSimpleName() + " but was a "
-							+ value.getClass()
-			);
-		}
-		return (U) value;
 	}
 }

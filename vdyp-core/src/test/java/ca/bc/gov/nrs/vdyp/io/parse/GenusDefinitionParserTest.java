@@ -1,11 +1,7 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.stringContainsInOrder;
+import static org.hamcrest.Matchers.*;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
@@ -25,10 +21,10 @@ import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 public class GenusDefinitionParserTest {
 
 	@Test
-	public void testParse() throws Exception {
+	void testParse() throws Exception {
 		var parser = new GenusDefinitionParser();
 
-		var result = parser.parse(ControlFileParserTest.class, "coe/SP0DEF_v0.dat", Collections.emptyMap());
+		var result = parser.parse(GenusDefinitionParserTest.class, "coe/SP0DEF_v0.dat", Collections.emptyMap());
 
 		assertThat(
 				result, contains(
@@ -201,7 +197,7 @@ public class GenusDefinitionParserTest {
 	}
 
 	@Test
-	void testErrorPreferenceOutOfBoundsHigh() throws Exception {
+	public void testErrorPreferenceOutOfBoundsHigh() throws Exception {
 		var parser = new GenusDefinitionParser(2);
 
 		Exception ex1;
@@ -254,6 +250,7 @@ public class GenusDefinitionParserTest {
 		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 2", "Preference 1", "set to AT")));
 	}
 
+// TODO Confirm if following methods are still needed after merge
 	/**
 	 * Add a mock control map entry for SP0 parse results with species "S1" and "S2"
 	 */

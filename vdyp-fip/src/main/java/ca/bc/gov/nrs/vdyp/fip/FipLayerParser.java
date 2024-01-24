@@ -26,7 +26,6 @@ public class FipLayerParser
 
 	public static final String CONTROL_KEY = "FIP_LAYERS";
 
-	static final String POLYGON_IDENTIFIER = "POLYGON_IDENTIFIER"; // POLYDESC
 	static final String LAYER = "LAYER"; // LAYER
 	static final String AGE_TOTAL = "AGE_TOTAL"; // AGETOT
 	static final String HEIGHT = "HEIGHT"; // HT
@@ -50,18 +49,28 @@ public class FipLayerParser
 			map(String fileName, FileResolver fileResolver, Map<String, Object> control)
 					throws IOException, ResourceParseException {
 		return () -> {
-			var lineParser = new LineParser().strippedString(25, POLYGON_IDENTIFIER).space(1).value(
-					1, LAYER,
-					ValueParser.valueOrMarker(
-							ValueParser.LAYER, ValueParser.optionalSingleton("Z"::equals, EndOfRecord.END_OF_RECORD)
-					)
-			).floating(4, AGE_TOTAL).floating(5, HEIGHT).floating(5, SITE_INDEX).floating(5, CROWN_CLOSURE).space(3)
-					.value(2, SITE_SP0, ControlledValueParser.optional(ValueParser.GENUS))
-					.value(3, SITE_SP64, ControlledValueParser.optional(ValueParser.STRING))
-					.floating(5, YEARS_TO_BREAST_HEIGHT)
-					.value(1, STOCKING_CLASS, ValueParser.optional(ValueParser.STRING)).space(2)
-					.value(4, INVENTORY_TYPE_GROUP, ValueParser.optional(ValueParser.INTEGER)).space(1)
-					.value(6, BREAST_HEIGHT_AGE, ValueParser.optional(ValueParser.FLOAT))
+			var lineParser = new LineParser() //
+					.strippedString(25, FipPolygonParser.POLYGON_IDENTIFIER).space(1) //
+					.value(
+							1, LAYER,
+							ValueParser.valueOrMarker(
+									ValueParser.LAYER,
+									ValueParser.optionalSingleton("Z"::equals, EndOfRecord.END_OF_RECORD)
+							)
+					) //
+					.floating(4, AGE_TOTAL) //
+					.floating(5, HEIGHT) //
+					.floating(5, SITE_INDEX) //
+					.floating(5, CROWN_CLOSURE) //
+					.space(3) //
+					.value(2, SITE_SP0, ControlledValueParser.optional(ValueParser.GENUS)) //
+					.value(3, SITE_SP64, ControlledValueParser.optional(ValueParser.STRING)) //
+					.floating(5, YEARS_TO_BREAST_HEIGHT) //
+					.value(1, STOCKING_CLASS, ValueParser.optional(ValueParser.CHARACTER)) //
+					.space(2) //
+					.value(4, INVENTORY_TYPE_GROUP, ValueParser.optional(ValueParser.INTEGER)) //
+					.space(1) //
+					.value(6, BREAST_HEIGHT_AGE, ValueParser.optional(ValueParser.FLOAT)) //
 					.value(3, SITE_CURVE_NUMBER, ValueParser.optional(ValueParser.INTEGER));
 
 			var is = fileResolver.resolve(fileName);
@@ -70,10 +79,10 @@ public class FipLayerParser
 					is, lineParser, control
 			) {
 
-				@SuppressWarnings("unchecked")
+				@SuppressWarnings({ "unchecked" })
 				@Override
 				protected ValueOrMarker<Optional<FipLayer>, EndOfRecord> convert(Map<String, Object> entry) {
-					var polygonId = (String) entry.get(POLYGON_IDENTIFIER);
+					var polygonId = (String) entry.get(FipPolygonParser.POLYGON_IDENTIFIER);
 					var layer = (ValueOrMarker<Optional<LayerType>, EndOfRecord>) entry.get(LAYER);
 					var ageTotal = (float) entry.get(AGE_TOTAL);
 					var height = (float) entry.get(HEIGHT);
@@ -82,42 +91,50 @@ public class FipLayerParser
 					var siteSp0 = (Optional<String>) entry.get(SITE_SP0);
 					var siteSp64 = (Optional<String>) entry.get(SITE_SP64);
 					var yearsToBreastHeight = (float) entry.get(YEARS_TO_BREAST_HEIGHT);
-					var stockingClass = (Optional<String>) entry.get(STOCKING_CLASS);
+					var stockingClass = (Optional<Character>) entry.get(STOCKING_CLASS);
 					var inventoryTypeGroup = (Optional<Integer>) entry.get(INVENTORY_TYPE_GROUP);
-					var breastHeightAge = (Optional<Float>) entry.get(BREAST_HEIGHT_AGE);
 					var siteCurveNumber = (Optional<Integer>) entry.get(SITE_CURVE_NUMBER);
 
-					var builder = new ValueOrMarker.Builder<Optional<FipLayer>, EndOfRecord>();
-					var result = layer.handle(l -> {
+					var vmBuilder = new ValueOrMarker.Builder<Optional<FipLayer>, EndOfRecord>();
+					return layer.handle(l -> {
 						switch (l.orElse(null)) {
 						case PRIMARY:
-							return builder.value(
-									Optional.of(
-											new FipLayerPrimary(
-													polygonId, ageTotal, height, siteIndex, crownClosure, siteSp0.get(),
-													siteSp64.get(), yearsToBreastHeight, stockingClass,
-													inventoryTypeGroup, breastHeightAge, siteCurveNumber
-											)
-									)
-							);
+							FipLayerPrimary fipLayerPrimary = FipLayerPrimary.buildPrimary(flBuilder -> {
+								flBuilder.polygonIdentifier(polygonId);
+								flBuilder.ageTotal(ageTotal);
+								flBuilder.yearsToBreastHeight(yearsToBreastHeight);
+								flBuilder.height(height);
+
+								flBuilder.siteIndex(siteIndex);
+								flBuilder.crownClosure(crownClosure);
+								flBuilder.siteGenus(siteSp0.get());
+								flBuilder.siteSpecies(siteSp64.get());
+
+								flBuilder.stockingClass(stockingClass);
+								flBuilder.inventoryTypeGroup(inventoryTypeGroup);
+								flBuilder.siteCurveNumber(siteCurveNumber);
+							});
+							return vmBuilder.value(Optional.of(fipLayerPrimary));
 						case VETERAN:
-							return builder.value(
-									Optional.of(
-											new FipLayer(
-													polygonId, LayerType.VETERAN, ageTotal, height, siteIndex,
-													crownClosure, siteSp0.get(), siteSp64.get(), yearsToBreastHeight,
-													inventoryTypeGroup, breastHeightAge
-											)
-									)
-							);
+							FipLayer fipLayerVeteran = FipLayer.build(flBuilder -> {
+								flBuilder.polygonIdentifier(polygonId);
+								flBuilder.layerType(LayerType.VETERAN);
+								flBuilder.ageTotal(ageTotal);
+								flBuilder.yearsToBreastHeight(yearsToBreastHeight);
+								flBuilder.height(height);
+
+								flBuilder.siteIndex(siteIndex);
+								flBuilder.crownClosure(crownClosure);
+								flBuilder.siteGenus(siteSp0.get());
+								flBuilder.siteSpecies(siteSp64.get());
+							});
+
+							return vmBuilder.value(Optional.of(fipLayerVeteran));
 
 						default:
-							return builder.value(Optional.empty());
+							return vmBuilder.value(Optional.empty());
 						}
-					}, m -> {
-						return builder.marker(m);
-					});
-					return result;
+					}, vmBuilder::marker);
 				}
 
 			};
@@ -145,8 +162,8 @@ public class FipLayerParser
 				protected Map<LayerType, FipLayer>
 						convert(List<ValueOrMarker<Optional<FipLayer>, EndOfRecord>> children) {
 					return children.stream().map(ValueOrMarker::getValue).map(Optional::get) // Should never be empty as
-																								// we've filtered out
-																								// markers
+							// we've filtered out
+							// markers
 							.flatMap(Optional::stream) // Skip if empty (and unknown layer type)
 							.collect(Collectors.toMap(FipLayer::getLayer, x -> x));
 				}

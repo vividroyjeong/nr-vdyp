@@ -13,10 +13,29 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.Region;
 
+/**
+ * Parses a mapping from a Species and Region to a list of three coefficients.
+ * Each row contains
+ * <ol>
+ * <li>(cols 0-1): a Species identifier</li>
+ * <li>(col 3): a Region indicator ('C' or 'I') or a blank</li>
+ * <li>(cols 4-13, 14-23, 24-33) - floats - coefficients</li>
+ * </ol>
+ * If the Region value is blank, the line is applied to both Regions. All lines
+ * are read - no lines are skipped, except the last line in the file if empty.
+ * All three coefficients must be present on each line.
+ * <p>
+ * FIP Control index: 097
+ * <p>
+ * Example file: coe/VETDQ2.DAT
+ *
+ * @author Kevin Smith, Vivid Solutions
+ * @see ControlMapSubResourceParser
+ */
 public class VeteranDQParser implements ControlMapSubResourceParser<MatrixMap2<String, Region, Coefficients>> {
 	public static final String CONTROL_KEY = "VETERAN_LAYER_DQ";
 
-	public final static int numCoefficients = 3;
+	public static final int NUM_COEFFICIENTS = 3;
 
 	public static final String SPECIES_KEY = "species";
 	public static final String REGION_KEY = "region";
@@ -33,7 +52,7 @@ public class VeteranDQParser implements ControlMapSubResourceParser<MatrixMap2<S
 
 		}.value(2, SPECIES_KEY, ValueParser.STRING).space(1)
 				.value(1, REGION_KEY, ControlledValueParser.optional(ValueParser.REGION))
-				.multiValue(numCoefficients, 10, COEFFICIENT_KEY, ValueParser.FLOAT);
+				.multiValue(NUM_COEFFICIENTS, 10, COEFFICIENT_KEY, ValueParser.FLOAT);
 	}
 
 	LineParser lineParser;
@@ -44,8 +63,8 @@ public class VeteranDQParser implements ControlMapSubResourceParser<MatrixMap2<S
 		final var speciesIndicies = GenusDefinitionParser.getSpeciesAliases(control);
 		final var regionIndicies = Arrays.asList(Region.values());
 
-		MatrixMap2<String, Region, Coefficients> result = new MatrixMap2Impl<String, Region, Coefficients>(
-				speciesIndicies, regionIndicies
+		MatrixMap2<String, Region, Coefficients> result = new MatrixMap2Impl<>(
+				speciesIndicies, regionIndicies, (k1, k2) -> Coefficients.empty(NUM_COEFFICIENTS, 1)
 		);
 		lineParser.parse(is, result, (v, r) -> {
 			var sp0 = (String) v.get(SPECIES_KEY);
@@ -56,8 +75,8 @@ public class VeteranDQParser implements ControlMapSubResourceParser<MatrixMap2<S
 			var coefficients = (List<Float>) v.get(COEFFICIENT_KEY);
 			GenusDefinitionParser.checkSpecies(speciesIndicies, sp0);
 
-			if (coefficients.size() < numCoefficients) {
-				throw new ValueParseException(null, "Expected " + numCoefficients + " coefficients");
+			if (coefficients.size() < NUM_COEFFICIENTS) {
+				throw new ValueParseException(null, "Expected " + NUM_COEFFICIENTS + " coefficients");
 			}
 
 			for (var region : regions) {

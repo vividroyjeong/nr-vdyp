@@ -1,43 +1,29 @@
 package ca.bc.gov.nrs.vdyp.fip.model;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Consumer;
 
-import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
 
-public class FipPolygon {
+public class FipPolygon extends BaseVdypPolygon<FipLayer, Optional<Float>> {
 
-	String polygonIdentifier; // FIP_P/POLYDESC
-	String forestInventoryZone; // FIP_P/FIZ
-	String biogeoclimaticZone; // FIP_P/BEC
-	Optional<Float> percentAvailable; // FIP_P2/PCTFLAND
-	Optional<FipMode> modeFip; // FIP_P2/MODE / MODEfip
-	Optional<String> nonproductiveDescription; // FIP_P3/NPDESC
-	float yieldFactor; // FIP_P4/YLDFACT
-
-	Map<LayerType, FipLayer> layers = Collections.emptyMap();
+	private String forestInventoryZone; // FIP_P/FIZ
+	private String biogeoclimaticZone; // FIP_P/BEC
+	private Optional<FipMode> modeFip; // FIP_P2/MODE / MODEfip
+	private Optional<String> nonproductiveDescription; // FIP_P3/NPDESC
+	private float yieldFactor; // FIP_P4/YLDFACT
 
 	public FipPolygon(
 			String polygonIdentifier, String fiz, String becIdentifier, Optional<Float> percentAvailable,
 			Optional<FipMode> modeFip, Optional<String> nonproductiveDescription, float yieldFactor
 	) {
-		super();
-		this.polygonIdentifier = polygonIdentifier;
+		super(polygonIdentifier, percentAvailable);
 		this.forestInventoryZone = fiz;
 		this.biogeoclimaticZone = becIdentifier;
-		this.percentAvailable = percentAvailable;
 		this.modeFip = modeFip;
 		this.nonproductiveDescription = nonproductiveDescription;
 		this.yieldFactor = yieldFactor;
-	}
-
-	public String getPolygonIdentifier() {
-		return polygonIdentifier;
-	}
-
-	public void setPolygonIdentifier(String polygonIdentifier) {
-		this.polygonIdentifier = polygonIdentifier;
 	}
 
 	public String getForestInventoryZone() {
@@ -54,14 +40,6 @@ public class FipPolygon {
 
 	public void setBiogeoclimaticZone(String biogeoclimaticZone) {
 		this.biogeoclimaticZone = biogeoclimaticZone;
-	}
-
-	public Optional<Float> getPercentAvailable() {
-		return percentAvailable;
-	}
-
-	public void setPercentAvailable(Optional<Float> percentAvailable) {
-		this.percentAvailable = percentAvailable;
 	}
 
 	public Optional<FipMode> getModeFip() {
@@ -88,12 +66,106 @@ public class FipPolygon {
 		this.yieldFactor = yieldFactor;
 	}
 
-	public Map<LayerType, FipLayer> getLayers() {
-		return layers;
+	/**
+	 * Accepts a configuration function that accepts a builder to configure.
+	 *
+	 * <pre>
+	 * VdypPolygon myPolygon = VdypPolygon.build(builder-&gt; {
+			builder.polygonIdentifier(polygonId);
+			builder.percentAvailable(percentAvailable);
+			builder.forestInventoryZone
+			builder.biogeoclimaticZone
+			builder.
+	 * })
+	 * </pre>
+	 *
+	 * @param config The configuration function
+	 * @return The object built by the configured builder.
+	 * @throws IllegalStateException if any required properties have not been set by
+	 *                               the configuration function.
+	 */
+	public static FipPolygon build(Consumer<Builder> config) {
+		var builder = new Builder();
+		config.accept(builder);
+		return builder.build();
 	}
 
-	public void setLayers(Map<LayerType, FipLayer> layers) {
-		this.layers = layers;
-	}
+	public static class Builder extends BaseVdypPolygon.Builder<FipPolygon, FipLayer, Optional<Float>> {
+		private Optional<String> forestInventoryZone = Optional.empty();
+		private Optional<String> biogeoclimaticZone = Optional.empty();
+		private Optional<FipMode> modeFip = Optional.empty();
+		private Optional<String> nonproductiveDescription = Optional.empty();
+		private Optional<Float> yieldFactor = Optional.empty();
 
+		public Builder() {
+			this.percentAvailable(Optional.empty());
+		}
+
+		public Builder forestInventoryZone(String forestInventoryZone) {
+			this.forestInventoryZone = Optional.of(forestInventoryZone);
+			return this;
+		}
+
+		public Builder biogeoclimaticZone(String biogeoclimaticZone) {
+			this.biogeoclimaticZone = Optional.of(biogeoclimaticZone);
+			return this;
+		}
+
+		public Builder modeFip(Optional<FipMode> modeFip) {
+			this.modeFip = modeFip;
+			return this;
+		}
+
+		public Builder nonproductiveDescription(Optional<String> nonproductiveDescription) {
+			this.nonproductiveDescription = nonproductiveDescription;
+			return this;
+		}
+
+		public Builder modeFip(FipMode modeFip) {
+			modeFip(Optional.of(modeFip));
+			return this;
+		}
+
+		public Builder nonproductiveDescription(String nonproductiveDescription) {
+			nonproductiveDescription(Optional.of(nonproductiveDescription));
+			return this;
+		}
+
+		public Builder yieldFactor(Float yieldFactor) {
+			this.yieldFactor = Optional.of(yieldFactor);
+			return this;
+		}
+
+		public Builder percentAvailable(Float percentAvailable) {
+			percentAvailable(Optional.of(percentAvailable));
+			return this;
+		}
+
+		@Override
+		protected void check(Collection<String> errors) {
+			super.check(errors);
+			requirePresent(forestInventoryZone, "forestInventoryZone", errors);
+			requirePresent(biogeoclimaticZone, "biogeoclimaticZone", errors);
+			requirePresent(yieldFactor, "yieldFactor", errors);
+		}
+
+		@Override
+		protected FipPolygon doBuild() {
+			return (new FipPolygon(
+					polygonIdentifier.get(), //
+					forestInventoryZone.get(), //
+					biogeoclimaticZone.get(), //
+					percentAvailable.get(), //
+					modeFip, //
+					nonproductiveDescription, //
+					yieldFactor.get() //
+			));
+		}
+
+		@Override
+		protected FipLayer.Builder getLayerBuilder() {
+			return new FipLayer.Builder();
+		}
+
+	}
 }

@@ -1,14 +1,8 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.causedBy;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.mmHasEntry;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.HashMap;
@@ -30,13 +24,13 @@ class VeteranDQParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		GenusDefinitionParserTest.populateControlMap(controlMap);
+		TestUtils.populateControlMapGenus(controlMap);
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, mmHasEntry(present(contains(22.500f, 0.24855f, 1.46089f)), "S1", Region.COASTAL));
-		assertThat(result, mmHasEntry(notPresent(), "S1", Region.INTERIOR));
-		assertThat(result, mmHasEntry(notPresent(), "S2", Region.COASTAL));
+		assertThat(result, mmHasEntry(coe(1, contains(22.500f, 0.24855f, 1.46089f)), "S1", Region.COASTAL));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f, 0f)), "S1", Region.INTERIOR));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f, 0f)), "S2", Region.COASTAL));
 	}
 
 	@Test
@@ -48,13 +42,13 @@ class VeteranDQParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		GenusDefinitionParserTest.populateControlMap(controlMap);
+		TestUtils.populateControlMapGenus(controlMap);
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, mmHasEntry(present(contains(22.500f, 0.24855f, 1.46089f)), "S1", Region.COASTAL));
-		assertThat(result, mmHasEntry(present(contains(22.500f, 0.24855f, 1.46089f)), "S1", Region.INTERIOR));
-		assertThat(result, mmHasEntry(notPresent(), "S2", Region.COASTAL));
+		assertThat(result, mmHasEntry(coe(1, contains(22.500f, 0.24855f, 1.46089f)), "S1", Region.COASTAL));
+		assertThat(result, mmHasEntry(coe(1, contains(22.500f, 0.24855f, 1.46089f)), "S1", Region.INTERIOR));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f, 0f)), "S2", Region.COASTAL));
 	}
 
 	@Test
@@ -66,8 +60,8 @@ class VeteranDQParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		GenusDefinitionParserTest.populateControlMap(controlMap);
-		BecDefinitionParserTest.populateControlMap(controlMap);
+		TestUtils.populateControlMapGenus(controlMap);
+		TestUtils.populateControlMapBec(controlMap);
 
 		var ex = assertThrows(ResourceParseLineException.class, () -> parser.parse(is, controlMap));
 		assertThat(ex, causedBy(hasProperty("value", is("SX"))));
@@ -82,8 +76,8 @@ class VeteranDQParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		GenusDefinitionParserTest.populateControlMap(controlMap);
-		BecDefinitionParserTest.populateControlMap(controlMap);
+		TestUtils.populateControlMapGenus(controlMap);
+		TestUtils.populateControlMapBec(controlMap);
 
 		var ex = assertThrows(ResourceParseLineException.class, () -> parser.parse(is, controlMap));
 		assertThat(ex, causedBy(hasProperty("value", nullValue()))); // TODO Do this better

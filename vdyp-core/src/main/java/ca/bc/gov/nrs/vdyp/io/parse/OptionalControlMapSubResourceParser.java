@@ -13,6 +13,7 @@ import java.util.Map;
 public interface OptionalControlMapSubResourceParser<T>
 		extends ControlMapSubResourceParser<T>, OptionalResourceControlMapModifier {
 
+	@Override
 	default void defaultModify(Map<String, Object> control) {
 		control.put(getControlKey(), defaultResult());
 	}

@@ -5,26 +5,32 @@ import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 import static org.hamcrest.Matchers.equalTo;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Region;
+import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
-public class BecDefinitionParserTest {
+class BecDefinitionParserTest {
 
 	@Test
 	void testParse() throws Exception {
 		var parser = new BecDefinitionParser();
 
-		var result = parser.parse(ControlFileParserTest.class, "coe/Becdef.dat", Collections.emptyMap());
+		var result = parser.parse(BecDefinitionParserTest.class, "coe/Becdef.dat", Collections.emptyMap());
 
 		assertThat(
 				result,
@@ -39,6 +45,9 @@ public class BecDefinitionParserTest {
 						)
 				)
 		);
+		assertThat(result.get("AT").get().getGrowthBec(), sameInstance(result.get("ESSF").get()));
+		assertThat(result.get("AT").get().getDecayBec(), sameInstance(result.get("AT").get()));
+		assertThat(result.get("AT").get().getVolumeBec(), sameInstance(result.get("AT").get()));
 		assertThat(
 				result,
 				hasBec(
@@ -52,6 +61,9 @@ public class BecDefinitionParserTest {
 						)
 				)
 		);
+		assertThat(result.get("BG").get().getGrowthBec(), sameInstance(result.get("ESSF").get()));
+		assertThat(result.get("BG").get().getDecayBec(), sameInstance(result.get("BG").get()));
+		assertThat(result.get("BG").get().getVolumeBec(), sameInstance(result.get("ESSF").get()));
 		assertThat(
 				result,
 				hasBec(
@@ -65,6 +77,9 @@ public class BecDefinitionParserTest {
 						)
 				)
 		);
+		assertThat(result.get("BWBS").get().getGrowthBec(), sameInstance(result.get("BWBS").get()));
+		assertThat(result.get("BWBS").get().getDecayBec(), sameInstance(result.get("BWBS").get()));
+		assertThat(result.get("BWBS").get().getVolumeBec(), sameInstance(result.get("BWBS").get()));
 		assertThat(
 				result,
 				hasBec(
@@ -78,6 +93,9 @@ public class BecDefinitionParserTest {
 						)
 				)
 		);
+		assertThat(result.get("CDF").get().getGrowthBec(), sameInstance(result.get("CDF").get()));
+		assertThat(result.get("CDF").get().getDecayBec(), sameInstance(result.get("CDF").get()));
+		assertThat(result.get("CDF").get().getVolumeBec(), sameInstance(result.get("CDF").get()));
 		assertThat(
 				result,
 				hasBec(
@@ -91,6 +109,9 @@ public class BecDefinitionParserTest {
 						)
 				)
 		);
+		assertThat(result.get("CWH").get().getGrowthBec(), sameInstance(result.get("CWH").get()));
+		assertThat(result.get("CWH").get().getDecayBec(), sameInstance(result.get("CWH").get()));
+		assertThat(result.get("CWH").get().getVolumeBec(), sameInstance(result.get("CWH").get()));
 		assertThat(
 				result,
 				hasBec(
@@ -104,6 +125,9 @@ public class BecDefinitionParserTest {
 						)
 				)
 		);
+		assertThat(result.get("ESSF").get().getGrowthBec(), sameInstance(result.get("ESSF").get()));
+		assertThat(result.get("ESSF").get().getDecayBec(), sameInstance(result.get("ESSF").get()));
+		assertThat(result.get("ESSF").get().getVolumeBec(), sameInstance(result.get("ESSF").get()));
 		assertThat(
 				result,
 				hasBec(
@@ -117,6 +141,9 @@ public class BecDefinitionParserTest {
 						)
 				)
 		);
+		assertThat(result.get("ICH").get().getGrowthBec(), sameInstance(result.get("ICH").get()));
+		assertThat(result.get("ICH").get().getDecayBec(), sameInstance(result.get("ICH").get()));
+		assertThat(result.get("ICH").get().getVolumeBec(), sameInstance(result.get("ICH").get()));
 		assertThat(
 				result,
 				hasBec(
@@ -130,6 +157,9 @@ public class BecDefinitionParserTest {
 						)
 				)
 		);
+		assertThat(result.get("IDF").get().getGrowthBec(), sameInstance(result.get("IDF").get()));
+		assertThat(result.get("IDF").get().getDecayBec(), sameInstance(result.get("IDF").get()));
+		assertThat(result.get("IDF").get().getVolumeBec(), sameInstance(result.get("IDF").get()));
 		assertThat(
 				result,
 				hasBec(
@@ -143,6 +173,9 @@ public class BecDefinitionParserTest {
 						)
 				)
 		);
+		assertThat(result.get("MH").get().getGrowthBec(), sameInstance(result.get("MH").get()));
+		assertThat(result.get("MH").get().getDecayBec(), sameInstance(result.get("MH").get()));
+		assertThat(result.get("MH").get().getVolumeBec(), sameInstance(result.get("MH").get()));
 		assertThat(
 				result,
 				hasBec(
@@ -156,6 +189,9 @@ public class BecDefinitionParserTest {
 						)
 				)
 		);
+		assertThat(result.get("MS").get().getGrowthBec(), sameInstance(result.get("MS").get()));
+		assertThat(result.get("MS").get().getDecayBec(), sameInstance(result.get("MS").get()));
+		assertThat(result.get("MS").get().getVolumeBec(), sameInstance(result.get("MS").get()));
 		assertThat(
 				result,
 				hasBec(
@@ -169,6 +205,9 @@ public class BecDefinitionParserTest {
 						)
 				)
 		);
+		assertThat(result.get("PP").get().getGrowthBec(), sameInstance(result.get("PP").get()));
+		assertThat(result.get("PP").get().getDecayBec(), sameInstance(result.get("PP").get()));
+		assertThat(result.get("PP").get().getVolumeBec(), sameInstance(result.get("PP").get()));
 		assertThat(
 				result,
 				hasBec(
@@ -182,6 +221,9 @@ public class BecDefinitionParserTest {
 						)
 				)
 		);
+		assertThat(result.get("SBPS").get().getGrowthBec(), sameInstance(result.get("SBPS").get()));
+		assertThat(result.get("SBPS").get().getDecayBec(), sameInstance(result.get("SBPS").get()));
+		assertThat(result.get("SBPS").get().getVolumeBec(), sameInstance(result.get("SBPS").get()));
 		assertThat(
 				result,
 				hasBec(
@@ -195,6 +237,9 @@ public class BecDefinitionParserTest {
 						)
 				)
 		);
+		assertThat(result.get("SBS").get().getGrowthBec(), sameInstance(result.get("SBS").get()));
+		assertThat(result.get("SBS").get().getDecayBec(), sameInstance(result.get("SBS").get()));
+		assertThat(result.get("SBS").get().getVolumeBec(), sameInstance(result.get("SBS").get()));
 		assertThat(
 				result,
 				hasBec(
@@ -208,62 +253,18 @@ public class BecDefinitionParserTest {
 						)
 				)
 		);
+		assertThat(result.get("SWB").get().getGrowthBec(), sameInstance(result.get("SWB").get()));
+		assertThat(result.get("SWB").get().getDecayBec(), sameInstance(result.get("SWB").get()));
+		assertThat(result.get("SWB").get().getVolumeBec(), sameInstance(result.get("SWB").get()));
 	}
 
-	/**
-	 * Add a mock control map entry for BEC parse results with species "B1" and "B2"
-	 * for Coastal and Interior Regions respectively
-	 */
-	public static void populateControlMap(Map<String, Object> controlMap) {
-		populateControlMap(controlMap, "B1", "B2");
-	}
-
-	static BecDefinition makeBec(String id, Region region, String name) {
-		return new BecDefinition(
-				id, region, name, BecDefinitionParser.GROWTH_INDEX.get("BG"),
-				BecDefinitionParser.VOLUME_INDEX.get("BG"), BecDefinitionParser.DECAY_INDEX.get("BG")
-		);
-	}
-
-	/**
-	 * Add a mock control map entry for BEC parse results with species "B1" and "B2"
-	 * for Coastal and Interior Regions respectively
-	 */
-	public static void populateControlMapReal(Map<String, Object> controlMap) {
-		List<BecDefinition> becs = new ArrayList<>();
-
-		becs.add(makeBec("BG", Region.INTERIOR, "Bunchgrass"));
-		becs.add(makeBec("BWBS", Region.INTERIOR, "Boreal White and Black Spruce"));
-		becs.add(makeBec("CDF", Region.INTERIOR, "Coastal Dougfir"));
-		becs.add(makeBec("CWH", Region.INTERIOR, "Coastal Western Hemlock"));
-		becs.add(makeBec("ESSF", Region.INTERIOR, "Englemann Sruce -SubAlpine Fir"));
-		becs.add(makeBec("ICH", Region.INTERIOR, "Interior Cedar-Hemlock"));
-		becs.add(makeBec("IDF", Region.INTERIOR, "Interior DougFir"));
-		becs.add(makeBec("MH", Region.INTERIOR, "Mountain Hemlock"));
-		becs.add(makeBec("MS", Region.INTERIOR, "Montane Spruce"));
-		becs.add(makeBec("PP", Region.INTERIOR, "Ponderosa Pine"));
-		becs.add(makeBec("SBPS", Region.INTERIOR, "SubBoreal Pine-Spruce"));
-		becs.add(makeBec("SBS", Region.INTERIOR, "SubBoreal Spruce"));
-		becs.add(makeBec("SWB", Region.INTERIOR, "Spruce-Willow-Birch"));
-
-		controlMap.put(BecDefinitionParser.CONTROL_KEY, new BecLookup(becs));
-	}
-
-	/**
-	 * Add a mock control map entry for SP0 parse results. Alternates assigning to
-	 * Coastal and Interior regions, starting with Coastal.
-	 */
-	public static void populateControlMap(Map<String, Object> controlMap, String... aliases) {
-
-		List<BecDefinition> becs = new ArrayList<>();
-
-		int i = 0;
-		for (var alias : aliases) {
-			becs.add(new BecDefinition(alias, Region.values()[i % 2], "Test " + alias, 2, 2, 2));
-			i++;
+	@Test
+	void testParseNoDefault() throws Exception {
+		var parser = new BecDefinitionParser();
+		try (var is = TestUtils.makeStream("")) {
+			var ex = assertThrows(IllegalStateException.class, () -> parser.parse(is, Collections.emptyMap()));
+			assertThat(ex, hasProperty("message", Matchers.is("Could not find default BEC ESSF")));
 		}
-
-		controlMap.put(BecDefinitionParser.CONTROL_KEY, new BecLookup(becs));
 	}
 
 }

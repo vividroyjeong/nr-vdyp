@@ -1,14 +1,8 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.causedBy;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.mmHasEntry;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.HashMap;
@@ -29,22 +23,22 @@ class UtilComponentBaseAreaParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		GenusDefinitionParserTest.populateControlMap(controlMap);
-		BecDefinitionParserTest.populateControlMap(controlMap, "B1", "B2", "B3", "B4");
+		TestUtils.populateControlMapGenus(controlMap);
+		TestUtils.populateControlMapBec(controlMap, "B1", "B2", "B3", "B4");
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, mmHasEntry(present(contains(-23.22790f, 12.60472f)), 2, "S1", "B1"));
-		assertThat(result, mmHasEntry(notPresent(), 2, "S1", "B2"));
-		assertThat(result, mmHasEntry(notPresent(), 2, "S1", "B3"));
-		assertThat(result, mmHasEntry(notPresent(), 2, "S1", "B4"));
+		assertThat(result, mmHasEntry(coe(1, contains(-23.22790f, 12.60472f)), 1, "S1", "B1"));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f)), 1, "S1", "B2"));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f)), 1, "S1", "B3"));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f)), 1, "S1", "B4"));
 
-		assertThat(result, mmHasEntry(notPresent(), 2, "S2", "B1"));
-		assertThat(result, mmHasEntry(notPresent(), 2, "S2", "B2"));
-		assertThat(result, mmHasEntry(notPresent(), 2, "S2", "B3"));
-		assertThat(result, mmHasEntry(notPresent(), 2, "S2", "B4"));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f)), 1, "S2", "B1"));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f)), 1, "S2", "B2"));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f)), 1, "S2", "B3"));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f)), 1, "S2", "B4"));
 
-		assertThat(result, mmHasEntry(notPresent(), 3, "S1", "B1"));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f)), 2, "S1", "B1"));
 	}
 
 	@Test
@@ -56,22 +50,22 @@ class UtilComponentBaseAreaParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		GenusDefinitionParserTest.populateControlMap(controlMap);
-		BecDefinitionParserTest.populateControlMap(controlMap, "B1", "B2", "B3", "B4");
+		TestUtils.populateControlMapGenus(controlMap);
+		TestUtils.populateControlMapBec(controlMap, "B1", "B2", "B3", "B4");
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, mmHasEntry(present(contains(-23.22790f, 12.60472f)), 2, "S1", "B1"));
-		assertThat(result, mmHasEntry(present(contains(-23.22790f, 12.60472f)), 2, "S1", "B3"));
-		assertThat(result, mmHasEntry(notPresent(), 2, "S1", "B2"));
-		assertThat(result, mmHasEntry(notPresent(), 2, "S1", "B4"));
+		assertThat(result, mmHasEntry(coe(1, contains(-23.22790f, 12.60472f)), 1, "S1", "B1"));
+		assertThat(result, mmHasEntry(coe(1, contains(-23.22790f, 12.60472f)), 1, "S1", "B3"));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f)), 1, "S1", "B2"));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f)), 1, "S1", "B4"));
 
-		assertThat(result, mmHasEntry(notPresent(), 2, "S2", "B1"));
-		assertThat(result, mmHasEntry(notPresent(), 2, "S2", "B2"));
-		assertThat(result, mmHasEntry(notPresent(), 2, "S2", "B3"));
-		assertThat(result, mmHasEntry(notPresent(), 2, "S2", "B4"));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f)), 1, "S2", "B1"));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f)), 1, "S2", "B2"));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f)), 1, "S2", "B3"));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f)), 1, "S2", "B4"));
 
-		assertThat(result, mmHasEntry(notPresent(), 3, "S1", "B1"));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f)), 2, "S1", "B1"));
 	}
 
 	@Test
@@ -83,22 +77,22 @@ class UtilComponentBaseAreaParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		GenusDefinitionParserTest.populateControlMap(controlMap);
-		BecDefinitionParserTest.populateControlMap(controlMap, "B1", "B2", "B3", "B4");
+		TestUtils.populateControlMapGenus(controlMap);
+		TestUtils.populateControlMapBec(controlMap, "B1", "B2", "B3", "B4");
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, mmHasEntry(present(contains(-23.22790f, 12.60472f)), 2, "S1", "B1"));
-		assertThat(result, mmHasEntry(present(contains(-23.22790f, 12.60472f)), 2, "S1", "B2"));
-		assertThat(result, mmHasEntry(present(contains(-23.22790f, 12.60472f)), 2, "S1", "B3"));
-		assertThat(result, mmHasEntry(present(contains(-23.22790f, 12.60472f)), 2, "S1", "B4"));
+		assertThat(result, mmHasEntry(coe(1, contains(-23.22790f, 12.60472f)), 1, "S1", "B1"));
+		assertThat(result, mmHasEntry(coe(1, contains(-23.22790f, 12.60472f)), 1, "S1", "B2"));
+		assertThat(result, mmHasEntry(coe(1, contains(-23.22790f, 12.60472f)), 1, "S1", "B3"));
+		assertThat(result, mmHasEntry(coe(1, contains(-23.22790f, 12.60472f)), 1, "S1", "B4"));
 
-		assertThat(result, mmHasEntry(notPresent(), 2, "S2", "B1"));
-		assertThat(result, mmHasEntry(notPresent(), 2, "S2", "B2"));
-		assertThat(result, mmHasEntry(notPresent(), 2, "S2", "B3"));
-		assertThat(result, mmHasEntry(notPresent(), 2, "S2", "B4"));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f)), 1, "S2", "B1"));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f)), 1, "S2", "B2"));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f)), 1, "S2", "B3"));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f)), 1, "S2", "B4"));
 
-		assertThat(result, mmHasEntry(notPresent(), 3, "S1", "B1"));
+		assertThat(result, mmHasEntry(coe(1, contains(0f, 0f)), 2, "S1", "B1"));
 
 	}
 
@@ -111,8 +105,8 @@ class UtilComponentBaseAreaParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		GenusDefinitionParserTest.populateControlMap(controlMap);
-		BecDefinitionParserTest.populateControlMap(controlMap);
+		TestUtils.populateControlMapGenus(controlMap);
+		TestUtils.populateControlMapBec(controlMap);
 
 		var ex = assertThrows(ResourceParseLineException.class, () -> parser.parse(is, controlMap));
 		assertThat(ex, causedBy(hasProperty("value", is("SX"))));
@@ -127,8 +121,8 @@ class UtilComponentBaseAreaParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		GenusDefinitionParserTest.populateControlMap(controlMap);
-		BecDefinitionParserTest.populateControlMap(controlMap);
+		TestUtils.populateControlMapGenus(controlMap);
+		TestUtils.populateControlMapBec(controlMap);
 
 		var ex = assertThrows(ResourceParseLineException.class, () -> parser.parse(is, controlMap));
 		assertThat(ex, causedBy(hasProperty("value", is("BX"))));
@@ -143,8 +137,8 @@ class UtilComponentBaseAreaParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		GenusDefinitionParserTest.populateControlMap(controlMap);
-		BecDefinitionParserTest.populateControlMap(controlMap);
+		TestUtils.populateControlMapGenus(controlMap);
+		TestUtils.populateControlMapBec(controlMap);
 
 		var ex = assertThrows(ResourceParseLineException.class, () -> parser.parse(is, controlMap));
 		assertThat(ex, causedBy(hasProperty("value", is("BAXX"))));
@@ -159,8 +153,8 @@ class UtilComponentBaseAreaParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		GenusDefinitionParserTest.populateControlMap(controlMap);
-		BecDefinitionParserTest.populateControlMap(controlMap);
+		TestUtils.populateControlMapGenus(controlMap);
+		TestUtils.populateControlMapBec(controlMap);
 
 		var ex = assertThrows(ResourceParseLineException.class, () -> parser.parse(is, controlMap));
 		assertThat(ex, causedBy(hasProperty("value", nullValue()))); // TODO Do this better

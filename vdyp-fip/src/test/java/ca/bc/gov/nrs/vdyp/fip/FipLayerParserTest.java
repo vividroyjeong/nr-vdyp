@@ -18,24 +18,22 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayer;
-import ca.bc.gov.nrs.vdyp.io.parse.BecDefinitionParserTest;
-import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParserTest;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
-public class FipLayerParserTest {
+class FipLayerParserTest {
 
 	@Test
-	public void testParseEmpty() throws Exception {
+	void testParseEmpty() throws Exception {
 
 		var parser = new FipLayerParser();
 
 		Map<String, Object> controlMap = new HashMap<>();
 
 		controlMap.put(FipLayerParser.CONTROL_KEY, "test.dat");
-		BecDefinitionParserTest.populateControlMapReal(controlMap);
+		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeStream(/* empty */));
 
@@ -54,14 +52,14 @@ public class FipLayerParserTest {
 	}
 
 	@Test
-	public void testParseLayer() throws Exception {
+	void testParseLayer() throws Exception {
 
 		var parser = new FipLayerParser();
 
 		Map<String, Object> controlMap = new HashMap<>();
 
 		controlMap.put(FipLayerParser.CONTROL_KEY, "test.dat");
-		GenusDefinitionParserTest.populateControlMapReal(controlMap);
+		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
@@ -89,16 +87,18 @@ public class FipLayerParserTest {
 		assertThat(
 				layers,
 				hasSpecificEntry(
-						LayerType.PRIMARY,
-						allOf(
-								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
-								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("ageTotal", is(55f)),
-								hasProperty("height", is(35.3f)), hasProperty("siteIndex", is(35.0f)),
-								hasProperty("crownClosure", is(87.4f)), hasProperty("siteSp0", is("D")),
-								hasProperty("siteSp64", is("D")), hasProperty("yearsToBreastHeight", is(1.0f)),
-								hasProperty("stockingClass", present(is("0"))),
-								hasProperty("inventoryTypeGroup", notPresent()),
-								hasProperty("breastHeightAge", notPresent()),
+						LayerType.PRIMARY, allOf(
+								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")), //
+								hasProperty("layer", is(LayerType.PRIMARY)), //
+								hasProperty("ageTotal", is(55f)), //
+								hasProperty("height", is(35.3f)), //
+								hasProperty("siteIndex", is(35.0f)), //
+								hasProperty("crownClosure", is(87.4f)), //
+								hasProperty("siteSp0", is("D")), //
+								hasProperty("siteSp64", is("D")), //
+								hasProperty("yearsToBreastHeight", is(1.0f)), //
+								hasProperty("stockingClass", present(is('0'))), //
+								hasProperty("inventoryTypeGroup", notPresent()), //
 								hasProperty("siteCurveNumber", present(is(13)))
 						)
 				)
@@ -108,14 +108,14 @@ public class FipLayerParserTest {
 	}
 
 	@Test
-	public void testParseTwoLayers() throws Exception {
+	void testParseTwoLayers() throws Exception {
 
 		var parser = new FipLayerParser();
 
 		Map<String, Object> controlMap = new HashMap<>();
 
 		controlMap.put(FipLayerParser.CONTROL_KEY, "test.dat");
-		GenusDefinitionParserTest.populateControlMapReal(controlMap);
+		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
@@ -151,9 +151,8 @@ public class FipLayerParserTest {
 								hasProperty("height", is(42.3f)), hasProperty("siteIndex", is(31.9f)),
 								hasProperty("crownClosure", is(82.8f)), hasProperty("siteSp0", is("H")),
 								hasProperty("siteSp64", is("H")), hasProperty("yearsToBreastHeight", is(4.9f)),
-								hasProperty("stockingClass", present(is("0"))),
+								hasProperty("stockingClass", present(is('0'))),
 								hasProperty("inventoryTypeGroup", notPresent()),
-								hasProperty("breastHeightAge", notPresent()),
 								hasProperty("siteCurveNumber", present(is(34)))
 						)
 				)
@@ -167,10 +166,8 @@ public class FipLayerParserTest {
 								hasProperty("layer", is(LayerType.VETERAN)), hasProperty("ageTotal", is(195f)),
 								hasProperty("height", is(45.2f)), hasProperty("siteIndex", is(22.3f)),
 								hasProperty("crownClosure", is(4.0f)), hasProperty("siteSp0", is("B")),
-								hasProperty("siteSp64", is("B")), hasProperty("yearsToBreastHeight", is(9.4f)),
+								hasProperty("siteSp64", is("B")), hasProperty("yearsToBreastHeight", is(9.4f))
 								// hasProperty("stockingClass", present(is("2"))),
-								hasProperty("inventoryTypeGroup", notPresent()),
-								hasProperty("breastHeightAge", notPresent())
 								// hasProperty("siteCurveNumber", present(is(8)))
 						)
 				)
@@ -180,14 +177,14 @@ public class FipLayerParserTest {
 	}
 
 	@Test
-	public void testIgnoreLayerIfHeightZero() throws Exception {
+	void testIgnoreLayerIfHeightZero() throws Exception {
 
 		var parser = new FipLayerParser();
 
 		Map<String, Object> controlMap = new HashMap<>();
 
 		controlMap.put(FipLayerParser.CONTROL_KEY, "test.dat");
-		GenusDefinitionParserTest.populateControlMapReal(controlMap);
+		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
@@ -223,9 +220,8 @@ public class FipLayerParserTest {
 								hasProperty("height", is(42.3f)), hasProperty("siteIndex", is(31.9f)),
 								hasProperty("crownClosure", is(82.8f)), hasProperty("siteSp0", is("H")),
 								hasProperty("siteSp64", is("H")), hasProperty("yearsToBreastHeight", is(4.9f)),
-								hasProperty("stockingClass", present(is("0"))),
+								hasProperty("stockingClass", present(is('0'))),
 								hasProperty("inventoryTypeGroup", notPresent()),
-								hasProperty("breastHeightAge", notPresent()),
 								hasProperty("siteCurveNumber", present(is(34)))
 						)
 				)
@@ -235,14 +231,14 @@ public class FipLayerParserTest {
 	}
 
 	@Test
-	public void testIgnoreLayerIfCrownClosureZero() throws Exception {
+	void testIgnoreLayerIfCrownClosureZero() throws Exception {
 
 		var parser = new FipLayerParser();
 
 		Map<String, Object> controlMap = new HashMap<>();
 
 		controlMap.put(FipLayerParser.CONTROL_KEY, "test.dat");
-		GenusDefinitionParserTest.populateControlMapReal(controlMap);
+		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
@@ -278,9 +274,8 @@ public class FipLayerParserTest {
 								hasProperty("height", is(42.3f)), hasProperty("siteIndex", is(31.9f)),
 								hasProperty("crownClosure", is(82.8f)), hasProperty("siteSp0", is("H")),
 								hasProperty("siteSp64", is("H")), hasProperty("yearsToBreastHeight", is(4.9f)),
-								hasProperty("stockingClass", present(is("0"))),
+								hasProperty("stockingClass", present(is('0'))),
 								hasProperty("inventoryTypeGroup", notPresent()),
-								hasProperty("breastHeightAge", notPresent()),
 								hasProperty("siteCurveNumber", present(is(34)))
 						)
 				)

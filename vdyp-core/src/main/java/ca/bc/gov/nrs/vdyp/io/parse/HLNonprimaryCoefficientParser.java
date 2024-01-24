@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3Impl;
@@ -14,11 +15,31 @@ import ca.bc.gov.nrs.vdyp.model.Region;
 /**
  * Parses an HL Nonprimary Coefficient data file.
  *
- * @author Kevin Smith, Vivid Solutions
+ * This file contains a (possibly incomplete) mapping of species aliases
+ * <b>x</b> species aliases <b>x</b> regions to a (one-based) list of two
+ * coefficients. Each row contains:
+ * <ol>
+ * <li>(cols 0-1) species alias #1</li>
+ * <li>(cols 3-4) species alias #2</li>
+ * <li>(col 6) region character ('I' or 'C')</li>
+ * <li>(col 8) an equation number</li>
+ * <li>(cols 9-18, 19-28) two coefficients</li>
+ * </ol>
+ * Lines where both Species aliases are empty are considered blank lines and are
+ * skipped. All lines are read.
+ * <p>
+ * The result of the parse is a {@link MatrixMap3} of (Coefficients, equation
+ * number) pairs indexed by species 1, species 2 and then region.
+ * <p>
+ * FIP Control index: 053
+ * <p>
+ * Example: coe/REGHL.COE
  *
+ * @author Kevin Smith, Vivid Solutions
+ * @see ControlMapSubResourceParser
  */
 public class HLNonprimaryCoefficientParser
-		implements ControlMapSubResourceParser<MatrixMap3<String, String, Region, NonprimaryHLCoefficients>> {
+		implements ControlMapSubResourceParser<MatrixMap3<String, String, Region, Optional<NonprimaryHLCoefficients>>> {
 
 	public static final String CONTROL_KEY = "HL_NONPRIMARY";
 
@@ -47,13 +68,13 @@ public class HLNonprimaryCoefficientParser
 	LineParser lineParser;
 
 	@Override
-	public MatrixMap3<String, String, Region, NonprimaryHLCoefficients>
+	public MatrixMap3<String, String, Region, Optional<NonprimaryHLCoefficients>>
 			parse(InputStream is, Map<String, Object> control) throws IOException, ResourceParseException {
 		final var regionIndicies = Arrays.asList(Region.values());
 		final var speciesIndicies = GenusDefinitionParser.getSpeciesAliases(control);
 
-		MatrixMap3<String, String, Region, NonprimaryHLCoefficients> result = new MatrixMap3Impl<String, String, Region, NonprimaryHLCoefficients>(
-				speciesIndicies, speciesIndicies, regionIndicies
+		MatrixMap3<String, String, Region, Optional<NonprimaryHLCoefficients>> result = new MatrixMap3Impl<>(
+				speciesIndicies, speciesIndicies, regionIndicies, MatrixMap3Impl.emptyDefault()
 		);
 		lineParser.parse(is, result, (v, r) -> {
 			var sp0_1 = (String) v.get(SPECIES_1_KEY);
@@ -68,7 +89,7 @@ public class HLNonprimaryCoefficientParser
 			if (coefficients.size() < NUM_COEFFICIENTS) {
 				throw new ValueParseException(null, "Expected 2 coefficients"); // TODO handle this better
 			}
-			r.put(sp0_1, sp0_2, region, new NonprimaryHLCoefficients(coefficients, ieqn));
+			r.put(sp0_1, sp0_2, region, Optional.of(new NonprimaryHLCoefficients(coefficients, ieqn)));
 
 			return r;
 		}, control);

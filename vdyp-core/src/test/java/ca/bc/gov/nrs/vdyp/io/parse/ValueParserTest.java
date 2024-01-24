@@ -1,30 +1,22 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.aMapWithSize;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
-import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 
 class ValueParserTest {
 
 	@Test
-	void rangeParserTest() throws Exception {
+	void testRangeParser() throws Exception {
 		var exclusiveParser = ValueParser.range(ValueParser.INTEGER, 10, false, 20, false, "Test");
 
 		var result = exclusiveParser.parse("11");
@@ -89,6 +81,44 @@ class ValueParserTest {
 	}
 
 	@Test
+	void testValidateRangeInclusive() throws Exception {
+		var unit = ValueParser.validateRangeInclusive(10f, 20f, "Test");
+
+		assertThat(unit.apply(10f), notPresent());
+		assertThat(unit.apply(20f), notPresent());
+		assertThat(unit.apply(11f), notPresent());
+		assertThat(unit.apply(19f), notPresent());
+		assertThat(unit.apply(9f), present(is("Test is expected to be between 10.0 and 20.0 but was 9.0")));
+		assertThat(unit.apply(21f), present(is("Test is expected to be between 10.0 and 20.0 but was 21.0")));
+
+	}
+
+	@Test
+	void testValidateRangeInclusiveBadRange() throws Exception {
+		assertThrows(IllegalArgumentException.class, () -> ValueParser.validateRangeInclusive(20f, 10f, "Test"));
+	}
+
+	@Test
+	void testPretestOptional() throws Exception {
+		var unit = ValueParser.pretestOptional(ValueParser.INTEGER, x -> !x.equals("IGNORE"));
+
+		assertThat(unit.parse("1"), present(is(1)));
+		assertThat(unit.parse("2"), present(is(2)));
+		assertThat(unit.parse("IGNORE"), notPresent());
+		assertThrows(ValueParseException.class, () -> unit.parse("DONT_IGNORE"));
+	}
+
+	@Test
+	void testPosttestOptional() throws Exception {
+		var unit = ValueParser.posttestOptional(ValueParser.INTEGER, x -> !x.equals(1));
+
+		assertThat(unit.parse("0"), present(is(0)));
+		assertThat(unit.parse("1"), notPresent());
+		assertThat(unit.parse("2"), present(is(2)));
+		assertThrows(ValueParseException.class, () -> unit.parse("DONT_IGNORE"));
+	}
+
+	@Test
 	void testValueOrMarkerParser() throws Exception {
 		var parser = ValueParser.valueOrMarker(ValueParser.INTEGER, (s) -> {
 			if ("MARK".equals(s)) {
@@ -108,21 +138,28 @@ class ValueParserTest {
 	}
 
 	@Test
-	void testLayerTypeParser() throws Exception {
-		var parser = ValueParser.LAYER;
+	void testOptionalSingleton() throws Exception {
+		var unit = ValueParser.optionalSingleton(x -> x.equals("PASS"), "X");
 
-		assertThat(parser.parse("1"), present(is(LayerType.PRIMARY)));
-		assertThat(parser.parse("P"), present(is(LayerType.PRIMARY)));
+		assertThat(unit.parse("FAIL"), notPresent());
+		assertThat(unit.parse("PASS"), present(is("X")));
+	}
 
-		assertThat(parser.parse("2"), present(is(LayerType.SECONDARY)));
-		assertThat(parser.parse("S"), present(is(LayerType.SECONDARY)));
+	@Test
+	void testLayer() throws Exception {
+		var unit = ValueParser.LAYER;
 
-		assertThat(parser.parse("V"), present(is(LayerType.VETERAN)));
+		assertThat(unit.parse("1"), present(is(LayerType.PRIMARY)));
+		assertThat(unit.parse("P"), present(is(LayerType.PRIMARY)));
 
-		assertThat(parser.parse("X"), notPresent());
-		assertThat(parser.parse(""), notPresent());
-		assertThat(parser.parse(" "), notPresent());
+		assertThat(unit.parse("2"), present(is(LayerType.SECONDARY)));
+		assertThat(unit.parse("S"), present(is(LayerType.SECONDARY)));
 
+		assertThat(unit.parse("V"), present(is(LayerType.VETERAN)));
+
+		assertThat(unit.parse(""), notPresent());
+		assertThat(unit.parse(" "), notPresent());
+		assertThat(unit.parse("X"), notPresent());
 	}
 
 	@Test

@@ -1,7 +1,6 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.mmHasEntry;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -37,7 +36,7 @@ class UpperCoefficientParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, mmHasEntry(present(is(2.0028f)), Region.INTERIOR, "S1", (Integer) 1));
+		assertThat(result, mmHasEntry(is(2.0028f), Region.INTERIOR, "S1", (Integer) 1));
 	}
 
 	@Test
