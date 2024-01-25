@@ -5,6 +5,9 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.IntFunction;
 
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
@@ -81,6 +84,13 @@ public class SimpleCoefficientParser1<K1> implements ControlMapSubResourceParser
 	public <K> BaseCoefficientParser<Coefficients, Coefficients, MatrixMap<Coefficients>>
 			coefficients(int number, int length) {
 		return delegate.coefficients(number, length);
+	}
+
+	public <K> BaseCoefficientParser<Coefficients, Coefficients, MatrixMap<Coefficients>>
+			coefficients(int number, int length
+					, Optional<Function<Void, Coefficients>> defaultEntryValuator
+					, Optional<IntFunction<Float>> defaultCoefficientValuator) {
+		return delegate.coefficients(number, length, defaultEntryValuator, defaultCoefficientValuator);
 	}
 
 	@Override
