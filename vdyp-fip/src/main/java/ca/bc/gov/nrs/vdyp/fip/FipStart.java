@@ -55,7 +55,6 @@ import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayer;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayerPrimary;
-import ca.bc.gov.nrs.vdyp.fip.model.FipMode;
 import ca.bc.gov.nrs.vdyp.fip.model.FipPolygon;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
@@ -95,6 +94,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayParser;
 import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayWasteParser;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.FipMode;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.JProgram;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
@@ -2599,7 +2599,7 @@ public class FipStart {
 		return polygon;
 	}
 
-	private Optional<Float> heightMinimum(Layer layer) {
+	private Optional<Float> heightMinimum(LayerType layer) {
 		var minima = Utils.<Map<String, Float>>expectParsedControl(controlMap, FipControlParser.MINIMA, Map.class);
 		switch (layer) {
 		case PRIMARY:
@@ -2675,7 +2675,7 @@ public class FipStart {
 		if (primaryLayer.getSiteIndex().orElse(0f) < 0.5) {
 			throw validationError(
 					"Polygon %s has %s layer where site index %s is less than minimum %.1f years.",
-					polygon.getPolygonIdentifier(), Layer.PRIMARY,
+					polygon.getPolygonIdentifier(), LayerType.PRIMARY,
 					primaryLayer.getSiteIndex().map(x -> String.format("%.1f", x)).orElse("N/A"), 0.5f
 			);
 		}

@@ -1,12 +1,12 @@
 package ca.bc.gov.nrs.vdyp.model;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float> {
+import ca.bc.gov.nrs.vdyp.common.Computed;
 
-	// TODO better name
-	int itg;
+public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float> {
 
 	// TODO better name
 	int grpBa1;
@@ -31,14 +31,14 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float> {
 		super(toCopy, convertPercentAvailable);
 	}
 
-	// TODO better name
-	public int getItg() {
-		return itg;
+	@Computed
+	public int getInventoryTypeGroup() {
+		return this.getLayers().get(LayerType.PRIMARY).getInventoryTypeGroup().get();
 	}
-
-	// TODO better name
-	public void setItg(int itg) {
-		this.itg = itg;
+	
+	@Computed
+	public void setInventoryTypeGroup(int itg) {
+		this.getLayers().get(LayerType.PRIMARY).setInventoryTypeGroup(Optional.of(itg));
 	}
 
 	// TODO better name
@@ -50,5 +50,45 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float> {
 	public void setGrpBa1(int grpBa1) {
 		this.grpBa1 = grpBa1;
 	}
+	
+	/**
+	 * Accepts a configuration function that accepts a builder to configure.
+	 *
+	 * <pre>
+	 * VdypPolygon myPolygon = VdypPolygon.build(builder-&gt; {
+			builder.polygonIdentifier(polygonId);
+			builder.percentAvailable(percentAvailable);
+	 * })
+	 * </pre>
+	 *
+	 * @param config The configuration function
+	 * @return The object built by the configured builder.
+	 * @throws IllegalStateException if any required properties have not been set by
+	 *                               the configuration function.
+	 */
+	public static VdypPolygon build(Consumer<Builder> config) {
+		var builder = new Builder();
+		config.accept(builder);
+		return builder.build();
+	}
 
+	public static class Builder extends BaseVdypPolygon.Builder<VdypPolygon, VdypLayer, Float> {
+
+		// TODO better name
+		int grpBa1;
+
+		@Override
+		protected VdypPolygon doBuild() {
+			return new VdypPolygon(
+					polygonIdentifier.get(), percentAvailable.get(), forestInventoryZone.get(), biogeoclimaticZone.get(),
+					modeFip
+			);
+		}
+
+		@Override
+		protected VdypLayer.Builder getLayerBuilder() {
+			return new VdypLayer.Builder();
+		}
+
+	}
 }

@@ -89,7 +89,7 @@ class FipLayerParserTest {
 				hasSpecificEntry(
 						LayerType.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")), //
-								hasProperty("layer", is(Layer.PRIMARY)), //
+								hasProperty("layer", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotalSafe", is(55f)), //
 								hasProperty("heightSafe", is(35.3f)), //
 								hasProperty("siteIndex", present(is(35.0f))), //
@@ -144,7 +144,7 @@ class FipLayerParserTest {
 		assertThat(
 				layers,
 				hasSpecificEntry(
-						Layer.PRIMARY, allOf(
+						LayerType.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
 								hasProperty("layer", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotalSafe", is(85f)), //
@@ -163,7 +163,7 @@ class FipLayerParserTest {
 		assertThat(
 				layers,
 				hasSpecificEntry(
-						Layer.VETERAN, allOf(
+						LayerType.VETERAN, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
 								hasProperty("layer", is(LayerType.VETERAN)), //
 								hasProperty("ageTotalSafe", is(195f)), //
@@ -172,7 +172,7 @@ class FipLayerParserTest {
 								hasProperty("crownClosure", is(4.0f)), //
 								hasProperty("siteGenus", present(is("B"))), //
 								hasProperty("siteSpecies", is("B")), //
-								hasProperty("yearsToBreastHeightSafe", is(9.4f)),
+								hasProperty("yearsToBreastHeightSafe", is(9.4f))
 								// hasProperty("stockingClass", present(is("2"))),
 								// hasProperty("siteCurveNumber", present(is(8)))
 						)
@@ -219,7 +219,7 @@ class FipLayerParserTest {
 		assertThat(
 				layers,
 				hasSpecificEntry(
-						Layer.PRIMARY, allOf(
+						LayerType.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
 								hasProperty("layer", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotalSafe", is(85f)), //
@@ -276,7 +276,7 @@ class FipLayerParserTest {
 		assertThat(
 				layers,
 				hasSpecificEntry(
-						Layer.PRIMARY, allOf(
+						LayerType.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
 								hasProperty("layer", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotalSafe", is(85f)), //

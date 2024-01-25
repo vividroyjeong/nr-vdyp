@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.model;
 
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -20,9 +21,9 @@ class VdypLayerTest {
 		});
 		assertThat(result, hasProperty("polygonIdentifier", is("Test")));
 		assertThat(result, hasProperty("layer", is(LayerType.PRIMARY)));
-		assertThat(result, hasProperty("ageTotal", is(42f)));
-		assertThat(result, hasProperty("yearsToBreastHeight", is(2f)));
-		assertThat(result, hasProperty("height", is(10f)));
+		assertThat(result, hasProperty("ageTotal", present(is(42f))));
+		assertThat(result, hasProperty("yearsToBreastHeight", present(is(2f))));
+		assertThat(result, hasProperty("height", present(is(10f))));
 		assertThat(result, hasProperty("species", anEmptyMap()));
 	}
 
@@ -35,9 +36,7 @@ class VdypLayerTest {
 				hasProperty(
 						"message",
 						allOf(
-								containsString("polygonIdentifier"), containsString("layer"),
-								containsString("ageTotal"), containsString("yearsToBreastHeight"),
-								containsString("height")
+								containsString("polygonIdentifier"), containsString("layer")
 						)
 				)
 		);
@@ -49,6 +48,9 @@ class VdypLayerTest {
 		var poly = VdypPolygon.build(builder -> {
 			builder.polygonIdentifier("Test");
 			builder.percentAvailable(50f);
+			
+			builder.forestInventoryZone("?");
+			builder.biogeoclimaticZone("?");
 		});
 
 		var result = VdypLayer.build(poly, builder -> {
@@ -60,9 +62,9 @@ class VdypLayerTest {
 
 		assertThat(result, hasProperty("polygonIdentifier", is("Test")));
 		assertThat(result, hasProperty("layer", is(LayerType.PRIMARY)));
-		assertThat(result, hasProperty("ageTotal", is(42f)));
-		assertThat(result, hasProperty("yearsToBreastHeight", is(2f)));
-		assertThat(result, hasProperty("height", is(10f)));
+		assertThat(result, hasProperty("ageTotal", present(is(42f))));
+		assertThat(result, hasProperty("yearsToBreastHeight", present(is(2f))));
+		assertThat(result, hasProperty("height", present(is(10f))));
 		assertThat(result, hasProperty("species", anEmptyMap()));
 
 		assertThat(poly.getLayers(), hasEntry(LayerType.PRIMARY, result));

@@ -50,7 +50,6 @@ import ca.bc.gov.nrs.vdyp.fip.FipStart.CompatibilityVariableMode;
 import ca.bc.gov.nrs.vdyp.fip.FipStart.VolumeComputeMode;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayer;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayerPrimary;
-import ca.bc.gov.nrs.vdyp.fip.model.FipMode;
 import ca.bc.gov.nrs.vdyp.fip.model.FipPolygon;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
 import ca.bc.gov.nrs.vdyp.fip.test.FipTestUtils;
@@ -62,7 +61,8 @@ import ca.bc.gov.nrs.vdyp.io.parse.StockingClassFactorParser;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.VeteranLayerVolumeAdjustParser;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.FipMode;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
@@ -160,7 +160,7 @@ class FipStartTest {
 				hasProperty(
 						"message",
 						is(
-								"Polygon " + polygonId + " has no " + Layer.PRIMARY
+								"Polygon " + polygonId + " has no " + LayerType.PRIMARY
 										+ " layer, or that layer has non-positive height or crown closure."
 						)
 				)
@@ -2445,7 +2445,6 @@ class FipStartTest {
 		layer.getBaseAreaByUtilization().setCoe(0, 76.5122147f);
 		layer.getTreesPerHectareByUtilization().setCoe(0, 845.805969f);
 		layer.getQuadraticMeanDiameterByUtilization().setCoe(0, 33.9379082f);
-		layer.setAgeTotal(285f);
 
 		var spec = VdypSpecies.build(layer, builder -> {
 			builder.genus("Y");
@@ -3440,7 +3439,7 @@ class FipStartTest {
 			builder.percentGenus(90f);
 		});
 
-		processedLayers.get(LayerType.PRIMARY).setHeight(15f);
+		processedLayers.get(LayerType.PRIMARY).setHeight(Optional.of(15f));
 		// processedLayers.get(LayerType.PRIMARY).setCrownClosure(60f);
 
 		var vdypPolygon = app.createVdypPolygon(fipPolygon, processedLayers);
@@ -3500,7 +3499,7 @@ class FipStartTest {
 			builder.percentGenus(90f);
 		});
 
-		processedLayers.get(LayerType.PRIMARY).setHeight(15f);
+		processedLayers.get(LayerType.PRIMARY).setHeight(Optional.of(15f));
 		// processedLayers.get(LayerType.PRIMARY).setCrownClosure(60f);
 
 		var vdypPolygon = app.createVdypPolygon(fipPolygon, processedLayers);
@@ -3554,7 +3553,7 @@ class FipStartTest {
 			builder.percentGenus(90f);
 		});
 
-		processedLayers.get(LayerType.PRIMARY).setHeight(15f);
+		processedLayers.get(LayerType.PRIMARY).setHeight(Optional.of(15f));
 		// processedLayers.get(LayerType.PRIMARY).setCrownClosure(60f);
 
 		var vdypPolygon = app.createVdypPolygon(fipPolygon, processedLayers);

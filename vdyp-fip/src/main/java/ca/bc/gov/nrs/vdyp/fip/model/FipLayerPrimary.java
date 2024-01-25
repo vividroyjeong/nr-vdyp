@@ -8,12 +8,23 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 public class FipLayerPrimary extends FipLayer {
 
-	private Optional<Character> stockingClass = Optional.empty(); // FIPL_1ST/STK_L1
+	private Optional<Character> stockingClass; // FIPL_1ST/STK_L1
 
-	private Optional<String> primaryGenus = Optional.empty(); // FIPL_1C/JPRIME
+	private Optional<String> primaryGenus; // FIPL_1C/JPRIME
 
-	public FipLayerPrimary(String polygonIdentifier) {
-		super(polygonIdentifier, Layer.PRIMARY);
+	public FipLayerPrimary(
+			String polygonIdentifier, Optional<Float> ageTotal, Optional<Float> height,
+			Optional<Float> yearsToBreastHeight, Optional<Float> siteIndex, Optional<Integer> siteCurveNumber,
+			Optional<Integer> inventoryTypeGroup, Optional<String> siteGenus, float crownClosure, String siteSpecies,
+			Optional<Character> stockingClass, Optional<String> primaryGenus
+	) {
+		super(
+				polygonIdentifier, LayerType.PRIMARY, ageTotal, height, yearsToBreastHeight, siteIndex, siteCurveNumber,
+				inventoryTypeGroup, siteGenus, crownClosure, siteSpecies
+		);
+		this.stockingClass=stockingClass;
+		this.primaryGenus=primaryGenus;
+		
 	}
 
 	public Optional<Character> getStockingClass() {
@@ -37,38 +48,6 @@ public class FipLayerPrimary extends FipLayer {
 		return primaryGenus.map(this.getSpecies()::get);
 	}
 
-	@Override
-	public void setAgeTotal(Optional<Float> value) {
-		value.orElseThrow(() -> new IllegalArgumentException());
-		super.setAgeTotal(value);
-	}
-
-	@Computed
-	public float getAgeTotalSafe() {
-		return super.getAgeTotal().get();
-	}
-
-	@Computed
-	public void setAgeTotalSafe(float value) {
-		setAgeTotal(Optional.of(value));
-	}
-
-	@Override
-	public void setYearsToBreastHeight(Optional<Float> value) {
-		value.orElseThrow(() -> new IllegalArgumentException());
-		super.setYearsToBreastHeight(value);
-	}
-
-	@Computed
-	public float getYearsToBreastHeightSafe() {
-		return super.getYearsToBreastHeight().get();
-	}
-
-	@Computed
-	public void setYearsToBreastHeightSafe(float value) {
-		setYearsToBreastHeight(Optional.of(value));
-	}
-
 	/**
 	 * Accepts a configuration function that accepts a builder to configure.
 	 *
@@ -78,7 +57,7 @@ public class FipLayerPrimary extends FipLayer {
 			builder.ageTotal(8f);
 			builder.yearsToBreastHeight(7f);
 			builder.height(6f);
-
+	
 			builder.siteIndex(5f);
 			builder.crownClosure(0.9f);
 			builder.siteGenus("B");
@@ -107,18 +86,9 @@ public class FipLayerPrimary extends FipLayer {
 	}
 
 	public static class PrimaryBuilder extends Builder {
-		private Optional<Integer> siteCurveNumber = Optional.empty();
-
 		private Optional<Character> stockingClass = Optional.empty();
 
 		private Optional<String> primaryGenus = Optional.empty();
-
-		private Optional<Integer> inventoryTypeGroup = Optional.empty();
-
-		public Builder siteCurveNumber(Optional<Integer> siteCurveNumber) {
-			this.siteCurveNumber = siteCurveNumber;
-			return this;
-		}
 
 		public Builder stockingClass(Optional<Character> stockingClass) {
 			this.stockingClass = stockingClass;
@@ -130,15 +100,6 @@ public class FipLayerPrimary extends FipLayer {
 			return this;
 		}
 
-		public Builder inventoryTypeGroup(Optional<Integer> inventoryTypeGroup) {
-			this.inventoryTypeGroup = inventoryTypeGroup;
-			return this;
-		}
-
-		public Builder siteCurveNumber(int siteCurveNumber) {
-			return siteCurveNumber(Optional.of(siteCurveNumber));
-		}
-
 		public Builder stockingClass(char stockingClass) {
 			return stockingClass(Optional.of(stockingClass));
 		}
@@ -147,32 +108,27 @@ public class FipLayerPrimary extends FipLayer {
 			return primaryGenus(Optional.of(primaryGenus));
 		}
 
-		public Builder inventoryTypeGroup(int inventoryTypeGroup) {
-			return inventoryTypeGroup(Optional.of(inventoryTypeGroup));
-		}
-
 		public PrimaryBuilder() {
 			super();
 			this.layerType(LayerType.PRIMARY);
 		}
-
+		
 		@Override
 		protected FipLayerPrimary doBuild() {
-			var result = new FipLayerPrimary(
+			return new FipLayerPrimary(
 					polygonIdentifier.get(), //
-					ageTotal.get(), //
-					yearsToBreastHeight.get(), //
-					height.get(), //
-					siteIndex.get(), //
+					ageTotal, //
+					height, //
+					yearsToBreastHeight, //
+					siteIndex, //
+					siteCurveNumber, //
+					inventoryTypeGroup, //
+					siteGenus, //
 					crownClosure.get(), //
-					siteGenus.get(), //
-					siteSpecies.get()
+					siteSpecies.get(), //
+					stockingClass,
+					primaryGenus
 			);
-			result.setSiteCurveNumber(this.siteCurveNumber);
-			result.setStockingClass(this.stockingClass);
-			result.setPrimaryGenus(this.primaryGenus);
-			result.setInventoryTypeGroup(this.inventoryTypeGroup);
-			return result;
 		}
 
 	}

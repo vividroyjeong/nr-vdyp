@@ -118,7 +118,7 @@ public class VriAdjustInputWriter implements Closeable {
 				polygon.getForestInventoryZone(), //
 
 				polygon.getPercentAvailable().intValue(), //
-				polygon.getItg(), //
+				polygon.getInventoryTypeGroup(), //
 				polygon.getGrpBa1(), //
 				polygon.getModeFip().map(FipMode::getCode).orElse(0)
 		);

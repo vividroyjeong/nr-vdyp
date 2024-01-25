@@ -261,7 +261,7 @@ class BecDefinitionParserTest {
 	@Test
 	void testParseNoDefault() throws Exception {
 		var parser = new BecDefinitionParser();
-		try (var is = TestUtils.makeStream("")) {
+		try (var is = TestUtils.makeInputStream("")) {
 			var ex = assertThrows(IllegalStateException.class, () -> parser.parse(is, Collections.emptyMap()));
 			assertThat(ex, hasProperty("message", Matchers.is("Could not find default BEC ESSF")));
 		}
