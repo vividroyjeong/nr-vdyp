@@ -35,7 +35,7 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float> {
 	public int getInventoryTypeGroup() {
 		return this.getLayers().get(LayerType.PRIMARY).getInventoryTypeGroup().get();
 	}
-	
+
 	@Computed
 	public void setInventoryTypeGroup(int itg) {
 		this.getLayers().get(LayerType.PRIMARY).setInventoryTypeGroup(Optional.of(itg));
@@ -50,7 +50,7 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float> {
 	public void setGrpBa1(int grpBa1) {
 		this.grpBa1 = grpBa1;
 	}
-	
+
 	/**
 	 * Accepts a configuration function that accepts a builder to configure.
 	 *
@@ -80,8 +80,8 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float> {
 		@Override
 		protected VdypPolygon doBuild() {
 			return new VdypPolygon(
-					polygonIdentifier.get(), percentAvailable.get(), forestInventoryZone.get(), biogeoclimaticZone.get(),
-					modeFip
+					polygonIdentifier.get(), percentAvailable.get(), forestInventoryZone.get(),
+					biogeoclimaticZone.get(), modeFip
 			);
 		}
 

@@ -62,9 +62,6 @@ public class FipPolygon extends BaseVdypPolygon<FipLayer, Optional<Float>> {
 	}
 
 	public static class Builder extends BaseVdypPolygon.Builder<FipPolygon, FipLayer, Optional<Float>> {
-		private Optional<String> forestInventoryZone = Optional.empty();
-		private Optional<String> biogeoclimaticZone = Optional.empty();
-		private Optional<FipMode> modeFip = Optional.empty();
 		private Optional<String> nonproductiveDescription = Optional.empty();
 		private Optional<Float> yieldFactor = Optional.empty();
 
@@ -72,28 +69,8 @@ public class FipPolygon extends BaseVdypPolygon<FipLayer, Optional<Float>> {
 			this.percentAvailable(Optional.empty());
 		}
 
-		public Builder forestInventoryZone(String forestInventoryZone) {
-			this.forestInventoryZone = Optional.of(forestInventoryZone);
-			return this;
-		}
-
-		public Builder biogeoclimaticZone(String biogeoclimaticZone) {
-			this.biogeoclimaticZone = Optional.of(biogeoclimaticZone);
-			return this;
-		}
-
-		public Builder modeFip(Optional<FipMode> modeFip) {
-			this.modeFip = modeFip;
-			return this;
-		}
-
 		public Builder nonproductiveDescription(Optional<String> nonproductiveDescription) {
 			this.nonproductiveDescription = nonproductiveDescription;
-			return this;
-		}
-
-		public Builder modeFip(FipMode modeFip) {
-			modeFip(Optional.of(modeFip));
 			return this;
 		}
 

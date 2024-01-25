@@ -28,7 +28,7 @@ public class BaseVdypLayer<S extends BaseVdypSpecies> {
 		super();
 		this.polygonIdentifier = polygonIdentifier;
 		this.layer = layer;
-		
+
 		this.ageTotal = ageTotal;
 		this.height = height;
 		this.yearsToBreastHeight = yearsToBreastHeight;
@@ -123,12 +123,12 @@ public class BaseVdypLayer<S extends BaseVdypSpecies> {
 		protected Optional<Float> ageTotal = Optional.empty();
 		protected Optional<Float> height = Optional.empty();
 		protected Optional<Float> yearsToBreastHeight = Optional.empty();
-		
+
 		protected Optional<Float> siteIndex = Optional.empty();
 		protected Optional<Integer> siteCurveNumber = Optional.empty();
 		protected Optional<Integer> inventoryTypeGroup = Optional.empty();
 		protected Optional<String> siteGenus = Optional.empty();
-		
+
 		protected List<S> species = new LinkedList<>();
 
 		public Builder<T, S> polygonIdentifier(String polygonIdentifier) {
@@ -144,15 +144,16 @@ public class BaseVdypLayer<S extends BaseVdypSpecies> {
 		public Builder<T, S> ageTotal(float ageTotal) {
 			return this.ageTotal(Optional.of(ageTotal));
 		}
-		
+
 		public Builder<T, S> ageTotal(Optional<Float> ageTotal) {
-			this.ageTotal =ageTotal;
+			this.ageTotal = ageTotal;
 			return this;
 		}
 
 		public Builder<T, S> height(float height) {
 			return this.height(Optional.of(height));
 		}
+
 		public Builder<T, S> height(Optional<Float> height) {
 			this.height = height;
 			return this;
@@ -161,6 +162,7 @@ public class BaseVdypLayer<S extends BaseVdypSpecies> {
 		public Builder<T, S> yearsToBreastHeight(float yearsToBreastHeight) {
 			return this.yearsToBreastHeight(Optional.of(yearsToBreastHeight));
 		}
+
 		public Builder<T, S> yearsToBreastHeight(Optional<Float> yearsToBreastHeight) {
 			this.yearsToBreastHeight = yearsToBreastHeight;
 			return this;
@@ -175,8 +177,6 @@ public class BaseVdypLayer<S extends BaseVdypSpecies> {
 			this.species.addAll(spec);
 			return this;
 		}
-		
-		
 
 		public Builder<T, S> siteIndex(float siteIndex) {
 			return this.siteIndex(Optional.of(siteIndex));
@@ -193,7 +193,7 @@ public class BaseVdypLayer<S extends BaseVdypSpecies> {
 		public Builder<T, S> siteGenus(String siteGenus) {
 			return this.siteGenus(Optional.of(siteGenus));
 		}
-		
+
 		public Builder<T, S> siteIndex(Optional<Float> siteIndex) {
 			this.siteIndex = siteIndex;
 			return this;
@@ -219,6 +219,11 @@ public class BaseVdypLayer<S extends BaseVdypSpecies> {
 			layerType(toCopy.getLayer());
 			ageTotal(toCopy.getAgeTotal());
 			yearsToBreastHeight(toCopy.getYearsToBreastHeight());
+			height(toCopy.getHeight());
+			siteIndex(toCopy.getSiteIndex());
+			siteCurveNumber(toCopy.getSiteCurveNumber());
+			inventoryTypeGroup(toCopy.getInventoryTypeGroup());
+			siteGenus(toCopy.getSiteGenus());
 			return this;
 		}
 

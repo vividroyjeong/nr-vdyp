@@ -162,6 +162,8 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?>, PA> {
 		public <PA2> Builder<T, L, PA> copy(BaseVdypPolygon<?, PA2> toCopy, Function<PA2, PA> paConvert) {
 			polygonIdentifier(toCopy.getPolygonIdentifier());
 			percentAvailable(paConvert.apply(toCopy.getPercentAvailable()));
+			biogeoclimaticZone(toCopy.getBiogeoclimaticZone());
+			forestInventoryZone(toCopy.getForestInventoryZone());
 			return this;
 		}
 

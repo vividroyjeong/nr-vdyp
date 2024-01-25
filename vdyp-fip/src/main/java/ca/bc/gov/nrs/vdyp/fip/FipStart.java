@@ -367,8 +367,7 @@ public class FipStart {
 		float percentAvailable = estimatePercentForestLand(fipPolygon, fipVetLayer, fipPrimaryLayer);
 
 		var vdypPolygon = VdypPolygon.build(builder -> {
-			builder.polygonIdentifier(fipPolygon.getPolygonIdentifier());
-			builder.percentAvailable(percentAvailable);
+			builder.copy(fipPolygon, (x) -> percentAvailable);
 		});
 		vdypPolygon.setLayers(processedLayers);
 		return vdypPolygon;
@@ -469,7 +468,6 @@ public class FipStart {
 		);
 
 		var result = VdypLayer.build(builder -> builder.copy(fipLayer));
-
 
 		// EMP040
 		var baseArea = estimatePrimaryBaseArea(

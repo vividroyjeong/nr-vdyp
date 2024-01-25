@@ -282,7 +282,7 @@ class VriAdjustInputWriterTest {
 			var species = VdypSpecies.build(layer, builder -> {
 				builder.genus("PL");
 				builder.addSpecies("PL", 100f);
-				
+
 				builder.percentGenus(100f);
 				builder.volumeGroup(0);
 				builder.decayGroup(0);
@@ -353,7 +353,6 @@ class VriAdjustInputWriterTest {
 				builder.modeFip(FipMode.FIPSTART);
 			});
 
-
 			var layer = VdypLayer.build(polygon, builder -> {
 				builder.layerType(LayerType.PRIMARY);
 
@@ -368,13 +367,13 @@ class VriAdjustInputWriterTest {
 			var species = VdypSpecies.build(layer, builder -> {
 				builder.genus("PL");
 				builder.addSpecies("PL", 100f);
-				
+
 				builder.percentGenus(100f);
 				builder.volumeGroup(0);
 				builder.decayGroup(0);
 				builder.breakageGroup(0);
 			});
-			
+
 			polygon.setInventoryTypeGroup(28);
 			polygon.setGrpBa1(119);
 

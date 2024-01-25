@@ -31,15 +31,7 @@ class VdypLayerTest {
 	void buildNoProperties() throws Exception {
 		var ex = assertThrows(IllegalStateException.class, () -> VdypLayer.build(builder -> {
 		}));
-		assertThat(
-				ex,
-				hasProperty(
-						"message",
-						allOf(
-								containsString("polygonIdentifier"), containsString("layer")
-						)
-				)
-		);
+		assertThat(ex, hasProperty("message", allOf(containsString("polygonIdentifier"), containsString("layer"))));
 	}
 
 	@Test
@@ -48,7 +40,7 @@ class VdypLayerTest {
 		var poly = VdypPolygon.build(builder -> {
 			builder.polygonIdentifier("Test");
 			builder.percentAvailable(50f);
-			
+
 			builder.forestInventoryZone("?");
 			builder.biogeoclimaticZone("?");
 		});

@@ -18,9 +18,10 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 			Optional<Float> yearsToBreastHeight, Optional<Float> siteIndex, Optional<Integer> siteCurveNumber,
 			Optional<Integer> inventoryTypeGroup, Optional<String> siteGenus, float crownClosure, String siteSpecies
 	) {
-		super(polygonIdentifier, layer, ageTotal, height,
-				yearsToBreastHeight, siteIndex, siteCurveNumber,
-				inventoryTypeGroup, siteGenus);
+		super(
+				polygonIdentifier, layer, ageTotal, height, yearsToBreastHeight, siteIndex, siteCurveNumber,
+				inventoryTypeGroup, siteGenus
+		);
 		this.crownClosure = crownClosure;
 		this.siteSpecies = siteSpecies;
 	}
@@ -40,7 +41,6 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 	public void setSiteSpecies(String siteSp64) {
 		this.siteSpecies = siteSp64;
 	}
-
 
 	@Computed
 	public float getAgeTotalSafe() {
@@ -151,11 +151,13 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 
 		@Override
 		protected FipLayer doBuild() {
-			/*public FipLayer(
-					String polygonIdentifier, LayerType layer, Optional<Float> ageTotal, Optional<Float> height,
-					Optional<Float> yearsToBreastHeight, Optional<Float> siteIndex, Optional<Integer> siteCurveNumber,
-					Optional<Integer> inventoryTypeGroup, Optional<String> siteGenus, float crownClosure, String siteSpecies
-				*/	
+			/*
+			 * public FipLayer( String polygonIdentifier, LayerType layer, Optional<Float>
+			 * ageTotal, Optional<Float> height, Optional<Float> yearsToBreastHeight,
+			 * Optional<Float> siteIndex, Optional<Integer> siteCurveNumber,
+			 * Optional<Integer> inventoryTypeGroup, Optional<String> siteGenus, float
+			 * crownClosure, String siteSpecies
+			 */
 			return (new FipLayer(
 					polygonIdentifier.get(), //
 					layer.get(), //

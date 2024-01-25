@@ -22,9 +22,9 @@ public class FipLayerPrimary extends FipLayer {
 				polygonIdentifier, LayerType.PRIMARY, ageTotal, height, yearsToBreastHeight, siteIndex, siteCurveNumber,
 				inventoryTypeGroup, siteGenus, crownClosure, siteSpecies
 		);
-		this.stockingClass=stockingClass;
-		this.primaryGenus=primaryGenus;
-		
+		this.stockingClass = stockingClass;
+		this.primaryGenus = primaryGenus;
+
 	}
 
 	public Optional<Character> getStockingClass() {
@@ -57,7 +57,7 @@ public class FipLayerPrimary extends FipLayer {
 			builder.ageTotal(8f);
 			builder.yearsToBreastHeight(7f);
 			builder.height(6f);
-	
+
 			builder.siteIndex(5f);
 			builder.crownClosure(0.9f);
 			builder.siteGenus("B");
@@ -112,7 +112,7 @@ public class FipLayerPrimary extends FipLayer {
 			super();
 			this.layerType(LayerType.PRIMARY);
 		}
-		
+
 		@Override
 		protected FipLayerPrimary doBuild() {
 			return new FipLayerPrimary(
@@ -126,8 +126,7 @@ public class FipLayerPrimary extends FipLayer {
 					siteGenus, //
 					crownClosure.get(), //
 					siteSpecies.get(), //
-					stockingClass,
-					primaryGenus
+					stockingClass, primaryGenus
 			);
 		}
 
