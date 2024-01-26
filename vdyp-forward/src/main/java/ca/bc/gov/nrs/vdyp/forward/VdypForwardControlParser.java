@@ -421,11 +421,11 @@ public class VdypForwardControlParser {
 			new PrimarySpeciesBasalAreaGrowthParser(),
 
 			// RD_E149
-			new NonPrimarySpeciesBasalAreaGrowthParser()
+			new NonPrimarySpeciesBasalAreaGrowthParser(),
 
-//			// RD_E150
-//			new PrimarySpeciesDqGrowthParser(),
-//
+			// RD_E150
+			new PrimarySpeciesDqGrowthParser()
+
 //			// RD_E151
 //			new NonPrimarySpeciesDqGrowthParser()
 	);
