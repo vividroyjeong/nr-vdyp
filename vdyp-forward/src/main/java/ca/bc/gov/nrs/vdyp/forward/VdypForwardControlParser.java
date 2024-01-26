@@ -402,11 +402,11 @@ public class VdypForwardControlParser {
 			// RD_E108
 			new UpperBoundsParser(),
 
-//			// RD_E111
-//			new BasalAreaGrowthFiatParser(),
+			// RD_E111
+			new BasalAreaGrowthFiatParser(),
 
-//			// RD_E117
-//			new DqGrowthFiatParser(),
+			// RD_E117
+			new DqGrowthFiatParser(),
 
 			// RD_E121
 			new BasalAreaGrowthEmpiricalParser(),
