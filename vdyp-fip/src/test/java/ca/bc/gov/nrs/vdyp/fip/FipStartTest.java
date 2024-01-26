@@ -1601,15 +1601,12 @@ class FipStartTest {
 
 		var utilizationClass = UtilizationClass.ALL;
 		var breakageGroup = 20;
-		var quadMeanDiameterUtil = new Coefficients(
-				new float[] { 0f, 13.4943399f, 10.2402296f, 14.6183214f, 19.3349762f, 25.6280651f }, -1
-		);
-		var closeUtilizationUtil = new Coefficients(
-				new float[] { 0f, 6.41845179f, 0.0353721268f, 2.99654913f, 2.23212862f, 1.1544019f }, -1
-		);
-		var closeUtilizationNetOfDecayAndWasteUtil = new Coefficients(
-				new float[] { 0f, 6.18276405f, 0.0347718038f, 2.93580461f, 2.169273853f, 1.04291379f }, -1
-		);
+		var quadMeanDiameterUtil = Utils
+				.utilizationVector(0f, 13.4943399f, 10.2402296f, 14.6183214f, 19.3349762f, 25.6280651f);
+		var closeUtilizationUtil = Utils
+				.utilizationVector(0f, 6.41845179f, 0.0353721268f, 2.99654913f, 2.23212862f, 1.1544019f);
+		var closeUtilizationNetOfDecayAndWasteUtil = Utils
+				.utilizationVector(0f, 6.18276405f, 0.0347718038f, 2.93580461f, 2.169273853f, 1.04291379f);
 
 		var closeUtilizationNetOfDecayWasteAndBreakageUtil = Utils.utilizationVector();
 

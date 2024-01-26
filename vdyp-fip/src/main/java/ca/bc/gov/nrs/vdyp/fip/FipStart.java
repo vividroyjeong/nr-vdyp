@@ -1024,9 +1024,7 @@ public class FipStart {
 		// Call EMP098 to get Veteran Basal Area, store in LVCOM1/BA array at positions
 		// 0,0 and 0,4
 		var estimatedBaseArea = estimateVeteranBaseArea(height, crownClosure, primaryGenus, region);
-		var baseAreaByUtilization = new Coefficients(
-				new float[] { 0.0f, estimatedBaseArea, 0.0f, 0.0f, 0.0f, estimatedBaseArea }, -1
-		);
+		var baseAreaByUtilization = Utils.utilizationVector(estimatedBaseArea);
 		// Copy over Species entries.
 		// LVCOM/ISPLV=ISPV
 		// LVCOM4/SP0LV=FIPSA/SP0V

@@ -89,16 +89,23 @@ public class Utils {
 		return Collections.unmodifiableMap(map);
 	}
 
+	public static Coefficients heightVector(float small, float all) {
+		return new Coefficients(new float[] { small, all}, -1);
+	}
+
 	public static Coefficients utilizationVector(float small, float all, float u1, float u2, float u3, float u4) {
 		return new Coefficients(new float[] { small, all, u1, u2, u3, u4 }, -1);
 	}
 
 	public static Coefficients utilizationVector(float small, float u1, float u2, float u3, float u4) {
-		return new Coefficients(new float[] { small, u1 + u2 + u3 + u4, u1, u2, u3, u4 }, -1);
+		return utilizationVector( small, u1 + u2 + u3 + u4, u1, u2, u3, u4 );
+	}
+	public static Coefficients utilizationVector(float singleValue) {
+		return utilizationVector( 0f, singleValue, 0f, 0f, singleValue);
 	}
 
 	public static Coefficients utilizationVector() {
-		return new Coefficients(new float[] { 0f, 0f, 0f, 0f, 0f, 0f }, -1);
+		return utilizationVector( 0f);
 	}
 
 }
