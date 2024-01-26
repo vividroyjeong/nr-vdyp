@@ -3,7 +3,6 @@ package ca.bc.gov.nrs.vdyp.io.parse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,10 +13,29 @@ import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Region;
 
 /**
- * Parser for a BEC Definition data file
+ * Parser for a BEC Definition data file. These files contain a list of lines,
+ * each of which defines one BEC Zone: an alias (2 - 4 characters), a space, a
+ * one character region indicator
+ * <ol>
+ * <li>(cols 0-3) BEC Zone alias</li>
+ * <li>(col 5) region ('C' (coastal) or 'I' (interior), or 'Z' (see below)</li>
+ * <li>(cols 7-56) BEC Zone name</li>
+ * </ol>
+ * The file is terminated by a line containing a Z in the region indicator
+ * column. All lines up to that point are parsed - there are no blank lines.
+ * <p>
+ * The "default" BEC Zone is ESSF (Englemann Sruce -SubAlpine Fir (sic)).
+ * <p>
+ * In addition, this parser determines whether each BEC Zone is a growth, decay
+ * or volume BEC Zone. All are growth zones except AT and BG. All are volume
+ * zones except BG. All are decay zones.
+ * <p>
+ * FIP Control index: 009
+ * <p>
+ * Example file: coe/Becdef.dat
  *
  * @author Kevin Smith, Vivid Solutions
- *
+ * @see ControlMapSubResourceParser
  */
 public class BecDefinitionParser implements ControlMapSubResourceParser<BecLookup> {
 
@@ -89,39 +107,6 @@ public class BecDefinitionParser implements ControlMapSubResourceParser<BecLooku
 	 */
 	public static BecLookup getBecs(Map<String, Object> control) {
 		return Utils.expectParsedControl(control, CONTROL_KEY, BecLookup.class);
-	}
-
-	/**
-	 * Get all the BECs in the specified region
-	 *
-	 * @param control Control map containing the parsed BEC definitions.
-	 * @return
-	 */
-	public static Collection<BecDefinition> getBecsByRegion(Map<String, Object> control, Region region) {
-		return getBecs(control).getBecsForRegion(region);
-	}
-
-	/**
-	 * Get all the aliases for defined BECs
-	 *
-	 * @param control Control map containing the parsed BEC definitions.
-	 * @return
-	 */
-	public static Collection<String> getBecAliases(Map<String, Object> control) {
-		return getBecs(control).getBecs().stream().map(BecDefinition::getAlias).toList();
-	}
-
-	/**
-	 * Find a set of BECs for the given scope. If the scope is blank, that's all
-	 * BECs, if it's a Region alias, it's all BECs for that region, otherwise its
-	 * treated as a BEC alias and the BEC matching it is returned.
-	 *
-	 * @param control Control map containing the parsed BEC definitions.
-	 * @param scope   The scope to match
-	 * @return A collection of matching BECs, or the empty set if none match.
-	 */
-	public static Collection<BecDefinition> getBecsByScope(Map<String, Object> control, String scope) {
-		return getBecs(control).getBecsForScope(scope);
 	}
 
 	@Override

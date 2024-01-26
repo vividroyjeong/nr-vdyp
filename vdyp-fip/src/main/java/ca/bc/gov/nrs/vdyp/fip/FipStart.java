@@ -94,7 +94,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayParser;
 import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayWasteParser;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
@@ -224,7 +224,7 @@ public class FipStart {
 	void process() throws ProcessingException {
 		try (
 				var polyStream = this.<FipPolygon>getStreamingParser(FipPolygonParser.CONTROL_KEY);
-				var layerStream = this.<Map<Layer, FipLayer>>getStreamingParser(FipLayerParser.CONTROL_KEY);
+				var layerStream = this.<Map<LayerType, FipLayer>>getStreamingParser(FipLayerParser.CONTROL_KEY);
 				var speciesStream = this.<Collection<FipSpecies>>getStreamingParser(FipSpeciesParser.CONTROL_KEY);
 		) {
 			log.atDebug().setMessage("Start Stand processing").log();
@@ -236,87 +236,12 @@ public class FipStart {
 				// FIP_GET
 				log.atInfo().setMessage("Getting polygon {}").addArgument(polygonsRead + 1).log();
 				var polygon = getPolygon(polyStream, layerStream, speciesStream);
-				VdypPolygon resultPoly;
 				try {
 
-					log.atInfo().setMessage("Read polygon {}, preparing to process")
-							.addArgument(polygon.getPolygonIdentifier()).log();
+					var resultPoly = processPolygon(polygonsRead, polygon);
+					if (resultPoly.isPresent())
+						polygonsRead++;
 
-					// if (MODE .eq. -1) go to 100
-
-					final var mode = polygon.getModeFip().orElse(FipMode.DONT_PROCESS);
-
-					if (mode == FipMode.DONT_PROCESS) {
-						log.atInfo().setMessage("Skipping polygon with mode {}").addArgument(mode).log();
-						continue;
-					}
-
-					// IP_IN = IP_IN+1
-					// if (IP_IN .gt. MAXPOLY) go to 200
-
-					polygonsRead++; // Don't count polygons we aren't processing due to mode. This was the behavior
-					// in VDYP7
-
-					// IPASS = 1
-					// CALL FIP_CHK( IPASS, IER)
-					// if (ier .gt. 0) go to 1000
-					//
-					// if (IPASS .le. 0) GO TO 120
-
-					log.atInfo().setMessage("Checking validity of polygon {}:{}").addArgument(polygonsRead)
-							.addArgument(polygon.getPolygonIdentifier()).log();
-					checkPolygon(polygon);
-
-					// CALL FIPCALCV( BAV, IER)
-					// CALL FIPCALC1( BAV, BA_TOTL1, IER)
-
-					Map<Layer, VdypLayer> processedLayers = new EnumMap<>(Layer.class);
-
-					var fipLayers = polygon.getLayers();
-					var fipVetLayer = Optional.ofNullable(fipLayers.get(Layer.VETERAN));
-					Optional<VdypLayer> resultVetLayer;
-					if (fipVetLayer.isPresent()) {
-						resultVetLayer = Optional.of(processLayerAsVeteran(polygon, fipVetLayer.get()));
-					} else {
-						resultVetLayer = Optional.empty();
-					}
-					resultVetLayer.ifPresent(layer -> processedLayers.put(Layer.VETERAN, layer));
-
-					FipLayerPrimary fipPrimeLayer = (FipLayerPrimary) fipLayers.get(Layer.PRIMARY);
-					assert fipPrimeLayer != null;
-					var resultPrimeLayer = processLayerAsPrimary(
-							polygon, fipPrimeLayer,
-							resultVetLayer.map(VdypLayer::getBaseAreaByUtilization).map(coe -> coe.get(UTIL_ALL))
-									.orElse(0f)
-					);
-					processedLayers.put(Layer.PRIMARY, resultPrimeLayer);
-
-					resultPoly = createVdypPolygon(polygon, processedLayers);
-
-					float baseAreaTotalPrime = resultPrimeLayer.getBaseAreaByUtilization().getCoe(UTIL_ALL); // BA_TOTL1
-
-					// if (FIPPASS(6) .eq. 0 .or. FIPPASS(6) .eq. 2) then
-					if (true /* TODO */) {
-						@SuppressWarnings("unchecked")
-						var minima = (Map<String, Float>) controlMap.get(FipControlParser.MINIMA);
-						float minimumBaseArea = minima.get(FipControlParser.MINIMUM_BASE_AREA);
-						float minimumPredictedBaseArea = minima.get(FipControlParser.MINIMUM_PREDICTED_BASE_AREA);
-						if (baseAreaTotalPrime < minimumBaseArea) {
-							throw new LowValueException("Base area", baseAreaTotalPrime, minimumBaseArea);
-						}
-						float predictedBaseArea = baseAreaTotalPrime * (100f / resultPoly.getPercentAvailable());
-						if (predictedBaseArea < minimumPredictedBaseArea) {
-							throw new LowValueException(
-									"Predicted base area", predictedBaseArea, minimumPredictedBaseArea
-							);
-						}
-					}
-					BecDefinition bec = BecDefinitionParser.getBecs(controlMap).get(polygon.getBiogeoclimaticZone())
-							.orElseThrow(
-									() -> new ProcessingException("Missing Bec " + polygon.getBiogeoclimaticZone())
-							);
-					// FIPSTK
-					adjustForStocking(resultPoly.getLayers().get(Layer.PRIMARY), fipPrimeLayer, bec);
 				} catch (StandProcessingException ex) {
 					// TODO include some sort of hook for different forms of user output
 					// TODO Implement single stand mode that propagates the exception
@@ -329,6 +254,82 @@ public class FipStart {
 		} catch (IOException | ResourceParseException ex) {
 			throw new ProcessingException("Error while reading or writing data.", ex);
 		}
+	}
+
+	Optional<VdypPolygon> processPolygon(int polygonsRead, FipPolygon polygon)
+			throws ProcessingException, LowValueException {
+		VdypPolygon resultPoly;
+		log.atInfo().setMessage("Read polygon {}, preparing to process").addArgument(polygon.getPolygonIdentifier())
+				.log();
+
+		// if (MODE .eq. -1) go to 100
+
+		final var mode = polygon.getModeFip().orElse(FipMode.DONT_PROCESS);
+
+		if (mode == FipMode.DONT_PROCESS) {
+			log.atInfo().setMessage("Skipping polygon with mode {}").addArgument(mode).log();
+			return Optional.empty();
+		}
+
+		// IP_IN = IP_IN+1
+		// if (IP_IN .gt. MAXPOLY) go to 200
+
+		// IPASS = 1
+		// CALL FIP_CHK( IPASS, IER)
+		// if (ier .gt. 0) go to 1000
+		//
+		// if (IPASS .le. 0) GO TO 120
+
+		log.atInfo().setMessage("Checking validity of polygon {}:{}").addArgument(polygonsRead)
+				.addArgument(polygon.getPolygonIdentifier()).log();
+		checkPolygon(polygon);
+
+		// CALL FIPCALCV( BAV, IER)
+		// CALL FIPCALC1( BAV, BA_TOTL1, IER)
+
+		Map<LayerType, VdypLayer> processedLayers = new EnumMap<>(LayerType.class);
+
+		var fipLayers = polygon.getLayers();
+		var fipVetLayer = Optional.ofNullable(fipLayers.get(LayerType.VETERAN));
+		Optional<VdypLayer> resultVetLayer;
+		if (fipVetLayer.isPresent()) {
+			resultVetLayer = Optional.of(processLayerAsVeteran(polygon, fipVetLayer.get()));
+		} else {
+			resultVetLayer = Optional.empty();
+		}
+		resultVetLayer.ifPresent(layer -> processedLayers.put(LayerType.VETERAN, layer));
+
+		FipLayerPrimary fipPrimeLayer = (FipLayerPrimary) fipLayers.get(LayerType.PRIMARY);
+		assert fipPrimeLayer != null;
+		var resultPrimeLayer = processLayerAsPrimary(
+				polygon, fipPrimeLayer,
+				resultVetLayer.map(VdypLayer::getBaseAreaByUtilization).map(coe -> coe.get(UTIL_ALL)).orElse(0f)
+		);
+		processedLayers.put(LayerType.PRIMARY, resultPrimeLayer);
+
+		resultPoly = createVdypPolygon(polygon, processedLayers);
+
+		float baseAreaTotalPrime = resultPrimeLayer.getBaseAreaByUtilization().getCoe(UTIL_ALL); // BA_TOTL1
+
+		// if (FIPPASS(6) .eq. 0 .or. FIPPASS(6) .eq. 2) then
+		if (true /* TODO */) {
+			@SuppressWarnings("unchecked")
+			var minima = (Map<String, Float>) controlMap.get(FipControlParser.MINIMA);
+			float minimumBaseArea = minima.get(FipControlParser.MINIMUM_BASE_AREA);
+			float minimumPredictedBaseArea = minima.get(FipControlParser.MINIMUM_PREDICTED_BASE_AREA);
+			if (baseAreaTotalPrime < minimumBaseArea) {
+				throw new LowValueException("Base area", baseAreaTotalPrime, minimumBaseArea);
+			}
+			float predictedBaseArea = baseAreaTotalPrime * (100f / resultPoly.getPercentAvailable());
+			if (predictedBaseArea < minimumPredictedBaseArea) {
+				throw new LowValueException("Predicted base area", predictedBaseArea, minimumPredictedBaseArea);
+			}
+		}
+		BecDefinition bec = BecDefinitionParser.getBecs(controlMap).get(polygon.getBiogeoclimaticZone())
+				.orElseThrow(() -> new ProcessingException("Missing Bec " + polygon.getBiogeoclimaticZone()));
+		// FIPSTK
+		adjustForStocking(resultPoly.getLayers().get(LayerType.PRIMARY), fipPrimeLayer, bec);
+		return Optional.of(resultPoly);
 	}
 
 	// FIPSTK
@@ -357,14 +358,17 @@ public class FipStart {
 		);
 	}
 
-	VdypPolygon createVdypPolygon(FipPolygon fipPolygon, Map<Layer, VdypLayer> processedLayers)
+	VdypPolygon createVdypPolygon(FipPolygon fipPolygon, Map<LayerType, VdypLayer> processedLayers)
 			throws ProcessingException {
-		var fipVetLayer = fipPolygon.getLayers().get(Layer.VETERAN);
-		var fipPrimaryLayer = (FipLayerPrimary) fipPolygon.getLayers().get(Layer.PRIMARY);
+		var fipVetLayer = fipPolygon.getLayers().get(LayerType.VETERAN);
+		var fipPrimaryLayer = (FipLayerPrimary) fipPolygon.getLayers().get(LayerType.PRIMARY);
 
 		float percentAvailable = estimatePercentForestLand(fipPolygon, fipVetLayer, fipPrimaryLayer);
 
-		var vdypPolygon = new VdypPolygon(fipPolygon.getPolygonIdentifier(), percentAvailable);
+		var vdypPolygon = VdypPolygon.build(builder -> {
+			builder.polygonIdentifier(fipPolygon.getPolygonIdentifier());
+			builder.percentAvailable(percentAvailable);
+		});
 		vdypPolygon.setLayers(processedLayers);
 		return vdypPolygon;
 	}
@@ -461,11 +465,9 @@ public class FipStart {
 				() -> new IllegalStateException("Could not find BEC " + fipPolygon.getBiogeoclimaticZone())
 		);
 
-		var result = new VdypLayer(fipLayer.getPolygonIdentifier(), fipLayer.getLayer());
+		var result = VdypLayer.build(builder -> builder.copy(fipLayer));
 
-		result.setAgeTotal(fipLayer.getAgeTotal());
 		result.setYearsToBreastHeight(fipLayer.getYearsToBreastHeight());
-		result.setBreastHeightAge(fipLayer.getAgeTotal() - fipLayer.getYearsToBreastHeight());
 		result.setHeight(fipLayer.getHeight());
 
 		// EMP040
@@ -505,9 +507,9 @@ public class FipStart {
 		Map<String, Float> targetPercentages = new HashMap<>(vdypSpecies.size());
 
 		for (var vSpec : vdypSpecies.values()) {
-			var volumeGroup = getGroup(fipPolygon, volumeGroupMap, vSpec);
-			var decayGroup = getGroup(fipPolygon, decayGroupMap, vSpec);
-			var breakageGroup = getGroup(fipPolygon, breakageGroupMap, vSpec);
+			var volumeGroup = getGroup(fipPolygon, volumeGroupMap, vSpec.getGenus());
+			var decayGroup = getGroup(fipPolygon, decayGroupMap, vSpec.getGenus());
+			var breakageGroup = getGroup(fipPolygon, breakageGroupMap, vSpec.getGenus());
 
 			vSpec.setVolumeGroup(volumeGroup);
 			vSpec.setDecayGroup(decayGroup);
@@ -605,7 +607,9 @@ public class FipStart {
 
 				Coefficients limitCoe = getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
 
-				final float maxHeightMultiplier = fipLayer.getPrimaryGenus().equals(spec.getGenus()) ? 1.5f : 1.0f;
+				final float maxHeightMultiplier = fipLayer.getPrimaryGenus()
+						.orElseThrow(() -> new IllegalStateException("primaryGenus has not been set"))
+						.equals(spec.getGenus()) ? 1.5f : 1.0f;
 				final float heightMax = limitCoe.getCoe(1) * maxHeightMultiplier;
 
 				spec.getLoreyHeightByUtilization().scalarInPlace(UTIL_ALL, x -> min(x, heightMax));
@@ -986,13 +990,13 @@ public class FipStart {
 
 		var polygonIdentifier = fipLayer.getPolygonIdentifier();
 
-		assert fipLayer.getLayer().equals(Layer.VETERAN) : "Layer must be VETERAN";
+		assert fipLayer.getLayer().equals(LayerType.VETERAN) : "Layer must be VETERAN";
 		assert fipPolygon.getPolygonIdentifier().equals(fipLayer.getPolygonIdentifier()) : String.format(
 				"Polygon polygonIdentifier '%s' doesn't match that of layer '%s'", fipPolygon.getPolygonIdentifier(),
 				fipLayer.getPolygonIdentifier()
 		);
 
-		var layer = Layer.VETERAN;
+		var layer = LayerType.VETERAN;
 
 		// find Primary genus (highest percentage) ISPPVET
 
@@ -1007,9 +1011,6 @@ public class FipStart {
 		// yearsToBreastHeight copy, minimum 6.0, LVCOM3/YTBHLV copied from
 		// FIPL_V/YTBH_L
 		var yearsToBreastHeight = Math.max(fipLayer.getYearsToBreastHeight(), 6.0f);
-
-		// breastHeightAge LVCOM3/AGEBHLV ageTotal-yearsToBreastHeight
-		var breastHeightAge = ageTotal - yearsToBreastHeight;
 
 		// height? copy LVCOM3/HDLV = FIPL_V/HT_LV
 		var height = fipLayer.getHeight();
@@ -1047,9 +1048,9 @@ public class FipStart {
 		var decayGroupMap = getGroupMap(DecayEquationGroupParser.CONTROL_KEY);
 		var breakageGroupMap = getGroupMap(BreakageEquationGroupParser.CONTROL_KEY);
 		for (var vSpec : vdypSpecies.values()) {
-			var volumeGroup = getGroup(fipPolygon, volumeGroupMap, vSpec);
-			var decayGroup = getGroup(fipPolygon, decayGroupMap, vSpec);
-			var breakageGroup = getGroup(fipPolygon, breakageGroupMap, vSpec);
+			var volumeGroup = getGroup(fipPolygon, volumeGroupMap, vSpec.getGenus());
+			var decayGroup = getGroup(fipPolygon, decayGroupMap, vSpec.getGenus());
+			var breakageGroup = getGroup(fipPolygon, breakageGroupMap, vSpec.getGenus());
 
 			vSpec.setVolumeGroup(volumeGroup);
 			vSpec.setDecayGroup(decayGroup);
@@ -1086,13 +1087,15 @@ public class FipStart {
 					.setCoe(UTIL_LARGEST, treesPerHectare(vSpec.getBaseAreaByUtilization().getCoe(UTIL_LARGEST), dq));
 		}
 
-		var vdypLayer = new VdypLayer(polygonIdentifier, layer);
-		vdypLayer.setAgeTotal(ageTotal);
-		vdypLayer.setHeight(height);
-		vdypLayer.setYearsToBreastHeight(yearsToBreastHeight);
-		vdypLayer.setBreastHeightAge(breastHeightAge);
-		vdypLayer.setSpecies(vdypSpecies);
-		// vdypLayer.setPrimaryGenus(primaryGenus);
+		var vdypLayer = VdypLayer.build(builder -> {
+			builder.polygonIdentifier(polygonIdentifier);
+			builder.layerType(layer);
+			builder.ageTotal(ageTotal);
+			builder.yearsToBreastHeight(yearsToBreastHeight);
+			builder.height(height);
+
+			builder.addSpecies(vdypSpecies.values());
+		});
 		vdypLayer.setBaseAreaByUtilization(baseAreaByUtilization);
 
 		computeUtilizationComponentsVeteran(vdypLayer, bec);
@@ -2524,8 +2527,8 @@ public class FipStart {
 		return k;
 	}
 
-	int getGroup(FipPolygon fipPolygon, MatrixMap2<String, String, Integer> volumeGroupMap, VdypSpecies vSpec) {
-		return volumeGroupMap.get(vSpec.getGenus(), fipPolygon.getBiogeoclimaticZone());
+	int getGroup(FipPolygon fipPolygon, MatrixMap2<String, String, Integer> volumeGroupMap, String genus) {
+		return volumeGroupMap.get(genus, fipPolygon.getBiogeoclimaticZone());
 	}
 
 	MatrixMap2<String, String, Integer> getGroupMap(String key) {
@@ -2534,7 +2537,7 @@ public class FipStart {
 
 	// FIP_GET
 	private FipPolygon getPolygon(
-			StreamingParser<FipPolygon> polyStream, StreamingParser<Map<Layer, FipLayer>> layerStream,
+			StreamingParser<FipPolygon> polyStream, StreamingParser<Map<LayerType, FipLayer>> layerStream,
 			StreamingParser<Collection<FipSpecies>> speciesStream
 	) throws ProcessingException, IOException, ResourceParseException {
 
@@ -2542,7 +2545,7 @@ public class FipStart {
 		var polygon = polyStream.next();
 
 		log.trace("Getting layers for polygon {}", polygon.getPolygonIdentifier());
-		Map<Layer, FipLayer> layers;
+		Map<LayerType, FipLayer> layers;
 		try {
 			layers = layerStream.next();
 		} catch (NoSuchElementException ex) {
@@ -2558,7 +2561,7 @@ public class FipStart {
 		}
 
 		// Validate that layers belong to the correct polygon
-		for (FipLayer layer : layers.values()) {
+		for (var layer : layers.values()) {
 			if (!layer.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
 				throw validationError(
 						"Record in layer file contains layer for polygon %s when expecting one for %s.",
@@ -2591,8 +2594,9 @@ public class FipStart {
 		return polygon;
 	}
 
-	private Optional<Float> heightMinimum(Layer layer) {
-		var minima = Utils.<Map<String, Float>>expectParsedControl(controlMap, FipControlParser.MINIMA, Map.class);
+	private Optional<Float> heightMinimum(LayerType layer) {
+		@SuppressWarnings("unchecked")
+		var minima = (Map<String, Float>) controlMap.get(FipControlParser.MINIMA);
 		switch (layer) {
 		case PRIMARY:
 			return Optional.of(minima.get(FipControlParser.MINIMUM_HEIGHT));
@@ -2612,14 +2616,14 @@ public class FipStart {
 		// TODO finding all the things that are wrong rather than failing on just the
 		// first would be a good idea.
 
-		if (!polygon.getLayers().containsKey(Layer.PRIMARY)) {
+		if (!polygon.getLayers().containsKey(LayerType.PRIMARY)) {
 			throw validationError(
 					"Polygon %s has no %s layer, or that layer has non-positive height or crown closure.",
-					polygon.getPolygonIdentifier(), Layer.PRIMARY
+					polygon.getPolygonIdentifier(), LayerType.PRIMARY
 			);
 		}
 
-		var primaryLayer = (FipLayerPrimary) polygon.getLayers().get(Layer.PRIMARY);
+		var primaryLayer = (FipLayerPrimary) polygon.getLayers().get(LayerType.PRIMARY);
 
 		// FIXME VDYP7 actually tests if total age - YTBH is less than 0.5 but gives an
 		// error that total age is "less than" YTBH. Replicating that for now but
@@ -2628,7 +2632,7 @@ public class FipStart {
 		if (primaryLayer.getAgeTotal() - primaryLayer.getYearsToBreastHeight() < 0.5f) {
 			throw validationError(
 					"Polygon %s has %s layer where total age is less than YTBH.", polygon.getPolygonIdentifier(),
-					Layer.PRIMARY
+					LayerType.PRIMARY
 			);
 		}
 
@@ -2660,14 +2664,14 @@ public class FipStart {
 		if (primaryLayer.getYearsToBreastHeight() < 0.5) {
 			throw validationError(
 					"Polygon %s has %s layer where years to breast height %.1f is less than minimum %.1f years.",
-					polygon.getPolygonIdentifier(), Layer.PRIMARY, primaryLayer.getYearsToBreastHeight(), 0.5f
+					polygon.getPolygonIdentifier(), LayerType.PRIMARY, primaryLayer.getYearsToBreastHeight(), 0.5f
 			);
 		}
 
 		if (primaryLayer.getSiteIndex() < 0.5) {
 			throw validationError(
 					"Polygon %s has %s layer where site index %.1f is less than minimum %.1f years.",
-					polygon.getPolygonIdentifier(), Layer.PRIMARY, primaryLayer.getSiteIndex(), 0.5f
+					polygon.getPolygonIdentifier(), LayerType.PRIMARY, primaryLayer.getSiteIndex(), 0.5f
 			);
 		}
 
@@ -2678,12 +2682,12 @@ public class FipStart {
 			if (Math.abs(percentTotal - 100f) > 0.01f) {
 				throw validationError(
 						"Polygon %s has %s layer where species entries have a percentage total that does not sum to 100%%.",
-						polygon.getPolygonIdentifier(), Layer.PRIMARY
+						polygon.getPolygonIdentifier(), LayerType.PRIMARY
 				);
 			}
 			// VDYP7 performs this step which should be negligible but might have a small
 			// impact due to the 0.01 percent variation and floating point errors.
-			if (layer.getLayer() == Layer.PRIMARY) {
+			if (layer.getLayer() == LayerType.PRIMARY) {
 				layer.getSpecies().values()
 						.forEach(species -> species.setFractionGenus(species.getPercentGenus() / percentTotal));
 			}

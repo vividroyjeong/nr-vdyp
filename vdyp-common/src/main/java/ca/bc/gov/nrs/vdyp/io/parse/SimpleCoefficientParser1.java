@@ -14,8 +14,6 @@ public class SimpleCoefficientParser1<K1> implements ControlMapSubResourceParser
 
 	private int indexFrom;
 
-	Class<K1> keyClass;
-
 	private BaseCoefficientParser<Coefficients, Coefficients, MatrixMap<Coefficients>> delegate = new BaseCoefficientParser<Coefficients, Coefficients, MatrixMap<Coefficients>>(
 			1, "DUMMY"
 	) {
@@ -40,8 +38,6 @@ public class SimpleCoefficientParser1<K1> implements ControlMapSubResourceParser
 	private String controlKey;
 
 	public SimpleCoefficientParser1(Class<K1> keyClass, int indexFrom, String controlKey) {
-		super();
-		this.keyClass = keyClass;
 		this.indexFrom = indexFrom;
 		this.controlKey = controlKey;
 	}

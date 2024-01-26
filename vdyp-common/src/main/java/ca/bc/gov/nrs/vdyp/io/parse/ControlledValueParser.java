@@ -113,7 +113,7 @@ public interface ControlledValueParser<T> {
 	 */
 	static final ControlledValueParser<String> BEC = (string, control) -> {
 		var result = string.strip();
-		if (!BecDefinitionParser.getBecAliases(control).contains(result)) {
+		if (!BecDefinitionParser.getBecs(control).getBecAliases().contains(result)) {
 			throw new ValueParseException(string, string + " is not a valid BEC");
 		}
 		return result;

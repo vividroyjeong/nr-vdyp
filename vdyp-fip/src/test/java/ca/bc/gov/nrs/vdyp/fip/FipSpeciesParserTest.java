@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 public class FipSpeciesParserTest {
@@ -87,7 +87,7 @@ public class FipSpeciesParserTest {
 				containsInAnyOrder(
 						allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
-								hasProperty("layer", is(Layer.PRIMARY)), hasProperty("genus", is("B")),
+								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
 						)
@@ -134,13 +134,13 @@ public class FipSpeciesParserTest {
 				containsInAnyOrder(
 						allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
-								hasProperty("layer", is(Layer.PRIMARY)), hasProperty("genus", is("B")),
+								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(75.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
 						),
 						allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
-								hasProperty("layer", is(Layer.PRIMARY)), hasProperty("genus", is("C")),
+								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("genus", is("C")),
 								hasProperty("percentGenus", is(25.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("C", is(100.0f))))
 						)
@@ -188,13 +188,13 @@ public class FipSpeciesParserTest {
 				containsInAnyOrder(
 						allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
-								hasProperty("layer", is(Layer.PRIMARY)), hasProperty("genus", is("B")),
+								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
 						),
 						allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
-								hasProperty("layer", is(Layer.VETERAN)), hasProperty("genus", is("B")),
+								hasProperty("layer", is(LayerType.VETERAN)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
 						)
@@ -242,7 +242,7 @@ public class FipSpeciesParserTest {
 				containsInAnyOrder(
 						allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
-								hasProperty("layer", is(Layer.PRIMARY)), hasProperty("genus", is("B")),
+								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
 						)
@@ -256,7 +256,7 @@ public class FipSpeciesParserTest {
 				containsInAnyOrder(
 						allOf(
 								hasProperty("polygonIdentifier", is("01002 S000002 00     1970")),
-								hasProperty("layer", is(Layer.PRIMARY)), hasProperty("genus", is("B")),
+								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
 						)
@@ -302,7 +302,7 @@ public class FipSpeciesParserTest {
 				containsInAnyOrder(
 						allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
-								hasProperty("layer", is(Layer.PRIMARY)), hasProperty("genus", is("B")),
+								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty(
 										"speciesPercent",

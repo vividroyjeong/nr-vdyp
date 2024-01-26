@@ -14,6 +14,10 @@ import javax.annotation.Nullable;
  */
 public class LazyValue<T> implements Supplier<T> {
 
+	public LazyValue(Supplier<T> compute) {
+		this.compute = compute;
+	}
+
 	@Nullable
 	private T value = null;
 
@@ -31,7 +35,4 @@ public class LazyValue<T> implements Supplier<T> {
 		return value;
 	}
 
-	public LazyValue(Supplier<T> compute) {
-		this.compute = compute;
-	}
 }

@@ -1,23 +1,30 @@
 package ca.bc.gov.nrs.vdyp.model;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 public class VdypSpecies extends BaseVdypSpecies implements VdypUtilizationHolder {
 
-	Coefficients baseAreaByUtilization = new Coefficients(Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1); // LVCOM/BA
-	Coefficients loreyHeightByUtilization = new Coefficients(Arrays.asList(0f, 0f), -1); // LVCOM/HL
-	Coefficients quadraticMeanDiameterByUtilization = new Coefficients(Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1); // LVCOM/DQ
-	Coefficients treesPerHectareByUtilization = new Coefficients(Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1); // LVCOM/TPH
+	private Coefficients baseAreaByUtilization = new Coefficients(Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1); // LVCOM/BA
+	private Coefficients loreyHeightByUtilization = new Coefficients(Arrays.asList(0f, 0f), -1); // LVCOM/HL
+	private Coefficients quadraticMeanDiameterByUtilization = new Coefficients(
+			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1
+	); // LVCOM/DQ
+	private Coefficients treesPerHectareByUtilization = new Coefficients(Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1); // LVCOM/TPH
 
-	Coefficients wholeStemVolumeByUtilization = new Coefficients(Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1); // LVCOM/VOLWS
-	Coefficients closeUtilizationVolumeByUtilization = new Coefficients(Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1); // LVCOM/VOLCU
-	Coefficients closeUtilizationNetVolumeOfDecayByUtilization = new Coefficients(
+	private Coefficients wholeStemVolumeByUtilization = new Coefficients(Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1); // LVCOM/VOLWS
+	private Coefficients closeUtilizationVolumeByUtilization = new Coefficients(
+			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1
+	); // LVCOM/VOLCU
+	private Coefficients closeUtilizationNetVolumeOfDecayByUtilization = new Coefficients(
 			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1
 	); // LVCOM/VOL_D
-	Coefficients closeUtilizationVolumeNetOfDecayAndWasteByUtilization = new Coefficients(
+	private Coefficients closeUtilizationVolumeNetOfDecayAndWasteByUtilization = new Coefficients(
 			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1
 	); // LVCOM/VOL_DW
-	Coefficients closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = new Coefficients(
+	private Coefficients closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = new Coefficients(
 			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1
 	); // LVCOM/VOL_DWB
 
@@ -25,8 +32,15 @@ public class VdypSpecies extends BaseVdypSpecies implements VdypUtilizationHolde
 	int decayGroup;
 	int breakageGroup;
 
-	public VdypSpecies(String polygonIdentifier, Layer layer, String genus) {
-		super(polygonIdentifier, layer, genus);
+	public VdypSpecies(
+			String polygonIdentifier, LayerType layer, String genus, float percentGenus, //
+			int volumeGroup, int decayGroup, int breakageGroup
+	) {
+		super(polygonIdentifier, layer, genus, percentGenus);
+		this.volumeGroup = volumeGroup;
+		this.decayGroup = decayGroup;
+		this.breakageGroup = breakageGroup;
+
 	}
 
 	public VdypSpecies(BaseVdypSpecies toCopy) {
@@ -165,4 +179,86 @@ public class VdypSpecies extends BaseVdypSpecies implements VdypUtilizationHolde
 		this.closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization;
 	}
 
+	/**
+	 * Accepts a configuration function that accepts a builder to configure.
+	 *
+	 * <pre>
+	 * FipSpecies myLayer = FipSpecies.build(builder-&gt; {
+			builder.polygonIdentifier(polygonId);
+			builder.layerType(LayerType.VETERAN);
+			builder.genus("B");
+			builder.percentGenus(6f);
+	 * })
+	 * </pre>
+	 *
+	 * @param config The configuration function
+	 * @return The object built by the configured builder.
+	 * @throws IllegalStateException if any required properties have not been set by
+	 *                               the configuration function.
+	 */
+	public static VdypSpecies build(Consumer<Builder> config) {
+		var builder = new Builder();
+		config.accept(builder);
+		return builder.build();
+	}
+
+	/**
+	 * Builds a species and adds it to the layer.
+	 *
+	 * @param layer  Layer to create the species for.
+	 * @param config Configuration function for the builder.
+	 * @return the new species.
+	 */
+	public static VdypSpecies build(VdypLayer layer, Consumer<Builder> config) {
+		var result = build(builder -> {
+			builder.polygonIdentifier(layer.getPolygonIdentifier());
+			builder.layerType(layer.getLayer());
+
+			config.accept(builder);
+		});
+		layer.getSpecies().put(result.getGenus(), result);
+		return result;
+	}
+
+	public static class Builder extends BaseVdypSpecies.Builder<VdypSpecies> {
+		Optional<Integer> volumeGroup = Optional.empty();
+		Optional<Integer> decayGroup = Optional.empty();
+		Optional<Integer> breakageGroup = Optional.empty();
+
+		@Override
+		protected void check(Collection<String> errors) {
+			super.check(errors);
+			requirePresent(volumeGroup, "volumeGroup", errors);
+			requirePresent(decayGroup, "decayGroup", errors);
+			requirePresent(breakageGroup, "breakageGroup", errors);
+		}
+
+		@Override
+		protected VdypSpecies doBuild() {
+			return new VdypSpecies(
+					polygonIdentifier.get(), //
+					layer.get(), //
+					genus.get(), //
+					percentGenus.get(), //
+					volumeGroup.get(), //
+					decayGroup.get(), //
+					breakageGroup.get() //
+			);
+		}
+
+		public Builder volumeGroup(int i) {
+			this.volumeGroup = Optional.of(i);
+			return this;
+		}
+
+		public Builder decayGroup(int i) {
+			this.decayGroup = Optional.of(i);
+			return this;
+		}
+
+		public Builder breakageGroup(int i) {
+			this.breakageGroup = Optional.of(i);
+			return this;
+		}
+	}
 }

@@ -30,10 +30,10 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 	public static final String UC_INDEX = "ucIndex";
 	public static final String GROUP_INDEX = "groupIndex";
 
-	int numCoefficients;
+	private int numCoefficients;
 
-	List<String> metaKeys = new ArrayList<>();
-	List<Function<Map<String, Object>, Collection<?>>> keyRanges = new ArrayList<>();
+	private List<String> metaKeys = new ArrayList<>();
+	private List<Function<Map<String, Object>, Collection<?>>> keyRanges = new ArrayList<>();
 	private int expectedKeys;
 	private final String controlKey;
 

@@ -5,15 +5,24 @@ import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.equalTo;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.model.BecDefinition;
+import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Region;
+import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 class BecDefinitionParserTest {
 
@@ -21,7 +30,7 @@ class BecDefinitionParserTest {
 	void testParse() throws Exception {
 		var parser = new BecDefinitionParser();
 
-		var result = parser.parse(ControlFileParserTest.class, "coe/Becdef.dat", Collections.emptyMap());
+		var result = parser.parse(BecDefinitionParserTest.class, "coe/Becdef.dat", Collections.emptyMap());
 
 		assertThat(
 				result,
@@ -247,6 +256,15 @@ class BecDefinitionParserTest {
 		assertThat(result.get("SWB").get().getGrowthBec(), sameInstance(result.get("SWB").get()));
 		assertThat(result.get("SWB").get().getDecayBec(), sameInstance(result.get("SWB").get()));
 		assertThat(result.get("SWB").get().getVolumeBec(), sameInstance(result.get("SWB").get()));
+	}
+
+	@Test
+	void testParseNoDefault() throws Exception {
+		var parser = new BecDefinitionParser();
+		try (var is = TestUtils.makeStream("")) {
+			var ex = assertThrows(IllegalStateException.class, () -> parser.parse(is, Collections.emptyMap()));
+			assertThat(ex, hasProperty("message", Matchers.is("Could not find default BEC ESSF")));
+		}
 	}
 
 }

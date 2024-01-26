@@ -78,10 +78,13 @@ public class BecLookup {
 	}
 
 	/**
-	 * Get all becs for a scope
+	 * Find a set of BECs for the given scope. If the scope is blank, that's all
+	 * BECs, if it's a Region alias, it's all BECs for that region, otherwise its
+	 * treated as a BEC alias and the BEC matching it is returned.
 	 *
-	 * @param scope Scope to search for
-	 * @return
+	 * @param scope The scope to match
+	 * @return A collection of matching BECs, or the empty set if none match.
+	 *
 	 */
 	public Collection<BecDefinition> getBecsForScope(String scope) {
 		if (scope.isBlank()) {
@@ -89,6 +92,16 @@ public class BecLookup {
 		}
 		return Region.fromAlias(scope).map(region -> this.getBecsForRegion(region))
 				.orElseGet(() -> this.get(scope).map(Collections::singletonList).orElseGet(Collections::emptyList));
+	}
+
+	/**
+	 * Get all the aliases for defined BECs
+	 *
+	 * @param control Control map containing the parsed BEC definitions.
+	 * @return
+	 */
+	public Collection<String> getBecAliases() {
+		return getBecs().stream().map(BecDefinition::getAlias).toList();
 	}
 
 }

@@ -31,6 +31,16 @@ public class Utils {
 		return Collections.singleton(value);
 	}
 
+	/**
+	 * Get an entry from a control map that is expected to exist.
+	 *
+	 * @param control The control map
+	 * @param key     Key for the entry in the control map
+	 * @param clazz   Expected type for the entry
+	 * @throws IllegalStateException if the control map does not have the requested
+	 *                               entry or it is the wrong type.
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public static <U> U expectParsedControl(Map<String, Object> control, String key, Class<? super U> clazz) {
 		var value = control.get(key);

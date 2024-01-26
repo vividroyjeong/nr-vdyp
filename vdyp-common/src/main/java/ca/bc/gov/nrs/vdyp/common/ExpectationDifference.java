@@ -12,8 +12,8 @@ import java.util.Set;
  * @param <T>
  */
 public class ExpectationDifference<T> {
-	final Set<T> missing;
-	final Set<T> unexpected;
+	private final Set<T> missing;
+	private final Set<T> unexpected;
 
 	public ExpectationDifference(Set<T> missing, Set<T> unexpected) {
 		super();

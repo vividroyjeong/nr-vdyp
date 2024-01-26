@@ -53,18 +53,20 @@ public class FipPolygonParser implements ControlMapValueReplacer<StreamingParser
 					var polygonId = (String) entry.get(POLYGON_IDENTIFIER);
 					var fizId = (String) entry.get(FOREST_INVENTORY_ZONE);
 					var becId = (String) entry.get(BIOGEOGRAPHIC_ZONE);
-					var percentForestLand = (Optional<Float>) entry.get(PERCENT_FOREST_LAND);
+					var percentForestLand = ((Optional<Float>) entry.get(PERCENT_FOREST_LAND)).filter(x -> x > 0.0f);
 					var fipMode = (Optional<Integer>) entry.get(FIP_MODE);
 					var nonproductiveDesc = (Optional<String>) entry.get(NONPRODUCTIVE_DESCRIPTION);
-					var yieldFactor = (Optional<Float>) entry.get(YIELD_FACTOR);
+					var yieldFactor = ((Optional<Float>) entry.get(YIELD_FACTOR)).filter(x -> x > 0.0f);
 
-					percentForestLand = percentForestLand.filter(x -> x > 0.0f);
-					yieldFactor = yieldFactor.filter(x -> x > 0.0f);
-
-					return new FipPolygon(
-							polygonId, fizId, becId, percentForestLand, fipMode.flatMap(FipMode::getByCode),
-							nonproductiveDesc, yieldFactor.orElse(1.0f)
-					);
+					return FipPolygon.build(builder -> {
+						builder.polygonIdentifier(polygonId);
+						builder.forestInventoryZone(fizId);
+						builder.biogeoclimaticZone(becId);
+						builder.percentAvailable(percentForestLand);
+						builder.modeFip(fipMode.flatMap(FipMode::getByCode));
+						builder.nonproductiveDescription(nonproductiveDesc);
+						builder.yieldFactor(yieldFactor.orElse(1.0f));
+					});
 				}
 
 			};

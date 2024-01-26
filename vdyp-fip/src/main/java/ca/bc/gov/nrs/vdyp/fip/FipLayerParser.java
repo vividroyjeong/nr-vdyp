@@ -19,13 +19,13 @@ import ca.bc.gov.nrs.vdyp.io.parse.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.ValueParser;
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 
-public class FipLayerParser implements ControlMapValueReplacer<StreamingParserFactory<Map<Layer, FipLayer>>, String> {
+public class FipLayerParser
+		implements ControlMapValueReplacer<StreamingParserFactory<Map<LayerType, FipLayer>>, String> {
 
 	public static final String CONTROL_KEY = "FIP_LAYERS";
 
-	static final String POLYGON_IDENTIFIER = "POLYGON_IDENTIFIER"; // POLYDESC
 	static final String LAYER = "LAYER"; // LAYER
 	static final String AGE_TOTAL = "AGE_TOTAL"; // AGETOT
 	static final String HEIGHT = "HEIGHT"; // HT
@@ -45,12 +45,12 @@ public class FipLayerParser implements ControlMapValueReplacer<StreamingParserFa
 	}
 
 	@Override
-	public StreamingParserFactory<Map<Layer, FipLayer>>
+	public StreamingParserFactory<Map<LayerType, FipLayer>>
 			map(String fileName, FileResolver fileResolver, Map<String, Object> control)
 					throws IOException, ResourceParseException {
 		return () -> {
 			var lineParser = new LineParser() //
-					.strippedString(25, POLYGON_IDENTIFIER).space(1) //
+					.strippedString(25, FipPolygonParser.POLYGON_IDENTIFIER).space(1) //
 					.value(
 							1, LAYER,
 							ValueParser.valueOrMarker(
@@ -79,11 +79,11 @@ public class FipLayerParser implements ControlMapValueReplacer<StreamingParserFa
 					is, lineParser, control
 			) {
 
-				@SuppressWarnings({ "unchecked", "deprecation" })
+				@SuppressWarnings({ "unchecked" })
 				@Override
 				protected ValueOrMarker<Optional<FipLayer>, EndOfRecord> convert(Map<String, Object> entry) {
-					var polygonId = (String) entry.get(POLYGON_IDENTIFIER);
-					var layer = (ValueOrMarker<Optional<Layer>, EndOfRecord>) entry.get(LAYER);
+					var polygonId = (String) entry.get(FipPolygonParser.POLYGON_IDENTIFIER);
+					var layer = (ValueOrMarker<Optional<LayerType>, EndOfRecord>) entry.get(LAYER);
 					var ageTotal = (float) entry.get(AGE_TOTAL);
 					var height = (float) entry.get(HEIGHT);
 					var siteIndex = (float) entry.get(SITE_INDEX);
@@ -93,47 +93,53 @@ public class FipLayerParser implements ControlMapValueReplacer<StreamingParserFa
 					var yearsToBreastHeight = (float) entry.get(YEARS_TO_BREAST_HEIGHT);
 					var stockingClass = (Optional<Character>) entry.get(STOCKING_CLASS);
 					var inventoryTypeGroup = (Optional<Integer>) entry.get(INVENTORY_TYPE_GROUP);
-					var breastHeightAge = (Optional<Float>) entry.get(BREAST_HEIGHT_AGE);
 					var siteCurveNumber = (Optional<Integer>) entry.get(SITE_CURVE_NUMBER);
 
-					var builder = new ValueOrMarker.Builder<Optional<FipLayer>, EndOfRecord>();
+					var vmBuilder = new ValueOrMarker.Builder<Optional<FipLayer>, EndOfRecord>();
 					return layer.handle(l -> {
 						switch (l.orElse(null)) {
 						case PRIMARY:
-							FipLayerPrimary fipLayerPrimary = new FipLayerPrimary(polygonId);
-							fipLayerPrimary.setAgeTotal(ageTotal);
-							fipLayerPrimary.setHeight(height);
-							fipLayerPrimary.setSiteIndex(siteIndex);
-							fipLayerPrimary.setCrownClosure(crownClosure);
-							fipLayerPrimary.setSiteGenus(siteSp0.get());
-							fipLayerPrimary.setSiteSpecies(siteSp64.get());
-							fipLayerPrimary.setYearsToBreastHeight(yearsToBreastHeight);
-							fipLayerPrimary.setStockingClass(stockingClass);
-							fipLayerPrimary.setInventoryTypeGroup(inventoryTypeGroup.orElse(0));
-							fipLayerPrimary.setBreastHeightAge(breastHeightAge);
-							fipLayerPrimary.setSiteCurveNumber(siteCurveNumber);
-							return builder.value(Optional.of(fipLayerPrimary));
+							FipLayerPrimary fipLayerPrimary = FipLayerPrimary.buildPrimary(flBuilder -> {
+								flBuilder.polygonIdentifier(polygonId);
+								flBuilder.ageTotal(ageTotal);
+								flBuilder.yearsToBreastHeight(yearsToBreastHeight);
+								flBuilder.height(height);
+
+								flBuilder.siteIndex(siteIndex);
+								flBuilder.crownClosure(crownClosure);
+								flBuilder.siteGenus(siteSp0.get());
+								flBuilder.siteSpecies(siteSp64.get());
+
+								flBuilder.stockingClass(stockingClass);
+								flBuilder.inventoryTypeGroup(inventoryTypeGroup);
+								flBuilder.siteCurveNumber(siteCurveNumber);
+							});
+							return vmBuilder.value(Optional.of(fipLayerPrimary));
 						case VETERAN:
-							FipLayer fipLayerVeteran = new FipLayer(polygonId, Layer.VETERAN);
-							fipLayerVeteran.setAgeTotal(ageTotal);
-							fipLayerVeteran.setHeight(height);
-							fipLayerVeteran.setSiteIndex(siteIndex);
-							fipLayerVeteran.setCrownClosure(crownClosure);
-							fipLayerVeteran.setSiteGenus(siteSp0.get());
-							fipLayerVeteran.setSiteSpecies(siteSp64.get());
-							fipLayerVeteran.setYearsToBreastHeight(yearsToBreastHeight);
-							fipLayerVeteran.setBreastHeightAge(breastHeightAge);
-							return builder.value(Optional.of(fipLayerVeteran));
+							FipLayer fipLayerVeteran = FipLayer.build(flBuilder -> {
+								flBuilder.polygonIdentifier(polygonId);
+								flBuilder.layerType(LayerType.VETERAN);
+								flBuilder.ageTotal(ageTotal);
+								flBuilder.yearsToBreastHeight(yearsToBreastHeight);
+								flBuilder.height(height);
+
+								flBuilder.siteIndex(siteIndex);
+								flBuilder.crownClosure(crownClosure);
+								flBuilder.siteGenus(siteSp0.get());
+								flBuilder.siteSpecies(siteSp64.get());
+							});
+
+							return vmBuilder.value(Optional.of(fipLayerVeteran));
 
 						default:
-							return builder.value(Optional.empty());
+							return vmBuilder.value(Optional.empty());
 						}
-					}, builder::marker);
+					}, vmBuilder::marker);
 				}
 
 			};
 
-			return new GroupingStreamingParser<Map<Layer, FipLayer>, ValueOrMarker<Optional<FipLayer>, EndOfRecord>>(
+			return new GroupingStreamingParser<Map<LayerType, FipLayer>, ValueOrMarker<Optional<FipLayer>, EndOfRecord>>(
 					delegateStream
 			) {
 
@@ -153,7 +159,8 @@ public class FipLayerParser implements ControlMapValueReplacer<StreamingParserFa
 				}
 
 				@Override
-				protected Map<Layer, FipLayer> convert(List<ValueOrMarker<Optional<FipLayer>, EndOfRecord>> children) {
+				protected Map<LayerType, FipLayer>
+						convert(List<ValueOrMarker<Optional<FipLayer>, EndOfRecord>> children) {
 					return children.stream().map(ValueOrMarker::getValue).map(Optional::get) // Should never be empty as
 							// we've filtered out
 							// markers
