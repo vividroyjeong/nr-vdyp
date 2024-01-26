@@ -28,21 +28,14 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
  * Example file: coe/BASP06.COE
  *
  * @author Michael Junkin, Vivid Solutions
- * @see SimpleCoefficientParser2
+ * @see NonPrimarySpeciesGrowthParser
  */
-public class NonPrimarySpeciesBasalAreaGrowthParser extends SimpleCoefficientParser2<String, Integer> {
+public class NonPrimarySpeciesBasalAreaGrowthParser extends NonPrimarySpeciesGrowthParser {
 	
 	public static final String CONTROL_KEY = "NON_PRIMARY_SP_BA_GROWTH";
 	
-	private static final int MAX_BASAL_AREA_GROUP_ID = 30;
-	
-	private static final String BASAL_AREA_GROUP_ID_KEY = "BasalAreaGroupId";
-
 	public NonPrimarySpeciesBasalAreaGrowthParser()
 	{
-		super(1, CONTROL_KEY);
-			this.speciesKey().key(3, BASAL_AREA_GROUP_ID_KEY, ValueParser.INTEGER
-					, IntStream.rangeClosed(0, MAX_BASAL_AREA_GROUP_ID).boxed().collect(Collectors.toList())
-					, "%s is not a valid basal area group id").coefficients(3, 10);
+		super(CONTROL_KEY);
 	}
 }
