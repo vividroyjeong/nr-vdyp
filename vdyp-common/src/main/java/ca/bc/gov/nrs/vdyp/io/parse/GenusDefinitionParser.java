@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
@@ -60,9 +59,9 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<List<G
 		this.numSp0 = 16;
 	}
 
-	public GenusDefinitionParser(int num_sp0) {
+	public GenusDefinitionParser(int numSp0) {
 		super();
-		this.numSp0 = num_sp0;
+		this.numSp0 = numSp0;
 	}
 
 	@SuppressWarnings("unchecked")

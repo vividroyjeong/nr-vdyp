@@ -366,14 +366,13 @@ public class FipStart {
 
 		float percentAvailable = estimatePercentForestLand(fipPolygon, fipVetLayer, fipPrimaryLayer);
 
-		var vdypPolygon = VdypPolygon.build(builder -> {
-			builder.copy(fipPolygon, (x) -> percentAvailable);
-		});
+		var vdypPolygon = VdypPolygon.build(builder -> builder.copy(fipPolygon, x -> percentAvailable));
 		vdypPolygon.setLayers(processedLayers);
 		return vdypPolygon;
 	}
 
 	// FIPLAND
+	@SuppressWarnings("java:S3655")
 	float estimatePercentForestLand(FipPolygon fipPolygon, FipLayer fipVetLayer, FipLayerPrimary fipPrimaryLayer)
 			throws ProcessingException {
 		if (fipPolygon.getPercentAvailable().isPresent()) {
@@ -1575,6 +1574,7 @@ public class FipStart {
 	private static final List<UtilizationClass> MODE_1_RECONCILE_AVAILABILITY_CLASSES = List
 			.of(UtilizationClass.OVER225, UtilizationClass.U175TO225, UtilizationClass.U125TO175);
 
+	@SuppressWarnings("java:S3655")
 	void reconcileComponentsMode1(
 			Coefficients baseAreaUtil, Coefficients treesPerHectareUtil, Coefficients quadMeanDiameterUtil,
 			float tphSumHigh
@@ -1741,6 +1741,7 @@ public class FipStart {
 		}
 	}
 
+	@SuppressWarnings("java:S3655")
 	void reconcileComponentsMode3(
 			Coefficients baseAreaUtil, Coefficients treesPerHectareUtil, Coefficients quadMeanDiameterUtil
 	) {
@@ -1825,7 +1826,7 @@ public class FipStart {
 		float quadMeanDiameter07 = quadMeanDiameterUtil.getCoe(UTIL_ALL);
 
 		for (var uc : UTIL_CLASSES) {
-			log.atDebug().setMessage("For util level {}").addArgument(uc.name);
+			log.atDebug().setMessage("For util level {}").addArgument(uc.className);
 			final var coeMap = Utils.<MatrixMap3<Integer, String, String, Coefficients>>expectParsedControl(
 					controlMap, UtilComponentDQParser.CONTROL_KEY, MatrixMap3.class
 			);
@@ -1876,15 +1877,17 @@ public class FipStart {
 				throw new IllegalStateException(
 						"Should not be attempting to process small component or all large components"
 				);
+			default:
+				throw new IllegalStateException("Unknown utilization class " + uc);
 			}
 
-			log.atDebug().setMessage("Util DQ for class {} is {}").addArgument(uc.name)
+			log.atDebug().setMessage("Util DQ for class {} is {}").addArgument(uc.className)
 					.addArgument(quadMeanDiameterUtil.getCoe(uc.index));
 		}
 
 		log.atTrace().setMessage("Estimated Diameters {}").addArgument(
 				() -> UTIL_CLASSES.stream()
-						.map(uc -> String.format("%s: %d", uc.name, quadMeanDiameterUtil.getCoe(uc.index)))
+						.map(uc -> String.format("%s: %d", uc.className, quadMeanDiameterUtil.getCoe(uc.index)))
 		);
 
 	}
@@ -1915,15 +1918,14 @@ public class FipStart {
 		// Start with a deep copy of the species map so there are no side effects from
 		// the manipulation this method does.
 		var combined = new HashMap<String, FipSpecies>(allSpecies.size());
-		allSpecies.entrySet().stream().forEach(spec -> {
-			combined.put(spec.getKey(), new FipSpecies(spec.getValue()));
-		});
+		allSpecies.entrySet().stream().forEach(spec -> combined.put(spec.getKey(), new FipSpecies(spec.getValue())));
 
 		for (var combinationGroup : PRIMARY_SPECIES_TO_COMBINE) {
 			var groupSpecies = combinationGroup.stream().map(combined::get).filter(Objects::nonNull).toList();
 			if (groupSpecies.size() < 2) {
 				continue;
 			}
+			@SuppressWarnings("java:S3655")
 			var groupPrimary = new FipSpecies(groupSpecies.stream().sorted(PERCENT_GENUS_DESCENDING).findFirst().get());
 			var total = (float) groupSpecies.stream().mapToDouble(FipSpecies::getPercentGenus).sum();
 			combinationGroup.forEach(combined::remove);
@@ -2522,9 +2524,7 @@ public class FipStart {
 		if (sum <= 0f) {
 			throw new ProcessingException("Total volume " + sum + " was not positive.");
 		}
-		UTIL_CLASSES.forEach(uc -> {
-			components.setCoe(uc.index, components.getCoe(uc.index) * k);
-		});
+		UTIL_CLASSES.forEach(uc -> components.setCoe(uc.index, components.getCoe(uc.index) * k));
 		return k;
 	}
 
@@ -3052,7 +3052,9 @@ public class FipStart {
 		float treesPerHectareSum = 0f;
 		float volumeSum = 0f;
 
-		Region region = BecDefinitionParser.getBecs(controlMap).get(fPoly.getBiogeoclimaticZone()).get().getRegion();
+		Region region = BecDefinitionParser.getBecs(controlMap).get(fPoly.getBiogeoclimaticZone())
+				.orElseThrow(() -> new IllegalStateException("Could not find BEC " + fPoly.getBiogeoclimaticZone()))
+				.getRegion();
 
 		for (VdypSpecies spec : layer.getSpecies().values()) {
 			float loreyHeightSpec = spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL); // HLsp

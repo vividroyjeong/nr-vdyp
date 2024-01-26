@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.easymock.EasyMock;
 import org.junit.jupiter.api.Test;
 
 class VdypSpeciesTest {

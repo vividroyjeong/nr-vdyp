@@ -33,7 +33,9 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float> {
 
 	@Computed
 	public int getInventoryTypeGroup() {
-		return this.getLayers().get(LayerType.PRIMARY).getInventoryTypeGroup().get();
+		return this.getLayers().get(LayerType.PRIMARY).getInventoryTypeGroup().orElseThrow(
+				() -> new IllegalArgumentException("Inventory Type Group does not exist if there is no primary layer")
+		);
 	}
 
 	@Computed

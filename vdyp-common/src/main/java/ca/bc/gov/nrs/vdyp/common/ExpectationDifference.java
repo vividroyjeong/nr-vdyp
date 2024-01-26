@@ -34,7 +34,7 @@ public class ExpectationDifference<T> {
 		missing.removeAll(values);
 		var unexpected = new HashSet<U>(values);
 		unexpected.removeAll(expected);
-		return new ExpectationDifference<U>(missing, unexpected);
+		return new ExpectationDifference<>(missing, unexpected);
 	}
 
 	/**

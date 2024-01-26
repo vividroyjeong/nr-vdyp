@@ -1,6 +1,5 @@
 package ca.bc.gov.nrs.vdyp.model;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Consumer;
 

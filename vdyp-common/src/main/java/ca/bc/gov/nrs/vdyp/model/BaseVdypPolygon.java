@@ -1,7 +1,6 @@
 package ca.bc.gov.nrs.vdyp.model;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;

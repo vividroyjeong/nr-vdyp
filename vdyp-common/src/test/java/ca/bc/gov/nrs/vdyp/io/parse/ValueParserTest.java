@@ -1,13 +1,9 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
-import static ca.bc.gov.nrs.vdyp.common.Utils.constMap;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isMarker;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isValue;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
@@ -19,7 +15,6 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 class ValueParserTest {

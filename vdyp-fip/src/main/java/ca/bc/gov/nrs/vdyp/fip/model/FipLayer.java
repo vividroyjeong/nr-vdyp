@@ -74,19 +74,25 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 
 	@Override
 	public void setAgeTotal(Optional<Float> ageTotal) {
-		ageTotal.orElseThrow(() -> new IllegalArgumentException());
+		if(ageTotal.isEmpty()) {
+			throw new IllegalArgumentException("ageTotal must not be empty");
+		}
 		super.setAgeTotal(ageTotal);
 	}
 
 	@Override
 	public void setHeight(Optional<Float> height) {
-		height.orElseThrow(() -> new IllegalArgumentException());
+		if(height.isEmpty()) {
+			throw new IllegalArgumentException("height must not be empty");
+		}
 		super.setHeight(height);
 	}
 
 	@Override
 	public void setYearsToBreastHeight(Optional<Float> yearsToBreastHeight) {
-		yearsToBreastHeight.orElseThrow(() -> new IllegalArgumentException());
+		if(yearsToBreastHeight.isEmpty()) {
+			throw new IllegalArgumentException("yearsToBreastHeight must not be empty");
+		}
 		super.setYearsToBreastHeight(yearsToBreastHeight);
 	}
 
