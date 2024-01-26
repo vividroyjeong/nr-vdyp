@@ -414,9 +414,9 @@ public class VdypForwardControlParser {
 			// RD_E122
 			new DqGrowthEmpiricalParser(),
 
-//			// RD_E123
-//			new DqGrowthEmpiricalLimitsParser(),
-//
+			// RD_E123
+			new DqGrowthEmpiricalLimitsParser(),
+
 			// RD_E148
 			new PrimarySpeciesBasalAreaGrowthParser(),
 
