@@ -10,7 +10,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>vdyp-core</artifactId>
+      <artifactId>vdyp-common</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
