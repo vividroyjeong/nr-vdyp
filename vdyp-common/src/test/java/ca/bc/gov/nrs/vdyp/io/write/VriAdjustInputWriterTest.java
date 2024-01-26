@@ -221,7 +221,7 @@ class VriAdjustInputWriterTest {
 			layer.setTreesPerHectareByUtilization(
 					Utils.utilizationVector(9.29f, 1485.82f, 834.25f, 509.09f, 123.56f, 18.92f)
 			);
-			layer.setLoreyHeightByUtilization(new Coefficients(new float[] { 7.8377f, 13.0660f }, -1));
+			layer.setLoreyHeightByUtilization(Utils.heightVector(7.8377f, 13.0660f));
 
 			layer.setWholeStemVolumeByUtilization(
 					Utils.utilizationVector(0.1077f, 117.9938f, 33.3680f, 52.4308f, 25.2296f, 6.9654f)
@@ -295,7 +295,7 @@ class VriAdjustInputWriterTest {
 			species.setTreesPerHectareByUtilization(
 					Utils.utilizationVector(9.29f, 1485.82f, 834.25f, 509.09f, 123.56f, 18.92f)
 			);
-			species.setLoreyHeightByUtilization(new Coefficients(new float[] { 7.8377f, 13.0660f }, -1));
+			species.setLoreyHeightByUtilization(Utils.heightVector(7.8377f, 13.0660f));
 
 			species.setWholeStemVolumeByUtilization(
 					Utils.utilizationVector(0.1077f, 117.9938f, 33.3680f, 52.4308f, 25.2296f, 6.9654f)
@@ -383,7 +383,7 @@ class VriAdjustInputWriterTest {
 			layer.setTreesPerHectareByUtilization(
 					Utils.utilizationVector(9.29f, 1485.82f, 834.25f, 509.09f, 123.56f, 18.92f)
 			);
-			layer.setLoreyHeightByUtilization(new Coefficients(new float[] { 7.8377f, 13.0660f }, -1));
+			layer.setLoreyHeightByUtilization(Utils.heightVector(7.8377f, 13.0660f));
 
 			layer.setWholeStemVolumeByUtilization(
 					Utils.utilizationVector(0.1077f, 117.9938f, 33.3680f, 52.4308f, 25.2296f, 6.9654f)
@@ -415,7 +415,7 @@ class VriAdjustInputWriterTest {
 			species.setTreesPerHectareByUtilization(
 					Utils.utilizationVector(9.29f, 1485.82f, 834.25f, 509.09f, 123.56f, 18.92f)
 			);
-			species.setLoreyHeightByUtilization(new Coefficients(new float[] { 7.8377f, 13.0660f }, -1));
+			species.setLoreyHeightByUtilization(Utils.heightVector(7.8377f, 13.0660f));
 
 			species.setWholeStemVolumeByUtilization(
 					Utils.utilizationVector(0.1077f, 117.9938f, 33.3680f, 52.4308f, 25.2296f, 6.9654f)
