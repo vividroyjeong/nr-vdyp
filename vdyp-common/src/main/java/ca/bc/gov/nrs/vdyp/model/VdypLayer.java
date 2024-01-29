@@ -3,7 +3,6 @@ package ca.bc.gov.nrs.vdyp.model;
 import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.common.Computed;
-import ca.bc.gov.nrs.vdyp.model.VdypSpecies.Builder;
 
 public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtilizationHolder {
 
