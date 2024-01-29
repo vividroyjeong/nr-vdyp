@@ -111,29 +111,57 @@ class RootFinderTest {
 
 	VdypLayer mockLayer1(Map<String, Object> control) {
 
-		final var layer = new VdypLayer("Test", LayerType.PRIMARY, 50f, 1f, 20f);
-		final var specMap = new LinkedHashMap<String, VdypSpecies>();
+		final var layer = VdypLayer.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.ageTotal(50f);
+			builder.yearsToBreastHeight(1f);
+			builder.height(20f);
+		});
 
-		var spec3 = new VdypSpecies(
-				"Test", LayerType.PRIMARY, GenusDefinitionParser.getSpeciesByIndex(3, control).getAlias()
-		);
-		var spec4 = new VdypSpecies(
-				"Test", LayerType.PRIMARY, GenusDefinitionParser.getSpeciesByIndex(4, control).getAlias()
-		);
-		var spec5 = new VdypSpecies(
-				"Test", LayerType.PRIMARY, GenusDefinitionParser.getSpeciesByIndex(5, control).getAlias()
-		);
-		var spec8 = new VdypSpecies(
-				"Test", LayerType.PRIMARY, GenusDefinitionParser.getSpeciesByIndex(8, control).getAlias()
-		);
-		var spec15 = new VdypSpecies(
-				"Test", LayerType.PRIMARY, GenusDefinitionParser.getSpeciesByIndex(15, control).getAlias()
-		);
-
+		var spec3 = VdypSpecies.build(layer, builder -> {
+			builder.genus(GenusDefinitionParser.getSpeciesByIndex(3, control).getAlias());
+			builder.percentGenus(20f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 		spec3.getLoreyHeightByUtilization().setCoe(UTIL_ALL, 38.7456512f);
+
+		var spec4 = VdypSpecies.build(layer, builder -> {
+			builder.genus(GenusDefinitionParser.getSpeciesByIndex(4, control).getAlias());
+			builder.percentGenus(20f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 		spec4.getLoreyHeightByUtilization().setCoe(UTIL_ALL, 22.8001652f);
+
+		var spec5 = VdypSpecies.build(layer, builder -> {
+			builder.genus(GenusDefinitionParser.getSpeciesByIndex(5, control).getAlias());
+			builder.percentGenus(20f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 		spec5.getLoreyHeightByUtilization().setCoe(UTIL_ALL, 33.6889763f);
+
+		var spec8 = VdypSpecies.build(layer, builder -> {
+			builder.genus(GenusDefinitionParser.getSpeciesByIndex(8, control).getAlias());
+			builder.percentGenus(20f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 		spec8.getLoreyHeightByUtilization().setCoe(UTIL_ALL, 24.3451157f);
+
+		var spec15 = VdypSpecies.build(layer, builder -> {
+			builder.genus(GenusDefinitionParser.getSpeciesByIndex(15, control).getAlias());
+			builder.percentGenus(20f);
+			builder.volumeGroup(-1);
+			builder.decayGroup(-1);
+			builder.breakageGroup(-1);
+		});
 		spec15.getLoreyHeightByUtilization().setCoe(UTIL_ALL, 34.6888771f);
 
 		layer.getBaseAreaByUtilization().setCoe(UTIL_ALL, 44.6249847f);
@@ -145,14 +173,6 @@ class RootFinderTest {
 		spec5.setVolumeGroup(25);
 		spec8.setVolumeGroup(37);
 		spec15.setVolumeGroup(66);
-
-		specMap.put(spec3.getGenus(), spec3);
-		specMap.put(spec4.getGenus(), spec4);
-		specMap.put(spec5.getGenus(), spec5);
-		specMap.put(spec8.getGenus(), spec8);
-		specMap.put(spec15.getGenus(), spec15);
-
-		layer.setSpecies(specMap);
 
 		return layer;
 	}

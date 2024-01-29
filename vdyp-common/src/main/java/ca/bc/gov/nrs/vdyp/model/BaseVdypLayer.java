@@ -2,8 +2,11 @@ package ca.bc.gov.nrs.vdyp.model;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class BaseVdypLayer<S extends BaseVdypSpecies> {
 
@@ -70,35 +73,56 @@ public class BaseVdypLayer<S extends BaseVdypSpecies> {
 		species.forEach(spec -> this.species.put(spec.getGenus(), spec));
 	}
 
-	protected abstract static class Builder<T extends BaseVdypLayer<?>> extends ModelClassBuilder<T> {
+	protected abstract static class Builder<T extends BaseVdypLayer<S>, S extends BaseVdypSpecies>
+			extends ModelClassBuilder<T> {
 		protected Optional<String> polygonIdentifier = Optional.empty();
 		protected Optional<LayerType> layer = Optional.empty();
 		protected Optional<Float> ageTotal = Optional.empty();
 		protected Optional<Float> height = Optional.empty();
 		protected Optional<Float> yearsToBreastHeight = Optional.empty();
+		protected List<S> species = new LinkedList<>();
 
-		public Builder<T> polygonIdentifier(String polygonIdentifier) {
+		public Builder<T, S> polygonIdentifier(String polygonIdentifier) {
 			this.polygonIdentifier = Optional.of(polygonIdentifier);
 			return this;
 		}
 
-		public Builder<T> layerType(LayerType layer) {
+		public Builder<T, S> layerType(LayerType layer) {
 			this.layer = Optional.of(layer);
 			return this;
 		}
 
-		public Builder<T> ageTotal(float ageTotal) {
+		public Builder<T, S> ageTotal(float ageTotal) {
 			this.ageTotal = Optional.of(ageTotal);
 			return this;
 		}
 
-		public Builder<T> height(float height) {
+		public Builder<T, S> height(float height) {
 			this.height = Optional.of(height);
 			return this;
 		}
 
-		public Builder<T> yearsToBreastHeight(float yearsToBreastHeight) {
+		public Builder<T, S> yearsToBreastHeight(float yearsToBreastHeight) {
 			this.yearsToBreastHeight = Optional.of(yearsToBreastHeight);
+			return this;
+		}
+
+		public Builder<T, S> addSpecies(S spec) {
+			this.species.add(spec);
+			return this;
+		}
+
+		public Builder<T, S> addSpecies(Collection<S> spec) {
+			this.species.addAll(spec);
+			return this;
+		}
+
+		public Builder<T, S> copy(BaseVdypLayer<?> toCopy) {
+			polygonIdentifier(toCopy.getPolygonIdentifier());
+			layerType(toCopy.getLayer());
+			ageTotal(toCopy.getAgeTotal());
+			height(toCopy.getHeight());
+			yearsToBreastHeight(toCopy.getYearsToBreastHeight());
 			return this;
 		}
 
@@ -111,6 +135,16 @@ public class BaseVdypLayer<S extends BaseVdypSpecies> {
 			requirePresent(height, "height", errors);
 		}
 
-	};
+		@Override
+		protected void postProcess(T result) {
+			super.postProcess(result);
+
+			// Add species
+			for (S spec : species) {
+				result.getSpecies().put(spec.getGenus(), spec);
+			}
+		}
+
+	}
 
 }

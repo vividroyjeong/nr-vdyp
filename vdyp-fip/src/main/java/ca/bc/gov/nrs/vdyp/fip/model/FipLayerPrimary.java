@@ -8,9 +8,6 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 public class FipLayerPrimary extends FipLayer {
 
-	static final String SITE_CURVE_NUMBER = "SITE_CURVE_NUMBER"; // SCN
-	static final String STOCKING_CLASS = "STOCKING_CLASS"; // STK
-
 	// TODO Confirm if these should be required instead of optional if we know it's
 	// a Primary layer.
 	private Optional<Integer> siteCurveNumber = Optional.empty(); // FIPL_1/SCN_L1
@@ -94,6 +91,15 @@ public class FipLayerPrimary extends FipLayer {
 		var builder = new PrimaryBuilder();
 		config.accept(builder);
 		return (FipLayerPrimary) builder.build();
+	}
+
+	public static FipLayerPrimary buildPrimary(FipPolygon polygon, Consumer<PrimaryBuilder> config) {
+		var layer = buildPrimary(builder -> {
+			builder.polygonIdentifier(polygon.getPolygonIdentifier());
+			config.accept(builder);
+		});
+		polygon.getLayers().put(layer.getLayer(), layer);
+		return layer;
 	}
 
 	public static class PrimaryBuilder extends Builder {

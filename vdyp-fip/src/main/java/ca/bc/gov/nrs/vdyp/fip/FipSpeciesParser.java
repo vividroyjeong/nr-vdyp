@@ -27,9 +27,6 @@ public class FipSpeciesParser
 
 	public static final String CONTROL_KEY = "FIP_SPECIES";
 
-	static final String POLYGON_IDENTIFIER = "POLYGON_IDENTIFIER"; // POLYDESC
-	static final String LAYER = "LAYER"; // LAYER
-
 	static final String GENUS = "GENUS"; // SP0
 	static final String PERCENT_GENUS = "PERCENT_GENUS"; // PTVSP0
 
@@ -52,8 +49,8 @@ public class FipSpeciesParser
 			map(String fileName, FileResolver fileResolver, Map<String, Object> control)
 					throws IOException, ResourceParseException {
 		return () -> {
-			var lineParser = new LineParser().strippedString(25, POLYGON_IDENTIFIER).space(1).value(
-					1, LAYER,
+			var lineParser = new LineParser().strippedString(25, FipPolygonParser.POLYGON_IDENTIFIER).space(1).value(
+					1, FipLayerParser.LAYER,
 					ValueParser.valueOrMarker(
 							ValueParser.LAYER, ValueParser.optionalSingleton("Z"::equals, EndOfRecord.END_OF_RECORD)
 					)
@@ -78,8 +75,8 @@ public class FipSpeciesParser
 				@Override
 				protected ValueOrMarker<Optional<FipSpecies>, EndOfRecord> convert(Map<String, Object> entry)
 						throws ResourceParseException {
-					var polygonId = (String) entry.get(POLYGON_IDENTIFIER);
-					var layer = (ValueOrMarker<Optional<LayerType>, EndOfRecord>) entry.get(LAYER);
+					var polygonId = (String) entry.get(FipPolygonParser.POLYGON_IDENTIFIER);
+					var layer = (ValueOrMarker<Optional<LayerType>, EndOfRecord>) entry.get(FipLayerParser.LAYER);
 					String genus;
 					if (layer.isValue()) {
 						genus = ((Optional<String>) entry.get(GENUS)).orElseThrow(
@@ -100,20 +97,23 @@ public class FipSpeciesParser
 					var species4 = (Optional<String>) entry.get(SPECIES_4);
 					var percentSpecies4 = (Float) entry.get(PERCENT_SPECIES_4);
 
-					var builder = new ValueOrMarker.Builder<Optional<FipSpecies>, EndOfRecord>();
+					var layerBuilder = new ValueOrMarker.Builder<Optional<FipSpecies>, EndOfRecord>();
 					return layer.handle(l -> {
-						return builder.value(l.map(layerType -> {
+						return layerBuilder.value(l.map(layerType -> {
 							Map<String, Float> speciesPercent = new LinkedHashMap<>();
 							species1.ifPresent((sp) -> speciesPercent.put(sp, percentSpecies1));
 							species2.ifPresent((sp) -> speciesPercent.put(sp, percentSpecies2));
 							species3.ifPresent((sp) -> speciesPercent.put(sp, percentSpecies3));
 							species4.ifPresent((sp) -> speciesPercent.put(sp, percentSpecies4));
-							var species = new FipSpecies(polygonId, layerType, genus);
-							species.setPercentGenus(percentGenus);
-							species.setSpeciesPercent(speciesPercent);
-							return species;
+							return FipSpecies.build(specBuilder -> {
+								specBuilder.polygonIdentifier(polygonId);
+								specBuilder.layerType(layerType);
+								specBuilder.genus(genus);
+								specBuilder.percentGenus(percentGenus);
+								specBuilder.addSpecies(speciesPercent);
+							});
 						}));
-					}, builder::marker);
+					}, layerBuilder::marker);
 				}
 
 			};

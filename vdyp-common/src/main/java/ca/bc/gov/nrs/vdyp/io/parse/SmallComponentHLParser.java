@@ -9,10 +9,11 @@ import java.util.Map;
  * <li>(cols 0-2) key - a Species code</li>
  * <li>(col 3-12, 13-22) - float - coefficients</li>
  * </ol>
- * Lines with an empty Species code are considered blank and are skipped. All lines in
- * the file are parsed.
+ * Lines with an empty Species code are considered blank and are skipped. All
+ * lines in the file are parsed.
  * <p>
- * The result of the parse is a {@link Map} of Species codes to a set of two coefficients.
+ * The result of the parse is a {@link Map} of Species codes to a set of two
+ * coefficients.
  * <p>
  * FIP Control index: 085
  * <p>
