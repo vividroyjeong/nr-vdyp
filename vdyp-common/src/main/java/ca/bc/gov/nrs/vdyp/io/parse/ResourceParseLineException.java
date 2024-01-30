@@ -10,7 +10,7 @@ public class ResourceParseLineException extends ResourceParseException {
 
 	private static final long serialVersionUID = 5188546056230073563L;
 
-	int line;
+	private int line;
 
 	public int getLine() {
 		return line;

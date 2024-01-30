@@ -12,8 +12,8 @@ import java.util.Set;
  * @param <T>
  */
 public class ExpectationDifference<T> {
-	final Set<T> missing;
-	final Set<T> unexpected;
+	private final Set<T> missing;
+	private final Set<T> unexpected;
 
 	public ExpectationDifference(Set<T> missing, Set<T> unexpected) {
 		super();
@@ -34,7 +34,7 @@ public class ExpectationDifference<T> {
 		missing.removeAll(values);
 		var unexpected = new HashSet<U>(values);
 		unexpected.removeAll(expected);
-		return new ExpectationDifference<U>(missing, unexpected);
+		return new ExpectationDifference<>(missing, unexpected);
 	}
 
 	/**

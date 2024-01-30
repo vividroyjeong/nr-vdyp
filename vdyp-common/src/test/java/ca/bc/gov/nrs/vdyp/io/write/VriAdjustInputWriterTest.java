@@ -2,8 +2,11 @@ package ca.bc.gov.nrs.vdyp.io.write;
 
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -15,13 +18,13 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKeys;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.FipMode;
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
-import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 import ca.bc.gov.nrs.vdyp.test.TestUtils.MockOutputStream;
 import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
@@ -92,15 +95,30 @@ class VriAdjustInputWriterTest {
 	void testWritePolygon() throws IOException {
 		try (var unit = new VriAdjustInputWriter(controlMap, fileResolver);) {
 
-			VdypPolygon polygon = new VdypPolygon(
-					"082E004    615       1988", 90f, "D", "IDF", Optional.of(FipMode.FIPSTART)
-			);
+			VdypPolygon polygon = VdypPolygon.build(builder -> {
 
-			VdypLayer primeLayer = new VdypLayer("082E004    615       1988", Layer.PRIMARY);
-			polygon.setLayers(List.of(primeLayer));
+				builder.polygonIdentifier("082E004    615       1988");
+				builder.percentAvailable(90f);
+				builder.biogeoclimaticZone("IDF");
+				builder.forestInventoryZone("D");
+				builder.modeFip(FipMode.FIPSTART);
+			});
+			var layer = VdypLayer.build(polygon, builder -> {
+				builder.polygonIdentifier("082E004    615       1988");
+				builder.layerType(LayerType.PRIMARY);
 
-			primeLayer.setInventoryTypeGroup(Optional.of(28));
+				builder.height(15f);
+				builder.siteIndex(14.7f);
+				builder.ageTotal(60f);
+				builder.yearsToBreastHeight(8.5f);
+				builder.siteGenus("PL");
+				builder.siteCurveNumber(0);
+			});
+
+			// FIXME Add to builder
 			primeLayer.setEmpericalRelationshipParameterIndex(Optional.of(119));
+			polygon.setInventoryTypeGroup(28);
+			polygon.setGrpBa1(119);
 
 			unit.writePolygon(polygon);
 		}
@@ -114,20 +132,27 @@ class VriAdjustInputWriterTest {
 	void testWriteSpecies() throws IOException {
 		try (var unit = new VriAdjustInputWriter(controlMap, fileResolver);) {
 
-			var layer = new VdypLayer("082E004    615       1988", Layer.PRIMARY);
+			var layer = VdypLayer.build(builder -> {
+				builder.polygonIdentifier("082E004    615       1988");
+				builder.layerType(LayerType.PRIMARY);
 
-			var species = new VdypSpecies("082E004    615       1988", Layer.PRIMARY, "PL");
-			species.setSpeciesPercent(Collections.singletonMap("PL", 100f));
+				builder.height(15f);
+				builder.siteIndex(14.7f);
+				builder.ageTotal(60f);
+				builder.yearsToBreastHeight(8.5f);
+				builder.siteGenus("PL");
+				builder.siteCurveNumber(0);
+			});
 
-			layer.setSpecies(List.of(species));
+			var species = VdypSpecies.build(layer, builder -> {
+				builder.genus("PL");
+				builder.addSpecies("PL", 100f);
 
-			layer.setSiteIndex(Optional.of(14.7f));
-			layer.setHeight(Optional.of(15f));
-			layer.setAgeTotal(Optional.of(60f));
-			layer.setBreastHeightAge(Optional.of(51.5f));
-			layer.setYearsToBreastHeight(Optional.of(8.5f));
-			layer.setSiteGenus(Optional.of("PL"));
-			layer.setSiteCurveNumber(Optional.of(0));
+				builder.percentGenus(100f);
+				builder.volumeGroup(0);
+				builder.decayGroup(0);
+				builder.breakageGroup(0);
+			});
 
 			unit.writeSpecies(layer, species);
 		}
@@ -144,20 +169,27 @@ class VriAdjustInputWriterTest {
 	void testWriteUtilizationForLayer() throws IOException {
 		try (var unit = new VriAdjustInputWriter(controlMap, fileResolver);) {
 
-			var layer = new VdypLayer("082E004    615       1988", Layer.PRIMARY);
+			var layer = VdypLayer.build(builder -> {
+				builder.polygonIdentifier("082E004    615       1988");
+				builder.layerType(LayerType.PRIMARY);
 
-			var species = new VdypSpecies("082E004    615       1988", Layer.PRIMARY, "PL");
-			species.setSpeciesPercent(Collections.singletonMap("PL", 100f));
+				builder.height(15f);
+				builder.siteIndex(14.7f);
+				builder.ageTotal(60f);
+				builder.yearsToBreastHeight(8.5f);
+				builder.siteGenus("PL");
+				builder.siteCurveNumber(0);
+			});
 
-			layer.setSpecies(List.of(species));
+			var species = VdypSpecies.build(layer, builder -> {
+				builder.genus("PL");
+				builder.addSpecies("PL", 100f);
 
-			layer.setSiteIndex(Optional.of(14.7f));
-			layer.setHeight(Optional.of(15f));
-			layer.setAgeTotal(Optional.of(60f));
-			layer.setBreastHeightAge(Optional.of(51.5f));
-			layer.setYearsToBreastHeight(Optional.of(8.5f));
-			layer.setSiteGenus(Optional.of("PL"));
-			layer.setSiteCurveNumber(Optional.of(0));
+				builder.percentGenus(100f);
+				builder.volumeGroup(0);
+				builder.decayGroup(0);
+				builder.breakageGroup(0);
+			});
 
 			layer.setBaseAreaByUtilization(
 					Utils.utilizationVector(0.02865f, 19.97867f, 6.79731f, 8.54690f, 3.63577f, 0.99869f)
@@ -165,7 +197,7 @@ class VriAdjustInputWriterTest {
 			layer.setTreesPerHectareByUtilization(
 					Utils.utilizationVector(9.29f, 1485.82f, 834.25f, 509.09f, 123.56f, 18.92f)
 			);
-			layer.setLoreyHeightByUtilization(new Coefficients(new float[] { 7.8377f, 13.0660f }, -1));
+			layer.setLoreyHeightByUtilization(Utils.heightVector(7.8377f, 13.0660f));
 
 			layer.setWholeStemVolumeByUtilization(
 					Utils.utilizationVector(0.1077f, 117.9938f, 33.3680f, 52.4308f, 25.2296f, 6.9654f)
@@ -211,20 +243,27 @@ class VriAdjustInputWriterTest {
 	void testWriteUtilizationZeroBaseArea() throws IOException {
 		try (var unit = new VriAdjustInputWriter(controlMap, fileResolver);) {
 
-			var layer = new VdypLayer("082E004    615       1988", Layer.PRIMARY);
+			var layer = VdypLayer.build(builder -> {
+				builder.polygonIdentifier("082E004    615       1988");
+				builder.layerType(LayerType.PRIMARY);
 
-			var species = new VdypSpecies("082E004    615       1988", Layer.PRIMARY, "PL");
-			species.setSpeciesPercent(Collections.singletonMap("PL", 100f));
+				builder.height(15f);
+				builder.siteIndex(14.7f);
+				builder.ageTotal(60f);
+				builder.yearsToBreastHeight(8.5f);
+				builder.siteGenus("PL");
+				builder.siteCurveNumber(0);
+			});
 
-			layer.setSpecies(List.of(species));
+			var species = VdypSpecies.build(layer, builder -> {
+				builder.genus("PL");
+				builder.addSpecies("PL", 100f);
 
-			layer.setSiteIndex(Optional.of(14.7f));
-			layer.setHeight(Optional.of(15f));
-			layer.setAgeTotal(Optional.of(60f));
-			layer.setBreastHeightAge(Optional.of(51.5f));
-			layer.setYearsToBreastHeight(Optional.of(8.5f));
-			layer.setSiteGenus(Optional.of("PL"));
-			layer.setSiteCurveNumber(Optional.of(0));
+				builder.percentGenus(100f);
+				builder.volumeGroup(0);
+				builder.decayGroup(0);
+				builder.breakageGroup(0);
+			});
 
 			species.setBaseAreaByUtilization(
 					Utils.utilizationVector(0.02865f, 19.97867f, 6.79731f, 8.54690f, 3.63577f, 0f)
@@ -232,7 +271,7 @@ class VriAdjustInputWriterTest {
 			species.setTreesPerHectareByUtilization(
 					Utils.utilizationVector(9.29f, 1485.82f, 834.25f, 509.09f, 123.56f, 18.92f)
 			);
-			species.setLoreyHeightByUtilization(new Coefficients(new float[] { 7.8377f, 13.0660f }, -1));
+			species.setLoreyHeightByUtilization(Utils.heightVector(7.8377f, 13.0660f));
 
 			species.setWholeStemVolumeByUtilization(
 					Utils.utilizationVector(0.1077f, 117.9938f, 33.3680f, 52.4308f, 25.2296f, 6.9654f)
@@ -281,27 +320,38 @@ class VriAdjustInputWriterTest {
 	void testWritePolygonWithChildren() throws IOException {
 		try (var unit = new VriAdjustInputWriter(controlMap, fileResolver);) {
 
-			VdypPolygon polygon = new VdypPolygon(
-					"082E004    615       1988", 90f, "D", "IDF", Optional.of(FipMode.FIPSTART)
-			);
+			VdypPolygon polygon = VdypPolygon.build(builder -> {
 
-			var layer = new VdypLayer("082E004    615       1988", Layer.PRIMARY);
-			layer.setInventoryTypeGroup(Optional.of(28));
-			layer.setEmpericalRelationshipParameterIndex(Optional.of(119));
+				builder.polygonIdentifier("082E004    615       1988");
+				builder.percentAvailable(90f);
+				builder.biogeoclimaticZone("IDF");
+				builder.forestInventoryZone("D");
+				builder.modeFip(FipMode.FIPSTART);
+			});
 
-			var species = new VdypSpecies("082E004    615       1988", Layer.PRIMARY, "PL");
-			species.setSpeciesPercent(Collections.singletonMap("PL", 100f));
+			var layer = VdypLayer.build(polygon, builder -> {
+				builder.layerType(LayerType.PRIMARY);
 
-			layer.setSpecies(List.of(species));
-			polygon.setLayers(List.of(layer));
+				builder.height(15f);
+				builder.siteIndex(14.7f);
+				builder.ageTotal(60f);
+				builder.yearsToBreastHeight(8.5f);
+				builder.siteGenus("PL");
+				builder.siteCurveNumber(0);
+			});
 
-			layer.setSiteIndex(Optional.of(14.7f));
-			layer.setHeight(Optional.of(15f));
-			layer.setAgeTotal(Optional.of(60f));
-			layer.setBreastHeightAge(Optional.of(51.5f));
-			layer.setYearsToBreastHeight(Optional.of(8.5f));
-			layer.setSiteGenus(Optional.of("PL"));
-			layer.setSiteCurveNumber(Optional.of(0));
+			var species = VdypSpecies.build(layer, builder -> {
+				builder.genus("PL");
+				builder.addSpecies("PL", 100f);
+
+				builder.percentGenus(100f);
+				builder.volumeGroup(0);
+				builder.decayGroup(0);
+				builder.breakageGroup(0);
+			});
+
+			polygon.setInventoryTypeGroup(28);
+			polygon.setGrpBa1(119);
 
 			layer.setBaseAreaByUtilization(
 					Utils.utilizationVector(0.02865f, 19.97867f, 6.79731f, 8.54690f, 3.63577f, 0.99869f)
@@ -309,7 +359,7 @@ class VriAdjustInputWriterTest {
 			layer.setTreesPerHectareByUtilization(
 					Utils.utilizationVector(9.29f, 1485.82f, 834.25f, 509.09f, 123.56f, 18.92f)
 			);
-			layer.setLoreyHeightByUtilization(new Coefficients(new float[] { 7.8377f, 13.0660f }, -1));
+			layer.setLoreyHeightByUtilization(Utils.heightVector(7.8377f, 13.0660f));
 
 			layer.setWholeStemVolumeByUtilization(
 					Utils.utilizationVector(0.1077f, 117.9938f, 33.3680f, 52.4308f, 25.2296f, 6.9654f)
@@ -341,7 +391,7 @@ class VriAdjustInputWriterTest {
 			species.setTreesPerHectareByUtilization(
 					Utils.utilizationVector(9.29f, 1485.82f, 834.25f, 509.09f, 123.56f, 18.92f)
 			);
-			species.setLoreyHeightByUtilization(new Coefficients(new float[] { 7.8377f, 13.0660f }, -1));
+			species.setLoreyHeightByUtilization(Utils.heightVector(7.8377f, 13.0660f));
 
 			species.setWholeStemVolumeByUtilization(
 					Utils.utilizationVector(0.1077f, 117.9938f, 33.3680f, 52.4308f, 25.2296f, 6.9654f)

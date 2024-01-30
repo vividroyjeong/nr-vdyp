@@ -25,7 +25,7 @@ public abstract class EquationGroupParser implements ControlMapSubResourceParser
 	public static final int MIN_GROUP = 1;
 	public static final int MAX_GROUP = 180;
 
-	LineParser lineParser;
+	private LineParser lineParser;
 
 	private Collection<String> hiddenBecs = Collections.emptyList();
 
@@ -49,7 +49,7 @@ public abstract class EquationGroupParser implements ControlMapSubResourceParser
 
 		final var sp0Keys = GenusDefinitionParser.getSpeciesAliases(control);
 
-		final var becKeys = BecDefinitionParser.getBecAliases(control);
+		final var becKeys = BecDefinitionParser.getBecs(control).getBecAliases();
 
 		Map<String, Map<String, Integer>> resultMap = lineParser.parse(is, new HashMap<>(), (v, r) -> {
 			final String sp0Alias = (String) v.get("sp0Alias");

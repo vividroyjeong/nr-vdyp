@@ -12,10 +12,34 @@ import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 
 /**
- * Parser for a Genus (SP0) Definition data file
+ * Parser for a Genus (SP0; Species) Definition data file.
+ *
+ * This file contains records defining the species on which the system
+ * functions. Each record contains:
+ * <ol>
+ * <li>(cols 0-1) a species alias
+ * <li>(cols 3-34) the name of the species
+ * <li>(cols 36-37) - int - the "preference" value.
+ * </ol>
+ * The preference values define an ordering of the species from 1 to 16. If a
+ * line provides no value or the value 0, the ordering is implicitly chosen to
+ * be the line number. Otherwise, a value from 1 - 16 must be provided and this
+ * value is used as the ordering. In the end, all values from 1 - 16 must be
+ * used. Note that it's possible, when ordering is explicitly given, for a given
+ * ordering to appear more than once; in this case, the last one present wins.
+ * <p>
+ * All lines in the file are read; there is no provision for blank lines (except
+ * the last line, if empty).
+ * <p>
+ * In the end, a value for each of the 16 Species must be provided, and each
+ * must have a distinct ordering value.
+ * <p>
+ * FIP Control index: 010
+ * <p>
+ * Example: coe/SP0DEF_v0.dat
  *
  * @author Kevin Smith, Vivid Solutions
- *
+ * @see ControlMapSubResourceParser
  */
 public class GenusDefinitionParser implements ControlMapSubResourceParser<List<GenusDefinition>> {
 
@@ -23,8 +47,8 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<List<G
 
 	private int numSp0;
 
-	LineParser lineParser = new LineParser().strippedString(2, "alias").space(1).strippedString(32, "name").space(1)
-			.value(
+	private LineParser lineParser = new LineParser().strippedString(2, "alias").space(1).strippedString(32, "name")
+			.space(1).value(
 					2, "preference",
 					(s, c) -> ValueParser.optional(ValueParser.INTEGER).parse(s)
 							.flatMap(v -> v == 0 ? Optional.empty() : Optional.of(v))
@@ -35,9 +59,9 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<List<G
 		this.numSp0 = 16;
 	}
 
-	public GenusDefinitionParser(int num_sp0) {
+	public GenusDefinitionParser(int numSp0) {
 		super();
-		this.numSp0 = num_sp0;
+		this.numSp0 = numSp0;
 	}
 
 	@SuppressWarnings("unchecked")

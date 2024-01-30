@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
  * @param <T>
  */
 public class MatrixMapImpl<T> implements MatrixMap<T> {
-	List<Map<Object, Integer>> maps;
-	Object[] matrix;
-	Function<Object[], T> defaultMapper;
+	private List<Map<Object, Integer>> maps;
+	private Object[] matrix;
+	private Function<Object[], T> defaultMapper;
 
 	public MatrixMapImpl(Function<Object[], T> defaultMapper, Collection<? extends Collection<?>> dimensions) {
 		this.defaultMapper = defaultMapper;

@@ -136,6 +136,7 @@ public class VriAdjustInputWriter implements Closeable {
 	 * @throws IOException
 	 */
 	void writeSpecies(VdypLayer layer, VdypSpecies spec) throws IOException {
+
 		// Ensure we have a list of 4 distribution entries
 		var specDistributionEntries = Stream.concat(
 				spec.getSpeciesPercent().entrySet().stream().sorted(Utils.compareUsing(Entry::getValue)),

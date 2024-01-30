@@ -2,52 +2,50 @@ package ca.bc.gov.nrs.vdyp.model;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.Consumer;
+
+import ca.bc.gov.nrs.vdyp.common.Computed;
 
 public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtilizationHolder {
 
-	Optional<Float> breastHeightAge = Optional.empty(); // LVCOM3/AGEBHLV +
+	Coefficients baseAreaByUtilization = //
+			VdypUtilizationHolder.emptyUtilization(); // LVCOM/BA species 0
+	Coefficients loreyHeightByUtilization = //
+			VdypUtilizationHolder.emptyLoreyHeightUtilization(); // LVCOM/HL species 0
+	Coefficients quadraticMeanDiameterByUtilization = //
+			VdypUtilizationHolder.emptyUtilization(); // LVCOM/DQ species 0
+	Coefficients treesPerHectareByUtilization = //
+			VdypUtilizationHolder.emptyUtilization(); // LVCOM/TPH species 0
 
-	Coefficients baseAreaByUtilization = new Coefficients(
-			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
-	); // LVCOM/BA species 0
-	Coefficients loreyHeightByUtilization = new Coefficients(
-			Arrays.asList(0f, 0f), -1 //
-	); // LVCOM/HL species 0
-	Coefficients quadraticMeanDiameterByUtilization = new Coefficients(
-			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
-	); // LVCOM/DQ species 0
-	Coefficients treesPerHectareByUtilization = new Coefficients(
-			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
-	); // LVCOM/TPH species 0
+	Coefficients wholeStemVolumeByUtilization = //
+			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOLWS species 0
+	Coefficients closeUtilizationVolumeByUtilization = //
+			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOLCU species/ 0
+	Coefficients closeUtilizationVolumeNetOfDecayByUtilization = //
+			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOL_D species 0
+	Coefficients closeUtilizationVolumeNetOfDecayAndWasteByUtilization = //
+			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOL_DW species 0
+	Coefficients closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = //
+			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOL_DWB species 0
 
-	Coefficients wholeStemVolumeByUtilization = new Coefficients(
-			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
-	); // LVCOM/VOLWS species 0
-	Coefficients closeUtilizationVolumeByUtilization = new Coefficients(
-			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
-	); // LVCOM/VOLCU species 0
-	Coefficients closeUtilizationVolumeNetOfDecayByUtilization = new Coefficients(
-			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
-	); // LVCOM/VOL_D species 0
-	Coefficients closeUtilizationVolumeNetOfDecayAndWasteByUtilization = new Coefficients(
-			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
-	); // LVCOM/VOL_DW species 0
-	Coefficients closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = new Coefficients(
-			Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1 //
-	); // LVCOM/VOL_DWB species 0
+	private Optional<String> dominantSpecies;
 
 	private Optional<Integer> empericalRelationshipParameterIndex = Optional.empty(); // INXL1/GRPBA1
 
-	public VdypLayer(String polygonIdentifier, Layer layer) {
-		super(polygonIdentifier, layer);
+	public VdypLayer(
+			String polygonIdentifier, LayerType layer, Optional<Float> ageTotal, Optional<Float> height,
+			Optional<Float> yearsToBreastHeight, Optional<Float> siteIndex, Optional<Integer> siteCurveNumber,
+			Optional<Integer> inventoryTypeGroup, Optional<String> siteGenus
+	) {
+		super(
+				polygonIdentifier, layer, ageTotal, height, yearsToBreastHeight, siteIndex, siteCurveNumber,
+				inventoryTypeGroup, siteGenus
+		);
 	}
 
+	@Computed
 	public Optional<Float> getBreastHeightAge() {
-		return breastHeightAge;
-	}
-
-	public void setBreastHeightAge(Optional<Float> breastHeightAge) {
-		this.breastHeightAge = breastHeightAge;
+		return this.getAgeTotal().flatMap(at -> this.getYearsToBreastHeight().map(bha -> at - bha));
 	}
 
 	@Override
@@ -146,6 +144,14 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 		this.closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization;
 	}
 
+	public Optional<String> getDominantSpecies() {
+		return dominantSpecies;
+	}
+
+	public void setDominantSpecies(Optional<String> dominantSpecies) {
+		this.dominantSpecies = dominantSpecies;
+	}
+
 	public Optional<Integer> getEmpericalRelationshipParameterIndex() {
 		return empericalRelationshipParameterIndex;
 	}
@@ -153,6 +159,68 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 	public void setEmpericalRelationshipParameterIndex(Optional<Integer> empericalRelationshipParameterIndex) {
 		this.empericalRelationshipParameterIndex = empericalRelationshipParameterIndex;
 
+	/**
+	 * Accepts a configuration function that accepts a builder to configure.
+	 *
+	 * <pre>
+	 * VdypLayer myLayer = VdypLayer.build(builder-&gt; {
+			builder.polygonIdentifier(polygonId);
+			builder.layerType(LayerType.VETERAN);
+			builder.ageTotal(8f);
+			builder.yearsToBreastHeight(7f);
+			builder.height(6f);
+
+			builder.siteIndex(5f);
+			builder.crownClosure(0.9f);
+			builder.siteGenus("B");
+			builder.siteSpecies("B");
+	 * })
+	 * </pre>
+	 *
+	 * @param config The configuration function
+	 * @return The object built by the configured builder.
+	 * @throws IllegalStateException if any required properties have not been set by
+	 *                               the configuration function.
+	 */
+	public static VdypLayer build(Consumer<Builder> config) {
+		var builder = new Builder();
+		config.accept(builder);
+		return builder.build();
 	}
 
+	/**
+	 * Builds a layer and adds it to the polygon.
+	 *
+	 * @param layer  Layer to create the species for.
+	 * @param config Configuration function for the builder.
+	 * @return the new species.
+	 */
+	public static VdypLayer build(VdypPolygon polygon, Consumer<Builder> config) {
+		var result = build(builder -> {
+			builder.polygonIdentifier(polygon.getPolygonIdentifier());
+
+			config.accept(builder);
+		});
+		polygon.getLayers().put(result.getLayer(), result);
+		return result;
+	}
+
+	public static class Builder extends BaseVdypLayer.Builder<VdypLayer, VdypSpecies> {
+
+		@Override
+		protected VdypLayer doBuild() {
+			return (new VdypLayer(
+					polygonIdentifier.get(), //
+					layer.get(), //
+					ageTotal, //
+					height, //
+					yearsToBreastHeight, //
+					siteIndex, //
+					siteCurveNumber, //
+					inventoryTypeGroup, //
+					siteGenus
+			));
+		}
+
+	}
 }

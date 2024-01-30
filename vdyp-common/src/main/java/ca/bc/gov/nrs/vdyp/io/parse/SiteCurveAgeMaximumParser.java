@@ -9,10 +9,33 @@ import java.util.Optional;
 import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
 
 /**
- * Parses a Site curve maximum age data file.
+ * Parses a Site Curve Maximum Age data file.
  *
+ * These files have multiple lines, each containing a key followed by four
+ * floats.
+ * <ol>
+ * <li>(cols 0-2) site curve key - an integer from -1 to 40. "-1" defines the
+ * defaults for all site curves not given in the file</li>
+ * <li>(cols 3-9) float - max total age that a site curve will increment
+ * (coastal region)</li>
+ * <li>(cols 10-16) float - max total age that a site curve will increment
+ * (interior region)</li>
+ * <li>(cols 17-23) float - "T1"</li>
+ * <li>(cols 24-30) float - "T2". T1 and T2 are "parameters that control special
+ * site curve modifications beyond max total age."</li>
+ * </ol>
+ * All lines in the file are read; there is no provision for blank lines. A Site
+ * Curve key of 999 stops the parse; this line and all following are ignored.
+ * <p>
+ * The result of the parse is a {@link Map} of Site Curve numbers to quads (the
+ * four floats.)
+ * <p>
+ * FIP Control index: 026
+ * <p>
+ * Example: coe/SIAGEMAX.PRM
+ *
+ * @see OptionalControlMapSubResourceParser
  * @author Kevin Smith, Vivid Solutions
- *
  */
 public class SiteCurveAgeMaximumParser
 		implements OptionalControlMapSubResourceParser<Map<Integer, SiteCurveAgeMaximum>> {
@@ -33,7 +56,7 @@ public class SiteCurveAgeMaximumParser
 
 	public static final int DEFAULT_SC = 140;
 
-	LineParser lineParser = new LineParser() {
+	private LineParser lineParser = new LineParser() {
 
 		@Override
 		public boolean isStopLine(String line) {

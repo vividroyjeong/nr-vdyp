@@ -1,41 +1,44 @@
 package ca.bc.gov.nrs.vdyp.model;
 
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.common.Computed;
 
 public abstract class BaseVdypSpecies {
-	final String polygonIdentifier; // FIP_P/POLYDESC
-	final Layer layer; // This is also represents the distinction between data stored in
+	private final String polygonIdentifier; // FIP_P/POLYDESC
+	private final LayerType layer; // This is also represents the distinction between data stored in
 	// FIPL_1(A) and FIP_V(A). Where VDYP7 stores both and looks at certain values
 	// to determine if a layer is "present". VDYP8 stores them in a map keyed by
 	// this value
 
-	final String genus; // FIPSA/SP0V
+	private final String genus; // FIPSA/SP0V
 
-	float percentGenus; // FIPS/PCTVOLV L1COM1/PCTL1
+	private float percentGenus; // FIPS/PCTVOLV L1COM1/PCTL1
 
 	// This is computed from percentGenus, but VDYP7 computes it in a way that might
 	// lead to a slight difference so it's stored separately and can be modified.
 	@Computed
-	float fractionGenus; // FRBASP0/FR
+	private float fractionGenus; // FRBASP0/FR
 
-	Map<String, Float> speciesPercent; // Map from
+	private Map<String, Float> speciesPercent; // Map from
 
-	protected BaseVdypSpecies(String polygonIdentifier, Layer layer, String genus) {
+	protected BaseVdypSpecies(String polygonIdentifier, LayerType layer, String genus, float percentGenus) {
 		this.polygonIdentifier = polygonIdentifier;
 		this.layer = layer;
 		this.genus = genus;
-
+		this.setPercentGenus(percentGenus);
 	}
 
 	protected BaseVdypSpecies(BaseVdypSpecies toCopy) {
 		this(
 				toCopy.getPolygonIdentifier(), //
 				toCopy.getLayer(), //
-				toCopy.getGenus() //
+				toCopy.getGenus(), //
+				toCopy.getPercentGenus()
 		);
-		setPercentGenus(toCopy.getPercentGenus());
 		setSpeciesPercent(toCopy.getSpeciesPercent());
 	}
 
@@ -43,7 +46,7 @@ public abstract class BaseVdypSpecies {
 		return polygonIdentifier;
 	}
 
-	public Layer getLayer() {
+	public LayerType getLayer() {
 		return layer;
 	}
 
@@ -76,6 +79,67 @@ public abstract class BaseVdypSpecies {
 
 	public String getGenus() {
 		return genus;
+	}
+
+	protected abstract static class Builder<T extends BaseVdypSpecies> extends ModelClassBuilder<T> {
+		protected Optional<String> polygonIdentifier = Optional.empty();
+		protected Optional<LayerType> layer = Optional.empty();
+		protected Optional<String> genus = Optional.empty();
+		protected Optional<Float> percentGenus = Optional.empty();
+		protected Map<String, Float> speciesPercent = new LinkedHashMap<>();
+
+		public Builder<T> polygonIdentifier(String polygonIdentifier) {
+			this.polygonIdentifier = Optional.of(polygonIdentifier);
+			return this;
+		}
+
+		public Builder<T> layerType(LayerType layer) {
+			this.layer = Optional.of(layer);
+			return this;
+		}
+
+		public Builder<T> genus(String genus) {
+			this.genus = Optional.of(genus);
+			return this;
+		}
+
+		public Builder<T> percentGenus(float percentGenus) {
+			this.percentGenus = Optional.of(percentGenus);
+			return this;
+		}
+
+		public Builder<T> addSpecies(String id, float percent) {
+			this.speciesPercent.put(id, percent);
+			return this;
+		}
+
+		public Builder<T> addSpecies(Map<String, Float> toAdd) {
+			this.speciesPercent.putAll(toAdd);
+			return this;
+		}
+
+		public Builder<T> copy(BaseVdypSpecies toCopy) {
+			polygonIdentifier(toCopy.getPolygonIdentifier());
+			layerType(toCopy.getLayer());
+			genus(toCopy.getGenus());
+			percentGenus(toCopy.getPercentGenus());
+			return this;
+		}
+
+		@Override
+		protected void check(Collection<String> errors) {
+			requirePresent(polygonIdentifier, "polygonIdentifier", errors);
+			requirePresent(layer, "layer", errors);
+			requirePresent(genus, "genus", errors);
+			requirePresent(percentGenus, "percentGenus", errors);
+		}
+
+		@Override
+		protected void postProcess(T result) {
+			super.postProcess(result);
+			result.setSpeciesPercent(speciesPercent);
+		}
+
 	}
 
 }

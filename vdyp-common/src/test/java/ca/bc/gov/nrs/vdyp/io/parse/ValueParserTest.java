@@ -1,20 +1,21 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
-import static ca.bc.gov.nrs.vdyp.common.Utils.constMap;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isMarker;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isValue;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.aMapWithSize;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.common.Utils;
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 class ValueParserTest {
 
@@ -62,14 +63,25 @@ class ValueParserTest {
 
 	}
 
+	static enum TestEnum {
+		VALUE1, VALUE2
+	}
+
 	@Test
 	void testEnumParser() throws Exception {
-		var unit = ValueParser.enumParser(Layer.class);
+		var parser = ValueParser.enumParser(TestEnum.class);
 
-		assertThat(unit.parse("PRIMARY"), is(Layer.PRIMARY));
+		assertThat(parser.parse("VALUE1"), is(TestEnum.VALUE1));
+		assertThat(parser.parse("VALUE2"), is(TestEnum.VALUE2));
 
-		var ex = assertThrows(ValueParseException.class, () -> unit.parse("NOT_A_LAYER"));
-		assertThat(ex, hasProperty("message", is("\"NOT_A_LAYER\" is not a valid Layer")));
+		var ex = assertThrows(ValueParseException.class, () -> parser.parse("FAKE"));
+		assertThat(ex.getMessage(), is("\"FAKE\" is not a valid TestEnum"));
+
+		ex = assertThrows(ValueParseException.class, () -> parser.parse(""));
+		assertThat(ex.getMessage(), is("\"\" is not a valid TestEnum"));
+
+		ex = assertThrows(ValueParseException.class, () -> parser.parse(" "));
+		assertThat(ex.getMessage(), is("\"\" is not a valid TestEnum"));
 	}
 
 	@Test
@@ -111,15 +123,22 @@ class ValueParserTest {
 	}
 
 	@Test
-	void testValueOrMarker() throws Exception {
-		var unit = ValueParser.valueOrMarker(
-				ValueParser.INTEGER, ValueParser.pretestOptional(ValueParser.STRING, x -> x.equals("MARKER"))
-		);
+	void testValueOrMarkerParser() throws Exception {
+		var parser = ValueParser.valueOrMarker(ValueParser.INTEGER, (s) -> {
+			if ("MARK".equals(s)) {
+				return Optional.of("MARK");
+			}
+			return Optional.empty();
+		});
 
-		assertThat(unit.parse("0"), isValue(is(0)));
-		assertThat(unit.parse("1"), isValue(is(1)));
-		assertThat(unit.parse("MARKER"), isMarker(is("MARKER")));
-		assertThrows(ValueParseException.class, () -> unit.parse("INVALID"));
+		assertThat(parser.parse("MARK").getMarker(), present(is("MARK")));
+		assertThat(parser.parse("MARK").getValue(), notPresent());
+
+		assertThat(parser.parse("1").getValue(), present(is(1)));
+		assertThat(parser.parse("1").getMarker(), notPresent());
+
+		var ex = assertThrows(ValueParseException.class, () -> parser.parse("X"));
+		assertThat(ex.getMessage(), is("\"X\" is not a valid Integer"));
 	}
 
 	@Test
@@ -134,13 +153,13 @@ class ValueParserTest {
 	void testLayer() throws Exception {
 		var unit = ValueParser.LAYER;
 
-		assertThat(unit.parse("1"), present(is(Layer.PRIMARY)));
-		assertThat(unit.parse("P"), present(is(Layer.PRIMARY)));
+		assertThat(unit.parse("1"), present(is(LayerType.PRIMARY)));
+		assertThat(unit.parse("P"), present(is(LayerType.PRIMARY)));
 
-		assertThat(unit.parse("2"), present(is(Layer.SECONDARY)));
-		assertThat(unit.parse("S"), present(is(Layer.SECONDARY)));
+		assertThat(unit.parse("2"), present(is(LayerType.SECONDARY)));
+		assertThat(unit.parse("S"), present(is(LayerType.SECONDARY)));
 
-		assertThat(unit.parse("V"), present(is(Layer.VETERAN)));
+		assertThat(unit.parse("V"), present(is(LayerType.VETERAN)));
 
 		assertThat(unit.parse(""), notPresent());
 		assertThat(unit.parse(" "), notPresent());
@@ -148,41 +167,86 @@ class ValueParserTest {
 	}
 
 	@Test
-	void testToMap() throws Exception {
-		var map = Utils.<String, Integer>constMap(x -> {
-			x.put("K3", 42);
-			x.put("K4", 23);
-		});
-		var unit = ValueParser
-				.<String, Integer>toMap(ValueParser.list(ValueParser.INTEGER), map, "K1", "K2", "K3", "K4");
+	void testMapParserSimple() throws Exception {
+		var parser = ValueParser.toMap(ValueParser.segmentList(3, ValueParser.INTEGER), "A", "B", "C");
 
-		assertThat(unit.parse(" 2 3"), equalTo(constMap(x -> {
-			x.put("K1", 2);
-			x.put("K2", 3);
-			x.put("K3", 42);
-			x.put("K4", 23);
-		})));
-		assertThat(unit.parse(" 2 3 4"), equalTo(constMap(x -> {
-			x.put("K1", 2);
-			x.put("K2", 3);
-			x.put("K3", 4);
-			x.put("K4", 23);
-		})));
-		assertThat(unit.parse(" 2 3 4 5"), equalTo(constMap(x -> {
-			x.put("K1", 2);
-			x.put("K2", 3);
-			x.put("K3", 4);
-			x.put("K4", 5);
-		})));
+		var result = parser.parse("  1  2  3");
 
-		assertThrows(ValueParseException.class, () -> unit.parse(" 2 "));
+		assertThat(result, aMapWithSize(3));
+		assertThat(result, hasEntry(is("A"), is(1)));
+		assertThat(result, hasEntry(is("B"), is(2)));
+		assertThat(result, hasEntry(is("C"), is(3)));
 
-		assertThrows(
+	}
+
+	@Test
+	void testMapParserMissingAValueError() throws Exception {
+		var parser = ValueParser.toMap(ValueParser.segmentList(3, ValueParser.INTEGER), "A", "B", "C");
+
+		var ex = assertThrows(ValueParseException.class, () -> parser.parse("  1  2"));
+		assertThat(ex, hasProperty("message", is("Expected exactly 3 values but there were 2")));
+	}
+
+	@Test
+	void testMapParserExtraAValueError() throws Exception {
+		var parser = ValueParser.toMap(ValueParser.segmentList(3, ValueParser.INTEGER), "A", "B", "C");
+
+		var ex = assertThrows(ValueParseException.class, () -> parser.parse("  1  2  3  4"));
+		assertThat(ex, hasProperty("message", is("Expected exactly 3 values but there were 4")));
+	}
+
+	@Test
+	void testMapParserWithDefaults() throws Exception {
+		Map<String, Integer> defaults = new HashMap<>();
+		defaults.put("C", 5);
+		defaults.put("D", 6);
+
+		var parser = ValueParser.toMap(ValueParser.segmentList(3, ValueParser.INTEGER), defaults, "A", "B", "C", "D");
+
+		var result = parser.parse("  1  2  3");
+
+		assertThat(result, aMapWithSize(4));
+		assertThat(result, hasEntry(is("A"), is(1)));
+		assertThat(result, hasEntry(is("B"), is(2)));
+		assertThat(result, hasEntry(is("C"), is(3)));// 3 not 5
+		assertThat(result, hasEntry(is("D"), is(6)));
+	}
+
+	@Test
+	void testMapParserWithDefaultsToFew() throws Exception {
+		Map<String, Integer> defaults = new HashMap<>();
+		defaults.put("C", 5);
+		defaults.put("D", 6);
+
+		var parser = ValueParser.toMap(ValueParser.segmentList(3, ValueParser.INTEGER), defaults, "A", "B", "C", "D");
+
+		var ex = assertThrows(ValueParseException.class, () -> parser.parse("  1"));
+		assertThat(ex, hasProperty("message", is("Expected between 2 and 4 values but there were 1")));
+	}
+
+	@Test
+	void testMapParserWithDefaultsToMany() throws Exception {
+		Map<String, Integer> defaults = new HashMap<>();
+		defaults.put("C", 5);
+		defaults.put("D", 6);
+
+		var parser = ValueParser.toMap(ValueParser.segmentList(3, ValueParser.INTEGER), defaults, "A", "B", "C", "D");
+
+		var ex = assertThrows(ValueParseException.class, () -> parser.parse("  1  2  3  4  5"));
+		assertThat(ex, hasProperty("message", is("Expected between 2 and 4 values but there were 5")));
+	}
+
+	@Test
+	void testMapParserDefaultsMustComeAfterRequired() throws Exception {
+		Map<String, Integer> defaults = new HashMap<>();
+		defaults.put("C", 5);
+		defaults.put("B", 6);
+
+		var ex = assertThrows(
 				IllegalArgumentException.class,
-				() -> ValueParser
-						.<String, Integer>toMap(ValueParser.list(ValueParser.INTEGER), map, "K1", "K3", "K2", "K4")
+				() -> ValueParser.toMap(ValueParser.segmentList(3, ValueParser.INTEGER), defaults, "A", "B", "C", "D")
 		);
-
+		assertThat(ex, hasProperty("message", is("Keys with defaults must follow those without")));
 	}
 
 }

@@ -19,7 +19,7 @@
 		<dependency>
 			<groupId>ca.bc.gov.nrs.vdyp</groupId>
 			<artifactId>vdyp-common</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>

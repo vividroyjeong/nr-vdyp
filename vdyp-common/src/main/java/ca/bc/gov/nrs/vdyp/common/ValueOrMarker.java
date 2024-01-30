@@ -24,7 +24,7 @@ public class ValueOrMarker<Value, Marker> {
 	}
 
 	/**
-	 * Is there a value
+	 * Is there a marker
 	 *
 	 * @return
 	 */
@@ -33,7 +33,7 @@ public class ValueOrMarker<Value, Marker> {
 	}
 
 	/**
-	 * Is there a marker
+	 * Is there a value
 	 *
 	 * @return
 	 */
@@ -88,7 +88,7 @@ public class ValueOrMarker<Value, Marker> {
 	 * @return
 	 */
 	public static <Value, Marker> Builder<Value, Marker> builder(Class<Value> vClazz, Class<Marker> mClazz) {
-		return new Builder<Value, Marker>();
+		return new Builder<>();
 	}
 
 	/**
@@ -102,22 +102,18 @@ public class ValueOrMarker<Value, Marker> {
 	 */
 	public static class Builder<Value, Marker> {
 
-		public Builder() {
-
-		}
-
 		/**
 		 * Create a ValueOrMarker with a Marker
 		 */
 		public ValueOrMarker<Value, Marker> marker(Marker m) {
-			return new ValueOrMarker<Value, Marker>(m, true);
+			return new ValueOrMarker<>(m, true);
 		}
 
 		/**
 		 * Create a ValueOrMarker with a Value
 		 */
 		public ValueOrMarker<Value, Marker> value(Value v) {
-			return new ValueOrMarker<Value, Marker>(v, false);
+			return new ValueOrMarker<>(v, false);
 		}
 	}
 }
