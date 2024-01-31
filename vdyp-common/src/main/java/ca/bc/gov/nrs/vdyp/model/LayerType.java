@@ -4,13 +4,23 @@ public enum LayerType {
 	/**
 	 * The primary layer
 	 */
-	PRIMARY,
+	PRIMARY("P"),
 	/**
 	 * The parser is aware of this but it is never implemented
 	 */
-	SECONDARY,
+	SECONDARY("S"),
 	/**
 	 * An older layer than the primary layer, also called the "overstory"
 	 */
-	VETERAN
+	VETERAN("V");
+
+	private final String alias;
+
+	private LayerType(String alias) {
+		this.alias = alias;
+	}
+
+	public String getAlias() {
+		return alias;
+	}
 }

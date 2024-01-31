@@ -35,7 +35,7 @@ class FipLayerParserTest {
 		controlMap.put(FipLayerParser.CONTROL_KEY, "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
-		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeStream(/* empty */));
+		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeInputStream(/* empty */));
 
 		parser.modify(controlMap, fileResolver);
 
@@ -63,7 +63,7 @@ class FipLayerParserTest {
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
-				TestUtils.makeStream(
+				TestUtils.makeInputStream(
 						"01002 S000001 00     1970 1  55 35.3 35.0 87.4   D  D  1.0 0              13",
 						"01002 S000001 00     1970 Z  55  0.0  0.0  0.0         0.0"
 				)
@@ -90,13 +90,13 @@ class FipLayerParserTest {
 						LayerType.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")), //
 								hasProperty("layer", is(LayerType.PRIMARY)), //
-								hasProperty("ageTotal", is(55f)), //
-								hasProperty("height", is(35.3f)), //
-								hasProperty("siteIndex", is(35.0f)), //
+								hasProperty("ageTotalSafe", is(55f)), //
+								hasProperty("heightSafe", is(35.3f)), //
+								hasProperty("siteIndex", present(is(35.0f))), //
 								hasProperty("crownClosure", is(87.4f)), //
-								hasProperty("siteSp0", is("D")), //
-								hasProperty("siteSp64", is("D")), //
-								hasProperty("yearsToBreastHeight", is(1.0f)), //
+								hasProperty("siteGenus", present(is("D"))), //
+								hasProperty("siteSpecies", is("D")), //
+								hasProperty("yearsToBreastHeightSafe", is(1.0f)), //
 								hasProperty("stockingClass", present(is('0'))), //
 								hasProperty("inventoryTypeGroup", notPresent()), //
 								hasProperty("siteCurveNumber", present(is(13)))
@@ -119,7 +119,7 @@ class FipLayerParserTest {
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
-				TestUtils.makeStream(
+				TestUtils.makeInputStream(
 						"01002 S000004 00     1970 V 195 45.2 22.3  4.0   B  B  9.4 2               8",
 						"01002 S000004 00     1970 1  85 42.3 31.9 82.8   H  H  4.9 0              34",
 						"01002 S000004 00     1970 Z  85  0.0  0.0  0.0         0.0"
@@ -144,15 +144,18 @@ class FipLayerParserTest {
 		assertThat(
 				layers,
 				hasSpecificEntry(
-						LayerType.PRIMARY,
-						allOf(
-								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")),
-								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("ageTotal", is(85f)),
-								hasProperty("height", is(42.3f)), hasProperty("siteIndex", is(31.9f)),
-								hasProperty("crownClosure", is(82.8f)), hasProperty("siteSp0", is("H")),
-								hasProperty("siteSp64", is("H")), hasProperty("yearsToBreastHeight", is(4.9f)),
-								hasProperty("stockingClass", present(is('0'))),
-								hasProperty("inventoryTypeGroup", notPresent()),
+						LayerType.PRIMARY, allOf(
+								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
+								hasProperty("layer", is(LayerType.PRIMARY)), //
+								hasProperty("ageTotalSafe", is(85f)), //
+								hasProperty("heightSafe", is(42.3f)), //
+								hasProperty("siteIndex", present(is(31.9f))), //
+								hasProperty("crownClosure", is(82.8f)), //
+								hasProperty("siteGenus", present(is("H"))), //
+								hasProperty("siteSpecies", is("H")), //
+								hasProperty("yearsToBreastHeightSafe", is(4.9f)), //
+								hasProperty("stockingClass", present(is('0'))), //
+								hasProperty("inventoryTypeGroup", notPresent()), //
 								hasProperty("siteCurveNumber", present(is(34)))
 						)
 				)
@@ -160,13 +163,16 @@ class FipLayerParserTest {
 		assertThat(
 				layers,
 				hasSpecificEntry(
-						LayerType.VETERAN,
-						allOf(
-								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")),
-								hasProperty("layer", is(LayerType.VETERAN)), hasProperty("ageTotal", is(195f)),
-								hasProperty("height", is(45.2f)), hasProperty("siteIndex", is(22.3f)),
-								hasProperty("crownClosure", is(4.0f)), hasProperty("siteSp0", is("B")),
-								hasProperty("siteSp64", is("B")), hasProperty("yearsToBreastHeight", is(9.4f))
+						LayerType.VETERAN, allOf(
+								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
+								hasProperty("layer", is(LayerType.VETERAN)), //
+								hasProperty("ageTotalSafe", is(195f)), //
+								hasProperty("heightSafe", is(45.2f)), //
+								hasProperty("siteIndex", present(is(22.3f))), //
+								hasProperty("crownClosure", is(4.0f)), //
+								hasProperty("siteGenus", present(is("B"))), //
+								hasProperty("siteSpecies", is("B")), //
+								hasProperty("yearsToBreastHeightSafe", is(9.4f))
 								// hasProperty("stockingClass", present(is("2"))),
 								// hasProperty("siteCurveNumber", present(is(8)))
 						)
@@ -188,7 +194,7 @@ class FipLayerParserTest {
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
-				TestUtils.makeStream(
+				TestUtils.makeInputStream(
 						"01002 S000004 00     1970 V 195 45.2 22.3  0.0   B  B  9.4 2               8",
 						"01002 S000004 00     1970 1  85 42.3 31.9 82.8   H  H  4.9 0              34",
 						"01002 S000004 00     1970 Z  85  0.0  0.0  0.0         0.0"
@@ -213,15 +219,18 @@ class FipLayerParserTest {
 		assertThat(
 				layers,
 				hasSpecificEntry(
-						LayerType.PRIMARY,
-						allOf(
-								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")),
-								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("ageTotal", is(85f)),
-								hasProperty("height", is(42.3f)), hasProperty("siteIndex", is(31.9f)),
-								hasProperty("crownClosure", is(82.8f)), hasProperty("siteSp0", is("H")),
-								hasProperty("siteSp64", is("H")), hasProperty("yearsToBreastHeight", is(4.9f)),
-								hasProperty("stockingClass", present(is('0'))),
-								hasProperty("inventoryTypeGroup", notPresent()),
+						LayerType.PRIMARY, allOf(
+								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
+								hasProperty("layer", is(LayerType.PRIMARY)), //
+								hasProperty("ageTotalSafe", is(85f)), //
+								hasProperty("heightSafe", is(42.3f)), //
+								hasProperty("siteIndex", present(is(31.9f))), //
+								hasProperty("crownClosure", is(82.8f)), //
+								hasProperty("siteGenus", present(is("H"))), //
+								hasProperty("siteSpecies", is("H")), //
+								hasProperty("yearsToBreastHeightSafe", is(4.9f)), //
+								hasProperty("stockingClass", present(is('0'))), //
+								hasProperty("inventoryTypeGroup", notPresent()), //
 								hasProperty("siteCurveNumber", present(is(34)))
 						)
 				)
@@ -242,7 +251,7 @@ class FipLayerParserTest {
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
-				TestUtils.makeStream(
+				TestUtils.makeInputStream(
 						"01002 S000004 00     1970 V 195  0.0 22.3  4.0   B  B  9.4 2               8",
 						"01002 S000004 00     1970 1  85 42.3 31.9 82.8   H  H  4.9 0              34",
 						"01002 S000004 00     1970 Z  85  0.0  0.0  0.0         0.0"
@@ -267,15 +276,18 @@ class FipLayerParserTest {
 		assertThat(
 				layers,
 				hasSpecificEntry(
-						LayerType.PRIMARY,
-						allOf(
-								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")),
-								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("ageTotal", is(85f)),
-								hasProperty("height", is(42.3f)), hasProperty("siteIndex", is(31.9f)),
-								hasProperty("crownClosure", is(82.8f)), hasProperty("siteSp0", is("H")),
-								hasProperty("siteSp64", is("H")), hasProperty("yearsToBreastHeight", is(4.9f)),
-								hasProperty("stockingClass", present(is('0'))),
-								hasProperty("inventoryTypeGroup", notPresent()),
+						LayerType.PRIMARY, allOf(
+								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
+								hasProperty("layer", is(LayerType.PRIMARY)), //
+								hasProperty("ageTotalSafe", is(85f)), //
+								hasProperty("heightSafe", is(42.3f)), //
+								hasProperty("siteIndex", present(is(31.9f))), //
+								hasProperty("crownClosure", is(82.8f)), //
+								hasProperty("siteGenus", present(is("H"))), //
+								hasProperty("siteSpecies", is("H")), //
+								hasProperty("yearsToBreastHeightSafe", is(4.9f)),
+								hasProperty("stockingClass", present(is('0'))), //
+								hasProperty("inventoryTypeGroup", notPresent()), //
 								hasProperty("siteCurveNumber", present(is(34)))
 						)
 				)

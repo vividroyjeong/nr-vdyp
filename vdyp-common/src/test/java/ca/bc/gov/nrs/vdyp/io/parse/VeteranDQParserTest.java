@@ -20,7 +20,7 @@ class VeteranDQParserTest {
 
 		var parser = new VeteranDQParser();
 
-		var is = TestUtils.makeStream("S1 C   22.500  0.24855  1.46089");
+		var is = TestUtils.makeInputStream("S1 C   22.500  0.24855  1.46089");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -38,7 +38,7 @@ class VeteranDQParserTest {
 
 		var parser = new VeteranDQParser();
 
-		var is = TestUtils.makeStream("S1     22.500  0.24855  1.46089");
+		var is = TestUtils.makeInputStream("S1     22.500  0.24855  1.46089");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -56,7 +56,7 @@ class VeteranDQParserTest {
 
 		var parser = new VeteranDQParser();
 
-		var is = TestUtils.makeStream("SX C   22.500  0.24855  1.46089");
+		var is = TestUtils.makeInputStream("SX C   22.500  0.24855  1.46089");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -72,7 +72,7 @@ class VeteranDQParserTest {
 
 		var parser = new VeteranDQParser();
 
-		var is = TestUtils.makeStream("S1 C   22.500  0.24855 ");
+		var is = TestUtils.makeInputStream("S1 C   22.500  0.24855 ");
 
 		Map<String, Object> controlMap = new HashMap<>();
 

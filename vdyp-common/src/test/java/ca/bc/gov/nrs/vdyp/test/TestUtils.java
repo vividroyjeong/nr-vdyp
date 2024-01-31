@@ -1,10 +1,14 @@
 package ca.bc.gov.nrs.vdyp.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,6 +20,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import org.hamcrest.Matcher;
 
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.BecDefinitionParser;
@@ -46,8 +52,57 @@ public class TestUtils {
 	/**
 	 * Create a stream returning the given sequence of lines.
 	 */
-	public static InputStream makeStream(String... lines) {
+	public static InputStream makeInputStream(String... lines) {
 		return new ByteArrayInputStream(String.join("\r\n", lines).getBytes());
+	}
+
+	public static class MockOutputStream extends OutputStream {
+		private boolean isOpen = true;
+		private ByteArrayOutputStream realStream;
+		private String streamName;
+
+		public MockOutputStream(String streamName) {
+			this.realStream = new ByteArrayOutputStream();
+			this.streamName = streamName;
+		}
+
+		@Override
+		public void write(int b) throws IOException {
+			if (isOpen) {
+				realStream.write(b);
+			} else {
+				fail("Attempt to write to closed stream");
+			}
+		}
+
+		@Override
+		public void close() throws IOException {
+			isOpen = false;
+		}
+
+		@Override
+		public String toString() {
+			return realStream.toString();
+		}
+
+		public boolean isOpen() {
+			return isOpen;
+		}
+
+		public void assertClosed() {
+			assertTrue(!isOpen, "stream " + streamName + " was not closed");
+		}
+
+		public void assertContent(Matcher<String> matcher) {
+			assertThat("Stream " + streamName + "contents", toString(), matcher);
+		}
+	}
+
+	/**
+	 * Read an output streams contents as a string..
+	 */
+	public static String readOutputStream(ByteArrayOutputStream os) {
+		return os.toString();
 	}
 
 	/**
@@ -62,7 +117,7 @@ public class TestUtils {
 		return new FileResolver() {
 
 			@Override
-			public InputStream resolve(String filename) throws IOException {
+			public InputStream resolveForInput(String filename) throws IOException {
 				if (filename.equals(expectedFilename)) {
 					return is;
 				} else {
@@ -74,6 +129,12 @@ public class TestUtils {
 			@Override
 			public String toString(String filename) throws IOException {
 				return "TEST:" + filename;
+			}
+
+			@Override
+			public OutputStream resolveForOutput(String filename) throws IOException {
+				fail("Unexpected attempt to open expectedFileName for output");
+				return null;
 			}
 
 		};

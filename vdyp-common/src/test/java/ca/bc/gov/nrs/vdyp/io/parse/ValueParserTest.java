@@ -1,8 +1,12 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.*;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.aMapWithSize;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.HashMap;
@@ -64,7 +68,7 @@ class ValueParserTest {
 	}
 
 	@Test
-	void enumParserTest() throws Exception {
+	void testEnumParser() throws Exception {
 		var parser = ValueParser.enumParser(TestEnum.class);
 
 		assertThat(parser.parse("VALUE1"), is(TestEnum.VALUE1));

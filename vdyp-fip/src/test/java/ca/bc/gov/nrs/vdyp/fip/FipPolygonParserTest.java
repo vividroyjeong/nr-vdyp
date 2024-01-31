@@ -14,10 +14,10 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.fip.model.FipMode;
 import ca.bc.gov.nrs.vdyp.fip.model.FipPolygon;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
+import ca.bc.gov.nrs.vdyp.model.FipMode;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 
@@ -33,7 +33,7 @@ public class FipPolygonParserTest {
 		controlMap.put(FipPolygonParser.CONTROL_KEY, "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
-		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeStream(/* empty */));
+		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeInputStream(/* empty */));
 
 		parser.modify(controlMap, fileResolver);
 
@@ -59,8 +59,9 @@ public class FipPolygonParserTest {
 		controlMap.put(FipPolygonParser.CONTROL_KEY, "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
-		var fileResolver = TestUtils
-				.fileResolver("test.dat", TestUtils.makeStream("Test Polygon              A CWH  90.0  2 BLAH  0.95"));
+		var fileResolver = TestUtils.fileResolver(
+				"test.dat", TestUtils.makeInputStream("Test Polygon              A CWH  90.0  2 BLAH  0.95")
+		);
 
 		parser.modify(controlMap, fileResolver);
 
@@ -96,8 +97,9 @@ public class FipPolygonParserTest {
 		controlMap.put(FipPolygonParser.CONTROL_KEY, "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
-		var fileResolver = TestUtils
-				.fileResolver("test.dat", TestUtils.makeStream("01002 S000001 00     1970 A CWH                    "));
+		var fileResolver = TestUtils.fileResolver(
+				"test.dat", TestUtils.makeInputStream("01002 S000001 00     1970 A CWH                    ")
+		);
 
 		parser.modify(controlMap, fileResolver);
 
@@ -135,7 +137,7 @@ public class FipPolygonParserTest {
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
-				TestUtils.makeStream(
+				TestUtils.makeInputStream(
 						"01002 S000001 00     1970 A CWH                1.00",
 						"01002 S000002 00     1970 A CWH                1.00",
 						"01002 S000003 00     1970 A CWH                1.00",
@@ -273,8 +275,9 @@ public class FipPolygonParserTest {
 		controlMap.put(FipPolygonParser.CONTROL_KEY, "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
-		var fileResolver = TestUtils
-				.fileResolver("test.dat", TestUtils.makeStream("01002 S000001 00     1970 A CWH   0.0  0       0.00"));
+		var fileResolver = TestUtils.fileResolver(
+				"test.dat", TestUtils.makeInputStream("01002 S000001 00     1970 A CWH   0.0  0       0.00")
+		);
 
 		parser.modify(controlMap, fileResolver);
 
@@ -310,8 +313,9 @@ public class FipPolygonParserTest {
 		controlMap.put(FipPolygonParser.CONTROL_KEY, "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
-		var fileResolver = TestUtils
-				.fileResolver("test.dat", TestUtils.makeStream("01002 S000001 00     1970 A CWH  -1.0         -1.00"));
+		var fileResolver = TestUtils.fileResolver(
+				"test.dat", TestUtils.makeInputStream("01002 S000001 00     1970 A CWH  -1.0         -1.00")
+		);
 
 		parser.modify(controlMap, fileResolver);
 

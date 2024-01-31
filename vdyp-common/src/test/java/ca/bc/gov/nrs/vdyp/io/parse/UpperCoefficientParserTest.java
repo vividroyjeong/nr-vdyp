@@ -23,7 +23,7 @@ class UpperCoefficientParserTest {
 
 		var parser = new UpperCoefficientParser();
 
-		var is = TestUtils.makeStream("S1 I 2.0028 -0.5343");
+		var is = TestUtils.makeInputStream("S1 I 2.0028 -0.5343");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -44,7 +44,7 @@ class UpperCoefficientParserTest {
 
 		var parser = new UpperCoefficientParser();
 
-		var is = TestUtils.makeStream("SX I 2.0028 -0.5343");
+		var is = TestUtils.makeInputStream("SX I 2.0028 -0.5343");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -64,7 +64,7 @@ class UpperCoefficientParserTest {
 
 		var parser = new UpperCoefficientParser();
 
-		var is = TestUtils.makeStream("S1 X 2.0028 -0.5343");
+		var is = TestUtils.makeInputStream("S1 X 2.0028 -0.5343");
 
 		Map<String, Object> controlMap = new HashMap<>();
 

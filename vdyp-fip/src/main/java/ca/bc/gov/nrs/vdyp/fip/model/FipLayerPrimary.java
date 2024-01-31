@@ -8,32 +8,23 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 public class FipLayerPrimary extends FipLayer {
 
-	// TODO Confirm if these should be required instead of optional if we know it's
-	// a Primary layer.
-	private Optional<Integer> siteCurveNumber = Optional.empty(); // FIPL_1/SCN_L1
+	private Optional<Character> stockingClass; // FIPL_1ST/STK_L1
 
-	private Optional<Character> stockingClass = Optional.empty(); // FIPL_1ST/STK_L1
-
-	private Optional<String> primaryGenus = Optional.empty(); // FIPL_1C/JPRIME
-
-	private Optional<Integer> inventoryTypeGroup = Optional.empty();
+	private Optional<String> primaryGenus; // FIPL_1C/JPRIME
 
 	public FipLayerPrimary(
-			String polygonIdentifier, float ageTotal, float yearsToBreastHeight, float height, float siteIndex,
-			float crownClosure, String siteGenus, String siteSpecies
+			String polygonIdentifier, Optional<Float> ageTotal, Optional<Float> height,
+			Optional<Float> yearsToBreastHeight, Optional<Float> siteIndex, Optional<Integer> siteCurveNumber,
+			Optional<Integer> inventoryTypeGroup, Optional<String> siteGenus, float crownClosure, String siteSpecies,
+			Optional<Character> stockingClass, Optional<String> primaryGenus
 	) {
 		super(
-				polygonIdentifier, LayerType.PRIMARY, ageTotal, yearsToBreastHeight, height, siteIndex, crownClosure,
-				siteGenus, siteSpecies
+				polygonIdentifier, LayerType.PRIMARY, ageTotal, height, yearsToBreastHeight, siteIndex, siteCurveNumber,
+				inventoryTypeGroup, siteGenus, crownClosure, siteSpecies
 		);
-	}
+		this.stockingClass = stockingClass;
+		this.primaryGenus = primaryGenus;
 
-	public Optional<Integer> getSiteCurveNumber() {
-		return siteCurveNumber;
-	}
-
-	public void setSiteCurveNumber(Optional<Integer> siteCurveNumber) {
-		this.siteCurveNumber = siteCurveNumber;
 	}
 
 	public Optional<Character> getStockingClass() {
@@ -55,14 +46,6 @@ public class FipLayerPrimary extends FipLayer {
 	@Computed
 	public Optional<FipSpecies> getPrimarySpeciesRecord() {
 		return primaryGenus.map(this.getSpecies()::get);
-	}
-
-	public Optional<Integer> getInventoryTypeGroup() {
-		return inventoryTypeGroup;
-	}
-
-	public void setInventoryTypeGroup(Optional<Integer> inventoryTypeGroup) {
-		this.inventoryTypeGroup = inventoryTypeGroup;
 	}
 
 	/**
@@ -103,18 +86,9 @@ public class FipLayerPrimary extends FipLayer {
 	}
 
 	public static class PrimaryBuilder extends Builder {
-		private Optional<Integer> siteCurveNumber = Optional.empty();
-
 		private Optional<Character> stockingClass = Optional.empty();
 
 		private Optional<String> primaryGenus = Optional.empty();
-
-		private Optional<Integer> inventoryTypeGroup = Optional.empty();
-
-		public Builder siteCurveNumber(Optional<Integer> siteCurveNumber) {
-			this.siteCurveNumber = siteCurveNumber;
-			return this;
-		}
 
 		public Builder stockingClass(Optional<Character> stockingClass) {
 			this.stockingClass = stockingClass;
@@ -126,25 +100,12 @@ public class FipLayerPrimary extends FipLayer {
 			return this;
 		}
 
-		public Builder inventoryTypeGroup(Optional<Integer> inventoryTypeGroup) {
-			this.inventoryTypeGroup = inventoryTypeGroup;
-			return this;
-		}
-
-		public Builder siteCurveNumber(int siteCurveNumber) {
-			return siteCurveNumber(Optional.of(siteCurveNumber));
-		}
-
 		public Builder stockingClass(char stockingClass) {
 			return stockingClass(Optional.of(stockingClass));
 		}
 
 		public Builder primaryGenus(String primaryGenus) {
 			return primaryGenus(Optional.of(primaryGenus));
-		}
-
-		public Builder inventoryTypeGroup(int inventoryTypeGroup) {
-			return inventoryTypeGroup(Optional.of(inventoryTypeGroup));
 		}
 
 		public PrimaryBuilder() {
@@ -154,21 +115,19 @@ public class FipLayerPrimary extends FipLayer {
 
 		@Override
 		protected FipLayerPrimary doBuild() {
-			var result = new FipLayerPrimary(
+			return new FipLayerPrimary(
 					polygonIdentifier.get(), //
-					ageTotal.get(), //
-					yearsToBreastHeight.get(), //
-					height.get(), //
-					siteIndex.get(), //
+					ageTotal, //
+					height, //
+					yearsToBreastHeight, //
+					siteIndex, //
+					siteCurveNumber, //
+					inventoryTypeGroup, //
+					siteGenus, //
 					crownClosure.get(), //
-					siteGenus.get(), //
-					siteSpecies.get()
+					siteSpecies.get(), //
+					stockingClass, primaryGenus
 			);
-			result.setSiteCurveNumber(this.siteCurveNumber);
-			result.setStockingClass(this.stockingClass);
-			result.setPrimaryGenus(this.primaryGenus);
-			result.setInventoryTypeGroup(this.inventoryTypeGroup);
-			return result;
 		}
 
 	}

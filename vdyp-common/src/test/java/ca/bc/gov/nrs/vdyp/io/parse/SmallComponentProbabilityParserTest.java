@@ -20,7 +20,7 @@ class SmallComponentProbabilityParserTest {
 	@Test
 	void testParseSimpleP1() throws Exception {
 
-		var is = TestUtils.makeStream("S1   0.48205   0.00000 -0.011862  -0.10014");
+		var is = TestUtils.makeInputStream("S1   0.48205   0.00000 -0.011862  -0.10014");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -35,7 +35,7 @@ class SmallComponentProbabilityParserTest {
 	@Test
 	void testParseBadSpecies() throws Exception {
 
-		var is = TestUtils.makeStream("SX   0.48205   0.00000 -0.011862  -0.10014");
+		var is = TestUtils.makeInputStream("SX   0.48205   0.00000 -0.011862  -0.10014");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
