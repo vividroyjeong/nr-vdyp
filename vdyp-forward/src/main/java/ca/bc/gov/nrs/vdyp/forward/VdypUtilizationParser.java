@@ -71,7 +71,7 @@ public class VdypUtilizationParser
 					.value(9, CU_VOLUME_LESS_DECAY_WASTAGE_BREAKAGE, ValueParser.FLOAT)
 					.value(6, QUADRATIC_MEAN_DIAMETER_BREAST_HEIGHT, ValueParser.FLOAT);
 
-			var is = fileResolver.resolve(fileName);
+			var is = fileResolver.resolveForInput(fileName);
 
 			var delegateStream = new AbstractStreamingParser<ValueOrMarker<Optional<VdypSpeciesUtilization>, EndOfRecord>>(
 					is, lineParser, control

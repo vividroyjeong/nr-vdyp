@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.vdyp.forward.test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -83,11 +84,16 @@ public class VdypForwardTestUtils {
 		return new FileResolver() {
 
 			@Override
-			public InputStream resolve(String filename) throws IOException {
+			public InputStream resolveForInput(String filename) throws IOException {
 				InputStream resourceAsStream = klazz.getResourceAsStream(filename);
 				if (resourceAsStream == null)
 					throw new IOException("Could not load " + filename);
 				return resourceAsStream;
+			}
+
+			@Override
+			public OutputStream resolveForOutput(String filename) throws IOException {
+				throw new UnsupportedOperationException();
 			}
 
 			@Override

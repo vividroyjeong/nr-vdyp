@@ -89,7 +89,7 @@ public class VdypForwardProcessor {
 		for (var controlFileName : controlFileNames) {
 			log.info("Resolving and parsing {}", controlFileName);
 
-			try (var is = resolver.resolve(controlFileName)) {
+			try (var is = resolver.resolveForInput(controlFileName)) {
 				Path controlFilePath = Path.of(controlFileName).getParent();
 				FileSystemRelativeFileResolver relativeResolver = new FileSystemRelativeFileResolver(
 						controlFilePath.toString()

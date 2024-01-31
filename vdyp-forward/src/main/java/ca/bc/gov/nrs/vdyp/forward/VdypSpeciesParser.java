@@ -85,7 +85,7 @@ public class VdypSpeciesParser
 					.value(2, IS_PRIMARY_SPECIES, ControlledValueParser.optional(ValueParser.LOGICAL_0_1))
 					.value(3, SITE_CURVE_NUMBER, ControlledValueParser.optional(ValueParser.INTEGER));
 
-			var is = fileResolver.resolve(fileName);
+			var is = fileResolver.resolveForInput(fileName);
 
 			var delegateStream = new AbstractStreamingParser<ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord>>(
 					is, lineParser, control

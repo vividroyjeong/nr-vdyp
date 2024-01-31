@@ -57,7 +57,7 @@ public class VdypPolygonParser implements ControlMapValueReplacer<StreamingParse
 					.value(3, BASAL_AREA_GROUP, ValueParser.optional(ValueParser.INTEGER))
 					.value(3, FIP_MODE, ValueParser.optional(ValueParser.INTEGER));
 
-			var is = fileResolver.resolve(fileName);
+			var is = fileResolver.resolveForInput(fileName);
 
 			return new AbstractStreamingParser<VdypPolygon>(is, lineParser, control) {
 

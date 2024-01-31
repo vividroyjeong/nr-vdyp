@@ -33,7 +33,7 @@ public class VdypForwardPolygonParserTest {
 		controlMap.put(VdypPolygonParser.CONTROL_KEY, "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
-		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeStream(/* empty */));
+		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeInputStream(/* empty */));
 
 		parser.modify(controlMap, fileResolver);
 
@@ -60,7 +60,7 @@ public class VdypForwardPolygonParserTest {
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils
-				.fileResolver("test.dat", TestUtils.makeStream("01002 S000001 00     1970 CWH  A    99 37  1  1"));
+				.fileResolver("test.dat", TestUtils.makeInputStream("01002 S000001 00     1970 CWH  A    99 37  1  1"));
 
 		parser.modify(controlMap, fileResolver);
 
@@ -98,7 +98,7 @@ public class VdypForwardPolygonParserTest {
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils
-				.fileResolver("test.dat", TestUtils.makeStream("01002 S000001 00     1970 CWH  A    99"));
+				.fileResolver("test.dat", TestUtils.makeInputStream("01002 S000001 00     1970 CWH  A    99"));
 
 		parser.modify(controlMap, fileResolver);
 
@@ -137,7 +137,7 @@ public class VdypForwardPolygonParserTest {
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
-				TestUtils.makeStream(
+				TestUtils.makeInputStream(
 						"01002 S000001 00     1970 CWH  A    99 37  1  1",
 						"01002 S000002 00     1970 CWH  A    98 15 75  1",
 						"01002 S000003 00     1970 CWH  A    99 15 75  1",
@@ -286,7 +286,7 @@ public class VdypForwardPolygonParserTest {
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
-				TestUtils.makeStream("01002 S000001 00     1970 CWH  A   0.0", "01002 S000002 00     1970 CWH  A  -1.0")
+				TestUtils.makeInputStream("01002 S000001 00     1970 CWH  A   0.0", "01002 S000002 00     1970 CWH  A  -1.0")
 		);
 
 		parser.modify(controlMap, fileResolver);

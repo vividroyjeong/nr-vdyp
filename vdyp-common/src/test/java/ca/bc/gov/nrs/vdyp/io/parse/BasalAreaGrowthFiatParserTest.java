@@ -45,7 +45,7 @@ public class BasalAreaGrowthFiatParserTest {
 
 		var parser = new BasalAreaGrowthFiatParser();
 
-		var is = TestUtils.makeStream(
+		var is = TestUtils.makeInputStream(
 				"  1     1   .02   100   .01   200     0     0     0   100   150   1.0"
 		);
 		
@@ -65,7 +65,7 @@ public class BasalAreaGrowthFiatParserTest {
 
 		var parser = new BasalAreaGrowthFiatParser();
 
-		var is = TestUtils.makeStream(
+		var is = TestUtils.makeInputStream(
 				"  2     1   .02   100   .01   200     0     0     0   100   150   1.0"
 		);
 		
@@ -85,7 +85,7 @@ public class BasalAreaGrowthFiatParserTest {
 
 		var parser = new BasalAreaGrowthFiatParser();
 
-		var is = TestUtils.makeStream(
+		var is = TestUtils.makeInputStream(
 		);
 		
 		Map<String, Object> controlMap = new HashMap<>();
@@ -104,7 +104,7 @@ public class BasalAreaGrowthFiatParserTest {
 
 		var parser = new BasalAreaGrowthFiatParser();
 
-		var is = TestUtils.makeStream(
+		var is = TestUtils.makeInputStream(
 				"  1   0.0   0.0   0.0   0.0     0     0     0     0   100   150   1.0",
 				"  2     1   .02   100   .01   200     0     0     0   100   150   1.0"
 		);
@@ -125,7 +125,7 @@ public class BasalAreaGrowthFiatParserTest {
 
 		var parser = new BasalAreaGrowthFiatParser();
 
-		var is = TestUtils.makeStream(
+		var is = TestUtils.makeInputStream(
 				"  1     1   .02   100   .01   200     0     0     0   100   150   1.0",
 				"  2     1   .02   100   .01   200     0     0     0   100   150   1.0",
 				"  2     1   .02   100   .01   200     0     0     0   100   150   1.0"

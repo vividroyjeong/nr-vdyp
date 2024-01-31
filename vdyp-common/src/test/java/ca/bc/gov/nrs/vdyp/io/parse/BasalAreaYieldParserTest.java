@@ -47,7 +47,7 @@ class BasalAreaYieldParserTest {
 		TestUtils.populateControlMapGenusReal(controlMap);
 		TestUtils.populateControlMapBecReal(controlMap);
 
-		var is = TestUtils.makeStream(
+		var is = TestUtils.makeInputStream(
 				"AT   A0 1 -4.8137 -0.8603 11.2376  7.6975 -1.5588-16.3758 12.6180 11.6395 -2.8281 -1.5588  0.3191  0.3191 -0.9866 -4.2533 10.7814  5.2548",
 				"     B2 0  8.1110  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000",
 				" ",

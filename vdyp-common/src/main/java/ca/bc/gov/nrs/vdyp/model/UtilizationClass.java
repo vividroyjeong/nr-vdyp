@@ -50,11 +50,11 @@ public enum UtilizationClass {
 		throw new IllegalArgumentException("UtilizationClass index " + index + " is not recognized");
 	}
 
-	Optional<UtilizationClass> next() {
+	public Optional<UtilizationClass> next() {
 		return this.next;
 	}
 
-	Optional<UtilizationClass> previous() {
+	public Optional<UtilizationClass> previous() {
 		return this.previous;
 	}
 }

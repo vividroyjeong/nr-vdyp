@@ -40,7 +40,7 @@ public class PrimarySpeciesBasalAreaGrowthParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		var is = TestUtils.makeStream(
+		var is = TestUtils.makeInputStream(
 				" 1  9  -0.08960  0.007892   0.00105",
 				" ",
 				" 2  3  -0.05273  0.001709   0.00000"

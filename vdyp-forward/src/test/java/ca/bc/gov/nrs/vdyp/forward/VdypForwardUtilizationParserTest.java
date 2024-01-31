@@ -37,7 +37,7 @@ public class VdypForwardUtilizationParserTest {
 		controlMap.put(VdypUtilizationParser.CONTROL_KEY, "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
-		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeStream(/* empty */));
+		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeInputStream(/* empty */));
 
 		parser.modify(controlMap, fileResolver);
 
@@ -65,7 +65,7 @@ public class VdypForwardUtilizationParserTest {
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
-				TestUtils.makeStream(
+				TestUtils.makeInputStream(
 						"01002 S000001 00     1970 P  0    -1  0.01513     5.24   7.0166   0.0630   0.0000   0.0000   0.0000   0.0000   6.1",
 						"01002 S000001 00     1970"
 				)
@@ -120,7 +120,7 @@ public class VdypForwardUtilizationParserTest {
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
-				TestUtils.makeStream(
+				TestUtils.makeInputStream(
 						"01002 S000001 00     1970 P  0    -1  0.01513     5.24   7.0166   0.0630   0.0000   0.0000   0.0000   0.0000   6.1",
 						"01002 S000001 00     1970 P  0    -1  0.01513     5.24   7.0166   0.0630   1.2343   0.0000   0.0000   0.0000   6.1",
 						"01002 S000001 00     1970"

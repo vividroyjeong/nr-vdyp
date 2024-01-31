@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.vdyp.forward;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -226,8 +227,13 @@ public class VdypForwardControlParser {
 			return parse(is, new FileResolver() {
 
 				@Override
-				public InputStream resolve(String filename) throws IOException {
+				public InputStream resolveForInput(String filename) throws IOException {
 					return Files.newInputStream(inputFile.resolveSibling(filename));
+				}
+
+				@Override
+				public OutputStream resolveForOutput(String filename) throws IOException {
+					throw new UnsupportedOperationException();
 				}
 
 				@Override

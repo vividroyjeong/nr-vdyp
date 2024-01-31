@@ -30,7 +30,7 @@ public class VdypForwardSpeciesParserTest {
 		controlMap.put(VdypSpeciesParser.CONTROL_KEY, "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
-		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeStream(/* empty */));
+		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeInputStream(/* empty */));
 
 		parser.modify(controlMap, fileResolver);
 
@@ -58,7 +58,7 @@ public class VdypForwardSpeciesParserTest {
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
-				TestUtils.makeStream(
+				TestUtils.makeInputStream(
 						"01002 S000001 00     1970 P 15 S  S  100.0     0.0     0.0     0.0 -9.00 -9.00  -9.0  -9.0  -9.0 0 -9",
 						"01002 S000001 00     1970"
 				)
@@ -120,7 +120,7 @@ public class VdypForwardSpeciesParserTest {
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
-				TestUtils.makeStream(
+				TestUtils.makeInputStream(
 						"01002 S000002 00     1970 P 15 S  S  100.0     0.0     0.0     0.0 -9.00 -9.00  -9.0  -9.0  -9.0 0 -9",
 						"01002 S000002 00     1970 V  3 B  B   50.0 S  50.0     0.0     0.0 -9.00 -9.00  -9.0  -9.0  -9.0",
 						"01002 S000002 00     1970",
@@ -162,7 +162,7 @@ public class VdypForwardSpeciesParserTest {
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
-				TestUtils.makeStream(
+				TestUtils.makeInputStream(
 						"01002 S000002 00     1970 P 15 S  S  100.0     0.0     0.0     0.0 -9.00 -9.00  20.0  12.0  -9.0 0 -9",
 						"01002 S000002 00     1970 V  3 B  B   50.0 S  50.0     0.0     0.0 -9.00 -9.00  -9.0   8.0   4.0",
 						"01002 S000002 00     1970 V  5 L  L   50.0 LA 25.0 LT 15.0 LW 10.0 -9.00 -9.00  14.0  -9.0   6.0 1",
@@ -276,7 +276,7 @@ public class VdypForwardSpeciesParserTest {
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat",
-				TestUtils.makeStream(
+				TestUtils.makeInputStream(
 						"01002 S000002 00     1970 P 15 S  S  100.0     0.0     0.0     0.0 -9.00 -9.00  -9.0  -9.0  -9.0 0 -9",
 						"01002 S000002 00     1970 V  3 B  B   50.0 S  50.0     0.0     0.0 -9.00 -9.00  -9.0  -9.0  -9.0",
 						"01002 S000002 00     1970"

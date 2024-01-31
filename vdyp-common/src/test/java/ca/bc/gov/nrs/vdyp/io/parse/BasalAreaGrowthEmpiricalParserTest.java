@@ -47,7 +47,7 @@ class BasalAreaGrowthEmpiricalParserTest {
 		TestUtils.populateControlMapGenusReal(controlMap);
 		TestUtils.populateControlMapBecReal(controlMap);
 
-		var is = TestUtils.makeStream(
+		var is = TestUtils.makeInputStream(
 				"AT   B0 0  7.9550  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000",
 				"     B2 0  8.1110  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000",
 				" ",
