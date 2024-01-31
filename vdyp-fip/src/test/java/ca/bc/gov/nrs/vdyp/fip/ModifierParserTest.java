@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +29,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.HLCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.HLNonprimaryCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.VeteranBQParser;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.JProgram;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
@@ -42,7 +44,7 @@ class ModifierParserTest {
 
 	@Test
 	void testNoFilenameForControlFile() throws Exception {
-		var parser = new ModifierParser(1);
+		var parser = new ModifierParser(JProgram.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ModifierParser.CONTROL_KEY, Optional.empty());
@@ -51,7 +53,13 @@ class ModifierParserTest {
 		var fileResolver = new FileResolver() {
 
 			@Override
-			public InputStream resolve(String filename) throws IOException {
+			public InputStream resolveForInput(String filename) throws IOException {
+				fail("Should not call FileResolver::resolve");
+				return null;
+			}
+
+			@Override
+			public OutputStream resolveForOutput(String filename) throws IOException {
 				fail("Should not call FileResolver::resolve");
 				return null;
 			}
@@ -71,7 +79,7 @@ class ModifierParserTest {
 
 	@Test
 	void testMissingControlFile() throws Exception {
-		var parser = new ModifierParser(1);
+		var parser = new ModifierParser(JProgram.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
@@ -80,10 +88,16 @@ class ModifierParserTest {
 		var fileResolver = new FileResolver() {
 
 			@Override
-			public InputStream resolve(String filename) throws IOException {
+			public InputStream resolveForInput(String filename) throws IOException {
 				assertThat(filename, is("testFilename"));
 
 				throw new IOException();
+			}
+
+			@Override
+			public OutputStream resolveForOutput(String filename) throws IOException {
+				fail("Should not call FileResolver::resolve");
+				return null;
 			}
 
 			@Override
@@ -102,7 +116,7 @@ class ModifierParserTest {
 
 	@Test
 	void testLoadEmptyFile() throws Exception {
-		var parser = new ModifierParser(1);
+		var parser = new ModifierParser(JProgram.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
@@ -113,15 +127,21 @@ class ModifierParserTest {
 		populateHlP3(controlMap);
 		populateHlNP(controlMap);
 
-		var is = TestUtils.makeStream();
+		var is = TestUtils.makeInputStream();
 
 		var fileResolver = new FileResolver() {
 
 			@Override
-			public InputStream resolve(String filename) throws IOException {
+			public InputStream resolveForInput(String filename) throws IOException {
 				assertThat(filename, is("testFilename"));
 
 				return is;
+			}
+
+			@Override
+			public OutputStream resolveForOutput(String filename) throws IOException {
+				fail("Should not call FileResolver::resolve");
+				return null;
 			}
 
 			@Override
@@ -178,7 +198,7 @@ class ModifierParserTest {
 
 	@Test
 	void testBaDqSpecies() throws Exception {
-		var parser = new ModifierParser(1);
+		var parser = new ModifierParser(JProgram.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
@@ -189,15 +209,21 @@ class ModifierParserTest {
 		populateHlP3(controlMap);
 		populateHlNP(controlMap);
 
-		var is = TestUtils.makeStream("201 1 0 0 0 0 0 2.000 3.000 4.000 5.000");
+		var is = TestUtils.makeInputStream("201 1 0 0 0 0 0 2.000 3.000 4.000 5.000");
 
 		var fileResolver = new FileResolver() {
 
 			@Override
-			public InputStream resolve(String filename) throws IOException {
+			public InputStream resolveForInput(String filename) throws IOException {
 				assertThat(filename, is("testFilename"));
 
 				return is;
+			}
+
+			@Override
+			public OutputStream resolveForOutput(String filename) throws IOException {
+				fail("Should not call FileResolver::resolve");
+				return null;
 			}
 
 			@Override
@@ -237,7 +263,7 @@ class ModifierParserTest {
 
 	@Test
 	void testBaDqSpeciesDifferentProgram() throws Exception {
-		var parser = new ModifierParser(3);
+		var parser = new ModifierParser(JProgram.VRI_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
@@ -248,15 +274,21 @@ class ModifierParserTest {
 		populateHlP3(controlMap);
 		populateHlNP(controlMap);
 
-		var is = TestUtils.makeStream("201 1 0 0 0 0 0 0.000 0.000 0.000 0.000");
+		var is = TestUtils.makeInputStream("201 1 0 0 0 0 0 0.000 0.000 0.000 0.000");
 
 		var fileResolver = new FileResolver() {
 
 			@Override
-			public InputStream resolve(String filename) throws IOException {
+			public InputStream resolveForInput(String filename) throws IOException {
 				assertThat(filename, is("testFilename"));
 
 				return is;
+			}
+
+			@Override
+			public OutputStream resolveForOutput(String filename) throws IOException {
+				fail("Should not call FileResolver::resolve");
+				return null;
 			}
 
 			@Override
@@ -273,7 +305,7 @@ class ModifierParserTest {
 
 	@Test
 	void testIgnoreAfterStop() throws Exception {
-		var parser = new ModifierParser(1);
+		var parser = new ModifierParser(JProgram.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
@@ -284,15 +316,21 @@ class ModifierParserTest {
 		populateHlP3(controlMap);
 		populateHlNP(controlMap);
 
-		var is = TestUtils.makeStream("999", "201 1 0 0 0 0 0 0.000 0.000 0.000 0.000");
+		var is = TestUtils.makeInputStream("999", "201 1 0 0 0 0 0 0.000 0.000 0.000 0.000");
 
 		var fileResolver = new FileResolver() {
 
 			@Override
-			public InputStream resolve(String filename) throws IOException {
+			public InputStream resolveForInput(String filename) throws IOException {
 				assertThat(filename, is("testFilename"));
 
 				return is;
+			}
+
+			@Override
+			public OutputStream resolveForOutput(String filename) throws IOException {
+				fail("Should not call FileResolver::resolve");
+				return null;
 			}
 
 			@Override
@@ -309,7 +347,7 @@ class ModifierParserTest {
 
 	@Test
 	void testIgnoreCommentsAndBlanks() throws Exception {
-		var parser = new ModifierParser(1);
+		var parser = new ModifierParser(JProgram.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
@@ -320,15 +358,21 @@ class ModifierParserTest {
 		populateHlP3(controlMap);
 		populateHlNP(controlMap);
 
-		var is = TestUtils.makeStream("", "    x", "000 x", "201 1 0 0 0 0 0 2.000 3.000 4.000 5.000");
+		var is = TestUtils.makeInputStream("", "    x", "000 x", "201 1 0 0 0 0 0 2.000 3.000 4.000 5.000");
 
 		var fileResolver = new FileResolver() {
 
 			@Override
-			public InputStream resolve(String filename) throws IOException {
+			public InputStream resolveForInput(String filename) throws IOException {
 				assertThat(filename, is("testFilename"));
 
 				return is;
+			}
+
+			@Override
+			public OutputStream resolveForOutput(String filename) throws IOException {
+				fail("Should not call FileResolver::resolve");
+				return null;
 			}
 
 			@Override
@@ -368,7 +412,7 @@ class ModifierParserTest {
 
 	@Test
 	void testBaDqAllSpecies() throws Exception {
-		var parser = new ModifierParser(1);
+		var parser = new ModifierParser(JProgram.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
@@ -379,15 +423,21 @@ class ModifierParserTest {
 		populateHlP3(controlMap);
 		populateHlNP(controlMap);
 
-		var is = TestUtils.makeStream("200 1 0 0 0 0 0 2.000 3.000 4.000 5.000");
+		var is = TestUtils.makeInputStream("200 1 0 0 0 0 0 2.000 3.000 4.000 5.000");
 
 		var fileResolver = new FileResolver() {
 
 			@Override
-			public InputStream resolve(String filename) throws IOException {
+			public InputStream resolveForInput(String filename) throws IOException {
 				assertThat(filename, is("testFilename"));
 
 				return is;
+			}
+
+			@Override
+			public OutputStream resolveForOutput(String filename) throws IOException {
+				fail("Should not call FileResolver::resolve");
+				return null;
 			}
 
 			@Override
@@ -419,7 +469,7 @@ class ModifierParserTest {
 
 	@Test
 	void testVetBq() throws Exception {
-		var parser = new ModifierParser(1);
+		var parser = new ModifierParser(JProgram.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
@@ -430,15 +480,21 @@ class ModifierParserTest {
 		populateHlP3(controlMap);
 		populateHlNP(controlMap);
 
-		var is = TestUtils.makeStream("098 1 0 0 0 0 0 0.200 0.300");
+		var is = TestUtils.makeInputStream("098 1 0 0 0 0 0 0.200 0.300");
 
 		var fileResolver = new FileResolver() {
 
 			@Override
-			public InputStream resolve(String filename) throws IOException {
+			public InputStream resolveForInput(String filename) throws IOException {
 				assertThat(filename, is("testFilename"));
 
 				return is;
+			}
+
+			@Override
+			public OutputStream resolveForOutput(String filename) throws IOException {
+				fail("Should not call FileResolver::resolve");
+				return null;
 			}
 
 			@Override
@@ -470,7 +526,7 @@ class ModifierParserTest {
 
 	@Test
 	void testDecayWaste() throws Exception {
-		var parser = new ModifierParser(1);
+		var parser = new ModifierParser(JProgram.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
@@ -481,15 +537,21 @@ class ModifierParserTest {
 		populateHlP3(controlMap);
 		populateHlNP(controlMap);
 
-		var is = TestUtils.makeStream("301 1 0 0 0 0 0 2.000 3.000 4.000 5.000");
+		var is = TestUtils.makeInputStream("301 1 0 0 0 0 0 2.000 3.000 4.000 5.000");
 
 		var fileResolver = new FileResolver() {
 
 			@Override
-			public InputStream resolve(String filename) throws IOException {
+			public InputStream resolveForInput(String filename) throws IOException {
 				assertThat(filename, is("testFilename"));
 
 				return is;
+			}
+
+			@Override
+			public OutputStream resolveForOutput(String filename) throws IOException {
+				fail("Should not call FileResolver::resolve");
+				return null;
 			}
 
 			@Override
@@ -529,7 +591,7 @@ class ModifierParserTest {
 
 	@Test
 	public void testHL() throws Exception {
-		var parser = new ModifierParser(1);
+		var parser = new ModifierParser(JProgram.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
@@ -541,15 +603,21 @@ class ModifierParserTest {
 		var hlP3Map = populateHlP3(controlMap);
 		var hlNPMap = populateHlNP(controlMap);
 
-		var is = TestUtils.makeStream("401 1 0 0 0 0 0 0.200 0.300 0.500 0.700");
+		var is = TestUtils.makeInputStream("401 1 0 0 0 0 0 0.200 0.300 0.500 0.700");
 
 		var fileResolver = new FileResolver() {
 
 			@Override
-			public InputStream resolve(String filename) throws IOException {
+			public InputStream resolveForInput(String filename) throws IOException {
 				assertThat(filename, is("testFilename"));
 
 				return is;
+			}
+
+			@Override
+			public OutputStream resolveForOutput(String filename) throws IOException {
+				fail("Should not call FileResolver::resolve");
+				return null;
 			}
 
 			@Override

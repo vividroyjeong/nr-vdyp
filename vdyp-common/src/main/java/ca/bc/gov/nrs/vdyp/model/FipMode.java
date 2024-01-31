@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.fip.model;
+package ca.bc.gov.nrs.vdyp.model;
 
 import java.util.Optional;
 

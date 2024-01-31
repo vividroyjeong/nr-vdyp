@@ -1,7 +1,10 @@
 package ca.bc.gov.nrs.vdyp.fip.test;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +17,7 @@ import ca.bc.gov.nrs.vdyp.fip.ModifierParser;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.ControlFileParserTest;
 import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.model.JProgram;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -51,7 +55,7 @@ public class FipTestUtils {
 	 * @param controlMap
 	 */
 	public static void modifyControlMap(HashMap<String, Object> controlMap) {
-		int jprogram = 1;
+		JProgram jprogram = JProgram.FIP_START;
 		TestUtils.populateControlMapFromResource(controlMap, new ModifierParser(jprogram), "mod19813.prm");
 
 	}
@@ -82,7 +86,7 @@ public class FipTestUtils {
 		return new FileResolver() {
 
 			@Override
-			public InputStream resolve(String filename) throws IOException {
+			public InputStream resolveForInput(String filename) throws IOException {
 				InputStream resourceAsStream = klazz.getResourceAsStream(filename);
 				if (resourceAsStream == null)
 					throw new IOException("Could not load " + filename);
@@ -90,9 +94,16 @@ public class FipTestUtils {
 			}
 
 			@Override
+			public OutputStream resolveForOutput(String filename) throws IOException {
+				fail("Should not be opening file " + filename + " for output");
+				return null;
+			}
+
+			@Override
 			public String toString(String filename) throws IOException {
 				return klazz.getResource(filename).toString();
 			}
+
 		};
 	}
 }

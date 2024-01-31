@@ -19,7 +19,7 @@ class UtilComponentBaseAreaParserTest {
 
 		var parser = new UtilComponentBaseAreaParser();
 
-		var is = TestUtils.makeStream("BA12 S1 B1   -23.22790  12.60472");
+		var is = TestUtils.makeInputStream("BA12 S1 B1   -23.22790  12.60472");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -46,7 +46,7 @@ class UtilComponentBaseAreaParserTest {
 
 		var parser = new UtilComponentBaseAreaParser();
 
-		var is = TestUtils.makeStream("BA12 S1 C    -23.22790  12.60472");
+		var is = TestUtils.makeInputStream("BA12 S1 C    -23.22790  12.60472");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -73,7 +73,7 @@ class UtilComponentBaseAreaParserTest {
 
 		var parser = new UtilComponentBaseAreaParser();
 
-		var is = TestUtils.makeStream("BA12 S1      -23.22790  12.60472");
+		var is = TestUtils.makeInputStream("BA12 S1      -23.22790  12.60472");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -101,7 +101,7 @@ class UtilComponentBaseAreaParserTest {
 
 		var parser = new UtilComponentBaseAreaParser();
 
-		var is = TestUtils.makeStream("BA12 SX B1   -23.22790  12.60472");
+		var is = TestUtils.makeInputStream("BA12 SX B1   -23.22790  12.60472");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -117,7 +117,7 @@ class UtilComponentBaseAreaParserTest {
 
 		var parser = new UtilComponentBaseAreaParser();
 
-		var is = TestUtils.makeStream("BA12 S1 BX   -23.22790  12.60472");
+		var is = TestUtils.makeInputStream("BA12 S1 BX   -23.22790  12.60472");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -133,7 +133,7 @@ class UtilComponentBaseAreaParserTest {
 
 		var parser = new UtilComponentBaseAreaParser();
 
-		var is = TestUtils.makeStream("BAXX S1 B1   -23.22790  12.60472");
+		var is = TestUtils.makeInputStream("BAXX S1 B1   -23.22790  12.60472");
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -149,7 +149,7 @@ class UtilComponentBaseAreaParserTest {
 
 		var parser = new UtilComponentBaseAreaParser();
 
-		var is = TestUtils.makeStream("BA12 S1 B1   -23.22790");
+		var is = TestUtils.makeInputStream("BA12 S1 B1   -23.22790");
 
 		Map<String, Object> controlMap = new HashMap<>();
 

@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.fip;
+package ca.bc.gov.nrs.vdyp.model;
 
 import java.util.Optional;
 
@@ -11,7 +11,7 @@ public enum UtilizationClass {
 	OVER225(4, ">22.5 cm", 22.5f, 10000f);
 
 	public final int index;
-	public final String name;
+	public final String className;
 	public final float lowBound;
 	public final float highBound;
 
@@ -25,18 +25,18 @@ public enum UtilizationClass {
 		}
 	}
 
-	UtilizationClass(int index, String name, float lowBound, float highBound) {
+	UtilizationClass(int index, String className, float lowBound, float highBound) {
 		this.index = index;
-		this.name = name;
+		this.className = className;
 		this.lowBound = lowBound;
 		this.highBound = highBound;
 	}
 
-	Optional<UtilizationClass> next() {
+	public Optional<UtilizationClass> next() {
 		return this.next;
 	}
 
-	Optional<UtilizationClass> previous() {
+	public Optional<UtilizationClass> previous() {
 		return this.previous;
 	}
 }

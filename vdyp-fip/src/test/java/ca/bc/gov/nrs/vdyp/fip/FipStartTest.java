@@ -38,18 +38,17 @@ import java.util.stream.Collectors;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.easymock.bytebuddy.agent.builder.AgentBuilder;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.fip.FipStart.CompatibilityVariableMode;
 import ca.bc.gov.nrs.vdyp.fip.FipStart.VolumeComputeMode;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayer;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayerPrimary;
-import ca.bc.gov.nrs.vdyp.fip.model.FipMode;
 import ca.bc.gov.nrs.vdyp.fip.model.FipPolygon;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
 import ca.bc.gov.nrs.vdyp.fip.test.FipTestUtils;
@@ -61,10 +60,12 @@ import ca.bc.gov.nrs.vdyp.io.parse.StockingClassFactorParser;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.VeteranLayerVolumeAdjustParser;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.FipMode;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
+import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
@@ -148,7 +149,7 @@ class FipStartTest {
 
 		var polygon = getTestPolygon(polygonId, valid());
 		var layer2 = getTestVeteranLayer(polygonId, x -> {
-			x.setHeight(9f);
+			x.setHeight(Optional.of(9f));
 		});
 		polygon.setLayers(List.of(layer2));
 
@@ -176,7 +177,7 @@ class FipStartTest {
 
 		var polygon = getTestPolygon(polygonId, valid());
 		var layer = this.getTestPrimaryLayer("Test Polygon", x -> {
-			x.setHeight(4f);
+			x.setHeight(Optional.of(4f));
 		});
 		polygon.setLayers(Collections.singletonMap(LayerType.PRIMARY, layer));
 
@@ -205,7 +206,7 @@ class FipStartTest {
 		var polygon = getTestPolygon(polygonId, valid());
 		var layer1 = getTestPrimaryLayer(polygonId, valid());
 		var layer2 = getTestVeteranLayer(polygonId, x -> {
-			x.setHeight(9f);
+			x.setHeight(Optional.of(9f));
 		});
 		polygon.setLayers(List.of(layer1, layer2));
 
@@ -234,7 +235,7 @@ class FipStartTest {
 
 		var polygon = getTestPolygon(polygonId, valid());
 		var layer1 = getTestPrimaryLayer(polygonId, x -> {
-			x.setYearsToBreastHeight(0.2f);
+			x.setYearsToBreastHeight(Optional.of(0.2f));
 		});
 		polygon.setLayers(List.of(layer1));
 
@@ -266,8 +267,8 @@ class FipStartTest {
 
 		var polygon = getTestPolygon(polygonId, valid());
 		var layer1 = getTestPrimaryLayer(polygonId, x -> {
-			x.setAgeTotal(7f);
-			x.setYearsToBreastHeight(8f);
+			x.setAgeTotal(Optional.of(7f));
+			x.setYearsToBreastHeight(Optional.of(8f));
 		});
 		polygon.setLayers(List.of(layer1));
 
@@ -295,7 +296,7 @@ class FipStartTest {
 
 		var polygon = getTestPolygon(polygonId, valid());
 		var layer = this.getTestPrimaryLayer("Test Polygon", x -> {
-			x.setSiteIndex(0.2f);
+			x.setSiteIndex(Optional.of(0.2f));
 		});
 		polygon.setLayers(Collections.singletonMap(LayerType.PRIMARY, layer));
 
@@ -603,12 +604,12 @@ class FipStartTest {
 		assertThat(result, hasProperty("layer", is(LayerType.VETERAN)));
 
 		// Direct Copy
-		assertThat(result, hasProperty("ageTotal", is(8f)));
-		assertThat(result, hasProperty("height", is(6f)));
-		assertThat(result, hasProperty("yearsToBreastHeight", is(7f)));
+		assertThat(result, hasProperty("ageTotal", present(is(8f))));
+		assertThat(result, hasProperty("height", present(is(6f))));
+		assertThat(result, hasProperty("yearsToBreastHeight", present(is(7f))));
 
 		// Computed
-		assertThat(result, hasProperty("breastHeightAge", is(1f)));
+		assertThat(result, hasProperty("breastHeightAge", present(is(1f))));
 
 		// Remap species
 		assertThat(
@@ -640,7 +641,7 @@ class FipStartTest {
 
 		var fipPolygon = getTestPolygon(polygonId, valid());
 		var fipLayer = getTestVeteranLayer(polygonId, (l) -> {
-			l.setYearsToBreastHeight(5.0f);
+			l.setYearsToBreastHeight(Optional.of(5.0f));
 		});
 		var fipSpecies = getTestSpecies(polygonId, LayerType.VETERAN, valid());
 		fipPolygon.setLayers(Collections.singletonMap(LayerType.VETERAN, fipLayer));
@@ -672,10 +673,10 @@ class FipStartTest {
 		assertThat(result, notNullValue());
 
 		// Set minimum
-		assertThat(result, hasProperty("yearsToBreastHeight", is(6f)));
+		assertThat(result, hasProperty("yearsToBreastHeight", present(is(6f))));
 
 		// Computed based on minimum
-		assertThat(result, hasProperty("breastHeightAge", is(2f)));
+		assertThat(result, hasProperty("breastHeightAge", present(is(2f))));
 
 	}
 
@@ -759,13 +760,13 @@ class FipStartTest {
 			x.setForestInventoryZone("A");
 		});
 		var fipLayer = getTestPrimaryLayer(polygonId, x -> {
-			x.setAgeTotal(55f);
-			x.setHeight(35.3f);
-			x.setSiteIndex(35f);
+			x.setAgeTotalSafe(55f);
+			x.setHeight(Optional.of(35.3f));
+			x.setSiteIndex(Optional.of(35f));
 			x.setCrownClosure(87.4f);
-			x.setSiteGenus("D");
+			x.setSiteGenus(Optional.of("D"));
 			x.setSiteSpecies("D");
-			x.setYearsToBreastHeight(1f);
+			x.setYearsToBreastHeight(Optional.of(1f));
 			x.setPrimaryGenus(Optional.of("H"));
 			x.setInventoryTypeGroup(Optional.of(13));
 		});
@@ -799,11 +800,11 @@ class FipStartTest {
 		assertThat(result, hasProperty("polygonIdentifier", is(polygonId)));
 		assertThat(result, hasProperty("layer", is(LayerType.PRIMARY)));
 
-		assertThat(result, hasProperty("ageTotal", is(55f)));
-		assertThat(result, hasProperty("height", is(35.3f)));
-		assertThat(result, hasProperty("yearsToBreastHeight", is(1f)));
+		assertThat(result, hasProperty("ageTotal", present(is(55f))));
+		assertThat(result, hasProperty("height", present(is(35.3f))));
+		assertThat(result, hasProperty("yearsToBreastHeight", present(is(1f))));
 
-		assertThat(result, hasProperty("breastHeightAge", is(54f)));
+		assertThat(result, hasProperty("breastHeightAge", present(is(54f))));
 
 		assertThat(
 				result,
@@ -1224,7 +1225,7 @@ class FipStartTest {
 
 		var fipPolygon = getTestPolygon(polygonId, valid());
 		var fipLayer = getTestVeteranLayer(polygonId, x -> {
-			x.setHeight(10f);
+			x.setHeight(Optional.of(10f));
 		});
 		var fipSpecies1 = getTestSpecies(polygonId, LayerType.VETERAN, "B", x -> {
 			var map = new LinkedHashMap<String, Float>();
@@ -1599,17 +1600,14 @@ class FipStartTest {
 
 		var utilizationClass = UtilizationClass.ALL;
 		var breakageGroup = 20;
-		var quadMeanDiameterUtil = new Coefficients(
-				new float[] { 0f, 13.4943399f, 10.2402296f, 14.6183214f, 19.3349762f, 25.6280651f }, -1
-		);
-		var closeUtilizationUtil = new Coefficients(
-				new float[] { 0f, 6.41845179f, 0.0353721268f, 2.99654913f, 2.23212862f, 1.1544019f }, -1
-		);
-		var closeUtilizationNetOfDecayAndWasteUtil = new Coefficients(
-				new float[] { 0f, 6.18276405f, 0.0347718038f, 2.93580461f, 2.169273853f, 1.04291379f }, -1
-		);
+		var quadMeanDiameterUtil = Utils
+				.utilizationVector(0f, 13.4943399f, 10.2402296f, 14.6183214f, 19.3349762f, 25.6280651f);
+		var closeUtilizationUtil = Utils
+				.utilizationVector(0f, 6.41845179f, 0.0353721268f, 2.99654913f, 2.23212862f, 1.1544019f);
+		var closeUtilizationNetOfDecayAndWasteUtil = Utils
+				.utilizationVector(0f, 6.18276405f, 0.0347718038f, 2.93580461f, 2.169273853f, 1.04291379f);
 
-		var closeUtilizationNetOfDecayWasteAndBreakageUtil = FipStart.utilizationVector();
+		var closeUtilizationNetOfDecayWasteAndBreakageUtil = Utils.utilizationVector();
 
 		app.estimateNetDecayWasteAndBreakageVolume(
 				utilizationClass, breakageGroup, quadMeanDiameterUtil, closeUtilizationUtil,
@@ -1635,13 +1633,13 @@ class FipStartTest {
 		});
 
 		var fipLayer = getTestVeteranLayer(polygonId, x -> {
-			x.setAgeTotal(105f);
-			x.setHeight(26.2f);
-			x.setSiteIndex(16.7f);
+			x.setAgeTotal(Optional.of(105f));
+			x.setHeight(Optional.of(26.2f));
+			x.setSiteIndex(Optional.of(16.7f));
 			x.setCrownClosure(4.0f);
-			x.setSiteGenus("H");
+			x.setSiteGenus(Optional.of("H"));
 			x.setSiteSpecies("H");
-			x.setYearsToBreastHeight(7.1f);
+			x.setYearsToBreastHeight(Optional.of(7.1f));
 		});
 		var fipSpecies1 = getTestSpecies(polygonId, LayerType.VETERAN, "B", x -> {
 			var map = new LinkedHashMap<String, Float>();
@@ -1675,10 +1673,10 @@ class FipStartTest {
 		assertThat(result, hasProperty("polygonIdentifier", is(polygonId)));
 		assertThat(result, hasProperty("layer", is(LayerType.VETERAN)));
 
-		assertThat(result, hasProperty("ageTotal", closeTo(105f))); // LVCOM3/AGETOTLV
-		assertThat(result, hasProperty("breastHeightAge", closeTo(97.9000015f))); // LVCOM3/AGEBHLV
-		assertThat(result, hasProperty("yearsToBreastHeight", closeTo(7.0999999f))); // LVCOM3/YTBHLV
-		assertThat(result, hasProperty("height", closeTo(26.2000008f))); // LVCOM3/HDLV
+		assertThat(result, hasProperty("ageTotal", present(closeTo(105f)))); // LVCOM3/AGETOTLV
+		assertThat(result, hasProperty("breastHeightAge", present(closeTo(97.9000015f)))); // LVCOM3/AGEBHLV
+		assertThat(result, hasProperty("yearsToBreastHeight", present(closeTo(7.0999999f)))); // LVCOM3/YTBHLV
+		assertThat(result, hasProperty("height", present(closeTo(26.2000008f)))); // LVCOM3/HDLV
 
 		assertThat(result, hasProperty("species", aMapWithSize(3)));
 		var resultSpeciesMap = result.getSpecies();
@@ -2076,13 +2074,13 @@ class FipStartTest {
 		var bec = becLookup.get("CWH").get();
 
 		var layer = this.getTestPrimaryLayer("test polygon", l -> {
-			l.setAgeTotal(85f);
-			l.setHeight(38.2999992f);
-			l.setSiteIndex(28.6000004f);
+			l.setAgeTotal(Optional.of(85f));
+			l.setHeight(Optional.of(38.2999992f));
+			l.setSiteIndex(Optional.of(28.6000004f));
 			l.setCrownClosure(82.8000031f);
-			l.setYearsToBreastHeight(5.4000001f);
+			l.setYearsToBreastHeight(Optional.of(5.4000001f));
 			l.setSiteCurveNumber(Optional.of(34));
-			l.setSiteGenus("H");
+			l.setSiteGenus(Optional.of("H"));
 			l.setSiteSpecies("H");
 		});
 
@@ -2116,13 +2114,13 @@ class FipStartTest {
 		var bec = becLookup.get("CWH").get();
 
 		var layer = this.getTestPrimaryLayer("test polygon", l -> {
-			l.setAgeTotal(85f);
-			l.setHeight(10.1667995f); // Altered this in the debugger while running VDYP7
-			l.setSiteIndex(28.6000004f);
+			l.setAgeTotal(Optional.of(85f));
+			l.setHeight(Optional.of(10.1667995f)); // Altered this in the debugger while running VDYP7
+			l.setSiteIndex(Optional.of(28.6000004f));
 			l.setCrownClosure(82.8000031f);
-			l.setYearsToBreastHeight(5.4000001f);
+			l.setYearsToBreastHeight(Optional.of(5.4000001f));
 			l.setSiteCurveNumber(Optional.of(34));
-			l.setSiteGenus("H");
+			l.setSiteGenus(Optional.of("H"));
 			l.setSiteSpecies("H");
 		});
 
@@ -2156,13 +2154,13 @@ class FipStartTest {
 		var bec = becLookup.get("CWH").get();
 
 		var layer = this.getTestPrimaryLayer("test polygon", l -> {
-			l.setAgeTotal(85f);
-			l.setHeight(38.2999992f);
-			l.setSiteIndex(28.6000004f);
+			l.setAgeTotal(Optional.of(85f));
+			l.setHeight(Optional.of(38.2999992f));
+			l.setSiteIndex(Optional.of(28.6000004f));
 			l.setCrownClosure(9f); // Altered this in the debugger while running VDYP7
-			l.setYearsToBreastHeight(5.4000001f);
+			l.setYearsToBreastHeight(Optional.of(5.4000001f));
 			l.setSiteCurveNumber(Optional.of(34));
-			l.setSiteGenus("H");
+			l.setSiteGenus(Optional.of("H"));
 			l.setSiteSpecies("H");
 		});
 
@@ -2196,13 +2194,13 @@ class FipStartTest {
 		var bec = becLookup.get("CWH").get();
 
 		var layer = this.getTestPrimaryLayer("test polygon", l -> {
-			l.setAgeTotal(85f);
-			l.setHeight(7f); // Altered this in the debugger while running VDYP7
-			l.setSiteIndex(28.6000004f);
+			l.setAgeTotal(Optional.of(85f));
+			l.setHeight(Optional.of(7f)); // Altered this in the debugger while running VDYP7
+			l.setSiteIndex(Optional.of(28.6000004f));
 			l.setCrownClosure(82.8000031f);
-			l.setYearsToBreastHeight(5.4000001f);
+			l.setYearsToBreastHeight(Optional.of(5.4000001f));
 			l.setSiteCurveNumber(Optional.of(34));
-			l.setSiteGenus("H");
+			l.setSiteGenus(Optional.of("H"));
 			l.setSiteSpecies("H");
 		});
 
@@ -2239,13 +2237,13 @@ class FipStartTest {
 		var bec = becLookup.get("CWH").get();
 
 		var layer = this.getTestPrimaryLayer("test polygon", l -> {
-			l.setAgeTotal(85f);
-			l.setHeight(38.2999992f);
-			l.setSiteIndex(28.6000004f);
+			l.setAgeTotal(Optional.of(85f));
+			l.setHeight(Optional.of(38.2999992f));
+			l.setSiteIndex(Optional.of(28.6000004f));
 			l.setCrownClosure(82.8000031f);
-			l.setYearsToBreastHeight(5.4000001f);
+			l.setYearsToBreastHeight(Optional.of(5.4000001f));
 			l.setSiteCurveNumber(Optional.of(34));
-			l.setSiteGenus("H");
+			l.setSiteGenus(Optional.of("H"));
 			l.setSiteSpecies("H");
 		});
 
@@ -2279,13 +2277,13 @@ class FipStartTest {
 		var bec = becLookup.get("CWH").get();
 
 		var layer = this.getTestPrimaryLayer("test polygon", l -> {
-			l.setAgeTotal(85f);
-			l.setHeight(4.74730005f); // Tweak this to be less than A5 for this BEC and SP0
-			l.setSiteIndex(28.6000004f);
+			l.setAgeTotal(Optional.of(85f));
+			l.setHeight(Optional.of(4.74730005f)); // Tweak this to be less than A5 for this BEC and SP0
+			l.setSiteIndex(Optional.of(28.6000004f));
 			l.setCrownClosure(82.8000031f);
-			l.setYearsToBreastHeight(5.4000001f);
+			l.setYearsToBreastHeight(Optional.of(5.4000001f));
 			l.setSiteCurveNumber(Optional.of(34));
-			l.setSiteGenus("H");
+			l.setSiteGenus(Optional.of("H"));
 			l.setSiteSpecies("H");
 		});
 
@@ -2320,13 +2318,13 @@ class FipStartTest {
 
 		var layer = this.getTestPrimaryLayer("test polygon", l -> {
 			// Tweak the values to produce a very large DQ
-			l.setAgeTotal(350f);
-			l.setHeight(80f);
-			l.setSiteIndex(28.6000004f);
+			l.setAgeTotal(Optional.of(350f));
+			l.setHeight(Optional.of(80f));
+			l.setSiteIndex(Optional.of(28.6000004f));
 			l.setCrownClosure(82.8000031f);
-			l.setYearsToBreastHeight(5.4000001f);
+			l.setYearsToBreastHeight(Optional.of(5.4000001f));
 			l.setSiteCurveNumber(Optional.of(34));
-			l.setSiteGenus("H");
+			l.setSiteGenus(Optional.of("H"));
 			l.setSiteSpecies("H");
 		});
 
@@ -2443,7 +2441,6 @@ class FipStartTest {
 		layer.getBaseAreaByUtilization().setCoe(0, 76.5122147f);
 		layer.getTreesPerHectareByUtilization().setCoe(0, 845.805969f);
 		layer.getQuadraticMeanDiameterByUtilization().setCoe(0, 33.9379082f);
-		layer.setAgeTotal(285f);
 
 		var spec = VdypSpecies.build(layer, builder -> {
 			builder.genus("Y");
@@ -2993,7 +2990,7 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		var coe = FipStart.utilizationVector();
+		var coe = Utils.utilizationVector();
 		coe.setCoe(FipStart.UTIL_ALL, 31.6622887f);
 
 		var bec = BecDefinitionParser.getBecs(controlMap).get("CWH").get();
@@ -3019,7 +3016,7 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		var coe = FipStart.utilizationVector();
+		var coe = Utils.utilizationVector();
 		coe.setCoe(FipStart.UTIL_ALL, 13.4943399f);
 
 		var bec = BecDefinitionParser.getBecs(controlMap).get("MH").get();
@@ -3045,8 +3042,8 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		var dq = FipStart.utilizationVector();
-		var ba = FipStart.utilizationVector();
+		var dq = Utils.utilizationVector();
+		var ba = Utils.utilizationVector();
 		dq.setCoe(0, 31.6622887f);
 		dq.setCoe(1, 10.0594692f);
 		dq.setCoe(2, 14.966774f);
@@ -3078,9 +3075,9 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		var dq = FipStart.utilizationVector();
-		var ba = FipStart.utilizationVector();
-		var tph = FipStart.utilizationVector();
+		var dq = Utils.utilizationVector();
+		var ba = Utils.utilizationVector();
+		var tph = Utils.utilizationVector();
 
 		// '082E004 615 1988' with component BA re-ordered from smallest to largest to
 		// force mode 1.
@@ -3116,9 +3113,9 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		var dq = FipStart.utilizationVector();
-		var ba = FipStart.utilizationVector();
-		var tph = FipStart.utilizationVector();
+		var dq = Utils.utilizationVector();
+		var ba = Utils.utilizationVector();
+		var tph = Utils.utilizationVector();
 		dq.setCoe(0, 31.6622887f);
 		dq.setCoe(1, 10.0594692f);
 		dq.setCoe(2, 14.966774f);
@@ -3150,9 +3147,9 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		var dq = FipStart.utilizationVector();
-		var ba = FipStart.utilizationVector();
-		var tph = FipStart.utilizationVector();
+		var dq = Utils.utilizationVector();
+		var ba = Utils.utilizationVector();
+		var tph = Utils.utilizationVector();
 
 		// Set of inputs that cause mode 2 to fail over into mode 3
 
@@ -3187,9 +3184,9 @@ class FipStartTest {
 		var app = new FipStart();
 		app.setControlMap(controlMap);
 
-		var dq = FipStart.utilizationVector();
-		var ba = FipStart.utilizationVector();
-		var wsv = FipStart.utilizationVector();
+		var dq = Utils.utilizationVector();
+		var ba = Utils.utilizationVector();
+		var wsv = Utils.utilizationVector();
 
 		dq.setCoe(0, 13.4943399f);
 		dq.setCoe(1, 10.2402296f);
@@ -3438,7 +3435,7 @@ class FipStartTest {
 			builder.percentGenus(90f);
 		});
 
-		processedLayers.get(LayerType.PRIMARY).setHeight(15f);
+		processedLayers.get(LayerType.PRIMARY).setHeight(Optional.of(15f));
 		// processedLayers.get(LayerType.PRIMARY).setCrownClosure(60f);
 
 		var vdypPolygon = app.createVdypPolygon(fipPolygon, processedLayers);
@@ -3498,7 +3495,7 @@ class FipStartTest {
 			builder.percentGenus(90f);
 		});
 
-		processedLayers.get(LayerType.PRIMARY).setHeight(15f);
+		processedLayers.get(LayerType.PRIMARY).setHeight(Optional.of(15f));
 		// processedLayers.get(LayerType.PRIMARY).setCrownClosure(60f);
 
 		var vdypPolygon = app.createVdypPolygon(fipPolygon, processedLayers);
@@ -3552,7 +3549,7 @@ class FipStartTest {
 			builder.percentGenus(90f);
 		});
 
-		processedLayers.get(LayerType.PRIMARY).setHeight(15f);
+		processedLayers.get(LayerType.PRIMARY).setHeight(Optional.of(15f));
 		// processedLayers.get(LayerType.PRIMARY).setCrownClosure(60f);
 
 		var vdypPolygon = app.createVdypPolygon(fipPolygon, processedLayers);
@@ -3607,19 +3604,17 @@ class FipStartTest {
 			builder.height(20f);
 		});
 
-		vdypLayer.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setLoreyHeightByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 
-		vdypLayer.setBaseAreaByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setTreesPerHectareByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setWholeStemVolumeByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setCloseUtilizationVolumeByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setCloseUtilizationVolumeNetOfDecayByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(
-				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
-		);
+		vdypLayer.setBaseAreaByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setTreesPerHectareByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setWholeStemVolumeByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setCloseUtilizationVolumeByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setCloseUtilizationVolumeNetOfDecayByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
 		vdypLayer.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
-				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
+				Utils.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
 		var spec1 = VdypSpecies.build(vdypLayer, builder -> {
@@ -3630,16 +3625,16 @@ class FipStartTest {
 			builder.breakageGroup(-1);
 		});
 
-		spec1.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
-		spec1.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
+		spec1.setLoreyHeightByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
+		spec1.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 
-		spec1.setBaseAreaByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec1.setTreesPerHectareByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec1.setWholeStemVolumeByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec1.setCloseUtilizationVolumeNetOfDecayByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec1.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec1.setBaseAreaByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec1.setTreesPerHectareByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec1.setWholeStemVolumeByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec1.setCloseUtilizationVolumeNetOfDecayByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec1.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
 		spec1.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
-				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
+				Utils.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
 		var spec2 = VdypSpecies.build(vdypLayer, builder -> {
@@ -3650,16 +3645,16 @@ class FipStartTest {
 			builder.breakageGroup(-1);
 		});
 
-		spec2.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
-		spec2.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
+		spec2.setLoreyHeightByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
+		spec2.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 
-		spec2.setBaseAreaByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec2.setTreesPerHectareByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec2.setWholeStemVolumeByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec2.setCloseUtilizationVolumeNetOfDecayByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec2.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec2.setBaseAreaByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec2.setTreesPerHectareByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec2.setWholeStemVolumeByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec2.setCloseUtilizationVolumeNetOfDecayByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec2.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
 		spec2.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
-				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
+				Utils.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
 		app.adjustForStocking(vdypLayer, fipPrimaryLayer, BecDefinitionParser.getBecs(controlMap).get("IDF").get());
@@ -3739,19 +3734,17 @@ class FipStartTest {
 			builder.yearsToBreastHeight(8.5f);
 			builder.height(20f);
 		});
-		vdypLayer.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setLoreyHeightByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 
-		vdypLayer.setBaseAreaByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setTreesPerHectareByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setWholeStemVolumeByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setCloseUtilizationVolumeByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setCloseUtilizationVolumeNetOfDecayByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(
-				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
-		);
+		vdypLayer.setBaseAreaByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setTreesPerHectareByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setWholeStemVolumeByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setCloseUtilizationVolumeByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setCloseUtilizationVolumeNetOfDecayByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
 		vdypLayer.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
-				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
+				Utils.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
 		var spec1 = VdypSpecies.build(vdypLayer, builder -> {
@@ -3762,16 +3755,16 @@ class FipStartTest {
 			builder.breakageGroup(-1);
 		});
 
-		spec1.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
-		spec1.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
+		spec1.setLoreyHeightByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
+		spec1.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 
-		spec1.setBaseAreaByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec1.setTreesPerHectareByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec1.setWholeStemVolumeByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec1.setCloseUtilizationVolumeNetOfDecayByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec1.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec1.setBaseAreaByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec1.setTreesPerHectareByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec1.setWholeStemVolumeByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec1.setCloseUtilizationVolumeNetOfDecayByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec1.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
 		spec1.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
-				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
+				Utils.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
 		var spec2 = VdypSpecies.build(vdypLayer, builder -> {
@@ -3782,16 +3775,16 @@ class FipStartTest {
 			builder.breakageGroup(-1);
 		});
 
-		spec2.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
-		spec2.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
+		spec2.setLoreyHeightByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
+		spec2.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 
-		spec2.setBaseAreaByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec2.setTreesPerHectareByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec2.setWholeStemVolumeByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec2.setCloseUtilizationVolumeNetOfDecayByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec2.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec2.setBaseAreaByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec2.setTreesPerHectareByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec2.setWholeStemVolumeByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec2.setCloseUtilizationVolumeNetOfDecayByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec2.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
 		spec2.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
-				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
+				Utils.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
 		app.adjustForStocking(vdypLayer, fipPrimaryLayer, BecDefinitionParser.getBecs(controlMap).get("IDF").get());
@@ -3883,19 +3876,17 @@ class FipStartTest {
 			builder.height(20f);
 		});
 
-		vdypLayer.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setLoreyHeightByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 
-		vdypLayer.setBaseAreaByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setTreesPerHectareByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setWholeStemVolumeByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setCloseUtilizationVolumeByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setCloseUtilizationVolumeNetOfDecayByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		vdypLayer.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(
-				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
-		);
+		vdypLayer.setBaseAreaByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setTreesPerHectareByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setWholeStemVolumeByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setCloseUtilizationVolumeByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setCloseUtilizationVolumeNetOfDecayByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		vdypLayer.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
 		vdypLayer.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
-				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
+				Utils.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
 		var spec1 = VdypSpecies.build(vdypLayer, builder -> {
@@ -3906,16 +3897,16 @@ class FipStartTest {
 			builder.breakageGroup(-1);
 		});
 
-		spec1.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
-		spec1.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
+		spec1.setLoreyHeightByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
+		spec1.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 
-		spec1.setBaseAreaByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec1.setTreesPerHectareByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec1.setWholeStemVolumeByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec1.setCloseUtilizationVolumeNetOfDecayByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec1.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec1.setBaseAreaByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec1.setTreesPerHectareByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec1.setWholeStemVolumeByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec1.setCloseUtilizationVolumeNetOfDecayByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec1.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
 		spec1.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
-				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
+				Utils.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
 		var spec2 = VdypSpecies.build(vdypLayer, builder -> {
@@ -3926,16 +3917,16 @@ class FipStartTest {
 			builder.breakageGroup(-1);
 		});
 
-		spec2.setLoreyHeightByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
-		spec2.setQuadraticMeanDiameterByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
+		spec2.setLoreyHeightByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
+		spec2.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f, 1f));
 
-		spec2.setBaseAreaByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec2.setTreesPerHectareByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec2.setWholeStemVolumeByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec2.setCloseUtilizationVolumeNetOfDecayByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
-		spec2.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec2.setBaseAreaByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec2.setTreesPerHectareByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec2.setWholeStemVolumeByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec2.setCloseUtilizationVolumeNetOfDecayByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
+		spec2.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(Utils.utilizationVector(1f, 1f, 1f, 1f, 1f));
 		spec2.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
-				FipStart.utilizationVector(1f, 1f, 1f, 1f, 1f)
+				Utils.utilizationVector(1f, 1f, 1f, 1f, 1f)
 		);
 
 		app.adjustForStocking(vdypLayer, fipPrimaryLayer, BecDefinitionParser.getBecs(controlMap).get("IDF").get());

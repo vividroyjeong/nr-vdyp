@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.easymock.EasyMock;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 class VdypPolygonTest {
@@ -15,6 +14,9 @@ class VdypPolygonTest {
 		var result = VdypPolygon.build(builder -> {
 			builder.polygonIdentifier("Test");
 			builder.percentAvailable(90f);
+
+			builder.forestInventoryZone("?");
+			builder.biogeoclimaticZone("?");
 		});
 		assertThat(result, hasProperty("polygonIdentifier", is("Test")));
 		assertThat(result, hasProperty("percentAvailable", is(90f)));
@@ -39,6 +41,10 @@ class VdypPolygonTest {
 		var result = VdypPolygon.build(builder -> {
 			builder.polygonIdentifier("Test");
 			builder.percentAvailable(90f);
+
+			builder.forestInventoryZone("?");
+			builder.biogeoclimaticZone("?");
+
 			builder.addLayer(mock);
 		});
 		assertThat(result, hasProperty("polygonIdentifier", is("Test")));
@@ -51,6 +57,10 @@ class VdypPolygonTest {
 		var result = VdypPolygon.build(builder -> {
 			builder.polygonIdentifier("Test");
 			builder.percentAvailable(90f);
+
+			builder.forestInventoryZone("?");
+			builder.biogeoclimaticZone("?");
+
 			builder.buildLayer(layerBuilder -> {
 				layerBuilder.layerType(LayerType.PRIMARY);
 				layerBuilder.ageTotal(10f);

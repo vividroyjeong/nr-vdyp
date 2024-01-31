@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.common;
+package ca.bc.gov.nrs.vdyp.io.common;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -7,6 +7,8 @@ import java.util.function.Supplier;
 
 import org.easymock.EasyMock;
 import org.junit.jupiter.api.Test;
+
+import ca.bc.gov.nrs.vdyp.common.LazyValue;
 
 class LazyValueTest {
 

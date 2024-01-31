@@ -65,7 +65,7 @@ public class FipSpeciesParser
 					.value(3, SPECIES_4, ControlledValueParser.optional(ValueParser.SPECIES))
 					.value(5, PERCENT_SPECIES_4, ValueParser.PERCENTAGE);
 
-			var is = fileResolver.resolve(fileName);
+			var is = fileResolver.resolveForInput(fileName);
 
 			var delegateStream = new AbstractStreamingParser<ValueOrMarker<Optional<FipSpecies>, EndOfRecord>>(
 					is, lineParser, control

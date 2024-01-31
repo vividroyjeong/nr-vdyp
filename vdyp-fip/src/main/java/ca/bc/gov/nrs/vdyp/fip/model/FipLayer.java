@@ -4,57 +4,96 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import ca.bc.gov.nrs.vdyp.common.Computed;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 public class FipLayer extends BaseVdypLayer<FipSpecies> {
 
-	private float siteIndex; // FIPL_1/SI_L1 or FIPL_V/SI_V1
 	private float crownClosure; // FIPL_1/CC_L1 or FIP:_V/CC_V1
-	private String siteGenus; // FIPL_1A/SITESP0_L1 or FIPL_VA/SITESP0_L1
 	private String siteSpecies; // FIPL_1A/SITESP64_L1 or FIPL_VA/SITESP64_L1
 
 	public FipLayer(
-			String polygonIdentifier, LayerType layer, float ageTotal, float yearsToBreastHeight, float height,
-			float siteIndex, float crownClosure, String siteGenus, String siteSpecies
+			String polygonIdentifier, LayerType layer, Optional<Float> ageTotal, Optional<Float> height,
+			Optional<Float> yearsToBreastHeight, Optional<Float> siteIndex, Optional<Integer> siteCurveNumber,
+			Optional<Integer> inventoryTypeGroup, Optional<String> siteGenus, float crownClosure, String siteSpecies
 	) {
-		super(polygonIdentifier, layer, ageTotal, yearsToBreastHeight, height);
-		this.siteIndex = siteIndex;
+		super(
+				polygonIdentifier, layer, ageTotal, height, yearsToBreastHeight, siteIndex, siteCurveNumber,
+				inventoryTypeGroup, siteGenus
+		);
 		this.crownClosure = crownClosure;
-		this.siteGenus = siteGenus;
-		this.siteSpecies = siteGenus;
-	}
-
-	public float getSiteIndex() {
-		return siteIndex;
+		this.siteSpecies = siteSpecies;
 	}
 
 	public float getCrownClosure() {
 		return crownClosure;
 	}
 
-	public String getSiteSp0() {
-		return siteGenus;
-	}
-
-	public String getSiteSp64() {
+	public String getSiteSpecies() {
 		return siteSpecies;
-	}
-
-	public void setSiteIndex(float siteIndex) {
-		this.siteIndex = siteIndex;
 	}
 
 	public void setCrownClosure(float crownClosure) {
 		this.crownClosure = crownClosure;
 	}
 
-	public void setSiteGenus(String sireSp0) {
-		this.siteGenus = sireSp0;
-	}
-
 	public void setSiteSpecies(String siteSp64) {
 		this.siteSpecies = siteSp64;
+	}
+
+	@Computed
+	public float getAgeTotalSafe() {
+		return super.getAgeTotal().orElseThrow(() -> new IllegalStateException());
+	}
+
+	@Computed
+	public float getHeightSafe() {
+		return super.getHeight().orElseThrow(() -> new IllegalStateException());
+	}
+
+	@Computed
+	public float getYearsToBreastHeightSafe() {
+		return super.getYearsToBreastHeight().orElseThrow(() -> new IllegalStateException());
+	}
+
+	@Computed
+	public void setAgeTotalSafe(float ageTotal) {
+		super.setAgeTotal(Optional.of(ageTotal));
+	}
+
+	@Computed
+	public void setHeightSafe(float height) {
+		super.setHeight(Optional.of(height));
+	}
+
+	@Computed
+	public void setYearsToBreastHeightSafe(float yearsToBreastHeight) {
+		super.setYearsToBreastHeight(Optional.of(yearsToBreastHeight));
+	}
+
+	@Override
+	public void setAgeTotal(Optional<Float> ageTotal) {
+		if(ageTotal.isEmpty()) {
+			throw new IllegalArgumentException("ageTotal must not be empty");
+		}
+		super.setAgeTotal(ageTotal);
+	}
+
+	@Override
+	public void setHeight(Optional<Float> height) {
+		if(height.isEmpty()) {
+			throw new IllegalArgumentException("height must not be empty");
+		}
+		super.setHeight(height);
+	}
+
+	@Override
+	public void setYearsToBreastHeight(Optional<Float> yearsToBreastHeight) {
+		if(yearsToBreastHeight.isEmpty()) {
+			throw new IllegalArgumentException("yearsToBreastHeight must not be empty");
+		}
+		super.setYearsToBreastHeight(yearsToBreastHeight);
 	}
 
 	/**
@@ -96,23 +135,11 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 	}
 
 	public static class Builder extends BaseVdypLayer.Builder<FipLayer, FipSpecies> {
-		protected Optional<Float> siteIndex = Optional.empty();
 		protected Optional<Float> crownClosure = Optional.empty();
-		protected Optional<String> siteGenus = Optional.empty();
 		protected Optional<String> siteSpecies = Optional.empty();
-
-		public Builder siteIndex(float siteIndex) {
-			this.siteIndex = Optional.of(siteIndex);
-			return this;
-		}
 
 		public Builder crownClosure(float crownClosure) {
 			this.crownClosure = Optional.of(crownClosure);
-			return this;
-		}
-
-		public Builder siteGenus(String siteGenus) {
-			this.siteGenus = Optional.of(siteGenus);
 			return this;
 		}
 
@@ -124,24 +151,30 @@ public class FipLayer extends BaseVdypLayer<FipSpecies> {
 		@Override
 		protected void check(Collection<String> errors) {
 			super.check(errors);
-			requirePresent(siteIndex, "siteIndex", errors);
 			requirePresent(crownClosure, "crownClosure", errors);
-			requirePresent(siteGenus, "siteGenus", errors);
 			requirePresent(siteSpecies, "siteSpecies", errors);
-
 		}
 
 		@Override
 		protected FipLayer doBuild() {
+			/*
+			 * public FipLayer( String polygonIdentifier, LayerType layer, Optional<Float>
+			 * ageTotal, Optional<Float> height, Optional<Float> yearsToBreastHeight,
+			 * Optional<Float> siteIndex, Optional<Integer> siteCurveNumber,
+			 * Optional<Integer> inventoryTypeGroup, Optional<String> siteGenus, float
+			 * crownClosure, String siteSpecies
+			 */
 			return (new FipLayer(
 					polygonIdentifier.get(), //
 					layer.get(), //
-					ageTotal.get(), //
-					yearsToBreastHeight.get(), //
-					height.get(), //
-					siteIndex.get(), //
+					ageTotal, //
+					height, //
+					yearsToBreastHeight, //
+					siteIndex, //
+					siteCurveNumber, //
+					inventoryTypeGroup, //
+					siteGenus, //
 					crownClosure.get(), //
-					siteGenus.get(), //
 					siteSpecies.get()
 			));
 		}

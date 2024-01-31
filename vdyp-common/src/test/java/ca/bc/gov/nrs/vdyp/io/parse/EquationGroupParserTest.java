@@ -38,7 +38,7 @@ class EquationGroupParserTest {
 		var controlMap = makeControlMapSingle();
 		String[] lines = { "S1 B1   001" };
 
-		var is = TestUtils.makeStream(lines);
+		var is = TestUtils.makeInputStream(lines);
 		var result = parser.parse(is, Collections.unmodifiableMap(controlMap));
 
 		assertThat(result, mmHasEntry(is(1), "S1", "B1"));
@@ -51,7 +51,7 @@ class EquationGroupParserTest {
 		var controlMap = makeControlMapSingle();
 		String[] lines = { "SX B1   001" };
 
-		var is = TestUtils.makeStream(lines);
+		var is = TestUtils.makeInputStream(lines);
 
 		ResourceParseLineException ex1 = Assertions.assertThrows(
 				ResourceParseLineException.class, () -> parser.parse(is, Collections.unmodifiableMap(controlMap))
@@ -69,7 +69,7 @@ class EquationGroupParserTest {
 		var controlMap = makeControlMapSingle();
 		String[] lines = { "S1 BX   001" };
 
-		var is = TestUtils.makeStream(lines);
+		var is = TestUtils.makeInputStream(lines);
 
 		ResourceParseLineException ex1 = Assertions.assertThrows(
 				ResourceParseLineException.class, () -> parser.parse(is, Collections.unmodifiableMap(controlMap))
@@ -90,7 +90,7 @@ class EquationGroupParserTest {
 		var controlMap = makeControlMapSingle();
 		String[] lines = { "S1 B1   001", "S1 B1   002" };
 
-		var is = TestUtils.makeStream(lines);
+		var is = TestUtils.makeInputStream(lines);
 		var result = parser.parse(is, Collections.unmodifiableMap(controlMap));
 
 		assertThat(result, mmHasEntry(is(2), "S1", "B1"));
@@ -104,7 +104,7 @@ class EquationGroupParserTest {
 		String[] lines = { "S1 B1   011", "S1 B2   012", "S1 B3   013", "S1 B4   014", "S2 B1   021", "S2 B2   022",
 				"S2 B3   023", "S2 B4   024" };
 
-		var is = TestUtils.makeStream(lines);
+		var is = TestUtils.makeInputStream(lines);
 		var result = parser.parse(is, Collections.unmodifiableMap(controlMap));
 
 		assertThat(result, mmHasEntry(is(11), "S1", "B1"));
@@ -128,7 +128,7 @@ class EquationGroupParserTest {
 		List<String> unusedBecs = Arrays.asList("B2", "B4");
 		String[] lines = { "S1 B1   011", "S1 B2   012", "S1 B3   013", "S1 B4   014" };
 
-		var is = TestUtils.makeStream(lines);
+		var is = TestUtils.makeInputStream(lines);
 
 		ResourceParseValidException ex1 = assertThrows(
 				ResourceParseValidException.class, () -> parser.parse(is, Collections.unmodifiableMap(controlMap))
@@ -149,7 +149,7 @@ class EquationGroupParserTest {
 		String[] lines = { "S1 B1   011", "S1 B2   012", "S1 B4   014", "S2 B1   021", "S2 B2   022", "S2 B3   023",
 				"S2 B4   024" };
 
-		var is = TestUtils.makeStream(lines);
+		var is = TestUtils.makeInputStream(lines);
 
 		ResourceParseValidException ex1 = assertThrows(
 				ResourceParseValidException.class, () -> parser.parse(is, Collections.unmodifiableMap(controlMap))
@@ -171,7 +171,7 @@ class EquationGroupParserTest {
 		String[] lines = { "S1 B1   011", "S1 B2   012", "S1 B4   014", "S2 B1   021", "S2 B2   022", "S2 B3   023",
 				"S2 B4   024" };
 
-		var is = TestUtils.makeStream(lines);
+		var is = TestUtils.makeInputStream(lines);
 
 		ResourceParseValidException ex1 = assertThrows(
 				ResourceParseValidException.class, () -> parser.parse(is, Collections.unmodifiableMap(controlMap))

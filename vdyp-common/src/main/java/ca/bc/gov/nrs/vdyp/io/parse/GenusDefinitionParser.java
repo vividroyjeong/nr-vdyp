@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
@@ -46,7 +45,7 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<List<G
 
 	public static final String CONTROL_KEY = "SP0_DEF";
 
-	private int num_sp0;
+	private int numSp0;
 
 	private LineParser lineParser = new LineParser().strippedString(2, "alias").space(1).strippedString(32, "name")
 			.space(1).value(
@@ -57,19 +56,19 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<List<G
 
 	public GenusDefinitionParser() {
 		super();
-		this.num_sp0 = 16;
+		this.numSp0 = 16;
 	}
 
-	public GenusDefinitionParser(int num_sp0) {
+	public GenusDefinitionParser(int numSp0) {
 		super();
-		this.num_sp0 = num_sp0;
+		this.numSp0 = numSp0;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<GenusDefinition> parse(InputStream is, Map<String, Object> control)
 			throws IOException, ResourceParseException {
-		GenusDefinition[] result = new GenusDefinition[num_sp0];
+		GenusDefinition[] result = new GenusDefinition[numSp0];
 		result = lineParser.parse(is, result, (v, r) -> {
 			String alias = (String) v.get("alias");
 			Optional<Integer> preference = (Optional<Integer>) v.get("preference");
@@ -79,9 +78,9 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<List<G
 			var defn = new GenusDefinition(alias, preference, name);
 			int p = preference.orElse(lineNumber);
 
-			if (p > num_sp0) {
+			if (p > numSp0) {
 				throw new ValueParseException(
-						Integer.toString(p), String.format("Preference %d is larger than %d", p, num_sp0)
+						Integer.toString(p), String.format("Preference %d is larger than %d", p, numSp0)
 				);
 			}
 			if (p < 1) {
@@ -120,7 +119,7 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<List<G
 	}
 
 	public static List<String> getSpeciesAliases(final Map<String, Object> controlMap) {
-		return getSpecies(controlMap).stream().map(GenusDefinition::getAlias).collect(Collectors.toList());
+		return getSpecies(controlMap).stream().map(GenusDefinition::getAlias).toList();
 	}
 
 	/**
@@ -133,6 +132,10 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<List<G
 	public static GenusDefinition getSpeciesByIndex(final int index, final Map<String, Object> controlMap) {
 
 		return getSpecies(controlMap).get(index - 1);
+	}
+
+	public static Optional<Integer> getIndex(final String alias, final Map<String, Object> controlMap) {
+		return Optional.of(getSpeciesAliases(controlMap).indexOf(alias) + 1).filter(x -> x != 0);
 	}
 
 	@Override

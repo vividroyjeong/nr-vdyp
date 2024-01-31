@@ -21,6 +21,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.ValueParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.ValueParser;
 import ca.bc.gov.nrs.vdyp.io.parse.VeteranBQParser;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.JProgram;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
@@ -75,11 +76,11 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 
 	public static final int MAX_MODS = 60;
 
-	int jprogram;
+	JProgram jprogram;
 
 	static final int[] ipoint = { 1, 0, 2, 0, 0, 3, 4, 5, 0 };
 
-	public ModifierParser(int jprogram) {
+	public ModifierParser(JProgram jprogram) {
 		super();
 		this.jprogram = jprogram;
 	}
@@ -248,7 +249,7 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 	boolean modIsForProgram(Map<String, Object> entry) {
 		@SuppressWarnings("unchecked")
 		var programs = (List<Boolean>) entry.get("programs");
-		var index = ipoint[this.jprogram - 1];
+		var index = ipoint[this.jprogram.getIndex() - 1];
 		if (index <= 0)
 			throw new IllegalStateException("JProgram " + this.jprogram + " mapped to " + index);
 		return programs.get(index - 1);

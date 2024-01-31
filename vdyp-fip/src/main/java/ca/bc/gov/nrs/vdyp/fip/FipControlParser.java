@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.vdyp.fip;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -9,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKeys;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.BreakageEquationGroupParser;
@@ -42,6 +44,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.VeteranLayerVolumeAdjustParser;
 import ca.bc.gov.nrs.vdyp.io.parse.VolumeEquationGroupParser;
 import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayParser;
 import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayWasteParser;
+import ca.bc.gov.nrs.vdyp.model.JProgram;
 import ca.bc.gov.nrs.vdyp.io.parse.EquationModifierParser;
 import ca.bc.gov.nrs.vdyp.io.parse.HLCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.HLNonprimaryCoefficientParser;
@@ -58,9 +61,6 @@ public class FipControlParser {
 	public static final String FIP_YIELD_POLY_INPUT = FipPolygonParser.CONTROL_KEY;
 	public static final String FIP_YIELD_LAYER_INPUT = FipLayerParser.CONTROL_KEY;
 	public static final String FIP_YIELD_LX_SP0_INPUT = FipSpeciesParser.CONTROL_KEY;
-	public static final String VDYP_POLYGON = "VDYP_POLYGON";
-	public static final String VDYP_LAYER_BY_SPECIES = "VDYP_LAYER_BY_SPECIES";
-	public static final String VDYP_LAYER_BY_SP0_BY_UTIL = "VDYP_LAYER_BY_SP0_BY_UTIL";
 	public static final String VOLUME_EQN_GROUPS = VolumeEquationGroupParser.CONTROL_KEY;
 	public static final String DECAY_GROUPS = DecayEquationGroupParser.CONTROL_KEY;
 	public static final String BREAKAGE_GROUPS = BreakageEquationGroupParser.CONTROL_KEY;
@@ -119,9 +119,9 @@ public class FipControlParser {
 			.record(12, FIP_YIELD_LAYER_INPUT, FILENAME) // GET_FIPL
 			.record(13, FIP_YIELD_LX_SP0_INPUT, FILENAME) // GET_FIPS
 
-			.record(15, VDYP_POLYGON, FILENAME) //
-			.record(16, VDYP_LAYER_BY_SPECIES, FILENAME) //
-			.record(18, VDYP_LAYER_BY_SP0_BY_UTIL, FILENAME) //
+			.record(15, ControlKeys.VDYP_POLYGON, FILENAME) //
+			.record(16, ControlKeys.VDYP_LAYER_BY_SPECIES, FILENAME) //
+			.record(18, ControlKeys.VDYP_LAYER_BY_SP0_BY_UTIL, FILENAME) //
 
 			.record(20, VOLUME_EQN_GROUPS, FILENAME) // RD_VGRP
 			.record(21, DECAY_GROUPS, FILENAME) // RD_DGRP
@@ -188,7 +188,7 @@ public class FipControlParser {
 
 	;
 
-	int jprogram = 1; // FIPSTART only TODO Track this down
+	JProgram jprogram = JProgram.FIP_START; // FIPSTART only TODO Track this down
 
 	public FipControlParser() {
 
@@ -200,8 +200,13 @@ public class FipControlParser {
 			return parse(is, new FileResolver() {
 
 				@Override
-				public InputStream resolve(String filename) throws IOException {
+				public InputStream resolveForInput(String filename) throws IOException {
 					return Files.newInputStream(inputFile.resolveSibling(filename));
+				}
+
+				@Override
+				public OutputStream resolveForOutput(String filename) throws IOException {
+					return Files.newOutputStream(inputFile.resolveSibling(filename));
 				}
 
 				@Override
@@ -210,31 +215,6 @@ public class FipControlParser {
 				}
 			});
 		}
-	}
-
-	Map<String, ?> parse(Class<?> klazz, String resourceName) throws IOException, ResourceParseException {
-		try (var is = klazz.getResourceAsStream(resourceName)) {
-
-			return parse(is, fileResolver(klazz));
-		}
-	}
-
-	static FileResolver fileResolver(Class<?> klazz) {
-		return new FileResolver() {
-
-			@Override
-			public InputStream resolve(String filename) throws IOException {
-				InputStream resourceAsStream = klazz.getResourceAsStream(filename);
-				if (resourceAsStream == null)
-					throw new IOException("Could not load " + filename);
-				return resourceAsStream;
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return klazz.getResource(filename).toString();
-			}
-		};
 	}
 
 	List<ControlMapModifier> DATA_FILES = Arrays.asList(
@@ -416,7 +396,7 @@ public class FipControlParser {
 
 		applyModifiers(map, DATA_FILES, fileResolver);
 
-		if (jprogram == 1) {
+		if (jprogram == JProgram.FIP_START) {
 			applyModifiers(map, FIPSTART_ONLY, fileResolver);
 		}
 
@@ -427,7 +407,7 @@ public class FipControlParser {
 		applyModifiers(map, COEFFICIENTS, fileResolver);
 
 		// Initiation items NOT for FIPSTART
-		if (jprogram > 1) {
+		if (jprogram != JProgram.FIP_START) {
 
 			throw new UnsupportedOperationException();
 			// RD_E106

@@ -1,7 +1,6 @@
 package ca.bc.gov.nrs.vdyp.model;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -11,15 +10,40 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class BaseVdypPolygon<L extends BaseVdypLayer<?>, PA> {
+public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?>, PA> {
 
-	private String polygonIdentifier; // FIP_P/POLYDESC
-	private PA percentAvailable; // FIP_P2/PCTFLAND
-	private Map<LayerType, L> layers = new LinkedHashMap<>();
+	String polygonIdentifier; // FIP_P/POLYDESC
+	PA percentAvailable; // FIP_P2/PCTFLAND
+	Map<LayerType, L> layers = new LinkedHashMap<>();
+	protected String biogeoclimaticZone;
+	protected String forestInventoryZone;
+	protected Optional<FipMode> modeFip;
 
-	public BaseVdypPolygon(String polygonIdentifier, PA percentAvailable) {
+	protected BaseVdypPolygon(
+			String polygonIdentifier, PA percentAvailable, String fiz, String becIdentifier, Optional<FipMode> modeFip
+	) {
+		super();
+		this.forestInventoryZone = fiz;
+		this.biogeoclimaticZone = becIdentifier;
+		this.modeFip = modeFip;
 		this.polygonIdentifier = polygonIdentifier;
 		this.percentAvailable = percentAvailable;
+	}
+
+	/**
+	 * Copy constructs from the simple attributes of another polygon, but does not
+	 * copy layers.
+	 *
+	 * @param <O>                     Type of the polygon to copy
+	 * @param <U>                     Type of percent available in the other polygon
+	 * @param toCopy                  The polygon to copy
+	 * @param convertPercentAvailable Function to convert
+	 */
+	protected <O extends BaseVdypPolygon<?, U>, U> BaseVdypPolygon(O toCopy, Function<U, PA> convertPercentAvailable) {
+		this(
+				toCopy.getPolygonIdentifier(), convertPercentAvailable.apply(toCopy.getPercentAvailable()),
+				toCopy.getForestInventoryZone(), toCopy.getBiogeoclimaticZone(), toCopy.getModeFip()
+		);
 	}
 
 	public String getPolygonIdentifier() {
@@ -51,10 +75,38 @@ public class BaseVdypPolygon<L extends BaseVdypLayer<?>, PA> {
 		this.percentAvailable = percentAvailable;
 	}
 
+	public String getBiogeoclimaticZone() {
+		return biogeoclimaticZone;
+	}
+
+	public void setBiogeoclimaticZone(String biogeoclimaticZone) {
+		this.biogeoclimaticZone = biogeoclimaticZone;
+	}
+
+	public String getForestInventoryZone() {
+		return forestInventoryZone;
+	}
+
+	public void setForestInventoryZone(String forestInventoryZone) {
+		this.forestInventoryZone = forestInventoryZone;
+	}
+
+	public Optional<FipMode> getModeFip() {
+		return modeFip;
+	}
+
+	public void setModeFip(Optional<FipMode> modeFip) {
+		this.modeFip = modeFip;
+	}
+
 	protected abstract static class Builder<T extends BaseVdypPolygon<L, PA>, L extends BaseVdypLayer<?>, PA>
 			extends ModelClassBuilder<T> {
 		protected Optional<String> polygonIdentifier = Optional.empty();
 		protected Optional<PA> percentAvailable = Optional.empty();
+		protected Optional<String> biogeoclimaticZone = Optional.empty();
+		protected Optional<String> forestInventoryZone = Optional.empty();
+		protected Optional<FipMode> modeFip = Optional.empty();
+
 		protected List<L> layers = new LinkedList<>();
 
 		public Builder<T, L, PA> polygonIdentifier(String polygonIdentifier) {
@@ -65,6 +117,25 @@ public class BaseVdypPolygon<L extends BaseVdypLayer<?>, PA> {
 		public Builder<T, L, PA> percentAvailable(PA pa) {
 			this.percentAvailable = Optional.of(pa);
 			return this;
+		}
+
+		public Builder<T, L, PA> biogeoclimaticZone(String biogeoclimaticZone) {
+			this.biogeoclimaticZone = Optional.of(biogeoclimaticZone);
+			return this;
+		}
+
+		public Builder<T, L, PA> forestInventoryZone(String forestInventoryZone) {
+			this.forestInventoryZone = Optional.of(forestInventoryZone);
+			return this;
+		}
+
+		public Builder<T, L, PA> modeFip(Optional<FipMode> modeFip) {
+			this.modeFip = modeFip;
+			return this;
+		}
+
+		public Builder<T, L, PA> modeFip(FipMode modeFip) {
+			return modeFip(Optional.of(modeFip));
 		}
 
 		public Builder<T, L, PA> addLayer(L layer) {
@@ -90,6 +161,8 @@ public class BaseVdypPolygon<L extends BaseVdypLayer<?>, PA> {
 		public <PA2> Builder<T, L, PA> copy(BaseVdypPolygon<?, PA2> toCopy, Function<PA2, PA> paConvert) {
 			polygonIdentifier(toCopy.getPolygonIdentifier());
 			percentAvailable(paConvert.apply(toCopy.getPercentAvailable()));
+			biogeoclimaticZone(toCopy.getBiogeoclimaticZone());
+			forestInventoryZone(toCopy.getForestInventoryZone());
 			return this;
 		}
 
@@ -97,6 +170,8 @@ public class BaseVdypPolygon<L extends BaseVdypLayer<?>, PA> {
 		protected void check(Collection<String> errors) {
 			requirePresent(polygonIdentifier, "polygonIdentifier", errors);
 			requirePresent(percentAvailable, "percentAvailable", errors);
+			requirePresent(biogeoclimaticZone, "biogeoclimaticZone", errors);
+			requirePresent(forestInventoryZone, "forestInventoryZone", errors);
 		}
 
 		@Override

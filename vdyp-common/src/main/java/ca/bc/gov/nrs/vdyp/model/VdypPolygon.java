@@ -1,11 +1,56 @@
 package ca.bc.gov.nrs.vdyp.model;
 
+import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
+
+import ca.bc.gov.nrs.vdyp.common.Computed;
 
 public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float> {
 
-	public VdypPolygon(String polygonIdentifier, Float percentAvailable) {
-		super(polygonIdentifier, percentAvailable);
+	// TODO better name
+	int grpBa1;
+
+	public VdypPolygon(
+			String polygonIdentifier, Float percentAvailable, String fiz, String becIdentifier,
+			Optional<FipMode> modeFip
+	) {
+		super(polygonIdentifier, percentAvailable, fiz, becIdentifier, modeFip);
+	}
+
+	/**
+	 * Copy constructs from the simple attributes of another polygon, but does not
+	 * copy layers.
+	 *
+	 * @param <O>                     Type of the polygon to copy
+	 * @param <U>                     Type of percent available in the other polygon
+	 * @param toCopy                  The polygon to copy
+	 * @param convertPercentAvailable Function to convert
+	 */
+	public <O extends BaseVdypPolygon<?, U>, U> VdypPolygon(O toCopy, Function<U, Float> convertPercentAvailable) {
+		super(toCopy, convertPercentAvailable);
+	}
+
+	@Computed
+	public int getInventoryTypeGroup() {
+		return this.getLayers().get(LayerType.PRIMARY).getInventoryTypeGroup().orElseThrow(
+				() -> new IllegalArgumentException("Inventory Type Group does not exist if there is no primary layer")
+		);
+	}
+
+	@Computed
+	public void setInventoryTypeGroup(int itg) {
+		this.getLayers().get(LayerType.PRIMARY).setInventoryTypeGroup(Optional.of(itg));
+	}
+
+	// TODO better name
+	public int getGrpBa1() {
+		return grpBa1;
+	}
+
+	// TODO better name
+	public void setGrpBa1(int grpBa1) {
+		this.grpBa1 = grpBa1;
 	}
 
 	/**
@@ -31,12 +76,15 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float> {
 
 	public static class Builder extends BaseVdypPolygon.Builder<VdypPolygon, VdypLayer, Float> {
 
+		// TODO better name
+		int grpBa1;
+
 		@Override
 		protected VdypPolygon doBuild() {
-			return (new VdypPolygon(
-					polygonIdentifier.get(), //
-					percentAvailable.get()
-			));
+			return new VdypPolygon(
+					polygonIdentifier.get(), percentAvailable.get(), forestInventoryZone.get(),
+					biogeoclimaticZone.get(), modeFip
+			);
 		}
 
 		@Override

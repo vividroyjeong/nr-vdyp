@@ -1,9 +1,9 @@
 package ca.bc.gov.nrs.vdyp.model;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.common.Computed;
-import ca.bc.gov.nrs.vdyp.model.VdypSpecies.Builder;
 
 public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtilizationHolder {
 
@@ -27,15 +27,22 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 	Coefficients closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOL_DWB species 0
 
+	private Optional<String> dominantSpecies;
+
 	public VdypLayer(
-			String polygonIdentifier, LayerType layer, float ageTotal, float yearsToBreastHeight, float height
+			String polygonIdentifier, LayerType layer, Optional<Float> ageTotal, Optional<Float> height,
+			Optional<Float> yearsToBreastHeight, Optional<Float> siteIndex, Optional<Integer> siteCurveNumber,
+			Optional<Integer> inventoryTypeGroup, Optional<String> siteGenus
 	) {
-		super(polygonIdentifier, layer, ageTotal, yearsToBreastHeight, height);
+		super(
+				polygonIdentifier, layer, ageTotal, height, yearsToBreastHeight, siteIndex, siteCurveNumber,
+				inventoryTypeGroup, siteGenus
+		);
 	}
 
 	@Computed
-	public float getBreastHeightAge() {
-		return this.getAgeTotal() - this.getYearsToBreastHeight();
+	public Optional<Float> getBreastHeightAge() {
+		return this.getAgeTotal().flatMap(at -> this.getYearsToBreastHeight().map(bha -> at - bha));
 	}
 
 	@Override
@@ -134,6 +141,14 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 		this.closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization;
 	}
 
+	public Optional<String> getDominantSpecies() {
+		return dominantSpecies;
+	}
+
+	public void setDominantSpecies(Optional<String> dominantSpecies) {
+		this.dominantSpecies = dominantSpecies;
+	}
+
 	/**
 	 * Accepts a configuration function that accepts a builder to configure.
 	 *
@@ -187,9 +202,13 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 			return (new VdypLayer(
 					polygonIdentifier.get(), //
 					layer.get(), //
-					ageTotal.get(), //
-					yearsToBreastHeight.get(), //
-					height.get()
+					ageTotal, //
+					height, //
+					yearsToBreastHeight, //
+					siteIndex, //
+					siteCurveNumber, //
+					inventoryTypeGroup, //
+					siteGenus
 			));
 		}
 

@@ -73,13 +73,13 @@ public class FipLayerParser
 					.value(6, BREAST_HEIGHT_AGE, ValueParser.optional(ValueParser.FLOAT)) //
 					.value(3, SITE_CURVE_NUMBER, ValueParser.optional(ValueParser.INTEGER));
 
-			var is = fileResolver.resolve(fileName);
+			var is = fileResolver.resolveForInput(fileName);
 
 			var delegateStream = new AbstractStreamingParser<ValueOrMarker<Optional<FipLayer>, EndOfRecord>>(
 					is, lineParser, control
 			) {
 
-				@SuppressWarnings({ "unchecked" })
+				@SuppressWarnings({ "unchecked", "deprecation" })
 				@Override
 				protected ValueOrMarker<Optional<FipLayer>, EndOfRecord> convert(Map<String, Object> entry) {
 					var polygonId = (String) entry.get(FipPolygonParser.POLYGON_IDENTIFIER);
@@ -148,7 +148,7 @@ public class FipLayerParser
 					return nextChild.getValue().map(x -> x.map(layer -> {
 						// TODO log this
 						// If the layer is present but has height or closure that's not positive, ignore
-						return layer.getHeight() <= 0f || layer.getCrownClosure() <= 0f;
+						return layer.getHeightSafe() <= 0f || layer.getCrownClosure() <= 0f;
 					}).orElse(true)) // If the layer is not present (Unknown layer type) ignore
 							.orElse(false); // If it's a marker, let it through so the stop method can see it.
 				}
