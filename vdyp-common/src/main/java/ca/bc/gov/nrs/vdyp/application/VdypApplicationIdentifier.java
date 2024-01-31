@@ -1,9 +1,8 @@
 package ca.bc.gov.nrs.vdyp.application;
 
 /**
- * Identifies the VDYP applications. The PH_ values are placeholders, included
- * so that the enum values agree with the original values used for the JPROGRAM
- * COMMON variable.
+ * Identifies the VDYP applications. Matches the values used for the FORTRAN 
+ * implementation's JPROGRAM COMMON variable.
  *
  * @author Michael Junkin, Vivid Solutions
  */

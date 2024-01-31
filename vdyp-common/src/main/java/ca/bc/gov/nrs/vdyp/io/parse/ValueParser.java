@@ -283,7 +283,7 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 	}
 
 	/**
-	 * Parse a string as a set of fixed length chucks.
+	 * Parse a string as a set of fixed length chunks.
 	 *
 	 * @param <U>
 	 * @param length   length of a chunk

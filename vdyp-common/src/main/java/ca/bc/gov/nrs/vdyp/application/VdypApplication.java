@@ -1,5 +1,10 @@
 package ca.bc.gov.nrs.vdyp.application;
 
+/** 
+ * Base class of all VDYP applications.
+ * 
+ * @author Michael Junkin, Vivid Solutions
+ */
 public abstract class VdypApplication extends VdypComponent {
 	public abstract VdypApplicationIdentifier getIdentifier();
 

@@ -65,7 +65,6 @@ import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayWasteParser;
  * Parser for VDYP control files
  *
  * @author Michael Junkin, Vivid Solutions
- *
  */
 public class VdypForwardControlParser {
 
@@ -207,7 +206,7 @@ public class VdypForwardControlParser {
 			.record(150, PRIMARY_SP_DQ_GROWTH, FILENAME) // RD_E150
 			.record(151, NON_PRIMARY_SP_DQ_GROWTH, FILENAME) // RD_E151
 
-			.record(198, MODIFIER_FILE, FILENAME) // RD_E198 IPSJF155, XII
+			.record(198, MODIFIER_FILE, ValueParser.optional(FILENAME)) // RD_E198 IPSJF155, XII
 
 			.record(199, DEBUG_SWITCHES, ValueParser.list(ValueParser.INTEGER)) // IPSJF155
 				// Debug switches (25) 0=default See IPSJF155, App IX 1st: 1: Do NOT apply BA
