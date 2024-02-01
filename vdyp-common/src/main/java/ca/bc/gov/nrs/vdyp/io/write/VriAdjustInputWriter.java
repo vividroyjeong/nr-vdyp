@@ -4,6 +4,8 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -14,7 +16,9 @@ import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.FipMode;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
@@ -57,7 +61,7 @@ public class VriAdjustInputWriter implements Closeable {
 	static final String UTIL_FORMAT = POLY_IDENTIFIER_FORMAT + " " + LAYER_TYPE_FORMAT + " " + SPEC_INDEX_FORMAT + " "
 			+ SPEC_IDENTIFIER_FORMAT + "%3d%9.5f%9.2f%9.4f%9.4f%9.4f%9.4f%9.4f%9.4f%6.1f\n";
 
-	static final String END_RECORD_FORMAT = POLY_IDENTIFIER_FORMAT + "  ";
+	static final String END_RECORD_FORMAT = POLY_IDENTIFIER_FORMAT + "  \n";
 
 	/**
 	 * Create a writer for VRI Adjust input files using provided OutputStreams. The
@@ -118,9 +122,9 @@ public class VriAdjustInputWriter implements Closeable {
 				polygon.getForestInventoryZone(), //
 
 				polygon.getPercentAvailable().intValue(), //
-				polygon.getInventoryTypeGroup(), //
-				polygon.getGrpBa1(), //
-				polygon.getModeFip().map(FipMode::getCode).orElse(0)
+				polygon.getLayers().get(LayerType.PRIMARY).getInventoryTypeGroup().orElse(EMPTY_INT), //
+				polygon.getLayers().get(LayerType.PRIMARY).getEmpiricalRelationshipParameterIndex().orElse(EMPTY_INT), //
+				polygon.getModeFip().orElse(FipMode.FIPSTART).getCode()
 		);
 	}
 
@@ -140,6 +144,7 @@ public class VriAdjustInputWriter implements Closeable {
 		).limit(4).toList();
 		// 082E004 615 1988 P 9 L LW 100.0 0.0 0.0 0.0 -9.00 -9.00 -9.0 -9.0 -9.0 0 -9
 		var specIndex = GenusDefinitionParser.getIndex(spec.getGenus(), controlMap);
+		boolean isSiteSpec = layer.getSiteGenus().map(spec.getGenus()::equals).orElse(false);
 		writeFormat(
 				speciesFile, //
 				SPEC_FORMAT, //
@@ -159,13 +164,14 @@ public class VriAdjustInputWriter implements Closeable {
 				specDistributionEntries.get(3).getKey(), //
 				specDistributionEntries.get(3).getValue(), //
 
-				layer.getSiteIndex().orElse(EMPTY_FLOAT), //
-				layer.getHeight().orElse(EMPTY_FLOAT), //
-				layer.getAgeTotal().orElse(EMPTY_FLOAT), //
-				layer.getBreastHeightAge().orElse(EMPTY_FLOAT), //
-				layer.getYearsToBreastHeight().orElse(EMPTY_FLOAT), //
-				layer.getSiteGenus().map(id -> id.equals(spec.getGenus())).orElse(false) ? 1 : 0, //
-				layer.getSiteCurveNumber().orElse(EMPTY_INT)
+				layer.getSiteIndex().filter(x -> isSiteSpec).orElse(EMPTY_FLOAT), //
+				layer.getHeight().filter(x -> isSiteSpec).orElse(EMPTY_FLOAT), //
+				layer.getAgeTotal().filter(x -> isSiteSpec).orElse(EMPTY_FLOAT), //
+				layer.getBreastHeightAge().filter(x -> isSiteSpec).orElse(EMPTY_FLOAT), //
+				layer.getYearsToBreastHeight().filter(x -> isSiteSpec).orElse(EMPTY_FLOAT), //
+				layer.getSiteGenus().filter(x -> isSiteSpec).map(id -> id.equals(spec.getGenus())).orElse(false) ? 1
+						: 0, //
+				layer.getSiteCurveNumber().filter(x -> isSiteSpec).orElse(EMPTY_INT)
 
 		);
 
@@ -190,7 +196,7 @@ public class VriAdjustInputWriter implements Closeable {
 		for (var uc : UtilizationClass.values()) {
 			Optional<Float> height = Optional.empty();
 			if (uc.index < 1) {
-				height = Optional.of(utils.getLoreyHeightByUtilization().getCoe(uc.index));
+				height = Optional.of(utils.getLoreyHeightByUtilization().getCoe(uc.index)).filter(x -> x > 0f);
 			}
 			Optional<Float> quadMeanDiameter = Optional.empty();
 			if (utils.getBaseAreaByUtilization().getCoe(uc.index) > 0) {
@@ -224,7 +230,9 @@ public class VriAdjustInputWriter implements Closeable {
 					utils.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization().getCoe(uc.index), //
 					utils.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization().getCoe(uc.index), //
 
-					quadMeanDiameter.orElse(EMPTY_FLOAT)
+					quadMeanDiameter.orElse(layer.getLayer() == LayerType.PRIMARY ? //
+							EMPTY_FLOAT : 0f
+					) // FIXME: VDYP7 is being inconsistent. Should consider using -9 for both.
 			);
 		}
 	}
@@ -241,7 +249,10 @@ public class VriAdjustInputWriter implements Closeable {
 		writePolygon(polygon);
 		for (var layer : polygon.getLayers().values()) {
 			writeUtilization(layer, layer);
-			for (var species : layer.getSpecies().values()) {
+			List<VdypSpecies> specs = new ArrayList<>(layer.getSpecies().size());
+			specs.addAll(layer.getSpecies().values());
+			specs.sort(Utils.compareUsing(BaseVdypSpecies::getGenus));
+			for (var species : specs) {
 				writeSpecies(layer, species);
 				writeUtilization(layer, species);
 			}

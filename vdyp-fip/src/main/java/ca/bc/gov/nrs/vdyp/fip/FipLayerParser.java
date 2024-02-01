@@ -79,7 +79,7 @@ public class FipLayerParser
 					is, lineParser, control
 			) {
 
-				@SuppressWarnings({ "unchecked", "deprecation" })
+				@SuppressWarnings({ "unchecked" })
 				@Override
 				protected ValueOrMarker<Optional<FipLayer>, EndOfRecord> convert(Map<String, Object> entry) {
 					var polygonId = (String) entry.get(FipPolygonParser.POLYGON_IDENTIFIER);

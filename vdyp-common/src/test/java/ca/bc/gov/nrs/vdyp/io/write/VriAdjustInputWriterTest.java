@@ -2,27 +2,20 @@ package ca.bc.gov.nrs.vdyp.io.write;
 
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKeys;
 import ca.bc.gov.nrs.vdyp.common.Utils;
-import ca.bc.gov.nrs.vdyp.io.FileResolver;
-import ca.bc.gov.nrs.vdyp.model.FipMode;
-import ca.bc.gov.nrs.vdyp.model.LayerType;
-import ca.bc.gov.nrs.vdyp.model.VdypLayer;
-import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
-import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
-import ca.bc.gov.nrs.vdyp.test.TestUtils;
+import ca.bc.gov.nrs.vdyp.model.*;
+import ca.bc.gov.nrs.vdyp.test.*;
 import ca.bc.gov.nrs.vdyp.test.TestUtils.MockOutputStream;
-import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 
 class VriAdjustInputWriterTest {
 
@@ -30,7 +23,7 @@ class VriAdjustInputWriterTest {
 	MockOutputStream specStream;
 	MockOutputStream utilStream;
 
-	FileResolver fileResolver;
+	MockFileResolver fileResolver;
 
 	Map<String, Object> controlMap;
 
@@ -47,35 +40,10 @@ class VriAdjustInputWriterTest {
 		controlMap.put(ControlKeys.VDYP_LAYER_BY_SPECIES, "testSpeciesFile");
 		controlMap.put(ControlKeys.VDYP_LAYER_BY_SP0_BY_UTIL, "testUtilizationFile");
 
-		fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				fail("Should not be attempting to open for reading");
-				return null;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				switch (filename) {
-				case "testPolygonFile":
-					return polyStream;
-				case "testSpeciesFile":
-					return specStream;
-				case "testUtilizationFile":
-					return utilStream;
-				default:
-					fail("Unexpected file " + filename + " opened");
-				}
-				return null;
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return "TEST:" + filename;
-			}
-
-		};
+		fileResolver = new MockFileResolver("TEST");
+		fileResolver.addStream("testPolygonFile", polyStream);
+		fileResolver.addStream("testSpeciesFile", specStream);
+		fileResolver.addStream("testUtilizationFile", utilStream);
 
 	}
 
@@ -136,6 +104,7 @@ class VriAdjustInputWriterTest {
 			});
 
 			// FIXME Add to builder
+			layer.setEmpericalRelationshipParameterIndex(Optional.of(119));
 			polygon.setInventoryTypeGroup(28);
 			polygon.setGrpBa1(119);
 
@@ -200,6 +169,7 @@ class VriAdjustInputWriterTest {
 				builder.siteCurveNumber(0);
 			});
 
+			@SuppressWarnings("unused")
 			var species = VdypSpecies.build(layer, builder -> {
 				builder.genus("PL");
 				builder.addSpecies("PL", 100f);

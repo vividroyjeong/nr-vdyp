@@ -16,7 +16,7 @@ public abstract class BaseVdypSpecies {
 
 	private final String genus; // FIPSA/SP0V
 
-	private float percentGenus; // FIPS/PCTVOLV
+	private float percentGenus; // FIPS/PCTVOLV L1COM1/PCTL1
 
 	// This is computed from percentGenus, but VDYP7 computes it in a way that might
 	// lead to a slight difference so it's stored separately and can be modified.

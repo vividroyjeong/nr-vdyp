@@ -1,26 +1,12 @@
 package ca.bc.gov.nrs.vdyp.fip;
 
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.hasBec;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.hasSpecificEntry;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.mmHasEntry;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isA;
+import static org.hamcrest.Matchers.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.SequenceInputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -28,24 +14,11 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.fip.test.FipTestUtils;
-import ca.bc.gov.nrs.vdyp.io.parse.BecDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ControlFileParserTest;
-import ca.bc.gov.nrs.vdyp.io.parse.HLNonprimaryCoefficientParserTest;
-import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SiteCurveAgeMaximumParserTest;
-import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
-import ca.bc.gov.nrs.vdyp.model.BecDefinition;
-import ca.bc.gov.nrs.vdyp.model.BecLookup;
-import ca.bc.gov.nrs.vdyp.model.Region;
-import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
-import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
-import ca.bc.gov.nrs.vdyp.model.SiteCurve;
-import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
-import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
+import ca.bc.gov.nrs.vdyp.io.parse.*;
+import ca.bc.gov.nrs.vdyp.model.*;
 
 @SuppressWarnings({ "unused", "unchecked", "rawtypes" })
-class FipControlParserTest {
+public class FipControlParserTest {
 
 	@Test
 	void testParseBec() throws Exception {
@@ -558,7 +531,7 @@ class FipControlParserTest {
 	}
 
 	@Test
-	public void testParseMinima() throws Exception {
+	void testParseMinima() throws Exception {
 		var parser = new FipControlParser();
 		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
@@ -576,7 +549,7 @@ class FipControlParserTest {
 	}
 
 	@Test
-	public void testParseV7O_FIP() throws Exception {
+	void testParseV7O_FIP() throws Exception {
 		var parser = new FipControlParser();
 		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
@@ -586,7 +559,7 @@ class FipControlParserTest {
 	}
 
 	@Test
-	public void testParseV7O_FIL() throws Exception {
+	void testParseV7O_FIL() throws Exception {
 		var parser = new FipControlParser();
 		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
@@ -595,7 +568,7 @@ class FipControlParserTest {
 	}
 
 	@Test
-	public void testParseV7O_FIS() throws Exception {
+	void testParseV7O_FIS() throws Exception {
 		var parser = new FipControlParser();
 		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
 		assertThat(
@@ -617,7 +590,7 @@ class FipControlParserTest {
 				InputStream baseIs = ControlFileParserTest.class.getResourceAsStream("FIPSTART.CTR");
 				InputStream is = addToEnd(baseIs, lines);
 		) {
-			return parser.parse(is, resolver);
+			return parser.parse(is, resolver, new HashMap<>());
 		}
 	}
 
@@ -625,7 +598,7 @@ class FipControlParserTest {
 			throws IOException, ResourceParseException {
 		try (var is = klazz.getResourceAsStream(resourceName)) {
 
-			return parser.parse(is, FipTestUtils.fileResolver(klazz));
+			return parser.parse(is, FipTestUtils.fileResolver(klazz), new HashMap<>());
 		}
 	}
 }
