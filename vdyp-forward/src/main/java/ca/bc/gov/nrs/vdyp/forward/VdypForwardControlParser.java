@@ -22,6 +22,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.BreakageParser;
 import ca.bc.gov.nrs.vdyp.io.parse.BySpeciesDqCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.CloseUtilVolumeParser;
 import ca.bc.gov.nrs.vdyp.io.parse.CoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.CompVarAdjustmentsParser;
 import ca.bc.gov.nrs.vdyp.io.parse.ComponentSizeParser;
 import ca.bc.gov.nrs.vdyp.io.parse.ControlFileParser;
 import ca.bc.gov.nrs.vdyp.io.parse.ControlMapModifier;
@@ -36,7 +37,6 @@ import ca.bc.gov.nrs.vdyp.io.parse.HLCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.HLNonprimaryCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.NonPrimarySpeciesBasalAreaGrowthParser;
 import ca.bc.gov.nrs.vdyp.io.parse.NonPrimarySpeciesDqGrowthParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ParameterAdjustmentParser;
 import ca.bc.gov.nrs.vdyp.io.parse.PrimarySpeciesBasalAreaGrowthParser;
 import ca.bc.gov.nrs.vdyp.io.parse.PrimarySpeciesDqGrowthParser;
 import ca.bc.gov.nrs.vdyp.io.parse.QuadraticMeanDiameterYieldParser;
@@ -80,7 +80,7 @@ public class VdypForwardControlParser {
 	public static final String CLOSE_UTIL_VOLUME = CloseUtilVolumeParser.CONTROL_KEY;
 	public static final String COE_BA = CoefficientParser.BA_CONTROL_KEY;
 	public static final String COE_DQ = CoefficientParser.DQ_CONTROL_KEY;
-	public static final String PARAM_ADJUSTMENTS = ParameterAdjustmentParser.CONTROL_KEY;
+	public static final String PARAM_ADJUSTMENTS = CompVarAdjustmentsParser.CONTROL_KEY;
 	public static final String DECAY_GROUPS = DecayEquationGroupParser.CONTROL_KEY;
 	public static final String DEFAULT_EQ_NUM = DefaultEquationNumberParser.CONTROL_KEY;
 	public static final String DQ_GROWTH_FIAT = DqGrowthFiatParser.CONTROL_KEY;
@@ -121,16 +121,17 @@ public class VdypForwardControlParser {
 	public static final String VDYP_LAYER_BY_SPECIES = "VDYP_LAYER_BY_SPECIES";
 	public static final String VDYP_LAYER_BY_SP0_BY_UTIL = "VDYP_LAYER_BY_SP0_BY_UTIL";
 
-	public static final String DEBUG_SWITCHES = "DEBUG_SWITCHES";
+	public static final String VTROL = "VTROL";
 	public static final String MAX_NUM_POLY = "MAX_NUM_POLY";
+	public static final String DEBUG_SWITCHES = "DEBUG_SWITCHES";
+	
 	public static final String MINIMA = "MINIMA";
 	public static final String MINIMUM_BASE_AREA = "MINIMUM_BASE_AREA";
 	public static final String MINIMUM_HEIGHT = "MINIMUM_HEIGHT";
 	public static final String MINIMUM_PREDICTED_BASE_AREA = "MINIMUM_PREDICTED_BASE_AREA";
 	public static final String MINIMUM_VETERAN_HEIGHT = "MINIMUM_VETERAN_HEIGHT";
-	public static final String MODIFIER_FILE = ModifierParser.CONTROL_KEY;
 
-	public static final float DEFAULT_MINIMUM_VETERAN_HEIGHT = 10.0f;
+	public static final String MODIFIER_FILE = ModifierParser.CONTROL_KEY;
 
 	private static final ValueParser<String> FILENAME = String::strip;
 
@@ -158,7 +159,6 @@ public class VdypForwardControlParser {
 
 			.record(30, DEFAULT_EQ_NUM, FILENAME) // RD_GRBA1
 			.record(31, EQN_MODIFIERS, FILENAME) // RD_GMBA1
-			.record(33, STOCKING_CLASS_FACTORS, FILENAME) // -- RD_STK33
 
 			.record(43, UPPER_BA_BY_CI_S0_P, FILENAME) // RD_E043 IPSJF128
 
@@ -189,7 +189,7 @@ public class VdypForwardControlParser {
 			.record(96, VETERAN_LAYER_VOLUME_ADJUST, FILENAME) // RD_YVET
 			.record(97, VETERAN_LAYER_DQ, FILENAME) // RD_YDQV
 
-			 // TODO: 101
+			.record(101, VTROL, new VdypVtrolParser())
 
 			.record(106, BA_YIELD, FILENAME) // RD_E106
 			.record(107, DQ_YIELD, FILENAME) // RD_E107
@@ -210,10 +210,14 @@ public class VdypForwardControlParser {
 			.record(198, MODIFIER_FILE, ValueParser.optional(FILENAME)) // RD_E198 IPSJF155, XII
 
 			.record(199, DEBUG_SWITCHES, ValueParser.list(ValueParser.INTEGER)) // IPSJF155
-				// Debug switches (25) 0=default See IPSJF155, App IX 1st: 1: Do NOT apply BA
-				// limits from SEQ043 2nd: 1: Do NOT apply DQ limits from SEQ043 4th: Future
-				// Development. Choice of upper limits 9th: 0: Normal - Suppress MATH77 error
-				// messages. 1: show some MATH77 errors; 2: show all. 22nd 1: extra preference
+				// Debug switches (25) 0=default See IPSJF155, App IX 
+				// 1st: 1: Do NOT apply BA limits from SEQ043 
+				// 2nd: 1: Do NOT apply DQ limits from SEQ043 
+				// 4th: Future Development. Choice of upper limits 
+				// 9th: 0: Normal - Suppress MATH77 error messages. 
+			    // 1: show some MATH77 errors; 
+				// 2: show all. 
+				// 22nd 1: extra preference
 				// for preferred sp (SEQ 010).
 				;
 
@@ -246,200 +250,14 @@ public class VdypForwardControlParser {
 
 	List<ControlMapModifier> DATA_FILES = Arrays.asList(
 
-			// V7O_FIP
+			// V7O_VIP
 			new VdypPolygonParser(),
 
-			// V7O_FIL
+			// V7O_VIS
 			new VdypSpeciesParser(),
 
-			// V7O_FIS
+			// V7O_VIU
 			new VdypUtilizationParser()
-	);
-
-	List<ControlMapModifier> BASIC_DEFINITIONS = Arrays.asList(
-
-			// RD_BEC
-			new BecDefinitionParser(),
-
-			// DEF_BEC
-
-			// RD_SP0
-			new GenusDefinitionParser()
-	);
-
-	List<ControlMapModifier> GROUP_DEFINITIONS = Arrays.asList(
-
-			// RD_VGRP
-			new VolumeEquationGroupParser(),
-
-			// RD_DGRP
-			new DecayEquationGroupParser(),
-
-			// RD_BGRP
-			new BreakageEquationGroupParser(),
-
-			// RD_GRBA1
-			new DefaultEquationNumberParser(),
-
-			// RD_GMBA1
-			new EquationModifierParser()
-	);
-
-	List<ControlMapModifier> FIPSTART_ONLY = Arrays.asList(
-
-			// RD_STK33
-			new StockingClassFactorParser()
-	);
-
-	List<ControlMapModifier> SITE_CURVES = Arrays.asList(
-
-			// User-assigned SC's (Site Curve Numbers)
-			//
-			// RD_E025
-			new SiteCurveParser(),
-
-			// Max tot ages to apply site curves (by SC)
-			//
-			// RD_E026
-			new SiteCurveAgeMaximumParser()
-	);
-
-	List<ControlMapModifier> COEFFICIENTS = Arrays.asList(
-			// RD_E043
-			new UpperCoefficientParser(),
-
-			// RD_YHL1
-			new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P1, HL_PRIMARY_SP_EQN_P1),
-
-			// RD_YHL2
-			new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P2, HL_PRIMARY_SP_EQN_P2),
-
-			// RD_YHL3
-			new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P3, HL_PRIMARY_SP_EQN_P3),
-
-			// RD_YHL4
-			new HLNonprimaryCoefficientParser(),
-
-			// RD_E060
-			new BySpeciesDqCoefficientParser(),
-
-			// Min and max DQ by species
-
-			// RD_E061
-			new ComponentSizeParser(),
-
-			// RD_UBA1
-			new UtilComponentBaseAreaParser(),
-
-			// RD_UDQ1
-			new UtilComponentDQParser(),
-
-			// Small Component (4.5 to 7.5 cm)
-
-			// RD_SBA1
-			new SmallComponentProbabilityParser(),
-
-			// RD_SBA2
-			new SmallComponentBaseAreaParser(),
-
-			// RD_SDQ1
-			new SmallComponentDQParser(),
-
-			// RD_SHL1
-			new SmallComponentHLParser(),
-
-			// RD_SVT1
-			new SmallComponentWSVolumeParser(),
-
-			// Standard Volume Relationships
-
-			// RD_YVT1
-			new TotalStandWholeStemParser(),
-
-			// RD_YVT2
-			new UtilComponentWSVolumeParser(),
-
-			// RD_YVC1
-			new CloseUtilVolumeParser(),
-
-			// RD_YVD1
-			new VolumeNetDecayParser(),
-
-			// RD_YVW1
-			new VolumeNetDecayWasteParser(),
-
-			// RD_E095
-			new BreakageParser(),
-
-			// Veterans
-
-			// RD_YVVET
-			new VeteranLayerVolumeAdjustParser(),
-
-			// RD_YDQV
-			new VeteranDQParser()
-	);
-
-	List<ControlMapModifier> FORWARD_DEFINITIONS = Arrays.asList(
-
-//			.record(106, BA_YIELD, FILENAME) // RD_E106
-//			.record(107, DQ_YIELD, FILENAME) // RD_E107
-//			.record(108, BA_DQ_UPPER_BOUNDS, FILENAME) // RD_E108
-//
-//			.record(111, BA_GROWTH_FIAT, FILENAME) // RD_E111
-//			.record(117, DQ_GROWTH_FIAT, FILENAME) // RD_E117
-//
-//			.record(121, BA_GROWTH_EMPIRICAL, FILENAME) // RD_E121
-//			.record(122, DQ_GROWTH_EMPIRICAL, FILENAME) // RD_E122
-//			.record(123, DQ_GROWTH_EMPIRICAL_LIMITS, FILENAME) // RD_E123
-//
-//			.record(148, PRIMARY_SP_BA_GROWTH, FILENAME) // RD_E148
-//			.record(149, NON_PRIMARY_SP_BA_GROWTH, FILENAME) // RD_E149
-//			.record(150, PRIMARY_SP_DQ_GROWTH, FILENAME) // RD_E150
-//			.record(151, NON_PRIMARY_SP_DQ_GROWTH, FILENAME) // RD_E151
-
-			// RD_E106
-			new BasalAreaYieldParser(),
-
-			// RD_E107
-			new QuadraticMeanDiameterYieldParser(),
-
-			// RD_E108
-			new UpperBoundsParser(),
-
-			// RD_E111
-			new BasalAreaGrowthFiatParser(),
-
-			// RD_E117
-			new DqGrowthFiatParser(),
-
-			// RD_E121
-			new BasalAreaGrowthEmpiricalParser(),
-
-			// RD_E122
-			new DqGrowthEmpiricalParser(),
-
-			// RD_E123
-			new DqGrowthEmpiricalLimitsParser(),
-
-			// RD_E148
-			new PrimarySpeciesBasalAreaGrowthParser(),
-
-			// RD_E149
-			new NonPrimarySpeciesBasalAreaGrowthParser(),
-
-			// RD_E150
-			new PrimarySpeciesDqGrowthParser(),
-
-			// RD_E151
-			new NonPrimarySpeciesDqGrowthParser()
-	);
-
-
-	List<ControlMapModifier> ADDITIONAL_MODIFIERS = Arrays.asList(
-
-			// RD_E198
-			new ModifierParser(VdypApplicationIdentifier.VDYPForward.getId())
 	);
 
 	private void applyModifiers(Map<String, Object> control, List<ControlMapModifier> modifiers, FileResolver fileResolver)
@@ -455,76 +273,151 @@ public class VdypForwardControlParser {
 
 		var map = controlParser.parse(is, Collections.emptyMap());
 
-		applyModifiers(map, BASIC_DEFINITIONS, fileResolver);
+		// This must be processed in an order identical to the order in GRO_INIT
+		
+		applyModifiers(map, List.of(		
+				// RD_BECD - 09
+				new BecDefinitionParser(),
+				// DEF_BEC
+				// RD_SP0 - 10
+				new GenusDefinitionParser())
+			, fileResolver);
 
 		// Read Groups
 
-		applyModifiers(map, GROUP_DEFINITIONS, fileResolver);
+		applyModifiers(map, List.of(			
+				// RD_VGRP - 20
+				new VolumeEquationGroupParser(),
+				// RD_DGRP - 21
+				new DecayEquationGroupParser(),
+				// RD_BGRP - 22
+				new BreakageEquationGroupParser(),
+				// RD_GRBA1 - 30
+				new DefaultEquationNumberParser(),
+				// RD_GMBA1 - 31
+				new EquationModifierParser())
+			, fileResolver);
 
 		// Initialize data file parser factories
 
 		applyModifiers(map, DATA_FILES, fileResolver);
 
-		if (app.getId() == 1) {
-			applyModifiers(map, FIPSTART_ONLY, fileResolver);
-		}
+		applyModifiers(map, List.of(			
+				// User-assigned SC's (Site Curve Numbers)
+				// RD_E025
+				new SiteCurveParser(),
 
-		applyModifiers(map, SITE_CURVES, fileResolver);
+				// Max tot ages to apply site curves (by SC)
+				// RD_E026
+				new SiteCurveAgeMaximumParser(),
+				
+				// RD_E028
+				new CompVarAdjustmentsParser())
+			, fileResolver);
 
 		// Coeff for Empirical relationships
 
-		applyModifiers(map, COEFFICIENTS, fileResolver);
+		applyModifiers(map, List.of(
+				// RD_E043
+				new UpperCoefficientParser(),
+				// RD_YHL1 - 50
+				new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P1, HL_PRIMARY_SP_EQN_P1),
+				// RD_YHL2 - 51
+				new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P2, HL_PRIMARY_SP_EQN_P2),
+				// RD_YHL3 - 52
+				new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P3, HL_PRIMARY_SP_EQN_P3),
+				// RD_YHL4 - 53
+				new HLNonprimaryCoefficientParser(),
+				// RD_E060
+				new BySpeciesDqCoefficientParser(),
+
+				// Min and max DQ by species
+				// RD_E061
+				new ComponentSizeParser(),
+				// RD_UBA1 - 70
+				new UtilComponentBaseAreaParser(),
+				// RD_UDQ1 - 71
+				new UtilComponentDQParser(),
+				
+				// Small Component (4.5 to 7.5 cm)
+				
+				// RD_SBA1 - 80
+				new SmallComponentProbabilityParser(),
+				// RD_SBA2 - 81
+				new SmallComponentBaseAreaParser(),
+				// RD_SDQ1 - 82
+				new SmallComponentDQParser(),
+				// RD_SHL1 - 85
+				new SmallComponentHLParser(),
+				// RD_SVT1 - 86
+				new SmallComponentWSVolumeParser(),
+				
+				// Standard Volume Relationships
+				
+				// RD_YVT1 - 90
+				new TotalStandWholeStemParser(),
+				// RD_YVT2 - 91
+				new UtilComponentWSVolumeParser(),
+				// RD_YVC1 - 92
+				new CloseUtilVolumeParser(),
+				// RD_YVD1 - 93
+				new VolumeNetDecayParser(),
+				// RD_YVW1 - 94
+				new VolumeNetDecayWasteParser(),
+				// RD_E095
+				new BreakageParser(),
+
+				// Veterans
+				// RD_YVVET - 96
+				new VeteranLayerVolumeAdjustParser(),
+				// RD_YDQV - 97
+				new VeteranDQParser())
+			, fileResolver);
+
+		applyModifiers(map, List.of(
+				// RD_E106
+				new BasalAreaYieldParser(),
+				// RD_E107
+				new QuadraticMeanDiameterYieldParser(),
+				// RD_E108
+				new UpperBoundsParser())
+			, fileResolver);
+
+		assert VdypApplicationIdentifier.VDYPForward.getJProgramNumber() == app.getJProgramNumber();
+
+		applyModifiers(map, List.of(
+				// RD_E111
+				new BasalAreaGrowthFiatParser(),
+				// RD_E117
+				new DqGrowthFiatParser(),
+				// RD_E121
+				new BasalAreaGrowthEmpiricalParser(),
+				// RD_E122
+				new DqGrowthEmpiricalParser(),
+				// RD_E123
+				new DqGrowthEmpiricalLimitsParser(),
+				// RD_E148
+				new PrimarySpeciesBasalAreaGrowthParser(),
+				// RD_E149
+				new NonPrimarySpeciesBasalAreaGrowthParser(),
+				// RD_E150
+				new PrimarySpeciesDqGrowthParser(),
+				// RD_E151
+				new NonPrimarySpeciesDqGrowthParser())
+			, fileResolver);
 
 		// Modifiers, IPSJF155-Appendix XII
 
-		// RD_E198
-		applyModifiers(map, ADDITIONAL_MODIFIERS, fileResolver);
+		applyModifiers(map, List.of(
+				// RD_E198
+				new ModifierParser(VdypApplicationIdentifier.VDYPForward.getJProgramNumber()))
+			, fileResolver);
+		
+		// 101
+		
 
 		// Debug switches (normally zero)
-		// TODO
-		/*
-		 * 141 FORMAT(25I2) DO 140 I=1,25 if ((NDEBUG(I) .ne.0) .and. (IU_WRITE .gt. 0))
-		 * & WRITE(IU_WRITE,142) I, NDEBUG(I) 142 FORMAT(' CTR Line 199 has
-		 * NDEBUG(',i2,') =',I3) 140 CONTINUE
-		 *
-		 * if (isDBG) then call dbgMsg( logr, 0 ) "Debug Switches (Ctl Line 199)" ) call
-		 * dbgI4( logr, 6 ) " 1: Applying BA Limits               ", NDEBUG( 1) ) call
-		 * dbgMsg( logr, 6 ) "       0 - Apply BA limits from SEQ043." ) call dbgMsg(
-		 * logr, 6 ) "       1 - Do not apply BA limits from SEQ043." ) call dbgI4(
-		 * logr, 6 ) " 2: Applying BA Limits               ", NDEBUG( 2) ) call dbgMsg(
-		 * logr, 6 ) "       0 - Apply DQ limits from SEQ043." ) call dbgMsg( logr, 6 )
-		 * "       1 - Do not apply DQ limits from SEQ043." ) call dbgI4( logr, 6 )
-		 * " 3: Not used                         ", NDEBUG( 3) ) call dbgI4( logr, 6 )
-		 * " 4: Not implemented. Upper bounds    ", NDEBUG( 4) ) call dbgMsg( logr, 6 )
-		 * "       0 - Will default to (2)." ) call dbgMsg( logr, 6 )
-		 * "       1 - Limits from Ctl Line 108 (GRPBA1)." ) call dbgMsg( logr, 6 )
-		 * "       2 - Limits from Ctl Line 043 (Coast/Interior)" ) call dbgI4( logr, 6
-		 * ) " 5: Not used                         ", NDEBUG( 5) ) call dbgI4( logr, 6 )
-		 * " 6: Not used                         ", NDEBUG( 6) ) call dbgI4( logr, 6 )
-		 * " 7: Not used                         ", NDEBUG( 7) ) call dbgI4( logr, 6 )
-		 * " 8: Not used                         ", NDEBUG( 8) ) call dbgI4( logr, 6 )
-		 * " 9: Error handling                   ", NDEBUG( 9) ) call dbgMsg( logr, 6 )
-		 * "       0 - Stop on all errors." ) call dbgMsg( logr, 6 )
-		 * "       1 - Continue to next poly (non-I/O errs)." ) call dbgI4( logr, 6 )
-		 * "10: Not used                         ", NDEBUG(10) ) call dbgI4( logr, 6 )
-		 * "11: Not used                         ", NDEBUG(11) ) call dbgI4( logr, 6 )
-		 * "12: Not used                         ", NDEBUG(12) ) call dbgI4( logr, 6 )
-		 * "13: Not used                         ", NDEBUG(13) ) call dbgI4( logr, 6 )
-		 * "14: Not used                         ", NDEBUG(14) ) call dbgI4( logr, 6 )
-		 * "15: Not used                         ", NDEBUG(15) ) call dbgI4( logr, 6 )
-		 * "16: Not used                         ", NDEBUG(16) ) call dbgI4( logr, 6 )
-		 * "17: Not used                         ", NDEBUG(17) ) call dbgI4( logr, 6 )
-		 * "18: Not used                         ", NDEBUG(18) ) call dbgI4( logr, 6 )
-		 * "19: Not used                         ", NDEBUG(19) ) call dbgI4( logr, 6 )
-		 * "20: Not used                         ", NDEBUG(20) ) call dbgI4( logr, 6 )
-		 * "21: Not used                         ", NDEBUG(21) ) call dbgI4( logr, 6 )
-		 * "22: Determining primary species      ", NDEBUG(22) ) call dbgMsg( logr, 6 )
-		 * "       0 - Normal " ) call dbgMsg( logr, 6 )
-		 * "       1 - Extra preference for preferred sp. as primary" ) call dbgI4(
-		 * logr, 6 ) "23: Not used                         ", NDEBUG(23) ) call dbgI4(
-		 * logr, 6 ) "24: Not used                         ", NDEBUG(24) ) call dbgI4(
-		 * logr, 6 ) "25: Not used                         ", NDEBUG(25) ) end if
-		 */
+		// TODO - 199
 
 		return map;
 	}

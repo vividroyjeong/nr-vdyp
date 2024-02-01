@@ -137,7 +137,7 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 						final float coastalMod = mods.get(0);
 						final float interiorMod = mods.get(1);
 	
-						var vetBqMap = (vetBqOptional = vetBqOptional.or(() -> Utils.expectParsedControl(control, VeteranBQParser.CONTROL_KEY, MatrixMap2.class))).get();
+						var vetBqMap = (vetBqOptional = vetBqOptional.or(() -> Optional.of(Utils.expectParsedControl(control, VeteranBQParser.CONTROL_KEY, MatrixMap2.class)))).get();
 	
 						if (coastalMod != 0.0) {
 							var coe = vetBqMap.get(sp0Alias, Region.COASTAL);
@@ -153,8 +153,8 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 					var sp0Index = sequence - 200;
 					var sp0Aliases = getSpeciesByIndex(sp0Index, control);
 	
-					var baMap = (baOptional = baOptional.or(() -> Utils.expectParsedControl(control, CONTROL_KEY_MOD200_BA, MatrixMap2.class))).get();
-					var dpMap = (dqOptional = dqOptional.or(() -> Utils.expectParsedControl(control, CONTROL_KEY_MOD200_DQ, MatrixMap2.class))).get();
+					var baMap = (baOptional = baOptional.or(() -> Optional.of(Utils.expectParsedControl(control, CONTROL_KEY_MOD200_BA, MatrixMap2.class)))).get();
+					var dpMap = (dqOptional = dqOptional.or(() -> Optional.of(Utils.expectParsedControl(control, CONTROL_KEY_MOD200_DQ, MatrixMap2.class)))).get();
 					
 					for (var sp0Alias : sp0Aliases) {
 						modsByRegions(mods, 0, (m, r) -> baMap.put(sp0Alias, r, m));
@@ -166,8 +166,8 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 					var sp0Index = sequence - 300;
 					var sp0Aliases = getSpeciesByIndex(sp0Index, control);
 	
-					var decayMap = (decayOptional = decayOptional.or(() -> Utils.expectParsedControl(control, CONTROL_KEY_MOD301_DECAY, MatrixMap2.class))).get();
-					var wasteMap = (wasteOptional = wasteOptional.or(() -> Utils.expectParsedControl(control, CONTROL_KEY_MOD301_WASTE, MatrixMap2.class))).get();
+					var decayMap = (decayOptional = decayOptional.or(() -> Optional.of(Utils.expectParsedControl(control, CONTROL_KEY_MOD301_DECAY, MatrixMap2.class)))).get();
+					var wasteMap = (wasteOptional = wasteOptional.or(() -> Optional.of(Utils.expectParsedControl(control, CONTROL_KEY_MOD301_WASTE, MatrixMap2.class)))).get();
 	
 					for (var sp0Alias : sp0Aliases) {
 						modsByRegions(mods, 0, (m, r) -> decayMap.put(sp0Alias, r, m));
@@ -179,10 +179,10 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 					var sp0Index = sequence - 400;
 					var sp0Aliases = getSpeciesByIndex(sp0Index, control);
 	
-					var hlP1Map = (hlP1Optional = hlP1Optional.or(() -> Utils.expectParsedControl(control, CONTROL_KEY_MOD400_P1, MatrixMap2.class))).get();
-					var hlP2Map = (hlP2Optional = hlP2Optional.or(() -> Utils.expectParsedControl(control, CONTROL_KEY_MOD400_P2, MatrixMap2.class))).get();
-					var hlP3Map = (hlP3Optional = hlP3Optional.or(() -> Utils.expectParsedControl(control, CONTROL_KEY_MOD400_P3, MatrixMap2.class))).get();
-					var hlNPMap = (hlNPOptional = hlNPOptional.or(() -> Utils.expectParsedControl(control, CONTROL_KEY_MOD400_NONPRIMARY, MatrixMap3.class))).get();
+					var hlP1Map = (hlP1Optional = hlP1Optional.or(() -> Optional.of(Utils.expectParsedControl(control, CONTROL_KEY_MOD400_P1, MatrixMap2.class)))).get();
+					var hlP2Map = (hlP2Optional = hlP2Optional.or(() -> Optional.of(Utils.expectParsedControl(control, CONTROL_KEY_MOD400_P2, MatrixMap2.class)))).get();
+					var hlP3Map = (hlP3Optional = hlP3Optional.or(() -> Optional.of(Utils.expectParsedControl(control, CONTROL_KEY_MOD400_P3, MatrixMap2.class)))).get();
+					var hlNPMap = (hlNPOptional = hlNPOptional.or(() -> Optional.of(Utils.expectParsedControl(control, CONTROL_KEY_MOD400_NONPRIMARY, MatrixMap3.class)))).get();
 	
 					for (var sp0Alias : sp0Aliases) {
 	
@@ -258,10 +258,8 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 		var it = raw.iterator();
 
 		var result = new ArrayList<T>(num);
-		for (int i = 0; i < num; i++) {
-			result.add(
-					it.next().orElseThrow(() -> new ValueParseException("", "Expected " + num + " modifier values"))
-			);
+		while (it.hasNext()) {
+			result.add(it.next().get());
 		}
 		// Possibly log a warning if there are extra unused values
 		return result;

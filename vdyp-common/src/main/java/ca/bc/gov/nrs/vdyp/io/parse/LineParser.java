@@ -193,7 +193,7 @@ public class LineParser {
 		int i = 0;
 		for (var segment : segments) {
 			if (i >= line.length()) {
-				result.add("");
+				result.add(null);
 				continue;
 			}
 			;

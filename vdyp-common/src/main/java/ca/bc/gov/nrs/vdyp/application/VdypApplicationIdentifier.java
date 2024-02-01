@@ -21,7 +21,7 @@ public enum VdypApplicationIdentifier {
 		this.jProgramNumber = jProgramNumber;
 	}
 	
-	public int getId()
+	public int getJProgramNumber()
 	{
 		return jProgramNumber;
 	}

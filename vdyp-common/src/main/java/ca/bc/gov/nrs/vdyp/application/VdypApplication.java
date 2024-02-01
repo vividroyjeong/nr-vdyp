@@ -6,13 +6,13 @@ package ca.bc.gov.nrs.vdyp.application;
  * @author Michael Junkin, Vivid Solutions
  */
 public abstract class VdypApplication extends VdypComponent {
-	public abstract VdypApplicationIdentifier getIdentifier();
+	public abstract VdypApplicationIdentifier getId();
 
 	/**
 	 * @returns the ordinal of the application's identifier. It will agree with the
 	 *          JPROGRAM values from the FORTRAN implementation.
 	 */
-	public int getId() {
-		return getIdentifier().ordinal();
+	public int getJProgramNumber() {
+		return getId().getJProgramNumber();
 	}
 }

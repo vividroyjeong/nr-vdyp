@@ -81,7 +81,7 @@ public class VdypForwardApplication extends VdypApplication {
 	}
 
 	@Override
-	public VdypApplicationIdentifier getIdentifier() {
+	public VdypApplicationIdentifier getId() {
 		return VdypApplicationIdentifier.VDYPForward;
 	}
 
