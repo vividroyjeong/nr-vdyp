@@ -175,7 +175,7 @@
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<configuration>
 					<includes>
-						<include>**/*IT.java</include>
+						<include>**/IT*.java</include>
 					</includes>
 					<skipTests>${skipIntegrationTests}</skipTests>
 				</configuration>

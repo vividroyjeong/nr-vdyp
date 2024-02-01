@@ -4,7 +4,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.util.*;
@@ -35,23 +38,13 @@ class ITFipStart {
 	private Path ioControlFile;
 
 	static Path copyResource(Class<?> klazz, String path, Path destination) throws IOException {
-		Path source = testResourcePath(klazz, path);
 		Path result = destination.resolve(path);
-		Files.copy(source, result);
-		return result;
 
-	}
-
-	private static Path testResourcePath(Class<?> klazz, String path) {
-		try {
-			var resourceUri = klazz.getResource(path);
-			assertThat("Could not find resource " + path, resourceUri, notNullValue());
-			Path source = Paths.get(resourceUri.toURI());
-			return source;
-		} catch (URISyntaxException e) {
-			Assumptions.abort(e.getMessage());
-			return null;
+		try (var is = klazz.getResourceAsStream(path)) {
+			Files.copy(is, result);
 		}
+
+		return result;
 
 	}
 
@@ -126,43 +119,64 @@ class ITFipStart {
 		assertTrue(Files.exists(path), path + " does not exist");
 	}
 
-	public void assertFileMatches(Path path, Path expected, BiPredicate<String, String> compare) throws IOException {
+	public void assertFileMatches(Path testPath, Path expectedPath, BiPredicate<String, String> compare)
+			throws IOException {
 
 		try (
-				var testStream = Files.newBufferedReader(path); //
-				var expectedStream = Files.newBufferedReader(expected);
+				var testStream = Files.newBufferedReader(testPath); //
+				var expectedStream = Files.newBufferedReader(expectedPath);
 		) {
-			for (int i = 1; true; i++) {
-				String testLine = testStream.readLine();
-				String expectedLine = expectedStream.readLine();
+			assertFileMatches(testPath.toString(), expectedPath.toString(), testStream, expectedStream, compare);
+		}
+	}
 
-				if (testLine == null && expectedLine == null) {
-					return;
-				}
-				if (testLine == null) {
-					fail(
-							"File " + path + " did not match " + expected
-									+ ". Missing expected lines. The first missing line (" + i + ") was:\n"
-									+ expectedLine
-					);
-				}
-				if (expectedLine == null) {
-					fail(
-							"File " + path + " did not match " + expected
-									+ ". Unexpected lines at the end. The first unexpected line (" + i + ") was:\n"
-									+ testLine
-					);
-				}
+	public void assertFileMatches(
+			Path testPath, Class<?> expectedClass, String expectedPath, BiPredicate<String, String> compare
+	) throws IOException {
 
-				if (!compare.test(testLine, expectedLine)) {
-					fail(
-							"File " + path + " did not match " + expected + ". The first line (" + i
-									+ ") to not match was: \n [Expected]: " + expectedLine + "\n   [Actual]: "
-									+ testLine
-					);
-				}
+		try (
+				var testStream = Files.newBufferedReader(testPath); //
+				var expectedStream = new BufferedReader(
+						new InputStreamReader(expectedClass.getResourceAsStream(expectedPath))
+				);
+		) {
+			assertFileMatches(testPath.toString(), expectedPath, testStream, expectedStream, compare);
+		}
+	}
 
+	public void assertFileMatches(
+			String testPath, String expectedPath, BufferedReader testStream, BufferedReader expectedStream,
+			BiPredicate<String, String> compare
+	) throws IOException {
+
+		for (int i = 1; true; i++) {
+			String testLine = testStream.readLine();
+			String expectedLine = expectedStream.readLine();
+
+			if (testLine == null && expectedLine == null) {
+				return;
 			}
+			if (testLine == null) {
+				fail(
+						"File " + testPath + " did not match " + expectedPath
+								+ ". Missing expected lines. The first missing line (" + i + ") was:\n" + expectedLine
+				);
+			}
+			if (expectedLine == null) {
+				fail(
+						"File " + testPath + " did not match " + expectedPath
+								+ ". Unexpected lines at the end. The first unexpected line (" + i + ") was:\n"
+								+ testLine
+				);
+			}
+
+			if (!compare.test(testLine, expectedLine)) {
+				fail(
+						"File " + testPath + " did not match " + expectedPath + ". The first line (" + i
+								+ ") to not match was: \n [Expected]: " + expectedLine + "\n   [Actual]: " + testLine
+				);
+			}
+
 		}
 	}
 
@@ -249,16 +263,13 @@ class ITFipStart {
 		assertFileExists(outputDir.resolve(UTILIZATION_OUTPUT_NAME));
 
 		assertFileMatches(
-				outputDir.resolve(POLYGON_OUTPUT_NAME), testResourcePath(FipControlParserTest.class, "vp_1.dat"),
-				String::equals
+				outputDir.resolve(POLYGON_OUTPUT_NAME), FipControlParserTest.class, "vp_1.dat", String::equals
 		);
 		assertFileMatches(
-				outputDir.resolve(SPECIES_OUTPUT_NAME), testResourcePath(FipControlParserTest.class, "vs_1.dat"),
-				String::equals
+				outputDir.resolve(SPECIES_OUTPUT_NAME), FipControlParserTest.class, "vs_1.dat", String::equals
 		);
 		assertFileMatches(
-				outputDir.resolve(UTILIZATION_OUTPUT_NAME), testResourcePath(FipControlParserTest.class, "vu_1.dat"),
-				this::linesMatch
+				outputDir.resolve(UTILIZATION_OUTPUT_NAME), FipControlParserTest.class, "vu_1.dat", this::linesMatch
 		);
 
 	}
