@@ -77,6 +77,11 @@ public interface MatrixMap3<K1, K2, K3, V> extends MatrixMap<V> {
 					return o.remove(params);
 				}
 
+				@Override
+				public boolean hasM(Object... params) {
+					return o.hasM(params);
+				}
+
 			};
 		}
 

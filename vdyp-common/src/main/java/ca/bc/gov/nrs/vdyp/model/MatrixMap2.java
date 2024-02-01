@@ -99,6 +99,12 @@ public interface MatrixMap2<K1, K2, V> extends MatrixMap<V> {
 				public V remove(Object... params) {
 					return o.remove(params);
 				}
+
+				@Override
+				public boolean hasM(Object... params) {
+					// TODO Auto-generated method stub
+					return o.hasM(params);
+				}
 			};
 		}
 

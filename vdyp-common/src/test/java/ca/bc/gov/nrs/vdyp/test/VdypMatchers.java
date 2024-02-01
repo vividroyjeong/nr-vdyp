@@ -504,7 +504,11 @@ public class VdypMatchers {
 	}
 
 	public static Matcher<Float> closeTo(float expected) {
-		float epsilon = Float.max(EPSILON * expected, Float.MIN_VALUE);
+		return closeTo(expected, EPSILON);
+	}
+
+	public static Matcher<Float> closeTo(float expected, float threshold) {
+		float epsilon = Float.max(threshold * expected, Float.MIN_VALUE);
 		return asFloat(Matchers.closeTo(expected, epsilon));
 	}
 

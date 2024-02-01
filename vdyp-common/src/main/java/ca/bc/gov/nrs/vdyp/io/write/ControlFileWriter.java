@@ -102,6 +102,16 @@ public class ControlFileWriter implements Closeable {
 		os.write(String.format(COMMENT_FORMAT, comment).getBytes(CHARSET));
 	}
 
+	/**
+	 * Write a blank line
+	 *
+	 * @throws IOException
+	 */
+	public void writeBlank() throws IOException {
+
+		os.write(NEW_LINE.getBytes(CHARSET));
+	}
+
 	@Override
 	public void close() throws IOException {
 		os.close();

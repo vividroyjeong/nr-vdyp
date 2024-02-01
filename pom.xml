@@ -21,6 +21,10 @@
 		<hamcrest.version>2.2</hamcrest.version>
 		<easymock.version>5.1.0</easymock.version>
 
+		<skipTests>false</skipTests>
+		<skipUnitTests>${skipTests}</skipUnitTests>
+		<skipIntegrationTests>${skipTests}</skipIntegrationTests>
+
 	</properties>
 
 	<modules>
@@ -116,6 +120,10 @@
 					<version>3.0.0</version>
 				</plugin>
 				<plugin>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>3.0.0</version>
+				</plugin>
+				<plugin>
 					<artifactId>maven-install-plugin</artifactId>
 					<version>3.1.1</version>
 				</plugin>
@@ -154,6 +162,32 @@
 				</executions>
 			</plugin>
 
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skipTests>${skipUnitTests}</skipTests>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+					<includes>
+						<include>**/IT*.java</include>
+					</includes>
+					<skipTests>${skipIntegrationTests}</skipTests>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 
 	</build>

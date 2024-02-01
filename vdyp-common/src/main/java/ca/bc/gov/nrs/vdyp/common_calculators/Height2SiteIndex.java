@@ -1,7 +1,9 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
-import java.lang.Math;
-import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.*;
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMaximumException;
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMinimumException;
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 
 /* @formatter:off */
 /**

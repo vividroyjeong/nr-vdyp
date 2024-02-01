@@ -1,11 +1,26 @@
 package ca.bc.gov.nrs.vdyp.fip;
 
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.abs;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.clamp;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.exp;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.floor;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.log;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.pow;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.ratio;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.sqrt;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -21,22 +36,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
-
-import static java.lang.Math.min;
-
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.abs;
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.clamp;
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.exp;
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.floor;
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.log;
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.pow;
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.ratio;
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.sqrt;
-import static java.lang.Math.max;
+import java.util.stream.Stream;
 
 import org.apache.commons.math3.analysis.MultivariateMatrixFunction;
 import org.apache.commons.math3.analysis.MultivariateVectorFunction;
@@ -57,7 +57,6 @@ import ca.bc.gov.nrs.vdyp.fip.model.FipLayer;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayerPrimary;
 import ca.bc.gov.nrs.vdyp.fip.model.FipPolygon;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
-import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.BreakageEquationGroupParser;
@@ -92,11 +91,13 @@ import ca.bc.gov.nrs.vdyp.io.parse.VeteranLayerVolumeAdjustParser;
 import ca.bc.gov.nrs.vdyp.io.parse.VolumeEquationGroupParser;
 import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayParser;
 import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayWasteParser;
+import ca.bc.gov.nrs.vdyp.io.write.VriAdjustInputWriter;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.FipMode;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.JProgram;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
@@ -108,7 +109,7 @@ import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 
-public class FipStart {
+public class FipStart implements Closeable {
 
 	private static final Comparator<FipSpecies> PERCENT_GENUS_DESCENDING = Utils
 			.compareUsing(FipSpecies::getPercentGenus).reversed();
@@ -125,6 +126,8 @@ public class FipStart {
 	public static final float TOLERANCE = 2.0e-3f;
 
 	JProgram jprogram = JProgram.FIP_START; // FIPSTART only TODO Track this down
+
+	VriAdjustInputWriter vriWriter;
 
 	static final Collection<UtilizationClass> UTIL_CLASSES = List.of(
 			UtilizationClass.U75TO125, UtilizationClass.U125TO175, UtilizationClass.U175TO225, UtilizationClass.OVER225
@@ -157,7 +160,7 @@ public class FipStart {
 	static final Collection<Collection<String>> PRIMARY_SPECIES_TO_COMBINE = Arrays
 			.asList(Arrays.asList("PL", "PA"), Arrays.asList("C", "Y"));
 
-	private Map<String, Object> controlMap = Collections.emptyMap();
+	private Map<String, Object> controlMap = new HashMap<>();
 
 	/**
 	 * Initialize FipStart
@@ -167,41 +170,62 @@ public class FipStart {
 	 * @throws IOException
 	 * @throws ResourceParseException
 	 */
-	void init(FileResolver resolver, String controlFilePath) throws IOException, ResourceParseException {
+	public void init(FileSystemFileResolver resolver, String... controlFilePaths)
+			throws IOException, ResourceParseException {
 
 		// Load the control map
 
-		var parser = new FipControlParser();
-		try (var is = resolver.resolveForInput(controlFilePath)) {
-			setControlMap(parser.parse(is, resolver));
+		if (controlFilePaths.length < 1) {
+			throw new IllegalArgumentException("At least one control file must be specifiec.");
 		}
 
+		var parser = new FipControlParser();
+		List<InputStream> resources = new ArrayList<>(controlFilePaths.length);
+		try {
+			for (String path : controlFilePaths) {
+				resources.add(resolver.resolveForInput(path));
+			}
+
+			setControlMap(parser.parse(resources, resolver, controlMap));
+		} finally {
+			for (var resource : resources) {
+				resource.close();
+			}
+		}
+		closeVriWriter();
+		vriWriter = new VriAdjustInputWriter(controlMap, resolver);
+	}
+
+	void closeVriWriter() throws IOException {
+		if (vriWriter != null) {
+			vriWriter.close();
+			vriWriter = null;
+		}
 	}
 
 	void setControlMap(Map<String, Object> controlMap) {
 		this.controlMap = controlMap;
 	}
 
-	public static void main(final String... args) {
+	public static void main(final String... args) throws IOException {
 
-		var app = new FipStart();
+		try (var app = new FipStart();) {
 
-		var resolver = new FileSystemFileResolver();
+			var resolver = new FileSystemFileResolver();
 
-		var controlFileName = args[0];
+			try {
+				app.init(resolver, args);
+			} catch (Exception ex) {
+				log.error("Error during initialization", ex);
+				System.exit(CONFIG_LOAD_ERROR);
+			}
 
-		try {
-			app.init(resolver, controlFileName);
-		} catch (Exception ex) {
-			log.error("Error during initialization", ex);
-			System.exit(CONFIG_LOAD_ERROR);
-		}
-
-		try {
-			app.process();
-		} catch (Exception ex) {
-			log.error("Error during processing", ex);
-			System.exit(PROCESSING_ERROR);
+			try {
+				app.process();
+			} catch (Exception ex) {
+				log.error("Error during processing", ex);
+				System.exit(PROCESSING_ERROR);
+			}
 		}
 	}
 
@@ -222,15 +246,15 @@ public class FipStart {
 	// TODO Fortran takes a vector of flags (FIPPASS) controlling which stages are
 	// implemented. FIPSTART always uses the same vector so far now that's not
 	// implemented.
-	void process() throws ProcessingException {
+	public void process() throws ProcessingException {
+		int polygonsRead = 0;
+		int polygonsWritten = 0;
 		try (
 				var polyStream = this.<FipPolygon>getStreamingParser(FipPolygonParser.CONTROL_KEY);
 				var layerStream = this.<Map<LayerType, FipLayer>>getStreamingParser(FipLayerParser.CONTROL_KEY);
 				var speciesStream = this.<Collection<FipSpecies>>getStreamingParser(FipSpeciesParser.CONTROL_KEY);
 		) {
 			log.atDebug().setMessage("Start Stand processing").log();
-			int polygonsRead = 0;
-			int polygonsWritten = 0;
 
 			while (polyStream.hasNext()) {
 
@@ -240,8 +264,17 @@ public class FipStart {
 				try {
 
 					var resultPoly = processPolygon(polygonsRead, polygon);
-					if (resultPoly.isPresent())
+					if (resultPoly.isPresent()) {
 						polygonsRead++;
+
+						// Output
+						vriWriter.writePolygonWithSpeciesAndUtilization(resultPoly.get());
+
+						polygonsWritten++;
+					}
+
+					log.atInfo().setMessage("Read {} polygons and wrote {}").addArgument(polygonsRead)
+							.addArgument(polygonsWritten);
 
 				} catch (StandProcessingException ex) {
 					// TODO include some sort of hook for different forms of user output
@@ -265,7 +298,7 @@ public class FipStart {
 
 		// if (MODE .eq. -1) go to 100
 
-		final var mode = polygon.getModeFip().orElse(FipMode.DONT_PROCESS);
+		final var mode = polygon.getModeFip().orElse(FipMode.FIPSTART);
 
 		if (mode == FipMode.DONT_PROCESS) {
 			log.atInfo().setMessage("Skipping polygon with mode {}").addArgument(mode).log();
@@ -304,7 +337,7 @@ public class FipStart {
 		assert fipPrimeLayer != null;
 		var resultPrimeLayer = processLayerAsPrimary(
 				polygon, fipPrimeLayer,
-				resultVetLayer.map(VdypLayer::getBaseAreaByUtilization).map(coe -> coe.get(UTIL_ALL)).orElse(0f)
+				resultVetLayer.map(VdypLayer::getBaseAreaByUtilization).map(coe -> coe.getCoe(UTIL_ALL)).orElse(0f)
 		);
 		processedLayers.put(LayerType.PRIMARY, resultPrimeLayer);
 
@@ -343,7 +376,7 @@ public class FipStart {
 		Region region = bec.getRegion();
 
 		var factorEntry = fipLayerPrimary.getStockingClass()
-				.flatMap(stockingClass -> stockingClassMap.get(stockingClass, region));
+				.flatMap(stockingClass -> MatrixMap.safeGet(stockingClassMap, stockingClass, region));
 
 		if (!factorEntry.isPresent()) {
 			return;
@@ -457,7 +490,12 @@ public class FipStart {
 			throws ProcessingException {
 
 		var lookup = BecDefinitionParser.getBecs(controlMap);
+		// PRIMFIND
 		var primarySpecies = findPrimarySpecies(fipLayer.getSpecies());
+
+		// There's always at least one entry and we want the first.
+		fipLayer.setPrimaryGenus(Optional.of(primarySpecies.iterator().next().getGenus()));
+
 		// VDYP7 stores this in the common FIPL_1C/ITGL1 but only seems to use it
 		// locally
 		var itg = findItg(primarySpecies);
@@ -466,7 +504,16 @@ public class FipStart {
 				() -> new IllegalStateException("Could not find BEC " + fipPolygon.getBiogeoclimaticZone())
 		);
 
-		var result = VdypLayer.build(builder -> builder.copy(fipLayer));
+		// GRPBA1FD
+		int empiricalRelationshipParameterIndex = findEmpiricalRelationshipParameterIndex(
+				primarySpecies.get(0).getGenus(), bec, itg
+		);
+
+		var result = VdypLayer.build(builder -> {
+			builder.copy(fipLayer);
+			builder.inventoryTypeGroup(itg);
+			builder.empiricalRelationshipParameterIndex(empiricalRelationshipParameterIndex);
+		});
 
 		// EMP040
 		var baseArea = estimatePrimaryBaseArea(
@@ -567,6 +614,23 @@ public class FipStart {
 		computeUtilizationComponentsPrimary(bec, result, VolumeComputeMode.BY_UTIL, CompatibilityVariableMode.NONE);
 
 		return result;
+	}
+
+	public static <T> List<T> utilizationArray(VdypLayer layer, Function<VdypUtilizationHolder, T> accessor) {
+		return Stream.concat(Stream.of(layer), layer.getSpecies().values().stream()).map(accessor).toList();
+	}
+
+	int findEmpiricalRelationshipParameterIndex(String specAlias, BecDefinition bec, int itg)
+			throws ProcessingException {
+		var groupMap = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
+				controlMap, DefaultEquationNumberParser.CONTROL_KEY, MatrixMap2.class
+		);
+		var modMap = Utils.<MatrixMap2<Integer, Integer, Optional<Integer>>>expectParsedControl(
+				controlMap, EquationModifierParser.CONTROL_KEY, MatrixMap2.class
+		);
+		var group = groupMap.get(specAlias, bec.getGrowthBec().getAlias());
+		group = MatrixMap.safeGet(modMap, group, itg).orElse(group);
+		return group;
 	}
 
 	// ROOTF01
@@ -1095,6 +1159,10 @@ public class FipStart {
 
 			builder.addSpecies(vdypSpecies.values());
 		});
+// FIXME Add to builder?
+		vdypLayer.setSiteGenus(fipLayer.getSiteGenus());
+		vdypLayer.setSiteIndex(fipLayer.getSiteIndex());
+
 		vdypLayer.setBaseAreaByUtilization(baseAreaByUtilization);
 
 		computeUtilizationComponentsVeteran(vdypLayer, bec);
@@ -1182,7 +1250,9 @@ public class FipStart {
 			wholeStemVolumeUtil.setCoe(UTIL_ALL, wholeStemVolumeSpec); // WSU
 
 			var adjustCloseUtil = Utils.utilizationVector(); // ADJVCU
+			@SuppressWarnings("unused")
 			var adjustDecayUtil = Utils.utilizationVector(); // ADJVD
+			@SuppressWarnings("unused")
 			var adjustDecayWasteUtil = Utils.utilizationVector(); // ADJVDW
 
 			// EMP071
@@ -1237,11 +1307,9 @@ public class FipStart {
 
 				if (compatibilityVariableMode == CompatibilityVariableMode.ALL) {
 					// apply compatibity variables to WS volume
-					throw new UnsupportedOperationException("TODO");
-				}
-				// TODO Combine this with IF above
-				if (compatibilityVariableMode == CompatibilityVariableMode.ALL) {
+
 					// Set the adjustment factors for next three volume types
+
 					throw new UnsupportedOperationException("TODO");
 				} else {
 					// Do nothing as the adjustment vectors are already set to 0
@@ -1480,6 +1548,16 @@ public class FipStart {
 		// sums of those of their species
 		sumSpeciesUtilizationVectorsToLayer(vdypLayer);
 
+		{
+			var hlVector = new Coefficients(new float[] { 0f, 0f }, -1);
+			vdypLayer.getSpecies().values().stream().forEach(spec -> {
+				var ba = spec.getBaseAreaByUtilization();
+				hlVector.pairwiseInPlace(spec.getLoreyHeightByUtilization(), (x, y, i) -> x + y * ba.getCoe(i));
+			});
+			var ba = vdypLayer.getBaseAreaByUtilization();
+			hlVector.scalarInPlace((x, i) -> ba.getCoe(i) > 0 ? x / ba.getCoe(i) : x);
+			vdypLayer.setLoreyHeightByUtilization(hlVector);
+		}
 		// Quadratic mean diameter for the layer is computed from the BA and TPH after
 		// they have been found from the species
 		{
@@ -1538,6 +1616,7 @@ public class FipStart {
 			return;
 		}
 
+		@SuppressWarnings("unused")
 		float tphSum = 0f;
 		float baSum = 0f;
 		for (var uc : UTIL_CLASSES) {
@@ -1691,14 +1770,13 @@ public class FipStart {
 			boolean violateLow = false;
 
 			for (var uc : UTIL_CLASSES) {
-				if (baseAreaUtil.getCoe(uc.index) > 0f) {
-					if (dqTrial.getCoe(uc.index) < uc.lowBound) {
-						float vi = 1f - dqTrial.getCoe(uc.index) / uc.lowBound;
-						if (vi > violate) {
-							violate = vi;
-							violateClass = uc;
-							violateLow = true;
-						}
+				if (baseAreaUtil.getCoe(uc.index) > 0f && dqTrial.getCoe(uc.index) < uc.lowBound) {
+					float vi = 1f - dqTrial.getCoe(uc.index) / uc.lowBound;
+					if (vi > violate) {
+						violate = vi;
+						violateClass = uc;
+						violateLow = true;
+
 					}
 				}
 				if (dqTrial.getCoe(uc.index) > uc.highBound) {
@@ -2007,6 +2085,20 @@ public class FipStart {
 			default:
 				return 20;
 			}
+		case "H":
+			switch (secondary.getGenus()) {
+			case "C", "Y":
+				return 14;
+			case "B":
+				return 15;
+			case "S":
+				return 16;
+			default:
+				if (HARDWOODS.contains(secondary.getGenus())) {
+					return 17;
+				}
+				return 13;
+			}
 		case "S":
 			switch (secondary.getGenus()) {
 			case "C", "Y", "H":
@@ -2235,7 +2327,6 @@ public class FipStart {
 			UtilizationClass utilizationClass, Coefficients aAdjust, int volumeGroup, float hlSp,
 			Coefficients quadMeanDiameterUtil, Coefficients wholeStemVolumeUtil, Coefficients closeUtilizationVolumeUtil
 	) throws ProcessingException {
-		var dqSp = quadMeanDiameterUtil.getCoe(UTIL_ALL);
 		final var closeUtilizationCoeMap = Utils
 				.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
 						controlMap, CloseUtilVolumeParser.CONTROL_KEY, MatrixMap2.class
@@ -2887,7 +2978,7 @@ public class FipStart {
 
 		var decayBecAlias = bec.getDecayBec().getAlias();
 		Coefficients coe = weightedCoefficientSum(
-				List.of(0, 1, 2, 3, 4), 9, 0, fipLayer.getSpecies().values(), FipSpecies::getFractionGenus,
+				List.of(0, 1, 2, 3, 4), 8, 0, fipLayer.getSpecies().values(), FipSpecies::getFractionGenus,
 				s -> coeMap.get(decayBecAlias, s.getGenus())
 		);
 
@@ -3057,9 +3148,11 @@ public class FipStart {
 				.getRegion();
 
 		for (VdypSpecies spec : layer.getSpecies().values()) {
+			@SuppressWarnings("unused")
 			float loreyHeightSpec = spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL); // HLsp
 			float baseAreaSpec = spec.getBaseAreaByUtilization().getCoe(UTIL_ALL); // BAsp
-			float quadMeanDiameterSpec = spec.getBaseAreaByUtilization().getCoe(UTIL_ALL); // DQsp
+			@SuppressWarnings("unused")
+			float quadMeanDiameterSpec = spec.getQuadraticMeanDiameterByUtilization().getCoe(UTIL_ALL); // DQsp
 
 			// EMP080
 			float smallComponentProbability = smallComponentProbability(layer, spec, region); // PROBsp
@@ -3304,5 +3397,10 @@ public class FipStart {
 				lastBody.accept(value);
 			}
 		}
+	}
+
+	@Override
+	public void close() throws IOException {
+		closeVriWriter();
 	}
 }
