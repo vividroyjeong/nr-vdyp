@@ -44,13 +44,19 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float> {
 	}
 
 	// TODO better name
+	@Computed
 	public int getGrpBa1() {
-		return grpBa1;
+		return this.getLayers().get(LayerType.PRIMARY).getEmpiricalRelationshipParameterIndex().orElseThrow(
+				() -> new IllegalArgumentException(
+						"Emperical Relationship Parameter Index does not exist if there is no primary layer"
+				)
+		);
 	}
 
 	// TODO better name
+	@Computed
 	public void setGrpBa1(int grpBa1) {
-		this.grpBa1 = grpBa1;
+		this.getLayers().get(LayerType.PRIMARY).setEmpericalRelationshipParameterIndex(Optional.of(grpBa1));
 	}
 
 	/**

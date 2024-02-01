@@ -18,7 +18,7 @@ import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.FipMode;
-import ca.bc.gov.nrs.vdyp.model.Layer;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
@@ -122,8 +122,8 @@ public class VriAdjustInputWriter implements Closeable {
 				polygon.getForestInventoryZone(), //
 
 				polygon.getPercentAvailable().intValue(), //
-				polygon.getLayers().get(Layer.PRIMARY).getInventoryTypeGroup().orElse(EMPTY_INT), //
-				polygon.getLayers().get(Layer.PRIMARY).getEmpericalRelationshipParameterIndex().orElse(EMPTY_INT), //
+				polygon.getLayers().get(LayerType.PRIMARY).getInventoryTypeGroup().orElse(EMPTY_INT), //
+				polygon.getLayers().get(LayerType.PRIMARY).getEmpiricalRelationshipParameterIndex().orElse(EMPTY_INT), //
 				polygon.getModeFip().orElse(FipMode.FIPSTART).getCode()
 		);
 	}
@@ -230,7 +230,7 @@ public class VriAdjustInputWriter implements Closeable {
 					utils.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization().getCoe(uc.index), //
 					utils.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization().getCoe(uc.index), //
 
-					quadMeanDiameter.orElse(layer.getLayer() == Layer.PRIMARY ? //
+					quadMeanDiameter.orElse(layer.getLayer() == LayerType.PRIMARY ? //
 							EMPTY_FLOAT : 0f
 					) // FIXME: VDYP7 is being inconsistent. Should consider using -9 for both.
 			);

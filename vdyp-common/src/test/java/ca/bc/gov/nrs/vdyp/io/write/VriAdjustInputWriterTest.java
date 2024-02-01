@@ -2,14 +2,9 @@ package ca.bc.gov.nrs.vdyp.io.write;
 
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -18,16 +13,9 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKeys;
 import ca.bc.gov.nrs.vdyp.common.Utils;
-import ca.bc.gov.nrs.vdyp.io.FileResolver;
-import ca.bc.gov.nrs.vdyp.model.Coefficients;
-import ca.bc.gov.nrs.vdyp.model.FipMode;
-import ca.bc.gov.nrs.vdyp.model.LayerType;
-import ca.bc.gov.nrs.vdyp.model.VdypLayer;
-import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
-import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
-import ca.bc.gov.nrs.vdyp.test.TestUtils;
+import ca.bc.gov.nrs.vdyp.model.*;
+import ca.bc.gov.nrs.vdyp.test.*;
 import ca.bc.gov.nrs.vdyp.test.TestUtils.MockOutputStream;
-import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 
 class VriAdjustInputWriterTest {
 
@@ -116,7 +104,7 @@ class VriAdjustInputWriterTest {
 			});
 
 			// FIXME Add to builder
-			primeLayer.setEmpericalRelationshipParameterIndex(Optional.of(119));
+			layer.setEmpericalRelationshipParameterIndex(Optional.of(119));
 			polygon.setInventoryTypeGroup(28);
 			polygon.setGrpBa1(119);
 
@@ -181,6 +169,7 @@ class VriAdjustInputWriterTest {
 				builder.siteCurveNumber(0);
 			});
 
+			@SuppressWarnings("unused")
 			var species = VdypSpecies.build(layer, builder -> {
 				builder.genus("PL");
 				builder.addSpecies("PL", 100f);

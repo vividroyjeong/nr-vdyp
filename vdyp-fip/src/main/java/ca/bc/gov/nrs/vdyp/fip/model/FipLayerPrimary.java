@@ -77,7 +77,6 @@ public class FipLayerPrimary extends FipLayer {
 		return (FipLayerPrimary) builder.build();
 	}
 
-	@Override
 	public static FipLayerPrimary buildPrimary(FipPolygon polygon, Consumer<PrimaryBuilder> config) {
 		var layer = buildPrimary(builder -> {
 			builder.polygonIdentifier(polygon.getPolygonIdentifier());
@@ -87,20 +86,16 @@ public class FipLayerPrimary extends FipLayer {
 		return layer;
 	}
 
-	@Override
 	public static class PrimaryBuilder extends Builder {
 		private Optional<Character> stockingClass = Optional.empty();
 
-	@Override
 		private Optional<String> primaryGenus = Optional.empty();
 
-	@Override
 		public Builder stockingClass(Optional<Character> stockingClass) {
 			this.stockingClass = stockingClass;
 			return this;
 		}
 
-	@Override
 		public Builder primaryGenus(Optional<String> primaryGenus) {
 			this.primaryGenus = primaryGenus;
 			return this;

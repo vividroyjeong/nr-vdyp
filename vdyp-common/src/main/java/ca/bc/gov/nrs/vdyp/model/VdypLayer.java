@@ -1,6 +1,5 @@
 package ca.bc.gov.nrs.vdyp.model;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -35,12 +34,14 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 	public VdypLayer(
 			String polygonIdentifier, LayerType layer, Optional<Float> ageTotal, Optional<Float> height,
 			Optional<Float> yearsToBreastHeight, Optional<Float> siteIndex, Optional<Integer> siteCurveNumber,
-			Optional<Integer> inventoryTypeGroup, Optional<String> siteGenus
+			Optional<Integer> inventoryTypeGroup, Optional<String> siteGenus,
+			Optional<Integer> empericalRelationshipParameterIndex
 	) {
 		super(
 				polygonIdentifier, layer, ageTotal, height, yearsToBreastHeight, siteIndex, siteCurveNumber,
 				inventoryTypeGroup, siteGenus
 		);
+		this.empericalRelationshipParameterIndex = empericalRelationshipParameterIndex;
 	}
 
 	@Computed
@@ -152,12 +153,13 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 		this.dominantSpecies = dominantSpecies;
 	}
 
-	public Optional<Integer> getEmpericalRelationshipParameterIndex() {
+	public Optional<Integer> getEmpiricalRelationshipParameterIndex() {
 		return empericalRelationshipParameterIndex;
 	}
 
 	public void setEmpericalRelationshipParameterIndex(Optional<Integer> empericalRelationshipParameterIndex) {
 		this.empericalRelationshipParameterIndex = empericalRelationshipParameterIndex;
+	}
 
 	/**
 	 * Accepts a configuration function that accepts a builder to configure.
@@ -207,6 +209,16 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 
 	public static class Builder extends BaseVdypLayer.Builder<VdypLayer, VdypSpecies> {
 
+		Optional<Integer> empericalRelationshipParameterIndex = Optional.empty();
+
+		public void empiricalRelationshipParameterIndex(Optional<Integer> empiricalRelationshipParameterIndex) {
+			this.empericalRelationshipParameterIndex = empiricalRelationshipParameterIndex;
+		}
+
+		public void empiricalRelationshipParameterIndex(int empiricalRelationshipParameterIndex) {
+			this.empiricalRelationshipParameterIndex(Optional.of(empiricalRelationshipParameterIndex));
+		}
+
 		@Override
 		protected VdypLayer doBuild() {
 			return (new VdypLayer(
@@ -218,7 +230,8 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtiliza
 					siteIndex, //
 					siteCurveNumber, //
 					inventoryTypeGroup, //
-					siteGenus
+					siteGenus, //
+					empericalRelationshipParameterIndex
 			));
 		}
 

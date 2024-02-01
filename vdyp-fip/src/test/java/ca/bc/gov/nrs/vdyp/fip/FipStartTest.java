@@ -619,16 +619,16 @@ class FipStartTest {
 			x.setSiteSpecies("H");
 			x.setSiteGenus(Optional.of("H"));
 		});
-		var fipSpecies1 = getTestSpecies(polygonId, Layer.VETERAN, "B", x -> {
+		var fipSpecies1 = getTestSpecies(polygonId, LayerType.VETERAN, "B", x -> {
 			x.setPercentGenus(22f);
 		});
-		var fipSpecies2 = getTestSpecies(polygonId, Layer.VETERAN, "H", x -> {
+		var fipSpecies2 = getTestSpecies(polygonId, LayerType.VETERAN, "H", x -> {
 			x.setPercentGenus(60f);
 		});
-		var fipSpecies3 = getTestSpecies(polygonId, Layer.VETERAN, "S", x -> {
+		var fipSpecies3 = getTestSpecies(polygonId, LayerType.VETERAN, "S", x -> {
 			x.setPercentGenus(18f);
 		});
-		fipPolygon.setLayers(Collections.singletonMap(Layer.VETERAN, fipLayer));
+		fipPolygon.setLayers(Collections.singletonMap(LayerType.VETERAN, fipLayer));
 		fipLayer.setSpecies(List.of(fipSpecies1, fipSpecies2, fipSpecies3));
 
 		var controlMap = FipTestUtils.loadControlMap();
@@ -644,7 +644,7 @@ class FipStartTest {
 
 		// Keys
 		assertThat(result, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(result, hasProperty("layer", is(Layer.VETERAN)));
+		assertThat(result, hasProperty("layer", is(LayerType.VETERAN)));
 
 		// Direct Copy
 		assertThat(result, hasProperty("ageTotal", present(is(105f))));
@@ -670,7 +670,7 @@ class FipStartTest {
 
 		// Keys
 		assertThat(speciesResult1, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(speciesResult1, hasProperty("layer", is(Layer.VETERAN)));
+		assertThat(speciesResult1, hasProperty("layer", is(LayerType.VETERAN)));
 		assertThat(speciesResult1, hasProperty("genus", is("B")));
 
 		// Copied
@@ -683,7 +683,7 @@ class FipStartTest {
 
 		// Keys
 		assertThat(speciesResult2, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(speciesResult2, hasProperty("layer", is(Layer.VETERAN)));
+		assertThat(speciesResult2, hasProperty("layer", is(LayerType.VETERAN)));
 		assertThat(speciesResult2, hasProperty("genus", is("H")));
 
 		// Copied
@@ -696,7 +696,7 @@ class FipStartTest {
 
 		// Keys
 		assertThat(speciesResult3, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(speciesResult3, hasProperty("layer", is(Layer.VETERAN)));
+		assertThat(speciesResult3, hasProperty("layer", is(LayerType.VETERAN)));
 		assertThat(speciesResult3, hasProperty("genus", is("S")));
 
 		// Copied
@@ -1090,7 +1090,7 @@ class FipStartTest {
 		);
 
 		// Setting the primaryGenus on the FIP layer is a necessary side effect
-		assertThat(fipLayer, hasProperty("primaryGenus", equalTo("D")));
+		assertThat(fipLayer, hasProperty("primaryGenus", present(equalTo("D"))));
 
 		var speciesResult = result.getSpecies().get("B");
 
@@ -1359,16 +1359,16 @@ class FipStartTest {
 			x.setInventoryTypeGroup(Optional.empty());
 			x.setSiteCurveNumber(Optional.of(34));
 		});
-		var fipSpecies1 = getTestSpecies(polygonId, Layer.PRIMARY, "B", x -> {
+		var fipSpecies1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", x -> {
 			x.setPercentGenus(15f);
 		});
-		var fipSpecies2 = getTestSpecies(polygonId, Layer.PRIMARY, "D", x -> {
+		var fipSpecies2 = getTestSpecies(polygonId, LayerType.PRIMARY, "D", x -> {
 			x.setPercentGenus(7f);
 		});
-		var fipSpecies3 = getTestSpecies(polygonId, Layer.PRIMARY, "H", x -> {
+		var fipSpecies3 = getTestSpecies(polygonId, LayerType.PRIMARY, "H", x -> {
 			x.setPercentGenus(77f);
 		});
-		var fipSpecies4 = getTestSpecies(polygonId, Layer.PRIMARY, "S", x -> {
+		var fipSpecies4 = getTestSpecies(polygonId, LayerType.PRIMARY, "S", x -> {
 			x.setPercentGenus(1f);
 		});
 		fipPolygon.setLayers(List.of(fipLayer));
@@ -1384,7 +1384,7 @@ class FipStartTest {
 		assertThat(result, notNullValue());
 
 		assertThat(result, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(result, hasProperty("layer", is(Layer.PRIMARY)));
+		assertThat(result, hasProperty("layer", is(LayerType.PRIMARY)));
 
 		assertThat(result, hasProperty("ageTotal", present(is(45f))));
 		assertThat(result, hasProperty("height", present(is(24.3f))));
@@ -1405,12 +1405,12 @@ class FipStartTest {
 		);
 
 		// Setting the primaryGenus on the FIP layer is a necessary side effect
-		assertThat(fipLayer, hasProperty("primaryGenus", equalTo("H")));
+		assertThat(fipLayer, hasProperty("primaryGenus", present(equalTo("H"))));
 
 		var speciesResult = result.getSpecies().get("H");
 
 		assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(speciesResult, hasProperty("layer", is(Layer.PRIMARY)));
+		assertThat(speciesResult, hasProperty("layer", is(LayerType.PRIMARY)));
 		assertThat(speciesResult, hasProperty("genus", is("H")));
 
 		assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.787526369f)));
@@ -3143,7 +3143,8 @@ class FipStartTest {
 		);
 
 	}
-		@Test
+
+	@Test
 	void testFindRootsForPrimaryLayerDiameterAndAreaMultipleSpeciesPass1Test2() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		var app = new FipStart();
@@ -3151,6 +3152,20 @@ class FipStartTest {
 
 		var becLookup = BecDefinitionParser.getBecs(controlMap);
 		var bec = becLookup.get("CWH").get();
+
+		var layer = VdypLayer.build(builder -> {
+			builder.polygonIdentifier("Test");
+			builder.layerType(LayerType.PRIMARY);
+			builder.ageTotal(45f);
+			builder.yearsToBreastHeight(5.4000001f);
+			builder.height(24.2999992f);
+			builder.siteGenus("H");
+		});
+
+		layer.getBaseAreaByUtilization().setCoe(0, 44.9531403f);
+		layer.getTreesPerHectareByUtilization().setCoe(0, 1291.11597f);
+		layer.getQuadraticMeanDiameterByUtilization().setCoe(0, 21.0548649f);
+
 		/*
 		 * HL[*, -1] 0 HL[0, 0] 0 BA[*, -1] BA[1, 0] VOLWS VOLCU VOL_D VOL_DW VOLDWB
 		 * dqspbase,goal
@@ -3162,52 +3177,42 @@ class FipStartTest {
 		 */
 		// sp 3, 4, 5, 8, 15
 		// sp B, C, D, H, S
-		var spec1 = new VdypSpecies("Test", Layer.PRIMARY, "B");
-		spec1.setVolumeGroup(12);
-		spec1.setDecayGroup(7);
-		spec1.setBreakageGroup(5);
+		var spec1 = VdypSpecies.build(layer, builder -> {
+			builder.genus("B");
+			builder.percentGenus(15f);
+			builder.volumeGroup(12);
+			builder.decayGroup(7);
+			builder.breakageGroup(5);
+		});
 		spec1.getLoreyHeightByUtilization().setCoe(0, 21.5356998f);
-		spec1.setPercentGenus(15f);
-		var spec2 = new VdypSpecies("Test", Layer.PRIMARY, "D");
-		spec2.setVolumeGroup(25);
-		spec2.setDecayGroup(19);
-		spec2.setBreakageGroup(12);
+		var spec2 = VdypSpecies.build(layer, builder -> {
+			builder.genus("D");
+			builder.percentGenus(7f);
+			builder.volumeGroup(25);
+			builder.decayGroup(19);
+			builder.breakageGroup(12);
+		});
 		spec2.getLoreyHeightByUtilization().setCoe(0, 22.4329224f);
-		spec2.setPercentGenus(7f);
-		var spec3 = new VdypSpecies("Test", Layer.PRIMARY, "H");
-		spec3.setVolumeGroup(37);
-		spec3.setDecayGroup(31);
-		spec3.setBreakageGroup(17);
+		var spec3 = VdypSpecies.build(layer, builder -> {
+			builder.genus("H");
+			builder.percentGenus(77f);
+			builder.volumeGroup(37);
+			builder.decayGroup(54);
+			builder.breakageGroup(28);
+		});
 		spec3.getLoreyHeightByUtilization().setCoe(0, 20.5984688f);
-		spec3.setPercentGenus(77f);
-		var spec4 = new VdypSpecies("Test", Layer.PRIMARY, "S");
-		spec4.setVolumeGroup(66);
-		spec4.setDecayGroup(54);
-		spec4.setBreakageGroup(28);
+		var spec4 = VdypSpecies.build(layer, builder -> {
+			builder.genus("S");
+			builder.percentGenus(1f);
+			builder.volumeGroup(66);
+			builder.decayGroup(54);
+			builder.breakageGroup(28);
+		});
 		spec4.getLoreyHeightByUtilization().setCoe(0, 24.0494442f);
-		spec4.setPercentGenus(1f);
-
-		Collection<VdypSpecies> specs = new ArrayList<>(5);
-		specs.add(spec1);
-		specs.add(spec2);
-		specs.add(spec3);
-		specs.add(spec4);
-
-		var layer = new VdypLayer("Test", Layer.PRIMARY);
-		layer.getBaseAreaByUtilization().setCoe(0, 44.9531403f);
-		layer.getTreesPerHectareByUtilization().setCoe(0, 1291.11597f);
-		layer.getQuadraticMeanDiameterByUtilization().setCoe(0, 21.0548649f);
-		layer.setAgeTotal(Optional.of(45f));
-		layer.setBreastHeightAge(Optional.of(39.5999985f));
-		layer.setYearsToBreastHeight(Optional.of(5.4000001f));
-		layer.setHeight(Optional.of(24.2999992f));
-		layer.setSiteGenus(Optional.of("H"));
-
-		layer.setSpecies(specs);
 
 		var fipLayer = this.getTestPrimaryLayer("Test", l -> {
 			l.setInventoryTypeGroup(Optional.of(15));
-			l.setPrimaryGenus("H");
+			l.setPrimaryGenus(Optional.of("H"));
 		});
 
 		app.findRootsForDiameterAndBaseArea(layer, fipLayer, bec, 2);
@@ -3403,11 +3408,12 @@ class FipStartTest {
 
 			var bec = BecDefinitionParser.getBecs(controlMap).get("CWH").get();
 
-			int result = app.findEmpericalRelationshipParameterIndex("D", bec, 37);
+			int result = app.findEmpiricalRelationshipParameterIndex("D", bec, 37);
 
 			assertThat(result, is(1));
 		}
 	}
+
 	@Test
 	void testEstimateQuadMeanDiameterForSpecies() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();

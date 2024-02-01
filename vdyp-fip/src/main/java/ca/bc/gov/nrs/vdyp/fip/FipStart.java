@@ -98,7 +98,6 @@ import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.FipMode;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.JProgram;
-import ca.bc.gov.nrs.vdyp.model.Layer;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
@@ -272,10 +271,13 @@ public class FipStart implements Closeable {
 						polygonsRead++;
 
 						// Output
-						vriWriter.writePolygonWithSpeciesAndUtilization(resultPoly);
+						vriWriter.writePolygonWithSpeciesAndUtilization(resultPoly.get());
 
 						polygonsWritten++;
 					}
+
+					log.atInfo().setMessage("Read {} polygons and wrote {}").addArgument(polygonsRead)
+							.addArgument(polygonsWritten);
 
 				} catch (StandProcessingException ex) {
 					// TODO include some sort of hook for different forms of user output
@@ -299,7 +301,7 @@ public class FipStart implements Closeable {
 
 		// if (MODE .eq. -1) go to 100
 
-		final var mode = polygon.getModeFip().orElse(FipMode.DONT_PROCESS);
+		final var mode = polygon.getModeFip().orElse(FipMode.FIPSTART);
 
 		if (mode == FipMode.DONT_PROCESS) {
 			log.atInfo().setMessage("Skipping polygon with mode {}").addArgument(mode).log();
@@ -322,15 +324,6 @@ public class FipStart implements Closeable {
 		// CALL FIPCALCV( BAV, IER)
 		// CALL FIPCALC1( BAV, BA_TOTL1, IER)
 
-					FipLayerPrimary fipPrimeLayer = (FipLayerPrimary) fipLayers.get(Layer.PRIMARY);
-					assert fipPrimeLayer != null;
-					var resultPrimeLayer = processLayerAsPrimary(
-							polygon, fipPrimeLayer,
-							resultVetLayer.map(VdypLayer::getBaseAreaByUtilization).map(coe -> coe.get(UTIL_ALL))
-									.orElse(0f)
-					);
-					processedLayers.put(Layer.PRIMARY, resultPrimeLayer);
-
 		Map<LayerType, VdypLayer> processedLayers = new EnumMap<>(LayerType.class);
 
 		var fipLayers = polygon.getLayers();
@@ -347,7 +340,7 @@ public class FipStart implements Closeable {
 		assert fipPrimeLayer != null;
 		var resultPrimeLayer = processLayerAsPrimary(
 				polygon, fipPrimeLayer,
-				resultVetLayer.map(VdypLayer::getBaseAreaByUtilization).map(coe -> coe.get(UTIL_ALL)).orElse(0f)
+				resultVetLayer.map(VdypLayer::getBaseAreaByUtilization).map(coe -> coe.getCoe(UTIL_ALL)).orElse(0f)
 		);
 		processedLayers.put(LayerType.PRIMARY, resultPrimeLayer);
 
@@ -374,7 +367,6 @@ public class FipStart implements Closeable {
 		// FIPSTK
 		adjustForStocking(resultPoly.getLayers().get(LayerType.PRIMARY), fipPrimeLayer, bec);
 		return Optional.of(resultPoly);
-		log.atInfo().setMessage("Read {} polygons and wrote {}").addArgument(polygonsRead).addArgument(polygonsWritten);
 	}
 
 	// FIPSTK
@@ -505,7 +497,7 @@ public class FipStart implements Closeable {
 		var primarySpecies = findPrimarySpecies(fipLayer.getSpecies());
 
 		// There's always at least one entry and we want the first.
-		fipLayer.setPrimaryGenus(primarySpecies.iterator().next().getGenus());
+		fipLayer.setPrimaryGenus(Optional.of(primarySpecies.iterator().next().getGenus()));
 
 		// VDYP7 stores this in the common FIPL_1C/ITGL1 but only seems to use it
 		// locally
@@ -515,13 +507,16 @@ public class FipStart implements Closeable {
 				() -> new IllegalStateException("Could not find BEC " + fipPolygon.getBiogeoclimaticZone())
 		);
 
-		var result = VdypLayer.build(builder -> builder.copy(fipLayer));
-//FIXME, add to builder?
-		result.setInventoryTypeGroup(Optional.of(itg));
-		result.setSiteGenus(fipLayer.getSiteGenus());
-		result.setSiteCurveNumber(fipLayer.getSiteCurveNumber());
-		result.setSiteIndex(fipLayer.getSiteIndex());
+		// GRPBA1FD
+		int empiricalRelationshipParameterIndex = findEmpiricalRelationshipParameterIndex(
+				primarySpecies.get(0).getGenus(), bec, itg
+		);
 
+		var result = VdypLayer.build(builder -> {
+			builder.copy(fipLayer);
+			builder.inventoryTypeGroup(itg);
+			builder.empiricalRelationshipParameterIndex(empiricalRelationshipParameterIndex);
+		});
 
 		// EMP040
 		var baseArea = estimatePrimaryBaseArea(
@@ -628,7 +623,7 @@ public class FipStart implements Closeable {
 		return Stream.concat(Stream.of(layer), layer.getSpecies().values().stream()).map(accessor).toList();
 	}
 
-	int findEmpericalRelationshipParameterIndex(String specAlias, BecDefinition bec, int itg)
+	int findEmpiricalRelationshipParameterIndex(String specAlias, BecDefinition bec, int itg)
 			throws ProcessingException {
 		var groupMap = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
 				controlMap, DefaultEquationNumberParser.CONTROL_KEY, MatrixMap2.class
@@ -1170,7 +1165,6 @@ public class FipStart implements Closeable {
 // FIXME Add to builder?
 		vdypLayer.setSiteGenus(fipLayer.getSiteGenus());
 		vdypLayer.setSiteIndex(fipLayer.getSiteIndex());
-
 
 		vdypLayer.setBaseAreaByUtilization(baseAreaByUtilization);
 
@@ -2732,7 +2726,7 @@ public class FipStart implements Closeable {
 		if (primaryLayer.getAgeTotal().orElse(0f) - primaryLayer.getYearsToBreastHeight().orElse(0f) < 0.5f) {
 			throw validationError(
 					"Polygon %s has %s layer where total age is less than YTBH.", polygon.getPolygonIdentifier(),
-					Layer.PRIMARY
+					LayerType.PRIMARY
 			);
 		}
 
