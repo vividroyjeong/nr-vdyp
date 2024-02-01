@@ -6,6 +6,9 @@ import java.util.Set;
 
 public class CompVarAdjustments
 {
+	public static final int MIN_INDEX = 1;
+	public static final int MAX_INDEX = 98;
+	
 	public static final int SMALL_BA = 1;
 	public static final int SMALL_DQ = 2;
 	public static final int SMALL_HL = 3;
@@ -30,6 +33,18 @@ public class CompVarAdjustments
 	
 	private Map<Integer, Float> values;
 	
+	/**
+	 * Constructs a default instance, one in which all index values are 1.0f. See rd_e028.for.
+	 */
+	public CompVarAdjustments() {
+		values = new HashMap<>();
+		for (int i = MIN_INDEX; i <= MAX_INDEX; i++)
+			values.put(i, 1.0f);
+	}
+	
+	/**
+	 * Constructs an instance from a data set.
+	 */
 	public CompVarAdjustments(Map<Integer, Float> values) {
 		this.values = new HashMap<>(values);
 	}

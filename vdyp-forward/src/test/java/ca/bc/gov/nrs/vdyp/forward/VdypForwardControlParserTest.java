@@ -13,6 +13,8 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.hasKey;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -31,6 +33,7 @@ import ca.bc.gov.nrs.vdyp.application.VdypApplication;
 import ca.bc.gov.nrs.vdyp.forward.test.VdypForwardControlParserTestApplication;
 import ca.bc.gov.nrs.vdyp.forward.test.VdypForwardTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.BecDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.CompVarAdjustmentsParser;
 import ca.bc.gov.nrs.vdyp.io.parse.ControlFileParserTest;
 import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.HLNonprimaryCoefficientParserTest;
@@ -39,6 +42,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.SiteCurveAgeMaximumParserTest;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
+import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
@@ -205,25 +209,23 @@ class VdypForwardControlParserTest {
 		assertThat(
 				result, (Matcher) hasSpecificEntry(
 						VdypForwardControlParser.PARAM_ADJUSTMENTS, allOf(
-								// Species
-								isA(Map.class), hasEntry(isA(Integer.class), isA(SiteCurveAgeMaximum.class))
-						)
-				)
-		);
+								isA(CompVarAdjustments.class))
+						));
 	}
 
 	@Test
 	void testParseE028Empty() throws Exception {
 		var parser = new VdypForwardControlParser(app);
 		var result = parseWithAppendix(parser, "028  ");
-		// Map is empty but gives appropriate default values
+		
+		// Test that we got the appropriate default values
 		assertThat(
-				result, (Matcher) hasSpecificEntry(VdypForwardControlParser.PARAM_ADJUSTMENTS, Matchers.anEmptyMap())
+				result, Matchers.hasKey(VdypForwardControlParser.PARAM_ADJUSTMENTS)
 		);
-		assertThat(
-				((Map<Integer, SiteCurveAgeMaximum>) result.get(VdypForwardControlParser.PARAM_ADJUSTMENTS)).get(1),
-				(Matcher) allOf(SiteCurveAgeMaximumParserTest.hasAge(Region.COASTAL, is(140.f)))
-		);
+		
+		CompVarAdjustments m = (CompVarAdjustments)result.get(CompVarAdjustmentsParser.CONTROL_KEY);
+		
+		assertThat(m.getParam(CompVarAdjustments.SMALL_BA), is(1.0f));
 	}
 
 	@Test
@@ -528,22 +530,13 @@ class VdypForwardControlParserTest {
 	public void testParseMinima() throws Exception {
 		var parser = new VdypForwardControlParser(app);
 		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
-		assertThat(
-				result, (Matcher) hasSpecificEntry(
-						VdypForwardControlParser.MINIMA,
-						// Includes modifiers from 198
-						allOf(
-								hasEntry(is(VdypForwardControlParser.MINIMUM_HEIGHT), is(5.0f)),
-								hasEntry(is(VdypForwardControlParser.MINIMUM_BASE_AREA), is(0.0f)),
-								hasEntry(is(VdypForwardControlParser.MINIMUM_PREDICTED_BASE_AREA), is(2.0f)),
-								hasEntry(is(VdypForwardControlParser.MINIMUM_VETERAN_HEIGHT), is(10.0f))
-						)
-				)
-		);
+		
+		// VDYP Forward does not load MINIMA
+		assertThat(result, not(hasKey(VdypForwardControlParser.MINIMA)));
 	}
 
 	@Test
-	public void testParseV7O_FIP() throws Exception {
+	public void testParseV7O_VIP() throws Exception {
 		var parser = new VdypForwardControlParser(app);
 		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
@@ -553,7 +546,7 @@ class VdypForwardControlParserTest {
 	}
 
 	@Test
-	public void testParseV7O_FIL() throws Exception {
+	public void testParseV7O_VIU() throws Exception {
 		var parser = new VdypForwardControlParser(app);
 		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(
@@ -563,7 +556,7 @@ class VdypForwardControlParserTest {
 	}
 
 	@Test
-	public void testParseV7O_FIS() throws Exception {
+	public void testParseV7O_VIS() throws Exception {
 		var parser = new VdypForwardControlParser(app);
 		var result = parse(parser, ControlFileParserTest.class, "VDYP.CTR");
 		assertThat(

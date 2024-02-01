@@ -155,7 +155,7 @@ public class VdypForwardControlParser {
 			.record(25, SITE_CURVE_NUMBERS, ValueParser.optional(FILENAME)) // RD_E025
 			.record(26, SITE_CURVE_AGE_MAX, ValueParser.optional(FILENAME)) // RD_E026
 
-			.record(28, PARAM_ADJUSTMENTS, FILENAME) // RD_E028
+			.record(28, PARAM_ADJUSTMENTS, ValueParser.optional(FILENAME)) // RD_E028
 
 			.record(30, DEFAULT_EQ_NUM, FILENAME) // RD_GRBA1
 			.record(31, EQN_MODIFIERS, FILENAME) // RD_GMBA1
@@ -209,17 +209,32 @@ public class VdypForwardControlParser {
 
 			.record(198, MODIFIER_FILE, ValueParser.optional(FILENAME)) // RD_E198 IPSJF155, XII
 
-			.record(199, DEBUG_SWITCHES, ValueParser.list(ValueParser.INTEGER)) // IPSJF155
-				// Debug switches (25) 0=default See IPSJF155, App IX 
-				// 1st: 1: Do NOT apply BA limits from SEQ043 
-				// 2nd: 1: Do NOT apply DQ limits from SEQ043 
-				// 4th: Future Development. Choice of upper limits 
-				// 9th: 0: Normal - Suppress MATH77 error messages. 
-			    // 1: show some MATH77 errors; 
-				// 2: show all. 
-				// 22nd 1: extra preference
-				// for preferred sp (SEQ 010).
-				;
+			.record(199, DEBUG_SWITCHES, ValueParser.list(ValueParser.INTEGER));
+				//	Debug switches (25) 
+				//     0 is the default value. See IPSJF155, App. IX
+				//    (1) = 1 to DIASABLE species dynamics
+				//    (2) = n, maximum BH age in BA and DQ eqns = 100*n.
+				//    (3) = 0 Fiat BA growth model (approach to yield curves)
+				//        = 1 to invoke empirical BA growth model (see IPSJF176)
+				//        = 2 invoke empirical growth model PLUS mixing with fiat model.                                                      
+				//    (4) = (1,2) to use limits (SEQ108-GRPBA1, SEQ043-(CI,Pri))  
+				//        = 0,  defaults to option 2 at present.
+				//    (5) MATH77 Error message control. Should be zero.
+				//        = 0: show no errors
+				//        = 1: show some errors
+				//		  = 2: shows all errors.
+				//    (6) = 0: for fiat DQ growth model (see IPSJF176, and SEQ 117)
+				//        = 1: for empirical
+				//        = 2: for mixed.   
+				// 		  Recommend: 0 or 2.                                                                        
+				//    (7) Not used
+				//    (8) = 1: force growth in non-primary HL to zero when del HD=0
+				//        = 2: same as 1, but also applies to primary species.
+				//    (9) = 1 for limited BA incr if DQ upper limit hit, else 0  (2009.03.18)
+				//    (10) Not used.
+				//    (11-20) Controls Ht/Age/SI fillin. See IPSJF174.doc
+				//    [Above values from Cam Bartram 14MAR2002]
+				//    (22) = 1 implies a preferred sp is primary if ba >.9995 of other.				;
 
 	public VdypForwardControlParser(VdypApplication app) {
 		this.app = app;
@@ -278,7 +293,9 @@ public class VdypForwardControlParser {
 		applyModifiers(map, List.of(		
 				// RD_BECD - 09
 				new BecDefinitionParser(),
-				// DEF_BEC
+				
+				// DEF_BEC - superseded by BecLookup.getGrowthBecs
+				
 				// RD_SP0 - 10
 				new GenusDefinitionParser())
 			, fileResolver);
@@ -413,9 +430,6 @@ public class VdypForwardControlParser {
 				new ModifierParser(VdypApplicationIdentifier.VDYPForward.getJProgramNumber()))
 			, fileResolver);
 		
-		// 101
-		
-
 		// Debug switches (normally zero)
 		// TODO - 199
 

@@ -1,11 +1,13 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
@@ -99,5 +101,31 @@ public class CompVarAdjustmentsParserTest {
 		assertThat(m.getCloseUtilLessDecayLessWasteVolumeAdjustment(UtilizationClass.U125TO175), is(0.95f));
 		assertThat(m.getCloseUtilLessDecayLessWasteVolumeAdjustment(UtilizationClass.U175TO225), is(0.96f));
 		assertThat(m.getCloseUtilLessDecayLessWasteVolumeAdjustment(UtilizationClass.OVER225), is(0.97f));
+	}
+	
+	@Test
+	void testParseBadIndex() throws Exception {
+
+		var parser = new CompVarAdjustmentsParser();
+
+		Map<String, Object> controlMap = new HashMap<>();
+		
+		var is1 = TestUtils.makeInputStream(" 99    0.50");
+		
+		try {
+			parser.modify(controlMap, is1);
+			Assertions.fail();
+		} catch (Exception e) {
+			assertThat(e, hasProperty("message", is("Error at line 1: Index 99 not in the range 1 to 98 inclusive")));
+		}
+		
+		var is2 = TestUtils.makeInputStream("  0    0.50");
+		
+		try {
+			parser.modify(controlMap, is2);
+			Assertions.fail();
+		} catch (Exception e) {
+			assertThat(e, hasProperty("message", is("Error at line 1: Index 0 not in the range 1 to 98 inclusive")));
+		}
 	}
 }
