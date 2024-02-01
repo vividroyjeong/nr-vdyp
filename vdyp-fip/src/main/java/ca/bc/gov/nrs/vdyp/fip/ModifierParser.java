@@ -234,7 +234,7 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 
 	}
 
-	<T> void modsByRegions(List<Float> mods, int offset, BiConsumer<Float, Region> modifier) {
+	void modsByRegions(List<Float> mods, int offset, BiConsumer<Float, Region> modifier) {
 		assert mods.size() % 2 == 0;
 		assert offset % 2 == 0;
 		assert mods.size() - offset >= 2;

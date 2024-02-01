@@ -4,6 +4,7 @@ import static ca.bc.gov.nrs.vdyp.fip.FipStart.UTIL_ALL;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 
+import java.io.IOException;
 import java.util.*;
 import org.apache.commons.math3.analysis.MultivariateMatrixFunction;
 import org.apache.commons.math3.analysis.MultivariateVectorFunction;
@@ -25,45 +26,45 @@ class RootFinderTest {
 	private final double epsilon = 0.00001;
 
 	@Test
-	void testRootFunction() {
+	void testRootFunction() throws IOException {
 		var control = FipTestUtils.loadControlMap();
-		var app = new FipStart();
-		app.setControlMap(control);
+		try (var app = new FipStart()) {
+			app.setControlMap(control);
 
-		var diameterBase = new double[] { 31.7022133, 26.4500256, 33.9676628, 21.4272919, 34.4568748 };
-		var x = new double[] { 1d, 7d, 74d, 9d, 0d };
+			var diameterBase = new double[] { 31.7022133, 26.4500256, 33.9676628, 21.4272919, 34.4568748 };
+			var x = new double[] { 1d, 7d, 74d, 9d, 0d };
 
-		var layer = mockLayer1(control);
+			var layer = mockLayer1(control);
 
-		MultivariateVectorFunction func = (point) -> app.rootFinderFunction(point, layer, diameterBase);
+			MultivariateVectorFunction func = (point) -> app.rootFinderFunction(point, layer, diameterBase);
 
-		double[] y = func.value(x);
-		assertThat(
-				Arrays.stream(y).mapToObj(d -> d).toList(),
-				contains(
-						closeTo(1 + 8.190178e-2), closeTo(7 - 2.869991e0), closeTo(74 + 5.996042e0),
-						closeTo(9 - 2.689271e0), closeTo(30.2601795 + 1.002164e0)
-				)
-		);
-
+			double[] y = func.value(x);
+			assertThat(
+					Arrays.stream(y).mapToObj(d -> d).toList(),
+					contains(
+							closeTo(1 + 8.190178e-2), closeTo(7 - 2.869991e0), closeTo(74 + 5.996042e0),
+							closeTo(9 - 2.689271e0), closeTo(30.2601795 + 1.002164e0)
+					)
+			);
+		}
 	}
 
 	@Test
-	void testRootFunctionJacobian() {
+	void testRootFunctionJacobian() throws IOException {
 		var control = FipTestUtils.loadControlMap();
-		var app = new FipStart();
-		app.setControlMap(control);
+		try (var app = new FipStart()) {
+			app.setControlMap(control);
 
-		var diameterBase = new double[] { 31.7022133, 26.4500256, 33.9676628, 21.4272919, 34.4568748 };
-		var x = new double[] { 1d, 7d, 74d, 9d, 0d };
+			var diameterBase = new double[] { 31.7022133, 26.4500256, 33.9676628, 21.4272919, 34.4568748 };
+			var x = new double[] { 1d, 7d, 74d, 9d, 0d };
 
-		var layer = mockLayer1(control);
+			var layer = mockLayer1(control);
 
-		MultivariateVectorFunction func = (point) -> app.rootFinderFunction(point, layer, diameterBase);
+			MultivariateVectorFunction func = (point) -> app.rootFinderFunction(point, layer, diameterBase);
 
-		MultivariateMatrixFunction jacFunc = (point) -> app.estimateJacobian(point, func);
+			MultivariateMatrixFunction jacFunc = (point) -> app.estimateJacobian(point, func);
 
-		RealMatrix jacobian = new Array2DRowRealMatrix(jacFunc.value(x));
+			RealMatrix jacobian = new Array2DRowRealMatrix(jacFunc.value(x));
 
 //		0x004F1B78   1.080512e0      -5.529128e-3     -1.078180e-1     -8.984832e-3     -2.384436e-2
 //		0x004F1B8C   3.801275e-3      6.043534e-1      2.809981e-1      2.211651e-2     -8.970021e-2
@@ -71,38 +72,41 @@ class RootFinderTest {
 //		0x004F1BB4   2.603777e-3      9.983147e-3      1.924444e-1      7.162524e-1     -2.040018e-1
 //		0x004F1BC8   1.723533e-2     -1.313168e-2     -5.943812e-2      4.215959e-2      1.170447e0
 
-		assertThat(
-				jacobian, matrixCloseTo(
-						new double[][] { //
-								{ 1.080512e0, 3.801275e-3, -1.501072e-3, 2.603777e-3, 1.723533e-2 }, //
-								{ -5.529128e-3, 6.043534e-1, -5.725262e-3, 9.983147e-3, -1.313168e-2 }, //
-								{ -1.078180e-1, 2.809981e-1, 9.703245e-1, 1.924444e-1, -5.943812e-2 }, //
-								{ -8.984832e-3, 2.211651e-2, -8.760679e-3, 7.162524e-1, 4.215959e-2 }, //
-								{ -2.384436e-2, -8.970021e-2, -3.791935e-3, -2.040018e-1, 1.170447e0 } //
-						}, 0.005
-				)
-		);
-
+			assertThat(
+					jacobian, matrixCloseTo(
+							new double[][] { //
+									{ 1.080512e0, 3.801275e-3, -1.501072e-3, 2.603777e-3, 1.723533e-2 }, //
+									{ -5.529128e-3, 6.043534e-1, -5.725262e-3, 9.983147e-3, -1.313168e-2 }, //
+									{ -1.078180e-1, 2.809981e-1, 9.703245e-1, 1.924444e-1, -5.943812e-2 }, //
+									{ -8.984832e-3, 2.211651e-2, -8.760679e-3, 7.162524e-1, 4.215959e-2 }, //
+									{ -2.384436e-2, -8.970021e-2, -3.791935e-3, -2.040018e-1, 1.170447e0 } //
+							}, 0.005
+					)
+			);
+		}
 	}
 
 	@Test
-	void testRootFunctionSolve() {
+	void testRootFunctionSolve() throws IOException {
 		var control = FipTestUtils.loadControlMap();
-		var app = new FipStart();
-		app.setControlMap(control);
+		try (var app = new FipStart()) {
+			app.setControlMap(control);
 
-		var diameterBase = new double[] { 31.7022133, 26.4500256, 33.9676628, 21.4272919, 34.4568748 };
-		var goal = new double[] { 1d, 7d, 74d, 9d, 30.2601795d };
-		var x = new double[] { 1d, 7d, 74d, 9d, 0d };
+			var diameterBase = new double[] { 31.7022133, 26.4500256, 33.9676628, 21.4272919, 34.4568748 };
+			var goal = new double[] { 1d, 7d, 74d, 9d, 30.2601795d };
+			var x = new double[] { 1d, 7d, 74d, 9d, 0d };
 
-		var layer = mockLayer1(control);
+			var layer = mockLayer1(control);
 
-		var point = app.findRoot(diameterBase, goal, x, layer, 2.0e-3f);
+			var point = app.findRoot(diameterBase, goal, x, layer, 2.0e-3f);
 
-		assertThat(
-				point,
-				vectorCloseTo(new double[] { 0.891877294, 11.4491625, 66.0574265, 12.3855982, 0.00443319743 }, 2.0E-03)
-		);
+			assertThat(
+					point,
+					vectorCloseTo(
+							new double[] { 0.891877294, 11.4491625, 66.0574265, 12.3855982, 0.00443319743 }, 2.0E-03
+					)
+			);
+		}
 	}
 
 	VdypLayer mockLayer1(Map<String, Object> control) {
