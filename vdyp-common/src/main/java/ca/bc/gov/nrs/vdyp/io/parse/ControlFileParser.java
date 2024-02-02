@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
+
 /**
  * Parser for control files.
  *
@@ -140,9 +142,9 @@ public class ControlFileParser implements ResourceParser<Map<String, Object>> {
 	 * @param parser
 	 * @return
 	 */
-	public ControlFileParser record(int index, String name, ValueParser<?> parser) {
-		record(index, name);
-		record(index, parser);
+	public ControlFileParser record(ControlKey key, ValueParser<?> parser) {
+		record(key);
+		record(key.sequence.orElseThrow(), parser);
 		return this;
 	}
 
@@ -155,9 +157,9 @@ public class ControlFileParser implements ResourceParser<Map<String, Object>> {
 	 * @param parser
 	 * @return
 	 */
-	public ControlFileParser optional(int index, String name, ControlledValueParser<?> parser) {
-		record(index, name);
-		optional(index, parser);
+	public ControlFileParser optional(ControlKey key, ControlledValueParser<?> parser) {
+		record(key);
+		optional(key.sequence.orElseThrow(), parser);
 		return this;
 	}
 
@@ -169,8 +171,8 @@ public class ControlFileParser implements ResourceParser<Map<String, Object>> {
 	 * @param parser
 	 * @return
 	 */
-	public ControlFileParser record(int index, String name) {
-		this.identifiers.put(index, name);
+	public ControlFileParser record(ControlKey key) {
+		this.identifiers.put(key.sequence.orElseThrow(), key.name());
 		return this;
 	}
 

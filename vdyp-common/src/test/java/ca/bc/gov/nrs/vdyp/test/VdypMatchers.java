@@ -22,6 +22,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParser;
@@ -322,6 +323,10 @@ public class VdypMatchers {
 
 		};
 
+	}
+
+	public static <V> Matcher<Map<String, V>> controlMapHasEntry(ControlKey key, Matcher<V> valueMatcher) {
+		return hasSpecificEntry(key.name(), valueMatcher);
 	}
 
 	/**

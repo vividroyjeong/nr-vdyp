@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.IntFunction;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
@@ -45,9 +46,6 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
  */
 public class CoefficientParser implements ControlMapSubResourceParser<MatrixMap2<String, String, Coefficients>> {
 
-	public static final String BA_CONTROL_KEY = "COE_BA"; // V7COE040/COE040
-	public static final String DQ_CONTROL_KEY = "COE_DQ"; // V7COE040/COE041
-
 	public static final String BEC_KEY = "bec";
 	public static final String COEFFICIENT_INDEX_KEY = "index";
 	public static final String INDICATOR_KEY = "indicator";
@@ -56,9 +54,9 @@ public class CoefficientParser implements ControlMapSubResourceParser<MatrixMap2
 	public static final int NUM_COEFFICIENTS = 10;
 	public static final int NUM_SPECIES = 16;
 
-	private final String controlKey;
+	private final ControlKey controlKey;
 
-	public CoefficientParser(String controlKey) {
+	public CoefficientParser(ControlKey controlKey) {
 		this.controlKey = controlKey;
 	}
 
@@ -122,7 +120,7 @@ public class CoefficientParser implements ControlMapSubResourceParser<MatrixMap2
 	}
 
 	@Override
-	public String getControlKey() {
+	public ControlKey getControlKey() {
 		return controlKey;
 	}
 

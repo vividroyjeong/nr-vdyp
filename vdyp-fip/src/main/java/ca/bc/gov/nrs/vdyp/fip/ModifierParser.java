@@ -9,17 +9,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.FloatUnaryOperator;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.HLCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.HLNonprimaryCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.OptionalResourceControlMapModifier;
 import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.ValueParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.ValueParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VeteranBQParser;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.JProgram;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
@@ -30,49 +28,39 @@ import ca.bc.gov.nrs.vdyp.model.Region;
 
 public class ModifierParser implements OptionalResourceControlMapModifier {
 
-	public static final String CONTROL_KEY = "MODIFIERS";
-
 	/**
 	 * MatrixMap2 of Species ID, Region to Coefficients (1-3)
 	 */
-	public static final String CONTROL_KEY_MOD098_VETERAN_BQ = VeteranBQParser.CONTROL_KEY;
-	/**
-	 * MatrixMap2 of Species ID, Region to Float
-	 */
-	public static final String CONTROL_KEY_MOD200_BA = "BA_MODIFIERS";
-	/**
-	 * MatrixMap2 of Species ID, Region to Float
-	 */
-	public static final String CONTROL_KEY_MOD200_DQ = "DQ_MODIFIERS";
+	public static final ControlKey CONTROL_KEY_MOD098_VETERAN_BQ = ControlKey.VETERAN_BQ;
 	/**
 	 * Boolean indicates HL modifiers are present
 	 */
-	public static final String CONTROL_KEY_MOD301_HL = "HL_MODIFIERS";
+	public static final ControlKey CONTROL_KEY_MOD301_HL = ControlKey.HL_MODIFIERS;
 	/**
 	 * MatrixMap2 of Species ID, Region to Float
 	 */
-	public static final String CONTROL_KEY_MOD301_DECAY = "DECAY_MODIFIERS";
+	public static final ControlKey CONTROL_KEY_MOD301_DECAY = ControlKey.DECAY_MODIFIERS;
 	/**
 	 * MatrixMap2 of Species ID, Region to Float
 	 */
-	public static final String CONTROL_KEY_MOD301_WASTE = "WASTE_MODIFIERS";
+	public static final ControlKey CONTROL_KEY_MOD301_WASTE = ControlKey.WASTE_MODIFIERS;
 
 	/**
 	 * MatrixMap3<Integer, String, Region, Float
 	 */
-	public static final String CONTROL_KEY_MOD400_P1 = HLCoefficientParser.CONTROL_KEY_P1;
+	public static final ControlKey CONTROL_KEY_MOD400_P1 = ControlKey.HL_PRIMARY_SP_EQN_P1;
 	/**
 	 * MatrixMap3<Integer, String, Region, Float
 	 */
-	public static final String CONTROL_KEY_MOD400_P2 = HLCoefficientParser.CONTROL_KEY_P2;
+	public static final ControlKey CONTROL_KEY_MOD400_P2 = ControlKey.HL_PRIMARY_SP_EQN_P2;
 	/**
 	 * MatrixMap3<Integer, String, Region, Float
 	 */
-	public static final String CONTROL_KEY_MOD400_P3 = HLCoefficientParser.CONTROL_KEY_P3;
+	public static final ControlKey CONTROL_KEY_MOD400_P3 = ControlKey.HL_PRIMARY_SP_EQN_P3;
 	/**
 	 * MatrixMap3<String, String, Region, NonprimaryHLCoefficients>
 	 */
-	public static final String CONTROL_KEY_MOD400_NONPRIMARY = HLNonprimaryCoefficientParser.CONTROL_KEY;
+	public static final ControlKey CONTROL_KEY_MOD400_NONPRIMARY = ControlKey.HL_NONPRIMARY;
 
 	public static final int MAX_MODS = 60;
 
@@ -118,31 +106,36 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 		}.integer(3, "sequence").multiValue(6, 2, "programs", ValueParser.LOGICAL)
 				.multiValue(10, 6, "mods", ValueParser.optional(ValueParser.FLOAT));
 
-		final MatrixMap2<String, Region, Coefficients> vetBqMap = Utils
-				.expectParsedControl(control, VeteranBQParser.CONTROL_KEY, MatrixMap2.class);
+		final var vetBqMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
+				control, ControlKey.VETERAN_BQ, MatrixMap2.class
+		);
 
-		@SuppressWarnings("unchecked")
-		final MatrixMap2<String, Region, Float> baMap = Utils
-				.expectParsedControl(control, CONTROL_KEY_MOD200_BA, MatrixMap2.class);
-		@SuppressWarnings("unchecked")
-		final MatrixMap2<String, Region, Float> dqMap = Utils
-				.expectParsedControl(control, CONTROL_KEY_MOD200_DQ, MatrixMap2.class);
+		final var baMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
+				control, ControlKey.BA_MODIFIERS, MatrixMap2.class
+		);
+		final var dqMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
+				control, ControlKey.DQ_MODIFIERS, MatrixMap2.class
+		);
 
-		@SuppressWarnings("unchecked")
-		final MatrixMap2<String, Region, Float> decayMap = Utils
-				.expectParsedControl(control, CONTROL_KEY_MOD301_DECAY, MatrixMap2.class);
-		@SuppressWarnings("unchecked")
-		final MatrixMap2<String, Region, Float> wasteMap = Utils
-				.expectParsedControl(control, CONTROL_KEY_MOD301_WASTE, MatrixMap2.class);
+		final var decayMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
+				control, CONTROL_KEY_MOD301_DECAY, MatrixMap2.class
+		);
+		final var wasteMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
+				control, CONTROL_KEY_MOD301_WASTE, MatrixMap2.class
+		);
 
-		final MatrixMap2<String, Region, Coefficients> hlP1Map = Utils
-				.expectParsedControl(control, CONTROL_KEY_MOD400_P1, MatrixMap2.class);
-		final MatrixMap2<String, Region, Coefficients> hlP2Map = Utils
-				.expectParsedControl(control, CONTROL_KEY_MOD400_P2, MatrixMap2.class);
-		final MatrixMap2<String, Region, Coefficients> hlP3Map = Utils
-				.expectParsedControl(control, CONTROL_KEY_MOD400_P3, MatrixMap2.class);
-		final MatrixMap3<String, String, Region, NonprimaryHLCoefficients> hlNPMap = Utils
-				.expectParsedControl(control, CONTROL_KEY_MOD400_NONPRIMARY, MatrixMap3.class);
+		final var hlP1Map = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
+				control, CONTROL_KEY_MOD400_P1, MatrixMap2.class
+		);
+		final var hlP2Map = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
+				control, CONTROL_KEY_MOD400_P2, MatrixMap2.class
+		);
+		final var hlP3Map = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
+				control, CONTROL_KEY_MOD400_P3, MatrixMap2.class
+		);
+		final var hlNPMap = Utils.<MatrixMap3<String, String, Region, NonprimaryHLCoefficients>>expectParsedControl(
+				control, CONTROL_KEY_MOD400_NONPRIMARY, MatrixMap3.class
+		);
 
 		parser.parse(data, control, (entry, result) -> {
 			int sequence = (int) entry.get("sequence");
@@ -282,8 +275,8 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 	}
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.MODIFIER_FILE;
 	}
 
 	@Override
@@ -292,16 +285,16 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 		var regions = Arrays.asList(Region.values());
 
 		var baModifiers = new MatrixMap2Impl<String, Region, Float>(spAliases, regions, (k1, k2) -> 1f);
-		control.put(CONTROL_KEY_MOD200_BA, baModifiers);
+		control.put(ControlKey.BA_MODIFIERS.name(), baModifiers);
 
 		var dqModifiers = new MatrixMap2Impl<String, Region, Float>(spAliases, regions, (k1, k2) -> 1f);
-		control.put(CONTROL_KEY_MOD200_DQ, dqModifiers);
+		control.put(ControlKey.DQ_MODIFIERS.name(), dqModifiers);
 
 		var decayModifiers = new MatrixMap2Impl<String, Region, Float>(spAliases, regions, (k1, k2) -> 0f);
-		control.put(CONTROL_KEY_MOD301_DECAY, decayModifiers);
+		control.put(CONTROL_KEY_MOD301_DECAY.name(), decayModifiers);
 
 		var wasteModifiers = new MatrixMap2Impl<String, Region, Float>(spAliases, regions, (k1, k2) -> 0f);
-		control.put(CONTROL_KEY_MOD301_WASTE, wasteModifiers);
+		control.put(CONTROL_KEY_MOD301_WASTE.name(), wasteModifiers);
 	}
 
 }

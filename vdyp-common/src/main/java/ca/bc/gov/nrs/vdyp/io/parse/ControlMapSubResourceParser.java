@@ -17,7 +17,7 @@ public interface ControlMapSubResourceParser<T> extends ResourceControlMapModifi
 	default void modify(Map<String, Object> control, InputStream data) throws IOException, ResourceParseException {
 		var result = this.parse(data, control);
 
-		control.put(getControlKey(), result);
+		control.put(getControlKeyName(), result);
 	}
 
 }

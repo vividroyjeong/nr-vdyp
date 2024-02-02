@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMapImpl;
@@ -15,7 +16,7 @@ public class SimpleCoefficientParser1<K1> implements ControlMapSubResourceParser
 	private int indexFrom;
 
 	private BaseCoefficientParser<Coefficients, Coefficients, MatrixMap<Coefficients>> delegate = new BaseCoefficientParser<Coefficients, Coefficients, MatrixMap<Coefficients>>(
-			1, "DUMMY"
+			1, null
 	) {
 
 		@SuppressWarnings("unchecked")
@@ -35,9 +36,9 @@ public class SimpleCoefficientParser1<K1> implements ControlMapSubResourceParser
 		}
 	};
 
-	private String controlKey;
+	private ControlKey controlKey;
 
-	public SimpleCoefficientParser1(Class<K1> keyClass, int indexFrom, String controlKey) {
+	public SimpleCoefficientParser1(Class<K1> keyClass, int indexFrom, ControlKey controlKey) {
 		this.indexFrom = indexFrom;
 		this.controlKey = controlKey;
 	}
@@ -84,7 +85,7 @@ public class SimpleCoefficientParser1<K1> implements ControlMapSubResourceParser
 	}
 
 	@Override
-	public String getControlKey() {
+	public ControlKey getControlKey() {
 		return this.controlKey;
 	}
 

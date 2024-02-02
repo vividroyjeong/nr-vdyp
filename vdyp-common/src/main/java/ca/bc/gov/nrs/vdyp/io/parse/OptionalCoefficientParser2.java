@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
@@ -13,7 +14,7 @@ public class OptionalCoefficientParser2<K1, K2> extends
 
 	private int indexFrom;
 
-	public OptionalCoefficientParser2(int indexFrom, String controlKey) {
+	public OptionalCoefficientParser2(int indexFrom, ControlKey controlKey) {
 		super(2, controlKey);
 		this.indexFrom = indexFrom;
 	}

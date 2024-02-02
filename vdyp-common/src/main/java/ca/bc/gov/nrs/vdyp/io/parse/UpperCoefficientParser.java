@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3Impl;
 import ca.bc.gov.nrs.vdyp.model.Region;
@@ -37,8 +38,6 @@ public class UpperCoefficientParser implements ControlMapSubResourceParser<Matri
 
 	public static final int BA = 1;
 	public static final int DQ = 2;
-
-	public static final String CONTROL_KEY = "UPPER_BA_BY_CI_S0_P";
 
 	public static final String SP0_KEY = "sp0";
 	public static final String REGION_KEY = "region";
@@ -84,8 +83,8 @@ public class UpperCoefficientParser implements ControlMapSubResourceParser<Matri
 	}
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.UPPER_BA_BY_CI_S0_P;
 	}
 
 }

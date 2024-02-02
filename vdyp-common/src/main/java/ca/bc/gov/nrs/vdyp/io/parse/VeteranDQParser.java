@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
@@ -33,8 +34,6 @@ import ca.bc.gov.nrs.vdyp.model.Region;
  * @see ControlMapSubResourceParser
  */
 public class VeteranDQParser implements ControlMapSubResourceParser<MatrixMap2<String, Region, Coefficients>> {
-	public static final String CONTROL_KEY = "VETERAN_LAYER_DQ";
-
 	public static final int NUM_COEFFICIENTS = 3;
 
 	public static final String SPECIES_KEY = "species";
@@ -89,8 +88,8 @@ public class VeteranDQParser implements ControlMapSubResourceParser<MatrixMap2<S
 	}
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.VETERAN_LAYER_DQ;
 	}
 
 }

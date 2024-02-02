@@ -11,7 +11,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import ca.bc.gov.nrs.vdyp.common.ControlKeys;
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
@@ -93,9 +93,9 @@ public class VriAdjustInputWriter implements Closeable {
 	 */
 	public VriAdjustInputWriter(Map<String, Object> controlMap, FileResolver resolver) throws IOException {
 		this(
-				getOutputStream(controlMap, resolver, ControlKeys.VDYP_POLYGON),
-				getOutputStream(controlMap, resolver, ControlKeys.VDYP_LAYER_BY_SPECIES),
-				getOutputStream(controlMap, resolver, ControlKeys.VDYP_LAYER_BY_SP0_BY_UTIL), controlMap
+				getOutputStream(controlMap, resolver, ControlKey.VDYP_POLYGON.name()),
+				getOutputStream(controlMap, resolver, ControlKey.VDYP_LAYER_BY_SPECIES.name()),
+				getOutputStream(controlMap, resolver, ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name()), controlMap
 		);
 	}
 

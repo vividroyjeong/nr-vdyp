@@ -11,7 +11,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.common.ControlKeys;
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.model.*;
 import ca.bc.gov.nrs.vdyp.test.*;
@@ -36,9 +36,9 @@ class VriAdjustInputWriterTest {
 		specStream = new TestUtils.MockOutputStream("species");
 		utilStream = new TestUtils.MockOutputStream("utilization");
 
-		controlMap.put(ControlKeys.VDYP_POLYGON, "testPolygonFile");
-		controlMap.put(ControlKeys.VDYP_LAYER_BY_SPECIES, "testSpeciesFile");
-		controlMap.put(ControlKeys.VDYP_LAYER_BY_SP0_BY_UTIL, "testUtilizationFile");
+		controlMap.put(ControlKey.VDYP_POLYGON.name(), "testPolygonFile");
+		controlMap.put(ControlKey.VDYP_LAYER_BY_SPECIES.name(), "testSpeciesFile");
+		controlMap.put(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name(), "testUtilizationFile");
 
 		fileResolver = new MockFileResolver("TEST");
 		fileResolver.addStream("testPolygonFile", polyStream);

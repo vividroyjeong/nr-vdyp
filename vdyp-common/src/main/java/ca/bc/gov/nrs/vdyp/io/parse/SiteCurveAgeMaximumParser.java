@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
 
 /**
@@ -39,8 +40,6 @@ import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
  */
 public class SiteCurveAgeMaximumParser
 		implements OptionalControlMapSubResourceParser<Map<Integer, SiteCurveAgeMaximum>> {
-	public static final String CONTROL_KEY = "SITE_CURVE_AGE_MAX";
-
 	public static final String SC_KEY = "siteCurve";
 	public static final String COASTAL_KEY = "coastalAgeMax";
 	public static final String INTERIOR_KEY = "interiorAgeMax";
@@ -113,8 +112,8 @@ public class SiteCurveAgeMaximumParser
 	}
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.SITE_CURVE_AGE_MAX;
 	}
 
 }

@@ -13,6 +13,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.model.Region;
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -32,7 +33,7 @@ class UpperCoefficientParserTest {
 				new GenusDefinition("S2", java.util.Optional.empty(), "Test S2")
 		);
 
-		controlMap.put(GenusDefinitionParser.CONTROL_KEY, sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
 
 		var result = parser.parse(is, controlMap);
 
@@ -53,7 +54,7 @@ class UpperCoefficientParserTest {
 				new GenusDefinition("S2", java.util.Optional.empty(), "Test S2")
 		);
 
-		controlMap.put(GenusDefinitionParser.CONTROL_KEY, sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
 
 		assertThrows(ResourceParseLineException.class, () -> parser.parse(is, controlMap));
 
@@ -73,7 +74,7 @@ class UpperCoefficientParserTest {
 				new GenusDefinition("S2", java.util.Optional.empty(), "Test S2")
 		);
 
-		controlMap.put(GenusDefinitionParser.CONTROL_KEY, sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
 
 		assertThrows(ResourceParseLineException.class, () -> parser.parse(is, controlMap));
 

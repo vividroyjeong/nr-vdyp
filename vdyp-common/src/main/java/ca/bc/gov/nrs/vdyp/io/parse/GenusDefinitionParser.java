@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 
@@ -42,8 +43,6 @@ import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
  * @see ControlMapSubResourceParser
  */
 public class GenusDefinitionParser implements ControlMapSubResourceParser<List<GenusDefinition>> {
-
-	public static final String CONTROL_KEY = "SP0_DEF";
 
 	private int numSp0;
 
@@ -114,8 +113,7 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<List<G
 	}
 
 	public static List<GenusDefinition> getSpecies(final Map<String, Object> controlMap) {
-		return Utils
-				.<List<GenusDefinition>>expectParsedControl(controlMap, GenusDefinitionParser.CONTROL_KEY, List.class);
+		return Utils.<List<GenusDefinition>>expectParsedControl(controlMap, ControlKey.SP0_DEF.name(), List.class);
 	}
 
 	public static List<String> getSpeciesAliases(final Map<String, Object> controlMap) {
@@ -139,8 +137,8 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<List<G
 	}
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.SP0_DEF;
 	}
 
 }

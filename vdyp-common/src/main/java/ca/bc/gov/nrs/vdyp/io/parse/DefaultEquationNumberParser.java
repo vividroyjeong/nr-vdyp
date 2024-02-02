@@ -2,6 +2,8 @@ package ca.bc.gov.nrs.vdyp.io.parse;
 
 import java.util.Arrays;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
+
 /**
  * Default Equation Number parser. This file contains a list of the default
  * equation numbers for each pair of Species and BEC Zone, excluding BEC Zones
@@ -27,16 +29,14 @@ import java.util.Arrays;
 public class DefaultEquationNumberParser extends EquationGroupParser {
 	// C_BAGRP1/BG1DEFV
 
-	public static final String CONTROL_KEY = "DEFAULT_EQ_NUM";
-
 	public DefaultEquationNumberParser() {
 		super(5);
 		this.setHiddenBecs(Arrays.asList("BG", "AT"));
 	}
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.DEFAULT_EQ_NUM;
 	}
 
 }

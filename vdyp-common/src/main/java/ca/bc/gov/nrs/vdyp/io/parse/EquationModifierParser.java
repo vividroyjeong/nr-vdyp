@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 
@@ -31,8 +32,6 @@ public class EquationModifierParser
 		implements ControlMapSubResourceParser<MatrixMap2<Integer, Integer, Optional<Integer>>> {
 
 	// C_BAGRP1/BG1MODV
-
-	public static final String CONTROL_KEY = "EQN_MODIFIERS";
 
 	private static final String DEFAULT_KEY = "default";
 	private static final String ITG_KEY = "itg";
@@ -64,8 +63,8 @@ public class EquationModifierParser
 	}
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.EQN_MODIFIERS;
 	}
 
 }

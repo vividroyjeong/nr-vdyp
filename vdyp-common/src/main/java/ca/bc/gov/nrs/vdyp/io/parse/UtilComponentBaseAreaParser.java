@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 
 /**
@@ -34,8 +35,6 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
  * @see UtilComponentParser
  */
 public class UtilComponentBaseAreaParser extends UtilComponentParser {
-	public static final String CONTROL_KEY = "UTIL_COMP_BA";
-
 	public static final int NUM_COEFFICIENTS = 2;
 
 	public UtilComponentBaseAreaParser() {
@@ -43,8 +42,8 @@ public class UtilComponentBaseAreaParser extends UtilComponentParser {
 	}
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.UTIL_COMP_BA;
 	}
 
 }

@@ -20,6 +20,8 @@ import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
+
 public class ControlFileParserTest {
 
 	@Test
@@ -277,12 +279,12 @@ public class ControlFileParserTest {
 			assertThat(result, hasEntry(equalTo("097"), equalTo("coe\\vetdq2.dat")));
 
 			assertThat(result, hasEntry(equalTo("098"), equalTo("coe\\REGBAV01.coe")));
-			assertThat(result, hasEntry(equalTo("minimums"), (Matcher) contains(5.0f, 0.0f, 2.0f)));
-			assertThat(result, hasEntry(equalTo("modifier_file"), equalTo("coe\\MOD19813.prm")));
+			assertThat(result, hasEntry(equalTo("MINIMA"), (Matcher) contains(5.0f, 0.0f, 2.0f)));
+			assertThat(result, hasEntry(equalTo("MODIFIER_FILE"), equalTo("coe\\MOD19813.prm")));
 			assertThat(
 					result,
 					hasEntry(
-							equalTo("debugSwitches"),
+							equalTo("DEBUG_SWITCHES"),
 							(Matcher) contains(
 									0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0
 							)
@@ -307,13 +309,13 @@ public class ControlFileParserTest {
 	void testParsesOptional() throws Exception {
 		var parser = makeParser();
 
-		parser.optional(1, "x", ValueParser.STRING);
+		parser.optional(ControlKey.MAX_NUM_POLY, ValueParser.STRING);
 
 		String file = "001 Control";
 		try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
 			var result = parser.parse(is);
 
-			assertThat(result, hasEntry(equalTo("x"), (Matcher) present(equalTo("Control"))));
+			assertThat(result, hasEntry(equalTo("MAX_NUM_POLY"), (Matcher) present(equalTo("Control"))));
 		}
 	}
 
@@ -330,8 +332,10 @@ public class ControlFileParserTest {
 	private ControlFileParser makeConfiguredParser() {
 		var parser = makeParser();
 
-		parser.record(197, "minimums", ValueParser.list(ValueParser.FLOAT)).record(198, "modifier_file")
-				.record(199, "debugSwitches", ValueParser.list(ValueParser.INTEGER));
+		parser //
+				.record(ControlKey.MINIMA, ValueParser.list(ValueParser.FLOAT))//
+				.record(ControlKey.MODIFIER_FILE)//
+				.record(ControlKey.DEBUG_SWITCHES, ValueParser.list(ValueParser.INTEGER));
 
 		return parser;
 	}

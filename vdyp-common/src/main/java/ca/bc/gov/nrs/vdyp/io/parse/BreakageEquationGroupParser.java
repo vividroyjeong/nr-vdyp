@@ -1,5 +1,7 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
+
 /**
  * Breakage Group Equation parser. This file contains a list of the Breakage
  * Group equation numbers for each pair of Species and BEC Zone. The file will
@@ -23,15 +25,13 @@ package ca.bc.gov.nrs.vdyp.io.parse;
  */
 public class BreakageEquationGroupParser extends EquationGroupParser {
 
-	public static final String CONTROL_KEY = "BREAKAGE_GROUPS";
-
 	public BreakageEquationGroupParser() {
 		super(3);
 	}
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.BREAKAGE_GROUPS;
 	}
 
 }

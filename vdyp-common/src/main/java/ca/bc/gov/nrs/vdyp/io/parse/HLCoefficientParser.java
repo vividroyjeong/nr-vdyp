@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
@@ -41,10 +42,6 @@ import ca.bc.gov.nrs.vdyp.model.Region;
 public class HLCoefficientParser
 		implements ControlMapSubResourceParser<MatrixMap2<String, Region, Optional<Coefficients>>> {
 
-	public static final String CONTROL_KEY_P1 = "HL_PRIMARY_SP_EQN_P1";
-	public static final String CONTROL_KEY_P2 = "HL_PRIMARY_SP_EQN_P2";
-	public static final String CONTROL_KEY_P3 = "HL_PRIMARY_SP_EQN_P3";
-
 	public static final int NUM_COEFFICIENTS_P1 = 3;
 	public static final int NUM_COEFFICIENTS_P2 = 2;
 	public static final int NUM_COEFFICIENTS_P3 = 4;
@@ -53,9 +50,9 @@ public class HLCoefficientParser
 	public static final String REGION_KEY = "region";
 	public static final String COEFFICIENT_KEY = "coefficient";
 
-	private String controlKey;
+	private ControlKey controlKey;
 
-	public HLCoefficientParser(int numCoefficients, String controlKey) {
+	public HLCoefficientParser(int numCoefficients, ControlKey controlKey) {
 		super();
 		this.lineParser = new LineParser() {
 
@@ -97,7 +94,7 @@ public class HLCoefficientParser
 	}
 
 	@Override
-	public String getControlKey() {
+	public ControlKey getControlKey() {
 		return controlKey;
 	}
 

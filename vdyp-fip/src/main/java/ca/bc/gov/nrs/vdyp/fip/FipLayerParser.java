@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayer;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayerPrimary;
@@ -24,8 +25,6 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 public class FipLayerParser
 		implements ControlMapValueReplacer<StreamingParserFactory<Map<LayerType, FipLayer>>, String> {
 
-	public static final String CONTROL_KEY = "FIP_LAYERS";
-
 	static final String LAYER = "LAYER"; // LAYER
 	static final String AGE_TOTAL = "AGE_TOTAL"; // AGETOT
 	static final String HEIGHT = "HEIGHT"; // HT
@@ -40,8 +39,8 @@ public class FipLayerParser
 	static final String SITE_CURVE_NUMBER = "SITE_CURVE_NUMBER"; // SCN
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.FIP_YIELD_LAYER_INPUT;
 	}
 
 	@Override

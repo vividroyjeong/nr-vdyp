@@ -2,6 +2,8 @@ package ca.bc.gov.nrs.vdyp.io.parse;
 
 import java.util.Map;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
+
 /**
  * Parser for a Veteran Layer Volume Adjust data file. Each line contains a
  * Species code and an array of four coefficients (one-based).
@@ -25,10 +27,8 @@ import java.util.Map;
  */
 public class VeteranLayerVolumeAdjustParser extends SimpleCoefficientParser1<String> {
 
-	public static final String CONTROL_KEY = "VETERAN_LAYER_VOLUME_ADJUST";
-
 	public VeteranLayerVolumeAdjustParser() {
-		super(String.class, 1, CONTROL_KEY);
+		super(String.class, 1, ControlKey.VETERAN_LAYER_VOLUME_ADJUST);
 		this.speciesKey();
 		this.coefficients(4, 9);
 	}

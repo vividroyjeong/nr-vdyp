@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.equalTo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 
 public class GenusDefinitionParserTest {
@@ -283,6 +284,6 @@ public class GenusDefinitionParserTest {
 			sp0List.add(new GenusDefinition(alias, java.util.Optional.empty(), "Test " + alias));
 		}
 
-		controlMap.put(GenusDefinitionParser.CONTROL_KEY, sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
 	}
 }

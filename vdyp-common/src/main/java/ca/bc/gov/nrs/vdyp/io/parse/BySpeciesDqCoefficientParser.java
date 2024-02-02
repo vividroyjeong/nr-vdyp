@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.HoldFirst;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 
@@ -43,14 +44,12 @@ import ca.bc.gov.nrs.vdyp.model.Coefficients;
  */
 public class BySpeciesDqCoefficientParser implements ControlMapSubResourceParser<Map<String, Coefficients>> {
 
-	public static final String CONTROL_KEY = "BY_SPECIES_DQ";
-
 	public static final String COEFFICIENT_INDEX_KEY = "coefficientIndex";
 	public static final String COEFFICIENTS_KEY = "coefficients";
 	public static final String INDICATOR_KEY = "indicator";
 
-	private final int NUM_COEFFICIENTS = 3;
-	private final int NUM_SPECIES = 16;
+	private static final int NUM_COEFFICIENTS = 3;
+	private static final int NUM_SPECIES = 16;
 
 	public BySpeciesDqCoefficientParser() {
 		super();
@@ -87,7 +86,7 @@ public class BySpeciesDqCoefficientParser implements ControlMapSubResourceParser
 				var specAlias = specIt.next();
 				float coe;
 				if (! (index == 0 || index == 1)) {
-					coe = firstSpecCoe.get(() -> coeIt.next());
+					coe = firstSpecCoe.get(coeIt::next);
 				} else {
 					try {
 						coe = coeIt.next();
@@ -95,7 +94,7 @@ public class BySpeciesDqCoefficientParser implements ControlMapSubResourceParser
 						throw new ValueParseException(null, "Expected " + NUM_SPECIES + " coefficients", ex);
 					}
 				}
-				result.computeIfAbsent(specAlias, (x) -> Coefficients.empty(NUM_COEFFICIENTS, 0)).setCoe(index, coe);
+				result.computeIfAbsent(specAlias, x -> Coefficients.empty(NUM_COEFFICIENTS, 0)).setCoe(index, coe);
 			}
 
 			return r;
@@ -105,8 +104,8 @@ public class BySpeciesDqCoefficientParser implements ControlMapSubResourceParser
 	}
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.BY_SPECIES_DQ;
 	}
 
 }

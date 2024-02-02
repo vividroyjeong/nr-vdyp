@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3Impl;
 import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
@@ -40,8 +41,6 @@ import ca.bc.gov.nrs.vdyp.model.Region;
  */
 public class HLNonprimaryCoefficientParser
 		implements ControlMapSubResourceParser<MatrixMap3<String, String, Region, Optional<NonprimaryHLCoefficients>>> {
-
-	public static final String CONTROL_KEY = "HL_NONPRIMARY";
 
 	public static final int NUM_COEFFICIENTS = 2;
 
@@ -97,8 +96,8 @@ public class HLNonprimaryCoefficientParser
 	}
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.HL_NONPRIMARY;
 	}
 
 }

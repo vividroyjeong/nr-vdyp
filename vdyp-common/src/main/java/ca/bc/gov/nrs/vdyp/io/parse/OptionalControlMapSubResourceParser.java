@@ -15,7 +15,7 @@ public interface OptionalControlMapSubResourceParser<T>
 
 	@Override
 	default void defaultModify(Map<String, Object> control) {
-		control.put(getControlKey(), defaultResult());
+		control.put(getControlKeyName(), defaultResult());
 	}
 
 	/**

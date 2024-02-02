@@ -2,6 +2,8 @@ package ca.bc.gov.nrs.vdyp.io.parse;
 
 import java.util.Arrays;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
+
 /**
  * Volume Equation Number parser. Each line of this file contains:
  * <ol>
@@ -25,16 +27,14 @@ import java.util.Arrays;
  */
 public class VolumeEquationGroupParser extends EquationGroupParser {
 
-	public static final String CONTROL_KEY = "VOLUME_EQN_GROUPS";
-
 	public VolumeEquationGroupParser() {
 		super(3);
 		this.setHiddenBecs(Arrays.asList("BG"));
 	}
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.VOLUME_EQN_GROUPS;
 	}
 
 }

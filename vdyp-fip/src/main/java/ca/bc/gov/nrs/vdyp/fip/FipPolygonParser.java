@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.fip.model.FipPolygon;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.AbstractStreamingParser;
@@ -16,8 +17,6 @@ import ca.bc.gov.nrs.vdyp.model.FipMode;
 
 public class FipPolygonParser implements ControlMapValueReplacer<StreamingParserFactory<FipPolygon>, String> {
 
-	public static final String CONTROL_KEY = "FIP_POLYGONS";
-
 	static final String POLYGON_IDENTIFIER = "POLYGON_IDENTIFIER"; // POLYDESC
 	static final String FOREST_INVENTORY_ZONE = "FOREST_INVENTORY_ZONE"; // FIZ
 	static final String BIOGEOGRAPHIC_ZONE = "BIOGEOGRAPHIC_ZONE"; // BEC
@@ -27,8 +26,8 @@ public class FipPolygonParser implements ControlMapValueReplacer<StreamingParser
 	static final String YIELD_FACTOR = "YIELD_FACTOR"; // YLDFACT
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.FIP_YIELD_POLY_INPUT;
 	}
 
 	@Override

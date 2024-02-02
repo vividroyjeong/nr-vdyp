@@ -23,7 +23,7 @@ public interface ControlMapValueReplacer<Result, Raw> extends KeyedControlMapMod
 	default void modify(Map<String, Object> control, FileResolver fileResolver)
 			throws ResourceParseException, IOException {
 
-		control.put(getControlKey(), this.map((Raw) control.get(this.getControlKey()), fileResolver, control));
+		control.put(getControlKeyName(), this.map((Raw) control.get(this.getControlKeyName()), fileResolver, control));
 
 	}
 

@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.fip.model.FipPolygon;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
@@ -25,14 +26,14 @@ public class FipPolygonParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(FipPolygonParser.CONTROL_KEY, "test.dat");
+		controlMap.put(ControlKey.FIP_YIELD_POLY_INPUT.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeInputStream(/* empty */));
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(FipPolygonParser.CONTROL_KEY);
+		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_POLY_INPUT.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -51,7 +52,7 @@ public class FipPolygonParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(FipPolygonParser.CONTROL_KEY, "test.dat");
+		controlMap.put(ControlKey.FIP_YIELD_POLY_INPUT.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -60,7 +61,7 @@ public class FipPolygonParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(FipPolygonParser.CONTROL_KEY);
+		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_POLY_INPUT.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -89,7 +90,7 @@ public class FipPolygonParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(FipPolygonParser.CONTROL_KEY, "test.dat");
+		controlMap.put(ControlKey.FIP_YIELD_POLY_INPUT.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -98,7 +99,7 @@ public class FipPolygonParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(FipPolygonParser.CONTROL_KEY);
+		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_POLY_INPUT.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -127,7 +128,7 @@ public class FipPolygonParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(FipPolygonParser.CONTROL_KEY, "test.dat");
+		controlMap.put(ControlKey.FIP_YIELD_POLY_INPUT.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -148,7 +149,7 @@ public class FipPolygonParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(FipPolygonParser.CONTROL_KEY);
+		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_POLY_INPUT.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -267,7 +268,7 @@ public class FipPolygonParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(FipPolygonParser.CONTROL_KEY, "test.dat");
+		controlMap.put(ControlKey.FIP_YIELD_POLY_INPUT.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -276,7 +277,7 @@ public class FipPolygonParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(FipPolygonParser.CONTROL_KEY);
+		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_POLY_INPUT.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -305,7 +306,7 @@ public class FipPolygonParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(FipPolygonParser.CONTROL_KEY, "test.dat");
+		controlMap.put(ControlKey.FIP_YIELD_POLY_INPUT.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -314,7 +315,7 @@ public class FipPolygonParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(FipPolygonParser.CONTROL_KEY);
+		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_POLY_INPUT.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 

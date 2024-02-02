@@ -20,7 +20,7 @@ public interface OptionalResourceControlMapModifier extends ResourceControlMapMo
 	default void modify(Map<String, Object> control, FileResolver fileResolver)
 			throws IOException, ResourceParseException {
 		@SuppressWarnings("unchecked")
-		var filename = (Optional<String>) control.get(getControlKey());
+		var filename = (Optional<String>) control.get(getControlKeyName());
 		if (filename.isPresent()) {
 			try (InputStream data = fileResolver.resolveForInput(filename.get())) {
 				modify(control, data);

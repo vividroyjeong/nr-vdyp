@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.io.parse;
 import java.util.Collection;
 import java.util.List;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
@@ -12,7 +13,7 @@ public class SimpleCoefficientParser2<K1, K2>
 
 	private int indexFrom;
 
-	public SimpleCoefficientParser2(int indexFrom, String controlKey) {
+	public SimpleCoefficientParser2(int indexFrom, ControlKey controlKey) {
 		super(2, controlKey);
 		this.indexFrom = indexFrom;
 	}

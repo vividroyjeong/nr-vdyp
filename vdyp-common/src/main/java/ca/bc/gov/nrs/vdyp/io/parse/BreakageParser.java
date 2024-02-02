@@ -2,6 +2,8 @@ package ca.bc.gov.nrs.vdyp.io.parse;
 
 import java.util.Map;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
+
 /**
  * Parser for a Breakage data file. Each line contains an index (an integer from
  * 1 to 40) and an array of four coefficients (one-based):
@@ -25,10 +27,9 @@ import java.util.Map;
 public class BreakageParser extends SimpleCoefficientParser1<Integer> {
 
 	public static final int MAX_GROUPS = 40;
-	public static final String CONTROL_KEY = "BREAKAGE";
 
 	public BreakageParser() {
-		super(Integer.class, 1, CONTROL_KEY);
+		super(Integer.class, 1, ControlKey.BREAKAGE);
 		this.groupIndexKey(MAX_GROUPS);
 		this.coefficients(6, 9);
 	}

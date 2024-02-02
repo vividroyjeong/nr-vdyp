@@ -2,6 +2,8 @@ package ca.bc.gov.nrs.vdyp.io.parse;
 
 import java.util.Map;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
+
 /**
  * Parser for a Small HL Component data file. Each line contains a Species code
  * and an array of two coefficients (one-based).
@@ -24,10 +26,8 @@ import java.util.Map;
  */
 public class SmallComponentHLParser extends SimpleCoefficientParser1<String> {
 
-	public static final String CONTROL_KEY = "SMALL_COMP_HL";
-
 	public SmallComponentHLParser() {
-		super(String.class, 1, CONTROL_KEY);
+		super(String.class, 1, ControlKey.SMALL_COMP_HL);
 		this.speciesKey();
 		this.coefficients(2, 10);
 	}

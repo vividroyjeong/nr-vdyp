@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
 import ca.bc.gov.nrs.vdyp.io.EndOfRecord;
@@ -25,8 +26,6 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 public class FipSpeciesParser
 		implements ControlMapValueReplacer<StreamingParserFactory<Collection<FipSpecies>>, String> {
 
-	public static final String CONTROL_KEY = "FIP_SPECIES";
-
 	static final String GENUS = "GENUS"; // SP0
 	static final String PERCENT_GENUS = "PERCENT_GENUS"; // PTVSP0
 
@@ -40,8 +39,8 @@ public class FipSpeciesParser
 	static final String PERCENT_SPECIES_4 = "PERCENT_SPECIES_4"; // PCT4
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.FIP_YIELD_LX_SP0_INPUT;
 	}
 
 	@Override

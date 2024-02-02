@@ -1,5 +1,7 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
+
 /**
  * Decay Equation parser. This file contains a list of the Decay equation
  * numbers for each pair of Species and BEC Zone.
@@ -22,15 +24,13 @@ package ca.bc.gov.nrs.vdyp.io.parse;
  */
 public class DecayEquationGroupParser extends EquationGroupParser {
 
-	public static final String CONTROL_KEY = "DECAY_GROUPS";
-
 	public DecayEquationGroupParser() {
 		super(3);
 	}
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.DECAY_GROUPS;
 	}
 
 }

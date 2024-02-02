@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 
 /**
@@ -30,11 +31,10 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
  */
 public class VolumeNetDecayParser extends OptionalCoefficientParser2<Integer, Integer> {
 
-	public static final String CONTROL_KEY = "VOLUME_NET_DECAY";
 	public static final int MAX_GROUPS = 80;
 
 	public VolumeNetDecayParser() {
-		super(1, CONTROL_KEY);
+		super(1, ControlKey.VOLUME_NET_DECAY);
 		this.ucIndexKey().space(1).groupIndexKey(MAX_GROUPS).coefficients(4, 10);
 	}
 

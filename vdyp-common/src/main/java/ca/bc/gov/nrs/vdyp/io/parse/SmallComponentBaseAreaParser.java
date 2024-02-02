@@ -2,6 +2,8 @@ package ca.bc.gov.nrs.vdyp.io.parse;
 
 import java.util.Map;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
+
 /**
  * Parser for a Small BA Component data file. Each line contains a Species code
  * and an array of four coefficients (one-based).
@@ -24,10 +26,8 @@ import java.util.Map;
  */
 public class SmallComponentBaseAreaParser extends SimpleCoefficientParser1<String> {
 
-	public static final String CONTROL_KEY = "SMALL_COMP_BA";
-
 	public SmallComponentBaseAreaParser() {
-		super(String.class, 1, CONTROL_KEY);
+		super(String.class, 1, ControlKey.SMALL_COMP_BA);
 		this.speciesKey();
 		this.coefficients(4, 10);
 	}

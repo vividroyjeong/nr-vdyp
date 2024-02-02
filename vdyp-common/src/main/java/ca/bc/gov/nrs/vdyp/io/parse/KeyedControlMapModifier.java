@@ -1,5 +1,7 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
+
 public interface KeyedControlMapModifier extends ControlMapModifier {
 
 	/**
@@ -7,6 +9,15 @@ public interface KeyedControlMapModifier extends ControlMapModifier {
 	 *
 	 * @return
 	 */
-	String getControlKey();
+	default String getControlKeyName() {
+		return getControlKey().name();
+	};
+
+	/**
+	 * The key for this resource's entry in the control map
+	 *
+	 * @return
+	 */
+	ControlKey getControlKey();
 
 }

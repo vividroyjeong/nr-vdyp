@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.Region;
@@ -35,9 +36,9 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 	private List<String> metaKeys = new ArrayList<>();
 	private List<Function<Map<String, Object>, Collection<?>>> keyRanges = new ArrayList<>();
 	private int expectedKeys;
-	private final String controlKey;
+	private final ControlKey controlKey;
 
-	protected BaseCoefficientParser(int expectedKeys, String controlKey) {
+	protected BaseCoefficientParser(int expectedKeys, ControlKey controlKey) {
 		super();
 		this.expectedKeys = expectedKeys;
 		this.lineParser = new LineParser() {
@@ -51,7 +52,7 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 		this.controlKey = controlKey;
 	}
 
-	protected BaseCoefficientParser(String controlKey) {
+	protected BaseCoefficientParser(ControlKey controlKey) {
 		this(0, controlKey);
 	}
 
@@ -169,7 +170,7 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 	};
 
 	@Override
-	public String getControlKey() {
+	public ControlKey getControlKey() {
 		return controlKey;
 	}
 }

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.Region;
@@ -40,8 +41,6 @@ import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
  */
 public class StockingClassFactorParser implements
 		ControlMapSubResourceParser<MatrixMap2<Character /* Stocking class */, Region, Optional<StockingClassFactor>>> {
-
-	public static final String CONTROL_KEY = "STOCKING_CLASS_FACTORS";
 
 	private static final String STK_KEY = "stk";
 	private static final String REGION_KEY = "region";
@@ -108,8 +107,8 @@ public class StockingClassFactorParser implements
 	}
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.STOCKING_CLASS_FACTORS;
 	}
 
 }

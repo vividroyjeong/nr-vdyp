@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.ExpectationDifference;
 import ca.bc.gov.nrs.vdyp.model.SiteCurve;
 
@@ -39,8 +40,6 @@ import ca.bc.gov.nrs.vdyp.model.SiteCurve;
  * @author Kevin Smith, Vivid Solutions
  */
 public class SiteCurveParser implements OptionalControlMapSubResourceParser<Map<String, SiteCurve>> {
-	public static final String CONTROL_KEY = "SITE_CURVE_NUMBERS";
-
 	public static final String SPECIES_KEY = "species";
 	public static final String VALUE_1_KEY = "value1";
 	public static final String VALUE_2_KEY = "value2";
@@ -81,8 +80,8 @@ public class SiteCurveParser implements OptionalControlMapSubResourceParser<Map<
 	}
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.SITE_CURVE_NUMBERS;
 	}
 
 	@Override

@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -29,7 +30,7 @@ class SiteCurveParserTest {
 
 		sp0List.add(new GenusDefinition("S1", java.util.Optional.empty(), "Test Species 1"));
 
-		controlMap.put(GenusDefinitionParser.CONTROL_KEY, sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
 
 		var result = parser.parse(is, controlMap);
 
@@ -46,7 +47,7 @@ class SiteCurveParserTest {
 
 		sp0List.add(new GenusDefinition("S1", java.util.Optional.empty(), "Test Species 1"));
 
-		controlMap.put(GenusDefinitionParser.CONTROL_KEY, sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
 
 		var result = parser.parse(is, controlMap);
 
@@ -65,7 +66,7 @@ class SiteCurveParserTest {
 		sp0List.add(new GenusDefinition("S1", java.util.Optional.empty(), "Test Species 1"));
 		sp0List.add(new GenusDefinition("S2", java.util.Optional.empty(), "Test Species 2"));
 
-		controlMap.put(GenusDefinitionParser.CONTROL_KEY, sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
 
 		var ex = assertThrows(ResourceParseValidException.class, () -> parser.parse(is, controlMap));
 
@@ -82,7 +83,7 @@ class SiteCurveParserTest {
 
 		sp0List.add(new GenusDefinition("S1", java.util.Optional.empty(), "Test Species 1"));
 
-		controlMap.put(GenusDefinitionParser.CONTROL_KEY, sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
 
 		var result = parser.parse(is, controlMap);
 
@@ -99,7 +100,7 @@ class SiteCurveParserTest {
 
 		sp0List.add(new GenusDefinition("S1", java.util.Optional.empty(), "Test Species 1"));
 
-		controlMap.put(GenusDefinitionParser.CONTROL_KEY, sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
 
 		var result = parser.parse(is, controlMap);
 
@@ -116,7 +117,7 @@ class SiteCurveParserTest {
 
 		sp0List.add(new GenusDefinition("S1", java.util.Optional.empty(), "Test Species 1"));
 
-		controlMap.put(GenusDefinitionParser.CONTROL_KEY, sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
 
 		var result = parser.parse(is, controlMap);
 

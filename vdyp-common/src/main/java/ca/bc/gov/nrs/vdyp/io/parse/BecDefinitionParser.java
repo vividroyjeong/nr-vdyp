@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
@@ -38,8 +39,6 @@ import ca.bc.gov.nrs.vdyp.model.Region;
  * @see ControlMapSubResourceParser
  */
 public class BecDefinitionParser implements ControlMapSubResourceParser<BecLookup> {
-
-	public static final String CONTROL_KEY = "BEC_DEF";
 
 	/**
 	 * Alias of the default BEC
@@ -106,11 +105,11 @@ public class BecDefinitionParser implements ControlMapSubResourceParser<BecLooku
 	 * @return
 	 */
 	public static BecLookup getBecs(Map<String, Object> control) {
-		return Utils.expectParsedControl(control, CONTROL_KEY, BecLookup.class);
+		return Utils.expectParsedControl(control, ControlKey.BEC_DEF.name(), BecLookup.class);
 	}
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.BEC_DEF;
 	}
 }

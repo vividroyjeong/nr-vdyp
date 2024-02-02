@@ -28,7 +28,8 @@ public class FipTestUtils {
 			populateControlMapDecayModifiers(Map<String, Object> controlMap, BiFunction<String, Region, Float> mapper) {
 		var spec = Arrays.asList(TestUtils.getSpeciesAliases());
 		var regions = Arrays.asList(Region.values());
-		TestUtils.populateControlMap2(controlMap, ModifierParser.CONTROL_KEY_MOD301_DECAY, spec, regions, mapper);
+		TestUtils
+				.populateControlMap2(controlMap, ModifierParser.CONTROL_KEY_MOD301_DECAY.name(), spec, regions, mapper);
 	}
 
 	/**
@@ -41,7 +42,8 @@ public class FipTestUtils {
 			populateControlMapWasteModifiers(Map<String, Object> controlMap, BiFunction<String, Region, Float> mapper) {
 		var spec = Arrays.asList(TestUtils.getSpeciesAliases());
 		var regions = Arrays.asList(Region.values());
-		TestUtils.populateControlMap2(controlMap, ModifierParser.CONTROL_KEY_MOD301_WASTE, spec, regions, mapper);
+		TestUtils
+				.populateControlMap2(controlMap, ModifierParser.CONTROL_KEY_MOD301_WASTE.name(), spec, regions, mapper);
 	}
 
 	/**
