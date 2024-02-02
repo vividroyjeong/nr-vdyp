@@ -221,9 +221,9 @@ public class VdypSpecies extends BaseVdypSpecies implements VdypUtilizationHolde
 	}
 
 	public static class Builder extends BaseVdypSpecies.Builder<VdypSpecies> {
-		Optional<Integer> volumeGroup = Optional.empty();
-		Optional<Integer> decayGroup = Optional.empty();
-		Optional<Integer> breakageGroup = Optional.empty();
+		protected Optional<Integer> volumeGroup = Optional.empty();
+		protected Optional<Integer> decayGroup = Optional.empty();
+		protected Optional<Integer> breakageGroup = Optional.empty();
 
 		@Override
 		protected void check(Collection<String> errors) {

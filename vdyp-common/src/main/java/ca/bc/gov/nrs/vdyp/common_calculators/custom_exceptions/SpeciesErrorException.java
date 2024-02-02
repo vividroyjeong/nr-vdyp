@@ -7,6 +7,8 @@ package ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions;
  * related error
  */
 public class SpeciesErrorException extends RuntimeException {
+	private static final long serialVersionUID = 5009902097015890175L;
+
 	public SpeciesErrorException() {
 	}
 

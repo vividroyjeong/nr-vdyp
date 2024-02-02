@@ -1,14 +1,10 @@
 package ca.bc.gov.nrs.vdyp.fip.integeration;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.util.*;
 import java.util.function.*;
@@ -101,7 +97,7 @@ class ITFipStart {
 
 			var resolver = new FileSystemFileResolver(configDir);
 
-			Assertions.assertThrows(IllegalArgumentException.class, () -> app.init(resolver));
+			assertThrows(IllegalArgumentException.class, () -> app.init(resolver));
 		}
 	}
 
@@ -111,7 +107,7 @@ class ITFipStart {
 
 			var resolver = new FileSystemFileResolver(configDir);
 
-			Assertions.assertThrows(NoSuchFileException.class, () -> app.init(resolver, "FAKE"));
+			assertThrows(NoSuchFileException.class, () -> app.init(resolver, "FAKE"));
 		}
 	}
 

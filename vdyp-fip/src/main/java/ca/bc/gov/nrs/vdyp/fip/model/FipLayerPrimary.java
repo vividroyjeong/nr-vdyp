@@ -87,9 +87,9 @@ public class FipLayerPrimary extends FipLayer {
 	}
 
 	public static class PrimaryBuilder extends Builder {
-		private Optional<Character> stockingClass = Optional.empty();
+		protected Optional<Character> stockingClass = Optional.empty();
 
-		private Optional<String> primaryGenus = Optional.empty();
+		protected Optional<String> primaryGenus = Optional.empty();
 
 		public Builder stockingClass(Optional<Character> stockingClass) {
 			this.stockingClass = stockingClass;

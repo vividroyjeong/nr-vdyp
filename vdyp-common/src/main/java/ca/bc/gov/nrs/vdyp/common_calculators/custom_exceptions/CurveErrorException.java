@@ -6,6 +6,8 @@ package ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions;
  * curve index is unknown, not valid or a similar issue
  */
 public class CurveErrorException extends RuntimeException {
+	private static final long serialVersionUID = 3447030886146679927L;
+
 	public CurveErrorException() {
 	}
 

@@ -12,9 +12,9 @@ import java.util.function.Function;
 
 public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?>, PA> {
 
-	String polygonIdentifier; // FIP_P/POLYDESC
-	PA percentAvailable; // FIP_P2/PCTFLAND
-	Map<LayerType, L> layers = new LinkedHashMap<>();
+	private String polygonIdentifier; // FIP_P/POLYDESC
+	private PA percentAvailable; // FIP_P2/PCTFLAND
+	private Map<LayerType, L> layers = new LinkedHashMap<>();
 	protected String biogeoclimaticZone;
 	protected String forestInventoryZone;
 	protected Optional<FipMode> modeFip;

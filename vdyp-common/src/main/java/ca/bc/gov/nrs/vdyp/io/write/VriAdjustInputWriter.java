@@ -30,10 +30,10 @@ import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
  */
 public class VriAdjustInputWriter implements Closeable {
 
-	Map<String, Object> controlMap;
-	OutputStream polygonFile;
-	OutputStream speciesFile;
-	OutputStream utilizationFile;
+	private Map<String, Object> controlMap;
+	private OutputStream polygonFile;
+	private OutputStream speciesFile;
+	private OutputStream utilizationFile;
 
 	static final String POLY_IDENTIFIER_FORMAT = "%-25s";
 	static final String LAYER_TYPE_FORMAT = "%-1s";

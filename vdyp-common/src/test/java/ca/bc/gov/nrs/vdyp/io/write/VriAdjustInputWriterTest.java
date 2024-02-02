@@ -105,8 +105,7 @@ class VriAdjustInputWriterTest {
 
 			// FIXME Add to builder
 			layer.setEmpericalRelationshipParameterIndex(Optional.of(119));
-			polygon.setInventoryTypeGroup(28);
-			polygon.setGrpBa1(119);
+			layer.setInventoryTypeGroup(Optional.of(28));
 
 			unit.writePolygon(polygon);
 		}
@@ -339,8 +338,9 @@ class VriAdjustInputWriterTest {
 				builder.breakageGroup(0);
 			});
 
-			polygon.setInventoryTypeGroup(28);
-			polygon.setGrpBa1(119);
+			// fixme add to builder
+			layer.setEmpericalRelationshipParameterIndex(Optional.of(119));
+			layer.setInventoryTypeGroup(Optional.of(28));
 
 			layer.setBaseAreaByUtilization(
 					Utils.utilizationVector(0.02865f, 19.97867f, 6.79731f, 8.54690f, 3.63577f, 0.99869f)

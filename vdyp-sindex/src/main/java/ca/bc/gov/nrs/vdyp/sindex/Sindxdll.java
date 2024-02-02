@@ -759,6 +759,8 @@ public class Sindxdll {
 	private static final int SI_ZH_START = SI_ERR_NO_ANS;
 //private static final int SI_ZH_END      = SI_ERR_NO_ANS; Unused
 
+	@SuppressWarnings("java:S1192") // Text is repetitive at times and it's clearer to let it be rather than trying
+									// to avoid the duplication.
 	private static final String[][] si_curve_notes = { {
 			/* SI_ACB_HUANG */
 			"Huang Shongming, Stephen J. Titus and Tom W. Lakusta. 1994."
