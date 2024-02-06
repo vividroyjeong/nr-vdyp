@@ -12,6 +12,7 @@ import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.io.parse.coe.StockingClassFactorParser;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 

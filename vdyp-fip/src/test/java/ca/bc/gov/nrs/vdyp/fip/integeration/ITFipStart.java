@@ -16,6 +16,7 @@ import org.junit.jupiter.api.io.*;
 import ca.bc.gov.nrs.vdyp.fip.*;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.*;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.write.ControlFileWriter;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
 

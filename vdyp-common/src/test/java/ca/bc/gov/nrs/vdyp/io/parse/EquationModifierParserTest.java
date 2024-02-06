@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.io.parse.coe.EquationModifierParser;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 class EquationModifierParserTest {

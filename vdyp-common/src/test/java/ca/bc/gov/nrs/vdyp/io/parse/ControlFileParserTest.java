@@ -21,6 +21,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseLineException;
+import ca.bc.gov.nrs.vdyp.io.parse.control.ControlFileParser;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 
 public class ControlFileParserTest {
 

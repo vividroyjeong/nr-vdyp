@@ -12,12 +12,12 @@ import java.util.function.BiConsumer;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.FloatUnaryOperator;
 import ca.bc.gov.nrs.vdyp.common.Utils;
-import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.LineParser;
-import ca.bc.gov.nrs.vdyp.io.parse.OptionalResourceControlMapModifier;
-import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.ValueParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.ValueParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.control.OptionalResourceControlMapModifier;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.JProgram;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
@@ -137,7 +137,7 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 				control, CONTROL_KEY_MOD400_NONPRIMARY, MatrixMap3.class
 		);
 
-		parser.parse(data, control, (entry, result) -> {
+		parser.parse(data, control, (entry, result, line) -> {
 			int sequence = (int) entry.get("sequence");
 
 			if (!modIsForProgram(entry))

@@ -15,6 +15,8 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseValidException;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 

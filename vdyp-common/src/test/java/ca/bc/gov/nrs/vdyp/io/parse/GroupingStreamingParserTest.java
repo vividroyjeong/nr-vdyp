@@ -11,6 +11,9 @@ import java.util.List;
 import org.easymock.EasyMock;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.GroupingStreamingParser;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
+
 public class GroupingStreamingParserTest {
 
 	@Test

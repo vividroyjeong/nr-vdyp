@@ -13,6 +13,7 @@ import org.opentest4j.AssertionFailedError;
 import ca.bc.gov.nrs.vdyp.fip.*;
 import ca.bc.gov.nrs.vdyp.io.*;
 import ca.bc.gov.nrs.vdyp.io.parse.*;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.model.*;
 import ca.bc.gov.nrs.vdyp.test.*;
 

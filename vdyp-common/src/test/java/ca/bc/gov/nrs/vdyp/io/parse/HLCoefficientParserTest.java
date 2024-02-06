@@ -11,18 +11,20 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.HLPrimarySpeciesEqnP1Parser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.HLPrimarySpeciesEqnP2Parser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.HLPrimarySpeciesEqnP3Parser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseLineException;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 class HLCoefficientParserTest {
 
-	private final ControlKey TEST_KEY = ControlKey.MAX_NUM_POLY;
-
 	@Test
 	void testParseSimpleP1() throws Exception {
 
-		var parser = new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P1, TEST_KEY);
+		var parser = new HLPrimarySpeciesEqnP1Parser() {
+		};
 
 		var is = TestUtils.makeInputStream("S1 I   1.00160   0.20508-0.0013743");
 
@@ -38,7 +40,8 @@ class HLCoefficientParserTest {
 	@Test
 	void testParseSimpleP2() throws Exception {
 
-		var parser = new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P2, TEST_KEY);
+		var parser = new HLPrimarySpeciesEqnP2Parser() {
+		};
 
 		var is = TestUtils.makeInputStream("S1 C   0.49722   1.18403");
 
@@ -54,7 +57,8 @@ class HLCoefficientParserTest {
 	@Test
 	void testParseSimpleP3() throws Exception {
 
-		var parser = new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P3, TEST_KEY);
+		var parser = new HLPrimarySpeciesEqnP3Parser() {
+		};
 
 		var is = TestUtils.makeInputStream("S1 I   1.04422   0.93010  -0.05745  -2.50000");
 
@@ -72,7 +76,8 @@ class HLCoefficientParserTest {
 	@Test
 	void testParseBadSpecies() throws Exception {
 
-		var parser = new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P1, TEST_KEY);
+		var parser = new HLPrimarySpeciesEqnP1Parser() {
+		};
 
 		var is = TestUtils.makeInputStream("SX I   1.00160   0.20508-0.0013743");
 
@@ -87,7 +92,8 @@ class HLCoefficientParserTest {
 	@Test
 	void testParseBadRegion() throws Exception {
 
-		var parser = new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P1, TEST_KEY);
+		var parser = new HLPrimarySpeciesEqnP1Parser() {
+		};
 
 		var is = TestUtils.makeInputStream("S1 X   1.00160   0.20508-0.0013743");
 

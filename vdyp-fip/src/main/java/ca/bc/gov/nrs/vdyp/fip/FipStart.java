@@ -59,13 +59,13 @@ import ca.bc.gov.nrs.vdyp.fip.model.FipLayerPrimary;
 import ca.bc.gov.nrs.vdyp.fip.model.FipPolygon;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.BecDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.HLCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.StreamingParser;
-import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
-import ca.bc.gov.nrs.vdyp.io.parse.UpperCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.base.HLCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.write.VriAdjustInputWriter;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
@@ -2151,8 +2151,7 @@ public class FipStart implements Closeable {
 		final var coeMap = Utils.<MatrixMap2<String, Region, Optional<Coefficients>>>expectParsedControl(
 				controlMap, ControlKey.HL_PRIMARY_SP_EQN_P1, MatrixMap2.class
 		);
-		var coe = coeMap.get(genus, region).orElse(Coefficients.empty(HLCoefficientParser.NUM_COEFFICIENTS_P1, 1))
-				.reindex(0);
+		var coe = coeMap.get(genus, region).orElse(Coefficients.empty(3, 1)).reindex(0);
 		return coe.get(0) - coe.getCoe(1) + coe.getCoe(1) * exp(coe.getCoe(2) * (treesPerHectarePrimary - 100f));
 	}
 

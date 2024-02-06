@@ -17,6 +17,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseLineException;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 
 public class GenusDefinitionParserTest {
@@ -198,7 +200,7 @@ public class GenusDefinitionParserTest {
 	}
 
 	@Test
-	public void testErrorPreferenceOutOfBoundsHigh() throws Exception {
+	void testErrorPreferenceOutOfBoundsHigh() throws Exception {
 		var parser = new GenusDefinitionParser(2);
 
 		Exception ex1;

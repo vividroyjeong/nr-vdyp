@@ -24,10 +24,10 @@ import org.hamcrest.TypeSafeDiagnosingMatcher;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
-import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.StreamingParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ValueParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.ValueParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;

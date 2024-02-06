@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BySpeciesDqCoefficientParser;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 class BySpeciesDqCoefficientParserTest {

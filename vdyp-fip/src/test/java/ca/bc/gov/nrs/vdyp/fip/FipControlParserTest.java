@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.fip.test.FipTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.*;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.*;
 
 @SuppressWarnings({ "unused", "unchecked", "rawtypes" })

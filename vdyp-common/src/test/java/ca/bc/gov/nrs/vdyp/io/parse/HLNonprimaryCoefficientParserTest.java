@@ -15,6 +15,8 @@ import java.util.Map;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.io.parse.coe.HLNonprimaryCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseLineException;
 import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;

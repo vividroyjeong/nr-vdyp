@@ -15,7 +15,7 @@ import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.FipMode;
 import ca.bc.gov.nrs.vdyp.model.LayerType;

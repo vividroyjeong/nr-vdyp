@@ -13,7 +13,7 @@ public class BaseAreaTreeDensityDiameter {
 	/**
 	 * π/10⁴
 	 */
-	public static final float PI_40K = (float) (Math.PI/40_000);
+	public static final float PI_40K = (float) (Math.PI / 40_000);
 
 	// FT_BD
 	public static float treesPerHectare(float baseArea, float quadraticMeanDiameter) {

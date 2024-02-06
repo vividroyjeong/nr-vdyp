@@ -12,42 +12,45 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.BecDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.BreakageEquationGroupParser;
-import ca.bc.gov.nrs.vdyp.io.parse.BreakageParser;
-import ca.bc.gov.nrs.vdyp.io.parse.BySpeciesDqCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.CloseUtilVolumeParser;
-import ca.bc.gov.nrs.vdyp.io.parse.CoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ComponentSizeParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ControlFileParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ControlMapModifier;
-import ca.bc.gov.nrs.vdyp.io.parse.DecayEquationGroupParser;
-import ca.bc.gov.nrs.vdyp.io.parse.DefaultEquationNumberParser;
-import ca.bc.gov.nrs.vdyp.io.parse.EquationModifierParser;
-import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.HLCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.HLNonprimaryCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.SiteCurveAgeMaximumParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SiteCurveParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentBaseAreaParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentDQParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentHLParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentProbabilityParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentWSVolumeParser;
-import ca.bc.gov.nrs.vdyp.io.parse.StockingClassFactorParser;
-import ca.bc.gov.nrs.vdyp.io.parse.TotalStandWholeStemParser;
-import ca.bc.gov.nrs.vdyp.io.parse.UpperCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.UtilComponentBaseAreaParser;
-import ca.bc.gov.nrs.vdyp.io.parse.UtilComponentDQParser;
-import ca.bc.gov.nrs.vdyp.io.parse.UtilComponentWSVolumeParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ValueParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VeteranBQParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VeteranDQParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VeteranLayerVolumeAdjustParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VolumeEquationGroupParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayWasteParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BaseAreaCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BreakageEquationGroupParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BreakageParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BySpeciesDqCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.CloseUtilVolumeParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.ComponentSizeParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.DecayEquationGroupParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.DefaultEquationNumberParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.EquationModifierParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.HLNonprimaryCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.HLPrimarySpeciesEqnP1Parser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.HLPrimarySpeciesEqnP2Parser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.HLPrimarySpeciesEqnP3Parser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.QuadMeanDiameterCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveAgeMaximumParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.SmallComponentBaseAreaParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.SmallComponentDQParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.SmallComponentHLParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.SmallComponentProbabilityParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.SmallComponentWSVolumeParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.StockingClassFactorParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.TotalStandWholeStemParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.UtilComponentBaseAreaParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.UtilComponentDQParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.UtilComponentWSVolumeParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.VeteranBQParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.VeteranDQParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.VeteranLayerVolumeAdjustParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.VolumeEquationGroupParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.VolumeNetDecayParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.VolumeNetDecayWasteParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.control.ControlFileParser;
+import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapModifier;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.JProgram;
 
 /**
@@ -221,23 +224,18 @@ public class FipControlParser {
 	);
 
 	List<ControlMapModifier> COEFFICIENTS = Arrays.asList(
-			// RD_E040
-			new CoefficientParser(ControlKey.COE_BA),
+			new BaseAreaCoefficientParser(),
 
-			// RD_E041
-			new CoefficientParser(ControlKey.COE_DQ),
+			new QuadMeanDiameterCoefficientParser(),
 
 			// RD_E043
 			new UpperCoefficientParser(),
 
-			// RD_YHL1
-			new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P1, ControlKey.HL_PRIMARY_SP_EQN_P1),
+			new HLPrimarySpeciesEqnP1Parser(),
 
-			// RD_YHL2
-			new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P2, ControlKey.HL_PRIMARY_SP_EQN_P2),
+			new HLPrimarySpeciesEqnP2Parser(),
 
-			// RD_YHL3
-			new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P3, ControlKey.HL_PRIMARY_SP_EQN_P3),
+			new HLPrimarySpeciesEqnP3Parser(),
 
 			// RD_YHL4
 			new HLNonprimaryCoefficientParser(),

@@ -8,6 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
+
 public class MockStreamingParser<T> implements StreamingParser<T> {
 
 	boolean closed = false;

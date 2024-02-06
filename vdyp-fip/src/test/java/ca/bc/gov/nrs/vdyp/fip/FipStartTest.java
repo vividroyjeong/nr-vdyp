@@ -35,6 +35,10 @@ import ca.bc.gov.nrs.vdyp.fip.FipStart.VolumeComputeMode;
 import ca.bc.gov.nrs.vdyp.fip.model.*;
 import ca.bc.gov.nrs.vdyp.fip.test.FipTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.*;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.*;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 

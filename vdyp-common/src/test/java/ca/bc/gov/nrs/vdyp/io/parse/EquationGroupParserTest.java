@@ -22,6 +22,9 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.io.parse.coe.DefaultEquationNumberParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseLineException;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseValidException;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
