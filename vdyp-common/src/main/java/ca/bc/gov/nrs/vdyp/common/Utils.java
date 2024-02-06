@@ -161,4 +161,12 @@ public class Utils {
 			}
 		};
 	}
+
+	public static boolean nullOrBlank(@Nullable String string) {
+		return string == null || string.isBlank();
+	}
+
+	public static boolean nullOrEmpty(@Nullable String string) {
+		return string == null || string.isEmpty();
+	}
 }

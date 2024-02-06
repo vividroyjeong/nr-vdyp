@@ -39,9 +39,10 @@ class EquationGroupParserTest {
 		var parser = new DefaultEquationNumberParser();
 
 		var controlMap = makeControlMapSingle();
-		String[] lines = { "S1 B1   001" };
 
-		var is = TestUtils.makeInputStream(lines);
+		var is = TestUtils.makeInputStream(
+				"S1 B1   001"//
+		);
 		var result = parser.parse(is, Collections.unmodifiableMap(controlMap));
 
 		assertThat(result, mmHasEntry(is(1), "S1", "B1"));
@@ -52,9 +53,8 @@ class EquationGroupParserTest {
 		var parser = new DefaultEquationNumberParser();
 
 		var controlMap = makeControlMapSingle();
-		String[] lines = { "SX B1   001" };
 
-		var is = TestUtils.makeInputStream(lines);
+		var is = TestUtils.makeInputStream("SX B1   001");
 
 		ResourceParseLineException ex1 = Assertions.assertThrows(
 				ResourceParseLineException.class, () -> parser.parse(is, Collections.unmodifiableMap(controlMap))
@@ -70,9 +70,10 @@ class EquationGroupParserTest {
 		var parser = new DefaultEquationNumberParser();
 
 		var controlMap = makeControlMapSingle();
-		String[] lines = { "S1 BX   001" };
 
-		var is = TestUtils.makeInputStream(lines);
+		var is = TestUtils.makeInputStream(
+				"S1 BX   001"//
+		);
 
 		ResourceParseLineException ex1 = Assertions.assertThrows(
 				ResourceParseLineException.class, () -> parser.parse(is, Collections.unmodifiableMap(controlMap))
@@ -91,9 +92,68 @@ class EquationGroupParserTest {
 		var parser = new DefaultEquationNumberParser();
 
 		var controlMap = makeControlMapSingle();
-		String[] lines = { "S1 B1   001", "S1 B1   002" };
 
-		var is = TestUtils.makeInputStream(lines);
+		var is = TestUtils.makeInputStream(
+				"S1 B1   001", //
+				"S1 B1   002"
+		);
+		var result = parser.parse(is, Collections.unmodifiableMap(controlMap));
+
+		assertThat(result, mmHasEntry(is(2), "S1", "B1"));
+	}
+
+	@Test
+	void testParseIgnoreBlankSpecies() throws Exception {
+		// Original Fortran allows subsequent entries to overwrite old ones so don't
+		// validate against that
+
+		var parser = new DefaultEquationNumberParser();
+
+		var controlMap = makeControlMapSingle();
+
+		var is = TestUtils.makeInputStream(
+				"S1 B1   001", //
+				"   B1   003", //
+				"S1 B1   002"
+		);
+		var result = parser.parse(is, Collections.unmodifiableMap(controlMap));
+
+		assertThat(result, mmHasEntry(is(2), "S1", "B1"));
+	}
+
+	@Test
+	void testParseIgnoreBlankBec() throws Exception {
+		// Original Fortran allows subsequent entries to overwrite old ones so don't
+		// validate against that
+
+		var parser = new DefaultEquationNumberParser();
+
+		var controlMap = makeControlMapSingle();
+
+		var is = TestUtils.makeInputStream(
+				"S1 B1   001", //
+				"S1      003", //
+				"S1 B1   002"
+		);
+		var result = parser.parse(is, Collections.unmodifiableMap(controlMap));
+
+		assertThat(result, mmHasEntry(is(2), "S1", "B1"));
+	}
+
+	@Test
+	void testParseIgnoreBlankLine() throws Exception {
+		// Original Fortran allows subsequent entries to overwrite old ones so don't
+		// validate against that
+
+		var parser = new DefaultEquationNumberParser();
+
+		var controlMap = makeControlMapSingle();
+
+		var is = TestUtils.makeInputStream(
+				"S1 B1   001", //
+				"", //
+				"S1 B1   002"
+		);
 		var result = parser.parse(is, Collections.unmodifiableMap(controlMap));
 
 		assertThat(result, mmHasEntry(is(2), "S1", "B1"));
@@ -104,10 +164,17 @@ class EquationGroupParserTest {
 		var parser = new DefaultEquationNumberParser();
 
 		var controlMap = makeControlMap();
-		String[] lines = { "S1 B1   011", "S1 B2   012", "S1 B3   013", "S1 B4   014", "S2 B1   021", "S2 B2   022",
-				"S2 B3   023", "S2 B4   024" };
 
-		var is = TestUtils.makeInputStream(lines);
+		var is = TestUtils.makeInputStream(
+				"S1 B1   011", //
+				"S1 B2   012", //
+				"S1 B3   013", //
+				"S1 B4   014", //
+				"S2 B1   021", //
+				"S2 B2   022", //
+				"S2 B3   023", //
+				"S2 B4   024"
+		);
 		var result = parser.parse(is, Collections.unmodifiableMap(controlMap));
 
 		assertThat(result, mmHasEntry(is(11), "S1", "B1"));
@@ -129,9 +196,13 @@ class EquationGroupParserTest {
 		var controlMap = makeControlMap();
 
 		List<String> unusedBecs = Arrays.asList("B2", "B4");
-		String[] lines = { "S1 B1   011", "S1 B2   012", "S1 B3   013", "S1 B4   014" };
 
-		var is = TestUtils.makeInputStream(lines);
+		var is = TestUtils.makeInputStream(
+				"S1 B1   011", //
+				"S1 B2   012", //
+				"S1 B3   013", //
+				"S1 B4   014"
+		);
 
 		ResourceParseValidException ex1 = assertThrows(
 				ResourceParseValidException.class, () -> parser.parse(is, Collections.unmodifiableMap(controlMap))
@@ -149,10 +220,17 @@ class EquationGroupParserTest {
 		var controlMap = makeControlMap();
 
 		List<String> unusedBecs = Arrays.asList("B2", "B4");
-		String[] lines = { "S1 B1   011", "S1 B2   012", "S1 B4   014", "S2 B1   021", "S2 B2   022", "S2 B3   023",
-				"S2 B4   024" };
+		String[] lines = {};
 
-		var is = TestUtils.makeInputStream(lines);
+		var is = TestUtils.makeInputStream(
+				"S1 B1   011", //
+				"S1 B2   012", //
+				"S1 B4   014", //
+				"S2 B1   021", //
+				"S2 B2   022", //
+				"S2 B3   023", //
+				"S2 B4   024"
+		);
 
 		ResourceParseValidException ex1 = assertThrows(
 				ResourceParseValidException.class, () -> parser.parse(is, Collections.unmodifiableMap(controlMap))
@@ -171,10 +249,16 @@ class EquationGroupParserTest {
 
 		List<String> hiddenBecs = Arrays.asList("B3");
 		parser.setHiddenBecs(hiddenBecs);
-		String[] lines = { "S1 B1   011", "S1 B2   012", "S1 B4   014", "S2 B1   021", "S2 B2   022", "S2 B3   023",
-				"S2 B4   024" };
 
-		var is = TestUtils.makeInputStream(lines);
+		var is = TestUtils.makeInputStream(
+				"S1 B1   011", //
+				"S1 B2   012", //
+				"S1 B4   014", //
+				"S2 B1   021", //
+				"S2 B2   022", //
+				"S2 B3   023", //
+				"S2 B4   024"
+		);
 
 		ResourceParseValidException ex1 = assertThrows(
 				ResourceParseValidException.class, () -> parser.parse(is, Collections.unmodifiableMap(controlMap))

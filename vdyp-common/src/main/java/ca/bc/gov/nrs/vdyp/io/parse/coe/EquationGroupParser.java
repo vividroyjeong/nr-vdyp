@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import ca.bc.gov.nrs.vdyp.common.ExpectationDifference;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseValidException;
@@ -40,13 +41,19 @@ public abstract class EquationGroupParser implements ControlMapSubResourceParser
 	}
 
 	protected EquationGroupParser(int identifierLength) {
-		lineParser = new LineParser().strippedString(2, "sp0Alias").space(1).strippedString(4, "becAlias").space(1)
-				.value(
-						identifierLength, "grpId",
-						ValueParser.validate(
-								ValueParser.INTEGER, ValueParser.validateRangeInclusive(MIN_GROUP, MAX_GROUP, "grpId")
-						)
-				);
+		lineParser = new LineParser() {
+
+			@Override
+			public boolean isIgnoredSegment(List<String> entry) {
+				return entry.size() < 3 || Utils.nullOrBlank(entry.get(0)) || Utils.nullOrBlank(entry.get(2));
+			}
+
+		}.strippedString(2, "sp0Alias").space(1).strippedString(4, "becAlias").space(1).value(
+				identifierLength, "grpId",
+				ValueParser.validate(
+						ValueParser.INTEGER, ValueParser.validateRangeInclusive(MIN_GROUP, MAX_GROUP, "grpId")
+				)
+		);
 	}
 
 	@Override
