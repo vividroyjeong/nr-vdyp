@@ -15,18 +15,20 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.fip.test.FipTestUtils;
-import ca.bc.gov.nrs.vdyp.io.parse.*;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.HLNonprimaryCoefficientParserTest;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveAgeMaximumParserTest;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.*;
+import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 @SuppressWarnings({ "unused", "unchecked", "rawtypes" })
-public class FipControlParserTest {
+class FipControlParserTest {
 
 	@Test
 	void testParseBec() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -39,7 +41,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseSP0() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -51,7 +53,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseVGRP() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -63,7 +65,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseDGRP() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -75,7 +77,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseBGRP() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -87,7 +89,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseGRBA1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -99,7 +101,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseGMBA1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result, (Matcher) controlMapHasEntry(
 						ControlKey.EQN_MODIFIERS, allOf(
@@ -113,7 +115,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseSTK33() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result, (Matcher) controlMapHasEntry(
 						ControlKey.STOCKING_CLASS_FACTORS, allOf(
@@ -142,14 +144,14 @@ public class FipControlParserTest {
 	@Test
 	void testParseE025Empty() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(result, (Matcher) controlMapHasEntry(ControlKey.SITE_CURVE_NUMBERS, Matchers.anEmptyMap()));
 	}
 
 	@Test
 	void testParseE026() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result, (Matcher) controlMapHasEntry(
 						ControlKey.SITE_CURVE_AGE_MAX, allOf(
@@ -176,7 +178,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseE040() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -199,7 +201,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseE041() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -222,7 +224,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseE043() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -234,7 +236,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseE050() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -251,7 +253,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseE051() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -264,7 +266,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseE052() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -282,7 +284,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseE053() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -300,7 +302,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseE060() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -312,7 +314,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseE061() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -325,7 +327,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseUBA1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -338,7 +340,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseYVC1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -351,7 +353,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseYVD1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -364,7 +366,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseSBA1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -377,7 +379,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseSBA2() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -390,7 +392,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseSDQ1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -402,7 +404,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseSHL1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -414,7 +416,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseSVT1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -427,7 +429,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseYVT1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -448,7 +450,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseYVT2() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -461,7 +463,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseYVW1() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -474,7 +476,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseE095() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -486,7 +488,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseYVVET() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -499,7 +501,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseYDQV() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -517,7 +519,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseE098() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result, (Matcher) controlMapHasEntry(
 						ControlKey.VETERAN_BQ,
@@ -535,7 +537,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseMinima() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result, (Matcher) controlMapHasEntry(
 						ControlKey.MINIMA,
@@ -553,7 +555,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseV7O_FIP() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(ControlKey.FIP_YIELD_POLY_INPUT, instanceOf(StreamingParserFactory.class))
@@ -563,7 +565,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseV7O_FIL() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(ControlKey.FIP_YIELD_LAYER_INPUT, instanceOf(StreamingParserFactory.class))
@@ -573,7 +575,7 @@ public class FipControlParserTest {
 	@Test
 	void testParseV7O_FIS() throws Exception {
 		var parser = new FipControlParser();
-		var result = parse(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -590,9 +592,9 @@ public class FipControlParserTest {
 
 	static Map<String, ?> parseWithAppendix(FipControlParser parser, String... lines)
 			throws IOException, ResourceParseException {
-		var resolver = FipTestUtils.fileResolver(ControlFileParserTest.class);
+		var resolver = FipTestUtils.fileResolver(TestUtils.class);
 		try (
-				InputStream baseIs = ControlFileParserTest.class.getResourceAsStream("FIPSTART.CTR");
+				InputStream baseIs = TestUtils.class.getResourceAsStream("FIPSTART.CTR");
 				InputStream is = addToEnd(baseIs, lines);
 		) {
 			return parser.parse(is, resolver, new HashMap<>());

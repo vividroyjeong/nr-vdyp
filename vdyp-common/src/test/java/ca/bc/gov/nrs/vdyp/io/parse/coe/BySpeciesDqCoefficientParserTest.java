@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.io.parse;
+package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.io.parse.coe.BySpeciesDqCoefficientParser;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 class BySpeciesDqCoefficientParserTest {

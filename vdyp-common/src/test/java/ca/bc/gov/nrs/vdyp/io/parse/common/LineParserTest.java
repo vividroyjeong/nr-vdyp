@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.io.parse;
+package ca.bc.gov.nrs.vdyp.io.parse.common;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -20,8 +20,6 @@ import java.util.Map;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
-import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseLineException;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 

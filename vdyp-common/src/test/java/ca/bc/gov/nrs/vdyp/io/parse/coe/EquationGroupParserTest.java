@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.io.parse;
+package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;

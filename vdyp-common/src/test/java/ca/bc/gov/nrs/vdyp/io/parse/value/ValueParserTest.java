@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.io.parse;
+package ca.bc.gov.nrs.vdyp.io.parse.value;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
@@ -15,8 +15,6 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 class ValueParserTest {

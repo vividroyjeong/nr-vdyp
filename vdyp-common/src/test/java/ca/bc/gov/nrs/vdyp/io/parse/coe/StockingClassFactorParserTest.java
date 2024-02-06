@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.io.parse;
+package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.mmEmpty;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.mmHasEntry;
@@ -12,7 +12,6 @@ import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.io.parse.coe.StockingClassFactorParser;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -47,7 +46,7 @@ class StockingClassFactorParserTest {
 	@Test
 	void testMultiple() throws Exception {
 		var parser = new StockingClassFactorParser();
-		try (var is = StockingClassFactorParserTest.class.getResourceAsStream("coe/FIPSTKR.PRM")) {
+		try (var is = TestUtils.class.getResourceAsStream("coe/FIPSTKR.PRM")) {
 
 			var result = parser.parse(is, Collections.emptyMap());
 

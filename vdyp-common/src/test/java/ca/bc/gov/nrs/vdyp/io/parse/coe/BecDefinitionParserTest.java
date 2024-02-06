@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.io.parse;
+package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.hasBec;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
@@ -14,7 +14,6 @@ import static org.hamcrest.Matchers.equalTo;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -24,7 +23,7 @@ class BecDefinitionParserTest {
 	void testParse() throws Exception {
 		var parser = new BecDefinitionParser();
 
-		var result = parser.parse(BecDefinitionParserTest.class, "coe/Becdef.dat", Collections.emptyMap());
+		var result = parser.parse(TestUtils.class, "coe/Becdef.dat", Collections.emptyMap());
 
 		assertThat(
 				result,

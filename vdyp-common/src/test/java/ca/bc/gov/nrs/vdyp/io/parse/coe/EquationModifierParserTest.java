@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.io.parse;
+package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.mmHasEntry;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
@@ -10,7 +10,6 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.io.parse.coe.EquationModifierParser;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 class EquationModifierParserTest {

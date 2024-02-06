@@ -14,11 +14,12 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.*;
 
 import ca.bc.gov.nrs.vdyp.fip.*;
+import ca.bc.gov.nrs.vdyp.fip.test.FipTestUtils;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.*;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.write.ControlFileWriter;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
+import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 class ITFipStart {
 
@@ -60,13 +61,13 @@ class ITFipStart {
 
 	@BeforeEach
 	void init() throws IOException {
-		baseControlFile = copyResource(ControlFileParserTest.class, "FIPSTART.CTR", configDir);
+		baseControlFile = copyResource(TestUtils.class, "FIPSTART.CTR", configDir);
 		Files.createDirectory(configDir.resolve("coe"));
 		for (String filename : COE_FILES) {
-			copyResource(ControlFileParserTest.class, "coe/" + filename, configDir);
+			copyResource(TestUtils.class, "coe/" + filename, configDir);
 		}
 		for (String filename : INPUT_FILES) {
-			copyResource(FipControlParserTest.class, filename, inputDir);
+			copyResource(FipTestUtils.class, filename, inputDir);
 		}
 
 		// Create a second control file pointing to the input and output
@@ -259,15 +260,9 @@ class ITFipStart {
 		assertFileExists(outputDir.resolve(SPECIES_OUTPUT_NAME));
 		assertFileExists(outputDir.resolve(UTILIZATION_OUTPUT_NAME));
 
-		assertFileMatches(
-				outputDir.resolve(POLYGON_OUTPUT_NAME), FipControlParserTest.class, "vp_1.dat", String::equals
-		);
-		assertFileMatches(
-				outputDir.resolve(SPECIES_OUTPUT_NAME), FipControlParserTest.class, "vs_1.dat", String::equals
-		);
-		assertFileMatches(
-				outputDir.resolve(UTILIZATION_OUTPUT_NAME), FipControlParserTest.class, "vu_1.dat", this::linesMatch
-		);
+		assertFileMatches(outputDir.resolve(POLYGON_OUTPUT_NAME), FipTestUtils.class, "vp_1.dat", String::equals);
+		assertFileMatches(outputDir.resolve(SPECIES_OUTPUT_NAME), FipTestUtils.class, "vs_1.dat", String::equals);
+		assertFileMatches(outputDir.resolve(UTILIZATION_OUTPUT_NAME), FipTestUtils.class, "vu_1.dat", this::linesMatch);
 
 	}
 

@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.io.common;
+package ca.bc.gov.nrs.vdyp.common;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
@@ -13,8 +13,6 @@ import java.util.List;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
-
-import ca.bc.gov.nrs.vdyp.common.Utils;
 
 class UtilsTest {
 

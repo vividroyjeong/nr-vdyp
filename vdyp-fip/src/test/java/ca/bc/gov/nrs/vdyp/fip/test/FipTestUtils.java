@@ -12,7 +12,6 @@ import org.opentest4j.AssertionFailedError;
 
 import ca.bc.gov.nrs.vdyp.fip.*;
 import ca.bc.gov.nrs.vdyp.io.*;
-import ca.bc.gov.nrs.vdyp.io.parse.*;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.model.*;
 import ca.bc.gov.nrs.vdyp.test.*;
@@ -73,7 +72,7 @@ public class FipTestUtils {
 	public static Map<String, Object> loadControlMap() {
 		var parser = new FipControlParser();
 		try {
-			return loadControlMap(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+			return loadControlMap(parser, TestUtils.class, "FIPSTART.CTR");
 		} catch (IOException | ResourceParseException ex) {
 			throw new AssertionFailedError(null, ex);
 		}

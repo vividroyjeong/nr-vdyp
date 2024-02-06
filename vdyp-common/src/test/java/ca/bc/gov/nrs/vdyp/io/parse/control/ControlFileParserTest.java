@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.io.parse;
+package ca.bc.gov.nrs.vdyp.io.parse.control;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.parseAs;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
@@ -22,11 +22,10 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseLineException;
-import ca.bc.gov.nrs.vdyp.io.parse.control.ControlFileParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 
-public class ControlFileParserTest {
+class ControlFileParserTest {
 
 	@Test
 	void testParsesEntriesSimple() throws Exception {

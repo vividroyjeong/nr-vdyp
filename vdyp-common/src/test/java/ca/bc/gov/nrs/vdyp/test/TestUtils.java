@@ -25,7 +25,6 @@ import org.hamcrest.Matcher;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.ControlFileParserTest;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BreakageParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.CloseUtilVolumeParser;
@@ -305,7 +304,7 @@ public class TestUtils {
 	public static void populateControlMapFromResource(
 			Map<String, Object> controlMap, ResourceControlMapModifier parser, String resource
 	) {
-		try (var is = ControlFileParserTest.class.getResourceAsStream("coe/" + resource)) {
+		try (var is = TestUtils.class.getResourceAsStream("coe/" + resource)) {
 			parser.modify(controlMap, is);
 		} catch (IOException | ResourceParseException ex) {
 			fail(ex);

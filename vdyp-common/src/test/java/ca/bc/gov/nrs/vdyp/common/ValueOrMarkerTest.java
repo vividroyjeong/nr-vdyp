@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.io.common;
+package ca.bc.gov.nrs.vdyp.common;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isMarker;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isValue;
@@ -7,8 +7,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
-
-import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 
 public class ValueOrMarkerTest {
 

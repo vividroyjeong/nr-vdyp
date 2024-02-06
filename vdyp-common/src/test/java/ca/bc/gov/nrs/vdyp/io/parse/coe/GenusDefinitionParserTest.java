@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.io.parse;
+package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -17,9 +17,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseLineException;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
+import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 public class GenusDefinitionParserTest {
 
@@ -27,7 +27,7 @@ public class GenusDefinitionParserTest {
 	void testParse() throws Exception {
 		var parser = new GenusDefinitionParser();
 
-		var result = parser.parse(GenusDefinitionParserTest.class, "coe/SP0DEF_v0.dat", Collections.emptyMap());
+		var result = parser.parse(TestUtils.class, "coe/SP0DEF_v0.dat", Collections.emptyMap());
 
 		assertThat(
 				result, contains(
