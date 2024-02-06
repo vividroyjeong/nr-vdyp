@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.common;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -10,6 +11,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.annotation.Nullable;
+
+import org.apache.commons.math3.util.Pair;
 
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 
@@ -124,4 +127,38 @@ public class Utils {
 		return utilizationVector(0f);
 	}
 
+	/**
+	 * Takes two iterables and returns an iterable of pairs of their entries. If
+	 * they have different lengths, it stops when the first one does.
+	 *
+	 * @param <T>
+	 * @param <U>
+	 * @param iterable1
+	 * @param iterable2
+	 * @return
+	 */
+	public static <T, U> Iterable<Pair<T, U>> parallelIterate(Iterable<T> iterable1, Iterable<U> iterable2) {
+		return new Iterable<Pair<T, U>>() {
+
+			@Override
+			public Iterator<Pair<T, U>> iterator() {
+				var iterator1 = iterable1.iterator();
+				var iterator2 = iterable2.iterator();
+
+				return new Iterator<Pair<T, U>>() {
+
+					@Override
+					public boolean hasNext() {
+						return iterator1.hasNext() && iterator2.hasNext();
+					}
+
+					@Override
+					public Pair<T, U> next() {
+						return new Pair<>(iterator1.next(), iterator2.next());
+					}
+
+				};
+			}
+		};
+	}
 }

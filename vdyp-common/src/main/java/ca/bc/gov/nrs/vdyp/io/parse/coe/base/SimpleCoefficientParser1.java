@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -53,9 +54,11 @@ public abstract class SimpleCoefficientParser1<K1> implements ControlMapSubResou
 		return MatrixMap.cast(matrixMapResult);
 	}
 
-	public <K> BaseCoefficientParser<Coefficients, Coefficients, MatrixMap<Coefficients>>
-			key(int length, String name, ValueParser<K> parser, Collection<K> range, String errorTemplate) {
-		return delegate.key(length, name, parser, range, errorTemplate);
+	public <K> BaseCoefficientParser<Coefficients, Coefficients, MatrixMap<Coefficients>> key(
+			int length, String name, ValueParser<K> parser, Collection<K> range, String errorTemplate,
+			Predicate<String> ignoreSegmentTest
+	) {
+		return delegate.key(length, name, parser, range, errorTemplate, ignoreSegmentTest);
 	}
 
 	public BaseCoefficientParser<Coefficients, Coefficients, MatrixMap<Coefficients>> regionKey() {

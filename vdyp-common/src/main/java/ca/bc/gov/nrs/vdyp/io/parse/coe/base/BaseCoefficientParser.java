@@ -9,9 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -43,6 +46,7 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 	private List<Function<Map<String, Object>, Collection<?>>> keyRanges = new ArrayList<>();
 	private int expectedKeys;
 	private final ControlKey controlKey;
+	private List<Predicate<String>> segmentIgnoreTests = new ArrayList<>();
 
 	protected BaseCoefficientParser(int expectedKeys, ControlKey controlKey) {
 		super();
@@ -50,8 +54,16 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 		this.lineParser = new LineParser() {
 
 			@Override
-			public boolean isStopSegment(List<String> segments) {
-				return segments.get(0).isBlank();
+			public boolean isIgnoredSegment(List<String> segments) {
+				if (segments.size() < segmentIgnoreTests.size()) {
+					return true;
+				}
+				for (var pair : Utils.parallelIterate(segmentIgnoreTests, segments)) {
+					if (pair.getSecond() == null || pair.getFirst().test(pair.getSecond())) {
+						return true;
+					}
+				}
+				return false;
 			}
 
 		};
@@ -61,6 +73,8 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 	protected BaseCoefficientParser(ControlKey controlKey) {
 		this(0, controlKey);
 	}
+
+	static final Pattern BLANK_OR_ZERO = Pattern.compile("^\\s*0*\\.?0*\\s*$");
 
 	/**
 	 * Add a key for the multimap
@@ -78,7 +92,7 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 	 */
 	public <K> BaseCoefficientParser<T, W, M> key(
 			int length, String name, ControlledValueParser<K> parser,
-			Function<Map<String, Object>, Collection<?>> range, String errorTemplate
+			Function<Map<String, Object>, Collection<?>> range, String errorTemplate, Predicate<String> keyIgnoreTest
 	) {
 		if (expectedKeys > 0 && metaKeys.size() == expectedKeys) {
 			throw new IllegalStateException(
@@ -93,23 +107,27 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 		lineParser.value(length, name, validParser);
 		metaKeys.add(name);
 		keyRanges.add(range);
+		segmentIgnoreTests.add(keyIgnoreTest);
 		return this;
 	}
 
-	public <K> BaseCoefficientParser<T, W, M>
-			key(int length, String name, ControlledValueParser<K> parser, Collection<?> range, String errorTemplate) {
-		return key(length, name, parser, c -> range, errorTemplate);
+	public <K> BaseCoefficientParser<T, W, M> key(
+			int length, String name, ControlledValueParser<K> parser, Collection<?> range, String errorTemplate,
+			Predicate<String> keyIgnoreTest
+	) {
+		return key(length, name, parser, c -> range, errorTemplate, keyIgnoreTest);
 	}
 
 	public BaseCoefficientParser<T, W, M> regionKey() {
 		var regions = Arrays.asList(Region.values());
-		return key(1, REGION_KEY, ValueParser.REGION, regions, "%s is not a valid region");
+		return key(1, REGION_KEY, ValueParser.REGION, regions, "%s is not a valid region", String::isBlank);
 	}
 
 	public BaseCoefficientParser<T, W, M> ucIndexKey() {
 		var indicies = Arrays.asList(1, 2, 3, 4);
 		return key(
-				2, UC_INDEX, ValueParser.INTEGER, indicies, "%s is not a valid UC Index, should be 1 to 4 inclusive"
+				2, UC_INDEX, ValueParser.INTEGER, indicies, "%s is not a valid UC Index, should be 1 to 4 inclusive",
+				BLANK_OR_ZERO.asPredicate()
 		);
 	}
 
@@ -117,14 +135,14 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 		var indicies = Stream.iterate(1, x -> x + 1).limit(maxGroups).toList();
 		return key(
 				3, GROUP_INDEX, ValueParser.INTEGER, indicies,
-				"%s is not a valid Group Index, should be 1 to " + maxGroups + " inclusive"
+				"%s is not a valid Group Index, should be 1 to " + maxGroups + " inclusive", BLANK_OR_ZERO.asPredicate()
 		);
 	}
 
 	public BaseCoefficientParser<T, W, M> speciesKey(String name) {
 		return key(
 				2, name, ControlledValueParser.GENUS, GenusDefinitionParser::getSpeciesAliases,
-				"%s is not a valid species"
+				"%s is not a valid species", String::isBlank
 		);
 	}
 
@@ -134,6 +152,7 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 
 	public BaseCoefficientParser<T, W, M> space(int length) {
 		lineParser.space(length);
+		segmentIgnoreTests.add(x -> false); // Has no impact on whether the line should be ignored
 		return this;
 	}
 
