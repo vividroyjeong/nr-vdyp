@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseLineException;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseValidException;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -251,6 +252,42 @@ public class GenusDefinitionParserTest {
 		}
 		assertThat(ex1, hasProperty("line", is(2)));
 		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 2", "Preference 1", "set to AT")));
+	}
+
+	@Test
+	void testErrorTooFew() throws Exception {
+		var parser = new GenusDefinitionParser(2);
+
+		Exception ex1;
+		try (
+				var is = TestUtils.makeInputStream(
+						"AT Aspen                            01" //
+				);
+		) {
+
+			ex1 = Assertions
+					.assertThrows(ResourceParseValidException.class, () -> parser.parse(is, Collections.emptyMap()));
+		}
+		assertThat(ex1, hasProperty("message", equalTo("Not all genus definitions were provided.")));
+	}
+
+	@Test
+	void testAutoPreferenceToHigh() throws Exception {
+		var parser = new GenusDefinitionParser(2);
+
+		Exception ex1;
+		try (
+				var is = TestUtils.makeInputStream(
+						"AT Aspen                            00", //
+						"AC Cottonwood                       00", //
+						"XX BAD                              00"
+				);
+		) {
+
+			ex1 = Assertions
+					.assertThrows(ResourceParseLineException.class, () -> parser.parse(is, Collections.emptyMap()));
+		}
+		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 3", "Preference 3", "larger than 2")));
 	}
 
 // TODO Confirm if following methods are still needed after merge
