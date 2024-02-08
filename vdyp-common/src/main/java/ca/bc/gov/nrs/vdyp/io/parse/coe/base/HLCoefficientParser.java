@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -46,7 +47,7 @@ import ca.bc.gov.nrs.vdyp.model.Region;
  * @see ControlMapSubResourceParser
  */
 public abstract class HLCoefficientParser
-		implements ControlMapSubResourceParser<MatrixMap2<String, Region, Optional<Coefficients>>> {
+		implements ControlMapSubResourceParser<MatrixMap2<String, Region, Coefficients>> {
 
 	public static final int NUM_COEFFICIENTS_P2 = 2;
 	public static final int NUM_COEFFICIENTS_P3 = 4;
@@ -74,13 +75,13 @@ public abstract class HLCoefficientParser
 	LineParser lineParser;
 
 	@Override
-	public MatrixMap2<String, Region, Optional<Coefficients>> parse(InputStream is, Map<String, Object> control)
+	public MatrixMap2<String, Region, Coefficients> parse(InputStream is, Map<String, Object> control)
 			throws IOException, ResourceParseException {
 		final var regionIndicies = Arrays.asList(Region.values());
 		final var speciesIndicies = GenusDefinitionParser.getSpeciesAliases(control);
 
-		MatrixMap2<String, Region, Optional<Coefficients>> result = new MatrixMap2Impl<>(
-				speciesIndicies, regionIndicies, MatrixMap2Impl.emptyDefault()
+		MatrixMap2<String, Region, Coefficients> result = new MatrixMap2Impl<>(
+				speciesIndicies, regionIndicies, (k1, k2) -> Coefficients.empty(NUM_COEFFICIENTS_P3, 1)
 		);
 		lineParser.parse(is, result, (value, r, line) -> {
 			var sp0 = (String) value.get(SP0_KEY);
@@ -91,10 +92,14 @@ public abstract class HLCoefficientParser
 				throw new ValueParseException(sp0, sp0 + " is not a valid species");
 			}
 
-			r.put(sp0, region, Optional.of(new Coefficients(coefficients, 1)));
+			r.put(sp0, region, new Coefficients(coefficients, 1));
 
 			return r;
 		}, control);
+
+		// TODO Consider requiring that all 32 combinations of spec and region are
+		// provided instead of defaulting to all 0.
+
 		return result;
 	}
 

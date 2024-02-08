@@ -2148,10 +2148,10 @@ public class FipStart implements Closeable {
 	}
 
 	private float heightMultiplier(String genus, Region region, float treesPerHectarePrimary) {
-		final var coeMap = Utils.<MatrixMap2<String, Region, Optional<Coefficients>>>expectParsedControl(
+		final var coeMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
 				controlMap, ControlKey.HL_PRIMARY_SP_EQN_P1, MatrixMap2.class
 		);
-		var coe = coeMap.get(genus, region).orElse(Coefficients.empty(3, 1)).reindex(0);
+		var coe = coeMap.get(genus, region).reindex(0);
 		return coe.get(0) - coe.getCoe(1) + coe.getCoe(1) * exp(coe.getCoe(2) * (treesPerHectarePrimary - 100f));
 	}
 
@@ -2198,10 +2198,10 @@ public class FipStart implements Closeable {
 	 * @return
 	 */
 	private float primaryHeightFromLeadHeightInitial(float leadHeight, String genus, Region region) {
-		final var coeMap = Utils.<MatrixMap2<String, Region, Optional<Coefficients>>>expectParsedControl(
+		final var coeMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
 				controlMap, ControlKey.HL_PRIMARY_SP_EQN_P2, MatrixMap2.class
 		);
-		var coe = coeMap.get(genus, region).orElse(Coefficients.empty(HLCoefficientParser.NUM_COEFFICIENTS_P2, 1));
+		var coe = coeMap.get(genus, region);
 		return 1.3f + coe.getCoe(1) * pow(leadHeight - 1.3f, coe.getCoe(2));
 	}
 

@@ -241,11 +241,7 @@ class FipControlParserTest {
 				result,
 				(Matcher) controlMapHasEntry(
 						ControlKey.HL_PRIMARY_SP_EQN_P1,
-						allOf(
-								mmHasEntry(
-										present(coe(1, contains(1.00160f, 0.20508f, -0.0013743f))), "AC", Region.COASTAL
-								)
-						)
+						allOf(mmHasEntry(coe(1, contains(1.00160f, 0.20508f, -0.0013743f)), "AC", Region.COASTAL))
 				)
 		);
 	}
@@ -258,7 +254,7 @@ class FipControlParserTest {
 				result,
 				(Matcher) controlMapHasEntry(
 						ControlKey.HL_PRIMARY_SP_EQN_P2,
-						allOf(mmHasEntry(present(coe(1, contains(0.49722f, 1.18403f))), "AC", Region.COASTAL))
+						allOf(mmHasEntry(coe(1, contains(0.49722f, 1.18403f)), "AC", Region.COASTAL))
 				)
 		);
 	}
@@ -273,8 +269,7 @@ class FipControlParserTest {
 						ControlKey.HL_PRIMARY_SP_EQN_P3,
 						allOf(
 								mmHasEntry(
-										present(coe(1, contains(1.04422f, 0.93010f, -0.05745f, -2.50000f))), "AC",
-										Region.COASTAL
+										coe(1, contains(1.04422f, 0.93010f, -0.05745f, -2.50000f)), "AC", Region.COASTAL
 								)
 						)
 				)

@@ -30,7 +30,7 @@ class HLCoefficientParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, mmHasEntry(present(contains(1.00160f, 0.20508f, -0.0013743f)), "S1", Region.INTERIOR));
+		assertThat(result, mmHasEntry(coe(1, 1.00160f, 0.20508f, -0.0013743f), "S1", Region.INTERIOR));
 	}
 
 	@Test
@@ -47,7 +47,7 @@ class HLCoefficientParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, mmHasEntry(present(contains(0.49722f, 1.18403f)), "S1", Region.COASTAL));
+		assertThat(result, mmHasEntry(coe(1, 0.49722f, 1.18403f), "S1", Region.COASTAL));
 	}
 
 	@Test
@@ -64,9 +64,7 @@ class HLCoefficientParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(
-				result, mmHasEntry(present(contains(1.04422f, 0.93010f, -0.05745f, -2.50000f)), "S1", Region.INTERIOR)
-		);
+		assertThat(result, mmHasEntry(coe(1, 1.04422f, 0.93010f, -0.05745f, -2.50000f), "S1", Region.INTERIOR));
 	}
 
 	@Test
