@@ -30,7 +30,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.coe.BreakageParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.CloseUtilVolumeParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.UtilComponentWSVolumeParser;
-import ca.bc.gov.nrs.vdyp.io.parse.coe.VeteranBQParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.VeteranBAParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.VolumeNetDecayParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ResourceControlMapModifier;
@@ -210,7 +210,7 @@ public class TestUtils {
 	 * Add mock control map entry for VeteranBQ Map
 	 */
 	public static void populateControlMapVeteranBq(Map<String, Object> controlMap) {
-		populateControlMapFromResource(controlMap, new VeteranBQParser(), "REGBAV01.COE");
+		populateControlMapFromResource(controlMap, new VeteranBAParser(), "REGBAV01.COE");
 	}
 
 	public static void

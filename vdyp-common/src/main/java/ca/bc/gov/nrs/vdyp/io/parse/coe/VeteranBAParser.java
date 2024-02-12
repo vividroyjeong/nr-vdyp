@@ -28,9 +28,9 @@ import ca.bc.gov.nrs.vdyp.model.Region;
  * @author Kevin Smith, Vivid Solutions
  * @see SimpleCoefficientParser2
  */
-public class VeteranBQParser extends SimpleCoefficientParser2<String, Region> {
+public class VeteranBAParser extends SimpleCoefficientParser2<String, Region> {
 
-	public VeteranBQParser() {
+	public VeteranBAParser() {
 		super(1, ControlKey.VETERAN_BQ);
 		this.speciesKey().space(1).regionKey().coefficients(3, 9);
 	}

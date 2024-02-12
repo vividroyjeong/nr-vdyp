@@ -31,6 +31,23 @@ class CloseUtilVolumeParserTest {
 	}
 
 	@Test
+	void testParseUCIndexInSecondColumn() throws Exception {
+
+		var parser = new CloseUtilVolumeParser();
+
+		var is = TestUtils.makeInputStream(" 1  1    -7.425    0.0000   0.15032");
+
+		Map<String, Object> controlMap = new HashMap<>();
+
+		var result = parser.parse(is, controlMap);
+
+		assertThat(result, mmHasEntry(present(coe(1, -7.425f, 0f, 0.15032f)), 1, 1));
+		assertThat(result, mmHasEntry(notPresent(), 2, 1));
+		assertThat(result, mmHasEntry(notPresent(), 1, 2));
+		assertThat(result, mmHasEntry(notPresent(), 2, 2));
+	}
+
+	@Test
 	void testParseTwoGroups() throws Exception {
 
 		var parser = new CloseUtilVolumeParser();

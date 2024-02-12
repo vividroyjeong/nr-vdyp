@@ -41,7 +41,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.UtilComponentBaseAreaParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.UtilComponentDQParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.UtilComponentWSVolumeParser;
-import ca.bc.gov.nrs.vdyp.io.parse.coe.VeteranBQParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.VeteranBAParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.VeteranDQParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.VeteranLayerVolumeAdjustParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.VolumeEquationGroupParser;
@@ -300,7 +300,7 @@ public class FipControlParser {
 			new VeteranDQParser(),
 
 			// RD_E098
-			new VeteranBQParser()
+			new VeteranBAParser()
 	);
 
 	List<ControlMapModifier> ADDITIONAL_MODIFIERS = Arrays.asList(
