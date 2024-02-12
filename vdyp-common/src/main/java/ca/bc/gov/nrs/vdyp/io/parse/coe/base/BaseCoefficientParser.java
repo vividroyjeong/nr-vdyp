@@ -76,7 +76,11 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 		this(0, controlKey);
 	}
 
-	static final Pattern BLANK_OR_ZERO = Pattern.compile("^\\s*0*\\.?0*\\s*$");
+	static final int MAX_BLANKABLE_KEY_LENGTH = 3;
+	static final Pattern BLANK_OR_ZERO = Pattern.compile(
+			"^\\s{0," + MAX_BLANKABLE_KEY_LENGTH + "}0{0," + MAX_BLANKABLE_KEY_LENGTH + "}\\.?0{0,"
+					+ MAX_BLANKABLE_KEY_LENGTH + "}\\s{0," + MAX_BLANKABLE_KEY_LENGTH + "}$"
+	);
 
 	/**
 	 * Add a key for the multimap
