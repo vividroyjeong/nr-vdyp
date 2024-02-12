@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -18,6 +19,7 @@ import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseValidException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapSubResourceParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ControlledValueParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
@@ -170,7 +172,10 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 			throw new IllegalStateException("Expected " + expectedKeys + " keys but there were " + metaKeys.size());
 		}
 		@SuppressWarnings({ "unchecked", "rawtypes" })
-		M result = (M) createMap((List) (keyRanges.stream().map(x -> x.apply(control)).toList()));
+		List<Collection<?>> keys = (List) keyRanges.stream().map(x -> x.apply(control)).toList();
+		M result = (M) createMap(keys);
+
+		var parsed = new AtomicInteger();
 
 		lineParser.parse(is, result, (value, r, line) -> {
 			var key = metaKeys.stream().map(value::get).toList().toArray(Object[]::new);
@@ -179,9 +184,15 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 			var coe = getCoefficients((List<Float>) value.get(COEFFICIENTS_KEY));
 
 			r.putM(wrapCoefficients(coe), key);
+			parsed.incrementAndGet();
 			return r;
 		}, control);
+		validate(result, parsed.get(), keys);
 		return result;
+	}
+
+	protected void validate(M result, int parsed, List<Collection<?>> keyRanges) throws ResourceParseValidException {
+		// Do Nothing
 	}
 
 	protected abstract M createMap(List<Collection<?>> keyRanges);

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseValidException;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
@@ -34,6 +35,16 @@ public abstract class SimpleCoefficientParser2<K1, K2>
 	@Override
 	protected Coefficients wrapCoefficients(Coefficients coefficients) {
 		return coefficients;
+	}
+
+	@Override
+	protected void validate(MatrixMap2<K1, K2, Coefficients> result, int parsed, List<Collection<?>> keyRanges)
+			throws ResourceParseValidException {
+		var expected = keyRanges.stream().mapToInt(Collection::size).reduce(1, (x, y) -> x * y);
+		if (expected != parsed) {
+			throw new ResourceParseValidException("Expected " + expected + " records but there were " + parsed);
+		}
+
 	}
 
 }

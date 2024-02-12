@@ -19,7 +19,12 @@ class ComponentSizeParserTest {
 	@Test
 	void testParseSimpleP1() throws Exception {
 
-		var is = TestUtils.makeInputStream("S1 C  49.4 153.3 0.726 3.647");
+		var is = TestUtils.makeInputStream(
+				"S1 C  49.4 153.3 0.726 3.647", //
+				"S1 C  49.4 153.3 0.726 3.647", //
+				"S2 I  49.4 153.3 0.726 3.647", //
+				"S2 I  49.4 153.3 0.726 3.647"
+		);
 
 		Map<String, Object> controlMap = new HashMap<>();
 
