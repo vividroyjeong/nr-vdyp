@@ -1,6 +1,6 @@
 package ca.bc.gov.nrs.vdyp.model;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 public class SiteCurveAgeMaximum {
@@ -13,7 +13,7 @@ public class SiteCurveAgeMaximum {
 	}
 
 	private static Map<Region, Float> maximums(float ageCoast, float ageInt) {
-		var result = new HashMap<Region, Float>();
+		var result = new EnumMap<Region, Float>(Region.class);
 		result.put(Region.COASTAL, ageCoast);
 		result.put(Region.INTERIOR, ageInt);
 		return result;
@@ -21,7 +21,7 @@ public class SiteCurveAgeMaximum {
 
 	public SiteCurveAgeMaximum(Map<Region, Float> ageMaximums, float t1, float t2) {
 		super();
-		this.ageMaximums = new HashMap<>(ageMaximums);
+		this.ageMaximums = new EnumMap<>(ageMaximums);
 		this.t1 = t1;
 		this.t2 = t2;
 	}

@@ -158,7 +158,7 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 		return this;
 	}
 
-	public <K> BaseCoefficientParser<T, W, M> coefficients(int number, int length) {
+	public BaseCoefficientParser<T, W, M> coefficients(int number, int length) {
 		lineParser.multiValue(number, length, COEFFICIENTS_KEY, ValueParser.FLOAT);
 		numCoefficients = number;
 		return this;
@@ -173,7 +173,7 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 		}
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		List<Collection<?>> keys = (List) keyRanges.stream().map(x -> x.apply(control)).toList();
-		M result = (M) createMap(keys);
+		M result = createMap(keys);
 
 		var parsed = new AtomicInteger();
 
@@ -203,7 +203,7 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 
 	protected T getCoefficients() {
 		return getCoefficients(Coefficients.sameSize(numCoefficients, 0f));
-	};
+	}
 
 	@Override
 	public ControlKey getControlKey() {

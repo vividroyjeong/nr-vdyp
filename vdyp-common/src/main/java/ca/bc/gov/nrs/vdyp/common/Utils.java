@@ -138,27 +138,23 @@ public class Utils {
 	 * @return
 	 */
 	public static <T, U> Iterable<Pair<T, U>> parallelIterate(Iterable<T> iterable1, Iterable<U> iterable2) {
-		return new Iterable<Pair<T, U>>() {
+		return () -> {
+			var iterator1 = iterable1.iterator();
+			var iterator2 = iterable2.iterator();
 
-			@Override
-			public Iterator<Pair<T, U>> iterator() {
-				var iterator1 = iterable1.iterator();
-				var iterator2 = iterable2.iterator();
+			return new Iterator<Pair<T, U>>() {
 
-				return new Iterator<Pair<T, U>>() {
+				@Override
+				public boolean hasNext() {
+					return iterator1.hasNext() && iterator2.hasNext();
+				}
 
-					@Override
-					public boolean hasNext() {
-						return iterator1.hasNext() && iterator2.hasNext();
-					}
+				@Override
+				public Pair<T, U> next() {
+					return new Pair<>(iterator1.next(), iterator2.next());
+				}
 
-					@Override
-					public Pair<T, U> next() {
-						return new Pair<>(iterator1.next(), iterator2.next());
-					}
-
-				};
-			}
+			};
 		};
 	}
 

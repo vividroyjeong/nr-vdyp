@@ -200,7 +200,7 @@ public class LineParser {
 				result.add(null);
 				continue;
 			}
-			;
+
 			String segmentString;
 			if (segment.getLength() >= 0 && i + segment.getLength() < line.length()) {
 				segmentString = line.substring(i, i + segment.length);
@@ -269,7 +269,7 @@ public class LineParser {
 			try {
 				result = addToResult.addTo(entry, result, stream.getLineNumber());
 			} catch (ValueParseException ex) {
-				stream.handleValueParseException(ex);
+				throw stream.handleValueParseException(ex);
 			}
 		}
 		return result;
@@ -317,8 +317,7 @@ public class LineParser {
 
 				return entry;
 			} catch (ValueParseException ex) {
-				handleValueParseException(ex);
-				return null;
+				throw handleValueParseException(ex);
 			} finally {
 				nextLine = Optional.empty();
 			}
@@ -331,7 +330,7 @@ public class LineParser {
 			return nextLine.get().isPresent();
 		}
 
-		private Optional<String> doGetNextLine() throws IOException, ResourceParseLineException {
+		private Optional<String> doGetNextLine() throws IOException {
 			while (true) {
 				lineNumber++;
 				var line = reader.readLine();
@@ -357,8 +356,8 @@ public class LineParser {
 			}
 		}
 
-		void handleValueParseException(ValueParseException ex) throws ResourceParseLineException {
-			throw new ResourceParseLineException(lineNumber, ex);
+		ResourceParseLineException handleValueParseException(ValueParseException ex) {
+			return new ResourceParseLineException(lineNumber, ex);
 		}
 
 		@Override
@@ -384,11 +383,10 @@ public class LineParser {
 	 */
 	public List<Map<String, Object>> parse(InputStream is, Map<String, Object> control)
 			throws IOException, ResourceParseLineException {
-		var result = this.parse(is, new ArrayList<Map<String, Object>>(), (value, r, line) -> {
+		return this.parse(is, new ArrayList<Map<String, Object>>(), (value, r, line) -> {
 			r.add(value);
 			return r;
 		}, control);
-		return result;
 	}
 
 	/**
