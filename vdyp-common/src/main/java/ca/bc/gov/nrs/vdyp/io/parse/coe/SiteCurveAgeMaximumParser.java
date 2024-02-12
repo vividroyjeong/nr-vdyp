@@ -68,7 +68,7 @@ public class SiteCurveAgeMaximumParser
 		}
 
 	}.value(3, SC_KEY, PARSE_SC).value(7, COASTAL_KEY, PARSE_AGE).value(7, INTERIOR_KEY, PARSE_AGE)
-			.value(7, T1_KEY, PARSE_AGE).value(7, T2_KEY, PARSE_AGE);
+			.value(7, T1_KEY, ValueParser.FLOAT).value(7, T2_KEY, ValueParser.FLOAT);
 
 	static final ControlledValueParser<Integer> PARSE_SC = ControlledValueParser
 			.validate(ValueParser.INTEGER, (v, c) -> {
@@ -106,10 +106,13 @@ public class SiteCurveAgeMaximumParser
 			var t1 = (float) value.get(T1_KEY);
 			var t2 = (float) value.get(T2_KEY);
 
-			if (sc <= -1)
-				sc = DEFAULT_SC;
-
-			r.put(sc, new SiteCurveAgeMaximum(ageCoast, ageInt, t1, t2));
+			if (sc <= -1) {
+				for (sc = 0; sc <= 140; sc++) {
+					r.put(sc, new SiteCurveAgeMaximum(ageCoast, ageInt, t1, t2));
+				}
+			} else {
+				r.put(sc, new SiteCurveAgeMaximum(ageCoast, ageInt, t1, t2));
+			}
 
 			return r;
 		}, control);

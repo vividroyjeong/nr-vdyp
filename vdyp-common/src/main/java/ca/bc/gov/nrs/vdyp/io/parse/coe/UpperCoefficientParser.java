@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
@@ -39,14 +38,14 @@ import ca.bc.gov.nrs.vdyp.model.Region;
  * @see ControlMapSubResourceParser
  */
 public class UpperCoefficientParser implements ControlMapSubResourceParser<MatrixMap3<Region, String, Integer, Float>> {
-	// TODO use a Coefficients object
 
 	public static final int BA = 1;
 	public static final int DQ = 2;
 
 	public static final String SP0_KEY = "sp0";
 	public static final String REGION_KEY = "region";
-	public static final String COEFFICIENT_KEY = "coefficient";
+	public static final String COEFFICIENT_KEY_1 = "coefficient_1";
+	public static final String COEFFICIENT_KEY_2 = "coefficient_2";
 
 	public static final int NUM_COEFFICIENTS = 2;
 
@@ -58,23 +57,22 @@ public class UpperCoefficientParser implements ControlMapSubResourceParser<Matri
 		}
 
 	}.value(2, SP0_KEY, ValueParser.STRING).space(1).value(1, REGION_KEY, ValueParser.REGION)
-			.multiValue(NUM_COEFFICIENTS, 7, COEFFICIENT_KEY, ValueParser.FLOAT);
+			.floating(7, COEFFICIENT_KEY_1).floating(6, COEFFICIENT_KEY_2);
 
 	@Override
 	public MatrixMap3<Region, String, Integer, Float> parse(InputStream is, Map<String, Object> control)
 			throws IOException, ResourceParseException {
 		var regionIndicies = Arrays.asList(Region.values());
-		List<Integer> coeIndicies = Stream.iterate(1, x -> x + 1).limit(NUM_COEFFICIENTS).collect(Collectors.toList());
+		List<Integer> coeIndicies = Stream.iterate(1, x -> x + 1).limit(NUM_COEFFICIENTS).toList();
 		final var speciesIndicies = GenusDefinitionParser.getSpeciesAliases(control);
 
-		MatrixMap3<Region, String, Integer, Float> result = new MatrixMap3Impl<Region, String, Integer, Float>(
+		MatrixMap3<Region, String, Integer, Float> result = new MatrixMap3Impl<>(
 				regionIndicies, speciesIndicies, coeIndicies, (k1, k2, k3) -> 0f
 		);
 		lineParser.parse(is, result, (value, r, line) -> {
 			var sp0 = (String) value.get(SP0_KEY);
 			var region = (Region) value.get(REGION_KEY);
-			@SuppressWarnings("unchecked")
-			var coefficients = (List<Float>) value.get(COEFFICIENT_KEY);
+			var coefficients = List.of((Float) value.get(COEFFICIENT_KEY_1), (Float) value.get(COEFFICIENT_KEY_2));
 			if (!speciesIndicies.contains(sp0)) {
 				throw new ValueParseException(sp0, sp0 + " is not a valid species");
 			}

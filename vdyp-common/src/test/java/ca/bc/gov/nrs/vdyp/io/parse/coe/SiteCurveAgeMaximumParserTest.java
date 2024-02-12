@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.hasSpecificEntry;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasEntry;
@@ -85,7 +86,7 @@ public class SiteCurveAgeMaximumParserTest {
 						)
 				)
 		);
-		assertThat(result, Matchers.aMapWithSize(1));
+		assertThat(result, hasSpecificEntry(42, hasProperty("t1", is(20f))));
 
 	}
 
