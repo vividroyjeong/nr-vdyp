@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
@@ -35,8 +36,8 @@ public abstract class UtilComponentParser
 		this.lineParser = new LineParser() {
 
 			@Override
-			public boolean isStopLine(String line) {
-				return line.startsWith("    ");
+			public boolean isIgnoredLine(String line) {
+				return Utils.nullOrPrefixBlank(line, 4);
 			}
 
 		}.value(4, UC_KEY, ValueParser.indexParser("UC", 1, ucCodes)).space(gap)

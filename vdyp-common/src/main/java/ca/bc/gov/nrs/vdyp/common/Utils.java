@@ -162,6 +162,11 @@ public class Utils {
 		};
 	}
 
+	public static boolean nullOrPrefixBlank(@Nullable String string, int length) {
+		return string == null || (string.length() <= length && string.isBlank())
+				|| (string.length() > length && string.substring(0, length).isBlank());
+	}
+
 	public static boolean nullOrBlank(@Nullable String string) {
 		return string == null || string.isBlank();
 	}
