@@ -60,8 +60,8 @@ public class HLNonprimaryCoefficientParser
 		this.lineParser = new LineParser() {
 
 			@Override
-			public boolean isStopLine(String line) {
-				return line.startsWith("   ");
+			public boolean isIgnoredLine(String line) {
+				return (line.length() < 6 && line.isBlank()) || line.substring(0, 6).isBlank();
 			}
 
 		}.value(2, SPECIES_1_KEY, ValueParser.STRING).space(1).value(2, SPECIES_2_KEY, ValueParser.STRING).space(1)

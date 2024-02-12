@@ -284,12 +284,7 @@ class FipControlParserTest {
 				result,
 				(Matcher) controlMapHasEntry(
 						ControlKey.HL_NONPRIMARY,
-						allOf(
-								mmHasEntry(
-										present(HLNonprimaryCoefficientParserTest.coe(0.86323f, 1.00505f, 1)), "AC",
-										"AT", Region.COASTAL
-								)
-						)
+						allOf(mmHasEntry(present(coe(1, 0.86323f, 1.00505f)), "AC", "AT", Region.COASTAL))
 				)
 		);
 	}
