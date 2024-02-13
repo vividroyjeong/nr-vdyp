@@ -9,9 +9,10 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayer;
-import ca.bc.gov.nrs.vdyp.io.parse.StreamingParser;
-import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -24,14 +25,14 @@ class FipLayerParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(FipLayerParser.CONTROL_KEY, "test.dat");
+		controlMap.put(ControlKey.FIP_YIELD_LAYER_INPUT.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeInputStream(/* empty */));
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(FipLayerParser.CONTROL_KEY);
+		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_LAYER_INPUT.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -50,7 +51,7 @@ class FipLayerParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(FipLayerParser.CONTROL_KEY, "test.dat");
+		controlMap.put(ControlKey.FIP_YIELD_LAYER_INPUT.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -63,7 +64,7 @@ class FipLayerParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(FipLayerParser.CONTROL_KEY);
+		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_LAYER_INPUT.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -106,7 +107,7 @@ class FipLayerParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(FipLayerParser.CONTROL_KEY, "test.dat");
+		controlMap.put(ControlKey.FIP_YIELD_LAYER_INPUT.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -120,7 +121,7 @@ class FipLayerParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(FipLayerParser.CONTROL_KEY);
+		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_LAYER_INPUT.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -181,7 +182,7 @@ class FipLayerParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(FipLayerParser.CONTROL_KEY, "test.dat");
+		controlMap.put(ControlKey.FIP_YIELD_LAYER_INPUT.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -195,7 +196,7 @@ class FipLayerParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(FipLayerParser.CONTROL_KEY);
+		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_LAYER_INPUT.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -238,7 +239,7 @@ class FipLayerParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(FipLayerParser.CONTROL_KEY, "test.dat");
+		controlMap.put(ControlKey.FIP_YIELD_LAYER_INPUT.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -252,7 +253,7 @@ class FipLayerParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(FipLayerParser.CONTROL_KEY);
+		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_LAYER_INPUT.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 

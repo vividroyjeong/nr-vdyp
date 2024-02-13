@@ -10,44 +10,47 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.bc.gov.nrs.vdyp.common.ControlKeys;
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.BecDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.BreakageEquationGroupParser;
-import ca.bc.gov.nrs.vdyp.io.parse.BreakageParser;
-import ca.bc.gov.nrs.vdyp.io.parse.BySpeciesDqCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.CloseUtilVolumeParser;
-import ca.bc.gov.nrs.vdyp.io.parse.CoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ComponentSizeParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ControlFileParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ControlMapModifier;
-import ca.bc.gov.nrs.vdyp.io.parse.DecayEquationGroupParser;
-import ca.bc.gov.nrs.vdyp.io.parse.DefaultEquationNumberParser;
-import ca.bc.gov.nrs.vdyp.io.parse.EquationModifierParser;
-import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.HLCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.HLNonprimaryCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.SiteCurveAgeMaximumParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SiteCurveParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentBaseAreaParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentDQParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentHLParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentProbabilityParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentWSVolumeParser;
-import ca.bc.gov.nrs.vdyp.io.parse.StockingClassFactorParser;
-import ca.bc.gov.nrs.vdyp.io.parse.TotalStandWholeStemParser;
-import ca.bc.gov.nrs.vdyp.io.parse.UpperCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.UtilComponentBaseAreaParser;
-import ca.bc.gov.nrs.vdyp.io.parse.UtilComponentDQParser;
-import ca.bc.gov.nrs.vdyp.io.parse.UtilComponentWSVolumeParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ValueParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VeteranBQParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VeteranDQParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VeteranLayerVolumeAdjustParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VolumeEquationGroupParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayWasteParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BaseAreaCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BreakageEquationGroupParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BreakageParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BySpeciesDqCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.CloseUtilVolumeParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.ComponentSizeParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.DecayEquationGroupParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.DefaultEquationNumberParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.EquationModifierParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.HLNonprimaryCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.HLPrimarySpeciesEqnP1Parser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.HLPrimarySpeciesEqnP2Parser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.HLPrimarySpeciesEqnP3Parser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.QuadMeanDiameterCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveAgeMaximumParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.SmallComponentBaseAreaParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.SmallComponentDQParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.SmallComponentHLParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.SmallComponentProbabilityParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.SmallComponentWSVolumeParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.StockingClassFactorParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.TotalStandWholeStemParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.UtilComponentBaseAreaParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.UtilComponentDQParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.UtilComponentWSVolumeParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.VeteranBAParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.VeteranDQParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.VeteranLayerVolumeAdjustParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.VolumeEquationGroupParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.VolumeNetDecayParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.VolumeNetDecayWasteParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.control.ControlFileParser;
+import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapModifier;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.JProgram;
 
 /**
@@ -60,49 +63,6 @@ public class FipControlParser {
 	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(FipControlParser.class);
 
-	public static final String FIP_YIELD_POLY_INPUT = FipPolygonParser.CONTROL_KEY;
-	public static final String FIP_YIELD_LAYER_INPUT = FipLayerParser.CONTROL_KEY;
-	public static final String FIP_YIELD_LX_SP0_INPUT = FipSpeciesParser.CONTROL_KEY;
-	public static final String VOLUME_EQN_GROUPS = VolumeEquationGroupParser.CONTROL_KEY;
-	public static final String DECAY_GROUPS = DecayEquationGroupParser.CONTROL_KEY;
-	public static final String BREAKAGE_GROUPS = BreakageEquationGroupParser.CONTROL_KEY;
-	public static final String SITE_CURVE_NUMBERS = SiteCurveParser.CONTROL_KEY;
-	public static final String SITE_CURVE_AGE_MAX = SiteCurveAgeMaximumParser.CONTROL_KEY;
-	public static final String DEFAULT_EQ_NUM = DefaultEquationNumberParser.CONTROL_KEY;
-	public static final String EQN_MODIFIERS = EquationModifierParser.CONTROL_KEY;
-	public static final String STOCKING_CLASS_FACTORS = StockingClassFactorParser.CONTROL_KEY;
-	public static final String COE_BA = CoefficientParser.BA_CONTROL_KEY;
-	public static final String COE_DQ = CoefficientParser.DQ_CONTROL_KEY;
-	public static final String UPPER_BA_BY_CI_S0_P = UpperCoefficientParser.CONTROL_KEY;
-	public static final String HL_PRIMARY_SP_EQN_P1 = HLCoefficientParser.CONTROL_KEY_P1;
-	public static final String HL_PRIMARY_SP_EQN_P2 = HLCoefficientParser.CONTROL_KEY_P2;
-	public static final String HL_PRIMARY_SP_EQN_P3 = HLCoefficientParser.CONTROL_KEY_P3;
-	public static final String HL_NONPRIMARY = HLNonprimaryCoefficientParser.CONTROL_KEY;
-	public static final String BY_SPECIES_DQ = BySpeciesDqCoefficientParser.CONTROL_KEY;
-	public static final String SPECIES_COMPONENT_SIZE_LIMIT = ComponentSizeParser.CONTROL_KEY;
-	public static final String UTIL_COMP_BA = UtilComponentBaseAreaParser.CONTROL_KEY;
-	public static final String UTIL_COMP_DQ = UtilComponentDQParser.CONTROL_KEY;
-	public static final String SMALL_COMP_PROBABILITY = SmallComponentProbabilityParser.CONTROL_KEY;
-	public static final String SMALL_COMP_BA = SmallComponentBaseAreaParser.CONTROL_KEY;
-	public static final String SMALL_COMP_DQ = SmallComponentDQParser.CONTROL_KEY;
-	public static final String SMALL_COMP_HL = SmallComponentHLParser.CONTROL_KEY;
-	public static final String SMALL_COMP_WS_VOLUME = SmallComponentWSVolumeParser.CONTROL_KEY;
-	public static final String TOTAL_STAND_WHOLE_STEM_VOL = TotalStandWholeStemParser.CONTROL_KEY;
-	public static final String UTIL_COMP_WS_VOLUME = UtilComponentWSVolumeParser.CONTROL_KEY;
-	public static final String CLOSE_UTIL_VOLUME = CloseUtilVolumeParser.CONTROL_KEY;
-	public static final String VOLUME_NET_DECAY = VolumeNetDecayParser.CONTROL_KEY;
-	public static final String VOLUME_NET_DECAY_WASTE = VolumeNetDecayWasteParser.CONTROL_KEY;
-	public static final String BREAKAGE = BreakageParser.CONTROL_KEY;
-	public static final String VETERAN_LAYER_VOLUME_ADJUST = VeteranLayerVolumeAdjustParser.CONTROL_KEY;
-	public static final String VETERAN_LAYER_DQ = VeteranDQParser.CONTROL_KEY;
-	public static final String VETERAN_BQ = VeteranBQParser.CONTROL_KEY;
-	public static final String MINIMA = "MINIMA";
-	public static final String MODIFIER_FILE = ModifierParser.CONTROL_KEY;
-	public static final String DEBUG_SWITCHES = "DEBUG_SWITCHES";
-	public static final String MAX_NUM_POLY = "MAX_NUM_POLY";
-	public static final String BEC_DEF = BecDefinitionParser.CONTROL_KEY;
-	public static final String SP0_DEF = GenusDefinitionParser.CONTROL_KEY;
-
 	static final ValueParser<String> FILENAME = String::strip;
 
 	public static final String MINIMUM_HEIGHT = "MINIMUM_HEIGHT";
@@ -112,64 +72,65 @@ public class FipControlParser {
 
 	public static final float DEFAULT_MINIMUM_VETERAN_HEIGHT = 10.0f;
 
-	ControlFileParser controlParser = new ControlFileParser().record(1, MAX_NUM_POLY, ValueParser.INTEGER)
+	ControlFileParser controlParser = new ControlFileParser() //
+			.record(ControlKey.MAX_NUM_POLY, ValueParser.INTEGER)
 
-			.record(9, BEC_DEF, FILENAME) // RD_BECD
-			.record(10, SP0_DEF, FILENAME) // RD_SP0
+			.record(ControlKey.BEC_DEF, FILENAME) // RD_BECD
+			.record(ControlKey.SP0_DEF, FILENAME) // RD_SP0
 
-			.record(11, FIP_YIELD_POLY_INPUT, FILENAME) // GET_FIPP
-			.record(12, FIP_YIELD_LAYER_INPUT, FILENAME) // GET_FIPL
-			.record(13, FIP_YIELD_LX_SP0_INPUT, FILENAME) // GET_FIPS
+			.record(ControlKey.FIP_YIELD_POLY_INPUT, FILENAME) // GET_FIPP
+			.record(ControlKey.FIP_YIELD_LAYER_INPUT, FILENAME) // GET_FIPL
+			.record(ControlKey.FIP_YIELD_LX_SP0_INPUT, FILENAME) // GET_FIPS
 
-			.record(15, ControlKeys.VDYP_POLYGON, FILENAME) //
-			.record(16, ControlKeys.VDYP_LAYER_BY_SPECIES, FILENAME) //
-			.record(18, ControlKeys.VDYP_LAYER_BY_SP0_BY_UTIL, FILENAME) //
+			.record(ControlKey.VDYP_POLYGON, FILENAME) //
+			.record(ControlKey.VDYP_LAYER_BY_SPECIES, FILENAME) //
+			.record(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL, FILENAME) //
 
-			.record(20, VOLUME_EQN_GROUPS, FILENAME) // RD_VGRP
-			.record(21, DECAY_GROUPS, FILENAME) // RD_DGRP
-			.record(22, BREAKAGE_GROUPS, FILENAME) // RD_BGRP IPSJF157
+			.record(ControlKey.VOLUME_EQN_GROUPS, FILENAME) // RD_VGRP
+			.record(ControlKey.DECAY_GROUPS, FILENAME) // RD_DGRP
+			.record(ControlKey.BREAKAGE_GROUPS, FILENAME) // RD_BGRP IPSJF157
 
-			.record(25, SITE_CURVE_NUMBERS, ValueParser.optional(FILENAME)) // RD_E025
-			.record(26, SITE_CURVE_AGE_MAX, ValueParser.optional(FILENAME)) // RD_E026
+			.record(ControlKey.SITE_CURVE_NUMBERS, ValueParser.optional(FILENAME)) // RD_E025
+			.record(ControlKey.SITE_CURVE_AGE_MAX, ValueParser.optional(FILENAME)) // RD_E026
 
-			.record(30, DEFAULT_EQ_NUM, FILENAME) // RD_GRBA1
-			.record(31, EQN_MODIFIERS, FILENAME) // RD_GMBA1
-			.record(33, STOCKING_CLASS_FACTORS, FILENAME) // RD_STK33
+			.record(ControlKey.DEFAULT_EQ_NUM, FILENAME) // RD_GRBA1
+			.record(ControlKey.EQN_MODIFIERS, FILENAME) // RD_GMBA1
+			.record(ControlKey.STOCKING_CLASS_FACTORS, FILENAME) // RD_STK33
 
-			.record(40, COE_BA, FILENAME) // RD_E040 IPSJF128
-			.record(41, COE_DQ, FILENAME) // RD_E041 IPSJF129
-			.record(43, UPPER_BA_BY_CI_S0_P, FILENAME) // RD_E043 IPSJF128
+			.record(ControlKey.COE_BA, FILENAME) // RD_E040 IPSJF128
+			.record(ControlKey.COE_DQ, FILENAME) // RD_E041 IPSJF129
+			.record(ControlKey.UPPER_BA_BY_CI_S0_P, FILENAME) // RD_E043 IPSJF128
 
-			.record(50, HL_PRIMARY_SP_EQN_P1, FILENAME) // RD_YHL1
-			.record(51, HL_PRIMARY_SP_EQN_P2, FILENAME) // RD_YHL2
-			.record(52, HL_PRIMARY_SP_EQN_P3, FILENAME) // RD_YHL3
-			.record(53, HL_NONPRIMARY, FILENAME) // RD_YHL4
+			.record(ControlKey.HL_PRIMARY_SP_EQN_P1, FILENAME) // RD_YHL1
+			.record(ControlKey.HL_PRIMARY_SP_EQN_P2, FILENAME) // RD_YHL2
+			.record(ControlKey.HL_PRIMARY_SP_EQN_P3, FILENAME) // RD_YHL3
+			.record(ControlKey.HL_NONPRIMARY, FILENAME) // RD_YHL4
 
-			.record(60, BY_SPECIES_DQ, FILENAME) // RD_E060 IPFJF125
-			.record(61, SPECIES_COMPONENT_SIZE_LIMIT, FILENAME) // RD_E061 IPSJF158
+			.record(ControlKey.BY_SPECIES_DQ, FILENAME) // RD_E060 IPFJF125
+			.record(ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, FILENAME) // RD_E061 IPSJF158
 
-			.record(70, UTIL_COMP_BA, FILENAME) // RD_UBA1
-			.record(71, UTIL_COMP_DQ, FILENAME) // RD_UDQ1
+			.record(ControlKey.UTIL_COMP_BA, FILENAME) // RD_UBA1
+			.record(ControlKey.UTIL_COMP_DQ, FILENAME) // RD_UDQ1
 
-			.record(80, SMALL_COMP_PROBABILITY, FILENAME) // RD_SBA1
-			.record(81, SMALL_COMP_BA, FILENAME) // RD_SBA2
-			.record(82, SMALL_COMP_DQ, FILENAME) // RD_SDQ1
-			.record(85, SMALL_COMP_HL, FILENAME) // RD_SHL1
-			.record(86, SMALL_COMP_WS_VOLUME, FILENAME) // RD_SVT1
+			.record(ControlKey.SMALL_COMP_PROBABILITY, FILENAME) // RD_SBA1
+			.record(ControlKey.SMALL_COMP_BA, FILENAME) // RD_SBA2
+			.record(ControlKey.SMALL_COMP_DQ, FILENAME) // RD_SDQ1
+			.record(ControlKey.SMALL_COMP_HL, FILENAME) // RD_SHL1
+			.record(ControlKey.SMALL_COMP_WS_VOLUME, FILENAME) // RD_SVT1
 
-			.record(90, TOTAL_STAND_WHOLE_STEM_VOL, FILENAME) // RD_YVT1 IPSJF117
-			.record(91, UTIL_COMP_WS_VOLUME, FILENAME) // RD_YVT2 IPSJF121
-			.record(92, CLOSE_UTIL_VOLUME, FILENAME) // RD_YVC1 IPSJF122
-			.record(93, VOLUME_NET_DECAY, FILENAME) // RD_YVD1 IPSJF123
-			.record(94, VOLUME_NET_DECAY_WASTE, FILENAME) // RD_YVW1 IPSJF123
-			.record(95, BREAKAGE, FILENAME) // RD_EMP95 IPSJF157
+			.record(ControlKey.TOTAL_STAND_WHOLE_STEM_VOL, FILENAME) // RD_YVT1 IPSJF117
+			.record(ControlKey.UTIL_COMP_WS_VOLUME, FILENAME) // RD_YVT2 IPSJF121
+			.record(ControlKey.CLOSE_UTIL_VOLUME, FILENAME) // RD_YVC1 IPSJF122
+			.record(ControlKey.VOLUME_NET_DECAY, FILENAME) // RD_YVD1 IPSJF123
+			.record(ControlKey.VOLUME_NET_DECAY_WASTE, FILENAME) // RD_YVW1 IPSJF123
+			.record(ControlKey.BREAKAGE, FILENAME) // RD_EMP95 IPSJF157
 
-			.record(96, VETERAN_LAYER_VOLUME_ADJUST, FILENAME) // RD_YVET
-			.record(97, VETERAN_LAYER_DQ, FILENAME) // RD_YDQV
-			.record(98, VETERAN_BQ, FILENAME) // RD_E098
+			.record(ControlKey.VETERAN_LAYER_VOLUME_ADJUST, FILENAME) // RD_YVET
+			.record(ControlKey.VETERAN_LAYER_DQ, FILENAME) // RD_YDQV
+			.record(ControlKey.VETERAN_BQ, FILENAME) // RD_E098
 
 			.record(
-					197, MINIMA,
+					ControlKey.MINIMA,
 					ValueParser.toMap(
 							ValueParser.list(ValueParser.FLOAT),
 							Collections.singletonMap(MINIMUM_VETERAN_HEIGHT, 10.0f), MINIMUM_HEIGHT, MINIMUM_BASE_AREA,
@@ -177,9 +138,9 @@ public class FipControlParser {
 					)
 			)
 
-			.record(198, MODIFIER_FILE, ValueParser.optional(FILENAME)) // RD_E198 IPSJF155, XII
+			.record(ControlKey.MODIFIER_FILE, ValueParser.optional(FILENAME)) // RD_E198 IPSJF155, XII
 
-			.record(199, DEBUG_SWITCHES, ValueParser.list(ValueParser.INTEGER)) // IPSJF155
+			.record(ControlKey.DEBUG_SWITCHES, ValueParser.list(ValueParser.INTEGER)) // IPSJF155
 	/*
 	 * Debug switches (25) 0=default See IPSJF155, App IX 1st: 1: Do NOT apply BA
 	 * limits from SEQ043 2nd: 1: Do NOT apply DQ limits from SEQ043 4th: Future
@@ -263,23 +224,18 @@ public class FipControlParser {
 	);
 
 	List<ControlMapModifier> COEFFICIENTS = Arrays.asList(
-			// RD_E040
-			new CoefficientParser(COE_BA),
+			new BaseAreaCoefficientParser(),
 
-			// RD_E041
-			new CoefficientParser(COE_DQ),
+			new QuadMeanDiameterCoefficientParser(),
 
 			// RD_E043
 			new UpperCoefficientParser(),
 
-			// RD_YHL1
-			new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P1, HL_PRIMARY_SP_EQN_P1),
+			new HLPrimarySpeciesEqnP1Parser(),
 
-			// RD_YHL2
-			new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P2, HL_PRIMARY_SP_EQN_P2),
+			new HLPrimarySpeciesEqnP2Parser(),
 
-			// RD_YHL3
-			new HLCoefficientParser(HLCoefficientParser.NUM_COEFFICIENTS_P3, HL_PRIMARY_SP_EQN_P3),
+			new HLPrimarySpeciesEqnP3Parser(),
 
 			// RD_YHL4
 			new HLNonprimaryCoefficientParser(),
@@ -344,7 +300,7 @@ public class FipControlParser {
 			new VeteranDQParser(),
 
 			// RD_E098
-			new VeteranBQParser()
+			new VeteranBAParser()
 	);
 
 	List<ControlMapModifier> ADDITIONAL_MODIFIERS = Arrays.asList(

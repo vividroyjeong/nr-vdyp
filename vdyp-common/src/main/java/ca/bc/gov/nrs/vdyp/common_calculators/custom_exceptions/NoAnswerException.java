@@ -6,6 +6,8 @@ package ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions;
  * compute value is out bounds or not a valid answer
  */
 public class NoAnswerException extends RuntimeException {
+	private static final long serialVersionUID = -5193821896984760660L;
+
 	public NoAnswerException() {
 	}
 

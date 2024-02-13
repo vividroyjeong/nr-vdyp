@@ -23,23 +23,17 @@ import java.util.stream.IntStream;
 
 import org.hamcrest.Matcher;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.BecDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.BreakageEquationGroupParser;
-import ca.bc.gov.nrs.vdyp.io.parse.BreakageParser;
-import ca.bc.gov.nrs.vdyp.io.parse.CloseUtilVolumeParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ControlFileParserTest;
-import ca.bc.gov.nrs.vdyp.io.parse.DecayEquationGroupParser;
-import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ResourceControlMapModifier;
-import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.UtilComponentWSVolumeParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VeteranBQParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VeteranDQParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VeteranLayerVolumeAdjustParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VolumeEquationGroupParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayWasteParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BreakageParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.CloseUtilVolumeParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.UtilComponentWSVolumeParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.VeteranBAParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.VolumeNetDecayParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.control.ResourceControlMapModifier;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
@@ -140,7 +134,7 @@ public class TestUtils {
 			i++;
 		}
 
-		controlMap.put(BecDefinitionParser.CONTROL_KEY, new BecLookup(becs));
+		controlMap.put(ControlKey.BEC_DEF.name(), new BecLookup(becs));
 	}
 
 	/**
@@ -188,7 +182,7 @@ public class TestUtils {
 			sp0List.add(new GenusDefinition(alias, java.util.Optional.empty(), "Test " + alias));
 		}
 
-		controlMap.put(GenusDefinitionParser.CONTROL_KEY, sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
 	}
 
 	/**
@@ -203,20 +197,20 @@ public class TestUtils {
 		var genusAliases = GenusDefinitionParser.getSpeciesAliases(controlMap);
 
 		var volume = new MatrixMap2Impl<String, String, Integer>(genusAliases, becAliases, mapper.andThen(x -> x[0]));
-		controlMap.put(VolumeEquationGroupParser.CONTROL_KEY, volume);
+		controlMap.put(ControlKey.VOLUME_EQN_GROUPS.name(), volume);
 
 		var decay = new MatrixMap2Impl<String, String, Integer>(genusAliases, becAliases, mapper.andThen(x -> x[1]));
-		controlMap.put(DecayEquationGroupParser.CONTROL_KEY, decay);
+		controlMap.put(ControlKey.DECAY_GROUPS.name(), decay);
 
 		var breakage = new MatrixMap2Impl<String, String, Integer>(genusAliases, becAliases, mapper.andThen(x -> x[2]));
-		controlMap.put(BreakageEquationGroupParser.CONTROL_KEY, breakage);
+		controlMap.put(ControlKey.BREAKAGE_GROUPS.name(), breakage);
 	}
 
 	/**
 	 * Add mock control map entry for VeteranBQ Map
 	 */
 	public static void populateControlMapVeteranBq(Map<String, Object> controlMap) {
-		populateControlMapFromResource(controlMap, new VeteranBQParser(), "REGBAV01.COE");
+		populateControlMapFromResource(controlMap, new VeteranBAParser(), "REGBAV01.COE");
 	}
 
 	public static void
@@ -227,7 +221,7 @@ public class TestUtils {
 		var result = new MatrixMap2Impl<String, Region, Coefficients>(
 				genusAliases, regions, mapper.andThen(x -> new Coefficients(x, 1))
 		);
-		controlMap.put(VeteranDQParser.CONTROL_KEY, result);
+		controlMap.put(ControlKey.VETERAN_LAYER_DQ.name(), result);
 	}
 
 	public static void
@@ -238,7 +232,7 @@ public class TestUtils {
 		var result = genusAliases.stream()
 				.collect(Collectors.toMap(x -> x, mapper.andThen(x -> new Coefficients(x, 1))));
 
-		controlMap.put(VeteranLayerVolumeAdjustParser.CONTROL_KEY, result);
+		controlMap.put(ControlKey.VETERAN_LAYER_VOLUME_ADJUST.name(), result);
 	}
 
 	public static void populateControlMapWholeStemVolume(
@@ -247,7 +241,7 @@ public class TestUtils {
 
 		var groupIndicies = groupIndices(UtilComponentWSVolumeParser.MAX_GROUPS);
 
-		populateControlMap2(controlMap, UtilComponentWSVolumeParser.CONTROL_KEY, UTIL_CLASSES, groupIndicies, mapper);
+		populateControlMap2(controlMap, ControlKey.UTIL_COMP_WS_VOLUME.name(), UTIL_CLASSES, groupIndicies, mapper);
 	}
 
 	public static void populateControlMapCloseUtilization(
@@ -256,7 +250,7 @@ public class TestUtils {
 
 		var groupIndicies = groupIndices(CloseUtilVolumeParser.MAX_GROUPS);
 
-		populateControlMap2(controlMap, CloseUtilVolumeParser.CONTROL_KEY, UTIL_CLASSES, groupIndicies, mapper);
+		populateControlMap2(controlMap, ControlKey.CLOSE_UTIL_VOLUME.name(), UTIL_CLASSES, groupIndicies, mapper);
 	}
 
 	public static void populateControlMapNetDecay(
@@ -265,21 +259,21 @@ public class TestUtils {
 
 		var groupIndicies = groupIndices(VolumeNetDecayParser.MAX_GROUPS);
 
-		populateControlMap2(controlMap, VolumeNetDecayParser.CONTROL_KEY, UTIL_CLASSES, groupIndicies, mapper);
+		populateControlMap2(controlMap, ControlKey.VOLUME_NET_DECAY.name(), UTIL_CLASSES, groupIndicies, mapper);
 	}
 
 	public static void
 			populateControlMapNetWaste(Map<String, Object> controlMap, Function<String, Coefficients> mapper) {
 		var speciesDim = Arrays.asList(getSpeciesAliases());
 
-		populateControlMap1(controlMap, VolumeNetDecayWasteParser.CONTROL_KEY, speciesDim, mapper);
+		populateControlMap1(controlMap, ControlKey.VOLUME_NET_DECAY_WASTE.name(), speciesDim, mapper);
 	}
 
 	public static void
 			populateControlMapNetBreakage(HashMap<String, Object> controlMap, Function<Integer, Coefficients> mapper) {
 		var groupIndicies = groupIndices(BreakageParser.MAX_GROUPS);
 
-		populateControlMap1(controlMap, BreakageParser.CONTROL_KEY, groupIndicies, mapper);
+		populateControlMap1(controlMap, ControlKey.BREAKAGE.name(), groupIndicies, mapper);
 	}
 
 	public static <K1, K2, V> void populateControlMap2(
@@ -310,7 +304,7 @@ public class TestUtils {
 	public static void populateControlMapFromResource(
 			Map<String, Object> controlMap, ResourceControlMapModifier parser, String resource
 	) {
-		try (var is = ControlFileParserTest.class.getResourceAsStream("coe/" + resource)) {
+		try (var is = TestUtils.class.getResourceAsStream("coe/" + resource)) {
 			parser.modify(controlMap, is);
 		} catch (IOException | ResourceParseException ex) {
 			fail(ex);

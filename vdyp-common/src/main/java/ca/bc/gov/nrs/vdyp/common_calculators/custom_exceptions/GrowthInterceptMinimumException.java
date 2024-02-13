@@ -7,6 +7,8 @@ package ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions;
  * something like breast height age is less than 0.5
  */
 public class GrowthInterceptMinimumException extends RuntimeException {
+	private static final long serialVersionUID = 6161058579395893538L;
+
 	public GrowthInterceptMinimumException() {
 	}
 

@@ -7,6 +7,8 @@ package ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions;
  * something like breast height age is greater than GI range
  */
 public class GrowthInterceptMaximumException extends RuntimeException {
+	private static final long serialVersionUID = 7947200735123548686L;
+
 	public GrowthInterceptMaximumException() {
 	}
 

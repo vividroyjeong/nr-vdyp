@@ -15,7 +15,7 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.io.parse.*;
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.*;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
@@ -28,14 +28,14 @@ class ModifierParserTest {
 		var parser = new ModifierParser(JProgram.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.empty());
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.empty());
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = new MockFileResolver("TEST");
 
 		parser.modify(controlMap, fileResolver);
 
-		assertThat(controlMap, (Matcher) hasSpecificEntry(ModifierParser.CONTROL_KEY, notPresent()));
+		assertThat(controlMap, (Matcher) controlMapHasEntry(ControlKey.MODIFIER_FILE, notPresent()));
 	}
 
 	@Test
@@ -43,7 +43,7 @@ class ModifierParserTest {
 		var parser = new ModifierParser(JProgram.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
 		TestUtils.populateControlMapBec(controlMap);
 
 		var fileResolver = new MockFileResolver("TEST");
@@ -60,7 +60,7 @@ class ModifierParserTest {
 		var parser = new ModifierParser(JProgram.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
 		TestUtils.populateControlMapGenusReal(controlMap);
 		populateVetBq(controlMap);
 		populateHlP1(controlMap);
@@ -81,41 +81,41 @@ class ModifierParserTest {
 	protected void modifierDefaultAsserts(Map<String, Object> controlMap) {
 		var expectedSp0Aliases = TestUtils.getSpeciesAliases();
 
-		assertThat(controlMap, (Matcher) hasSpecificEntry(ModifierParser.CONTROL_KEY, present(is("testFilename"))));
+		assertThat(controlMap, (Matcher) controlMapHasEntry(ControlKey.MODIFIER_FILE, present(is("testFilename"))));
 
 		assertThat(
 				controlMap,
-				(Matcher) hasSpecificEntry(
-						ModifierParser.CONTROL_KEY_MOD200_BA,
+				(Matcher) controlMapHasEntry(
+						ControlKey.BA_MODIFIERS,
 						mmDimensions(contains((Object[]) expectedSp0Aliases), contains((Object[]) Region.values()))
 				)
 		);
-		assertThat(controlMap, (Matcher) hasSpecificEntry(ModifierParser.CONTROL_KEY_MOD200_BA, mmAll(is(1.0f))));
+		assertThat(controlMap, (Matcher) controlMapHasEntry(ControlKey.BA_MODIFIERS, mmAll(is(1.0f))));
 		assertThat(
 				controlMap,
-				(Matcher) hasSpecificEntry(
-						ModifierParser.CONTROL_KEY_MOD200_DQ,
+				(Matcher) controlMapHasEntry(
+						ControlKey.DQ_MODIFIERS,
 						mmDimensions(contains((Object[]) expectedSp0Aliases), contains((Object[]) Region.values()))
 				)
 		);
-		assertThat(controlMap, (Matcher) hasSpecificEntry(ModifierParser.CONTROL_KEY_MOD200_DQ, mmAll(is(1.0f))));
+		assertThat(controlMap, (Matcher) controlMapHasEntry(ControlKey.DQ_MODIFIERS, mmAll(is(1.0f))));
 
 		assertThat(
 				controlMap,
-				(Matcher) hasSpecificEntry(
+				(Matcher) controlMapHasEntry(
 						ModifierParser.CONTROL_KEY_MOD301_DECAY,
 						mmDimensions(contains((Object[]) expectedSp0Aliases), contains((Object[]) Region.values()))
 				)
 		);
-		assertThat(controlMap, (Matcher) hasSpecificEntry(ModifierParser.CONTROL_KEY_MOD301_DECAY, mmAll(is(0.0f))));
+		assertThat(controlMap, (Matcher) controlMapHasEntry(ModifierParser.CONTROL_KEY_MOD301_DECAY, mmAll(is(0.0f))));
 		assertThat(
 				controlMap,
-				(Matcher) hasSpecificEntry(
+				(Matcher) controlMapHasEntry(
 						ModifierParser.CONTROL_KEY_MOD301_WASTE,
 						mmDimensions(contains((Object[]) expectedSp0Aliases), contains((Object[]) Region.values()))
 				)
 		);
-		assertThat(controlMap, (Matcher) hasSpecificEntry(ModifierParser.CONTROL_KEY_MOD301_WASTE, mmAll(is(0.0f))));
+		assertThat(controlMap, (Matcher) controlMapHasEntry(ModifierParser.CONTROL_KEY_MOD301_WASTE, mmAll(is(0.0f))));
 	}
 
 	@Test
@@ -123,7 +123,7 @@ class ModifierParserTest {
 		var parser = new ModifierParser(JProgram.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
 		TestUtils.populateControlMapGenusReal(controlMap);
 		populateVetBq(controlMap);
 		populateHlP1(controlMap);
@@ -138,7 +138,7 @@ class ModifierParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var baMap = ((MatrixMap<Float>) controlMap.get(ModifierParser.CONTROL_KEY_MOD200_BA));
+		var baMap = ((MatrixMap<Float>) controlMap.get(ControlKey.BA_MODIFIERS.name()));
 		baMap.eachKey(k -> {
 			if (k[0].equals("AC")) {
 				if (k[1].equals(Region.COASTAL)) {
@@ -150,7 +150,7 @@ class ModifierParserTest {
 				assertThat(baMap.getM(k), is(1.0f));
 			}
 		});
-		var dqMap = ((MatrixMap<Float>) controlMap.get(ModifierParser.CONTROL_KEY_MOD200_DQ));
+		var dqMap = ((MatrixMap<Float>) controlMap.get(ControlKey.DQ_MODIFIERS.name()));
 		dqMap.eachKey(k -> {
 			if (k[0].equals("AC")) {
 				if (k[1].equals(Region.COASTAL)) {
@@ -169,7 +169,7 @@ class ModifierParserTest {
 		var parser = new ModifierParser(JProgram.VRI_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
 		TestUtils.populateControlMapGenusReal(controlMap);
 		populateVetBq(controlMap);
 		populateHlP1(controlMap);
@@ -192,7 +192,7 @@ class ModifierParserTest {
 		var parser = new ModifierParser(JProgram.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
 		TestUtils.populateControlMapGenusReal(controlMap);
 		populateVetBq(controlMap);
 		populateHlP1(controlMap);
@@ -215,7 +215,7 @@ class ModifierParserTest {
 		var parser = new ModifierParser(JProgram.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
 		TestUtils.populateControlMapGenusReal(controlMap);
 		populateVetBq(controlMap);
 		populateHlP1(controlMap);
@@ -230,7 +230,7 @@ class ModifierParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var baMap = ((MatrixMap<Float>) controlMap.get(ModifierParser.CONTROL_KEY_MOD200_BA));
+		var baMap = ((MatrixMap<Float>) controlMap.get(ControlKey.BA_MODIFIERS.name()));
 		baMap.eachKey(k -> {
 			if (k[0].equals("AC")) {
 				if (k[1].equals(Region.COASTAL)) {
@@ -242,7 +242,7 @@ class ModifierParserTest {
 				assertThat(baMap.getM(k), is(1.0f));
 			}
 		});
-		var dqMap = ((MatrixMap<Float>) controlMap.get(ModifierParser.CONTROL_KEY_MOD200_DQ));
+		var dqMap = ((MatrixMap<Float>) controlMap.get(ControlKey.DQ_MODIFIERS.name()));
 		dqMap.eachKey(k -> {
 			if (k[0].equals("AC")) {
 				if (k[1].equals(Region.COASTAL)) {
@@ -261,7 +261,7 @@ class ModifierParserTest {
 		var parser = new ModifierParser(JProgram.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
 		TestUtils.populateControlMapGenusReal(controlMap);
 		populateVetBq(controlMap);
 		populateHlP1(controlMap);
@@ -276,7 +276,7 @@ class ModifierParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var baMap = ((MatrixMap<Float>) controlMap.get(ModifierParser.CONTROL_KEY_MOD200_BA));
+		var baMap = ((MatrixMap<Float>) controlMap.get(ControlKey.BA_MODIFIERS.name()));
 		baMap.eachKey(k -> {
 			if (k[1].equals(Region.COASTAL)) {
 				assertThat(baMap.getM(k), is(2.0f));
@@ -284,7 +284,7 @@ class ModifierParserTest {
 				assertThat(baMap.getM(k), is(3.0f));
 			}
 		});
-		var dqMap = ((MatrixMap<Float>) controlMap.get(ModifierParser.CONTROL_KEY_MOD200_DQ));
+		var dqMap = ((MatrixMap<Float>) controlMap.get(ControlKey.DQ_MODIFIERS.name()));
 		dqMap.eachKey(k -> {
 			if (k[1].equals(Region.COASTAL)) {
 				assertThat(dqMap.getM(k), is(4.0f));
@@ -299,7 +299,7 @@ class ModifierParserTest {
 		var parser = new ModifierParser(JProgram.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
 		TestUtils.populateControlMapGenusReal(controlMap);
 		MatrixMap2<String, Region, Coefficients> vetBqMap = populateVetBq(controlMap);
 		populateHlP1(controlMap);
@@ -328,7 +328,7 @@ class ModifierParserTest {
 				Arrays.asList(TestUtils.getSpeciesAliases()), Arrays.asList(Region.values()),
 				(k1, k2) -> new Coefficients(Arrays.asList(1.0f, 5.0f, 7.0f), 1)
 		);
-		controlMap.put(VeteranBQParser.CONTROL_KEY, vetBqMap);
+		controlMap.put(ControlKey.VETERAN_BQ.name(), vetBqMap);
 		return vetBqMap;
 	}
 
@@ -337,7 +337,7 @@ class ModifierParserTest {
 		var parser = new ModifierParser(JProgram.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
 		TestUtils.populateControlMapGenusReal(controlMap);
 		populateVetBq(controlMap);
 		populateHlP1(controlMap);
@@ -352,7 +352,7 @@ class ModifierParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var decayMap = ((MatrixMap<Float>) controlMap.get(ModifierParser.CONTROL_KEY_MOD301_DECAY));
+		var decayMap = ((MatrixMap<Float>) controlMap.get(ModifierParser.CONTROL_KEY_MOD301_DECAY.name()));
 		decayMap.eachKey(k -> {
 			if (k[0].equals("AC")) {
 				if (k[1].equals(Region.COASTAL)) {
@@ -364,7 +364,7 @@ class ModifierParserTest {
 				assertThat(decayMap.getM(k), is(0.0f));
 			}
 		});
-		var wasteMap = ((MatrixMap<Float>) controlMap.get(ModifierParser.CONTROL_KEY_MOD301_WASTE));
+		var wasteMap = ((MatrixMap<Float>) controlMap.get(ModifierParser.CONTROL_KEY_MOD301_WASTE.name()));
 		wasteMap.eachKey(k -> {
 			if (k[0].equals("AC")) {
 				if (k[1].equals(Region.COASTAL)) {
@@ -379,11 +379,11 @@ class ModifierParserTest {
 	}
 
 	@Test
-	public void testHL() throws Exception {
+	void testHL() throws Exception {
 		var parser = new ModifierParser(JProgram.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
 
 		TestUtils.populateControlMapGenusReal(controlMap);
 		populateVetBq(controlMap);
@@ -453,7 +453,7 @@ class ModifierParserTest {
 				MatrixMap3Impl.emptyDefault()
 		);
 		hlNPMap.setAll(k -> new NonprimaryHLCoefficients(Arrays.asList(1.0f, 5.0f), 1));
-		controlMap.put(HLNonprimaryCoefficientParser.CONTROL_KEY, hlNPMap);
+		controlMap.put(ControlKey.HL_NONPRIMARY.name(), hlNPMap);
 		return hlNPMap;
 	}
 
@@ -464,7 +464,7 @@ class ModifierParserTest {
 				MatrixMap2Impl.emptyDefault()
 		);
 		hlP3Map.setAll(k -> new Coefficients(Arrays.asList(1.0f, 5.0f, 7.0f, 13.0f), 1));
-		controlMap.put(HLCoefficientParser.CONTROL_KEY_P3, hlP3Map);
+		controlMap.put(ControlKey.HL_PRIMARY_SP_EQN_P3.name(), hlP3Map);
 		return hlP3Map;
 	}
 
@@ -475,7 +475,7 @@ class ModifierParserTest {
 				MatrixMap2Impl.emptyDefault()
 		);
 		hlP2Map.setAll(k -> new Coefficients(Arrays.asList(1.0f, 5.0f), 1));
-		controlMap.put(HLCoefficientParser.CONTROL_KEY_P2, hlP2Map);
+		controlMap.put(ControlKey.HL_PRIMARY_SP_EQN_P2.name(), hlP2Map);
 		return hlP2Map;
 	}
 
@@ -486,7 +486,7 @@ class ModifierParserTest {
 				MatrixMap2Impl.emptyDefault()
 		);
 		hlP1Map.setAll(k -> new Coefficients(Arrays.asList(1.0f, 5.0f, 7.0f), 1));
-		controlMap.put(HLCoefficientParser.CONTROL_KEY_P1, hlP1Map);
+		controlMap.put(ControlKey.HL_PRIMARY_SP_EQN_P1.name(), hlP1Map);
 		return hlP1Map;
 	}
 

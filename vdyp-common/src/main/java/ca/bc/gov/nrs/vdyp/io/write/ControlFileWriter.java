@@ -7,7 +7,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
-import ca.bc.gov.nrs.vdyp.io.parse.ControlFileParser;
+import ca.bc.gov.nrs.vdyp.io.parse.control.ControlFileParser;
 
 /**
  * Writer for control files

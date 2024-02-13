@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.common;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -10,6 +11,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.annotation.Nullable;
+
+import org.apache.commons.math3.util.Pair;
 
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 
@@ -64,6 +67,21 @@ public class Utils {
 	}
 
 	/**
+	 * Get an entry from a control map that is expected to exist.
+	 *
+	 * @param control The control map
+	 * @param key     Key for the entry in the control map
+	 * @param clazz   Expected type for the entry
+	 * @throws IllegalStateException if the control map does not have the requested
+	 *                               entry or it is the wrong type.
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static <U> U expectParsedControl(Map<String, Object> control, ControlKey key, Class<? super U> clazz) {
+		return (U) expectParsedControl(control, key.name(), clazz);
+	}
+
+	/**
 	 * Creates a Comparator that compares two objects by applying the given accessor
 	 * function to get comparable values that are then compared.
 	 *
@@ -109,4 +127,47 @@ public class Utils {
 		return utilizationVector(0f);
 	}
 
+	/**
+	 * Takes two iterables and returns an iterable of pairs of their entries. If
+	 * they have different lengths, it stops when the first one does.
+	 *
+	 * @param <T>
+	 * @param <U>
+	 * @param iterable1
+	 * @param iterable2
+	 * @return
+	 */
+	public static <T, U> Iterable<Pair<T, U>> parallelIterate(Iterable<T> iterable1, Iterable<U> iterable2) {
+		return () -> {
+			var iterator1 = iterable1.iterator();
+			var iterator2 = iterable2.iterator();
+
+			return new Iterator<Pair<T, U>>() {
+
+				@Override
+				public boolean hasNext() {
+					return iterator1.hasNext() && iterator2.hasNext();
+				}
+
+				@Override
+				public Pair<T, U> next() {
+					return new Pair<>(iterator1.next(), iterator2.next());
+				}
+
+			};
+		};
+	}
+
+	public static boolean nullOrPrefixBlank(@Nullable String string, int length) {
+		return string == null || (string.length() <= length && string.isBlank())
+				|| (string.length() > length && string.substring(0, length).isBlank());
+	}
+
+	public static boolean nullOrBlank(@Nullable String string) {
+		return string == null || string.isBlank();
+	}
+
+	public static boolean nullOrEmpty(@Nullable String string) {
+		return string == null || string.isEmpty();
+	}
 }

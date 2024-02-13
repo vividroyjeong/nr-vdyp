@@ -7,24 +7,24 @@ import ca.bc.gov.nrs.vdyp.common.Computed;
 
 public class VdypLayer extends BaseVdypLayer<VdypSpecies> implements VdypUtilizationHolder {
 
-	Coefficients baseAreaByUtilization = //
+	private Coefficients baseAreaByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/BA species 0
-	Coefficients loreyHeightByUtilization = //
+	private Coefficients loreyHeightByUtilization = //
 			VdypUtilizationHolder.emptyLoreyHeightUtilization(); // LVCOM/HL species 0
-	Coefficients quadraticMeanDiameterByUtilization = //
+	private Coefficients quadraticMeanDiameterByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/DQ species 0
-	Coefficients treesPerHectareByUtilization = //
+	private Coefficients treesPerHectareByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/TPH species 0
 
-	Coefficients wholeStemVolumeByUtilization = //
+	private Coefficients wholeStemVolumeByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOLWS species 0
-	Coefficients closeUtilizationVolumeByUtilization = //
+	private Coefficients closeUtilizationVolumeByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOLCU species/ 0
-	Coefficients closeUtilizationVolumeNetOfDecayByUtilization = //
+	private Coefficients closeUtilizationVolumeNetOfDecayByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOL_D species 0
-	Coefficients closeUtilizationVolumeNetOfDecayAndWasteByUtilization = //
+	private Coefficients closeUtilizationVolumeNetOfDecayAndWasteByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOL_DW species 0
-	Coefficients closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = //
+	private Coefficients closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOL_DWB species 0
 
 	private Optional<String> dominantSpecies;

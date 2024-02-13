@@ -50,6 +50,7 @@ import org.apache.commons.math3.util.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.IndexedFloatBinaryOperator;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
@@ -58,39 +59,12 @@ import ca.bc.gov.nrs.vdyp.fip.model.FipLayerPrimary;
 import ca.bc.gov.nrs.vdyp.fip.model.FipPolygon;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.BecDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.BreakageEquationGroupParser;
-import ca.bc.gov.nrs.vdyp.io.parse.BreakageParser;
-import ca.bc.gov.nrs.vdyp.io.parse.BySpeciesDqCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.CloseUtilVolumeParser;
-import ca.bc.gov.nrs.vdyp.io.parse.CoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ComponentSizeParser;
-import ca.bc.gov.nrs.vdyp.io.parse.DecayEquationGroupParser;
-import ca.bc.gov.nrs.vdyp.io.parse.DefaultEquationNumberParser;
-import ca.bc.gov.nrs.vdyp.io.parse.EquationModifierParser;
-import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.HLCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.HLNonprimaryCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentBaseAreaParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentDQParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentHLParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentProbabilityParser;
-import ca.bc.gov.nrs.vdyp.io.parse.SmallComponentWSVolumeParser;
-import ca.bc.gov.nrs.vdyp.io.parse.StockingClassFactorParser;
-import ca.bc.gov.nrs.vdyp.io.parse.StreamingParser;
-import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
-import ca.bc.gov.nrs.vdyp.io.parse.TotalStandWholeStemParser;
-import ca.bc.gov.nrs.vdyp.io.parse.UpperCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.UtilComponentBaseAreaParser;
-import ca.bc.gov.nrs.vdyp.io.parse.UtilComponentDQParser;
-import ca.bc.gov.nrs.vdyp.io.parse.UtilComponentWSVolumeParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VeteranBQParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VeteranDQParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VeteranLayerVolumeAdjustParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VolumeEquationGroupParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VolumeNetDecayWasteParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperCoefficientParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.write.VriAdjustInputWriter;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
@@ -229,10 +203,11 @@ public class FipStart implements Closeable {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private <T> StreamingParser<T> getStreamingParser(String key) throws ProcessingException {
+	private <T> StreamingParser<T> getStreamingParser(ControlKey key) throws ProcessingException {
 		try {
-			var factory = (StreamingParserFactory<T>) controlMap.get(key);
+			var factory = Utils
+					.<StreamingParserFactory<T>>expectParsedControl(controlMap, key, StreamingParserFactory.class);
+
 			if (factory == null) {
 				throw new ProcessingException(String.format("Data file %s not specified in control map.", key));
 			}
@@ -250,9 +225,9 @@ public class FipStart implements Closeable {
 		int polygonsRead = 0;
 		int polygonsWritten = 0;
 		try (
-				var polyStream = this.<FipPolygon>getStreamingParser(FipPolygonParser.CONTROL_KEY);
-				var layerStream = this.<Map<LayerType, FipLayer>>getStreamingParser(FipLayerParser.CONTROL_KEY);
-				var speciesStream = this.<Collection<FipSpecies>>getStreamingParser(FipSpeciesParser.CONTROL_KEY);
+				var polyStream = this.<FipPolygon>getStreamingParser(ControlKey.FIP_YIELD_POLY_INPUT);
+				var layerStream = this.<Map<LayerType, FipLayer>>getStreamingParser(ControlKey.FIP_YIELD_LAYER_INPUT);
+				var speciesStream = this.<Collection<FipSpecies>>getStreamingParser(ControlKey.FIP_YIELD_LX_SP0_INPUT);
 		) {
 			log.atDebug().setMessage("Start Stand processing").log();
 
@@ -347,8 +322,8 @@ public class FipStart implements Closeable {
 
 		// if (FIPPASS(6) .eq. 0 .or. FIPPASS(6) .eq. 2) then
 		if (true /* TODO */) {
-			@SuppressWarnings("unchecked")
-			var minima = (Map<String, Float>) controlMap.get(FipControlParser.MINIMA);
+			var minima = Utils.<Map<String, Float>>expectParsedControl(controlMap, ControlKey.MINIMA, Map.class);
+
 			float minimumBaseArea = minima.get(FipControlParser.MINIMUM_BASE_AREA);
 			float minimumPredictedBaseArea = minima.get(FipControlParser.MINIMUM_PREDICTED_BASE_AREA);
 			if (baseAreaTotalPrime < minimumBaseArea) {
@@ -369,9 +344,8 @@ public class FipStart implements Closeable {
 	// FIPSTK
 	void adjustForStocking(VdypLayer vdypLayer, FipLayerPrimary fipLayerPrimary, BecDefinition bec) {
 
-		@SuppressWarnings("unchecked")
-		var stockingClassMap = (MatrixMap2<Character, Region, Optional<StockingClassFactor>>) controlMap
-				.get(StockingClassFactorParser.CONTROL_KEY);
+		MatrixMap2<Character, Region, Optional<StockingClassFactor>> stockingClassMap = Utils
+				.expectParsedControl(controlMap, ControlKey.STOCKING_CLASS_FACTORS, MatrixMap2.class);
 
 		Region region = bec.getRegion();
 
@@ -545,9 +519,9 @@ public class FipStart implements Closeable {
 
 		// Lookup volume group, Decay Group, and Breakage group for each species.
 
-		var volumeGroupMap = getGroupMap(VolumeEquationGroupParser.CONTROL_KEY);
-		var decayGroupMap = getGroupMap(DecayEquationGroupParser.CONTROL_KEY);
-		var breakageGroupMap = getGroupMap(BreakageEquationGroupParser.CONTROL_KEY);
+		var volumeGroupMap = getGroupMap(ControlKey.VOLUME_EQN_GROUPS);
+		var decayGroupMap = getGroupMap(ControlKey.DECAY_GROUPS);
+		var breakageGroupMap = getGroupMap(ControlKey.BREAKAGE_GROUPS);
 
 		Map<String, Float> targetPercentages = new HashMap<>(vdypSpecies.size());
 
@@ -623,10 +597,10 @@ public class FipStart implements Closeable {
 	int findEmpiricalRelationshipParameterIndex(String specAlias, BecDefinition bec, int itg)
 			throws ProcessingException {
 		var groupMap = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
-				controlMap, DefaultEquationNumberParser.CONTROL_KEY, MatrixMap2.class
+				controlMap, ControlKey.DEFAULT_EQ_NUM, MatrixMap2.class
 		);
 		var modMap = Utils.<MatrixMap2<Integer, Integer, Optional<Integer>>>expectParsedControl(
-				controlMap, EquationModifierParser.CONTROL_KEY, MatrixMap2.class
+				controlMap, ControlKey.EQN_MODIFIERS, MatrixMap2.class
 		);
 		var group = groupMap.get(specAlias, bec.getGrowthBec().getAlias());
 		group = MatrixMap.safeGet(modMap, group, itg).orElse(group);
@@ -868,9 +842,8 @@ public class FipStart implements Closeable {
 			return standQuadMeanDiameter;
 		}
 
-		var coeMap = Utils.<Map<String, Coefficients>>expectParsedControl(
-				controlMap, BySpeciesDqCoefficientParser.CONTROL_KEY, Map.class
-		);
+		var coeMap = Utils
+				.<Map<String, Coefficients>>expectParsedControl(controlMap, ControlKey.BY_SPECIES_DQ, Map.class);
 		var specAliases = GenusDefinitionParser.getSpeciesAliases(controlMap);
 
 		// TODO we can probably remove these as they seem to only be used for debugging
@@ -993,7 +966,7 @@ public class FipStart implements Closeable {
 	// EMP061
 	private Coefficients getLimitsForHeightAndDiameter(String genus, Region region) {
 		var coeMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
-				controlMap, ComponentSizeParser.CONTROL_KEY, MatrixMap2.class
+				controlMap, ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, MatrixMap2.class
 		);
 
 		return coeMap.get(genus, region);
@@ -1002,7 +975,7 @@ public class FipStart implements Closeable {
 	// EMP090
 	private float estimateWholeStemVolumePerTree(int volumeGroup, float loreyHeight, float quadMeanDiameter) {
 		var coeMap = Utils.<Map<Integer, Coefficients>>expectParsedControl(
-				controlMap, TotalStandWholeStemParser.CONTROL_KEY, Map.class
+				controlMap, ControlKey.TOTAL_STAND_WHOLE_STEM_VOL, Map.class
 		);
 		var coe = coeMap.get(volumeGroup).reindex(0);
 
@@ -1033,7 +1006,7 @@ public class FipStart implements Closeable {
 			VdypSpecies vspec, VdypSpecies vspecPrime, BecDefinition bec, float leadHeight, float primaryHeight
 	) throws ProcessingException {
 		var coeMap = Utils.<MatrixMap3<String, String, Region, Optional<NonprimaryHLCoefficients>>>expectParsedControl(
-				controlMap, HLNonprimaryCoefficientParser.CONTROL_KEY, MatrixMap3.class
+				controlMap, ControlKey.HL_NONPRIMARY, MatrixMap3.class
 		);
 
 		var coe = coeMap.get(vspec.getGenus(), vspecPrime.getGenus(), bec.getRegion()).orElseThrow(
@@ -1104,9 +1077,9 @@ public class FipStart implements Closeable {
 
 		// Lookup volume group, Decay Group, and Breakage group for each species.
 
-		var volumeGroupMap = getGroupMap(VolumeEquationGroupParser.CONTROL_KEY);
-		var decayGroupMap = getGroupMap(DecayEquationGroupParser.CONTROL_KEY);
-		var breakageGroupMap = getGroupMap(BreakageEquationGroupParser.CONTROL_KEY);
+		var volumeGroupMap = getGroupMap(ControlKey.VOLUME_EQN_GROUPS);
+		var decayGroupMap = getGroupMap(ControlKey.DECAY_GROUPS);
+		var breakageGroupMap = getGroupMap(ControlKey.BREAKAGE_GROUPS);
 		for (var vSpec : vdypSpecies.values()) {
 			var volumeGroup = getGroup(fipPolygon, volumeGroupMap, vSpec.getGenus());
 			var decayGroup = getGroup(fipPolygon, decayGroupMap, vSpec.getGenus());
@@ -1131,7 +1104,7 @@ public class FipStart implements Closeable {
 		}
 
 		var vetDqMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
-				controlMap, VeteranDQParser.CONTROL_KEY, MatrixMap2.class
+				controlMap, ControlKey.VETERAN_LAYER_DQ, MatrixMap2.class
 		);
 
 		for (var vSpec : vdypSpecies.values()) {
@@ -1426,7 +1399,7 @@ public class FipStart implements Closeable {
 		);
 
 		var volumeAdjustMap = Utils.<Map<String, Coefficients>>expectParsedControl(
-				controlMap, VeteranLayerVolumeAdjustParser.CONTROL_KEY, Map.class
+				controlMap, ControlKey.VETERAN_LAYER_VOLUME_ADJUST, Map.class
 		);
 		try {
 			for (var vdypSpecies : vdypLayer.getSpecies().values()) {
@@ -1853,7 +1826,7 @@ public class FipStart implements Closeable {
 			BecDefinition bec, Coefficients quadMeanDiameterUtil, Coefficients baseAreaUtil, VdypSpecies spec
 	) throws ProcessingException {
 		final var coeMap = Utils.<MatrixMap3<Integer, String, String, Coefficients>>expectParsedControl(
-				controlMap, UtilComponentBaseAreaParser.CONTROL_KEY, MatrixMap3.class
+				controlMap, ControlKey.UTIL_COMP_BA, MatrixMap3.class
 		);
 
 		float dq = quadMeanDiameterUtil.getCoe(UTIL_ALL);
@@ -1906,7 +1879,7 @@ public class FipStart implements Closeable {
 		for (var uc : UTIL_CLASSES) {
 			log.atDebug().setMessage("For util level {}").addArgument(uc.className);
 			final var coeMap = Utils.<MatrixMap3<Integer, String, String, Coefficients>>expectParsedControl(
-					controlMap, UtilComponentDQParser.CONTROL_KEY, MatrixMap3.class
+					controlMap, ControlKey.UTIL_COMP_DQ, MatrixMap3.class
 			);
 			var coe = coeMap.get(uc.index, spec.getGenus(), bec.getGrowthBec().getAlias());
 
@@ -2164,21 +2137,20 @@ public class FipStart implements Closeable {
 	int findBaseAreaGroup(FipSpecies fipSpecies, BecDefinition bec, int itg) {
 		var growthBec = bec.getGrowthBec();
 		final var defaultGroupsMap = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
-				controlMap, DefaultEquationNumberParser.CONTROL_KEY, MatrixMap2.class
+				controlMap, ControlKey.DEFAULT_EQ_NUM, MatrixMap2.class
 		);
 		final var modifierMap = Utils.<MatrixMap2<Integer, Integer, Optional<Integer>>>expectParsedControl(
-				controlMap, EquationModifierParser.CONTROL_KEY, MatrixMap2.class
+				controlMap, ControlKey.EQN_MODIFIERS, MatrixMap2.class
 		);
 		var defaultGroup = defaultGroupsMap.get(fipSpecies.getGenus(), growthBec.getAlias());
 		return modifierMap.getM(defaultGroup, itg).orElse(defaultGroup);
 	}
 
 	private float heightMultiplier(String genus, Region region, float treesPerHectarePrimary) {
-		final var coeMap = Utils.<MatrixMap2<String, Region, Optional<Coefficients>>>expectParsedControl(
-				controlMap, HLCoefficientParser.CONTROL_KEY_P1, MatrixMap2.class
+		final var coeMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
+				controlMap, ControlKey.HL_PRIMARY_SP_EQN_P1, MatrixMap2.class
 		);
-		var coe = coeMap.get(genus, region).orElse(Coefficients.empty(HLCoefficientParser.NUM_COEFFICIENTS_P1, 1))
-				.reindex(0);
+		var coe = coeMap.get(genus, region).reindex(0);
 		return coe.get(0) - coe.getCoe(1) + coe.getCoe(1) * exp(coe.getCoe(2) * (treesPerHectarePrimary - 100f));
 	}
 
@@ -2225,10 +2197,10 @@ public class FipStart implements Closeable {
 	 * @return
 	 */
 	private float primaryHeightFromLeadHeightInitial(float leadHeight, String genus, Region region) {
-		final var coeMap = Utils.<MatrixMap2<String, Region, Optional<Coefficients>>>expectParsedControl(
-				controlMap, HLCoefficientParser.CONTROL_KEY_P2, MatrixMap2.class
+		final var coeMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
+				controlMap, ControlKey.HL_PRIMARY_SP_EQN_P2, MatrixMap2.class
 		);
-		var coe = coeMap.get(genus, region).orElse(Coefficients.empty(HLCoefficientParser.NUM_COEFFICIENTS_P2, 1));
+		var coe = coeMap.get(genus, region);
 		return 1.3f + coe.getCoe(1) * pow(leadHeight - 1.3f, coe.getCoe(2));
 	}
 
@@ -2283,7 +2255,7 @@ public class FipStart implements Closeable {
 		var dqSp = quadMeanDiameterUtil.getCoe(UTIL_ALL);
 		final var wholeStemUtilizationComponentMap = Utils
 				.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
-						controlMap, UtilComponentWSVolumeParser.CONTROL_KEY, MatrixMap2.class
+						controlMap, ControlKey.UTIL_COMP_WS_VOLUME, MatrixMap2.class
 				);
 		estimateUtilization(baseAreaUtil, wholeStemVolumeUtil, utilizationClass, (uc, ba) -> {
 			Coefficients wholeStemCoe = wholeStemUtilizationComponentMap.get(uc.index, volumeGroup).orElseThrow(
@@ -2329,7 +2301,7 @@ public class FipStart implements Closeable {
 	) throws ProcessingException {
 		final var closeUtilizationCoeMap = Utils
 				.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
-						controlMap, CloseUtilVolumeParser.CONTROL_KEY, MatrixMap2.class
+						controlMap, ControlKey.CLOSE_UTIL_VOLUME, MatrixMap2.class
 				);
 		estimateUtilization(wholeStemVolumeUtil, closeUtilizationVolumeUtil, utilizationClass, (uc, ws) -> {
 			Coefficients closeUtilCoe = closeUtilizationCoeMap.get(uc.index, volumeGroup).orElseThrow(
@@ -2435,7 +2407,7 @@ public class FipStart implements Closeable {
 	) throws ProcessingException {
 		var dqSp = quadMeanDiameterUtil.getCoe(UTIL_ALL);
 		final var netDecayCoeMap = Utils.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
-				controlMap, VolumeNetDecayParser.CONTROL_KEY, MatrixMap2.class
+				controlMap, ControlKey.VOLUME_NET_DECAY, MatrixMap2.class
 		);
 		final var decayModifierMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
 				controlMap, ModifierParser.CONTROL_KEY_MOD301_DECAY, MatrixMap2.class
@@ -2480,10 +2452,10 @@ public class FipStart implements Closeable {
 			Coefficients closeUtilizationNetOfDecayUtil, Coefficients closeUtilizationNetOfDecayAndWasteUtil
 	) throws ProcessingException {
 		final var netDecayCoeMap = Utils.<Map<String, Coefficients>>expectParsedControl(
-				controlMap, VolumeNetDecayWasteParser.CONTROL_KEY, Map.class
+				controlMap, ControlKey.VOLUME_NET_DECAY_WASTE, Map.class
 		);
 		final var wasteModifierMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
-				controlMap, ModifierParser.CONTROL_KEY_MOD301_WASTE, MatrixMap2.class
+				controlMap, ControlKey.WASTE_MODIFIERS, MatrixMap2.class
 		);
 
 		estimateUtilization(
@@ -2555,7 +2527,7 @@ public class FipStart implements Closeable {
 			Coefficients closeUtilizationNetOfDecayWasteAndBreakageUtil
 	) throws ProcessingException {
 		final var netBreakageCoeMap = Utils
-				.<Map<Integer, Coefficients>>expectParsedControl(controlMap, BreakageParser.CONTROL_KEY, Map.class);
+				.<Map<Integer, Coefficients>>expectParsedControl(controlMap, ControlKey.BREAKAGE, Map.class);
 		final var coefficients = netBreakageCoeMap.get(breakageGroup);
 		if (coefficients == null) {
 			throw new ProcessingException("Could not find net breakage coefficients for group " + breakageGroup);
@@ -2623,7 +2595,7 @@ public class FipStart implements Closeable {
 		return volumeGroupMap.get(genus, fipPolygon.getBiogeoclimaticZone());
 	}
 
-	MatrixMap2<String, String, Integer> getGroupMap(String key) {
+	MatrixMap2<String, String, Integer> getGroupMap(ControlKey key) {
 		return Utils.expectParsedControl(controlMap, key, MatrixMap2.class);
 	}
 
@@ -2687,7 +2659,7 @@ public class FipStart implements Closeable {
 	}
 
 	private Optional<Float> heightMinimum(LayerType layer) {
-		var minima = Utils.<Map<String, Float>>expectParsedControl(controlMap, FipControlParser.MINIMA, Map.class);
+		var minima = Utils.<Map<String, Float>>expectParsedControl(controlMap, ControlKey.MINIMA.name(), Map.class);
 		switch (layer) {
 		case PRIMARY:
 			return Optional.of(minima.get(FipControlParser.MINIMUM_HEIGHT));
@@ -2796,13 +2768,13 @@ public class FipStart implements Closeable {
 		crownClosure = lowCrownClosure ? LOW_CROWN_CLOSURE : crownClosure;
 
 		var coeMap = Utils.<MatrixMap2<String, String, Coefficients>>expectParsedControl(
-				controlMap, CoefficientParser.BA_CONTROL_KEY, MatrixMap2.class
+				controlMap, ControlKey.COE_BA, MatrixMap2.class
 		);
 		var modMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
-				controlMap, ModifierParser.CONTROL_KEY_MOD200_BA, MatrixMap2.class
+				controlMap, ControlKey.BA_MODIFIERS, MatrixMap2.class
 		);
 		var upperBoundMap = Utils.<MatrixMap3<Region, String, Integer, Float>>expectParsedControl(
-				controlMap, UpperCoefficientParser.CONTROL_KEY, MatrixMap3.class
+				controlMap, ControlKey.UPPER_BA_BY_CI_S0_P, MatrixMap3.class
 		);
 
 		var leadGenus = leadGenus(fipLayer);
@@ -2942,9 +2914,9 @@ public class FipStart implements Closeable {
 
 	// EMP098
 	float estimateVeteranBaseArea(float height, float crownClosure, String genus, Region region) {
-		@SuppressWarnings("unchecked")
-		var coefficients = ((MatrixMap2<String, Region, Coefficients>) controlMap.get(VeteranBQParser.CONTROL_KEY))
-				.getM(genus, region);
+		var coefficients = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
+				controlMap, ControlKey.VETERAN_BQ, MatrixMap2.class
+		).getM(genus, region);
 
 		// mismatched index is copied from VDYP7
 		float a0 = coefficients.getCoe(1);
@@ -2965,13 +2937,13 @@ public class FipStart implements Closeable {
 			FipLayerPrimary fipLayer, BecDefinition bec, float breastHeightAge, float baseAreaOverstory
 	) {
 		var coeMap = Utils.<MatrixMap2<String, String, Coefficients>>expectParsedControl(
-				controlMap, CoefficientParser.DQ_CONTROL_KEY, MatrixMap2.class
+				controlMap, ControlKey.COE_DQ, MatrixMap2.class
 		);
 		var modMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
-				controlMap, ModifierParser.CONTROL_KEY_MOD200_DQ, MatrixMap2.class
+				controlMap, ControlKey.DQ_MODIFIERS, MatrixMap2.class
 		);
 		var upperBoundMap = Utils.<MatrixMap3<Region, String, Integer, Float>>expectParsedControl(
-				controlMap, UpperCoefficientParser.CONTROL_KEY, MatrixMap3.class
+				controlMap, ControlKey.UPPER_BA_BY_CI_S0_P, MatrixMap3.class
 		);
 
 		var leadGenus = leadGenus(fipLayer);
@@ -3045,7 +3017,7 @@ public class FipStart implements Closeable {
 	 */
 	public float estimateMeanVolume(int volumeGroup, float loreyHeight, float quadMeanDiameter) {
 		var coeMap = Utils.<Map<Integer, Coefficients>>expectParsedControl(
-				controlMap, TotalStandWholeStemParser.CONTROL_KEY, Map.class
+				controlMap, ControlKey.TOTAL_STAND_WHOLE_STEM_VOL, Map.class
 		);
 
 		var coe = coeMap.get(volumeGroup);
@@ -3206,7 +3178,7 @@ public class FipStart implements Closeable {
 
 	// EMP086
 	private float meanVolumeSmall(VdypSpecies spec, float quadMeanDiameterSpecSmall, float loreyHeightSpecSmall) {
-		Coefficients coe = getCoeForSpec(spec, SmallComponentWSVolumeParser.CONTROL_KEY);
+		Coefficients coe = getCoeForSpec(spec, ControlKey.SMALL_COMP_WS_VOLUME);
 
 		// EQN 1 in IPSJF119.doc
 
@@ -3223,7 +3195,7 @@ public class FipStart implements Closeable {
 
 	// EMP085
 	private float smallComponentLoreyHeight(VdypSpecies spec, float quadMeanDiameterSpecSmall) {
-		Coefficients coe = getCoeForSpec(spec, SmallComponentHLParser.CONTROL_KEY);
+		Coefficients coe = getCoeForSpec(spec, ControlKey.SMALL_COMP_HL);
 
 		// EQN 1 in IPSJF119.doc
 
@@ -3238,7 +3210,7 @@ public class FipStart implements Closeable {
 
 	// EMP082
 	private float smallComponentQuadMeanDiameter(VdypSpecies spec) {
-		Coefficients coe = getCoeForSpec(spec, SmallComponentDQParser.CONTROL_KEY);
+		Coefficients coe = getCoeForSpec(spec, ControlKey.SMALL_COMP_DQ);
 
 		// EQN 5 in IPSJF118.doc
 
@@ -3253,7 +3225,7 @@ public class FipStart implements Closeable {
 
 	// EMP081
 	private float conditionalExpectedBaseArea(VdypSpecies spec, float baseAreaSpec, Region region) {
-		Coefficients coe = getCoeForSpec(spec, SmallComponentBaseAreaParser.CONTROL_KEY);
+		Coefficients coe = getCoeForSpec(spec, ControlKey.SMALL_COMP_BA);
 
 		// EQN 3 in IPSJF118.doc
 
@@ -3280,7 +3252,7 @@ public class FipStart implements Closeable {
 
 	// EMP080
 	private float smallComponentProbability(VdypLayer layer, VdypSpecies spec, Region region) {
-		Coefficients coe = getCoeForSpec(spec, SmallComponentProbabilityParser.CONTROL_KEY);
+		Coefficients coe = getCoeForSpec(spec, ControlKey.SMALL_COMP_PROBABILITY);
 
 		// EQN 1 in IPSJF118.doc
 
@@ -3300,7 +3272,7 @@ public class FipStart implements Closeable {
 		return exp(logit) / (1.0f + exp(logit));
 	}
 
-	Coefficients getCoeForSpec(VdypSpecies spec, String controlKey) {
+	Coefficients getCoeForSpec(VdypSpecies spec, ControlKey controlKey) {
 		var coeMap = Utils.<Map<String, Coefficients>>expectParsedControl(controlMap, controlKey, Map.class);
 		return coeMap.get(spec.getGenus());
 	}

@@ -62,8 +62,8 @@ public class FipPolygon extends BaseVdypPolygon<FipLayer, Optional<Float>> {
 	}
 
 	public static class Builder extends BaseVdypPolygon.Builder<FipPolygon, FipLayer, Optional<Float>> {
-		private Optional<String> nonproductiveDescription = Optional.empty();
-		private Optional<Float> yieldFactor = Optional.empty();
+		protected Optional<String> nonproductiveDescription = Optional.empty();
+		protected Optional<Float> yieldFactor = Optional.empty();
 
 		public Builder() {
 			this.percentAvailable(Optional.empty());

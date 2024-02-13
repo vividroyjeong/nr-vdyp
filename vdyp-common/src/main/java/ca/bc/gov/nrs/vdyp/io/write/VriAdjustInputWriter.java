@@ -11,11 +11,11 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import ca.bc.gov.nrs.vdyp.common.ControlKeys;
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.FipMode;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
@@ -30,10 +30,10 @@ import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
  */
 public class VriAdjustInputWriter implements Closeable {
 
-	Map<String, Object> controlMap;
-	OutputStream polygonFile;
-	OutputStream speciesFile;
-	OutputStream utilizationFile;
+	private Map<String, Object> controlMap;
+	private OutputStream polygonFile;
+	private OutputStream speciesFile;
+	private OutputStream utilizationFile;
 
 	static final String POLY_IDENTIFIER_FORMAT = "%-25s";
 	static final String LAYER_TYPE_FORMAT = "%-1s";
@@ -93,9 +93,9 @@ public class VriAdjustInputWriter implements Closeable {
 	 */
 	public VriAdjustInputWriter(Map<String, Object> controlMap, FileResolver resolver) throws IOException {
 		this(
-				getOutputStream(controlMap, resolver, ControlKeys.VDYP_POLYGON),
-				getOutputStream(controlMap, resolver, ControlKeys.VDYP_LAYER_BY_SPECIES),
-				getOutputStream(controlMap, resolver, ControlKeys.VDYP_LAYER_BY_SP0_BY_UTIL), controlMap
+				getOutputStream(controlMap, resolver, ControlKey.VDYP_POLYGON.name()),
+				getOutputStream(controlMap, resolver, ControlKey.VDYP_LAYER_BY_SPECIES.name()),
+				getOutputStream(controlMap, resolver, ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name()), controlMap
 		);
 	}
 

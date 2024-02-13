@@ -12,6 +12,7 @@ import java.util.function.Function;
  * @param <Value>
  * @param <Marker>
  */
+@SuppressWarnings("java:S119")
 public class ValueOrMarker<Value, Marker> {
 	private final boolean isMarker;
 	private final Object obj;
