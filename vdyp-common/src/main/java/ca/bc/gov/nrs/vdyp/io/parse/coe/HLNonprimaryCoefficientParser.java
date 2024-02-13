@@ -81,7 +81,9 @@ public class HLNonprimaryCoefficientParser
 				speciesIndicies, speciesIndicies, regionIndicies, MatrixMap3Impl.emptyDefault()
 		);
 		lineParser.parse(is, result, (value, r, line) -> {
+			@SuppressWarnings("java:S117")
 			var sp0_1 = (String) value.get(SPECIES_1_KEY);
+			@SuppressWarnings("java:S117")
 			var sp0_2 = (String) value.get(SPECIES_2_KEY);
 			var ieqn = (Integer) value.get(EQUATION_KEY);
 			var region = (Region) value.get(REGION_KEY);

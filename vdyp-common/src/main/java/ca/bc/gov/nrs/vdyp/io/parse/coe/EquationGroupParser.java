@@ -29,6 +29,10 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
  */
 public abstract class EquationGroupParser implements ControlMapSubResourceParser<MatrixMap2<String, String, Integer>> {
 
+	private static final String SP0_ALIAS_KEY = "sp0Alias";
+	private static final String BEC_ALIAS_KEY = "becAlias";
+	private static final String GROUP_ID_KEY = "grpId";
+
 	public static final int MIN_GROUP = 1;
 	public static final int MAX_GROUP = 180;
 
@@ -48,10 +52,10 @@ public abstract class EquationGroupParser implements ControlMapSubResourceParser
 				return entry.size() < 3 || Utils.nullOrBlank(entry.get(0)) || Utils.nullOrBlank(entry.get(2));
 			}
 
-		}.strippedString(2, "sp0Alias").space(1).strippedString(4, "becAlias").space(1).value(
-				identifierLength, "grpId",
+		}.strippedString(2, SP0_ALIAS_KEY).space(1).strippedString(4, BEC_ALIAS_KEY).space(1).value(
+				identifierLength, GROUP_ID_KEY,
 				ValueParser.validate(
-						ValueParser.INTEGER, ValueParser.validateRangeInclusive(MIN_GROUP, MAX_GROUP, "grpId")
+						ValueParser.INTEGER, ValueParser.validateRangeInclusive(MIN_GROUP, MAX_GROUP, GROUP_ID_KEY)
 				)
 		);
 	}
@@ -65,8 +69,8 @@ public abstract class EquationGroupParser implements ControlMapSubResourceParser
 		final var becKeys = BecDefinitionParser.getBecs(control).getBecAliases();
 
 		Map<String, Map<String, Integer>> resultMap = lineParser.parse(is, new HashMap<>(), (value, r, line) -> {
-			final String sp0Alias = (String) value.get("sp0Alias");
-			final String becAlias = (String) value.get("becAlias");
+			final String sp0Alias = (String) value.get(SP0_ALIAS_KEY);
+			final String becAlias = (String) value.get(BEC_ALIAS_KEY);
 
 			if (!sp0Keys.contains(sp0Alias)) {
 				throw new ValueParseException(sp0Alias, sp0Alias + " is not an SP0 identifier");
@@ -75,7 +79,7 @@ public abstract class EquationGroupParser implements ControlMapSubResourceParser
 				throw new ValueParseException(becAlias, becAlias + " is not a BEC identifier");
 			}
 
-			int grpId = (Integer) value.get("grpId");
+			int grpId = (Integer) value.get(GROUP_ID_KEY);
 
 			r.computeIfAbsent(sp0Alias, k -> new HashMap<>()).put(becAlias, grpId);
 			return r;

@@ -12,6 +12,8 @@ import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 @FunctionalInterface
 public interface ControlledValueParser<T> {
 
+	public static final String DELEGATE_MUST_NOT_BE_NULL = "delegate must not be null";
+
 	/**
 	 * Parse a string to a value using a control map for context. Should not attempt
 	 * to modify the map.
@@ -35,7 +37,7 @@ public interface ControlledValueParser<T> {
 	public static <U> ControlledValueParser<U> validate(
 			ControlledValueParser<U> delegate, BiFunction<U, Map<String, Object>, Optional<String>> validator
 	) {
-		Objects.requireNonNull(delegate, "delegate must not be null");
+		Objects.requireNonNull(delegate, DELEGATE_MUST_NOT_BE_NULL);
 		return (s, c) -> {
 			var value = delegate.parse(s, c);
 			var error = validator.apply(value, c);
@@ -53,7 +55,7 @@ public interface ControlledValueParser<T> {
 	 * @param delegate Parser to use if the string is not blank
 	 */
 	public static <U> ControlledValueParser<Optional<U>> optional(ControlledValueParser<U> delegate) {
-		Objects.requireNonNull(delegate, "delegate must not be null");
+		Objects.requireNonNull(delegate, DELEGATE_MUST_NOT_BE_NULL);
 		return pretestOptional(delegate, s -> !s.isBlank());
 	}
 
@@ -66,7 +68,7 @@ public interface ControlledValueParser<T> {
 	 */
 	public static <U> ControlledValueParser<Optional<U>>
 			pretestOptional(ControlledValueParser<U> delegate, Predicate<String> test) {
-		Objects.requireNonNull(delegate, "delegate must not be null");
+		Objects.requireNonNull(delegate, DELEGATE_MUST_NOT_BE_NULL);
 		return (s, c) -> {
 			if (test.test(s)) {
 				return Optional.of(delegate.parse(s, c));
@@ -84,7 +86,7 @@ public interface ControlledValueParser<T> {
 	 */
 	public static <U> ControlledValueParser<Optional<U>>
 			posttestOptional(ControlledValueParser<U> delegate, Predicate<U> test) {
-		Objects.requireNonNull(delegate, "delegate must not be null");
+		Objects.requireNonNull(delegate, DELEGATE_MUST_NOT_BE_NULL);
 		return (s, c) -> {
 			var result = delegate.parse(s, c);
 			if (test.test(result)) {

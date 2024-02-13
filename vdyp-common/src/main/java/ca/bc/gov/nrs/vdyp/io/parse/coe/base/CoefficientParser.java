@@ -106,10 +106,6 @@ public abstract class CoefficientParser
 			for (int species = 0; species < speciesIndecies.size(); species++) {
 				float c;
 				switch (indicator) {
-				case 0:
-				default:
-					c = coefficients.get(0);
-					break;
 				case 2:
 					c = coefficients.get(species);
 					break;
@@ -118,6 +114,10 @@ public abstract class CoefficientParser
 						c = coefficients.get(0);
 					else
 						c = coefficients.get(0) + coefficients.get(species);
+					break;
+				case 0:
+				default:
+					c = coefficients.get(0);
 					break;
 				}
 				r.get(bec, speciesLookup.apply(species + 1)).setCoe(index, c);

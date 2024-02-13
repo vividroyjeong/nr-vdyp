@@ -88,7 +88,7 @@ public class StockingClassFactorParser implements
 
 					var factorEntry = new StockingClassFactor(stk, region, factor, npctArea);
 
-					result.computeIfAbsent(stk, (c) -> new HashMap<Region, StockingClassFactor>())
+					result.computeIfAbsent(stk, c -> new HashMap<Region, StockingClassFactor>())
 							.put(region, factorEntry);
 
 					return result;

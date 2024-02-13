@@ -76,15 +76,10 @@ public class BecDefinitionParser implements ControlMapSubResourceParser<BecLooku
 		}, control);
 		var defaultBec = result.stream().filter(bec -> bec.getAlias().equals(DEFAULT_BEC)).findAny()
 				.orElseThrow(() -> new IllegalStateException("Could not find default BEC " + DEFAULT_BEC));
-		if (NON_GROWTH_BECS.contains(defaultBec.getAlias())) {
-			throw new IllegalStateException("Default BEC " + defaultBec + " is not a growth BEC.");
-		}
-		if (NON_DECAY_BECS.contains(defaultBec.getAlias())) {
-			throw new IllegalStateException("Default BEC " + defaultBec + " is not a decay BEC.");
-		}
-		if (NON_VOLUME_BECS.contains(defaultBec.getAlias())) {
-			throw new IllegalStateException("Default BEC " + defaultBec + " is not a volume BEC.");
-		}
+
+		checkDefaultBecType(defaultBec, NON_GROWTH_BECS, "growth");
+		checkDefaultBecType(defaultBec, NON_DECAY_BECS, "decay");
+		checkDefaultBecType(defaultBec, NON_VOLUME_BECS, "volume");
 
 		// Map the BECs so they know what their contextual alternate BECs are
 		result = result.stream().map(baseBec -> {
@@ -100,6 +95,12 @@ public class BecDefinitionParser implements ControlMapSubResourceParser<BecLooku
 			);
 		}).toList();
 		return new BecLookup(result);
+	}
+
+	private void checkDefaultBecType(BecDefinition defaultBec, Set<String> badBecs, String becTypeName) {
+		if (badBecs.contains(defaultBec.getAlias())) {
+			throw new IllegalStateException("Default BEC " + defaultBec + " is not a " + becTypeName + " BEC.");
+		}
 	}
 
 	/**

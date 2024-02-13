@@ -23,6 +23,9 @@ import ca.bc.gov.nrs.vdyp.model.Region;
  */
 @FunctionalInterface
 public interface ValueParser<T> extends ControlledValueParser<T> {
+
+	public static final String S_IS_NOT_A_VALID_S = "\"%s\" is not a valid %s";
+
 	/**
 	 * Parse a string to a value
 	 *
@@ -56,7 +59,7 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 				return parser.parse(stripped);
 			} catch (NumberFormatException ex) {
 				throw new ValueParseException(
-						stripped, String.format("\"%s\" is not a valid %s", stripped, klazz.getSimpleName()), ex
+						stripped, String.format(S_IS_NOT_A_VALID_S, stripped, klazz.getSimpleName()), ex
 				);
 			}
 		};
@@ -74,7 +77,7 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 				return Enum.valueOf(klazz, s);
 			} catch (IllegalArgumentException ex) {
 				throw new ValueParseException(
-						stripped, String.format("\"%s\" is not a valid %s", stripped, klazz.getSimpleName()), ex
+						stripped, String.format(S_IS_NOT_A_VALID_S, stripped, klazz.getSimpleName()), ex
 				);
 			}
 		};
@@ -89,9 +92,7 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 			String stripped = s.strip();
 			int index = Arrays.asList(values).indexOf(stripped);
 			if (index < 0) {
-				throw new ValueParseException(
-						stripped, String.format("\"%s\" is not a valid %s", stripped, sequenceName)
-				);
+				throw new ValueParseException(stripped, String.format(S_IS_NOT_A_VALID_S, stripped, sequenceName));
 			}
 			return indexFrom + index;
 		};
