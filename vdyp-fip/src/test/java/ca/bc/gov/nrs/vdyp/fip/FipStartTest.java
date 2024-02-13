@@ -28,12 +28,17 @@ import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.fip.FipStart.CompatibilityVariableMode;
 import ca.bc.gov.nrs.vdyp.fip.FipStart.VolumeComputeMode;
 import ca.bc.gov.nrs.vdyp.fip.model.*;
 import ca.bc.gov.nrs.vdyp.fip.test.FipTestUtils;
-import ca.bc.gov.nrs.vdyp.io.parse.*;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.MockStreamingParser;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.*;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -1524,7 +1529,7 @@ class FipStartTest {
 		var map = GenusDefinitionParser.getSpeciesAliases(controlMap).stream()
 				.collect(Collectors.toMap(x -> x, mapper.andThen(x -> new Coefficients(x, 1))));
 
-		controlMap.put(VeteranLayerVolumeAdjustParser.CONTROL_KEY, map);
+		controlMap.put(ControlKey.VETERAN_LAYER_VOLUME_ADJUST.name(), map);
 	}
 
 	@Test
@@ -4354,7 +4359,7 @@ class FipStartTest {
 		var controlMap = FipTestUtils.loadControlMap();
 		@SuppressWarnings("unchecked")
 		var stockingClassMap = (MatrixMap2<Character, Region, Optional<StockingClassFactor>>) controlMap
-				.get(StockingClassFactorParser.CONTROL_KEY);
+				.get(ControlKey.STOCKING_CLASS_FACTORS.name());
 
 		stockingClassMap
 				.put('R', Region.INTERIOR, Optional.of(new StockingClassFactor('R', Region.INTERIOR, 0.42f, 100)));
@@ -4494,7 +4499,7 @@ class FipStartTest {
 		var controlMap = FipTestUtils.loadControlMap();
 		@SuppressWarnings("unchecked")
 		var stockingClassMap = (MatrixMap2<Character, Region, StockingClassFactor>) controlMap
-				.get(StockingClassFactorParser.CONTROL_KEY);
+				.get(ControlKey.STOCKING_CLASS_FACTORS.name());
 
 		stockingClassMap.put('R', Region.INTERIOR, new StockingClassFactor('R', Region.INTERIOR, 0.42f, 100));
 
@@ -4646,7 +4651,7 @@ class FipStartTest {
 		var controlMap = FipTestUtils.loadControlMap();
 		@SuppressWarnings("unchecked")
 		var stockingClassMap = (MatrixMap2<Character, Region, StockingClassFactor>) controlMap
-				.get(StockingClassFactorParser.CONTROL_KEY);
+				.get(ControlKey.STOCKING_CLASS_FACTORS.name());
 
 		stockingClassMap.remove('R', Region.INTERIOR);
 
@@ -4898,20 +4903,20 @@ class FipStartTest {
 		minima.put(FipControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
 		minima.put(FipControlParser.MINIMUM_VETERAN_HEIGHT, 10f);
 
-		controlMap.put(FipControlParser.MINIMA, minima);
+		controlMap.put(ControlKey.MINIMA.name(), minima);
 
 		controlMap.putAll(myControlMap);
 
 		var control = EasyMock.createControl();
 
 		MockStreamingParser<FipPolygon> polygonStream = mockStream(
-				control, controlMap, FipPolygonParser.CONTROL_KEY, "polygonStream"
+				control, controlMap, ControlKey.FIP_YIELD_POLY_INPUT.name(), "polygonStream"
 		);
 		MockStreamingParser<Map<LayerType, FipLayer>> layerStream = mockStream(
-				control, controlMap, FipLayerParser.CONTROL_KEY, "layerStream"
+				control, controlMap, ControlKey.FIP_YIELD_LAYER_INPUT.name(), "layerStream"
 		);
 		MockStreamingParser<Collection<FipSpecies>> speciesStream = mockStream(
-				control, controlMap, FipSpeciesParser.CONTROL_KEY, "speciesStream"
+				control, controlMap, ControlKey.FIP_YIELD_LX_SP0_INPUT.name(), "speciesStream"
 		);
 
 		mockWith(polygonStream, polygons);

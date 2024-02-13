@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public class FileSystemFileResolver implements FileResolver {
 
-	Optional<Path> currentDirectory;
+	private Optional<Path> currentDirectory;
 
 	public FileSystemFileResolver(Path currentDirectory) {
 		this.currentDirectory = Optional.of(currentDirectory);

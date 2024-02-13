@@ -11,7 +11,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.common.ControlKeys;
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.model.*;
 import ca.bc.gov.nrs.vdyp.test.*;
@@ -36,9 +36,9 @@ class VriAdjustInputWriterTest {
 		specStream = new TestUtils.MockOutputStream("species");
 		utilStream = new TestUtils.MockOutputStream("utilization");
 
-		controlMap.put(ControlKeys.VDYP_POLYGON, "testPolygonFile");
-		controlMap.put(ControlKeys.VDYP_LAYER_BY_SPECIES, "testSpeciesFile");
-		controlMap.put(ControlKeys.VDYP_LAYER_BY_SP0_BY_UTIL, "testUtilizationFile");
+		controlMap.put(ControlKey.VDYP_POLYGON.name(), "testPolygonFile");
+		controlMap.put(ControlKey.VDYP_LAYER_BY_SPECIES.name(), "testSpeciesFile");
+		controlMap.put(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name(), "testUtilizationFile");
 
 		fileResolver = new MockFileResolver("TEST");
 		fileResolver.addStream("testPolygonFile", polyStream);
@@ -105,8 +105,7 @@ class VriAdjustInputWriterTest {
 
 			// FIXME Add to builder
 			layer.setEmpericalRelationshipParameterIndex(Optional.of(119));
-			polygon.setInventoryTypeGroup(28);
-			polygon.setGrpBa1(119);
+			layer.setInventoryTypeGroup(Optional.of(28));
 
 			unit.writePolygon(polygon);
 		}
@@ -339,8 +338,9 @@ class VriAdjustInputWriterTest {
 				builder.breakageGroup(0);
 			});
 
-			polygon.setInventoryTypeGroup(28);
-			polygon.setGrpBa1(119);
+			// fixme add to builder
+			layer.setEmpericalRelationshipParameterIndex(Optional.of(119));
+			layer.setInventoryTypeGroup(Optional.of(28));
 
 			layer.setBaseAreaByUtilization(
 					Utils.utilizationVector(0.02865f, 19.97867f, 6.79731f, 8.54690f, 3.63577f, 0.99869f)
