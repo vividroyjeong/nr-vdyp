@@ -65,20 +65,20 @@ public class DqGrowthEmpiricalLimitsParser implements ControlMapSubResourceParse
 
 		Map<Integer, Coefficients> result = new HashMap<>();
 		
-		lineParser.parse(is, result, (v, r, lineNumber) -> {
-			var basalAreaGroupId = (Integer) v.get(BASAL_AREA_GROUP_ID_KEY);
+		lineParser.parse(is, result, (value, r, lineNumber) -> {
+			var basalAreaGroupId = (Integer) value.get(BASAL_AREA_GROUP_ID_KEY);
 			
 			if (basalAreaGroupId < 1 || basalAreaGroupId > MAX_BASAL_AREA_GROUP_ID) {
 				throw new ValueParseException(
-						MessageFormat.format("Line: {0}: basal area group id {1} is out of range; expecting a value from 1 to {2}"
+						MessageFormat.format("Line {0}: basal area group id {1} is out of range; expecting a value from 1 to {2}"
 								, lineNumber, basalAreaGroupId, MAX_BASAL_AREA_GROUP_ID));
 			}
 			
 			List<Float> coefficientList = new ArrayList<Float>();
 			@SuppressWarnings("unchecked")
-			var coefficient9List = (List<Float>) v.get(COEFFICIENTS_9_KEY);
+			var coefficient9List = (List<Float>) value.get(COEFFICIENTS_9_KEY);
 			@SuppressWarnings("unchecked")
-			var coefficient6List = (List<Float>) v.get(COEFFICIENTS_6_KEY);
+			var coefficient6List = (List<Float>) value.get(COEFFICIENTS_6_KEY);
 			
 			coefficientList.addAll(coefficient9List);
 			coefficientList.addAll(coefficient6List);
