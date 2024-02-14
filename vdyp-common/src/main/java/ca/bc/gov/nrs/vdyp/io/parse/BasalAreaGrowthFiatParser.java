@@ -2,6 +2,8 @@ package ca.bc.gov.nrs.vdyp.io.parse;
 
 import java.util.Map;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
+
 /**
  * Parser for Basal Area Growth Fiat model details data file. 
  * <ol>
@@ -16,7 +18,7 @@ import java.util.Map;
  * (COASTAL) and one line for region 2 (INTERIOR). No other region ids are supported. The age
  * values must start with a value other than 0.0. 
  * <p>
- * FIP Control index: 111
+ * Control index: 111
  * <p>
  * Example file: coe/EMP111A1.PRM
  *
@@ -28,8 +30,8 @@ public class BasalAreaGrowthFiatParser extends GrowthFiatParser {
 	public static final String CONTROL_KEY = "BA_GROWTH_FIAT";
 
 	@Override
-	public String getControlKey()
+	public ControlKey getControlKey()
 	{
-		return CONTROL_KEY;
+		return ControlKey.BA_GROWTH_FIAT;
 	}
 }

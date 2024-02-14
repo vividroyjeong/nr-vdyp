@@ -6,25 +6,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypSpeciesUtilization;
 import ca.bc.gov.nrs.vdyp.io.EndOfRecord;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.AbstractStreamingParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ControlMapValueReplacer;
-import ca.bc.gov.nrs.vdyp.io.parse.ControlledValueParser;
-import ca.bc.gov.nrs.vdyp.io.parse.GroupingStreamingParser;
-import ca.bc.gov.nrs.vdyp.io.parse.LineParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
-import ca.bc.gov.nrs.vdyp.io.parse.ValueParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapValueReplacer;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.AbstractStreamingParser;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.GroupingStreamingParser;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ControlledValueParser;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
 public class VdypUtilizationParser
 		implements ControlMapValueReplacer<StreamingParserFactory<Collection<VdypSpeciesUtilization>>, String> {
-
-	public static final String CONTROL_KEY = "VDYP_UTILIZATIONS";
 
 	private static final String DESCRIPTION = "DESCRIPTION"; // POLYDESC
 	private static final String LAYER_TYPE = "LAYER_TYPE"; // LAYERG
@@ -42,8 +41,8 @@ public class VdypUtilizationParser
 	private static final String QUADRATIC_MEAN_DIAMETER_BREAST_HEIGHT = "QUADRATIC_MEAN_DIAMETER_BREAST_HEIGHT"; // DQ
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL;
 	}
 
 	@Override

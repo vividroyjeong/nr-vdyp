@@ -8,6 +8,7 @@ import java.util.Map;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -22,7 +23,7 @@ class UpperBoundsParserTest {
 		TestUtils.populateControlMapFromResource(controlMap, parser, "PCT_407.coe");
 
 		@SuppressWarnings("unchecked")
-		Map<Integer, Coefficients> m = (Map<Integer, Coefficients>) controlMap.get(UpperBoundsParser.CONTROL_KEY);
+		Map<Integer, Coefficients> m = (Map<Integer, Coefficients>) controlMap.get(ControlKey.BA_DQ_UPPER_BOUNDS.name());
 		
 		assertThat(m, Matchers.aMapWithSize(UpperBoundsParser.MAX_BA_GROUPS));
 		assertThat(m.get(1), Matchers.contains(74.78f, 76.10f));

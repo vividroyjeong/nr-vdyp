@@ -13,8 +13,7 @@ import org.opentest4j.AssertionFailedError;
 import ca.bc.gov.nrs.vdyp.forward.ModifierParser;
 import ca.bc.gov.nrs.vdyp.forward.VdypForwardControlParser;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.ControlFileParserTest;
-import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -73,11 +72,10 @@ public class VdypForwardTestUtils {
 	public static Map<String, Object> loadControlMap() {
 		var parser = new VdypForwardControlParser(new VdypForwardControlParserTestApplication());
 		try {
-			return loadControlMap(parser, ControlFileParserTest.class, "FIPSTART.CTR");
+			return loadControlMap(parser, VdypForwardControlParser.class, "FIPSTART.CTR");
 		} catch (IOException | ResourceParseException ex) {
 			throw new AssertionFailedError(null, ex);
 		}
-
 	}
 
 	public static FileResolver fileResolver(Class<?> klazz) {
@@ -99,6 +97,13 @@ public class VdypForwardTestUtils {
 			@Override
 			public String toString(String filename) throws IOException {
 				return klazz.getResource(filename).toString();
+			}
+
+			@Override
+			public FileResolver relative(String path)
+				throws IOException
+			{
+				throw new UnsupportedOperationException();
 			}
 		};
 	}

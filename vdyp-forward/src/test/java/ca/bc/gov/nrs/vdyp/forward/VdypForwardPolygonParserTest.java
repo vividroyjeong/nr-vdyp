@@ -14,10 +14,11 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.forward.model.FipMode;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
-import ca.bc.gov.nrs.vdyp.io.parse.StreamingParser;
-import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 
@@ -30,14 +31,14 @@ public class VdypForwardPolygonParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(VdypPolygonParser.CONTROL_KEY, "test.dat");
+		controlMap.put(ControlKey.VDYP_POLYGON.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeInputStream(/* empty */));
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(VdypPolygonParser.CONTROL_KEY);
+		var parserFactory = controlMap.get(ControlKey.VDYP_POLYGON.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -56,7 +57,7 @@ public class VdypForwardPolygonParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(VdypPolygonParser.CONTROL_KEY, "test.dat");
+		controlMap.put(ControlKey.VDYP_POLYGON.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils
@@ -64,7 +65,7 @@ public class VdypForwardPolygonParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(VdypPolygonParser.CONTROL_KEY);
+		var parserFactory = controlMap.get(ControlKey.VDYP_POLYGON.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -94,7 +95,7 @@ public class VdypForwardPolygonParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(VdypPolygonParser.CONTROL_KEY, "test.dat");
+		controlMap.put(ControlKey.VDYP_POLYGON.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils
@@ -102,7 +103,7 @@ public class VdypForwardPolygonParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(VdypPolygonParser.CONTROL_KEY);
+		var parserFactory = controlMap.get(ControlKey.VDYP_POLYGON.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -132,7 +133,7 @@ public class VdypForwardPolygonParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(VdypPolygonParser.CONTROL_KEY, "test.dat");
+		controlMap.put(ControlKey.VDYP_POLYGON.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -152,7 +153,7 @@ public class VdypForwardPolygonParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(VdypPolygonParser.CONTROL_KEY);
+		var parserFactory = controlMap.get(ControlKey.VDYP_POLYGON.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -281,7 +282,7 @@ public class VdypForwardPolygonParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(VdypPolygonParser.CONTROL_KEY, "test.dat");
+		controlMap.put(ControlKey.VDYP_POLYGON.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -291,7 +292,7 @@ public class VdypForwardPolygonParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(VdypPolygonParser.CONTROL_KEY);
+		var parserFactory = controlMap.get(ControlKey.VDYP_POLYGON.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 

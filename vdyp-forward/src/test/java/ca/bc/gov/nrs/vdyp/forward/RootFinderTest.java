@@ -1,7 +1,7 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
 class RootFinderTest {
-	private final double epsilon = 0.00001;
+//	private final double epsilon = 0.00001;
 
 //	@Test
 //	void testRootFunction() {

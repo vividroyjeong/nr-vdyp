@@ -2,9 +2,7 @@ package ca.bc.gov.nrs.vdyp.forward;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -13,8 +11,7 @@ import org.slf4j.LoggerFactory;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
-import ca.bc.gov.nrs.vdyp.io.FileSystemRelativeFileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 
 /**
  *
@@ -49,15 +46,11 @@ public class VdypForwardProcessor {
 	private static final Logger log = LoggerFactory.getLogger(VdypForwardProcessor.class);
 
 	private final VdypForwardApplication app;
-	private final Set<VdypPass> vdypPassSet;
-
-	private Map<String, Object> controlMap = Collections.emptyMap();
 
 	public VdypForwardProcessor(VdypForwardApplication app, Set<VdypPass> vdypPassSet, List<String> controlFileNames)
 			throws IOException, ResourceParseException, ProcessingException {
 
 		this.app = app;
-		this.vdypPassSet = vdypPassSet;
 
 		log.info("VDYPPASS: " + vdypPassSet);
 		log.debug("VDYPPASS(1): Perform Initiation activities?");
@@ -91,11 +84,9 @@ public class VdypForwardProcessor {
 
 			try (var is = resolver.resolveForInput(controlFileName)) {
 				Path controlFilePath = Path.of(controlFileName).getParent();
-				FileSystemRelativeFileResolver relativeResolver = new FileSystemRelativeFileResolver(
-						controlFilePath.toString()
-				);
+				FileSystemFileResolver relativeResolver = new FileSystemFileResolver(controlFilePath);
 
-				controlMap = parser.parse(is, relativeResolver);
+				parser.parse(is, relativeResolver);
 			}
 		}
 	}

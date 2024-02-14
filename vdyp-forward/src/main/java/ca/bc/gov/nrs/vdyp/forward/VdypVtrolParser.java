@@ -3,8 +3,8 @@ package ca.bc.gov.nrs.vdyp.forward;
 import java.util.List;
 
 import ca.bc.gov.nrs.vdyp.forward.model.VdypGrowthDetails;
-import ca.bc.gov.nrs.vdyp.io.parse.ValueParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.ValueParser;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 
 public class VdypVtrolParser implements ValueParser<VdypGrowthDetails> {
 

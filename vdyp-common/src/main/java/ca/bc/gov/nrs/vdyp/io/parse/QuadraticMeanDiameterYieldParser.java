@@ -1,5 +1,7 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
+
 /**
  * Parses a mapping from a BEC Zone Alias and Species to a list of six coefficients. Each row contains 
  * <ol>
@@ -29,7 +31,7 @@ public class QuadraticMeanDiameterYieldParser extends BecZoneBySpeciesCoefficien
 	}
 	
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.DQ_YIELD;
 	}
 }

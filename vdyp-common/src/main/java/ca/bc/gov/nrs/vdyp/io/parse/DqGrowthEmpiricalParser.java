@@ -2,6 +2,9 @@ package ca.bc.gov.nrs.vdyp.io.parse;
 
 import java.util.Optional;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.base.SimpleCoefficientParser1;
+
 /**
  * Parses a mapping from a Basal Area Group number to a list of ten coefficients. Each row contains 
  * <ol>
@@ -22,11 +25,10 @@ import java.util.Optional;
  */
 public class DqGrowthEmpiricalParser extends SimpleCoefficientParser1<Integer> {
 	
-	public static final String CONTROL_KEY = "DQ_GROWTH_EMPIRICAL";
 	public static final int MAX_GROUPS = 40;
 	
 	public DqGrowthEmpiricalParser() {
-		super(Integer.class, 1, CONTROL_KEY);
+		super(Integer.class, 1, ControlKey.DQ_GROWTH_EMPIRICAL);
 		
 		this.groupIndexKey(MAX_GROUPS).coefficients(10, 9
 				, Optional.empty()

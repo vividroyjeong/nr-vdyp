@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -24,7 +25,8 @@ public class DqGrowthEmpiricalParserTest {
 		TestUtils.populateControlMapFromResource(controlMap, parser, "GD23.coe");
 		
 		@SuppressWarnings("unchecked")
-		Map<Integer, Coefficients> m = (Map<Integer, Coefficients>)controlMap.get(DqGrowthEmpiricalParser.CONTROL_KEY);
+		Map<Integer, Coefficients> m = (Map<Integer, Coefficients>)controlMap
+			.get(ControlKey.DQ_GROWTH_EMPIRICAL.name());
 		
 		assertThat(m.get(1), hasSize(10));
 		assertThat(m.get(1), contains(-0.76723f, 0.00000f, -0.18524f, 0.02194f, -0.00752f, -0.00339f, 0.41806f, 0.0f, 0.0f, 0.0f));

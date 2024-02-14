@@ -6,15 +6,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.base.SimpleCoefficientParser1;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 
 public class UpperBoundsParser extends SimpleCoefficientParser1<Integer> {
 	
 	public static final int MAX_BA_GROUPS = 180;
-	public static final String CONTROL_KEY = "BA_DQ_UPPER_BOUNDS";
 	
 	public UpperBoundsParser() {
-		super(Integer.class, 1, CONTROL_KEY);
+		super(Integer.class, 1, ControlKey.BA_DQ_UPPER_BOUNDS);
 		
 		this.groupIndexKey(MAX_BA_GROUPS).coefficients(2, 8
 				, Optional.of((Void) -> new Coefficients(new float[] { 0.0f, 7.6f }, 1))

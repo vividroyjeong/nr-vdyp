@@ -5,6 +5,14 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapSubResourceParser;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
@@ -62,7 +70,7 @@ public abstract class BecZoneBySpeciesCoefficientParser implements ControlMapSub
 				becAliases, sp0Aliases, (k1, k2) -> Coefficients.empty(nCoefficients, 0)
 		);
 		
-		lineParser.parse(is, result, (v, r) -> {
+		lineParser.parse(is, result, (v, r, l) -> {
 			var becZoneId = (String)v.get(BEC_ZONE_ID_KEY);
 			var index = (int) v.get(INDEX_KEY);
 			var indicator = (int) v.get(INDICATOR_KEY);
@@ -85,7 +93,7 @@ public abstract class BecZoneBySpeciesCoefficientParser implements ControlMapSub
 			int coefficientIndex = 0;
 			while (specIt.hasNext()) {
 				
-				Coefficients coefficients = result.get(becZoneId, specIt.next());
+				Coefficients coefficients = r.get(becZoneId, specIt.next());
 				Float coe = specCoefficients.get(coefficientIndex);
 				coefficients.setCoe(index, coe);
 				
@@ -102,7 +110,7 @@ public abstract class BecZoneBySpeciesCoefficientParser implements ControlMapSub
 	}
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.BA_GROWTH_EMPIRICAL;
 	}
 }

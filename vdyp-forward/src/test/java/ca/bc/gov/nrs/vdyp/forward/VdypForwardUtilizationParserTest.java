@@ -4,11 +4,11 @@ import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.assertEmpty;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.assertNext;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasItem;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,9 +18,10 @@ import java.util.Optional;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypSpeciesUtilization;
-import ca.bc.gov.nrs.vdyp.io.parse.StreamingParser;
-import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
@@ -34,14 +35,14 @@ public class VdypForwardUtilizationParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(VdypUtilizationParser.CONTROL_KEY, "test.dat");
+		controlMap.put(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeInputStream(/* empty */));
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(VdypUtilizationParser.CONTROL_KEY);
+		var parserFactory = controlMap.get(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -60,7 +61,7 @@ public class VdypForwardUtilizationParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(VdypUtilizationParser.CONTROL_KEY, "test.dat");
+		controlMap.put(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -73,7 +74,7 @@ public class VdypForwardUtilizationParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(VdypUtilizationParser.CONTROL_KEY);
+		var parserFactory = controlMap.get(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -115,7 +116,7 @@ public class VdypForwardUtilizationParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(VdypUtilizationParser.CONTROL_KEY, "test.dat");
+		controlMap.put(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -129,7 +130,7 @@ public class VdypForwardUtilizationParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(VdypUtilizationParser.CONTROL_KEY);
+		var parserFactory = controlMap.get(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 

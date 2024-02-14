@@ -9,11 +9,8 @@ import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,10 +21,7 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.io.FileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.HLCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.HLNonprimaryCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VeteranBQParser;
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
@@ -36,6 +30,7 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3Impl;
 import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
 import ca.bc.gov.nrs.vdyp.model.Region;
+import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -46,34 +41,14 @@ class ModifierParserTest {
 		var parser = new ModifierParser(1);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.empty());
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.empty());
 		TestUtils.populateControlMapGenusReal(controlMap);
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				fail("Should not call FileResolver::resolve");
-				return null;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				fail("Should not call FileResolver::resolve");
-				return null;
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				fail("Should not call FileResolver::toString");
-				return filename;
-			}
-
-		};
+		var fileResolver = new MockFileResolver("TEST");
 
 		parser.modify(controlMap, fileResolver);
 
-		assertThat(controlMap, (Matcher) hasSpecificEntry(ModifierParser.CONTROL_KEY, notPresent()));
+		assertThat(controlMap, (Matcher) hasSpecificEntry(ControlKey.MODIFIER_FILE.name(), notPresent()));
 	}
 
 	@Test
@@ -81,30 +56,11 @@ class ModifierParserTest {
 		var parser = new ModifierParser(1);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
 		TestUtils.populateControlMapBec(controlMap);
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat(filename, is("testFilename"));
-
-				throw new IOException();
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				fail("Should not call FileResolver::toString");
-				return filename;
-			}
-
-		};
+		var fileResolver = new MockFileResolver("TEST");
+		fileResolver.addError("testFilename", () -> new IOException());
 
 		var ex = Assertions.assertThrows(IOException.class, () -> parser.modify(controlMap, fileResolver));
 
@@ -117,7 +73,7 @@ class ModifierParserTest {
 		var parser = new ModifierParser(1);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
 		TestUtils.populateControlMapGenusReal(controlMap);
 		populateVetBq(controlMap);
 		populateHlP1(controlMap);
@@ -125,30 +81,7 @@ class ModifierParserTest {
 		populateHlP3(controlMap);
 		populateHlNP(controlMap);
 
-		var is = TestUtils.makeInputStream();
-
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat(filename, is("testFilename"));
-
-				return is;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return filename;
-			}
-
-		};
-
-		parser.modify(controlMap, fileResolver);
+		parser.modify(controlMap, TestUtils.makeInputStream());
 
 		modifierDefaultAsserts(controlMap);
 	}
@@ -156,7 +89,7 @@ class ModifierParserTest {
 	protected void modifierDefaultAsserts(Map<String, Object> controlMap) {
 		var expectedSp0Aliases = TestUtils.getSpeciesAliases();
 
-		assertThat(controlMap, (Matcher) hasSpecificEntry(ModifierParser.CONTROL_KEY, present(is("testFilename"))));
+		assertThat(controlMap, (Matcher) hasSpecificEntry(ControlKey.MODIFIER_FILE.name(), present(is("testFilename"))));
 
 		assertThat(
 				controlMap,
@@ -198,7 +131,7 @@ class ModifierParserTest {
 		var parser = new ModifierParser(1);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
 		TestUtils.populateControlMapGenusReal(controlMap);
 		populateVetBq(controlMap);
 		populateHlP1(controlMap);
@@ -208,28 +141,7 @@ class ModifierParserTest {
 
 		var is = TestUtils.makeInputStream("201 1 0 0 0 0 0 2.000 3.000 4.000 5.000");
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat(filename, is("testFilename"));
-
-				return is;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return filename;
-			}
-
-		};
-
-		parser.modify(controlMap, fileResolver);
+		parser.modify(controlMap, is);
 
 		var baMap = ((MatrixMap<Float>) controlMap.get(ModifierParser.CONTROL_KEY_MOD200_BA));
 		baMap.eachKey(k -> {
@@ -262,7 +174,7 @@ class ModifierParserTest {
 		var parser = new ModifierParser(3);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
 		TestUtils.populateControlMapGenusReal(controlMap);
 		populateVetBq(controlMap);
 		populateHlP1(controlMap);
@@ -272,28 +184,7 @@ class ModifierParserTest {
 
 		var is = TestUtils.makeInputStream("201 1 0 0 0 0 0 0.000 0.000 0.000 0.000");
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat(filename, is("testFilename"));
-
-				return is;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return filename;
-			}
-
-		};
-
-		parser.modify(controlMap, fileResolver);
+		parser.modify(controlMap, is);
 
 		modifierDefaultAsserts(controlMap);
 	}
@@ -303,7 +194,7 @@ class ModifierParserTest {
 		var parser = new ModifierParser(1);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
 		TestUtils.populateControlMapGenusReal(controlMap);
 		populateVetBq(controlMap);
 		populateHlP1(controlMap);
@@ -313,28 +204,7 @@ class ModifierParserTest {
 
 		var is = TestUtils.makeInputStream("999", "201 1 0 0 0 0 0 0.000 0.000 0.000 0.000");
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat(filename, is("testFilename"));
-
-				return is;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return filename;
-			}
-
-		};
-
-		parser.modify(controlMap, fileResolver);
+		parser.modify(controlMap, is);
 
 		modifierDefaultAsserts(controlMap);
 	}
@@ -344,7 +214,7 @@ class ModifierParserTest {
 		var parser = new ModifierParser(1);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
 		TestUtils.populateControlMapGenusReal(controlMap);
 		populateVetBq(controlMap);
 		populateHlP1(controlMap);
@@ -354,28 +224,7 @@ class ModifierParserTest {
 
 		var is = TestUtils.makeInputStream("", "    x", "000 x", "201 1 0 0 0 0 0 2.000 3.000 4.000 5.000");
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat(filename, is("testFilename"));
-
-				return is;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return filename;
-			}
-
-		};
-
-		parser.modify(controlMap, fileResolver);
+		parser.modify(controlMap, is);
 
 		var baMap = ((MatrixMap<Float>) controlMap.get(ModifierParser.CONTROL_KEY_MOD200_BA));
 		baMap.eachKey(k -> {
@@ -408,7 +257,7 @@ class ModifierParserTest {
 		var parser = new ModifierParser(1);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
 		TestUtils.populateControlMapGenusReal(controlMap);
 		populateVetBq(controlMap);
 		populateHlP1(controlMap);
@@ -418,28 +267,7 @@ class ModifierParserTest {
 
 		var is = TestUtils.makeInputStream("200 1 0 0 0 0 0 2.000 3.000 4.000 5.000");
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat(filename, is("testFilename"));
-
-				return is;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return filename;
-			}
-
-		};
-
-		parser.modify(controlMap, fileResolver);
+		parser.modify(controlMap, is);
 
 		var baMap = ((MatrixMap<Float>) controlMap.get(ModifierParser.CONTROL_KEY_MOD200_BA));
 		baMap.eachKey(k -> {
@@ -464,7 +292,7 @@ class ModifierParserTest {
 		var parser = new ModifierParser(1);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
 		TestUtils.populateControlMapGenusReal(controlMap);
 		MatrixMap2<String, Region, Coefficients> vetBqMap = populateVetBq(controlMap);
 		populateHlP1(controlMap);
@@ -474,28 +302,7 @@ class ModifierParserTest {
 
 		var is = TestUtils.makeInputStream("098 1 0 0 0 0 0 0.200 0.300");
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat(filename, is("testFilename"));
-
-				return is;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return filename;
-			}
-
-		};
-
-		parser.modify(controlMap, fileResolver);
+		parser.modify(controlMap, is);
 
 		vetBqMap.eachKey(k -> {
 			if (k[1].equals(Region.COASTAL)) {
@@ -511,7 +318,7 @@ class ModifierParserTest {
 				Arrays.asList(TestUtils.getSpeciesAliases()), Arrays.asList(Region.values()),
 				(k1, k2) -> new Coefficients(Arrays.asList(1.0f, 5.0f, 7.0f), 1)
 		);
-		controlMap.put(VeteranBQParser.CONTROL_KEY, vetBqMap);
+		controlMap.put(ControlKey.VETERAN_BQ.name(), vetBqMap);
 		return vetBqMap;
 	}
 
@@ -520,7 +327,7 @@ class ModifierParserTest {
 		var parser = new ModifierParser(1);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
 		TestUtils.populateControlMapGenusReal(controlMap);
 		populateVetBq(controlMap);
 		populateHlP1(controlMap);
@@ -530,28 +337,7 @@ class ModifierParserTest {
 
 		var is = TestUtils.makeInputStream("301 1 0 0 0 0 0 2.000 3.000 4.000 5.000");
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat(filename, is("testFilename"));
-
-				return is;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return filename;
-			}
-
-		};
-
-		parser.modify(controlMap, fileResolver);
+		parser.modify(controlMap, TestUtils.fileResolver("testFilename", is));
 
 		var decayMap = ((MatrixMap<Float>) controlMap.get(ModifierParser.CONTROL_KEY_MOD301_DECAY));
 		decayMap.eachKey(k -> {
@@ -584,7 +370,7 @@ class ModifierParserTest {
 		var parser = new ModifierParser(1);
 
 		Map<String, Object> controlMap = new HashMap<>();
-		controlMap.put(ModifierParser.CONTROL_KEY, Optional.of("testFilename"));
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
 
 		TestUtils.populateControlMapGenusReal(controlMap);
 		populateVetBq(controlMap);
@@ -595,28 +381,7 @@ class ModifierParserTest {
 
 		var is = TestUtils.makeInputStream("401 1 0 0 0 0 0 0.200 0.300 0.500 0.700");
 
-		var fileResolver = new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat(filename, is("testFilename"));
-
-				return is;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return filename;
-			}
-
-		};
-
-		parser.modify(controlMap, fileResolver);
+		parser.modify(controlMap, TestUtils.fileResolver("testFilename", is));
 
 		hlP1Map.eachKey(k -> {
 			if (k[0].equals("AC")) {
@@ -672,7 +437,7 @@ class ModifierParserTest {
 				MatrixMap3Impl.emptyDefault()
 		);
 		hlNPMap.setAll(k -> new NonprimaryHLCoefficients(Arrays.asList(1.0f, 5.0f), 1));
-		controlMap.put(HLNonprimaryCoefficientParser.CONTROL_KEY, hlNPMap);
+		controlMap.put(ControlKey.HL_NONPRIMARY.name(), hlNPMap);
 		return hlNPMap;
 	}
 
@@ -683,7 +448,7 @@ class ModifierParserTest {
 				MatrixMap2Impl.emptyDefault()
 		);
 		hlP3Map.setAll(k -> new Coefficients(Arrays.asList(1.0f, 5.0f, 7.0f, 13.0f), 1));
-		controlMap.put(HLCoefficientParser.CONTROL_KEY_P3, hlP3Map);
+		controlMap.put(ControlKey.HL_PRIMARY_SP_EQN_P3.name(), hlP3Map);
 		return hlP3Map;
 	}
 
@@ -694,7 +459,7 @@ class ModifierParserTest {
 				MatrixMap2Impl.emptyDefault()
 		);
 		hlP2Map.setAll(k -> new Coefficients(Arrays.asList(1.0f, 5.0f), 1));
-		controlMap.put(HLCoefficientParser.CONTROL_KEY_P2, hlP2Map);
+		controlMap.put(ControlKey.HL_PRIMARY_SP_EQN_P2.name(), hlP2Map);
 		return hlP2Map;
 	}
 
@@ -705,7 +470,7 @@ class ModifierParserTest {
 				MatrixMap2Impl.emptyDefault()
 		);
 		hlP1Map.setAll(k -> new Coefficients(Arrays.asList(1.0f, 5.0f, 7.0f), 1));
-		controlMap.put(HLCoefficientParser.CONTROL_KEY_P1, hlP1Map);
+		controlMap.put(ControlKey.HL_PRIMARY_SP_EQN_P1.name(), hlP1Map);
 		return hlP1Map;
 	}
 

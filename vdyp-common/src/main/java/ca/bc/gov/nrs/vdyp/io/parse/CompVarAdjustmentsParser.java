@@ -6,6 +6,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.control.OptionalControlMapSubResourceParser;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ControlledValueParser;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
 
 /**
@@ -37,7 +43,7 @@ import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
  * <li>14, 24, 34, 44: close util volume, less decay, less waste, adjustment for Utilization Classes 1 - 4, respectively
  * </ul>
  * <p>
- * FIP Control index: 028
+ * Control index: 028
  * <p>
  * Example: coe/CVADJ.PRM
  *
@@ -46,8 +52,6 @@ import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
  */
 public class CompVarAdjustmentsParser implements OptionalControlMapSubResourceParser<CompVarAdjustments>
 {
-	public static final String CONTROL_KEY = "PARAM_ADJUSTMENTS";
-	
 	private static final String INDEX_KEY = "index";
 	private static final String ADJUSTMENT_KEY = "adjustmentKey";
 	
@@ -82,9 +86,9 @@ public class CompVarAdjustmentsParser implements OptionalControlMapSubResourcePa
 
 		Map<Integer, Float> values = new HashMap<>();
 		
-		lineParser.parse(is, values, (v, r) -> {
-			var index = (Integer) v.get(INDEX_KEY);
-			var adjustment = (Float) v.get(ADJUSTMENT_KEY);
+		lineParser.parse(is, values, (value, r, lineNumber) -> {
+			var index = (Integer) value.get(INDEX_KEY);
+			var adjustment = (Float) value.get(ADJUSTMENT_KEY);
 
 			r.put(index, adjustment);
 			
@@ -95,7 +99,7 @@ public class CompVarAdjustmentsParser implements OptionalControlMapSubResourcePa
 	}
 	
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.PARAM_ADJUSTMENTS;
 	}
 }

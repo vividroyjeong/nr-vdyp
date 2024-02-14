@@ -43,7 +43,7 @@ public class MockFileResolver implements FileResolver {
 				if (e instanceof IOException) {
 					throw (IOException) e;
 				}
-				fail("Unexpected thowoable type specified for MockFileResolver");
+				fail("Unexpected throwable type specified for MockFileResolver");
 			}
 		}
 		var result = map.get(filename);

@@ -10,6 +10,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
@@ -63,7 +64,7 @@ public class CompVarAdjustmentsParserTest {
 		
 		TestUtils.populateControlMapFromStream(controlMap, parser, is);
 		
-		CompVarAdjustments m = (CompVarAdjustments)controlMap.get(CompVarAdjustmentsParser.CONTROL_KEY);
+		CompVarAdjustments m = (CompVarAdjustments)controlMap.get(ControlKey.PARAM_ADJUSTMENTS.name());
 		
 		assertThat(m.getParam(CompVarAdjustments.SMALL_BA), is(0.50f));
 		assertThat(m.getParam(CompVarAdjustments.SMALL_DQ), is(0.51f));

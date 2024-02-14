@@ -2,11 +2,18 @@ package ca.bc.gov.nrs.vdyp.io.parse;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapSubResourceParser;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 
 /**
@@ -58,11 +65,13 @@ public class DqGrowthEmpiricalLimitsParser implements ControlMapSubResourceParse
 
 		Map<Integer, Coefficients> result = new HashMap<>();
 		
-		lineParser.parse(is, result, (v, r) -> {
+		lineParser.parse(is, result, (v, r, lineNumber) -> {
 			var basalAreaGroupId = (Integer) v.get(BASAL_AREA_GROUP_ID_KEY);
 			
 			if (basalAreaGroupId < 1 || basalAreaGroupId > MAX_BASAL_AREA_GROUP_ID) {
-				throw new ValueParseException("Basal Area group id " + basalAreaGroupId + " is out of range; expecting a value from 1 to " + basalAreaGroupId);
+				throw new ValueParseException(
+						MessageFormat.format("Line: {0}: basal area group id {1} is out of range; expecting a value from 1 to {2}"
+								, lineNumber, basalAreaGroupId, MAX_BASAL_AREA_GROUP_ID));
 			}
 			
 			List<Float> coefficientList = new ArrayList<Float>();
@@ -83,8 +92,8 @@ public class DqGrowthEmpiricalLimitsParser implements ControlMapSubResourceParse
 	}
 
 	@Override
-	public String getControlKey()
+	public ControlKey getControlKey()
 	{
-		return CONTROL_KEY;
+		return ControlKey.DQ_GROWTH_EMPIRICAL_LIMITS;
 	}
 }

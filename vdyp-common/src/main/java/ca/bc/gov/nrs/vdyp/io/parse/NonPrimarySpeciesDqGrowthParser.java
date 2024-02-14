@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 
 /**
@@ -20,7 +21,7 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
  * The result of the parse is a {@link MatrixMap2} of three coefficients (first index = 1)
  * indexed first by Species then Basal Area Group Id. 
  * <p>
- * FIP Control index: 151
+ * Control index: 151
  * <p>
  * Example file: coe/DQSP06.COE
  *
@@ -29,10 +30,8 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
  */
 public class NonPrimarySpeciesDqGrowthParser extends NonPrimarySpeciesGrowthParser {
 	
-	public static final String CONTROL_KEY = "NON_PRIMARY_SP_DQ_GROWTH";
-	
 	public NonPrimarySpeciesDqGrowthParser()
 	{
-		super(CONTROL_KEY);
+		super(ControlKey.NON_PRIMARY_SP_DQ_GROWTH);
 	}
 }

@@ -10,17 +10,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.FloatUnaryOperator;
 import ca.bc.gov.nrs.vdyp.common.Utils;
-import ca.bc.gov.nrs.vdyp.io.parse.GenusDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.HLCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.HLNonprimaryCoefficientParser;
-import ca.bc.gov.nrs.vdyp.io.parse.LineParser;
-import ca.bc.gov.nrs.vdyp.io.parse.OptionalResourceControlMapModifier;
-import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.ValueParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.ValueParser;
-import ca.bc.gov.nrs.vdyp.io.parse.VeteranBQParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.control.OptionalResourceControlMapModifier;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
@@ -30,10 +28,6 @@ import ca.bc.gov.nrs.vdyp.model.Region;
 
 public class ModifierParser implements OptionalResourceControlMapModifier {
 
-	public static final String CONTROL_KEY = "MODIFIERS";
-
-	/** MatrixMap2 of Species ID, Region to Coefficients (1-3) */
-	public static final String CONTROL_KEY_MOD098_VETERAN_BQ = VeteranBQParser.CONTROL_KEY;
 	/** MatrixMap2 of Species ID, Region to Float */
 	public static final String CONTROL_KEY_MOD200_BA = "BA_MODIFIERS";
 	/** MatrixMap2 of Species ID, Region to Float */
@@ -46,13 +40,13 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 	public static final String CONTROL_KEY_MOD301_WASTE = "WASTE_MODIFIERS";
 
 	/** MatrixMap3<Integer, String, Region, Float */
-	public static final String CONTROL_KEY_MOD400_P1 = HLCoefficientParser.CONTROL_KEY_P1;
+	public static final String CONTROL_KEY_MOD400_P1 = ControlKey.HL_PRIMARY_SP_EQN_P1.name();
 	/** MatrixMap3<Integer, String, Region, Float */
-	public static final String CONTROL_KEY_MOD400_P2 = HLCoefficientParser.CONTROL_KEY_P2;
+	public static final String CONTROL_KEY_MOD400_P2 = ControlKey.HL_PRIMARY_SP_EQN_P2.name();
 	/** MatrixMap3<Integer, String, Region, Float */
-	public static final String CONTROL_KEY_MOD400_P3 = HLCoefficientParser.CONTROL_KEY_P3;
+	public static final String CONTROL_KEY_MOD400_P3 = ControlKey.HL_PRIMARY_SP_EQN_P3.name();
 	/** MatrixMap3<String, String, Region, NonprimaryHLCoefficients> */
-	public static final String CONTROL_KEY_MOD400_NONPRIMARY = HLNonprimaryCoefficientParser.CONTROL_KEY;
+	public static final String CONTROL_KEY_MOD400_NONPRIMARY = ControlKey.HL_NONPRIMARY.name();
 
 	public static final int MAX_MODS = 60;
 
@@ -100,7 +94,7 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 			.multiValue(10, 6, "mods", ValueParser.optional(ValueParser.FLOAT));
 
 		Map<Integer, List<Float>> modifierMap = new HashMap<>();		
-		parser.parse(data, modifierMap, (entry, result) -> {
+		parser.parse(data, modifierMap, (entry, result, lineNumber) -> {
 			int sequence = (int) entry.get("sequence");
 
 			if (modIsForProgram(entry)) {
@@ -137,7 +131,7 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 						final float coastalMod = mods.get(0);
 						final float interiorMod = mods.get(1);
 	
-						var vetBqMap = (vetBqOptional = vetBqOptional.or(() -> Optional.of(Utils.expectParsedControl(control, VeteranBQParser.CONTROL_KEY, MatrixMap2.class)))).get();
+						var vetBqMap = (vetBqOptional = vetBqOptional.or(() -> Optional.of(Utils.expectParsedControl(control, ControlKey.VETERAN_BQ.name(), MatrixMap2.class)))).get();
 	
 						if (coastalMod != 0.0) {
 							var coe = vetBqMap.get(sp0Alias, Region.COASTAL);
@@ -266,8 +260,8 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 	}
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.MODIFIER_FILE;
 	}
 
 	@Override

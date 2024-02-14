@@ -8,7 +8,7 @@ import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.io.parse.ValueParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
 
 class VdypGrowthDetailParserTest {
 	

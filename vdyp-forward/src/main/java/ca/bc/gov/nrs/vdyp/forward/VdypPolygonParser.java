@@ -6,24 +6,22 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common_calculators.FizCheck;
 import ca.bc.gov.nrs.vdyp.forward.model.FipMode;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.AbstractStreamingParser;
-import ca.bc.gov.nrs.vdyp.io.parse.BecDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ControlMapValueReplacer;
-import ca.bc.gov.nrs.vdyp.io.parse.ControlledValueParser;
-import ca.bc.gov.nrs.vdyp.io.parse.LineParser;
-import ca.bc.gov.nrs.vdyp.io.parse.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.StreamingParserFactory;
-import ca.bc.gov.nrs.vdyp.io.parse.ValueParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapValueReplacer;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.AbstractStreamingParser;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ControlledValueParser;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 
 public class VdypPolygonParser implements ControlMapValueReplacer<StreamingParserFactory<VdypPolygon>, String> {
-
-	public static final String CONTROL_KEY = "VDYP_POLYGONS";
 
 	private static final String DESCRIPTION = "DESCRIPTION"; // POLYDESC
 	private static final String BIOGEOCLIMATIC_ZONE = "BIOGEOCLIMATIC_ZONE"; // BEC
@@ -34,8 +32,8 @@ public class VdypPolygonParser implements ControlMapValueReplacer<StreamingParse
 	private static final String FIP_MODE = "FIP_MODE"; // MODEfip
 
 	@Override
-	public String getControlKey() {
-		return CONTROL_KEY;
+	public ControlKey getControlKey() {
+		return ControlKey.VDYP_POLYGON;
 	}
 
 	private static Pattern descriptionPattern = Pattern.compile(".*([\\d]{4}$)");
@@ -93,7 +91,7 @@ public class VdypPolygonParser implements ControlMapValueReplacer<StreamingParse
 						);
 					}
 
-					BecLookup becLookup = (BecLookup) control.get(BecDefinitionParser.CONTROL_KEY);
+					BecLookup becLookup = (BecLookup) control.get(ControlKey.BEC_DEF.name());
 					BecDefinition bec = becLookup.get(becAlias)
 							.orElseThrow(() -> new ResourceParseException(becAlias + " is not a recognized BEC alias"));
 

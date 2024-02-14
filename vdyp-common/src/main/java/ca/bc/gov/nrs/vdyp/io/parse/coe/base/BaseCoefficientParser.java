@@ -10,7 +10,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.function.IntFunction;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
@@ -104,7 +108,8 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 	 */
 	public <K> BaseCoefficientParser<T, W, M> key(
 			int length, String name, ControlledValueParser<K> parser,
-			Function<Map<String, Object>, Collection<?>> range, String errorTemplate, Predicate<String> keyIgnoreTest
+			Function<Map<String, Object>, Collection<?>> range, 
+			String errorTemplate, Predicate<String> keyIgnoreTest
 	) {
 		if (expectedKeys > 0 && metaKeys.size() == expectedKeys) {
 			throw new IllegalStateException(
@@ -169,17 +174,17 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 	}
 
 	public <K> BaseCoefficientParser<T, W, M> coefficients(int number, int length) {
-		lineParser.multiValue(numCoefficients, length, COEFFICIENTS_KEY, ValueParser.FLOAT);
-		this.numCoefficients = numCoefficients;
+		lineParser.multiValue(number, length, COEFFICIENTS_KEY, ValueParser.FLOAT);
+		this.numCoefficients = number;
 		this.defaultEntryValuator = Optional.empty();
 		this.defaultCoefficientValuator = Optional.empty();
 		return this;
 	}
 
-	public <K> BaseCoefficientParser<T, W, M> coefficients(int numCoefficients, int length
+	public <K> BaseCoefficientParser<T, W, M> coefficients(int number, int length
 			, Optional<Function<Void, T>> defaultEntryValuator, Optional<IntFunction<Float>> defaultCoefficientValuator) {
-		lineParser.multiValue(numCoefficients, length, COEFFICIENTS_KEY, ValueParser.FLOAT);
-		this.numCoefficients = numCoefficients;
+		lineParser.multiValue(number, length, COEFFICIENTS_KEY, ValueParser.FLOAT);
+		this.numCoefficients = number;
 		this.defaultEntryValuator = defaultEntryValuator;
 		this.defaultCoefficientValuator = defaultCoefficientValuator;
 		return this;
@@ -198,19 +203,18 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 
 		var parsed = new AtomicInteger();
 
-		lineParser.parse(is, result, (value, r, line) -> {
+		lineParser.parse(is, result, (value, r, lineNumber) -> {
 			var key = metaKeys.stream().map(value::get).toList().toArray(Object[]::new);
 			
 			@SuppressWarnings("unchecked")
-			var coe = getCoefficients((List<Float>) value.get(COEFFICIENTS_KEY));
+			var coeList = getCoefficients((List<Float>)value.get(COEFFICIENTS_KEY));
 			if (coeList.size() < numCoefficients && defaultCoefficientValuator.isPresent()) {
 				
 				List<Float> defaultedValues = IntStream.range(coeList.size(), numCoefficients)
 					.mapToObj(i -> defaultCoefficientValuator.get().apply(i))
 					.collect(Collectors.toList());
 				
-				defaultedValues.addAll(0, coeList);
-				coeList = defaultedValues;
+				coeList.addAll(defaultedValues);
 			}
 			
 			var coe = getCoefficients(coeList);
