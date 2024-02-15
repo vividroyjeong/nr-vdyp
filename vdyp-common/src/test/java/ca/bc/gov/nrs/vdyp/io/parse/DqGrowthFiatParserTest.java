@@ -28,7 +28,7 @@ public class DqGrowthFiatParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 		
-		TestUtils.populateControlMapFromResource(controlMap, parser, "EMP117A1.PRM");
+		TestUtils.populateControlMapFromResource(controlMap, parser, "EMP117A1.prm");
 		
 		@SuppressWarnings("unchecked")
 		Map<Region, GrowthFiatDetails> m = (Map<Region, GrowthFiatDetails>)controlMap.get(ControlKey.DQ_GROWTH_FIAT.name());

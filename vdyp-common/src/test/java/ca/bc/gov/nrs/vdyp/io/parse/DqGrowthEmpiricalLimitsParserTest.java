@@ -23,7 +23,7 @@ public class DqGrowthEmpiricalLimitsParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 		
-		TestUtils.populateControlMapFromResource(controlMap, parser, "REGDQL2.COE");
+		TestUtils.populateControlMapFromResource(controlMap, parser, "REGDQL2.coe");
 		
 		@SuppressWarnings("unchecked")
 		Map<Integer, Coefficients> m = (Map<Integer, Coefficients>)controlMap.get(ControlKey.DQ_GROWTH_EMPIRICAL_LIMITS.name());
