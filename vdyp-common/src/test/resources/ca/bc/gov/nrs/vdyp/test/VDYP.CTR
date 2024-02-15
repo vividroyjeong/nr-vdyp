@@ -6,7 +6,7 @@
 
 001 00999999                                          Max # of Polygons to process (I8)
 009 coe/Becdef.dat                                    BEC Zone Definitions
-010 coe/SP0DEF_V0.dat                                 Standard SP0 Codes        RD_SP0
+010 coe/SP0DEF_v0.dat                                 Standard SP0 Codes        RD_SP0
 
 011 vin_p1.dat                                        VDYP7 Polygon input
 012 vin_s1.dat                                        VDYP7 Layer by Species, input
@@ -93,7 +93,7 @@
 117 coe/EMP117A1.prm                                  DQ GROWTH (PRI. L) IPSJF178, FIAT AND MIXED MODEL.
 121 coe/GROWBA27.COE                                  GROWTH IN BA (PRIM LAYER) EMP. Model (EMP121) IPSJF162 
 122 coe/GD23.coe                                      DQ growth EMP122  IPSJF178, empirical model
-123 coe/REGDQL2.COE                                   Limits on DQ growth  EMP123  IPSJF178
+123 coe/REGDQL2.coe                                   Limits on DQ growth  EMP123  IPSJF178
 148 coe/BASP05.COE                                    BA growth Primary SP IPSJF148
 149 coe/BASP06.COE                                    BA growth NONPrimary SP IPSJF149
 150 coe/DQSP05.COE                                    DQ growth Primary SP IPSJF150
