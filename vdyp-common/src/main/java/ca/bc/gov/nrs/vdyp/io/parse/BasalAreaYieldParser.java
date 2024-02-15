@@ -22,7 +22,6 @@ import ca.bc.gov.nrs.vdyp.common.ControlKey;
  * @see BecZoneBySpeciesCoefficientParser
  */
 public class BasalAreaYieldParser extends BecZoneBySpeciesCoefficientParser {
-	public static final String CONTROL_KEY = "BA_YIELD";
 	
 	private static final int NUM_COEFFICIENTS = 7;
 

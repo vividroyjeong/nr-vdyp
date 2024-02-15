@@ -27,8 +27,6 @@ import ca.bc.gov.nrs.vdyp.common.ControlKey;
  */
 public class DqGrowthFiatParser extends GrowthFiatParser {
 	
-	public static final String CONTROL_KEY = "DQ_GROWTH_FIAT";
-
 	@Override
 	public ControlKey getControlKey()
 	{

@@ -27,11 +27,8 @@ import ca.bc.gov.nrs.vdyp.common.ControlKey;
  */
 public class BasalAreaGrowthFiatParser extends GrowthFiatParser {
 	
-	public static final String CONTROL_KEY = "BA_GROWTH_FIAT";
-
 	@Override
-	public ControlKey getControlKey()
-	{
+	public ControlKey getControlKey() {
 		return ControlKey.BA_GROWTH_FIAT;
 	}
 }

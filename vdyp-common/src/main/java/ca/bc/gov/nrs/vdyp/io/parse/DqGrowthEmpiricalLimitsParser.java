@@ -36,8 +36,6 @@ import ca.bc.gov.nrs.vdyp.model.Coefficients;
  */
 public class DqGrowthEmpiricalLimitsParser implements ControlMapSubResourceParser<Map<Integer, Coefficients>> {
 	
-	public static final String CONTROL_KEY = "DQ_GROWTH_EMPIRICAL_LIMITS";
-	
 	public static final int MAX_BASAL_AREA_GROUP_ID = 40;
 	
 	public static final String BASAL_AREA_GROUP_ID_KEY = "BasalAreaGroupId";

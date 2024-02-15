@@ -22,7 +22,6 @@ import ca.bc.gov.nrs.vdyp.common.ControlKey;
  * @see BecZoneBySpeciesCoefficientParser
  */
 public class QuadraticMeanDiameterYieldParser extends BecZoneBySpeciesCoefficientParser {
-	public static final String CONTROL_KEY = "DQ_YIELD";
 	
 	private static final int NUM_COEFFICIENTS = 6;
 
