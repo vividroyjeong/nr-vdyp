@@ -1,6 +1,7 @@
-package ca.bc.gov.nrs.vdyp.io.parse;
+package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.base.NonPrimarySpeciesGrowthParser;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 
 /**

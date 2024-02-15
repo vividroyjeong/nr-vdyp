@@ -1,6 +1,7 @@
-package ca.bc.gov.nrs.vdyp.io.parse;
+package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.base.BecZoneBySpeciesCoefficientParser;
 
 /**
  * Parses a mapping from a BEC Zone Alias and Species to a list of seven coefficients. Each row contains 

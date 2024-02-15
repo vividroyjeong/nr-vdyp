@@ -1,8 +1,9 @@
-package ca.bc.gov.nrs.vdyp.io.parse;
+package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
 import java.util.Map;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.base.GrowthFiatParser;
 
 /**
  * Parser for Dq (quadratic mean diameter) growth Fiat model details data file. 
