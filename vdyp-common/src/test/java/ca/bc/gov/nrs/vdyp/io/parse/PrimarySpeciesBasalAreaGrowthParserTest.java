@@ -55,6 +55,7 @@ public class PrimarySpeciesBasalAreaGrowthParserTest {
 		Map<Integer, ModelCoefficients> m = parser.parse(is, controlMap);
 		assertThat(m.get(1), hasProperty("model", is(9)));
 		assertThat(m.get(1), hasProperty("coefficients", contains(-0.08960f, 0.007892f, 0.00105f)));
-		assertThat(m.get(2), Matchers.nullValue());
+		assertThat(m.get(2), hasProperty("model", is(0)));
+		assertThat(m.get(2), hasProperty("coefficients", contains(0.0f, 0.0f, 0.0f)));
 	}
 }
