@@ -1,20 +1,26 @@
 package ca.bc.gov.nrs.vdyp.fip.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import java.io.*;
-import java.util.*;
-import java.util.function.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiFunction;
 
 import org.hamcrest.Matchers;
 import org.opentest4j.AssertionFailedError;
 
-import ca.bc.gov.nrs.vdyp.fip.*;
-import ca.bc.gov.nrs.vdyp.io.*;
+import ca.bc.gov.nrs.vdyp.fip.FipControlParser;
+import ca.bc.gov.nrs.vdyp.fip.ModifierParser;
+import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.model.*;
-import ca.bc.gov.nrs.vdyp.test.*;
+import ca.bc.gov.nrs.vdyp.model.JProgram;
+import ca.bc.gov.nrs.vdyp.model.Region;
+import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 public class FipTestUtils {
 

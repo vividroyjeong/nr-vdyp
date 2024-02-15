@@ -33,6 +33,7 @@
 		<module>vdyp-vri</module>
 		<module>vdyp-buildtools</module>
 		<module>vdyp-sindex</module>
+		<module>vdyp-forward</module>
 	</modules>
 
 	<dependencyManagement>

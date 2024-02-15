@@ -167,6 +167,20 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 	public static final ValueParser<Boolean> LOGICAL = s -> INTEGER.parse(s) != 0;
 
 	/**
+	 * Parser for integers as booleans restricted to the values 1 (true) and 0
+	 * (false)
+	 */
+	public static final ValueParser<Boolean> LOGICAL_0_1 = s -> {
+		int v = INTEGER.parse(s);
+		if (v == 0)
+			return false;
+		else if (v == 1)
+			return true;
+		else
+			throw new ValueParseException("Logical value is not 0 or 1");
+	};
+
+	/**
 	 * Parser for Characters
 	 */
 	public static final ValueParser<Character> CHARACTER = s -> {
@@ -270,7 +284,7 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 	}
 
 	/**
-	 * Parse a string as a set of fixed length chucks.
+	 * Parse a string as a set of fixed length chunks.
 	 *
 	 * @param <U>
 	 * @param length   length of a chunk
