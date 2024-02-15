@@ -61,11 +61,6 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 		this.lineParser = new LineParser() {
 
 			@Override
-			public boolean isStopSegment(List<String> segments) {
-				return segments.get(0).isBlank();
-			}
-
-			@Override
 			public boolean isIgnoredSegment(List<String> segments) {
 				if (segments.size() < segmentIgnoreTests.size()) {
 					return true;
@@ -207,14 +202,15 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 			var key = metaKeys.stream().map(value::get).toList().toArray(Object[]::new);
 			
 			@SuppressWarnings("unchecked")
-			var coeList = getCoefficients((List<Float>)value.get(COEFFICIENTS_KEY));
+			var coeList = (List<Float>)value.get(COEFFICIENTS_KEY);
 			if (coeList.size() < numCoefficients && defaultCoefficientValuator.isPresent()) {
 				
 				List<Float> defaultedValues = IntStream.range(coeList.size(), numCoefficients)
 					.mapToObj(i -> defaultCoefficientValuator.get().apply(i))
 					.collect(Collectors.toList());
 				
-				coeList.addAll(defaultedValues);
+				defaultedValues.addAll(0, coeList);
+				coeList = defaultedValues;
 			}
 			
 			var coe = getCoefficients(coeList);
