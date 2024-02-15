@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.vdyp.io.parse;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -28,8 +29,6 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
  * @see ControlMapSubResourceParser
  */
 public abstract class BecZoneBySpeciesCoefficientParser implements ControlMapSubResourceParser<MatrixMap2<String, String, Coefficients>> {
-
-	public static final String CONTROL_KEY = "BA_GROWTH_EMPIRICAL";
 
 	public static final String BEC_ZONE_ID_KEY = "BecId";
 	public static final String INDEX_KEY = "index";
@@ -70,20 +69,20 @@ public abstract class BecZoneBySpeciesCoefficientParser implements ControlMapSub
 				becAliases, sp0Aliases, (k1, k2) -> Coefficients.empty(nCoefficients, 0)
 		);
 		
-		lineParser.parse(is, result, (v, r, l) -> {
-			var becZoneId = (String)v.get(BEC_ZONE_ID_KEY);
-			var index = (int) v.get(INDEX_KEY);
-			var indicator = (int) v.get(INDICATOR_KEY);
+		lineParser.parse(is, result, (value, r, lineNumber) -> {
+			var becZoneId = (String)value.get(BEC_ZONE_ID_KEY);
+			var index = (int) value.get(INDEX_KEY);
+			var indicator = (int) value.get(INDICATOR_KEY);
 			
 			@SuppressWarnings("unchecked")
-			var specCoefficients = (List<Float>) v.get(COEFFICIENTS_KEY);
+			var specCoefficients = (List<Float>) value.get(COEFFICIENTS_KEY);
 
 			if (index < 0 || index >= nCoefficients) {
-				throw new ValueParseException("Index value " + index + " is out of range; expecting a value from 0 to " + nCoefficients);
+				throw new ValueParseException(MessageFormat.format("Line {0}: Index value {1} is out of range; expecting a value from 0 to {2}", lineNumber, index, nCoefficients));
 			}
 			
 			if (indicator < 0 || indicator > 1) {
-				throw new ValueParseException("Indicator value " + indicator + " is out of range; expecting either 0 or 1");
+				throw new ValueParseException(MessageFormat.format("Line {0}: Indicator value {1} is out of range; expecting either 0 or 1", lineNumber, indicator));
 			}
 			
 			BecDefinitionParser.getBecs(control).get(becZoneId).orElseThrow(() -> new ValueParseException("BEC Zone Id " + becZoneId + " is not a recognized BEC Zone"));
