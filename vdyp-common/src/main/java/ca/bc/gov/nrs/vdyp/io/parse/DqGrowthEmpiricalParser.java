@@ -1,9 +1,11 @@
 package ca.bc.gov.nrs.vdyp.io.parse;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.base.SimpleCoefficientParser1;
+import ca.bc.gov.nrs.vdyp.model.Coefficients;
 
 /**
  * Parses a mapping from a Basal Area Group number to a list of ten coefficients. Each row contains 
@@ -27,11 +29,14 @@ public class DqGrowthEmpiricalParser extends SimpleCoefficientParser1<Integer> {
 	
 	public static final int MAX_GROUPS = 40;
 	
+	public static final Coefficients defaultCoefficients = new Coefficients(
+			new float[] { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }, 1);
+			
 	public DqGrowthEmpiricalParser() {
 		super(Integer.class, 1, ControlKey.DQ_GROWTH_EMPIRICAL);
 		
 		this.groupIndexKey(MAX_GROUPS).coefficients(10, 9
-				, Optional.empty()
+				, Optional.of((index) -> defaultCoefficients)
 				, Optional.of((index) -> 0.0f));
 	}
 }
