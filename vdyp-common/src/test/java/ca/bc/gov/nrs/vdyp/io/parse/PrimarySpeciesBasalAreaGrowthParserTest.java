@@ -11,6 +11,7 @@ import java.util.Map;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.ModelCoefficients;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -26,12 +27,16 @@ public class PrimarySpeciesBasalAreaGrowthParserTest {
 		TestUtils.populateControlMapFromResource(controlMap, parser, "BASP05.COE");
 		
 		@SuppressWarnings("unchecked")
-		Map<Integer, ModelCoefficients> m = (Map<Integer, ModelCoefficients>)controlMap.get(PrimarySpeciesBasalAreaGrowthParser.CONTROL_KEY);
+		Map<Integer, ModelCoefficients> m = (Map<Integer, ModelCoefficients>)controlMap.get(ControlKey.PRIMARY_SP_BA_GROWTH.name());
 		
 		assertThat(m.get(1), hasProperty("model", is(9)));
 		assertThat(m.get(1), hasProperty("coefficients", contains(-0.08960f, 0.007892f, 0.00105f)));
 		assertThat(m.get(30), hasProperty("model", is(8)));
 		assertThat(m.get(30), hasProperty("coefficients", contains(0.00579f, -0.000076f, 0.00449f)));
+
+		// Check that defaults are applied
+		assertThat(m.get(27), hasProperty("model", is(0)));
+		assertThat(m.get(27), hasProperty("coefficients", contains(0.0f, 0.0f, 0.0f)));
 	}
 
 	@Test

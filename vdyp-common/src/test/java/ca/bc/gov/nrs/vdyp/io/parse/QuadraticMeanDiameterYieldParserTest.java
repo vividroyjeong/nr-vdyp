@@ -9,6 +9,7 @@ import java.util.Map;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
@@ -28,7 +29,7 @@ class QuadraticMeanDiameterYieldParserTest {
 		TestUtils.populateControlMapFromResource(controlMap, parser, "YLDDQ45.COE");
 		
 		@SuppressWarnings("unchecked")
-		MatrixMap2<String, String, Coefficients> m = (MatrixMap2<String, String, Coefficients>)controlMap.get(QuadraticMeanDiameterYieldParser.CONTROL_KEY);
+		MatrixMap2<String, String, Coefficients> m = (MatrixMap2<String, String, Coefficients>)controlMap.get(ControlKey.DQ_YIELD.name());
 		
 		assertThat(m.get("AT", "AC"), hasSize(6));
 		assertThat(m.get("AT", "AC"), 

@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.vdyp.io.parse;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Map;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
@@ -28,8 +30,9 @@ class BasalAreaGrowthEmpiricalParserTest {
 		TestUtils.populateControlMapFromResource(controlMap, parser, "GROWBA27.COE");
 		
 		@SuppressWarnings("unchecked")
-		MatrixMap2<String, String, Coefficients> m = (MatrixMap2<String, String, Coefficients>)controlMap.get(BasalAreaGrowthEmpiricalParser.CONTROL_KEY);
+		MatrixMap2<String, String, Coefficients> m = (MatrixMap2<String, String, Coefficients>)controlMap.get(ControlKey.BA_GROWTH_EMPIRICAL.name());
 		
+		assertTrue(m.isFull());
 		assertThat(m.get("AT", "AC"), hasSize(8));
 		assertThat(m.get("AT", "AC"), 
 				Matchers.contains(7.9550f, -0.5818f, 0.00538f, 3.90488f, -1.0999f, 0.01348f, 0.82063f, 0.69837f));

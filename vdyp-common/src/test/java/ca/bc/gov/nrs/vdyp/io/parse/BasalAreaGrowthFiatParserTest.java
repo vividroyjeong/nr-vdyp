@@ -9,6 +9,7 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseLineException;
 import ca.bc.gov.nrs.vdyp.model.GrowthFiatDetails;
@@ -27,7 +28,7 @@ public class BasalAreaGrowthFiatParserTest {
 		TestUtils.populateControlMapFromResource(controlMap, parser, "EMP111A1.PRM");
 		
 		@SuppressWarnings("unchecked")
-		Map<Region, GrowthFiatDetails> m = (Map<Region, GrowthFiatDetails>)controlMap.get(BasalAreaGrowthFiatParser.CONTROL_KEY);
+		Map<Region, GrowthFiatDetails> m = (Map<Region, GrowthFiatDetails>)controlMap.get(ControlKey.BA_GROWTH_FIAT.name());
 		
 		assertThat(m, Matchers.aMapWithSize(2));
 		assertThat(m.get(Region.COASTAL),

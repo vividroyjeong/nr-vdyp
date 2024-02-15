@@ -8,6 +8,7 @@ import java.util.Map;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.GrowthFiatDetails;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
@@ -29,7 +30,7 @@ public class DqGrowthFiatParserTest {
 		TestUtils.populateControlMapFromResource(controlMap, parser, "EMP117A1.PRM");
 		
 		@SuppressWarnings("unchecked")
-		Map<Region, GrowthFiatDetails> m = (Map<Region, GrowthFiatDetails>)controlMap.get(DqGrowthFiatParser.CONTROL_KEY);
+		Map<Region, GrowthFiatDetails> m = (Map<Region, GrowthFiatDetails>)controlMap.get(ControlKey.DQ_GROWTH_FIAT.name());
 		
 		assertThat(m, Matchers.aMapWithSize(2));
 		assertThat(m.get(Region.COASTAL),
