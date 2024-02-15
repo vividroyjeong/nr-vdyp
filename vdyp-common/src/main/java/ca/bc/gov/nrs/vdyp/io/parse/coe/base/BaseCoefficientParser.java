@@ -48,7 +48,7 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 	private int numCoefficients;
 	private Optional<IntFunction<Float>> defaultCoefficientValuator;
 	private Optional<Function<Void, T>> defaultEntryValuator;
-	
+
 	private List<String> metaKeys = new ArrayList<>();
 	private List<Function<Map<String, Object>, Collection<?>>> keyRanges = new ArrayList<>();
 	private int expectedKeys;
@@ -103,8 +103,7 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 	 */
 	public <K> BaseCoefficientParser<T, W, M> key(
 			int length, String name, ControlledValueParser<K> parser,
-			Function<Map<String, Object>, Collection<?>> range, 
-			String errorTemplate, Predicate<String> keyIgnoreTest
+			Function<Map<String, Object>, Collection<?>> range, String errorTemplate, Predicate<String> keyIgnoreTest
 	) {
 		if (expectedKeys > 0 && metaKeys.size() == expectedKeys) {
 			throw new IllegalStateException(
@@ -176,8 +175,10 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 		return this;
 	}
 
-	public <K> BaseCoefficientParser<T, W, M> coefficients(int number, int length
-			, Optional<Function<Void, T>> defaultEntryValuator, Optional<IntFunction<Float>> defaultCoefficientValuator) {
+	public <K> BaseCoefficientParser<T, W, M> coefficients(
+			int number, int length, Optional<Function<Void, T>> defaultEntryValuator,
+			Optional<IntFunction<Float>> defaultCoefficientValuator
+	) {
 		lineParser.multiValue(number, length, COEFFICIENTS_KEY, ValueParser.FLOAT);
 		this.numCoefficients = number;
 		this.defaultEntryValuator = defaultEntryValuator;
@@ -200,21 +201,20 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 
 		lineParser.parse(is, result, (value, r, lineNumber) -> {
 			var key = metaKeys.stream().map(value::get).toList().toArray(Object[]::new);
-			
+
 			@SuppressWarnings("unchecked")
-			var coeList = (List<Float>)value.get(COEFFICIENTS_KEY);
+			var coeList = (List<Float>) value.get(COEFFICIENTS_KEY);
 			if (coeList.size() < numCoefficients && defaultCoefficientValuator.isPresent()) {
-				
+
 				List<Float> defaultedValues = IntStream.range(coeList.size(), numCoefficients)
-					.mapToObj(i -> defaultCoefficientValuator.get().apply(i))
-					.collect(Collectors.toList());
-				
+						.mapToObj(i -> defaultCoefficientValuator.get().apply(i)).collect(Collectors.toList());
+
 				defaultedValues.addAll(0, coeList);
 				coeList = defaultedValues;
 			}
-			
+
 			var coe = getCoefficients(coeList);
-				
+
 			r.putM(wrapCoefficients(coe), key);
 			parsed.incrementAndGet();
 			return r;

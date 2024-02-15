@@ -1,23 +1,19 @@
 package ca.bc.gov.nrs.vdyp.model;
 
-public class ModelCoefficients
-{
+public class ModelCoefficients {
 	private final int model;
 	private final Coefficients coefficients;
-	
-	public ModelCoefficients(int model, Coefficients coefficients)
-	{
+
+	public ModelCoefficients(int model, Coefficients coefficients) {
 		this.model = model;
 		this.coefficients = coefficients;
 	}
 
-	public int getModel()
-	{
+	public int getModel() {
 		return model;
 	}
 
-	public Coefficients getCoefficients()
-	{
+	public Coefficients getCoefficients() {
 		return coefficients;
 	}
 }

@@ -100,9 +100,7 @@ public class VdypForwardTestUtils {
 			}
 
 			@Override
-			public FileResolver relative(String path)
-				throws IOException
-			{
+			public FileResolver relative(String path) throws IOException {
 				throw new UnsupportedOperationException();
 			}
 		};

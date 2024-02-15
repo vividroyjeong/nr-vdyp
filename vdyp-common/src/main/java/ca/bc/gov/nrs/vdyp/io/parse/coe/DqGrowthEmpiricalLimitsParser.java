@@ -35,9 +35,9 @@ import ca.bc.gov.nrs.vdyp.model.Coefficients;
  * @see ControlMapSubResourceParser
  */
 public class DqGrowthEmpiricalLimitsParser implements ControlMapSubResourceParser<Map<Integer, Coefficients>> {
-	
+
 	public static final int MAX_BASAL_AREA_GROUP_ID = 40;
-	
+
 	public static final String BASAL_AREA_GROUP_ID_KEY = "BasalAreaGroupId";
 	public static final String COEFFICIENTS_9_KEY = "Coefficients-9";
 	public static final String COEFFICIENTS_6_KEY = "Coefficients-6";
@@ -77,10 +77,10 @@ public class DqGrowthEmpiricalLimitsParser implements ControlMapSubResourceParse
 			var coefficient9List = (List<Float>) value.get(COEFFICIENTS_9_KEY);
 			@SuppressWarnings("unchecked")
 			var coefficient6List = (List<Float>) value.get(COEFFICIENTS_6_KEY);
-			
+
 			coefficientList.addAll(coefficient9List);
 			coefficientList.addAll(coefficient6List);
-			
+
 			r.put(basalAreaGroupId, new Coefficients(coefficientList, 0));
 
 			return r;
@@ -90,8 +90,7 @@ public class DqGrowthEmpiricalLimitsParser implements ControlMapSubResourceParse
 	}
 
 	@Override
-	public ControlKey getControlKey()
-	{
+	public ControlKey getControlKey() {
 		return ControlKey.DQ_GROWTH_EMPIRICAL_LIMITS;
 	}
 }

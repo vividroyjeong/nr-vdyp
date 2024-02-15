@@ -98,7 +98,8 @@ public class BySpeciesDqCoefficientParser implements ControlMapSubResourceParser
 						coe = coeIt.next();
 					} catch (NoSuchElementException ex) {
 						throw new ValueParseException(
-							MessageFormat.format("Line {0}: expected {1} coefficients", lineNumber, NUM_SPECIES), ex);
+								MessageFormat.format("Line {0}: expected {1} coefficients", lineNumber, NUM_SPECIES), ex
+						);
 					}
 				}
 				result.computeIfAbsent(specAlias, x -> Coefficients.empty(NUM_COEFFICIENTS, 0)).setCoe(index, coe);

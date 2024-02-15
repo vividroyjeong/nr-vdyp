@@ -29,7 +29,7 @@ public class BasalAreaGrowthEmpiricalParser extends BecZoneBySpeciesCoefficientP
 	public BasalAreaGrowthEmpiricalParser() {
 		super(NUM_COEFFICIENTS);
 	}
-	
+
 	@Override
 	public ControlKey getControlKey() {
 		return ControlKey.BA_GROWTH_EMPIRICAL;

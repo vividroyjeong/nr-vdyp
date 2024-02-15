@@ -16,7 +16,7 @@ import ca.bc.gov.nrs.vdyp.model.GrowthFiatDetails;
 import ca.bc.gov.nrs.vdyp.model.Region;
 
 public abstract class GrowthFiatParser implements ControlMapSubResourceParser<Map<Region, GrowthFiatDetails>> {
-	
+
 	public static final String REGION_ID_KEY = "RegionId";
 	public static final String COEFFICIENTS_KEY = "Coefficients";
 
@@ -57,23 +57,24 @@ public abstract class GrowthFiatParser implements ControlMapSubResourceParser<Ma
 			if (details.getNAges() == 0) {
 				throw new ValueParseException("0", "Region Id " + regionId + " contains no age ranges");
 			}
-			
+
 			if (r.containsKey(details.getRegion())) {
-				throw new ValueParseException(details.getRegion().name(), "Region Id " + details.getRegion().name() + " is present multiple times in the file");
+				throw new ValueParseException(
+						details.getRegion().name(),
+						"Region Id " + details.getRegion().name() + " is present multiple times in the file"
+				);
 			}
-			
+
 			r.put(details.getRegion(), details);
 
 			return r;
 		}, control);
-		
+
 		if (result.size() == 0) {
 			throw new ResourceParseException("Details for Interior and Coastal regions missing");
-		}
-		else if (result.size() == 1 && result.containsKey(Region.COASTAL)) {
+		} else if (result.size() == 1 && result.containsKey(Region.COASTAL)) {
 			throw new ResourceParseException("Details for Interior region missing");
-		}
-		else if (result.size() == 1) {
+		} else if (result.size() == 1) {
 			throw new ResourceParseException("Details for Coastal region missing");
 		}
 

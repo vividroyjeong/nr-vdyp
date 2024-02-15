@@ -6,7 +6,7 @@ import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.base.GrowthFiatParser;
 
 /**
- * Parser for Basal Area Growth Fiat model details data file. 
+ * Parser for Basal Area Growth Fiat model details data file.
  * <ol>
  * <li>(cols 0-2) int - region (either 1 or 2)</li>
  * <li>(cols 3-8, 9-14, 15-20, 21-26) float - age values</li>
@@ -27,7 +27,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.coe.base.GrowthFiatParser;
  * @see GrowthFiatParser
  */
 public class BasalAreaGrowthFiatParser extends GrowthFiatParser {
-	
+
 	@Override
 	public ControlKey getControlKey() {
 		return ControlKey.BA_GROWTH_FIAT;

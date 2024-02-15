@@ -23,7 +23,7 @@ import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
  * <li>(cols 0-2) index - an integer from 1 to 98</li>
  * <li>(cols 3-9) float - adjustment value for that index</li>
  * </ol>
- * Any line whose index value is blank or missing is considered a blank line. An 
+ * Any line whose index value is blank or missing is considered a blank line. An
  * index of 999 stops the parse; this line and all following are ignored.
  * <p>
  * The result of the parse is a {@link Map} of indices to floats. The supported
@@ -50,11 +50,10 @@ import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
  * @see OptionalControlMapSubResourceParser
  * @author Michael Junkin, Vivid Solutions
  */
-public class CompVarAdjustmentsParser implements OptionalControlMapSubResourceParser<CompVarAdjustments>
-{
+public class CompVarAdjustmentsParser implements OptionalControlMapSubResourceParser<CompVarAdjustments> {
 	private static final String INDEX_KEY = "index";
 	private static final String ADJUSTMENT_KEY = "adjustmentKey";
-	
+
 	private LineParser lineParser = new LineParser() {
 		@Override
 		public boolean isStopLine(String line) {
@@ -70,7 +69,10 @@ public class CompVarAdjustmentsParser implements OptionalControlMapSubResourcePa
 	static final ControlledValueParser<Integer> PARSE_INDEX = ControlledValueParser
 			.validate(ValueParser.INTEGER, (v, c) -> {
 				if (v < CompVarAdjustments.MIN_INDEX || v > CompVarAdjustments.MAX_INDEX) {
-					return Optional.of("Index " + v + " not in the range " + CompVarAdjustments.MIN_INDEX + " to " + CompVarAdjustments.MAX_INDEX + " inclusive");
+					return Optional.of(
+							"Index " + v + " not in the range " + CompVarAdjustments.MIN_INDEX + " to "
+									+ CompVarAdjustments.MAX_INDEX + " inclusive"
+					);
 				}
 				return Optional.empty();
 			});
@@ -85,19 +87,19 @@ public class CompVarAdjustmentsParser implements OptionalControlMapSubResourcePa
 			throws IOException, ResourceParseException {
 
 		Map<Integer, Float> values = new HashMap<>();
-		
+
 		lineParser.parse(is, values, (value, r, lineNumber) -> {
 			var index = (Integer) value.get(INDEX_KEY);
 			var adjustment = (Float) value.get(ADJUSTMENT_KEY);
 
 			r.put(index, adjustment);
-			
+
 			return r;
 		}, control);
-		
+
 		return new CompVarAdjustments(values);
 	}
-	
+
 	@Override
 	public ControlKey getControlKey() {
 		return ControlKey.PARAM_ADJUSTMENTS;

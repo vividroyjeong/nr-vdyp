@@ -15,15 +15,15 @@ import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 
 public abstract class NonPrimarySpeciesGrowthParser extends OptionalCoefficientParser2<String, Integer> {
-	
+
 	private static final int MAX_BASAL_AREA_GROUP_ID = 30;
-	
-	private static final Optional<Coefficients> defaultCoefficients = Optional.of(new Coefficients(new float[] { 0.0f, 0.0f, 0.0f }, 1));
-	
+
+	private static final Optional<Coefficients> defaultCoefficients = Optional
+			.of(new Coefficients(new float[] { 0.0f, 0.0f, 0.0f }, 1));
+
 	private static final String BASAL_AREA_GROUP_ID_KEY = "BasalAreaGroupId";
 
-	public NonPrimarySpeciesGrowthParser(ControlKey controlKey)
-	{
+	public NonPrimarySpeciesGrowthParser(ControlKey controlKey) {
 		super(1, controlKey);
 			this.speciesKey()
 				.key(  3, BASAL_AREA_GROUP_ID_KEY
@@ -35,16 +35,16 @@ public abstract class NonPrimarySpeciesGrowthParser extends OptionalCoefficientP
 	}
 
 	@Override
-	public MatrixMap2<String, Integer, Optional<Coefficients>> parse(InputStream is, Map<String, Object> control) 
+	public MatrixMap2<String, Integer, Optional<Coefficients>> parse(InputStream is, Map<String, Object> control)
 			throws IOException, ResourceParseException {
 		var m = super.parse(is, control);
-		
-		m.eachKey(k-> {
+
+		m.eachKey(k -> {
 			if (m.getM(k).isEmpty()) {
-				m.put((String)k[0], (Integer)k[1], defaultCoefficients);
+				m.put((String) k[0], (Integer) k[1], defaultCoefficients);
 			}
 		});
-		
+
 		return m;
 	}
 }

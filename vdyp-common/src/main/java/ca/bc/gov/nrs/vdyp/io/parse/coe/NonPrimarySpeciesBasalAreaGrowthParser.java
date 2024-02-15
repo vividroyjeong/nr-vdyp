@@ -30,9 +30,8 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
  * @see NonPrimarySpeciesGrowthParser
  */
 public class NonPrimarySpeciesBasalAreaGrowthParser extends NonPrimarySpeciesGrowthParser {
-	
-	public NonPrimarySpeciesBasalAreaGrowthParser()
-	{
+
+	public NonPrimarySpeciesBasalAreaGrowthParser() {
 		super(ControlKey.NON_PRIMARY_SP_BA_GROWTH);
 	}
 }

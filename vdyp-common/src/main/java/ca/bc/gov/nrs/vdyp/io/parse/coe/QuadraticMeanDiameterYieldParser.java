@@ -23,13 +23,13 @@ import ca.bc.gov.nrs.vdyp.io.parse.coe.base.BecZoneBySpeciesCoefficientParser;
  * @see BecZoneBySpeciesCoefficientParser
  */
 public class QuadraticMeanDiameterYieldParser extends BecZoneBySpeciesCoefficientParser {
-	
+
 	private static final int NUM_COEFFICIENTS = 6;
 
 	public QuadraticMeanDiameterYieldParser() {
 		super(NUM_COEFFICIENTS);
 	}
-	
+
 	@Override
 	public ControlKey getControlKey() {
 		return ControlKey.DQ_YIELD;
