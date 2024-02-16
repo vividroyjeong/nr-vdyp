@@ -50,6 +50,7 @@ import org.apache.commons.math3.util.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.bc.gov.nrs.vdyp.application.VdypApplication;
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.IndexedFloatBinaryOperator;
@@ -83,7 +84,7 @@ import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 
-public class FipStart implements Closeable {
+public class FipStart extends VdypApplication implements Closeable {
 
 	private static final Comparator<FipSpecies> PERCENT_GENUS_DESCENDING = Utils
 			.compareUsing(FipSpecies::getPercentGenus).reversed();
@@ -98,8 +99,6 @@ public class FipStart implements Closeable {
 	public static final int UTIL_SMALL = UtilizationClass.SMALL.index;
 
 	public static final float TOLERANCE = 2.0e-3f;
-
-	VdypApplicationIdentifier jprogram = VdypApplicationIdentifier.FIPStart; // FIPSTART only TODO Track this down
 
 	VriAdjustInputWriter vriWriter;
 
@@ -389,11 +388,11 @@ public class FipStart implements Closeable {
 			boolean veteran = fipVetLayer != null && fipVetLayer.getHeight().orElse(0f) > 0f
 					&& fipVetLayer.getCrownClosure() > 0f; // LAYERV
 
-			if (jprogram == VdypApplicationIdentifier.FIPStart
+			if (getId() == VdypApplicationIdentifier.FIPStart
 					&& fipPolygon.getModeFip().map(mode -> mode == FipMode.FIPYOUNG).orElse(false)) {
 				return 100f;
 			}
-			if (jprogram == VdypApplicationIdentifier.VRIStart) {
+			if (getId() == VdypApplicationIdentifier.VRIStart) {
 				veteran = fipVetLayer != null;
 			}
 
@@ -1308,7 +1307,7 @@ public class FipStart implements Closeable {
 						closeVolumeNetDecayUtil, closeVolumeNetDecayWasteUtil
 				);
 
-				if (jprogram.isStart()) {
+				if (getId().isStart()) {
 					// EMP095
 					estimateNetDecayWasteAndBreakageVolume(
 							UtilizationClass.ALL, spec.getBreakageGroup(), quadMeanDiameterUtil, closeVolumeUtil,
@@ -1467,7 +1466,7 @@ public class FipStart implements Closeable {
 						closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
 				);
 
-				if (jprogram.isStart()) {
+				if (getId().isStart()) {
 					// EMP095
 					estimateNetDecayWasteAndBreakageVolume(
 							utilizationClass, vdypSpecies.getBreakageGroup(), quadMeanDiameterUtil,
@@ -3374,5 +3373,10 @@ public class FipStart implements Closeable {
 	@Override
 	public void close() throws IOException {
 		closeVriWriter();
+	}
+
+	@Override
+	public VdypApplicationIdentifier getId() {
+		return VdypApplicationIdentifier.FIPStart;
 	}
 }
