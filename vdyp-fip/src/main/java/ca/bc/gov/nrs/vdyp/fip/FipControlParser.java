@@ -10,6 +10,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BaseAreaCoefficientParser;
@@ -51,7 +52,6 @@ import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ControlFileParser;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapModifier;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
-import ca.bc.gov.nrs.vdyp.model.JProgram;
 
 /**
  * Parser for FIP control files
@@ -151,7 +151,7 @@ public class FipControlParser {
 
 	;
 
-	JProgram jprogram = JProgram.FIP_START; // FIPSTART only TODO Track this down
+	VdypApplicationIdentifier jprogram = VdypApplicationIdentifier.FIPStart; // FIPSTART only TODO Track this down
 
 	public FipControlParser() {
 
@@ -339,7 +339,7 @@ public class FipControlParser {
 
 		applyModifiers(map, DATA_FILES, fileResolver);
 
-		if (jprogram == JProgram.FIP_START) {
+		if (jprogram == VdypApplicationIdentifier.FIPStart) {
 			applyModifiers(map, FIPSTART_ONLY, fileResolver);
 		}
 
@@ -350,7 +350,7 @@ public class FipControlParser {
 		applyModifiers(map, COEFFICIENTS, fileResolver);
 
 		// Initiation items NOT for FIPSTART
-		if (jprogram != JProgram.FIP_START) {
+		if (jprogram != VdypApplicationIdentifier.FIPStart) {
 
 			throw new UnsupportedOperationException();
 			// RD_E106

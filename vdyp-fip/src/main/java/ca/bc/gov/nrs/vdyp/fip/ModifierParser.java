@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.FloatUnaryOperator;
 import ca.bc.gov.nrs.vdyp.common.Utils;
@@ -19,7 +20,6 @@ import ca.bc.gov.nrs.vdyp.io.parse.control.OptionalResourceControlMapModifier;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
-import ca.bc.gov.nrs.vdyp.model.JProgram;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
@@ -64,11 +64,11 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 
 	public static final int MAX_MODS = 60;
 
-	JProgram jprogram;
+	VdypApplicationIdentifier jprogram;
 
 	static final int[] ipoint = { 1, 0, 2, 0, 0, 3, 4, 5, 0 };
 
-	public ModifierParser(JProgram jprogram) {
+	public ModifierParser(VdypApplicationIdentifier jprogram) {
 		super();
 		this.jprogram = jprogram;
 	}
@@ -242,7 +242,7 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 	boolean modIsForProgram(Map<String, Object> entry) {
 		@SuppressWarnings("unchecked")
 		var programs = (List<Boolean>) entry.get("programs");
-		var index = ipoint[this.jprogram.getIndex() - 1];
+		var index = ipoint[this.jprogram.getJProgramNumber() - 1];
 		if (index <= 0)
 			throw new IllegalStateException("JProgram " + this.jprogram + " mapped to " + index);
 		return programs.get(index - 1);

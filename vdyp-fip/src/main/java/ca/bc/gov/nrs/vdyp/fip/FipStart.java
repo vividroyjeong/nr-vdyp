@@ -50,6 +50,7 @@ import org.apache.commons.math3.util.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.IndexedFloatBinaryOperator;
 import ca.bc.gov.nrs.vdyp.common.Utils;
@@ -69,7 +70,6 @@ import ca.bc.gov.nrs.vdyp.io.write.VriAdjustInputWriter;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.FipMode;
-import ca.bc.gov.nrs.vdyp.model.JProgram;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
@@ -99,7 +99,7 @@ public class FipStart implements Closeable {
 
 	public static final float TOLERANCE = 2.0e-3f;
 
-	JProgram jprogram = JProgram.FIP_START; // FIPSTART only TODO Track this down
+	VdypApplicationIdentifier jprogram = VdypApplicationIdentifier.FIPStart; // FIPSTART only TODO Track this down
 
 	VriAdjustInputWriter vriWriter;
 
@@ -389,11 +389,11 @@ public class FipStart implements Closeable {
 			boolean veteran = fipVetLayer != null && fipVetLayer.getHeight().orElse(0f) > 0f
 					&& fipVetLayer.getCrownClosure() > 0f; // LAYERV
 
-			if (jprogram == JProgram.FIP_START
+			if (jprogram == VdypApplicationIdentifier.FIPStart
 					&& fipPolygon.getModeFip().map(mode -> mode == FipMode.FIPYOUNG).orElse(false)) {
 				return 100f;
 			}
-			if (jprogram == JProgram.VRI_START) {
+			if (jprogram == VdypApplicationIdentifier.VRIStart) {
 				veteran = fipVetLayer != null;
 			}
 

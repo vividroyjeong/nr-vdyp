@@ -14,11 +14,11 @@ import java.util.function.BiFunction;
 import org.hamcrest.Matchers;
 import org.opentest4j.AssertionFailedError;
 
+import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.fip.FipControlParser;
 import ca.bc.gov.nrs.vdyp.fip.ModifierParser;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.model.JProgram;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -58,7 +58,7 @@ public class FipTestUtils {
 	 * @param controlMap
 	 */
 	public static void modifyControlMap(HashMap<String, Object> controlMap) {
-		JProgram jprogram = JProgram.FIP_START;
+		VdypApplicationIdentifier jprogram = VdypApplicationIdentifier.FIPStart;
 		TestUtils.populateControlMapFromResource(controlMap, new ModifierParser(jprogram), "mod19813.prm");
 
 	}
