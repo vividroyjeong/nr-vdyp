@@ -39,9 +39,11 @@ public class VdypComponent {
 	private Properties loadProperties() {
 		Properties properties = new Properties();
 
-		try {
-			ClassLoader loader = Thread.currentThread().getContextClassLoader();
-			InputStream stream = loader.getResourceAsStream("application.properties");
+		ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		try (InputStream stream = loader.getResourceAsStream("application.properties")) {
+			if (stream == null) {
+				throw new IllegalStateException("Could not find application.properties on classpath");
+			}
 
 			properties.load(stream);
 		} catch (IOException e) {

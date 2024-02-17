@@ -3,6 +3,9 @@ package ca.bc.gov.nrs.vdyp.application;
 /**
  * Base class of all VDYP applications.
  *
+ * <p>
+ * Expects <tt>application.properties</tt> to be on the class path.
+ *
  * @author Michael Junkin, Vivid Solutions
  */
 public abstract class VdypApplication extends VdypComponent {
