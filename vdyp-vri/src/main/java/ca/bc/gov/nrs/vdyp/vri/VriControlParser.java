@@ -25,10 +25,10 @@ import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
  *
  */
 public class VriControlParser extends BaseStartAppControlParser {
-	
+
 	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(VriControlParser.class);
-	
+
 	/*
 	 * Debug switches (25) 0=default See IPSJF155, App IX 1st: 1: Do NOT apply BA
 	 * limits from SEQ043 2nd: 1: Do NOT apply DQ limits from SEQ043 4th: Future
@@ -87,9 +87,9 @@ public class VriControlParser extends BaseStartAppControlParser {
 			new ModifierParser(VdypApplicationIdentifier.VRIStart)
 	);
 
-	
 	@Override
-	protected void applyAllModifiers(Map<String, Object> map, FileResolver fileResolver) throws ResourceParseException, IOException {
+	protected void applyAllModifiers(Map<String, Object> map, FileResolver fileResolver)
+			throws ResourceParseException, IOException {
 		applyModifiers(map, BASIC_DEFINITIONS, fileResolver);
 
 		// Read Groups
@@ -112,29 +112,29 @@ public class VriControlParser extends BaseStartAppControlParser {
 
 		// Initiation items NOT for FIPSTART
 
-			// RD_E106
-			// TODO
+		// RD_E106
+		// TODO
 
-			// RD_E107
-			// TODO
+		// RD_E107
+		// TODO
 
-			// RD_E108
-			// TODO
+		// RD_E108
+		// TODO
 
-			// Minima again, differently?
-			// TODO
+		// Minima again, differently?
+		// TODO
 
-			/*
-			 * READ(CNTRV(197), 197, ERR= 912 ) VMINH, VMINBA, VMINBAeqn,VMINvetH IF
-			 * (VMINVetH .le. 0.0) VMINVetH=10.0
-			 */
+		/*
+		 * READ(CNTRV(197), 197, ERR= 912 ) VMINH, VMINBA, VMINBAeqn,VMINvetH IF
+		 * (VMINVetH .le. 0.0) VMINVetH=10.0
+		 */
 
-			// RD_E112
-			// Was commented out in Fortran
+		// RD_E112
+		// Was commented out in Fortran
 
-			// RD_E116
-			// Was commented out in Fortran
-		//}
+		// RD_E116
+		// Was commented out in Fortran
+		// }
 
 		// Modifiers, IPSJF155-Appendix XII
 

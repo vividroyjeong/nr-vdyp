@@ -49,7 +49,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 
 public abstract class BaseStartAppControlParser {
-	
+
 	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(BaseStartAppControlParser.class);
 
@@ -120,7 +120,6 @@ public abstract class BaseStartAppControlParser {
 			.record(ControlKey.DEBUG_SWITCHES, ValueParser.list(ValueParser.INTEGER)) // IPSJF155
 	;
 
-
 	protected List<ControlMapModifier> BASIC_DEFINITIONS = Arrays.asList(
 
 			// RD_BEC
@@ -150,13 +149,13 @@ public abstract class BaseStartAppControlParser {
 			// RD_GMBA1
 			new EquationModifierParser()
 	);
-	
+
 	// TODO minima?
 	/*
 	 * READ(CNTRV(197), 197, ERR= 912 ) FMINH, FMINBA, FMINBAF,FMINVetH IF (FMINVetH
 	 * .le. 0.0) FMINVetH=10.0
 	 */
-	
+
 	protected List<ControlMapModifier> SITE_CURVES = Arrays.asList(
 
 			// User-assigned SC's (Site Curve Numbers)
@@ -269,11 +268,12 @@ public abstract class BaseStartAppControlParser {
 		for (var is : resources) {
 			map.putAll(controlParser.parse(is, map));
 		}
-		
+
 		applyAllModifiers(map, fileResolver);
-		
+
 		return map;
 	}
 
-	protected abstract void applyAllModifiers(Map<String, Object> map, FileResolver fileResolver) throws ResourceParseException, IOException;
+	protected abstract void applyAllModifiers(Map<String, Object> map, FileResolver fileResolver)
+			throws ResourceParseException, IOException;
 }

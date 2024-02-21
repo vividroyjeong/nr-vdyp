@@ -28,7 +28,6 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.fip.test.FipTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveAgeMaximumParserTest;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
@@ -602,7 +601,7 @@ class FipControlParserTest {
 
 	static Map<String, ?> parseWithAppendix(FipControlParser parser, String... lines)
 			throws IOException, ResourceParseException {
-		var resolver = FipTestUtils.fileResolver(TestUtils.class);
+		var resolver = TestUtils.fileResolver(TestUtils.class);
 		try (
 				InputStream baseIs = TestUtils.class.getResourceAsStream("FIPSTART.CTR");
 				InputStream is = addToEnd(baseIs, lines);
@@ -615,7 +614,7 @@ class FipControlParserTest {
 			throws IOException, ResourceParseException {
 		try (var is = klazz.getResourceAsStream(resourceName)) {
 
-			return parser.parse(is, FipTestUtils.fileResolver(klazz), new HashMap<>());
+			return parser.parse(is, TestUtils.fileResolver(klazz), new HashMap<>());
 		}
 	}
 }

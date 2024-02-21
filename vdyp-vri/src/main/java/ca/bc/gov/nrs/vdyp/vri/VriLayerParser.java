@@ -10,8 +10,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapValueReplacer;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
 
-public class VriLayerParser
-		implements ControlMapValueReplacer<StreamingParserFactory<VriLayer>, String> {
+public class VriLayerParser implements ControlMapValueReplacer<StreamingParserFactory<VriLayer>, String> {
 
 	@Override
 	public ControlKey getControlKey() {
@@ -19,9 +18,8 @@ public class VriLayerParser
 	}
 
 	@Override
-	public StreamingParserFactory<VriLayer>
-			map(String fileName, FileResolver fileResolver, Map<String, Object> control)
-					throws IOException, ResourceParseException {
+	public StreamingParserFactory<VriLayer> map(String fileName, FileResolver fileResolver, Map<String, Object> control)
+			throws IOException, ResourceParseException {
 		return null; // TODO
 	}
 }

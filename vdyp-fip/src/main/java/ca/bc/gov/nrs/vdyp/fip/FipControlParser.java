@@ -96,7 +96,6 @@ public class FipControlParser extends BaseStartAppControlParser {
 
 		applyModifiers(map, COEFFICIENTS, fileResolver);
 
-
 		// Modifiers, IPSJF155-Appendix XII
 
 		// RD_E198

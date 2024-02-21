@@ -23,8 +23,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.vri.model.VriSpecies;
 
-public class VriSpeciesParser
-		implements ControlMapValueReplacer<StreamingParserFactory<VriSpecies>, String> {
+public class VriSpeciesParser implements ControlMapValueReplacer<StreamingParserFactory<VriSpecies>, String> {
 
 	@Override
 	public ControlKey getControlKey() {
@@ -35,7 +34,7 @@ public class VriSpeciesParser
 	public StreamingParserFactory<VriSpecies>
 			map(String fileName, FileResolver fileResolver, Map<String, Object> control)
 					throws IOException, ResourceParseException {
-						return null; // TODO
-		
+		return null; // TODO
+
 	}
 }

@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
@@ -319,5 +320,37 @@ public class TestUtils {
 		} catch (IOException | ResourceParseException ex) {
 			fail(ex);
 		}
+	}
+
+	public static FileResolver fileResolver(Class<?> klazz) {
+		return new FileResolver() {
+
+			@Override
+			public InputStream resolveForInput(String filename) throws IOException {
+				assertThat("Attempt to resolve a null filename for input", filename, Matchers.notNullValue());
+				InputStream resourceAsStream = klazz.getResourceAsStream(filename);
+				if (resourceAsStream == null)
+					throw new IOException("Could not load " + filename);
+				return resourceAsStream;
+			}
+
+			@Override
+			public OutputStream resolveForOutput(String filename) throws IOException {
+				fail("Should not be opening file " + filename + " for output");
+				return null;
+			}
+
+			@Override
+			public String toString(String filename) throws IOException {
+				return klazz.getResource(filename).toString();
+			}
+
+			@Override
+			public FileResolver relative(String path) throws IOException {
+				fail("Should not be requesting relative file resolver " + path);
+				return null;
+			}
+
+		};
 	}
 }
