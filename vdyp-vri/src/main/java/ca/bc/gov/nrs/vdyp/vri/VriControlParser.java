@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.fip;
+package ca.bc.gov.nrs.vdyp.vri;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -19,21 +19,33 @@ import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapModifier;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 
 /**
- * Parser for FIP control files
+ * Parser for VRI control files
  *
  * @author Kevin Smith, Vivid Solutions
  *
  */
-public class FipControlParser extends BaseStartAppControlParser {
+public class VriControlParser extends BaseStartAppControlParser {
+	
 	@SuppressWarnings("unused")
-	private static final Logger log = LoggerFactory.getLogger(FipControlParser.class);
+	private static final Logger log = LoggerFactory.getLogger(VriControlParser.class);
+	
+	/*
+	 * Debug switches (25) 0=default See IPSJF155, App IX 1st: 1: Do NOT apply BA
+	 * limits from SEQ043 2nd: 1: Do NOT apply DQ limits from SEQ043 4th: Future
+	 * Development. Choice of upper limits 9th: 0: Normal - Suppress MATH77 error
+	 * messages. 1: show some MATH77 errors; 2: show all. 22nd 1: extra preference
+	 * for preferred sp (SEQ 010).
+	 */
 
-	public FipControlParser() {
+	;
+
+	public VriControlParser() {
 		this.controlParser //
 				// Inputs
-				.record(ControlKey.FIP_YIELD_POLY_INPUT, FILENAME) // GET_FIPP
-				.record(ControlKey.FIP_YIELD_LAYER_INPUT, FILENAME) // GET_FIPL
-				.record(ControlKey.FIP_YIELD_LX_SP0_INPUT, FILENAME) // GET_FIPS
+				.record(ControlKey.VRI_YIELD_POLY_INPUT, FILENAME) // GET_FIPP
+				.record(ControlKey.VRI_YIELD_LAYER_INPUT, FILENAME) // GET_FIPL
+				.record(ControlKey.VRI_YIELD_HEIGHT_AGE_SI_INPUT, FILENAME) // GET_FIPS
+				.record(ControlKey.VRI_YIELD_SPEC_DIST_INPUT, FILENAME) // GET_FIPS
 
 				// FIP only
 				.record(ControlKey.STOCKING_CLASS_FACTORS, FILENAME) // RD_STK33
@@ -54,13 +66,13 @@ public class FipControlParser extends BaseStartAppControlParser {
 	List<ControlMapModifier> DATA_FILES = Arrays.asList(
 
 			// V7O_FIP
-			new FipPolygonParser(),
+			new VriPolygonParser(),
 
 			// V7O_FIL
-			new FipLayerParser(),
+			new VriLayerParser(),
 
 			// V7O_FIS
-			new FipSpeciesParser()
+			new VriSpeciesParser()
 	);
 
 	List<ControlMapModifier> FIPSTART_ONLY = Arrays.asList(
@@ -75,9 +87,9 @@ public class FipControlParser extends BaseStartAppControlParser {
 			new ModifierParser(VdypApplicationIdentifier.VRIStart)
 	);
 
+	
 	@Override
-	protected void applyAllModifiers(Map<String, Object> map, FileResolver fileResolver)
-			throws ResourceParseException, IOException {
+	protected void applyAllModifiers(Map<String, Object> map, FileResolver fileResolver) throws ResourceParseException, IOException {
 		applyModifiers(map, BASIC_DEFINITIONS, fileResolver);
 
 		// Read Groups
@@ -88,7 +100,9 @@ public class FipControlParser extends BaseStartAppControlParser {
 
 		applyModifiers(map, DATA_FILES, fileResolver);
 
-		applyModifiers(map, FIPSTART_ONLY, fileResolver);
+//		if (jprogram == VdypApplicationIdentifier.FIPStart) {
+//			applyModifiers(map, FIPSTART_ONLY, fileResolver);
+//		}
 
 		applyModifiers(map, SITE_CURVES, fileResolver);
 
@@ -96,6 +110,31 @@ public class FipControlParser extends BaseStartAppControlParser {
 
 		applyModifiers(map, COEFFICIENTS, fileResolver);
 
+		// Initiation items NOT for FIPSTART
+
+			// RD_E106
+			// TODO
+
+			// RD_E107
+			// TODO
+
+			// RD_E108
+			// TODO
+
+			// Minima again, differently?
+			// TODO
+
+			/*
+			 * READ(CNTRV(197), 197, ERR= 912 ) VMINH, VMINBA, VMINBAeqn,VMINvetH IF
+			 * (VMINVetH .le. 0.0) VMINVetH=10.0
+			 */
+
+			// RD_E112
+			// Was commented out in Fortran
+
+			// RD_E116
+			// Was commented out in Fortran
+		//}
 
 		// Modifiers, IPSJF155-Appendix XII
 
