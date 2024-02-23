@@ -177,7 +177,7 @@ public class VdypForwardControlParser {
 		this.app = app;
 	}
 
-	Map<String, ?> parse(Path inputFile) throws IOException, ResourceParseException {
+	Map<String, Object> parse(Path inputFile) throws IOException, ResourceParseException {
 		try (var is = Files.newInputStream(inputFile)) {
 
 			return parse(is, new FileSystemFileResolver());
