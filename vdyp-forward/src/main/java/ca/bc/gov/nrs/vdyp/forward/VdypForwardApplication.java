@@ -82,7 +82,7 @@ public class VdypForwardApplication extends VdypApplication {
 
 	@Override
 	public VdypApplicationIdentifier getId() {
-		return VdypApplicationIdentifier.VDYPForward;
+		return VdypApplicationIdentifier.VDYP_FORWARD;
 	}
 
 //	public static final float PI_40K = 0.78539816E-04f;
