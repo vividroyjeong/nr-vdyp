@@ -50,9 +50,8 @@ public class VriControlParser extends BaseStartAppControlParser {
 				// FIP only
 				.record(ControlKey.STOCKING_CLASS_FACTORS, FILENAME) // RD_STK33
 
-				// FIP/VRI specific execution
 				.record(
-						ControlKey.MINIMA,
+						ControlKey.VRI_MINIMA,
 						ValueParser.toMap(
 								ValueParser.list(ValueParser.FLOAT),
 								Collections.singletonMap(MINIMUM_VETERAN_HEIGHT, 10.0f), MINIMUM_HEIGHT,

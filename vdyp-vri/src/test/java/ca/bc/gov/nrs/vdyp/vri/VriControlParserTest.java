@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.forward;
+package ca.bc.gov.nrs.vdyp.vri;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.controlMapHasEntry;
@@ -10,56 +10,50 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
-import static org.hamcrest.Matchers.not;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.application.VdypApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.forward.test.VdypForwardControlParserTestApplication;
-import ca.bc.gov.nrs.vdyp.forward.test.VdypForwardTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveAgeMaximumParserTest;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
-import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.SiteCurve;
 import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
+import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
-@SuppressWarnings({ "unchecked", "rawtypes" })
-class VdypForwardControlParserTest {
+@SuppressWarnings({ "unused", "unchecked", "rawtypes" })
+class VriControlParserTest {
 
-	private static VdypApplication app;
+	static final String CONTROL_FILE = "VRISTART.CTR";
 
-	@BeforeAll
-	public static void beforeAll() {
-		app = new VdypForwardControlParserTestApplication();
-	}
+	// Most of these tests are the same as in FipControlParserTest TODO consider
+	// putting them in a shared location
 
 	@Test
-	void testParseBec_9() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+	void testParseBec() throws Exception {
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -70,9 +64,9 @@ class VdypForwardControlParserTest {
 	}
 
 	@Test
-	void testParseSP0_10() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+	void testParseSP0() throws Exception {
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -82,9 +76,9 @@ class VdypForwardControlParserTest {
 	}
 
 	@Test
-	void testParseVGRP_20() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+	void testParseVGRP() throws Exception {
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -94,9 +88,9 @@ class VdypForwardControlParserTest {
 	}
 
 	@Test
-	void testParseDGRP_21() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+	void testParseDGRP() throws Exception {
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -106,9 +100,9 @@ class VdypForwardControlParserTest {
 	}
 
 	@Test
-	void testParseBGRP_22() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+	void testParseBGRP() throws Exception {
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -118,9 +112,9 @@ class VdypForwardControlParserTest {
 	}
 
 	@Test
-	void testParseGRBA1_30() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+	void testParseGRBA1() throws Exception {
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -130,9 +124,9 @@ class VdypForwardControlParserTest {
 	}
 
 	@Test
-	void testParseGMBA1_31() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+	void testParseGMBA1() throws Exception {
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result, (Matcher) controlMapHasEntry(
 						ControlKey.EQN_MODIFIERS, allOf(
@@ -145,7 +139,7 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseE025() throws Exception {
-		var parser = new VdypForwardControlParser(app);
+		var parser = new VriControlParser();
 		var result = parseWithAppendix(parser, "025 coe/SIEQN.PRM");
 		assertThat(
 				result, (Matcher) controlMapHasEntry(
@@ -159,15 +153,15 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseE025Empty() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(result, (Matcher) controlMapHasEntry(ControlKey.SITE_CURVE_NUMBERS, Matchers.anEmptyMap()));
 	}
 
 	@Test
 	void testParseE026() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result, (Matcher) controlMapHasEntry(
 						ControlKey.SITE_CURVE_AGE_MAX, allOf(
@@ -179,8 +173,9 @@ class VdypForwardControlParserTest {
 	}
 
 	@Test
+	// @Disabled
 	void testParseE026Empty() throws Exception {
-		var parser = new VdypForwardControlParser(app);
+		var parser = new VriControlParser();
 		var result = parseWithAppendix(parser, "026  ");
 		// Map is empty but gives appropriate default values
 		assertThat(result, (Matcher) controlMapHasEntry(ControlKey.SITE_CURVE_AGE_MAX, Matchers.anEmptyMap()));
@@ -191,31 +186,55 @@ class VdypForwardControlParserTest {
 	}
 
 	@Test
-	void testParseE028() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+	void testParseE040() throws Exception {
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
-				result, (Matcher) controlMapHasEntry(ControlKey.PARAM_ADJUSTMENTS, allOf(isA(CompVarAdjustments.class)))
+				result,
+				(Matcher) controlMapHasEntry(
+						ControlKey.COE_BA,
+						allOf(
+								mmHasEntry(
+										coe(
+												0,
+												contains(
+														2.0028f, 0.2426f, 10.1668f, -0.9042f, -5.0012f, -0.0068f,
+														-0.0095f, 1.1938f, -0.2749f, 0f
+												)
+										), "AT", "AC"
+								)
+						)
+				)
 		);
 	}
 
 	@Test
-	void testParseE028Empty() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parseWithAppendix(parser, "028  ");
-
-		// Test that we got the appropriate default values
-		assertThat(result, Matchers.hasKey(ControlKey.PARAM_ADJUSTMENTS.name()));
-
-		CompVarAdjustments m = (CompVarAdjustments) result.get(ControlKey.PARAM_ADJUSTMENTS.name());
-
-		assertThat(m.getParam(CompVarAdjustments.SMALL_BA), is(1.0f));
+	void testParseE041() throws Exception {
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
+		assertThat(
+				result,
+				(Matcher) controlMapHasEntry(
+						ControlKey.COE_DQ,
+						allOf(
+								mmHasEntry(
+										coe(
+												0,
+												contains(
+														6.6190f, -0.5579f, -1.9421f, -0.7092f, -5.2290f, 4.8473f,
+														0.2629f, -0.0062f, 0f, 0f
+												)
+										), "AT", "AC"
+								)
+						)
+				)
+		);
 	}
 
 	@Test
 	void testParseE043() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -226,8 +245,8 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseE050() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -239,8 +258,8 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseE051() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -252,8 +271,8 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseE052() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -269,8 +288,8 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseE053() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -282,8 +301,8 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseE060() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -294,8 +313,8 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseE061() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -307,8 +326,8 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseUBA1() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -320,8 +339,8 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseYVC1() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -333,8 +352,8 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseYVD1() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -346,8 +365,8 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseSBA1() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -359,8 +378,8 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseSBA2() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -372,8 +391,8 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseSDQ1() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -384,8 +403,8 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseSHL1() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -396,8 +415,8 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseSVT1() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -409,8 +428,8 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseYVT1() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -430,8 +449,8 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseYVT2() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -443,8 +462,8 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseYVW1() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -456,8 +475,8 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseE095() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -468,8 +487,8 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseYVVET() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -481,8 +500,8 @@ class VdypForwardControlParserTest {
 
 	@Test
 	void testParseYDQV() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
@@ -498,42 +517,86 @@ class VdypForwardControlParserTest {
 	}
 
 	@Test
-	public void testParseMinima() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
-
-		// VDYP Forward does not load MINIMA
-		assertThat(result, not(hasKey(ControlKey.FIP_MINIMA)));
-	}
-
-	@Test
-	public void testParseV7O_VIP() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+	void testParseE098() throws Exception {
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
-				result, (Matcher) controlMapHasEntry(ControlKey.VDYP_POLYGON, instanceOf(StreamingParserFactory.class))
-		);
-	}
-
-	@Test
-	public void testParseV7O_VIU() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
-		assertThat(
-				result,
-				(Matcher) controlMapHasEntry(
-						ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL, instanceOf(StreamingParserFactory.class)
+				result, (Matcher) controlMapHasEntry(
+						ControlKey.VETERAN_BQ,
+						// Includes modifiers from 198
+						allOf(
+								mmHasEntry(contains(0.12874f * 0.311f, 8.00000f, 1.26982f), "B", Region.COASTAL),
+								mmHasEntry(contains(0.70932f * 0.374f, 7.63269f, 0.62545f), "B", Region.INTERIOR),
+								mmHasEntry(contains(0.07962f * 0.311f, 6.60231f, 1.37998f), "D", Region.COASTAL),
+								mmHasEntry(contains(0.07962f * 0.374f, 6.60231f, 1.37998f), "D", Region.INTERIOR)
+						)
 				)
 		);
 	}
 
 	@Test
-	public void testParseV7O_VIS() throws Exception {
-		var parser = new VdypForwardControlParser(app);
-		var result = parse(parser, "VDYP.CTR");
+	void testParseMinima() throws Exception {
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
+		assertThat(
+				result, (Matcher) controlMapHasEntry(
+						ControlKey.VRI_MINIMA,
+						// Includes modifiers from 198
+						allOf(
+								hasEntry(is(VriControlParser.MINIMUM_HEIGHT), is(6.0f)),
+								hasEntry(is(VriControlParser.MINIMUM_BASE_AREA), is(0.0f)),
+								hasEntry(is(VriControlParser.MINIMUM_PREDICTED_BASE_AREA), is(2.0f)),
+								hasEntry(is(VriControlParser.MINIMUM_VETERAN_HEIGHT), is(10.0f))
+						)
+				)
+		);
+	}
+
+	@Disabled("TODO VDYP-176")
+	@Test
+	void testParseV7R_RIP1() throws Exception {
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
-				(Matcher) controlMapHasEntry(ControlKey.VDYP_LAYER_BY_SPECIES, instanceOf(StreamingParserFactory.class))
+				(Matcher) controlMapHasEntry(ControlKey.VRI_YIELD_POLY_INPUT, instanceOf(StreamingParserFactory.class))
+		);
+	}
+
+	@Disabled("TODO VDYP-176")
+	@Test
+	void testParseV7R_RIL1() throws Exception {
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
+		assertThat(
+				result,
+				(Matcher) controlMapHasEntry(ControlKey.VRI_YIELD_LAYER_INPUT, instanceOf(StreamingParserFactory.class))
+		);
+	}
+
+	@Disabled("TODO VDYP-176")
+	@Test
+	void testParseV7R_RIT1() throws Exception {
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
+		assertThat(
+				result,
+				(Matcher) controlMapHasEntry(
+						ControlKey.VRI_YIELD_HEIGHT_AGE_SI_INPUT, instanceOf(StreamingParserFactory.class)
+				)
+		);
+	}
+
+	@Disabled("TODO VDYP-176")
+	@Test
+	void testParseV7R_RIS1() throws Exception {
+		var parser = new VriControlParser();
+		var result = parse(parser, TestUtils.class, CONTROL_FILE);
+		assertThat(
+				result,
+				(Matcher) controlMapHasEntry(
+						ControlKey.VRI_YIELD_SPEC_DIST_INPUT, instanceOf(StreamingParserFactory.class)
+				)
 		);
 	}
 
@@ -543,22 +606,22 @@ class VdypForwardControlParserTest {
 		return result;
 	}
 
-	static Map<String, ?> parseWithAppendix(VdypForwardControlParser parser, String... lines)
+	static Map<String, ?> parseWithAppendix(VriControlParser parser, String... lines)
 			throws IOException, ResourceParseException {
-
-		Class<?> klazz = TestUtils.class;
-		try (InputStream baseIs = klazz.getResourceAsStream("VDYP.CTR"); InputStream is = addToEnd(baseIs, lines);) {
-			return parser.parse(is, VdypForwardTestUtils.fileResolver(klazz));
+		var resolver = TestUtils.fileResolver(TestUtils.class);
+		try (
+				InputStream baseIs = TestUtils.class.getResourceAsStream(CONTROL_FILE);
+				InputStream is = addToEnd(baseIs, lines);
+		) {
+			return parser.parse(is, resolver, new HashMap<>());
 		}
 	}
 
-	Map<String, ?> parse(VdypForwardControlParser parser, String resourceName)
+	Map<String, ?> parse(VriControlParser parser, Class<?> klazz, String resourceName)
 			throws IOException, ResourceParseException {
-
-		Class<?> klazz = TestUtils.class;
 		try (var is = klazz.getResourceAsStream(resourceName)) {
 
-			return parser.parse(is, VdypForwardTestUtils.fileResolver(klazz));
+			return parser.parse(is, TestUtils.fileResolver(klazz), new HashMap<>());
 		}
 	}
 }

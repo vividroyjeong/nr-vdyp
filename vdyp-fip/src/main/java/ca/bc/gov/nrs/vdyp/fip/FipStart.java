@@ -321,7 +321,7 @@ public class FipStart extends VdypApplication implements Closeable {
 
 		// if (FIPPASS(6) .eq. 0 .or. FIPPASS(6) .eq. 2) then
 		if (true /* TODO */) {
-			var minima = Utils.<Map<String, Float>>expectParsedControl(controlMap, ControlKey.MINIMA, Map.class);
+			var minima = Utils.<Map<String, Float>>expectParsedControl(controlMap, ControlKey.FIP_MINIMA, Map.class);
 
 			float minimumBaseArea = minima.get(FipControlParser.MINIMUM_BASE_AREA);
 			float minimumPredictedBaseArea = minima.get(FipControlParser.MINIMUM_PREDICTED_BASE_AREA);
@@ -2658,7 +2658,7 @@ public class FipStart extends VdypApplication implements Closeable {
 	}
 
 	private Optional<Float> heightMinimum(LayerType layer) {
-		var minima = Utils.<Map<String, Float>>expectParsedControl(controlMap, ControlKey.MINIMA.name(), Map.class);
+		var minima = Utils.<Map<String, Float>>expectParsedControl(controlMap, ControlKey.FIP_MINIMA.name(), Map.class);
 		switch (layer) {
 		case PRIMARY:
 			return Optional.of(minima.get(FipControlParser.MINIMUM_HEIGHT));

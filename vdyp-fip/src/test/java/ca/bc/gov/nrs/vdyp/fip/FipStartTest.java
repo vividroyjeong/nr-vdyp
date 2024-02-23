@@ -4932,7 +4932,7 @@ class FipStartTest {
 		minima.put(FipControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
 		minima.put(FipControlParser.MINIMUM_VETERAN_HEIGHT, 10f);
 
-		controlMap.put(ControlKey.MINIMA.name(), minima);
+		controlMap.put(ControlKey.FIP_MINIMA.name(), minima);
 
 		controlMap.putAll(myControlMap);
 

@@ -40,7 +40,7 @@ public class FipControlParser extends BaseStartAppControlParser {
 
 				// FIP/VRI specific execution
 				.record(
-						ControlKey.MINIMA,
+						ControlKey.FIP_MINIMA,
 						ValueParser.toMap(
 								ValueParser.list(ValueParser.FLOAT),
 								Collections.singletonMap(MINIMUM_VETERAN_HEIGHT, 10.0f), MINIMUM_HEIGHT,
