@@ -8,11 +8,11 @@ package ca.bc.gov.nrs.vdyp.application;
  */
 public enum VdypApplicationIdentifier {
 
-	FIPStart(true, 1), //
-	VRIStart(true, 3), //
-	VDYPForward(false, 6), //
-	VDYPBack(false, 7), //
-	VRIAdjust(false, 8);
+	FIP_START(true, 1), //
+	VRI_START(true, 3), //
+	VDYP_FORWARD(false, 6), //
+	VDYP_BACK(false, 7), //
+	VRI_ADJUST(false, 8);
 
 	private final int jProgramNumber;
 	private final boolean isStart;

@@ -23,7 +23,7 @@ public abstract class NonPrimarySpeciesGrowthParser extends OptionalCoefficientP
 
 	private static final String BASAL_AREA_GROUP_ID_KEY = "BasalAreaGroupId";
 
-	public NonPrimarySpeciesGrowthParser(ControlKey controlKey) {
+	protected NonPrimarySpeciesGrowthParser(ControlKey controlKey) {
 		super(1, controlKey);
 		this.speciesKey()
 				.key(

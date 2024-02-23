@@ -39,7 +39,7 @@ class ModifierParserTest {
 
 	@Test
 	void testNoFilenameForControlFile() throws Exception {
-		var parser = new ModifierParser(VdypApplicationIdentifier.FIPStart);
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.empty());
@@ -54,7 +54,7 @@ class ModifierParserTest {
 
 	@Test
 	void testMissingControlFile() throws Exception {
-		var parser = new ModifierParser(VdypApplicationIdentifier.FIPStart);
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
@@ -71,7 +71,7 @@ class ModifierParserTest {
 
 	@Test
 	void testLoadEmptyFile() throws Exception {
-		var parser = new ModifierParser(VdypApplicationIdentifier.FIPStart);
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
@@ -134,7 +134,7 @@ class ModifierParserTest {
 
 	@Test
 	void testBaDqSpecies() throws Exception {
-		var parser = new ModifierParser(VdypApplicationIdentifier.FIPStart);
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
@@ -180,7 +180,7 @@ class ModifierParserTest {
 
 	@Test
 	void testBaDqSpeciesDifferentProgram() throws Exception {
-		var parser = new ModifierParser(VdypApplicationIdentifier.VRIStart);
+		var parser = new ModifierParser(VdypApplicationIdentifier.VRI_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
@@ -203,7 +203,7 @@ class ModifierParserTest {
 
 	@Test
 	void testIgnoreAfterStop() throws Exception {
-		var parser = new ModifierParser(VdypApplicationIdentifier.FIPStart);
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
@@ -226,7 +226,7 @@ class ModifierParserTest {
 
 	@Test
 	void testIgnoreCommentsAndBlanks() throws Exception {
-		var parser = new ModifierParser(VdypApplicationIdentifier.FIPStart);
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
@@ -272,7 +272,7 @@ class ModifierParserTest {
 
 	@Test
 	void testBaDqAllSpecies() throws Exception {
-		var parser = new ModifierParser(VdypApplicationIdentifier.FIPStart);
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
@@ -310,7 +310,7 @@ class ModifierParserTest {
 
 	@Test
 	void testVetBq() throws Exception {
-		var parser = new ModifierParser(VdypApplicationIdentifier.FIPStart);
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
@@ -348,7 +348,7 @@ class ModifierParserTest {
 
 	@Test
 	void testDecayWaste() throws Exception {
-		var parser = new ModifierParser(VdypApplicationIdentifier.FIPStart);
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
@@ -394,7 +394,7 @@ class ModifierParserTest {
 
 	@Test
 	void testHL() throws Exception {
-		var parser = new ModifierParser(VdypApplicationIdentifier.FIPStart);
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));

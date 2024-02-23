@@ -49,7 +49,7 @@ public class UpperBoundsParser implements ControlMapSubResourceParser<Map<Intege
 	public static final String MAX_BA_KEY = "maxBaKey";
 	public static final String MAX_DQ_KEY = "maxDqKey";
 
-	private Pattern zeroes = Pattern.compile("[0]{0,3}");
+	private static final Pattern ZEROES = Pattern.compile("0{0,3}");
 
 	public UpperBoundsParser() {
 
@@ -58,8 +58,7 @@ public class UpperBoundsParser implements ControlMapSubResourceParser<Map<Intege
 			@Override
 			public boolean isIgnoredLine(String line) {
 				String basalAreaGroupIdText = line.substring(0, Math.min(3, line.length())).trim();
-				boolean result = zeroes.matcher(basalAreaGroupIdText).matches();
-				return result;
+				return ZEROES.matcher(basalAreaGroupIdText).matches();
 			}
 		}.value(3, BASAL_AREA_GROUP_ID_KEY, ValueParser.INTEGER).value(8, MAX_BA_KEY, ValueParser.FLOAT).space(1)
 				.value(8, MAX_DQ_KEY, ValueParser.FLOAT);

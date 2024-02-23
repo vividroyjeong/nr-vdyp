@@ -20,7 +20,7 @@ public abstract class GrowthFiatParser implements ControlMapSubResourceParser<Ma
 	public static final String REGION_ID_KEY = "RegionId";
 	public static final String COEFFICIENTS_KEY = "Coefficients";
 
-	public GrowthFiatParser() {
+	protected GrowthFiatParser() {
 
 		this.lineParser = new LineParser() {
 			@Override

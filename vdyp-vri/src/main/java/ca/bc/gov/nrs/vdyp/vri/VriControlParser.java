@@ -80,7 +80,7 @@ public class VriControlParser extends BaseStartAppControlParser {
 	List<ControlMapModifier> ADDITIONAL_MODIFIERS = Arrays.asList(
 
 			// RD_E198
-			new ModifierParser(VdypApplicationIdentifier.VRIStart)
+			new ModifierParser(VdypApplicationIdentifier.VRI_START)
 	);
 
 	@Override

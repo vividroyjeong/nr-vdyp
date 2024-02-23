@@ -177,7 +177,7 @@ public class VdypForwardControlParser {
 		this.app = app;
 	}
 
-	Map<String, ?> parse(Path inputFile) throws IOException, ResourceParseException {
+	Map<String, Object> parse(Path inputFile) throws IOException, ResourceParseException {
 		try (var is = Files.newInputStream(inputFile)) {
 
 			return parse(is, new FileSystemFileResolver());
@@ -332,7 +332,7 @@ public class VdypForwardControlParser {
 				), fileResolver
 		);
 
-		assert VdypApplicationIdentifier.VDYPForward.getJProgramNumber() == app.getJProgramNumber();
+		assert VdypApplicationIdentifier.VDYP_FORWARD.getJProgramNumber() == app.getJProgramNumber();
 
 		applyModifiers(
 				map, List.of(
@@ -362,7 +362,7 @@ public class VdypForwardControlParser {
 		applyModifiers(
 				map, List.of(
 						// RD_E198
-						new ModifierParser(VdypApplicationIdentifier.VDYPForward.getJProgramNumber())
+						new ModifierParser(VdypApplicationIdentifier.VDYP_FORWARD.getJProgramNumber())
 				), fileResolver
 		);
 

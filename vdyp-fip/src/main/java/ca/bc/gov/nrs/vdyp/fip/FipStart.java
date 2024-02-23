@@ -388,11 +388,11 @@ public class FipStart extends VdypApplication implements Closeable {
 			boolean veteran = fipVetLayer != null && fipVetLayer.getHeight().orElse(0f) > 0f
 					&& fipVetLayer.getCrownClosure() > 0f; // LAYERV
 
-			if (getId() == VdypApplicationIdentifier.FIPStart
+			if (getId() == VdypApplicationIdentifier.FIP_START
 					&& fipPolygon.getModeFip().map(mode -> mode == FipMode.FIPYOUNG).orElse(false)) {
 				return 100f;
 			}
-			if (getId() == VdypApplicationIdentifier.VRIStart) {
+			if (getId() == VdypApplicationIdentifier.VRI_START) {
 				veteran = fipVetLayer != null;
 			}
 
@@ -3377,6 +3377,6 @@ public class FipStart extends VdypApplication implements Closeable {
 
 	@Override
 	public VdypApplicationIdentifier getId() {
-		return VdypApplicationIdentifier.FIPStart;
+		return VdypApplicationIdentifier.FIP_START;
 	}
 }

@@ -51,7 +51,7 @@ public class FipTestUtils {
 	 * @param controlMap
 	 */
 	public static void modifyControlMap(HashMap<String, Object> controlMap) {
-		VdypApplicationIdentifier jprogram = VdypApplicationIdentifier.FIPStart;
+		VdypApplicationIdentifier jprogram = VdypApplicationIdentifier.FIP_START;
 		TestUtils.populateControlMapFromResource(controlMap, new ModifierParser(jprogram), "mod19813.prm");
 
 	}
