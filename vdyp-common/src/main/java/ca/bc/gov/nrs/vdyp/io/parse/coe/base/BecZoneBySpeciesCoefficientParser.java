@@ -40,7 +40,7 @@ public abstract class BecZoneBySpeciesCoefficientParser
 	private final int nCoefficients;
 	private static final int NUM_SPECIES = 16;
 
-	public BecZoneBySpeciesCoefficientParser(int nCoefficients) {
+	protected BecZoneBySpeciesCoefficientParser(int nCoefficients) {
 
 		this.nCoefficients = nCoefficients;
 
