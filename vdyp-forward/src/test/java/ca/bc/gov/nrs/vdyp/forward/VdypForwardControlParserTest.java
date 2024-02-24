@@ -503,7 +503,7 @@ class VdypForwardControlParserTest {
 		var result = parse(parser, "VDYP.CTR");
 
 		// VDYP Forward does not load MINIMA
-		assertThat(result, not(hasKey(ControlKey.FIP_MINIMA)));
+		assertThat(result, not(hasKey(ControlKey.MINIMA)));
 	}
 
 	@Test

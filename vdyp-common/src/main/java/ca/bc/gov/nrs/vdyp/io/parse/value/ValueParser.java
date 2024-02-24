@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -199,6 +200,11 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 	 * Parser for strings
 	 */
 	public static final ValueParser<String> STRING = String::strip;
+
+	/**
+	 * Parser for filenames
+	 */
+	public static final ValueParser<String> FILENAME = String::strip;
 
 	/**
 	 * Parser for a region identifier
@@ -416,6 +422,22 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 					result.put(key, defaultValues.get(key)); // should never be null due to preceding checks
 				}
 			}
+			return result;
+		};
+	}
+
+	/**
+	 * Call the provided callback after parsing. This is meant for logging. It
+	 * should not be used for business logic.
+	 *
+	 * @param delegate
+	 * @param callback
+	 * @return
+	 */
+	public static <T> ValueParser<T> callback(ValueParser<T> delegate, Consumer<T> callback) {
+		return s -> {
+			var result = delegate.parse(s);
+			callback.accept(result);
 			return result;
 		};
 	}

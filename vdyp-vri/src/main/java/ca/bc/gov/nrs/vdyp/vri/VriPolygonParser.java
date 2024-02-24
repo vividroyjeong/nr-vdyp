@@ -8,6 +8,7 @@ import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapValueReplacer;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.vri.model.VriPolygon;
 
 public class VriPolygonParser implements ControlMapValueReplacer<StreamingParserFactory<VriPolygon>, String> {
@@ -24,4 +25,8 @@ public class VriPolygonParser implements ControlMapValueReplacer<StreamingParser
 		return null; // TODO
 	}
 
+	@Override
+	public ValueParser<? extends Object> getValueParser() {
+		return ValueParser.FILENAME;
+	}
 }

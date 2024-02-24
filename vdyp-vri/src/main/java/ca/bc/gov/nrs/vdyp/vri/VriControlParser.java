@@ -16,8 +16,10 @@ import ca.bc.gov.nrs.vdyp.io.parse.coe.BasalAreaYieldParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.QuadraticMeanDiameterYieldParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperBoundsParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.control.BaseStartAppControlParser;
+import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapModifier;
+import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapValueReplacer;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 
 /**
@@ -26,25 +28,22 @@ import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
  * @author Kevin Smith, Vivid Solutions
  *
  */
-public class VriControlParser extends BaseStartAppControlParser {
+public class VriControlParser extends BaseControlParser {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(VriControlParser.class);
 
 	public VriControlParser() {
+		// Value parsers for input files
+		dataFiles.forEach(fileParser -> this.controlParser.record(fileParser.getControlKey(), FILENAME));
 		this.controlParser //
-				// Inputs
-				.record(ControlKey.VRI_YIELD_POLY_INPUT, FILENAME) // GET_FIPP
-				.record(ControlKey.VRI_YIELD_LAYER_INPUT, FILENAME) // GET_FIPL
-				.record(ControlKey.VRI_YIELD_HEIGHT_AGE_SI_INPUT, FILENAME) // GET_FIPS
-				.record(ControlKey.VRI_YIELD_SPEC_DIST_INPUT, FILENAME) // GET_FIPS
 
 				.record(ControlKey.BA_YIELD, FILENAME) // COE106
 				.record(ControlKey.DQ_YIELD, FILENAME) // COE107
 				.record(ControlKey.BA_DQ_UPPER_BOUNDS, FILENAME) // COE108
 
 				.record(
-						ControlKey.VRI_MINIMA,
+						ControlKey.MINIMA,
 						ValueParser.toMap(
 								ValueParser.list(ValueParser.FLOAT),
 								Collections.singletonMap(MINIMUM_VETERAN_HEIGHT, 10.0f), MINIMUM_HEIGHT,
@@ -55,7 +54,7 @@ public class VriControlParser extends BaseStartAppControlParser {
 		;
 	}
 
-	List<ControlMapModifier> DATA_FILES = Arrays.asList(
+	List<ControlMapValueReplacer<? extends StreamingParserFactory<? extends Object>, String>> dataFiles = Arrays.asList(
 
 			// V7O_FIP
 			new VriPolygonParser(),
@@ -67,7 +66,7 @@ public class VriControlParser extends BaseStartAppControlParser {
 			new VriSpeciesParser()
 	);
 
-	List<ControlMapModifier> NON_FIPSTART = Arrays.asList(
+	List<ControlMapModifier> nonFipStart = Arrays.asList(
 
 			// RD_E106
 			new BasalAreaYieldParser(),
@@ -77,38 +76,76 @@ public class VriControlParser extends BaseStartAppControlParser {
 			new UpperBoundsParser()
 	);
 
-	List<ControlMapModifier> ADDITIONAL_MODIFIERS = Arrays.asList(
-
-			// RD_E198
-			new ModifierParser(VdypApplicationIdentifier.VRI_START)
-	);
+	@Override
+	protected VdypApplicationIdentifier getProgramId() {
+		return VdypApplicationIdentifier.VRI_START;
+	}
 
 	@Override
 	protected void applyAllModifiers(Map<String, Object> map, FileResolver fileResolver)
 			throws ResourceParseException, IOException {
-		applyModifiers(map, BASIC_DEFINITIONS, fileResolver);
+		applyModifiers(map, basicDefinitions, fileResolver);
 
 		// Read Groups
 
-		applyModifiers(map, GROUP_DEFINITIONS, fileResolver);
+		applyModifiers(map, groupDefinitions, fileResolver);
 
 		// Initialize data file parser factories
 
-		applyModifiers(map, DATA_FILES, fileResolver);
+		applyModifiers(map, inputFileParsers(), fileResolver);
 
-		applyModifiers(map, SITE_CURVES, fileResolver);
+		applyModifiers(map, siteCurves, fileResolver);
 
 		// Coeff for Empirical relationships
 
-		applyModifiers(map, COEFFICIENTS, fileResolver);
+		applyModifiers(map, coefficients, fileResolver);
 
 		// Initiation items NOT for FIPSTART
 
-		applyModifiers(map, NON_FIPSTART, fileResolver);
+		applyModifiers(map, nonFipStart, fileResolver);
 
 		// RD_E198
-		applyModifiers(map, ADDITIONAL_MODIFIERS, fileResolver);
+		applyModifiers(map, additionalModifiers, fileResolver);
 
 	}
 
+	@Override
+	protected ValueParser<Map<String, Float>> minimaParser() {
+		return ValueParser.callback(
+				ValueParser.toMap(
+						ValueParser.list(ValueParser.FLOAT), Collections.singletonMap(MINIMUM_VETERAN_HEIGHT, 10.0f),
+						MINIMUM_HEIGHT, MINIMUM_BASE_AREA, MINIMUM_PREDICTED_BASE_AREA, MINIMUM_VETERAN_HEIGHT
+				), minima -> {
+					log.atDebug().setMessage(
+							"Minima read from VRISTART Control at line {}\n  Minimum Height: {}\n  Minimum BA: {}\n  Minimum Predicted BA: {}\n  Minimum Veteran Height: {}"
+					)//
+							.addArgument(ControlKey.MINIMA.sequence.map(i -> Integer.toString(i)).orElse("N/A"))
+							.addArgument(minima.get(MINIMUM_HEIGHT)) //
+							.addArgument(minima.get(MINIMUM_BASE_AREA)) //
+							.addArgument(minima.get(MINIMUM_PREDICTED_BASE_AREA)) //
+							.addArgument(minima.get(MINIMUM_VETERAN_HEIGHT));
+				}
+		);
+	}
+
+	@Override
+	protected List<ControlMapValueReplacer<?, String>> inputFileParsers() {
+		return List.of(
+
+				// V7O_FIP
+				new VriPolygonParser(),
+
+				// V7O_FIL
+				new VriLayerParser(),
+
+				// V7O_FIS
+				new VriSpeciesParser()
+		);
+
+	}
+
+	@Override
+	protected List<ControlKey> outputFileParsers() {
+		return List.of(ControlKey.VDYP_POLYGON, ControlKey.VDYP_LAYER_BY_SPECIES, ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL);
+	}
 }

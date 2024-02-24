@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 
 /**
  * Modify a control map based on a resource referenced within it if it is
@@ -38,5 +39,10 @@ public interface OptionalResourceControlMapModifier extends ResourceControlMapMo
 	 * @param control
 	 */
 	void defaultModify(Map<String, Object> control);
+
+	@Override
+	default ValueParser<? extends Object> getValueParser() {
+		return ValueParser.optional(ValueParser.FILENAME);
+	}
 
 }

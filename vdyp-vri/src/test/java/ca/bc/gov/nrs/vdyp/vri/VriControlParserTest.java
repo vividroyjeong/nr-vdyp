@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveAgeMaximumParserTest;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
@@ -52,7 +53,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseBec() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -65,7 +66,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseSP0() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -77,7 +78,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseVGRP() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -89,7 +90,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseDGRP() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -101,7 +102,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseBGRP() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -113,7 +114,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseGRBA1() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -125,7 +126,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseGMBA1() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result, (Matcher) controlMapHasEntry(
@@ -139,7 +140,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseE025() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parseWithAppendix(parser, "025 coe/SIEQN.PRM");
 		assertThat(
 				result, (Matcher) controlMapHasEntry(
@@ -153,14 +154,14 @@ class VriControlParserTest {
 
 	@Test
 	void testParseE025Empty() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(result, (Matcher) controlMapHasEntry(ControlKey.SITE_CURVE_NUMBERS, Matchers.anEmptyMap()));
 	}
 
 	@Test
 	void testParseE026() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result, (Matcher) controlMapHasEntry(
@@ -175,7 +176,7 @@ class VriControlParserTest {
 	@Test
 	// @Disabled
 	void testParseE026Empty() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parseWithAppendix(parser, "026  ");
 		// Map is empty but gives appropriate default values
 		assertThat(result, (Matcher) controlMapHasEntry(ControlKey.SITE_CURVE_AGE_MAX, Matchers.anEmptyMap()));
@@ -187,7 +188,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseE040() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -210,7 +211,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseE041() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -233,7 +234,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseE043() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -245,7 +246,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseE050() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -258,7 +259,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseE051() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -271,7 +272,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseE052() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -288,7 +289,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseE053() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -301,7 +302,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseE060() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -313,7 +314,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseE061() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -326,7 +327,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseUBA1() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -339,7 +340,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseYVC1() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -352,7 +353,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseYVD1() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -365,7 +366,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseSBA1() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -378,7 +379,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseSBA2() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -391,7 +392,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseSDQ1() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -403,7 +404,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseSHL1() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -415,7 +416,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseSVT1() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -428,7 +429,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseYVT1() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -449,7 +450,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseYVT2() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -462,7 +463,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseYVW1() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -475,7 +476,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseE095() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -487,7 +488,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseYVVET() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -500,7 +501,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseYDQV() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -518,7 +519,7 @@ class VriControlParserTest {
 
 	@Test
 	void testParseE098() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result, (Matcher) controlMapHasEntry(
@@ -536,17 +537,17 @@ class VriControlParserTest {
 
 	@Test
 	void testParseMinima() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result, (Matcher) controlMapHasEntry(
-						ControlKey.VRI_MINIMA,
+						ControlKey.MINIMA,
 						// Includes modifiers from 198
 						allOf(
-								hasEntry(is(VriControlParser.MINIMUM_HEIGHT), is(6.0f)),
-								hasEntry(is(VriControlParser.MINIMUM_BASE_AREA), is(0.0f)),
-								hasEntry(is(VriControlParser.MINIMUM_PREDICTED_BASE_AREA), is(2.0f)),
-								hasEntry(is(VriControlParser.MINIMUM_VETERAN_HEIGHT), is(10.0f))
+								hasEntry(is(BaseControlParser.MINIMUM_HEIGHT), is(6.0f)),
+								hasEntry(is(BaseControlParser.MINIMUM_BASE_AREA), is(0.0f)),
+								hasEntry(is(BaseControlParser.MINIMUM_PREDICTED_BASE_AREA), is(2.0f)),
+								hasEntry(is(BaseControlParser.MINIMUM_VETERAN_HEIGHT), is(10.0f))
 						)
 				)
 		);
@@ -555,7 +556,7 @@ class VriControlParserTest {
 	@Disabled("TODO VDYP-176")
 	@Test
 	void testParseV7R_RIP1() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -566,7 +567,7 @@ class VriControlParserTest {
 	@Disabled("TODO VDYP-176")
 	@Test
 	void testParseV7R_RIL1() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -577,7 +578,7 @@ class VriControlParserTest {
 	@Disabled("TODO VDYP-176")
 	@Test
 	void testParseV7R_RIT1() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -590,7 +591,7 @@ class VriControlParserTest {
 	@Disabled("TODO VDYP-176")
 	@Test
 	void testParseV7R_RIS1() throws Exception {
-		var parser = new VriControlParser();
+		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
@@ -606,7 +607,7 @@ class VriControlParserTest {
 		return result;
 	}
 
-	static Map<String, ?> parseWithAppendix(VriControlParser parser, String... lines)
+	static Map<String, ?> parseWithAppendix(BaseControlParser parser, String... lines)
 			throws IOException, ResourceParseException {
 		var resolver = TestUtils.fileResolver(TestUtils.class);
 		try (
@@ -617,7 +618,7 @@ class VriControlParserTest {
 		}
 	}
 
-	Map<String, ?> parse(VriControlParser parser, Class<?> klazz, String resourceName)
+	Map<String, ?> parse(BaseControlParser parser, Class<?> klazz, String resourceName)
 			throws IOException, ResourceParseException {
 		try (var is = klazz.getResourceAsStream(resourceName)) {
 

@@ -3,12 +3,14 @@ package ca.bc.gov.nrs.vdyp.io.parse.control;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BaseAreaCoefficientParser;
@@ -26,6 +28,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.coe.HLNonprimaryCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.HLPrimarySpeciesEqnP1Parser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.HLPrimarySpeciesEqnP2Parser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.HLPrimarySpeciesEqnP3Parser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.QuadMeanDiameterCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveAgeMaximumParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveParser;
@@ -48,79 +51,54 @@ import ca.bc.gov.nrs.vdyp.io.parse.coe.VolumeNetDecayWasteParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 
-public abstract class BaseStartAppControlParser {
+public abstract class BaseControlParser {
 
 	@SuppressWarnings("unused")
-	private static final Logger log = LoggerFactory.getLogger(BaseStartAppControlParser.class);
+	private static final Logger log = LoggerFactory.getLogger(BaseControlParser.class);
 
 	protected static final ValueParser<String> FILENAME = String::strip;
 
 	public static final String MINIMUM_HEIGHT = "MINIMUM_HEIGHT";
 	public static final String MINIMUM_BASE_AREA = "MINIMUM_BASE_AREA";
 	public static final String MINIMUM_PREDICTED_BASE_AREA = "MINIMUM_PREDICTED_BASE_AREA";
+	public static final String MINIMUM_FULLY_STOCKED_AREA = "MINIMUM_FULLY_STOCKED_BASE_AREA";
 	public static final String MINIMUM_VETERAN_HEIGHT = "MINIMUM_VETERAN_HEIGHT";
 
 	public static final float DEFAULT_MINIMUM_VETERAN_HEIGHT = 10.0f;
 
-	protected ControlFileParser controlParser = new ControlFileParser() //
-			.record(ControlKey.MAX_NUM_POLY, ValueParser.INTEGER)
+	protected ControlFileParser controlParser = new ControlFileParser();
 
-			.record(ControlKey.BEC_DEF, FILENAME) // RD_BECD
-			.record(ControlKey.SP0_DEF, FILENAME) // RD_SP0
+	protected BaseControlParser() {
 
-			// Output Files
-			.record(ControlKey.VDYP_POLYGON, FILENAME) //
-			.record(ControlKey.VDYP_LAYER_BY_SPECIES, FILENAME) //
-			.record(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL, FILENAME) //
+		controlParser.record(ControlKey.MAX_NUM_POLY, ValueParser.INTEGER);
 
-			.record(ControlKey.VOLUME_EQN_GROUPS, FILENAME) // RD_VGRP
-			.record(ControlKey.DECAY_GROUPS, FILENAME) // RD_DGRP
-			.record(ControlKey.BREAKAGE_GROUPS, FILENAME) // RD_BGRP IPSJF157
+		inputFileParsers().forEach(
+				subResourceParser -> controlParser
+						.record(subResourceParser.getControlKey(), subResourceParser.getValueParser())
+		);
 
-			.record(ControlKey.SITE_CURVE_NUMBERS, ValueParser.optional(FILENAME)) // RD_E025
-			.record(ControlKey.SITE_CURVE_AGE_MAX, ValueParser.optional(FILENAME)) // RD_E026
+		outputFileParsers().forEach(key -> controlParser.record(key, ValueParser.FILENAME));
 
-			.record(ControlKey.DEFAULT_EQ_NUM, FILENAME) // RD_GRBA1
-			.record(ControlKey.EQN_MODIFIERS, FILENAME) // RD_GMBA1
+		List.of(basicDefinitions, groupDefinitions, siteCurves, coefficients, additionalModifiers).forEach(group -> {
+			group.forEach(
+					subResourceParser -> controlParser
+							.record(subResourceParser.getControlKey(), subResourceParser.getValueParser())
+			);
+		});
 
-			.record(ControlKey.COE_BA, FILENAME) // RD_E040 IPSJF128
-			.record(ControlKey.COE_DQ, FILENAME) // RD_E041 IPSJF129
-			.record(ControlKey.UPPER_BA_BY_CI_S0_P, FILENAME) // RD_E043 IPSJF128
+		controlParser.record(ControlKey.MINIMA, minimaParser());
 
-			.record(ControlKey.HL_PRIMARY_SP_EQN_P1, FILENAME) // RD_YHL1
-			.record(ControlKey.HL_PRIMARY_SP_EQN_P2, FILENAME) // RD_YHL2
-			.record(ControlKey.HL_PRIMARY_SP_EQN_P3, FILENAME) // RD_YHL3
-			.record(ControlKey.HL_NONPRIMARY, FILENAME) // RD_YHL4
+		controlParser.record(ControlKey.DEBUG_SWITCHES, ValueParser.list(ValueParser.INTEGER)); // IPSJF155
 
-			.record(ControlKey.BY_SPECIES_DQ, FILENAME) // RD_E060 IPFJF125
-			.record(ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, FILENAME) // RD_E061 IPSJF158
+	}
 
-			.record(ControlKey.UTIL_COMP_BA, FILENAME) // RD_UBA1
-			.record(ControlKey.UTIL_COMP_DQ, FILENAME) // RD_UDQ1
+	protected abstract ValueParser<Map<String, Float>> minimaParser();
 
-			.record(ControlKey.SMALL_COMP_PROBABILITY, FILENAME) // RD_SBA1
-			.record(ControlKey.SMALL_COMP_BA, FILENAME) // RD_SBA2
-			.record(ControlKey.SMALL_COMP_DQ, FILENAME) // RD_SDQ1
-			.record(ControlKey.SMALL_COMP_HL, FILENAME) // RD_SHL1
-			.record(ControlKey.SMALL_COMP_WS_VOLUME, FILENAME) // RD_SVT1
+	protected abstract List<ControlMapValueReplacer<?, String>> inputFileParsers();
 
-			.record(ControlKey.TOTAL_STAND_WHOLE_STEM_VOL, FILENAME) // RD_YVT1 IPSJF117
-			.record(ControlKey.UTIL_COMP_WS_VOLUME, FILENAME) // RD_YVT2 IPSJF121
-			.record(ControlKey.CLOSE_UTIL_VOLUME, FILENAME) // RD_YVC1 IPSJF122
-			.record(ControlKey.VOLUME_NET_DECAY, FILENAME) // RD_YVD1 IPSJF123
-			.record(ControlKey.VOLUME_NET_DECAY_WASTE, FILENAME) // RD_YVW1 IPSJF123
-			.record(ControlKey.BREAKAGE, FILENAME) // RD_EMP95 IPSJF157
+	protected abstract List<ControlKey> outputFileParsers();
 
-			.record(ControlKey.VETERAN_LAYER_VOLUME_ADJUST, FILENAME) // RD_YVET
-			.record(ControlKey.VETERAN_LAYER_DQ, FILENAME) // RD_YDQV
-			.record(ControlKey.VETERAN_BQ, FILENAME) // RD_E098
-
-			.record(ControlKey.MODIFIER_FILE, ValueParser.optional(FILENAME)) // RD_E198 IPSJF155, XII
-
-			.record(ControlKey.DEBUG_SWITCHES, ValueParser.list(ValueParser.INTEGER)) // IPSJF155
-	;
-
-	protected List<ControlMapModifier> BASIC_DEFINITIONS = Arrays.asList(
+	protected List<ControlMapSubResourceParser<?>> basicDefinitions = Arrays.asList(
 
 			// RD_BEC
 			new BecDefinitionParser(),
@@ -132,7 +110,7 @@ public abstract class BaseStartAppControlParser {
 			new GenusDefinitionParser()
 	);
 
-	protected List<ControlMapModifier> GROUP_DEFINITIONS = Arrays.asList(
+	protected List<ControlMapSubResourceParser<?>> groupDefinitions = Arrays.asList(
 
 			// RD_VGRP
 			new VolumeEquationGroupParser(),
@@ -156,7 +134,7 @@ public abstract class BaseStartAppControlParser {
 	 * .le. 0.0) FMINVetH=10.0
 	 */
 
-	protected List<ControlMapModifier> SITE_CURVES = Arrays.asList(
+	protected List<ControlMapSubResourceParser<?>> siteCurves = Arrays.asList(
 
 			// User-assigned SC's (Site Curve Numbers)
 			//
@@ -169,7 +147,7 @@ public abstract class BaseStartAppControlParser {
 			new SiteCurveAgeMaximumParser()
 	);
 
-	protected List<ControlMapModifier> COEFFICIENTS = Arrays.asList(
+	protected List<ControlMapSubResourceParser<?>> coefficients = Arrays.asList(
 			new BaseAreaCoefficientParser(),
 
 			new QuadMeanDiameterCoefficientParser(),
@@ -249,9 +227,15 @@ public abstract class BaseStartAppControlParser {
 			new VeteranBAParser()
 	);
 
-	protected void
-			applyModifiers(Map<String, Object> control, List<ControlMapModifier> modifiers, FileResolver fileResolver)
-					throws ResourceParseException, IOException {
+	protected List<OptionalResourceControlMapModifier> additionalModifiers = Arrays.asList(
+
+			// RD_E198
+			new ModifierParser(getProgramId())
+	);
+
+	protected void applyModifiers(
+			Map<String, Object> control, List<? extends ControlMapModifier> modifiers, FileResolver fileResolver
+	) throws ResourceParseException, IOException {
 		for (var modifier : modifiers) {
 			modifier.modify(control, fileResolver);
 		}
@@ -276,4 +260,6 @@ public abstract class BaseStartAppControlParser {
 
 	protected abstract void applyAllModifiers(Map<String, Object> map, FileResolver fileResolver)
 			throws ResourceParseException, IOException;
+
+	protected abstract VdypApplicationIdentifier getProgramId();
 }

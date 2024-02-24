@@ -144,4 +144,9 @@ public class FipSpeciesParser
 			};
 		};
 	}
+
+	@Override
+	public ValueParser<? extends Object> getValueParser() {
+		return ValueParser.FILENAME;
+	}
 }

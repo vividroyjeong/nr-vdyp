@@ -6,6 +6,7 @@ import java.util.Map;
 
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 
 /**
  * Modifies the control map based on a resource
@@ -34,4 +35,5 @@ public interface ResourceControlMapModifier extends ControlMapModifier, KeyedCon
 			modify(control, data);
 		}
 	}
+
 }

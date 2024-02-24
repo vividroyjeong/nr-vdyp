@@ -177,4 +177,9 @@ public class VdypSpeciesParser
 			};
 		};
 	}
+
+	@Override
+	public ValueParser<? extends Object> getValueParser() {
+		return ValueParser.FILENAME;
+	}
 }

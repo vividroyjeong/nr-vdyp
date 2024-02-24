@@ -549,12 +549,12 @@ class FipControlParserTest {
 		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result, (Matcher) controlMapHasEntry(
-						ControlKey.FIP_MINIMA,
+						ControlKey.MINIMA,
 						// Includes modifiers from 198
 						allOf(
 								hasEntry(is(FipControlParser.MINIMUM_HEIGHT), is(5.0f)),
 								hasEntry(is(FipControlParser.MINIMUM_BASE_AREA), is(0.0f)),
-								hasEntry(is(FipControlParser.MINIMUM_PREDICTED_BASE_AREA), is(2.0f)),
+								hasEntry(is(FipControlParser.MINIMUM_FULLY_STOCKED_AREA), is(2.0f)),
 								hasEntry(is(FipControlParser.MINIMUM_VETERAN_HEIGHT), is(10.0f))
 						)
 				)

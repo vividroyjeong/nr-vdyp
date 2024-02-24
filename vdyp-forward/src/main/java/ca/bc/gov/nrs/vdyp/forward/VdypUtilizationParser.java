@@ -142,4 +142,9 @@ public class VdypUtilizationParser
 			};
 		};
 	}
+
+	@Override
+	public ValueParser<? extends Object> getValueParser() {
+		return ValueParser.FILENAME;
+	}
 }

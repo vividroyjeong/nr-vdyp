@@ -283,7 +283,7 @@ class ControlFileParserTest {
 			assertThat(result, hasEntry(equalTo("097"), equalTo("coe\\vetdq2.dat")));
 
 			assertThat(result, hasEntry(equalTo("098"), equalTo("coe\\REGBAV01.coe")));
-			assertThat(result, hasEntry(equalTo("FIP_MINIMA"), (Matcher) contains(5.0f, 0.0f, 2.0f)));
+			assertThat(result, hasEntry(equalTo("MINIMA"), (Matcher) contains(5.0f, 0.0f, 2.0f)));
 			assertThat(result, hasEntry(equalTo("MODIFIER_FILE"), equalTo("coe\\MOD19813.prm")));
 			assertThat(
 					result,
@@ -337,7 +337,7 @@ class ControlFileParserTest {
 		var parser = makeParser();
 
 		parser //
-				.record(ControlKey.FIP_MINIMA, ValueParser.list(ValueParser.FLOAT))//
+				.record(ControlKey.MINIMA, ValueParser.list(ValueParser.FLOAT))//
 				.record(ControlKey.MODIFIER_FILE)//
 				.record(ControlKey.DEBUG_SWITCHES, ValueParser.list(ValueParser.INTEGER));
 

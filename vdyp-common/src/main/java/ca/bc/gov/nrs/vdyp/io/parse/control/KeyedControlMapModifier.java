@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.io.parse.control;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 
 public interface KeyedControlMapModifier extends ControlMapModifier {
 
@@ -19,5 +20,12 @@ public interface KeyedControlMapModifier extends ControlMapModifier {
 	 * @return
 	 */
 	ControlKey getControlKey();
+
+	/**
+	 * Value parser for the control value before modification
+	 *
+	 * @return
+	 */
+	ValueParser<? extends Object> getValueParser();
 
 }

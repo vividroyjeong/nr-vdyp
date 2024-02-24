@@ -112,4 +112,8 @@ public class VdypPolygonParser implements ControlMapValueReplacer<StreamingParse
 		};
 	}
 
+	@Override
+	public ValueParser<? extends Object> getValueParser() {
+		return ValueParser.FILENAME;
+	}
 }

@@ -72,4 +72,8 @@ public class FipPolygonParser implements ControlMapValueReplacer<StreamingParser
 		};
 	}
 
+	@Override
+	public ValueParser<? extends Object> getValueParser() {
+		return ValueParser.FILENAME;
+	}
 }
