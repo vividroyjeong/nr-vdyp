@@ -59,25 +59,13 @@ public class FipControlParser extends BaseControlParser {
 		);
 	}
 
-	List<ControlMapModifier> DATA_FILES = Arrays.asList(
-
-			// V7O_FIP
-			new FipPolygonParser(),
-
-			// V7O_FIL
-			new FipLayerParser(),
-
-			// V7O_FIS
-			new FipSpeciesParser()
-	);
-
-	List<ControlMapModifier> FIPSTART_ONLY = Arrays.asList(
+	List<ControlMapModifier> fipstartOnly = Arrays.asList(
 
 			// RD_STK33
 			new StockingClassFactorParser()
 	);
 
-	List<ControlMapModifier> ADDITIONAL_MODIFIERS = Arrays.asList(
+	List<ControlMapModifier> additionalModifiers = Arrays.asList(
 
 			// RD_E198
 			new ModifierParser(VdypApplicationIdentifier.VRI_START)
@@ -94,9 +82,9 @@ public class FipControlParser extends BaseControlParser {
 
 		// Initialize data file parser factories
 
-		applyModifiers(map, DATA_FILES, fileResolver);
+		applyModifiers(map, inputFileParsers(), fileResolver);
 
-		applyModifiers(map, FIPSTART_ONLY, fileResolver);
+		applyModifiers(map, fipstartOnly, fileResolver);
 
 		applyModifiers(map, siteCurves, fileResolver);
 
@@ -107,7 +95,7 @@ public class FipControlParser extends BaseControlParser {
 		// Modifiers, IPSJF155-Appendix XII
 
 		// RD_E198
-		applyModifiers(map, ADDITIONAL_MODIFIERS, fileResolver);
+		applyModifiers(map, additionalModifiers, fileResolver);
 
 		// Debug switches (normally zero)
 		// TODO
