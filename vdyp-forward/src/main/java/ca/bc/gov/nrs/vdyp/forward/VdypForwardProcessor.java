@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.vdyp.forward;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -88,7 +89,7 @@ public class VdypForwardProcessor {
 				Path controlFilePath = Path.of(controlFileName).getParent();
 				FileSystemFileResolver relativeResolver = new FileSystemFileResolver(controlFilePath);
 
-				parser.parse(is, relativeResolver);
+				parser.parse(is, relativeResolver, new HashMap<>());
 			}
 		}
 	}

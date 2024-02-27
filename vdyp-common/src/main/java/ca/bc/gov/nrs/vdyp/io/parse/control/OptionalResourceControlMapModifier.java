@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
@@ -21,8 +22,7 @@ public interface OptionalResourceControlMapModifier extends ResourceControlMapMo
 	@Override
 	default void modify(Map<String, Object> control, FileResolver fileResolver)
 			throws IOException, ResourceParseException {
-		@SuppressWarnings("unchecked")
-		var filename = (Optional<String>) control.get(getControlKeyName());
+		var filename = Utils.parsedControl(control, getControlKey(), String.class);
 		if (filename.isPresent()) {
 			try (InputStream data = fileResolver.resolveForInput(filename.get())) {
 				modify(control, data);

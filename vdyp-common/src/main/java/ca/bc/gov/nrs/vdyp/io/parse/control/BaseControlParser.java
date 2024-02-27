@@ -80,16 +80,20 @@ public abstract class BaseControlParser {
 		outputFileParsers().forEach(key -> controlParser.record(key, ValueParser.FILENAME));
 
 		List.of(basicDefinitions, groupDefinitions, siteCurves, coefficients, additionalModifiers).forEach(group -> {
-			group.forEach(
-					subResourceParser -> controlParser
-							.record(subResourceParser.getControlKey(), subResourceParser.getValueParser())
-			);
+			recordAll(group);
 		});
 
 		controlParser.record(ControlKey.MINIMA, minimaParser());
 
 		controlParser.record(ControlKey.DEBUG_SWITCHES, ValueParser.list(ValueParser.INTEGER)); // IPSJF155
 
+	}
+
+	protected void recordAll(List<? extends ResourceControlMapModifier> group) {
+		group.forEach(
+				subResourceParser -> controlParser
+						.record(subResourceParser.getControlKey(), subResourceParser.getValueParser())
+		);
 	}
 
 	protected abstract ValueParser<Map<String, Float>> minimaParser();

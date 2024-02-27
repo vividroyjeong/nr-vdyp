@@ -10,9 +10,10 @@ import java.util.function.BiFunction;
 
 import org.opentest4j.AssertionFailedError;
 
-import ca.bc.gov.nrs.vdyp.forward.ModifierParser;
+import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.forward.VdypForwardControlParser;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
@@ -29,7 +30,8 @@ public class VdypForwardTestUtils {
 			populateControlMapDecayModifiers(Map<String, Object> controlMap, BiFunction<String, Region, Float> mapper) {
 		var spec = Arrays.asList(TestUtils.getSpeciesAliases());
 		var regions = Arrays.asList(Region.values());
-		TestUtils.populateControlMap2(controlMap, ModifierParser.CONTROL_KEY_MOD301_DECAY, spec, regions, mapper);
+		TestUtils
+				.populateControlMap2(controlMap, ModifierParser.CONTROL_KEY_MOD301_DECAY.name(), spec, regions, mapper);
 	}
 
 	/**
@@ -42,7 +44,8 @@ public class VdypForwardTestUtils {
 			populateControlMapWasteModifiers(Map<String, Object> controlMap, BiFunction<String, Region, Float> mapper) {
 		var spec = Arrays.asList(TestUtils.getSpeciesAliases());
 		var regions = Arrays.asList(Region.values());
-		TestUtils.populateControlMap2(controlMap, ModifierParser.CONTROL_KEY_MOD301_WASTE, spec, regions, mapper);
+		TestUtils
+				.populateControlMap2(controlMap, ModifierParser.CONTROL_KEY_MOD301_WASTE.name(), spec, regions, mapper);
 	}
 
 	/**
@@ -51,7 +54,7 @@ public class VdypForwardTestUtils {
 	 * @param controlMap
 	 */
 	public static void modifyControlMap(HashMap<String, Object> controlMap) {
-		int jprogram = 1;
+		var jprogram = VdypApplicationIdentifier.VDYP_FORWARD;
 		TestUtils.populateControlMapFromResource(controlMap, new ModifierParser(jprogram), "mod19813.prm");
 
 	}
@@ -61,7 +64,7 @@ public class VdypForwardTestUtils {
 					throws IOException, ResourceParseException {
 		try (var is = klazz.getResourceAsStream(resourceName)) {
 
-			return parser.parse(is, VdypForwardTestUtils.fileResolver(klazz));
+			return parser.parse(is, VdypForwardTestUtils.fileResolver(klazz), new HashMap<>());
 		}
 	}
 

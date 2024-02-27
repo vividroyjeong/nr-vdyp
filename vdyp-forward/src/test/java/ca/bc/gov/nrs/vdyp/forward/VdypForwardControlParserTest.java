@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -498,7 +499,7 @@ class VdypForwardControlParserTest {
 	}
 
 	@Test
-	public void testParseMinima() throws Exception {
+	void testParseMinima() throws Exception {
 		var parser = new VdypForwardControlParser(app);
 		var result = parse(parser, "VDYP.CTR");
 
@@ -507,7 +508,7 @@ class VdypForwardControlParserTest {
 	}
 
 	@Test
-	public void testParseV7O_VIP() throws Exception {
+	void testParseV7O_VIP() throws Exception {
 		var parser = new VdypForwardControlParser(app);
 		var result = parse(parser, "VDYP.CTR");
 		assertThat(
@@ -516,7 +517,7 @@ class VdypForwardControlParserTest {
 	}
 
 	@Test
-	public void testParseV7O_VIU() throws Exception {
+	void testParseV7O_VIU() throws Exception {
 		var parser = new VdypForwardControlParser(app);
 		var result = parse(parser, "VDYP.CTR");
 		assertThat(
@@ -528,7 +529,7 @@ class VdypForwardControlParserTest {
 	}
 
 	@Test
-	public void testParseV7O_VIS() throws Exception {
+	void testParseV7O_VIS() throws Exception {
 		var parser = new VdypForwardControlParser(app);
 		var result = parse(parser, "VDYP.CTR");
 		assertThat(
@@ -548,7 +549,7 @@ class VdypForwardControlParserTest {
 
 		Class<?> klazz = TestUtils.class;
 		try (InputStream baseIs = klazz.getResourceAsStream("VDYP.CTR"); InputStream is = addToEnd(baseIs, lines);) {
-			return parser.parse(is, VdypForwardTestUtils.fileResolver(klazz));
+			return parser.parse(is, VdypForwardTestUtils.fileResolver(klazz), new HashMap<>());
 		}
 	}
 
@@ -558,7 +559,7 @@ class VdypForwardControlParserTest {
 		Class<?> klazz = TestUtils.class;
 		try (var is = klazz.getResourceAsStream(resourceName)) {
 
-			return parser.parse(is, VdypForwardTestUtils.fileResolver(klazz));
+			return parser.parse(is, VdypForwardTestUtils.fileResolver(klazz), new HashMap<>());
 		}
 	}
 }

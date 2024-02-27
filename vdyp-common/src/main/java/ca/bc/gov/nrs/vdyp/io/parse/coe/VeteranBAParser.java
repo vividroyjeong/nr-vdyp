@@ -35,4 +35,9 @@ public class VeteranBAParser extends SimpleCoefficientParser2<String, Region> {
 		this.speciesKey().space(1).regionKey().coefficients(3, 9);
 	}
 
+	@Override
+	public boolean isRequired() {
+		return false;
+	}
+
 }

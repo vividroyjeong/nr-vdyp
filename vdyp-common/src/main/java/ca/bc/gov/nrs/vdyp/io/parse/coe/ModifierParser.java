@@ -105,7 +105,7 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 		}.integer(3, "sequence").multiValue(6, 2, "programs", ValueParser.LOGICAL)
 				.multiValue(10, 6, "mods", ValueParser.optional(ValueParser.FLOAT));
 
-		final var vetBqMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
+		final var vetBqMap = Utils.<MatrixMap2<String, Region, Coefficients>>parsedControl(
 				control, ControlKey.VETERAN_BQ, MatrixMap2.class
 		);
 
@@ -151,14 +151,16 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 					final float coastalMod = mods.get(0);
 					final float interiorMod = mods.get(1);
 
-					if (coastalMod != 0.0) {
-						var coe = vetBqMap.get(sp0Alias, Region.COASTAL);
-						coe.scalarInPlace(1, (FloatUnaryOperator) x -> x * coastalMod);
-					}
-					if (interiorMod != 0.0) {
-						var coe = vetBqMap.get(sp0Alias, Region.INTERIOR);
-						coe.scalarInPlace(1, (FloatUnaryOperator) x -> x * interiorMod);
-					}
+					vetBqMap.ifPresent(map -> {
+						if (coastalMod != 0.0) {
+							var coe = map.get(sp0Alias, Region.COASTAL);
+							coe.scalarInPlace(1, (FloatUnaryOperator) x -> x * coastalMod);
+						}
+						if (interiorMod != 0.0) {
+							var coe = map.get(sp0Alias, Region.INTERIOR);
+							coe.scalarInPlace(1, (FloatUnaryOperator) x -> x * interiorMod);
+						}
+					});
 				}
 			} else if (sequence >= 200 && sequence <= 299) {
 				// Modifiers are per region for BA and DQ, for each species, set the modifier
