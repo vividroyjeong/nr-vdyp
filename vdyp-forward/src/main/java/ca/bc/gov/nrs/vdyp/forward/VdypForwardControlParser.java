@@ -54,8 +54,8 @@ public class VdypForwardControlParser extends NonFipControlParser {
 	}
 
 	@Override
-	protected List<ControlMapValueReplacer<?, String>> inputFileParsers() {
-		return List.of(
+	protected List<ControlMapValueReplacer<Object, String>> inputFileParsers() {
+		return inputParserList(
 
 				// V7O_VIP
 				new VdypPolygonParser(),

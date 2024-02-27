@@ -66,6 +66,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.write.VriAdjustInputWriter;
@@ -153,7 +154,7 @@ public class FipStart extends VdypApplication implements Closeable {
 			throw new IllegalArgumentException("At least one control file must be specifiec.");
 		}
 
-		var parser = new FipControlParser();
+		BaseControlParser parser = new FipControlParser();
 		List<InputStream> resources = new ArrayList<>(controlFilePaths.length);
 		try {
 			for (String path : controlFilePaths) {
@@ -324,8 +325,8 @@ public class FipStart extends VdypApplication implements Closeable {
 		if (true /* TODO */) {
 			var minima = Utils.<Map<String, Float>>expectParsedControl(controlMap, ControlKey.MINIMA, Map.class);
 
-			float minimumBaseArea = minima.get(FipControlParser.MINIMUM_BASE_AREA);
-			float minimumPredictedBaseArea = minima.get(FipControlParser.MINIMUM_FULLY_STOCKED_AREA);
+			float minimumBaseArea = minima.get(BaseControlParser.MINIMUM_BASE_AREA);
+			float minimumPredictedBaseArea = minima.get(BaseControlParser.MINIMUM_FULLY_STOCKED_AREA);
 			if (baseAreaTotalPrime < minimumBaseArea) {
 				throw new LowValueException("Base area", baseAreaTotalPrime, minimumBaseArea);
 			}
@@ -2662,9 +2663,9 @@ public class FipStart extends VdypApplication implements Closeable {
 		var minima = Utils.<Map<String, Float>>expectParsedControl(controlMap, ControlKey.MINIMA.name(), Map.class);
 		switch (layer) {
 		case PRIMARY:
-			return Optional.of(minima.get(FipControlParser.MINIMUM_HEIGHT));
+			return Optional.of(minima.get(BaseControlParser.MINIMUM_HEIGHT));
 		case VETERAN:
-			return Optional.of(minima.get(FipControlParser.MINIMUM_VETERAN_HEIGHT));
+			return Optional.of(minima.get(BaseControlParser.MINIMUM_VETERAN_HEIGHT));
 		default:
 			return Optional.empty();
 		}

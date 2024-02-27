@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
 import ca.bc.gov.nrs.vdyp.io.EndOfRecord;
@@ -115,25 +116,24 @@ public class VdypSpeciesParser
 					var totalAge = (Float) entry.get(TOTAL_AGE);
 					var ageAtBreastHeight = (Float) entry.get(AGE_AT_BREAST_HEIGHT);
 					var yearsToBreastHeight = (Float) entry.get(YEARS_TO_BREAST_HEIGHT);
-					var isPrimarySpeciesValue = (Optional<Boolean>) entry.get(IS_PRIMARY_SPECIES);
-					Optional<Boolean> isPrimarySpecies = (isPrimarySpeciesValue == null) ? Optional.empty()
-							: isPrimarySpeciesValue;
-					var siteCurveNumberValue = (Optional<Integer>) entry.get(SITE_CURVE_NUMBER);
-					Optional<Integer> siteCurveNumber = (siteCurveNumberValue == null) ? Optional.of(9)
-							: siteCurveNumberValue;
+					var isPrimarySpecies = Utils.<Boolean>optSafe(entry.get(IS_PRIMARY_SPECIES));
+					var siteCurveNumber = Optional.of(Utils.<Integer>optSafe(entry.get(SITE_CURVE_NUMBER)).orElse(9));
 
 					var builder = new ValueOrMarker.Builder<Optional<VdypLayerSpecies>, EndOfRecord>();
-					var result = layerType.handle(l -> {
+					return layerType.handle(l -> {
 						return builder.value(l.map(lt -> {
 
 							List<SpeciesDistribution> sdList = new ArrayList<>();
 							sdList.add(new SpeciesDistribution(species1, percentSpecies1));
-							if (species2.isPresent() && percentSpecies2.isPresent())
-								sdList.add(new SpeciesDistribution(species2.get(), percentSpecies2.get()));
-							if (species3.isPresent() && percentSpecies3.isPresent())
-								sdList.add(new SpeciesDistribution(species3.get(), percentSpecies3.get()));
-							if (species4.isPresent() && percentSpecies4.isPresent())
-								sdList.add(new SpeciesDistribution(species4.get(), percentSpecies4.get()));
+							Utils.ifBothPresent(species2, percentSpecies2, (s, p) -> {
+								sdList.add(new SpeciesDistribution(s, p));
+							});
+							Utils.ifBothPresent(species3, percentSpecies3, (s, p) -> {
+								sdList.add(new SpeciesDistribution(s, p));
+							});
+							Utils.ifBothPresent(species4, percentSpecies4, (s, p) -> {
+								sdList.add(new SpeciesDistribution(s, p));
+							});
 							SpeciesDistributionSet speciesDistributionSet = new SpeciesDistributionSet(sdList);
 
 							return new VdypLayerSpecies(
@@ -143,7 +143,6 @@ public class VdypSpeciesParser
 						}));
 					}, builder::marker);
 
-					return result;
 				}
 			};
 
@@ -179,7 +178,7 @@ public class VdypSpeciesParser
 	}
 
 	@Override
-	public ValueParser<? extends Object> getValueParser() {
-		return ValueParser.FILENAME;
+	public ValueParser<Object> getValueParser() {
+		return FILENAME;
 	}
 }

@@ -1,6 +1,5 @@
 package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;

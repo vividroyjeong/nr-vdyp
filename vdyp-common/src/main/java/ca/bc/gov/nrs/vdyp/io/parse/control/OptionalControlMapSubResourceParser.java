@@ -28,7 +28,7 @@ public interface OptionalControlMapSubResourceParser<T>
 	T defaultResult();
 
 	@Override
-	default ValueParser<? extends Object> getValueParser() {
+	default ValueParser<Object> getValueParser() {
 		return OptionalResourceControlMapModifier.super.getValueParser();
 	}
 

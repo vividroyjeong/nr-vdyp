@@ -26,7 +26,7 @@ public class VriPolygonParser implements ControlMapValueReplacer<StreamingParser
 	}
 
 	@Override
-	public ValueParser<? extends Object> getValueParser() {
-		return ValueParser.FILENAME;
+	public ValueParser<Object> getValueParser() {
+		return FILENAME;
 	}
 }

@@ -3,8 +3,6 @@ package ca.bc.gov.nrs.vdyp.io.parse.control;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-import java.util.Optional;
-
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -41,8 +39,8 @@ public interface OptionalResourceControlMapModifier extends ResourceControlMapMo
 	void defaultModify(Map<String, Object> control);
 
 	@Override
-	default ValueParser<? extends Object> getValueParser() {
-		return ValueParser.optional(ValueParser.FILENAME);
+	default ValueParser<Object> getValueParser() {
+		return OPTIONAL_FILENAME;
 	}
 
 }

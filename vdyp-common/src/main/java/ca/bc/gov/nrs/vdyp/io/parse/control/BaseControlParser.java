@@ -3,7 +3,6 @@ package ca.bc.gov.nrs.vdyp.io.parse.control;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -66,6 +65,13 @@ public abstract class BaseControlParser {
 
 	public static final float DEFAULT_MINIMUM_VETERAN_HEIGHT = 10.0f;
 
+	@SuppressWarnings("unchecked")
+	protected static List<ControlMapValueReplacer<Object, String>>
+			inputParserList(@SuppressWarnings("rawtypes") ControlMapValueReplacer... inputParsers) {
+		return Arrays.asList(inputParsers);
+
+	}
+
 	protected ControlFileParser controlParser = new ControlFileParser();
 
 	protected BaseControlParser() {
@@ -98,7 +104,7 @@ public abstract class BaseControlParser {
 
 	protected abstract ValueParser<Map<String, Float>> minimaParser();
 
-	protected abstract List<ControlMapValueReplacer<?, String>> inputFileParsers();
+	protected abstract List<ControlMapValueReplacer<Object, String>> inputFileParsers();
 
 	protected abstract List<ControlKey> outputFileParsers();
 

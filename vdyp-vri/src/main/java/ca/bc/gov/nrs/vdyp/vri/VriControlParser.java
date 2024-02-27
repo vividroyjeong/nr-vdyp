@@ -1,7 +1,6 @@
 package ca.bc.gov.nrs.vdyp.vri;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
@@ -9,7 +8,6 @@ import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapValueReplacer;
 import ca.bc.gov.nrs.vdyp.io.parse.control.NonFipControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
-import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 
 /**
  * Parser for VRI control files
@@ -37,8 +35,8 @@ public class VriControlParser extends NonFipControlParser {
 	}
 
 	@Override
-	protected List<ControlMapValueReplacer<?, String>> inputFileParsers() {
-		return List.of(
+	protected List<ControlMapValueReplacer<Object, String>> inputFileParsers() {
+		return inputParserList(
 
 				// V7O_FIP
 				new VriPolygonParser(),

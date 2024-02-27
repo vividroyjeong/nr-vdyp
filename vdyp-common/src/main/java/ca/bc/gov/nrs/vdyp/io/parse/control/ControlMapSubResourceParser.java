@@ -25,8 +25,8 @@ public interface ControlMapSubResourceParser<T> extends ResourceControlMapModifi
 	}
 
 	@Override
-	default ValueParser<? extends Object> getValueParser() {
-		return ValueParser.FILENAME;
+	default ValueParser<Object> getValueParser() {
+		return FILENAME;
 	}
 
 }

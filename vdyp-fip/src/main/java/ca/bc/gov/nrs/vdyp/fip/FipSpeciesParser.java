@@ -146,7 +146,7 @@ public class FipSpeciesParser
 	}
 
 	@Override
-	public ValueParser<? extends Object> getValueParser() {
-		return ValueParser.FILENAME;
+	public ValueParser<Object> getValueParser() {
+		return FILENAME;
 	}
 }

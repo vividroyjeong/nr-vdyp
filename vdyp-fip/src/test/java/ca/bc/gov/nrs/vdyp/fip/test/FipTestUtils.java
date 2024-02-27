@@ -12,6 +12,7 @@ import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.fip.FipControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -56,7 +57,7 @@ public class FipTestUtils {
 
 	}
 
-	public static Map<String, Object> loadControlMap(FipControlParser parser, Class<?> klazz, String resourceName)
+	public static Map<String, Object> loadControlMap(BaseControlParser parser, Class<?> klazz, String resourceName)
 			throws IOException, ResourceParseException {
 		try (var is = klazz.getResourceAsStream(resourceName)) {
 
@@ -69,7 +70,7 @@ public class FipTestUtils {
 	 * control map parser.
 	 */
 	public static Map<String, Object> loadControlMap() {
-		var parser = new FipControlParser();
+		BaseControlParser parser = new FipControlParser();
 		try {
 			return loadControlMap(parser, TestUtils.class, "FIPSTART.CTR");
 		} catch (IOException | ResourceParseException ex) {

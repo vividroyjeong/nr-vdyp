@@ -56,6 +56,7 @@ import ca.bc.gov.nrs.vdyp.fip.test.FipTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.MockStreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
@@ -4927,10 +4928,10 @@ class FipStartTest {
 
 		Map<String, Float> minima = new HashMap<>();
 
-		minima.put(FipControlParser.MINIMUM_HEIGHT, 5f);
-		minima.put(FipControlParser.MINIMUM_BASE_AREA, 0f);
-		minima.put(FipControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
-		minima.put(FipControlParser.MINIMUM_VETERAN_HEIGHT, 10f);
+		minima.put(BaseControlParser.MINIMUM_HEIGHT, 5f);
+		minima.put(BaseControlParser.MINIMUM_BASE_AREA, 0f);
+		minima.put(BaseControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		minima.put(BaseControlParser.MINIMUM_VETERAN_HEIGHT, 10f);
 
 		controlMap.put(ControlKey.MINIMA.name(), minima);
 

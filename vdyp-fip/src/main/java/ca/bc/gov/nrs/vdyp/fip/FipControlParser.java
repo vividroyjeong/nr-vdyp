@@ -108,8 +108,8 @@ public class FipControlParser extends BaseControlParser {
 	}
 
 	@Override
-	protected List<ControlMapValueReplacer<?, String>> inputFileParsers() {
-		return List.of(
+	protected List<ControlMapValueReplacer<Object, String>> inputFileParsers() {
+		return inputParserList(
 
 				// V7O_FIP
 				new FipPolygonParser(),

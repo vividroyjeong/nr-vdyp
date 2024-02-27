@@ -2,11 +2,11 @@ package ca.bc.gov.nrs.vdyp.forward;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.FizCheck;
 import ca.bc.gov.nrs.vdyp.forward.model.FipMode;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
@@ -59,25 +59,15 @@ public class VdypPolygonParser implements ControlMapValueReplacer<StreamingParse
 
 			return new AbstractStreamingParser<VdypPolygon>(is, lineParser, control) {
 
-				@SuppressWarnings("unchecked")
 				@Override
 				protected VdypPolygon convert(Map<String, Object> entry) throws ResourceParseException {
 					var description = (String) entry.get(DESCRIPTION);
 					var becAlias = (String) entry.get(BIOGEOCLIMATIC_ZONE);
 					var fizId = (Character) entry.get(FOREST_INVENTORY_ZONE);
 					var percentForestLand = (Float) entry.get(PERCENT_FOREST_LAND);
-					var inventoryTypeGroup = (Optional<Integer>) entry.get(INVENTORY_TYPE_GROUP);
-					if (inventoryTypeGroup == null) {
-						inventoryTypeGroup = Optional.empty();
-					}
-					var basalAreaGroup = (Optional<Integer>) entry.get(BASAL_AREA_GROUP);
-					if (basalAreaGroup == null) {
-						basalAreaGroup = Optional.empty();
-					}
-					var fipMode = (Optional<Integer>) entry.get(FIP_MODE);
-					if (fipMode == null) {
-						fipMode = Optional.empty();
-					}
+					var inventoryTypeGroup = Utils.<Integer>optSafe(entry.get(INVENTORY_TYPE_GROUP));
+					var basalAreaGroup = Utils.<Integer>optSafe(entry.get(BASAL_AREA_GROUP));
+					var fipMode = Utils.<Integer>optSafe(entry.get(FIP_MODE));
 
 					Integer year;
 					Matcher matcher = descriptionPattern.matcher(description);
@@ -113,7 +103,7 @@ public class VdypPolygonParser implements ControlMapValueReplacer<StreamingParse
 	}
 
 	@Override
-	public ValueParser<? extends Object> getValueParser() {
-		return ValueParser.FILENAME;
+	public ValueParser<Object> getValueParser() {
+		return FILENAME;
 	}
 }

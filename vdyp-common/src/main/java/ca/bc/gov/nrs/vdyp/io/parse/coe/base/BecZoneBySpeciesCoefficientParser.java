@@ -12,6 +12,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapSubResourceParser;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ControlledValueParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
@@ -51,8 +52,14 @@ public abstract class BecZoneBySpeciesCoefficientParser
 				return line.substring(0, Math.min(4, line.length())).trim().length() == 0;
 			}
 
-		}.value(4, BEC_ZONE_ID_KEY, ValueParser.STRING).space(2).value(1, INDEX_KEY, ValueParser.INTEGER)
-				.value(2, INDICATOR_KEY, ValueParser.INTEGER)
+		}//
+				.value(4, BEC_ZONE_ID_KEY, ControlledValueParser.BEC)//
+				.space(2)//
+				.value(
+						1, INDEX_KEY,
+						ValueParser.range(ValueParser.INTEGER, 0, true, nCoefficients, false, "Index value")
+				)//
+				.value(2, INDICATOR_KEY, ValueParser.LOGICAL_0_1) //
 				.multiValue(NUM_SPECIES, 8, COEFFICIENTS_KEY, ValueParser.FLOAT);
 	}
 
@@ -71,32 +78,10 @@ public abstract class BecZoneBySpeciesCoefficientParser
 		lineParser.parse(is, result, (value, r, lineNumber) -> {
 			var becZoneId = (String) value.get(BEC_ZONE_ID_KEY);
 			var index = (int) value.get(INDEX_KEY);
-			var indicator = (int) value.get(INDICATOR_KEY);
+			var indicator = (boolean) value.get(INDICATOR_KEY);
 
 			@SuppressWarnings("unchecked")
 			var specCoefficients = (List<Float>) value.get(COEFFICIENTS_KEY);
-
-			if (index < 0 || index >= nCoefficients) {
-				throw new ValueParseException(
-						MessageFormat.format(
-								"Line {0}: Index value {1} is out of range; expecting a value from 0 to {2}",
-								lineNumber, index, nCoefficients
-						)
-				);
-			}
-
-			if (indicator < 0 || indicator > 1) {
-				throw new ValueParseException(
-						MessageFormat.format(
-								"Line {0}: Indicator value {1} is out of range; expecting either 0 or 1", lineNumber,
-								indicator
-						)
-				);
-			}
-
-			BecDefinitionParser.getBecs(control).get(becZoneId).orElseThrow(
-					() -> new ValueParseException("BEC Zone Id " + becZoneId + " is not a recognized BEC Zone")
-			);
 
 			var specIt = sp0Aliases.iterator();
 
@@ -107,7 +92,7 @@ public abstract class BecZoneBySpeciesCoefficientParser
 				Float coe = specCoefficients.get(coefficientIndex);
 				coefficients.setCoe(index, coe);
 
-				if (indicator == 0)
+				if (!indicator)
 					break;
 
 				coefficientIndex += 1;
