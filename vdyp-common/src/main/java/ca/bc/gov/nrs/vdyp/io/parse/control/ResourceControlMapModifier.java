@@ -9,6 +9,7 @@ import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseValidException;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 
 /**
  * Modifies the control map based on a resource
@@ -52,6 +53,11 @@ public interface ResourceControlMapModifier extends ControlMapModifier, KeyedCon
 
 	default boolean isRequired() {
 		return true;
+	}
+
+	@Override
+	default ValueParser<Object> getValueParser() {
+		return isRequired() ? FILENAME : OPTIONAL_FILENAME;
 	}
 
 }
