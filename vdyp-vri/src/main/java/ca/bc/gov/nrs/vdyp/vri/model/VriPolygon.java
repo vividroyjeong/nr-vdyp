@@ -20,7 +20,9 @@ public class VriPolygon extends BaseVdypPolygon<VriLayer, Optional<Float>> {
 		this.nonproductiveDescription = nonproductiveDescription;
 		this.yieldFactor = yieldFactor;
 	}
-
+	// TODO Stub, to be completed in VDYP-176
+	// @formatter:off
+/*
 	public Optional<String> getNonproductiveDescription() {
 		return nonproductiveDescription;
 	}
@@ -36,7 +38,7 @@ public class VriPolygon extends BaseVdypPolygon<VriLayer, Optional<Float>> {
 	public void setYieldFactor(float yieldFactor) {
 		this.yieldFactor = yieldFactor;
 	}
-
+*/
 	/**
 	 * Accepts a configuration function that accepts a builder to configure.
 	 *
@@ -55,7 +57,7 @@ public class VriPolygon extends BaseVdypPolygon<VriLayer, Optional<Float>> {
 	 * @throws IllegalStateException if any required properties have not been set by
 	 *                               the configuration function.
 	 */
-	public static VriPolygon build(Consumer<Builder> config) {
+/*	public static VriPolygon build(Consumer<Builder> config) {
 		var builder = new Builder();
 		config.accept(builder);
 		return builder.build();
@@ -115,5 +117,7 @@ public class VriPolygon extends BaseVdypPolygon<VriLayer, Optional<Float>> {
 			return new VriLayer.Builder();
 		}
 
-	}
+	}*/
+	// @formatter:on
+
 }

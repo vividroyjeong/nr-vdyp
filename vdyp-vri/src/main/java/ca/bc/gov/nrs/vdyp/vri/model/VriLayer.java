@@ -25,7 +25,9 @@ public class VriLayer extends BaseVdypLayer<VriSpecies> {
 		this.crownClosure = crownClosure;
 		this.siteSpecies = siteSpecies;
 	}
-
+	// TODO Stub, to be completed in VDYP-176
+	// @formatter:off
+/*
 	public float getCrownClosure() {
 		return crownClosure;
 	}
@@ -96,6 +98,8 @@ public class VriLayer extends BaseVdypLayer<VriSpecies> {
 		super.setYearsToBreastHeight(yearsToBreastHeight);
 	}
 
+*/
+
 	/**
 	 * Accepts a configuration function that accepts a builder to configure.
 	 *
@@ -119,6 +123,8 @@ public class VriLayer extends BaseVdypLayer<VriSpecies> {
 	 * @throws IllegalStateException if any required properties have not been set by
 	 *                               the configuration function.
 	 */
+
+	/**
 	public static VriLayer build(Consumer<Builder> config) {
 		var builder = new Builder();
 		config.accept(builder);
@@ -157,6 +163,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies> {
 
 		@Override
 		protected VriLayer doBuild() {
+		*/
 			/*
 			 * public FipLayer( String polygonIdentifier, LayerType layer, Optional<Float>
 			 * ageTotal, Optional<Float> height, Optional<Float> yearsToBreastHeight,
@@ -164,7 +171,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies> {
 			 * Optional<Integer> inventoryTypeGroup, Optional<String> siteGenus, float
 			 * crownClosure, String siteSpecies
 			 */
-			return (new VriLayer(
+/*			return (new VriLayer(
 					polygonIdentifier.get(), //
 					layer.get(), //
 					ageTotal, //
@@ -179,5 +186,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies> {
 			));
 		}
 
-	}
+	}*/
+	// @formatter:on
+
 }
