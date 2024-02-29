@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -352,5 +353,9 @@ public class TestUtils {
 			}
 
 		};
+	}
+
+	public static void assumeThat(java.lang.Object actual, @SuppressWarnings("rawtypes") org.hamcrest.Matcher matcher) {
+		assumeTrue(matcher.matches(actual));
 	}
 }

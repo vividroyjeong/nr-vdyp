@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.vdyp.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.describedAs;
 import static org.hamcrest.Matchers.hasProperty;
@@ -98,6 +99,10 @@ public class VdypMatchers {
 			}
 
 		};
+	}
+
+	public static <T> Matcher<Optional<T>> present() {
+		return present(anything());
 	}
 
 	/**
