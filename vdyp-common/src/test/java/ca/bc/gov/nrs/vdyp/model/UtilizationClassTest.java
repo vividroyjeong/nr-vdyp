@@ -30,14 +30,14 @@ class UtilizationClassTest {
 	@EnumSource(UtilizationClass.class)
 	void previousOfNextIsSelf(UtilizationClass uc) {
 		assumeThat(uc.next(), present(Matchers.anything()));
-		assumeThat(uc.next().get().previous(), present(is(uc)));
+		assertThat(uc.next().get().previous(), present(is(uc)));
 	}
 
 	@ParameterizedTest
 	@EnumSource(UtilizationClass.class)
 	void nextOfPreviousIsSelf(UtilizationClass uc) {
 		assumeThat(uc.previous(), present(Matchers.anything()));
-		assumeThat(uc.previous().get().next(), present(is(uc)));
+		assertThat(uc.previous().get().next(), present(is(uc)));
 	}
 
 	@Test
