@@ -20,6 +20,8 @@ import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
@@ -222,6 +224,31 @@ class ModifierParserTest {
 		parser.modify(controlMap, fileResolver);
 
 		modifierDefaultAsserts(controlMap);
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = { "001", "097", "099", "199", "500" })
+	void testIgnoreUnknownSequence(String sequence) throws Exception {
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
+
+		Map<String, Object> controlMap = new HashMap<>();
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
+		TestUtils.populateControlMapGenusReal(controlMap);
+		populateVetBq(controlMap);
+		populateHlP1(controlMap);
+		populateHlP2(controlMap);
+		populateHlP3(controlMap);
+		populateHlNP(controlMap);
+
+		var is = TestUtils.makeInputStream(sequence + " 1 0 0 0 0 0 0.000 0.000 0.000 0.000");
+
+		var fileResolver = new MockFileResolver("TEST");
+		fileResolver.addStream("testFilename", is);
+
+		parser.modify(controlMap, fileResolver);
+
+		modifierDefaultAsserts(controlMap);
+
 	}
 
 	@Test
