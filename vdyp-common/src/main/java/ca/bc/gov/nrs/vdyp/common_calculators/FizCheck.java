@@ -14,9 +14,9 @@ public class FizCheck {
 /* @formatter:on */
 
 	// From sindex.h
-	private static short FIZ_UNKNOWN = 0;
-	private static short FIZ_COAST = 1;
-	private static short FIZ_INTERIOR = 2;
+	public static final short FIZ_UNKNOWN = 0;
+	public static final short FIZ_COAST = 1;
+	public static final short FIZ_INTERIOR = 2;
 
 	public static short fiz_check(char fiz) {
 		switch (fiz) {

@@ -41,4 +41,10 @@ public class QuadMeanDiameterCoefficientParser extends CoefficientParser {
 	public QuadMeanDiameterCoefficientParser() {
 		super(ControlKey.COE_DQ);
 	}
+
+	@Override
+	public boolean isRequired() {
+		return false;
+	}
+
 }

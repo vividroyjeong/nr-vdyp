@@ -6,6 +6,7 @@ import java.util.Map;
 
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParser;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 
 /**
  * A resource that can be loaded as a sub-resource of a control file.
@@ -21,6 +22,11 @@ public interface ControlMapSubResourceParser<T> extends ResourceControlMapModifi
 		var result = this.parse(data, control);
 
 		control.put(getControlKeyName(), result);
+	}
+
+	@Override
+	default ValueParser<Object> getValueParser() {
+		return FILENAME;
 	}
 
 }

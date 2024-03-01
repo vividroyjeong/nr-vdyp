@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
 @FunctionalInterface
 public interface ControlledValueParser<T> {
@@ -56,7 +57,7 @@ public interface ControlledValueParser<T> {
 	 */
 	public static <U> ControlledValueParser<Optional<U>> optional(ControlledValueParser<U> delegate) {
 		Objects.requireNonNull(delegate, DELEGATE_MUST_NOT_BE_NULL);
-		return pretestOptional(delegate, s -> !s.isBlank());
+		return pretestOptional(delegate, s -> s != null && !s.isBlank());
 	}
 
 	/**
@@ -124,4 +125,15 @@ public interface ControlledValueParser<T> {
 		return result;
 	};
 
+	/**
+	 * Parser that strips whitespace and validates that the string is a Genus (SP0)
+	 * ID
+	 */
+	static final ControlledValueParser<UtilizationClass> UTILIZATION_CLASS = (string, control) -> {
+		try {
+			return UtilizationClass.getByIndex(string.strip());
+		} catch (IllegalArgumentException e) {
+			throw new ValueParseException(string, string + " is not a valid Utilization Class");
+		}
+	};
 }

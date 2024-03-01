@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
@@ -311,4 +313,49 @@ public class TestUtils {
 		}
 	}
 
+	public static void populateControlMapFromStream(
+			Map<String, Object> controlMap, ResourceControlMapModifier parser, InputStream is
+	) {
+		try {
+			parser.modify(controlMap, is);
+		} catch (IOException | ResourceParseException ex) {
+			fail(ex);
+		}
+	}
+
+	public static FileResolver fileResolver(Class<?> klazz) {
+		return new FileResolver() {
+
+			@Override
+			public InputStream resolveForInput(String filename) throws IOException {
+				assertThat("Attempt to resolve a null filename for input", filename, Matchers.notNullValue());
+				InputStream resourceAsStream = klazz.getResourceAsStream(filename);
+				if (resourceAsStream == null)
+					throw new IOException("Could not load " + filename);
+				return resourceAsStream;
+			}
+
+			@Override
+			public OutputStream resolveForOutput(String filename) throws IOException {
+				fail("Should not be opening file " + filename + " for output");
+				return null;
+			}
+
+			@Override
+			public String toString(String filename) throws IOException {
+				return klazz.getResource(filename).toString();
+			}
+
+			@Override
+			public FileResolver relative(String path) throws IOException {
+				fail("Should not be requesting relative file resolver " + path);
+				return null;
+			}
+
+		};
+	}
+
+	public static void assumeThat(java.lang.Object actual, @SuppressWarnings("rawtypes") org.hamcrest.Matcher matcher) {
+		assumeTrue(matcher.matches(actual));
+	}
 }

@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -37,6 +39,53 @@ public class Utils {
 	}
 
 	/**
+	 * Normalize a nullable value that may or may not be an Optional to a non-null
+	 * Optional.
+	 *
+	 * Mostly useful for Optionalizing values from maps.
+	 *
+	 * @param <U>
+	 * @param value
+	 * @return
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <U> Optional<U> optSafe(@Nullable Object value) {
+		return Optional.ofNullable(value).flatMap(x -> x instanceof Optional o ? o : (Optional) Optional.of(x));
+	}
+
+	public static <T, U> void ifBothPresent(Optional<T> opt1, Optional<U> opt2, BiConsumer<T, U> consumer) {
+		opt1.ifPresent(v1 -> {
+			opt2.ifPresent(v2 -> consumer.accept(v1, v2));
+		});
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <U> Optional<U> parsedControl(Map<String, Object> control, String key, Class<? super U> clazz) {
+		var opt = optSafe(control.get(key));
+
+		opt.ifPresent(value -> {
+			if (clazz != String.class && value instanceof String) {
+				throw new IllegalStateException(
+						"Expected control map entry " + key + " to be parsed but was still a String " + value
+				);
+			}
+			if (!clazz.isInstance(value)) {
+				throw new IllegalStateException(
+						"Expected control map entry " + key + " to be a " + clazz.getSimpleName() + " but was a "
+								+ value.getClass()
+				);
+			}
+		});
+
+		return (Optional<U>) opt.map(clazz::cast);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <U> Optional<U> parsedControl(Map<String, Object> control, ControlKey key, Class<? super U> clazz) {
+		return (Optional<U>) parsedControl(control, key.name(), clazz);
+	}
+
+	/**
 	 * Get an entry from a control map that is expected to exist.
 	 *
 	 * @param control The control map
@@ -48,22 +97,8 @@ public class Utils {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <U> U expectParsedControl(Map<String, Object> control, String key, Class<? super U> clazz) {
-		var value = control.get(key);
-		if (value == null) {
-			throw new IllegalStateException("Expected control map to have " + key);
-		}
-		if (clazz != String.class && value instanceof String) {
-			throw new IllegalStateException(
-					"Expected control map entry " + key + " to be parsed but was still a String " + value
-			);
-		}
-		if (!clazz.isInstance(value)) {
-			throw new IllegalStateException(
-					"Expected control map entry " + key + " to be a " + clazz.getSimpleName() + " but was a "
-							+ value.getClass()
-			);
-		}
-		return (U) value;
+		return (U) parsedControl(control, key, clazz)
+				.orElseThrow(() -> new IllegalStateException("Expected control map to have " + key));
 	}
 
 	/**

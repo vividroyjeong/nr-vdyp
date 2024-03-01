@@ -1,7 +1,13 @@
 package ca.bc.gov.nrs.vdyp.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anything;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.describedAs;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isA;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -93,6 +99,10 @@ public class VdypMatchers {
 			}
 
 		};
+	}
+
+	public static <T> Matcher<Optional<T>> present() {
+		return present(anything());
 	}
 
 	/**

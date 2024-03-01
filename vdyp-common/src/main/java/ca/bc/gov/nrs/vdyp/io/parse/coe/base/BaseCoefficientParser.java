@@ -10,8 +10,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
@@ -43,6 +46,8 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 	public static final String GROUP_INDEX = "groupIndex";
 
 	private int numCoefficients;
+	private Optional<IntFunction<Float>> defaultCoefficientValuator;
+	private Optional<Function<Void, T>> defaultEntryValuator;
 
 	private List<String> metaKeys = new ArrayList<>();
 	private List<Function<Map<String, Object>, Collection<?>>> keyRanges = new ArrayList<>();
@@ -162,9 +167,22 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 		return this;
 	}
 
-	public BaseCoefficientParser<T, W, M> coefficients(int number, int length) {
+	public <K> BaseCoefficientParser<T, W, M> coefficients(int number, int length) {
 		lineParser.multiValue(number, length, COEFFICIENTS_KEY, ValueParser.FLOAT);
-		numCoefficients = number;
+		this.numCoefficients = number;
+		this.defaultEntryValuator = Optional.empty();
+		this.defaultCoefficientValuator = Optional.empty();
+		return this;
+	}
+
+	public <K> BaseCoefficientParser<T, W, M> coefficients(
+			int number, int length, Optional<Function<Void, T>> defaultEntryValuator,
+			Optional<IntFunction<Float>> defaultCoefficientValuator
+	) {
+		lineParser.multiValue(number, length, COEFFICIENTS_KEY, ValueParser.FLOAT);
+		this.numCoefficients = number;
+		this.defaultEntryValuator = defaultEntryValuator;
+		this.defaultCoefficientValuator = defaultCoefficientValuator;
 		return this;
 	}
 
@@ -181,11 +199,21 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 
 		var parsed = new AtomicInteger();
 
-		lineParser.parse(is, result, (value, r, line) -> {
+		lineParser.parse(is, result, (value, r, lineNumber) -> {
 			var key = metaKeys.stream().map(value::get).toList().toArray(Object[]::new);
 
 			@SuppressWarnings("unchecked")
-			var coe = getCoefficients((List<Float>) value.get(COEFFICIENTS_KEY));
+			var coeList = (List<Float>) value.get(COEFFICIENTS_KEY);
+			if (coeList.size() < numCoefficients && defaultCoefficientValuator.isPresent()) {
+
+				List<Float> defaultedValues = IntStream.range(coeList.size(), numCoefficients)
+						.mapToObj(i -> defaultCoefficientValuator.get().apply(i)).collect(Collectors.toList());
+
+				defaultedValues.addAll(0, coeList);
+				coeList = defaultedValues;
+			}
+
+			var coe = getCoefficients(coeList);
 
 			r.putM(wrapCoefficients(coe), key);
 			parsed.incrementAndGet();
@@ -206,7 +234,10 @@ public abstract class BaseCoefficientParser<T extends Coefficients, W, M extends
 	protected abstract W wrapCoefficients(T coefficients);
 
 	protected T getCoefficients() {
-		return getCoefficients(Coefficients.sameSize(numCoefficients, 0f));
+		if (defaultEntryValuator.isPresent())
+			return defaultEntryValuator.get().apply(null);
+		else
+			return getCoefficients(Coefficients.sameSize(numCoefficients, 0f));
 	}
 
 	@Override

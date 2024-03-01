@@ -110,7 +110,7 @@ public class BecDefinitionParser implements ControlMapSubResourceParser<BecLooku
 	 * @return
 	 */
 	public static BecLookup getBecs(Map<String, Object> control) {
-		return Utils.expectParsedControl(control, ControlKey.BEC_DEF.name(), BecLookup.class);
+		return Utils.expectParsedControl(control, ControlKey.BEC_DEF, BecLookup.class);
 	}
 
 	@Override

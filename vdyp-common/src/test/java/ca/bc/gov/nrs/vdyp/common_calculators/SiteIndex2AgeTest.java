@@ -1,13 +1,14 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
-import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.closeTo;
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 
 class SiteIndex2AgeTest {
 	// Taken from sindex.h

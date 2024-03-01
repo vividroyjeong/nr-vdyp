@@ -1,7 +1,8 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.*;
+
+import org.junit.jupiter.api.Test;
 
 class FizCheckTest {
 	// From sindex.h

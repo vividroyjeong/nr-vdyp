@@ -1,20 +1,20 @@
 package ca.bc.gov.nrs.vdyp.fip.test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiFunction;
 
-import java.io.*;
-import java.util.*;
-import java.util.function.*;
-
-import org.hamcrest.Matchers;
 import org.opentest4j.AssertionFailedError;
 
-import ca.bc.gov.nrs.vdyp.fip.*;
-import ca.bc.gov.nrs.vdyp.io.*;
+import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
+import ca.bc.gov.nrs.vdyp.fip.FipControlParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.model.*;
-import ca.bc.gov.nrs.vdyp.test.*;
+import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
+import ca.bc.gov.nrs.vdyp.model.Region;
+import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 public class FipTestUtils {
 
@@ -52,16 +52,16 @@ public class FipTestUtils {
 	 * @param controlMap
 	 */
 	public static void modifyControlMap(HashMap<String, Object> controlMap) {
-		JProgram jprogram = JProgram.FIP_START;
+		VdypApplicationIdentifier jprogram = VdypApplicationIdentifier.FIP_START;
 		TestUtils.populateControlMapFromResource(controlMap, new ModifierParser(jprogram), "mod19813.prm");
 
 	}
 
-	public static Map<String, Object> loadControlMap(FipControlParser parser, Class<?> klazz, String resourceName)
+	public static Map<String, Object> loadControlMap(BaseControlParser parser, Class<?> klazz, String resourceName)
 			throws IOException, ResourceParseException {
 		try (var is = klazz.getResourceAsStream(resourceName)) {
 
-			return parser.parse(is, FipTestUtils.fileResolver(klazz), new HashMap<>());
+			return parser.parse(is, TestUtils.fileResolver(klazz), new HashMap<>());
 		}
 	}
 
@@ -70,44 +70,12 @@ public class FipTestUtils {
 	 * control map parser.
 	 */
 	public static Map<String, Object> loadControlMap() {
-		var parser = new FipControlParser();
+		BaseControlParser parser = new FipControlParser();
 		try {
 			return loadControlMap(parser, TestUtils.class, "FIPSTART.CTR");
 		} catch (IOException | ResourceParseException ex) {
 			throw new AssertionFailedError(null, ex);
 		}
 
-	}
-
-	public static FileResolver fileResolver(Class<?> klazz) {
-		return new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				assertThat("Attempt to resolve a null filename for input", filename, Matchers.notNullValue());
-				InputStream resourceAsStream = klazz.getResourceAsStream(filename);
-				if (resourceAsStream == null)
-					throw new IOException("Could not load " + filename);
-				return resourceAsStream;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				fail("Should not be opening file " + filename + " for output");
-				return null;
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return klazz.getResource(filename).toString();
-			}
-
-			@Override
-			public FileResolver relative(String path) throws IOException {
-				fail("Should not be requesting relative file resolver " + path);
-				return null;
-			}
-
-		};
 	}
 }

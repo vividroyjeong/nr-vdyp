@@ -5,8 +5,8 @@ import java.io.InputStream;
 import java.util.Map;
 
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
-import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser.LineStream;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 
 public abstract class AbstractStreamingParser<T> implements StreamingParser<T> {
 

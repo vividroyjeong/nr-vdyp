@@ -30,8 +30,10 @@
 	<modules>
 		<module>vdyp-common</module>
 		<module>vdyp-fip</module>
+		<module>vdyp-vri</module>
 		<module>vdyp-buildtools</module>
 		<module>vdyp-sindex</module>
+		<module>vdyp-forward</module>
 	</modules>
 
 	<dependencyManagement>

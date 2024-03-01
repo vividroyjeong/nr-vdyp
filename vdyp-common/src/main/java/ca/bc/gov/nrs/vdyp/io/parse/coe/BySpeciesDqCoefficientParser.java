@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +80,7 @@ public class BySpeciesDqCoefficientParser implements ControlMapSubResourceParser
 
 		var sp0Aliases = GenusDefinitionParser.getSpeciesAliases(control);
 
-		lineParser.parse(is, result, (value, r, line) -> {
+		lineParser.parse(is, result, (value, r, lineNumber) -> {
 			var index = (int) value.get(COEFFICIENT_INDEX_KEY);
 			@SuppressWarnings("unchecked")
 			var specCoefficients = (List<Float>) value.get(COEFFICIENTS_KEY);
@@ -96,7 +97,9 @@ public class BySpeciesDqCoefficientParser implements ControlMapSubResourceParser
 					try {
 						coe = coeIt.next();
 					} catch (NoSuchElementException ex) {
-						throw new ValueParseException(null, "Expected " + NUM_SPECIES + " coefficients", ex);
+						throw new ValueParseException(
+								MessageFormat.format("Line {0}: expected {1} coefficients", lineNumber, NUM_SPECIES), ex
+						);
 					}
 				}
 				result.computeIfAbsent(specAlias, x -> Coefficients.empty(NUM_COEFFICIENTS, 0)).setCoe(index, coe);

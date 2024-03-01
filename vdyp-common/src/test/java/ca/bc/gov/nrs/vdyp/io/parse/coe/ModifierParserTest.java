@@ -1,10 +1,16 @@
-package ca.bc.gov.nrs.vdyp.fip;
+package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.*;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.controlMapHasEntry;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.mmAll;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.mmDimensions;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,9 +20,19 @@ import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.model.*;
+import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap3Impl;
+import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
+import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -25,7 +41,7 @@ class ModifierParserTest {
 
 	@Test
 	void testNoFilenameForControlFile() throws Exception {
-		var parser = new ModifierParser(JProgram.FIP_START);
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.empty());
@@ -40,7 +56,7 @@ class ModifierParserTest {
 
 	@Test
 	void testMissingControlFile() throws Exception {
-		var parser = new ModifierParser(JProgram.FIP_START);
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
@@ -57,7 +73,7 @@ class ModifierParserTest {
 
 	@Test
 	void testLoadEmptyFile() throws Exception {
-		var parser = new ModifierParser(JProgram.FIP_START);
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
@@ -120,7 +136,7 @@ class ModifierParserTest {
 
 	@Test
 	void testBaDqSpecies() throws Exception {
-		var parser = new ModifierParser(JProgram.FIP_START);
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
@@ -166,7 +182,7 @@ class ModifierParserTest {
 
 	@Test
 	void testBaDqSpeciesDifferentProgram() throws Exception {
-		var parser = new ModifierParser(JProgram.VRI_START);
+		var parser = new ModifierParser(VdypApplicationIdentifier.VRI_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
@@ -189,7 +205,7 @@ class ModifierParserTest {
 
 	@Test
 	void testIgnoreAfterStop() throws Exception {
-		var parser = new ModifierParser(JProgram.FIP_START);
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
@@ -210,9 +226,34 @@ class ModifierParserTest {
 		modifierDefaultAsserts(controlMap);
 	}
 
+	@ParameterizedTest
+	@ValueSource(strings = { "001", "097", "099", "199", "500" })
+	void testIgnoreUnknownSequence(String sequence) throws Exception {
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
+
+		Map<String, Object> controlMap = new HashMap<>();
+		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
+		TestUtils.populateControlMapGenusReal(controlMap);
+		populateVetBq(controlMap);
+		populateHlP1(controlMap);
+		populateHlP2(controlMap);
+		populateHlP3(controlMap);
+		populateHlNP(controlMap);
+
+		var is = TestUtils.makeInputStream(sequence + " 1 0 0 0 0 0 0.000 0.000 0.000 0.000");
+
+		var fileResolver = new MockFileResolver("TEST");
+		fileResolver.addStream("testFilename", is);
+
+		parser.modify(controlMap, fileResolver);
+
+		modifierDefaultAsserts(controlMap);
+
+	}
+
 	@Test
 	void testIgnoreCommentsAndBlanks() throws Exception {
-		var parser = new ModifierParser(JProgram.FIP_START);
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
@@ -258,7 +299,7 @@ class ModifierParserTest {
 
 	@Test
 	void testBaDqAllSpecies() throws Exception {
-		var parser = new ModifierParser(JProgram.FIP_START);
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
@@ -296,7 +337,7 @@ class ModifierParserTest {
 
 	@Test
 	void testVetBq() throws Exception {
-		var parser = new ModifierParser(JProgram.FIP_START);
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
@@ -334,7 +375,7 @@ class ModifierParserTest {
 
 	@Test
 	void testDecayWaste() throws Exception {
-		var parser = new ModifierParser(JProgram.FIP_START);
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));
@@ -380,7 +421,7 @@ class ModifierParserTest {
 
 	@Test
 	void testHL() throws Exception {
-		var parser = new ModifierParser(JProgram.FIP_START);
+		var parser = new ModifierParser(VdypApplicationIdentifier.FIP_START);
 
 		Map<String, Object> controlMap = new HashMap<>();
 		controlMap.put(ControlKey.MODIFIER_FILE.name(), Optional.of("testFilename"));

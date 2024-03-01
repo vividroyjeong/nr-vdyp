@@ -2,6 +2,8 @@ package ca.bc.gov.nrs.vdyp.io.parse.control;
 
 import java.util.Map;
 
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
+
 /**
  * Replace a control map entry referencing a file with a parsed version of that
  * file if it was specified, otherwise initialize that entry with a default.
@@ -24,5 +26,10 @@ public interface OptionalControlMapSubResourceParser<T>
 	 * @return
 	 */
 	T defaultResult();
+
+	@Override
+	default ValueParser<Object> getValueParser() {
+		return OptionalResourceControlMapModifier.super.getValueParser();
+	}
 
 }

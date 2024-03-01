@@ -41,4 +41,10 @@ public class BaseAreaCoefficientParser extends CoefficientParser {
 	public BaseAreaCoefficientParser() {
 		super(ControlKey.COE_BA);
 	}
+
+	@Override
+	public boolean isRequired() {
+		return false;
+	}
+
 }

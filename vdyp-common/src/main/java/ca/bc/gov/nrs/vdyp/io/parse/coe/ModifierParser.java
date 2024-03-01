@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.fip;
+package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,17 +9,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.FloatUnaryOperator;
 import ca.bc.gov.nrs.vdyp.common.Utils;
-import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.OptionalResourceControlMapModifier;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
-import ca.bc.gov.nrs.vdyp.model.JProgram;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
@@ -27,6 +29,8 @@ import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
 import ca.bc.gov.nrs.vdyp.model.Region;
 
 public class ModifierParser implements OptionalResourceControlMapModifier {
+
+	private static final Logger log = LoggerFactory.getLogger(ModifierParser.class);
 
 	/**
 	 * MatrixMap2 of Species ID, Region to Coefficients (1-3)
@@ -64,11 +68,11 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 
 	public static final int MAX_MODS = 60;
 
-	JProgram jprogram;
+	VdypApplicationIdentifier jprogram;
 
 	static final int[] ipoint = { 1, 0, 2, 0, 0, 3, 4, 5, 0 };
 
-	public ModifierParser(JProgram jprogram) {
+	public ModifierParser(VdypApplicationIdentifier jprogram) {
 		super();
 		this.jprogram = jprogram;
 	}
@@ -106,7 +110,7 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 		}.integer(3, "sequence").multiValue(6, 2, "programs", ValueParser.LOGICAL)
 				.multiValue(10, 6, "mods", ValueParser.optional(ValueParser.FLOAT));
 
-		final var vetBqMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
+		final var vetBqMap = Utils.<MatrixMap2<String, Region, Coefficients>>parsedControl(
 				control, ControlKey.VETERAN_BQ, MatrixMap2.class
 		);
 
@@ -144,87 +148,120 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 				return result;
 
 			if (sequence == 98) {
-				// If modifiers are per region, for each species, multiply the first coefficient
-				// for veteran BQ by the region appropriate modifier.
-				var mods = getMods(2, entry);
-				var sp0Aliases = GenusDefinitionParser.getSpeciesAliases(control);
-				for (var sp0Alias : sp0Aliases) {
-					final float coastalMod = mods.get(0);
-					final float interiorMod = mods.get(1);
-
-					if (coastalMod != 0.0) {
-						var coe = vetBqMap.get(sp0Alias, Region.COASTAL);
-						coe.scalarInPlace(1, (FloatUnaryOperator) x -> x * coastalMod);
-					}
-					if (interiorMod != 0.0) {
-						var coe = vetBqMap.get(sp0Alias, Region.INTERIOR);
-						coe.scalarInPlace(1, (FloatUnaryOperator) x -> x * interiorMod);
-					}
-				}
+				modify98(control, vetBqMap, entry);
 			} else if (sequence >= 200 && sequence <= 299) {
-				// Modifiers are per region for BA and DQ, for each species, set the modifier
-				// map
-				var mods = getMods(4, entry);
-				var sp0Index = sequence - 200;
-				var sp0Aliases = getSpeciesByIndex(sp0Index, control);
-				for (var sp0Alias : sp0Aliases) {
-					modsByRegions(mods, 0, (m, r) -> baMap.put(sp0Alias, r, m));
-					modsByRegions(mods, 2, (m, r) -> dqMap.put(sp0Alias, r, m));
-				}
+				modify200(control, baMap, dqMap, entry, sequence);
 			} else if (sequence >= 300 && sequence <= 399) {
-				// Modifiers are per region for Decay and Waste, for the specified species, set
-				// the
-				// modifier map
-				var sp0Index = sequence - 300;
-				var sp0Aliases = getSpeciesByIndex(sp0Index, control);
-				var mods = getMods(4, entry);
-
-				for (var sp0Alias : sp0Aliases) {
-					modsByRegions(mods, 0, (m, r) -> decayMap.put(sp0Alias, r, m));
-					modsByRegions(mods, 2, (m, r) -> wasteMap.put(sp0Alias, r, m));
-				}
+				modify300(control, decayMap, wasteMap, entry, sequence);
 			} else if (sequence >= 400 && sequence <= 499) {
-				// Modifiers are per region, for the specified species, multiply existing
-				// coefficients
-				var sp0Index = sequence - 400;
-				var sp0Aliases = getSpeciesByIndex(sp0Index, control);
-				var mods = getMods(4, entry);
-
-				for (var sp0Alias : sp0Aliases) {
-
-					modsByRegions(mods, 0, (m, r) -> {
-						var coe = hlP1Map.get(sp0Alias, r);
-						coe.scalarInPlace(1, (FloatUnaryOperator) x -> x * m);
-						coe.scalarInPlace(2, (FloatUnaryOperator) x -> x * m);
-					});
-					modsByRegions(mods, 0, (m, r) -> {
-						var coe = hlP2Map.get(sp0Alias, r);
-						coe.scalarInPlace(1, (FloatUnaryOperator) x -> x * m);
-					});
-					modsByRegions(mods, 0, (m, r) -> {
-						var coe = hlP3Map.get(sp0Alias, r);
-						coe.scalarInPlace(1, (FloatUnaryOperator) x -> {
-							if (x > 0.0f && x < 1.0e06f) {
-								return x * m;
-							}
-							return x;
-						});
-					});
-					for (var primarySp : GenusDefinitionParser.getSpeciesAliases(control)) {
-						modsByRegions(mods, 2, (m, r) -> {
-							var coe = hlNPMap.get(sp0Alias, primarySp, r);
-							if (coe.getEquationIndex() == 1) {
-								coe.scalarInPlace(1, (FloatUnaryOperator) x -> x * m);
-							}
-						});
-					}
-				}
+				modify400(control, hlP1Map, hlP2Map, hlP3Map, hlNPMap, entry, sequence);
 			} else {
+				log.atWarn().setMessage("Unexpected modifier sequence: {}").addArgument(sequence);
 				// Unexpected sequence in modifier file
 			}
 			return result;
 		}, control);
 
+	}
+
+	private void modify400(
+			Map<String, Object> control, final MatrixMap2<String, Region, Coefficients> hlP1Map,
+			final MatrixMap2<String, Region, Coefficients> hlP2Map,
+			final MatrixMap2<String, Region, Coefficients> hlP3Map,
+			final MatrixMap3<String, String, Region, NonprimaryHLCoefficients> hlNPMap, Map<String, Object> entry,
+			int sequence
+	) throws ValueParseException {
+		// Modifiers are per region, for the specified species, multiply existing
+		// coefficients
+		var sp0Index = sequence - 400;
+		var sp0Aliases = getSpeciesByIndex(sp0Index, control);
+		var mods = getMods(4, entry);
+
+		for (var sp0Alias : sp0Aliases) {
+
+			modsByRegions(mods, 0, (m, r) -> {
+				var coe = hlP1Map.get(sp0Alias, r);
+				coe.scalarInPlace(1, (FloatUnaryOperator) x -> x * m);
+				coe.scalarInPlace(2, (FloatUnaryOperator) x -> x * m);
+			});
+			modsByRegions(mods, 0, (m, r) -> {
+				var coe = hlP2Map.get(sp0Alias, r);
+				coe.scalarInPlace(1, (FloatUnaryOperator) x -> x * m);
+			});
+			modsByRegions(mods, 0, (m, r) -> {
+				var coe = hlP3Map.get(sp0Alias, r);
+				coe.scalarInPlace(1, (FloatUnaryOperator) x -> {
+					if (x > 0.0f && x < 1.0e06f) {
+						return x * m;
+					}
+					return x;
+				});
+			});
+			for (var primarySp : GenusDefinitionParser.getSpeciesAliases(control)) {
+				modsByRegions(mods, 2, (m, r) -> {
+					var coe = hlNPMap.get(sp0Alias, primarySp, r);
+					if (coe.getEquationIndex() == 1) {
+						coe.scalarInPlace(1, (FloatUnaryOperator) x -> x * m);
+					}
+				});
+			}
+		}
+	}
+
+	private void modify300(
+			Map<String, Object> control, final MatrixMap2<String, Region, Float> decayMap,
+			final MatrixMap2<String, Region, Float> wasteMap, Map<String, Object> entry, int sequence
+	) throws ValueParseException {
+		// Modifiers are per region for Decay and Waste, for the specified species, set
+		// the modifier map
+		var sp0Index = sequence - 300;
+		var sp0Aliases = getSpeciesByIndex(sp0Index, control);
+		var mods = getMods(4, entry);
+
+		for (var sp0Alias : sp0Aliases) {
+			modsByRegions(mods, 0, (m, r) -> decayMap.put(sp0Alias, r, m));
+			modsByRegions(mods, 2, (m, r) -> wasteMap.put(sp0Alias, r, m));
+		}
+	}
+
+	private void modify200(
+			Map<String, Object> control, final MatrixMap2<String, Region, Float> baMap,
+			final MatrixMap2<String, Region, Float> dqMap, Map<String, Object> entry, int sequence
+	) throws ValueParseException {
+		// Modifiers are per region for BA and DQ, for each species, set the modifier
+		// map
+		var mods = getMods(4, entry);
+		var sp0Index = sequence - 200;
+		var sp0Aliases = getSpeciesByIndex(sp0Index, control);
+		for (var sp0Alias : sp0Aliases) {
+			modsByRegions(mods, 0, (m, r) -> baMap.put(sp0Alias, r, m));
+			modsByRegions(mods, 2, (m, r) -> dqMap.put(sp0Alias, r, m));
+		}
+	}
+
+	private void modify98(
+			Map<String, Object> control, final Optional<MatrixMap2<String, Region, Coefficients>> vetBqMap,
+			Map<String, Object> entry
+	) throws ValueParseException {
+		// If modifiers are per region, for each species, multiply the first coefficient
+		// for veteran BQ by the region appropriate modifier.
+		var mods = getMods(2, entry);
+		var sp0Aliases = GenusDefinitionParser.getSpeciesAliases(control);
+		for (var sp0Alias : sp0Aliases) {
+			final float coastalMod = mods.get(0);
+			final float interiorMod = mods.get(1);
+
+			vetBqMap.ifPresent(map -> {
+				if (coastalMod != 0.0) {
+					var coe = map.get(sp0Alias, Region.COASTAL);
+					coe.scalarInPlace(1, (FloatUnaryOperator) x -> x * coastalMod);
+				}
+				if (interiorMod != 0.0) {
+					var coe = map.get(sp0Alias, Region.INTERIOR);
+					coe.scalarInPlace(1, (FloatUnaryOperator) x -> x * interiorMod);
+				}
+			});
+		}
 	}
 
 	void modsByRegions(List<Float> mods, int offset, BiConsumer<Float, Region> modifier) {
@@ -242,7 +279,7 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 	boolean modIsForProgram(Map<String, Object> entry) {
 		@SuppressWarnings("unchecked")
 		var programs = (List<Boolean>) entry.get("programs");
-		var index = ipoint[this.jprogram.getIndex() - 1];
+		var index = ipoint[this.jprogram.getJProgramNumber() - 1];
 		if (index <= 0)
 			throw new IllegalStateException("JProgram " + this.jprogram + " mapped to " + index);
 		return programs.get(index - 1);

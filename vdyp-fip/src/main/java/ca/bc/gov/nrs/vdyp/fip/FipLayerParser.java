@@ -170,4 +170,9 @@ public class FipLayerParser
 			};
 		};
 	}
+
+	@Override
+	public ValueParser<Object> getValueParser() {
+		return FILENAME;
+	}
 }

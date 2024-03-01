@@ -50,6 +50,8 @@ import org.apache.commons.math3.util.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.bc.gov.nrs.vdyp.application.VdypApplication;
+import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.IndexedFloatBinaryOperator;
 import ca.bc.gov.nrs.vdyp.common.Utils;
@@ -61,8 +63,10 @@ import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.write.VriAdjustInputWriter;
@@ -70,7 +74,6 @@ import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.FipMode;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
-import ca.bc.gov.nrs.vdyp.model.JProgram;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
@@ -83,7 +86,7 @@ import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 
-public class FipStart implements Closeable {
+public class FipStart extends VdypApplication implements Closeable {
 
 	private static final Comparator<FipSpecies> PERCENT_GENUS_DESCENDING = Utils
 			.compareUsing(FipSpecies::getPercentGenus).reversed();
@@ -98,8 +101,6 @@ public class FipStart implements Closeable {
 	public static final int UTIL_SMALL = UtilizationClass.SMALL.index;
 
 	public static final float TOLERANCE = 2.0e-3f;
-
-	JProgram jprogram = JProgram.FIP_START; // FIPSTART only TODO Track this down
 
 	VriAdjustInputWriter vriWriter;
 
@@ -153,7 +154,7 @@ public class FipStart implements Closeable {
 			throw new IllegalArgumentException("At least one control file must be specifiec.");
 		}
 
-		var parser = new FipControlParser();
+		BaseControlParser parser = new FipControlParser();
 		List<InputStream> resources = new ArrayList<>(controlFilePaths.length);
 		try {
 			for (String path : controlFilePaths) {
@@ -324,8 +325,8 @@ public class FipStart implements Closeable {
 		if (true /* TODO */) {
 			var minima = Utils.<Map<String, Float>>expectParsedControl(controlMap, ControlKey.MINIMA, Map.class);
 
-			float minimumBaseArea = minima.get(FipControlParser.MINIMUM_BASE_AREA);
-			float minimumPredictedBaseArea = minima.get(FipControlParser.MINIMUM_PREDICTED_BASE_AREA);
+			float minimumBaseArea = minima.get(BaseControlParser.MINIMUM_BASE_AREA);
+			float minimumPredictedBaseArea = minima.get(BaseControlParser.MINIMUM_FULLY_STOCKED_AREA);
 			if (baseAreaTotalPrime < minimumBaseArea) {
 				throw new LowValueException("Base area", baseAreaTotalPrime, minimumBaseArea);
 			}
@@ -389,11 +390,11 @@ public class FipStart implements Closeable {
 			boolean veteran = fipVetLayer != null && fipVetLayer.getHeight().orElse(0f) > 0f
 					&& fipVetLayer.getCrownClosure() > 0f; // LAYERV
 
-			if (jprogram == JProgram.FIP_START
+			if (getId() == VdypApplicationIdentifier.FIP_START
 					&& fipPolygon.getModeFip().map(mode -> mode == FipMode.FIPYOUNG).orElse(false)) {
 				return 100f;
 			}
-			if (jprogram == JProgram.VRI_START) {
+			if (getId() == VdypApplicationIdentifier.VRI_START) {
 				veteran = fipVetLayer != null;
 			}
 
@@ -1308,7 +1309,7 @@ public class FipStart implements Closeable {
 						closeVolumeNetDecayUtil, closeVolumeNetDecayWasteUtil
 				);
 
-				if (jprogram.isStart()) {
+				if (getId().isStart()) {
 					// EMP095
 					estimateNetDecayWasteAndBreakageVolume(
 							UtilizationClass.ALL, spec.getBreakageGroup(), quadMeanDiameterUtil, closeVolumeUtil,
@@ -1467,7 +1468,7 @@ public class FipStart implements Closeable {
 						closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
 				);
 
-				if (jprogram.isStart()) {
+				if (getId().isStart()) {
 					// EMP095
 					estimateNetDecayWasteAndBreakageVolume(
 							utilizationClass, vdypSpecies.getBreakageGroup(), quadMeanDiameterUtil,
@@ -2662,9 +2663,9 @@ public class FipStart implements Closeable {
 		var minima = Utils.<Map<String, Float>>expectParsedControl(controlMap, ControlKey.MINIMA.name(), Map.class);
 		switch (layer) {
 		case PRIMARY:
-			return Optional.of(minima.get(FipControlParser.MINIMUM_HEIGHT));
+			return Optional.of(minima.get(BaseControlParser.MINIMUM_HEIGHT));
 		case VETERAN:
-			return Optional.of(minima.get(FipControlParser.MINIMUM_VETERAN_HEIGHT));
+			return Optional.of(minima.get(BaseControlParser.MINIMUM_VETERAN_HEIGHT));
 		default:
 			return Optional.empty();
 		}
@@ -3374,5 +3375,10 @@ public class FipStart implements Closeable {
 	@Override
 	public void close() throws IOException {
 		closeVriWriter();
+	}
+
+	@Override
+	public VdypApplicationIdentifier getId() {
+		return VdypApplicationIdentifier.FIP_START;
 	}
 }

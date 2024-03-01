@@ -31,7 +31,7 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
  * @see HLCoefficientParser
  */
 public class HLPrimarySpeciesEqnP1Parser extends HLCoefficientParser {
-	private static final int NUM_COEFFICIENTS = 3;
+	public static final int NUM_COEFFICIENTS = 3;
 
 	public HLPrimarySpeciesEqnP1Parser() {
 		super(NUM_COEFFICIENTS, ControlKey.HL_PRIMARY_SP_EQN_P1);

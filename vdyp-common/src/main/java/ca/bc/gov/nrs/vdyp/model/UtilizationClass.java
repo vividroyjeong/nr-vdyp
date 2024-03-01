@@ -32,6 +32,24 @@ public enum UtilizationClass {
 		this.highBound = highBound;
 	}
 
+	public static UtilizationClass getByIndex(String indexText) {
+		try {
+			return getByIndex(Integer.parseInt(indexText.strip()));
+		} catch (NullPointerException | NumberFormatException e) {
+			throw new IllegalArgumentException("UtilizationClass index " + indexText + " is not recognized");
+		}
+	}
+
+	public static UtilizationClass getByIndex(int index) {
+
+		for (UtilizationClass uc : values()) {
+			if (uc.index == index)
+				return uc;
+		}
+
+		throw new IllegalArgumentException("UtilizationClass index " + index + " is not recognized");
+	}
+
 	public Optional<UtilizationClass> next() {
 		return this.next;
 	}
