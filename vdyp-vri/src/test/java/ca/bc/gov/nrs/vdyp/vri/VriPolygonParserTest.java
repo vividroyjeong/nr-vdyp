@@ -49,12 +49,11 @@ public class VriPolygonParserTest {
 
 		assertEmpty(stream);
 	}
-	/*
- *  @formatter:off
+	
 	@Test
 	public void testParsePolygon() throws Exception {
 
-		var parser = new FipPolygonParser();
+		var parser = new VriPolygonParser();
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -62,7 +61,7 @@ public class VriPolygonParserTest {
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat", TestUtils.makeInputStream("Test Polygon              A CWH  90.0  2 BLAH  0.95")
+				"test.dat", TestUtils.makeInputStream("082F074/0071         2001 G IDF  90.0  2 BLAH  0.95")
 		);
 
 		parser.modify(controlMap, fileResolver);
@@ -72,15 +71,15 @@ public class VriPolygonParserTest {
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
 		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<FipPolygon>) parserFactory).get();
+		var stream = ((StreamingParserFactory<VriPolygon>) parserFactory).get();
 
 		assertThat(stream, instanceOf(StreamingParser.class));
 
 		var poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("Test Polygon")));
-		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
-		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
+		assertThat(poly, hasProperty("polygonIdentifier", is("082F074/0071         2001")));
+		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
+		assertThat(poly, hasProperty("biogeoclimaticZone", is("IDF")));
 		assertThat(poly, hasProperty("percentAvailable", present(is(90.0f))));
 		assertThat(poly, hasProperty("modeFip", present(is(FipMode.FIPYOUNG))));
 		assertThat(poly, hasProperty("nonproductiveDescription", present(is("BLAH"))));
@@ -88,6 +87,8 @@ public class VriPolygonParserTest {
 
 		VdypMatchers.assertEmpty(stream);
 	}
+	/*
+ *  @formatter:off
 
 	@Test
 	public void testParsePolygonWithBlanks() throws Exception {
