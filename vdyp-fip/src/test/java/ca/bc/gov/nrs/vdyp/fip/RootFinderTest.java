@@ -20,6 +20,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.fip.model.FipSite.Builder;
 import ca.bc.gov.nrs.vdyp.fip.test.FipTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
@@ -118,9 +119,15 @@ class RootFinderTest {
 		final var layer = VdypLayer.build(builder -> {
 			builder.polygonIdentifier("Test");
 			builder.layerType(LayerType.PRIMARY);
-			builder.ageTotal(50f);
-			builder.yearsToBreastHeight(1f);
-			builder.height(20f);
+
+			builder.addSite(siteBuilder -> {
+				siteBuilder.ageTotal(50f);
+				siteBuilder.yearsToBreastHeight(1f);
+				siteBuilder.height(20f);
+
+				siteBuilder.siteIndex(5f);
+				siteBuilder.siteGenus("L");
+			});
 		});
 
 		var spec3 = VdypSpecies.build(layer, builder -> {

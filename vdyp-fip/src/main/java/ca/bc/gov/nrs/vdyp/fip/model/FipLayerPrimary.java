@@ -13,15 +13,10 @@ public class FipLayerPrimary extends FipLayer {
 	private Optional<String> primaryGenus; // FIPL_1C/JPRIME
 
 	public FipLayerPrimary(
-			String polygonIdentifier, Optional<Float> ageTotal, Optional<Float> height,
-			Optional<Float> yearsToBreastHeight, Optional<Float> siteIndex, Optional<Integer> siteCurveNumber,
-			Optional<Integer> inventoryTypeGroup, Optional<String> siteGenus, float crownClosure, String siteSpecies,
+			String polygonIdentifier, Optional<Integer> inventoryTypeGroup, float crownClosure,
 			Optional<Character> stockingClass, Optional<String> primaryGenus
 	) {
-		super(
-				polygonIdentifier, LayerType.PRIMARY, ageTotal, height, yearsToBreastHeight, siteIndex, siteCurveNumber,
-				inventoryTypeGroup, siteGenus, crownClosure, siteSpecies
-		);
+		super(polygonIdentifier, LayerType.PRIMARY, inventoryTypeGroup, crownClosure);
 		this.stockingClass = stockingClass;
 		this.primaryGenus = primaryGenus;
 
@@ -118,16 +113,10 @@ public class FipLayerPrimary extends FipLayer {
 		protected FipLayerPrimary doBuild() {
 			return new FipLayerPrimary(
 					polygonIdentifier.get(), //
-					ageTotal, //
-					height, //
-					yearsToBreastHeight, //
-					siteIndex, //
-					siteCurveNumber, //
 					inventoryTypeGroup, //
-					siteGenus, //
 					crownClosure.get(), //
-					siteSpecies.get(), //
-					stockingClass, primaryGenus
+					stockingClass, //
+					primaryGenus
 			);
 		}
 

@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?>, PA> {
+public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?, ?>, PA> {
 
 	private String polygonIdentifier; // FIP_P/POLYDESC
 	private PA percentAvailable; // FIP_P2/PCTFLAND
@@ -99,7 +99,7 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?>, PA> {
 		this.modeFip = modeFip;
 	}
 
-	protected abstract static class Builder<T extends BaseVdypPolygon<L, PA>, L extends BaseVdypLayer<?>, PA>
+	protected abstract static class Builder<T extends BaseVdypPolygon<L, PA>, L extends BaseVdypLayer<?, ?>, PA>
 			extends ModelClassBuilder<T> {
 		protected Optional<String> polygonIdentifier = Optional.empty();
 		protected Optional<PA> percentAvailable = Optional.empty();
@@ -148,7 +148,7 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?>, PA> {
 			return this;
 		}
 
-		public Builder<T, L, PA> buildLayer(Consumer<BaseVdypLayer.Builder<L, ?>> specConfig) {
+		public Builder<T, L, PA> buildLayer(Consumer<BaseVdypLayer.Builder<L, ?, ?>> specConfig) {
 			var layerBuilder = getLayerBuilder();
 			layerBuilder.polygonIdentifier(this.polygonIdentifier.get());
 			specConfig.accept(layerBuilder);
@@ -156,7 +156,7 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?>, PA> {
 			return this;
 		}
 
-		protected abstract BaseVdypLayer.Builder<L, ?> getLayerBuilder();
+		protected abstract BaseVdypLayer.Builder<L, ?, ?> getLayerBuilder();
 
 		public <PA2> Builder<T, L, PA> copy(BaseVdypPolygon<?, PA2> toCopy, Function<PA2, PA> paConvert) {
 			polygonIdentifier(toCopy.getPolygonIdentifier());

@@ -488,6 +488,12 @@ public class FipStart extends VdypApplication implements Closeable {
 			builder.copy(fipLayer);
 			builder.inventoryTypeGroup(itg);
 			builder.empiricalRelationshipParameterIndex(empiricalRelationshipParameterIndex);
+			fipLayer.getSite().ifPresent(site -> {
+				builder.addSite(siteBuilder -> {
+					siteBuilder.copy(site);
+				});
+			});
+
 		});
 
 		// EMP040
@@ -1127,15 +1133,17 @@ public class FipStart extends VdypApplication implements Closeable {
 		var vdypLayer = VdypLayer.build(builder -> {
 			builder.polygonIdentifier(polygonIdentifier);
 			builder.layerType(layer);
-			builder.ageTotal(ageTotal);
-			builder.yearsToBreastHeight(yearsToBreastHeight);
-			builder.height(height);
+
+			builder.addSite(siteBuilder -> {
+				siteBuilder.ageTotal(ageTotal);
+				siteBuilder.yearsToBreastHeight(yearsToBreastHeight);
+				siteBuilder.height(height);
+				siteBuilder.siteGenus(fipLayer.getSiteGenus());
+				siteBuilder.siteIndex(fipLayer.getSiteIndex());
+			});
 
 			builder.addSpecies(vdypSpecies.values());
 		});
-// FIXME Add to builder?
-		vdypLayer.setSiteGenus(fipLayer.getSiteGenus());
-		vdypLayer.setSiteIndex(fipLayer.getSiteIndex());
 
 		vdypLayer.setBaseAreaByUtilization(baseAreaByUtilization);
 

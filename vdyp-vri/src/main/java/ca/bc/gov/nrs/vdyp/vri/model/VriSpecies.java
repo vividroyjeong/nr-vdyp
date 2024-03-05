@@ -11,9 +11,6 @@ public class VriSpecies extends BaseVdypSpecies {
 		super(polygonIdentifier, layer, genus, percentGenus);
 	}
 
-	public VriSpecies(VriSpecies toCopy) {
-		super(toCopy);
-	}
 	// TODO Stub, to be completed in VDYP-176
 	// @formatter:off
 
