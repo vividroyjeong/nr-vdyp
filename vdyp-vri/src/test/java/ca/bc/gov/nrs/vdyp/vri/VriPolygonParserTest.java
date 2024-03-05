@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
-import ca.bc.gov.nrs.vdyp.model.FipMode;
+import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 import ca.bc.gov.nrs.vdyp.vri.model.VriPolygon;
@@ -81,7 +81,7 @@ public class VriPolygonParserTest {
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("IDF")));
 		assertThat(poly, hasProperty("percentAvailable", present(is(90.0f))));
-		assertThat(poly, hasProperty("modeFip", present(is(FipMode.FIPYOUNG))));
+		assertThat(poly, hasProperty("modeFip", present(is(PolygonMode.YOUNG))));
 		assertThat(poly, hasProperty("nonproductiveDescription", present(is("BLAH"))));
 		assertThat(poly, hasProperty("yieldFactor", is(0.95f)));
 
@@ -267,13 +267,11 @@ public class VriPolygonParserTest {
 		VdypMatchers.assertEmpty(stream);
 	}
 	
-	/*
- *  @formatter:off
 
 	@Test
 	public void testParsePolygonZeroAsDefault() throws Exception {
 
-		var parser = new FipPolygonParser();
+		var parser = new VriPolygonParser();
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -291,14 +289,14 @@ public class VriPolygonParserTest {
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
 		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<FipPolygon>) parserFactory).get();
+		var stream = ((StreamingParserFactory<VriPolygon>) parserFactory).get();
 
 		assertThat(stream, instanceOf(StreamingParser.class));
 
 		var poly = assertNext(stream);
 
 		assertThat(poly, hasProperty("polygonIdentifier", is("01002 S000001 00     1970")));
-		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
+		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
 		assertThat(poly, hasProperty("modeFip", notPresent()));
@@ -307,6 +305,9 @@ public class VriPolygonParserTest {
 
 		VdypMatchers.assertEmpty(stream);
 	}
+
+	/*
+ *  @formatter:off
 
 	@Test
 	public void testParsePolygonNegativeAsDefault() throws Exception {

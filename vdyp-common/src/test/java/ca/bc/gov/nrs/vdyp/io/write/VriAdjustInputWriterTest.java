@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
-import ca.bc.gov.nrs.vdyp.model.FipMode;
+import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
@@ -95,7 +95,7 @@ class VriAdjustInputWriterTest {
 				builder.percentAvailable(90f);
 				builder.biogeoclimaticZone("IDF");
 				builder.forestInventoryZone("D");
-				builder.modeFip(FipMode.FIPSTART);
+				builder.modeFip(PolygonMode.START);
 			});
 			var layer = VdypLayer.build(polygon, builder -> {
 				builder.polygonIdentifier("082E004    615       1988");
@@ -328,7 +328,7 @@ class VriAdjustInputWriterTest {
 				builder.percentAvailable(90f);
 				builder.biogeoclimaticZone("IDF");
 				builder.forestInventoryZone("D");
-				builder.modeFip(FipMode.FIPSTART);
+				builder.modeFip(PolygonMode.START);
 			});
 
 			var layer = VdypLayer.build(polygon, builder -> {

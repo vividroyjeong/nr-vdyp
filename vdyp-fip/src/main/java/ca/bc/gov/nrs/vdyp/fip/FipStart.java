@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -72,7 +73,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.write.VriAdjustInputWriter;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
-import ca.bc.gov.nrs.vdyp.model.FipMode;
+import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
@@ -266,6 +267,8 @@ public class FipStart extends VdypApplication implements Closeable {
 		}
 	}
 
+	static final EnumSet<PolygonMode> ACCEPTABLE_MODES = EnumSet.of(PolygonMode.START, PolygonMode.YOUNG);
+	
 	Optional<VdypPolygon> processPolygon(int polygonsRead, FipPolygon polygon)
 			throws ProcessingException, LowValueException {
 		VdypPolygon resultPoly;
@@ -274,9 +277,9 @@ public class FipStart extends VdypApplication implements Closeable {
 
 		// if (MODE .eq. -1) go to 100
 
-		final var mode = polygon.getModeFip().orElse(FipMode.FIPSTART);
+		final var mode = polygon.getModeFip().orElse(PolygonMode.START);
 
-		if (mode == FipMode.DONT_PROCESS) {
+		if (!ACCEPTABLE_MODES.contains(mode)) {
 			log.atInfo().setMessage("Skipping polygon with mode {}").addArgument(mode).log();
 			return Optional.empty();
 		}
@@ -391,7 +394,7 @@ public class FipStart extends VdypApplication implements Closeable {
 					&& fipVetLayer.getCrownClosure() > 0f; // LAYERV
 
 			if (getId() == VdypApplicationIdentifier.FIP_START
-					&& fipPolygon.getModeFip().map(mode -> mode == FipMode.FIPYOUNG).orElse(false)) {
+					&& fipPolygon.getModeFip().map(mode -> mode == PolygonMode.YOUNG).orElse(false)) {
 				return 100f;
 			}
 			if (getId() == VdypApplicationIdentifier.VRI_START) {
@@ -2727,9 +2730,9 @@ public class FipStart extends VdypApplication implements Closeable {
 			);
 		}
 
-		if (polygon.getModeFip().map(x -> x == FipMode.FIPYOUNG).orElse(false)) {
+		if (polygon.getModeFip().map(x -> x == PolygonMode.YOUNG).orElse(false)) {
 			throw validationError(
-					"Polygon %s is using unsupported mode %s.", polygon.getPolygonIdentifier(), FipMode.FIPYOUNG
+					"Polygon %s is using unsupported mode %s.", polygon.getPolygonIdentifier(), PolygonMode.YOUNG
 			);
 		}
 

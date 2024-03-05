@@ -17,10 +17,10 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?, ?>, PA> {
 	private Map<LayerType, L> layers = new LinkedHashMap<>();
 	protected String biogeoclimaticZone;
 	protected String forestInventoryZone;
-	protected Optional<FipMode> modeFip;
+	protected Optional<PolygonMode> modeFip;
 
 	protected BaseVdypPolygon(
-			String polygonIdentifier, PA percentAvailable, String fiz, String becIdentifier, Optional<FipMode> modeFip
+			String polygonIdentifier, PA percentAvailable, String fiz, String becIdentifier, Optional<PolygonMode> modeFip
 	) {
 		super();
 		this.forestInventoryZone = fiz;
@@ -91,11 +91,11 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?, ?>, PA> {
 		this.forestInventoryZone = forestInventoryZone;
 	}
 
-	public Optional<FipMode> getModeFip() {
+	public Optional<PolygonMode> getModeFip() {
 		return modeFip;
 	}
 
-	public void setModeFip(Optional<FipMode> modeFip) {
+	public void setModeFip(Optional<PolygonMode> modeFip) {
 		this.modeFip = modeFip;
 	}
 
@@ -105,7 +105,7 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?, ?>, PA> {
 		protected Optional<PA> percentAvailable = Optional.empty();
 		protected Optional<String> biogeoclimaticZone = Optional.empty();
 		protected Optional<String> forestInventoryZone = Optional.empty();
-		protected Optional<FipMode> modeFip = Optional.empty();
+		protected Optional<PolygonMode> modeFip = Optional.empty();
 
 		protected List<L> layers = new LinkedList<>();
 
@@ -129,12 +129,12 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?, ?>, PA> {
 			return this;
 		}
 
-		public Builder<T, L, PA> modeFip(Optional<FipMode> modeFip) {
+		public Builder<T, L, PA> modeFip(Optional<PolygonMode> modeFip) {
 			this.modeFip = modeFip;
 			return this;
 		}
 
-		public Builder<T, L, PA> modeFip(FipMode modeFip) {
+		public Builder<T, L, PA> modeFip(PolygonMode modeFip) {
 			return modeFip(Optional.of(modeFip));
 		}
 

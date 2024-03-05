@@ -8,7 +8,7 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float> {
 
 	public VdypPolygon(
 			String polygonIdentifier, Float percentAvailable, String fiz, String becIdentifier,
-			Optional<FipMode> modeFip
+			Optional<PolygonMode> modeFip
 	) {
 		super(polygonIdentifier, percentAvailable, fiz, becIdentifier, modeFip);
 	}
