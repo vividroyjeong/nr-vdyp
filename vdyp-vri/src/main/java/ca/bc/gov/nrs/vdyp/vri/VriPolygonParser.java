@@ -55,15 +55,15 @@ public class VriPolygonParser implements ControlMapValueReplacer<StreamingParser
 					var polygonId = (String) entry.get(POLYGON_IDENTIFIER);
 					var becId = (String) entry.get(BIOGEOGRAPHIC_ZONE);
 					var percentForestLand = ((Optional<Float>) entry.get(PERCENT_FOREST_LAND)).filter(x -> x > 0.0f);
-					var fipMode = (Optional<Integer>) entry.get(FIP_MODE);
+					var fipMode = ((Optional<Integer>) entry.get(FIP_MODE)).flatMap(PolygonMode::getByCode);
 					var nonproductiveDesc = (Optional<String>) entry.get(NONPRODUCTIVE_DESCRIPTION);
 					var yieldFactor = ((Optional<Float>) entry.get(YIELD_FACTOR)).filter(x -> x > 0.0f);
-
+					var percentForestLandWithDefault=percentForestLand.or(()->fipMode.flatMap(mode->mode==PolygonMode.BATC?Optional.of(85f):Optional.empty()));
 					return VriPolygon.build(builder -> {
 						builder.polygonIdentifier(polygonId);
 						builder.biogeoclimaticZone(becId);
-						builder.percentAvailable(percentForestLand);
-						builder.modeFip(fipMode.flatMap(PolygonMode::getByCode));
+						builder.percentAvailable(percentForestLandWithDefault);
+						builder.modeFip(fipMode);
 						builder.nonproductiveDescription(nonproductiveDesc);
 						builder.yieldFactor(yieldFactor.orElse(1.0f));
 					});

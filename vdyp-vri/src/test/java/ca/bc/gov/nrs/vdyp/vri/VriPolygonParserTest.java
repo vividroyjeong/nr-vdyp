@@ -306,13 +306,11 @@ public class VriPolygonParserTest {
 		VdypMatchers.assertEmpty(stream);
 	}
 
-	/*
- *  @formatter:off
 
 	@Test
 	public void testParsePolygonNegativeAsDefault() throws Exception {
 
-		var parser = new FipPolygonParser();
+		var parser = new VriPolygonParser();
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -330,14 +328,14 @@ public class VriPolygonParserTest {
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
 		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<FipPolygon>) parserFactory).get();
+		var stream = ((StreamingParserFactory<VriPolygon>) parserFactory).get();
 
 		assertThat(stream, instanceOf(StreamingParser.class));
 
 		var poly = assertNext(stream);
 
 		assertThat(poly, hasProperty("polygonIdentifier", is("01002 S000001 00     1970")));
-		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
+		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
 		assertThat(poly, hasProperty("modeFip", notPresent()));
@@ -346,6 +344,81 @@ public class VriPolygonParserTest {
 
 		VdypMatchers.assertEmpty(stream);
 	}
-	@formatter:on
-	*/
+	
+	@Test
+	public void testParsePolygonSetPercentAvailableDefaultInBatcMode() throws Exception {
+
+		var parser = new VriPolygonParser();
+
+		Map<String, Object> controlMap = new HashMap<>();
+
+		controlMap.put(ControlKey.FIP_YIELD_POLY_INPUT.name(), "test.dat");
+		TestUtils.populateControlMapBecReal(controlMap);
+
+		var fileResolver = TestUtils.fileResolver(
+				"test.dat", TestUtils.makeInputStream("082F074/0071         2001 G IDF        4 BLAH  0.95")
+		);
+
+		parser.modify(controlMap, fileResolver);
+
+		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_POLY_INPUT.name());
+
+		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
+
+		@SuppressWarnings("unchecked")
+		var stream = ((StreamingParserFactory<VriPolygon>) parserFactory).get();
+
+		assertThat(stream, instanceOf(StreamingParser.class));
+
+		var poly = assertNext(stream);
+
+		assertThat(poly, hasProperty("polygonIdentifier", is("082F074/0071         2001")));
+		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
+		assertThat(poly, hasProperty("biogeoclimaticZone", is("IDF")));
+		assertThat(poly, hasProperty("percentAvailable", present(is(85.0f))));
+		assertThat(poly, hasProperty("modeFip", present(is(PolygonMode.BATC))));
+		assertThat(poly, hasProperty("nonproductiveDescription", present(is("BLAH"))));
+		assertThat(poly, hasProperty("yieldFactor", is(0.95f)));
+
+		VdypMatchers.assertEmpty(stream);
+	}
+	
+	@Test
+	public void testParsePolygonDontOverridePercentAvailableInBatcMode() throws Exception {
+
+		var parser = new VriPolygonParser();
+
+		Map<String, Object> controlMap = new HashMap<>();
+
+		controlMap.put(ControlKey.FIP_YIELD_POLY_INPUT.name(), "test.dat");
+		TestUtils.populateControlMapBecReal(controlMap);
+
+		var fileResolver = TestUtils.fileResolver(
+				"test.dat", TestUtils.makeInputStream("082F074/0071         2001 G IDF  90.0  4 BLAH  0.95")
+		);
+
+		parser.modify(controlMap, fileResolver);
+
+		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_POLY_INPUT.name());
+
+		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
+
+		@SuppressWarnings("unchecked")
+		var stream = ((StreamingParserFactory<VriPolygon>) parserFactory).get();
+
+		assertThat(stream, instanceOf(StreamingParser.class));
+
+		var poly = assertNext(stream);
+
+		assertThat(poly, hasProperty("polygonIdentifier", is("082F074/0071         2001")));
+		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
+		assertThat(poly, hasProperty("biogeoclimaticZone", is("IDF")));
+		assertThat(poly, hasProperty("percentAvailable", present(is(90.0f))));
+		assertThat(poly, hasProperty("modeFip", present(is(PolygonMode.BATC))));
+		assertThat(poly, hasProperty("nonproductiveDescription", present(is("BLAH"))));
+		assertThat(poly, hasProperty("yieldFactor", is(0.95f)));
+
+		VdypMatchers.assertEmpty(stream);
+	}
+
 }
