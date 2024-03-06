@@ -67,7 +67,7 @@ public class BaseVdypSite {
 		protected Optional<String> polygonIdentifier = Optional.empty();
 		protected Optional<LayerType> layer = Optional.empty();
 		protected Optional<String> siteGenus = Optional.empty();
-		
+
 		protected Optional<Integer> siteCurveNumber = Optional.empty();
 		protected Optional<Float> siteIndex = Optional.empty();
 
@@ -84,7 +84,7 @@ public class BaseVdypSite {
 			this.layer = Optional.of(layer);
 			return this;
 		}
-		
+
 		public Builder<T> siteGenus(String siteGenus) {
 			this.siteGenus = Optional.of(siteGenus);
 			return this;

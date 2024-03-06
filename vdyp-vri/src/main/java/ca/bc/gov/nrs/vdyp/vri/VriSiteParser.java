@@ -89,7 +89,7 @@ public class VriSiteParser implements ControlMapValueReplacer<StreamingParserFac
 					return layer.handle(s -> {
 
 						final var polygon = (String) entry.get(VriPolygonParser.POLYGON_IDENTIFIER);
-						
+
 						final var siteGenus = (String) entry.get(SITE_SP0);
 						final var siteSpecies = (String) entry.get(SITE_SP64);
 						final var siteCurveNumber = (int) entry.get(SITE_CURVE_NUMBER);
@@ -105,7 +105,7 @@ public class VriSiteParser implements ControlMapValueReplacer<StreamingParserFac
 
 							siteBuilder.polygonIdentifier(polygon);
 							siteBuilder.layerType(s.get());
-							
+
 							siteBuilder.siteGenus(siteGenus);
 							siteBuilder.siteSpecies(siteSpecies);
 							siteBuilder.siteCurveNumber(siteCurveNumber);

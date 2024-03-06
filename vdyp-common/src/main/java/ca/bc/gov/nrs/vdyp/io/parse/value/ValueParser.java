@@ -123,16 +123,20 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 	 * Parser for single precision floats
 	 */
 	public static final ValueParser<Float> FLOAT = numberParser(Float::parseFloat, Float.class);
-	
+
 	/**
 	 * Parser for single precision floats >0
 	 */
-	public static final ValueParser<Optional<Float>> SAFE_POSITIVE_FLOAT = rangeSilentLow(FLOAT, 0f, false, Float.MAX_VALUE, true, "positive float");
-	
+	public static final ValueParser<Optional<Float>> SAFE_POSITIVE_FLOAT = rangeSilentLow(
+			FLOAT, 0f, false, Float.MAX_VALUE, true, "positive float"
+	);
+
 	/**
 	 * Parser for single precision floats >=0
 	 */
-	public static final ValueParser<Optional<Float>> SAFE_NONNEGATIVE_FLOAT = rangeSilentLow(FLOAT, 0f, true, Float.MAX_VALUE, true, "non-negative float");
+	public static final ValueParser<Optional<Float>> SAFE_NONNEGATIVE_FLOAT = rangeSilentLow(
+			FLOAT, 0f, true, Float.MAX_VALUE, true, "non-negative float"
+	);
 
 	/**
 	 * Parser for percentages
@@ -173,7 +177,8 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 	}
 
 	/**
-	 * Validate that a parsed value is within a range.  Returns empty if out of bounds low and throws an exception if out of bounds high.
+	 * Validate that a parsed value is within a range. Returns empty if out of
+	 * bounds low and throws an exception if out of bounds high.
 	 *
 	 * @param parser     underlying parser
 	 * @param min        the lower bound
