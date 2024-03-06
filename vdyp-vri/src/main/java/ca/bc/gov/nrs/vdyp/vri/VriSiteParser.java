@@ -22,6 +22,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ControlledValueParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.vri.model.VriPolygon;
 import ca.bc.gov.nrs.vdyp.vri.model.VriSite;
 import ca.bc.gov.nrs.vdyp.vri.model.VriSpecies;
 
@@ -87,6 +88,8 @@ public class VriSiteParser implements ControlMapValueReplacer<StreamingParserFac
 					var markerBuilder = new ValueOrMarker.Builder<Optional<VriSite>, EndOfRecord>();
 					return layer.handle(s -> {
 
+						final var polygon = (String) entry.get(VriPolygonParser.POLYGON_IDENTIFIER);
+						
 						final var siteGenus = (String) entry.get(SITE_SP0);
 						final var siteSpecies = (String) entry.get(SITE_SP64);
 						final var siteCurveNumber = (int) entry.get(SITE_CURVE_NUMBER);
@@ -100,6 +103,9 @@ public class VriSiteParser implements ControlMapValueReplacer<StreamingParserFac
 
 						return markerBuilder.value(s.map(layerType -> VriSite.build(siteBuilder -> {
 
+							siteBuilder.polygonIdentifier(polygon);
+							siteBuilder.layerType(s.get());
+							
 							siteBuilder.siteGenus(siteGenus);
 							siteBuilder.siteSpecies(siteSpecies);
 							siteBuilder.siteCurveNumber(siteCurveNumber);

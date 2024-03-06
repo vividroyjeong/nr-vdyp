@@ -231,6 +231,8 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 		@Override
 		protected VdypSite buildSite(Consumer<ca.bc.gov.nrs.vdyp.model.BaseVdypSite.Builder<VdypSite>> config) {
 			return VdypSite.build(builder -> {
+				builder.polygonIdentifier(polygonIdentifier.get());
+				builder.layerType(layer.get());
 				config.accept(builder);
 			});
 		}

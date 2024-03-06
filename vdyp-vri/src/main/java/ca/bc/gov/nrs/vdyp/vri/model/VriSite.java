@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 public class VriSite extends BaseVdypSite {
 
@@ -12,11 +13,11 @@ public class VriSite extends BaseVdypSite {
 	private final Optional<Float> breastHeightAge; // VRISI/VR_SCN
 
 	public VriSite(
-			String siteGenus, Optional<Integer> siteCurveNumber, Optional<Float> siteIndex, Optional<Float> height,
-			Optional<Float> ageTotal, Optional<Float> yearsToBreastHeight, String siteSpecies,
-			Optional<Float> breastHeightAge
+			String polygonIdentifier, LayerType layer, String siteGenus, Optional<Integer> siteCurveNumber,
+			Optional<Float> siteIndex, Optional<Float> height, Optional<Float> ageTotal,
+			Optional<Float> yearsToBreastHeight, String siteSpecies, Optional<Float> breastHeightAge
 	) {
-		super(siteGenus, siteCurveNumber, siteIndex, height, ageTotal, yearsToBreastHeight);
+		super(polygonIdentifier, layer, siteGenus, siteCurveNumber, siteIndex, height, ageTotal, yearsToBreastHeight);
 		this.siteSpecies = siteSpecies;
 		this.breastHeightAge = breastHeightAge;
 	}
@@ -56,7 +57,7 @@ public class VriSite extends BaseVdypSite {
 		public Builder siteSpecies(String string) {
 			return siteSpecies(Optional.of(string));
 		}
-		
+
 		public Builder breastHeightAge(Optional<Float> breastHeightAge) {
 			this.breastHeightAge = breastHeightAge;
 			return this;
@@ -65,8 +66,6 @@ public class VriSite extends BaseVdypSite {
 		public Builder breastHeightAge(float breastHeightAge) {
 			return breastHeightAge(Optional.of(breastHeightAge));
 		}
-		
-		
 
 		@Override
 		protected void check(Collection<String> errors) {
@@ -77,6 +76,8 @@ public class VriSite extends BaseVdypSite {
 		@Override
 		protected VriSite doBuild() {
 			return new VriSite(
+					this.polygonIdentifier.get(), //
+					this.layer.get(), //
 					this.siteGenus.get(), //
 					this.siteCurveNumber, //
 					this.siteIndex, //

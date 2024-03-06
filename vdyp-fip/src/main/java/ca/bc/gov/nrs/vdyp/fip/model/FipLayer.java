@@ -130,6 +130,8 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> {
 		@Override
 		protected FipSite buildSite(Consumer<ca.bc.gov.nrs.vdyp.model.BaseVdypSite.Builder<FipSite>> config) {
 			return FipSite.build(builder -> {
+				builder.polygonIdentifier(polygonIdentifier.get());
+				builder.layerType(layer.get());
 				config.accept(builder);
 			});
 		}

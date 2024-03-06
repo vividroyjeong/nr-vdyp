@@ -6,10 +6,11 @@ import java.util.function.Consumer;
 public class VdypSite extends BaseVdypSite {
 
 	public VdypSite(
-			String siteGenus, Optional<Integer> siteCurveNumber, Optional<Float> siteIndex, Optional<Float> height,
-			Optional<Float> ageTotal, Optional<Float> yearsToBreastHeight
+			String polygonIdentifier, LayerType layer, String siteGenus, Optional<Integer> siteCurveNumber,
+			Optional<Float> siteIndex, Optional<Float> height, Optional<Float> ageTotal,
+			Optional<Float> yearsToBreastHeight
 	) {
-		super(siteGenus, siteCurveNumber, siteIndex, height, ageTotal, yearsToBreastHeight);
+		super(polygonIdentifier, layer, siteGenus, siteCurveNumber, siteIndex, height, ageTotal, yearsToBreastHeight);
 	}
 
 	/**
@@ -43,7 +44,12 @@ public class VdypSite extends BaseVdypSite {
 	 * @return the new species.
 	 */
 	public static VdypSite build(VdypLayer layer, Consumer<Builder> config) {
-		var result = build(config::accept);
+
+		var result = build(builder -> {
+			builder.polygonIdentifier(layer.getPolygonIdentifier());
+			builder.layerType(layer.getLayer());
+			config.accept(builder);
+		});
 		layer.getSites().put(result.getSiteGenus(), result);
 		return result;
 	}
@@ -52,7 +58,10 @@ public class VdypSite extends BaseVdypSite {
 
 		@Override
 		protected VdypSite doBuild() {
-			return new VdypSite(siteGenus.get(), siteCurveNumber, siteIndex, height, ageTotal, yearsToBreastHeight);
+			return new VdypSite(
+					polygonIdentifier.get(), layer.get(), siteGenus.get(), siteCurveNumber, siteIndex, height, ageTotal,
+					yearsToBreastHeight
+			);
 		}
 	}
 }

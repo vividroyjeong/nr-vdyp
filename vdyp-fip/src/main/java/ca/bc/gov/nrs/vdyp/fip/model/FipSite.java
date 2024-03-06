@@ -4,16 +4,18 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 public class FipSite extends BaseVdypSite {
 
 	private final Optional<String> siteSpecies; // FIPL_1A/SITESP64_L1 or FIPL_VA/SITESP64_L1
 
 	public FipSite(
-			String siteGenus, Optional<Integer> siteCurveNumber, Optional<Float> siteIndex, Optional<Float> height,
-			Optional<Float> ageTotal, Optional<Float> yearsToBreastHeight, Optional<String> siteSpecies
+			String polygonIdentifier, LayerType layer, String siteGenus, Optional<Integer> siteCurveNumber,
+			Optional<Float> siteIndex, Optional<Float> height, Optional<Float> ageTotal,
+			Optional<Float> yearsToBreastHeight, Optional<String> siteSpecies
 	) {
-		super(siteGenus, siteCurveNumber, siteIndex, height, ageTotal, yearsToBreastHeight);
+		super(polygonIdentifier, layer, siteGenus, siteCurveNumber, siteIndex, height, ageTotal, yearsToBreastHeight);
 		this.siteSpecies = siteSpecies;
 	}
 
@@ -51,6 +53,8 @@ public class FipSite extends BaseVdypSite {
 		@Override
 		protected FipSite doBuild() {
 			return new FipSite(
+					this.polygonIdentifier.get(), //
+					this.layer.get(), //
 					this.siteGenus.get(), //
 					this.siteCurveNumber, //
 					this.siteIndex, //

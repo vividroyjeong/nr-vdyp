@@ -5,6 +5,8 @@ import java.util.Optional;
 
 public class BaseVdypSite {
 
+	private final String polygonIdentifier;
+	private final LayerType layer;
 	private final String siteGenus; // FIPL_1A/SITESP0_L1, VRISIA/SITESP0
 	private final Optional<Integer> siteCurveNumber; // VRISI/VR_SCN
 	private final Optional<Float> siteIndex; // VRISI/VR_SI
@@ -14,16 +16,27 @@ public class BaseVdypSite {
 	private final Optional<Float> yearsToBreastHeight; // LVCOM3/YTBHLV, L1COM3/YTBHL1, VRISI/VR_YTBH
 
 	public BaseVdypSite(
-			String siteGenus, Optional<Integer> siteCurveNumber, Optional<Float> siteIndex, Optional<Float> height,
-			Optional<Float> ageTotal, Optional<Float> yearsToBreastHeight
+			String polygonIdentifier, LayerType layer, String siteGenus, Optional<Integer> siteCurveNumber,
+			Optional<Float> siteIndex, Optional<Float> height, Optional<Float> ageTotal,
+			Optional<Float> yearsToBreastHeight
 	) {
 		super();
+		this.polygonIdentifier = polygonIdentifier;
+		this.layer = layer;
 		this.siteGenus = siteGenus;
 		this.siteCurveNumber = siteCurveNumber;
 		this.siteIndex = siteIndex;
 		this.height = height;
 		this.ageTotal = ageTotal;
 		this.yearsToBreastHeight = yearsToBreastHeight;
+	}
+
+	public String getPolygonIdentifier() {
+		return polygonIdentifier;
+	}
+
+	public LayerType getLayer() {
+		return layer;
 	}
 
 	public String getSiteGenus() {
@@ -51,7 +64,10 @@ public class BaseVdypSite {
 	}
 
 	public abstract static class Builder<T extends BaseVdypSite> extends ModelClassBuilder<T> {
+		protected Optional<String> polygonIdentifier = Optional.empty();
+		protected Optional<LayerType> layer = Optional.empty();
 		protected Optional<String> siteGenus = Optional.empty();
+		
 		protected Optional<Integer> siteCurveNumber = Optional.empty();
 		protected Optional<Float> siteIndex = Optional.empty();
 
@@ -59,6 +75,16 @@ public class BaseVdypSite {
 		protected Optional<Float> height = Optional.empty();
 		protected Optional<Float> yearsToBreastHeight = Optional.empty();
 
+		public Builder<T> polygonIdentifier(String polygonIdentifier) {
+			this.polygonIdentifier = Optional.of(polygonIdentifier);
+			return this;
+		}
+
+		public Builder<T> layerType(LayerType layer) {
+			this.layer = Optional.of(layer);
+			return this;
+		}
+		
 		public Builder<T> siteGenus(String siteGenus) {
 			this.siteGenus = Optional.of(siteGenus);
 			return this;
@@ -115,6 +141,8 @@ public class BaseVdypSite {
 		}
 
 		public Builder<T> copy(BaseVdypSite toCopy) {
+			polygonIdentifier(toCopy.getPolygonIdentifier());
+			layerType(toCopy.getLayer());
 			ageTotal(toCopy.getAgeTotal());
 			yearsToBreastHeight(toCopy.getYearsToBreastHeight());
 			height(toCopy.getHeight());
@@ -126,6 +154,8 @@ public class BaseVdypSite {
 
 		@Override
 		protected void check(Collection<String> errors) {
+			requirePresent(polygonIdentifier, "polygonIdentifier", errors);
+			requirePresent(layer, "layer", errors);
 			requirePresent(siteGenus, "siteGenus", errors);
 		}
 
