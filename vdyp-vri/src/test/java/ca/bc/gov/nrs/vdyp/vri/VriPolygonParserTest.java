@@ -49,7 +49,7 @@ public class VriPolygonParserTest {
 
 		assertEmpty(stream);
 	}
-	
+
 	@Test
 	public void testParsePolygon() throws Exception {
 
@@ -125,7 +125,6 @@ public class VriPolygonParserTest {
 
 		VdypMatchers.assertEmpty(stream);
 	}
-	
 
 	@Test
 	public void testParseMultiple() throws Exception {
@@ -266,7 +265,6 @@ public class VriPolygonParserTest {
 
 		VdypMatchers.assertEmpty(stream);
 	}
-	
 
 	@Test
 	public void testParsePolygonZeroAsDefault() throws Exception {
@@ -306,7 +304,6 @@ public class VriPolygonParserTest {
 		VdypMatchers.assertEmpty(stream);
 	}
 
-
 	@Test
 	public void testParsePolygonNegativeAsDefault() throws Exception {
 
@@ -344,7 +341,7 @@ public class VriPolygonParserTest {
 
 		VdypMatchers.assertEmpty(stream);
 	}
-	
+
 	@Test
 	public void testParsePolygonSetPercentAvailableDefaultInBatcMode() throws Exception {
 
@@ -382,7 +379,7 @@ public class VriPolygonParserTest {
 
 		VdypMatchers.assertEmpty(stream);
 	}
-	
+
 	@Test
 	public void testParsePolygonDontOverridePercentAvailableInBatcMode() throws Exception {
 

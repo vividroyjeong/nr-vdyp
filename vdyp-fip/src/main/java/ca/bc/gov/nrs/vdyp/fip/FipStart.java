@@ -268,7 +268,7 @@ public class FipStart extends VdypApplication implements Closeable {
 	}
 
 	static final EnumSet<PolygonMode> ACCEPTABLE_MODES = EnumSet.of(PolygonMode.START, PolygonMode.YOUNG);
-	
+
 	Optional<VdypPolygon> processPolygon(int polygonsRead, FipPolygon polygon)
 			throws ProcessingException, LowValueException {
 		VdypPolygon resultPoly;

@@ -13,6 +13,8 @@ import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
 
 public class VriLayerParser implements ControlMapValueReplacer<StreamingParserFactory<VriLayer>, String> {
 
+	public static final String LAYER = "LAYER";
+
 	@Override
 	public ControlKey getControlKey() {
 		return ControlKey.VRI_YIELD_LAYER_INPUT;

@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -204,5 +205,18 @@ public class Utils {
 
 	public static boolean nullOrEmpty(@Nullable String string) {
 		return string == null || string.isEmpty();
+	}
+
+	public static boolean parsesBlankOrNonPositive(String string) {
+		if (string == null || string.isBlank())
+			return true;
+		var value = Float.valueOf(string);
+		return value != null && value <= 0;
+	}
+
+	public static <T> Optional<T> getIfPresent(List<T> list, int index) {
+		if (list.size() >= index)
+			return Optional.of(list.get(index));
+		return Optional.empty();
 	}
 }

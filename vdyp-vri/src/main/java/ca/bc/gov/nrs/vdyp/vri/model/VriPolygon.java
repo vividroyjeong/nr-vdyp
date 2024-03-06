@@ -11,7 +11,7 @@ public class VriPolygon extends BaseVdypPolygon<VriLayer, Optional<Float>> {
 
 	private Optional<String> nonproductiveDescription; // FIP_P3/NPDESC
 	private float yieldFactor; // FIP_P4/YLDFACT
-	public final static String FIZ = " "; 
+	public final static String FIZ = " ";
 
 	public VriPolygon(
 			String polygonIdentifier, String fiz, String becIdentifier, Optional<Float> percentAvailable,
@@ -76,7 +76,6 @@ public class VriPolygon extends BaseVdypPolygon<VriLayer, Optional<Float>> {
 			this.yieldFactor = Optional.of(yieldFactor);
 			return this;
 		}
-
 
 		@Override
 		protected void check(Collection<String> errors) {

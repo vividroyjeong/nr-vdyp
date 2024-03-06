@@ -20,7 +20,8 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?, ?>, PA> {
 	protected Optional<PolygonMode> modeFip;
 
 	protected BaseVdypPolygon(
-			String polygonIdentifier, PA percentAvailable, String fiz, String becIdentifier, Optional<PolygonMode> modeFip
+			String polygonIdentifier, PA percentAvailable, String fiz, String becIdentifier,
+			Optional<PolygonMode> modeFip
 	) {
 		super();
 		this.forestInventoryZone = fiz;
