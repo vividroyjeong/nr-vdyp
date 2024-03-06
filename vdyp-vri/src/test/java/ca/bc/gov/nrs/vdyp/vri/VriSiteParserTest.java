@@ -4,6 +4,7 @@ import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.assertEmpty;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.assertNext;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.closeTo;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.hasSpecificEntry;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
@@ -349,5 +350,302 @@ public class VriSiteParserTest {
 
 		assertEmpty(stream);
 	}
+	
+	@Test
+	public void testBreastHeightAgeZeroAndTotalEmpty() throws Exception {
+
+		var parser = new VriSiteParser();
+
+		Map<String, Object> controlMap = new HashMap<>();
+
+		controlMap.put(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name(), "test.dat");
+		TestUtils.populateControlMapGenusReal(controlMap);
+
+		var fileResolver = TestUtils.fileResolver(
+				"test.dat",
+				TestUtils.makeInputStream(
+						"082F074/0071         2001 P  -9 28.0 14.3        C CW 10.9            0.0 11",
+						"082F074/0071         2001 Z   0  0.0  0.0"
+				)
+		);
+
+		parser.modify(controlMap, fileResolver);
+
+		var parserFactory = controlMap.get(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name());
+
+		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
+
+		@SuppressWarnings("unchecked")
+		var stream = ((StreamingParserFactory<Collection<VriSite>>) parserFactory).get();
+
+		assertThat(stream, instanceOf(StreamingParser.class));
+
+		var sites = assertNext(stream);
+
+		assertThat(sites, iterableWithSize(1));
+		assertThat(
+				sites.iterator().next(), allOf(
+						hasProperty("ageTotal", notPresent()), //
+						hasProperty("breastHeightAge", notPresent())
+				)
+		);
+
+		assertEmpty(stream);
+	}
+	
+	@Test
+	public void testBreastHeightAgeZeroAndNotCloseToExpected() throws Exception {
+
+		var parser = new VriSiteParser();
+
+		Map<String, Object> controlMap = new HashMap<>();
+
+		controlMap.put(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name(), "test.dat");
+		TestUtils.populateControlMapGenusReal(controlMap);
+
+		var fileResolver = TestUtils.fileResolver(
+				"test.dat",
+				TestUtils.makeInputStream(
+						// YTBH differs from Age Total by more than 0.5
+						"082F074/0071         2001 P  20 28.0 14.3        C CW 19.4            0.0 11",
+						"082F074/0071         2001 Z   0  0.0  0.0"
+				)
+		);
+
+		parser.modify(controlMap, fileResolver);
+
+		var parserFactory = controlMap.get(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name());
+
+		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
+
+		@SuppressWarnings("unchecked")
+		var stream = ((StreamingParserFactory<Collection<VriSite>>) parserFactory).get();
+
+		assertThat(stream, instanceOf(StreamingParser.class));
+
+		var sites = assertNext(stream);
+
+		assertThat(sites, iterableWithSize(1));
+		assertThat(
+				sites.iterator().next(), allOf(
+						hasProperty("ageTotal", present(closeTo(20f))), //
+						hasProperty("breastHeightAge", notPresent())
+				)
+		);
+
+		assertEmpty(stream);
+	}
+	
+	@Test
+	public void testBreastHeightAgeZeroAndIsCloseToExpected() throws Exception {
+
+		var parser = new VriSiteParser();
+
+		Map<String, Object> controlMap = new HashMap<>();
+
+		controlMap.put(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name(), "test.dat");
+		TestUtils.populateControlMapGenusReal(controlMap);
+
+		var fileResolver = TestUtils.fileResolver(
+				"test.dat",
+				TestUtils.makeInputStream(
+						// YTBH differs from Age Total by less than 0.5
+						"082F074/0071         2001 P  20 28.0 14.3        C CW 19.6            0.0 11",
+						"082F074/0071         2001 Z   0  0.0  0.0"
+				)
+		);
+
+		parser.modify(controlMap, fileResolver);
+
+		var parserFactory = controlMap.get(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name());
+
+		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
+
+		@SuppressWarnings("unchecked")
+		var stream = ((StreamingParserFactory<Collection<VriSite>>) parserFactory).get();
+
+		assertThat(stream, instanceOf(StreamingParser.class));
+
+		var sites = assertNext(stream);
+
+		assertThat(sites, iterableWithSize(1));
+		assertThat(
+				sites.iterator().next(), allOf(
+						hasProperty("ageTotal", present(closeTo(20f))), //
+						hasProperty("breastHeightAge", present(closeTo(0f)))
+				)
+		);
+
+		assertEmpty(stream);
+	}
+	
+	@Test
+	public void testDefaultHeight() throws Exception {
+
+		var parser = new VriSiteParser();
+
+		Map<String, Object> controlMap = new HashMap<>();
+
+		controlMap.put(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name(), "test.dat");
+		TestUtils.populateControlMapGenusReal(controlMap);
+
+		var fileResolver = TestUtils.fileResolver(
+				"test.dat",
+				TestUtils.makeInputStream(
+						// height empty, ageTotal within 0.6 of 1, siteIndex >=3 
+						"082F074/0071         2001 P   1 -9.0 14.3        C CW 19.6            0.0 11",
+						"082F074/0071         2001 Z   0  0.0  0.0"
+				)
+		);
+
+		parser.modify(controlMap, fileResolver);
+
+		var parserFactory = controlMap.get(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name());
+
+		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
+
+		@SuppressWarnings("unchecked")
+		var stream = ((StreamingParserFactory<Collection<VriSite>>) parserFactory).get();
+
+		assertThat(stream, instanceOf(StreamingParser.class));
+
+		var sites = assertNext(stream);
+
+		assertThat(sites, iterableWithSize(1));
+		assertThat(
+				sites.iterator().next(), allOf(
+						hasProperty("height", present(closeTo(0.05f)))
+				)
+		);
+
+		assertEmpty(stream);
+	}
+	
+	@Test
+	public void testNoDefaultHeightIfTotalAgeTooHigh() throws Exception {
+
+		var parser = new VriSiteParser();
+
+		Map<String, Object> controlMap = new HashMap<>();
+
+		controlMap.put(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name(), "test.dat");
+		TestUtils.populateControlMapGenusReal(controlMap);
+
+		var fileResolver = TestUtils.fileResolver(
+				"test.dat",
+				TestUtils.makeInputStream(
+						// height empty, ageTotal within 0.6 of 1, siteIndex >=3 
+						"082F074/0071         2001 P 1.7 -9.0 14.3        C CW 19.6            0.0 11",
+						"082F074/0071         2001 Z   0  0.0  0.0"
+				)
+		);
+
+		parser.modify(controlMap, fileResolver);
+
+		var parserFactory = controlMap.get(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name());
+
+		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
+
+		@SuppressWarnings("unchecked")
+		var stream = ((StreamingParserFactory<Collection<VriSite>>) parserFactory).get();
+
+		assertThat(stream, instanceOf(StreamingParser.class));
+
+		var sites = assertNext(stream);
+
+		assertThat(sites, iterableWithSize(1));
+		assertThat(
+				sites.iterator().next(), allOf(
+						hasProperty("height", notPresent())
+				)
+		);
+
+		assertEmpty(stream);
+	}
+
+	@Test
+	public void testNoDefaultHeightIfTotalAgeTooLow() throws Exception {
+
+		var parser = new VriSiteParser();
+
+		Map<String, Object> controlMap = new HashMap<>();
+
+		controlMap.put(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name(), "test.dat");
+		TestUtils.populateControlMapGenusReal(controlMap);
+
+		var fileResolver = TestUtils.fileResolver(
+				"test.dat",
+				TestUtils.makeInputStream(
+						// height empty, ageTotal within 0.6 of 1, siteIndex >=3 
+						"082F074/0071         2001 P 0.3 -9.0 14.3        C CW 19.6            0.0 11",
+						"082F074/0071         2001 Z   0  0.0  0.0"
+				)
+		);
+
+		parser.modify(controlMap, fileResolver);
+
+		var parserFactory = controlMap.get(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name());
+
+		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
+
+		@SuppressWarnings("unchecked")
+		var stream = ((StreamingParserFactory<Collection<VriSite>>) parserFactory).get();
+
+		assertThat(stream, instanceOf(StreamingParser.class));
+
+		var sites = assertNext(stream);
+
+		assertThat(sites, iterableWithSize(1));
+		assertThat(
+				sites.iterator().next(), allOf(
+						hasProperty("height", notPresent())
+				)
+		);
+
+		assertEmpty(stream);
+	}
+
+	@Test
+	public void testNoDefaultHeightIfSiteIndexTooLow() throws Exception {
+
+		var parser = new VriSiteParser();
+
+		Map<String, Object> controlMap = new HashMap<>();
+
+		controlMap.put(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name(), "test.dat");
+		TestUtils.populateControlMapGenusReal(controlMap);
+
+		var fileResolver = TestUtils.fileResolver(
+				"test.dat",
+				TestUtils.makeInputStream(
+						// height empty, ageTotal within 0.6 of 1, siteIndex >=3 
+						"082F074/0071         2001 P   1 -9.0  2.9        C CW 19.6            0.0 11",
+						"082F074/0071         2001 Z   0  0.0  0.0"
+				)
+		);
+
+		parser.modify(controlMap, fileResolver);
+
+		var parserFactory = controlMap.get(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name());
+
+		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
+
+		@SuppressWarnings("unchecked")
+		var stream = ((StreamingParserFactory<Collection<VriSite>>) parserFactory).get();
+
+		assertThat(stream, instanceOf(StreamingParser.class));
+
+		var sites = assertNext(stream);
+
+		assertThat(sites, iterableWithSize(1));
+		assertThat(
+				sites.iterator().next(), allOf(
+						hasProperty("height", notPresent())
+				)
+		);
+
+		assertEmpty(stream);
+	}
+
 
 }

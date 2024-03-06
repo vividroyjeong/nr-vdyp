@@ -21,6 +21,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.GroupingStreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ControlledValueParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
+import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.vri.model.VriPolygon;
 import ca.bc.gov.nrs.vdyp.vri.model.VriSite;
@@ -112,10 +113,29 @@ public class VriSiteParser implements ControlMapValueReplacer<StreamingParserFac
 
 							siteBuilder.siteIndex(siteIndex);
 
-							siteBuilder.height(height);
+							siteBuilder.height(
+									// Default height to 0.05 if the layer is primary, age total is within 0.6 of 1,
+									// and site index is >=3. per VDYP7 Fortran, per memo JFmemo_20090329.doc
+									height.or(() -> s.map(l -> l == LayerType.PRIMARY).orElse(false) && //
+											ageTotal.map(at -> FloatMath.abs(at - 1f) < 0.6).orElse(false) && //
+											siteIndex.map(si -> si >= 3f).orElse(false) //
+													? Optional.of(0.05f)
+													: Optional.empty()
+									)
+							);
 							siteBuilder.ageTotal(ageTotal);
 							siteBuilder.yearsToBreastHeight(yearsToBreastHeight);
-							siteBuilder.breastHeightAge(breastHeightAge);
+							siteBuilder.breastHeightAge(
+									// breastHeightAge can only be 0.0 if ageTotal and yearsToBreastHeight are
+									// both present and within 0.5 of each other. Otherwise 0 means it's not
+									// present. per VDYP7 Fortran
+									breastHeightAge.filter(
+											x -> x != 0f || Utils.mapBoth(
+													ageTotal, yearsToBreastHeight,
+													(at, ytbh) -> FloatMath.abs(at - ytbh) < 0.5
+											).orElse(false)
+									)
+							);
 						})));
 					}, markerBuilder::marker);
 				}

@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -54,10 +55,30 @@ public class Utils {
 		return Optional.ofNullable(value).flatMap(x -> x instanceof Optional o ? o : (Optional) Optional.of(x));
 	}
 
+	/**
+	 * Passes both operands to the consumer only if both are present.
+	 * @return
+	 */
 	public static <T, U> void ifBothPresent(Optional<T> opt1, Optional<U> opt2, BiConsumer<T, U> consumer) {
 		opt1.ifPresent(v1 -> {
 			opt2.ifPresent(v2 -> consumer.accept(v1, v2));
 		});
+	}
+
+	/**
+	 * Returns the result of the function applied to the operands if both are present, otherwise empty.
+	 * @return
+	 */
+	public static <T, U, V> Optional<V> mapBoth(Optional<T> opt1, Optional<U> opt2, BiFunction<T, U, V> function) {
+		return opt1.flatMap(v1 -> opt2.map(v2 -> function.apply(v1, v2)));
+	}
+	
+	/**
+	 * Returns the result of the function applied to the operands if both are present, otherwise empty.
+	 * @return
+	 */
+	public static <T, U, V> Optional<V> flatMapBoth(Optional<T> opt1, Optional<U> opt2, BiFunction<T, U, Optional<V>> function) {
+		return opt1.flatMap(v1 -> opt2.flatMap(v2 -> function.apply(v1, v2)));
 	}
 
 	@SuppressWarnings("unchecked")
