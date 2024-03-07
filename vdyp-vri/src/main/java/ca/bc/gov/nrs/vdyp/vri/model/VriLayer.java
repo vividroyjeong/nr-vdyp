@@ -78,6 +78,21 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 			this.crownClosure = Optional.of(crownClosure);
 			return this;
 		}
+		
+		public Builder baseArea(float baseArea) {
+			this.baseArea = Optional.of(baseArea);
+			return this;
+		}
+		
+		public Builder treesPerHectare(float treesPerHectare) {
+			this.treesPerHectare = Optional.of(treesPerHectare);
+			return this;
+		}
+		
+		public Builder utilization(float utilization) {
+			this.utilization = Optional.of(utilization);
+			return this;
+		}
 
 		@Override
 		protected void check(Collection<String> errors) {

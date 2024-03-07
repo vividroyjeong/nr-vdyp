@@ -25,17 +25,10 @@ public class VriLayerParser
 		implements ControlMapValueReplacer<StreamingParserFactory<Map<LayerType, VriLayer>>, String> {
 
 	static final String LAYER = "LAYER"; // LAYER
-	static final String AGE_TOTAL = "AGE_TOTAL"; // AGETOT
-	static final String HEIGHT = "HEIGHT"; // HT
-	static final String SITE_INDEX = "SITE_INDEX"; // SI
 	static final String CROWN_CLOSURE = "CROWN_CLOSURE"; // CC
-	static final String SITE_SP0 = "SITE_SP0"; // SITESP0
-	static final String SITE_SP64 = "SITE_SP64"; // SITESP64
-	static final String YEARS_TO_BREAST_HEIGHT = "YEARS_TO_BREAST_HEIGHT"; // YTBH
-	static final String STOCKING_CLASS = "STOCKING_CLASS"; // STK
-	static final String INVENTORY_TYPE_GROUP = "INVENTORY_TYPE_GROUP"; // ITGFIP
-	static final String BREAST_HEIGHT_AGE = "BREAST_HEIGHT_AGE"; // AGEBH
-	static final String SITE_CURVE_NUMBER = "SITE_CURVE_NUMBER"; // SCN
+	static final String BASE_AREA = "BASE_AREA"; // BA
+	static final String TREES_PER_HECTARE = "TREES_PER_HECTARE"; // TPH
+	static final String UTILIZATION = "UTILIZATION"; // UTL
 
 	@Override
 	public ControlKey getControlKey() {
@@ -48,7 +41,8 @@ public class VriLayerParser
 					throws IOException, ResourceParseException {
 		return () -> {
 			var lineParser = new LineParser() //
-					.strippedString(25, VriPolygonParser.POLYGON_IDENTIFIER).space(1) //
+					.strippedString(25, VriPolygonParser.POLYGON_IDENTIFIER) //
+					.space(1) //
 					.value(
 							1, LAYER,
 							ValueParser.valueOrMarker(
@@ -56,20 +50,12 @@ public class VriLayerParser
 									ValueParser.optionalSingleton("Z"::equals, EndOfRecord.END_OF_RECORD)
 							)
 					) //
-					.floating(4, AGE_TOTAL) //
-					.floating(5, HEIGHT) //
-					.floating(5, SITE_INDEX) //
-					.floating(5, CROWN_CLOSURE) //
-					.space(3) //
-					.value(2, SITE_SP0, ControlledValueParser.optional(ValueParser.GENUS)) //
-					.value(3, SITE_SP64, ControlledValueParser.optional(ValueParser.STRING)) //
-					.floating(5, YEARS_TO_BREAST_HEIGHT) //
-					.value(1, STOCKING_CLASS, ValueParser.optional(ValueParser.CHARACTER)) //
-					.space(2) //
-					.value(4, INVENTORY_TYPE_GROUP, ValueParser.optional(ValueParser.INTEGER)) //
+					.floating(6, CROWN_CLOSURE) //
+					.floating(9, BASE_AREA) //
 					.space(1) //
-					.value(6, BREAST_HEIGHT_AGE, ValueParser.optional(ValueParser.FLOAT)) //
-					.value(3, SITE_CURVE_NUMBER, ValueParser.optional(ValueParser.INTEGER));
+					.floating(8, TREES_PER_HECTARE) //
+					.space(1) //
+					.floating(4, UTILIZATION);
 
 			var is = fileResolver.resolveForInput(fileName);
 
@@ -82,15 +68,21 @@ public class VriLayerParser
 				protected ValueOrMarker<Optional<VriLayer>, EndOfRecord> convert(Map<String, Object> entry) {
 					var polygonId = (String) entry.get(VriPolygonParser.POLYGON_IDENTIFIER);
 					var layer = (ValueOrMarker<Optional<LayerType>, EndOfRecord>) entry.get(LAYER);
-					var crownClosure = (float) entry.get(CROWN_CLOSURE);
+					var crownClosure = (Float) entry.get(CROWN_CLOSURE);
+					var baseArea = (Float) entry.get(BASE_AREA);
+					var treesPerHectare = (Float) entry.get(TREES_PER_HECTARE);
+					var utilization = (Float) entry.get(UTILIZATION);
 
 					var vmBuilder = new ValueOrMarker.Builder<Optional<VriLayer>, EndOfRecord>();
 					return layer.handle(l -> {
-						VriLayer fipLayer = VriLayer.build(flBuilder -> {
-							flBuilder.polygonIdentifier(polygonId);
-							flBuilder.layerType(LayerType.VETERAN);
+						VriLayer fipLayer = VriLayer.build(layerBuilder -> {
+							layerBuilder.polygonIdentifier(polygonId);
+							layerBuilder.layerType(l.get());
 
-							flBuilder.crownClosure(crownClosure);
+							layerBuilder.crownClosure(crownClosure);
+							layerBuilder.baseArea(baseArea);
+							layerBuilder.treesPerHectare(treesPerHectare);
+							layerBuilder.utilization(utilization);
 						});
 
 						return vmBuilder.value(Optional.of(fipLayer));
