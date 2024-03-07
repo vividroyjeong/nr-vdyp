@@ -5,44 +5,46 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 
-	private float crownClosure; // FIPL_1/CC_L1 or FIP:_V/CC_V1
+	private final float crownClosure; // VRIL/CCL
+	private final float baseArea; // VRIL/BAL
+	private final float treesPerHectare; // VRIL/TPHL
+	private final float utilization; // VRIL/UTLL
 
 	public VriLayer(
-			String polygonIdentifier, LayerType layer, Optional<Integer> inventoryTypeGroup, float crownClosure
+			String polygonIdentifier, LayerType layer, float crownClosure, float baseArea, float treesPerHectare,
+			float utilization
 	) {
-		super(polygonIdentifier, layer, inventoryTypeGroup);
+		super(polygonIdentifier, layer, Optional.empty());
 		this.crownClosure = crownClosure;
+		this.baseArea = baseArea;
+		this.treesPerHectare = treesPerHectare;
+		this.utilization = utilization;
 	}
 
 	public float getCrownClosure() {
 		return crownClosure;
 	}
 
-	public void setCrownClosure(float crownClosure) {
-		this.crownClosure = crownClosure;
+	public float getBaseArea() {
+		return baseArea;
+	}
+
+	public float getTreesPerHectare() {
+		return treesPerHectare;
+	}
+
+	public float getUtilization() {
+		return utilization;
 	}
 
 	/**
 	 * Accepts a configuration function that accepts a builder to configure.
-	 *
-	 * <pre>
-	 * FipLayer myLayer = FipLayer.build(builder-&gt; {
-			builder.polygonIdentifier(polygonId);
-			builder.layerType(LayerType.VETERAN);
-			builder.ageTotal(8f);
-			builder.yearsToBreastHeight(7f);
-			builder.height(6f);
-
-			builder.siteIndex(5f);
-			builder.crownClosure(0.9f);
-			builder.siteGenus("B");
-			builder.siteSpecies("B");
-	 * })
-	 * </pre>
 	 *
 	 * @param config The configuration function
 	 * @return The object built by the configured builder.
@@ -65,17 +67,15 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 		return layer;
 	}
 
-	public static class Builder extends BaseVdypLayer.Builder<VriLayer, VriSpecies, VriSite> {
+	public static class Builder
+			extends BaseVdypLayer.Builder<VriLayer, VriSpecies, VriSite, VriSpecies.Builder, VriSite.Builder> {
 		protected Optional<Float> crownClosure = Optional.empty();
-		protected Optional<String> siteSpecies = Optional.empty();
+		protected Optional<Float> baseArea = Optional.empty();
+		protected Optional<Float> treesPerHectare = Optional.empty();
+		protected Optional<Float> utilization = Optional.empty();
 
 		public Builder crownClosure(float crownClosure) {
 			this.crownClosure = Optional.of(crownClosure);
-			return this;
-		}
-
-		public Builder siteSpecies(String siteSpecies) {
-			this.siteSpecies = Optional.of(siteSpecies);
 			return this;
 		}
 
@@ -83,7 +83,9 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 		protected void check(Collection<String> errors) {
 			super.check(errors);
 			requirePresent(crownClosure, "crownClosure", errors);
-			requirePresent(siteSpecies, "siteSpecies", errors);
+			requirePresent(baseArea, "baseArea", errors);
+			requirePresent(treesPerHectare, "treesPerHectare", errors);
+			requirePresent(utilization, "utilization", errors);
 		}
 
 		@Override
@@ -92,22 +94,27 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 			return (new VriLayer(
 					polygonIdentifier.get(), //
 					layer.get(), //
-					inventoryTypeGroup, //
-					crownClosure.get()
+					crownClosure.get(), //
+					baseArea.get(), //
+					treesPerHectare.get(), //
+					utilization.get()
 			));
 		}
 
 		@Override
-		protected VriSpecies
-				buildSpecies(Consumer<ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder<VriSpecies>> config) {
-			// TODO Auto-generated method stub
-			return null;
+		protected VriSpecies buildSpecies(Consumer<VriSpecies.Builder> config) {
+			return VriSpecies.build(builder -> {
+				builder.polygonIdentifier(polygonIdentifier.get());
+				builder.layerType(layer.get());
+			});
 		}
 
 		@Override
-		protected VriSite buildSite(Consumer<ca.bc.gov.nrs.vdyp.model.BaseVdypSite.Builder<VriSite>> config) {
-			// TODO Auto-generated method stub
-			return null;
+		protected VriSite buildSite(Consumer<VriSite.Builder> config) {
+			return VriSite.build(builder -> {
+				builder.polygonIdentifier(polygonIdentifier.get());
+				builder.layerType(layer.get());
+			});
 		}
 
 	}

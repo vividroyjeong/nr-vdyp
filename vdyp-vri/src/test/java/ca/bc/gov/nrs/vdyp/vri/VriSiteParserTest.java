@@ -350,7 +350,7 @@ public class VriSiteParserTest {
 
 		assertEmpty(stream);
 	}
-	
+
 	@Test
 	public void testBreastHeightAgeZeroAndTotalEmpty() throws Exception {
 
@@ -392,7 +392,7 @@ public class VriSiteParserTest {
 
 		assertEmpty(stream);
 	}
-	
+
 	@Test
 	public void testBreastHeightAgeZeroAndNotCloseToExpected() throws Exception {
 
@@ -404,8 +404,7 @@ public class VriSiteParserTest {
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat",
-				TestUtils.makeInputStream(
+				"test.dat", TestUtils.makeInputStream(
 						// YTBH differs from Age Total by more than 0.5
 						"082F074/0071         2001 P  20 28.0 14.3        C CW 19.4            0.0 11",
 						"082F074/0071         2001 Z   0  0.0  0.0"
@@ -435,7 +434,7 @@ public class VriSiteParserTest {
 
 		assertEmpty(stream);
 	}
-	
+
 	@Test
 	public void testBreastHeightAgeZeroAndIsCloseToExpected() throws Exception {
 
@@ -447,8 +446,7 @@ public class VriSiteParserTest {
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat",
-				TestUtils.makeInputStream(
+				"test.dat", TestUtils.makeInputStream(
 						// YTBH differs from Age Total by less than 0.5
 						"082F074/0071         2001 P  20 28.0 14.3        C CW 19.6            0.0 11",
 						"082F074/0071         2001 Z   0  0.0  0.0"
@@ -478,7 +476,7 @@ public class VriSiteParserTest {
 
 		assertEmpty(stream);
 	}
-	
+
 	@Test
 	public void testDefaultHeight() throws Exception {
 
@@ -490,9 +488,8 @@ public class VriSiteParserTest {
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat",
-				TestUtils.makeInputStream(
-						// height empty, ageTotal within 0.6 of 1, siteIndex >=3 
+				"test.dat", TestUtils.makeInputStream(
+						// height empty, ageTotal within 0.6 of 1, siteIndex >=3
 						"082F074/0071         2001 P   1 -9.0 14.3        C CW 19.6            0.0 11",
 						"082F074/0071         2001 Z   0  0.0  0.0"
 				)
@@ -512,15 +509,11 @@ public class VriSiteParserTest {
 		var sites = assertNext(stream);
 
 		assertThat(sites, iterableWithSize(1));
-		assertThat(
-				sites.iterator().next(), allOf(
-						hasProperty("height", present(closeTo(0.05f)))
-				)
-		);
+		assertThat(sites.iterator().next(), allOf(hasProperty("height", present(closeTo(0.05f)))));
 
 		assertEmpty(stream);
 	}
-	
+
 	@Test
 	public void testNoDefaultHeightIfTotalAgeTooHigh() throws Exception {
 
@@ -532,9 +525,8 @@ public class VriSiteParserTest {
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat",
-				TestUtils.makeInputStream(
-						// height empty, ageTotal within 0.6 of 1, siteIndex >=3 
+				"test.dat", TestUtils.makeInputStream(
+						// height empty, ageTotal within 0.6 of 1, siteIndex >=3
 						"082F074/0071         2001 P 1.7 -9.0 14.3        C CW 19.6            0.0 11",
 						"082F074/0071         2001 Z   0  0.0  0.0"
 				)
@@ -554,11 +546,7 @@ public class VriSiteParserTest {
 		var sites = assertNext(stream);
 
 		assertThat(sites, iterableWithSize(1));
-		assertThat(
-				sites.iterator().next(), allOf(
-						hasProperty("height", notPresent())
-				)
-		);
+		assertThat(sites.iterator().next(), allOf(hasProperty("height", notPresent())));
 
 		assertEmpty(stream);
 	}
@@ -574,9 +562,8 @@ public class VriSiteParserTest {
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat",
-				TestUtils.makeInputStream(
-						// height empty, ageTotal within 0.6 of 1, siteIndex >=3 
+				"test.dat", TestUtils.makeInputStream(
+						// height empty, ageTotal within 0.6 of 1, siteIndex >=3
 						"082F074/0071         2001 P 0.3 -9.0 14.3        C CW 19.6            0.0 11",
 						"082F074/0071         2001 Z   0  0.0  0.0"
 				)
@@ -596,11 +583,7 @@ public class VriSiteParserTest {
 		var sites = assertNext(stream);
 
 		assertThat(sites, iterableWithSize(1));
-		assertThat(
-				sites.iterator().next(), allOf(
-						hasProperty("height", notPresent())
-				)
-		);
+		assertThat(sites.iterator().next(), allOf(hasProperty("height", notPresent())));
 
 		assertEmpty(stream);
 	}
@@ -616,9 +599,8 @@ public class VriSiteParserTest {
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat",
-				TestUtils.makeInputStream(
-						// height empty, ageTotal within 0.6 of 1, siteIndex >=3 
+				"test.dat", TestUtils.makeInputStream(
+						// height empty, ageTotal within 0.6 of 1, siteIndex >=3
 						"082F074/0071         2001 P   1 -9.0  2.9        C CW 19.6            0.0 11",
 						"082F074/0071         2001 Z   0  0.0  0.0"
 				)
@@ -638,14 +620,9 @@ public class VriSiteParserTest {
 		var sites = assertNext(stream);
 
 		assertThat(sites, iterableWithSize(1));
-		assertThat(
-				sites.iterator().next(), allOf(
-						hasProperty("height", notPresent())
-				)
-		);
+		assertThat(sites.iterator().next(), allOf(hasProperty("height", notPresent())));
 
 		assertEmpty(stream);
 	}
-
 
 }

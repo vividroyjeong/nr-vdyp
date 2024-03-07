@@ -196,7 +196,8 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 		return result;
 	}
 
-	public static class Builder extends BaseVdypLayer.Builder<VdypLayer, VdypSpecies, VdypSite> {
+	public static class Builder
+			extends BaseVdypLayer.Builder<VdypLayer, VdypSpecies, VdypSite, VdypSpecies.Builder, VdypSite.Builder> {
 
 		Optional<Integer> empericalRelationshipParameterIndex = Optional.empty();
 
@@ -219,8 +220,7 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 		}
 
 		@Override
-		protected VdypSpecies
-				buildSpecies(Consumer<ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder<VdypSpecies>> config) {
+		protected VdypSpecies buildSpecies(Consumer<VdypSpecies.Builder> config) {
 			return VdypSpecies.build(builder -> {
 				builder.polygonIdentifier(this.polygonIdentifier.get());
 				builder.layerType(this.layer.get());
@@ -229,7 +229,7 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 		}
 
 		@Override
-		protected VdypSite buildSite(Consumer<ca.bc.gov.nrs.vdyp.model.BaseVdypSite.Builder<VdypSite>> config) {
+		protected VdypSite buildSite(Consumer<VdypSite.Builder> config) {
 			return VdypSite.build(builder -> {
 				builder.polygonIdentifier(polygonIdentifier.get());
 				builder.layerType(layer.get());

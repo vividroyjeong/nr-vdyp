@@ -4261,7 +4261,7 @@ class FipStartTest {
 					siteBuilder.yearsToBreastHeight(8.5f);
 					siteBuilder.height(15f);
 					siteBuilder.siteGenus("L");
-					((Builder) siteBuilder).siteSpecies("L");
+					siteBuilder.siteSpecies("L");
 					siteBuilder.siteIndex(5f);
 				});
 
@@ -4326,7 +4326,7 @@ class FipStartTest {
 
 					siteBuilder.siteIndex(5f);
 					siteBuilder.siteGenus("L");
-					((Builder) siteBuilder).siteSpecies("L");
+					siteBuilder.siteSpecies("L");
 				});
 			});
 
@@ -4391,7 +4391,7 @@ class FipStartTest {
 
 					siteBuilder.siteIndex(5f);
 					siteBuilder.siteGenus("L");
-					((Builder) siteBuilder).siteSpecies("L");
+					siteBuilder.siteSpecies("L");
 				});
 			});
 
@@ -4452,7 +4452,7 @@ class FipStartTest {
 
 					siteBuilder.siteIndex(5f);
 					siteBuilder.siteGenus("L");
-					((Builder) siteBuilder).siteSpecies("L");
+					siteBuilder.siteSpecies("L");
 				});
 
 				builder.stockingClass('R');
@@ -4604,7 +4604,7 @@ class FipStartTest {
 
 					siteBuilder.siteIndex(5f);
 					siteBuilder.siteGenus("L");
-					((Builder) siteBuilder).siteSpecies("L");
+					siteBuilder.siteSpecies("L");
 				});
 			});
 
@@ -4771,7 +4771,7 @@ class FipStartTest {
 
 					siteBuilder.siteIndex(5f);
 					siteBuilder.siteGenus("L");
-					((Builder) siteBuilder).siteSpecies("L");
+					siteBuilder.siteSpecies("L");
 				});
 			});
 
@@ -4945,7 +4945,7 @@ class FipStartTest {
 
 				siteBuilder.siteIndex(1f);
 				siteBuilder.siteGenus("B");
-				((Builder) siteBuilder).siteSpecies("B");
+				siteBuilder.siteSpecies("B");
 			});
 
 		});
@@ -5094,8 +5094,8 @@ class FipStartTest {
 				siteBuilder.height(6f);
 				siteBuilder.siteIndex(5f);
 				siteBuilder.siteGenus("B");
-				((FipSite.Builder) siteBuilder).siteSpecies("B");
-				siteMutator.accept((FipSite.Builder) siteBuilder);
+				siteBuilder.siteSpecies("B");
+				siteMutator.accept(siteBuilder);
 			});
 
 			builder.crownClosure(0.9f);
@@ -5118,8 +5118,8 @@ class FipStartTest {
 				siteBuilder.height(6f);
 				siteBuilder.siteIndex(5f);
 				siteBuilder.siteGenus("B");
-				((FipSite.Builder) siteBuilder).siteSpecies("B");
-				siteMutator.accept((FipSite.Builder) siteBuilder);
+				siteBuilder.siteSpecies("B");
+				siteMutator.accept(siteBuilder);
 			});
 
 			builder.crownClosure(0.9f);

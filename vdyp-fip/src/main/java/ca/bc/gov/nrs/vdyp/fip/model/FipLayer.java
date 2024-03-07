@@ -87,7 +87,8 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> {
 		return layer;
 	}
 
-	public static class Builder extends BaseVdypLayer.Builder<FipLayer, FipSpecies, FipSite> {
+	public static class Builder
+			extends BaseVdypLayer.Builder<FipLayer, FipSpecies, FipSite, FipSpecies.Builder, FipSite.Builder> {
 		protected Optional<Float> crownClosure = Optional.empty();
 
 		public Builder crownClosure(float crownClosure) {
@@ -119,8 +120,7 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> {
 		}
 
 		@Override
-		protected FipSpecies
-				buildSpecies(Consumer<ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder<FipSpecies>> config) {
+		protected FipSpecies buildSpecies(Consumer<FipSpecies.Builder> config) {
 			return FipSpecies.build(builder -> {
 				builder.polygonIdentifier(this.polygonIdentifier.get());
 				config.accept(builder);
@@ -128,7 +128,7 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> {
 		}
 
 		@Override
-		protected FipSite buildSite(Consumer<ca.bc.gov.nrs.vdyp.model.BaseVdypSite.Builder<FipSite>> config) {
+		protected FipSite buildSite(Consumer<FipSite.Builder> config) {
 			return FipSite.build(builder -> {
 				builder.polygonIdentifier(polygonIdentifier.get());
 				builder.layerType(layer.get());

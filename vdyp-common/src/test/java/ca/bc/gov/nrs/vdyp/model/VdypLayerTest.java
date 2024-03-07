@@ -97,9 +97,9 @@ class VdypLayerTest {
 			builder.addSpecies(specBuilder -> {
 				specBuilder.genus("B");
 				specBuilder.percentGenus(90f);
-				((VdypSpecies.Builder) specBuilder).volumeGroup(10);
-				((VdypSpecies.Builder) specBuilder).decayGroup(10);
-				((VdypSpecies.Builder) specBuilder).breakageGroup(10);
+				specBuilder.volumeGroup(10);
+				specBuilder.decayGroup(10);
+				specBuilder.breakageGroup(10);
 			});
 		});
 		assertThat(result, hasProperty("species", hasEntry(is("B"), hasProperty("genus", is("B")))));

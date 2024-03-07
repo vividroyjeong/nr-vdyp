@@ -57,6 +57,7 @@ public class Utils {
 
 	/**
 	 * Passes both operands to the consumer only if both are present.
+	 *
 	 * @return
 	 */
 	public static <T, U> void ifBothPresent(Optional<T> opt1, Optional<U> opt2, BiConsumer<T, U> consumer) {
@@ -66,18 +67,23 @@ public class Utils {
 	}
 
 	/**
-	 * Returns the result of the function applied to the operands if both are present, otherwise empty.
+	 * Returns the result of the function applied to the operands if both are
+	 * present, otherwise empty.
+	 *
 	 * @return
 	 */
 	public static <T, U, V> Optional<V> mapBoth(Optional<T> opt1, Optional<U> opt2, BiFunction<T, U, V> function) {
 		return opt1.flatMap(v1 -> opt2.map(v2 -> function.apply(v1, v2)));
 	}
-	
+
 	/**
-	 * Returns the result of the function applied to the operands if both are present, otherwise empty.
+	 * Returns the result of the function applied to the operands if both are
+	 * present, otherwise empty.
+	 *
 	 * @return
 	 */
-	public static <T, U, V> Optional<V> flatMapBoth(Optional<T> opt1, Optional<U> opt2, BiFunction<T, U, Optional<V>> function) {
+	public static <T, U, V> Optional<V>
+			flatMapBoth(Optional<T> opt1, Optional<U> opt2, BiFunction<T, U, Optional<V>> function) {
 		return opt1.flatMap(v1 -> opt2.flatMap(v2 -> function.apply(v1, v2)));
 	}
 

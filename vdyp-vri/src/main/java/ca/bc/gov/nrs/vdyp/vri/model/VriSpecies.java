@@ -34,24 +34,6 @@ public class VriSpecies extends BaseVdypSpecies {
 		return builder.build();
 	}
 
-	/**
-	 * Builds a species and adds it to the layer.
-	 *
-	 * @param layer  Layer to create the species for.
-	 * @param config Configuration function for the builder.
-	 * @return the new species.
-	 */
-	public static VriSpecies build(VriLayer layer, Consumer<Builder> config) {
-		var result = build(builder -> {
-			builder.polygonIdentifier(layer.getPolygonIdentifier());
-			builder.layerType(layer.getLayer());
-
-			config.accept(builder);
-		});
-		layer.getSpecies().put(result.getGenus(), result);
-		return result;
-	}
-
 	public static class Builder extends BaseVdypSpecies.Builder<VriSpecies> {
 
 		@Override

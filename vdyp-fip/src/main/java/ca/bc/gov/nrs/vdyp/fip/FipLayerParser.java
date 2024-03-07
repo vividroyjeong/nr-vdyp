@@ -109,7 +109,7 @@ public class FipLayerParser
 									siteBuilder.siteIndex(siteIndex);
 									siteBuilder.siteGenus(siteSp0.get());
 									siteBuilder.siteCurveNumber(siteCurveNumber);
-									((FipSite.Builder) siteBuilder).siteSpecies(siteSp64.get());
+									siteBuilder.siteSpecies(siteSp64.get());
 
 								});
 
@@ -129,7 +129,7 @@ public class FipLayerParser
 									siteBuilder.height(height);
 									siteBuilder.siteIndex(siteIndex);
 									siteBuilder.siteGenus(siteSp0.get());
-									((FipSite.Builder) siteBuilder).siteSpecies(siteSp64.get());
+									siteBuilder.siteSpecies(siteSp64.get());
 								});
 
 								flBuilder.crownClosure(crownClosure);

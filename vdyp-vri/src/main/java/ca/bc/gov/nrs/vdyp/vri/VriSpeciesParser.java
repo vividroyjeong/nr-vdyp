@@ -115,9 +115,9 @@ public class VriSpeciesParser
 					var species4 = (Optional<String>) entry.get(SPECIES_4);
 					var percentSpecies4 = (Float) entry.get(PERCENT_SPECIES_4);
 
-					var layerBuilder = new ValueOrMarker.Builder<Optional<VriSpecies>, EndOfRecord>();
+					var markerBuilder = new ValueOrMarker.Builder<Optional<VriSpecies>, EndOfRecord>();
 					return species.handle(s -> {
-						return layerBuilder.value(s.map(layerType -> {
+						return markerBuilder.value(s.map(layerType -> {
 							Map<String, Float> speciesPercent = new LinkedHashMap<>();
 							species1.ifPresent((sp) -> speciesPercent.put(sp, percentSpecies1));
 							species2.ifPresent((sp) -> speciesPercent.put(sp, percentSpecies2));
@@ -131,7 +131,7 @@ public class VriSpeciesParser
 								specBuilder.addSpecies(speciesPercent);
 							});
 						}));
-					}, layerBuilder::marker);
+					}, markerBuilder::marker);
 				}
 
 			};
