@@ -50,12 +50,12 @@ public class VriLayerParser
 									ValueParser.optionalSingleton("Z"::equals, EndOfRecord.END_OF_RECORD)
 							)
 					) //
-					.floating(6, CROWN_CLOSURE) //
-					.floating(9, BASE_AREA) //
+					.value(6, CROWN_CLOSURE, ValueParser.FLOAT) //
+					.value(9, BASE_AREA, ValueParser.SAFE_NONNEGATIVE_FLOAT) //
 					.space(1) //
-					.floating(8, TREES_PER_HECTARE) //
+					.value(8, TREES_PER_HECTARE, ValueParser.SAFE_NONNEGATIVE_FLOAT) //
 					.space(1) //
-					.floating(4, UTILIZATION);
+					.value(4, UTILIZATION, ValueParser.FLOAT);
 
 			var is = fileResolver.resolveForInput(fileName);
 
@@ -69,8 +69,8 @@ public class VriLayerParser
 					var polygonId = (String) entry.get(VriPolygonParser.POLYGON_IDENTIFIER);
 					var layer = (ValueOrMarker<Optional<LayerType>, EndOfRecord>) entry.get(LAYER);
 					var crownClosure = (Float) entry.get(CROWN_CLOSURE);
-					var baseArea = (Float) entry.get(BASE_AREA);
-					var treesPerHectare = (Float) entry.get(TREES_PER_HECTARE);
+					var baseArea = (Optional<Float>) entry.get(BASE_AREA);
+					var treesPerHectare = (Optional<Float>) entry.get(TREES_PER_HECTARE);
 					var utilization = (Float) entry.get(UTILIZATION);
 
 					var vmBuilder = new ValueOrMarker.Builder<Optional<VriLayer>, EndOfRecord>();

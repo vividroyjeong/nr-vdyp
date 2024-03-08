@@ -12,12 +12,12 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 
 	private final float crownClosure; // VRIL/CCL
-	private final float baseArea; // VRIL/BAL
-	private final float treesPerHectare; // VRIL/TPHL
+	private final Optional<Float> baseArea; // VRIL/BAL
+	private final Optional<Float> treesPerHectare; // VRIL/TPHL
 	private final float utilization; // VRIL/UTLL
 
 	public VriLayer(
-			String polygonIdentifier, LayerType layer, float crownClosure, float baseArea, float treesPerHectare,
+			String polygonIdentifier, LayerType layer, float crownClosure, Optional<Float> baseArea, Optional<Float> treesPerHectare,
 			float utilization
 	) {
 		super(polygonIdentifier, layer, Optional.empty());
@@ -31,11 +31,11 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 		return crownClosure;
 	}
 
-	public float getBaseArea() {
+	public Optional<Float> getBaseArea() {
 		return baseArea;
 	}
 
-	public float getTreesPerHectare() {
+	public Optional<Float> getTreesPerHectare() {
 		return treesPerHectare;
 	}
 
@@ -79,14 +79,22 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 			return this;
 		}
 		
-		public Builder baseArea(float baseArea) {
-			this.baseArea = Optional.of(baseArea);
+		public Builder baseArea(Optional<Float> baseArea) {
+			this.baseArea = baseArea;
 			return this;
 		}
 		
-		public Builder treesPerHectare(float treesPerHectare) {
-			this.treesPerHectare = Optional.of(treesPerHectare);
+		public Builder treesPerHectare(Optional<Float> treesPerHectare) {
+			this.treesPerHectare = treesPerHectare;
 			return this;
+		}
+		
+		public Builder baseArea(float baseArea) {
+			return baseArea(Optional.of(baseArea));
+		}
+		
+		public Builder treesPerHectare(float treesPerHectare) {
+			return treesPerHectare(Optional.of(treesPerHectare));
 		}
 		
 		public Builder utilization(float utilization) {
@@ -98,8 +106,6 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 		protected void check(Collection<String> errors) {
 			super.check(errors);
 			requirePresent(crownClosure, "crownClosure", errors);
-			requirePresent(baseArea, "baseArea", errors);
-			requirePresent(treesPerHectare, "treesPerHectare", errors);
 			requirePresent(utilization, "utilization", errors);
 		}
 
@@ -110,8 +116,8 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 					polygonIdentifier.get(), //
 					layer.get(), //
 					crownClosure.get(), //
-					baseArea.get(), //
-					treesPerHectare.get(), //
+					baseArea, //
+					treesPerHectare, //
 					utilization.get()
 			));
 		}
