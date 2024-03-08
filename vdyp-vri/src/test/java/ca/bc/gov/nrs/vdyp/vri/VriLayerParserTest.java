@@ -15,7 +15,6 @@ import static org.hamcrest.Matchers.is;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
@@ -23,6 +22,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
+import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
 
 class VriLayerParserTest {
@@ -46,7 +46,7 @@ class VriLayerParserTest {
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
 		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<VriLayer>) parserFactory).get();
+		var stream = ((StreamingParserFactory<Map<LayerType, VriLayer.Builder>>) parserFactory).get();
 
 		assertThat(stream, instanceOf(StreamingParser.class));
 
@@ -63,8 +63,7 @@ class VriLayerParserTest {
 		controlMap.put(ControlKey.VRI_YIELD_LAYER_INPUT.name(), "test.dat");
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat",
-				TestUtils.makeInputStream(
+				"test.dat", TestUtils.makeInputStream(
 						"082F074/0071         2001 P  57.8     66.0      850  7.5", //
 						"082F074/0071         2001 Z"
 				)
@@ -77,7 +76,7 @@ class VriLayerParserTest {
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
 		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<Map<LayerType, VriLayer>>) parserFactory).get();
+		var stream = ((StreamingParserFactory<Map<LayerType, VriLayer.Builder>>) parserFactory).get();
 
 		assertThat(stream, instanceOf(StreamingParser.class));
 
@@ -88,20 +87,23 @@ class VriLayerParserTest {
 		assertThat(
 				layers,
 				hasSpecificEntry(
-						LayerType.PRIMARY, allOf(
-								hasProperty("polygonIdentifier", is("082F074/0071         2001")), //
-								hasProperty("layer", is(LayerType.PRIMARY)), //
-								hasProperty("crownClosure", is(57.8f)), //
-								hasProperty("baseArea", present(is(66.0f))), //
-								hasProperty("treesPerHectare", present(is(850f))), //
-								hasProperty("utilization", is(7.5f))
+						LayerType.PRIMARY,
+						VdypMatchers.builds(
+								allOf(
+										hasProperty("polygonIdentifier", is("082F074/0071         2001")), //
+										hasProperty("layer", is(LayerType.PRIMARY)), //
+										hasProperty("crownClosure", is(57.8f)), //
+										hasProperty("baseArea", present(is(66.0f))), //
+										hasProperty("treesPerHectare", present(is(850f))), //
+										hasProperty("utilization", is(7.5f))
+								)
 						)
 				)
 		);
 
 		assertEmpty(stream);
 	}
-	
+
 	@Test
 	void testParseVeteranLayer() throws Exception {
 
@@ -112,8 +114,7 @@ class VriLayerParserTest {
 		controlMap.put(ControlKey.VRI_YIELD_LAYER_INPUT.name(), "test.dat");
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat",
-				TestUtils.makeInputStream(
+				"test.dat", TestUtils.makeInputStream(
 						"082F074/0071         2001 V  57.8     66.0      850  7.5", //
 						"082F074/0071         2001 Z"
 				)
@@ -126,7 +127,7 @@ class VriLayerParserTest {
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
 		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<Map<LayerType, VriLayer>>) parserFactory).get();
+		var stream = ((StreamingParserFactory<Map<LayerType, VriLayer.Builder>>) parserFactory).get();
 
 		assertThat(stream, instanceOf(StreamingParser.class));
 
@@ -137,13 +138,16 @@ class VriLayerParserTest {
 		assertThat(
 				layers,
 				hasSpecificEntry(
-						LayerType.VETERAN, allOf(
-								hasProperty("polygonIdentifier", is("082F074/0071         2001")), //
-								hasProperty("layer", is(LayerType.VETERAN)), //
-								hasProperty("crownClosure", is(57.8f)), //
-								hasProperty("baseArea", present(is(66.0f))), //
-								hasProperty("treesPerHectare", present(is(850f))), //
-								hasProperty("utilization", is(7.5f))
+						LayerType.VETERAN,
+						VdypMatchers.builds(
+								allOf(
+										hasProperty("polygonIdentifier", is("082F074/0071         2001")), //
+										hasProperty("layer", is(LayerType.VETERAN)), //
+										hasProperty("crownClosure", is(57.8f)), //
+										hasProperty("baseArea", present(is(66.0f))), //
+										hasProperty("treesPerHectare", present(is(850f))), //
+										hasProperty("utilization", is(7.5f))
+								)
 						)
 				)
 		);
@@ -162,8 +166,7 @@ class VriLayerParserTest {
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat",
-				TestUtils.makeInputStream(
+				"test.dat", TestUtils.makeInputStream(
 						"082F074/0071         2001 P  57.8     66.0      850  7.5", //
 						"082F074/0071         2001 V  30.0     -9.0       -9  7.5", //
 						"082F074/0071         2001 Z"
@@ -177,7 +180,7 @@ class VriLayerParserTest {
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
 		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<Map<LayerType, VriLayer>>) parserFactory).get();
+		var stream = ((StreamingParserFactory<Map<LayerType, VriLayer.Builder>>) parserFactory).get();
 
 		assertThat(stream, instanceOf(StreamingParser.class));
 
@@ -188,26 +191,32 @@ class VriLayerParserTest {
 		assertThat(
 				layers,
 				hasSpecificEntry(
-						LayerType.PRIMARY, allOf(
-								hasProperty("polygonIdentifier", is("082F074/0071         2001")), //
-								hasProperty("layer", is(LayerType.PRIMARY)), //
-								hasProperty("crownClosure", is(57.8f)), //
-								hasProperty("baseArea", present(is(66.0f))), //
-								hasProperty("treesPerHectare", present(is(850f))), //
-								hasProperty("utilization", is(7.5f))
+						LayerType.PRIMARY,
+						VdypMatchers.builds(
+								allOf(
+										hasProperty("polygonIdentifier", is("082F074/0071         2001")), //
+										hasProperty("layer", is(LayerType.PRIMARY)), //
+										hasProperty("crownClosure", is(57.8f)), //
+										hasProperty("baseArea", present(is(66.0f))), //
+										hasProperty("treesPerHectare", present(is(850f))), //
+										hasProperty("utilization", is(7.5f))
+								)
 						)
 				)
 		);
 		assertThat(
 				layers,
 				hasSpecificEntry(
-						LayerType.VETERAN, allOf(
-								hasProperty("polygonIdentifier", is("082F074/0071         2001")), //
-								hasProperty("layer", is(LayerType.VETERAN)), //
-								hasProperty("crownClosure", is(30.0f)), //
-								hasProperty("baseArea", notPresent()), //
-								hasProperty("treesPerHectare", notPresent()), //
-								hasProperty("utilization", is(7.5f))
+						LayerType.VETERAN,
+						VdypMatchers.builds(
+								allOf(
+										hasProperty("polygonIdentifier", is("082F074/0071         2001")), //
+										hasProperty("layer", is(LayerType.VETERAN)), //
+										hasProperty("crownClosure", is(30.0f)), //
+										hasProperty("baseArea", notPresent()), //
+										hasProperty("treesPerHectare", notPresent()), //
+										hasProperty("utilization", is(7.5f))
+								)
 						)
 				)
 		);

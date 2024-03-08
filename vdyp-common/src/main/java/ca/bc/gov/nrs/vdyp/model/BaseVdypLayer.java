@@ -90,6 +90,10 @@ public class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdypSite> {
 			return this;
 		}
 
+		public Optional<LayerType> getLayerType() {
+			return layer;
+		}
+
 		public Builder<T, S, I, SB, IB> addSpecies(Consumer<SB> config) {
 			speciesBuilders.add(config);
 			return this;

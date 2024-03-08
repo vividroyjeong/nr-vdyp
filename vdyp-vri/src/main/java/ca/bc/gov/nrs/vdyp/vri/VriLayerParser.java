@@ -22,8 +22,13 @@ import ca.bc.gov.nrs.vdyp.io.parse.value.ControlledValueParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 
+/**
+ * Parses a file containing VRI Layer records into VriLayer.Builder objects.
+ * Returns Builders rather than finished VriLayer objects because some
+ * additional manipulation is needed before adding them to their VriPolygon
+ */
 public class VriLayerParser
-		implements ControlMapValueReplacer<StreamingParserFactory<Map<LayerType, VriLayer>>, String> {
+		implements ControlMapValueReplacer<StreamingParserFactory<Map<LayerType, VriLayer.Builder>>, String> {
 
 	static final String LAYER = "LAYER"; // LAYER
 	static final String CROWN_CLOSURE = "CROWN_CLOSURE"; // CC
@@ -37,7 +42,7 @@ public class VriLayerParser
 	}
 
 	@Override
-	public StreamingParserFactory<Map<LayerType, VriLayer>>
+	public StreamingParserFactory<Map<LayerType, VriLayer.Builder>>
 			map(String fileName, FileResolver fileResolver, Map<String, Object> control)
 					throws IOException, ResourceParseException {
 		return () -> {
@@ -60,13 +65,13 @@ public class VriLayerParser
 
 			var is = fileResolver.resolveForInput(fileName);
 
-			var delegateStream = new AbstractStreamingParser<ValueOrMarker<Optional<VriLayer>, EndOfRecord>>(
+			var delegateStream = new AbstractStreamingParser<ValueOrMarker<Optional<VriLayer.Builder>, EndOfRecord>>(
 					is, lineParser, control
 			) {
 
 				@SuppressWarnings({ "unchecked" })
 				@Override
-				protected ValueOrMarker<Optional<VriLayer>, EndOfRecord> convert(Map<String, Object> entry) {
+				protected ValueOrMarker<Optional<VriLayer.Builder>, EndOfRecord> convert(Map<String, Object> entry) {
 					var polygonId = (String) entry.get(VriPolygonParser.POLYGON_IDENTIFIER);
 					var layer = (ValueOrMarker<Optional<LayerType>, EndOfRecord>) entry.get(LAYER);
 					var crownClosure = (Float) entry.get(CROWN_CLOSURE);
@@ -74,31 +79,30 @@ public class VriLayerParser
 					var treesPerHectare = (Optional<Float>) entry.get(TREES_PER_HECTARE);
 					var utilization = (Float) entry.get(UTILIZATION);
 
-					var vmBuilder = new ValueOrMarker.Builder<Optional<VriLayer>, EndOfRecord>();
+					var vmBuilder = new ValueOrMarker.Builder<Optional<VriLayer.Builder>, EndOfRecord>();
 					return layer.handle(l -> {
-						VriLayer fipLayer = VriLayer.build(layerBuilder -> {
-							layerBuilder.polygonIdentifier(polygonId);
-							layerBuilder.layerType(l.get());
+						var layerBuilder = new VriLayer.Builder();
+						layerBuilder.polygonIdentifier(polygonId);
+						layerBuilder.layerType(l.get());
 
-							layerBuilder.crownClosure(crownClosure);
-							layerBuilder.baseArea(baseArea);
-							layerBuilder.treesPerHectare(treesPerHectare);
-							layerBuilder.utilization(utilization);
-						});
+						layerBuilder.crownClosure(crownClosure);
+						layerBuilder.baseArea(baseArea);
+						layerBuilder.treesPerHectare(treesPerHectare);
+						layerBuilder.utilization(utilization);
 
-						return vmBuilder.value(Optional.of(fipLayer));
+						return vmBuilder.value(Optional.of(layerBuilder));
 
 					}, vmBuilder::marker);
 				}
 
 			};
 
-			return new GroupingStreamingParser<Map<LayerType, VriLayer>, ValueOrMarker<Optional<VriLayer>, EndOfRecord>>(
+			return new GroupingStreamingParser<Map<LayerType, VriLayer.Builder>, ValueOrMarker<Optional<VriLayer.Builder>, EndOfRecord>>(
 					delegateStream
 			) {
 
 				@Override
-				protected boolean skip(ValueOrMarker<Optional<VriLayer>, EndOfRecord> nextChild) {
+				protected boolean skip(ValueOrMarker<Optional<VriLayer.Builder>, EndOfRecord> nextChild) {
 					return nextChild.getValue().map(x -> x.map(layer -> {
 						return false;
 					}).orElse(true)) // If the layer is not present (Unknown layer type) ignore
@@ -106,19 +110,19 @@ public class VriLayerParser
 				}
 
 				@Override
-				protected boolean stop(ValueOrMarker<Optional<VriLayer>, EndOfRecord> nextChild) {
+				protected boolean stop(ValueOrMarker<Optional<VriLayer.Builder>, EndOfRecord> nextChild) {
 					return nextChild.isMarker();
 				}
-				
+
 				@Override
-				protected Map<LayerType, VriLayer>
-						convert(List<ValueOrMarker<Optional<VriLayer>, EndOfRecord>> children) {
+				protected Map<LayerType, VriLayer.Builder>
+						convert(List<ValueOrMarker<Optional<VriLayer.Builder>, EndOfRecord>> children) {
 
 					return children.stream().map(ValueOrMarker::getValue).map(Optional::get) // Should never be empty as
 							// we've filtered out
 							// markers
 							.flatMap(Optional::stream) // Skip if empty (and unknown layer type)
-							.collect(Collectors.toMap(VriLayer::getLayer, x -> x));
+							.collect(Collectors.toMap(x -> x.getLayerType().get(), x -> x));
 				}
 
 			};

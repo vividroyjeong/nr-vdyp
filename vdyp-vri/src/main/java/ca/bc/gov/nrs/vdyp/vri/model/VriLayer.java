@@ -17,8 +17,8 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 	private final float utilization; // VRIL/UTLL
 
 	public VriLayer(
-			String polygonIdentifier, LayerType layer, float crownClosure, Optional<Float> baseArea, Optional<Float> treesPerHectare,
-			float utilization
+			String polygonIdentifier, LayerType layer, float crownClosure, Optional<Float> baseArea,
+			Optional<Float> treesPerHectare, float utilization
 	) {
 		super(polygonIdentifier, layer, Optional.empty());
 		this.crownClosure = crownClosure;
@@ -78,25 +78,25 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 			this.crownClosure = Optional.of(crownClosure);
 			return this;
 		}
-		
+
 		public Builder baseArea(Optional<Float> baseArea) {
 			this.baseArea = baseArea;
 			return this;
 		}
-		
+
 		public Builder treesPerHectare(Optional<Float> treesPerHectare) {
 			this.treesPerHectare = treesPerHectare;
 			return this;
 		}
-		
+
 		public Builder baseArea(float baseArea) {
 			return baseArea(Optional.of(baseArea));
 		}
-		
+
 		public Builder treesPerHectare(float treesPerHectare) {
 			return treesPerHectare(Optional.of(treesPerHectare));
 		}
-		
+
 		public Builder utilization(float utilization) {
 			this.utilization = Optional.of(utilization);
 			return this;
