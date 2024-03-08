@@ -15,9 +15,9 @@ import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.StockingClassFactorParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapModifier;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapValueReplacer;
+import ca.bc.gov.nrs.vdyp.io.parse.control.StartApplicationControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 
 /**
@@ -26,7 +26,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
  * @author Kevin Smith, Vivid Solutions
  *
  */
-public class FipControlParser extends BaseControlParser {
+public class FipControlParser extends StartApplicationControlParser {
 	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(FipControlParser.class);
 

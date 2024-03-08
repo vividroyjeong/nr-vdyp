@@ -6,7 +6,7 @@ import java.util.Map;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 
-public interface ControlMapValueReplacer<Result, Raw> extends KeyedControlMapModifier {
+public interface ControlMapValueReplacer<Result, Raw> extends ControlMapModifier {
 
 	/**
 	 * Remap a raw control value

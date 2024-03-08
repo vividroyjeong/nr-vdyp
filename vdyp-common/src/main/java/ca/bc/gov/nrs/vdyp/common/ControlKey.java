@@ -56,7 +56,7 @@ public enum ControlKey {
 	BA_MODIFIERS, DQ_MODIFIERS, HL_MODIFIERS, DECAY_MODIFIERS, WASTE_MODIFIERS;
 
 	public final Optional<Integer> sequence;
-
+	
 	ControlKey(int sequence) {
 		this.sequence = Optional.of(sequence);
 	}
@@ -65,4 +65,12 @@ public enum ControlKey {
 		this.sequence = Optional.empty();
 	}
 
+	public static boolean isControlKey(String key) {
+		try {
+			ControlKey.valueOf(key);
+		} catch (IllegalArgumentException e) {
+			return false;
+		}
+		return true;
+	}
 }

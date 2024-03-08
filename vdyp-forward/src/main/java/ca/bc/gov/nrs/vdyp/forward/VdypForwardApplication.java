@@ -7,22 +7,34 @@ import static ca.bc.gov.nrs.vdyp.forward.VdypPass.PASS_4;
 import static ca.bc.gov.nrs.vdyp.forward.VdypPass.PASS_5;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.LogManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.application.VdypApplication;
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
+import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 
 public class VdypForwardApplication extends VdypApplication {
 
-	private static final Logger log = LoggerFactory.getLogger(VdypForwardApplication.class);
+	static {
+		try {
+			LogManager.getLogManager().readConfiguration(VdypForwardProcessor.class.getClassLoader()
+					.getResourceAsStream("logging.properties"));
+		} catch (SecurityException | IOException e) {
+			System.err.println("Unable to configure logging system");
+		}
+	}
+
+	private static final Logger logger = LoggerFactory.getLogger(VdypForwardApplication.class);
 
 	public static final int CONFIG_LOAD_ERROR = 1; // TODO check what Fortran VDYP Forward would exit with.
 	public static final int PROCESSING_ERROR = 2; // TODO check what Fortran VDYP Forward would exit with.
@@ -30,9 +42,10 @@ public class VdypForwardApplication extends VdypApplication {
 	public static final String DEFAULT_VDYP_CONTROL_FILE_NAME = "vdyp.ctr";
 
 	private static Set<VdypPass> vdypPassSet = new HashSet<>(
-			Arrays.asList(new VdypPass[] { PASS_1, PASS_2, PASS_3, PASS_4, PASS_5 })
+			Arrays.asList(PASS_1, PASS_2, PASS_3, PASS_4, PASS_5)
 	);
 
+	@SuppressWarnings("java:S106")
 	public static void main(final String... args) {
 
 		var app = new VdypForwardApplication();
@@ -61,23 +74,25 @@ public class VdypForwardApplication extends VdypApplication {
 				controlFileNames = Arrays.asList(args);
 			}
 		} catch (Exception ex) {
-			log.error("Error during initialization", ex);
+			logger.error("Error during initialization", ex);
 			System.exit(CONFIG_LOAD_ERROR);
 		}
 
 		try {
-			VdypForwardProcessor processor = new VdypForwardProcessor(app, vdypPassSet, controlFileNames);
-			processor.process();
+			VdypForwardProcessor processor = new VdypForwardProcessor();
+			
+			processor.run(new FileSystemFileResolver(), controlFileNames, vdypPassSet);
+			
 		} catch (Exception ex) {
-			log.error("Error during processing", ex);
+			logger.error("Error during processing", ex);
 			System.exit(PROCESSING_ERROR);
 		}
 	}
 
 	private void logVersionInformation() {
-		log.info(RESOURCE_SHORT_VERSION + " " + RESOURCE_VERSION_DATE);
-		log.info(RESOURCE_BINARY_NAME + " Ver:" + RESOURCE_SHORT_VERSION + " " + RESOURCE_VERSION_DATE);
-		log.info("VDYP7 Support Ver: " + AVERSION);
+		logger.info("{} {}", RESOURCE_SHORT_VERSION, RESOURCE_VERSION_DATE);
+		logger.info("{} Ver:{} {}", RESOURCE_BINARY_NAME, RESOURCE_SHORT_VERSION, RESOURCE_VERSION_DATE);
+		logger.info("VDYP7 Support Ver: {}", AVERSION);
 	}
 
 	@Override
