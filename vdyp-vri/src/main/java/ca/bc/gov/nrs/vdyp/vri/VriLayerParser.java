@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
 import ca.bc.gov.nrs.vdyp.io.EndOfRecord;
@@ -108,10 +109,11 @@ public class VriLayerParser
 				protected boolean stop(ValueOrMarker<Optional<VriLayer>, EndOfRecord> nextChild) {
 					return nextChild.isMarker();
 				}
-
+				
 				@Override
 				protected Map<LayerType, VriLayer>
 						convert(List<ValueOrMarker<Optional<VriLayer>, EndOfRecord>> children) {
+
 					return children.stream().map(ValueOrMarker::getValue).map(Optional::get) // Should never be empty as
 							// we've filtered out
 							// markers
