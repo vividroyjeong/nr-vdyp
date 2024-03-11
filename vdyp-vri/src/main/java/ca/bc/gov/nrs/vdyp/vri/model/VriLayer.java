@@ -73,6 +73,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 		protected Optional<Float> baseArea = Optional.empty();
 		protected Optional<Float> treesPerHectare = Optional.empty();
 		protected Optional<Float> utilization = Optional.empty();
+		protected Optional<Float> percentAvailable = Optional.empty();
 
 		public Builder crownClosure(float crownClosure) {
 			this.crownClosure = Optional.of(crownClosure);
@@ -102,6 +103,15 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 			return this;
 		}
 
+		public Builder percentAvailable(Optional<Float> percentAvailable) {
+			this.percentAvailable = percentAvailable;
+			return this;
+		}
+		public Builder percentAvailable(float percentAvailable) {
+			return percentAvailable(Optional.of(percentAvailable));
+		}
+
+		
 		@Override
 		protected void check(Collection<String> errors) {
 			super.check(errors);
@@ -111,14 +121,14 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 
 		@Override
 		protected VriLayer doBuild() {
-
+			float multiplier = percentAvailable.orElse(100f) / 100f;
 			return (new VriLayer(
 					polygonIdentifier.get(), //
 					layer.get(), //
-					crownClosure.get(), //
-					baseArea, //
-					treesPerHectare, //
-					utilization.get()
+					crownClosure.get() * multiplier, //
+					baseArea.map(x -> x * multiplier), //
+					treesPerHectare.map(x -> x * multiplier), //
+					utilization.get() * multiplier
 			));
 		}
 
