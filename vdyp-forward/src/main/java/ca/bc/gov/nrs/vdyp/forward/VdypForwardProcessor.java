@@ -105,5 +105,8 @@ public class VdypForwardProcessor {
 		}
 		
 		logger.debug("MaxPoly: {}", maxPoly);
+
+		if (vdypPassSet.contains(VdypPass.PASS_2)) {
+		}
 	}
 }

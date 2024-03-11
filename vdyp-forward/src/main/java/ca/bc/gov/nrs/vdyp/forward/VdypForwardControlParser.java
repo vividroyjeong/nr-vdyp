@@ -3,11 +3,11 @@ package ca.bc.gov.nrs.vdyp.forward;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,11 +82,7 @@ public class VdypForwardControlParser extends BaseControlParser {
 
 	@Override
 	protected List<ControlMapValueReplacer<Object, String>> inputFileParsers() {
-		return inputParserList(
-				new VdypPolygonParser(), // V7O_VIP
-				new VdypSpeciesParser(), // V7O_VIS
-				new VdypUtilizationParser() // V7O_VIU
-		);
+		return new ArrayList<>(vdypForwardInputParsers.values());
 	}
 
 	@Override
@@ -112,14 +108,23 @@ public class VdypForwardControlParser extends BaseControlParser {
 		);
 	}
 
-	private static final Map<ControlKey, ResourceControlMapModifier> vdypForwardConfigurationParsers;
+	private static final List<ControlKey> orderedControlKeys = new ArrayList<>();
+	
+	private static final Map<ControlKey, ControlMapValueReplacer<Object, String>> vdypForwardInputParsers = new EnumMap<>(ControlKey.class);
+	
+	private static void addInputParser(ControlMapValueReplacer<Object, String> parser) {
+		vdypForwardInputParsers.put(parser.getControlKey(), parser);
+		orderedControlKeys.add(parser.getControlKey());
+	}
+	
+	private static final Map<ControlKey, ResourceControlMapModifier> vdypForwardConfigurationParsers = new EnumMap<>(ControlKey.class);
 		
-	static void addConfigurationParser(ResourceControlMapModifier parser) {
+	private static void addConfigurationParser(ResourceControlMapModifier parser) {
 		vdypForwardConfigurationParsers.put(parser.getControlKey(), parser);
+		orderedControlKeys.add(parser.getControlKey());
 	}
 	
 	static {
-		vdypForwardConfigurationParsers = new EnumMap<>(ControlKey.class);
 		
 		// RD_BECD - 09
 		addConfigurationParser(new BecDefinitionParser());
@@ -233,6 +238,28 @@ public class VdypForwardControlParser extends BaseControlParser {
 
 		// RD_E198: Modifiers); IPSJF155-Appendix XII
 		addConfigurationParser(new ModifierParser(VdypApplicationIdentifier.VDYP_FORWARD));
+
+		// V7O_VIP - 11
+		addInputParser(new VdypPolygonParser());
+		// V7O_VIS - 12
+		addInputParser(new VdypSpeciesParser());
+		// V7O_VIU - 13
+		addInputParser(new VdypUtilizationParser());
+		// V7O_VI7 - 14
+		addInputParser(new VdypPolygonDescriptionParser());		
+
+		// 101 - a literal value of type VdypGrowthDetails
+		orderedControlKeys.add(ControlKey.VTROL);
+
+		// 199 - debug switches
+		orderedControlKeys.add(ControlKey.DEBUG_SWITCHES);
+		
+		// 1 - MAX_NUM_POLY
+		orderedControlKeys.add(ControlKey.MAX_NUM_POLY);
+	}
+	
+	public VdypForwardControlParser() {
+		controlParser.record(ControlKey.VTROL, new VdypVtrolParser());	
 	}
 	
 	@Override
@@ -244,26 +271,33 @@ public class VdypForwardControlParser extends BaseControlParser {
 	protected void applyAllModifiers(Map<String, Object> map, FileResolver fileResolver)
 			throws ResourceParseException, IOException {
 		
-		List<ControlKey> keySet = map.keySet().stream().filter(ControlKey::isControlKey)
-				.map(ControlKey::valueOf).collect(Collectors.toList());
-		
-		Collections.sort(keySet, new ControlKeyComparator());
-		
-		for (ControlKey key: keySet) {
+		for (ControlKey key: orderedControlKeys) {
 			
 			ResourceControlMapModifier m = vdypForwardConfigurationParsers.get(key);
 			if (m != null) {
 				// m is a configuration file parser.
+				logger.debug("Parsing configuration file {}[{}] using {}", m.getControlKeyName(), key.sequence.get(), m.getClass().getName());
 				m.modify(map, fileResolver);
-			}			
+			}
+			
+			ControlMapValueReplacer<?, ?> r = vdypForwardInputParsers.get(key);
+			if (r != null) {
+				// r is an input file parser.
+				logger.debug("Parsing input file {}[{}] using {}", r.getControlKeyName(), key.sequence.get(), r.getClass().getName());
+				r.modify(map, fileResolver);
+			}
 		}
-	}
-	
-	public class ControlKeyComparator implements Comparator<ControlKey> {
-
-		@Override
-		public int compare(ControlKey o1, ControlKey o2) {
-			return o1.sequence.orElseThrow().compareTo(o2.sequence.orElseThrow());
-		}
+		
+		// Report any control map items that are a) not included in orderedControlKeys or b) for which
+		// not parser was registered.
+		
+		// a
+		Set<ControlKey> parsersNotExecuted = new HashSet<>(map.keySet().stream().filter(ControlKey::isControlKey)
+				.map(ControlKey::valueOf).filter(k -> k.sequence.isPresent()).toList());
+		parsersNotExecuted.removeAll(orderedControlKeys);
+		parsersNotExecuted.stream().forEach(e -> logger.warn("{}[{}] was present in the configuration file but not read", e, e.sequence.get()));
+		
+		// b
+		map.keySet().stream().filter(k -> !ControlKey.isControlKey(k)).forEach(k -> logger.warn("{} was present in the configuration file but no parser was registered", k));
 	}
 }

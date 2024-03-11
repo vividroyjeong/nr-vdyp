@@ -19,7 +19,7 @@ public class VdypVtrolParser implements ValueParser<VdypGrowthDetails> {
 		}
 
 		var parser = ValueParser.list(ValueParser.INTEGER);
-		List<Integer> vtrol = (List<Integer>) parser.parse(string);
+		List<Integer> vtrol = parser.parse(string);
 
 		var a = new Integer[vtrol.size()];
 		var details = new VdypGrowthDetails(vtrol.toArray(a));

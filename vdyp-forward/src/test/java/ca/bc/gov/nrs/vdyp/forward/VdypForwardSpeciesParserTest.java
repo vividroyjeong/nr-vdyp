@@ -26,23 +26,23 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
-public class VdypForwardSpeciesParserTest {
+class VdypForwardSpeciesParserTest {
 
 	@Test
-	public void testParseEmpty() throws Exception {
+	void testParseEmpty() throws Exception {
 
 		var parser = new VdypSpeciesParser();
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SPECIES.name(), "test.dat");
+		controlMap.put(ControlKey.FORWARD_VDYP_LAYER_BY_SPECIES_INPUT.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeInputStream(/* empty */));
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VDYP_LAYER_BY_SPECIES.name());
+		var parserFactory = controlMap.get(ControlKey.FORWARD_VDYP_LAYER_BY_SPECIES_INPUT.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -55,13 +55,13 @@ public class VdypForwardSpeciesParserTest {
 	}
 
 	@Test
-	public void testParseOneGenus() throws Exception {
+	void testParseOneGenus() throws Exception {
 
 		var parser = new VdypSpeciesParser();
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SPECIES.name(), "test.dat");
+		controlMap.put(ControlKey.FORWARD_VDYP_LAYER_BY_SPECIES_INPUT.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -74,7 +74,7 @@ public class VdypForwardSpeciesParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VDYP_LAYER_BY_SPECIES.name());
+		var parserFactory = controlMap.get(ControlKey.FORWARD_VDYP_LAYER_BY_SPECIES_INPUT.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -117,13 +117,13 @@ public class VdypForwardSpeciesParserTest {
 	}
 
 	@Test
-	public void testParseTwoPairsOfGenera() throws Exception {
+	void testParseTwoPairsOfGenera() throws Exception {
 
 		var parser = new VdypSpeciesParser();
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SPECIES.name(), "test.dat");
+		controlMap.put(ControlKey.FORWARD_VDYP_LAYER_BY_SPECIES_INPUT.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -140,7 +140,7 @@ public class VdypForwardSpeciesParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VDYP_LAYER_BY_SPECIES.name());
+		var parserFactory = controlMap.get(ControlKey.FORWARD_VDYP_LAYER_BY_SPECIES_INPUT.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -159,13 +159,13 @@ public class VdypForwardSpeciesParserTest {
 	}
 
 	@Test
-	public void testParseComputesAgesWhenMissing() throws Exception {
+	void testParseComputesAgesWhenMissing() throws Exception {
 
 		var parser = new VdypSpeciesParser();
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SPECIES.name(), "test.dat");
+		controlMap.put(ControlKey.FORWARD_VDYP_LAYER_BY_SPECIES_INPUT.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -180,7 +180,7 @@ public class VdypForwardSpeciesParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VDYP_LAYER_BY_SPECIES.name());
+		var parserFactory = controlMap.get(ControlKey.FORWARD_VDYP_LAYER_BY_SPECIES_INPUT.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -273,13 +273,13 @@ public class VdypForwardSpeciesParserTest {
 	}
 
 	@Test
-	public void testParseTwoGenera() throws Exception {
+	void testParseTwoGenera() throws Exception {
 
 		var parser = new VdypSpeciesParser();
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SPECIES.name(), "test.dat");
+		controlMap.put(ControlKey.FORWARD_VDYP_LAYER_BY_SPECIES_INPUT.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -293,7 +293,7 @@ public class VdypForwardSpeciesParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VDYP_LAYER_BY_SPECIES.name());
+		var parserFactory = controlMap.get(ControlKey.FORWARD_VDYP_LAYER_BY_SPECIES_INPUT.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 

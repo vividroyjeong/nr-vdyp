@@ -27,12 +27,9 @@ import java.util.Map;
 
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.application.VdypApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.forward.test.VdypForwardControlParserTestApplication;
 import ca.bc.gov.nrs.vdyp.forward.test.VdypForwardTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveAgeMaximumParserTest;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -49,13 +46,6 @@ import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 class VdypForwardControlParserTest {
-
-	private static VdypApplication app;
-
-	@BeforeAll
-	public static void beforeAll() {
-		app = new VdypForwardControlParserTestApplication();
-	}
 
 	@Test
 	void testParseBec_9() throws Exception {
@@ -512,7 +502,7 @@ class VdypForwardControlParserTest {
 		var parser = new VdypForwardControlParser();
 		var result = parse(parser, "VDYP.CTR");
 		assertThat(
-				result, (Matcher) controlMapHasEntry(ControlKey.VDYP_POLYGON, instanceOf(StreamingParserFactory.class))
+				result, (Matcher) controlMapHasEntry(ControlKey.FORWARD_VDYP_POLY_INPUT, instanceOf(StreamingParserFactory.class))
 		);
 	}
 
@@ -523,7 +513,7 @@ class VdypForwardControlParserTest {
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
-						ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL, instanceOf(StreamingParserFactory.class)
+						ControlKey.FORWARD_VDYP_LAYER_BY_SP0_BY_UTIL_INPUT, instanceOf(StreamingParserFactory.class)
 				)
 		);
 	}
@@ -534,7 +524,17 @@ class VdypForwardControlParserTest {
 		var result = parse(parser, "VDYP.CTR");
 		assertThat(
 				result,
-				(Matcher) controlMapHasEntry(ControlKey.VDYP_LAYER_BY_SPECIES, instanceOf(StreamingParserFactory.class))
+				(Matcher) controlMapHasEntry(ControlKey.FORWARD_VDYP_LAYER_BY_SPECIES_INPUT, instanceOf(StreamingParserFactory.class))
+		);
+	}
+
+	@Test
+	void testParseV7O_VIY() throws Exception {
+		var parser = new VdypForwardControlParser();
+		var result = parse(parser, "VDYP.CTR");
+		assertThat(
+				result,
+				(Matcher) controlMapHasEntry(ControlKey.FORWARD_GROWTO_INPUT, instanceOf(StreamingParserFactory.class))
 		);
 	}
 
