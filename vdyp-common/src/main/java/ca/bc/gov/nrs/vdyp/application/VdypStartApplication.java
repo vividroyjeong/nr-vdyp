@@ -30,23 +30,24 @@ import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 
-public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional<Float>>, L extends BaseVdypLayer<S, I>, S extends BaseVdypSpecies, I extends BaseVdypSite> extends VdypApplication implements Closeable {
+public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional<Float>>, L extends BaseVdypLayer<S, I>, S extends BaseVdypSpecies, I extends BaseVdypSite>
+		extends VdypApplication implements Closeable {
 
 	private static final Logger log = LoggerFactory.getLogger(VdypStartApplication.class);
 
 	public static final int CONFIG_LOAD_ERROR = 1;
 	public static final int PROCESSING_ERROR = 2;
-	
+
 	protected static void doMain(VdypStartApplication<?, ?, ?, ?> app, final String... args) {
 		var resolver = new FileSystemFileResolver();
-	
+
 		try {
 			app.init(resolver, args);
 		} catch (Exception ex) {
 			log.error("Error during initialization", ex);
 			System.exit(CONFIG_LOAD_ERROR);
 		}
-	
+
 		try {
 			app.process();
 		} catch (Exception ex) {
@@ -72,16 +73,16 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	}
 
 	protected VriAdjustInputWriter vriWriter;
-	
+
 	protected Map<String, Object> controlMap = new HashMap<>();
-	
+
 	static final Comparator<BaseVdypSpecies> PERCENT_GENUS_DESCENDING = Utils
 			.compareUsing(BaseVdypSpecies::getPercentGenus).reversed();
-	
+
 	protected VdypStartApplication() {
 		super();
 	}
-	
+
 	/**
 	 * Initialize FipStart
 	 *
@@ -105,7 +106,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			for (String path : controlFilePaths) {
 				resources.add(resolver.resolveForInput(path));
 			}
-			
+
 			init(resolver, parser.parse(resources, resolver, controlMap));
 
 		} finally {
@@ -114,22 +115,21 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			}
 		}
 	}
-	
+
 	/**
 	 * Initialize FipStart
 	 *
 	 * @param controlMap
 	 * @throws IOException
 	 */
-	public void init(FileSystemFileResolver resolver, Map<String, Object> controlMap)
-			throws IOException {
+	public void init(FileSystemFileResolver resolver, Map<String, Object> controlMap) throws IOException {
 
 		setControlMap(controlMap);
 		closeVriWriter();
 		vriWriter = new VriAdjustInputWriter(controlMap, resolver);
 	}
 
-	protected abstract  BaseControlParser getControlFileParser();
+	protected abstract BaseControlParser getControlFileParser();
 
 	void closeVriWriter() throws IOException {
 		if (vriWriter != null) {
@@ -146,7 +146,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		try {
 			var factory = Utils
 					.<StreamingParserFactory<T>>expectParsedControl(controlMap, key, StreamingParserFactory.class);
-	
+
 			if (factory == null) {
 				throw new ProcessingException(String.format("Data file %s not specified in control map.", key));
 			}
@@ -167,7 +167,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		var coeMap = Utils.<Map<String, Coefficients>>expectParsedControl(controlMap, controlKey, java.util.Map.class);
 		return coeMap.get(spec.getGenus());
 	}
-	
+
 	protected static <E extends Throwable> void throwIfPresent(Optional<E> opt) throws E {
 		if (opt.isPresent()) {
 			throw opt.get();

@@ -126,11 +126,11 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					builder.treesPerHectare(0f);
 					builder.utilization(7.5f);
 				}
-				
-				if(layerType==LayerType.PRIMARY) {
+
+				if (layerType == LayerType.PRIMARY) {
 					builder.percentAvailable(polygon.getPercentAvailable().orElse(1f));
 				}
-				
+
 				return builder;
 			}).map(VriLayer.Builder::build).collect(Collectors.toUnmodifiableMap(VriLayer::getLayer, x -> x));
 

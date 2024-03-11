@@ -117,7 +117,7 @@ class ParsersTogetherTest {
 
 		app.close();
 	}
-	
+
 	@Test
 	void testVeteranOnly() throws IOException, StandProcessingException, ResourceParseException {
 		var app = new VriStart();
@@ -201,9 +201,10 @@ class ParsersTogetherTest {
 		);
 		app.close();
 	}
-	
+
 	@Test
-	void testApplyPercentAvailableToPrimaryLayer() throws IOException, StandProcessingException, ResourceParseException {
+	void testApplyPercentAvailableToPrimaryLayer()
+			throws IOException, StandProcessingException, ResourceParseException {
 		var app = new VriStart();
 
 		var controlMap = new HashMap<String, Object>();
@@ -248,7 +249,7 @@ class ParsersTogetherTest {
 		layerBuilder2.utilization(8f);
 		layerBuilder2.baseArea(30);
 		layerBuilder2.treesPerHectare(200);
-		layerStream.addValue(Utils.constMap(map->{
+		layerStream.addValue(Utils.constMap(map -> {
 			map.put(LayerType.PRIMARY, layerBuilder1);
 			map.put(LayerType.VETERAN, layerBuilder2);
 		}));
@@ -276,9 +277,11 @@ class ParsersTogetherTest {
 						hasProperty("polygonIdentifier", is(polygonId)), //
 						hasProperty("layer", is(LayerType.PRIMARY)), //
 						hasProperty("crownClosure", is(0.95f)), //
-						hasProperty("utilization", is(9f)),
-						hasProperty("baseArea", present(closeTo(20f*0.75f))), // Apply Layer Percent Available
-						hasProperty("treesPerHectare", present(closeTo(300f*0.75f))) // Apply Layer Percent Available
+						hasProperty("utilization", is(9f)), hasProperty("baseArea", present(closeTo(20f * 0.75f))), // Apply
+																													// Layer
+																													// Percent
+																													// Available
+						hasProperty("treesPerHectare", present(closeTo(300f * 0.75f))) // Apply Layer Percent Available
 				)
 		);
 		// Set to defaults, not that optional values should be present with a value of 0
