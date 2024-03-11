@@ -33,7 +33,7 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 
 	@Override
 	public ControlKey getControlKey() {
-		return ControlKey.FORWARD_VDYP_POLY_INPUT;
+		return ControlKey.FORWARD_INPUT_VDYP_POLY;
 	}
 
 	private static Pattern descriptionPattern = Pattern.compile(".*([\\d]{4}$)");

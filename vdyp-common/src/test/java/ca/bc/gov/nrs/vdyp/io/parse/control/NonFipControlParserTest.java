@@ -582,7 +582,7 @@ class NonFipControlParserTest {
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
-				(Matcher) controlMapHasEntry(ControlKey.VRI_YIELD_POLY_INPUT, instanceOf(StreamingParserFactory.class))
+				(Matcher) controlMapHasEntry(ControlKey.VRI_INPUT_YIELD_POLY, instanceOf(StreamingParserFactory.class))
 		);
 	}
 
@@ -593,7 +593,7 @@ class NonFipControlParserTest {
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
-				(Matcher) controlMapHasEntry(ControlKey.VRI_YIELD_LAYER_INPUT, instanceOf(StreamingParserFactory.class))
+				(Matcher) controlMapHasEntry(ControlKey.VRI_INPUT_YIELD_LAYER, instanceOf(StreamingParserFactory.class))
 		);
 	}
 
@@ -605,7 +605,7 @@ class NonFipControlParserTest {
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
-						ControlKey.VRI_YIELD_HEIGHT_AGE_SI_INPUT, instanceOf(StreamingParserFactory.class)
+						ControlKey.VRI_INPUT_YIELD_HEIGHT_AGE_SI, instanceOf(StreamingParserFactory.class)
 				)
 		);
 	}
@@ -618,7 +618,7 @@ class NonFipControlParserTest {
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
-						ControlKey.VRI_YIELD_SPEC_DIST_INPUT, instanceOf(StreamingParserFactory.class)
+						ControlKey.VRI_INPUT_YIELD_SPEC_DIST, instanceOf(StreamingParserFactory.class)
 				)
 		);
 	}

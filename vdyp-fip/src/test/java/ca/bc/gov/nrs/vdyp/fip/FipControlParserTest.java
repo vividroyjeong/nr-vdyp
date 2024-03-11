@@ -568,7 +568,7 @@ class FipControlParserTest {
 		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
-				(Matcher) controlMapHasEntry(ControlKey.FIP_YIELD_POLY_INPUT, instanceOf(StreamingParserFactory.class))
+				(Matcher) controlMapHasEntry(ControlKey.FIP_INPUT_YIELD_POLY, instanceOf(StreamingParserFactory.class))
 		);
 	}
 
@@ -578,7 +578,7 @@ class FipControlParserTest {
 		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
 		assertThat(
 				result,
-				(Matcher) controlMapHasEntry(ControlKey.FIP_YIELD_LAYER_INPUT, instanceOf(StreamingParserFactory.class))
+				(Matcher) controlMapHasEntry(ControlKey.FIP_INPUT_YIELD_LAYER, instanceOf(StreamingParserFactory.class))
 		);
 	}
 
@@ -589,7 +589,7 @@ class FipControlParserTest {
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
-						ControlKey.FIP_YIELD_LX_SP0_INPUT, instanceOf(StreamingParserFactory.class)
+						ControlKey.FIP_INPUT_YIELD_LX_SP0, instanceOf(StreamingParserFactory.class)
 				)
 		);
 	}

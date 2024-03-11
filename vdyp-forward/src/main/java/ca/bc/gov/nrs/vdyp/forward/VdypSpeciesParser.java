@@ -52,7 +52,7 @@ public class VdypSpeciesParser
 
 	@Override
 	public ControlKey getControlKey() {
-		return ControlKey.FORWARD_VDYP_LAYER_BY_SPECIES_INPUT;
+		return ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SPECIES;
 	}
 
 	@Override

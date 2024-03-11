@@ -42,7 +42,7 @@ public class VdypUtilizationParser
 
 	@Override
 	public ControlKey getControlKey() {
-		return ControlKey.FORWARD_VDYP_LAYER_BY_SP0_BY_UTIL_INPUT;
+		return ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL;
 	}
 
 	@Override
