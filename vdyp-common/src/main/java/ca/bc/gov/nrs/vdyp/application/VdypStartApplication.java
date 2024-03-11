@@ -105,13 +105,26 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			for (String path : controlFilePaths) {
 				resources.add(resolver.resolveForInput(path));
 			}
+			
+			init(resolver, parser.parse(resources, resolver, controlMap));
 
-			setControlMap(parser.parse(resources, resolver, controlMap));
 		} finally {
 			for (var resource : resources) {
 				resource.close();
 			}
 		}
+	}
+	
+	/**
+	 * Initialize FipStart
+	 *
+	 * @param controlMap
+	 * @throws IOException
+	 */
+	public void init(FileSystemFileResolver resolver, Map<String, Object> controlMap)
+			throws IOException {
+
+		setControlMap(controlMap);
 		closeVriWriter();
 		vriWriter = new VriAdjustInputWriter(controlMap, resolver);
 	}

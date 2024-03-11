@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -25,6 +26,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.ModelClassBuilder;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
@@ -57,7 +59,9 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				var layerStream = this.<Map<LayerType, VriLayer.Builder>>getStreamingParser(
 						ControlKey.VRI_YIELD_LAYER_INPUT
 				);
-				var speciesStream = this.<Collection<VriSpecies>>getStreamingParser(ControlKey.FIP_YIELD_LX_SP0_INPUT);
+				var speciesStream = this
+						.<Collection<VriSpecies>>getStreamingParser(ControlKey.VRI_YIELD_SPEC_DIST_INPUT);
+				var siteStream = this.<Collection<VriSite>>getStreamingParser(ControlKey.VRI_YIELD_HEIGHT_AGE_SI_INPUT);
 		) {
 			log.atDebug().setMessage("Start Stand processing").log();
 
@@ -65,7 +69,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 				// FIP_GET
 				log.atInfo().setMessage("Getting polygon {}").addArgument(polygonsRead + 1).log();
-				var polygon = getPolygon(polyStream, layerStream, speciesStream);
+				var polygon = getPolygon(polyStream, layerStream, speciesStream, siteStream);
 				try {
 
 					var resultPoly = processPolygon(polygonsRead, polygon);
@@ -97,7 +101,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 	VriPolygon getPolygon(
 			StreamingParser<VriPolygon> polyStream, StreamingParser<Map<LayerType, VriLayer.Builder>> layerStream,
-			StreamingParser<Collection<VriSpecies>> speciesStream
+			StreamingParser<Collection<VriSpecies>> speciesStream, StreamingParser<Collection<VriSite>> siteStream
 	) throws StandProcessingException, IOException, ResourceParseException {
 
 		log.trace("Getting polygon");
@@ -105,19 +109,34 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		log.trace("Getting layers for polygon {}", polygon.getPolygonIdentifier());
 		Map<LayerType, VriLayer.Builder> layersBuilders;
+		Map<LayerType, VriLayer> layers;
 		try {
 			layersBuilders = layerStream.next();
+
+			// Do some additional processing then build the layers.
+			layers = List.of(LayerType.PRIMARY, LayerType.VETERAN).stream().map(layerType -> {
+
+				var builder = layersBuilders.get(layerType);
+				if (builder == null) {
+					builder = new VriLayer.Builder();
+					builder.polygonIdentifier(polygon.getPolygonIdentifier());
+					builder.layerType(layerType);
+					builder.crownClosure(0f);
+					builder.baseArea(0f);
+					builder.treesPerHectare(0f);
+					builder.utilization(7.5f);
+				}
+				
+				if(layerType==LayerType.PRIMARY) {
+					builder.percentAvailable(polygon.getPercentAvailable().orElse(1f));
+				}
+				
+				return builder;
+			}).map(VriLayer.Builder::build).collect(Collectors.toUnmodifiableMap(VriLayer::getLayer, x -> x));
+
 		} catch (NoSuchElementException ex) {
 			throw validationError("Layers file has fewer records than polygon file.", ex);
 		}
-
-		// Do some additional processing then build the layers.
-		var layers = layersBuilders.entrySet().stream().map(e -> {
-			if (e.getKey() == LayerType.PRIMARY) {
-				e.getValue().percentAvailable(polygon.getPercentAvailable());
-			}
-			return e.getValue().build();
-		}).collect(Collectors.toUnmodifiableMap(VriLayer::getLayer, x -> x));
 
 		log.trace("Getting species for polygon {}", polygon.getPolygonIdentifier());
 		Collection<VriSpecies> species;
@@ -125,6 +144,14 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			species = speciesStream.next();
 		} catch (NoSuchElementException ex) {
 			throw validationError("Species file has fewer records than polygon file.", ex);
+		}
+
+		log.trace("Getting sites for polygon {}", polygon.getPolygonIdentifier());
+		Collection<VriSite> sites;
+		try {
+			sites = siteStream.next();
+		} catch (NoSuchElementException ex) {
+			throw validationError("Sites file has fewer records than polygon file.", ex);
 		}
 
 		// Validate that layers belong to the correct polygon
@@ -156,6 +183,24 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			layer.getSpecies().put(spec.getGenus(), spec);
 		}
 
+		for (var site : sites) {
+			var layer = layers.get(site.getLayer());
+			// Validate that species belong to the correct polygon
+			if (!site.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
+				throw validationError(
+						"Record in site file contains site for polygon %s when expecting one for %s.",
+						layer.getPolygonIdentifier(), polygon.getPolygonIdentifier()
+				);
+			}
+			if (Objects.isNull(layer)) {
+				throw validationError(
+						"Site entry references layer %s of polygon %s but it is not present.", layer,
+						polygon.getPolygonIdentifier()
+				);
+			}
+			layer.getSites().put(site.getSiteGenus(), site);
+		}
+
 		polygon.setLayers(layers);
 
 		return polygon;
@@ -171,9 +216,9 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 	VdypPolygon createVdypPolygon(VriPolygon sourcePolygon, Map<LayerType, VdypLayer> processedLayers)
 			throws ProcessingException {
-		
+
 		// TODO expand this
-		
+
 		var vdypPolygon = VdypPolygon.build(builder -> builder.copy(sourcePolygon, x -> x.get()));
 		vdypPolygon.setLayers(processedLayers);
 		return vdypPolygon;

@@ -70,7 +70,7 @@ public class VriSite extends BaseVdypSite {
 		@Override
 		protected void check(Collection<String> errors) {
 			super.check(errors);
-			requirePresent(siteGenus, "siteSpecies", errors);
+			requirePresent(siteSpecies, "siteSpecies", errors);
 		}
 
 		@Override

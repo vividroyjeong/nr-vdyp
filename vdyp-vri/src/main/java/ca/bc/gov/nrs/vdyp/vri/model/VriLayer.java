@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
@@ -107,11 +108,11 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 			this.percentAvailable = percentAvailable;
 			return this;
 		}
+
 		public Builder percentAvailable(float percentAvailable) {
 			return percentAvailable(Optional.of(percentAvailable));
 		}
 
-		
 		@Override
 		protected void check(Collection<String> errors) {
 			super.check(errors);
@@ -125,10 +126,10 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 			return (new VriLayer(
 					polygonIdentifier.get(), //
 					layer.get(), //
-					crownClosure.get() * multiplier, //
+					crownClosure.get(), //
 					baseArea.map(x -> x * multiplier), //
 					treesPerHectare.map(x -> x * multiplier), //
-					utilization.get() * multiplier
+					Math.max(utilization.get(), 7.5f)
 			));
 		}
 
