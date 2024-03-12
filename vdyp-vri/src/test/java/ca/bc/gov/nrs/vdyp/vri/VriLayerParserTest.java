@@ -34,14 +34,14 @@ class VriLayerParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VRI_YIELD_LAYER_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.VRI_INPUT_YIELD_LAYER.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeInputStream(/* empty */));
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VRI_YIELD_LAYER_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.VRI_INPUT_YIELD_LAYER.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -60,7 +60,7 @@ class VriLayerParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VRI_YIELD_LAYER_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.VRI_INPUT_YIELD_LAYER.name(), "test.dat");
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat", TestUtils.makeInputStream(
@@ -71,7 +71,7 @@ class VriLayerParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VRI_YIELD_LAYER_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.VRI_INPUT_YIELD_LAYER.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -111,7 +111,7 @@ class VriLayerParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VRI_YIELD_LAYER_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.VRI_INPUT_YIELD_LAYER.name(), "test.dat");
 
 		var fileResolver = TestUtils.fileResolver(
 				"test.dat", TestUtils.makeInputStream(
@@ -122,7 +122,7 @@ class VriLayerParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VRI_YIELD_LAYER_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.VRI_INPUT_YIELD_LAYER.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -162,7 +162,7 @@ class VriLayerParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VRI_YIELD_LAYER_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.VRI_INPUT_YIELD_LAYER.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -175,7 +175,7 @@ class VriLayerParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VRI_YIELD_LAYER_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.VRI_INPUT_YIELD_LAYER.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 

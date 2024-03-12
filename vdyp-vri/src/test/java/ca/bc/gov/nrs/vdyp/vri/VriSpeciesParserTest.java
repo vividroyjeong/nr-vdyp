@@ -33,14 +33,14 @@ public class VriSpeciesParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeInputStream(/* empty */));
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -59,7 +59,7 @@ public class VriSpeciesParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -72,7 +72,7 @@ public class VriSpeciesParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -105,7 +105,7 @@ public class VriSpeciesParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -119,7 +119,7 @@ public class VriSpeciesParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -152,7 +152,7 @@ public class VriSpeciesParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -166,7 +166,7 @@ public class VriSpeciesParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -199,7 +199,7 @@ public class VriSpeciesParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -213,7 +213,7 @@ public class VriSpeciesParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -246,7 +246,7 @@ public class VriSpeciesParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -260,7 +260,7 @@ public class VriSpeciesParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -300,7 +300,7 @@ public class VriSpeciesParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -314,7 +314,7 @@ public class VriSpeciesParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -353,7 +353,7 @@ public class VriSpeciesParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -368,7 +368,7 @@ public class VriSpeciesParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -415,7 +415,7 @@ public class VriSpeciesParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -428,7 +428,7 @@ public class VriSpeciesParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VRI_YIELD_SPEC_DIST_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 

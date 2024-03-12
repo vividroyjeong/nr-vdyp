@@ -39,7 +39,7 @@ public class VriSiteParser implements ControlMapValueReplacer<StreamingParserFac
 
 	@Override
 	public ControlKey getControlKey() {
-		return ControlKey.VRI_YIELD_SPEC_DIST_INPUT;
+		return ControlKey.VRI_INPUT_YIELD_SPEC_DIST;
 	}
 
 	@Override
@@ -115,8 +115,7 @@ public class VriSiteParser implements ControlMapValueReplacer<StreamingParserFac
 									height.or(() -> s.map(l -> l == LayerType.PRIMARY).orElse(false) && //
 											ageTotal.map(at -> FloatMath.abs(at - 1f) < 0.6).orElse(false) && //
 											siteIndex.map(si -> si >= 3f).orElse(false) //
-													? Optional.of(0.05f)
-													: Optional.empty()
+													? Optional.of(0.05f) : Optional.empty()
 									)
 							);
 							siteBuilder.ageTotal(ageTotal);

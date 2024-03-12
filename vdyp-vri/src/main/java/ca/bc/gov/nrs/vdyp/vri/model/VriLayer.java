@@ -46,8 +46,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 	 *
 	 * @param config The configuration function
 	 * @return The object built by the configured builder.
-	 * @throws IllegalStateException if any required properties have not been set by
-	 *                               the configuration function.
+	 * @throws IllegalStateException if any required properties have not been set by the configuration function.
 	 */
 
 	public static VriLayer build(Consumer<Builder> config) {

@@ -25,8 +25,7 @@ public class VriSpecies extends BaseVdypSpecies {
 	 *
 	 * @param config The configuration function
 	 * @return The object built by the configured builder.
-	 * @throws IllegalStateException if any required properties have not been set by
-	 *                               the configuration function.
+	 * @throws IllegalStateException if any required properties have not been set by the configuration function.
 	 */
 	public static VriSpecies build(Consumer<Builder> config) {
 		var builder = new Builder();

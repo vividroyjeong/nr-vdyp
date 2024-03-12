@@ -39,9 +39,9 @@ class ParsersTogetherTest {
 
 		var controlMap = new HashMap<String, Object>();
 
-		controlMap.put(ControlKey.VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
 
 		final var polygonId = "Test";
 		final var layerType = LayerType.PRIMARY;
@@ -124,9 +124,9 @@ class ParsersTogetherTest {
 
 		var controlMap = new HashMap<String, Object>();
 
-		controlMap.put(ControlKey.VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
 
 		final var polygonId = "Test";
 		final var layerType = LayerType.VETERAN;
@@ -209,9 +209,9 @@ class ParsersTogetherTest {
 
 		var controlMap = new HashMap<String, Object>();
 
-		controlMap.put(ControlKey.VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
 
 		final var polygonId = "Test";
 		final var layerType = LayerType.VETERAN;

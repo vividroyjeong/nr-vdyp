@@ -36,9 +36,9 @@ class VdypStartApplicationTest {
 
 		var controlMap = new HashMap<String, Object>();
 
-		controlMap.put(ControlKey.VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
 
 		resolver.addStream("DUMMY1", new ByteArrayOutputStream());
 		resolver.addStream("DUMMY2", new ByteArrayOutputStream());
@@ -118,10 +118,10 @@ class VdypStartApplicationTest {
 		MockFileResolver resolver = new MockFileResolver("Test");
 		var controlMap = new HashMap<String, Object>();
 
-		controlMap.put(ControlKey.VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
-		controlMap.put(ControlKey.FIP_YIELD_LAYER_INPUT.name(), streamingParserFactory);
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+		controlMap.put(ControlKey.FIP_INPUT_YIELD_LAYER.name(), streamingParserFactory);
 
 		resolver.addStream("DUMMY1", new ByteArrayOutputStream());
 		resolver.addStream("DUMMY2", new ByteArrayOutputStream());
@@ -151,7 +151,7 @@ class VdypStartApplicationTest {
 
 		app.init(resolver, controlMap);
 
-		var result = app.getStreamingParser(ControlKey.FIP_YIELD_LAYER_INPUT);
+		var result = app.getStreamingParser(ControlKey.FIP_INPUT_YIELD_LAYER);
 
 		assertThat(result, is(streamingParser));
 
@@ -168,9 +168,9 @@ class VdypStartApplicationTest {
 		MockFileResolver resolver = new MockFileResolver("Test");
 		var controlMap = new HashMap<String, Object>();
 
-		controlMap.put(ControlKey.VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
 
 		resolver.addStream("DUMMY1", new ByteArrayOutputStream());
 		resolver.addStream("DUMMY2", new ByteArrayOutputStream());
@@ -199,9 +199,9 @@ class VdypStartApplicationTest {
 		app.init(resolver, controlMap);
 
 		var ex = assertThrows(
-				ProcessingException.class, () -> app.getStreamingParser(ControlKey.FIP_YIELD_LAYER_INPUT)
+				ProcessingException.class, () -> app.getStreamingParser(ControlKey.FIP_INPUT_YIELD_LAYER)
 		);
-		assertThat(ex, hasProperty("message", is("Data file FIP_YIELD_LAYER_INPUT not specified in control map.")));
+		assertThat(ex, hasProperty("message", is("Data file FIP_INPUT_YIELD_LAYER not specified in control map.")));
 
 		EasyMock.verify(controlParser);
 
@@ -217,10 +217,10 @@ class VdypStartApplicationTest {
 		MockFileResolver resolver = new MockFileResolver("Test");
 		var controlMap = new HashMap<String, Object>();
 
-		controlMap.put(ControlKey.VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
-		controlMap.put(ControlKey.FIP_YIELD_LAYER_INPUT.name(), streamingParserFactory);
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+		controlMap.put(ControlKey.FIP_INPUT_YIELD_LAYER.name(), streamingParserFactory);
 
 		resolver.addStream("DUMMY1", new ByteArrayOutputStream());
 		resolver.addStream("DUMMY2", new ByteArrayOutputStream());
@@ -252,7 +252,7 @@ class VdypStartApplicationTest {
 		app.init(resolver, controlMap);
 
 		var ex = assertThrows(
-				ProcessingException.class, () -> app.getStreamingParser(ControlKey.FIP_YIELD_LAYER_INPUT)
+				ProcessingException.class, () -> app.getStreamingParser(ControlKey.FIP_INPUT_YIELD_LAYER)
 		);
 		assertThat(ex, hasProperty("message", is("Error while opening data file.")));
 		assertThat(ex, causedBy(is(exception)));

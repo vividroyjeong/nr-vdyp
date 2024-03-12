@@ -57,8 +57,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	}
 
 	/**
-	 * Iterates over all but the last entry, passing them to the first consumer then
-	 * passes the last entry to the second consumer
+	 * Iterates over all but the last entry, passing them to the first consumer then passes the last entry to the second
+	 * consumer
 	 */
 	protected static <T> void eachButLast(Collection<T> items, Consumer<T> body, Consumer<T> lastBody) {
 		var it = items.iterator();

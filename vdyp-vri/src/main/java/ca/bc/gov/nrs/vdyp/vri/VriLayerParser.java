@@ -21,9 +21,8 @@ import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 /**
- * Parses a file containing VRI Layer records into VriLayer.Builder objects.
- * Returns Builders rather than finished VriLayer objects because some
- * additional manipulation is needed before adding them to their VriPolygon
+ * Parses a file containing VRI Layer records into VriLayer.Builder objects. Returns Builders rather than finished
+ * VriLayer objects because some additional manipulation is needed before adding them to their VriPolygon
  */
 public class VriLayerParser
 		implements ControlMapValueReplacer<StreamingParserFactory<Map<LayerType, VriLayer.Builder>>, String> {

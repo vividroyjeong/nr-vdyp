@@ -3040,12 +3040,10 @@ class FipStartTest {
 			layer.getQuadraticMeanDiameterByUtilization().setCoe(0, 30.2601795f);
 
 			/*
-			 * HL[*, -1] 0 HL[0, 0] 0 BA[*, -1] BA[1, 0] VOLWS VOLCU VOL_D VOL_DW VOLDWB
-			 * dqspbase,goal
+			 * HL[*, -1] 0 HL[0, 0] 0 BA[*, -1] BA[1, 0] VOLWS VOLCU VOL_D VOL_DW VOLDWB dqspbase,goal
 			 *
-			 * HL[1, 0] spec BA[0, 0] layer TPH[0, 0] layer DQ[0,0] layer INL1VGRP,
-			 * INL1DGRP, INL1BGRP spec VGRPL, DGRPL, BGRPL spec Same as above AGETOTL1 layer
-			 * AGEBHL1 layer YTBH hdl1
+			 * HL[1, 0] spec BA[0, 0] layer TPH[0, 0] layer DQ[0,0] layer INL1VGRP, INL1DGRP, INL1BGRP spec VGRPL,
+			 * DGRPL, BGRPL spec Same as above AGETOTL1 layer AGEBHL1 layer YTBH hdl1
 			 *
 			 */
 			// sp 3, 4, 5, 8, 15
@@ -3321,12 +3319,10 @@ class FipStartTest {
 			layer.getQuadraticMeanDiameterByUtilization().setCoe(0, 21.0548649f);
 
 			/*
-			 * HL[*, -1] 0 HL[0, 0] 0 BA[*, -1] BA[1, 0] VOLWS VOLCU VOL_D VOL_DW VOLDWB
-			 * dqspbase,goal
+			 * HL[*, -1] 0 HL[0, 0] 0 BA[*, -1] BA[1, 0] VOLWS VOLCU VOL_D VOL_DW VOLDWB dqspbase,goal
 			 *
-			 * HL[1, 0] spec BA[0, 0] layer TPH[0, 0] layer DQ[0,0] layer INL1VGRP,
-			 * INL1DGRP, INL1BGRP spec VGRPL, DGRPL, BGRPL spec Same as above AGETOTL1 layer
-			 * AGEBHL1 layer YTBH hdl1
+			 * HL[1, 0] spec BA[0, 0] layer TPH[0, 0] layer DQ[0,0] layer INL1VGRP, INL1DGRP, INL1BGRP spec VGRPL,
+			 * DGRPL, BGRPL spec Same as above AGETOTL1 layer AGEBHL1 layer YTBH hdl1
 			 *
 			 */
 			// sp 3, 4, 5, 8, 15

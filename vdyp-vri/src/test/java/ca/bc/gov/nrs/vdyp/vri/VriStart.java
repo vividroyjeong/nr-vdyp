@@ -53,13 +53,13 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		int polygonsRead = 0;
 		int polygonsWritten = 0;
 		try (
-				var polyStream = this.<VriPolygon>getStreamingParser(ControlKey.VRI_YIELD_POLY_INPUT);
+				var polyStream = this.<VriPolygon>getStreamingParser(ControlKey.VRI_INPUT_YIELD_POLY);
 				var layerStream = this.<Map<LayerType, VriLayer.Builder>>getStreamingParser(
-						ControlKey.VRI_YIELD_LAYER_INPUT
+						ControlKey.VRI_INPUT_YIELD_LAYER
 				);
 				var speciesStream = this
-						.<Collection<VriSpecies>>getStreamingParser(ControlKey.VRI_YIELD_SPEC_DIST_INPUT);
-				var siteStream = this.<Collection<VriSite>>getStreamingParser(ControlKey.VRI_YIELD_HEIGHT_AGE_SI_INPUT);
+						.<Collection<VriSpecies>>getStreamingParser(ControlKey.VRI_INPUT_YIELD_SPEC_DIST);
+				var siteStream = this.<Collection<VriSite>>getStreamingParser(ControlKey.VRI_INPUT_YIELD_HEIGHT_AGE_SI);
 		) {
 			log.atDebug().setMessage("Start Stand processing").log();
 
