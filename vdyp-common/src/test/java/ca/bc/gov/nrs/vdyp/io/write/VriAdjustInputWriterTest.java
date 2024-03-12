@@ -42,9 +42,9 @@ class VriAdjustInputWriterTest {
 		specStream = new TestUtils.MockOutputStream("species");
 		utilStream = new TestUtils.MockOutputStream("utilization");
 
-		controlMap.put(ControlKey.VDYP_POLYGON.name(), "testPolygonFile");
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SPECIES.name(), "testSpeciesFile");
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name(), "testUtilizationFile");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "testPolygonFile");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "testSpeciesFile");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "testUtilizationFile");
 
 		fileResolver = new MockFileResolver("TEST");
 		fileResolver.addStream("testPolygonFile", polyStream);

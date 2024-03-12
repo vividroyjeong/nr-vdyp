@@ -33,14 +33,14 @@ public class FipSpeciesParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.FIP_YIELD_LX_SP0_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.FIP_INPUT_YIELD_LX_SP0.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeInputStream(/* empty */));
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_LX_SP0_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.FIP_INPUT_YIELD_LX_SP0.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -59,7 +59,7 @@ public class FipSpeciesParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.FIP_YIELD_LX_SP0_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.FIP_INPUT_YIELD_LX_SP0.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -72,7 +72,7 @@ public class FipSpeciesParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_LX_SP0_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.FIP_INPUT_YIELD_LX_SP0.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -105,7 +105,7 @@ public class FipSpeciesParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.FIP_YIELD_LX_SP0_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.FIP_INPUT_YIELD_LX_SP0.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -119,7 +119,7 @@ public class FipSpeciesParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_LX_SP0_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.FIP_INPUT_YIELD_LX_SP0.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -159,7 +159,7 @@ public class FipSpeciesParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.FIP_YIELD_LX_SP0_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.FIP_INPUT_YIELD_LX_SP0.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -173,7 +173,7 @@ public class FipSpeciesParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_LX_SP0_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.FIP_INPUT_YIELD_LX_SP0.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -212,7 +212,7 @@ public class FipSpeciesParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.FIP_YIELD_LX_SP0_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.FIP_INPUT_YIELD_LX_SP0.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -227,7 +227,7 @@ public class FipSpeciesParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_LX_SP0_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.FIP_INPUT_YIELD_LX_SP0.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -274,7 +274,7 @@ public class FipSpeciesParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.FIP_YIELD_LX_SP0_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.FIP_INPUT_YIELD_LX_SP0.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -287,7 +287,7 @@ public class FipSpeciesParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_LX_SP0_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.FIP_INPUT_YIELD_LX_SP0.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 

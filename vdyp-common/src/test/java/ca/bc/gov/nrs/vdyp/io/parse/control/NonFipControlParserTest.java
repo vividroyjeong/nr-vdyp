@@ -50,24 +50,30 @@ class NonFipControlParserTest {
 
 	static final String CONTROL_FILE = "VRISTART.CTR";
 
+	private class TestNonFipControlParser extends NonFipControlParser {
+		
+		public TestNonFipControlParser() { 
+			initialize();
+		}
+		
+		@Override
+		protected List<ControlMapValueReplacer<Object, String>> inputFileParsers() {
+			return Collections.emptyList();
+		}
+
+		@Override
+		protected List<ControlKey> outputFileParsers() {
+			return Collections.emptyList();
+		}
+
+		@Override
+		protected VdypApplicationIdentifier getProgramId() {
+			return VdypApplicationIdentifier.VRI_START;
+		}
+	};
+
 	private NonFipControlParser getUnit() {
-		return new NonFipControlParser() {
-
-			@Override
-			protected List<ControlMapValueReplacer<Object, String>> inputFileParsers() {
-				return Collections.emptyList();
-			}
-
-			@Override
-			protected List<ControlKey> outputFileParsers() {
-				return Collections.emptyList();
-			}
-
-			@Override
-			protected VdypApplicationIdentifier getProgramId() {
-				return VdypApplicationIdentifier.VRI_START;
-			}
-		};
+		return new TestNonFipControlParser();
 	}
 
 	// Most of these tests are the same as in FipControlParserTest TODO consider
@@ -582,7 +588,7 @@ class NonFipControlParserTest {
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
-				(Matcher) controlMapHasEntry(ControlKey.VRI_YIELD_POLY_INPUT, instanceOf(StreamingParserFactory.class))
+				(Matcher) controlMapHasEntry(ControlKey.VRI_INPUT_YIELD_POLY, instanceOf(StreamingParserFactory.class))
 		);
 	}
 
@@ -593,7 +599,7 @@ class NonFipControlParserTest {
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
 		assertThat(
 				result,
-				(Matcher) controlMapHasEntry(ControlKey.VRI_YIELD_LAYER_INPUT, instanceOf(StreamingParserFactory.class))
+				(Matcher) controlMapHasEntry(ControlKey.VRI_INPUT_YIELD_LAYER, instanceOf(StreamingParserFactory.class))
 		);
 	}
 
@@ -605,7 +611,7 @@ class NonFipControlParserTest {
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
-						ControlKey.VRI_YIELD_HEIGHT_AGE_SI_INPUT, instanceOf(StreamingParserFactory.class)
+						ControlKey.VRI_INPUT_YIELD_HEIGHT_AGE_SI, instanceOf(StreamingParserFactory.class)
 				)
 		);
 	}
@@ -618,7 +624,7 @@ class NonFipControlParserTest {
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
-						ControlKey.VRI_YIELD_SPEC_DIST_INPUT, instanceOf(StreamingParserFactory.class)
+						ControlKey.VRI_INPUT_YIELD_SPEC_DIST, instanceOf(StreamingParserFactory.class)
 				)
 		);
 	}

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapSubResourceParser;
@@ -51,7 +52,7 @@ public class DqGrowthEmpiricalLimitsParser implements ControlMapSubResourceParse
 		this.lineParser = new LineParser() {
 			@Override
 			public boolean isStopLine(String line) {
-				return line == null || line.trim().length() == 0;
+				return Utils.nullOrBlank(line);
 			}
 		}.value(3, BASAL_AREA_GROUP_ID_KEY, ValueParser.INTEGER).multiValue(6, 9, COEFFICIENTS_9_KEY, ValueParser.FLOAT)
 				.multiValue(2, 6, COEFFICIENTS_6_KEY, ValueParser.FLOAT);

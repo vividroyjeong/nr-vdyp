@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
@@ -20,8 +21,8 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 /**
  * Base class for parsers of configuration files whose lines contain a BEC Zone
  * Alias, an integer index, an indicator flag and a list of 16 coefficients (one
- * per species) and generates a MatrixMap2 indexed by BEC Zone alias and then
- * sp0 alias of coefficients, one per index.
+ * per species) and generates a MatrixMap2 of coefficients indexed by first BEC 
+ * Zone Alias and then sp0 Alias, one per index.
  *
  * Indices range from 0 to a parameterized value (7, for example).
  *
@@ -44,24 +45,23 @@ public abstract class BecZoneBySpeciesCoefficientParser
 		this.nCoefficients = nCoefficients;
 
 		this.lineParser = new LineParser() {
-
 			@Override
 			public boolean isIgnoredLine(String line) {
-				return line.substring(0, Math.min(4, line.length())).trim().length() == 0;
+				return Utils.nullOrPrefixBlank(line, 4);
 			}
 
-		}//
-				.value(4, BEC_ZONE_ID_KEY, ControlledValueParser.BEC)//
-				.space(2)//
-				.value(
-						1, INDEX_KEY,
-						ValueParser.range(ValueParser.INTEGER, 0, true, nCoefficients, false, "Index value")
-				)//
-				.value(2, INDICATOR_KEY, ValueParser.LOGICAL_0_1) //
-				.multiValue(NUM_SPECIES, 8, COEFFICIENTS_KEY, ValueParser.FLOAT);
+		} //
+		.value(4, BEC_ZONE_ID_KEY, ControlledValueParser.BEC) //
+		.space(2) //
+		.value(
+				1, INDEX_KEY,
+				ValueParser.range(ValueParser.INTEGER, 0, true, nCoefficients, false, "Index value")
+		) //
+		.value(2, INDICATOR_KEY, ValueParser.LOGICAL_0_1) //
+		.multiValue(NUM_SPECIES, 8, COEFFICIENTS_KEY, ValueParser.FLOAT);
 	}
 
-	LineParser lineParser;
+	private LineParser lineParser;
 
 	@Override
 	public MatrixMap2<String, String, Coefficients> parse(InputStream is, Map<String, Object> control)
@@ -76,7 +76,7 @@ public abstract class BecZoneBySpeciesCoefficientParser
 		lineParser.parse(is, result, (value, r, lineNumber) -> {
 			var becZoneId = (String) value.get(BEC_ZONE_ID_KEY);
 			var index = (int) value.get(INDEX_KEY);
-			var indicator = (boolean) value.get(INDICATOR_KEY);
+			var valueAppliesToAllSpecies = (!(boolean) value.get(INDICATOR_KEY));
 
 			@SuppressWarnings("unchecked")
 			var specCoefficients = (List<Float>) value.get(COEFFICIENTS_KEY);
@@ -90,7 +90,7 @@ public abstract class BecZoneBySpeciesCoefficientParser
 				Float coe = specCoefficients.get(coefficientIndex);
 				coefficients.setCoe(index, coe);
 
-				if (!indicator)
+				if (valueAppliesToAllSpecies)
 					break;
 
 				coefficientIndex += 1;

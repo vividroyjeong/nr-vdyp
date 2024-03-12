@@ -17,12 +17,11 @@ import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperBoundsParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 
-public abstract class NonFipControlParser extends BaseControlParser {
+public abstract class NonFipControlParser extends StartApplicationControlParser {
 
-	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(NonFipControlParser.class);
+	
 	List<ControlMapModifier> nonFipStart = Arrays.asList(
-
 			// RD_E106
 			new BasalAreaYieldParser(),
 			// RD_E106

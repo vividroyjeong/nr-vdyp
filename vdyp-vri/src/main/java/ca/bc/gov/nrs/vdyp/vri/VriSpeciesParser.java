@@ -43,7 +43,7 @@ public class VriSpeciesParser
 
 	@Override
 	public ControlKey getControlKey() {
-		return ControlKey.VRI_YIELD_SPEC_DIST_INPUT;
+		return ControlKey.VRI_INPUT_YIELD_SPEC_DIST;
 	}
 
 	@Override

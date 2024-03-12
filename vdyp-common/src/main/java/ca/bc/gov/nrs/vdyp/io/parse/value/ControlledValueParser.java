@@ -126,8 +126,7 @@ public interface ControlledValueParser<T> {
 	};
 
 	/**
-	 * Parser that strips whitespace and validates that the string is a Genus (SP0)
-	 * ID
+	 * Parser that strips whitespace and validates that the string is a Utilization Class name
 	 */
 	static final ControlledValueParser<UtilizationClass> UTILIZATION_CLASS = (string, control) -> {
 		try {

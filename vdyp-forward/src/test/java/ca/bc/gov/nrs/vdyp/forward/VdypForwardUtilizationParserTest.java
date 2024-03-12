@@ -35,14 +35,14 @@ public class VdypForwardUtilizationParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name(), "test.dat");
+		controlMap.put(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeInputStream(/* empty */));
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name());
+		var parserFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -61,7 +61,7 @@ public class VdypForwardUtilizationParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name(), "test.dat");
+		controlMap.put(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -74,7 +74,7 @@ public class VdypForwardUtilizationParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name());
+		var parserFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -116,7 +116,7 @@ public class VdypForwardUtilizationParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name(), "test.dat");
+		controlMap.put(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "test.dat");
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -130,7 +130,7 @@ public class VdypForwardUtilizationParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name());
+		var parserFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 

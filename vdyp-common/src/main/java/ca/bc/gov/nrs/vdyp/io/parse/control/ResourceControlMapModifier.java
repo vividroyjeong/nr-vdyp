@@ -12,12 +12,15 @@ import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseValidException;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 
 /**
- * Modifies the control map based on a resource
+ * Replaces a filename-valued entry in a Control Map with the parsed content of the
+ * file. The filename is mapped to a file by the given {@code FileResolver}. The 
+ * original entry may or may not be required; if not, and no value is provided in
+ * the entry, the entry is ignored. Otherwise, an inability to find the file or parse 
+ * its content is an error and an exception is thrown.
  *
  * @author Kevin Smith, Vivid Solutions
- *
  */
-public interface ResourceControlMapModifier extends ControlMapModifier, KeyedControlMapModifier {
+public interface ResourceControlMapModifier extends ControlMapModifier {
 
 	void modify(Map<String, Object> control, InputStream data) throws ResourceParseException, IOException;
 

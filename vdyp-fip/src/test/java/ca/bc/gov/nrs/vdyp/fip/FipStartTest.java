@@ -5030,13 +5030,13 @@ class FipStartTest {
 		var control = EasyMock.createControl();
 
 		MockStreamingParser<FipPolygon> polygonStream = mockStream(
-				control, controlMap, ControlKey.FIP_YIELD_POLY_INPUT.name(), "polygonStream"
+				control, controlMap, ControlKey.FIP_INPUT_YIELD_POLY.name(), "polygonStream"
 		);
 		MockStreamingParser<Map<LayerType, FipLayer>> layerStream = mockStream(
-				control, controlMap, ControlKey.FIP_YIELD_LAYER_INPUT.name(), "layerStream"
+				control, controlMap, ControlKey.FIP_INPUT_YIELD_LAYER.name(), "layerStream"
 		);
 		MockStreamingParser<Collection<FipSpecies>> speciesStream = mockStream(
-				control, controlMap, ControlKey.FIP_YIELD_LX_SP0_INPUT.name(), "speciesStream"
+				control, controlMap, ControlKey.FIP_INPUT_YIELD_LX_SP0.name(), "speciesStream"
 		);
 
 		mockWith(polygonStream, polygons);

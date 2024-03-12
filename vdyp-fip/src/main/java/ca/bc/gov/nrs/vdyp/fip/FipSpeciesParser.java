@@ -40,7 +40,7 @@ public class FipSpeciesParser
 
 	@Override
 	public ControlKey getControlKey() {
-		return ControlKey.FIP_YIELD_LX_SP0_INPUT;
+		return ControlKey.FIP_INPUT_YIELD_LX_SP0;
 	}
 
 	@Override

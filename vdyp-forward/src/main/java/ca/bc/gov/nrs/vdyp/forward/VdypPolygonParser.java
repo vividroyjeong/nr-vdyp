@@ -21,7 +21,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 
-public class VdypPolygonParser implements ControlMapValueReplacer<StreamingParserFactory<VdypPolygon>, String> {
+public class VdypPolygonParser implements ControlMapValueReplacer<Object, String> {
 
 	private static final String DESCRIPTION = "DESCRIPTION"; // POLYDESC
 	private static final String BIOGEOCLIMATIC_ZONE = "BIOGEOCLIMATIC_ZONE"; // BEC
@@ -33,7 +33,7 @@ public class VdypPolygonParser implements ControlMapValueReplacer<StreamingParse
 
 	@Override
 	public ControlKey getControlKey() {
-		return ControlKey.VDYP_POLYGON;
+		return ControlKey.FORWARD_INPUT_VDYP_POLY;
 	}
 
 	private static Pattern descriptionPattern = Pattern.compile(".*([\\d]{4}$)");

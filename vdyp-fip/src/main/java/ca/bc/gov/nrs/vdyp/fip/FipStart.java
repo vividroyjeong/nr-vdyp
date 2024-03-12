@@ -144,9 +144,9 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		int polygonsRead = 0;
 		int polygonsWritten = 0;
 		try (
-				var polyStream = this.<FipPolygon>getStreamingParser(ControlKey.FIP_YIELD_POLY_INPUT);
-				var layerStream = this.<Map<LayerType, FipLayer>>getStreamingParser(ControlKey.FIP_YIELD_LAYER_INPUT);
-				var speciesStream = this.<Collection<FipSpecies>>getStreamingParser(ControlKey.FIP_YIELD_LX_SP0_INPUT);
+				var polyStream = this.<FipPolygon>getStreamingParser(ControlKey.FIP_INPUT_YIELD_POLY);
+				var layerStream = this.<Map<LayerType, FipLayer>>getStreamingParser(ControlKey.FIP_INPUT_YIELD_LAYER);
+				var speciesStream = this.<Collection<FipSpecies>>getStreamingParser(ControlKey.FIP_INPUT_YIELD_LX_SP0);
 		) {
 			log.atDebug().setMessage("Start Stand processing").log();
 
