@@ -4,10 +4,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
-import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
-import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {

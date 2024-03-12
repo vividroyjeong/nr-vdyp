@@ -11,8 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.model.VdypSpecies.Builder;
-
 class VdypSpeciesTest {
 
 	@Test
