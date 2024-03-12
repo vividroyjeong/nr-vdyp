@@ -15,7 +15,7 @@ public class VriPolygonParser implements ControlMapValueReplacer<StreamingParser
 
 	@Override
 	public ControlKey getControlKey() {
-		return ControlKey.FIP_YIELD_POLY_INPUT;
+		return ControlKey.FIP_INPUT_YIELD_POLY;
 	}
 
 	@Override

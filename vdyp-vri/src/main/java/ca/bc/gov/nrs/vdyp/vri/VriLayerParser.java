@@ -15,7 +15,7 @@ public class VriLayerParser implements ControlMapValueReplacer<StreamingParserFa
 
 	@Override
 	public ControlKey getControlKey() {
-		return ControlKey.VRI_YIELD_LAYER_INPUT;
+		return ControlKey.VRI_INPUT_YIELD_LAYER;
 	}
 
 	@Override

@@ -31,14 +31,13 @@ public class FipControlParser extends StartApplicationControlParser {
 	private static final Logger log = LoggerFactory.getLogger(FipControlParser.class);
 
 	public FipControlParser() {
-		this.controlParser //
+		
+		initialize();
 
+		this.controlParser //
 				// FIP only
 				.record(ControlKey.STOCKING_CLASS_FACTORS, FILENAME) // RD_STK33
-
 		;
-
-		initialize();
 	}
 
 	@Override

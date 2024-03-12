@@ -42,7 +42,8 @@ public abstract class BaseControlParser {
 	protected BaseControlParser() { }
 	
 	/**
-	 * This method is to be called as the last action of concrete Control Parsers.
+	 * This method is to be called after the concrete Control Parsers are initialized. This
+	 * can be from the constructors of those classes, after initialization is complete.
 	 */
 	protected void initialize() {
 
