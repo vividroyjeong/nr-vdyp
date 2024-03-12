@@ -107,6 +107,12 @@ public class VdypForwardProcessor {
 		logger.debug("MaxPoly: {}", maxPoly);
 
 		if (vdypPassSet.contains(VdypPass.PASS_2)) {
+			// input files are already opened
+			// TODO: open output files
+		}
+		
+		if (vdypPassSet.contains(VdypPass.PASS_3)) {
+			
 		}
 	}
 }

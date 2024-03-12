@@ -39,7 +39,12 @@ public abstract class BaseControlParser {
 
 	protected ControlFileParser controlParser = new ControlFileParser();
 
-	protected BaseControlParser() {
+	protected BaseControlParser() { }
+	
+	/**
+	 * This method is to be called as the last action of concrete Control Parsers.
+	 */
+	protected void initialize() {
 
 		controlParser.record(ControlKey.MAX_NUM_POLY, ValueParser.INTEGER);
 

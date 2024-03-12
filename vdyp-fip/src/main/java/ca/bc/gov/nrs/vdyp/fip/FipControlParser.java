@@ -38,6 +38,7 @@ public class FipControlParser extends StartApplicationControlParser {
 
 		;
 
+		initialize();
 	}
 
 	@Override

@@ -75,6 +75,13 @@ public class VdypForwardControlParser extends BaseControlParser {
 
 	private static final Logger logger = LoggerFactory.getLogger(VdypForwardControlParser.class);
 
+	public VdypForwardControlParser()
+	{
+		initialize();
+
+		controlParser.record(ControlKey.VTROL, new VdypVtrolParser());	
+	}
+	
 	@Override
 	protected VdypApplicationIdentifier getProgramId() {
 		return VdypApplicationIdentifier.VDYP_FORWARD;
@@ -108,23 +115,24 @@ public class VdypForwardControlParser extends BaseControlParser {
 		);
 	}
 
-	private static final List<ControlKey> orderedControlKeys = new ArrayList<>();
+	private final List<ControlKey> orderedControlKeys = new ArrayList<>();
 	
-	private static final Map<ControlKey, ControlMapValueReplacer<Object, String>> vdypForwardInputParsers = new EnumMap<>(ControlKey.class);
+	private final Map<ControlKey, ControlMapValueReplacer<Object, String>> vdypForwardInputParsers = new EnumMap<>(ControlKey.class);
 	
-	private static void addInputParser(ControlMapValueReplacer<Object, String> parser) {
+	private void addInputParser(ControlMapValueReplacer<Object, String> parser) {
 		vdypForwardInputParsers.put(parser.getControlKey(), parser);
 		orderedControlKeys.add(parser.getControlKey());
 	}
 	
-	private static final Map<ControlKey, ResourceControlMapModifier> vdypForwardConfigurationParsers = new EnumMap<>(ControlKey.class);
+	private final Map<ControlKey, ResourceControlMapModifier> vdypForwardConfigurationParsers = new EnumMap<>(ControlKey.class);
 		
-	private static void addConfigurationParser(ResourceControlMapModifier parser) {
+	private void addConfigurationParser(ResourceControlMapModifier parser) {
 		vdypForwardConfigurationParsers.put(parser.getControlKey(), parser);
 		orderedControlKeys.add(parser.getControlKey());
 	}
 	
-	static {
+	@Override
+	protected void initialize() {
 		
 		// RD_BECD - 09
 		addConfigurationParser(new BecDefinitionParser());
@@ -256,10 +264,9 @@ public class VdypForwardControlParser extends BaseControlParser {
 		
 		// 1 - MAX_NUM_POLY
 		orderedControlKeys.add(ControlKey.MAX_NUM_POLY);
-	}
-	
-	public VdypForwardControlParser() {
-		controlParser.record(ControlKey.VTROL, new VdypVtrolParser());	
+		
+		
+		super.initialize();
 	}
 	
 	@Override
