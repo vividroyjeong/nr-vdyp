@@ -21,9 +21,7 @@ public interface OptionalControlMapSubResourceParser<T>
 	}
 
 	/**
-	 * The default value
-	 *
-	 * @return
+	 * @return the default value for this resource
 	 */
 	T defaultResult();
 
@@ -31,5 +29,4 @@ public interface OptionalControlMapSubResourceParser<T>
 	default ValueParser<Object> getValueParser() {
 		return OptionalResourceControlMapModifier.super.getValueParser();
 	}
-
 }

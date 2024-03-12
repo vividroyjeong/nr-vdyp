@@ -11,7 +11,7 @@
 011 vin_p1.dat                                        VDYP7 Polygon input
 012 vin_s1.dat                                        VDYP7 Layer by Species, input
 013 vin_u1.dat                                        VDYP7 Layer by SP0 by Util, input 
-014 growto.dat                                        Grow-to years
+014 vin_y1.dat                                        Grow-to years
 
 015 vp_grow2.dat                                      VDYP7 Polygon  out
 016 vs_grow2.dat                                      VDYP7 Layer by SP0  out

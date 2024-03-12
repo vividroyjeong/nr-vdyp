@@ -57,10 +57,11 @@ public class ControlFileParser implements ResourceParser<Map<String, Object>> {
 	public static final List<String> COMMENT_FLAGS = List.of("C");
 	public static final String COMMENT_MARKER = "!";
 
-	private Map<Integer, String> identifiers;
-	private Map<Integer, ControlledValueParser<?>> valueParsers;
-	private ValueParser<?> defaultValueParser;
-	private Map<String, Supplier<?>> defaultValueGenerators;
+	private final Map<Integer, String> identifiers = new HashMap<>();
+	private final Map<Integer, ControlledValueParser<?>> valueParsers = new HashMap<>();
+	private final Map<String, Supplier<?>> defaultValueGenerators = new LinkedHashMap<>();
+
+	private ValueParser<?> defaultValueParser = String::strip;
 
 	LineParser lineParser = new LineParser() {
 
@@ -88,10 +89,7 @@ public class ControlFileParser implements ResourceParser<Map<String, Object>> {
 	 * Create a control file parser.
 	 */
 	public ControlFileParser() {
-		this.identifiers = new HashMap<>();
-		this.valueParsers = new HashMap<>();
 		this.defaultValueParser = String::strip;
-		this.defaultValueGenerators = new LinkedHashMap<>();
 	}
 
 	@Override

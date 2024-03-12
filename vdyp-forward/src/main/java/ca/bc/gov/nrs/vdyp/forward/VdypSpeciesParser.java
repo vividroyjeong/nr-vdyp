@@ -26,7 +26,7 @@ import ca.bc.gov.nrs.vdyp.model.SpeciesDistribution;
 import ca.bc.gov.nrs.vdyp.model.SpeciesDistributionSet;
 
 public class VdypSpeciesParser
-		implements ControlMapValueReplacer<StreamingParserFactory<Collection<VdypLayerSpecies>>, String> {
+		implements ControlMapValueReplacer<Object, String> {
 
 	private static final String DESCRIPTION = "DESCRIPTION"; // POLYDESC
 	private static final String LAYER_TYPE = "LAYER_TYPE"; // LAYERG
@@ -52,7 +52,7 @@ public class VdypSpeciesParser
 
 	@Override
 	public ControlKey getControlKey() {
-		return ControlKey.VDYP_LAYER_BY_SPECIES;
+		return ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SPECIES;
 	}
 
 	@Override

@@ -308,7 +308,7 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 		};
 	}
 
-	static <U> ValueParser<U> uncontrolled(ControlledValueParser<U> delegate) {
+	private static <U> ValueParser<U> uncontrolled(ControlledValueParser<U> delegate) {
 		return s -> delegate.parse(s, Collections.emptyMap());
 	}
 

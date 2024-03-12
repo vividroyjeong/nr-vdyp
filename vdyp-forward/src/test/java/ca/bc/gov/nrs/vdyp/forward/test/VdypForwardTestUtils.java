@@ -73,7 +73,7 @@ public class VdypForwardTestUtils {
 	 * control map parser.
 	 */
 	public static Map<String, Object> loadControlMap() {
-		var parser = new VdypForwardControlParser(new VdypForwardControlParserTestApplication());
+		var parser = new VdypForwardControlParser();
 		try {
 			return loadControlMap(parser, VdypForwardControlParser.class, "FIPSTART.CTR");
 		} catch (IOException | ResourceParseException ex) {

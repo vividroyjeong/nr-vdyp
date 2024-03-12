@@ -31,14 +31,14 @@ public class FipPolygonParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.FIP_YIELD_POLY_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.FIP_INPUT_YIELD_POLY.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver("test.dat", TestUtils.makeInputStream(/* empty */));
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_POLY_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.FIP_INPUT_YIELD_POLY.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -57,7 +57,7 @@ public class FipPolygonParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.FIP_YIELD_POLY_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.FIP_INPUT_YIELD_POLY.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -66,7 +66,7 @@ public class FipPolygonParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_POLY_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.FIP_INPUT_YIELD_POLY.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -95,7 +95,7 @@ public class FipPolygonParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.FIP_YIELD_POLY_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.FIP_INPUT_YIELD_POLY.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -104,7 +104,7 @@ public class FipPolygonParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_POLY_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.FIP_INPUT_YIELD_POLY.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -133,7 +133,7 @@ public class FipPolygonParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.FIP_YIELD_POLY_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.FIP_INPUT_YIELD_POLY.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -154,7 +154,7 @@ public class FipPolygonParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_POLY_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.FIP_INPUT_YIELD_POLY.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -273,7 +273,7 @@ public class FipPolygonParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.FIP_YIELD_POLY_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.FIP_INPUT_YIELD_POLY.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -282,7 +282,7 @@ public class FipPolygonParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_POLY_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.FIP_INPUT_YIELD_POLY.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
@@ -311,7 +311,7 @@ public class FipPolygonParserTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 
-		controlMap.put(ControlKey.FIP_YIELD_POLY_INPUT.name(), "test.dat");
+		controlMap.put(ControlKey.FIP_INPUT_YIELD_POLY.name(), "test.dat");
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
@@ -320,7 +320,7 @@ public class FipPolygonParserTest {
 
 		parser.modify(controlMap, fileResolver);
 
-		var parserFactory = controlMap.get(ControlKey.FIP_YIELD_POLY_INPUT.name());
+		var parserFactory = controlMap.get(ControlKey.FIP_INPUT_YIELD_POLY.name());
 
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 

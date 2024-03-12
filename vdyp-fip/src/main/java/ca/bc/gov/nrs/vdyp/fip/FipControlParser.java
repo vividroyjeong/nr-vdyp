@@ -15,9 +15,9 @@ import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.StockingClassFactorParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapModifier;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapValueReplacer;
+import ca.bc.gov.nrs.vdyp.io.parse.control.StartApplicationControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 
 /**
@@ -26,18 +26,18 @@ import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
  * @author Kevin Smith, Vivid Solutions
  *
  */
-public class FipControlParser extends BaseControlParser {
+public class FipControlParser extends StartApplicationControlParser {
 	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(FipControlParser.class);
 
 	public FipControlParser() {
-		this.controlParser //
+		
+		initialize();
 
+		this.controlParser //
 				// FIP only
 				.record(ControlKey.STOCKING_CLASS_FACTORS, FILENAME) // RD_STK33
-
 		;
-
 	}
 
 	@Override
@@ -124,7 +124,7 @@ public class FipControlParser extends BaseControlParser {
 
 	@Override
 	protected List<ControlKey> outputFileParsers() {
-		return List.of(ControlKey.VDYP_POLYGON, ControlKey.VDYP_LAYER_BY_SPECIES, ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL);
+		return List.of(ControlKey.VRI_OUTPUT_VDYP_POLYGON, ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES, ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL);
 	}
 
 }

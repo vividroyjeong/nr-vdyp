@@ -31,7 +31,7 @@ public class DqGrowthEmpiricalParser extends SimpleCoefficientParser1<Integer> {
 
 	public static final int MAX_GROUPS = 40;
 
-	public static final Coefficients defaultCoefficients = new Coefficients(
+	protected static final Coefficients defaultCoefficients = new Coefficients(
 			new float[] { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }, 1
 	);
 

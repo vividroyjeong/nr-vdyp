@@ -23,7 +23,7 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
 public class VdypUtilizationParser
-		implements ControlMapValueReplacer<StreamingParserFactory<Collection<VdypSpeciesUtilization>>, String> {
+		implements ControlMapValueReplacer<Object, String> {
 
 	private static final String DESCRIPTION = "DESCRIPTION"; // POLYDESC
 	private static final String LAYER_TYPE = "LAYER_TYPE"; // LAYERG
@@ -42,7 +42,7 @@ public class VdypUtilizationParser
 
 	@Override
 	public ControlKey getControlKey() {
-		return ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL;
+		return ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL;
 	}
 
 	@Override

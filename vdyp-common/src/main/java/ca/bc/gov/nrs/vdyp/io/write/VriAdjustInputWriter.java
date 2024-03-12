@@ -93,9 +93,9 @@ public class VriAdjustInputWriter implements Closeable {
 	 */
 	public VriAdjustInputWriter(Map<String, Object> controlMap, FileResolver resolver) throws IOException {
 		this(
-				getOutputStream(controlMap, resolver, ControlKey.VDYP_POLYGON.name()),
-				getOutputStream(controlMap, resolver, ControlKey.VDYP_LAYER_BY_SPECIES.name()),
-				getOutputStream(controlMap, resolver, ControlKey.VDYP_LAYER_BY_SP0_BY_UTIL.name()), controlMap
+				getOutputStream(controlMap, resolver, ControlKey.VRI_OUTPUT_VDYP_POLYGON.name()),
+				getOutputStream(controlMap, resolver, ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name()),
+				getOutputStream(controlMap, resolver, ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name()), controlMap
 		);
 	}
 

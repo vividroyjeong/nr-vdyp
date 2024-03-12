@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import java.util.Map;
 
 /**
- * A parser for a multi-line recource
+ * A parser for a multi-line resource
  *
  * @author Kevin Smith, Vivid Solutions
  *

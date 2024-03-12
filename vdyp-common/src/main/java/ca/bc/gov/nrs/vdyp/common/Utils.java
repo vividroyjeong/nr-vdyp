@@ -193,15 +193,35 @@ public class Utils {
 		};
 	}
 
+    /**
+     * @return true iff <code>string</code> is null or when the result of 
+     * passing the first {@code Math.min(string.length(), length)} characters of 
+     * {@code string} to {@code java.lang.String.isBlank()} would return true.
+     * 
+     * @param string the String against which the check is being made
+     * @param length the length of the prefix of {@code string} that's being checked.
+     */
 	public static boolean nullOrPrefixBlank(@Nullable String string, int length) {
 		return string == null || (string.length() <= length && string.isBlank())
 				|| (string.length() > length && string.substring(0, length).isBlank());
 	}
 
+	/**
+	 * @return true iff <code>string</code> is null or {@code java.lang.String.isBlank()} would
+	 * return true.
+     * 
+     * @param string the String against which the check is being made
+	 */
 	public static boolean nullOrBlank(@Nullable String string) {
 		return string == null || string.isBlank();
 	}
 
+    /**
+     * @return true iff <code>string</code> is null or {@code java.lang.String.isEmpty()} would
+     * return true.
+     * 
+     * @param string the String against which the check is being made
+     */
 	public static boolean nullOrEmpty(@Nullable String string) {
 		return string == null || string.isEmpty();
 	}

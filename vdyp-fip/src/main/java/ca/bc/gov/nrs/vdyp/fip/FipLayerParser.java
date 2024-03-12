@@ -40,7 +40,7 @@ public class FipLayerParser
 
 	@Override
 	public ControlKey getControlKey() {
-		return ControlKey.FIP_YIELD_LAYER_INPUT;
+		return ControlKey.FIP_INPUT_YIELD_LAYER;
 	}
 
 	@Override

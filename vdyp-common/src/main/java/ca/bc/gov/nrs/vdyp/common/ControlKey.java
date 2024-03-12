@@ -9,14 +9,18 @@ public enum ControlKey {
 	BEC_DEF(9), SP0_DEF(10),
 
 	// FIP Inputs
-	FIP_YIELD_POLY_INPUT(11), FIP_YIELD_LAYER_INPUT(12), FIP_YIELD_LX_SP0_INPUT(13),
+	FIP_INPUT_YIELD_POLY(11), FIP_INPUT_YIELD_LAYER(12), FIP_INPUT_YIELD_LX_SP0(13),
 
 	// VRI Inputs
-	VRI_YIELD_POLY_INPUT(11), VRI_YIELD_LAYER_INPUT(12), VRI_YIELD_HEIGHT_AGE_SI_INPUT(13),
-	VRI_YIELD_SPEC_DIST_INPUT(14),
+	VRI_INPUT_YIELD_POLY(11), VRI_INPUT_YIELD_LAYER(12), VRI_INPUT_YIELD_HEIGHT_AGE_SI(13),
+	VRI_INPUT_YIELD_SPEC_DIST(14),
 
+	// VDYP Forward Inputs
+	FORWARD_INPUT_VDYP_POLY(11), FORWARD_INPUT_VDYP_LAYER_BY_SPECIES(12), FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL(13),
+	FORWARD_INPUT_GROWTO(14),
+	
 	// FIP/VRI Outputs
-	VDYP_POLYGON(15), VDYP_LAYER_BY_SPECIES(16), VDYP_LAYER_BY_SP0_BY_UTIL(18),
+	VRI_OUTPUT_VDYP_POLYGON(15), VRI_OUTPUT_VDYP_LAYER_BY_SPECIES(16), VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL(18),
 
 	VOLUME_EQN_GROUPS(20), DECAY_GROUPS(21), BREAKAGE_GROUPS(22),
 
@@ -56,7 +60,7 @@ public enum ControlKey {
 	BA_MODIFIERS, DQ_MODIFIERS, HL_MODIFIERS, DECAY_MODIFIERS, WASTE_MODIFIERS;
 
 	public final Optional<Integer> sequence;
-
+	
 	ControlKey(int sequence) {
 		this.sequence = Optional.of(sequence);
 	}
@@ -65,4 +69,12 @@ public enum ControlKey {
 		this.sequence = Optional.empty();
 	}
 
+	public static boolean isControlKey(String key) {
+		try {
+			ControlKey.valueOf(key);
+		} catch (IllegalArgumentException e) {
+			return false;
+		}
+		return true;
+	}
 }
