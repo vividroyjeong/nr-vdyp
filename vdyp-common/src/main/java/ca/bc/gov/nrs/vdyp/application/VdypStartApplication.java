@@ -97,7 +97,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		// Load the control map
 
 		if (controlFilePaths.length < 1) {
-			throw new IllegalArgumentException("At least one control file must be specifiec.");
+			throw new IllegalArgumentException("At least one control file must be specified.");
 		}
 
 		BaseControlParser parser = getControlFileParser();
@@ -147,10 +147,9 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			var factory = Utils
 					.<StreamingParserFactory<T>>expectParsedControl(controlMap, key, StreamingParserFactory.class);
 
-			if (factory == null) {
-				throw new ProcessingException(String.format("Data file %s not specified in control map.", key));
-			}
 			return factory.get();
+		} catch (IllegalStateException ex) {
+			throw new ProcessingException(String.format("Data file %s not specified in control map.", key), ex);
 		} catch (IOException ex) {
 			throw new ProcessingException("Error while opening data file.", ex);
 		}
