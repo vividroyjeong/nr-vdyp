@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.forward.model;
 
 import java.util.Map;
+import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
@@ -14,10 +15,12 @@ public class VdypPolygonLayer {
 
 	private final VdypPolygon parent;
 	private final Map<GenusDefinition, VdypLayerSpecies> genus;
-	private final Map<UtilizationClass, VdypSpeciesUtilization> defaultUtilizationMap;
+	private final Optional<Map<UtilizationClass, VdypSpeciesUtilization>> defaultUtilizationMap;
 
-	public VdypPolygonLayer(LayerType layerType, VdypPolygon parent, Map<GenusDefinition, VdypLayerSpecies> genus,
-			Map<UtilizationClass, VdypSpeciesUtilization> defaultUtilizationMap) {
+	public VdypPolygonLayer(
+			LayerType layerType, VdypPolygon parent, Map<GenusDefinition, VdypLayerSpecies> genus,
+			Optional<Map<UtilizationClass, VdypSpeciesUtilization>> defaultUtilizationMap
+	) {
 		this.layerType = layerType;
 		this.parent = parent;
 		this.genus = genus;
@@ -36,7 +39,7 @@ public class VdypPolygonLayer {
 		return genus;
 	}
 
-	public Map<UtilizationClass, VdypSpeciesUtilization> getDefaultUtilizationMap() {
+	public Optional<Map<UtilizationClass, VdypSpeciesUtilization>> getDefaultUtilizationMap() {
 		return defaultUtilizationMap;
 	}
 }

@@ -25,8 +25,7 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.SpeciesDistribution;
 import ca.bc.gov.nrs.vdyp.model.SpeciesDistributionSet;
 
-public class VdypSpeciesParser
-		implements ControlMapValueReplacer<Object, String> {
+public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String> {
 
 	private static final String DESCRIPTION = "DESCRIPTION"; // POLYDESC
 	private static final String LAYER_TYPE = "LAYER_TYPE"; // LAYERG
@@ -70,11 +69,10 @@ public class VdypSpeciesParser
 											EndOfRecord.END_OF_RECORD
 									)
 							)
-					).space(1)
-					.value(2, GENUS_INDEX, ValueParser.INTEGER).space(1)
-					.value(2, GENUS, ControlledValueParser.optional(ControlledValueParser.GENUS))
-					.space(1)
-					.value(3, SPECIES_1, ControlledValueParser.SPECIES).value(5, PERCENT_SPECIES_1, ValueParser.PERCENTAGE)
+					).space(1).value(2, GENUS_INDEX, ValueParser.INTEGER).space(1)
+					.value(2, GENUS, ControlledValueParser.optional(ControlledValueParser.GENUS)).space(1)
+					.value(3, SPECIES_1, ControlledValueParser.SPECIES)
+					.value(5, PERCENT_SPECIES_1, ValueParser.PERCENTAGE)
 					.value(3, SPECIES_2, ControlledValueParser.optional(ControlledValueParser.SPECIES))
 					.value(5, PERCENT_SPECIES_2, ControlledValueParser.optional(ValueParser.PERCENTAGE))
 					.value(3, SPECIES_3, ControlledValueParser.optional(ControlledValueParser.SPECIES))
@@ -122,23 +120,27 @@ public class VdypSpeciesParser
 					var siteCurveNumber = Optional.of(Utils.<Integer>optSafe(entry.get(SITE_CURVE_NUMBER)).orElse(9));
 
 					var builder = new ValueOrMarker.Builder<Optional<VdypLayerSpecies>, EndOfRecord>();
-					return layerType.handle(l -> 
-						builder.value(l.map(lt -> {
+					return layerType.handle(l -> builder.value(l.map(lt -> {
 
-							List<SpeciesDistribution> sdList = new ArrayList<>();
-							sdList.add(new SpeciesDistribution(species1, percentSpecies1));
-							Utils.ifBothPresent(species2, percentSpecies2, (s, p) -> sdList.add(new SpeciesDistribution(s, p)));
-							Utils.ifBothPresent(species3, percentSpecies3, (s, p) -> sdList.add(new SpeciesDistribution(s, p)));
-							Utils.ifBothPresent(species4, percentSpecies4, (s, p) -> sdList.add(new SpeciesDistribution(s, p)));
+						List<SpeciesDistribution> sdList = new ArrayList<>();
+						sdList.add(new SpeciesDistribution(species1, percentSpecies1));
+						Utils.ifBothPresent(
+								species2, percentSpecies2, (s, p) -> sdList.add(new SpeciesDistribution(s, p))
+						);
+						Utils.ifBothPresent(
+								species3, percentSpecies3, (s, p) -> sdList.add(new SpeciesDistribution(s, p))
+						);
+						Utils.ifBothPresent(
+								species4, percentSpecies4, (s, p) -> sdList.add(new SpeciesDistribution(s, p))
+						);
 
-							SpeciesDistributionSet speciesDistributionSet = new SpeciesDistributionSet(sdList);
+						SpeciesDistributionSet speciesDistributionSet = new SpeciesDistributionSet(sdList);
 
-							return new VdypLayerSpecies(
-									polygonId, lt, genusIndex, genus, speciesDistributionSet, siteIndex, dominantHeight,
-									totalAge, ageAtBreastHeight, yearsToBreastHeight, isPrimarySpecies, siteCurveNumber
-							);
-						}))
-					, builder::marker);
+						return new VdypLayerSpecies(
+								polygonId, lt, genusIndex, genus, speciesDistributionSet, siteIndex, dominantHeight,
+								totalAge, ageAtBreastHeight, yearsToBreastHeight, isPrimarySpecies, siteCurveNumber
+						);
+					})), builder::marker);
 				}
 			};
 
@@ -159,7 +161,7 @@ public class VdypSpeciesParser
 				protected Collection<VdypLayerSpecies>
 						convert(List<ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord>> children) {
 					// Skip if empty (and unknown layer type)
-					return children.stream().map(ValueOrMarker::getValue).map(Optional::get).flatMap(Optional::stream) 
+					return children.stream().map(ValueOrMarker::getValue).map(Optional::get).flatMap(Optional::stream)
 							.toList();
 				}
 			};

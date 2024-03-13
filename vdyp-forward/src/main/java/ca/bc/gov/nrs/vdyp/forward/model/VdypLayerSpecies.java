@@ -26,7 +26,7 @@ public class VdypLayerSpecies {
 
 	// Set after construction
 	private VdypPolygonLayer parent;
-	Map<UtilizationClass, VdypSpeciesUtilization> utilizations;
+	Optional<Map<UtilizationClass, VdypSpeciesUtilization>> utilizations;
 
 	public VdypLayerSpecies(
 			VdypPolygonDescription polygonId, LayerType layerType, Integer genusIndex, Optional<String> genus,
@@ -64,13 +64,13 @@ public class VdypLayerSpecies {
 		this.isPrimary = isPrimary;
 		this.siteCurveNumber = siteCurveNumber;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		
+
 		sb.append(polygonId).append(' ').append(layerType).append(' ').append(genusIndex);
-		
+
 		return sb.toString();
 	}
 
@@ -78,7 +78,7 @@ public class VdypLayerSpecies {
 		this.parent = parent;
 	}
 
-	public void setUtilizations(Map<UtilizationClass, VdypSpeciesUtilization> utilizations) {
+	public void setUtilizations(Optional<Map<UtilizationClass, VdypSpeciesUtilization>> utilizations) {
 		this.utilizations = utilizations;
 	}
 
@@ -134,7 +134,7 @@ public class VdypLayerSpecies {
 		return parent;
 	}
 
-	public Map<UtilizationClass, VdypSpeciesUtilization> getUtilizations() {
+	public Optional<Map<UtilizationClass, VdypSpeciesUtilization>> getUtilizations() {
 		return utilizations;
 	}
 }

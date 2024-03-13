@@ -502,7 +502,10 @@ class VdypForwardControlParserTest {
 		var parser = new VdypForwardControlParser();
 		var result = parse(parser, "VDYP.CTR");
 		assertThat(
-				result, (Matcher) controlMapHasEntry(ControlKey.FORWARD_INPUT_VDYP_POLY, instanceOf(StreamingParserFactory.class))
+				result,
+				(Matcher) controlMapHasEntry(
+						ControlKey.FORWARD_INPUT_VDYP_POLY, instanceOf(StreamingParserFactory.class)
+				)
 		);
 	}
 
@@ -524,7 +527,9 @@ class VdypForwardControlParserTest {
 		var result = parse(parser, "VDYP.CTR");
 		assertThat(
 				result,
-				(Matcher) controlMapHasEntry(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SPECIES, instanceOf(StreamingParserFactory.class))
+				(Matcher) controlMapHasEntry(
+						ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SPECIES, instanceOf(StreamingParserFactory.class)
+				)
 		);
 	}
 
@@ -549,7 +554,7 @@ class VdypForwardControlParserTest {
 
 		Class<?> klazz = TestUtils.class;
 		try (InputStream baseIs = klazz.getResourceAsStream("VDYP.CTR"); InputStream is = addToEnd(baseIs, lines);) {
-			return parser.parse(is, VdypForwardTestUtils.fileResolver(klazz), new HashMap<>());
+			return parser.parse(is, TestUtils.fileResolver(klazz), new HashMap<>());
 		}
 	}
 
@@ -559,7 +564,7 @@ class VdypForwardControlParserTest {
 		Class<?> klazz = TestUtils.class;
 		try (var is = klazz.getResourceAsStream(resourceName)) {
 
-			return parser.parse(is, VdypForwardTestUtils.fileResolver(klazz), new HashMap<>());
+			return parser.parse(is, TestUtils.fileResolver(klazz), new HashMap<>());
 		}
 	}
 }

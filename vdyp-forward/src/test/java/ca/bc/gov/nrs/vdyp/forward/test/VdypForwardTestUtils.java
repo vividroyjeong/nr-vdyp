@@ -64,7 +64,7 @@ public class VdypForwardTestUtils {
 					throws IOException, ResourceParseException {
 		try (var is = klazz.getResourceAsStream(resourceName)) {
 
-			return parser.parse(is, VdypForwardTestUtils.fileResolver(klazz), new HashMap<>());
+			return parser.parse(is, TestUtils.fileResolver(klazz), new HashMap<>());
 		}
 	}
 
@@ -79,33 +79,5 @@ public class VdypForwardTestUtils {
 		} catch (IOException | ResourceParseException ex) {
 			throw new AssertionFailedError(null, ex);
 		}
-	}
-
-	public static FileResolver fileResolver(Class<?> klazz) {
-		return new FileResolver() {
-
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				InputStream resourceAsStream = klazz.getResourceAsStream(filename);
-				if (resourceAsStream == null)
-					throw new IOException("Could not load " + filename);
-				return resourceAsStream;
-			}
-
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return klazz.getResource(filename).toString();
-			}
-
-			@Override
-			public FileResolver relative(String path) throws IOException {
-				throw new UnsupportedOperationException();
-			}
-		};
 	}
 }

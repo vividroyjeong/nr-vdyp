@@ -14,7 +14,7 @@ public class VdypSpeciesUtilization {
 	private final Integer genusIndex; // ISP
 	private final Optional<String> genus; // SP0
 	private final UtilizationClass ucIndex; // J - utilization index
-	private final Float basalArea; 
+	private final Float basalArea;
 	private final Float liveTreesPerHectare;
 	private final Float loreyHeight;
 	private final Float wholeStemVolume;
@@ -28,10 +28,10 @@ public class VdypSpeciesUtilization {
 	private VdypLayerSpecies parent;
 
 	public VdypSpeciesUtilization(
-			VdypPolygonDescription polygonId, LayerType layerType, Integer genusIndex, Optional<String> genus, UtilizationClass ucIndex,
-			Float basalArea, Float liveTreesPerHectare, Float loreyHeight, Float wholeStemVolume,
-			Float closeUtilizationVolume, Float cuVolumeMinusDecay, Float cuVolumeMinusDecayWastage,
-			Float cuVolumeMinusDecayWastageBreakage, Float quadraticMeanDiameterAtBH
+			VdypPolygonDescription polygonId, LayerType layerType, Integer genusIndex, Optional<String> genus,
+			UtilizationClass ucIndex, Float basalArea, Float liveTreesPerHectare, Float loreyHeight,
+			Float wholeStemVolume, Float closeUtilizationVolume, Float cuVolumeMinusDecay,
+			Float cuVolumeMinusDecayWastage, Float cuVolumeMinusDecayWastageBreakage, Float quadraticMeanDiameterAtBH
 	) {
 		this.polygonId = polygonId;
 		this.layerType = layerType;
@@ -48,13 +48,14 @@ public class VdypSpeciesUtilization {
 		this.cuVolumeMinusDecayWastageBreakage = cuVolumeMinusDecayWastageBreakage;
 		this.quadraticMeanDiameterAtBH = quadraticMeanDiameterAtBH;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		
-		sb.append(polygonId).append(' ').append(layerType).append(' ').append(genusIndex).append(' ').append(ucIndex.index);
-		
+
+		sb.append(polygonId).append(' ').append(layerType).append(' ').append(genusIndex).append(' ')
+				.append(ucIndex.index);
+
 		return sb.toString();
 	}
 

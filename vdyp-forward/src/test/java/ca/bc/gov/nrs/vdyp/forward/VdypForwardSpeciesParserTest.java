@@ -89,7 +89,7 @@ class VdypForwardSpeciesParserTest {
 				genera,
 				hasItem(
 						allOf(
-								hasProperty("polygonId", is("01002 S000001 00     1970")),
+								hasProperty("polygonId", hasProperty("description", is("01002 S000001 00     1970"))),
 								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genusIndex", is(15)),
 								hasProperty("genus", is(Optional.of("S"))),
 								hasProperty(
@@ -308,7 +308,7 @@ class VdypForwardSpeciesParserTest {
 				genera,
 				hasItems(
 						allOf(
-								hasProperty("polygonId", is("01002 S000002 00     1970")),
+								hasProperty("polygonId", hasProperty("description", is("01002 S000002 00     1970"))),
 								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genusIndex", is(15)),
 								hasProperty("genus", is(Optional.of("S"))),
 								hasProperty(
@@ -330,7 +330,7 @@ class VdypForwardSpeciesParserTest {
 								hasProperty("siteCurveNumber", is(Optional.of(-9)))
 						),
 						allOf(
-								hasProperty("polygonId", is("01002 S000002 00     1970")),
+								hasProperty("polygonId", hasProperty("description", is("01002 S000002 00     1970"))),
 								hasProperty("layerType", is(LayerType.VETERAN)), hasProperty("genusIndex", is(3)),
 								hasProperty("genus", is(Optional.of("B"))),
 								hasProperty(
