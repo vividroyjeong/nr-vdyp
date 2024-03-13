@@ -27,12 +27,12 @@ public class VdypPolygonDescriptionParser implements ControlMapValueReplacer<Obj
 	private static Pattern descriptionPattern = Pattern.compile("(.*)([\\d]{4}$)");
 
 	public static VdypPolygonDescription parse(String description) throws ResourceParseException {
-		
+
 		Matcher matcher = descriptionPattern.matcher(description);
 
 		Integer year;
 		String name;
-		
+
 		if (matcher.matches() && matcher.group(2) != null) {
 			year = Integer.parseInt(matcher.group(2));
 			name = matcher.group(1);
@@ -46,7 +46,7 @@ public class VdypPolygonDescriptionParser implements ControlMapValueReplacer<Obj
 
 		return new VdypPolygonDescription(description, name, year);
 	}
-	
+
 	@Override
 	public StreamingParserFactory<VdypPolygonDescription>
 			map(String fileName, FileResolver fileResolver, Map<String, Object> control)
@@ -65,7 +65,7 @@ public class VdypPolygonDescriptionParser implements ControlMapValueReplacer<Obj
 
 				@Override
 				protected VdypPolygonDescription convert(Map<String, Object> entry) throws ResourceParseException {
-					
+
 					var description = (String) entry.get(DESCRIPTION);
 					return parse(description);
 				}

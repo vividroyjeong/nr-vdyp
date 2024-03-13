@@ -21,9 +21,8 @@ public class VdypPolygon {
 	private Optional<VdypPolygonLayer> veteranLayer;
 
 	public VdypPolygon(
-			VdypPolygonDescription vdypPolygonDescription, BecDefinition bec, Character fizId, 
-			Float percentForestLand, Optional<Integer> inventoryTypeGroup, Optional<Integer> basalAreaGroup, 
-			Optional<FipMode> fipMode
+			VdypPolygonDescription vdypPolygonDescription, BecDefinition bec, Character fizId, Float percentForestLand,
+			Optional<Integer> inventoryTypeGroup, Optional<Integer> basalAreaGroup, Optional<FipMode> fipMode
 	) {
 		this.description = vdypPolygonDescription;
 		this.biogeoclimaticZone = bec;
@@ -40,9 +39,9 @@ public class VdypPolygon {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		
+
 		sb.append(description.getName()).append('(').append(description.getYear()).append(')');
-		
+
 		return sb.toString();
 	}
 

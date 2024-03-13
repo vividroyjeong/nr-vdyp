@@ -27,8 +27,9 @@ public class VdypForwardApplication extends VdypApplication {
 
 	static {
 		try {
-			LogManager.getLogManager().readConfiguration(VdypForwardProcessor.class.getClassLoader()
-					.getResourceAsStream("logging.properties"));
+			LogManager.getLogManager().readConfiguration(
+					VdypForwardProcessor.class.getClassLoader().getResourceAsStream("logging.properties")
+			);
 		} catch (SecurityException | IOException e) {
 			System.err.println("Unable to configure logging system");
 		}
@@ -80,9 +81,9 @@ public class VdypForwardApplication extends VdypApplication {
 
 		try {
 			VdypForwardProcessor processor = new VdypForwardProcessor();
-			
+
 			processor.run(new FileSystemFileResolver(), controlFileNames, vdypPassSet);
-			
+
 		} catch (Exception ex) {
 			logger.error("Error during processing", ex);
 			System.exit(PROCESSING_ERROR);

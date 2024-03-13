@@ -20,6 +20,7 @@ public class VdypPolygonDescription {
 		sb.append(name).append('(').append(year).append(')');
 		return sb.toString();
 	}
+
 	public String getDescription() {
 		return description;
 	}
@@ -27,18 +28,18 @@ public class VdypPolygonDescription {
 	public Integer getYear() {
 		return year;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return other instanceof VdypPolygonDescription that && name.equals(that.name);
 	}
-	
+
 	@Override
-	public int hashCode() { 
+	public int hashCode() {
 		return description.hashCode();
 	}
 }

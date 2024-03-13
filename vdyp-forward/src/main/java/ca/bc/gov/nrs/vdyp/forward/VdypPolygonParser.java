@@ -80,8 +80,8 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 					}
 
 					return new VdypPolygon(
-							VdypPolygonDescriptionParser.parse(description), bec, fizId, percentForestLand, inventoryTypeGroup, basalAreaGroup,
-							fipMode.flatMap(FipMode::getByCode)
+							VdypPolygonDescriptionParser.parse(description), bec, fizId, percentForestLand,
+							inventoryTypeGroup, basalAreaGroup, fipMode.flatMap(FipMode::getByCode)
 					);
 				}
 			};
