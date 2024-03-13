@@ -8,8 +8,7 @@ public class VdypPolygon {
 
 	// See IPSJF155.doc
 
-	private final String description; // POLYDESC
-	private final Integer year; // derived - last four characters of POLYDESC
+	private final VdypPolygonDescription description; // POLYDESC
 	private final BecDefinition biogeoclimaticZone; // BEC
 	private final Character forestInventoryZone; // FIZ
 	private final Float percentForestLand; // PCTFLAND
@@ -22,12 +21,11 @@ public class VdypPolygon {
 	private Optional<VdypPolygonLayer> veteranLayer;
 
 	public VdypPolygon(
-			String description, Integer year, BecDefinition bec, Character fizId, Float percentForestLand,
-			Optional<Integer> inventoryTypeGroup, Optional<Integer> basalAreaGroup, Optional<FipMode> fipMode
+			VdypPolygonDescription vdypPolygonDescription, BecDefinition bec, Character fizId, 
+			Float percentForestLand, Optional<Integer> inventoryTypeGroup, Optional<Integer> basalAreaGroup, 
+			Optional<FipMode> fipMode
 	) {
-		super();
-		this.description = description;
-		this.year = year;
+		this.description = vdypPolygonDescription;
 		this.biogeoclimaticZone = bec;
 		this.forestInventoryZone = fizId;
 		if (percentForestLand <= 0.0)
@@ -39,6 +37,15 @@ public class VdypPolygon {
 		this.fipMode = fipMode;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append(description.getName()).append('(').append(description.getYear()).append(')');
+		
+		return sb.toString();
+	}
+
 	public void setPrimaryLayer(VdypPolygonLayer primaryLayer) {
 		this.primaryLayer = primaryLayer;
 	}
@@ -47,12 +54,16 @@ public class VdypPolygon {
 		this.veteranLayer = veteranLayer;
 	}
 
-	public String getDescription() {
+	public VdypPolygonDescription getDescription() {
 		return description;
 	}
 
+	public String getName() {
+		return description.getName();
+	}
+
 	public Integer getYear() {
-		return year;
+		return description.getYear();
 	}
 
 	public BecDefinition getBiogeoclimaticZone() {

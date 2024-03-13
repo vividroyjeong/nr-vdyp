@@ -24,8 +24,29 @@ public class VdypPolygonDescriptionParser implements ControlMapValueReplacer<Obj
 		return ControlKey.FORWARD_INPUT_GROWTO;
 	}
 
-	private static Pattern descriptionPattern = Pattern.compile(".*([\\d]{4}$)");
+	private static Pattern descriptionPattern = Pattern.compile("(.*)([\\d]{4}$)");
 
+	public static VdypPolygonDescription parse(String description) throws ResourceParseException {
+		
+		Matcher matcher = descriptionPattern.matcher(description);
+
+		Integer year;
+		String name;
+		
+		if (matcher.matches() && matcher.group(2) != null) {
+			year = Integer.parseInt(matcher.group(2));
+			name = matcher.group(1);
+		} else {
+			throw new ResourceParseException(
+					"Polygon description " + description + " did not end with a four-digit year value."
+							+ " Instead, it ended with "
+							+ description.substring(description.length() - 4, description.length())
+			);
+		}
+
+		return new VdypPolygonDescription(description, name, year);
+	}
+	
 	@Override
 	public StreamingParserFactory<VdypPolygonDescription>
 			map(String fileName, FileResolver fileResolver, Map<String, Object> control)
@@ -44,23 +65,10 @@ public class VdypPolygonDescriptionParser implements ControlMapValueReplacer<Obj
 
 				@Override
 				protected VdypPolygonDescription convert(Map<String, Object> entry) throws ResourceParseException {
+					
 					var description = (String) entry.get(DESCRIPTION);
-
-					Integer year;
-					Matcher matcher = descriptionPattern.matcher(description);
-					if (matcher.matches() && matcher.group(1) != null) {
-						year = Integer.parseInt(matcher.group(1));
-					} else {
-						throw new ResourceParseException(
-								"Polygon description " + description + " did not end with a four-digit year value."
-										+ " Instead, it ended with "
-										+ description.substring(description.length() - 4, description.length())
-						);
-					}
-
-					return new VdypPolygonDescription(description, year);
+					return parse(description);
 				}
-
 			};
 		};
 	}

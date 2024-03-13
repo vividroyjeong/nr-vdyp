@@ -2,8 +2,6 @@ package ca.bc.gov.nrs.vdyp.forward;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
@@ -36,8 +34,6 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 		return ControlKey.FORWARD_INPUT_VDYP_POLY;
 	}
 
-	private static Pattern descriptionPattern = Pattern.compile(".*([\\d]{4}$)");
-
 	@Override
 	public StreamingParserFactory<VdypPolygon>
 			map(String fileName, FileResolver fileResolver, Map<String, Object> control)
@@ -48,12 +44,15 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 				public boolean isStopLine(String line) {
 					return line.substring(0, Math.min(25, line.length())).trim().length() == 0;
 				}
-			}.strippedString(25, DESCRIPTION).space(1).value(4, BIOGEOCLIMATIC_ZONE, ValueParser.BEC).space(1)
-					.value(1, FOREST_INVENTORY_ZONE, ValueParser.CHARACTER) // TODO: add ValueParser.FIZ
-					.value(6, PERCENT_FOREST_LAND, ValueParser.FLOAT)
-					.value(3, INVENTORY_TYPE_GROUP, ControlledValueParser.optional(ValueParser.INTEGER))
-					.value(3, BASAL_AREA_GROUP, ValueParser.optional(ValueParser.INTEGER))
-					.value(3, FIP_MODE, ValueParser.optional(ValueParser.INTEGER));
+			}.strippedString(25, DESCRIPTION)
+				.space(1)
+				.value(4, BIOGEOCLIMATIC_ZONE, ControlledValueParser.BEC)
+				.space(1)
+				.value(1, FOREST_INVENTORY_ZONE, ValueParser.CHARACTER) // TODO: add ValueParser.FIZ
+				.value(6, PERCENT_FOREST_LAND, ValueParser.FLOAT)
+				.value(3, INVENTORY_TYPE_GROUP, ControlledValueParser.optional(ValueParser.INTEGER))
+				.value(3, BASAL_AREA_GROUP, ValueParser.optional(ValueParser.INTEGER))
+				.value(3, FIP_MODE, ValueParser.optional(ValueParser.INTEGER));
 
 			var is = fileResolver.resolveForInput(fileName);
 
@@ -69,18 +68,6 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 					var basalAreaGroup = Utils.<Integer>optSafe(entry.get(BASAL_AREA_GROUP));
 					var fipMode = Utils.<Integer>optSafe(entry.get(FIP_MODE));
 
-					Integer year;
-					Matcher matcher = descriptionPattern.matcher(description);
-					if (matcher.matches() && matcher.group(1) != null) {
-						year = Integer.parseInt(matcher.group(1));
-					} else {
-						throw new ResourceParseException(
-								"Polygon description " + description + " did not end with a four-digit year value."
-										+ " Instead, it ended with "
-										+ description.substring(description.length() - 4, description.length())
-						);
-					}
-
 					BecLookup becLookup = (BecLookup) control.get(ControlKey.BEC_DEF.name());
 					BecDefinition bec = becLookup.get(becAlias)
 							.orElseThrow(() -> new ResourceParseException(becAlias + " is not a recognized BEC alias"));
@@ -93,11 +80,10 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 					}
 
 					return new VdypPolygon(
-							description, year, bec, fizId, percentForestLand, inventoryTypeGroup, basalAreaGroup,
+							VdypPolygonDescriptionParser.parse(description), bec, fizId, percentForestLand, inventoryTypeGroup, basalAreaGroup,
 							fipMode.flatMap(FipMode::getByCode)
 					);
 				}
-
 			};
 		};
 	}

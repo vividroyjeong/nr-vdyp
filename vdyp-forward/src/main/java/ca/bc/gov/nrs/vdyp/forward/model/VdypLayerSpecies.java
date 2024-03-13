@@ -11,7 +11,7 @@ public class VdypLayerSpecies {
 
 	// See IPSJF155.doc
 
-	private final String polygonId; // POLYDESC
+	private final VdypPolygonDescription polygonId; // POLYDESC
 	private final LayerType layerType; // LAYERG
 	private final Integer genusIndex; // ISP
 	private final Optional<String> genus; // SP0
@@ -29,7 +29,7 @@ public class VdypLayerSpecies {
 	Map<UtilizationClass, VdypSpeciesUtilization> utilizations;
 
 	public VdypLayerSpecies(
-			String polygonId, LayerType layerType, Integer genusIndex, Optional<String> genus,
+			VdypPolygonDescription polygonId, LayerType layerType, Integer genusIndex, Optional<String> genus,
 			SpeciesDistributionSet speciesDistributions, Float siteIndex, Float dominantHeight, Float ageTotal,
 			Float ageAtBreastHeight, Float yearsToBreastHeight, Optional<Boolean> isPrimary,
 			Optional<Integer> siteCurveNumber
@@ -64,16 +64,25 @@ public class VdypLayerSpecies {
 		this.isPrimary = isPrimary;
 		this.siteCurveNumber = siteCurveNumber;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append(polygonId).append(' ').append(layerType).append(' ').append(genusIndex);
+		
+		return sb.toString();
+	}
 
-	void setParent(VdypPolygonLayer parent) {
+	public void setParent(VdypPolygonLayer parent) {
 		this.parent = parent;
 	}
 
-	void setUtilizations(Map<UtilizationClass, VdypSpeciesUtilization> utilizations) {
+	public void setUtilizations(Map<UtilizationClass, VdypSpeciesUtilization> utilizations) {
 		this.utilizations = utilizations;
 	}
 
-	public String getPolygonId() {
+	public VdypPolygonDescription getPolygonId() {
 		return polygonId;
 	}
 

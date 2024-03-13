@@ -70,14 +70,16 @@ public class VdypSpeciesParser
 											EndOfRecord.END_OF_RECORD
 									)
 							)
-					).space(1).value(2, GENUS_INDEX, ValueParser.INTEGER).space(1)
-					.value(2, GENUS, ControlledValueParser.optional(ValueParser.GENUS)).space(1)
-					.value(3, SPECIES_1, ValueParser.SPECIES).value(5, PERCENT_SPECIES_1, ValueParser.PERCENTAGE)
-					.value(3, SPECIES_2, ControlledValueParser.optional(ValueParser.SPECIES))
+					).space(1)
+					.value(2, GENUS_INDEX, ValueParser.INTEGER).space(1)
+					.value(2, GENUS, ControlledValueParser.optional(ControlledValueParser.GENUS))
+					.space(1)
+					.value(3, SPECIES_1, ControlledValueParser.SPECIES).value(5, PERCENT_SPECIES_1, ValueParser.PERCENTAGE)
+					.value(3, SPECIES_2, ControlledValueParser.optional(ControlledValueParser.SPECIES))
 					.value(5, PERCENT_SPECIES_2, ControlledValueParser.optional(ValueParser.PERCENTAGE))
-					.value(3, SPECIES_3, ControlledValueParser.optional(ValueParser.SPECIES))
+					.value(3, SPECIES_3, ControlledValueParser.optional(ControlledValueParser.SPECIES))
 					.value(5, PERCENT_SPECIES_3, ControlledValueParser.optional(ValueParser.PERCENTAGE))
-					.value(3, SPECIES_4, ControlledValueParser.optional(ValueParser.SPECIES))
+					.value(3, SPECIES_4, ControlledValueParser.optional(ControlledValueParser.SPECIES))
 					.value(5, PERCENT_SPECIES_4, ControlledValueParser.optional(ValueParser.PERCENTAGE))
 					.value(6, SITE_INDEX, ValueParser.FLOAT).value(6, DOMINANT_HEIGHT, ValueParser.FLOAT)
 					.value(6, TOTAL_AGE, ValueParser.FLOAT).value(6, AGE_AT_BREAST_HEIGHT, ValueParser.FLOAT)
@@ -95,7 +97,7 @@ public class VdypSpeciesParser
 				protected ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord> convert(Map<String, Object> entry)
 						throws ResourceParseException {
 
-					var polygonId = (String) entry.get(DESCRIPTION);
+					var polygonId = VdypPolygonDescriptionParser.parse((String) entry.get(DESCRIPTION));
 					var layerType = (ValueOrMarker<Optional<LayerType>, EndOfRecord>) entry.get(LAYER_TYPE);
 					if (layerType == null) {
 						var builder = new ValueOrMarker.Builder<Optional<LayerType>, EndOfRecord>();
@@ -120,36 +122,29 @@ public class VdypSpeciesParser
 					var siteCurveNumber = Optional.of(Utils.<Integer>optSafe(entry.get(SITE_CURVE_NUMBER)).orElse(9));
 
 					var builder = new ValueOrMarker.Builder<Optional<VdypLayerSpecies>, EndOfRecord>();
-					return layerType.handle(l -> {
-						return builder.value(l.map(lt -> {
+					return layerType.handle(l -> 
+						builder.value(l.map(lt -> {
 
 							List<SpeciesDistribution> sdList = new ArrayList<>();
 							sdList.add(new SpeciesDistribution(species1, percentSpecies1));
-							Utils.ifBothPresent(species2, percentSpecies2, (s, p) -> {
-								sdList.add(new SpeciesDistribution(s, p));
-							});
-							Utils.ifBothPresent(species3, percentSpecies3, (s, p) -> {
-								sdList.add(new SpeciesDistribution(s, p));
-							});
-							Utils.ifBothPresent(species4, percentSpecies4, (s, p) -> {
-								sdList.add(new SpeciesDistribution(s, p));
-							});
+							Utils.ifBothPresent(species2, percentSpecies2, (s, p) -> sdList.add(new SpeciesDistribution(s, p)));
+							Utils.ifBothPresent(species3, percentSpecies3, (s, p) -> sdList.add(new SpeciesDistribution(s, p)));
+							Utils.ifBothPresent(species4, percentSpecies4, (s, p) -> sdList.add(new SpeciesDistribution(s, p)));
+
 							SpeciesDistributionSet speciesDistributionSet = new SpeciesDistributionSet(sdList);
 
 							return new VdypLayerSpecies(
 									polygonId, lt, genusIndex, genus, speciesDistributionSet, siteIndex, dominantHeight,
 									totalAge, ageAtBreastHeight, yearsToBreastHeight, isPrimarySpecies, siteCurveNumber
 							);
-						}));
-					}, builder::marker);
-
+						}))
+					, builder::marker);
 				}
 			};
 
 			return new GroupingStreamingParser<Collection<VdypLayerSpecies>, ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord>>(
 					delegateStream
 			) {
-
 				@Override
 				protected boolean skip(ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord> nextChild) {
 					return nextChild.getValue().map(Optional::isEmpty).orElse(false);
@@ -163,16 +158,10 @@ public class VdypSpeciesParser
 				@Override
 				protected Collection<VdypLayerSpecies>
 						convert(List<ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord>> children) {
-					return children.stream().map(ValueOrMarker::getValue).map(Optional::get).flatMap(Optional::stream) // Skip
-																														// if
-																														// empty
-																														// (and
-																														// unknown
-																														// layer
-																														// type)
+					// Skip if empty (and unknown layer type)
+					return children.stream().map(ValueOrMarker::getValue).map(Optional::get).flatMap(Optional::stream) 
 							.toList();
 				}
-
 			};
 		};
 	}

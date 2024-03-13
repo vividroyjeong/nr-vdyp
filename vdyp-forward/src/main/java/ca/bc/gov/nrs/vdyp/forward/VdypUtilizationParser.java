@@ -62,7 +62,7 @@ public class VdypUtilizationParser
 							)
 					).value(3, GENUS_INDEX, ValueParser.INTEGER).space(1)
 					.value(2, GENUS, ControlledValueParser.optional(ValueParser.GENUS))
-					.value(3, UTILIZATION_CLASS_INDEX, ValueParser.UTILIZATION_CLASS)
+					.value(3, UTILIZATION_CLASS_INDEX, ControlledValueParser.UTILIZATION_CLASS)
 					.value(9, BASAL_AREA, ValueParser.FLOAT).value(9, LIVE_TREES_PER_HECTARE, ValueParser.FLOAT)
 					.value(9, LOREY_HEIGHT, ValueParser.FLOAT).value(9, WHOLE_STEM_VOLUME, ValueParser.FLOAT)
 					.value(9, CLOSE_UTIL_VOLUME, ValueParser.FLOAT).value(9, CU_VOLUME_LESS_DECAY, ValueParser.FLOAT)
@@ -80,7 +80,7 @@ public class VdypUtilizationParser
 				protected ValueOrMarker<Optional<VdypSpeciesUtilization>, EndOfRecord>
 						convert(Map<String, Object> entry) throws ResourceParseException {
 
-					var polygonId = (String) entry.get(DESCRIPTION);
+					var polygonId = VdypPolygonDescriptionParser.parse((String) entry.get(DESCRIPTION));
 					var layerType = (ValueOrMarker<Optional<LayerType>, EndOfRecord>) entry.get(LAYER_TYPE);
 					if (layerType == null) {
 						var builder = new ValueOrMarker.Builder<Optional<LayerType>, EndOfRecord>();
@@ -97,7 +97,7 @@ public class VdypUtilizationParser
 					var cuVolumeLessDecay = (Float) entry.get(CU_VOLUME_LESS_DECAY);
 					var cuVolumeLessDecayWastage = (Float) entry.get(CU_VOLUME_LESS_DECAY_WASTAGE);
 					var cuVolumeLessDecayWastageBreakage = (Float) entry.get(CU_VOLUME_LESS_DECAY_WASTAGE_BREAKAGE);
-					var quadraticMean_DBH = (Float) entry.get(QUADRATIC_MEAN_DIAMETER_BREAST_HEIGHT);
+					var quadraticMeanDBH = (Float) entry.get(QUADRATIC_MEAN_DIAMETER_BREAST_HEIGHT);
 
 					var builder = new ValueOrMarker.Builder<Optional<VdypSpeciesUtilization>, EndOfRecord>();
 					return layerType.handle(l -> {
@@ -105,7 +105,7 @@ public class VdypUtilizationParser
 							return new VdypSpeciesUtilization(
 									polygonId, lt, genusIndex, genus, utilizationClass, basalArea, liveTreesPerHectare,
 									loreyHeight, wholeStemVolume, closeUtilVolume, cuVolumeLessDecay,
-									cuVolumeLessDecayWastage, cuVolumeLessDecayWastageBreakage, quadraticMean_DBH
+									cuVolumeLessDecayWastage, cuVolumeLessDecayWastageBreakage, quadraticMeanDBH
 							);
 						}));
 					}, builder::marker);
@@ -129,16 +129,10 @@ public class VdypUtilizationParser
 				@Override
 				protected Collection<VdypSpeciesUtilization>
 						convert(List<ValueOrMarker<Optional<VdypSpeciesUtilization>, EndOfRecord>> children) {
-					return children.stream().map(ValueOrMarker::getValue).map(Optional::get).flatMap(Optional::stream) // Skip
-																														// if
-																														// empty
-																														// (and
-																														// unknown
-																														// layer
-																														// type)
+					// Skip if empty (and unknown layer type)
+					return children.stream().map(ValueOrMarker::getValue).map(Optional::get).flatMap(Optional::stream)
 							.toList();
 				}
-
 			};
 		};
 	}
