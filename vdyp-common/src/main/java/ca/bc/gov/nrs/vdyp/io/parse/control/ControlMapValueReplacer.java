@@ -26,22 +26,26 @@ public interface ControlMapValueReplacer<Result, Raw> extends ControlMapModifier
 	default void modify(Map<String, Object> control, FileResolver fileResolver)
 			throws ResourceParseException, IOException {
 
-		Optional<Raw> source =  Utils.optSafe(control.get(this.getControlKeyName()));
-		if(source.isPresent()) {
+		Optional<Raw> source = Utils.optSafe(control.get(this.getControlKeyName()));
+		if (source.isPresent()) {
 			control.put(getControlKeyName(), this.map(source.get(), fileResolver, control));
 		} else {
 			control.put(getControlKeyName(), defaultModification(control));
 		}
 
 	}
-	
+
 	/**
-	 * Override this to provide appropriate behavior when 
+	 * Override this to provide appropriate behavior when
+	 *
 	 * @return
 	 * @throws ResourceParseValidException
 	 */
 	default Result defaultModification(Map<String, Object> control) throws ResourceParseValidException {
-		throw new ResourceParseValidException("Expected "+this.getControlKeyName()+" ("+this.getControlKey().sequence+") but it was not present.");
+		throw new ResourceParseValidException(
+				"Expected " + this.getControlKeyName()
+						+ this.getControlKey().sequence.map(x -> "(" + x + ")").orElse("") + " but it was not present."
+		);
 	}
 
 }
