@@ -36,7 +36,7 @@ public interface ControlMapValueReplacer<Result, Raw> extends ControlMapModifier
 	}
 
 	/**
-	 * Override this to provide appropriate behavior when
+	 * Override this to provide appropriate behavior when the key is not present
 	 *
 	 * @return
 	 * @throws ResourceParseValidException
