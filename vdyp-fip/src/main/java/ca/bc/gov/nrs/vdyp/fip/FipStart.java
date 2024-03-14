@@ -2591,14 +2591,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		// TODO finding all the things that are wrong rather than failing on just the
 		// first would be a good idea.
 
-		if (!polygon.getLayers().containsKey(LayerType.PRIMARY)) {
-			throw validationError(
-					"Polygon %s has no %s layer, or that layer has non-positive height or crown closure.",
-					polygon.getPolygonIdentifier(), LayerType.PRIMARY
-			);
-		}
-
-		var primaryLayer = (FipLayerPrimary) polygon.getLayers().get(LayerType.PRIMARY);
+		var primaryLayer = requireLayer(polygon, LayerType.PRIMARY);
 
 		// FIXME VDYP7 actually tests if total age - YTBH is less than 0.5 but gives an
 		// error that total age is "less than" YTBH. Replicating that for now but

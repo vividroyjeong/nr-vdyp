@@ -20,6 +20,8 @@ import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
@@ -114,19 +116,30 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			// Do some additional processing then build the layers.
 			layers = List.of(LayerType.PRIMARY, LayerType.VETERAN).stream().map(layerType -> {
 
-				var builder = layersBuilders.get(layerType);
-				if (builder == null) {
-					builder = new VriLayer.Builder();
-					builder.polygonIdentifier(polygon.getPolygonIdentifier());
-					builder.layerType(layerType);
-					builder.crownClosure(0f);
-					builder.baseArea(0f);
-					builder.treesPerHectare(0f);
-					builder.utilization(7.5f);
-				}
+				var builder = Utils.<VriLayer.Builder>optSafe(layersBuilders.get(layerType)).orElseGet(() -> {
+					var b = new VriLayer.Builder();
+					b.polygonIdentifier(polygon.getPolygonIdentifier());
+					b.layerType(layerType);
+					b.crownClosure(0f);
+					b.baseArea(0f);
+					b.treesPerHectare(0f);
+					b.utilization(7.5f);
+					return b;
+				});
 
 				if (layerType == LayerType.PRIMARY) {
 					builder.percentAvailable(polygon.getPercentAvailable().orElse(1f));
+
+					// This was being done in VRI_CHK but I moved it here to when the object is
+					// being built instead.
+					if (builder.getBaseArea()
+							.flatMap(
+									ba -> builder.getTreesPerHectare()
+											.map(tph -> BaseAreaTreeDensityDiameter.quadMeanDiameter(ba, tph) < 7.5f)
+							).orElse(false)) {
+						builder.baseArea(Optional.empty());
+						builder.treesPerHectare(Optional.empty());
+					}
 				}
 
 				return builder;
@@ -208,7 +221,45 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	static final EnumSet<PolygonMode> ACCEPTABLE_MODES = EnumSet.of(PolygonMode.START, PolygonMode.YOUNG);
 
 	Optional<VdypPolygon> processPolygon(int polygonsRead, VriPolygon polygon) throws ProcessingException {
+		VdypPolygon resultPoly;
+		log.atInfo().setMessage("Read polygon {}, preparing to process").addArgument(polygon.getPolygonIdentifier())
+				.log();
+
+		// if (MODE .eq. -1) go to 100
+
+		final var mode = polygon.getModeFip().orElse(PolygonMode.START);
+
+		if (mode != PolygonMode.DONT_PROCESS) {
+			log.atInfo().setMessage("Skipping polygon with mode {}").addArgument(mode).log();
+			return Optional.empty();
+		}
+
+		// IP_IN = IP_IN+1
+		// if (IP_IN .gt. MAXPOLY) go to 200
+
+		// IPASS = 1
+		// CALL FIP_CHK( IPASS, IER)
+		// if (ier .gt. 0) go to 1000
+		//
+		// if (IPASS .le. 0) GO TO 120
+
+		log.atInfo().setMessage("Checking validity of polygon {}:{}").addArgument(polygonsRead)
+				.addArgument(polygon.getPolygonIdentifier()).log();
+		checkPolygon(polygon);
+
+		// TODO
 		return Optional.empty();
+
+	}
+
+	// VRI_CHK
+	void checkPolygon(VriPolygon polygon) throws ProcessingException {
+
+		var primaryLayer = requireLayer(polygon, LayerType.PRIMARY);
+
+		// At this point the Fortran implementation nulled the BA and TPH of Primary
+		// layers if the BA and TPH were present and resulted in a DQ <7.5
+		// I did that in getPolygon instead of here.
 
 	}
 

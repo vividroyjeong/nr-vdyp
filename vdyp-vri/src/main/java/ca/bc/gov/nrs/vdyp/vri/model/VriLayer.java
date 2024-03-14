@@ -109,6 +109,16 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 			return percentAvailable(Optional.of(percentAvailable));
 		}
 
+		
+		
+		public Optional<Float> getBaseArea() {
+			return baseArea;
+		}
+
+		public Optional<Float> getTreesPerHectare() {
+			return treesPerHectare;
+		}
+
 		@Override
 		protected void check(Collection<String> errors) {
 			super.check(errors);

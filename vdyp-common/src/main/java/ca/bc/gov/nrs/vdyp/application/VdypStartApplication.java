@@ -28,6 +28,7 @@ import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 
 public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional<Float>>, L extends BaseVdypLayer<S, I>, S extends BaseVdypSpecies, I extends BaseVdypSite>
@@ -165,6 +166,17 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	protected Coefficients getCoeForSpec(VdypSpecies spec, ControlKey controlKey) {
 		var coeMap = Utils.<Map<String, Coefficients>>expectParsedControl(controlMap, controlKey, java.util.Map.class);
 		return coeMap.get(spec.getGenus());
+	}
+
+	protected L requireLayer(P polygon, LayerType type) throws ProcessingException {
+		if (!polygon.getLayers().containsKey(LayerType.PRIMARY)) {
+			throw validationError(
+					"Polygon %s has no %s layer, or that layer has non-positive height or crown closure.",
+					polygon.getPolygonIdentifier(), type
+			);
+		}
+		
+		return polygon.getLayers().get(type);
 	}
 
 	protected static <E extends Throwable> void throwIfPresent(Optional<E> opt) throws E {
