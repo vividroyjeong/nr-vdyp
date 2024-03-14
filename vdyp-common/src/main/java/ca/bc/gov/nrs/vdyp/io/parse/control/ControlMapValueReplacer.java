@@ -2,9 +2,12 @@ package ca.bc.gov.nrs.vdyp.io.parse.control;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseValidException;
 
 public interface ControlMapValueReplacer<Result, Raw> extends ControlMapModifier {
 
@@ -19,13 +22,26 @@ public interface ControlMapValueReplacer<Result, Raw> extends ControlMapModifier
 	public Result map(Raw rawValue, FileResolver fileResolver, Map<String, Object> control)
 			throws ResourceParseException, IOException;
 
-	@SuppressWarnings("unchecked")
 	@Override
 	default void modify(Map<String, Object> control, FileResolver fileResolver)
 			throws ResourceParseException, IOException {
 
-		control.put(getControlKeyName(), this.map((Raw) control.get(this.getControlKeyName()), fileResolver, control));
+		Optional<Raw> source =  Utils.optSafe(control.get(this.getControlKeyName()));
+		if(source.isPresent()) {
+			control.put(getControlKeyName(), this.map(source.get(), fileResolver, control));
+		} else {
+			control.put(getControlKeyName(), defaultModification(control));
+		}
 
+	}
+	
+	/**
+	 * Override this to provide appropriate behavior when 
+	 * @return
+	 * @throws ResourceParseValidException
+	 */
+	default Result defaultModification(Map<String, Object> control) throws ResourceParseValidException {
+		throw new ResourceParseValidException("Expected "+this.getControlKeyName()+" ("+this.getControlKey().sequence+") but it was not present.");
 	}
 
 }
