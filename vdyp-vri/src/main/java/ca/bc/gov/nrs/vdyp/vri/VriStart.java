@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -26,6 +27,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
@@ -261,6 +263,17 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		// layers if the BA and TPH were present and resulted in a DQ <7.5
 		// I did that in getPolygon instead of here.
 
+		for (var layer : polygon.getLayers().values()) {
+
+			// At this point the Fortran implementation copied from the VRI globals to the
+			// FIP globals. That's not necessary here because it's stored in a VriLayer
+			// which shares BaseVdypLayer as s superclass with FipLayer
+
+			this.getPercentTotal(layer); // Validate that percent total is close to 100%
+			
+			
+		}
+
 	}
 
 	VdypPolygon createVdypPolygon(VriPolygon sourcePolygon, Map<LayerType, VdypLayer> processedLayers)
@@ -282,5 +295,12 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	protected BaseControlParser getControlFileParser() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	protected VriSpecies copySpecies(VriSpecies toCopy, Consumer<Builder<VriSpecies>> config) {
+		return VriSpecies.build(builder->{
+			builder.copy(toCopy);
+		});
 	}
 }

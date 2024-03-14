@@ -16,7 +16,6 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -30,6 +29,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
@@ -68,6 +68,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
@@ -86,7 +87,7 @@ import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 
 public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpecies, FipSite> {
 
-	private static final Comparator<FipSpecies> PERCENT_GENUS_DESCENDING = Utils
+	public static final Comparator<FipSpecies> PERCENT_GENUS_DESCENDING = Utils
 			.compareUsing(FipSpecies::getPercentGenus).reversed();
 
 	private static final Logger log = LoggerFactory.getLogger(FipStart.class);
@@ -100,33 +101,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 	static final Collection<UtilizationClass> UTIL_CLASSES = List.of(
 			UtilizationClass.U75TO125, UtilizationClass.U125TO175, UtilizationClass.U175TO225, UtilizationClass.OVER225
 	);
-
-	static final Map<String, Integer> ITG_PURE = Utils.constMap(map -> {
-		map.put("AC", 36);
-		map.put("AT", 42);
-		map.put("B", 18);
-		map.put("C", 9);
-		map.put("D", 38);
-		map.put("E", 40);
-		map.put("F", 1);
-		map.put("H", 12);
-		map.put("L", 34);
-		map.put("MB", 39);
-		map.put("PA", 28);
-		map.put("PL", 28);
-		map.put("PW", 27);
-		map.put("PY", 32);
-		map.put("S", 21);
-		map.put("Y", 9);
-	});
-
-	static final Set<String> HARDWOODS = Set.of("AC", "AT", "D", "E", "MB");
-
-	/**
-	 * When finding primary species these genera should be combined
-	 */
-	static final Collection<Collection<String>> PRIMARY_SPECIES_TO_COMBINE = Arrays
-			.asList(Arrays.asList("PL", "PA"), Arrays.asList("C", "Y"));
 
 	public static void main(final String... args) throws IOException {
 
@@ -333,8 +307,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			crownClosure = clamp(crownClosure, 0, 100);
 
 			/*
-			 * assume that CC occurs at age 25 and that most land goes to 90% occupancy but that occupancy increases
-			 * only 1% /yr with no increases after ages 25. });
+			 * assume that CC occurs at age 25 and that most land goes to 90% occupancy but
+			 * that occupancy increases only 1% /yr with no increases after ages 25. });
 			 */
 
 			// Obtain the percent yield (in comparison with CC = 90%)
@@ -1881,183 +1855,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		return exp(logit);
 	}
 
-	/**
-	 * Returns the primary, and secondary if present species records as a one or two element list.
-	 */
-	// PRIMFIND
-	List<FipSpecies> findPrimarySpecies(Map<String, FipSpecies> allSpecies) {
-		if (allSpecies.isEmpty()) {
-			throw new IllegalArgumentException("Can not find primary species as there are no species");
-		}
-		var result = new ArrayList<FipSpecies>(2);
-
-		// Start with a deep copy of the species map so there are no side effects from
-		// the manipulation this method does.
-		var combined = new HashMap<String, FipSpecies>(allSpecies.size());
-		allSpecies.entrySet().stream().forEach(spec -> combined.put(spec.getKey(), new FipSpecies(spec.getValue())));
-
-		for (var combinationGroup : PRIMARY_SPECIES_TO_COMBINE) {
-			var groupSpecies = combinationGroup.stream().map(combined::get).filter(Objects::nonNull).toList();
-			if (groupSpecies.size() < 2) {
-				continue;
-			}
-			@SuppressWarnings("java:S3655")
-			var groupPrimary = new FipSpecies(groupSpecies.stream().sorted(PERCENT_GENUS_DESCENDING).findFirst().get());
-			var total = (float) groupSpecies.stream().mapToDouble(FipSpecies::getPercentGenus).sum();
-			combinationGroup.forEach(combined::remove);
-			groupPrimary.setPercentGenus(total);
-			combined.put(groupPrimary.getGenus(), groupPrimary);
-		}
-
-		assert !combined.isEmpty();
-
-		if (combined.size() == 1) {
-			// There's only one
-			result.addAll(combined.values());
-		} else {
-			var NDEBUG_22 = false;
-			if (NDEBUG_22) {
-				// TODO
-				throw new UnsupportedOperationException();
-			} else {
-				combined.values().stream().sorted(PERCENT_GENUS_DESCENDING).limit(2).forEach(result::add);
-			}
-		}
-
-		assert !result.isEmpty();
-		assert result.size() <= 2;
-		return result;
-	}
-
-	/**
-	 * Find Inventory type group (ITG)
-	 *
-	 * @param primarySecondary
-	 * @return
-	 * @throws ProcessingException
-	 */
-	// ITGFIND
-	int findItg(List<FipSpecies> primarySecondary) throws ProcessingException {
-		var primary = primarySecondary.get(0);
-
-		if (primary.getPercentGenus() > 79.999) { // Copied from VDYP7
-			return ITG_PURE.get(primary.getGenus());
-		}
-		assert primarySecondary.size() == 2;
-
-		var secondary = primarySecondary.get(1);
-
-		assert !primary.getGenus().equals(secondary.getGenus());
-
-		switch (primary.getGenus()) {
-		case "F":
-			switch (secondary.getGenus()) {
-			case "C", "Y":
-				return 2;
-			case "B", "H":
-				return 3;
-			case "S":
-				return 4;
-			case "PL", "PA":
-				return 5;
-			case "PY":
-				return 6;
-			case "L", "PW":
-				return 7;
-			default:
-				return 8;
-			}
-		case "C", "Y":
-			switch (secondary.getGenus()) {
-			case "C", "Y":
-				return 10;
-			case "H", "B", "S":
-				return 11;
-			default:
-				return 10;
-			}
-		case "B":
-			switch (secondary.getGenus()) {
-			case "C", "Y", "H":
-				return 19;
-			default:
-				return 20;
-			}
-		case "H":
-			switch (secondary.getGenus()) {
-			case "C", "Y":
-				return 14;
-			case "B":
-				return 15;
-			case "S":
-				return 16;
-			default:
-				if (HARDWOODS.contains(secondary.getGenus())) {
-					return 17;
-				}
-				return 13;
-			}
-		case "S":
-			switch (secondary.getGenus()) {
-			case "C", "Y", "H":
-				return 23;
-			case "B":
-				return 24;
-			case "PL":
-				return 25;
-			default:
-				if (HARDWOODS.contains(secondary.getGenus())) {
-					return 26;
-				}
-				return 22;
-			}
-		case "PW":
-			return 27;
-		case "PL", "PA":
-			switch (secondary.getGenus()) {
-			case "PL", "PA":
-				return 28;
-			case "F", "PW", "L", "PY":
-				return 29;
-			default:
-				if (HARDWOODS.contains(secondary.getGenus())) {
-					return 31;
-				}
-				return 30;
-			}
-		case "PY":
-			return 32;
-		case "L":
-			switch (secondary.getGenus()) {
-			case "F":
-				return 33;
-			default:
-				return 34;
-			}
-		case "AC":
-			if (HARDWOODS.contains(secondary.getGenus())) {
-				return 36;
-			}
-			return 35;
-		case "D":
-			if (HARDWOODS.contains(secondary.getGenus())) {
-				return 38;
-			}
-			return 37;
-		case "MB":
-			return 39;
-		case "E":
-			return 40;
-		case "AT":
-			if (HARDWOODS.contains(secondary.getGenus())) {
-				return 42;
-			}
-			return 41;
-		default:
-			throw new ProcessingException("Unexpected primary species: " + primary.getGenus());
-		}
-	}
-
 	// GRPBA1FD
 	int findBaseAreaGroup(FipSpecies fipSpecies, BecDefinition bec, int itg) {
 		var growthBec = bec.getGrowthBec();
@@ -2645,15 +2442,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		}
 
 		for (FipLayer layer : polygon.getLayers().values()) {
-			var percentTotal = layer.getSpecies().values().stream()//
-					.map(FipSpecies::getPercentGenus)//
-					.reduce(0.0f, (x, y) -> x + y);
-			if (Math.abs(percentTotal - 100f) > 0.01f) {
-				throw validationError(
-						"Polygon %s has %s layer where species entries have a percentage total that does not sum to 100%%.",
-						polygon.getPolygonIdentifier(), LayerType.PRIMARY
-				);
-			}
+			var percentTotal = getPercentTotal(layer);
 			// VDYP7 performs this step which should be negligible but might have a small
 			// impact due to the 0.01 percent variation and floating point errors.
 			if (layer.getLayer() == LayerType.PRIMARY) {
@@ -3250,4 +3039,12 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 	protected BaseControlParser getControlFileParser() {
 		return new FipControlParser();
 	}
+	
+	@Override
+	protected FipSpecies copySpecies(FipSpecies toCopy, Consumer<BaseVdypSpecies.Builder<FipSpecies>> config) {
+		return FipSpecies.build(builder->{
+			builder.copy(toCopy);
+		});
+	}
+	
 }
