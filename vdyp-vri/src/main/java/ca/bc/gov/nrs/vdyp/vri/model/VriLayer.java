@@ -109,8 +109,6 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 			return percentAvailable(Optional.of(percentAvailable));
 		}
 
-		
-		
 		public Optional<Float> getBaseArea() {
 			return baseArea;
 		}

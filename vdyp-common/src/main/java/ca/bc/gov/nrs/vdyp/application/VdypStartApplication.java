@@ -41,8 +41,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	public static final int CONFIG_LOAD_ERROR = 1;
 	public static final int PROCESSING_ERROR = 2;
-	
-	
+
 	public static final Map<String, Integer> ITG_PURE = Utils.constMap(map -> {
 		map.put("AC", 36);
 		map.put("AT", 42);
@@ -64,8 +63,6 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	public static final Set<String> HARDWOODS = Set.of("AC", "AT", "D", "E", "MB");
 
-	
-	
 	protected static void doMain(VdypStartApplication<?, ?, ?, ?> app, final String... args) {
 		var resolver = new FileSystemFileResolver();
 
@@ -85,8 +82,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	}
 
 	/**
-	 * Iterates over all but the last entry, passing them to the first consumer then
-	 * passes the last entry to the second consumer
+	 * Iterates over all but the last entry, passing them to the first consumer then passes the last entry to the second
+	 * consumer
 	 */
 	protected static <T> void eachButLast(Collection<T> items, Consumer<T> body, Consumer<T> lastBody) {
 		var it = items.iterator();
@@ -213,9 +210,9 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	}
 
 	/**
-	 * Get the sum of the percentages of the species in a layer. Throws an exception
-	 * if this differs from the expected 100% by too much.
-	 * 
+	 * Get the sum of the percentages of the species in a layer. Throws an exception if this differs from the expected
+	 * 100% by too much.
+	 *
 	 * @param layer
 	 * @return
 	 * @throws StandProcessingException
@@ -243,27 +240,30 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			throw new IllegalArgumentException("Can not find primary species as there are no species");
 		}
 		var result = new ArrayList<S>(2);
-	
+
 		// Start with a deep copy of the species map so there are no side effects from
 		// the manipulation this method does.
 		var combined = new HashMap<String, S>(allSpecies.size());
-		allSpecies.entrySet().stream().forEach(spec -> combined.put(spec.getKey(), copySpecies(spec.getValue(), x->{})));
-	
+		allSpecies.entrySet().stream().forEach(spec -> combined.put(spec.getKey(), copySpecies(spec.getValue(), x -> {
+		})));
+
 		for (var combinationGroup : PRIMARY_SPECIES_TO_COMBINE) {
 			var groupSpecies = combinationGroup.stream().map(combined::get).filter(Objects::nonNull).toList();
 			if (groupSpecies.size() < 2) {
 				continue;
 			}
-			var groupPrimary = copySpecies(groupSpecies.stream().sorted(PERCENT_GENUS_DESCENDING).findFirst().get(), builder->{
-				var total = (float) groupSpecies.stream().mapToDouble(BaseVdypSpecies::getPercentGenus).sum();
-				builder.percentGenus(total);
-			});
+			var groupPrimary = copySpecies(
+					groupSpecies.stream().sorted(PERCENT_GENUS_DESCENDING).findFirst().get(), builder -> {
+						var total = (float) groupSpecies.stream().mapToDouble(BaseVdypSpecies::getPercentGenus).sum();
+						builder.percentGenus(total);
+					}
+			);
 			combinationGroup.forEach(combined::remove);
 			combined.put(groupPrimary.getGenus(), groupPrimary);
 		}
-	
+
 		assert !combined.isEmpty();
-	
+
 		if (combined.size() == 1) {
 			// There's only one
 			result.addAll(combined.values());
@@ -276,7 +276,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				combined.values().stream().sorted(PERCENT_GENUS_DESCENDING).limit(2).forEach(result::add);
 			}
 		}
-	
+
 		assert !result.isEmpty();
 		assert result.size() <= 2;
 		return result;

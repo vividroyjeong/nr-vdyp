@@ -307,8 +307,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			crownClosure = clamp(crownClosure, 0, 100);
 
 			/*
-			 * assume that CC occurs at age 25 and that most land goes to 90% occupancy but
-			 * that occupancy increases only 1% /yr with no increases after ages 25. });
+			 * assume that CC occurs at age 25 and that most land goes to 90% occupancy but that occupancy increases
+			 * only 1% /yr with no increases after ages 25. });
 			 */
 
 			// Obtain the percent yield (in comparison with CC = 90%)
@@ -3039,12 +3039,12 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 	protected BaseControlParser getControlFileParser() {
 		return new FipControlParser();
 	}
-	
+
 	@Override
 	protected FipSpecies copySpecies(FipSpecies toCopy, Consumer<BaseVdypSpecies.Builder<FipSpecies>> config) {
-		return FipSpecies.build(builder->{
+		return FipSpecies.build(builder -> {
 			builder.copy(toCopy);
 		});
 	}
-	
+
 }

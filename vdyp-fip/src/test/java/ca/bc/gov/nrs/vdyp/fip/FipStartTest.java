@@ -2212,7 +2212,6 @@ class FipStartTest {
 
 	}
 
-
 	@Test
 	void testFindEquationGroupDefault() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
@@ -4832,7 +4831,9 @@ class FipStartTest {
 
 	@FunctionalInterface
 	private static interface TestConsumer<T> {
-		public void accept(VdypStartApplication<FipPolygon, FipLayer, FipSpecies, FipSite> unit, Map<String, Object> controlMap) throws Exception;
+		public void accept(
+				VdypStartApplication<FipPolygon, FipLayer, FipSpecies, FipSite> unit, Map<String, Object> controlMap
+		) throws Exception;
 	}
 
 	Matcher<Coefficients> utilizationAllAndBiggest(float all) {

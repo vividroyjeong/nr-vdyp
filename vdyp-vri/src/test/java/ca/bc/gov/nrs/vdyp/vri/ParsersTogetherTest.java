@@ -301,7 +301,7 @@ class ParsersTogetherTest {
 		);
 		app.close();
 	}
-	
+
 	@Test
 	void testPrimaryWithSmallComputedDiameter() throws IOException, StandProcessingException, ResourceParseException {
 		var app = new VriStart();

@@ -270,8 +270,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			// which shares BaseVdypLayer as s superclass with FipLayer
 
 			this.getPercentTotal(layer); // Validate that percent total is close to 100%
-			
-			
+
 		}
 
 	}
@@ -299,7 +298,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 	@Override
 	protected VriSpecies copySpecies(VriSpecies toCopy, Consumer<Builder<VriSpecies>> config) {
-		return VriSpecies.build(builder->{
+		return VriSpecies.build(builder -> {
 			builder.copy(toCopy);
 		});
 	}

@@ -81,7 +81,7 @@ public abstract class BaseVdypSpecies {
 	public String getGenus() {
 		return genus;
 	}
-	
+
 	public abstract static class Builder<T extends BaseVdypSpecies> extends ModelClassBuilder<T> {
 		protected Optional<String> polygonIdentifier = Optional.empty();
 		protected Optional<LayerType> layer = Optional.empty();
@@ -109,7 +109,7 @@ public abstract class BaseVdypSpecies {
 			this.percentGenus = Optional.of(percentGenus);
 			return this;
 		}
-		
+
 		protected Builder<T> fractionGenus(float fractionGenus) {
 			this.fractionGenus = Optional.of(fractionGenus);
 			return this;
@@ -130,7 +130,7 @@ public abstract class BaseVdypSpecies {
 			layerType(toCopy.getLayer());
 			genus(toCopy.getGenus());
 			percentGenus(toCopy.getPercentGenus());
-			
+
 			fractionGenus(toCopy.getFractionGenus());
 			return this;
 		}
