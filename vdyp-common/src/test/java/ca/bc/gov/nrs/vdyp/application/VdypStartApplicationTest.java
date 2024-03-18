@@ -289,7 +289,7 @@ class VdypStartApplicationTest {
 
 		try (VdypStartApplication app = getTestUnit(mockControl)) {
 			mockControl.replay();
-			Map<String, BaseVdypSpecies> allSpecies = Collections.emptyMap();
+			var allSpecies = Collections.emptyList();
 			assertThrows(IllegalArgumentException.class, () -> app.findPrimarySpecies(allSpecies));
 		}
 		mockControl.verify();
@@ -308,7 +308,7 @@ class VdypStartApplicationTest {
 		try (VdypStartApplication app = getTestUnit(mockControl)) {
 			EasyMock.expect(app.copySpecies(EasyMock.same(spec), EasyMock.anyObject())).andReturn(spec);
 			mockControl.replay();
-			Map<String, BaseVdypSpecies> allSpecies = Collections.singletonMap("B", spec);
+			var allSpecies = List.of(spec);
 			List<BaseVdypSpecies> result = app.findPrimarySpecies(allSpecies);
 
 			assertThat(result, hasSize(1));
@@ -341,9 +341,7 @@ class VdypStartApplicationTest {
 					.andReturn(specCombined);
 			mockControl.replay();
 
-			Map<String, BaseVdypSpecies> allSpecies = new HashMap<>();
-			allSpecies.put(spec1.getGenus(), spec1);
-			allSpecies.put(spec2.getGenus(), spec2);
+			var allSpecies = List.of(spec1, spec2);
 
 			List<BaseVdypSpecies> result = app.findPrimarySpecies(allSpecies);
 
@@ -383,9 +381,7 @@ class VdypStartApplicationTest {
 					.andReturn(specCombined);
 			mockControl.replay();
 
-			Map<String, BaseVdypSpecies> allSpecies = new HashMap<>();
-			allSpecies.put(spec1.getGenus(), spec1);
-			allSpecies.put(spec2.getGenus(), spec2);
+			var allSpecies = List.of(spec1, spec2);
 
 			List<BaseVdypSpecies> result = app.findPrimarySpecies(allSpecies);
 
@@ -426,9 +422,7 @@ class VdypStartApplicationTest {
 					.andReturn(specCombined);
 			mockControl.replay();
 
-			Map<String, BaseVdypSpecies> allSpecies = new HashMap<>();
-			allSpecies.put(spec1.getGenus(), spec1);
-			allSpecies.put(spec2.getGenus(), spec2);
+			var allSpecies = List.of(spec1, spec2);
 
 			List<BaseVdypSpecies> result = app.findPrimarySpecies(allSpecies);
 
@@ -469,9 +463,7 @@ class VdypStartApplicationTest {
 					.andReturn(specCombined);
 			mockControl.replay();
 
-			Map<String, BaseVdypSpecies> allSpecies = new HashMap<>();
-			allSpecies.put(spec1.getGenus(), spec1);
-			allSpecies.put(spec2.getGenus(), spec2);
+			var allSpecies = List.of(spec1, spec2);
 
 			List<BaseVdypSpecies> result = app.findPrimarySpecies(allSpecies);
 
@@ -516,10 +508,7 @@ class VdypStartApplicationTest {
 			EasyMock.expect(app.copySpecies(EasyMock.same(spec3), EasyMock.capture(copyCapture))).andReturn(spec3);
 			mockControl.replay();
 
-			Map<String, BaseVdypSpecies> allSpecies = new HashMap<>();
-			allSpecies.put(spec1.getGenus(), spec1);
-			allSpecies.put(spec2.getGenus(), spec2);
-			allSpecies.put(spec3.getGenus(), spec3);
+			var allSpecies = List.of(spec1, spec2, spec3);
 
 			List<BaseVdypSpecies> result = app.findPrimarySpecies(allSpecies);
 

@@ -78,14 +78,14 @@ class ParsersTogetherTest {
 		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
 			specBuilder.polygonIdentifier("Test");
 			specBuilder.layerType(layerType);
-			specBuilder.genus("W");
+			specBuilder.genus("B");
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
 			siteBuilder.polygonIdentifier("Test");
 			siteBuilder.layerType(layerType);
-			siteBuilder.siteGenus("W");
-			siteBuilder.siteSpecies("W");
+			siteBuilder.siteGenus("B");
+			siteBuilder.siteSpecies("B");
 		})));
 
 		var result = app.getPolygon(polyStream, layerStream, speciesStream, siteStream);
@@ -163,14 +163,14 @@ class ParsersTogetherTest {
 		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
 			specBuilder.polygonIdentifier("Test");
 			specBuilder.layerType(layerType);
-			specBuilder.genus("W");
+			specBuilder.genus("B");
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
 			siteBuilder.polygonIdentifier("Test");
 			siteBuilder.layerType(layerType);
-			siteBuilder.siteGenus("W");
-			siteBuilder.siteSpecies("W");
+			siteBuilder.siteGenus("B");
+			siteBuilder.siteSpecies("B");
 		})));
 
 		var result = app.getPolygon(polyStream, layerStream, speciesStream, siteStream);
@@ -260,14 +260,14 @@ class ParsersTogetherTest {
 		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
 			specBuilder.polygonIdentifier("Test");
 			specBuilder.layerType(layerType);
-			specBuilder.genus("W");
+			specBuilder.genus("B");
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
 			siteBuilder.polygonIdentifier("Test");
 			siteBuilder.layerType(layerType);
-			siteBuilder.siteGenus("W");
-			siteBuilder.siteSpecies("W");
+			siteBuilder.siteGenus("B");
+			siteBuilder.siteSpecies("B");
 		})));
 
 		var result = app.getPolygon(polyStream, layerStream, speciesStream, siteStream);
@@ -346,14 +346,14 @@ class ParsersTogetherTest {
 		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
 			specBuilder.polygonIdentifier("Test");
 			specBuilder.layerType(layerType);
-			specBuilder.genus("W");
+			specBuilder.genus("B");
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
 			siteBuilder.polygonIdentifier("Test");
 			siteBuilder.layerType(layerType);
-			siteBuilder.siteGenus("W");
-			siteBuilder.siteSpecies("W");
+			siteBuilder.siteGenus("B");
+			siteBuilder.siteSpecies("B");
 		})));
 
 		var result = app.getPolygon(polyStream, layerStream, speciesStream, siteStream);
@@ -381,6 +381,82 @@ class ParsersTogetherTest {
 						hasProperty("utilization", is(7.5f)), //
 						hasProperty("baseArea", present(is(0f))), //
 						hasProperty("treesPerHectare", present(is(0f)))
+				)
+		);
+
+		app.close();
+	}
+
+	@Test
+	void testFindsPrimaryGenusAndITG() throws IOException, StandProcessingException, ResourceParseException {
+		var app = new VriStart();
+
+		var controlMap = new HashMap<String, Object>();
+
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+
+		final var polygonId = "Test";
+		final var layerType = LayerType.PRIMARY;
+
+		MockFileResolver resolver = new MockFileResolver("Test");
+		resolver.addStream("DUMMY1", (OutputStream) new ByteArrayOutputStream());
+		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
+		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
+
+		app.init(resolver, controlMap);
+
+		var polyStream = new MockStreamingParser<VriPolygon>();
+		var layerStream = new MockStreamingParser<Map<LayerType, VriLayer.Builder>>();
+		var speciesStream = new MockStreamingParser<Collection<VriSpecies>>();
+		var siteStream = new MockStreamingParser<Collection<VriSite>>();
+
+		polyStream.addValue(VriPolygon.build(polyBuilder -> {
+			polyBuilder.polygonIdentifier(polygonId);
+			polyBuilder.percentAvailable(Optional.of(100.0f));
+			polyBuilder.biogeoclimaticZone("IDF");
+			polyBuilder.yieldFactor(0.9f);
+		}));
+
+		var layerBuilder = new VriLayer.Builder();
+		layerBuilder.polygonIdentifier(polygonId);
+		layerBuilder.layerType(layerType);
+		layerBuilder.crownClosure(0.95f);
+		layerBuilder.utilization(0.6f);
+		layerBuilder.baseArea(20);
+		layerBuilder.treesPerHectare(300);
+		layerStream.addValue(Collections.singletonMap(layerType, layerBuilder));
+
+		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
+			specBuilder.polygonIdentifier("Test");
+			specBuilder.layerType(layerType);
+			specBuilder.genus("B");
+			specBuilder.percentGenus(100f);
+		})));
+		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
+			siteBuilder.polygonIdentifier("Test");
+			siteBuilder.layerType(layerType);
+			siteBuilder.siteGenus("B");
+			siteBuilder.siteSpecies("B");
+		})));
+
+		var result = app.getPolygon(polyStream, layerStream, speciesStream, siteStream);
+
+		assertThat(result, hasProperty("layers", Matchers.aMapWithSize(2)));
+		var primaryResult = result.getLayers().get(LayerType.PRIMARY);
+		var veteranResult = result.getLayers().get(LayerType.VETERAN);
+		assertThat(
+				primaryResult, allOf(
+						hasProperty("primaryGenus", present(is("B"))), //
+						hasProperty("inventoryTypeGroup", present(is(18))) // ITG for a pure B layer
+				)
+		);
+		assertThat(
+				veteranResult, allOf(
+					// Veteran layer should not have primary genus or ITG
+						hasProperty("primaryGenus", notPresent()), //
+						hasProperty("inventoryTypeGroup", notPresent())
 				)
 		);
 

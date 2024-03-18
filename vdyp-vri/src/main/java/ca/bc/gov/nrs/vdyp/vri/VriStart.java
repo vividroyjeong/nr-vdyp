@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
+import ca.bc.gov.nrs.vdyp.application.RuntimeStandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
@@ -109,6 +110,14 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		log.trace("Getting polygon");
 		var polygon = polyStream.next();
 
+		log.trace("Getting species for polygon {}", polygon.getPolygonIdentifier());
+		Collection<VriSpecies> species;
+		try {
+			species = speciesStream.next();
+		} catch (NoSuchElementException ex) {
+			throw validationError("Species file has fewer records than polygon file.", ex);
+		}
+
 		log.trace("Getting layers for polygon {}", polygon.getPolygonIdentifier());
 		Map<LayerType, VriLayer.Builder> layersBuilders;
 		Map<LayerType, VriLayer> layers;
@@ -142,6 +151,16 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 						builder.baseArea(Optional.empty());
 						builder.treesPerHectare(Optional.empty());
 					}
+
+					var primarySpecs = this.findPrimarySpecies(species);
+					builder.primaryGenus(primarySpecs.get(0).getGenus());
+
+					try {
+						builder.inventoryTypeGroup(findItg(primarySpecs));
+					} catch (StandProcessingException ex) {
+						throw new RuntimeStandProcessingException(ex);
+					}
+
 				}
 
 				return builder;
@@ -149,14 +168,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		} catch (NoSuchElementException ex) {
 			throw validationError("Layers file has fewer records than polygon file.", ex);
-		}
-
-		log.trace("Getting species for polygon {}", polygon.getPolygonIdentifier());
-		Collection<VriSpecies> species;
-		try {
-			species = speciesStream.next();
-		} catch (NoSuchElementException ex) {
-			throw validationError("Species file has fewer records than polygon file.", ex);
+		} catch (RuntimeStandProcessingException ex) {
+			throw ex.getCause();
 		}
 
 		log.trace("Getting sites for polygon {}", polygon.getPolygonIdentifier());
@@ -270,6 +283,9 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			// which shares BaseVdypLayer as s superclass with FipLayer
 
 			this.getPercentTotal(layer); // Validate that percent total is close to 100%
+
+			// At this point the Fortran implementation Set the Primary Genus and ITG, I did
+			// that in getPolygon instead of here.
 
 		}
 

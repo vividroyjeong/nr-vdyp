@@ -360,7 +360,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 		var lookup = BecDefinitionParser.getBecs(controlMap);
 		// PRIMFIND
-		var primarySpecies = findPrimarySpecies(fipLayer.getSpecies());
+		var primarySpecies = findPrimarySpecies(fipLayer.getSpecies().values());
 
 		// There's always at least one entry and we want the first.
 		fipLayer.setPrimaryGenus(Optional.of(primarySpecies.iterator().next().getGenus()));

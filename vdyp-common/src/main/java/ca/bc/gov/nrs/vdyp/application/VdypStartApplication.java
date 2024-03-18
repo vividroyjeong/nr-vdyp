@@ -235,7 +235,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	/**
 	 * Returns the primary, and secondary if present species records as a one or two element list.
 	 */
-	protected List<S> findPrimarySpecies(Map<String, S> allSpecies) {
+	protected List<S> findPrimarySpecies(Collection<S> allSpecies) {
 		if (allSpecies.isEmpty()) {
 			throw new IllegalArgumentException("Can not find primary species as there are no species");
 		}
@@ -244,7 +244,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		// Start with a deep copy of the species map so there are no side effects from
 		// the manipulation this method does.
 		var combined = new HashMap<String, S>(allSpecies.size());
-		allSpecies.entrySet().stream().forEach(spec -> combined.put(spec.getKey(), copySpecies(spec.getValue(), x -> {
+		allSpecies.stream().forEach(spec -> combined.put(spec.getGenus(), copySpecies(spec, x -> {
 		})));
 
 		for (var combinationGroup : PRIMARY_SPECIES_TO_COMBINE) {
@@ -289,7 +289,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	 * @return
 	 * @throws ProcessingException
 	 */
-	protected int findItg(List<S> primarySecondary) throws ProcessingException {
+	protected int findItg(List<S> primarySecondary) throws StandProcessingException {
 		var primary = primarySecondary.get(0);
 
 		if (primary.getPercentGenus() > 79.999) { // Copied from VDYP7
@@ -406,7 +406,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			}
 			return 41;
 		default:
-			throw new ProcessingException("Unexpected primary species: " + primary.getGenus());
+			throw new StandProcessingException("Unexpected primary species: " + primary.getGenus());
 		}
 	}
 
