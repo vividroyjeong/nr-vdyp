@@ -454,7 +454,7 @@ class ParsersTogetherTest {
 		);
 		assertThat(
 				veteranResult, allOf(
-					// Veteran layer should not have primary genus or ITG
+						// Veteran layer should not have primary genus or ITG
 						hasProperty("primaryGenus", notPresent()), //
 						hasProperty("inventoryTypeGroup", notPresent())
 				)

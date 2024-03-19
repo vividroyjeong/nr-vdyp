@@ -166,6 +166,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 			return VriSpecies.build(builder -> {
 				builder.polygonIdentifier(polygonIdentifier.get());
 				builder.layerType(layer.get());
+				config.accept(builder);
 			});
 		}
 
@@ -174,6 +175,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 			return VriSite.build(builder -> {
 				builder.polygonIdentifier(polygonIdentifier.get());
 				builder.layerType(layer.get());
+				config.accept(builder);
 			});
 		}
 

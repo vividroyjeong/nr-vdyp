@@ -59,6 +59,7 @@ public class VriPolygon extends BaseVdypPolygon<VriLayer, Optional<Float>> {
 
 		public Builder() {
 			this.forestInventoryZone(FIZ); // VRI FIZ is always " "
+			this.percentAvailable = Optional.of(Optional.empty());
 		}
 
 		public Builder nonproductiveDescription(Optional<String> nonproductiveDescription) {

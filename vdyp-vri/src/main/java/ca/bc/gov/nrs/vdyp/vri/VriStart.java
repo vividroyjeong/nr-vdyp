@@ -282,7 +282,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			// FIP globals. That's not necessary here because it's stored in a VriLayer
 			// which shares BaseVdypLayer as s superclass with FipLayer
 
-			this.getPercentTotal(layer); // Validate that percent total is close to 100%
+			if (layer.getLayer() == LayerType.PRIMARY)
+				this.getPercentTotal(layer); // Validate that percent total is close to 100%
 
 			// At this point the Fortran implementation Set the Primary Genus and ITG, I did
 			// that in getPolygon instead of here.
