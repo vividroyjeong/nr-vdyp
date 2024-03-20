@@ -5,11 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
 import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
@@ -36,15 +38,13 @@ class VriInputValidationTest {
 		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
 		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
 
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		}));
+
 		app.init(resolver, controlMap);
-		/*
-		 * 082F074/0071 2001 G IDF 0 0 1.00 082F074/0071 2001 P 57.8 66.0 850 7.5 082F074/0071 2001 Z 082F074/0071 2001
-		 * P -9 -9.0 -9.0 B BL -9.0 -9.0 8 082F074/0071 2001 P 200 28.0 14.3 C CW 10.9 189.1 11 082F074/0071 2001 P 200
-		 * 32.0 14.6 H HW 9.7 190.3 37 082F074/0071 2001 P -9 -9.0 -9.0 S SE -9.0 -9.0 71 082F074/0071 2001 Z 0 0.0 0.0
-		 * 082F074/0071 2001 P B 3.0BL 100.0 0.0 0.0 0.0 082F074/0071 2001 P C 30.0CW 100.0 0.0 0.0 0.0 082F074/0071
-		 * 2001 P H 48.9HW 100.0 0.0 0.0 0.0 082F074/0071 2001 P S 18.1SE 100.0 0.0 0.0 0.0 082F074/0071 2001 Z 0.0 0.0
-		 * 0.0 0.0 0.0
-		 */
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
@@ -134,23 +134,12 @@ class VriInputValidationTest {
 		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
 		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
 
-		final var polygonId = "Test";
-		final var layerType = LayerType.PRIMARY;
-
 		MockFileResolver resolver = new MockFileResolver("Test");
 		resolver.addStream("DUMMY1", (OutputStream) new ByteArrayOutputStream());
 		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
 		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
 
 		app.init(resolver, controlMap);
-		/*
-		 * 082F074/0071 2001 G IDF 0 0 1.00 082F074/0071 2001 P 57.8 66.0 850 7.5 082F074/0071 2001 Z 082F074/0071 2001
-		 * P -9 -9.0 -9.0 B BL -9.0 -9.0 8 082F074/0071 2001 P 200 28.0 14.3 C CW 10.9 189.1 11 082F074/0071 2001 P 200
-		 * 32.0 14.6 H HW 9.7 190.3 37 082F074/0071 2001 P -9 -9.0 -9.0 S SE -9.0 -9.0 71 082F074/0071 2001 Z 0 0.0 0.0
-		 * 082F074/0071 2001 P B 3.0BL 100.0 0.0 0.0 0.0 082F074/0071 2001 P C 30.0CW 100.0 0.0 0.0 0.0 082F074/0071
-		 * 2001 P H 48.9HW 100.0 0.0 0.0 0.0 082F074/0071 2001 P S 18.1SE 100.0 0.0 0.0 0.0 082F074/0071 2001 Z 0.0 0.0
-		 * 0.0 0.0 0.0
-		 */
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
@@ -249,14 +238,6 @@ class VriInputValidationTest {
 		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
 
 		app.init(resolver, controlMap);
-		/*
-		 * 082F074/0071 2001 G IDF 0 0 1.00 082F074/0071 2001 P 57.8 66.0 850 7.5 082F074/0071 2001 Z 082F074/0071 2001
-		 * P -9 -9.0 -9.0 B BL -9.0 -9.0 8 082F074/0071 2001 P 200 28.0 14.3 C CW 10.9 189.1 11 082F074/0071 2001 P 200
-		 * 32.0 14.6 H HW 9.7 190.3 37 082F074/0071 2001 P -9 -9.0 -9.0 S SE -9.0 -9.0 71 082F074/0071 2001 Z 0 0.0 0.0
-		 * 082F074/0071 2001 P B 3.0BL 100.0 0.0 0.0 0.0 082F074/0071 2001 P C 30.0CW 100.0 0.0 0.0 0.0 082F074/0071
-		 * 2001 P H 48.9HW 100.0 0.0 0.0 0.0 082F074/0071 2001 P S 18.1SE 100.0 0.0 0.0 0.0 082F074/0071 2001 Z 0.0 0.0
-		 * 0.0 0.0 0.0
-		 */
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
@@ -329,4 +310,39 @@ class VriInputValidationTest {
 		assertThrows(StandProcessingException.class, () -> app.checkPolygon(poly));
 	}
 
+	@Test
+	void testFindDefaultMode() throws Exception {
+		var app = new VriStart();
+
+		var controlMap = new HashMap<String, Object>();
+
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		}));
+
+		final var polygonId = "Test";
+		final var layerType = LayerType.PRIMARY;
+
+		MockFileResolver resolver = new MockFileResolver("Test");
+		resolver.addStream("DUMMY1", (OutputStream) new ByteArrayOutputStream());
+		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
+		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
+
+		app.init(resolver, controlMap);
+
+		Optional<Float> ageTotal = Optional.of(200f);
+		Optional<Float> yearsToBreastHeight = Optional.of(190f);
+		Optional<Float> height = Optional.of(10f);
+		Optional<Float> baseArea = Optional.of(30f);
+		Optional<Float> treesPerHectare = Optional.of(300f);
+		Optional<Float> percentForest = Optional.of(90f);
+
+		app.findDefaultPolygonMode(ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest);
+	}
 }

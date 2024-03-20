@@ -43,8 +43,10 @@ public abstract class NonFipControlParser extends StartApplicationControlParser 
 						ControlKey.MINIMA,
 						ValueParser.toMap(
 								ValueParser.list(ValueParser.FLOAT),
-								Collections.singletonMap(MINIMUM_VETERAN_HEIGHT, 10.0f), MINIMUM_HEIGHT,
-								MINIMUM_BASE_AREA, MINIMUM_PREDICTED_BASE_AREA, MINIMUM_VETERAN_HEIGHT
+								Collections.singletonMap(MINIMUM_VETERAN_HEIGHT, 10.0f), MINIMUM_HEIGHT, // VMINH
+								MINIMUM_BASE_AREA, // VMINBA
+								MINIMUM_PREDICTED_BASE_AREA, // VMINBAeqn
+								MINIMUM_VETERAN_HEIGHT // VMINVetH
 						)
 				)
 

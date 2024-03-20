@@ -288,8 +288,73 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			// At this point the Fortran implementation Set the Primary Genus and ITG, I did
 			// that in getPolygon instead of here.
 
+			Optional<VriSite> primarySite = layer.getPrimaryGenus()
+					.flatMap(id -> Utils.optSafe(layer.getSites().get(id)));
+
+			var ageTotal = primarySite.flatMap(VriSite::getAgeTotal);
+			var height = primarySite.flatMap(VriSite::getHeight);
+			var yearsToBreastHeight = primarySite.flatMap(VriSite::getYearsToBreastHeight);
+			var baseArea = layer.getBaseArea();
+			var treesPerHectare = layer.getTreesPerHectare();
+			var percentForest = polygon.getPercentAvailable();
+
+			findDefaultPolygonMode(ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest);
 		}
 
+	}
+
+	PolygonMode findDefaultPolygonMode(
+			Optional<Float> ageTotal, Optional<Float> yearsToBreastHeight, Optional<Float> height,
+			Optional<Float> baseArea, Optional<Float> treesPerHectare, Optional<Float> percentForest
+	) {
+		Optional<Float> ageBH = ageTotal.map(at -> at - yearsToBreastHeight.orElse(3f));
+
+		float bap;
+		if (ageBH.map(abh -> abh >= 1).orElse(false)) {
+			// TODO EMP106
+			bap = 0;
+		} else {
+			bap = 0;
+		}
+
+		var mode = PolygonMode.START;
+
+		Map<String, Float> minMap = Utils.expectParsedControl(controlMap, ControlKey.MINIMA, Map.class);
+
+		float minHeight = minMap.get(VriControlParser.MINIMUM_HEIGHT);
+		float minBA = minMap.get(VriControlParser.MINIMUM_BASE_AREA);
+		float minPredictedBA = minMap.get(VriControlParser.MINIMUM_PREDICTED_BASE_AREA);
+
+		if (height.map(h -> h < minHeight).orElse(true)) {
+			mode = PolygonMode.YOUNG;
+
+			log.atDebug().setMessage("Mode {} because Height {} is below minimum {}.").addArgument(mode)
+					.addArgument(height).addArgument(minHeight).log();
+		} else if (bap < minPredictedBA) {
+			mode = PolygonMode.YOUNG;
+
+			log.atDebug().setMessage("Mode {} because Base Area {} is below minimum {}.").addArgument(mode)
+					.addArgument(bap).addArgument(minBA).log();
+		} else if (baseArea.map(x -> x == 0).orElse(true) || treesPerHectare.map(x -> x == 0).orElse(true)) {
+			mode = PolygonMode.YOUNG;
+
+			log.atDebug().setMessage("Mode {} because Base Area and Trees Per Hectare were not specified or zero")
+					.addArgument(mode).log();
+		} else {
+			var ration = Utils.mapBoth(baseArea, percentForest, (ba, pf) -> ba * 100f / pf);
+
+			if (ration.map(r -> r < minBA).orElse(false)) {
+				mode = PolygonMode.YOUNG;
+				log.atDebug().setMessage(
+						"Mode {} because ration ({}) of Base Area ({}) to Percent Forest Land ({}) was below minimum {}"
+				).addArgument(mode).addArgument(ration).addArgument(baseArea).addArgument(percentForest)
+						.addArgument(minBA).log();
+
+			}
+		}
+		log.atDebug().setMessage("Defaulting to mode {}.").addArgument(mode).log();
+
+		return mode;
 	}
 
 	VdypPolygon createVdypPolygon(VriPolygon sourcePolygon, Map<LayerType, VdypLayer> processedLayers)
