@@ -1,5 +1,7 @@
 package ca.bc.gov.nrs.vdyp.vri;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.ByteArrayOutputStream;
@@ -13,6 +15,7 @@ import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
 import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
 import ca.bc.gov.nrs.vdyp.vri.model.VriPolygon;
@@ -311,6 +314,82 @@ class VriInputValidationTest {
 	}
 
 	@Test
+	void testFindDefaultModeLowBA() throws Exception {
+		var app = new VriStart();
+
+		var controlMap = new HashMap<String, Object>();
+
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		}));
+
+		final var polygonId = "Test";
+		final var layerType = LayerType.PRIMARY;
+
+		MockFileResolver resolver = new MockFileResolver("Test");
+		resolver.addStream("DUMMY1", (OutputStream) new ByteArrayOutputStream());
+		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
+		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
+
+		app.init(resolver, controlMap);
+
+		Optional<Float> ageTotal = Optional.of(200f);
+		Optional<Float> yearsToBreastHeight = Optional.of(191f);
+		Optional<Float> height = Optional.of(10f);
+		Optional<Float> baseArea = Optional.of(30f);
+		Optional<Float> treesPerHectare = Optional.of(300f);
+		Optional<Float> percentForest = Optional.of(90f);
+
+		var result = app.findDefaultPolygonMode(ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest);
+		
+		assertThat(result, is(PolygonMode.YOUNG));
+	}
+	
+	@Test
+	void testFindDefaultModeLowHeight() throws Exception {
+		var app = new VriStart();
+
+		var controlMap = new HashMap<String, Object>();
+
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		}));
+
+		final var polygonId = "Test";
+		final var layerType = LayerType.PRIMARY;
+
+		MockFileResolver resolver = new MockFileResolver("Test");
+		resolver.addStream("DUMMY1", (OutputStream) new ByteArrayOutputStream());
+		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
+		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
+
+		app.init(resolver, controlMap);
+
+		Optional<Float> ageTotal = Optional.of(200f);
+		Optional<Float> yearsToBreastHeight = Optional.of(189f);
+		Optional<Float> height = Optional.of(1f);
+		Optional<Float> baseArea = Optional.of(30f);
+		Optional<Float> treesPerHectare = Optional.of(300f);
+		Optional<Float> percentForest = Optional.of(90f);
+
+		var result = app.findDefaultPolygonMode(ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest);
+		
+		assertThat(result, is(PolygonMode.YOUNG));
+	}
+	
+	@Test
 	void testFindDefaultMode() throws Exception {
 		var app = new VriStart();
 
@@ -337,12 +416,14 @@ class VriInputValidationTest {
 		app.init(resolver, controlMap);
 
 		Optional<Float> ageTotal = Optional.of(200f);
-		Optional<Float> yearsToBreastHeight = Optional.of(190f);
+		Optional<Float> yearsToBreastHeight = Optional.of(189f);
 		Optional<Float> height = Optional.of(10f);
 		Optional<Float> baseArea = Optional.of(30f);
 		Optional<Float> treesPerHectare = Optional.of(300f);
 		Optional<Float> percentForest = Optional.of(90f);
 
-		app.findDefaultPolygonMode(ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest);
+		var result = app.findDefaultPolygonMode(ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest);
+		
+		assertThat(result, is(PolygonMode.YOUNG));
 	}
 }
