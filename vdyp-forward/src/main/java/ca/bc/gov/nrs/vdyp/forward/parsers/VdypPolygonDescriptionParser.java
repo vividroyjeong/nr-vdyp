@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.forward;
+package ca.bc.gov.nrs.vdyp.forward.parsers;
 
 import java.io.IOException;
 import java.util.Map;

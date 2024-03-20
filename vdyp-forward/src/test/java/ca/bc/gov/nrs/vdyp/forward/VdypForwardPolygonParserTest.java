@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.forward.model.FipMode;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
+import ca.bc.gov.nrs.vdyp.forward.parsers.VdypPolygonParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;

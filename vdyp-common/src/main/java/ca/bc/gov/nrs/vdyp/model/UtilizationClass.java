@@ -1,5 +1,9 @@
 package ca.bc.gov.nrs.vdyp.model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 public enum UtilizationClass {
@@ -18,6 +22,9 @@ public enum UtilizationClass {
 	private Optional<UtilizationClass> next = Optional.empty();
 	private Optional<UtilizationClass> previous = Optional.empty();
 
+	public static final List<UtilizationClass> allButSmall = Collections.unmodifiableList(
+			new ArrayList<>(Arrays.asList(U75TO125, U125TO175, U175TO225, OVER225)));
+	
 	static {
 		for (int i = 1; i < UtilizationClass.values().length; i++) {
 			UtilizationClass.values()[i].previous = Optional.of(UtilizationClass.values()[i - 1]);

@@ -1,8 +1,6 @@
 package ca.bc.gov.nrs.vdyp.forward.test;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,8 +9,7 @@ import java.util.function.BiFunction;
 import org.opentest4j.AssertionFailedError;
 
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
-import ca.bc.gov.nrs.vdyp.forward.VdypForwardControlParser;
-import ca.bc.gov.nrs.vdyp.io.FileResolver;
+import ca.bc.gov.nrs.vdyp.forward.ForwardControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.model.Region;
@@ -60,7 +57,7 @@ public class VdypForwardTestUtils {
 	}
 
 	public static Map<String, Object>
-			loadControlMap(VdypForwardControlParser parser, Class<?> klazz, String resourceName)
+			loadControlMap(ForwardControlParser parser, Class<?> klazz, String resourceName)
 					throws IOException, ResourceParseException {
 		try (var is = klazz.getResourceAsStream(resourceName)) {
 
@@ -73,9 +70,9 @@ public class VdypForwardTestUtils {
 	 * control map parser.
 	 */
 	public static Map<String, Object> loadControlMap() {
-		var parser = new VdypForwardControlParser();
+		var parser = new ForwardControlParser();
 		try {
-			return loadControlMap(parser, VdypForwardControlParser.class, "FIPSTART.CTR");
+			return loadControlMap(parser, ForwardControlParser.class, "FIPSTART.CTR");
 		} catch (IOException | ResourceParseException ex) {
 			throw new AssertionFailedError(null, ex);
 		}

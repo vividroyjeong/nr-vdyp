@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.forward;
+package ca.bc.gov.nrs.vdyp.forward.parsers;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -83,7 +83,7 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 					.value(6, TOTAL_AGE, ValueParser.FLOAT).value(6, AGE_AT_BREAST_HEIGHT, ValueParser.FLOAT)
 					.value(6, YEARS_TO_BREAST_HEIGHT, ValueParser.FLOAT)
 					.value(2, IS_PRIMARY_SPECIES, ControlledValueParser.optional(ValueParser.LOGICAL_0_1))
-					.value(3, SITE_CURVE_NUMBER, ControlledValueParser.optional(ValueParser.INTEGER));
+					.value(3, SITE_CURVE_NUMBER, ValueParser.posttestOptional(ValueParser.INTEGER, x -> x >= 0));
 
 			var is = fileResolver.resolveForInput(fileName);
 
@@ -117,7 +117,7 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 					var ageAtBreastHeight = (Float) entry.get(AGE_AT_BREAST_HEIGHT);
 					var yearsToBreastHeight = (Float) entry.get(YEARS_TO_BREAST_HEIGHT);
 					var isPrimarySpecies = Utils.<Boolean>optSafe(entry.get(IS_PRIMARY_SPECIES));
-					var siteCurveNumber = Optional.of(Utils.<Integer>optSafe(entry.get(SITE_CURVE_NUMBER)).orElse(9));
+					var siteCurveNumber = Utils.<Integer>optSafe(entry.get(SITE_CURVE_NUMBER));
 
 					var builder = new ValueOrMarker.Builder<Optional<VdypLayerSpecies>, EndOfRecord>();
 					return layerType.handle(l -> builder.value(l.map(lt -> {

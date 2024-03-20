@@ -1,7 +1,11 @@
-package ca.bc.gov.nrs.vdyp.forward;
+package ca.bc.gov.nrs.vdyp.forward.parsers;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
@@ -20,6 +24,10 @@ import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 
 public class VdypPolygonParser implements ControlMapValueReplacer<Object, String> {
+
+	private static final Logger logger = LoggerFactory.getLogger(VdypPolygonParser.class);
+	
+	private static final Float DEFAULT_FORESTED_LAND_PERCENTAGE = 90.0f;
 
 	private static final String DESCRIPTION = "DESCRIPTION"; // POLYDESC
 	private static final String BIOGEOCLIMATIC_ZONE = "BIOGEOCLIMATIC_ZONE"; // BEC
@@ -60,7 +68,7 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 
 				@Override
 				protected VdypPolygon convert(Map<String, Object> entry) throws ResourceParseException {
-					var description = (String) entry.get(DESCRIPTION);
+					var descriptionText = (String) entry.get(DESCRIPTION);
 					var becAlias = (String) entry.get(BIOGEOCLIMATIC_ZONE);
 					var fizId = (Character) entry.get(FOREST_INVENTORY_ZONE);
 					var percentForestLand = (Float) entry.get(PERCENT_FOREST_LAND);
@@ -78,9 +86,18 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 										+ " is not a recognized FIZ (only 'A' ... 'L' are supported)"
 						);
 					}
+					
+					var description = VdypPolygonDescriptionParser.parse(descriptionText);
+					
+					if (percentForestLand <= 0.0) {
+						// VDYPGETP.for lines 146 - 154
+						logger.warn(MessageFormat.format("Polygon {} percent-forested-land value {} is <= 0.0; replacing with default {}"
+								, description.getName(), percentForestLand, DEFAULT_FORESTED_LAND_PERCENTAGE));
+						percentForestLand = DEFAULT_FORESTED_LAND_PERCENTAGE;
+					}
 
 					return new VdypPolygon(
-							VdypPolygonDescriptionParser.parse(description), bec, fizId, percentForestLand,
+							description, bec, fizId, percentForestLand,
 							inventoryTypeGroup, basalAreaGroup, fipMode.flatMap(FipMode::getByCode)
 					);
 				}

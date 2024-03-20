@@ -40,10 +40,10 @@ class VdypForwardReadPolygonTest {
 	@Test
 	void testReadPolygons() throws Exception {
 
-		var parser = new VdypForwardControlParser();
+		var parser = new ForwardControlParser();
 		Map<String, Object> controlMap = parse(parser, "VDYP.CTR");
 
-		var processor = new VdypForwardProcessor();
+		var processor = new ForwardProcessor();
 		try {
 			var genusDefinitionMap = new GenusDefinitionMap(
 					(List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name())
@@ -166,7 +166,7 @@ class VdypForwardReadPolygonTest {
 		return result;
 	}
 
-	static Map<String, ?> parseWithAppendix(VdypForwardControlParser parser, String... lines)
+	static Map<String, ?> parseWithAppendix(ForwardControlParser parser, String... lines)
 			throws IOException, ResourceParseException {
 
 		Class<?> klazz = TestUtils.class;
@@ -175,7 +175,7 @@ class VdypForwardReadPolygonTest {
 		}
 	}
 
-	Map<String, Object> parse(VdypForwardControlParser parser, String resourceName)
+	Map<String, Object> parse(ForwardControlParser parser, String resourceName)
 			throws IOException, ResourceParseException {
 
 		Class<?> klazz = TestUtils.class;

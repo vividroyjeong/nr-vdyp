@@ -1,10 +1,10 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
-import static ca.bc.gov.nrs.vdyp.forward.VdypPass.PASS_1;
-import static ca.bc.gov.nrs.vdyp.forward.VdypPass.PASS_2;
-import static ca.bc.gov.nrs.vdyp.forward.VdypPass.PASS_3;
-import static ca.bc.gov.nrs.vdyp.forward.VdypPass.PASS_4;
-import static ca.bc.gov.nrs.vdyp.forward.VdypPass.PASS_5;
+import static ca.bc.gov.nrs.vdyp.forward.ForwardPass.PASS_1;
+import static ca.bc.gov.nrs.vdyp.forward.ForwardPass.PASS_2;
+import static ca.bc.gov.nrs.vdyp.forward.ForwardPass.PASS_3;
+import static ca.bc.gov.nrs.vdyp.forward.ForwardPass.PASS_4;
+import static ca.bc.gov.nrs.vdyp.forward.ForwardPass.PASS_5;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,7 +28,7 @@ public class VdypForwardApplication extends VdypApplication {
 	static {
 		try {
 			LogManager.getLogManager().readConfiguration(
-					VdypForwardProcessor.class.getClassLoader().getResourceAsStream("logging.properties")
+					ForwardProcessor.class.getClassLoader().getResourceAsStream("logging.properties")
 			);
 		} catch (SecurityException | IOException e) {
 			System.err.println("Unable to configure logging system");
@@ -42,7 +42,7 @@ public class VdypForwardApplication extends VdypApplication {
 
 	public static final String DEFAULT_VDYP_CONTROL_FILE_NAME = "vdyp.ctr";
 
-	private static Set<VdypPass> vdypPassSet = new HashSet<>(
+	private static Set<ForwardPass> vdypPassSet = new HashSet<>(
 			Arrays.asList(PASS_1, PASS_2, PASS_3, PASS_4, PASS_5)
 	);
 
@@ -80,7 +80,7 @@ public class VdypForwardApplication extends VdypApplication {
 		}
 
 		try {
-			VdypForwardProcessor processor = new VdypForwardProcessor();
+			ForwardProcessor processor = new ForwardProcessor();
 
 			processor.run(new FileSystemFileResolver(), controlFileNames, vdypPassSet);
 

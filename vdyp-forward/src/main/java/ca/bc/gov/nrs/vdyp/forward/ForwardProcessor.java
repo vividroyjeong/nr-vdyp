@@ -61,9 +61,9 @@ import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
  *
  * @author Michael Junkin, Vivid Solutions
  */
-public class VdypForwardProcessor {
+public class ForwardProcessor {
 
-	private static final Logger logger = LoggerFactory.getLogger(VdypForwardProcessor.class);
+	private static final Logger logger = LoggerFactory.getLogger(ForwardProcessor.class);
 
 	/**
 	 * Initialize VdypForwardProcessor
@@ -75,7 +75,7 @@ public class VdypForwardProcessor {
 	 * @throws ResourceParseException
 	 * @throws ProcessingException
 	 */
-	void run(FileSystemFileResolver resolver, List<String> controlFileNames, Set<VdypPass> vdypPassSet)
+	void run(FileSystemFileResolver resolver, List<String> controlFileNames, Set<ForwardPass> vdypPassSet)
 			throws IOException, ResourceParseException, ProcessingException {
 
 		logger.info("VDYPPASS: {}", vdypPassSet);
@@ -89,7 +89,7 @@ public class VdypForwardProcessor {
 		// Load the control map
 		Map<String, Object> controlMap = new HashMap<>();
 
-		var parser = new VdypForwardControlParser();
+		var parser = new ForwardControlParser();
 
 		for (var controlFileName : controlFileNames) {
 			logger.info("Resolving and parsing {}", controlFileName);
@@ -110,12 +110,13 @@ public class VdypForwardProcessor {
 	 *
 	 * @throws ProcessingException
 	 */
-	public void process(Set<VdypPass> vdypPassSet, Map<String, Object> controlMap) throws ProcessingException {
+	@SuppressWarnings("unchecked")
+	public void process(Set<ForwardPass> vdypPassSet, Map<String, Object> controlMap) throws ProcessingException {
 
 		logger.info("Beginning processing with given configuration");
 
 		int maxPoly = 0;
-		if (vdypPassSet.contains(VdypPass.PASS_1)) {
+		if (vdypPassSet.contains(ForwardPass.PASS_1)) {
 			Object maxPolyValue = controlMap.get(ControlKey.MAX_NUM_POLY.name());
 			if (maxPolyValue != null) {
 				maxPoly = (Integer) maxPolyValue;
@@ -124,38 +125,36 @@ public class VdypForwardProcessor {
 
 		logger.debug("MaxPoly: {}", maxPoly);
 
-		if (vdypPassSet.contains(VdypPass.PASS_2)) {
+		if (vdypPassSet.contains(ForwardPass.PASS_2)) {
 			// input files are already opened
 			// TODO: open output files
 		}
 
-		if (vdypPassSet.contains(VdypPass.PASS_3)) {
+		if (vdypPassSet.contains(ForwardPass.PASS_3)) {
 
 			try {
-				@SuppressWarnings("unchecked")
 				var genusDefinitionMap = new GenusDefinitionMap(
 						(List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name())
 				);
 
-				var polygonDescriptionStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_GROWTO.name());
-				@SuppressWarnings("unchecked")
-				var polygonDescriptionStream = ((StreamingParserFactory<VdypPolygonDescription>) polygonDescriptionStreamFactory).get();
+				var polygonDescriptionStreamFactory = (StreamingParserFactory<VdypPolygonDescription>)controlMap.get(ControlKey.FORWARD_INPUT_GROWTO.name());
+				var polygonDescriptionStream = polygonDescriptionStreamFactory.get();
 
 				var polygonStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_POLY.name());
-				@SuppressWarnings("unchecked")
 				var polygonStream = ((StreamingParserFactory<VdypPolygon>) polygonStreamFactory).get();
 
 				var layerSpeciesStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SPECIES.name());
-				@SuppressWarnings("unchecked")
 				var layerSpeciesStream = ((StreamingParserFactory<Collection<VdypLayerSpecies>>) layerSpeciesStreamFactory).get();
 
 				var speciesUtilizationStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name());
-				@SuppressWarnings("unchecked")
 				var speciesUtilizationStream = ((StreamingParserFactory<Collection<VdypSpeciesUtilization>>) speciesUtilizationStreamFactory).get();
+
+				var fpe = new ForwardProcessingEngine(genusDefinitionMap);
 
 				// Fetch the next polygon to process.
 				int nPolygonsProcessed = 0;
 				while (polygonDescriptionStream.hasNext()) {
+					
 					if (nPolygonsProcessed == maxPoly) {
 						logger.info(
 								"Prematurely terminating polygon processing since MAX_POLY ({}) polygons have been processed",
@@ -170,7 +169,8 @@ public class VdypForwardProcessor {
 							speciesUtilizationStream
 					);
 
-					processPolygon(polygon);
+					fpe.processPolygon(polygon);
+					
 					nPolygonsProcessed += 1;
 				}
 
@@ -323,10 +323,5 @@ public class VdypForwardProcessor {
 		}
 
 		return thePolygon;
-	}
-
-	private void processPolygon(VdypPolygon polygon) {
-		logger.info("Starting processing of polygon {}", polygon.getDescription());
-
 	}
 }

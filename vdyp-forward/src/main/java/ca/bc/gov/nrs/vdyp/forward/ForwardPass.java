@@ -15,6 +15,6 @@ package ca.bc.gov.nrs.vdyp.forward;
 //                             0   Stand was processed and written
 //                             +ve value.  Serious error. Set to IER.
 
-public enum VdypPass {
+public enum ForwardPass {
 	PASS_1, PASS_2, PASS_3, PASS_4, PASS_5, PASS_6
 }

@@ -7,6 +7,7 @@ import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -14,6 +15,11 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.forward.parsers.VdypPolygonParser;
+import ca.bc.gov.nrs.vdyp.forward.parsers.VdypSpeciesParser;
+import ca.bc.gov.nrs.vdyp.forward.parsers.VdypUtilizationParser;
+import ca.bc.gov.nrs.vdyp.forward.parsers.VdypVtrolParser;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BasalAreaGrowthEmpiricalParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BasalAreaGrowthFiatParser;
@@ -71,11 +77,11 @@ import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
  *
  * @author Michael Junkin, Vivid Solutions
  */
-public class VdypForwardControlParser extends BaseControlParser {
+public class ForwardControlParser extends BaseControlParser {
 
-	private static final Logger logger = LoggerFactory.getLogger(VdypForwardControlParser.class);
+	private static final Logger logger = LoggerFactory.getLogger(ForwardControlParser.class);
 
-	public VdypForwardControlParser() {
+	public ForwardControlParser() {
 		initialize();
 
 		controlParser.record(ControlKey.VTROL, new VdypVtrolParser());
@@ -279,6 +285,14 @@ public class VdypForwardControlParser extends BaseControlParser {
 	@Override
 	protected void applyAllModifiers(Map<String, Object> map, FileResolver fileResolver)
 			throws ResourceParseException, IOException {
+
+		// FORWARD_INPUT_GROWTO is optional; if missing, the polygon list is read from the 
+		// polygon file itself.
+		Optional<String> source = Utils.optSafe(map.get(ControlKey.FORWARD_INPUT_GROWTO.name()));
+		if (source.isEmpty()) {
+			String polyFileName = (String)map.get(ControlKey.FORWARD_INPUT_VDYP_POLY.name());
+			map.put(ControlKey.FORWARD_INPUT_GROWTO.name(), polyFileName);
+		}
 
 		for (ControlKey key : orderedControlKeys) {
 

@@ -27,10 +27,13 @@ public class VdypPolygon {
 		this.description = vdypPolygonDescription;
 		this.biogeoclimaticZone = bec;
 		this.forestInventoryZone = fizId;
+		
+		// VDYPGETP lines 146-154
 		if (percentForestLand <= 0.0)
 			this.percentForestLand = 90.0f;
 		else
 			this.percentForestLand = percentForestLand;
+		
 		this.inventoryTypeGroup = inventoryTypeGroup;
 		this.basalAreaGroup = basalAreaGroup;
 		this.fipMode = fipMode;
