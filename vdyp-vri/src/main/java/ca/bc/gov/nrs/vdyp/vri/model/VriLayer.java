@@ -14,11 +14,12 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 	private final Optional<Float> baseArea; // VRIL/BAL
 	private final Optional<Float> treesPerHectare; // VRIL/TPHL
 	private final float utilization; // VRIL/UTLL
-	private final Optional<String> primaryGenus; // FIPL_1C/JPRIME_L1
+	private final Optional<String> primaryGenus; // FIPL_1C/JPRIME_L1 ISPP
+	private final Optional<String> secondaryGenus; // FIPL_1C/JPRIME_L1 ISPS
 
 	public VriLayer(
 			String polygonIdentifier, LayerType layer, float crownClosure, Optional<Float> baseArea,
-			Optional<Float> treesPerHectare, float utilization, Optional<String> primaryGenus
+			Optional<Float> treesPerHectare, float utilization, Optional<String> primaryGenus, Optional<String> secondaryGenus
 	) {
 		super(polygonIdentifier, layer, Optional.empty());
 		this.crownClosure = crownClosure;
@@ -26,6 +27,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 		this.treesPerHectare = treesPerHectare;
 		this.utilization = utilization;
 		this.primaryGenus = primaryGenus;
+		this.secondaryGenus = secondaryGenus;
 	}
 
 	public float getCrownClosure() {
@@ -47,10 +49,29 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 	public Optional<String> getPrimaryGenus() {
 		return primaryGenus;
 	}
+	
+	public Optional<String> getSecondaryGenus() {
+		return secondaryGenus;
+	}
 
 	@Computed
 	public Optional<VriSpecies> getPrimarySpeciesRecord() {
 		return primaryGenus.map(this.getSpecies()::get);
+	}
+
+	@Computed
+	public Optional<VriSpecies> getSecondarySpeciesRecord() {
+		return secondaryGenus.map(this.getSpecies()::get);
+	}
+	
+	@Computed
+	public Optional<VriSite> getPrimarySite() {
+		return primaryGenus.map(this.getSites()::get);
+	}
+
+	@Computed
+	public Optional<VriSite> getSecondarySite() {
+		return secondaryGenus.map(this.getSites()::get);
 	}
 
 	/**
@@ -84,6 +105,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 		protected Optional<Float> utilization = Optional.empty();
 		protected Optional<Float> percentAvailable = Optional.empty();
 		protected Optional<String> primaryGenus = Optional.empty();
+		protected Optional<String> secondaryGenus = Optional.empty();
 
 		public Builder crownClosure(float crownClosure) {
 			this.crownClosure = Optional.of(crownClosure);
@@ -139,6 +161,15 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 			return primaryGenus(Optional.of(primaryGenus));
 		}
 
+		public Builder secondaryGenus(Optional<String> secondaryGenus) {
+			this.secondaryGenus = secondaryGenus;
+			return this;
+		}
+
+		public Builder secondaryGenus(String secondaryGenus) {
+			return secondaryGenus(Optional.of(secondaryGenus));
+		}
+
 		@Override
 		protected void check(Collection<String> errors) {
 			super.check(errors);
@@ -155,7 +186,9 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 					crownClosure.get(), //
 					baseArea.map(x -> x * multiplier), //
 					treesPerHectare.map(x -> x * multiplier), //
-					Math.max(utilization.get(), 7.5f), primaryGenus
+					Math.max(utilization.get(), 7.5f),//
+					primaryGenus,
+					secondaryGenus
 			);
 			result.setInventoryTypeGroup(inventoryTypeGroup);
 			return result;

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -23,23 +24,13 @@ import ca.bc.gov.nrs.vdyp.vri.model.VriSite;
 
 class VriInputValidationTest {
 
+	Map<String, Object> controlMap = new HashMap<>();
+
 	@Test
 	void testPassValid() throws Exception {
 		var app = new VriStart();
 
-		var controlMap = new HashMap<String, Object>();
-
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
-
-		final var polygonId = "Test";
-		final var layerType = LayerType.PRIMARY;
-
-		MockFileResolver resolver = new MockFileResolver("Test");
-		resolver.addStream("DUMMY1", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
+		MockFileResolver resolver = dummyInput();
 
 		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
 			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
@@ -131,16 +122,7 @@ class VriInputValidationTest {
 	void testFailPrimarySpeciesDontSumTo100() throws Exception {
 		var app = new VriStart();
 
-		var controlMap = new HashMap<String, Object>();
-
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
-
-		MockFileResolver resolver = new MockFileResolver("Test");
-		resolver.addStream("DUMMY1", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
+		MockFileResolver resolver = dummyInput();
 
 		app.init(resolver, controlMap);
 
@@ -226,19 +208,10 @@ class VriInputValidationTest {
 	void testFailIfMissingPrimary() throws Exception {
 		var app = new VriStart();
 
-		var controlMap = new HashMap<String, Object>();
-
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+		MockFileResolver resolver = dummyInput();
 
 		final var polygonId = "Test";
 		final var layerType = LayerType.PRIMARY;
-
-		MockFileResolver resolver = new MockFileResolver("Test");
-		resolver.addStream("DUMMY1", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
 
 		app.init(resolver, controlMap);
 
@@ -317,11 +290,7 @@ class VriInputValidationTest {
 	void testFindDefaultModeLowBA() throws Exception {
 		var app = new VriStart();
 
-		var controlMap = new HashMap<String, Object>();
-
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+		MockFileResolver resolver = dummyInput();
 
 		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
 			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
@@ -331,11 +300,6 @@ class VriInputValidationTest {
 
 		final var polygonId = "Test";
 		final var layerType = LayerType.PRIMARY;
-
-		MockFileResolver resolver = new MockFileResolver("Test");
-		resolver.addStream("DUMMY1", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
 
 		app.init(resolver, controlMap);
 
@@ -346,20 +310,17 @@ class VriInputValidationTest {
 		Optional<Float> treesPerHectare = Optional.of(300f);
 		Optional<Float> percentForest = Optional.of(90f);
 
-		var result = app.findDefaultPolygonMode(ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest);
-		
+		var result = app
+				.findDefaultPolygonMode(ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest);
+
 		assertThat(result, is(PolygonMode.YOUNG));
 	}
-	
+
 	@Test
 	void testFindDefaultModeLowHeight() throws Exception {
 		var app = new VriStart();
 
-		var controlMap = new HashMap<String, Object>();
-
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+		MockFileResolver resolver = dummyInput();
 
 		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
 			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
@@ -369,11 +330,6 @@ class VriInputValidationTest {
 
 		final var polygonId = "Test";
 		final var layerType = LayerType.PRIMARY;
-
-		MockFileResolver resolver = new MockFileResolver("Test");
-		resolver.addStream("DUMMY1", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
 
 		app.init(resolver, controlMap);
 
@@ -384,20 +340,17 @@ class VriInputValidationTest {
 		Optional<Float> treesPerHectare = Optional.of(300f);
 		Optional<Float> percentForest = Optional.of(90f);
 
-		var result = app.findDefaultPolygonMode(ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest);
-		
+		var result = app
+				.findDefaultPolygonMode(ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest);
+
 		assertThat(result, is(PolygonMode.YOUNG));
 	}
-	
+
 	@Test
 	void testFindDefaultMode() throws Exception {
 		var app = new VriStart();
 
-		var controlMap = new HashMap<String, Object>();
-
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+		MockFileResolver resolver = dummyInput();
 
 		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
 			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
@@ -408,11 +361,6 @@ class VriInputValidationTest {
 		final var polygonId = "Test";
 		final var layerType = LayerType.PRIMARY;
 
-		MockFileResolver resolver = new MockFileResolver("Test");
-		resolver.addStream("DUMMY1", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
-
 		app.init(resolver, controlMap);
 
 		Optional<Float> ageTotal = Optional.of(200f);
@@ -422,8 +370,37 @@ class VriInputValidationTest {
 		Optional<Float> treesPerHectare = Optional.of(300f);
 		Optional<Float> percentForest = Optional.of(90f);
 
-		var result = app.findDefaultPolygonMode(ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest);
-		
+		var result = app
+				.findDefaultPolygonMode(ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest);
+
 		assertThat(result, is(PolygonMode.YOUNG));
+	}
+
+	private MockFileResolver dummyInput() {
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+
+		MockFileResolver resolver = new MockFileResolver("Test");
+		resolver.addStream("DUMMY1", (OutputStream) new ByteArrayOutputStream());
+		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
+		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
+		return resolver;
+	}
+
+	@Test
+	void testEMP106() throws Exception {
+		var app = new VriStart();
+
+		MockFileResolver resolver = dummyInput();
+
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		}));
+
+		app.init(resolver, controlMap);
+		
 	}
 }

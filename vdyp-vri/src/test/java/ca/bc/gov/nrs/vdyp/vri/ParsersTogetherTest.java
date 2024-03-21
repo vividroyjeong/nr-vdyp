@@ -93,6 +93,7 @@ class ParsersTogetherTest {
 		assertThat(result, hasProperty("layers", Matchers.aMapWithSize(2)));
 		var primaryResult = result.getLayers().get(LayerType.PRIMARY);
 		var veteranResult = result.getLayers().get(LayerType.VETERAN);
+		primaryResult.getPrimaryGenus();
 		assertThat(
 				primaryResult, allOf(
 						hasProperty("polygonIdentifier", is(polygonId)), //
@@ -100,7 +101,9 @@ class ParsersTogetherTest {
 						hasProperty("crownClosure", is(0.95f)), //
 						hasProperty("utilization", is(7.5f)), // Raised to minimum
 						hasProperty("baseArea", present(is(20f))), //
-						hasProperty("treesPerHectare", present(is(300f)))
+						hasProperty("treesPerHectare", present(is(300f))), //
+						hasProperty("primaryGenus", present(is("B"))), //
+						hasProperty("secondaryGenus", notPresent())
 				)
 		);
 		// Set to defaults, not that optional values should be present with a value of 0
@@ -112,7 +115,9 @@ class ParsersTogetherTest {
 						hasProperty("crownClosure", is(0f)), //
 						hasProperty("utilization", is(7.5f)), //
 						hasProperty("baseArea", present(is(0f))), //
-						hasProperty("treesPerHectare", present(is(0f)))
+						hasProperty("treesPerHectare", present(is(0f))),
+						hasProperty("primaryGenus", notPresent()), //
+						hasProperty("secondaryGenus", notPresent())
 				)
 		);
 
@@ -185,7 +190,9 @@ class ParsersTogetherTest {
 						hasProperty("crownClosure", is(0.95f)), //
 						hasProperty("utilization", is(7.5f)), // Raised to minimum
 						hasProperty("baseArea", present(is(20f))), //
-						hasProperty("treesPerHectare", present(is(300f)))
+						hasProperty("treesPerHectare", present(is(300f))), //
+						hasProperty("primaryGenus", present(is("B"))), //
+						hasProperty("secondaryGenus", notPresent())
 				)
 		);
 		// Set to defaults, not that optional values should be present with a value of 0
@@ -199,7 +206,9 @@ class ParsersTogetherTest {
 						hasProperty("crownClosure", is(0f)), //
 						hasProperty("utilization", is(7.5f)), //
 						hasProperty("baseArea", notPresent()), //
-						hasProperty("treesPerHectare", notPresent())
+						hasProperty("treesPerHectare", notPresent()), //
+						hasProperty("primaryGenus", notPresent()), //
+						hasProperty("secondaryGenus", notPresent())
 				)
 		);
 		app.close();
@@ -432,13 +441,25 @@ class ParsersTogetherTest {
 			specBuilder.polygonIdentifier("Test");
 			specBuilder.layerType(layerType);
 			specBuilder.genus("B");
-			specBuilder.percentGenus(100f);
+			specBuilder.percentGenus(80f);
+		})));
+		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
+			specBuilder.polygonIdentifier("Test");
+			specBuilder.layerType(layerType);
+			specBuilder.genus("S");
+			specBuilder.percentGenus(20f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
 			siteBuilder.polygonIdentifier("Test");
 			siteBuilder.layerType(layerType);
 			siteBuilder.siteGenus("B");
 			siteBuilder.siteSpecies("B");
+		})));
+		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
+			siteBuilder.polygonIdentifier("Test");
+			siteBuilder.layerType(layerType);
+			siteBuilder.siteGenus("S");
+			siteBuilder.siteSpecies("S");
 		})));
 
 		var result = app.getPolygon(polyStream, layerStream, speciesStream, siteStream);
@@ -449,13 +470,15 @@ class ParsersTogetherTest {
 		assertThat(
 				primaryResult, allOf(
 						hasProperty("primaryGenus", present(is("B"))), //
-						hasProperty("inventoryTypeGroup", present(is(18))) // ITG for a pure B layer
+						hasProperty("secondaryGenus", present(is("S"))), //
+						hasProperty("inventoryTypeGroup", present(is(18))) // ITG for a pure (80%) B layer
 				)
 		);
 		assertThat(
 				veteranResult, allOf(
 						// Veteran layer should not have primary genus or ITG
 						hasProperty("primaryGenus", notPresent()), //
+						hasProperty("secondaryGenus", notPresent()), //
 						hasProperty("inventoryTypeGroup", notPresent())
 				)
 		);

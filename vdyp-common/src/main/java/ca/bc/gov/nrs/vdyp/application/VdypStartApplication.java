@@ -14,6 +14,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +33,10 @@ import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
+import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 
 public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional<Float>>, L extends BaseVdypLayer<S, I>, S extends BaseVdypSpecies, I extends BaseVdypSite>
@@ -410,6 +415,18 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		}
 	}
 
+	protected int findBaseAreaGroup(BaseVdypSpecies fipSpecies, BecDefinition bec, int itg) {
+		var growthBec = bec.getGrowthBec();
+		final var defaultGroupsMap = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
+				controlMap, ControlKey.DEFAULT_EQ_NUM, MatrixMap2.class
+		);
+		final var modifierMap = Utils.<MatrixMap2<Integer, Integer, Optional<Integer>>>expectParsedControl(
+				controlMap, ControlKey.EQN_MODIFIERS, MatrixMap2.class
+		);
+		var defaultGroup = defaultGroupsMap.get(fipSpecies.getGenus(), growthBec.getAlias());
+		return modifierMap.getM(defaultGroup, itg).orElse(defaultGroup);
+	}
+
 	protected static <E extends Throwable> void throwIfPresent(Optional<E> opt) throws E {
 		if (opt.isPresent()) {
 			throw opt.get();
@@ -419,4 +436,65 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	protected static StandProcessingException validationError(String template, Object... values) {
 		return new StandProcessingException(String.format(template, values));
 	}
+
+	/**
+	 * Create a coefficients object where its values are either a weighted sum of those for each of the given entities,
+	 * or the value from one arbitrarily chose entity.
+	 *
+	 * @param <T>             The type of entity
+	 * @param weighted        the indicies of the coefficients that should be weighted sums, those that are not included
+	 *                        are assumed to be constant across all entities and one is choses arbitrarily.
+	 * @param size            Size of the resulting coefficients object
+	 * @param indexFrom       index from of the resulting coefficients object
+	 * @param entities        the entities to do weighted sums over
+	 * @param weight          the weight for a given entity
+	 * @param getCoefficients the coefficients for a given entity
+	 */
+	public static <T> Coefficients
+			weightedCoefficientSum(Collection<Integer> weighted, int size, int indexFrom, Collection<T> entities, ToDoubleFunction<T> weight, Function<T, Coefficients> getCoefficients) {
+				Coefficients coe = Coefficients.empty(size, indexFrom);
+			
+				// Do the summation in double precision
+				var coeWorking = new double[size];
+				Arrays.fill(coeWorking, 0.0);
+			
+				for (var entity : entities) {
+					var entityCoe = getCoefficients.apply(entity);
+					double fraction = weight.applyAsDouble(entity);
+					for (int i : weighted) {
+						coeWorking[i - indexFrom] += (entityCoe.getCoe(i)) * fraction;
+					}
+				}
+				// Reduce back to float once done
+				for (int i : weighted) {
+					coe.setCoe(i, (float) coeWorking[i - indexFrom]);
+				}
+			
+				// Pick one entity to fill in the fixed coefficients
+				// Choice is arbitrary, they should all be the same
+				var anyCoe = getCoefficients.apply(entities.iterator().next());
+			
+				for (int i = indexFrom; i < size + indexFrom; i++) {
+					if (weighted.contains(i))
+						continue;
+					coe.setCoe(i, anyCoe.getCoe(i));
+				}
+				return coe;
+			}
+	/**
+	 * Create a coefficients object where its values are either a weighted sum of those for each of the given entities,
+	 * or the value from one arbitrarily chose entity.
+	 *
+	 * @param <T>             The type of entity
+	 * @param size            Size of the resulting coefficients object
+	 * @param indexFrom       index from of the resulting coefficients object
+	 * @param entities        the entities to do weighted sums over
+	 * @param weight          the weight for a given entity
+	 * @param getCoefficients the coefficients for a given entity
+	 */
+	public static <T> Coefficients
+			weightedCoefficientSum(int size, int indexFrom, Collection<T> entities, ToDoubleFunction<T> weight, Function<T, Coefficients> getCoefficients) {
+				var weighted = IntStream.range(indexFrom, size+indexFrom).boxed().toList();
+				return weightedCoefficientSum(weighted, size, indexFrom, entities, weight, getCoefficients);
+			}
 }

@@ -2215,7 +2215,7 @@ class FipStartTest {
 	@Test
 	void testFindEquationGroupDefault() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
-		try (var app = new FipStart()) {
+		try (VdypStartApplication<FipPolygon, FipLayer, FipSpecies, FipSite> app = new FipStart()) {
 			app.setControlMap(controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
@@ -2232,7 +2232,7 @@ class FipStartTest {
 	@Test
 	void testFindEquationGroupModified() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
-		try (var app = new FipStart()) {
+		try (VdypStartApplication<FipPolygon, FipLayer, FipSpecies, FipSite> app = new FipStart()) {
 			app.setControlMap(controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);

@@ -28,8 +28,12 @@ import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder;
+import ca.bc.gov.nrs.vdyp.model.BecDefinition;
+import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
@@ -59,11 +63,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		int polygonsWritten = 0;
 		try (
 				var polyStream = this.<VriPolygon>getStreamingParser(ControlKey.VRI_INPUT_YIELD_POLY);
-				var layerStream = this.<Map<LayerType, VriLayer.Builder>>getStreamingParser(
-						ControlKey.VRI_INPUT_YIELD_LAYER
-				);
-				var speciesStream = this
-						.<Collection<VriSpecies>>getStreamingParser(ControlKey.VRI_INPUT_YIELD_SPEC_DIST);
+				var layerStream = this.<Map<LayerType, VriLayer.Builder>>getStreamingParser(ControlKey.VRI_INPUT_YIELD_LAYER);
+				var speciesStream = this.<Collection<VriSpecies>>getStreamingParser(ControlKey.VRI_INPUT_YIELD_SPEC_DIST);
 				var siteStream = this.<Collection<VriSite>>getStreamingParser(ControlKey.VRI_INPUT_YIELD_HEIGHT_AGE_SI);
 		) {
 			log.atDebug().setMessage("Start Stand processing").log();
@@ -92,8 +93,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					// TODO include some sort of hook for different forms of user output
 					// TODO Implement single stand mode that propagates the exception
 
-					log.atWarn().setMessage("Polygon {} bypassed").addArgument(polygon.getPolygonIdentifier())
-							.setCause(ex);
+					log.atWarn().setMessage("Polygon {} bypassed").addArgument(polygon.getPolygonIdentifier()).setCause(ex);
 				}
 
 			}
@@ -138,6 +138,14 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					return b;
 				});
 
+				var primarySpecs = this.findPrimarySpecies(species);
+				try {
+					builder.inventoryTypeGroup(findItg(primarySpecs));
+				} catch (StandProcessingException ex) {
+					throw new RuntimeStandProcessingException(ex);
+				}
+				builder.primaryGenus(primarySpecs.get(0).getGenus());
+
 				if (layerType == LayerType.PRIMARY) {
 					builder.percentAvailable(polygon.getPercentAvailable().orElse(1f));
 
@@ -152,15 +160,11 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 						builder.treesPerHectare(Optional.empty());
 					}
 
-					var primarySpecs = this.findPrimarySpecies(species);
-					builder.primaryGenus(primarySpecs.get(0).getGenus());
-
-					try {
-						builder.inventoryTypeGroup(findItg(primarySpecs));
-					} catch (StandProcessingException ex) {
-						throw new RuntimeStandProcessingException(ex);
+					if (primarySpecs.size() > 1) {
+						builder.secondaryGenus(primarySpecs.get(1).getGenus());
 					}
-
+					
+					// TODO GRPBA1FD
 				}
 
 				return builder;
@@ -214,14 +218,13 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			// Validate that species belong to the correct polygon
 			if (!site.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
 				throw validationError(
-						"Record in site file contains site for polygon %s when expecting one for %s.",
-						layer.getPolygonIdentifier(), polygon.getPolygonIdentifier()
+						"Record in site file contains site for polygon %s when expecting one for %s.", layer.getPolygonIdentifier(),
+						polygon.getPolygonIdentifier()
 				);
 			}
 			if (Objects.isNull(layer)) {
 				throw validationError(
-						"Site entry references layer %s of polygon %s but it is not present.", layer,
-						polygon.getPolygonIdentifier()
+						"Site entry references layer %s of polygon %s but it is not present.", layer, polygon.getPolygonIdentifier()
 				);
 			}
 			layer.getSites().put(site.getSiteGenus(), site);
@@ -237,8 +240,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 	Optional<VdypPolygon> processPolygon(int polygonsRead, VriPolygon polygon) throws ProcessingException {
 		VdypPolygon resultPoly;
-		log.atInfo().setMessage("Read polygon {}, preparing to process").addArgument(polygon.getPolygonIdentifier())
-				.log();
+		log.atInfo().setMessage("Read polygon {}, preparing to process").addArgument(polygon.getPolygonIdentifier()).log();
 
 		// if (MODE .eq. -1) go to 100
 
@@ -288,8 +290,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			// At this point the Fortran implementation Set the Primary Genus and ITG, I did
 			// that in getPolygon instead of here.
 
-			Optional<VriSite> primarySite = layer.getPrimaryGenus()
-					.flatMap(id -> Utils.optSafe(layer.getSites().get(id)));
+			Optional<VriSite> primarySite = layer.getPrimaryGenus().flatMap(id -> Utils.optSafe(layer.getSites().get(id)));
 
 			var ageTotal = primarySite.flatMap(VriSite::getAgeTotal);
 			var height = primarySite.flatMap(VriSite::getHeight);
@@ -303,9 +304,28 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 	}
 
+	// EMP106
+	float estimateBaseAreaYield(Collection<? extends BaseVdypSpecies> species, BecDefinition bec) {
+		var coeMap = Utils.<MatrixMap2<String, String, Coefficients>>expectParsedControl(
+				controlMap, ControlKey.BA_YIELD, MatrixMap2.class
+		);
+
+		var coe = weightedCoefficientSum(
+				7, 0, //
+				species, //
+				BaseVdypSpecies::getFractionGenus, // Weight by fraction
+				spec -> coeMap.get(spec.getGenus(), bec.getDecayBec().getAlias())
+		);
+
+		coe.scalarInPlace(5, x -> Math.max(x, 0f));
+
+		// TODO
+		return Float.NaN;
+	}
+
 	PolygonMode findDefaultPolygonMode(
-			Optional<Float> ageTotal, Optional<Float> yearsToBreastHeight, Optional<Float> height,
-			Optional<Float> baseArea, Optional<Float> treesPerHectare, Optional<Float> percentForest
+			Optional<Float> ageTotal, Optional<Float> yearsToBreastHeight, Optional<Float> height, Optional<Float> baseArea,
+			Optional<Float> treesPerHectare, Optional<Float> percentForest
 	) {
 		Optional<Float> ageBH = ageTotal.map(at -> at - yearsToBreastHeight.orElse(3f));
 
@@ -328,13 +348,13 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		if (height.map(h -> h < minHeight).orElse(true)) {
 			mode = PolygonMode.YOUNG;
 
-			log.atDebug().setMessage("Mode {} because Height {} is below minimum {}.").addArgument(mode)
-					.addArgument(height).addArgument(minHeight).log();
+			log.atDebug().setMessage("Mode {} because Height {} is below minimum {}.").addArgument(mode).addArgument(height)
+					.addArgument(minHeight).log();
 		} else if (bap < minPredictedBA) {
 			mode = PolygonMode.YOUNG;
 
-			log.atDebug().setMessage("Mode {} because Base Area {} is below minimum {}.").addArgument(mode)
-					.addArgument(bap).addArgument(minBA).log();
+			log.atDebug().setMessage("Mode {} because Base Area {} is below minimum {}.").addArgument(mode).addArgument(bap)
+					.addArgument(minBA).log();
 		} else if (baseArea.map(x -> x == 0).orElse(true) || treesPerHectare.map(x -> x == 0).orElse(true)) {
 			mode = PolygonMode.YOUNG;
 
@@ -345,10 +365,11 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 			if (ration.map(r -> r < minBA).orElse(false)) {
 				mode = PolygonMode.YOUNG;
-				log.atDebug().setMessage(
-						"Mode {} because ration ({}) of Base Area ({}) to Percent Forest Land ({}) was below minimum {}"
-				).addArgument(mode).addArgument(ration).addArgument(baseArea).addArgument(percentForest)
-						.addArgument(minBA).log();
+				log.atDebug()
+						.setMessage(
+								"Mode {} because ration ({}) of Base Area ({}) to Percent Forest Land ({}) was below minimum {}"
+						).addArgument(mode).addArgument(ration).addArgument(baseArea).addArgument(percentForest).addArgument(minBA)
+						.log();
 
 			}
 		}
