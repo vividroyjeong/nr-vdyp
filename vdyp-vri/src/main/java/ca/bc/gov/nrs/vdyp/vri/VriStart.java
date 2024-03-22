@@ -31,6 +31,7 @@ import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
+import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
@@ -63,8 +64,11 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		int polygonsWritten = 0;
 		try (
 				var polyStream = this.<VriPolygon>getStreamingParser(ControlKey.VRI_INPUT_YIELD_POLY);
-				var layerStream = this.<Map<LayerType, VriLayer.Builder>>getStreamingParser(ControlKey.VRI_INPUT_YIELD_LAYER);
-				var speciesStream = this.<Collection<VriSpecies>>getStreamingParser(ControlKey.VRI_INPUT_YIELD_SPEC_DIST);
+				var layerStream = this.<Map<LayerType, VriLayer.Builder>>getStreamingParser(
+						ControlKey.VRI_INPUT_YIELD_LAYER
+				);
+				var speciesStream = this
+						.<Collection<VriSpecies>>getStreamingParser(ControlKey.VRI_INPUT_YIELD_SPEC_DIST);
 				var siteStream = this.<Collection<VriSite>>getStreamingParser(ControlKey.VRI_INPUT_YIELD_HEIGHT_AGE_SI);
 		) {
 			log.atDebug().setMessage("Start Stand processing").log();
@@ -93,7 +97,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					// TODO include some sort of hook for different forms of user output
 					// TODO Implement single stand mode that propagates the exception
 
-					log.atWarn().setMessage("Polygon {} bypassed").addArgument(polygon.getPolygonIdentifier()).setCause(ex);
+					log.atWarn().setMessage("Polygon {} bypassed").addArgument(polygon.getPolygonIdentifier())
+							.setCause(ex);
 				}
 
 			}
@@ -107,8 +112,13 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			StreamingParser<Collection<VriSpecies>> speciesStream, StreamingParser<Collection<VriSite>> siteStream
 	) throws StandProcessingException, IOException, ResourceParseException {
 
+		var becLookup = Utils.expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class);
+
 		log.trace("Getting polygon");
 		var polygon = polyStream.next();
+
+		BecDefinition bec = becLookup.get(polygon.getBiogeoclimaticZone())
+				.orElseThrow(() -> new StandProcessingException("Unknown BEC " + polygon.getBiogeoclimaticZone()));
 
 		log.trace("Getting species for polygon {}", polygon.getPolygonIdentifier());
 		Collection<VriSpecies> species;
@@ -118,11 +128,55 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			throw validationError("Species file has fewer records than polygon file.", ex);
 		}
 
+		Map<LayerType, VriLayer.Builder> layersBuilders = layerStream.next();
+
+		for (var spec : species) {
+			var layerBuilder = layersBuilders.get(spec.getLayer());
+			// Validate that species belong to the correct polygon
+			if (!spec.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
+				throw validationError(
+						"Record in species file contains species for polygon %s when expecting one for %s.",
+						spec.getPolygonIdentifier(), polygon.getPolygonIdentifier()
+				);
+			}
+			if (Objects.isNull(layerBuilder)) {
+				throw validationError(
+						"Species entry references layer %s of polygon %s but it is not present.", spec.getLayer(),
+						polygon.getPolygonIdentifier()
+				);
+			}
+			layerBuilder.addSpecies(spec);
+		}
+
+		log.trace("Getting sites for polygon {}", polygon.getPolygonIdentifier());
+		Collection<VriSite> sites;
+		try {
+			sites = siteStream.next();
+		} catch (NoSuchElementException ex) {
+			throw validationError("Sites file has fewer records than polygon file.", ex);
+		}
+
+		for (var site : sites) {
+			var layerBuilder = layersBuilders.get(site.getLayer());
+			// Validate that species belong to the correct polygon
+			if (!site.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
+				throw validationError(
+						"Record in site file contains site for polygon %s when expecting one for %s.",
+						site.getPolygonIdentifier(), polygon.getPolygonIdentifier()
+				);
+			}
+			if (Objects.isNull(layerBuilder)) {
+				throw validationError(
+						"Site entry references layer %s of polygon %s but it is not present.", site.getLayer(),
+						polygon.getPolygonIdentifier()
+				);
+			}
+			layerBuilder.addSite(site);
+		}
+
 		log.trace("Getting layers for polygon {}", polygon.getPolygonIdentifier());
-		Map<LayerType, VriLayer.Builder> layersBuilders;
 		Map<LayerType, VriLayer> layers;
 		try {
-			layersBuilders = layerStream.next();
 
 			// Do some additional processing then build the layers.
 			layers = List.of(LayerType.PRIMARY, LayerType.VETERAN).stream().map(layerType -> {
@@ -138,35 +192,45 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					return b;
 				});
 
-				var primarySpecs = this.findPrimarySpecies(species);
-				try {
-					builder.inventoryTypeGroup(findItg(primarySpecs));
-				} catch (StandProcessingException ex) {
-					throw new RuntimeStandProcessingException(ex);
-				}
-				builder.primaryGenus(primarySpecs.get(0).getGenus());
+				builder.buildChildren(); // Make sure all children are built before getting them.
+				var layerSpecies = builder.getSpecies();
 
 				if (layerType == LayerType.PRIMARY) {
 					builder.percentAvailable(polygon.getPercentAvailable().orElse(1f));
-
-					// This was being done in VRI_CHK but I moved it here to when the object is
-					// being built instead.
-					if (builder.getBaseArea()
-							.flatMap(
-									ba -> builder.getTreesPerHectare()
-											.map(tph -> BaseAreaTreeDensityDiameter.quadMeanDiameter(ba, tph) < 7.5f)
-							).orElse(false)) {
-						builder.baseArea(Optional.empty());
-						builder.treesPerHectare(Optional.empty());
-					}
-
-					if (primarySpecs.size() > 1) {
-						builder.secondaryGenus(primarySpecs.get(1).getGenus());
-					}
-					
-					// TODO GRPBA1FD
 				}
+				if (!layerSpecies.isEmpty()) {
+					var primarySpecs = this.findPrimarySpecies(layerSpecies);
+					int itg;
+					try {
+						itg = findItg(primarySpecs);
 
+						builder.inventoryTypeGroup(itg);
+					} catch (StandProcessingException ex) {
+						throw new RuntimeStandProcessingException(ex);
+					}
+					builder.primaryGenus(primarySpecs.get(0).getGenus());
+
+					if (layerType == LayerType.PRIMARY) {
+
+						// This was being done in VRI_CHK but I moved it here to when the object is
+						// being built instead.
+						if (builder.getBaseArea().flatMap(
+								ba -> builder.getTreesPerHectare()
+										.map(tph -> BaseAreaTreeDensityDiameter.quadMeanDiameter(ba, tph) < 7.5f)
+						).orElse(false)) {
+							builder.baseArea(Optional.empty());
+							builder.treesPerHectare(Optional.empty());
+						}
+
+						if (primarySpecs.size() > 1) {
+							builder.secondaryGenus(primarySpecs.get(1).getGenus());
+						}
+
+						builder.empiricalRelationshipParameterIndex(
+								findEmpiricalRelationshipParameterIndex(primarySpecs.get(0).getGenus(), bec, itg)
+						);
+					}
+				}
 				return builder;
 			}).map(VriLayer.Builder::build).collect(Collectors.toUnmodifiableMap(VriLayer::getLayer, x -> x));
 
@@ -174,14 +238,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			throw validationError("Layers file has fewer records than polygon file.", ex);
 		} catch (RuntimeStandProcessingException ex) {
 			throw ex.getCause();
-		}
-
-		log.trace("Getting sites for polygon {}", polygon.getPolygonIdentifier());
-		Collection<VriSite> sites;
-		try {
-			sites = siteStream.next();
-		} catch (NoSuchElementException ex) {
-			throw validationError("Sites file has fewer records than polygon file.", ex);
 		}
 
 		// Validate that layers belong to the correct polygon
@@ -195,41 +251,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			layer.setSpecies(new HashMap<>());
 		}
 
-		for (var spec : species) {
-			var layer = layers.get(spec.getLayer());
-			// Validate that species belong to the correct polygon
-			if (!spec.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
-				throw validationError(
-						"Record in species file contains species for polygon %s when expecting one for %s.",
-						layer.getPolygonIdentifier(), polygon.getPolygonIdentifier()
-				);
-			}
-			if (Objects.isNull(layer)) {
-				throw validationError(
-						"Species entry references layer %s of polygon %s but it is not present.", layer,
-						polygon.getPolygonIdentifier()
-				);
-			}
-			layer.getSpecies().put(spec.getGenus(), spec);
-		}
-
-		for (var site : sites) {
-			var layer = layers.get(site.getLayer());
-			// Validate that species belong to the correct polygon
-			if (!site.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
-				throw validationError(
-						"Record in site file contains site for polygon %s when expecting one for %s.", layer.getPolygonIdentifier(),
-						polygon.getPolygonIdentifier()
-				);
-			}
-			if (Objects.isNull(layer)) {
-				throw validationError(
-						"Site entry references layer %s of polygon %s but it is not present.", layer, polygon.getPolygonIdentifier()
-				);
-			}
-			layer.getSites().put(site.getSiteGenus(), site);
-		}
-
 		polygon.setLayers(layers);
 
 		return polygon;
@@ -240,7 +261,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 	Optional<VdypPolygon> processPolygon(int polygonsRead, VriPolygon polygon) throws ProcessingException {
 		VdypPolygon resultPoly;
-		log.atInfo().setMessage("Read polygon {}, preparing to process").addArgument(polygon.getPolygonIdentifier()).log();
+		log.atInfo().setMessage("Read polygon {}, preparing to process").addArgument(polygon.getPolygonIdentifier())
+				.log();
 
 		// if (MODE .eq. -1) go to 100
 
@@ -290,7 +312,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			// At this point the Fortran implementation Set the Primary Genus and ITG, I did
 			// that in getPolygon instead of here.
 
-			Optional<VriSite> primarySite = layer.getPrimaryGenus().flatMap(id -> Utils.optSafe(layer.getSites().get(id)));
+			Optional<VriSite> primarySite = layer.getPrimaryGenus()
+					.flatMap(id -> Utils.optSafe(layer.getSites().get(id)));
 
 			var ageTotal = primarySite.flatMap(VriSite::getAgeTotal);
 			var height = primarySite.flatMap(VriSite::getHeight);
@@ -324,8 +347,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	}
 
 	PolygonMode findDefaultPolygonMode(
-			Optional<Float> ageTotal, Optional<Float> yearsToBreastHeight, Optional<Float> height, Optional<Float> baseArea,
-			Optional<Float> treesPerHectare, Optional<Float> percentForest
+			Optional<Float> ageTotal, Optional<Float> yearsToBreastHeight, Optional<Float> height,
+			Optional<Float> baseArea, Optional<Float> treesPerHectare, Optional<Float> percentForest
 	) {
 		Optional<Float> ageBH = ageTotal.map(at -> at - yearsToBreastHeight.orElse(3f));
 
@@ -348,13 +371,13 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		if (height.map(h -> h < minHeight).orElse(true)) {
 			mode = PolygonMode.YOUNG;
 
-			log.atDebug().setMessage("Mode {} because Height {} is below minimum {}.").addArgument(mode).addArgument(height)
-					.addArgument(minHeight).log();
+			log.atDebug().setMessage("Mode {} because Height {} is below minimum {}.").addArgument(mode)
+					.addArgument(height).addArgument(minHeight).log();
 		} else if (bap < minPredictedBA) {
 			mode = PolygonMode.YOUNG;
 
-			log.atDebug().setMessage("Mode {} because Base Area {} is below minimum {}.").addArgument(mode).addArgument(bap)
-					.addArgument(minBA).log();
+			log.atDebug().setMessage("Mode {} because Base Area {} is below minimum {}.").addArgument(mode)
+					.addArgument(bap).addArgument(minBA).log();
 		} else if (baseArea.map(x -> x == 0).orElse(true) || treesPerHectare.map(x -> x == 0).orElse(true)) {
 			mode = PolygonMode.YOUNG;
 
@@ -365,11 +388,10 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 			if (ration.map(r -> r < minBA).orElse(false)) {
 				mode = PolygonMode.YOUNG;
-				log.atDebug()
-						.setMessage(
-								"Mode {} because ration ({}) of Base Area ({}) to Percent Forest Land ({}) was below minimum {}"
-						).addArgument(mode).addArgument(ration).addArgument(baseArea).addArgument(percentForest).addArgument(minBA)
-						.log();
+				log.atDebug().setMessage(
+						"Mode {} because ration ({}) of Base Area ({}) to Percent Forest Land ({}) was below minimum {}"
+				).addArgument(mode).addArgument(ration).addArgument(baseArea).addArgument(percentForest)
+						.addArgument(minBA).log();
 
 			}
 		}

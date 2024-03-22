@@ -3240,20 +3240,6 @@ class FipStartTest {
 	}
 
 	@Test
-	void testFindEmpericalRelationshipParameterIndex() throws Exception {
-		var controlMap = FipTestUtils.loadControlMap();
-		try (var app = new FipStart();) {
-			app.setControlMap(controlMap);
-
-			var bec = BecDefinitionParser.getBecs(controlMap).get("CWH").get();
-
-			int result = app.findEmpiricalRelationshipParameterIndex("D", bec, 37);
-
-			assertThat(result, is(1));
-		}
-	}
-
-	@Test
 	void testEstimateQuadMeanDiameterForSpecies() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {

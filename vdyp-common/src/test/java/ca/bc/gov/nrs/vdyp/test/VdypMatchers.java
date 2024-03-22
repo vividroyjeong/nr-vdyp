@@ -181,8 +181,8 @@ public class VdypMatchers {
 					description.appendText("was not an Optional");
 					return;
 				}
-				if (((Optional<?>) item).isPresent()) {
-					description.appendText("had value ").appendValue(((Optional<?>) item).get());
+				if ( ((Optional<?>) item).isPresent()) {
+					description.appendText("had value ").appendValue( ((Optional<?>) item).get());
 					return;
 				}
 			}

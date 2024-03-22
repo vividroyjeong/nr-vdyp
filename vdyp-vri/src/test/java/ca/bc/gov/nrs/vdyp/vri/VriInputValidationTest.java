@@ -310,8 +310,9 @@ class VriInputValidationTest {
 		Optional<Float> treesPerHectare = Optional.of(300f);
 		Optional<Float> percentForest = Optional.of(90f);
 
-		var result = app
-				.findDefaultPolygonMode(ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest);
+		var result = app.findDefaultPolygonMode(
+				ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest
+		);
 
 		assertThat(result, is(PolygonMode.YOUNG));
 	}
@@ -340,38 +341,9 @@ class VriInputValidationTest {
 		Optional<Float> treesPerHectare = Optional.of(300f);
 		Optional<Float> percentForest = Optional.of(90f);
 
-		var result = app
-				.findDefaultPolygonMode(ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest);
-
-		assertThat(result, is(PolygonMode.YOUNG));
-	}
-
-	@Test
-	void testFindDefaultMode() throws Exception {
-		var app = new VriStart();
-
-		MockFileResolver resolver = dummyInput();
-
-		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
-			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
-			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
-			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
-		}));
-
-		final var polygonId = "Test";
-		final var layerType = LayerType.PRIMARY;
-
-		app.init(resolver, controlMap);
-
-		Optional<Float> ageTotal = Optional.of(200f);
-		Optional<Float> yearsToBreastHeight = Optional.of(189f);
-		Optional<Float> height = Optional.of(10f);
-		Optional<Float> baseArea = Optional.of(30f);
-		Optional<Float> treesPerHectare = Optional.of(300f);
-		Optional<Float> percentForest = Optional.of(90f);
-
-		var result = app
-				.findDefaultPolygonMode(ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest);
+		var result = app.findDefaultPolygonMode(
+				ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest
+		);
 
 		assertThat(result, is(PolygonMode.YOUNG));
 	}
@@ -401,6 +373,8 @@ class VriInputValidationTest {
 		}));
 
 		app.init(resolver, controlMap);
-		
+
+		// TODO
+
 	}
 }

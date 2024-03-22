@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -493,19 +492,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 	public static <T> List<T> utilizationArray(VdypLayer layer, Function<VdypUtilizationHolder, T> accessor) {
 		return Stream.concat(Stream.of(layer), layer.getSpecies().values().stream()).map(accessor).toList();
-	}
-
-	int findEmpiricalRelationshipParameterIndex(String specAlias, BecDefinition bec, int itg)
-			throws ProcessingException {
-		var groupMap = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
-				controlMap, ControlKey.DEFAULT_EQ_NUM, MatrixMap2.class
-		);
-		var modMap = Utils.<MatrixMap2<Integer, Integer, Optional<Integer>>>expectParsedControl(
-				controlMap, ControlKey.EQN_MODIFIERS, MatrixMap2.class
-		);
-		var group = groupMap.get(specAlias, bec.getGrowthBec().getAlias());
-		group = MatrixMap.safeGet(modMap, group, itg).orElse(group);
-		return group;
 	}
 
 	// ROOTF01

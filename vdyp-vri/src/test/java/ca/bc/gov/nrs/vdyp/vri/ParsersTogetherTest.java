@@ -14,19 +14,33 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.DefaultEquationNumberParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.EquationModifierParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.MockStreamingParser;
+import ca.bc.gov.nrs.vdyp.model.BecDefinition;
+import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
+import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
+import ca.bc.gov.nrs.vdyp.test.TestUtils;
 import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
 import ca.bc.gov.nrs.vdyp.vri.model.VriPolygon;
 import ca.bc.gov.nrs.vdyp.vri.model.VriSite;
@@ -34,23 +48,53 @@ import ca.bc.gov.nrs.vdyp.vri.model.VriSpecies;
 
 class ParsersTogetherTest {
 
-	@Test
-	void testPrimaryOnly() throws IOException, StandProcessingException, ResourceParseException {
-		var app = new VriStart();
+	Map<String, Object> controlMap = new HashMap<>();
+	MockFileResolver resolver;
+	IMocksControl mockControl = EasyMock.createControl();
 
-		var controlMap = new HashMap<String, Object>();
-
+	@BeforeEach
+	void setUp() throws IOException, ResourceParseException {
 		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
 		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
 		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
 
-		final var polygonId = "Test";
-		final var layerType = LayerType.PRIMARY;
+		resolver = new MockFileResolver("Test");
 
-		MockFileResolver resolver = new MockFileResolver("Test");
 		resolver.addStream("DUMMY1", (OutputStream) new ByteArrayOutputStream());
 		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
 		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
+
+		controlMap.put(
+				ControlKey.BEC_DEF.name(),
+				new BecDefinitionParser().parse(TestUtils.class, "coe/Becdef.dat", controlMap)
+		);
+		controlMap.put(
+				ControlKey.SP0_DEF.name(),
+				new GenusDefinitionParser().parse(TestUtils.class, "coe/SP0DEF_v0.dat", controlMap)
+		);
+		controlMap.put(
+				ControlKey.DEFAULT_EQ_NUM.name(),
+				new DefaultEquationNumberParser().parse(TestUtils.class, "coe/GRPBA1.DAT", controlMap)
+		);
+		controlMap.put(
+				ControlKey.EQN_MODIFIERS.name(),
+				new EquationModifierParser().parse(TestUtils.class, "coe/GMODBA1.DAT", controlMap)
+		);
+	}
+
+	@AfterEach
+	void verifyMocks() {
+		mockControl.verify();
+	}
+
+	@Test
+	void testPrimaryOnly() throws IOException, StandProcessingException, ResourceParseException {
+		var app = new VriStart();
+
+		final var polygonId = "Test";
+		final var layerType = LayerType.PRIMARY;
+
+		mockControl.replay();
 
 		app.init(resolver, controlMap);
 
@@ -115,8 +159,7 @@ class ParsersTogetherTest {
 						hasProperty("crownClosure", is(0f)), //
 						hasProperty("utilization", is(7.5f)), //
 						hasProperty("baseArea", present(is(0f))), //
-						hasProperty("treesPerHectare", present(is(0f))),
-						hasProperty("primaryGenus", notPresent()), //
+						hasProperty("treesPerHectare", present(is(0f))), hasProperty("primaryGenus", notPresent()), //
 						hasProperty("secondaryGenus", notPresent())
 				)
 		);
@@ -128,19 +171,10 @@ class ParsersTogetherTest {
 	void testVeteranOnly() throws IOException, StandProcessingException, ResourceParseException {
 		var app = new VriStart();
 
-		var controlMap = new HashMap<String, Object>();
-
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
-
 		final var polygonId = "Test";
 		final var layerType = LayerType.VETERAN;
 
-		MockFileResolver resolver = new MockFileResolver("Test");
-		resolver.addStream("DUMMY1", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
+		mockControl.replay();
 
 		app.init(resolver, controlMap);
 
@@ -205,8 +239,8 @@ class ParsersTogetherTest {
 						hasProperty("layer", is(LayerType.PRIMARY)), //
 						hasProperty("crownClosure", is(0f)), //
 						hasProperty("utilization", is(7.5f)), //
-						hasProperty("baseArea", notPresent()), //
-						hasProperty("treesPerHectare", notPresent()), //
+						hasProperty("baseArea", present(is(0f))), //
+						hasProperty("treesPerHectare", present(is(0f))), //
 						hasProperty("primaryGenus", notPresent()), //
 						hasProperty("secondaryGenus", notPresent())
 				)
@@ -219,19 +253,10 @@ class ParsersTogetherTest {
 			throws IOException, StandProcessingException, ResourceParseException {
 		var app = new VriStart();
 
-		var controlMap = new HashMap<String, Object>();
-
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
-
 		final var polygonId = "Test";
 		final var layerType = LayerType.VETERAN;
 
-		MockFileResolver resolver = new MockFileResolver("Test");
-		resolver.addStream("DUMMY1", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
+		mockControl.replay();
 
 		app.init(resolver, controlMap);
 
@@ -315,19 +340,10 @@ class ParsersTogetherTest {
 	void testPrimaryWithSmallComputedDiameter() throws IOException, StandProcessingException, ResourceParseException {
 		var app = new VriStart();
 
-		var controlMap = new HashMap<String, Object>();
-
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
-
 		final var polygonId = "Test";
 		final var layerType = LayerType.PRIMARY;
 
-		MockFileResolver resolver = new MockFileResolver("Test");
-		resolver.addStream("DUMMY1", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
+		mockControl.replay();
 
 		app.init(resolver, controlMap);
 
@@ -400,19 +416,10 @@ class ParsersTogetherTest {
 	void testFindsPrimaryGenusAndITG() throws IOException, StandProcessingException, ResourceParseException {
 		var app = new VriStart();
 
-		var controlMap = new HashMap<String, Object>();
-
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
-
 		final var polygonId = "Test";
 		final var layerType = LayerType.PRIMARY;
 
-		MockFileResolver resolver = new MockFileResolver("Test");
-		resolver.addStream("DUMMY1", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
+		mockControl.replay();
 
 		app.init(resolver, controlMap);
 
@@ -437,25 +444,23 @@ class ParsersTogetherTest {
 		layerBuilder.treesPerHectare(300);
 		layerStream.addValue(Collections.singletonMap(layerType, layerBuilder));
 
-		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
+		speciesStream.addValue(List.of(VriSpecies.build(specBuilder -> {
 			specBuilder.polygonIdentifier("Test");
 			specBuilder.layerType(layerType);
 			specBuilder.genus("B");
 			specBuilder.percentGenus(80f);
-		})));
-		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
+		}), VriSpecies.build(specBuilder -> {
 			specBuilder.polygonIdentifier("Test");
 			specBuilder.layerType(layerType);
 			specBuilder.genus("S");
 			specBuilder.percentGenus(20f);
 		})));
-		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
+		siteStream.addValue(List.of(VriSite.build(siteBuilder -> {
 			siteBuilder.polygonIdentifier("Test");
 			siteBuilder.layerType(layerType);
 			siteBuilder.siteGenus("B");
 			siteBuilder.siteSpecies("B");
-		})));
-		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
+		}), VriSite.build(siteBuilder -> {
 			siteBuilder.polygonIdentifier("Test");
 			siteBuilder.layerType(layerType);
 			siteBuilder.siteGenus("S");
@@ -484,6 +489,78 @@ class ParsersTogetherTest {
 		);
 
 		app.close();
+	}
+
+	@Test
+	void testFindsGRPBA1() throws IOException, StandProcessingException, ResourceParseException {
+		var app = new VriStart();
+
+		final var polygonId = "Test";
+		final var layerType = LayerType.PRIMARY;
+
+		mockControl.replay();
+
+		app.init(resolver, controlMap);
+
+		var polyStream = new MockStreamingParser<VriPolygon>();
+		var layerStream = new MockStreamingParser<Map<LayerType, VriLayer.Builder>>();
+		var speciesStream = new MockStreamingParser<Collection<VriSpecies>>();
+		var siteStream = new MockStreamingParser<Collection<VriSite>>();
+
+		polyStream.addValue(VriPolygon.build(polyBuilder -> {
+			polyBuilder.polygonIdentifier(polygonId);
+			polyBuilder.percentAvailable(Optional.of(100.0f));
+			polyBuilder.biogeoclimaticZone("IDF");
+			polyBuilder.yieldFactor(0.9f);
+		}));
+
+		var layerBuilder = new VriLayer.Builder();
+		layerBuilder.polygonIdentifier(polygonId);
+		layerBuilder.layerType(layerType);
+		layerBuilder.crownClosure(0.95f);
+		layerBuilder.utilization(0.6f);
+		layerBuilder.baseArea(20);
+		layerBuilder.treesPerHectare(300);
+		layerStream.addValue(Collections.singletonMap(layerType, layerBuilder));
+
+		speciesStream.addValue(List.of(VriSpecies.build(specBuilder -> {
+			specBuilder.polygonIdentifier("Test");
+			specBuilder.layerType(layerType);
+			specBuilder.genus("B");
+			specBuilder.percentGenus(80f);
+		}), VriSpecies.build(specBuilder -> {
+			specBuilder.polygonIdentifier("Test");
+			specBuilder.layerType(layerType);
+			specBuilder.genus("S");
+			specBuilder.percentGenus(20f);
+		})));
+		siteStream.addValue(List.of(VriSite.build(siteBuilder -> {
+			siteBuilder.polygonIdentifier("Test");
+			siteBuilder.layerType(layerType);
+			siteBuilder.siteGenus("B");
+			siteBuilder.siteSpecies("B");
+		}), VriSite.build(siteBuilder -> {
+			siteBuilder.polygonIdentifier("Test");
+			siteBuilder.layerType(layerType);
+			siteBuilder.siteGenus("S");
+			siteBuilder.siteSpecies("S");
+		})));
+
+		var result = app.getPolygon(polyStream, layerStream, speciesStream, siteStream);
+
+		assertThat(result, hasProperty("layers", Matchers.aMapWithSize(2)));
+		var primaryResult = result.getLayers().get(LayerType.PRIMARY);
+		var veteranResult = result.getLayers().get(LayerType.VETERAN);
+		assertThat(primaryResult, allOf(hasProperty("empericalRelationshipParameterIndex", present(is(27)))));
+		assertThat(
+				veteranResult, allOf(
+						// Veteran layer should not have a GRPBA1
+						hasProperty("empericalRelationshipParameterIndex", notPresent())
+				)
+		);
+
+		app.close();
+		mockControl.verify();
 	}
 
 }
