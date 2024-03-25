@@ -302,6 +302,9 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		for (var layer : polygon.getLayers().values()) {
 
+			if (layer.getSpecies().isEmpty())
+				continue;
+
 			// At this point the Fortran implementation copied from the VRI globals to the
 			// FIP globals. That's not necessary here because it's stored in a VriLayer
 			// which shares BaseVdypLayer as s superclass with FipLayer
@@ -321,6 +324,21 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			var baseArea = layer.getBaseArea();
 			var treesPerHectare = layer.getTreesPerHectare();
 			var percentForest = polygon.getPercentAvailable();
+
+			if (polygon.getModeFip().map(x -> x == PolygonMode.YOUNG).orElse(false)
+					&& layer.getLayer() == LayerType.PRIMARY) {
+				if (ageTotal.map(x -> x <= 0f).orElse(true) || treesPerHectare.map(x -> x <= 0f).orElse(true)) {
+					throw validationError(
+							"Age Total and Trees Per Hectare must be positive for a PRIMARY layer in mode YOUNG"
+					);
+				}
+			} else {
+				if (height.map(x -> x <= 0f).orElse(true)) {
+					throw validationError(
+							"Height must be positive for a VETERAN layer or a PRIMARY layer not in mode YOUNG"
+					);
+				}
+			}
 
 			findDefaultPolygonMode(ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest);
 		}
