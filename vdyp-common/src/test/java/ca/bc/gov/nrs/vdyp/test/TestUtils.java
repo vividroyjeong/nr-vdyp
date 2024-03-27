@@ -35,6 +35,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.coe.UtilComponentWSVolumeParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.VeteranBAParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.VolumeNetDecayParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ResourceControlMapModifier;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
@@ -357,5 +358,13 @@ public class TestUtils {
 
 	public static void assumeThat(java.lang.Object actual, @SuppressWarnings("rawtypes") org.hamcrest.Matcher matcher) {
 		assumeTrue(matcher.matches(actual));
+	}
+
+	public static Map<String, Object> loadControlMap(BaseControlParser parser, Class<?> klazz, String resourceName)
+			throws IOException, ResourceParseException {
+		try (var is = klazz.getResourceAsStream(resourceName)) {
+
+			return parser.parse(is, TestUtils.fileResolver(klazz), new HashMap<>());
+		}
 	}
 }

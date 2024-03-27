@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.Util;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.application.RuntimeStandProcessingException;
@@ -27,6 +28,7 @@ import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
+import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder;
@@ -45,6 +47,8 @@ import ca.bc.gov.nrs.vdyp.vri.model.VriSpecies;
 public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpecies, VriSite> implements Closeable {
 
 	static final Logger log = LoggerFactory.getLogger(VriStart.class);
+
+	static final float EMPOC = 0.85f;
 
 	public static void main(final String... args) throws IOException {
 
@@ -346,7 +350,10 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	}
 
 	// EMP106
-	float estimateBaseAreaYield(Collection<? extends BaseVdypSpecies> species, BecDefinition bec) {
+	float estimateBaseAreaYield(
+			float dominantHeight, float breastHeightAge, Optional<Float> baseAreaOverstory, boolean fullOccupancy,
+			Collection<? extends BaseVdypSpecies> species, BecDefinition bec, int baseAreaGroup
+	) throws StandProcessingException {
 		var coeMap = Utils.<MatrixMap2<String, String, Coefficients>>expectParsedControl(
 				controlMap, ControlKey.BA_YIELD, MatrixMap2.class
 		);
@@ -355,13 +362,42 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				7, 0, //
 				species, //
 				BaseVdypSpecies::getFractionGenus, // Weight by fraction
-				spec -> coeMap.get(spec.getGenus(), bec.getDecayBec().getAlias())
+				spec -> coeMap.get(bec.getDecayBec().getAlias(), spec.getGenus())
 		);
 
 		coe.scalarInPlace(5, x -> Math.max(x, 0f));
 
-		// TODO
-		return Float.NaN;
+		// UPPERGEN Method 1
+		var upperBoundsMap = Utils
+				.<Map<Integer, Coefficients>>expectParsedControl(controlMap, ControlKey.BA_DQ_UPPER_BOUNDS, Map.class);
+		var upperBounds = Utils.<Coefficients>optSafe(upperBoundsMap.get(baseAreaGroup))
+				.orElseThrow(() -> new IllegalStateException("Could not find base area group " + baseAreaGroup));
+
+		float ageToUse = breastHeightAge;
+
+		// TODO NDEBUG(2)
+
+		if (ageToUse <= 0f) {
+			throw new StandProcessingException("Age was not positive");
+		}
+
+		float trAge = FloatMath.log(ageToUse);
+
+		float a00 = Math.max(coe.getCoe(0) + coe.getCoe(1) * trAge, 0f);
+		float ap = Math.max(coe.getCoe(3) + coe.getCoe(4) * trAge, 0f);
+
+		float bap;
+		if (dominantHeight <= coe.getCoe(2)) {
+			bap = 0f;
+		} else {
+			bap = a00 * FloatMath.pow(dominantHeight - coe.getCoe(2), ap)
+					+ FloatMath.exp(coe.getCoe(5) * dominantHeight + coe.getCoe(6) * baseAreaOverstory.orElse(0f));
+		}
+
+		if (fullOccupancy)
+			bap /= EMPOC;
+
+		return bap;
 	}
 
 	PolygonMode findDefaultPolygonMode(

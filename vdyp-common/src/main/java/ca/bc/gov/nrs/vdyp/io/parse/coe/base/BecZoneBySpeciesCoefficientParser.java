@@ -4,8 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.HoldFirst;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
@@ -62,6 +63,14 @@ public abstract class BecZoneBySpeciesCoefficientParser
 
 	private LineParser lineParser;
 
+	protected float value(float current, Optional<Float> first) {
+		return current;
+	}
+
+	protected float valueShared(float current, Optional<Float> first) {
+		return first.isPresent() ? 0f : current;
+	}
+
 	@Override
 	public MatrixMap2<String, String, Coefficients> parse(InputStream is, Map<String, Object> control)
 			throws IOException, ResourceParseException {
@@ -83,16 +92,20 @@ public abstract class BecZoneBySpeciesCoefficientParser
 			var specIt = sp0Aliases.iterator();
 
 			int coefficientIndex = 0;
+			var first = new HoldFirst<Float>();
 			while (specIt.hasNext()) {
-
-				Coefficients coefficients = r.get(becZoneId, specIt.next());
+				var spec = specIt.next();
+				Coefficients coefficients = r.get(becZoneId, spec);
 				Float coe = specCoefficients.get(coefficientIndex);
-				coefficients.setCoe(index, coe);
 
-				if (valueAppliesToAllSpecies)
-					break;
+				if (valueAppliesToAllSpecies) {
+					coefficients.setCoe(index, valueShared(coe, first.get()));
+				} else {
+					coefficients.setCoe(index, value(coe, first.get()));
+				}
 
 				coefficientIndex += 1;
+				first.set(coe);
 			}
 
 			return r;
@@ -101,8 +114,4 @@ public abstract class BecZoneBySpeciesCoefficientParser
 		return result;
 	}
 
-	@Override
-	public ControlKey getControlKey() {
-		return ControlKey.BA_GROWTH_EMPIRICAL;
-	}
 }
