@@ -1,30 +1,22 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 
 /**
- * SiteIndex2HeightSmoothed.java
- *
- * @throws NoAnswerException   if iteration could not converge (projected height > 999)
- * @throws LessThan13Exception if site index < 1.3m
+ * SiteIndex2HeightSmoothed
+ * 
+ * Defines {@code index_to_height_smoothed}
  */
 public class SiteIndex2HeightSmoothed {
-/* @formatter:off */
-/*
- * 2016 mar 9  - Adjusted default equations for Pli, Sw, Fdc, Hwc
-               to incorporate height smoothing near 1.3m.
- * 2023 jul 17 - Translated like for like from C to Java
- *             - Renamed from si2hts to SiteIndex2HeightSmoothed
-*/
-/* @formatter:on */
-
-//Taken from sindex.h
+	// Taken from sindex
+	
 	/*
 	 * age types
 	 */
-	private static final short SI_AT_TOTAL = 0;
-	private static final short SI_AT_BREAST = 1;
+	private static final int SI_AT_TOTAL = 0;
+	private static final int SI_AT_BREAST = 1;
 
 	/* define species and equation indices */
 	private static final int SI_FDC_BRUCEAC = 100;
@@ -33,22 +25,25 @@ public class SiteIndex2HeightSmoothed {
 	private static final int SI_SW_GOUDIE_NATAC = 106;
 	private static final int SI_SW_GOUDIE_PLAAC = 112;
 
-//This doesn't seem to be used? It seems like this was copied over from SiteIndex2Height.java. Maybe be removable
-	public static double ppow(double x, double y) {
-		return (x <= 0) ? 0.0 : Math.pow(x, y);
-	}
-
-	public static double llog(double x) {
-		return ( (x) <= 0.0) ? Math.log(.00001) : Math.log(x);
-	}
-
+	/**
+	 * @param cu_index
+	 * @param iage
+	 * @param age_type
+	 * @param site_index
+	 * @param y2bh
+	 * @param seedling_age
+	 * @param seedling_ht
+	 * @return
+	 * @throws LessThan13Exception when {@code site_index} is less than 1.3
+	 * @throws NoAnswerException when the iteration will not converge
+	 */
 	public static double index_to_height_smoothed(
-			short cu_index, double iage, short age_type, double site_index, double y2bh, double seedling_age,
+			int cu_index, double iage, int age_type, double site_index, double y2bh, double seedling_age,
 			double seedling_ht
-	) {
-		double height; // return value
-		double k0, k1;
-		double itage; // user's total age
+	) throws CommonCalculatorException {
+		
+		double result; // return value
+		
 		double tage; // total age
 		double bhage; // breast-height age
 		double pi; // proportion of height growth between breast height
@@ -62,7 +57,7 @@ public class SiteIndex2HeightSmoothed {
 			throw new NoAnswerException("Iteration could not converge (projected height > 999), y2bh: " + y2bh);
 		}
 
-		itage = iage;
+		double itage = iage;
 		if (age_type == SI_AT_BREAST) {
 			itage = iage + y2bh;
 		}
@@ -80,16 +75,18 @@ public class SiteIndex2HeightSmoothed {
 			pi = 0.5;
 		}
 
+		double k0;
+		double k1;
+		
 		bhage = 2;
 		do {
-			height = SiteIndex2Height.index_to_height(cu_index, bhage, SI_AT_BREAST, site_index, y2bh, pi);
-			if (height < 0) {
-				return height;
+			result = SiteIndex2Height.index_to_height(cu_index, bhage, SI_AT_BREAST, site_index, y2bh, pi);
+			if (result < 0) {
+				return result;
 			}
 			tage = bhage + (int) y2bh;
-			k1 = Math.log( (1.3 - seedling_ht) / (height - seedling_ht))
+			k1 = Math.log( (1.3 - seedling_ht) / (result - seedling_ht))
 					/ Math.log( (y2bh - seedling_age) / (tage - seedling_age));
-			// printf ("%f %f k1\n", tage, height, k1);
 			if (k1 >= 1) {
 				k0 = (1.3 - seedling_ht) / Math.pow(y2bh - seedling_age, k1);
 				break;
@@ -104,21 +101,20 @@ public class SiteIndex2HeightSmoothed {
 
 		if (seedling_age == 0) {
 			if (itage <= tage) {
-				height = k0 * Math.pow(itage, k1);
+				result = k0 * Math.pow(itage, k1);
 			} else {
-				height = SiteIndex2Height.index_to_height(cu_index, itage, SI_AT_TOTAL, site_index, y2bh, pi);
+				result = SiteIndex2Height.index_to_height(cu_index, itage, SI_AT_TOTAL, site_index, y2bh, pi);
 			}
 		} else {
 			if (itage < seedling_age) {
-				height = seedling_ht / seedling_age * itage;
+				result = seedling_ht / seedling_age * itage;
 			} else if (itage < tage) {
-				height = seedling_ht + k0 * Math.pow(itage - seedling_age, k1);
+				result = seedling_ht + k0 * Math.pow(itage - seedling_age, k1);
 			} else {
-				height = SiteIndex2Height.index_to_height(cu_index, itage, SI_AT_TOTAL, site_index, y2bh, pi);
+				result = SiteIndex2Height.index_to_height(cu_index, itage, SI_AT_TOTAL, site_index, y2bh, pi);
 			}
 		}
 
-		return height;
+		return result;
 	}
-
 }

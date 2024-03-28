@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 
@@ -23,32 +24,10 @@ class SiteIndex2HeightSmoothedTest {
 
 	private static final double ERROR_TOLERANCE = 0.00001;
 
-	@Test
-	void testPpowPositive() {
-		assertThat(8.0, closeTo(SiteIndex2HeightSmoothed.ppow(2.0, 3.0), ERROR_TOLERANCE));
-		assertThat(1.0, closeTo(SiteIndex2HeightSmoothed.ppow(5.0, 0.0), ERROR_TOLERANCE));
-	}
-
-	@Test
-	void testPpowZero() {
-		assertThat(0.0, closeTo(SiteIndex2HeightSmoothed.ppow(0.0, 3.0), ERROR_TOLERANCE));
-	}
-
-	@Test
-	void testLlogPositive() {
-		assertThat(1.60943, closeTo(SiteIndex2HeightSmoothed.llog(5.0), ERROR_TOLERANCE));
-		assertThat(11.51293, closeTo(SiteIndex2HeightSmoothed.llog(100000.0), ERROR_TOLERANCE));
-	}
-
-	@Test
-	void testLlogZero() {
-		assertThat(-11.51293, closeTo(SiteIndex2HeightSmoothed.llog(0.0), ERROR_TOLERANCE));
-	}
-
 	@Nested
 	class IndexToHeightSmoothedTest {
 		@Test
-		void testInvalidSiteIndex() {
+		void testInvalidSiteIndex() throws CommonCalculatorException {
 			assertThrows(
 					LessThan13Exception.class,
 					() -> SiteIndex2HeightSmoothed
@@ -57,7 +36,7 @@ class SiteIndex2HeightSmoothedTest {
 		}
 
 		@Test
-		void testInvalidY2BH() {
+		void testInvalidY2BH() throws CommonCalculatorException {
 			assertThrows(
 					NoAnswerException.class,
 					() -> SiteIndex2HeightSmoothed
@@ -66,7 +45,7 @@ class SiteIndex2HeightSmoothedTest {
 		}
 
 		@Test
-		void testItageInvalid() {
+		void testItageInvalid() throws CommonCalculatorException {
 			assertThrows(
 					NoAnswerException.class,
 					() -> SiteIndex2HeightSmoothed
@@ -80,7 +59,7 @@ class SiteIndex2HeightSmoothedTest {
 		}
 
 		@Test
-		void testIterationCannotConverge() {
+		void testIterationCannotConverge() throws CommonCalculatorException {
 			assertThrows(
 					NoAnswerException.class,
 					() -> SiteIndex2HeightSmoothed
@@ -89,7 +68,7 @@ class SiteIndex2HeightSmoothedTest {
 		}
 
 		@Test
-		void testValidInput() {
+		void testValidInput() throws CommonCalculatorException {
 			double actualResult = SiteIndex2HeightSmoothed
 					.index_to_height_smoothed((short) 21, 3.0, SI_AT_TOTAL, 16.0, 4.0, 3.1, 1.3);
 			double expectedResult = 1.3 / 3.1 * 3;

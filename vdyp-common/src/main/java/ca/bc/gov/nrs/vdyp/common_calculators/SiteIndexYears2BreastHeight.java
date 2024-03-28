@@ -1,11 +1,11 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptTotalException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 
-/* @formatter:off */
 /**
  * siy2bh.c
  * - computes number of years from seed to breast height.
@@ -17,153 +17,9 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException
  *     SI_ERR_GI_TOT: cannot use with GI equations
  *     SI_ERR_NO_ANS: site index out of range
  */
-/* @formatter:on */
 public class SiteIndexYears2BreastHeight {
-/* @formatter:off */
-/*
- * 1990 may 31
- *      jun 8  - Added Fdi Monserud's equations.
- *               Added At Goudie's equation.
- *          11 - Added Dr Harrington & Curtis' equation.
- *             - Added Bg Cochran's equation.
- *             - Added Bc Cochran's equation.
- *          15 - Changed most variable names, and file name, to include
- *               "si" at start.
- *      aug 29 - Added Pp Hann & Scrivani's equation.
- *               Added Lw Milner's equation.
- *      oct 22 - Changed Pli Goudie's equation from 7.591 to 3.591.
- *               Added some missing "break;" statements.
- *          23 - Changed Pli Goudie's equation to include 2 years from
- *               seed to seedling age.
- *          26 - Copied Pli Goudie's equation to Pp Hann and Lw Milner.
- *      dec 13 - Added Dempster's Sw, Sb, and Pli.
- *          17 - If incoming site index is 0, change it to a bit bigger.
- * 1991 jan 11 - Added Mb, Ea, Pw, Pa, and Yc, using other existing equations.
- *          16 - Added Fdc, Cwi and Fdi, by Hegyi.
- *          17 - Added Hw, Cw, and Ss Barker.
- *          23 - Split Goudie's Pli, Sw, Pw, and Pa into natural and
- *               plantation versions.
- *          24 - Added Hegyi's black cottonwood.
- *      feb 4  - Changed EA to EP.
- *          12 - Added Curtis' Pw.
- *          28 - Added ppow() and llog() macros to check for out-of-range
- *               conditions.
- *               Added a check for zero sites for Hegyi's curves.
- *               Changed FDI y2bh equations to from 1.7+103/site to 4+99/site.
- *      mar 15 - Removed Goudie's Pw.
- *      jun 19 - Split balsam into coast and interior.
- *               Changed y2bh function for LW.
- *          21 - Added Ker & Bowling's Bac, Sb, and Sw.
- *      oct 21 - Added Cieszewski & Bella's Pl.
- *      nov 6  - Added Cieszewski & Bella's Sw, Sb, and At.
- *      dec 2  - Changed to independent Sindex functions.
- *          6  - Changed y2bh for Goudie Pli :
- *               plantation: old: 2 + 3.592 + 42.637 / SI
- *                           new: 2.68 + 65.5 / SI
- *               natural: old: 5 + 3.592 + 42.637 / SI
- *                        new: 2 + 2.68 + 65.5 / SI
- * 1992 jan 10 - Added defines for how function prototypes and definitions are
- *               handled.
- *      feb 11 - Added Milner's Pp, Fdi, and Pli.
- *      apr 1  - Removed 2 years from y2bh functions for Ponderosa Pine.
- *          29 - Changed y2bh for Goudie Pli, back to his original, and
- *               applied it to plantations and natural stands:
- *                   y2bh = 2 + 3.6 + 42.64 / SI
- *               This equation is now used for Pli Milner, Pli Cieszewski,
- *               Pli Goudie, Pli Dempster, Pp Hann, Pp Milner, and Pa Goudie.
- *               Removed difference between plantations and natural stands
- *               for Pli Goudie and Pa Goudie.
- *      jun 10 - Updated all Sb equations, adding in 7 years to account for
- *               years from ground to stump height.
- *      dec 2  - Added Mario Dilucca's coastal balsam fir.
- * 1993 feb 4  - Added Thrower's draft height-age curve for lodgepole pine.
- *      mar 22 - Added Thrower's draft height-age curve for black cottonwood.
- *      sep 16 - Added Thrower's height-age curve for white spruce.
- * 1994 sep 27 - Copied Kurucz' 1982 Ba equation to Bg and Bc.
- * 1995 jun 12 - Added Goudie's Teak.
- *      sep 20 - Added Huang, Titus, & Lakusta equations for Sw, Pli, At,
- *               Sb, Pj, Acb, Bb, Fdi.
- *      oct 13 - Updated Thrower's Pli.
- *      nov 3  - Copied Ss Goudie to Ss Nigh.
- *          20 - Removed white fir.
- *      dec 19 - Added Hm.
- * 1996 jun 10 - Copied Fdc Bruce to Fdc Nigh.
- *             - Copied Hw Wiley to Hw Nigh.
- *             - Copied Pli Goudie to Pli Nigh.
- *             - Copied Ss Goudie to Ss Nigh(GI).
- *             - Copied Sw Goudie pla/nat to Sw Nigh pla/nat.
- *          27 - Added error codes.
- *      aug 2  - Added error code -9 to indicate not available for GI.
- *             - Amalgamated SI_SW_NIGH_PLA and SI_SW_NIGH_NAT into
- *               SI_SW_NIGH.
- *          8  - Changed error codes to defined constants.
- *          9  - Removed global check for y2bh < 0.
- *             - Added individual checks for y2bh < 1.
- *      oct 22 - Changed MB_HARRING to MB_THROWER.
- * 1997 feb 5  - Changed check for top height or site index < 1.3 to be
- *               <= 1.3.
- *      mar 21 - Added Nigh's 1997 Hwi GI.
- *             - Changed define names: FDC_NIGH, HW_NIGH, PLI_NIGH, SW_NIGH
- *               all have "GI" added after them.
- *             - Added Nigh's 1997 Hwi.
- *             - Added Nigh's 1997 Pl GI.
- *             - Added Nigh's 1997 Fdi GI.
- *          24 - Split HW into HWI and HWC.
- *      oct 28 - Added Thrower's Bl GI.
- *      nov 17 - Added Ea as At Goudie.
- *             - Added Lt and La as Lw Milner.
- *             - Added Pf as Pli Goudie.
- *             - Added Se as Sw Goudie.
- * 1998 apr 7  - Added inclusion of sindex2.h.
- *      nov 12 - Added Nigh & Courtin's 1998 Dr.
- *             - Added Nigh & Love's 1998 Pli.
- *          13 - Added hybrid Pli Thrower 1994 with Pli Nigh & Love 1998.
- * 1999 jan 8  - Changed int to short int.
- *      apr 15 - Added functions for Chen's curves.
- *      may 28 - Added Cameron's Ep.
- *      sep 24 - Added Curtis' Bp.
- *      oct 18 - Added Nigh's Hwc GI, SS GI, Sw GI, Lw GI.
- *             - Added Nigh/Love's Sw total age curve.
- * 2000 jan 27 - Added Nigh's Cw GI.
- *      jul 24 - Renamed CW to CWC or CWI.
- *          25 - Added spliced Sw Goudie/Nigh.
- *      oct 10 - Changed check for site <= 1.3 to < 1.3.
- *      nov 3  - Added Hm by Means/Campbell/Johnson.
- *      dec 12 - Renamed BAC_KER to BB_KER.
- * 2001 apr 9  - Added Fdc Nigh total age curve, and spliced with Bruce.
- *      may 3  - Added Lw curve by Brisco, Klinka, Nigh.
- * 2002 feb 12 - Added Sb Nigh.
- *      jun 27 - Major change to force output to be steps of 0.5, 1.5, etc.
- *      aug 21 - Changed numbers for Bruce-Nigh Fdc.
- *          26 - A final change to Bruce-Nigh Fdc, for sites below 6.6661.
- *      oct 9  - Added At Nigh.
- * 2003 jun 13 - Copied several curves and "corrected" the origin from
- *               bhage=0 ht=1.3 to bhage=0.5 ht=1.3.
- *               Added "AC" to the end of the define.
- * 2004 mar 26 - Added SI_SW_GOUDIE_NATAC.
- *      apr 28 - Added Nigh's 2002 Py.
- *             - Added Nigh's 2004 Pl/Sw/Se total age curves.
- *      may 4  - Added SI_SW_GOUDIE_PLAAC.
- * 2005 oct 20 - Added Huang's Pj.
- * 2008 feb 28 - Added 2004 Sw Nigh GI.
- * 2009 aug 28 - Added Nigh's 2009 Ep.
- * 2010 mar 4  - Added 2009 Ba Nigh GI.
- *             - Added 2009 Ba Nigh.
- *      apr 14 - Added 2010 Sw Hu and Garcia.
- *          15 - Changed return of error code to be Goudie's planted stand
- *               y2bh for SW_NIGHTA2004, SW_NIGHTA, SW_HU_GARCIA, SE_NIGHTA.
- * 2014 sep 2  - Added 2014 Se Nigh GI.
- * 2015 may 13 - Added 2015 Se Nigh.
- * 2016 mar 9  - Changed si_y2bh() to NOT round result,
- *               and added si_y2bh05() which DOES round the result
- *               into steps of 0.5, 1.5, 2.5, etc.
- * 2017 feb 2  - Added Nigh's 2016 Cwc.
- * 2023 jul 17 - Translated like for like from C to Java
- *             - Renamed from siy2bh to SiteIndexYears2BreastHeight
- */
-/* @formatter:on */
-
 	// Taken from sindex.h
+	
 	/* define species and equation indices */
 	private static final int SI_ACB_HUANGAC = 97;
 	private static final int SI_ACB_HUANG = 0;
@@ -299,7 +155,7 @@ public class SiteIndexYears2BreastHeight {
 		return ( (x) <= 0.0) ? Math.log(.00001) : Math.log(x);
 	}
 
-	public static double si_y2bh(short cu_index, double site_index) {
+	public static double si_y2bh(int cu_index, double site_index) throws CommonCalculatorException {
 		double y2bh;
 		double si20;
 
@@ -309,7 +165,7 @@ public class SiteIndexYears2BreastHeight {
 
 		switch (cu_index) {
 		case SI_FDC_NIGHGI:
-			throw new GrowthInterceptTotalException("Cannot use with GI equations, case SI_FDC_NIGHGI" + cu_index);
+			throw new GrowthInterceptTotalException("Cannot use with GI equations, case SI_FDC_NIGHGI: " + cu_index);
 
 		case SI_FDC_BRUCE:
 			/* from seed */
@@ -1280,7 +1136,7 @@ public class SiteIndexYears2BreastHeight {
 		return y2bh;
 	}
 
-	public static double si_y2bh05(short cu_index, double site_index) {
+	public static double si_y2bh05(int cu_index, double site_index) throws CommonCalculatorException {
 		double y2bh;
 
 		y2bh = si_y2bh(cu_index, site_index);

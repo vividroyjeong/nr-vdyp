@@ -4,12 +4,14 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public enum Region {
-	COASTAL('C'), INTERIOR('I');
+	COASTAL('C', 1), INTERIOR('I', 2);
 
 	private final char characterAlias;
+	private final int index;
 
-	private Region(char characterAlias) {
+	private Region(char characterAlias, int index) {
 		this.characterAlias = characterAlias;
+		this.index = index;
 	}
 
 	public static Optional<Region> fromAlias(char alias) {
@@ -23,8 +25,20 @@ public enum Region {
 		return Optional.empty();
 	}
 
+	public static Optional<Region> fromIndex(int index) {
+		switch (index) {
+			case 1: return Optional.of(COASTAL);
+			case 2: return Optional.of(INTERIOR);
+			default: return Optional.empty();
+		}
+	}
+
 	public char getCharacterAlias() {
 		return characterAlias;
+	}
+	
+	public int getIndex() {
+		return index;
 	}
 
 }

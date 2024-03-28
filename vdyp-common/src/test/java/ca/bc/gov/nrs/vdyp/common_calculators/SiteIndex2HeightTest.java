@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMinimumException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
@@ -39,24 +40,24 @@ class SiteIndex2HeightTest {
 	private static final double ERROR_TOLERANCE = 0.00001;
 
 	@Test
-	void testPpowPositive() {
+	void testPpowPositive() throws CommonCalculatorException {
 		assertThat(8.0, closeTo(SiteIndex2Height.ppow(2.0, 3.0), ERROR_TOLERANCE));
 		assertThat(1.0, closeTo(SiteIndex2Height.ppow(5.0, 0.0), ERROR_TOLERANCE));
 	}
 
 	@Test
-	void testPpowZero() {
+	void testPpowZero() throws CommonCalculatorException {
 		assertThat(0.0, closeTo(SiteIndex2Height.ppow(0.0, 3.0), ERROR_TOLERANCE));
 	}
 
 	@Test
-	void testLlogPositive() {
+	void testLlogPositive() throws CommonCalculatorException {
 		assertThat(1.60943, closeTo(SiteIndex2Height.llog(5.0), ERROR_TOLERANCE));
 		assertThat(11.51293, closeTo(SiteIndex2Height.llog(100000.0), ERROR_TOLERANCE));
 	}
 
 	@Test
-	void testLlogZero() {
+	void testLlogZero() throws CommonCalculatorException {
 		assertThat(-11.51293, closeTo(SiteIndex2Height.llog(0.0), ERROR_TOLERANCE));
 	}
 
@@ -64,7 +65,7 @@ class SiteIndex2HeightTest {
 	class Index_to_heightTest {
 
 		@Test
-		void testInvalidSiteIndex() {
+		void testInvalidSiteIndex() throws CommonCalculatorException {
 			assertThrows(
 					LessThan13Exception.class,
 					() -> SiteIndex2Height.index_to_height((short) 0, 0.0, (short) 0, 1.2, 0.0, 0.0)
@@ -72,7 +73,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testInvalidTage() {
+		void testInvalidTage() throws CommonCalculatorException {
 			double expectedResult = 0;
 			double actualResult = SiteIndex2Height.index_to_height(SI_BP_CURTISAC, 0.0, SI_AT_TOTAL, 1.31, 0.0, 0.0);
 
@@ -85,7 +86,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_FDC_COCHRAN() {
+		void testSI_FDC_COCHRAN() throws CommonCalculatorException {
 			double actualResult = SiteIndex2Height.index_to_height(SI_FDC_COCHRAN, 0.0, SI_AT_BREAST, 1.31, 1.0, 0.0);
 			double expectedResult = 1.37;
 			double site_index = 1.31;
@@ -103,7 +104,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_FDC_KINGBhageLessThanZero() {
+		void testSI_FDC_KINGBhageLessThanZero() throws CommonCalculatorException {
 			double actualResult = SiteIndex2Height.index_to_height(SI_FDC_KING, 0.0, SI_AT_BREAST, 1.31, 1.0, 0.0);
 			double expectedResult = 1.37;
 
@@ -111,7 +112,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_FDC_KINGBhageLessThanFive() {
+		void testSI_FDC_KINGBhageLessThanFive() throws CommonCalculatorException {
 			double site_index = 1.31;
 			double actualResult = SiteIndex2Height
 					.index_to_height(SI_FDC_KING, 1.0, SI_AT_BREAST, site_index, 1.0, 0.0);
@@ -130,7 +131,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_FDC_KINGBhageGreaterThanFive() {
+		void testSI_FDC_KINGBhageGreaterThanFive() throws CommonCalculatorException {
 			double site_index = 1.31;
 
 			double actualResult = SiteIndex2Height
@@ -150,7 +151,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_HWC_FARRBhageGreaterThanZero() {
+		void testSI_HWC_FARRBhageGreaterThanZero() throws CommonCalculatorException {
 			double site_index = 1.31;
 
 			double actualResult = SiteIndex2Height
@@ -175,7 +176,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_HWC_FARRBhageLessThanZero() { // LessThanOrEqual is meant but omitted
+		void testSI_HWC_FARRBhageLessThanZero() throws CommonCalculatorException { // LessThanOrEqual is meant but omitted
 			double actualResult = SiteIndex2Height.index_to_height(SI_HWC_FARR, 0.0, SI_AT_BREAST, 1.31, 2.0, 0.0);
 			double expectedResult = 1.37;
 
@@ -183,7 +184,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_HWC_BARKER() {
+		void testSI_HWC_BARKER() throws CommonCalculatorException {
 			double actualResult = SiteIndex2Height.index_to_height(SI_HWC_BARKER, 0.0, SI_AT_BREAST, 1.31, 1.0, 0.0);
 			double expectedResult = Math.exp(4.35753) * SiteIndex2Height.ppow(
 					(-10.45 + 1.30049 * 1.31 - 0.0022 * 1.7161) / Math.exp(4.35753),
@@ -194,7 +195,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_HM_MEANSBhageGreaterThanZero() {
+		void testSI_HM_MEANSBhageGreaterThanZero() throws CommonCalculatorException {
 			double site_index = 1.31;
 			double actualResult = SiteIndex2Height
 					.index_to_height(SI_HM_MEANS, 5.0, SI_AT_BREAST, site_index, 1.0, 0.0);
@@ -209,7 +210,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_HM_MEANSBhageLessThanZero() {
+		void testSI_HM_MEANSBhageLessThanZero() throws CommonCalculatorException {
 			double actualResult = SiteIndex2Height.index_to_height(SI_HM_MEANS, 0.0, SI_AT_BREAST, 1.31, 1.0, 0.0);
 			double expectedResult = 1.37;
 
@@ -217,7 +218,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_HM_MEANSACBhageGreaterThanHalf() {
+		void testSI_HM_MEANSACBhageGreaterThanHalf() throws CommonCalculatorException {
 			double site_index = 1.31;
 
 			double actualResult = SiteIndex2Height
@@ -233,7 +234,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_HM_MEANSACBhageLessThanHalf() {
+		void testSI_HM_MEANSACBhageLessThanHalf() throws CommonCalculatorException {
 			double actualResult = SiteIndex2Height.index_to_height(SI_HM_MEANSAC, 0.0, SI_AT_BREAST, 1.31, 1.5, 0.0);
 			double expectedResult = 1.37 / 1.5 / 1.5;
 
@@ -241,7 +242,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_HWC_WILEYBHAGEZero() {
+		void testSI_HWC_WILEYBHAGEZero() throws CommonCalculatorException {
 			double site_index = 1.31;
 
 			double actualResult = SiteIndex2Height
@@ -253,7 +254,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_HWC_WILEYBHAGELargeSite() {
+		void testSI_HWC_WILEYBHAGELargeSite() throws CommonCalculatorException {
 			double site_index = 80;
 
 			double actualResult = SiteIndex2Height
@@ -269,7 +270,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_HWC_WILEY_BCBHAGEZero() {
+		void testSI_HWC_WILEY_BCBHAGEZero() throws CommonCalculatorException {
 			double site_index = 1.31;
 
 			double actualResult = SiteIndex2Height
@@ -281,7 +282,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_HWC_WILEY_BCBHAGELargeSite() {
+		void testSI_HWC_WILEY_BCBHAGELargeSite() throws CommonCalculatorException {
 			double site_index = 80;
 
 			double actualResult = SiteIndex2Height
@@ -297,7 +298,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_HWC_WILEY_MBBHAGEZero() {
+		void testSI_HWC_WILEY_MBBHAGEZero() throws CommonCalculatorException {
 			double site_index = 1.31;
 
 			double actualResult = SiteIndex2Height
@@ -309,7 +310,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_HWC_WILEY_MBBHAGELargeSite() {
+		void testSI_HWC_WILEY_MBBHAGELargeSite() throws CommonCalculatorException {
 			double site_index = 80;
 
 			double actualResult = SiteIndex2Height
@@ -325,7 +326,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_HWC_WILEYACBHAGELessThanPI() {
+		void testSI_HWC_WILEYACBHAGELessThanPI() throws CommonCalculatorException {
 			double site_index = 1.31;
 
 			double actualResult = SiteIndex2Height
@@ -337,7 +338,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_HWC_WILEYACBHAGELargeSite() {
+		void testSI_HWC_WILEYACBHAGELargeSite() throws CommonCalculatorException {
 			double site_index = 80;
 
 			double actualResult = SiteIndex2Height
@@ -353,7 +354,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_BP_CURTISBhageLessThanZero() {
+		void testSI_BP_CURTISBhageLessThanZero() throws CommonCalculatorException {
 			double actualResult = SiteIndex2Height.index_to_height(SI_BP_CURTIS, 0.0, SI_AT_BREAST, 1.31, 1.0, 0.0);
 			double expectedResult = 1.37;
 
@@ -361,7 +362,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_BP_CURTISBhageGreaterThanHalf() {
+		void testSI_BP_CURTISBhageGreaterThanHalf() throws CommonCalculatorException {
 			double site_index = 6;
 			double bhage = 5;
 
@@ -382,7 +383,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_BP_CURTISACBhageLessThanZero() {
+		void testSI_BP_CURTISACBhageLessThanZero() throws CommonCalculatorException {
 			double actualResult = SiteIndex2Height.index_to_height(SI_BP_CURTISAC, 0.5, SI_AT_BREAST, 1.31, 1.0, 0.6);
 			double expectedResult = 1.37;
 
@@ -390,7 +391,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_BP_CURTISACBhageGreaterThanHalf() {
+		void testSI_BP_CURTISACBhageGreaterThanHalf() throws CommonCalculatorException {
 			double site_index = 6;
 			double bhage = 5;
 
@@ -411,7 +412,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_SW_GOUDNIGHBhageGreaterThanHalf() {
+		void testSI_SW_GOUDNIGHBhageGreaterThanHalf() throws CommonCalculatorException {
 			double site_index = 18.0;
 			double bhage = 1.0;
 			double y2bh = 1.5;
@@ -429,7 +430,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_BA_NIGHGI() {
+		void testSI_BA_NIGHGI() throws CommonCalculatorException {
 			double site_index = 1.31;
 
 			double expectedResult = SiteIndex2Height.gi_si2ht(SI_BA_NIGHGI, 5, site_index);
@@ -439,7 +440,7 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testDefaultSwitchStatement() {
+		void testDefaultSwitchStatement() throws CommonCalculatorException {
 			assertThrows(
 					CurveErrorException.class,
 					() -> SiteIndex2Height.index_to_height((short) 300, 5, SI_AT_BREAST, 1.31, 1.5, 0.0)
@@ -451,12 +452,12 @@ class SiteIndex2HeightTest {
 	@Nested
 	class testGiSi2Ht {
 		@Test
-		void testBhageLessThanHalf() {
+		void testBhageLessThanHalf() throws CommonCalculatorException {
 			assertThrows(GrowthInterceptMinimumException.class, () -> SiteIndex2Height.gi_si2ht((short) 0, 0.0, 0.0));
 		}
 
 		@Test
-		void testValidInput() {
+		void testValidInput() throws CommonCalculatorException {
 			double actualResult = SiteIndex2Height.gi_si2ht(SI_FDC_COCHRAN, 1, 1.31);
 
 			double expectedResult = 1.965;
@@ -465,14 +466,14 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testConvergenceError() {
+		void testConvergenceError() throws CommonCalculatorException {
 			assertThrows(NoAnswerException.class, () -> {
 				SiteIndex2Height.gi_si2ht(SI_FDC_COCHRAN, 5.0, 2000.0);
 			});
 		}
 
 		@Test
-		void testNegativeSiteIndex() {
+		void testNegativeSiteIndex() throws CommonCalculatorException {
 			double actualResult = SiteIndex2Height.gi_si2ht((short) 1, 3.0, -5.0);
 			assertThat(actualResult, closeTo(1.3, ERROR_TOLERANCE));
 		}
@@ -480,9 +481,10 @@ class SiteIndex2HeightTest {
 	}
 
 	@Test
-	void testHuGarciaQ() { // the way I've done these tests is to validate them with the original C code
-							// and
-							// compare them with the output of the java code
+	void testHuGarciaQ() throws CommonCalculatorException { 
+		// the way I've done these tests is to validate them with the original C code and
+		// compare them with the output of the java code
+		
 		// Test case 1
 		double siteIndex1 = 20.0;
 		double bhAge1 = 30.0;
@@ -501,7 +503,7 @@ class SiteIndex2HeightTest {
 	}
 
 	@Test
-	void testHuGarciaH() {
+	void testHuGarciaH() throws CommonCalculatorException {
 		double q = 05;
 		double bhage = 10.0;
 
