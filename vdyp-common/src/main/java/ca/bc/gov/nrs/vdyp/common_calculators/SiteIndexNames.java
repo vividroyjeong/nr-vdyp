@@ -4,161 +4,8 @@ package ca.bc.gov.nrs.vdyp.common_calculators;
  * SiteIndexNames.java
  */
 public class SiteIndexNames {
-/* @formatter:off */
-/*
- * 1991 dec 2  - Created.
- * 1992 feb 7  - Added Milner's Pp, Pli, and Fdi, and updated Lw.
- *          27 - Changed a lot of the species names, mainly to remove
- *               "coastal" and "interior" where they aren't necessary.
- *               Changed source of Fdi from Thrower 1989 to Thrower &
- *               Goudie 1992.
- *      mar 31 - Changed "Pll" to "Pli".
- *               Changed "Pp" to "Py".
- *               Changed "Bac" to "Ba".
- *               Changed "Bai" to "Bl".
- *      apr 29 - Removed difference between plantations and natural stands
- *               for Pli Goudie and Pa Goudie.
- *      jun 16 - Removed [Ba] from subalpine fir, as it has a different
- *               y2bh function.
- *      dec 2  - Added Mario Dilucca's coastal balsam fir.
- * 1993 jan 11 - Changed author of SS_GOUDIE from Goudie to Barker & Goudie.
- *             - Changed date on Milner's equations from 1992 to 1989, as
- *               the 1992 publication uses the same equations as in 1989.
- *      feb 4  - Added Thrower's draft height-age curve for lodgepole pine.
- *      mar 22 - Added Thrower's draft height-age curve for black cottonwood.
- *      aug 10 - Changed date of Thrower's Pli from draft 1992 to 1993.
- *      sep 16 - Added Thrower's draft height-age curve for white spruce.
- * 1994 sep 27 - Copied Kurucz' 1982 Ba equation to Bg and Bc.
- * 1995 may 17 - Added si_convert[][] for converting site index between
- *               species.
- *          23 - Added Ss <-> Hw SI conversion.
- *      jun 12 - Added Goudie's Teak.
- *          19 - Added growth intercept model indicators.
- *          26 - Changed date of Goudie's At from 1982 to 1986.
- *             - Changed date of Harrington & Curtis' Dr from 1986 to 1987.
- *      aug 31 - Update to include growth-intercept models for Hw and Sw.
- *      sep 20 - Added Huang, Titus, & Lakusta equations for Sw, Pli, At,
- *               Sb, Pj, Acb, Bb, Fdi.
- *      oct 13 - Changed date of Thrower's Pli and Sw to 1994.
- *      nov 3  - Added draft Ss Nigh.
- *          20 - Removed white fir.
- *      dec 8  - Changed Cieszewski & Bella's 1989 to 1991.
- *             - Added "& Moore" to "Vander Ploeg".
- *             - Changed date of Milner's 1989 equations to the published
- *               date of 1992.
- *             - Changed date of Harrington & Curtis' Dr back to 1986.
- *             - Changed credit of Goudie's At to Alberta Forest Service.
- *             - Changed credit of Dempster's Pli/Sb/Sw to Alberta Forest
- *               Service, and changed date from 1983 to 1985.
- *          18 - Changed "Interior White Spruce" to "White Spruce".
- *             - Changed "Interior Grand Fir" to "Grand Fir".
- *          19 - Added Mountain Hemlock (Hm) as Western Hemlock (Hw) using
- *               Wiley 1978.
- * 1996 feb 8  - Changed date of Nigh's draft Ss from 1995 to 1996.
- *      jun 10 - Added Nigh's variable growth intercept models as regular
- *               equations.
- *             - Removed array of growth intercept indicators.
- *      aug 2  - Amalgamated SI_SW_NIGH_PLA and SI_SW_NIGH_NAT into
- *               SI_SW_NIGH.
- *      oct 22 - Changed MB_HARRING to MB_THROWER.
- * 1997 mar 21 - Added Nigh's 1997 Hwi GI.
- *             - Changed define names: FDC_NIGH, HW_NIGH, PLI_NIGH, SW_NIGH
- *               all have "GI" added after them.
- *             - Added Nigh's 1997 Hwi.
- *             - Changed Nigh's Ss from "1996 draft" to "1997".
- *             - Added Nigh's 1997 Pl GI.
- *             - Added Nigh's 1997 Fdi GI.
- *          24 - Split HW into HWI and HWC.
- *      oct 17 - Changed "Hw" to "Hwc".
- *          20 - Added si_curve_types[].
- *          28 - Added Thrower's Bl GI.
- *             - Changed Nigh's Fdc GI from 1996 to 1997.
- *      nov 17 - Added Ea as At Goudie.
- *             - Changed "Yellow Cedar" to "Yellow-cedar".
- *             - Changed Ep's "Alberta Forest Service (1982) [At]" to
- *               "Alberta Forest Service (1985) [At]" (date correction).
- *             - Added Lt and La as Lw Milner.
- *             - Added Pf as Pli Goudie.
- *             - Added Se as Sw Goudie.
- * 1998 jan 29 - Corrected species conversion involving Hwi, as a result
- *               of the Hwc/Hwi split.
- *      mar 11 - Changed Nigh's Hwi from "1997 draft" to "1998".
- *          25 - Corrected Pf saying Pf not Pli as Goudie reference.
- *             - Changed how species refer to the curve they use.
- *      may 27 - Super minor bug fix in species conversion.  I had a
- *               HWC define enabling a HWI conversion.  Since both are
- *               always defined, it would likely never have been a problem.
- *      nov 12 - Added Nigh & Courtin's Dr.
- *             - Added Nigh & Love's Pli.
- *          13 - Added hybrid Pli Thrower 1994 with Pli Nigh & Love 1998.
- *      dec 8  - Added Chen's Se, Bl, Pl.
- * 1999 jan 8  - Changed int to char or short int.
- *      feb 15 - Added Chen's Ep, Dr.
- *      apr 14 - Added Chen's At.
- *          15 - Changed si_names to say y2bh is available for most curves.
- *          29 - Changed name from "Thrower (1994) + Nigh (1998)" to
- *               "Nigh (1999)", and "Nigh & Love (1998)" to "... (1999)".
- *             - Changed "&" to "and".
- *      may 28 - Added Ian Cameron's Ep.
- *      jun 3  - Removed "(GI) " from GI curves.
- *          9  - Added not-yet-finished Cwi Nigh.
- *      sep 24 - Added Curtis' Bp Noble Fir.
- *      oct 18 - Added Nigh's Hwc GI, SS GI, Sw GI, Lw GI.
- *             - Added Sb <-> Pli conversion.
- *             - Added Nigh/Love's Sw total age curve.
- * 2000 jan 27 - Added Nigh's Cw GI.
- *             - Bug fix in including Nigh/Love Sw total age curve.
- *      jul 24 - Changed Cw to Cwc, and added Cwi.
- *          25 - Added Goudie/Nigh's spliced Sw.
- *      aug 1  - Temporarily removed Cwi for SiteTools.
- *      oct 10 - Implemented Cwc/Cwi.
- *          11 - Changed BAI to BL.
- *      nov 2  - Added site index conversion between Cwc and Hwc.
- *          3  - Added Hm by Means/Campbell/Johnson.
- *          15 - Put HM_MEANS in proper place, at end of two arrays.
- *      dec 12 - Removed Dr-Chen.
- *             - Changed BAC_KER to BB_KER.
- *             - Updated date on Sw Nigh/Love.
- *             - Modified attribution of Sw-Nigh/Goudie.
- * 2001 jan 17 - Changed "Chen" to "Chen and Klinka" for Se, Bl, Pl.
- *             - Added Se curve.
- *      apr 9  - Added Bac <-> Hwc site index conversion.
- *             - Added Fdc Nigh total age curve, and spliced with Bruce.
- *      may 3  - Added Lw curve by Brisco, Klinka, Nigh.
- * 2002 feb 12 - Added Sb Nigh.
- *      oct 8  - Changed si_convert[] from int to float.
- *             - Changed many elements of si_convert to make conversions
- *               back and forth minimize round-off errors.
- *             - Added conversion from Cwc to Hwc that was missing.
- *          9  - Added Nigh's At.
- *      nov 29 - Major expansion of species list.
- * 2003 jun 13 - Copied several curves and "corrected" the origin from
- *               bhage=0 ht=1.3 to bhage=0.5 ht=1.3.
- *               Added "AC" to the end of the define.
- *      aug 7  - Added 40 more species.
- *      sep 11 - Added Fd, Pl, Hw, Cw.
- * 2004 mar 26 - Added SI_SW_GOUDIE_NATAC.
- *      apr 28 - Added Nigh's 2002 Py.
- *             - Added Nigh's 2004 Pl/Sw/Se total age curves.
- *      may 4  - Added SI_SW_GOUDIE_PLAAC.
- * 2005 oct 20 - Added Huang Pj.
- * 2006 jan 4  - Added site conversion between Sw and At.
- * 2008 feb 28 - Added 2004 Sw Nigh GI.
- * 2009 aug 28 - Added Nigh's 2009 Ep.
- * 2010 mar 4  - Added 2009 Ba Nigh GI.
- *             - Added 2009 Ba Nigh.
- *      apr 14 - Added 2010 Sw Hu and Garcia.
- * 2014 jul 30 - Added si_curve_bh[] to give breast height.
- *      sep 2  - Added 2014 Se Nigh GI.
- * 2015 may 13 - Added 2015 Se Nigh.
- *      aug 27 - Added the above two (missing) to the si_curve_bh[] array.
- * 2017 feb 2  - Added Nigh's 2016 Cwc equation.
- * 2023 jul 17 - Translated like for like from C to Java
- *             - Renamed from sinames to SiteIndexNames
- */
-/* @formatter:on */
-
-//Taken from sindex.h
+	// Taken from sindex.h
+	
 	/* define species and equation indices */
 	private static final int SI_SPEC_AT = 8;
 	private static final int SI_SPEC_BA = 11;
@@ -582,6 +429,7 @@ public class SiteIndexNames {
 
 			// SI_SPEC_ZH
 			"Zh", };
+	
 	public static final String[] si_spec_name = {
 			// SI_SPEC_A
 			"Aspen",
@@ -1893,8 +1741,8 @@ public class SiteIndexNames {
 
 	};
 
-	/*
-	 * height(m) of breast height (typically 1.3, 1.37, 1.3716
+	/**
+	 * height(m) of breast height (typically 1.3, 1.37, 1.3716)
 	 */
 	public static double[] si_curve_bh = {
 			// SI_ACB_HUANG
@@ -2330,8 +2178,6 @@ public class SiteIndexNames {
 			1.3,
 
 			// SI_CWC_NIGH
-			1.3,
-
+			1.3
 	};
-
 }

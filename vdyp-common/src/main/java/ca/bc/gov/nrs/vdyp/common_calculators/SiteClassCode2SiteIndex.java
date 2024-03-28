@@ -1,10 +1,10 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ClassErrorException;
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ForestInventoryZoneException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.SpeciesErrorException;
 
-/* @formatter:off */
 /**
  * SiteClassCode2SiteIndex.java
  * - translates site class code to site index (height in metres) for a
@@ -14,35 +14,9 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.SpeciesErrorExcep
  * - primarily used by VDYP and FredTab.
  * - the origin of the values used here is Inventory Branch.
  */
-/* @formatter:on */
 public class SiteClassCode2SiteIndex {
-/* @formatter:off */
-/*
- * 1994 oct 19 - Moved here from FredTab.
- * 1996 jun 27 - Changed error return of -1 to -5.
- *             - Changed error return of -2 to -6.
- *             - Changed error return of -3 to -7.
- *      aug 8  - Changed error codes to defined constants.
- *      oct 22 - Changed MB_HARRING to MB_THROWER.
- *      nov 28 - Added SS_NIGH.
- *             - Started adding conditional compilation to curves.
- * 1997 mar 24 - Changed HW_WILEY to HWC_WILEY.
- *             - Added HWI_NIGH.
- *      aug 27 - Added conditional compilation around HWI_NIGH.
- *      nov 17 - Added Ea as At Goudie.
- *             - Added Lt and La as Lw Milner.
- *             - Added Pf as Pli Goudie.
- *             - Added Se as Sw Goudie.
- * 1998 nov 12 - Added Nigh & Courtin's Dr.
- * 1999 jan 8  - Changed int to short int.
- *             - Changed to take species index as parameter.
- * 2000 jul 24 - Split CW into CWI and CWC.
- * 2023 jul 14  - Translated like for like from C to Java
- * 			   -  Renamed from sc2si.c to SiteClassCode2SiteIndex
- */
-/* @formatter:on */
-
 	// Taken from sindex.h
+
 	/* define species and equation indices */
 	private static final int SI_SPEC_ACT = 5;
 	private static final int SI_SPEC_AT = 8;
@@ -72,16 +46,10 @@ public class SiteClassCode2SiteIndex {
 	private static final int SI_SPEC_SW = 100;
 	private static final int SI_SPEC_YC = 130;
 
-	/*
-	 * codes returned by fiz_check()
-	 */
-	private static final int FIZ_COAST = 1;
-	private static final int FIZ_INTERIOR = 2;
-
-	public static double class_to_index(short sp_index, char sitecl, char fiz) throws IllegalArgumentException {
+	public static double class_to_index(int sp_index, char sitecl, char fiz) throws CommonCalculatorException {
+		
 		if (sitecl != 'G' && sitecl != 'M' && sitecl != 'P' && sitecl != 'L') {
 			throw new ClassErrorException("Unknown site class code: " + sitecl);
-
 		}
 
 		switch (sp_index) {
@@ -213,7 +181,7 @@ public class SiteClassCode2SiteIndex {
 			break;
 		case SI_SPEC_HWC:
 			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
+			case FizCheck.FIZ_COAST:
 				switch (sitecl) {
 				case 'G':
 					return 28;
@@ -227,7 +195,7 @@ public class SiteClassCode2SiteIndex {
 					break;
 				}
 				break;
-			case FIZ_INTERIOR:
+			case FizCheck.FIZ_INTERIOR:
 				switch (sitecl) {
 				case 'G':
 					return 21;

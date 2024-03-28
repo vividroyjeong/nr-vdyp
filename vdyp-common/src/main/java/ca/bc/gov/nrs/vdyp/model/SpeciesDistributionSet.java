@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class SpeciesDistributionSet {
 	private Map<String, SpeciesDistribution> speciesDistributionMap = new HashMap<>();
@@ -26,11 +27,11 @@ public class SpeciesDistributionSet {
 		return Collections.unmodifiableMap(speciesDistributionMap);
 	}
 
-	public Float getSpeciesDistribution(String species) {
+	public Optional<Float> getSpeciesDistribution(String species) {
 		if (speciesDistributionMap.containsKey(species))
-			return speciesDistributionMap.get(species).getPercentage();
+			return Optional.of(speciesDistributionMap.get(species).getPercentage());
 		else
-			return 0.0f;
+			return Optional.empty();
 	}
 
 	public SpeciesDistributionSet copy() {

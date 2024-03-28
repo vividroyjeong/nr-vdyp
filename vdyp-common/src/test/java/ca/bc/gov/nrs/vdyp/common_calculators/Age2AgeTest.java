@@ -75,7 +75,7 @@ class Age2AgeTest {
 	}
 
 	@Test
-	void testShouldBranchReturnValue() {
+	void testShouldBranchReturnValue() throws AgeTypeErrorException {
 		double expectedResult = 3.0; // normal calculated test
 		double actualResult = Age2Age.age_to_age(SI_AT_NIGH, 1.5, SI_AT_BREAST, SI_AT_TOTAL, 2);
 
@@ -96,7 +96,7 @@ class Age2AgeTest {
 	}
 
 	@Test
-	void testShouldNotBranchReturnValue() {
+	void testShouldNotBranchReturnValue() throws AgeTypeErrorException {
 		double expectedResult = 3.0; // normal calculated test
 		double actualResult = Age2Age.age_to_age((short) 600, 1, SI_AT_BREAST, SI_AT_TOTAL, 2);
 
@@ -122,7 +122,7 @@ class Age2AgeTest {
 	}
 
 	@Test
-	void testUncheckedCasesWithShouldBranch() {
+	void testUncheckedCasesWithShouldBranch() throws AgeTypeErrorException {
 		double expectedResult = 3.0; // normal calculated test
 		short[] cases = { SI_CWI_NIGH, SI_DR_NIGH, SI_EP_NIGH, SI_FDC_BRUCENIGH, SI_FDC_BRUCEAC, SI_FDC_NIGHTA,
 				SI_FDI_THROWERAC, SI_HWI_NIGH, SI_LW_NIGH, SI_PJ_HUANG, SI_PJ_HUANGAC, SI_PLI_NIGHTA2004,

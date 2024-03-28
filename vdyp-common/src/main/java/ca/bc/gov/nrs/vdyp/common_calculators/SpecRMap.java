@@ -1,66 +1,17 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CodeErrorException;
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ForestInventoryZoneException;
 
-/* @formatter:off */
 /**
  * SpecRMap.java
  * - determines the default species/curve index for a given species code.
  * - initial species code remappings provided by Inventory Branch.
  * - species codes can be 1-3 letters, in upper or lower case.
  */
-/* @formatter:on */
-
 public class SpecRMap {
-/* @formatter:off */
-/*
- * 1994 oct 19 - Moved here from FredTab.
- * 1996 jun 3  - Changed remap of YC to CW.
- *             - Changed remap of EP to AT.
- *             - Changed remap of MB to DR.
- *             - Changed remap of PA to PLI.
- *             - Changed SS_GOUDIE to SS_NIGH as default curve for Ss.
- *          27 - Changed error code of -1 to -8.
- *             - Changed error code of -2 to -7.
- *      aug 9  - Changed error codes to defined constants.
- * 1997 mar 24 - Split HW into HWC and HWI.
- *             - Added Nigh's Hwi.
- *      aug 27 - Added conditional compilation around HWI_NIGH.
- *      nov 17 - Changed mapping of PJ from PLI_GOUDIE_DRY to PJ_HUANG_NAT.
- *          21 - Changed mapping of PJ back to PLI_GOUDIE_DRY.
- *          26 - Changed remapping of MB from DR to ACT.
- * 1998 sep 17 - Added some ifdefs.
- *             - Changed code to allow checking 3-letter codes, and allow
- *               lower case.
- * 1999 jan 8  - Changed int to short int.
- *             - Changed to return species index, not curve index.
- *      may 31 - Split Ac into Acb and Act.
- *      sep 24 - Added Bp.
- * 2000 jul 24 - Split Cw into Cwc and Cwi.
- *      oct 10 - Implemented Cwc/Cwi.
- *      nov 3  - Changed remap of Hm -> Hwc to stay Hm.
- * 2001 jan 4  - If "CW" was entered, a bug made it always return "ACT". Fixed.
- *             - If "C" was entered, "CWC" was always returned. Fixed.
- *          17 - Changed mapping of SE.
- *      mar 14 - Bug fix in 'S'. A 'break;' was missing, causing any
- *               single letter 'S' to fall through to the SB case.
- * 2002 jan 30 - Added vdyp_species_remap().
- *      feb 8  - Added a few more cases to vdyp_species_remap().
- *          21 - Bug fixes and additions to vdyp_species_remap().
- *      mar 7  - Bug fixes and additions to vdyp_species_remap().
- *          25 - Removed vdyp_species_remap().
- *             - Expanded and limited species_remap().
- *      jun 21 - Changed dynamic sc2[] to static array.
- *      nov 29 - Added species_map().
- * 2003 jan 16 - Added Hwc, Hwi, Cwc, Cwi, Pli to species_map().
- *      aug 7  - Added 40 more species.
- *      sep 11 - Added Fd, Pl, Hw, Cw.
- * 2005 oct 20 - Changed PJ mapping from PLI to PJ.
- * 2009 aug 18 - Changed E* remaps from At to Ep.
- * 2015 apr 9  - Removed species code "Bv".
- */
-/* @formatter:on */
 	// Taken from sindex.h
+	
 	/* define species and equation indices */
 	private static final int SI_SPEC_A = 0;
 	private static final int SI_SPEC_ABAL = 1;
@@ -198,26 +149,19 @@ public class SpecRMap {
 	private static final int SI_SPEC_ZC = 133;
 	private static final int SI_SPEC_ZH = 134;
 
-	/*
-	 * codes returned by fiz_check()
-	 */
-	private static final int FIZ_COAST = 1;
-	private static final int FIZ_INTERIOR = 2;
-
-	public static short species_map(String sc) {
+	public static int species_map(String sc) throws CodeErrorException {
+		
 		// This can be done more elegantly with Java
 		String sc2 = sc.replaceAll(" ", "").toUpperCase();
 
-		// Just incase here is a like for like recreation
+		// Just in case here is a like for like recreation
 		/*
-		 * short i, i2; char[] sc2 = new char[10];
+		 * int i, i2; char[] sc2 = new char[10];
 		 *
 		 * i2 = 0; for (i = 0; i < sc.length && i < 10; i++) { if (sc[i] != ' ') { sc2[i2] =
 		 * Character.toUpperCase(sc[i]); i2++; } } sc2[i2] = '\0';
 		 */
 
-		// This could be improved with a switch statement or even an if/else. But I have
-		// left it since it's like for like
 		if (sc2.equals("A")) {
 			return SI_SPEC_A;
 		}
@@ -628,16 +572,22 @@ public class SpecRMap {
 		throw new CodeErrorException("Unknown species code: " + sc2);
 	}
 
-	public static short species_remap(String sc, char fiz) {
+	public static int species_remap(String sc, char fiz) throws CodeErrorException, ForestInventoryZoneException {
+		
 		// This can be done more elegantly with Java
 		String sc2 = sc.replaceAll(" ", "").toUpperCase();
 
 		// Just incase here is a like for like recreation
 		/*
-		 * short i, i2; char[] sc2 = new char[10];
+		 * int i, i2; char[] sc2 = new char[10];
 		 *
-		 * i2 = 0; for (i = 0; i < sc.length && i < 10; i++) { if (sc[i] != ' ') { sc2[i2] =
-		 * Character.toUpperCase(sc[i]); i2++; } } sc2[i2] = '\0';
+		 * i2 = 0; 
+		 * for (i = 0; i < sc.length && i < 10; i++) { 
+		 *     if (sc[i] != ' ') { 
+		 *         sc2[i2] = Character.toUpperCase(sc[i]); i2++; 
+		 *     }
+		 * }
+		 * sc2[i2] = '\0';
 		 */
 
 		if (sc2.equals("A")) {
@@ -671,14 +621,7 @@ public class SpecRMap {
 			return SI_SPEC_ACB;
 		}
 		if (sc2.equals("B")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_BA;
-			case FIZ_INTERIOR:
-				return SI_SPEC_BL;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_BA, SI_SPEC_BL);
 		}
 		if (sc2.equals("BA")) {
 			return SI_SPEC_BA;
@@ -693,14 +636,7 @@ public class SpecRMap {
 			return SI_SPEC_BL;
 		}
 		if (sc2.equals("BC")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_BA;
-			case FIZ_INTERIOR:
-				return SI_SPEC_BL;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_BA, SI_SPEC_BL);
 		}
 		if (sc2.equals("BG")) {
 			return SI_SPEC_BA;
@@ -720,52 +656,26 @@ public class SpecRMap {
 		if (sc2.equals("BP")) {
 			return SI_SPEC_BP;
 		}
-//  if (sc2.equals("BV")){ return SI_SPEC_AT;}
+		// if (sc2.equals("BV")) { 
+		//     return SI_SPEC_AT;
+		// }
 		if (sc2.equals("C")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_CWC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_CWI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_CWC, SI_SPEC_CWI);
 		}
 		if (sc2.equals("CI")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_CWC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_CWI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_CWC, SI_SPEC_CWI);
 		}
 		if (sc2.equals("COT")) {
 			return SI_SPEC_ACT;
 		}
 		if (sc2.equals("CP")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_CWC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_CWI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_CWC, SI_SPEC_CWI);
 		}
 		if (sc2.equals("CT")) {
 			return SI_SPEC_ACT;
 		}
 		if (sc2.equals("CW")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_CWC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_CWI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_CWC, SI_SPEC_CWI);
 		}
 		if (sc2.equals("CWC")) {
 			return SI_SPEC_CWC;
@@ -774,27 +684,13 @@ public class SpecRMap {
 			return SI_SPEC_CWI;
 		}
 		if (sc2.equals("CY")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_CWC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_CWI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_CWC, SI_SPEC_CWI);
 		}
 		if (sc2.equals("D")) {
 			return SI_SPEC_DR;
 		}
 		if (sc2.equals("DF")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_FDC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_FDI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_FDC, SI_SPEC_FDI);
 		}
 		if (sc2.equals("DG")) {
 			return SI_SPEC_DR;
@@ -830,24 +726,10 @@ public class SpecRMap {
 			return SI_SPEC_EP;
 		}
 		if (sc2.equals("F")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_FDC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_FDI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_FDC, SI_SPEC_FDI);
 		}
 		if (sc2.equals("FD")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_FDC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_FDI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_FDC, SI_SPEC_FDI);
 		}
 		if (sc2.equals("FDC")) {
 			return SI_SPEC_FDC;
@@ -865,27 +747,13 @@ public class SpecRMap {
 			return SI_SPEC_DR;
 		}
 		if (sc2.equals("H")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_HWC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_HWI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_HWC, SI_SPEC_HWI);
 		}
 		if (sc2.equals("HM")) {
 			return SI_SPEC_HM;
 		}
 		if (sc2.equals("HW")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_HWC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_HWI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_HWC, SI_SPEC_HWI);
 		}
 		if (sc2.equals("HWC")) {
 			return SI_SPEC_HWC;
@@ -894,54 +762,19 @@ public class SpecRMap {
 			return SI_SPEC_HWI;
 		}
 		if (sc2.equals("HXM")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_HWC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_HWI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_HWC, SI_SPEC_HWI);
 		}
 		if (sc2.equals("IG")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_CWC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_CWI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_CWC, SI_SPEC_CWI);
 		}
 		if (sc2.equals("IS")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_CWC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_CWI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_CWC, SI_SPEC_CWI);
 		}
 		if (sc2.equals("J")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_CWC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_CWI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_CWC, SI_SPEC_CWI);
 		}
 		if (sc2.equals("JR")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_CWC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_CWI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_CWC, SI_SPEC_CWI);
 		}
 		if (sc2.equals("K")) {
 			return SI_SPEC_AT;
@@ -986,34 +819,13 @@ public class SpecRMap {
 			return SI_SPEC_DR;
 		}
 		if (sc2.equals("OA")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_CWC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_CWI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_CWC, SI_SPEC_CWI);
 		}
 		if (sc2.equals("OB")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_CWC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_CWI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_CWC, SI_SPEC_CWI);
 		}
 		if (sc2.equals("OC")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_CWC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_CWI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_CWC, SI_SPEC_CWI);
 		}
 		if (sc2.equals("OD")) {
 			return SI_SPEC_AT;
@@ -1085,14 +897,7 @@ public class SpecRMap {
 			return SI_SPEC_DR;
 		}
 		if (sc2.equals("S")) { // Duplicate case? Unreachable
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_SS;
-			case FIZ_INTERIOR:
-				return SI_SPEC_SW;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_SS, SI_SPEC_SW);
 		}
 		if (sc2.equals("SA")) { // Duplicate case? Unreachable
 			return SI_SPEC_SW;
@@ -1116,80 +921,31 @@ public class SpecRMap {
 			return SI_SPEC_SW;
 		}
 		if (sc2.equals("SX")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_SS;
-			case FIZ_INTERIOR:
-				return SI_SPEC_SW;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_SS, SI_SPEC_SW);
 		}
 		if (sc2.equals("SXB")) {
 			return SI_SPEC_SW;
 		}
 		if (sc2.equals("SXE")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_SS;
-			case FIZ_INTERIOR:
-				return SI_SPEC_SE;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_SS, SI_SPEC_SE);
 		}
 		if (sc2.equals("SXL")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_SS;
-			case FIZ_INTERIOR:
-				return SI_SPEC_SW;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_SS, SI_SPEC_SW);
 		}
 		if (sc2.equals("SXS")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_SS;
-			case FIZ_INTERIOR:
-				return SI_SPEC_SW;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_SS, SI_SPEC_SW);
 		}
 		if (sc2.equals("SXW")) {
 			return SI_SPEC_SW;
 		}
 		if (sc2.equals("SXX")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_SS;
-			case FIZ_INTERIOR:
-				return SI_SPEC_SW;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_SS, SI_SPEC_SW);
 		}
 		if (sc2.equals("T")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_HWC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_HWI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_HWC, SI_SPEC_HWI);
 		}
 		if (sc2.equals("TW")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_HWC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_HWI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_HWC, SI_SPEC_HWI);
 		}
 		if (sc2.equals("U")) {
 			return SI_SPEC_AT;
@@ -1240,77 +996,28 @@ public class SpecRMap {
 			return SI_SPEC_AT;
 		}
 		if (sc2.equals("X")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_FDC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_FDI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_FDC, SI_SPEC_FDI);
 		}
 		if (sc2.equals("XC")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_FDC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_FDI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_FDC, SI_SPEC_FDI);
 		}
 		if (sc2.equals("XH")) {
 			return SI_SPEC_AT;
 		}
 		if (sc2.equals("Y")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_CWC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_CWI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_CWC, SI_SPEC_CWI);
 		}
 		if (sc2.equals("YC")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_CWC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_CWI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_CWC, SI_SPEC_CWI);
 		}
 		if (sc2.equals("YP")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_CWC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_CWI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_CWC, SI_SPEC_CWI);
 		}
 		if (sc2.equals("Z")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_FDC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_FDI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_FDC, SI_SPEC_FDI);
 		}
 		if (sc2.equals("ZC")) {
-			switch (FizCheck.fiz_check(fiz)) {
-			case FIZ_COAST:
-				return SI_SPEC_FDC;
-			case FIZ_INTERIOR:
-				return SI_SPEC_FDI;
-			default:
-				throw new CodeErrorException("Unknown species code: " + sc2);
-			}
+			return speciesByFizCategory(fiz, SI_SPEC_FDC, SI_SPEC_FDI);
 		}
 		if (sc2.equals("ZH")) {
 			return SI_SPEC_AT;
@@ -1318,5 +1025,16 @@ public class SpecRMap {
 
 		throw new CodeErrorException("Unknown species code: " + sc2);
 	}
-
+	
+	private static int speciesByFizCategory(char fiz, int coastalSpecies, int interiorSpecies)
+			throws ForestInventoryZoneException {
+		switch (FizCheck.fiz_check(fiz)) {
+		case FizCheck.FIZ_COAST:
+			return coastalSpecies;
+		case FizCheck.FIZ_INTERIOR:
+			return interiorSpecies;
+		default:
+			throw new ForestInventoryZoneException("Unknown forest inventory code: " + fiz);
+		}
+	}
 }

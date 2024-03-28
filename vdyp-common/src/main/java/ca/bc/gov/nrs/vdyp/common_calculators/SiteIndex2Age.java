@@ -4,11 +4,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptTotalException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 
-/* @formatter:off */
 /**
  * SiteIndex2Age.java
  * - given site index and site height, computes age.
@@ -18,74 +18,14 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException
  * @throws CurveEroorException unknown curve index
  * @throws GrowthInterceptTotalException cannot compute growth intercept when using total age
  */
-/* @formatter:on */
 public class SiteIndex2Age {
-/* @formatter:off */
-/*
- * 1990 aug 15 - Created.
- * 1991 jan 15 - Added check for no convergence.
- *      jul 23 - Added code to compute age directly for Bruce's Fdc,
- *               Wiley's Hw, and Goudie's Pli, Ss, and Sw.
- *      dec 2  - Changed to independent Sindex functions.
- * 1992 jan 10 - Added defines for how function prototypes and definitions
- *               are handled.
- *      apr 29 - Noticed that Pli Goudie Dry was included, but Wet was not.
- *               Fixed.
- *               Removed difference between plantations and natural stands
- *               for Pli Goudie.
- * 1994 dec 6  - Added another check for getting stuck when iterating.
- * 1995 dec 19 - Added Hm.
- * 1996 jun 27 - Added error code of -4, instead of 999.
- *      jul 30 - Added check for incoming height or site < 1.3m.
- *      aug 1  - Refined iterating loop when growth intercept curves are used.
- *          8  - Changed error codes to defined constants.
- * 1997 jan 23 - Added special function to handle growth intercept.
- *      feb 5  - Changed check for top height or site index < 1.3 to be
- *               <= 1.3.
- *      mar 21 - Added Nigh's 1997 Hwi GI.
- *             - Changed define names: FDC_NIGH, HW_NIGH, PLI_NIGH, SW_NIGH
- *               all have "GI" added after them.
- *             - Added Nigh's 1997 Pl GI.
- *             - Added Nigh's 1997 Fdi GI.
- *          24 - Split HW into HWI and HWC.
- *      jul 8  - Replaced checking height <= 1.3 and returning error code
- *               with checking and returning 0 if age type is breast-height.
- *      sep 16 - Changed a "log(50)" to "log(50.0)" in Goudie formulation.
- *      nov 17 - Added Pf as Pli Goudie.
- *             - Added Se as Sw Goudie.
- * 1998 apr 7  - Added inclusion of sindex2.h.
- *      may 27 - If site height is <= 1.3 and age type is breast height,
- *               return value is SI_ERR_NO_ANS.
- * 1999 jan 8  - Changed int to short int.
- *      aug 20 - Changed iteration to always be to breast height age.
- *          24 - Added error count to ensure iterate loop doesn't run forever.
- *             - Added additional error checks in iterate loop.
- *          26 - Removed y2bh as parameter to gi_iterate().
- *      sep 24 - If an error occurs in iterating, don't convert age type.
- *             - If age is really tiny and total age, return 0.
- *      oct 1  - D'oh!  The aug 20 change to make iterating always be
- *               by breast height makes it impossible to iterate for
- *               heights below breast-height!  Trying total age now...
- * 2000 jan 27 - Added some missing GI cases.
- *      apr 25 - Added call to age_to_age() in iterate() when converting
- *               from total age to breast height age.
- *      jul 24 - Changed CW to CWI.
- *      oct 10 - Changed check for site <= 1.3 to < 1.3.
- * 2009 may 6  - Forced pure y2bh to be computed for Fdc-Bruce.
- *      apr 16 - Added 2010 Sw Hu and Garcia.
- * 2016 mar 9  - Added parameter to index_to_height().
- * 2023 jul 14  - Translated like for like from C to Java
- *              - Renamed from si2age.c to SiteIndex2Age
- *
- */
-/* @formatter:on */
-
 	// Taken from sindex.h
+	
 	/*
 	 * age types
 	 */
-	private static final short SI_AT_TOTAL = 0;
-	private static final short SI_AT_BREAST = 1;
+	private static final int SI_AT_TOTAL = 0;
+	private static final int SI_AT_BREAST = 1;
 
 	/*
 	 * site index estimation (from height and age) types
@@ -145,8 +85,8 @@ public class SiteIndex2Age {
 	 * moved the file stuff into the functions where it happens #endif
 	 */
 
-	public static double
-			index_to_age(short cu_index, double site_height, short age_type, double site_index, double y2bh) {
+	public static double index_to_age(int cu_index, double site_height, int age_type, double site_index, double y2bh) 
+			throws CommonCalculatorException {
 		double x1, x2, x3, x4;
 		double a, b, c;
 		/*
@@ -259,7 +199,8 @@ public class SiteIndex2Age {
 			if (age < 10 && age > 0) {
 				age = iterate(cu_index, site_height, age_type, site_index, y2bh);
 				if (HOOP) {
-					ht5 = SiteIndex2Height.index_to_height(cu_index, 5.0, SI_AT_BREAST, site_index, y2bh, 0.5); // 0.5
+					ht5 = SiteIndex2Height.index_to_height(cu_index, 5.0, SI_AT_BREAST, site_index, y2bh, 0.5); 
+					// 0.5
 																												// may
 																												// have
 																												// to
@@ -620,11 +561,12 @@ public class SiteIndex2Age {
 		return (age);
 	}
 
-	public static double iterate(short cu_index, double site_height, short age_type, double site_index, double y2bh) {
+	public static double iterate(int cu_index, double site_height, int age_type, double site_index, double y2bh) 
+			throws CommonCalculatorException {
 		double si2age;
 		double step;
 		double test_ht;
-		short err_count;
+		int err_count;
 
 		/* initial guess */
 		si2age = 25;
@@ -632,9 +574,7 @@ public class SiteIndex2Age {
 		err_count = 0;
 
 		/* do a preliminary test to catch some obvious errors */
-		test_ht = SiteIndex2Height.index_to_height(cu_index, si2age, SI_AT_TOTAL, site_index, y2bh, 0.5); // 0.5 may
-																											// have to
-																											// change
+		test_ht = SiteIndex2Height.index_to_height(cu_index, si2age, SI_AT_TOTAL, site_index, y2bh, 0.5 /* may have to change */); 
 		// This would throw an illegal argument exception and move up the stack
 
 		/* loop until real close, or other end condition */
@@ -663,11 +603,8 @@ public class SiteIndex2Age {
 			}
 
 			try {
-				test_ht = SiteIndex2Height.index_to_height(cu_index, si2age, SI_AT_TOTAL, site_index, y2bh, 0.5); // 0.5
-																													// may
-																													// have
-																													// to
-																													// change
+				// 0.5 may have to change
+				test_ht = SiteIndex2Height.index_to_height(cu_index, si2age, SI_AT_TOTAL, site_index, y2bh, 0.5); 
 
 				if (TEST) {
 					try {
@@ -758,7 +695,8 @@ public class SiteIndex2Age {
 		return (si2age);
 	}
 
-	public static double gi_iterate(short cu_index, double site_height, short age_type, double site_index) {
+	public static double gi_iterate(int cu_index, double site_height, int age_type, double site_index)
+			throws CommonCalculatorException {
 		double age;
 		double si2age;
 		double test_site;
@@ -796,7 +734,7 @@ public class SiteIndex2Age {
 
 			}
 			test_site = Height2SiteIndex
-					.height_to_index(cu_index, age, SI_AT_BREAST, site_height, (short) SI_EST_DIRECT);
+					.height_to_index(cu_index, age, SI_AT_BREAST, site_height, SI_EST_DIRECT);
 
 			if (TEST) {
 				try {

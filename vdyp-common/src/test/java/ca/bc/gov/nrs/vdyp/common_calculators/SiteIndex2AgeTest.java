@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 
@@ -50,7 +51,7 @@ class SiteIndex2AgeTest {
 	@Nested
 	class index_to_ageTest {
 		@Test
-		void testSiteHeightLessTooSmall() {
+		void testSiteHeightLessTooSmall() throws CommonCalculatorException {
 			// Test where SiteHeight < 1.3, AgeType = 1 (SI_AT_BREAST)
 			assertThrows(
 					LessThan13Exception.class,
@@ -73,7 +74,7 @@ class SiteIndex2AgeTest {
 		}
 
 		@Test
-		void testSI_FDC_BRUCEValid() {
+		void testSI_FDC_BRUCEValid() throws CommonCalculatorException {
 			double site_height = 1.5;
 			double site_index = 25.0;
 
@@ -124,7 +125,7 @@ class SiteIndex2AgeTest {
 		}
 
 		@Test
-		void testSI_SW_HU_GARCIAValid() {
+		void testSI_SW_HU_GARCIAValid() throws CommonCalculatorException {
 			double site_index = 2;
 			double site_height = 1.6;
 
@@ -136,7 +137,7 @@ class SiteIndex2AgeTest {
 		}
 
 		@Test
-		void testSI_SW_HU_GARCIASI_AT_TOTAL() {
+		void testSI_SW_HU_GARCIASI_AT_TOTAL() throws CommonCalculatorException {
 			double site_index = 2;
 			double site_height = 1.6;
 

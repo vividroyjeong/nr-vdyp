@@ -2,13 +2,10 @@ package ca.bc.gov.nrs.vdyp.common_calculators;
 
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.sqrt;
 
-/*
- * Converts between trees per hectare and quad mean diameter given a base area
+/**
+ * Converts between trees per hectare and quad mean diameter in a given base area
  */
 public class BaseAreaTreeDensityDiameter {
-
-	private BaseAreaTreeDensityDiameter() {
-	}
 
 	/**
 	 * π/10⁴

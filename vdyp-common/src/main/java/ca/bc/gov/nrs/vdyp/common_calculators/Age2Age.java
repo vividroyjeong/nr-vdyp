@@ -2,42 +2,15 @@ package ca.bc.gov.nrs.vdyp.common_calculators;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.AgeTypeErrorException;
 
-/* @formatter:off */
 /**
  * Age2Age.java
  * given age and type, converts to other type of age.
  *
  * @throws AgeTypeErrorException if unnkown age type is provided
  */
-/* @formatter:on */
 public class Age2Age {
-/* @formatter:off */
-/*
- * 1999 sep 23 - Created.
- * 2000 mar 15 - Added specific case for Nigh's 1999 Pli.
- *      jul 25 - Added Goudie/Nigh Sw.
- * 2001 sep 5  - Added Cwi Nigh, Dr Nigh, Fdc Bruce-Nigh, Fdc Nigh TA,
- *               Hwi Nigh, Lw Nigh, Pli Nigh TA98, SW Nigh TA, SS Nigh.
- * 2002 feb 12 - Added Sb Nigh.
- *      oct 9  - Added At Nigh.
- * 2003 jun 13 - Copied several curves and "corrected" the origin from
- *               bhage=0 ht=1.3 to bhage=0.5 ht=1.3.
- *               Added "AC" to the end of the define.
- * 2004 mar 26 - Added SI_SW_GOUDIE_NATAC.
- *      apr 28 - Added Nigh's 2002 Py.
- *             - Added Nigh's 2004 Pl/Sw/Se total age curves.
- *      may 4  - Added SI_SW_GOUDIE_PLAAC.
- *      jul 12 - Added PLI_THROWER which should have been in here since 1999.
- *             - Added check for return value going negative.
- * 2005 oct 20 - Added Huang's Pj.
- * 2009 aug 28 - Added Nigh's 2009 Ep.
- * 2010 mar 4  - Added Nigh's 2009 Ba.
- * 2023 jul 7  - Translated like for like from C to Java
- *             - Renamed from age2age to Age2Age
- */
-/* @formatter:on */
+	// Taken from sindex.h
 
-//Taken from sindex.h
 	/*
 	 * age types
 	 */
@@ -84,7 +57,8 @@ public class Age2Age {
 	private static final int SI_SW_NIGHTA2004 = 111;
 	private static final int SI_PLI_NIGHTA2004 = 109;
 
-	public static double age_to_age(short cu_index, double age1, short age1_type, short age2_type, double y2bh) {
+	public static double age_to_age(int cu_index, double age1, int age1_type, int age2_type, double y2bh)
+			throws AgeTypeErrorException {
 		double returnValue;
 
 		boolean shouldBranch;

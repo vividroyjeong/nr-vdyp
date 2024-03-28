@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ClassErrorException;
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ForestInventoryZoneException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.SpeciesErrorException;
 
@@ -43,12 +44,12 @@ class SiteClassCode2SiteIndexTest {
 	private static final char[] validSiteCl = { 'G', 'M', 'P', 'L' };
 
 	@Test
-	void testClassErrorExcepion() {
+	void testClassErrorExcepion() throws CommonCalculatorException {
 		assertThrows(ClassErrorException.class, () -> SiteClassCode2SiteIndex.class_to_index(SI_SPEC_ACT, 'A', 'A'));
 	}
 
 	@Test
-	void testSI_SPEC_ActAndMb() {
+	void testSI_SPEC_ActAndMb() throws CommonCalculatorException {
 		double actualResult = SiteClassCode2SiteIndex.class_to_index(SI_SPEC_MB, validSiteCl[0], 'A');
 		assertEquals(actualResult, (double) 26);
 
@@ -63,7 +64,7 @@ class SiteClassCode2SiteIndexTest {
 	}
 
 	@Test
-	void testSI_SPEC_AtEaAndEp() {
+	void testSI_SPEC_AtEaAndEp() throws CommonCalculatorException {
 		double actualResult = SiteClassCode2SiteIndex.class_to_index(SI_SPEC_AT, validSiteCl[0], 'A');
 		assertEquals(actualResult, (double) 27);
 
@@ -78,7 +79,7 @@ class SiteClassCode2SiteIndexTest {
 	}
 
 	@Test
-	void testSI_SPEC_BA() {
+	void testSI_SPEC_BA() throws CommonCalculatorException {
 		double actualResult = SiteClassCode2SiteIndex.class_to_index(SI_SPEC_BA, validSiteCl[0], 'A');
 		assertEquals(actualResult, (double) 29);
 
@@ -93,7 +94,7 @@ class SiteClassCode2SiteIndexTest {
 	}
 
 	@Test
-	void testSI_SPEC_BL() {
+	void testSI_SPEC_BL() throws CommonCalculatorException {
 		double actualResult = SiteClassCode2SiteIndex.class_to_index(SI_SPEC_BL, validSiteCl[0], 'A');
 		assertEquals(actualResult, (double) 18);
 
@@ -108,7 +109,7 @@ class SiteClassCode2SiteIndexTest {
 	}
 
 	@Test
-	void testSI_SPEC_CwcAndYc() {
+	void testSI_SPEC_CwcAndYc() throws CommonCalculatorException {
 		double actualResult = SiteClassCode2SiteIndex.class_to_index(SI_SPEC_CWC, validSiteCl[0], 'A');
 		assertEquals(actualResult, (double) 29);
 
@@ -123,7 +124,7 @@ class SiteClassCode2SiteIndexTest {
 	}
 
 	@Test
-	void testSI_SPEC_Cwi() {
+	void testSI_SPEC_Cwi() throws CommonCalculatorException {
 		double actualResult = SiteClassCode2SiteIndex.class_to_index(SI_SPEC_CWI, validSiteCl[0], 'A');
 		assertEquals(actualResult, (double) 22);
 
@@ -138,7 +139,7 @@ class SiteClassCode2SiteIndexTest {
 	}
 
 	@Test
-	void testSI_SPEC_Dr() {
+	void testSI_SPEC_Dr() throws CommonCalculatorException {
 		double actualResult = SiteClassCode2SiteIndex.class_to_index(SI_SPEC_DR, validSiteCl[0], 'A');
 		assertEquals(actualResult, (double) 33);
 
@@ -153,7 +154,7 @@ class SiteClassCode2SiteIndexTest {
 	}
 
 	@Test
-	void testSI_SPEC_Fdc() {
+	void testSI_SPEC_Fdc() throws CommonCalculatorException {
 		double actualResult = SiteClassCode2SiteIndex.class_to_index(SI_SPEC_FDC, validSiteCl[0], 'A');
 		assertEquals(actualResult, (double) 32);
 
@@ -168,7 +169,7 @@ class SiteClassCode2SiteIndexTest {
 	}
 
 	@Test
-	void testSI_SPEC_Fdi() {
+	void testSI_SPEC_Fdi() throws CommonCalculatorException {
 		double actualResult = SiteClassCode2SiteIndex.class_to_index(SI_SPEC_FDI, validSiteCl[0], 'A');
 		assertEquals(actualResult, (double) 20);
 
@@ -183,7 +184,7 @@ class SiteClassCode2SiteIndexTest {
 	}
 
 	@Test
-	void testSI_SPEC_Hwc() {
+	void testSI_SPEC_Hwc() throws CommonCalculatorException {
 		double actualResult = SiteClassCode2SiteIndex.class_to_index(SI_SPEC_HWC, validSiteCl[0], 'A');
 		assertEquals(actualResult, (double) 28);
 
@@ -215,7 +216,7 @@ class SiteClassCode2SiteIndexTest {
 	}
 
 	@Test
-	void testSI_SPEC_Hwi() {
+	void testSI_SPEC_Hwi() throws CommonCalculatorException {
 		double actualResult = SiteClassCode2SiteIndex.class_to_index(SI_SPEC_HWI, validSiteCl[0], 'A');
 		assertEquals(actualResult, (double) 21);
 
@@ -230,7 +231,7 @@ class SiteClassCode2SiteIndexTest {
 	}
 
 	@Test
-	void testSI_SPEC_LaLtAndLw() {
+	void testSI_SPEC_LaLtAndLw() throws CommonCalculatorException {
 		double actualResult = SiteClassCode2SiteIndex.class_to_index(SI_SPEC_LW, validSiteCl[0], 'A');
 		assertEquals(actualResult, (double) 20);
 
@@ -245,7 +246,7 @@ class SiteClassCode2SiteIndexTest {
 	}
 
 	@Test
-	void testSI_SPEC_PliPaAndPf() {
+	void testSI_SPEC_PliPaAndPf() throws CommonCalculatorException {
 		double actualResult = SiteClassCode2SiteIndex.class_to_index(SI_SPEC_PLI, validSiteCl[0], 'A');
 		assertEquals(actualResult, (double) 20);
 
@@ -260,7 +261,7 @@ class SiteClassCode2SiteIndexTest {
 	}
 
 	@Test
-	void testSI_SPEC_Py() {
+	void testSI_SPEC_Py() throws CommonCalculatorException {
 		double actualResult = SiteClassCode2SiteIndex.class_to_index(SI_SPEC_PY, validSiteCl[0], 'A');
 		assertEquals(actualResult, (double) 17);
 
@@ -275,7 +276,7 @@ class SiteClassCode2SiteIndexTest {
 	}
 
 	@Test
-	void testSI_SPEC_Pw() {
+	void testSI_SPEC_Pw() throws CommonCalculatorException {
 		double actualResult = SiteClassCode2SiteIndex.class_to_index(SI_SPEC_PW, validSiteCl[0], 'A');
 		assertEquals(actualResult, (double) 28);
 
@@ -290,7 +291,7 @@ class SiteClassCode2SiteIndexTest {
 	}
 
 	@Test
-	void testSI_SPEC_Ss() {
+	void testSI_SPEC_Ss() throws CommonCalculatorException {
 		double actualResult = SiteClassCode2SiteIndex.class_to_index(SI_SPEC_SS, validSiteCl[0], 'A');
 		assertEquals(actualResult, (double) 28);
 
@@ -305,7 +306,7 @@ class SiteClassCode2SiteIndexTest {
 	}
 
 	@Test
-	void testSI_SPEC_SbSwAndSe() {
+	void testSI_SPEC_SbSwAndSe() throws CommonCalculatorException {
 		double actualResult = SiteClassCode2SiteIndex.class_to_index(SI_SPEC_SB, validSiteCl[0], 'A');
 		assertEquals(actualResult, (double) 19);
 
@@ -320,7 +321,7 @@ class SiteClassCode2SiteIndexTest {
 	}
 
 	@Test
-	void testSpeciesErrorException() {
+	void testSpeciesErrorException() throws CommonCalculatorException {
 		assertThrows(
 				SpeciesErrorException.class,
 				() -> SiteClassCode2SiteIndex.class_to_index((short) 150, validSiteCl[3], 'X')

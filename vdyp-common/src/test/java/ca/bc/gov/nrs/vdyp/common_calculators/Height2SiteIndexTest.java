@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.AgeTypeErrorException;
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMaximumException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMinimumException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
@@ -115,7 +117,7 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testAgeTypeIsSI_AT_BREAST() {
+		void testAgeTypeIsSI_AT_BREAST() throws CommonCalculatorException {
 			double height = 2;
 			double age = 1;
 
@@ -128,7 +130,7 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testAgeTypeIsNotSI_AT_BREAST() {
+		void testAgeTypeIsNotSI_AT_BREAST() throws CommonCalculatorException {
 			double height = 2;
 			double age = 1;
 
@@ -152,7 +154,7 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testAgeTypeIsNotSI_AT_BREASTDefaultCase() {
+		void testAgeTypeIsNotSI_AT_BREASTDefaultCase() throws CommonCalculatorException {
 			double height = 2;
 			double age = 4;
 			short cu_index = SI_PLI_THROWER;
@@ -166,7 +168,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testAgeTypeIsNotSI_AT_BREASTNotSI_EST_DIRECT() {
+		void testAgeTypeIsNotSI_AT_BREASTNotSI_EST_DIRECT() 
+				throws CommonCalculatorException {
 			double height = 2;
 			double age = 4;
 			short cu_index = SI_PLI_THROWER;
@@ -191,7 +194,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_BA_DILUCCA() {
+		void testValidSI_BA_DILUCCA() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -208,7 +212,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_DR_NIGH() {
+		void testValidSI_DR_NIGH() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -222,7 +227,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_HM_MEANS() {
+		void testValidSI_HM_MEANS()
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -237,7 +243,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_FDI_MILNER() {
+		void testValidSI_FDI_MILNER()
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -252,7 +259,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_FDI_THROWER() {
+		void testValidSI_FDI_THROWER()
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -265,7 +273,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_PLI_THROWER() {
+		void testValidSI_PLI_THROWER()
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -281,7 +290,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_LW_MILNER() {
+		void testValidSI_LW_MILNER() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -298,7 +308,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_PLI_DEMPSTER() {
+		void testValidSI_PLI_DEMPSTER() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -317,7 +328,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_PLI_MILNER() {
+		void testValidSI_PLI_MILNER()
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -333,7 +345,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_PY_MILNER() {
+		void testValidSI_PY_MILNER() 				
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -350,7 +363,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_PW_CURTIS() {
+		void testValidSI_PW_CURTIS() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -368,7 +382,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_SW_HU_GARCIA() {
+		void testValidSI_SW_HU_GARCIA() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -382,7 +397,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_SW_DEMPSTER() {
+		void testValidSI_SW_DEMPSTER() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -399,7 +415,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_SB_DEMPSTER() {
+		void testValidSI_SB_DEMPSTER()
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -416,7 +433,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_AT_GOUDIE() {
+		void testValidSI_AT_GOUDIE()
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -432,7 +450,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_FDI_VDP_MONT() {
+		void testValidSI_FDI_VDP_MONT()
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -448,7 +467,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_FDI_VDP_WASH() {
+		void testValidSI_FDI_VDP_WASH() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -464,7 +484,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_FDI_MONS_DF() {
+		void testValidSI_FDI_MONS_DF() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -480,7 +501,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_FDI_MONS_GF() {
+		void testValidSI_FDI_MONS_GF()
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -496,7 +518,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_FDI_MONS_WRC() {
+		void testValidSI_FDI_MONS_WRC()
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -512,7 +535,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_FDI_MONS_WH() {
+		void testValidSI_FDI_MONS_WH()
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -528,7 +552,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_FDI_MONS_SAF() {
+		void testValidSI_FDI_MONS_SAF()
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 1;
 
@@ -544,7 +569,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_FDI_NIGHGI() {
+		void testValidSI_FDI_NIGHGI()
+				throws CommonCalculatorException {
 			double height = 1.3;
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
@@ -785,7 +811,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_PLI_NIGHGI97() {
+		void testValidSI_PLI_NIGHGI97() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
@@ -1027,7 +1054,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_SW_NIGHGI() {
+		void testValidSI_SW_NIGHGI() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 
 			for (int bhage = 1; bhage <= 30; bhage++) {
@@ -1187,7 +1215,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_SW_NIGHGI99() {
+		void testValidSI_SW_NIGHGI99() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
@@ -1427,7 +1456,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_SW_NIGHGI2004() {
+		void testValidSI_SW_NIGHGI2004() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
@@ -1669,7 +1699,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_HWC_NIGHGI99() {
+		void testValidSI_HWC_NIGHGI99() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
@@ -1911,7 +1942,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_HWC_NIGHGI() {
+		void testValidSI_HWC_NIGHGI() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 
 			for (int bhage = 1; bhage <= 30; bhage++) {
@@ -2072,7 +2104,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_HWI_NIGHGI() {
+		void testValidSI_HWI_NIGHGI() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
@@ -2313,7 +2346,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_FDC_NIGHGI() {
+		void testValidSI_FDC_NIGHGI()
+				throws CommonCalculatorException {
 			double height = 1.3;
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
@@ -2554,7 +2588,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_SE_NIGHGI() {
+		void testValidSI_SE_NIGHGI() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
@@ -2792,7 +2827,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_SS_NIGHGI() {
+		void testValidSI_SS_NIGHGI()
+				throws CommonCalculatorException {
 			double height = 1.3;
 
 			for (int bhage = 1; bhage <= 30; bhage++) {
@@ -2951,7 +2987,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_SS_NIGHGI99() {
+		void testValidSI_SS_NIGHGI99()
+				throws CommonCalculatorException {
 			double height = 1.3;
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
@@ -3181,7 +3218,9 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testInvalidSI_SS_NIGHGI99() { // checks minimum and maximum for bhage
+		void testInvalidSI_SS_NIGHGI99() 
+				throws CommonCalculatorException {
+			// checks minimum and maximum for bhage
 			double height = 1.3;
 			assertThrows(
 					GrowthInterceptMaximumException.class,
@@ -3190,7 +3229,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_CWI_NIGHGI() {
+		void testValidSI_CWI_NIGHGI() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
@@ -3429,7 +3469,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_LW_NIGHGI() {
+		void testValidSI_LW_NIGHGI()				
+				throws CommonCalculatorException {
 			double height = 1.3;
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
@@ -3668,7 +3709,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_PY_NIGHGI() {
+		void testValidSI_PY_NIGHGI()
+				throws CommonCalculatorException {
 			double height = 1.3;
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
@@ -3907,7 +3949,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_BA_NIGHGI() {
+		void testValidSI_BA_NIGHGI() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
@@ -4146,7 +4189,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testValidSI_BL_THROWERGI() {
+		void testValidSI_BL_THROWERGI() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
@@ -4386,7 +4430,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testSwitchDefault() {
+		void testSwitchDefault() 
+				throws CommonCalculatorException {
 			double height = 1.3;
 			double bhage = 4;
 
@@ -4400,7 +4445,8 @@ class Height2SiteIndexTest {
 		}
 
 		@Test
-		void testNeitherIfStatement() {
+		void testNeitherIfStatement() 
+				throws CommonCalculatorException {
 			double height = 1.31;
 			double bhage = 4;
 
@@ -4417,7 +4463,7 @@ class Height2SiteIndexTest {
 	@Nested
 	class site_iterateTest {
 		@Test
-		void testAgeTypeIsSI_AT_BREAST() {
+		void testAgeTypeIsSI_AT_BREAST() throws CommonCalculatorException {
 			short cu_index = SI_PLI_THROWER;
 			double age = 4.0; // we are passing this value in so that we have the SI_PLI_THOWER case where
 								// bhage > pi within SiteIndex2Height
