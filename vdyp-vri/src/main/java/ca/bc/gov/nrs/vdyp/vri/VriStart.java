@@ -354,18 +354,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			float dominantHeight, float breastHeightAge, Optional<Float> baseAreaOverstory, boolean fullOccupancy,
 			Collection<? extends BaseVdypSpecies> species, BecDefinition bec, int baseAreaGroup
 	) throws StandProcessingException {
-		var coeMap = Utils.<MatrixMap2<String, String, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.BA_YIELD, MatrixMap2.class
-		);
-
-		var coe = weightedCoefficientSum(
-				7, 0, //
-				species, //
-				BaseVdypSpecies::getFractionGenus, // Weight by fraction
-				spec -> coeMap.get(bec.getDecayBec().getAlias(), spec.getGenus())
-		);
-
-		coe.scalarInPlace(5, x -> Math.max(x, 0f));
+		var coe = estimateBaseAreaYieldCoefficients(species, bec);
 
 		// UPPERGEN Method 1
 		var upperBoundsMap = Utils
@@ -391,13 +380,30 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			bap = 0f;
 		} else {
 			bap = a00 * FloatMath.pow(dominantHeight - coe.getCoe(2), ap)
-					+ FloatMath.exp(coe.getCoe(5) * dominantHeight + coe.getCoe(6) * baseAreaOverstory.orElse(0f));
+					* FloatMath.exp(coe.getCoe(5) * dominantHeight + coe.getCoe(6) * baseAreaOverstory.orElse(0f));
 		}
 
 		if (fullOccupancy)
 			bap /= EMPOC;
 
 		return bap;
+	}
+
+	Coefficients estimateBaseAreaYieldCoefficients(Collection<? extends BaseVdypSpecies> species, BecDefinition bec) {
+		var coeMap = Utils.<MatrixMap2<String, String, Coefficients>>expectParsedControl(
+				controlMap, ControlKey.BA_YIELD, MatrixMap2.class
+		);
+
+		var coe = weightedCoefficientSum(
+				7, 0, //
+				species, //
+				BaseVdypSpecies::getFractionGenus, // Weight by fraction
+				spec -> coeMap.get(bec.getDecayBec().getAlias(), spec.getGenus())
+		);
+
+		// TODO confirm going over 0.5 should drop to 0 as this seems odd.
+		coe.scalarInPlace(5, x -> x > 0.0f ? 0f : x);
+		return coe;
 	}
 
 	PolygonMode findDefaultPolygonMode(
