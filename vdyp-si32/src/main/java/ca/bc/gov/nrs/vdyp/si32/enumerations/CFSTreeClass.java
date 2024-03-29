@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.si32;
+package ca.bc.gov.nrs.vdyp.si32.enumerations;
 
 import java.text.MessageFormat;
 
@@ -38,8 +38,7 @@ import java.text.MessageFormat;
  * The definitions of this table come from Table 2 found in the 'Volume_to_Biomass.doc' file 
  * located in 'Documents/CFS-Biomass'.
  */
-
-public enum enumIntCFSTreeClass implements SI32Enum<enumIntCFSTreeClass> {
+public enum CFSTreeClass implements SI32Enum<CFSTreeClass> {
 	cfsTreeCls_UNKNOWN(-1),
 
 	cfsTreeCls_Missing(0), //
@@ -51,20 +50,20 @@ public enum enumIntCFSTreeClass implements SI32Enum<enumIntCFSTreeClass> {
 	cfsTreeCls_NoLongerUsed(6);
 
 	private int intValue;
-	private static java.util.HashMap<Integer, enumIntCFSTreeClass> mappings;
+	private static java.util.HashMap<Integer, CFSTreeClass> mappings;
 
-	private static java.util.HashMap<Integer, enumIntCFSTreeClass> getMappings() {
+	private static java.util.HashMap<Integer, CFSTreeClass> getMappings() {
 		if (mappings == null) {
-			synchronized (enumIntCFSTreeClass.class) {
+			synchronized (CFSTreeClass.class) {
 				if (mappings == null) {
-					mappings = new java.util.HashMap<Integer, enumIntCFSTreeClass>();
+					mappings = new java.util.HashMap<Integer, CFSTreeClass>();
 				}
 			}
 		}
 		return mappings;
 	}
 
-	private enumIntCFSTreeClass(int value) {
+	private CFSTreeClass(int value) {
 		intValue = value;
 		getMappings().put(value, this);
 	}
@@ -94,7 +93,7 @@ public enum enumIntCFSTreeClass implements SI32Enum<enumIntCFSTreeClass> {
 		return this.toString().substring("cfsTreeCls_".length());
 	}
 
-	public static enumIntCFSTreeClass forValue(int value) {
+	public static CFSTreeClass forValue(int value) {
 		return getMappings().get(value);
 	}
 
@@ -102,7 +101,7 @@ public enum enumIntCFSTreeClass implements SI32Enum<enumIntCFSTreeClass> {
 		return cfsTreeCls_NoLongerUsed.intValue - cfsTreeCls_Missing.intValue + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<enumIntCFSTreeClass> {
+	public static class Iterator extends SI32EnumIterator<CFSTreeClass> {
 		public Iterator() {
 			super(cfsTreeCls_Missing, cfsTreeCls_NoLongerUsed, mappings);
 		}

@@ -1,5 +1,16 @@
 package ca.bc.gov.nrs.vdyp.si32;
 
+import ca.bc.gov.nrs.vdyp.si32.enumerations.CFSBiomassConversionSupportedEcoZone;
+import ca.bc.gov.nrs.vdyp.si32.enumerations.CFSBiomassConversionSupportedSpecies;
+import ca.bc.gov.nrs.vdyp.si32.enumerations.CFSLiveConversionParams;
+
+/**
+ * An two-dimensional array indexed by {@link CFSBiomassConversionSupportedEcoZone} and 
+ * then {@link CFSBiomassConversionSupportedSpecies} given the biomass conversion 
+ * coefficients for that Eco Zone and Species. Each array element is a record
+ * indicating whether it "contains data" - that is, has meaningful values and, if so,
+ * an array of floats indexed by {@link CFSLiveConversionParams}.
+ */
 public class CfsSpeciesBiomassConversionCoefficients {
 	
 	public record Details(

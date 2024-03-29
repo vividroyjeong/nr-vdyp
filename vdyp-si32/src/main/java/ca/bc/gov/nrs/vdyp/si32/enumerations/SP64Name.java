@@ -1,16 +1,14 @@
-package ca.bc.gov.nrs.vdyp.si32;
+package ca.bc.gov.nrs.vdyp.si32.enumerations;
 
 import java.text.MessageFormat;
 
 /**
  * An enumeration holding each of the valid SP0 Species known to VDYP7.
  * <p>
- * <b>sp64_UNKNOWN</b>
- * <p>
- * Represents an error condition or an uninitialized state. This value should not 
- * be used as a species constant.
+ * <b>sp64_UNKNOWN</b> represents an error condition or an uninitialized state. 
+ * This value should not be used as a species constant.
  */
-public enum enumSP64Name implements SI32Enum<enumSP64Name> {
+public enum SP64Name implements SI32Enum<SP64Name> {
 	sp64_UNKNOWN(0),
 
 	sp64_A(1), //
@@ -157,20 +155,20 @@ public enum enumSP64Name implements SI32Enum<enumSP64Name> {
 	sp64_ZH(142);
 
 	private int intValue;
-	private static java.util.HashMap<Integer, enumSP64Name> mappings;
+	private static java.util.HashMap<Integer, SP64Name> mappings;
 
-	private static java.util.HashMap<Integer, enumSP64Name> getMappings() {
+	private static java.util.HashMap<Integer, SP64Name> getMappings() {
 		if (mappings == null) {
-			synchronized (enumSP64Name.class) {
+			synchronized (SP64Name.class) {
 				if (mappings == null) {
-					mappings = new java.util.HashMap<Integer, enumSP64Name>();
+					mappings = new java.util.HashMap<Integer, SP64Name>();
 				}
 			}
 		}
 		return mappings;
 	}
 
-	private enumSP64Name(int value) {
+	private SP64Name(int value) {
 		intValue = value;
 		getMappings().put(value, this);
 	}
@@ -205,11 +203,11 @@ public enum enumSP64Name implements SI32Enum<enumSP64Name> {
 	 * @param text the text value == the enumeration text minus the "sp64_" prefix.
 	 * @return as described
 	 */
-	public static enumSP64Name forText(String text) {
+	public static SP64Name forText(String text) {
 		
 		if (text != null) {
 			try {
-				return enumSP64Name.valueOf(enumSP64Name.class, "sp64_" + text.toUpperCase());
+				return SP64Name.valueOf(SP64Name.class, "sp64_" + text.toUpperCase());
 			} catch (IllegalArgumentException e) {
 				return sp64_UNKNOWN;
 			}
@@ -218,7 +216,7 @@ public enum enumSP64Name implements SI32Enum<enumSP64Name> {
 		}
 	}
 
-	public static enumSP64Name forValue(int value) {
+	public static SP64Name forValue(int value) {
 		return getMappings().get(value);
 	}
 
@@ -226,7 +224,7 @@ public enum enumSP64Name implements SI32Enum<enumSP64Name> {
 		return sp64_ZH.intValue - sp64_A.intValue + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<enumSP64Name> {
+	public static class Iterator extends SI32EnumIterator<SP64Name> {
 		public Iterator() {
 			super(sp64_A, sp64_ZH, mappings);
 		}

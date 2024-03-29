@@ -3198,8 +3198,6 @@ public class Sindxdll {
 	 *                  condition occurs, the height is set to the same as the return value.
 	 *
 	 * @return 0, or an exception
-	 * @throws CommonCalculatorException 
-	 *
 	 * @throws CurveErrorException             when input curve is not a valid curve index
 	 * @throws GrowthInterceptMinimumException when bhage < 0.5
 	 * @throws GrowthInterceptMaximumException when bhage > GI range
@@ -3573,5 +3571,4 @@ public class Sindxdll {
 
 		return si_curve_intend[cu_index];
 	}
-
 }

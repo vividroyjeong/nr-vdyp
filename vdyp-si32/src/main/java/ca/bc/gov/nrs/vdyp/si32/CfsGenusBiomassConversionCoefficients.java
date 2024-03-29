@@ -1,5 +1,16 @@
 package ca.bc.gov.nrs.vdyp.si32;
 
+import ca.bc.gov.nrs.vdyp.si32.enumerations.CFSBiomassConversionSupportedEcoZone;
+import ca.bc.gov.nrs.vdyp.si32.enumerations.CFSBiomassConversionSupportedGenera;
+import ca.bc.gov.nrs.vdyp.si32.enumerations.CFSDeadConversionParams;
+
+/**
+ * An two-dimensional array indexed by {@link CFSBiomassConversionSupportedEcoZone} and 
+ * then {@link CFSBiomassConversionSupportedGenera} given the biomass conversion coefficients 
+ * for that Eco Zone and Genus. Each array element is a record indicating whether it "contains data" - 
+ * that is, has meaningful values and, if so, an array of floats indexed by {@link 
+ * CFSDeadConversionParams}.
+ */
 public class CfsGenusBiomassConversionCoefficients {
 
 	public record Details(
@@ -9,8 +20,11 @@ public class CfsGenusBiomassConversionCoefficients {
 
 	public static Details[][] array = new Details[][]
 	{
+        /*                                cfsLiveParm_A                           cfsLiveParm_b_nonmerch                 cfsLiveParm_a_sap                         cfsLiveParm_cap_sap                       cfsLiveParm_a3                           cfsLiveParm_b3                            cfsLiveParm_c3                        cfsLiveParm_low_stemwood_prop    cfsLiveParm_high_stembark_prop           cfsLiveParm_low_foliage_prop                  */
+        /*                                               cfsLiveParm_B                        cfsLiveParm_k_nonmerch                    cfsLiveParm_b_sap                         cfsLiveParm_a1                           cfsLiveParm_b1                          cfsLiveParm_c1                           cfsLiveParm_min_volume              cfsLiveParm_high_stemwood_prop         cfsLiveParm_low_branches_prop           cfsLiveParm_high_foliage_prop  */
+        /*           containsData                                    cfsLiveParm_a_nonmerch                cfsLiveParm_cap_nonmerch                   cfsLiveParm_k_sap                        cfsLiveParm_a2                           cfsLiveParm_b2                            cfsLiveParm_c2                         cfsLiveParm_max_volume              cfsLiveParm_low_stembark_prop         cfsLiveParm_high_branches_prop                             */
 		{ 
-			new Details(true, new float[] { 1.22712652f, 0.81452013f, 30.54103246f, -0.85134424f, 0.66976961f, 7.47663677f,38.20710600f, -1.70180922f, 0.99582731f, 1.07813018f, -1.36048400f, -0.00020830f,-0.03628110f, -2.11027300f, -0.00008480f, -0.06130400f, -2.14430900f, -0.00021470f,-0.22855880f, 0.24238936f, 1054.28216650f, 0.69867966f, 0.79917170f, 0.16877191f,0.12783935f, 0.07650313f, 0.05779464f, 0.05604530f, 0.01519431f }), 
+			new Details(true, new float[] { 1.22712652f, 0.81452013f, 30.54103246f, -0.85134424f, 0.66976961f, 7.47663677f, 38.20710600f, -1.70180922f, 0.99582731f, 1.07813018f, -1.36048400f, -0.00020830f,-0.03628110f, -2.11027300f, -0.00008480f, -0.06130400f, -2.14430900f, -0.00021470f,-0.22855880f, 0.24238936f, 1054.28216650f, 0.69867966f, 0.79917170f, 0.16877191f,0.12783935f, 0.07650313f, 0.05779464f, 0.05604530f, 0.01519431f }), 
 			new Details(true, new float[] { 0.62123600f, 0.92745332f, 19.30602940f, -0.94332226f, 0.92391419f, 5.50265387f, 0.14752324f, -0.49851762f, 0.98816410f, 1.06044551f, -0.40594000f, 0.00205040f, -0.35415510f, 0.40718550f, 0.00015900f, -0.39484070f, 0.48957120f, -0.00012160f, -0.48394590f, 39.64644616f, 266.25940420f, 0.56054960f, 0.69704505f, 0.10552136f, 0.11022134f, 0.18914164f, 0.11958752f, 0.14478740f, 0.07314609f }), 
 			new Details(false, new float[] { -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f }), 
 			new Details(false, new float[] { -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f, -9.00000000f }), 

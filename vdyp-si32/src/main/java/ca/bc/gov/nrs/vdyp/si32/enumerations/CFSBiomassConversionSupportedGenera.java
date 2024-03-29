@@ -1,79 +1,75 @@
-package ca.bc.gov.nrs.vdyp.si32;
+package ca.bc.gov.nrs.vdyp.si32.enumerations;
 
 import java.text.MessageFormat;
+
+import ca.bc.gov.nrs.vdyp.si32.CfsGenusBiomassConversionCoefficients;
 
 /**
  * Lists the indices for CFS Genus for looking up CFS Conversion Params at the Genus level.
  * <p>
- * These values are used as an index into the {@code cfsGenusBiomassConversionCoefficients} array.
+ * These values are used as an index into the {@link CfsGenusBiomassConversionCoefficients} array.
  */
-public enum enumGenusInternalIndex implements SI32Enum<enumGenusInternalIndex> {
+public enum CFSBiomassConversionSupportedGenera implements SI32Enum<CFSBiomassConversionSupportedGenera> {
 	genusInt_INVALID(-1),
 
 	/* 0 */
-	genusInt_AC(0, "AC"),
+	genusInt_AC(0),
 	/* 1 */
-	genusInt_B(1, "B"),
+	genusInt_B(1),
 	/* 2 */
-	genusInt_C(2, "C"),
+	genusInt_C(2),
 	/* 3 */
-	genusInt_D(3, "D"),
+	genusInt_D(3),
 	/* 4 */
-	genusInt_E(4, "E"),
+	genusInt_E(4),
 	/* 5 */
-	genusInt_F(5, "F"),
+	genusInt_F(5),
 	/* 6 */
-	genusInt_G(6, "G"),
+	genusInt_G(6),
 	/* 7 */
-	genusInt_H(7, "H"),
+	genusInt_H(7),
 	/* 8 */
-	genusInt_L(8, "L"),
+	genusInt_L(8),
 	/* 9 */
-	genusInt_M(9, "M"),
+	genusInt_M(9),
 	/* 10 */
-	genusInt_PL(10, "PL"),
+	genusInt_PL(10),
 	/* 11 */
-	genusInt_Q(11, "O"),
+	genusInt_Q(11),
 	/* 12 */
-	genusInt_R(12, "R"),
+	genusInt_R(12),
 	/* 13 */
-	genusInt_S(13, "S"),
+	genusInt_S(13),
 	/* 14 */
-	genusInt_U(14, "U"),
+	genusInt_U(14),
 	/* 15 */
-	genusInt_V(15, "V"),
+	genusInt_V(15),
 	/* 16 */
-	genusInt_W(16, "W"),
+	genusInt_W(16),
 	/* 17 */
-	genusInt_XH(17, "XH"),
+	genusInt_XH(17),
 	/* 18 */
-	genusInt_ZC(18, "ZC"),
+	genusInt_ZC(18),
 	/* 19 */
-	genusInt_ZH(19, "ZH");
+	genusInt_ZH(19);
 
-	private int intValue;
-	private String textValue;
-	private static java.util.HashMap<Integer, enumGenusInternalIndex> mappings;
+	private final int intValue;
+	private static java.util.HashMap<Integer, CFSBiomassConversionSupportedGenera> mappings;
 
-	private static java.util.HashMap<Integer, enumGenusInternalIndex> getMappings() {
+	private static java.util.HashMap<Integer, CFSBiomassConversionSupportedGenera> getMappings() {
 		if (mappings == null) {
-			synchronized (enumGenusInternalIndex.class) {
+			synchronized (CFSBiomassConversionSupportedGenera.class) {
 				if (mappings == null) {
-					mappings = new java.util.HashMap<Integer, enumGenusInternalIndex>();
+					mappings = new java.util.HashMap<Integer, CFSBiomassConversionSupportedGenera>();
 				}
 			}
 		}
 		return mappings;
 	}
 
-	private enumGenusInternalIndex(int intValue) {
+	private CFSBiomassConversionSupportedGenera(int intValue) {
 		this.intValue = intValue;
 		getMappings().put(intValue, this);
-	}
-
-	private enumGenusInternalIndex(int value, String textValue) {
-		this(value);
-		this.textValue = textValue;
 	}
 
 	@Override
@@ -98,10 +94,10 @@ public enum enumGenusInternalIndex implements SI32Enum<enumGenusInternalIndex> {
 					.format("Cannot call getText on {} as it's not a standard member of the enumeration", this));
 		}
 		
-		return textValue;
+		return this.toString().substring("genusInt_".length());
 	}
 	
-	public static enumGenusInternalIndex forValue(int value) {
+	public static CFSBiomassConversionSupportedGenera forValue(int value) {
 		return getMappings().get(value);
 	}
 
@@ -109,7 +105,7 @@ public enum enumGenusInternalIndex implements SI32Enum<enumGenusInternalIndex> {
 		return genusInt_ZH.intValue - genusInt_AC.intValue + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<enumGenusInternalIndex> {
+	public static class Iterator extends SI32EnumIterator<CFSBiomassConversionSupportedGenera> {
 		public Iterator() {
 			super(genusInt_AC, genusInt_ZH, mappings);
 		}

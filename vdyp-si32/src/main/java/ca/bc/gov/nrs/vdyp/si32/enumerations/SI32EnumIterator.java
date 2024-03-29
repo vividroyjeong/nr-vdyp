@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.si32;
+package ca.bc.gov.nrs.vdyp.si32.enumerations;
 
 import java.util.Iterator;
 import java.util.Map;

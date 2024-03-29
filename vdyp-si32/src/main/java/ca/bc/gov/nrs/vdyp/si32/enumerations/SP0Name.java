@@ -1,11 +1,11 @@
-package ca.bc.gov.nrs.vdyp.si32;
+package ca.bc.gov.nrs.vdyp.si32.enumerations;
 
 import java.text.MessageFormat;
 
 /**
- * An enumeration holding each of the valid SP0 Species known to VDYP7.
+ * An enumeration holding each of the valid SP0 genera known to VDYP7.
  */
-public enum enumSP0Name implements SI32Enum<enumSP0Name> {
+public enum SP0Name implements SI32Enum<SP0Name> {
 	sp0_UNKNOWN(-1),
 
 	sp0_AC(0), //
@@ -26,20 +26,20 @@ public enum enumSP0Name implements SI32Enum<enumSP0Name> {
 	sp0_Y(15);
 
 	private int intValue;
-	private static java.util.HashMap<Integer, enumSP0Name> mappings;
+	private static java.util.HashMap<Integer, SP0Name> mappings;
 
-	private static java.util.HashMap<Integer, enumSP0Name> getMappings() {
+	private static java.util.HashMap<Integer, SP0Name> getMappings() {
 		if (mappings == null) {
-			synchronized (enumSP0Name.class) {
+			synchronized (SP0Name.class) {
 				if (mappings == null) {
-					mappings = new java.util.HashMap<Integer, enumSP0Name>();
+					mappings = new java.util.HashMap<Integer, SP0Name>();
 				}
 			}
 		}
 		return mappings;
 	}
 
-	private enumSP0Name(int value) {
+	private SP0Name(int value) {
 		intValue = value;
 		getMappings().put(value, this);
 	}
@@ -68,7 +68,7 @@ public enum enumSP0Name implements SI32Enum<enumSP0Name> {
 		return this.toString().substring("sp0_".length());
 	}
 
-	public static enumSP0Name forValue(int value) {
+	public static SP0Name forValue(int value) {
 		return getMappings().get(value);
 	}
 	
@@ -76,7 +76,7 @@ public enum enumSP0Name implements SI32Enum<enumSP0Name> {
 		return sp0_Y.intValue - sp0_AC.intValue + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<enumSP0Name> {
+	public static class Iterator extends SI32EnumIterator<SP0Name> {
 		public Iterator() {
 			super(sp0_AC, sp0_Y, mappings);
 		}

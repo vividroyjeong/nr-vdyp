@@ -1,49 +1,34 @@
-package ca.bc.gov.nrs.vdyp.si32;
+package ca.bc.gov.nrs.vdyp.si32.enumerations;
 
 import java.text.MessageFormat;
 
-/*-----------------------------------------------------------------------------
- *
- * enumSpcsInternalIndex
- * =====================
- *
- *    Lists the indices for species supported by the CFS Biomass conversion
- *    process.
- *
- *
- * Members
- * -------
- *
- *    spcsInt_UNKNOWN
- *       Indicates an uninitialized or error condition. This value should never
- *       be used to indicate an actual species index value.
- *
- *    spcsInt_...
- *       Indices into the appropriate dimension for the 
- *       'cfsBiomassConversionCoefficients' array for the indicated
- *       CFS Species.
- *
- *
- * Remarks
- * -------
- *
+/**
+ * Lists the indices for species supported by the CFS Biomass conversion process.
+ * <ul>
+ * <li><b>spcsInt_UNKNOWN</b> indicates an uninitialized or error condition. This 
+ * value should never be used to indicate an actual species index value.
+ * <li><b>spcsInt_...</b> indices into the appropriate dimension for the 
+ * {@link CfsBiomassConversionCoefficients} array for the indicated CFS Species.
+ * </ul>
+ * <b>Remarks</b>
+ * <p>
  *    For BC, there are a limited number of CFS defined species for which
  *    there is a set of conversion factors for within specific Eco Zones.
- *
- *    This enumeration lists each of the species across all ECO Zones for
+ * <p>
+ *    This enumeration lists each of the species across all Eco Zones for
  *    which species specific conversion factors appear at least once.
- *
+ * <p>
  *    The list of enumeration constants is automatically generated and copy
  *    and pasted into this enum definition from the:
- *       -  'Internal C Enum Definition' column of the 
- *       -  'SpeciesTable' table found on the 
- *       -  'Lookups' tab in the
- *       -  'BC_Inventory_updates_by_CBMv2bs.xlsx' located in the
- *       -  'Documents/CFS-Biomass' folder.
- *
+ * <ol>
+ * <li>'Internal C Enum Definition' column of the 
+ * <li>'SpeciesTable' table found on the 
+ * <li>'Lookups' tab in the
+ * <li>'BC_Inventory_updates_by_CBMv2bs.xlsx' located in the
+ * <li>'Documents/CFS-Biomass' folder.
+ * </ol>
  */
-
-public enum enumSpcsInternalIndex implements SI32Enum<enumSpcsInternalIndex> {
+public enum CFSBiomassConversionSupportedSpecies implements SI32Enum<CFSBiomassConversionSupportedSpecies> {
 	spcsInt_UNKNOWN(-1),
 
 	spcsInt_AC(0), // 
@@ -86,20 +71,20 @@ public enum enumSpcsInternalIndex implements SI32Enum<enumSpcsInternalIndex> {
 	spcsInt_YC(37);
 
 	private int intValue;
-	private static java.util.HashMap<Integer, enumSpcsInternalIndex> mappings;
+	private static java.util.HashMap<Integer, CFSBiomassConversionSupportedSpecies> mappings;
 
-	private static java.util.HashMap<Integer, enumSpcsInternalIndex> getMappings() {
+	private static java.util.HashMap<Integer, CFSBiomassConversionSupportedSpecies> getMappings() {
 		if (mappings == null) {
-			synchronized (enumSpcsInternalIndex.class) {
+			synchronized (CFSBiomassConversionSupportedSpecies.class) {
 				if (mappings == null) {
-					mappings = new java.util.HashMap<Integer, enumSpcsInternalIndex>();
+					mappings = new java.util.HashMap<Integer, CFSBiomassConversionSupportedSpecies>();
 				}
 			}
 		}
 		return mappings;
 	}
 
-	private enumSpcsInternalIndex(int value) {
+	private CFSBiomassConversionSupportedSpecies(int value) {
 		intValue = value;
 		getMappings().put(value, this);
 	}
@@ -109,7 +94,7 @@ public enum enumSpcsInternalIndex implements SI32Enum<enumSpcsInternalIndex> {
 		return intValue;
 	}
 
-	public static enumSpcsInternalIndex forValue(int value) {
+	public static CFSBiomassConversionSupportedSpecies forValue(int value) {
 		return getMappings().get(value);
 	}
 
@@ -136,7 +121,7 @@ public enum enumSpcsInternalIndex implements SI32Enum<enumSpcsInternalIndex> {
 		return spcsInt_YC.intValue - spcsInt_AC.intValue + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<enumSpcsInternalIndex> {
+	public static class Iterator extends SI32EnumIterator<CFSBiomassConversionSupportedSpecies> {
 		public Iterator() {
 			super(spcsInt_AC, spcsInt_YC, mappings);
 		}
