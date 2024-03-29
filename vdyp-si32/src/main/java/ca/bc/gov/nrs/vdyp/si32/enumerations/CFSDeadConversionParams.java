@@ -1,20 +1,20 @@
-package ca.bc.gov.nrs.vdyp.si32;
+package ca.bc.gov.nrs.vdyp.si32.enumerations;
 
 import java.text.MessageFormat;
+
+import ca.bc.gov.nrs.vdyp.si32.CfsDeadBiomassConversionCoefficients;
 
 /**
  * Lists the different conversion parameters that support the calculation of Dead CFS Biomass.
  * <ul>
  * <li> cfsDeadParm_UNKNOWN: Indicates an error condition or an uninitialized value. This value
  *       should never be used as an index for a specific conversion parameter.
- * <li> cfsDeadParm_...: Indices into the 'cfsDeadBiomassConversionCoefficients' array for each
+ * <li> cfsDeadParm_...: Indices into the {@link CfsDeadBiomassConversionCoefficients} array for each
  *       of the CFS Biomass conversion parameters/coefficients.
  * </ul>
+ * The CFS Biomass Conversion process is based on a number of hard coded constants/coefficients which 
+ * are used to adjust the conversion by CFS Eco Zone and Species.
  * <p>
- * The CFS Biomass Conversion process is based on a number of hard coded
- * constants/coefficients which are used to adjust the conversion by
- * CFS Eco Zone and Species.
- *
  * The list of enumeration constants is automatically generated and copy and pasted into this 
  * enum definition from the:
  * <ol>
@@ -25,7 +25,7 @@ import java.text.MessageFormat;
  * <li> 'Documents/CFS-Biomass' folder.
  * </ol>
  */
-public enum enumDeadCFSConversionParams implements SI32Enum<enumDeadCFSConversionParams> {
+public enum CFSDeadConversionParams implements SI32Enum<CFSDeadConversionParams> {
 	cfsDeadParm_UNKNOWN(-1), 
 
 	cfsDeadParm_Prop1(0),
@@ -38,13 +38,13 @@ public enum enumDeadCFSConversionParams implements SI32Enum<enumDeadCFSConversio
 	cfsDeadParm_V3(7),
 	cfsDeadParm_V4(8);
 
-	private static java.util.HashMap<Integer, enumDeadCFSConversionParams> mappings;
+	private static java.util.HashMap<Integer, CFSDeadConversionParams> mappings;
 
-	private static java.util.HashMap<Integer, enumDeadCFSConversionParams> getMappings() {
+	private static java.util.HashMap<Integer, CFSDeadConversionParams> getMappings() {
 		if (mappings == null) {
-			synchronized (enumDeadCFSConversionParams.class) {
+			synchronized (CFSDeadConversionParams.class) {
 				if (mappings == null) {
-					mappings = new java.util.HashMap<Integer, enumDeadCFSConversionParams>();
+					mappings = new java.util.HashMap<Integer, CFSDeadConversionParams>();
 				}
 			}
 		}
@@ -53,7 +53,7 @@ public enum enumDeadCFSConversionParams implements SI32Enum<enumDeadCFSConversio
 
 	private int intValue;
 	
-	private enumDeadCFSConversionParams(int value) {
+	private CFSDeadConversionParams(int value) {
 		intValue = value;
 		getMappings().put(value, this);
 	}
@@ -87,7 +87,7 @@ public enum enumDeadCFSConversionParams implements SI32Enum<enumDeadCFSConversio
 		return cfsDeadParm_Prop1.intValue - cfsDeadParm_V4.intValue + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<enumDeadCFSConversionParams> {
+	public static class Iterator extends SI32EnumIterator<CFSDeadConversionParams> {
 		public Iterator() {
 			super(cfsDeadParm_Prop1, cfsDeadParm_V4, mappings);
 		}

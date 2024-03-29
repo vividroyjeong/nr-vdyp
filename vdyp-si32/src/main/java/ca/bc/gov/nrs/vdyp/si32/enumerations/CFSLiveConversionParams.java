@@ -1,15 +1,17 @@
-package ca.bc.gov.nrs.vdyp.si32;
+package ca.bc.gov.nrs.vdyp.si32.enumerations;
 
 import java.text.MessageFormat;
+
+import ca.bc.gov.nrs.vdyp.si32.CfsSpeciesBiomassConversionCoefficients;
 
 /**
  * Live CFS Biomass definitions.
  * <ul>
- * <li> cfsLiveParm_UNKNOWN<p>
+ * <li><b>cfsLiveParm_UNKNOWN</b>
  * 	     Indicates an error condition or an uninitialized value. This value
  *       should never be used as an index for a specific conversion parameter.
- * <li> cfsLiveParm_...<p>
- *       Indices into the 'cfsSpcsBiomassConversionCoefficients' array for each
+ * <li><b>cfsLiveParm_...</b>
+ *       Indices into the {@link CfsSpeciesBiomassConversionCoefficients} array for each
  *       of the CFS Biomass conversion parameters/coefficients.
  * </ul>
  * The CFS Biomass Conversion process is based on a number of hard coded constants/coefficients 
@@ -22,7 +24,7 @@ import java.text.MessageFormat;
  * <li> 'Documents/CFS-Biomass' folder.
  * </ol>
  */
-public enum enumLiveCFSConversionParams implements SI32Enum<enumLiveCFSConversionParams> {
+public enum CFSLiveConversionParams implements SI32Enum<CFSLiveConversionParams> {
 	cfsLiveParm_UNKNOWN(-1, "UNKNOWN"),
 
 	/* Rows copied from spreadsheet appear below. */
@@ -58,20 +60,20 @@ public enum enumLiveCFSConversionParams implements SI32Enum<enumLiveCFSConversio
 
 	private final int intValue;
 	private final String category;
-	private static java.util.HashMap<Integer, enumLiveCFSConversionParams> mappings;
+	private static java.util.HashMap<Integer, CFSLiveConversionParams> mappings;
 
-	private static java.util.HashMap<Integer, enumLiveCFSConversionParams> getMappings() {
+	private static java.util.HashMap<Integer, CFSLiveConversionParams> getMappings() {
 		if (mappings == null) {
-			synchronized (enumLiveCFSConversionParams.class) {
+			synchronized (CFSLiveConversionParams.class) {
 				if (mappings == null) {
-					mappings = new java.util.HashMap<Integer, enumLiveCFSConversionParams>();
+					mappings = new java.util.HashMap<Integer, CFSLiveConversionParams>();
 				}
 			}
 		}
 		return mappings;
 	}
 
-	private enumLiveCFSConversionParams(int value, String category) {
+	private CFSLiveConversionParams(int value, String category) {
 		this.intValue = value;
 		this.category = category;
 		getMappings().put(value, this);
@@ -105,7 +107,7 @@ public enum enumLiveCFSConversionParams implements SI32Enum<enumLiveCFSConversio
 		return this.toString().substring("cfsLiveParm_".length());
 	}
 
-	public static enumLiveCFSConversionParams forValue(int value) {
+	public static CFSLiveConversionParams forValue(int value) {
 		return getMappings().get(value);
 	}
 
@@ -113,7 +115,7 @@ public enum enumLiveCFSConversionParams implements SI32Enum<enumLiveCFSConversio
 		return cfsLiveParm_high_foliage_prop.intValue - cfsLiveParm_A.intValue + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<enumLiveCFSConversionParams> {
+	public static class Iterator extends SI32EnumIterator<CFSLiveConversionParams> {
 		public Iterator() {
 			super(cfsLiveParm_A, cfsLiveParm_high_foliage_prop, mappings);
 		}

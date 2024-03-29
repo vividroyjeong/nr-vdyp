@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.si32;
+package ca.bc.gov.nrs.vdyp.si32.enumerations;
 
 import java.text.MessageFormat;
 
@@ -8,13 +8,12 @@ import java.text.MessageFormat;
  * <ul>
  * <li> ecoZoneInt_UNKNOWN: Indicates an uninitialized value or error condition. This should
  *      never be used to indicate a valid Eco Zone Index.
- * <li> ecoZoneInt_...: Indices into the 'cfsBiomassConversionCoefficients' array corresponding 
+ * <li> ecoZoneInt_...: Indices into the {@link CfsBiomassConversionCoefficients} array corresponding 
  * 		to the identified CFS Eco Zone.
  * </ul>
- * For the BC implementation of the CFS Conversion Factors, only a subset
- * Eco Zones are supported. This enumeration lists each of those Eco Zones
- * and their corresponding index into the 'cfsBiomassConversionCoefficients'
- * array.
+ * For the BC implementation of the CFS Conversion Factors, only a subset Eco Zones are supported. 
+ * This enumeration lists each of those Eco Zones and their corresponding index into the
+ * Cfs*BiomassConversionCoefficients arrays.
  * <p>
  * The list of enumeration constants is automatically generated and copy and pasted into this 
  * enum definition from the:
@@ -26,7 +25,7 @@ import java.text.MessageFormat;
  * <li> 'Documents/CFS-Biomass' folder.
  * </ol>
  */
-public enum enumEcoZoneInternalIndex implements SI32Enum<enumEcoZoneInternalIndex> {
+public enum CFSBiomassConversionSupportedEcoZone implements SI32Enum<CFSBiomassConversionSupportedEcoZone> {
 	ecoZoneInt_UNKNOWN(-1), 
 
 	/* 4 */
@@ -41,20 +40,20 @@ public enum enumEcoZoneInternalIndex implements SI32Enum<enumEcoZoneInternalInde
 	ecoZoneInt_MontaneCordillera(4);
 
 	private int intValue;
-	private static java.util.HashMap<Integer, enumEcoZoneInternalIndex> mappings;
+	private static java.util.HashMap<Integer, CFSBiomassConversionSupportedEcoZone> mappings;
 
-	private static java.util.HashMap<Integer, enumEcoZoneInternalIndex> getMappings() {
+	private static java.util.HashMap<Integer, CFSBiomassConversionSupportedEcoZone> getMappings() {
 		if (mappings == null) {
-			synchronized (enumEcoZoneInternalIndex.class) {
+			synchronized (CFSBiomassConversionSupportedEcoZone.class) {
 				if (mappings == null) {
-					mappings = new java.util.HashMap<Integer, enumEcoZoneInternalIndex>();
+					mappings = new java.util.HashMap<Integer, CFSBiomassConversionSupportedEcoZone>();
 				}
 			}
 		}
 		return mappings;
 	}
 
-	private enumEcoZoneInternalIndex(int value) {
+	private CFSBiomassConversionSupportedEcoZone(int value) {
 		intValue = value;
 		getMappings().put(value, this);
 	}
@@ -88,7 +87,7 @@ public enum enumEcoZoneInternalIndex implements SI32Enum<enumEcoZoneInternalInde
 		return ecoZoneInt_MontaneCordillera.intValue - ecoZoneInt_TaigaPlains.intValue + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<enumEcoZoneInternalIndex> {
+	public static class Iterator extends SI32EnumIterator<CFSBiomassConversionSupportedEcoZone> {
 		public Iterator() {
 			super(ecoZoneInt_TaigaPlains, ecoZoneInt_MontaneCordillera, mappings);
 		}

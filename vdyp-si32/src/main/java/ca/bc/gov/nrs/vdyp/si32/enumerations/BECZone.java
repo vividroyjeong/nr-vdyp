@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.si32;
+package ca.bc.gov.nrs.vdyp.si32.enumerations;
 
 import java.text.MessageFormat;
 
@@ -8,7 +8,7 @@ import java.text.MessageFormat;
  * <li> bec_UNKNOWN: Represents an unknown BEC Zone or an error condition.
  * <li> bec_...: Individual BEC Zones recognized.
  */
-public enum enumIntBECZone implements SI32Enum<enumIntBECZone> {
+public enum BECZone implements SI32Enum<BECZone> {
 	bec_UNKNOWN(-1),
 	
 	bec_AT(1), 
@@ -27,20 +27,20 @@ public enum enumIntBECZone implements SI32Enum<enumIntBECZone> {
 	bec_SWB(14);
 
 	private int intValue;
-	private static java.util.HashMap<Integer, enumIntBECZone> mappings;
+	private static java.util.HashMap<Integer, BECZone> mappings;
 
-	private static java.util.HashMap<Integer, enumIntBECZone> getMappings() {
+	private static java.util.HashMap<Integer, BECZone> getMappings() {
 		if (mappings == null) {
-			synchronized (enumIntBECZone.class) {
+			synchronized (BECZone.class) {
 				if (mappings == null) {
-					mappings = new java.util.HashMap<Integer, enumIntBECZone>();
+					mappings = new java.util.HashMap<Integer, BECZone>();
 				}
 			}
 		}
 		return mappings;
 	}
 
-	private enumIntBECZone(int value) {
+	private BECZone(int value) {
 		intValue = value;
 		getMappings().put(value, this);
 	}
@@ -70,7 +70,7 @@ public enum enumIntBECZone implements SI32Enum<enumIntBECZone> {
 		return this.toString().substring("bec_".length());
 	}
 
-	public static enumIntBECZone forValue(int value) {
+	public static BECZone forValue(int value) {
 		return getMappings().get(value);
 	}
 
@@ -78,7 +78,7 @@ public enum enumIntBECZone implements SI32Enum<enumIntBECZone> {
 		return bec_SWB.intValue - bec_AT.intValue + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<enumIntBECZone> {
+	public static class Iterator extends SI32EnumIterator<BECZone> {
 		public Iterator() {
 			super(bec_AT, bec_SWB, mappings);
 		}

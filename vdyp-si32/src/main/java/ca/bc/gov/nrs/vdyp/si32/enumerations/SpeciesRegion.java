@@ -1,6 +1,4 @@
-package ca.bc.gov.nrs.vdyp.si32;
-
-import java.text.MessageFormat;
+package ca.bc.gov.nrs.vdyp.si32.enumerations;
 
 /**
  * Enumerates each of the potential regions a species can be found in.
@@ -9,26 +7,26 @@ import java.text.MessageFormat;
  * <li>spcsRgn_Interior
  * </ul>
  */
-public enum enumSpeciesRegion implements SI32Enum<enumSpeciesRegion> {
+public enum SpeciesRegion implements SI32Enum<SpeciesRegion> {
 	
 	spcsRgn_Coast(0), // 
 	spcsRgn_Interior(1);
 
 	private int intValue;
-	private static java.util.HashMap<Integer, enumSpeciesRegion> mappings;
+	private static java.util.HashMap<Integer, SpeciesRegion> mappings;
 
-	private static java.util.HashMap<Integer, enumSpeciesRegion> getMappings() {
+	private static java.util.HashMap<Integer, SpeciesRegion> getMappings() {
 		if (mappings == null) {
-			synchronized (enumSpeciesRegion.class) {
+			synchronized (SpeciesRegion.class) {
 				if (mappings == null) {
-					mappings = new java.util.HashMap<Integer, enumSpeciesRegion>();
+					mappings = new java.util.HashMap<Integer, SpeciesRegion>();
 				}
 			}
 		}
 		return mappings;
 	}
 
-	private enumSpeciesRegion(int value) {
+	private SpeciesRegion(int value) {
 		intValue = value;
 		getMappings().put(value, this);
 	}
@@ -48,7 +46,7 @@ public enum enumSpeciesRegion implements SI32Enum<enumSpeciesRegion> {
 		return this.toString().substring("spcsRgn_".length());
 	}
 
-	public static enumSpeciesRegion forValue(int value) {
+	public static SpeciesRegion forValue(int value) {
 		return getMappings().get(value);
 	}
 
@@ -56,7 +54,7 @@ public enum enumSpeciesRegion implements SI32Enum<enumSpeciesRegion> {
 		return spcsRgn_Interior.intValue - spcsRgn_Coast.intValue + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<enumSpeciesRegion> {
+	public static class Iterator extends SI32EnumIterator<SpeciesRegion> {
 		public Iterator() {
 			super(spcsRgn_Coast, spcsRgn_Interior, mappings);
 		}
