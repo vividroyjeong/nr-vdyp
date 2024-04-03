@@ -18,6 +18,9 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.math3.util.Pair;
 
+import ca.bc.gov.nrs.vdyp.application.ProcessingException;
+import ca.bc.gov.nrs.vdyp.model.BecDefinition;
+import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 
 public class Utils {
@@ -257,5 +260,11 @@ public class Utils {
 		if (list.size() >= index)
 			return Optional.of(list.get(index));
 		return Optional.empty();
+	}
+
+	public static BecDefinition getBec(String biogeoclimaticZone, Map<String, Object> controlMap)
+			throws ProcessingException {
+		return expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class).get(biogeoclimaticZone)
+				.orElseThrow(() -> new ProcessingException("Reference to unexpected BEC " + biogeoclimaticZone));
 	}
 }

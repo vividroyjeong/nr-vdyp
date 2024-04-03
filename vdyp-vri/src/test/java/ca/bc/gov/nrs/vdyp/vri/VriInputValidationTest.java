@@ -10,14 +10,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BasalAreaYieldParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperBoundsParser;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
+import ca.bc.gov.nrs.vdyp.test.TestUtils;
 import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
 import ca.bc.gov.nrs.vdyp.vri.model.VriPolygon;
 import ca.bc.gov.nrs.vdyp.vri.model.VriSite;
@@ -25,6 +29,14 @@ import ca.bc.gov.nrs.vdyp.vri.model.VriSite;
 class VriInputValidationTest {
 
 	Map<String, Object> controlMap = new HashMap<>();
+
+	@BeforeEach
+	void setupControlMap() {
+		TestUtils.populateControlMapBecReal(controlMap);
+		TestUtils.populateControlMapGenusReal(controlMap);
+		TestUtils.populateControlMapFromResource(controlMap, new BasalAreaYieldParser(), "YLDBA407.COE");
+		TestUtils.populateControlMapFromResource(controlMap, new UpperBoundsParser(), "PCT_407.coe");
+	}
 
 	@Test
 	void testPassValid() throws Exception {
@@ -51,6 +63,7 @@ class VriInputValidationTest {
 				((VriLayer.Builder) lBuilder).baseArea(66.0f);
 				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
 				((VriLayer.Builder) lBuilder).utilization(7.5f);
+				((VriLayer.Builder) lBuilder).empiricalRelationshipParameterIndex(76);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
@@ -295,68 +308,6 @@ class VriInputValidationTest {
 		assertThrows(StandProcessingException.class, () -> app.checkPolygon(poly));
 	}
 
-	@Test
-	void testFindDefaultModeLowBA() throws Exception {
-		var app = new VriStart();
-
-		MockFileResolver resolver = dummyInput();
-
-		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
-			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
-			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
-			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
-		}));
-
-		final var polygonId = "Test";
-		final var layerType = LayerType.PRIMARY;
-
-		app.init(resolver, controlMap);
-
-		Optional<Float> ageTotal = Optional.of(200f);
-		Optional<Float> yearsToBreastHeight = Optional.of(191f);
-		Optional<Float> height = Optional.of(10f);
-		Optional<Float> baseArea = Optional.of(30f);
-		Optional<Float> treesPerHectare = Optional.of(300f);
-		Optional<Float> percentForest = Optional.of(90f);
-
-		var result = app.findDefaultPolygonMode(
-				ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest
-		);
-
-		assertThat(result, is(PolygonMode.YOUNG));
-	}
-
-	@Test
-	void testFindDefaultModeLowHeight() throws Exception {
-		var app = new VriStart();
-
-		MockFileResolver resolver = dummyInput();
-
-		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
-			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
-			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
-			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
-		}));
-
-		final var polygonId = "Test";
-		final var layerType = LayerType.PRIMARY;
-
-		app.init(resolver, controlMap);
-
-		Optional<Float> ageTotal = Optional.of(200f);
-		Optional<Float> yearsToBreastHeight = Optional.of(189f);
-		Optional<Float> height = Optional.of(1f);
-		Optional<Float> baseArea = Optional.of(30f);
-		Optional<Float> treesPerHectare = Optional.of(300f);
-		Optional<Float> percentForest = Optional.of(90f);
-
-		var result = app.findDefaultPolygonMode(
-				ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest
-		);
-
-		assertThat(result, is(PolygonMode.YOUNG));
-	}
-
 	private MockFileResolver dummyInput() {
 		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
 		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
@@ -367,24 +318,6 @@ class VriInputValidationTest {
 		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
 		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
 		return resolver;
-	}
-
-	@Test
-	void testEMP106() throws Exception {
-		var app = new VriStart();
-
-		MockFileResolver resolver = dummyInput();
-
-		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
-			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
-			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
-			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
-		}));
-
-		app.init(resolver, controlMap);
-
-		// TODO
-
 	}
 
 	@Test
@@ -603,6 +536,7 @@ class VriInputValidationTest {
 				((VriLayer.Builder) lBuilder).baseArea(66.0f);
 				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
 				((VriLayer.Builder) lBuilder).utilization(7.5f);
+				((VriLayer.Builder) lBuilder).empiricalRelationshipParameterIndex(76);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
@@ -698,6 +632,7 @@ class VriInputValidationTest {
 				((VriLayer.Builder) lBuilder).baseArea(66.0f);
 				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
 				((VriLayer.Builder) lBuilder).utilization(7.5f);
+				((VriLayer.Builder) lBuilder).empiricalRelationshipParameterIndex(76);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {

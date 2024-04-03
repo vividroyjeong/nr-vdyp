@@ -298,6 +298,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	// VRI_CHK
 	void checkPolygon(VriPolygon polygon) throws ProcessingException {
 
+		BecDefinition bec = Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap);
+
 		var primaryLayer = requireLayer(polygon, LayerType.PRIMARY);
 
 		// At this point the Fortran implementation nulled the BA and TPH of Primary
@@ -344,7 +346,10 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				}
 			}
 
-			findDefaultPolygonMode(ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest);
+			findDefaultPolygonMode(
+					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest,
+					layer.getSpecies().values(), bec, layer.getEmpericalRelationshipParameterIndex()
+			);
 		}
 
 	}
@@ -408,14 +413,16 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 	PolygonMode findDefaultPolygonMode(
 			Optional<Float> ageTotal, Optional<Float> yearsToBreastHeight, Optional<Float> height,
-			Optional<Float> baseArea, Optional<Float> treesPerHectare, Optional<Float> percentForest
-	) {
+			Optional<Float> baseArea, Optional<Float> treesPerHectare, Optional<Float> percentForest,
+			Collection<VriSpecies> species, BecDefinition bec, Optional<Integer> baseAreaGroup
+	) throws StandProcessingException {
 		Optional<Float> ageBH = ageTotal.map(at -> at - yearsToBreastHeight.orElse(3f));
 
 		float bap;
 		if (ageBH.map(abh -> abh >= 1).orElse(false)) {
-			// TODO EMP106
-			bap = 0;
+			bap = this.estimateBaseAreaYield(
+					height.get(), ageBH.get(), Optional.empty(), false, species, bec, baseAreaGroup.get()
+			);
 		} else {
 			bap = 0;
 		}
@@ -436,20 +443,20 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		} else if (bap < minPredictedBA) {
 			mode = PolygonMode.YOUNG;
 
-			log.atDebug().setMessage("Mode {} because Base Area {} is below minimum {}.").addArgument(mode)
+			log.atDebug().setMessage("Mode {} because predicted Base Area {} is below minimum {}.").addArgument(mode)
 					.addArgument(bap).addArgument(minBA).log();
 		} else if (baseArea.map(x -> x == 0).orElse(true) || treesPerHectare.map(x -> x == 0).orElse(true)) {
 			mode = PolygonMode.YOUNG;
 
-			log.atDebug().setMessage("Mode {} because Base Area and Trees Per Hectare were not specified or zero")
+			log.atDebug().setMessage("Mode {} because given Base Area and Trees Per Hectare were not specified or zero")
 					.addArgument(mode).log();
 		} else {
-			var ration = Utils.mapBoth(baseArea, percentForest, (ba, pf) -> ba * 100f / pf);
+			var ration = Utils.mapBoth(baseArea, percentForest, (ba, pf) -> ba * (100f / pf));
 
 			if (ration.map(r -> r < minBA).orElse(false)) {
 				mode = PolygonMode.YOUNG;
 				log.atDebug().setMessage(
-						"Mode {} because ration ({}) of Base Area ({}) to Percent Forest Land ({}) was below minimum {}"
+						"Mode {} because ration ({}) of given Base Area ({}) to Percent Forest Land ({}) was below minimum {}"
 				).addArgument(mode).addArgument(ration).addArgument(baseArea).addArgument(percentForest)
 						.addArgument(minBA).log();
 
