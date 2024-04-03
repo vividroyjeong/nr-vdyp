@@ -1,7 +1,10 @@
 package ca.bc.gov.nrs.vdyp.vri;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.ByteArrayOutputStream;
@@ -12,12 +15,15 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BasalAreaYieldParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperBoundsParser;
+import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
@@ -603,7 +609,7 @@ class VriInputValidationTest {
 			});
 		});
 
-		app.checkPolygon(poly);
+		assertDoesNotThrow(() -> app.checkPolygon(poly));
 	}
 
 	@Test
@@ -699,7 +705,7 @@ class VriInputValidationTest {
 			});
 		});
 
-		app.checkPolygon(poly);
+		assertDoesNotThrow(() -> app.checkPolygon(poly));
 	}
 
 	@Test
@@ -795,6 +801,707 @@ class VriInputValidationTest {
 		});
 
 		assertThrows(StandProcessingException.class, () -> app.checkPolygon(poly));
+	}
+
+	@ParameterizedTest
+	@CsvSource({ "START,fail", "YOUNG,fail", "BATC,fail", "BATN,fail", "DONT_PROCESS,pass" })
+	void testFailIfSiteIndexMissing(String modeName, String passFail) throws Exception {
+
+		PolygonMode mode = PolygonMode.valueOf(modeName);
+		boolean pass = passFail.equals("pass");
+		var app = new VriStart();
+
+		MockFileResolver resolver = dummyInput();
+
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		}));
+
+		app.init(resolver, controlMap);
+
+		var poly = VriPolygon.build(pBuilder -> {
+			pBuilder.polygonIdentifier("082F074/0071         2001");
+			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.forestInventoryZone(" ");
+			pBuilder.yieldFactor(1.0f);
+			pBuilder.modeFip(mode);
+			pBuilder.buildLayer(lBuilder -> {
+				lBuilder.layerType(LayerType.PRIMARY);
+				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
+				((VriLayer.Builder) lBuilder).baseArea(66.0f);
+				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
+				((VriLayer.Builder) lBuilder).utilization(7.5f);
+
+				// Sites
+				lBuilder.addSite(iBuilder -> {
+					iBuilder.siteGenus("B");
+					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.height(5f);
+					iBuilder.siteCurveNumber(8);
+					// iBuilder.ageTotal(100f);
+				});
+
+				// Species
+				lBuilder.addSpecies(sBuilder -> {
+					sBuilder.genus("B");
+					sBuilder.percentGenus(100f);
+					sBuilder.addSpecies("BL", 100);
+				});
+
+				((VriLayer.Builder) lBuilder).primaryGenus("B");
+			});
+		});
+		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+
+		if (pass) {
+			assertDoesNotThrow(() -> app.checkPolygon(poly));
+		} else {
+			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
+
+			assertThat(ex, hasProperty("message", is("Site index is not present")));
+		}
+	}
+
+	@ParameterizedTest
+	@CsvSource({ "START,fail", "YOUNG,fail", "BATC,fail", "BATN,fail", "DONT_PROCESS,pass" })
+	void testFailIfSiteIndexLow(String modeName, String passFail) throws Exception {
+
+		PolygonMode mode = PolygonMode.valueOf(modeName);
+		boolean pass = passFail.equals("pass");
+		var app = new VriStart();
+
+		MockFileResolver resolver = dummyInput();
+
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		}));
+
+		app.init(resolver, controlMap);
+
+		var poly = VriPolygon.build(pBuilder -> {
+			pBuilder.polygonIdentifier("082F074/0071         2001");
+			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.forestInventoryZone(" ");
+			pBuilder.yieldFactor(1.0f);
+			pBuilder.modeFip(mode);
+			pBuilder.buildLayer(lBuilder -> {
+				lBuilder.layerType(LayerType.PRIMARY);
+				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
+				((VriLayer.Builder) lBuilder).baseArea(66.0f);
+				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
+				((VriLayer.Builder) lBuilder).utilization(7.5f);
+
+				// Sites
+				lBuilder.addSite(iBuilder -> {
+					iBuilder.siteGenus("B");
+					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.height(5f);
+					iBuilder.siteCurveNumber(8);
+					iBuilder.siteIndex(0.0f);
+				});
+
+				// Species
+				lBuilder.addSpecies(sBuilder -> {
+					sBuilder.genus("B");
+					sBuilder.percentGenus(100f);
+					sBuilder.addSpecies("BL", 100);
+				});
+
+				((VriLayer.Builder) lBuilder).primaryGenus("B");
+			});
+		});
+		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+
+		if (pass) {
+			assertDoesNotThrow(() -> app.checkPolygon(poly));
+		} else {
+			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
+
+			assertThat(ex, hasProperty("message", is("Site index 0.0 should be greater than 0.0")));
+		}
+	}
+
+	@ParameterizedTest
+	@CsvSource({ "START,fail", "YOUNG,fail", "BATC,fail", "BATN,fail", "DONT_PROCESS,pass" })
+	void testFailIfAgeTotalMissing(String modeName, String passFail) throws Exception {
+
+		PolygonMode mode = PolygonMode.valueOf(modeName);
+		boolean pass = passFail.equals("pass");
+		var app = new VriStart();
+
+		MockFileResolver resolver = dummyInput();
+
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		}));
+
+		app.init(resolver, controlMap);
+
+		var poly = VriPolygon.build(pBuilder -> {
+			pBuilder.polygonIdentifier("082F074/0071         2001");
+			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.forestInventoryZone(" ");
+			pBuilder.yieldFactor(1.0f);
+			pBuilder.modeFip(mode);
+			pBuilder.buildLayer(lBuilder -> {
+				lBuilder.layerType(LayerType.PRIMARY);
+				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
+				((VriLayer.Builder) lBuilder).baseArea(66.0f);
+				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
+				((VriLayer.Builder) lBuilder).utilization(7.5f);
+
+				// Sites
+				lBuilder.addSite(iBuilder -> {
+					iBuilder.siteGenus("B");
+					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.height(5f);
+					iBuilder.siteCurveNumber(8);
+					iBuilder.siteIndex(1f);
+					iBuilder.ageTotal(Optional.empty());
+				});
+
+				// Species
+				lBuilder.addSpecies(sBuilder -> {
+					sBuilder.genus("B");
+					sBuilder.percentGenus(100f);
+					sBuilder.addSpecies("BL", 100);
+				});
+
+				((VriLayer.Builder) lBuilder).primaryGenus("B");
+			});
+		});
+		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+
+		if (pass) {
+			assertDoesNotThrow(() -> app.checkPolygon(poly));
+		} else {
+			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
+
+			assertThat(ex, hasProperty("message", is("Age total is not present")));
+		}
+	}
+
+	@ParameterizedTest
+	@CsvSource({ "START,fail", "YOUNG,fail", "BATC,fail", "BATN,fail", "DONT_PROCESS,pass" })
+	void testFailIfAgeTotalLow(String modeName, String passFail) throws Exception {
+
+		PolygonMode mode = PolygonMode.valueOf(modeName);
+		boolean pass = passFail.equals("pass");
+		var app = new VriStart();
+
+		MockFileResolver resolver = dummyInput();
+
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		}));
+
+		app.init(resolver, controlMap);
+
+		var poly = VriPolygon.build(pBuilder -> {
+			pBuilder.polygonIdentifier("082F074/0071         2001");
+			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.forestInventoryZone(" ");
+			pBuilder.yieldFactor(1.0f);
+			pBuilder.modeFip(mode);
+			pBuilder.buildLayer(lBuilder -> {
+				lBuilder.layerType(LayerType.PRIMARY);
+				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
+				((VriLayer.Builder) lBuilder).baseArea(66.0f);
+				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
+				((VriLayer.Builder) lBuilder).utilization(7.5f);
+
+				// Sites
+				lBuilder.addSite(iBuilder -> {
+					iBuilder.siteGenus("B");
+					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.height(5f);
+					iBuilder.siteCurveNumber(8);
+					iBuilder.siteIndex(1f);
+					iBuilder.ageTotal(0f);
+				});
+
+				// Species
+				lBuilder.addSpecies(sBuilder -> {
+					sBuilder.genus("B");
+					sBuilder.percentGenus(100f);
+					sBuilder.addSpecies("BL", 100);
+				});
+
+				((VriLayer.Builder) lBuilder).primaryGenus("B");
+			});
+		});
+		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+
+		if (pass) {
+			assertDoesNotThrow(() -> app.checkPolygon(poly));
+		} else {
+			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
+
+			assertThat(ex, hasProperty("message", is("Age total 0.0 should be greater than 0.0")));
+		}
+	}
+
+	@ParameterizedTest
+	@CsvSource({ "START,fail", "YOUNG,pass", "BATC,fail", "BATN,fail", "DONT_PROCESS,pass" })
+	void testFailIfBreastHeightAgeLow(String modeName, String passFail) throws Exception {
+
+		PolygonMode mode = PolygonMode.valueOf(modeName);
+		boolean pass = passFail.equals("pass");
+		var app = new VriStart();
+
+		MockFileResolver resolver = dummyInput();
+
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		}));
+
+		app.init(resolver, controlMap);
+
+		var poly = VriPolygon.build(pBuilder -> {
+			pBuilder.polygonIdentifier("082F074/0071         2001");
+			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.forestInventoryZone(" ");
+			pBuilder.yieldFactor(1.0f);
+			pBuilder.modeFip(mode);
+			pBuilder.buildLayer(lBuilder -> {
+				lBuilder.layerType(LayerType.PRIMARY);
+				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
+				((VriLayer.Builder) lBuilder).baseArea(66.0f);
+				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
+				((VriLayer.Builder) lBuilder).utilization(7.5f);
+
+				// Sites
+				lBuilder.addSite(iBuilder -> {
+					iBuilder.siteGenus("B");
+					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.height(5f);
+					iBuilder.siteCurveNumber(8);
+					iBuilder.siteIndex(1f);
+
+					// These are equal so computed breast height age will be 0
+					iBuilder.ageTotal(10f);
+					iBuilder.yearsToBreastHeight(10f);
+				});
+
+				// Species
+				lBuilder.addSpecies(sBuilder -> {
+					sBuilder.genus("B");
+					sBuilder.percentGenus(100f);
+					sBuilder.addSpecies("BL", 100);
+				});
+
+				((VriLayer.Builder) lBuilder).primaryGenus("B");
+			});
+		});
+		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+
+		if (pass) {
+			assertDoesNotThrow(() -> app.checkPolygon(poly));
+		} else {
+			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
+
+			assertThat(ex, hasProperty("message", is("Breast height age 0.0 should be greater than 0.0")));
+		}
+	}
+
+	@ParameterizedTest
+	@CsvSource({ "START,pass", "YOUNG,fail", "BATC,pass", "BATN,pass", "DONT_PROCESS,pass" })
+	void testFailIfYearsToBreastHeightLow(String modeName, String passFail) throws Exception {
+
+		PolygonMode mode = PolygonMode.valueOf(modeName);
+		boolean pass = passFail.equals("pass");
+		var app = new VriStart();
+
+		MockFileResolver resolver = dummyInput();
+
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		}));
+
+		app.init(resolver, controlMap);
+
+		var poly = VriPolygon.build(pBuilder -> {
+			pBuilder.polygonIdentifier("082F074/0071         2001");
+			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.forestInventoryZone(" ");
+			pBuilder.yieldFactor(1.0f);
+			pBuilder.modeFip(mode);
+			pBuilder.buildLayer(lBuilder -> {
+				lBuilder.layerType(LayerType.PRIMARY);
+				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
+				((VriLayer.Builder) lBuilder).baseArea(66.0f);
+				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
+				((VriLayer.Builder) lBuilder).utilization(7.5f);
+
+				// Sites
+				lBuilder.addSite(iBuilder -> {
+					iBuilder.siteGenus("B");
+					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.height(5f);
+					iBuilder.siteCurveNumber(8);
+					iBuilder.siteIndex(1f);
+					iBuilder.ageTotal(100f);
+					iBuilder.yearsToBreastHeight(0f);
+				});
+
+				// Species
+				lBuilder.addSpecies(sBuilder -> {
+					sBuilder.genus("B");
+					sBuilder.percentGenus(100f);
+					sBuilder.addSpecies("BL", 100);
+				});
+
+				((VriLayer.Builder) lBuilder).primaryGenus("B");
+			});
+		});
+		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+
+		if (pass) {
+			assertDoesNotThrow(() -> app.checkPolygon(poly));
+		} else {
+			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
+
+			assertThat(ex, hasProperty("message", is("Years to breast height 0.0 should be greater than 0.0")));
+		}
+	}
+
+	@ParameterizedTest
+	@CsvSource(
+		{ //
+				"START,5.0,pass", "YOUNG,5.0,pass", "BATC,5.0,pass", "BATN,5.0,pass", "DONT_PROCESS,5.0,pass", //
+				"START,4.5,fail", "YOUNG,4.5,pass", "BATC,4.5,pass", "BATN,4.5,pass", "DONT_PROCESS,4.5,pass", //
+				"START,1.4,fail", "YOUNG,1.4,pass", "BATC,1.4,pass", "BATN,1.4,pass", "DONT_PROCESS,1.4,pass", //
+				"START,1.3,fail", "YOUNG,1.3,pass", "BATC,1.3,fail", "BATN,1.3,fail", "DONT_PROCESS,1.4,pass", //
+				"START,0.0,fail", "YOUNG,0.0,pass", "BATC,0.0,fail", "BATN,0.0,fail" } // DONT_PROCESS triggers another
+																						// check in this case
+	)
+
+	void testFailIfYearsToBreastHeightLow(String modeName, String heightS, String passFail) throws Exception {
+
+		PolygonMode mode = PolygonMode.valueOf(modeName);
+		boolean pass = passFail.equals("pass");
+		var app = new VriStart();
+
+		MockFileResolver resolver = dummyInput();
+
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		}));
+
+		app.init(resolver, controlMap);
+
+		var poly = VriPolygon.build(pBuilder -> {
+			pBuilder.polygonIdentifier("082F074/0071         2001");
+			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.forestInventoryZone(" ");
+			pBuilder.yieldFactor(1.0f);
+			pBuilder.modeFip(mode);
+			pBuilder.buildLayer(lBuilder -> {
+				lBuilder.layerType(LayerType.PRIMARY);
+				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
+				((VriLayer.Builder) lBuilder).baseArea(66.0f);
+				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
+				((VriLayer.Builder) lBuilder).utilization(7.5f);
+
+				// Sites
+				lBuilder.addSite(iBuilder -> {
+					iBuilder.siteGenus("B");
+					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.height(Float.valueOf(heightS));
+					iBuilder.siteCurveNumber(8);
+					iBuilder.siteIndex(1f);
+					iBuilder.ageTotal(100f);
+					iBuilder.yearsToBreastHeight(5f);
+				});
+
+				// Species
+				lBuilder.addSpecies(sBuilder -> {
+					sBuilder.genus("B");
+					sBuilder.percentGenus(100f);
+					sBuilder.addSpecies("BL", 100);
+				});
+
+				((VriLayer.Builder) lBuilder).primaryGenus("B");
+			});
+		});
+		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+
+		if (pass) {
+			assertDoesNotThrow(() -> app.checkPolygon(poly));
+		} else {
+			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
+
+			assertThat(ex, hasProperty("message", startsWith("Height " + heightS + " should be greater than ")));
+		}
+	}
+
+	@ParameterizedTest
+	@CsvSource({ "START,fail", "YOUNG,pass", "BATC,pass", "BATN,pass", "DONT_PROCESS,pass" })
+	void testFailIfBaseAreaLow(String modeName, String passFail) throws Exception {
+
+		PolygonMode mode = PolygonMode.valueOf(modeName);
+		boolean pass = passFail.equals("pass");
+		var app = new VriStart();
+
+		MockFileResolver resolver = dummyInput();
+
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		}));
+
+		app.init(resolver, controlMap);
+
+		var poly = VriPolygon.build(pBuilder -> {
+			pBuilder.polygonIdentifier("082F074/0071         2001");
+			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.forestInventoryZone(" ");
+			pBuilder.yieldFactor(1.0f);
+			pBuilder.modeFip(mode);
+			pBuilder.buildLayer(lBuilder -> {
+				lBuilder.layerType(LayerType.PRIMARY);
+				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
+				((VriLayer.Builder) lBuilder).baseArea(0.0f);
+				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
+				((VriLayer.Builder) lBuilder).utilization(7.5f);
+
+				// Sites
+				lBuilder.addSite(iBuilder -> {
+					iBuilder.siteGenus("B");
+					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.height(5f);
+					iBuilder.siteCurveNumber(8);
+					iBuilder.siteIndex(1f);
+					iBuilder.ageTotal(100f);
+					iBuilder.yearsToBreastHeight(5f);
+				});
+
+				// Species
+				lBuilder.addSpecies(sBuilder -> {
+					sBuilder.genus("B");
+					sBuilder.percentGenus(100f);
+					sBuilder.addSpecies("BL", 100);
+				});
+
+				((VriLayer.Builder) lBuilder).primaryGenus("B");
+			});
+		});
+		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+
+		if (pass) {
+			assertDoesNotThrow(() -> app.checkPolygon(poly));
+		} else {
+			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
+
+			assertThat(ex, hasProperty("message", is("Base area 0.0 should be greater than 0.0")));
+		}
+	}
+
+	@ParameterizedTest
+	@CsvSource(
+		{ "START,fail", /* YOUNG triggers a different validation error in this case */ "BATC,pass", "BATN,pass",
+				"DONT_PROCESS,pass" }
+	)
+	void testFailIfTreesPerHectareLow(String modeName, String passFail) throws Exception {
+
+		PolygonMode mode = PolygonMode.valueOf(modeName);
+		boolean pass = passFail.equals("pass");
+		var app = new VriStart();
+
+		MockFileResolver resolver = dummyInput();
+
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		}));
+
+		app.init(resolver, controlMap);
+
+		var poly = VriPolygon.build(pBuilder -> {
+			pBuilder.polygonIdentifier("082F074/0071         2001");
+			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.forestInventoryZone(" ");
+			pBuilder.yieldFactor(1.0f);
+			pBuilder.modeFip(mode);
+			pBuilder.buildLayer(lBuilder -> {
+				lBuilder.layerType(LayerType.PRIMARY);
+				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
+				((VriLayer.Builder) lBuilder).baseArea(30.0f);
+				((VriLayer.Builder) lBuilder).treesPerHectare(0f);
+				((VriLayer.Builder) lBuilder).utilization(7.5f);
+
+				// Sites
+				lBuilder.addSite(iBuilder -> {
+					iBuilder.siteGenus("B");
+					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.height(5f);
+					iBuilder.siteCurveNumber(8);
+					iBuilder.siteIndex(1f);
+					iBuilder.ageTotal(100f);
+					iBuilder.yearsToBreastHeight(5f);
+				});
+
+				// Species
+				lBuilder.addSpecies(sBuilder -> {
+					sBuilder.genus("B");
+					sBuilder.percentGenus(100f);
+					sBuilder.addSpecies("BL", 100);
+				});
+
+				((VriLayer.Builder) lBuilder).primaryGenus("B");
+			});
+		});
+		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+
+		if (pass) {
+			assertDoesNotThrow(() -> app.checkPolygon(poly));
+		} else {
+			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
+
+			assertThat(ex, hasProperty("message", is("Trees per hectare 0.0 should be greater than 0.0")));
+		}
+	}
+
+	@ParameterizedTest
+	@CsvSource({ "START,pass", "YOUNG,pass", "BATC,fail", "BATN,pass", "DONT_PROCESS,pass" })
+	void testFailIfCrownClosureLow(String modeName, String passFail) throws Exception {
+
+		PolygonMode mode = PolygonMode.valueOf(modeName);
+		boolean pass = passFail.equals("pass");
+		var app = new VriStart();
+
+		MockFileResolver resolver = dummyInput();
+
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		}));
+
+		app.init(resolver, controlMap);
+
+		var poly = VriPolygon.build(pBuilder -> {
+			pBuilder.polygonIdentifier("082F074/0071         2001");
+			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.forestInventoryZone(" ");
+			pBuilder.yieldFactor(1.0f);
+			pBuilder.modeFip(mode);
+			pBuilder.buildLayer(lBuilder -> {
+				lBuilder.layerType(LayerType.PRIMARY);
+				((VriLayer.Builder) lBuilder).crownClosure(0.0f);
+				((VriLayer.Builder) lBuilder).baseArea(30.0f);
+				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
+				((VriLayer.Builder) lBuilder).utilization(7.5f);
+
+				// Sites
+				lBuilder.addSite(iBuilder -> {
+					iBuilder.siteGenus("B");
+					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.height(5f);
+					iBuilder.siteCurveNumber(8);
+					iBuilder.siteIndex(1f);
+					iBuilder.ageTotal(100f);
+					iBuilder.yearsToBreastHeight(5f);
+				});
+
+				// Species
+				lBuilder.addSpecies(sBuilder -> {
+					sBuilder.genus("B");
+					sBuilder.percentGenus(100f);
+					sBuilder.addSpecies("BL", 100);
+				});
+
+				((VriLayer.Builder) lBuilder).primaryGenus("B");
+			});
+		});
+		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+
+		if (pass) {
+			assertDoesNotThrow(() -> app.checkPolygon(poly));
+		} else {
+			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
+
+			assertThat(ex, hasProperty("message", is("Crown closure 0.0 should be greater than 0.0")));
+		}
+	}
+
+	@ParameterizedTest
+	@CsvSource({ "START,pass", "YOUNG,pass", "BATC,pass", "BATN,pass", "DONT_PROCESS,pass" })
+	void testModeSpecificValidationEverythingOK(String modeName, String passFail) throws Exception {
+
+		PolygonMode mode = PolygonMode.valueOf(modeName);
+		boolean pass = passFail.equals("pass");
+		var app = new VriStart();
+
+		MockFileResolver resolver = dummyInput();
+
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		}));
+
+		app.init(resolver, controlMap);
+
+		var poly = VriPolygon.build(pBuilder -> {
+			pBuilder.polygonIdentifier("082F074/0071         2001");
+			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.forestInventoryZone(" ");
+			pBuilder.yieldFactor(1.0f);
+			pBuilder.modeFip(mode);
+			pBuilder.buildLayer(lBuilder -> {
+				lBuilder.layerType(LayerType.PRIMARY);
+				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
+				((VriLayer.Builder) lBuilder).baseArea(30.0f);
+				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
+				((VriLayer.Builder) lBuilder).utilization(7.5f);
+
+				// Sites
+				lBuilder.addSite(iBuilder -> {
+					iBuilder.siteGenus("B");
+					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.height(5f);
+					iBuilder.siteCurveNumber(8);
+					iBuilder.siteIndex(1f);
+					iBuilder.ageTotal(100f);
+					iBuilder.yearsToBreastHeight(5f);
+				});
+
+				// Species
+				lBuilder.addSpecies(sBuilder -> {
+					sBuilder.genus("B");
+					sBuilder.percentGenus(100f);
+					sBuilder.addSpecies("BL", 100);
+				});
+
+				((VriLayer.Builder) lBuilder).primaryGenus("B");
+			});
+		});
+		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+
+		if (pass) {
+			assertDoesNotThrow(() -> app.checkPolygon(poly));
+		} else {
+			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
+
+			assertThat(ex, hasProperty("message", is("Crown closure 0.0 should be greater than 0.0")));
+		}
 	}
 
 }

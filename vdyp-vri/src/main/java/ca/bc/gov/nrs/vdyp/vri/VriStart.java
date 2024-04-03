@@ -323,13 +323,9 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 			Optional<VriSite> primarySite = layer.getPrimaryGenus()
 					.flatMap(id -> Utils.optSafe(layer.getSites().get(id)));
-
 			var ageTotal = primarySite.flatMap(VriSite::getAgeTotal);
-			var height = primarySite.flatMap(VriSite::getHeight);
-			var yearsToBreastHeight = primarySite.flatMap(VriSite::getYearsToBreastHeight);
-			var baseArea = layer.getBaseArea();
 			var treesPerHectare = layer.getTreesPerHectare();
-			var percentForest = polygon.getPercentAvailable();
+			var height = primarySite.flatMap(VriSite::getHeight);
 
 			if (polygon.getModeFip().map(x -> x == PolygonMode.YOUNG).orElse(false)
 					&& layer.getLayer() == LayerType.PRIMARY) {
@@ -346,12 +342,91 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				}
 			}
 
-			findDefaultPolygonMode(
-					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest,
-					layer.getSpecies().values(), bec, layer.getEmpericalRelationshipParameterIndex()
-			);
 		}
 
+		checkPolygonForMode(polygon, bec);
+	}
+
+	protected void checkPolygonForMode(VriPolygon polygon, BecDefinition bec) throws StandProcessingException {
+		VriLayer primaryLayer = polygon.getLayers().get(LayerType.PRIMARY);
+		Optional<VriSite> primarySite = primaryLayer.getPrimaryGenus()
+				.flatMap(id -> Utils.optSafe(primaryLayer.getSites().get(id)));
+		var ageTotal = primarySite.flatMap(VriSite::getAgeTotal);
+		var height = primarySite.flatMap(VriSite::getHeight);
+		var siteIndex = primarySite.flatMap(VriSite::getSiteIndex);
+		var yearsToBreastHeight = primarySite.flatMap(VriSite::getYearsToBreastHeight);
+		var baseArea = primaryLayer.getBaseArea();
+		var treesPerHectare = primaryLayer.getTreesPerHectare();
+		var crownClosure = primaryLayer.getCrownClosure();
+		var percentForest = polygon.getPercentAvailable();
+
+		try {
+			PolygonMode mode = polygon.getModeFip().orElseGet(() -> {
+				try {
+					return findDefaultPolygonMode(
+							ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest,
+							primaryLayer.getSpecies().values(), bec,
+							primaryLayer.getEmpericalRelationshipParameterIndex()
+					);
+				} catch (StandProcessingException e) {
+					throw new RuntimeStandProcessingException(e);
+				}
+			});
+			polygon.setModeFip(Optional.of(mode));
+			Optional<Float> primaryBreastHeightAge = Utils.mapBoth(
+					primaryLayer.getPrimarySite().flatMap(VriSite::getAgeTotal),
+					primaryLayer.getPrimarySite().flatMap(VriSite::getYearsToBreastHeight), (at, ytbh) -> at - ytbh
+			);
+			log.atDebug().setMessage("Polygon mode {} checks").addArgument(mode);
+			switch (mode) {
+
+			case START:
+				validateMinimum("Site index", siteIndex, 0f);
+				validateMinimum("Age total", ageTotal, 0f);
+				validateMinimum("Breast height age", primaryBreastHeightAge, 0f);
+				validateMinimum("Height", height, 4.5f);
+				validateMinimum("Base area", baseArea, 0f);
+				validateMinimum("Trees per hectare", treesPerHectare, 0f);
+				break;
+
+			case YOUNG:
+				validateMinimum("Site index", siteIndex, 0f);
+				validateMinimum("Age total", ageTotal, 0f);
+				validateMinimum("Years to breast height", yearsToBreastHeight, 0f);
+				break;
+
+			case BATN:
+				validateMinimum("Site index", siteIndex, 0f);
+				validateMinimum("Age total", ageTotal, 0f);
+				validateMinimum("Breast height age", primaryBreastHeightAge, 0f);
+				validateMinimum("Height", height, 1.3f);
+				break;
+
+			case BATC:
+				validateMinimum("Site index", siteIndex, 0f);
+				validateMinimum("Age total", ageTotal, 0f);
+				validateMinimum("Breast height age", primaryBreastHeightAge, 0f);
+				validateMinimum("Height", height, 1.3f);
+				validateMinimum("Crown closure", crownClosure, 0f);
+				break;
+
+			case DONT_PROCESS:
+				log.atDebug().setMessage("Skipping validation for ignored polygon");
+				// Do Nothing
+				break;
+			}
+		} catch (RuntimeStandProcessingException e) {
+			throw e.getCause();
+		}
+	}
+
+	void validateMinimum(String fieldName, float value, float minimum) throws StandProcessingException {
+		if (value <= minimum)
+			throw validationError("%s %s should be greater than %s", fieldName, value, minimum);
+	}
+
+	void validateMinimum(String fieldName, Optional<Float> value, float minimum) throws StandProcessingException {
+		validateMinimum(fieldName, value.orElseThrow(() -> validationError("%s is not present", fieldName)), minimum);
 	}
 
 	// EMP106
