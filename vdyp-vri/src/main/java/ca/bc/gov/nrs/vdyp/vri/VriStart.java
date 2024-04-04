@@ -183,18 +183,9 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		try {
 
 			// Do some additional processing then build the layers.
-			layers = List.of(LayerType.PRIMARY, LayerType.VETERAN).stream().map(layerType -> {
+			layers = layersBuilders.values().stream().map(builder -> {
 
-				var builder = Utils.<VriLayer.Builder>optSafe(layersBuilders.get(layerType)).orElseGet(() -> {
-					var b = new VriLayer.Builder();
-					b.polygonIdentifier(polygon.getPolygonIdentifier());
-					b.layerType(layerType);
-					b.crownClosure(0f);
-					b.baseArea(0f);
-					b.treesPerHectare(0f);
-					b.utilization(7.5f);
-					return b;
-				});
+				var layerType = builder.getLayerType().get();
 
 				builder.buildChildren(); // Make sure all children are built before getting them.
 				var layerSpecies = builder.getSpecies();
@@ -345,6 +336,22 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		}
 
 		checkPolygonForMode(polygon, bec);
+
+		VriLayer veteranLayer = polygon.getLayers().get(LayerType.VETERAN);
+
+		Map<String, Float> minMap = Utils.expectParsedControl(controlMap, ControlKey.MINIMA, Map.class);
+
+		float veteranMinHeight = minMap.get(VriControlParser.MINIMUM_VETERAN_HEIGHT);
+
+		if (veteranLayer != null) {
+			Optional<Float> veteranHeight = veteranLayer.getPrimarySite().flatMap(VriSite::getHeight);
+			if (veteranHeight.map(x -> x <= veteranMinHeight).orElse(true)) {
+				throw validationError(
+						"Veteran layer primary species height %s should be greater than or equal to %s",
+						veteranHeight.map(Object::toString).orElse("N/A"), veteranMinHeight
+				);
+			}
+		}
 	}
 
 	protected void checkPolygonForMode(VriPolygon polygon, BecDefinition bec) throws StandProcessingException {

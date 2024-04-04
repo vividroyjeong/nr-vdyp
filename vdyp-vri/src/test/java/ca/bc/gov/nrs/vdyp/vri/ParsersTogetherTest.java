@@ -7,6 +7,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -134,7 +135,7 @@ class ParsersTogetherTest {
 
 		var result = app.getPolygon(polyStream, layerStream, speciesStream, siteStream);
 
-		assertThat(result, hasProperty("layers", Matchers.aMapWithSize(2)));
+		assertThat(result, hasProperty("layers", Matchers.aMapWithSize(1)));
 		var primaryResult = result.getLayers().get(LayerType.PRIMARY);
 		var veteranResult = result.getLayers().get(LayerType.VETERAN);
 		primaryResult.getPrimaryGenus();
@@ -150,19 +151,8 @@ class ParsersTogetherTest {
 						hasProperty("secondaryGenus", notPresent())
 				)
 		);
-		// Set to defaults, not that optional values should be present with a value of 0
-		// instead of not present per the VDYP7 Fortran
-		assertThat(
-				veteranResult, allOf(
-						hasProperty("polygonIdentifier", is(polygonId)), //
-						hasProperty("layer", is(LayerType.VETERAN)), //
-						hasProperty("crownClosure", is(0f)), //
-						hasProperty("utilization", is(7.5f)), //
-						hasProperty("baseArea", present(is(0f))), //
-						hasProperty("treesPerHectare", present(is(0f))), hasProperty("primaryGenus", notPresent()), //
-						hasProperty("secondaryGenus", notPresent())
-				)
-		);
+
+		assertThat(veteranResult, nullValue());
 
 		app.close();
 	}
@@ -214,7 +204,7 @@ class ParsersTogetherTest {
 
 		var result = app.getPolygon(polyStream, layerStream, speciesStream, siteStream);
 
-		assertThat(result, hasProperty("layers", Matchers.aMapWithSize(2)));
+		assertThat(result, hasProperty("layers", Matchers.aMapWithSize(1)));
 		var primaryResult = result.getLayers().get(LayerType.PRIMARY);
 		var veteranResult = result.getLayers().get(LayerType.VETERAN);
 		assertThat(
@@ -229,22 +219,9 @@ class ParsersTogetherTest {
 						hasProperty("secondaryGenus", notPresent())
 				)
 		);
-		// Set to defaults, not that optional values should be present with a value of 0
-		// instead of not present per the VDYP7 Fortran
-		// Except that 0 and 0 are present so they should be nulled later during the
-		// check that computed DQ is less than 7.5.
-		assertThat(
-				primaryResult, allOf(
-						hasProperty("polygonIdentifier", is(polygonId)), //
-						hasProperty("layer", is(LayerType.PRIMARY)), //
-						hasProperty("crownClosure", is(0f)), //
-						hasProperty("utilization", is(7.5f)), //
-						hasProperty("baseArea", present(is(0f))), //
-						hasProperty("treesPerHectare", present(is(0f))), //
-						hasProperty("primaryGenus", notPresent()), //
-						hasProperty("secondaryGenus", notPresent())
-				)
-		);
+
+		assertThat(primaryResult, nullValue());
+
 		app.close();
 	}
 
@@ -314,25 +291,25 @@ class ParsersTogetherTest {
 						hasProperty("polygonIdentifier", is(polygonId)), //
 						hasProperty("layer", is(LayerType.PRIMARY)), //
 						hasProperty("crownClosure", is(0.95f)), //
-						hasProperty("utilization", is(9f)), hasProperty("baseArea", present(closeTo(20f * 0.75f))), // Apply
-																													// Layer
-																													// Percent
-																													// Available
+						hasProperty("utilization", is(9f)), hasProperty(
+								"baseArea", //
+								present(closeTo(20f * 0.75f))
+						), // Apply Layer Percent Available
 						hasProperty("treesPerHectare", present(closeTo(300f * 0.75f))) // Apply Layer Percent Available
 				)
 		);
-		// Set to defaults, not that optional values should be present with a value of 0
-		// instead of not present per the VDYP7 Fortran
+
 		assertThat(
 				veteranResult, allOf(
 						hasProperty("polygonIdentifier", is(polygonId)), //
 						hasProperty("layer", is(LayerType.VETERAN)), //
 						hasProperty("crownClosure", is(0.8f)), //
 						hasProperty("utilization", is(8f)), //
-						hasProperty("baseArea", present(is(30f))), //
-						hasProperty("treesPerHectare", present(is(200f)))
+						hasProperty("baseArea", present(is(30f))), // Don't Apply Layer Percent Available
+						hasProperty("treesPerHectare", present(is(200f))) // Don't Apply Layer Percent Available
 				)
 		);
+
 		app.close();
 	}
 
@@ -383,7 +360,7 @@ class ParsersTogetherTest {
 
 		var result = app.getPolygon(polyStream, layerStream, speciesStream, siteStream);
 
-		assertThat(result, hasProperty("layers", Matchers.aMapWithSize(2)));
+		assertThat(result, hasProperty("layers", Matchers.aMapWithSize(1)));
 		var primaryResult = result.getLayers().get(LayerType.PRIMARY);
 		var veteranResult = result.getLayers().get(LayerType.VETERAN);
 		assertThat(
@@ -396,18 +373,7 @@ class ParsersTogetherTest {
 						hasProperty("treesPerHectare", present(is(300f)))
 				)
 		);
-		// Set to defaults, not that optional values should be present with a value of 0
-		// instead of not present per the VDYP7 Fortran
-		assertThat(
-				veteranResult, allOf(
-						hasProperty("polygonIdentifier", is(polygonId)), //
-						hasProperty("layer", is(LayerType.VETERAN)), //
-						hasProperty("crownClosure", is(0f)), //
-						hasProperty("utilization", is(7.5f)), //
-						hasProperty("baseArea", present(is(0f))), //
-						hasProperty("treesPerHectare", present(is(0f)))
-				)
-		);
+		assertThat(veteranResult, nullValue());
 
 		app.close();
 	}
@@ -435,14 +401,25 @@ class ParsersTogetherTest {
 			polyBuilder.yieldFactor(0.9f);
 		}));
 
-		var layerBuilder = new VriLayer.Builder();
-		layerBuilder.polygonIdentifier(polygonId);
-		layerBuilder.layerType(layerType);
-		layerBuilder.crownClosure(0.95f);
-		layerBuilder.utilization(0.6f);
-		layerBuilder.baseArea(20);
-		layerBuilder.treesPerHectare(300);
-		layerStream.addValue(Collections.singletonMap(layerType, layerBuilder));
+		layerStream.addValue(Utils.constMap(map -> {
+			var layerBuilder = new VriLayer.Builder();
+			layerBuilder.polygonIdentifier(polygonId);
+			layerBuilder.layerType(LayerType.PRIMARY);
+			layerBuilder.crownClosure(0.95f);
+			layerBuilder.utilization(0.6f);
+			layerBuilder.baseArea(20);
+			layerBuilder.treesPerHectare(300);
+			map.put(LayerType.PRIMARY, layerBuilder);
+
+			layerBuilder = new VriLayer.Builder();
+			layerBuilder.polygonIdentifier(polygonId);
+			layerBuilder.layerType(LayerType.VETERAN);
+			layerBuilder.crownClosure(0.85f);
+			layerBuilder.utilization(0.7f);
+			layerBuilder.baseArea(30);
+			layerBuilder.treesPerHectare(200);
+			map.put(LayerType.VETERAN, layerBuilder);
+		}));
 
 		speciesStream.addValue(List.of(VriSpecies.build(specBuilder -> {
 			specBuilder.polygonIdentifier("Test");
@@ -479,6 +456,7 @@ class ParsersTogetherTest {
 						hasProperty("inventoryTypeGroup", present(is(18))) // ITG for a pure (80%) B layer
 				)
 		);
+
 		assertThat(
 				veteranResult, allOf(
 						// Veteran layer should not have primary genus or ITG
@@ -548,16 +526,11 @@ class ParsersTogetherTest {
 
 		var result = app.getPolygon(polyStream, layerStream, speciesStream, siteStream);
 
-		assertThat(result, hasProperty("layers", Matchers.aMapWithSize(2)));
+		assertThat(result, hasProperty("layers", Matchers.aMapWithSize(1)));
 		var primaryResult = result.getLayers().get(LayerType.PRIMARY);
 		var veteranResult = result.getLayers().get(LayerType.VETERAN);
 		assertThat(primaryResult, allOf(hasProperty("empericalRelationshipParameterIndex", present(is(27)))));
-		assertThat(
-				veteranResult, allOf(
-						// Veteran layer should not have a GRPBA1
-						hasProperty("empericalRelationshipParameterIndex", notPresent())
-				)
-		);
+		assertThat(veteranResult, nullValue());
 
 		app.close();
 		mockControl.verify();
