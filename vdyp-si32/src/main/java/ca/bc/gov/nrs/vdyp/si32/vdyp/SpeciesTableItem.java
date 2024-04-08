@@ -1,9 +1,9 @@
-package ca.bc.gov.nrs.vdyp.si32;
+package ca.bc.gov.nrs.vdyp.si32.vdyp;
 
-import ca.bc.gov.nrs.vdyp.si32.enumerations.CFSTreeSpecies;
+import ca.bc.gov.nrs.vdyp.si32.cfs.CfsTreeSpecies;
 
 /**
- * Records all of the information regarding a particular species.
+ * Records all of the information regarding a particular CSF species.
  */
 public record SpeciesTableItem(
 	
@@ -26,7 +26,7 @@ public record SpeciesTableItem(
 	 * The corresponding CFS Species for the MoF Species.  The source for this
 	 * mapping is found in the document <b>Documents/CFS-Biomass/BCSpcsToCFSSpcs-SAS.txt</b>
 	 */
-	CFSTreeSpecies cfsSpecies,
+	CfsTreeSpecies cfsSpecies,
 	
 	/**
 	 * <ul>

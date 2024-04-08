@@ -1,6 +1,9 @@
-package ca.bc.gov.nrs.vdyp.si32.enumerations;
+package ca.bc.gov.nrs.vdyp.si32.cfs;
 
 import java.text.MessageFormat;
+
+import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
+import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 
 /**
  * Lists the indices for species supported by the CFS Biomass conversion process.
@@ -28,7 +31,7 @@ import java.text.MessageFormat;
  * <li>'Documents/CFS-Biomass' folder.
  * </ol>
  */
-public enum CFSBiomassConversionSupportedSpecies implements SI32Enum<CFSBiomassConversionSupportedSpecies> {
+public enum CfsBiomassConversionSupportedSpecies implements SI32Enum<CfsBiomassConversionSupportedSpecies> {
 	spcsInt_UNKNOWN(-1),
 
 	spcsInt_AC(0), // 
@@ -70,41 +73,39 @@ public enum CFSBiomassConversionSupportedSpecies implements SI32Enum<CFSBiomassC
 	spcsInt_XC(36), // 
 	spcsInt_YC(37);
 
-	private int intValue;
-	private static java.util.HashMap<Integer, CFSBiomassConversionSupportedSpecies> mappings;
+	private final int index;
 
-	private static java.util.HashMap<Integer, CFSBiomassConversionSupportedSpecies> getMappings() {
-		if (mappings == null) {
-			synchronized (CFSBiomassConversionSupportedSpecies.class) {
-				if (mappings == null) {
-					mappings = new java.util.HashMap<Integer, CFSBiomassConversionSupportedSpecies>();
-				}
-			}
-		}
-		return mappings;
-	}
-
-	private CFSBiomassConversionSupportedSpecies(int value) {
-		intValue = value;
-		getMappings().put(value, this);
-	}
-
-	@Override
-	public int getValue() {
-		return intValue;
-	}
-
-	public static CFSBiomassConversionSupportedSpecies forValue(int value) {
-		return getMappings().get(value);
+	private CfsBiomassConversionSupportedSpecies(int index) {
+		this.index = index;
 	}
 
 	@Override
 	public int getIndex() {
+		return index;
+	}
+
+	/**
+	 * Returns the enumeration constant with the given index.
+	 * @param index the value in question
+	 * @return the enumeration value, unless no enumeration constant has the given 
+	 * 	   <code>index</code> in which case <code>null</code> is returned.
+	 */
+	public static CfsBiomassConversionSupportedSpecies forIndex(int index) {
+		for (CfsBiomassConversionSupportedSpecies e: CfsBiomassConversionSupportedSpecies.values()) {
+			if (index == e.index)
+				return e;
+		}
+		
+		return null;
+	}
+
+	@Override
+	public int getOffset() {
 		if (this.equals(spcsInt_UNKNOWN)) {
 			throw new UnsupportedOperationException(MessageFormat.format("Cannot call getIndex on {} as it's not a standard member of the enumeration", this));
 		}
 		
-		return intValue;
+		return index;
 	}
 	
 	@Override
@@ -117,13 +118,16 @@ public enum CFSBiomassConversionSupportedSpecies implements SI32Enum<CFSBiomassC
 		return this.toString().substring("spcsInt_".length());
 	}
 
+	/**
+	 * @return the number of non-housekeeping entries in the enumeration
+	 */
 	public static int size() {
-		return spcsInt_YC.intValue - spcsInt_AC.intValue + 1;
+		return spcsInt_YC.index - spcsInt_AC.index + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<CFSBiomassConversionSupportedSpecies> {
+	public static class Iterator extends SI32EnumIterator<CfsBiomassConversionSupportedSpecies> {
 		public Iterator() {
-			super(spcsInt_AC, spcsInt_YC, mappings);
+			super(spcsInt_AC, spcsInt_YC, values());
 		}
 	}
 }

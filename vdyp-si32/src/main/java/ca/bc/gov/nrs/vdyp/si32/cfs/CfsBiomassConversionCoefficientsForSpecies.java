@@ -1,17 +1,15 @@
-package ca.bc.gov.nrs.vdyp.si32;
+package ca.bc.gov.nrs.vdyp.si32.cfs;
 
-import ca.bc.gov.nrs.vdyp.si32.enumerations.CFSBiomassConversionSupportedEcoZone;
-import ca.bc.gov.nrs.vdyp.si32.enumerations.CFSBiomassConversionSupportedSpecies;
-import ca.bc.gov.nrs.vdyp.si32.enumerations.CFSLiveConversionParams;
+import java.text.MessageFormat;
 
 /**
- * An two-dimensional array indexed by {@link CFSBiomassConversionSupportedEcoZone} and 
- * then {@link CFSBiomassConversionSupportedSpecies} given the biomass conversion 
+ * An two-dimensional array indexed by {@link CfsBiomassConversionSupportedEcoZone} and 
+ * then {@link CfsBiomassConversionSupportedSpecies} given the biomass conversion 
  * coefficients for that Eco Zone and Species. Each array element is a record
  * indicating whether it "contains data" - that is, has meaningful values and, if so,
- * an array of floats indexed by {@link CFSLiveConversionParams}.
+ * an array of floats indexed by {@link CfsLiveConversionParams}.
  */
-public class CfsSpeciesBiomassConversionCoefficients {
+public class CfsBiomassConversionCoefficientsForSpecies {
 	
 	public record Details(
 			boolean containsData,
@@ -197,6 +195,7 @@ public class CfsSpeciesBiomassConversionCoefficients {
 /* 172, 14, "LT"            */        new Details( true, new float[]  {    0.75143778f,   0.91192913f,  10.74498908f,  -0.46301133f,   0.17440278f,   4.39212937f,   0.90308376f,  -1.22332431f,   0.99952427f,   1.01477127f,  -2.34729600f,  -0.00003810f,   0.06769770f,  -1.76185300f,  -0.00011640f,  -0.06103690f,  -1.94045600f,  -0.00012810f,  -0.13599980f,   3.85755740f, 795.06432589f,   0.73110412f,   0.76791169f,   0.08102680f,   0.11201413f,   0.10985001f,   0.07993896f,   0.07801907f,    0.04013522f } ),
 /* 173, 14, "LW"            */        new Details( true, new float[]  {    0.75143778f,   0.91192913f,  10.74498908f,  -0.46301133f,   0.17440278f,   4.39212937f,   0.90308376f,  -1.22332431f,   0.99952427f,   1.01477127f,  -2.34729600f,  -0.00003810f,   0.06769770f,  -1.76185300f,  -0.00011640f,  -0.06103690f,  -1.94045600f,  -0.00012810f,  -0.13599980f,   3.85755740f, 795.06432589f,   0.73110412f,   0.76791169f,   0.08102680f,   0.11201413f,   0.10985001f,   0.07993896f,   0.07801907f,    0.04013522f } ),
 /* 174, 14, "MB"            */        new Details( true, new float[]  {    0.59524454f,   0.95946064f,   0.99561952f,  -0.00000001f,   0.01076243f,   1.00638191f,  99.99999999f,  -2.16809311f,   0.99862246f,   1.05240888f,  -1.29145400f,   0.00005210f,  -0.07563690f,  -0.10166420f,   0.00006500f,  -0.27327530f,  -0.80874890f,   0.00011330f,  -0.42555760f,  49.42286060f,1286.02461060f,   0.62914565f,   0.74957214f,   0.12814717f,   0.12815607f,   0.19127050f,   0.10394965f,   0.05143668f,    0.01832213f } ),
+/* 175, 14, "PA"            */        new Details( true, new float[]  {    0.75479228f,   0.89089985f,  99.99999999f,  -2.20023945f,   1.00795439f,   1.02569442f,  99.99999999f,  -2.25728374f,   1.00003645f,   1.03971916f,  -1.30883100f,   0.00037560f,  -0.16440740f,   1.03003500f,   0.00041770f,  -0.46260100f,   1.05425300f,   0.00042330f,  -0.56997400f,   0.89773295f, 529.17971886f,   0.28743721f,   0.70990129f,   0.05801830f,   0.08330062f,   0.35442526f,   0.13573796f,   0.30011923f,    0.07106014f } ),
 /* 176, 14, "PL"            */        new Details( true, new float[]  {    0.85578297f,   0.89359071f,  23.08267664f,  -0.98990909f,   0.91989693f,   3.74879422f,  99.99999999f,  -2.25728374f,   1.00003645f,   1.03971916f,  -1.78523200f,  -0.00017230f,  -0.08261900f,  -1.37992800f,  -0.00061760f,  -0.11238560f,  -1.33995100f,  -0.00060200f,  -0.21375100f,   0.18979415f,1134.25872860f,   0.64951020f,   0.85973857f,   0.09509778f,   0.06631924f,   0.13578987f,   0.04867655f,   0.11960215f,    0.02526565f } ),
 /* 177, 14, "PLC"           */        new Details( false, new float[] {   -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,  -9.00000000f,   -9.00000000f } ),
 /* 178, 14, "PLI"           */        new Details( true, new float[]  {    0.85578297f,   0.89359071f,  23.08267664f,  -0.98990909f,   0.91989693f,   3.74879422f,  99.99999999f,  -2.25728374f,   1.00003645f,   1.03971916f,  -1.78523200f,  -0.00017230f,  -0.08261900f,  -1.37992800f,  -0.00061760f,  -0.11238560f,  -1.33995100f,  -0.00060200f,  -0.21375100f,   0.18979415f,1134.25872860f,   0.64951020f,   0.85973857f,   0.09509778f,   0.06631924f,   0.13578987f,   0.04867655f,   0.11960215f,    0.02526565f } ),
@@ -212,4 +211,43 @@ public class CfsSpeciesBiomassConversionCoefficients {
 /* 188, 14, "XC"            */        new Details( true, new float[]  {    0.71277167f,   0.91839618f,  18.91496167f,  -0.95750355f,   0.95031550f,   4.07752734f,  13.99522104f,  -1.82655187f,   1.00020156f,   1.03737665f,  -1.40125200f,   0.00029920f,  -0.12317990f,  -0.56233390f,   0.00016490f,  -0.20800120f,  -0.55519280f,  -0.00025920f,  -0.28653120f,   0.18979415f,2571.70932790f,   0.50922886f,   0.71271393f,   0.10239754f,   0.14399744f,   0.20604212f,   0.12116144f,   0.18233148f,    0.02212719f } ),
 /* 189, 14, "YC"            */        new Details( true, new float[]  {    0.65504661f,   0.94266575f,  48.26663286f,  -1.50863098f,   1.03107421f,  10.00000000f,   0.37187560f,  -0.66318784f,   0.99125833f,   1.07026039f,   0.18168430f,   0.00057200f,  -0.43323690f,   1.71208200f,   0.00048400f,  -0.62852180f,   2.25981300f,   0.00071330f,  -0.81356780f,   1.81173251f,1591.07396390f,   0.19240853f,   0.76220480f,   0.10059605f,   0.09301315f,   0.31947167f,   0.08848552f,   0.38752376f,    0.05629654f } ) }
 };
+
+	static {
+		if (array.length != CfsBiomassConversionSupportedEcoZone.size()) {
+			throw new IllegalStateException("CfsBiomassConversionCoefficientsForSpecies does not contain exactly one "
+					+ " entry for each CfsBiomassConversionSupportedEcoZone");
+		}
+	
+		for (int i = 0; i < array.length; i++) {
+			if (array[i].length != CfsBiomassConversionSupportedSpecies.size()) {
+				throw new IllegalStateException(MessageFormat.format("CfsBiomassConversionCoefficientsForSpecies at" 
+						+ " index {0} does not contain exactly one "
+						+ " entry for each CfsBiomassConversionSupportedSpecies", i));
+			}
+		}
+	
+		for (int i = 0; i < array.length; i++) {
+			for (int j = 0; j < array[i].length; j++) {
+				if (array[i][j].parms.length != CfsLiveConversionParams.size()) {
+					throw new IllegalStateException(MessageFormat.format("CfsBiomassConversionCoefficientsForSpecies at" 
+							+ " index {0} {1} contains {2} elements, but {3} were expected", i, j, array[i][j].parms.length, CfsLiveConversionParams.size()));
+				}
+				if (array[i][j].containsData) {
+					for (int k = 0; k < CfsLiveConversionParams.size(); k++) {
+						if (array[i][j].parms[k] == -9.0f) {
+							throw new IllegalStateException(MessageFormat.format("CfsBiomassConversionCoefficientsForSpecies at" 
+									+ " index {0} {1} {2} is recorded as not containing data, but contains -9.0f", i, j, k));
+						}
+					}
+				} else {
+					for (int k = 0; k < CfsLiveConversionParams.size(); k++) {
+						if (array[i][j].parms[k] != -9.0f) {
+							throw new IllegalStateException(MessageFormat.format("CfsBiomassConversionCoefficientsForSpecies at" 
+									+ " index {0} {1} {2} is recorded as not containing data, but contains {3}", i, j, k, array[i][j].parms[k]));
+						}
+					}
+				}
+			}
+		}
+	}
 }

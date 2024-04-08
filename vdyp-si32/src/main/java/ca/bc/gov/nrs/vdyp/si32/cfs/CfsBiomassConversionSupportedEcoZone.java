@@ -1,6 +1,9 @@
-package ca.bc.gov.nrs.vdyp.si32.enumerations;
+package ca.bc.gov.nrs.vdyp.si32.cfs;
 
 import java.text.MessageFormat;
+
+import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
+import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 
 /**
  * Lists indices to Eco Zone conversion factors for the supported CFS Biomass 
@@ -25,7 +28,7 @@ import java.text.MessageFormat;
  * <li> 'Documents/CFS-Biomass' folder.
  * </ol>
  */
-public enum CFSBiomassConversionSupportedEcoZone implements SI32Enum<CFSBiomassConversionSupportedEcoZone> {
+public enum CfsBiomassConversionSupportedEcoZone implements SI32Enum<CfsBiomassConversionSupportedEcoZone> {
 	ecoZoneInt_UNKNOWN(-1), 
 
 	/* 4 */
@@ -39,38 +42,25 @@ public enum CFSBiomassConversionSupportedEcoZone implements SI32Enum<CFSBiomassC
 	/* 14 */
 	ecoZoneInt_MontaneCordillera(4);
 
-	private int intValue;
-	private static java.util.HashMap<Integer, CFSBiomassConversionSupportedEcoZone> mappings;
+	private final int index;
 
-	private static java.util.HashMap<Integer, CFSBiomassConversionSupportedEcoZone> getMappings() {
-		if (mappings == null) {
-			synchronized (CFSBiomassConversionSupportedEcoZone.class) {
-				if (mappings == null) {
-					mappings = new java.util.HashMap<Integer, CFSBiomassConversionSupportedEcoZone>();
-				}
-			}
-		}
-		return mappings;
-	}
-
-	private CFSBiomassConversionSupportedEcoZone(int value) {
-		intValue = value;
-		getMappings().put(value, this);
-	}
-
-	@Override
-	public int getValue() {
-		return intValue;
+	private CfsBiomassConversionSupportedEcoZone(int index) {
+		this.index = index;
 	}
 
 	@Override
 	public int getIndex() {
+		return index;
+	}
+
+	@Override
+	public int getOffset() {
 		if (this.equals(ecoZoneInt_UNKNOWN)) {
 			throw new UnsupportedOperationException(MessageFormat
 					.format("Cannot call getIndex on {} as it's not a standard member of the enumeration", this));
 		}
 		
-		return intValue;
+		return index;
 	}
 	
 	@Override
@@ -83,13 +73,16 @@ public enum CFSBiomassConversionSupportedEcoZone implements SI32Enum<CFSBiomassC
 		return this.toString().substring("ecoZoneInt_".length());
 	}
 
+	/**
+	 * @return the number of non-housekeeping entries in the enumeration
+	 */
 	public static int size() {
-		return ecoZoneInt_MontaneCordillera.intValue - ecoZoneInt_TaigaPlains.intValue + 1;
+		return ecoZoneInt_MontaneCordillera.index - ecoZoneInt_TaigaPlains.index + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<CFSBiomassConversionSupportedEcoZone> {
+	public static class Iterator extends SI32EnumIterator<CfsBiomassConversionSupportedEcoZone> {
 		public Iterator() {
-			super(ecoZoneInt_TaigaPlains, ecoZoneInt_MontaneCordillera, mappings);
+			super(ecoZoneInt_TaigaPlains, ecoZoneInt_MontaneCordillera, values());
 		}
 	}
 }

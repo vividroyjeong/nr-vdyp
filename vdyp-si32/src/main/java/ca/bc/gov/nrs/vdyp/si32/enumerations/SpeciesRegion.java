@@ -1,5 +1,8 @@
 package ca.bc.gov.nrs.vdyp.si32.enumerations;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Enumerates each of the potential regions a species can be found in.
  * <ul>
@@ -12,33 +15,34 @@ public enum SpeciesRegion implements SI32Enum<SpeciesRegion> {
 	spcsRgn_Coast(0), // 
 	spcsRgn_Interior(1);
 
-	private int intValue;
-	private static java.util.HashMap<Integer, SpeciesRegion> mappings;
+	private static Map<Integer, SpeciesRegion> index2EnumMap = null;
 
-	private static java.util.HashMap<Integer, SpeciesRegion> getMappings() {
-		if (mappings == null) {
+	private static Map<Integer, SpeciesRegion> getMappings() {
+		if (index2EnumMap == null) {
 			synchronized (SpeciesRegion.class) {
-				if (mappings == null) {
-					mappings = new java.util.HashMap<Integer, SpeciesRegion>();
+				if (index2EnumMap == null) {
+					index2EnumMap = new HashMap<>();
 				}
 			}
 		}
-		return mappings;
+		return index2EnumMap;
 	}
 
-	private SpeciesRegion(int value) {
-		intValue = value;
-		getMappings().put(value, this);
-	}
+	private final int index;
 
-	@Override
-	public int getValue() {
-		return intValue;
+	private SpeciesRegion(int index) {
+		this.index = index;
+		getMappings().put(index, this);
 	}
 
 	@Override
 	public int getIndex() {
-		return intValue;
+		return index;
+	}
+
+	@Override
+	public int getOffset() {
+		return index;
 	}
 	
 	@Override
@@ -46,17 +50,26 @@ public enum SpeciesRegion implements SI32Enum<SpeciesRegion> {
 		return this.toString().substring("spcsRgn_".length());
 	}
 
-	public static SpeciesRegion forValue(int value) {
-		return getMappings().get(value);
+	/**
+	 * Returns the enumeration constant with the given index.
+	 * @param index the value in question
+	 * @return the enumeration value, unless no enumeration constant has the given 
+	 * 	   <code>index</code> in which case <code>null</code> is returned.
+	 */
+	public static SpeciesRegion forIndex(int index) {
+		return index2EnumMap.get(index);
 	}
 
+	/**
+	 * @return the number of non-housekeeping entries in the enumeration
+	 */
 	public static int size() {
-		return spcsRgn_Interior.intValue - spcsRgn_Coast.intValue + 1;
+		return spcsRgn_Interior.index - spcsRgn_Coast.index + 1;
 	}
 
 	public static class Iterator extends SI32EnumIterator<SpeciesRegion> {
 		public Iterator() {
-			super(spcsRgn_Coast, spcsRgn_Interior, mappings);
+			super(spcsRgn_Coast, spcsRgn_Interior, values());
 		}
 	}
 }

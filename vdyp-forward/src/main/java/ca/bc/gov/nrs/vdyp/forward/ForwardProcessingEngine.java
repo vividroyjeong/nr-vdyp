@@ -41,6 +41,10 @@ public class ForwardProcessingEngine {
 		fps = new ForwardProcessingState(genusDefinitionMap);
 	}
 
+	public ForwardProcessingEngine(GenusDefinitionMap genusDefinitionMap2) {
+		// TODO Auto-generated constructor stub
+	}
+
 	public void processPolygon(VdypPolygon polygon) throws ProcessingException {
 		
 		logger.info("Starting processing of polygon {}", polygon.getDescription());

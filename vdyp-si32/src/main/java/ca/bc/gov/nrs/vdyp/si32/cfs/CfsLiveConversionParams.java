@@ -1,8 +1,9 @@
-package ca.bc.gov.nrs.vdyp.si32.enumerations;
+package ca.bc.gov.nrs.vdyp.si32.cfs;
 
 import java.text.MessageFormat;
 
-import ca.bc.gov.nrs.vdyp.si32.CfsSpeciesBiomassConversionCoefficients;
+import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
+import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 
 /**
  * Live CFS Biomass definitions.
@@ -11,7 +12,7 @@ import ca.bc.gov.nrs.vdyp.si32.CfsSpeciesBiomassConversionCoefficients;
  * 	     Indicates an error condition or an uninitialized value. This value
  *       should never be used as an index for a specific conversion parameter.
  * <li><b>cfsLiveParm_...</b>
- *       Indices into the {@link CfsSpeciesBiomassConversionCoefficients} array for each
+ *       Indices into the {@link CfsBiomassConversionCoefficientsForSpecies} array for each
  *       of the CFS Biomass conversion parameters/coefficients.
  * </ul>
  * The CFS Biomass Conversion process is based on a number of hard coded constants/coefficients 
@@ -24,7 +25,7 @@ import ca.bc.gov.nrs.vdyp.si32.CfsSpeciesBiomassConversionCoefficients;
  * <li> 'Documents/CFS-Biomass' folder.
  * </ol>
  */
-public enum CFSLiveConversionParams implements SI32Enum<CFSLiveConversionParams> {
+public enum CfsLiveConversionParams implements SI32Enum<CfsLiveConversionParams> {
 	cfsLiveParm_UNKNOWN(-1, "UNKNOWN"),
 
 	/* Rows copied from spreadsheet appear below. */
@@ -58,30 +59,17 @@ public enum CFSLiveConversionParams implements SI32Enum<CFSLiveConversionParams>
 	cfsLiveParm_low_foliage_prop(27, "Foliage"), //
 	cfsLiveParm_high_foliage_prop(28, "Foliage");
 
-	private final int intValue;
+	private final int index;
 	private final String category;
-	private static java.util.HashMap<Integer, CFSLiveConversionParams> mappings;
 
-	private static java.util.HashMap<Integer, CFSLiveConversionParams> getMappings() {
-		if (mappings == null) {
-			synchronized (CFSLiveConversionParams.class) {
-				if (mappings == null) {
-					mappings = new java.util.HashMap<Integer, CFSLiveConversionParams>();
-				}
-			}
-		}
-		return mappings;
-	}
-
-	private CFSLiveConversionParams(int value, String category) {
-		this.intValue = value;
+	private CfsLiveConversionParams(int index, String category) {
+		this.index = index;
 		this.category = category;
-		getMappings().put(value, this);
 	}
 
 	@Override
-	public int getValue() {
-		return intValue;
+	public int getIndex() {
+		return index;
 	}
 
 	public String getCategory() {
@@ -89,12 +77,12 @@ public enum CFSLiveConversionParams implements SI32Enum<CFSLiveConversionParams>
 	}
 
 	@Override
-	public int getIndex() {
+	public int getOffset() {
 		if (this.equals(cfsLiveParm_UNKNOWN)) {
 			throw new UnsupportedOperationException(MessageFormat.format("Cannot call getIndex on {} as it's not a standard member of the enumeration", this));
 		}
 		
-		return intValue;
+		return index;
 	}
 	
 	@Override
@@ -107,17 +95,31 @@ public enum CFSLiveConversionParams implements SI32Enum<CFSLiveConversionParams>
 		return this.toString().substring("cfsLiveParm_".length());
 	}
 
-	public static CFSLiveConversionParams forValue(int value) {
-		return getMappings().get(value);
+	/**
+	 * Returns the enumeration constant with the given index.
+	 * @param index the value in question
+	 * @return the enumeration value, unless no enumeration constant has the given 
+	 * 	   <code>index</code> in which case <code>null</code> is returned.
+	 */
+	public static CfsLiveConversionParams forIndex(int index) {
+		for (CfsLiveConversionParams e: CfsLiveConversionParams.values()) {
+			if (index == e.index)
+				return e;
+		}
+		
+		return null;
 	}
 
+	/**
+	 * @return the number of non-housekeeping entries in the enumeration
+	 */
 	public static int size() {
-		return cfsLiveParm_high_foliage_prop.intValue - cfsLiveParm_A.intValue + 1;
+		return cfsLiveParm_high_foliage_prop.index - cfsLiveParm_A.index + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<CFSLiveConversionParams> {
+	public static class Iterator extends SI32EnumIterator<CfsLiveConversionParams> {
 		public Iterator() {
-			super(cfsLiveParm_A, cfsLiveParm_high_foliage_prop, mappings);
+			super(cfsLiveParm_A, cfsLiveParm_high_foliage_prop, values());
 		}
 	}
 }
