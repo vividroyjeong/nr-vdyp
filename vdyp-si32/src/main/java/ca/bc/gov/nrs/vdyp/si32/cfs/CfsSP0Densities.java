@@ -1,20 +1,26 @@
-package ca.bc.gov.nrs.vdyp.si32;
+package ca.bc.gov.nrs.vdyp.si32.cfs;
 
-import ca.bc.gov.nrs.vdyp.si32.enumerations.CFSDensity;
-import ca.bc.gov.nrs.vdyp.si32.enumerations.SP0Name;
+import ca.bc.gov.nrs.vdyp.si32.vdyp.SP0Name;
 
 /**
  * This is a two dimensional array indexed first by {@link SP0Name} and then
- * {@link CFSDensity}, yielding the density value for this species and density.
+ * {@link CfsDensity}, yielding the density value for the given VDYP7 species
+ * and density.
  * 
  * The density values come from Table 6 of 'Volume_to_Biomass.doc' found in the 
  * folder 'Documents/CFS-Biomass'.
  */
 public class CfsSP0Densities {
 
-	public static float getValue(SP0Name sp0Name, CFSDensity cfsDensity) {
+	public static float DEFAULT_VALUE = -9.0f;
+	
+	public static float getValue(SP0Name sp0Name, CfsDensity cfsDensity) {
 		
-		return array[sp0Name.getIndex()][cfsDensity.ordinal()];
+		if (sp0Name == null || cfsDensity == null) {
+			return DEFAULT_VALUE;
+		} else {
+			return array[sp0Name.getOffset()][cfsDensity.getOffset()];
+		}
 	}
 	
 	private final static float[][] array = {
@@ -35,4 +41,15 @@ public class CfsSP0Densities {
 			{ 387.00F, 257.00F, 568.00F }, //
 			{ 453.00F, 239.00F, 544.00F }
 	};
+	
+	static {
+		if (array.length != SP0Name.size()) {
+			throw new IllegalStateException("CfsSP0Densities.array does not have exactly one row per VDYP7 species");
+		}
+		for (int i = 0; i < array.length; i++) {
+			if (array[i].length != CfsDensity.size()) {
+				throw new IllegalStateException("CfsSP0Densities.array[" + i + "] does not have exactly one element per CFSDensity value");
+			}
+		}
+	}
 }

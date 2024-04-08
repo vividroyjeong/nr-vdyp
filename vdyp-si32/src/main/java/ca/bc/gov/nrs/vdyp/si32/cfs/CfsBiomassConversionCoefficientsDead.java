@@ -1,17 +1,15 @@
-package ca.bc.gov.nrs.vdyp.si32;
+package ca.bc.gov.nrs.vdyp.si32.cfs;
 
-import ca.bc.gov.nrs.vdyp.si32.enumerations.CFSBiomassConversionSupportedEcoZone;
-import ca.bc.gov.nrs.vdyp.si32.enumerations.CFSBiomassConversionSupportedGenera;
-import ca.bc.gov.nrs.vdyp.si32.enumerations.CFSDeadConversionParams;
+import java.text.MessageFormat;
 
 /**
- * An two-dimensional array indexed by {@link CFSBiomassConversionSupportedEcoZone} and 
- * then {@link CFSBiomassConversionSupportedGenera} given the biomass conversion coefficients 
- * for that Eco Zone and Genus. Each array element is a record indicating whether it "contains data" - 
- * that is, has meaningful values and, if so, an array of floats indexed by {@link 
- * CFSDeadConversionParams}.
+ * An two-dimensional array indexed by {@link CfsBiomassConversionSupportedEcoZone} and 
+ * then {@link CfsBiomassConversionSupportedGenera} giving the dead biomass conversion 
+ * coefficients for that Eco Zone and Genus. Each array element is a record indicating 
+ * whether it "contains data" - that is, has meaningful values and, if so, an array of 
+ * floats indexed by {@link CfsDeadConversionParams}.
  */
-public class CfsDeadBiomassConversionCoefficients {
+public class CfsBiomassConversionCoefficientsDead {
 
 	public record Details(
 			boolean containsData, 
@@ -127,4 +125,43 @@ public class CfsDeadBiomassConversionCoefficients {
 			new Details(true, new float[] { 0.08800000f, 0.12600000f, 0.09800000f, 0.08100000f, 0.09200000f, 89.00000000f, 181.50000000f, 301.50000000f, 676.00000000f }) 
 		} 
 	};
+	
+	static {
+		if (array.length != CfsBiomassConversionSupportedEcoZone.size()) {
+			throw new IllegalStateException("CfsBiomassConversionCoefficientsDead does not contain exactly one "
+					+ " entry for each CfsBiomassConversionSupportedEcoZone");
+		}
+
+		for (int i = 0; i < array.length; i++) {
+			if (array[i].length != CfsBiomassConversionSupportedGenera.size()) {
+				throw new IllegalStateException(MessageFormat.format("CfsBiomassConversionCoefficientsDead at" 
+						+ " index {0} does not contain exactly one "
+						+ " entry for each CfsBiomassConversionSupportedGenera", i));
+			}
+		}
+
+		for (int i = 0; i < array.length; i++) {
+			for (int j = 0; j < array[i].length; j++) {
+				if (array[i][j].parms.length != CfsDeadConversionParams.size()) {
+					throw new IllegalStateException(MessageFormat.format("CfsBiomassConversionCoefficientsDead at" 
+							+ " index {0} {1} contains {2} elements, but {3} were expected", i, j, array[i][j].parms.length, CfsDeadConversionParams.size()));
+				}
+				if (array[i][j].containsData) {
+					for (int k = 0; k < CfsDeadConversionParams.size(); k++) {
+						if (array[i][j].parms[k] == -9.0f) {
+							throw new IllegalStateException(MessageFormat.format("CfsBiomassConversionCoefficientsDead at" 
+									+ " index {0} {1} {2} is recorded as containing data, but contains -9.0f", i, j, k));
+						}
+					}
+				} else {
+					for (int k = 0; k < CfsDeadConversionParams.size(); k++) {
+						if (array[i][j].parms[k] != -9.0f) {
+							throw new IllegalStateException(MessageFormat.format("CfsBiomassConversionCoefficientsDead at" 
+									+ " index {0} {1} {2} is recorded as not containing data, but contains {3}", i, j, k, array[i][j].parms[k]));
+						}
+					}
+				}
+			}
+		}
+	}
 }

@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.si32;
+package ca.bc.gov.nrs.vdyp.si32.vdyp;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -6,11 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ca.bc.gov.nrs.vdyp.si32.enumerations.CFSTreeSpecies;
-import ca.bc.gov.nrs.vdyp.si32.enumerations.SP64Name;
+import ca.bc.gov.nrs.vdyp.si32.cfs.CfsTreeSpecies;
 
 /**
- * Maintains all information regarding a particular species.
+ * Maintains all information for VDYP7 species.
  * <p>
  * These entries MUST be listed alphabetically by sCodeName. It is essential
  * that this array's contents match {@code enumSP64Enum} exactly.
@@ -24,7 +23,7 @@ public class SpeciesTable {
 	public static final String UNKNOWN_ENTRY_CODE_NAME = "??";
 	
 	public static final SpeciesTableItem DefaultEntry = new SpeciesTableItem(
-			UNKNOWN_ENTRY_CODE_NAME, "Invalid Species", "Invalid Species", "", "", CFSTreeSpecies.cfsSpcs_UNKNOWN, false,
+			UNKNOWN_ENTRY_CODE_NAME, "Invalid Species", "Invalid Species", "", "", CfsTreeSpecies.cfsSpcs_UNKNOWN, false,
 			false, false, new float[] { -1.0f, -1.0f }, new int[] { -1, -1 });
 	
 	private final List<SpeciesTableItem> speciesTable = new ArrayList<>();
@@ -43,15 +42,19 @@ public class SpeciesTable {
 	}
 	
 	/**
-	 * @param code the two-letter name ("code") of the species.
+	 * @param sp64Name the code name of the species to be found.
 	 * @return the {@code structSpeciesTableItem} of that name, or {@code DefaultEntry} if not found.
 	 */
-	public SpeciesTableItem getByCode(String code) {
-		if (speciesByTextMap.containsKey(code)) {
-			return speciesByTextMap.get(code);
-		} else {
-			return DefaultEntry;
+	public SpeciesTableItem getByCode(String sp64Name) {
+		
+		if (sp64Name != null) {
+			String sp64NameUC = sp64Name.toUpperCase();
+			if (speciesByTextMap.containsKey(sp64NameUC)) {
+				return speciesByTextMap.get(sp64NameUC);
+			} 
 		}
+		
+		return DefaultEntry;
 	}
 	
 	public int getNSpecies() {
@@ -63,599 +66,599 @@ public class SpeciesTable {
 		addSpeciesToTable(DefaultEntry);
 		
 		addSpeciesToTable(new SpeciesTableItem(
-				"A", "Aspen/Cottonwood/Poplar", "Populus", "A", "AC", CFSTreeSpecies.cfsSpcs_UNKNOWN, true,
+				"A", "Aspen/Cottonwood/Poplar", "Populus", "A", "AC", CfsTreeSpecies.cfsSpcs_UNKNOWN, true,
 				true, false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"ABAL", "Silver Fir", "Abies alba", "B", "B", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true,
+				"ABAL", "Silver Fir", "Abies alba", "B", "B", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true,
 				false, new float[] { 57.0f, 42.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"ABCO", "White Fir", "Abies concolor", "B", "B", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true,
+				"ABCO", "White Fir", "Abies concolor", "B", "B", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true,
 				false, new float[] { 57.0f, 42.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"AC", "Poplar", "Populus balsamifera", "CT", "AC", CFSTreeSpecies.cfsSpcs_BalsamPoplar, true,
+				"AC", "Poplar", "Populus balsamifera", "CT", "AC", CfsTreeSpecies.cfsSpcs_BalsamPoplar, true,
 				true, false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"ACB", "Balsam Poplar", "Populus balsamifera ssp. balsamifera", "CT", "AC",
-				CFSTreeSpecies.cfsSpcs_BalsamPoplar, true, true, false, new float[] { 61.0f, 61.0f },
+				CfsTreeSpecies.cfsSpcs_BalsamPoplar, true, true, false, new float[] { 61.0f, 61.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"ACT", "Black Cottonwood", "Populus balsamifera spp. trichocarpa", "CT", "AC",
-				CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true, false, new float[] { 61.0f, 61.0f },
+				CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true, false, new float[] { 61.0f, 61.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"AD", "Cottonwood (exotic)", "<<unknown>>", "CT", "AC", CFSTreeSpecies.cfsSpcs_UNKNOWN, true,
+				"AD", "Cottonwood (exotic)", "<<unknown>>", "CT", "AC", CfsTreeSpecies.cfsSpcs_UNKNOWN, true,
 				true, false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"AH", "Poplar Cottonwood hybrid", "<<unknown>>", "??", "AC",
-				CFSTreeSpecies.cfsSpcs_AspenTrembling, true, true, false, new float[] { 61.0f, 61.0f },
+				CfsTreeSpecies.cfsSpcs_AspenTrembling, true, true, false, new float[] { 61.0f, 61.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"AT", "Trembling Aspen", "Populus tremuloides", "A", "AT",
-				CFSTreeSpecies.cfsSpcs_AspenTrembling, true, true, false, new float[] { 52.0f, 52.0f },
+				CfsTreeSpecies.cfsSpcs_AspenTrembling, true, true, false, new float[] { 52.0f, 52.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"AX", "Hybrid Poplars", "Populus ssp.", "CT", "AC", CFSTreeSpecies.cfsSpcs_UNKNOWN, true,
+				"AX", "Hybrid Poplars", "Populus ssp.", "CT", "AC", CfsTreeSpecies.cfsSpcs_UNKNOWN, true,
 				true, false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"B", "Balsam", "Abies", "B", "B", CFSTreeSpecies.cfsSpcs_Fir, true, false, true,
+				"B", "Balsam", "Abies", "B", "B", CfsTreeSpecies.cfsSpcs_Fir, true, false, true,
 				new float[] { 57.0f, 42.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"BA", "Amabilis/Pacific Silver Fir", "Abies amabilis", "B", "B",
-				CFSTreeSpecies.cfsSpcs_FirAmabilis, true, false, true, new float[] { 57.0f, 57.0f },
+				CfsTreeSpecies.cfsSpcs_FirAmabilis, true, false, true, new float[] { 57.0f, 57.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"BAC", "Amabilis fir (coast)", "<<unknown>>", "B", "B", CFSTreeSpecies.cfsSpcs_UNKNOWN, true,
+				"BAC", "Amabilis fir (coast)", "<<unknown>>", "B", "B", CfsTreeSpecies.cfsSpcs_UNKNOWN, true,
 				false, true, new float[] { 57.0f, 42.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"BAI", "Amabilis fir (interior)", "<<unknown>>", "B", "B", CFSTreeSpecies.cfsSpcs_UNKNOWN,
+				"BAI", "Amabilis fir (interior)", "<<unknown>>", "B", "B", CfsTreeSpecies.cfsSpcs_UNKNOWN,
 				true, false, true, new float[] { 57.0f, 42.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"BB", "Balsam Fir", "Abies balsamea", "B", "B", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false,
+				"BB", "Balsam Fir", "Abies balsamea", "B", "B", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false,
 				true, new float[] { 57.0f, 42.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"BC", "White Fir", "Abies concolor", "B", "B", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false,
+				"BC", "White Fir", "Abies concolor", "B", "B", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false,
 				true, new float[] { 57.0f, 42.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"BG", "Grand Fir", "Abies grandis", "B", "B", CFSTreeSpecies.cfsSpcs_FirGrand, true, false,
+				"BG", "Grand Fir", "Abies grandis", "B", "B", CfsTreeSpecies.cfsSpcs_FirGrand, true, false,
 				true, new float[] { 57.0f, 42.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"BI", "Birch", "Betula", "BI", "E", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true, false,
+				"BI", "Birch", "Betula", "BI", "E", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true, false,
 				new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"BL", "Alpine Fir", "Abies lasiocarpa", "B", "B",
-				CFSTreeSpecies.cfsSpcs_FirSubalpineOrAlpine, true, false, true, new float[] { 42.0f, 42.0f },
+				CfsTreeSpecies.cfsSpcs_FirSubalpineOrAlpine, true, false, true, new float[] { 42.0f, 42.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"BM", "Shasta Red Fir", "Abies magnifica var. shastensis", "B", "B",
-				CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false, true, new float[] { 57.0f, 42.0f },
+				CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false, true, new float[] { 57.0f, 42.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"BN", "Noble fir", "<<unknown>>", "B", "B", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false,
+				"BN", "Noble fir", "<<unknown>>", "B", "B", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false,
 				true, new float[] { 57.0f, 42.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"BP", "Noble Fir", "Abies procera", "B", "B", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false,
+				"BP", "Noble Fir", "Abies procera", "B", "B", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false,
 				true, new float[] { 57.0f, 42.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"BV", "Silver/Paper Birch", "<<unknown>>", "BI", "E", CFSTreeSpecies.cfsSpcs_UNKNOWN, true,
+				"BV", "Silver/Paper Birch", "<<unknown>>", "BI", "E", CfsTreeSpecies.cfsSpcs_UNKNOWN, true,
 				true, false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"C", "Cedar", "Thuja", "C", "C", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false, true,
+				"C", "Cedar", "Thuja", "C", "C", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false, true,
 				new float[] { 60.0f, 51.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"CI", "Incense Cedar", "Calocedrus decurrens", "??", "C", CFSTreeSpecies.cfsSpcs_UNKNOWN,
+				"CI", "Incense Cedar", "Calocedrus decurrens", "??", "C", CfsTreeSpecies.cfsSpcs_UNKNOWN,
 				true, false, true, new float[] { 60.0f, 51.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"COT", "Cottonwood", "<<unknown>>", "CT", "AC", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true,
+				"COT", "Cottonwood", "<<unknown>>", "CT", "AC", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true,
 				false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"CP", "Port Orford Cedar", "<<unknown>>", "??", "C", CFSTreeSpecies.cfsSpcs_UNKNOWN, true,
+				"CP", "Port Orford Cedar", "<<unknown>>", "??", "C", CfsTreeSpecies.cfsSpcs_UNKNOWN, true,
 				false, true, new float[] { 60.0f, 51.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"CT", "Cottonwood", "<<unknown>>", "CT", "AC", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true,
+				"CT", "Cottonwood", "<<unknown>>", "CT", "AC", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true,
 				false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"CW", "Western Red Cedar", "Thuja plicata", "C", "C", CFSTreeSpecies.cfsSpcs_CedarWesternRed,
+				"CW", "Western Red Cedar", "Thuja plicata", "C", "C", CfsTreeSpecies.cfsSpcs_CedarWesternRed,
 				true, false, true, new float[] { 60.0f, 51.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"CY", "Yellow Cedar", "<<unknown>>", "C", "Y", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false,
+				"CY", "Yellow Cedar", "<<unknown>>", "C", "Y", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false,
 				true, new float[] { 60.0f, 51.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"D", "Alder", "Alnus", "D", "D", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true, false,
+				"D", "Alder", "Alnus", "D", "D", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true, false,
 				new float[] { 72.0f, 72.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"DF", "Douglas Fir", "Pseudotsuga menziesii", "F", "F", CFSTreeSpecies.cfsSpcs_UNKNOWN, true,
+				"DF", "Douglas Fir", "Pseudotsuga menziesii", "F", "F", CfsTreeSpecies.cfsSpcs_UNKNOWN, true,
 				false, true, new float[] { 61.0f, 48.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"DG", "Sitka (green) Alder", "<<unknown>>", "D", "D", CFSTreeSpecies.cfsSpcs_AlderSitka,
+				"DG", "Sitka (green) Alder", "<<unknown>>", "D", "D", CfsTreeSpecies.cfsSpcs_AlderSitka,
 				true, true, false, new float[] { 72.0f, 72.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"DM", "Mountain Alder", "<<unknown>>", "D", "D", CFSTreeSpecies.cfsSpcs_AlderSitka, true,
+				"DM", "Mountain Alder", "<<unknown>>", "D", "D", CfsTreeSpecies.cfsSpcs_AlderSitka, true,
 				true, false, new float[] { 72.0f, 72.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"DR", "Red Alder", "Alnus rubra", "D", "D", CFSTreeSpecies.cfsSpcs_AlderRed, true, true,
+				"DR", "Red Alder", "Alnus rubra", "D", "D", CfsTreeSpecies.cfsSpcs_AlderRed, true, true,
 				false, new float[] { 72.0f, 72.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"E", "Birch", "Betula", "BI", "E", CFSTreeSpecies.cfsSpcs_BirchWhite, true, true, false,
+				"E", "Birch", "Betula", "BI", "E", CfsTreeSpecies.cfsSpcs_BirchWhite, true, true, false,
 				new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"EA", "Common Paper Birch", "Betula neoalaskana", "BI", "E",
-				CFSTreeSpecies.cfsSpcs_BirchAlaskaPaper, true, true, false, new float[] { 61.0f, 61.0f },
+				CfsTreeSpecies.cfsSpcs_BirchAlaskaPaper, true, true, false, new float[] { 61.0f, 61.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"EB", "Bog Birch", "<<unknown>>", "BI", "E", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true,
+				"EB", "Bog Birch", "<<unknown>>", "BI", "E", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true,
 				false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"EE", "European Birch", "Betula pendula", "BI", "E", CFSTreeSpecies.cfsSpcs_UNKNOWN, true,
+				"EE", "European Birch", "Betula pendula", "BI", "E", CfsTreeSpecies.cfsSpcs_UNKNOWN, true,
 				true, false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"EP", "Silver Paper Birch", "Betula papyrifera", "BI", "E",
-				CFSTreeSpecies.cfsSpcs_BirchWhite, true, true, false, new float[] { 61.0f, 61.0f },
+				CfsTreeSpecies.cfsSpcs_BirchWhite, true, true, false, new float[] { 61.0f, 61.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"ES", "Silver Birch (exotic)", "Betula pubescens", "BI", "E", CFSTreeSpecies.cfsSpcs_UNKNOWN,
+				"ES", "Silver Birch (exotic)", "Betula pubescens", "BI", "E", CfsTreeSpecies.cfsSpcs_UNKNOWN,
 				true, true, false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"EW", "Water Birch", "Betula occidentalis", "BI", "E", CFSTreeSpecies.cfsSpcs_BirchWhite,
+				"EW", "Water Birch", "Betula occidentalis", "BI", "E", CfsTreeSpecies.cfsSpcs_BirchWhite,
 				true, true, false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"EXP", "Alaska x Paper Birch Hybrid", "Betula x. winteri", "BI", "E",
-				CFSTreeSpecies.cfsSpcs_BirchAlaskaPaperAndWhite, true, true, false,
+				CfsTreeSpecies.cfsSpcs_BirchAlaskaPaperAndWhite, true, true, false,
 				new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"F", "Douglas Fir", "Pseudotsuga", "F", "F", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false,
+				"F", "Douglas Fir", "Pseudotsuga", "F", "F", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false,
 				true, new float[] { 61.0f, 48.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"FD", "Douglas Fir", "Pseudotsuga menziesii", "F", "F",
-				CFSTreeSpecies.cfsSpcs_FirDouglasAndRockyMountain, true, false, true,
+				CfsTreeSpecies.cfsSpcs_FirDouglasAndRockyMountain, true, false, true,
 				new float[] { 61.0f, 48.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"FDC", "Douglas Fir (Coastal)", "Pseudotsuga mensiesii var. menziesii", "F", "F",
-				CFSTreeSpecies.cfsSpcs_FirDouglasAndRockyMountain, true, false, true,
+				CfsTreeSpecies.cfsSpcs_FirDouglasAndRockyMountain, true, false, true,
 				new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"FDI", "Douglas Fir (Interior)", "Pseudotsuga menziesii var. glauca", "F", "F",
-				CFSTreeSpecies.cfsSpcs_FirDouglasAndRockyMountain, true, false, true,
+				CfsTreeSpecies.cfsSpcs_FirDouglasAndRockyMountain, true, false, true,
 				new float[] { 48.0f, 48.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"G", "Dogwood", "Cornus", "G", "MB", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false, false,
+				"G", "Dogwood", "Cornus", "G", "MB", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false, false,
 				new float[] { 71.0f, 71.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"GP", "Pacific Dogwood", "Cornus nuttallii", "G", "MB",
-				CFSTreeSpecies.cfsSpcs_DogwoodWesternflowering, true, false, false,
+				CfsTreeSpecies.cfsSpcs_DogwoodWesternflowering, true, false, false,
 				new float[] { 71.0f, 71.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"GR", "Red-Osier Dogwood", "<<unknown>>", "G", "MB", CFSTreeSpecies.cfsSpcs_UNKNOWN, true,
+				"GR", "Red-Osier Dogwood", "<<unknown>>", "G", "MB", CfsTreeSpecies.cfsSpcs_UNKNOWN, true,
 				false, false, new float[] { 71.0f, 71.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"H", "Hemlock", "Tsuga", "H", "H", CFSTreeSpecies.cfsSpcs_Hemlock, true, false, true,
+				"H", "Hemlock", "Tsuga", "H", "H", CfsTreeSpecies.cfsSpcs_Hemlock, true, false, true,
 				new float[] { 61.0f, 51.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"HM", "Mountain Hemlock", "Tsuga mertensiana", "H", "H",
-				CFSTreeSpecies.cfsSpcs_HemlockMountain, true, false, true, new float[] { 61.0f, 51.0f },
+				CfsTreeSpecies.cfsSpcs_HemlockMountain, true, false, true, new float[] { 61.0f, 51.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"HW", "Western Hemlock", "Tsuga heterophylla", "H", "H",
-				CFSTreeSpecies.cfsSpcs_HemlockWestern, true, false, true, new float[] { 61.0f, 51.0f },
+				CfsTreeSpecies.cfsSpcs_HemlockWestern, true, false, true, new float[] { 61.0f, 51.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"HWC", "Western hemlock (coast)", "<<unknown>>", "H", "H", CFSTreeSpecies.cfsSpcs_UNKNOWN,
+				"HWC", "Western hemlock (coast)", "<<unknown>>", "H", "H", CfsTreeSpecies.cfsSpcs_UNKNOWN,
 				true, false, true, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"HWI", "Western hemlock (interior)", "<<unknown>>", "H", "H", CFSTreeSpecies.cfsSpcs_UNKNOWN,
+				"HWI", "Western hemlock (interior)", "<<unknown>>", "H", "H", CfsTreeSpecies.cfsSpcs_UNKNOWN,
 				true, false, true, new float[] { 51.0f, 51.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"HXM", "Western/Mountain Hemlock cross", "<<unknown>>", "H", "H",
-				CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false, true, new float[] { 61.0f, 51.0f },
+				CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false, true, new float[] { 61.0f, 51.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"IG", "Giant Sequoia", "Sequoiadendron giganteum", "C", "C", CFSTreeSpecies.cfsSpcs_UNKNOWN,
+				"IG", "Giant Sequoia", "Sequoiadendron giganteum", "C", "C", CfsTreeSpecies.cfsSpcs_UNKNOWN,
 				true, false, true, new float[] { 60.0f, 51.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"IS", "Coast Redwood", "Sequoia sempervirens", "C", "C", CFSTreeSpecies.cfsSpcs_UNKNOWN,
+				"IS", "Coast Redwood", "Sequoia sempervirens", "C", "C", CfsTreeSpecies.cfsSpcs_UNKNOWN,
 				true, false, true, new float[] { 60.0f, 51.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"J", "Juniper", "Juniperus", "J", "C", CFSTreeSpecies.cfsSpcs_JuniperRockyMountain, true,
+				"J", "Juniper", "Juniperus", "J", "C", CfsTreeSpecies.cfsSpcs_JuniperRockyMountain, true,
 				false, true, new float[] { 61.0f, 51.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"JR", "Rocky Mountain Juniper", "Juniperus scopulorum", "J", "C",
-				CFSTreeSpecies.cfsSpcs_JuniperRockyMountain, true, false, true, new float[] { 60.0f, 51.0f },
+				CfsTreeSpecies.cfsSpcs_JuniperRockyMountain, true, false, true, new float[] { 60.0f, 51.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"K", "Cascara", "Rhamnus", "K", "E", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false, false,
+				"K", "Cascara", "Rhamnus", "K", "E", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false, false,
 				new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"KC", "Casara", "Rhamnus Purshiana", "K", "E", CFSTreeSpecies.cfsSpcs_SpruceWhite, true,
+				"KC", "Casara", "Rhamnus Purshiana", "K", "E", CfsTreeSpecies.cfsSpcs_SpruceWhite, true,
 				false, false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"L", "Larch", "Larix", "L", "L", CFSTreeSpecies.cfsSpcs_TamarackLarch, true, true, false,
+				"L", "Larch", "Larix", "L", "L", CfsTreeSpecies.cfsSpcs_TamarackLarch, true, true, false,
 				new float[] { 54.0f, 54.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"LA", "Alpine Larch", "Larix lyallii", "L", "L", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true,
+				"LA", "Alpine Larch", "Larix lyallii", "L", "L", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true,
 				false, new float[] { 54.0f, 54.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"LE", "Eastern Larch", "<<unknown>>", "??", "L", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true,
+				"LE", "Eastern Larch", "<<unknown>>", "??", "L", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true,
 				false, new float[] { 54.0f, 54.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"LT", "Tamarack", "Larix laricina", "L", "L", CFSTreeSpecies.cfsSpcs_Tamarack, true, true,
+				"LT", "Tamarack", "Larix laricina", "L", "L", CfsTreeSpecies.cfsSpcs_Tamarack, true, true,
 				false, new float[] { 54.0f, 54.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"LW", "Western Larch", "Larix occidentalis", "L", "L", CFSTreeSpecies.cfsSpcs_LarchWestern,
+				"LW", "Western Larch", "Larix occidentalis", "L", "L", CfsTreeSpecies.cfsSpcs_LarchWestern,
 				true, true, false, new float[] { 54.0f, 54.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"M", "Maple", "Acer", "M", "MB", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true, false,
+				"M", "Maple", "Acer", "M", "MB", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true, false,
 				new float[] { 71.0f, 71.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"MB", "Broadleaf Maple", "Acer macrophyllum", "M", "MB", CFSTreeSpecies.cfsSpcs_MapleBigleaf,
+				"MB", "Broadleaf Maple", "Acer macrophyllum", "M", "MB", CfsTreeSpecies.cfsSpcs_MapleBigleaf,
 				true, true, false, new float[] { 71.0f, 71.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"ME", "Box elder", "Acer negundo", "??", "E", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true,
+				"ME", "Box elder", "Acer negundo", "??", "E", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true,
 				false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"MN", "Norway Maple", "Acer platanoides", "M", "MB", CFSTreeSpecies.cfsSpcs_UNKNOWN, true,
+				"MN", "Norway Maple", "Acer platanoides", "M", "MB", CfsTreeSpecies.cfsSpcs_UNKNOWN, true,
 				true, false, new float[] { 71.0f, 71.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"MR", "Rocky Mountain Maple", "<<unknown>>", "M", "MB", CFSTreeSpecies.cfsSpcs_Maple, true,
+				"MR", "Rocky Mountain Maple", "<<unknown>>", "M", "MB", CfsTreeSpecies.cfsSpcs_Maple, true,
 				true, false, new float[] { 71.0f, 71.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"MS", "Sycamore Maple", "<<unknown>>", "M", "MB", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true,
+				"MS", "Sycamore Maple", "<<unknown>>", "M", "MB", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true,
 				false, new float[] { 71.0f, 71.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"MV", "Vine Maple", "Acer macrophyllum", "M", "MB", CFSTreeSpecies.cfsSpcs_Maple, true, true,
+				"MV", "Vine Maple", "Acer macrophyllum", "M", "MB", CfsTreeSpecies.cfsSpcs_Maple, true, true,
 				false, new float[] { 71.0f, 71.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"OA", "Incense cedar", "Calocedrus decurrens", "??", "C", CFSTreeSpecies.cfsSpcs_UNKNOWN,
+				"OA", "Incense cedar", "Calocedrus decurrens", "??", "C", CfsTreeSpecies.cfsSpcs_UNKNOWN,
 				true, false, true, new float[] { 60.0f, 51.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"OB", "Giant sequoia", "Seqoiadendron giganteum", "??", "C", CFSTreeSpecies.cfsSpcs_UNKNOWN,
+				"OB", "Giant sequoia", "Seqoiadendron giganteum", "??", "C", CfsTreeSpecies.cfsSpcs_UNKNOWN,
 				true, false, true, new float[] { 60.0f, 51.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"OC", "Coast redwood", "Sequoia sempervirens", "??", "C", CFSTreeSpecies.cfsSpcs_UNKNOWN,
+				"OC", "Coast redwood", "Sequoia sempervirens", "??", "C", CfsTreeSpecies.cfsSpcs_UNKNOWN,
 				true, false, true, new float[] { 60.0f, 51.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"OD", "European mountain Ash", "Sorbus aucuparia", "??", "MB",
-				CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false, false, new float[] { 71.0f, 71.0f },
+				CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false, false, new float[] { 71.0f, 71.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"OE", "Siberian elm", "Ulmus pumila", "??", "MB", CFSTreeSpecies.cfsSpcs_UNKNOWN, true,
+				"OE", "Siberian elm", "Ulmus pumila", "??", "MB", CfsTreeSpecies.cfsSpcs_UNKNOWN, true,
 				false, false, new float[] { 71.0f, 71.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"OF", "Common pear", "Pyrus communis", "??", "MB", CFSTreeSpecies.cfsSpcs_UNKNOWN, true,
+				"OF", "Common pear", "Pyrus communis", "??", "MB", CfsTreeSpecies.cfsSpcs_UNKNOWN, true,
 				true, false, new float[] { 71.0f, 71.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"OG", "Oregon ash", "Fraxinus latifolia", "??", "MB", CFSTreeSpecies.cfsSpcs_UNKNOWN, true,
+				"OG", "Oregon ash", "Fraxinus latifolia", "??", "MB", CfsTreeSpecies.cfsSpcs_UNKNOWN, true,
 				true, false, new float[] { 71.0f, 71.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"P", "Pine", "Pinus", "PL", "PL", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false, true,
+				"P", "Pine", "Pinus", "PL", "PL", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false, true,
 				new float[] { 50.0f, 50.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"PA", "Whitebark Pine", "Pinus albicaulis", "PL", "PA", CFSTreeSpecies.cfsSpcs_PineWhitebark,
+				"PA", "Whitebark Pine", "Pinus albicaulis", "PL", "PA", CfsTreeSpecies.cfsSpcs_PineWhitebark,
 				true, false, true, new float[] { 50.0f, 50.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"PF", "Limber Pine", "Pinus Flexilis", "PL", "PA", CFSTreeSpecies.cfsSpcs_UNKNOWN, true,
+				"PF", "Limber Pine", "Pinus Flexilis", "PL", "PA", CfsTreeSpecies.cfsSpcs_UNKNOWN, true,
 				false, true, new float[] { 50.0f, 50.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"PJ", "Jack Pine", "Pinus banksiana", "PL", "PL", CFSTreeSpecies.cfsSpcs_PineJack, true,
+				"PJ", "Jack Pine", "Pinus banksiana", "PL", "PL", CfsTreeSpecies.cfsSpcs_PineJack, true,
 				false, true, new float[] { 50.0f, 50.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"PL", "Lodgepole Pine", "Pinus contorta", "PL", "PL", CFSTreeSpecies.cfsSpcs_PineLodgepole,
+				"PL", "Lodgepole Pine", "Pinus contorta", "PL", "PL", CfsTreeSpecies.cfsSpcs_PineLodgepole,
 				true, false, true, new float[] { 50.0f, 50.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"PLC", "Lodgepole Pine (Coastal)", "Pinus contorta var. contorta", "PL", "PL",
-				CFSTreeSpecies.cfsSpcs_PineShore, true, false, true, new float[] { 50.0f, 50.0f },
+				CfsTreeSpecies.cfsSpcs_PineShore, true, false, true, new float[] { 50.0f, 50.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"PLI", "Lodgepole Pine (Interior)", "Pinus contorta var. latifolia", "PL", "PL",
-				CFSTreeSpecies.cfsSpcs_PineLodgepole, true, false, true, new float[] { 50.0f, 50.0f },
+				CfsTreeSpecies.cfsSpcs_PineLodgepole, true, false, true, new float[] { 50.0f, 50.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"PM", "Monterray Pine", "Pinus radiata", "PL", "PW", CFSTreeSpecies.cfsSpcs_UNKNOWN, true,
+				"PM", "Monterray Pine", "Pinus radiata", "PL", "PW", CfsTreeSpecies.cfsSpcs_UNKNOWN, true,
 				false, true, new float[] { 55.0f, 55.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"PR", "Red Pine", "Pinus Resinosa", "PL", "PW", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false,
+				"PR", "Red Pine", "Pinus Resinosa", "PL", "PW", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false,
 				true, new float[] { 55.0f, 55.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"PS", "Sugar Pine", "Pinus lambertiana", "PL", "PW", CFSTreeSpecies.cfsSpcs_UNKNOWN, true,
+				"PS", "Sugar Pine", "Pinus lambertiana", "PL", "PW", CfsTreeSpecies.cfsSpcs_UNKNOWN, true,
 				false, true, new float[] { 55.0f, 55.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"PV", "Ponderosa pine", "Pinus ponderosa", "PY", "PY", CFSTreeSpecies.cfsSpcs_UNKNOWN, true,
+				"PV", "Ponderosa pine", "Pinus ponderosa", "PY", "PY", CfsTreeSpecies.cfsSpcs_UNKNOWN, true,
 				false, true, new float[] { 30.0f, 30.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"PW", "Western White Pine", "Pinus monticola", "PW", "PW",
-				CFSTreeSpecies.cfsSpcs_PineWesternWhite, true, false, true, new float[] { 55.0f, 55.0f },
+				CfsTreeSpecies.cfsSpcs_PineWesternWhite, true, false, true, new float[] { 55.0f, 55.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"PXJ", "Lodgepole/Jack Pine Hybrid", "Pinus x. murraybanksiana", "PL", "PL",
-				CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false, true, new float[] { 50.0f, 50.0f },
+				CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false, true, new float[] { 50.0f, 50.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"PY", "Yellow Pine", "Pinus ponderosa", "PY", "PY", CFSTreeSpecies.cfsSpcs_PinePonderosa,
+				"PY", "Yellow Pine", "Pinus ponderosa", "PY", "PY", CfsTreeSpecies.cfsSpcs_PinePonderosa,
 				true, false, true, new float[] { 30.0f, 30.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"Q", "Oak", "Quercus", "Q", "MB", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true, false,
+				"Q", "Oak", "Quercus", "Q", "MB", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true, false,
 				new float[] { 71.0f, 71.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"QE", "English Oak", "Quercus robur", "Q", "MB", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true,
+				"QE", "English Oak", "Quercus robur", "Q", "MB", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true,
 				false, new float[] { 71.0f, 71.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"QG", "Garry Oak", "Quercus Garryana", "Q", "MB", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true,
+				"QG", "Garry Oak", "Quercus Garryana", "Q", "MB", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true,
 				false, new float[] { 71.0f, 71.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"R", "Arbutus", "Arbutus", "R", "MB", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true, false,
+				"R", "Arbutus", "Arbutus", "R", "MB", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true, false,
 				new float[] { 71.0f, 71.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"RA", "Arbutus", "Arbutus menziesii", "R", "MB", CFSTreeSpecies.cfsSpcs_Arbutus, true, true,
+				"RA", "Arbutus", "Arbutus menziesii", "R", "MB", CfsTreeSpecies.cfsSpcs_Arbutus, true, true,
 				false, new float[] { 71.0f, 71.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"S", "Spruce", "Picea", "S", "S", CFSTreeSpecies.cfsSpcs_Spruce, true, false, true,
+				"S", "Spruce", "Picea", "S", "S", CfsTreeSpecies.cfsSpcs_Spruce, true, false, true,
 				new float[] { 50.0f, 46.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"SA", "Norway Spruce", "<<unknown>>", "??", "S", CFSTreeSpecies.cfsSpcs_SpruceWhite, true,
+				"SA", "Norway Spruce", "<<unknown>>", "??", "S", CfsTreeSpecies.cfsSpcs_SpruceWhite, true,
 				false, true, new float[] { 50.0f, 46.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"SB", "Black Spruce", "Picea mariana", "S", "S", CFSTreeSpecies.cfsSpcs_SpruceBlack, true,
+				"SB", "Black Spruce", "Picea mariana", "S", "S", CfsTreeSpecies.cfsSpcs_SpruceBlack, true,
 				false, true, new float[] { 46.0f, 46.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"SE", "Engelmann Spruce", "Picea engelmannii", "S", "S",
-				CFSTreeSpecies.cfsSpcs_SpruceEnglemann, true, false, true, new float[] { 50.0f, 46.0f },
+				CfsTreeSpecies.cfsSpcs_SpruceEnglemann, true, false, true, new float[] { 50.0f, 46.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"SI", "Interior Spruce", "<<unknown>>", "S", "S", CFSTreeSpecies.cfsSpcs_UNKNOWN, true,
+				"SI", "Interior Spruce", "<<unknown>>", "S", "S", CfsTreeSpecies.cfsSpcs_UNKNOWN, true,
 				false, true, new float[] { 46.0f, 46.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"SN", "Norway Spruce", "<<unknown>>", "S", "S", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false,
+				"SN", "Norway Spruce", "<<unknown>>", "S", "S", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false,
 				true, new float[] { 50.0f, 46.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"SS", "Sitka Spruce", "Picea sitchensis", "S", "S", CFSTreeSpecies.cfsSpcs_SpruceSitka, true,
+				"SS", "Sitka Spruce", "Picea sitchensis", "S", "S", CfsTreeSpecies.cfsSpcs_SpruceSitka, true,
 				false, true, new float[] { 50.0f, 50.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"SW", "White Spruce", "Picea glauca", "S", "S", CFSTreeSpecies.cfsSpcs_SpruceWhite, true,
+				"SW", "White Spruce", "Picea glauca", "S", "S", CfsTreeSpecies.cfsSpcs_SpruceWhite, true,
 				false, true, new float[] { 46.0f, 46.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"SX", "Spruce Hybrid", "Picea x", "S", "S", CFSTreeSpecies.cfsSpcs_Spruce, true, false, true,
+				"SX", "Spruce Hybrid", "Picea x", "S", "S", CfsTreeSpecies.cfsSpcs_Spruce, true, false, true,
 				new float[] { 50.0f, 46.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"SXB", "SXxSB hybrid", "<<unknown>>", "S", "S", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false,
+				"SXB", "SXxSB hybrid", "<<unknown>>", "S", "S", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false,
 				true, new float[] { 50.0f, 46.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"SXE", "SSxSE hybrid", "<<unknown>>", "S", "S", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false,
+				"SXE", "SSxSE hybrid", "<<unknown>>", "S", "S", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false,
 				true, new float[] { 50.0f, 46.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"SXL", "Sitka/White Spruce Hybrid", "Picea sitchensis x. lutzii", "S", "S",
-				CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false, true, new float[] { 50.0f, 46.0f },
+				CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false, true, new float[] { 50.0f, 46.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"SXS", "Sitka Spruce Hybrid", "Picea sitchensis x", "S", "S", CFSTreeSpecies.cfsSpcs_UNKNOWN,
+				"SXS", "Sitka Spruce Hybrid", "Picea sitchensis x", "S", "S", CfsTreeSpecies.cfsSpcs_UNKNOWN,
 				true, false, true, new float[] { 50.0f, 46.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"SXW", "Engelmann/White Spruce Hybrid", "Picea engelmannii x. glauca", "S", "S",
-				CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false, true, new float[] { 50.0f, 46.0f },
+				CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false, true, new float[] { 50.0f, 46.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"SXX", "SW hybrid", "<<unknown>>", "S", "S", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false,
+				"SXX", "SW hybrid", "<<unknown>>", "S", "S", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false,
 				true, new float[] { 50.0f, 46.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"T", "Yew", "Taxus", "T", "H", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true, true,
+				"T", "Yew", "Taxus", "T", "H", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true, true,
 				new float[] { 61.0f, 51.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"TW", "Pacific (western) yew", "Taxus brevifolia", "T", "H",
-				CFSTreeSpecies.cfsSpcs_YewWestern, true, true, true, new float[] { 61.0f, 51.0f },
+				CfsTreeSpecies.cfsSpcs_YewWestern, true, true, true, new float[] { 61.0f, 51.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"U", "Apple", "Malus", "U", "E", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true, false,
+				"U", "Apple", "Malus", "U", "E", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true, false,
 				new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"UA", "Apple", "Malus pumila", "U", "E", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true, false,
+				"UA", "Apple", "Malus pumila", "U", "E", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true, false,
 				new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"UP", "Crab apple", "Malus fusca", "U", "E", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true,
+				"UP", "Crab apple", "Malus fusca", "U", "E", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true,
 				false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"V", "Cherry", "Prunus", "V", "E", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true, false,
+				"V", "Cherry", "Prunus", "V", "E", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true, false,
 				new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"VB", "Bitter Cherry", "Prunus emarginata", "V", "E", CFSTreeSpecies.cfsSpcs_CherryBitter,
+				"VB", "Bitter Cherry", "Prunus emarginata", "V", "E", CfsTreeSpecies.cfsSpcs_CherryBitter,
 				true, true, false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"VP", "Pin Cherry", "Prunus pensylvanica", "V", "E", CFSTreeSpecies.cfsSpcs_CherryPin, true,
+				"VP", "Pin Cherry", "Prunus pensylvanica", "V", "E", CfsTreeSpecies.cfsSpcs_CherryPin, true,
 				true, false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"VS", "Sweet Cherry", "Prunus avium", "V", "E", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true,
+				"VS", "Sweet Cherry", "Prunus avium", "V", "E", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true,
 				false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"VV", "Choke Cherry", "Prunus virginiana", "V", "E", CFSTreeSpecies.cfsSpcs_UNKNOWN, true,
+				"VV", "Choke Cherry", "Prunus virginiana", "V", "E", CfsTreeSpecies.cfsSpcs_UNKNOWN, true,
 				true, false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"W", "Willow", "Salix", "W", "E", CFSTreeSpecies.cfsSpcs_Willow, true, true, false,
+				"W", "Willow", "Salix", "W", "E", CfsTreeSpecies.cfsSpcs_Willow, true, true, false,
 				new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"WA", "Peachleaf Willow", "Salix amygdaloides", "W", "E", CFSTreeSpecies.cfsSpcs_UNKNOWN,
+				"WA", "Peachleaf Willow", "Salix amygdaloides", "W", "E", CfsTreeSpecies.cfsSpcs_UNKNOWN,
 				true, true, false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"WB", "Bebb's Willow", "Salix bebbiana", "W", "E", CFSTreeSpecies.cfsSpcs_Willow, true, true,
+				"WB", "Bebb's Willow", "Salix bebbiana", "W", "E", CfsTreeSpecies.cfsSpcs_Willow, true, true,
 				false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"WD", "Pussy Willow", "Salix discolor", "W", "E", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true,
+				"WD", "Pussy Willow", "Salix discolor", "W", "E", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true,
 				false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"WI", "Willow", "<<unknown>>", "W", "E", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true, false,
+				"WI", "Willow", "<<unknown>>", "W", "E", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true, false,
 				new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"WP", "Pacific Willow", "Salix lucida", "W", "E", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, true,
+				"WP", "Pacific Willow", "Salix lucida", "W", "E", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, true,
 				false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"WS", "Scouler's Willow", "Salix scouleriana", "W", "E", CFSTreeSpecies.cfsSpcs_Willow, true,
+				"WS", "Scouler's Willow", "Salix scouleriana", "W", "E", CfsTreeSpecies.cfsSpcs_Willow, true,
 				true, false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"WT", "Sitka Willow", "Salix sitchensis", "W", "E", CFSTreeSpecies.cfsSpcs_UNKNOWN, true,
+				"WT", "Sitka Willow", "Salix sitchensis", "W", "E", CfsTreeSpecies.cfsSpcs_UNKNOWN, true,
 				true, false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"X", "Unknown", "<<unknown>>", "X", "F", CFSTreeSpecies.cfsSpcs_UnspecifiedSoftwood, true,
+				"X", "Unknown", "<<unknown>>", "X", "F", CfsTreeSpecies.cfsSpcs_UnspecifiedSoftwood, true,
 				false, true, new float[] { 61.0f, 48.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"XC", "Unknown conifer", "<<unknown>>", "X", "F", CFSTreeSpecies.cfsSpcs_SpruceWhite, true,
+				"XC", "Unknown conifer", "<<unknown>>", "X", "F", CfsTreeSpecies.cfsSpcs_SpruceWhite, true,
 				false, true, new float[] { 61.0f, 48.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"XH", "Unknown hardwood", "<<unknown>>", "X", "E", CFSTreeSpecies.cfsSpcs_SpruceWhite, true,
+				"XH", "Unknown hardwood", "<<unknown>>", "X", "E", CfsTreeSpecies.cfsSpcs_SpruceWhite, true,
 				true, false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"Y", "Yellow Cedar", "Chamaecyparis", "C", "Y", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false,
+				"Y", "Yellow Cedar", "Chamaecyparis", "C", "Y", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false,
 				true, new float[] { 60.0f, 51.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
 				"YC", "Yellow Cedar", "Chamaecyparis nootkatensis", "C", "Y",
-				CFSTreeSpecies.cfsSpcs_CypressYellow, true, false, true, new float[] { 60.0f, 51.0f },
+				CfsTreeSpecies.cfsSpcs_CypressYellow, true, false, true, new float[] { 60.0f, 51.0f },
 				new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"YP", "Port Orford", "Chamaecyparis lawsoniana", "C", "Y", CFSTreeSpecies.cfsSpcs_UNKNOWN,
+				"YP", "Port Orford", "Chamaecyparis lawsoniana", "C", "Y", CfsTreeSpecies.cfsSpcs_UNKNOWN,
 				true, false, true, new float[] { 60.0f, 51.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"Z", "Other Tree", "<<unknown>>", "Z", "E", CFSTreeSpecies.cfsSpcs_UNKNOWN, true, false,
+				"Z", "Other Tree", "<<unknown>>", "Z", "E", CfsTreeSpecies.cfsSpcs_UNKNOWN, true, false,
 				false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"ZC", "Other tree (conifer)", "<<unknown>>", "Z", "F", CFSTreeSpecies.cfsSpcs_SpruceWhite,
+				"ZC", "Other tree (conifer)", "<<unknown>>", "Z", "F", CfsTreeSpecies.cfsSpcs_SpruceWhite,
 				true, false, true, new float[] { 61.0f, 48.0f }, new int[] { -1, -1 }
 		));
 		addSpeciesToTable(new SpeciesTableItem(
-				"ZH", "Other tree (hardwood)", "<<unknown>>", "Z", "E", CFSTreeSpecies.cfsSpcs_SpruceWhite,
+				"ZH", "Other tree (hardwood)", "<<unknown>>", "Z", "E", CfsTreeSpecies.cfsSpcs_SpruceWhite,
 				true, true, false, new float[] { 61.0f, 61.0f }, new int[] { -1, -1 }
 		));
 	}

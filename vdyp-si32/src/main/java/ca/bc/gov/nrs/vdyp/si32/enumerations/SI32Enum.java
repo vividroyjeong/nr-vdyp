@@ -6,7 +6,7 @@ public interface SI32Enum<T> {
 	 * enumeration, this is normally the sequence n, n + 1, n + 2, ...
 	 * where n is either 0 or 1, but it doesn't have to be.
 	 */
-	public int getValue();
+	public int getIndex();
 
 	/**
 	 * @return the index of the enumeration entry. This is the relative
@@ -15,7 +15,7 @@ public interface SI32Enum<T> {
 	 * 
 	 * @throws IllegalArgumentException if this is a housekeeping entry.
 	 */
-	int getIndex();
+	int getOffset();
 
 	/**
 	 * @return the text identifying the enumeration entry. This is normally

@@ -1,6 +1,9 @@
-package ca.bc.gov.nrs.vdyp.si32.enumerations;
+package ca.bc.gov.nrs.vdyp.si32.cfs;
 
 import java.text.MessageFormat;
+
+import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
+import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 
 /**
  * Enumerate the different Tree Genus as defined by the Canadian Forest Service for 
@@ -30,7 +33,7 @@ import java.text.MessageFormat;
  * <li>'Documents/CFS-Biomass' folder.
  * </ol>
  */
-public enum CFSTreeGenus implements SI32Enum<CFSTreeGenus> {
+public enum CfsTreeGenus implements SI32Enum<CfsTreeGenus> {
 	cfsGenus_UNKNOWN(-1, "UNKNOWN"), //
 	
 	cfsGenus_NotApplicable(-9, "Not applicable"), //
@@ -50,32 +53,17 @@ public enum CFSTreeGenus implements SI32Enum<CFSTreeGenus> {
 	cfsGenus_OtherBroadleaves(12, "Other broadleaved species"), //
 	cfsGenus_UnspecifiedBroadleaves(13, "Unspecified broadleaved species"); //
 
-	private final int intValue;
+	private final int index;
 	private final String genusName;
 	
-	private static java.util.HashMap<Integer, CFSTreeGenus> mappings;
-
-	private static java.util.HashMap<Integer, CFSTreeGenus> getMappings() {
-		if (mappings == null) {
-			synchronized (CFSTreeGenus.class) {
-				if (mappings == null) {
-					mappings = new java.util.HashMap<Integer, CFSTreeGenus>();
-				}
-			}
-		}
-		return mappings;
-	}
-
-	private CFSTreeGenus(int value, String genusName) {
-		this.intValue = value;
+	private CfsTreeGenus(int index, String genusName) {
+		this.index = index;
 		this.genusName = genusName;
-		
-		getMappings().put(value, this);
 	}
 
 	@Override
-	public int getValue() {
-		return intValue;
+	public int getIndex() {
+		return index;
 	}
 	
 	public String getGenusName() {
@@ -83,12 +71,12 @@ public enum CFSTreeGenus implements SI32Enum<CFSTreeGenus> {
 	}
 
 	@Override
-	public int getIndex() {
+	public int getOffset() {
 		if (this.equals(cfsGenus_UNKNOWN) || this.equals(cfsGenus_NotApplicable) || this.equals(cfsGenus_MissingValue)) {
 			throw new UnsupportedOperationException(MessageFormat.format("Cannot call getIndex on {} as it's not a standard member of the enumeration", this));
 		}
 		
-		return intValue - 1;
+		return index - 1;
 	}
 	
 	@Override
@@ -101,17 +89,31 @@ public enum CFSTreeGenus implements SI32Enum<CFSTreeGenus> {
 		return this.toString().substring("cfsGenus_".length());
 	}
 
-	public static CFSTreeGenus forValue(int value) {
-		return getMappings().get(value);
+	/**
+	 * Returns the enumeration constant with the given index.
+	 * @param index the value in question
+	 * @return the enumeration value, unless no enumeration constant has the given 
+	 * 	   <code>index</code> in which case <code>null</code> is returned.
+	 */
+	public static CfsTreeGenus forIndex(int index) {
+		for (CfsTreeGenus e: CfsTreeGenus.values()) {
+			if (index == e.index)
+				return e;
+		}
+		
+		return null;
 	}
 
+	/**
+	 * @return the number of non-housekeeping entries in the enumeration
+	 */
 	public static int size() {
-		return cfsGenus_UnspecifiedBroadleaves.intValue - cfsGenus_Spruce.intValue + 1;
+		return cfsGenus_UnspecifiedBroadleaves.index - cfsGenus_Spruce.index + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<CFSTreeGenus> {
+	public static class Iterator extends SI32EnumIterator<CfsTreeGenus> {
 		public Iterator() {
-			super(cfsGenus_Spruce, cfsGenus_UnspecifiedBroadleaves, mappings);
+			super(cfsGenus_Spruce, cfsGenus_UnspecifiedBroadleaves, values());
 		}
 	}
 }

@@ -1,6 +1,9 @@
-package ca.bc.gov.nrs.vdyp.si32.enumerations;
+package ca.bc.gov.nrs.vdyp.si32.cfs;
 
 import java.text.MessageFormat;
+
+import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
+import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 
 /**
  * Provides an enumeration of the different types of Tree Classes as defined by the
@@ -38,49 +41,38 @@ import java.text.MessageFormat;
  * The definitions of this table come from Table 2 found in the 'Volume_to_Biomass.doc' file 
  * located in 'Documents/CFS-Biomass'.
  */
-public enum CFSTreeClass implements SI32Enum<CFSTreeClass> {
-	cfsTreeCls_UNKNOWN(-1),
+public enum CfsTreeClass implements SI32Enum<CfsTreeClass> {
+	cfsTreeCls_UNKNOWN(-1, "Unknown CFS Tree Class"),
 
-	cfsTreeCls_Missing(0), //
-	cfsTreeCls_LiveNoPath(1), //
-	cfsTreeCls_LiveWithPath(2), //
-	cfsTreeCls_DeadPotential(3), //
-	cfsTreeCls_DeadUseless(4), //
-	cfsTreeCls_Veteran(5), //
-	cfsTreeCls_NoLongerUsed(6);
+	cfsTreeCls_Missing(0, "Missing"), //
+	cfsTreeCls_LiveNoPath(1, "Live, no pathological indicators"), //
+	cfsTreeCls_LiveWithPath(2, "Live, some patholigical indicators"), //
+	cfsTreeCls_DeadPotential(3, "Dead, potentially merchantable"), //
+	cfsTreeCls_DeadUseless(4, "Dead, not merchantable"), //
+	cfsTreeCls_Veteran(5, "Veteran"), //
+	cfsTreeCls_NoLongerUsed(6, "No longer used");
 
-	private int intValue;
-	private static java.util.HashMap<Integer, CFSTreeClass> mappings;
+	private final int index;
+	private final String description;
 
-	private static java.util.HashMap<Integer, CFSTreeClass> getMappings() {
-		if (mappings == null) {
-			synchronized (CFSTreeClass.class) {
-				if (mappings == null) {
-					mappings = new java.util.HashMap<Integer, CFSTreeClass>();
-				}
-			}
-		}
-		return mappings;
-	}
-
-	private CFSTreeClass(int value) {
-		intValue = value;
-		getMappings().put(value, this);
-	}
-
-	@Override
-	public int getValue() {
-		return intValue;
+	private CfsTreeClass(int index, String description) {
+		this.index = index;
+		this.description = description;
 	}
 
 	@Override
 	public int getIndex() {
+		return index;
+	}
+
+	@Override
+	public int getOffset() {
 		if (this.equals(cfsTreeCls_UNKNOWN)) {
 			throw new UnsupportedOperationException(MessageFormat
 					.format("Cannot call getIndex on {} as it's not a standard member of the enumeration", this));
 		}
 		
-		return intValue;
+		return index;
 	}
 	
 	@Override
@@ -92,18 +84,37 @@ public enum CFSTreeClass implements SI32Enum<CFSTreeClass> {
 		
 		return this.toString().substring("cfsTreeCls_".length());
 	}
-
-	public static CFSTreeClass forValue(int value) {
-		return getMappings().get(value);
+	
+	public String getDescription() {
+		return this.description;
 	}
 
+	/**
+	 * Returns the enumeration constant with the given index.
+	 * @param index the value in question
+	 * @return the enumeration value, unless no enumeration constant has the given 
+	 * 	   <code>index</code> in which case <code>null</code> is returned.
+	 */
+	public static CfsTreeClass forIndex(int index) {
+		
+		for (CfsTreeClass e: CfsTreeClass.values()) {
+			if (index == e.index)
+				return e;
+		}
+		
+		return null;
+	}
+
+	/**
+	 * @return the number of non-housekeeping entries in the enumeration
+	 */
 	public static int size() {
-		return cfsTreeCls_NoLongerUsed.intValue - cfsTreeCls_Missing.intValue + 1;
+		return cfsTreeCls_NoLongerUsed.index - cfsTreeCls_Missing.index + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<CFSTreeClass> {
+	public static class Iterator extends SI32EnumIterator<CfsTreeClass> {
 		public Iterator() {
-			super(cfsTreeCls_Missing, cfsTreeCls_NoLongerUsed, mappings);
+			super(cfsTreeCls_Missing, cfsTreeCls_NoLongerUsed, values());
 		}
 	}
 }

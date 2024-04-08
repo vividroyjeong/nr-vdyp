@@ -1,15 +1,16 @@
-package ca.bc.gov.nrs.vdyp.si32.enumerations;
+package ca.bc.gov.nrs.vdyp.si32.cfs;
 
 import java.text.MessageFormat;
 
-import ca.bc.gov.nrs.vdyp.si32.CfsDeadBiomassConversionCoefficients;
+import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
+import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 
 /**
  * Lists the different conversion parameters that support the calculation of Dead CFS Biomass.
  * <ul>
  * <li> cfsDeadParm_UNKNOWN: Indicates an error condition or an uninitialized value. This value
  *       should never be used as an index for a specific conversion parameter.
- * <li> cfsDeadParm_...: Indices into the {@link CfsDeadBiomassConversionCoefficients} array for each
+ * <li> cfsDeadParm_...: Indices into the {@link CfsBiomassConversionCoefficientsDead} array for each
  *       of the CFS Biomass conversion parameters/coefficients.
  * </ul>
  * The CFS Biomass Conversion process is based on a number of hard coded constants/coefficients which 
@@ -25,7 +26,7 @@ import ca.bc.gov.nrs.vdyp.si32.CfsDeadBiomassConversionCoefficients;
  * <li> 'Documents/CFS-Biomass' folder.
  * </ol>
  */
-public enum CFSDeadConversionParams implements SI32Enum<CFSDeadConversionParams> {
+public enum CfsDeadConversionParams implements SI32Enum<CfsDeadConversionParams> {
 	cfsDeadParm_UNKNOWN(-1), 
 
 	cfsDeadParm_Prop1(0),
@@ -38,39 +39,25 @@ public enum CFSDeadConversionParams implements SI32Enum<CFSDeadConversionParams>
 	cfsDeadParm_V3(7),
 	cfsDeadParm_V4(8);
 
-	private static java.util.HashMap<Integer, CFSDeadConversionParams> mappings;
-
-	private static java.util.HashMap<Integer, CFSDeadConversionParams> getMappings() {
-		if (mappings == null) {
-			synchronized (CFSDeadConversionParams.class) {
-				if (mappings == null) {
-					mappings = new java.util.HashMap<Integer, CFSDeadConversionParams>();
-				}
-			}
-		}
-		return mappings;
-	}
-
-	private int intValue;
+	private final int index;
 	
-	private CFSDeadConversionParams(int value) {
-		intValue = value;
-		getMappings().put(value, this);
+	private CfsDeadConversionParams(int index) {
+		this.index = index;
 	}
 
-	@Override
-	public int getValue() {
-		return intValue;
-	}
-	
 	@Override
 	public int getIndex() {
+		return index;
+	}
+	
+	@Override
+	public int getOffset() {
 		if (this.equals(cfsDeadParm_UNKNOWN)) {
 			throw new UnsupportedOperationException(MessageFormat
 					.format("Cannot call getIndex on {} as it's not a standard member of the enumeration", this));
 		}
 		
-		return intValue;
+		return index;
 	}
 	
 	@Override
@@ -83,13 +70,16 @@ public enum CFSDeadConversionParams implements SI32Enum<CFSDeadConversionParams>
 		return this.toString().substring("cfsDeadParm_".length());
 	}
 	
+	/**
+	 * @return the number of non-housekeeping entries in the enumeration
+	 */
 	public static int size() {
-		return cfsDeadParm_Prop1.intValue - cfsDeadParm_V4.intValue + 1;
+		return cfsDeadParm_V4.index - cfsDeadParm_Prop1.index + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<CFSDeadConversionParams> {
+	public static class Iterator extends SI32EnumIterator<CfsDeadConversionParams> {
 		public Iterator() {
-			super(cfsDeadParm_Prop1, cfsDeadParm_V4, mappings);
+			super(cfsDeadParm_Prop1, cfsDeadParm_V4, values());
 		}
 	}
 }

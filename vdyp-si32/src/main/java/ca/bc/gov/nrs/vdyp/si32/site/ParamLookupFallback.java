@@ -1,4 +1,6 @@
-package ca.bc.gov.nrs.vdyp.si32.enumerations;
+package ca.bc.gov.nrs.vdyp.si32.site;
+
+import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
 
 /**
  * Specifies where in the Species to Genus to default lookup process a set of CFS parameters
@@ -12,21 +14,17 @@ public enum ParamLookupFallback implements SI32Enum<ParamLookupFallback> {
 	cfsLookup_NotFound;
 
 	@Override
-	public int getValue() {
+	public int getIndex() {
 		return this.ordinal();
 	}
 	
 	@Override
 	public String getText() {
-		return this.toString().substring("cfsLookup_".length());
-	}
-
-	public static ParamLookupFallback forValue(int value) {
-		return values()[value];
+		return toString().substring("cfsLookup_".length());
 	}
 
 	@Override
-	public int getIndex() {
+	public int getOffset() {
 		return this.ordinal();
 	}
 }

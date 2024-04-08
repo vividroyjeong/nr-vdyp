@@ -1,6 +1,9 @@
-package ca.bc.gov.nrs.vdyp.si32.enumerations;
+package ca.bc.gov.nrs.vdyp.si32.vdyp;
 
 import java.text.MessageFormat;
+
+import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
+import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 
 /**
  * An enumeration holding each of the valid SP0 Species known to VDYP7.
@@ -154,37 +157,24 @@ public enum SP64Name implements SI32Enum<SP64Name> {
 	sp64_ZC(141), //
 	sp64_ZH(142);
 
-	private int intValue;
-	private static java.util.HashMap<Integer, SP64Name> mappings;
+	private final int index;
 
-	private static java.util.HashMap<Integer, SP64Name> getMappings() {
-		if (mappings == null) {
-			synchronized (SP64Name.class) {
-				if (mappings == null) {
-					mappings = new java.util.HashMap<Integer, SP64Name>();
-				}
-			}
-		}
-		return mappings;
-	}
-
-	private SP64Name(int value) {
-		intValue = value;
-		getMappings().put(value, this);
-	}
-
-	@Override
-	public int getValue() {
-		return intValue;
+	private SP64Name(int index) {
+		this.index = index;
 	}
 
 	@Override
 	public int getIndex() {
+		return index;
+	}
+
+	@Override
+	public int getOffset() {
 		if (this.equals(sp64_UNKNOWN)) {
 			throw new UnsupportedOperationException(MessageFormat.format("Cannot call getIndex on {} as it's not a standard member of the enumeration", this));
 		}
 		
-		return intValue - 1;
+		return index - 1;
 	}
 	
 	@Override
@@ -216,17 +206,31 @@ public enum SP64Name implements SI32Enum<SP64Name> {
 		}
 	}
 
-	public static SP64Name forValue(int value) {
-		return getMappings().get(value);
+	/**
+	 * Returns the enumeration constant with the given index.
+	 * @param index the value in question
+	 * @return the enumeration value, unless no enumeration constant has the given 
+	 * 	   <code>index</code> in which case <code>null</code> is returned.
+	 */
+	public static SP64Name forIndex(int index) {
+		for (SP64Name e: SP64Name.values()) {
+			if (index == e.index)
+				return e;
+		}
+		
+		return null;
 	}
 
+	/**
+	 * @return the number of non-housekeeping entries in the enumeration
+	 */
 	public static int size() {
-		return sp64_ZH.intValue - sp64_A.intValue + 1;
+		return sp64_ZH.index - sp64_A.index + 1;
 	}
 
 	public static class Iterator extends SI32EnumIterator<SP64Name> {
 		public Iterator() {
-			super(sp64_A, sp64_ZH, mappings);
+			super(sp64_A, sp64_ZH, values());
 		}
 	}
 }
