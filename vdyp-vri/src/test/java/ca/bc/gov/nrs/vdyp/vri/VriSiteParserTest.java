@@ -26,10 +26,10 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 import ca.bc.gov.nrs.vdyp.vri.model.VriSite;
 
-public class VriSiteParserTest {
+class VriSiteParserTest {
 
 	@Test
-	public void testParseEmpty() throws Exception {
+	void testParseEmpty() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -55,7 +55,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testParseOneSite() throws Exception {
+	void testParseOneSite() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -103,7 +103,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testIgnoreIfNotPrimaryOrSecondary() throws Exception {
+	void testIgnoreIfNotPrimaryOrSecondary() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -154,7 +154,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testParseTwoSites() throws Exception {
+	void testParseTwoSites() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -215,7 +215,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testParseTwoLayers() throws Exception {
+	void testParseTwoLayers() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -277,7 +277,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testParseTwoPolygons() throws Exception {
+	void testParseTwoPolygons() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -348,7 +348,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testBreastHeightAgeZeroAndTotalEmpty() throws Exception {
+	void testBreastHeightAgeZeroAndTotalEmpty() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -390,7 +390,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testBreastHeightAgeZeroAndNotCloseToExpected() throws Exception {
+	void testBreastHeightAgeZeroAndNotCloseToExpected() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -432,7 +432,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testBreastHeightAgeZeroAndIsCloseToExpected() throws Exception {
+	void testBreastHeightAgeZeroAndIsCloseToExpected() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -474,7 +474,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testDefaultHeight() throws Exception {
+	void testDefaultHeight() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -511,7 +511,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testNoDefaultHeightIfTotalAgeTooHigh() throws Exception {
+	void testNoDefaultHeightIfTotalAgeTooHigh() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -548,7 +548,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testNoDefaultHeightIfTotalAgeTooLow() throws Exception {
+	void testNoDefaultHeightIfTotalAgeTooLow() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -585,7 +585,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testNoDefaultHeightIfSiteIndexTooLow() throws Exception {
+	void testNoDefaultHeightIfSiteIndexTooLow() throws Exception {
 
 		var parser = new VriSiteParser();
 

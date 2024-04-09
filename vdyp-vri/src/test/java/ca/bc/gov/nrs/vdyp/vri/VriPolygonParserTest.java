@@ -22,10 +22,10 @@ import ca.bc.gov.nrs.vdyp.test.TestUtils;
 import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 import ca.bc.gov.nrs.vdyp.vri.model.VriPolygon;
 
-public class VriPolygonParserTest {
+class VriPolygonParserTest {
 
 	@Test
-	public void testParseEmpty() throws Exception {
+	void testParseEmpty() throws Exception {
 
 		var parser = new VriPolygonParser();
 
@@ -51,7 +51,7 @@ public class VriPolygonParserTest {
 	}
 
 	@Test
-	public void testParsePolygon() throws Exception {
+	void testParsePolygon() throws Exception {
 
 		var parser = new VriPolygonParser();
 
@@ -89,7 +89,7 @@ public class VriPolygonParserTest {
 	}
 
 	@Test
-	public void testParsePolygonWithBlanks() throws Exception {
+	void testParsePolygonWithBlanks() throws Exception {
 
 		var parser = new VriPolygonParser();
 
@@ -127,7 +127,7 @@ public class VriPolygonParserTest {
 	}
 
 	@Test
-	public void testParseMultiple() throws Exception {
+	void testParseMultiple() throws Exception {
 
 		var parser = new VriPolygonParser();
 
@@ -267,7 +267,7 @@ public class VriPolygonParserTest {
 	}
 
 	@Test
-	public void testParsePolygonZeroAsDefault() throws Exception {
+	void testParsePolygonZeroAsDefault() throws Exception {
 
 		var parser = new VriPolygonParser();
 
@@ -305,7 +305,7 @@ public class VriPolygonParserTest {
 	}
 
 	@Test
-	public void testParsePolygonNegativeAsDefault() throws Exception {
+	void testParsePolygonNegativeAsDefault() throws Exception {
 
 		var parser = new VriPolygonParser();
 
@@ -343,7 +343,7 @@ public class VriPolygonParserTest {
 	}
 
 	@Test
-	public void testParsePolygonSetPercentAvailableDefaultInBatcMode() throws Exception {
+	void testParsePolygonSetPercentAvailableDefaultInBatcMode() throws Exception {
 
 		var parser = new VriPolygonParser();
 
@@ -381,7 +381,7 @@ public class VriPolygonParserTest {
 	}
 
 	@Test
-	public void testParsePolygonDontOverridePercentAvailableInBatcMode() throws Exception {
+	void testParsePolygonDontOverridePercentAvailableInBatcMode() throws Exception {
 
 		var parser = new VriPolygonParser();
 

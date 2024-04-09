@@ -24,10 +24,10 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 import ca.bc.gov.nrs.vdyp.vri.model.VriSpecies;
 
-public class VriSpeciesParserTest {
+class VriSpeciesParserTest {
 
 	@Test
-	public void testParseEmpty() throws Exception {
+	void testParseEmpty() throws Exception {
 
 		var parser = new VriSpeciesParser();
 
@@ -53,7 +53,7 @@ public class VriSpeciesParserTest {
 	}
 
 	@Test
-	public void testParseOneGenus() throws Exception {
+	void testParseOneGenus() throws Exception {
 
 		var parser = new VriSpeciesParser();
 
@@ -99,7 +99,7 @@ public class VriSpeciesParserTest {
 	}
 
 	@Test
-	public void testIgnoreIfNotPrimaryOrSecondary() throws Exception {
+	void testIgnoreIfNotPrimaryOrSecondary() throws Exception {
 
 		var parser = new VriSpeciesParser();
 
@@ -146,7 +146,7 @@ public class VriSpeciesParserTest {
 	}
 
 	@Test
-	public void testIgnoreIfPercentIsZero() throws Exception {
+	void testIgnoreIfPercentIsZero() throws Exception {
 
 		var parser = new VriSpeciesParser();
 
@@ -193,7 +193,7 @@ public class VriSpeciesParserTest {
 	}
 
 	@Test
-	public void testIgnoreIfPercentIsNegative() throws Exception {
+	void testIgnoreIfPercentIsNegative() throws Exception {
 
 		var parser = new VriSpeciesParser();
 
@@ -240,7 +240,7 @@ public class VriSpeciesParserTest {
 	}
 
 	@Test
-	public void testParseTwoGenera() throws Exception {
+	void testParseTwoGenera() throws Exception {
 
 		var parser = new VriSpeciesParser();
 
@@ -294,7 +294,7 @@ public class VriSpeciesParserTest {
 	}
 
 	@Test
-	public void testParseTwoLayers() throws Exception {
+	void testParseTwoLayers() throws Exception {
 
 		var parser = new VriSpeciesParser();
 
@@ -347,7 +347,7 @@ public class VriSpeciesParserTest {
 	}
 
 	@Test
-	public void testParseTwoPolygons() throws Exception {
+	void testParseTwoPolygons() throws Exception {
 
 		var parser = new VriSpeciesParser();
 
@@ -409,7 +409,7 @@ public class VriSpeciesParserTest {
 	}
 
 	@Test
-	public void testParseMutipleSpecies() throws Exception {
+	void testParseMutipleSpecies() throws Exception {
 
 		var parser = new VriSpeciesParser();
 
