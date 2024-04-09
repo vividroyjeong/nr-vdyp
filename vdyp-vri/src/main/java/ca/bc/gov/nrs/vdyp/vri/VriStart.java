@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -225,47 +226,11 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					builder.primaryGenus(primarySpecs.get(0).getGenus());
 
 					if (layerType == LayerType.PRIMARY) {
-
-						// This was being done in VRI_CHK but I moved it here to when the object is
-						// being built instead.
-						if (builder.getBaseArea().flatMap(
-								ba -> builder.getTreesPerHectare()
-										.map(tph -> BaseAreaTreeDensityDiameter.quadMeanDiameter(ba, tph) < 7.5f)
-						).orElse(false)) {
-							builder.baseArea(Optional.empty());
-							builder.treesPerHectare(Optional.empty());
-						}
-
-						if (primarySpecs.size() > 1) {
-							builder.secondaryGenus(primarySpecs.get(1).getGenus());
-						}
-
-						builder.empiricalRelationshipParameterIndex(
-								findEmpiricalRelationshipParameterIndex(primarySpecs.get(0).getGenus(), bec, itg)
-						);
+						modifyPrimaryLayerBuild(bec, builder, primarySpecs, itg);
 					}
 				}
-				if (layerType == LayerType.VETERAN && (builder.getBaseArea().map(x -> x <= 0f).orElse(true)
-						|| builder.getTreesPerHectare().map(x -> x <= 0f).orElse(true))) {
-					// BA or TPH missing from Veteran layer.
-
-					builder.treesPerHectare(0f);
-
-					float crownClosure = builder.getCrownClosure().filter(x -> x > 0f).orElseThrow(
-							() -> new RuntimeStandProcessingException(
-									validationError(
-											"Expected a positive crown closure for veteran layer but was %s",
-											Utils.optNa(builder.getCrownClosure())
-									)
-							)
-					);
-					// If the primary layer base area is positive, multiply that by veteran crown
-					// closure, otherwise just use half the veteran crown closure.
-					builder.baseArea(
-							layersBuilders.get(LayerType.PRIMARY).getBaseArea().filter(x -> x > 0f)
-									.map(pba -> crownClosure / 100f * pba).orElse(crownClosure / 2f)
-					);
-
+				if (layerType == LayerType.VETERAN) {
+					modifyVeteranLayerBuild(layersBuilders, builder);
 				}
 				return builder;
 			}).map(VriLayer.Builder::build).collect(Collectors.toUnmodifiableMap(VriLayer::getLayer, x -> x));
@@ -276,6 +241,56 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			throw ex.getCause();
 		}
 		return layers;
+	}
+
+	private void modifyVeteranLayerBuild(
+			Map<LayerType, VriLayer.Builder> layersBuilders, ca.bc.gov.nrs.vdyp.vri.model.VriLayer.Builder builder
+	) {
+		if (builder.getBaseArea().map(x -> x <= 0f).orElse(true)
+				|| builder.getTreesPerHectare().map(x -> x <= 0f).orElse(true)) {
+			// BA or TPH missing from Veteran layer.
+
+			builder.treesPerHectare(0f);
+
+			float crownClosure = builder.getCrownClosure().filter(x -> x > 0f).orElseThrow(
+					() -> new RuntimeStandProcessingException(
+							validationError(
+									"Expected a positive crown closure for veteran layer but was %s",
+									Utils.optNa(builder.getCrownClosure())
+							)
+					)
+			);
+			// If the primary layer base area is positive, multiply that by veteran crown
+			// closure, otherwise just use half the veteran crown closure.
+			builder.baseArea(
+					layersBuilders.get(LayerType.PRIMARY).getBaseArea().filter(x -> x > 0f)
+							.map(pba -> crownClosure / 100f * pba).orElse(crownClosure / 2f)
+			);
+		}
+	}
+
+	private void modifyPrimaryLayerBuild(
+			BecDefinition bec, ca.bc.gov.nrs.vdyp.vri.model.VriLayer.Builder builder, List<VriSpecies> primarySpecs,
+			int itg
+	) {
+		// This was being done in VRI_CHK but I moved it here to when the object is
+		// being built instead.
+		if (builder.getBaseArea()
+				.flatMap(
+						ba -> builder.getTreesPerHectare()
+								.map(tph -> BaseAreaTreeDensityDiameter.quadMeanDiameter(ba, tph) < 7.5f)
+				).orElse(false)) {
+			builder.baseArea(Optional.empty());
+			builder.treesPerHectare(Optional.empty());
+		}
+
+		if (primarySpecs.size() > 1) {
+			builder.secondaryGenus(primarySpecs.get(1).getGenus());
+		}
+
+		builder.empiricalRelationshipParameterIndex(
+				findEmpiricalRelationshipParameterIndex(primarySpecs.get(0).getGenus(), bec, itg)
+		);
 	}
 
 	static final EnumSet<PolygonMode> ACCEPTABLE_MODES = EnumSet.of(PolygonMode.START, PolygonMode.YOUNG);
