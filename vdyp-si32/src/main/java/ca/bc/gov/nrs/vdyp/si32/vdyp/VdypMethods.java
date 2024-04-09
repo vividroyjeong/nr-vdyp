@@ -19,7 +19,6 @@ import ca.bc.gov.nrs.vdyp.si32.vdyp.SpeciesTable.SpeciesTableItem;
 import ca.bc.gov.nrs.vdyp.sindex.Sindxdll;
 
 public class VdypMethods {
-	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(VdypMethods.class);
 
 	private static final int SI_MAX_CURVES = 123;
@@ -454,19 +453,19 @@ public class VdypMethods {
 	 * For a specific species, returns the default Crown Closure associated with that species within a particular region
 	 * of the province.
 	 *
-	 * @param spName the species name to be looked up.
+	 * @param sp64Name the species name to be looked up.
 	 * @param region indicates which provincial region to get the default CC for.
 	 *
 	 * @return the default CC associated with the species in that particular region and -1.0 if the species was not
 	 *         recognized or no default CC has been assigned to that species and region.
 	 */
-	public static float getDefaultCrownClosure(String spName, SpeciesRegion region) {
+	public static float getDefaultCrownClosure(String sp64Name, SpeciesRegion region) {
 
 		// Note that if spName is invalid, the default entry is returned, which in
 		// turn contains the right default value of -1.0f.
 
-		if (spName != null && region != null) {
-			return speciesTable.getByCode(spName).details().defaultCrownClosure()[region.ordinal()];
+		if (sp64Name != null && region != null) {
+			return speciesTable.getByCode(sp64Name).details().defaultCrownClosure()[region.ordinal()];
 		} else {
 			return -1.0f;
 		}
