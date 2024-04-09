@@ -28,9 +28,7 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
-import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
 import ca.bc.gov.nrs.vdyp.vri.model.VriPolygon;
-import ca.bc.gov.nrs.vdyp.vri.model.VriSite;
 
 class VriInputValidationTest {
 
@@ -66,16 +64,16 @@ class VriInputValidationTest {
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(66.0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
-				((VriLayer.Builder) lBuilder).empiricalRelationshipParameterIndex(76);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(66.0f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
+				lBuilder.empiricalRelationshipParameterIndex(76);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("B");
-					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.siteSpecies("BL");
 					iBuilder.siteCurveNumber(8);
 				});
 				lBuilder.addSite(iBuilder -> {
@@ -83,9 +81,9 @@ class VriInputValidationTest {
 					iBuilder.height(28.0f);
 					iBuilder.siteIndex(14.3f);
 					iBuilder.siteGenus("C");
-					((VriSite.Builder) iBuilder).siteSpecies("CW");
+					iBuilder.siteSpecies("CW");
 					iBuilder.yearsToBreastHeight(10.9f);
-					((VriSite.Builder) iBuilder).breastHeightAge(189.1f);
+					iBuilder.breastHeightAge(189.1f);
 					iBuilder.siteCurveNumber(11);
 				});
 				lBuilder.addSite(iBuilder -> {
@@ -93,14 +91,14 @@ class VriInputValidationTest {
 					iBuilder.height(32.0f);
 					iBuilder.siteIndex(14.6f);
 					iBuilder.siteGenus("H");
-					((VriSite.Builder) iBuilder).siteSpecies("HW");
+					iBuilder.siteSpecies("HW");
 					iBuilder.yearsToBreastHeight(9.7f);
-					((VriSite.Builder) iBuilder).breastHeightAge(190.3f);
+					iBuilder.breastHeightAge(190.3f);
 					iBuilder.siteCurveNumber(37);
 				});
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("S");
-					((VriSite.Builder) iBuilder).siteSpecies("SE");
+					iBuilder.siteSpecies("SE");
 					iBuilder.siteCurveNumber(71);
 				});
 
@@ -126,24 +124,24 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("SE", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("H");
+				lBuilder.primaryGenus("H");
 
 			});
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.VETERAN);
-				((VriLayer.Builder) lBuilder).crownClosure(0f);
-				((VriLayer.Builder) lBuilder).baseArea(0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(0f);
-				((VriLayer.Builder) lBuilder).utilization(0f);
+				lBuilder.crownClosure(0f);
+				lBuilder.baseArea(0f);
+				lBuilder.treesPerHectare(0f);
+				lBuilder.utilization(0f);
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.ageTotal(200);
 					iBuilder.height(34.0f);
 					iBuilder.siteIndex(14.6f);
 					iBuilder.siteGenus("H");
-					((VriSite.Builder) iBuilder).siteSpecies("HW");
+					iBuilder.siteSpecies("HW");
 					iBuilder.yearsToBreastHeight(9.7f);
-					((VriSite.Builder) iBuilder).breastHeightAge(190.3f);
+					iBuilder.breastHeightAge(190.3f);
 					iBuilder.siteCurveNumber(37);
 				});
 
@@ -154,7 +152,7 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("HW", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("H");
+				lBuilder.primaryGenus("H");
 			});
 		});
 
@@ -178,15 +176,15 @@ class VriInputValidationTest {
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(66.0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(66.0f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("B");
-					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.siteSpecies("BL");
 					iBuilder.siteCurveNumber(8);
 				});
 				lBuilder.addSite(iBuilder -> {
@@ -194,9 +192,9 @@ class VriInputValidationTest {
 					iBuilder.height(28.0f);
 					iBuilder.siteIndex(14.3f);
 					iBuilder.siteGenus("C");
-					((VriSite.Builder) iBuilder).siteSpecies("CW");
+					iBuilder.siteSpecies("CW");
 					iBuilder.yearsToBreastHeight(10.9f);
-					((VriSite.Builder) iBuilder).breastHeightAge(189.1f);
+					iBuilder.breastHeightAge(189.1f);
 					iBuilder.siteCurveNumber(11);
 				});
 				lBuilder.addSite(iBuilder -> {
@@ -204,14 +202,14 @@ class VriInputValidationTest {
 					iBuilder.height(32.0f);
 					iBuilder.siteIndex(14.6f);
 					iBuilder.siteGenus("H");
-					((VriSite.Builder) iBuilder).siteSpecies("HW");
+					iBuilder.siteSpecies("HW");
 					iBuilder.yearsToBreastHeight(9.7f);
-					((VriSite.Builder) iBuilder).breastHeightAge(190.3f);
+					iBuilder.breastHeightAge(190.3f);
 					iBuilder.siteCurveNumber(37);
 				});
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("S");
-					((VriSite.Builder) iBuilder).siteSpecies("SE");
+					iBuilder.siteSpecies("SE");
 					iBuilder.siteCurveNumber(71);
 				});
 
@@ -237,7 +235,7 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("SE", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("H");
+				lBuilder.primaryGenus("H");
 
 			});
 		});
@@ -262,15 +260,15 @@ class VriInputValidationTest {
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.VETERAN);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(66.0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(66.0f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("B");
-					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.siteSpecies("BL");
 					iBuilder.siteCurveNumber(8);
 				});
 				lBuilder.addSite(iBuilder -> {
@@ -278,9 +276,9 @@ class VriInputValidationTest {
 					iBuilder.height(28.0f);
 					iBuilder.siteIndex(14.3f);
 					iBuilder.siteGenus("C");
-					((VriSite.Builder) iBuilder).siteSpecies("CW");
+					iBuilder.siteSpecies("CW");
 					iBuilder.yearsToBreastHeight(10.9f);
-					((VriSite.Builder) iBuilder).breastHeightAge(189.1f);
+					iBuilder.breastHeightAge(189.1f);
 					iBuilder.siteCurveNumber(11);
 				});
 				lBuilder.addSite(iBuilder -> {
@@ -288,14 +286,14 @@ class VriInputValidationTest {
 					iBuilder.height(32.0f);
 					iBuilder.siteIndex(14.6f);
 					iBuilder.siteGenus("H");
-					((VriSite.Builder) iBuilder).siteSpecies("HW");
+					iBuilder.siteSpecies("HW");
 					iBuilder.yearsToBreastHeight(9.7f);
-					((VriSite.Builder) iBuilder).breastHeightAge(190.3f);
+					iBuilder.breastHeightAge(190.3f);
 					iBuilder.siteCurveNumber(37);
 				});
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("S");
-					((VriSite.Builder) iBuilder).siteSpecies("SE");
+					iBuilder.siteSpecies("SE");
 					iBuilder.siteCurveNumber(71);
 				});
 
@@ -321,7 +319,7 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("SE", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("H");
+				lBuilder.primaryGenus("H");
 
 			});
 		});
@@ -366,15 +364,15 @@ class VriInputValidationTest {
 			pBuilder.modeFip(PolygonMode.YOUNG);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(66.0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(66.0f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("B");
-					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.siteSpecies("BL");
 					iBuilder.siteCurveNumber(8);
 				});
 				lBuilder.addSite(iBuilder -> {
@@ -382,9 +380,9 @@ class VriInputValidationTest {
 					iBuilder.height(28.0f);
 					iBuilder.siteIndex(14.3f);
 					iBuilder.siteGenus("C");
-					((VriSite.Builder) iBuilder).siteSpecies("CW");
+					iBuilder.siteSpecies("CW");
 					iBuilder.yearsToBreastHeight(10.9f);
-					((VriSite.Builder) iBuilder).breastHeightAge(189.1f);
+					iBuilder.breastHeightAge(189.1f);
 					iBuilder.siteCurveNumber(11);
 				});
 				lBuilder.addSite(iBuilder -> {
@@ -392,14 +390,14 @@ class VriInputValidationTest {
 					iBuilder.height(32.0f);
 					iBuilder.siteIndex(14.6f);
 					iBuilder.siteGenus("H");
-					((VriSite.Builder) iBuilder).siteSpecies("HW");
+					iBuilder.siteSpecies("HW");
 					// iBuilder.yearsToBreastHeight(9.7f);
-					// ((VriSite.Builder) iBuilder).breastHeightAge(190.3f);
+					// iBuilder.breastHeightAge(190.3f);
 					iBuilder.siteCurveNumber(37);
 				});
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("S");
-					((VriSite.Builder) iBuilder).siteSpecies("SE");
+					iBuilder.siteSpecies("SE");
 					iBuilder.siteCurveNumber(71);
 				});
 
@@ -425,7 +423,7 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("SE", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("H");
+				lBuilder.primaryGenus("H");
 			});
 		});
 
@@ -457,15 +455,15 @@ class VriInputValidationTest {
 			pBuilder.modeFip(PolygonMode.YOUNG);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(66.0f);
-				// ((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(66.0f);
+				// lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("B");
-					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.siteSpecies("BL");
 					iBuilder.siteCurveNumber(8);
 				});
 				lBuilder.addSite(iBuilder -> {
@@ -473,9 +471,9 @@ class VriInputValidationTest {
 					iBuilder.height(28.0f);
 					iBuilder.siteIndex(14.3f);
 					iBuilder.siteGenus("C");
-					((VriSite.Builder) iBuilder).siteSpecies("CW");
+					iBuilder.siteSpecies("CW");
 					iBuilder.yearsToBreastHeight(10.9f);
-					((VriSite.Builder) iBuilder).breastHeightAge(189.1f);
+					iBuilder.breastHeightAge(189.1f);
 					iBuilder.siteCurveNumber(11);
 				});
 				lBuilder.addSite(iBuilder -> {
@@ -483,14 +481,14 @@ class VriInputValidationTest {
 					iBuilder.height(32.0f);
 					iBuilder.siteIndex(14.6f);
 					iBuilder.siteGenus("H");
-					((VriSite.Builder) iBuilder).siteSpecies("HW");
+					iBuilder.siteSpecies("HW");
 					iBuilder.yearsToBreastHeight(9.7f);
-					((VriSite.Builder) iBuilder).breastHeightAge(190.3f);
+					iBuilder.breastHeightAge(190.3f);
 					iBuilder.siteCurveNumber(37);
 				});
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("S");
-					((VriSite.Builder) iBuilder).siteSpecies("SE");
+					iBuilder.siteSpecies("SE");
 					iBuilder.siteCurveNumber(71);
 				});
 
@@ -516,7 +514,7 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("SE", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("H");
+				lBuilder.primaryGenus("H");
 			});
 
 		});
@@ -549,16 +547,16 @@ class VriInputValidationTest {
 			pBuilder.modeFip(PolygonMode.YOUNG);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(66.0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
-				((VriLayer.Builder) lBuilder).empiricalRelationshipParameterIndex(76);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(66.0f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
+				lBuilder.empiricalRelationshipParameterIndex(76);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("B");
-					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.siteSpecies("BL");
 					iBuilder.siteCurveNumber(8);
 				});
 				lBuilder.addSite(iBuilder -> {
@@ -566,9 +564,9 @@ class VriInputValidationTest {
 					iBuilder.height(28.0f);
 					iBuilder.siteIndex(14.3f);
 					iBuilder.siteGenus("C");
-					((VriSite.Builder) iBuilder).siteSpecies("CW");
+					iBuilder.siteSpecies("CW");
 					iBuilder.yearsToBreastHeight(10.9f);
-					((VriSite.Builder) iBuilder).breastHeightAge(189.1f);
+					iBuilder.breastHeightAge(189.1f);
 					iBuilder.siteCurveNumber(11);
 				});
 				lBuilder.addSite(iBuilder -> {
@@ -576,14 +574,14 @@ class VriInputValidationTest {
 					iBuilder.height(32.0f);
 					iBuilder.siteIndex(14.6f);
 					iBuilder.siteGenus("H");
-					((VriSite.Builder) iBuilder).siteSpecies("HW");
+					iBuilder.siteSpecies("HW");
 					iBuilder.yearsToBreastHeight(9.7f);
-					((VriSite.Builder) iBuilder).breastHeightAge(190.3f);
+					iBuilder.breastHeightAge(190.3f);
 					iBuilder.siteCurveNumber(37);
 				});
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("S");
-					((VriSite.Builder) iBuilder).siteSpecies("SE");
+					iBuilder.siteSpecies("SE");
 					iBuilder.siteCurveNumber(71);
 				});
 
@@ -609,7 +607,7 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("SE", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("H");
+				lBuilder.primaryGenus("H");
 			});
 		});
 
@@ -641,16 +639,16 @@ class VriInputValidationTest {
 			pBuilder.modeFip(PolygonMode.START);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(66.0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
-				((VriLayer.Builder) lBuilder).empiricalRelationshipParameterIndex(76);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(66.0f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
+				lBuilder.empiricalRelationshipParameterIndex(76);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("B");
-					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.siteSpecies("BL");
 					iBuilder.siteCurveNumber(8);
 				});
 				lBuilder.addSite(iBuilder -> {
@@ -658,9 +656,9 @@ class VriInputValidationTest {
 					iBuilder.height(28.0f);
 					iBuilder.siteIndex(14.3f);
 					iBuilder.siteGenus("C");
-					((VriSite.Builder) iBuilder).siteSpecies("CW");
+					iBuilder.siteSpecies("CW");
 					iBuilder.yearsToBreastHeight(10.9f);
-					((VriSite.Builder) iBuilder).breastHeightAge(189.1f);
+					iBuilder.breastHeightAge(189.1f);
 					iBuilder.siteCurveNumber(11);
 				});
 				lBuilder.addSite(iBuilder -> {
@@ -668,14 +666,14 @@ class VriInputValidationTest {
 					iBuilder.height(32.0f);
 					iBuilder.siteIndex(14.6f);
 					iBuilder.siteGenus("H");
-					((VriSite.Builder) iBuilder).siteSpecies("HW");
+					iBuilder.siteSpecies("HW");
 					iBuilder.yearsToBreastHeight(9.7f);
-					((VriSite.Builder) iBuilder).breastHeightAge(190.3f);
+					iBuilder.breastHeightAge(190.3f);
 					iBuilder.siteCurveNumber(37);
 				});
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("S");
-					((VriSite.Builder) iBuilder).siteSpecies("SE");
+					iBuilder.siteSpecies("SE");
 					iBuilder.siteCurveNumber(71);
 				});
 
@@ -701,7 +699,7 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("SE", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("H");
+				lBuilder.primaryGenus("H");
 			});
 		});
 
@@ -733,15 +731,15 @@ class VriInputValidationTest {
 			pBuilder.modeFip(PolygonMode.START);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(66.0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(66.0f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("B");
-					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.siteSpecies("BL");
 					iBuilder.siteCurveNumber(8);
 				});
 				lBuilder.addSite(iBuilder -> {
@@ -749,9 +747,9 @@ class VriInputValidationTest {
 					iBuilder.height(28.0f);
 					iBuilder.siteIndex(14.3f);
 					iBuilder.siteGenus("C");
-					((VriSite.Builder) iBuilder).siteSpecies("CW");
+					iBuilder.siteSpecies("CW");
 					iBuilder.yearsToBreastHeight(10.9f);
-					((VriSite.Builder) iBuilder).breastHeightAge(189.1f);
+					iBuilder.breastHeightAge(189.1f);
 					iBuilder.siteCurveNumber(11);
 				});
 				lBuilder.addSite(iBuilder -> {
@@ -759,14 +757,14 @@ class VriInputValidationTest {
 					// iBuilder.height(32.0f); // Remove height from primary species
 					iBuilder.siteIndex(14.6f);
 					iBuilder.siteGenus("H");
-					((VriSite.Builder) iBuilder).siteSpecies("HW");
+					iBuilder.siteSpecies("HW");
 					iBuilder.yearsToBreastHeight(9.7f);
-					((VriSite.Builder) iBuilder).breastHeightAge(190.3f);
+					iBuilder.breastHeightAge(190.3f);
 					iBuilder.siteCurveNumber(37);
 				});
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("S");
-					((VriSite.Builder) iBuilder).siteSpecies("SE");
+					iBuilder.siteSpecies("SE");
 					iBuilder.siteCurveNumber(71);
 				});
 
@@ -792,7 +790,7 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("SE", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("H");
+				lBuilder.primaryGenus("H");
 			});
 		});
 
@@ -828,15 +826,15 @@ class VriInputValidationTest {
 			pBuilder.modeFip(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(66.0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(66.0f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("B");
-					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.siteSpecies("BL");
 					iBuilder.height(5f);
 					iBuilder.siteCurveNumber(8);
 					// iBuilder.ageTotal(100f);
@@ -849,7 +847,7 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("BL", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("B");
+				lBuilder.primaryGenus("B");
 			});
 		});
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
@@ -892,15 +890,15 @@ class VriInputValidationTest {
 			pBuilder.modeFip(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(66.0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(66.0f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("B");
-					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.siteSpecies("BL");
 					iBuilder.height(5f);
 					iBuilder.siteCurveNumber(8);
 					iBuilder.siteIndex(0.0f);
@@ -913,7 +911,7 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("BL", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("B");
+				lBuilder.primaryGenus("B");
 			});
 		});
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
@@ -956,15 +954,15 @@ class VriInputValidationTest {
 			pBuilder.modeFip(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(66.0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(66.0f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("B");
-					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.siteSpecies("BL");
 					iBuilder.height(5f);
 					iBuilder.siteCurveNumber(8);
 					iBuilder.siteIndex(1f);
@@ -978,7 +976,7 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("BL", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("B");
+				lBuilder.primaryGenus("B");
 			});
 		});
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
@@ -1021,15 +1019,15 @@ class VriInputValidationTest {
 			pBuilder.modeFip(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(66.0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(66.0f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("B");
-					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.siteSpecies("BL");
 					iBuilder.height(5f);
 					iBuilder.siteCurveNumber(8);
 					iBuilder.siteIndex(1f);
@@ -1043,7 +1041,7 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("BL", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("B");
+				lBuilder.primaryGenus("B");
 			});
 		});
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
@@ -1086,15 +1084,15 @@ class VriInputValidationTest {
 			pBuilder.modeFip(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(66.0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(66.0f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("B");
-					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.siteSpecies("BL");
 					iBuilder.height(5f);
 					iBuilder.siteCurveNumber(8);
 					iBuilder.siteIndex(1f);
@@ -1111,7 +1109,7 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("BL", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("B");
+				lBuilder.primaryGenus("B");
 			});
 		});
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
@@ -1154,15 +1152,15 @@ class VriInputValidationTest {
 			pBuilder.modeFip(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(66.0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(66.0f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("B");
-					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.siteSpecies("BL");
 					iBuilder.height(5f);
 					iBuilder.siteCurveNumber(8);
 					iBuilder.siteIndex(1f);
@@ -1177,7 +1175,7 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("BL", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("B");
+				lBuilder.primaryGenus("B");
 			});
 		});
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
@@ -1229,15 +1227,15 @@ class VriInputValidationTest {
 			pBuilder.modeFip(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(66.0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(66.0f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("B");
-					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.siteSpecies("BL");
 					iBuilder.height(Float.valueOf(heightS));
 					iBuilder.siteCurveNumber(8);
 					iBuilder.siteIndex(1f);
@@ -1252,7 +1250,7 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("BL", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("B");
+				lBuilder.primaryGenus("B");
 			});
 		});
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
@@ -1295,15 +1293,15 @@ class VriInputValidationTest {
 			pBuilder.modeFip(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(0.0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(0.0f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("B");
-					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.siteSpecies("BL");
 					iBuilder.height(5f);
 					iBuilder.siteCurveNumber(8);
 					iBuilder.siteIndex(1f);
@@ -1318,7 +1316,7 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("BL", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("B");
+				lBuilder.primaryGenus("B");
 			});
 		});
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
@@ -1364,15 +1362,15 @@ class VriInputValidationTest {
 			pBuilder.modeFip(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(30.0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(0f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(30.0f);
+				lBuilder.treesPerHectare(0f);
+				lBuilder.utilization(7.5f);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("B");
-					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.siteSpecies("BL");
 					iBuilder.height(5f);
 					iBuilder.siteCurveNumber(8);
 					iBuilder.siteIndex(1f);
@@ -1387,7 +1385,7 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("BL", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("B");
+				lBuilder.primaryGenus("B");
 			});
 		});
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
@@ -1430,15 +1428,15 @@ class VriInputValidationTest {
 			pBuilder.modeFip(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(0.0f);
-				((VriLayer.Builder) lBuilder).baseArea(30.0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
+				lBuilder.crownClosure(0.0f);
+				lBuilder.baseArea(30.0f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("B");
-					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.siteSpecies("BL");
 					iBuilder.height(5f);
 					iBuilder.siteCurveNumber(8);
 					iBuilder.siteIndex(1f);
@@ -1453,7 +1451,7 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("BL", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("B");
+				lBuilder.primaryGenus("B");
 			});
 		});
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
@@ -1496,15 +1494,15 @@ class VriInputValidationTest {
 			pBuilder.modeFip(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(30.0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(30.0f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("B");
-					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.siteSpecies("BL");
 					iBuilder.height(5f);
 					iBuilder.siteCurveNumber(8);
 					iBuilder.siteIndex(1f);
@@ -1519,7 +1517,7 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("BL", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("B");
+				lBuilder.primaryGenus("B");
 			});
 		});
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
@@ -1557,16 +1555,16 @@ class VriInputValidationTest {
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(66.0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
-				((VriLayer.Builder) lBuilder).empiricalRelationshipParameterIndex(76);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(66.0f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
+				lBuilder.empiricalRelationshipParameterIndex(76);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("B");
-					((VriSite.Builder) iBuilder).siteSpecies("BL");
+					iBuilder.siteSpecies("BL");
 					iBuilder.siteCurveNumber(8);
 				});
 				lBuilder.addSite(iBuilder -> {
@@ -1574,9 +1572,9 @@ class VriInputValidationTest {
 					iBuilder.height(28.0f);
 					iBuilder.siteIndex(14.3f);
 					iBuilder.siteGenus("C");
-					((VriSite.Builder) iBuilder).siteSpecies("CW");
+					iBuilder.siteSpecies("CW");
 					iBuilder.yearsToBreastHeight(10.9f);
-					((VriSite.Builder) iBuilder).breastHeightAge(189.1f);
+					iBuilder.breastHeightAge(189.1f);
 					iBuilder.siteCurveNumber(11);
 				});
 				lBuilder.addSite(iBuilder -> {
@@ -1584,14 +1582,14 @@ class VriInputValidationTest {
 					iBuilder.height(32.0f);
 					iBuilder.siteIndex(14.6f);
 					iBuilder.siteGenus("H");
-					((VriSite.Builder) iBuilder).siteSpecies("HW");
+					iBuilder.siteSpecies("HW");
 					iBuilder.yearsToBreastHeight(9.7f);
-					((VriSite.Builder) iBuilder).breastHeightAge(190.3f);
+					iBuilder.breastHeightAge(190.3f);
 					iBuilder.siteCurveNumber(37);
 				});
 				lBuilder.addSite(iBuilder -> {
 					iBuilder.siteGenus("S");
-					((VriSite.Builder) iBuilder).siteSpecies("SE");
+					iBuilder.siteSpecies("SE");
 					iBuilder.siteCurveNumber(71);
 				});
 
@@ -1617,15 +1615,15 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("SE", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("H");
+				lBuilder.primaryGenus("H");
 
 			});
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.VETERAN);
-				((VriLayer.Builder) lBuilder).crownClosure(0f);
-				((VriLayer.Builder) lBuilder).baseArea(0f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(0f);
-				((VriLayer.Builder) lBuilder).utilization(0f);
+				lBuilder.crownClosure(0f);
+				lBuilder.baseArea(0f);
+				lBuilder.treesPerHectare(0f);
+				lBuilder.utilization(0f);
 
 				// Sites
 				lBuilder.addSite(iBuilder -> {
@@ -1633,9 +1631,9 @@ class VriInputValidationTest {
 					iBuilder.height(34.0f);
 					iBuilder.siteIndex(14.6f);
 					iBuilder.siteGenus("H");
-					((VriSite.Builder) iBuilder).siteSpecies("HW");
+					iBuilder.siteSpecies("HW");
 					iBuilder.yearsToBreastHeight(9.7f);
-					((VriSite.Builder) iBuilder).breastHeightAge(190.3f);
+					iBuilder.breastHeightAge(190.3f);
 					iBuilder.siteCurveNumber(37);
 				});
 
@@ -1646,7 +1644,7 @@ class VriInputValidationTest {
 					sBuilder.addSpecies("HW", 100);
 				});
 
-				((VriLayer.Builder) lBuilder).primaryGenus("H");
+				lBuilder.primaryGenus("H");
 
 			});
 		});

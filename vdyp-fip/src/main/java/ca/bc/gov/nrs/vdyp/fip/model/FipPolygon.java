@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 
-public class FipPolygon extends BaseVdypPolygon<FipLayer, Optional<Float>> {
+public class FipPolygon extends BaseVdypPolygon<FipLayer, Optional<Float>, FipSpecies, FipSite> {
 
 	private Optional<String> nonproductiveDescription; // FIP_P3/NPDESC
 	private float yieldFactor; // FIP_P4/YLDFACT
@@ -60,7 +60,8 @@ public class FipPolygon extends BaseVdypPolygon<FipLayer, Optional<Float>> {
 		return builder.build();
 	}
 
-	public static class Builder extends BaseVdypPolygon.Builder<FipPolygon, FipLayer, Optional<Float>> {
+	public static class Builder extends
+			BaseVdypPolygon.Builder<FipPolygon, FipLayer, Optional<Float>, FipSpecies, FipSite, FipLayer.Builder, FipSpecies.Builder, FipSite.Builder> {
 		protected Optional<String> nonproductiveDescription = Optional.empty();
 		protected Optional<Float> yieldFactor = Optional.empty();
 

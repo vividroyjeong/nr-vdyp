@@ -40,7 +40,7 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 
-public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional<Float>>, L extends BaseVdypLayer<S, I>, S extends BaseVdypSpecies, I extends BaseVdypSite>
+public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional<Float>, S, I>, L extends BaseVdypLayer<S, I>, S extends BaseVdypSpecies, I extends BaseVdypSite>
 		extends VdypApplication implements Closeable {
 
 	private static final Logger log = LoggerFactory.getLogger(VdypStartApplication.class);
