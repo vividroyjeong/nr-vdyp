@@ -169,6 +169,10 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 			return treesPerHectare;
 		}
 
+		public Optional<Float> getCrownClosure() {
+			return crownClosure;
+		}
+
 		public Builder primaryGenus(Optional<String> primaryGenus) {
 			this.primaryGenus = primaryGenus;
 			return this;
@@ -229,7 +233,6 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 				config.accept(builder);
 			});
 		}
-
 	}
 
 }

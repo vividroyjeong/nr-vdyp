@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.is;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -173,9 +172,6 @@ class VriStartTest {
 			map.put(76, new Coefficients(new float[] { 89.69f, 53.60f }, 1));
 		}));
 
-		final var polygonId = "Test";
-		final var layerType = LayerType.PRIMARY;
-
 		app.init(resolver, controlMap);
 
 		Optional<Float> ageTotal = Optional.of(200f);
@@ -199,6 +195,8 @@ class VriStartTest {
 		);
 
 		assertThat(result, is(PolygonMode.YOUNG));
+
+		app.close();
 	}
 
 	@Test
@@ -227,9 +225,6 @@ class VriStartTest {
 			map.put(76, new Coefficients(new float[] { 89.69f, 53.60f }, 1));
 		}));
 
-		final var polygonId = "Test";
-		final var layerType = LayerType.PRIMARY;
-
 		app.init(resolver, controlMap);
 
 		Optional<Float> ageTotal = Optional.of(200f);
@@ -253,6 +248,8 @@ class VriStartTest {
 		);
 
 		assertThat(result, is(PolygonMode.YOUNG));
+
+		app.close();
 	}
 
 	@Test
@@ -281,9 +278,6 @@ class VriStartTest {
 			map.put(76, new Coefficients(new float[] { 89.69f, 53.60f }, 1));
 		}));
 
-		final var polygonId = "Test";
-		final var layerType = LayerType.PRIMARY;
-
 		app.init(resolver, controlMap);
 
 		Optional<Float> ageTotal = Optional.of(200f);
@@ -307,6 +301,8 @@ class VriStartTest {
 		);
 
 		assertThat(result, is(PolygonMode.YOUNG));
+
+		app.close();
 	}
 
 	@Test
@@ -335,9 +331,6 @@ class VriStartTest {
 			map.put(76, new Coefficients(new float[] { 89.69f, 53.60f }, 1));
 		}));
 
-		final var polygonId = "Test";
-		final var layerType = LayerType.PRIMARY;
-
 		app.init(resolver, controlMap);
 
 		Optional<Float> ageTotal = Optional.of(200f);
@@ -361,6 +354,8 @@ class VriStartTest {
 		);
 
 		assertThat(result, is(PolygonMode.YOUNG));
+
+		app.close();
 	}
 
 	@Test
@@ -389,9 +384,6 @@ class VriStartTest {
 			map.put(76, new Coefficients(new float[] { 89.69f, 53.60f }, 1));
 		}));
 
-		final var polygonId = "Test";
-		final var layerType = LayerType.PRIMARY;
-
 		app.init(resolver, controlMap);
 
 		Optional<Float> ageTotal = Optional.of(200f);
@@ -415,6 +407,8 @@ class VriStartTest {
 		);
 
 		assertThat(result, is(PolygonMode.YOUNG));
+
+		app.close();
 	}
 
 	@Test
@@ -443,9 +437,6 @@ class VriStartTest {
 			map.put(76, new Coefficients(new float[] { 89.69f, 53.60f }, 1));
 		}));
 
-		final var polygonId = "Test";
-		final var layerType = LayerType.PRIMARY;
-
 		app.init(resolver, controlMap);
 
 		Optional<Float> ageTotal = Optional.of(200f);
@@ -469,6 +460,8 @@ class VriStartTest {
 		);
 
 		assertThat(result, is(PolygonMode.START));
+
+		app.close();
 	}
 
 }

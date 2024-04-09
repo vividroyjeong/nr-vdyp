@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -15,8 +14,6 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.helpers.Util;
-
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.application.RuntimeStandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
@@ -178,6 +175,28 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			layerBuilder.addSite(site);
 		}
 
+		Map<LayerType, VriLayer> layers = getLayersForPolygon(polygon, bec, layersBuilders);
+
+		// Validate that layers belong to the correct polygon
+		for (var layer : layers.values()) {
+			if (!layer.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
+				throw validationError(
+						"Record in layer file contains layer for polygon %s when expecting one for %s.",
+						layer.getPolygonIdentifier(), polygon.getPolygonIdentifier()
+				);
+			}
+			layer.setSpecies(new HashMap<>());
+		}
+
+		polygon.setLayers(layers);
+
+		return polygon;
+
+	}
+
+	private Map<LayerType, VriLayer>
+			getLayersForPolygon(VriPolygon polygon, BecDefinition bec, Map<LayerType, VriLayer.Builder> layersBuilders)
+					throws StandProcessingException {
 		log.trace("Getting layers for polygon {}", polygon.getPolygonIdentifier());
 		Map<LayerType, VriLayer> layers;
 		try {
@@ -226,6 +245,28 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 						);
 					}
 				}
+				if (layerType == LayerType.VETERAN && (builder.getBaseArea().map(x -> x <= 0f).orElse(true)
+						|| builder.getTreesPerHectare().map(x -> x <= 0f).orElse(true))) {
+					// BA or TPH missing from Veteran layer.
+
+					builder.treesPerHectare(0f);
+
+					float crownClosure = builder.getCrownClosure().filter(x -> x > 0f).orElseThrow(
+							() -> new RuntimeStandProcessingException(
+									validationError(
+											"Expected a positive crown closure for veteran layer but was %s",
+											Utils.optNa(builder.getCrownClosure())
+									)
+							)
+					);
+					// If the primary layer base area is positive, multiply that by veteran crown
+					// closure, otherwise just use half the veteran crown closure.
+					builder.baseArea(
+							layersBuilders.get(LayerType.PRIMARY).getBaseArea().filter(x -> x > 0f)
+									.map(pba -> crownClosure / 100f * pba).orElse(crownClosure / 2f)
+					);
+
+				}
 				return builder;
 			}).map(VriLayer.Builder::build).collect(Collectors.toUnmodifiableMap(VriLayer::getLayer, x -> x));
 
@@ -234,22 +275,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		} catch (RuntimeStandProcessingException ex) {
 			throw ex.getCause();
 		}
-
-		// Validate that layers belong to the correct polygon
-		for (var layer : layers.values()) {
-			if (!layer.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
-				throw validationError(
-						"Record in layer file contains layer for polygon %s when expecting one for %s.",
-						layer.getPolygonIdentifier(), polygon.getPolygonIdentifier()
-				);
-			}
-			layer.setSpecies(new HashMap<>());
-		}
-
-		polygon.setLayers(layers);
-
-		return polygon;
-
+		return layers;
 	}
 
 	static final EnumSet<PolygonMode> ACCEPTABLE_MODES = EnumSet.of(PolygonMode.START, PolygonMode.YOUNG);
@@ -298,41 +324,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		// I did that in getPolygon instead of here.
 
 		for (var layer : polygon.getLayers().values()) {
-
-			if (layer.getSpecies().isEmpty())
-				continue;
-
-			// At this point the Fortran implementation copied from the VRI globals to the
-			// FIP globals. That's not necessary here because it's stored in a VriLayer
-			// which shares BaseVdypLayer as s superclass with FipLayer
-
-			if (layer.getLayer() == LayerType.PRIMARY)
-				this.getPercentTotal(layer); // Validate that percent total is close to 100%
-
-			// At this point the Fortran implementation Set the Primary Genus and ITG, I did
-			// that in getPolygon instead of here.
-
-			Optional<VriSite> primarySite = layer.getPrimaryGenus()
-					.flatMap(id -> Utils.optSafe(layer.getSites().get(id)));
-			var ageTotal = primarySite.flatMap(VriSite::getAgeTotal);
-			var treesPerHectare = layer.getTreesPerHectare();
-			var height = primarySite.flatMap(VriSite::getHeight);
-
-			if (polygon.getModeFip().map(x -> x == PolygonMode.YOUNG).orElse(false)
-					&& layer.getLayer() == LayerType.PRIMARY) {
-				if (ageTotal.map(x -> x <= 0f).orElse(true) || treesPerHectare.map(x -> x <= 0f).orElse(true)) {
-					throw validationError(
-							"Age Total and Trees Per Hectare must be positive for a PRIMARY layer in mode YOUNG"
-					);
-				}
-			} else {
-				if (height.map(x -> x <= 0f).orElse(true)) {
-					throw validationError(
-							"Height must be positive for a VETERAN layer or a PRIMARY layer not in mode YOUNG"
-					);
-				}
-			}
-
+			checkLayer(polygon, layer);
 		}
 
 		checkPolygonForMode(polygon, bec);
@@ -345,14 +337,43 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		if (veteranLayer != null) {
 			Optional<Float> veteranHeight = veteranLayer.getPrimarySite().flatMap(VriSite::getHeight);
-			if (veteranHeight.map(x -> x <= veteranMinHeight).orElse(true)) {
+			validateMinimum("Veteran layer primary species height", veteranHeight, veteranMinHeight, true);
+		}
+	}
+
+	private void checkLayer(VriPolygon polygon, VriLayer layer) throws StandProcessingException {
+		if (layer.getSpecies().isEmpty())
+			return;
+		if (layer.getLayer() == LayerType.PRIMARY)
+			this.getPercentTotal(layer); // Validate that percent total is close to 100%
+		Optional<VriSite> primarySite = layer.getPrimaryGenus().flatMap(id -> Utils.optSafe(layer.getSites().get(id)));
+		var ageTotal = primarySite.flatMap(VriSite::getAgeTotal);
+		var treesPerHectare = layer.getTreesPerHectare();
+		var height = primarySite.flatMap(VriSite::getHeight);
+		if (polygon.getModeFip().map(x -> x == PolygonMode.YOUNG).orElse(false)
+				&& layer.getLayer() == LayerType.PRIMARY) {
+			if (ageTotal.map(x -> x <= 0f).orElse(true) || treesPerHectare.map(x -> x <= 0f).orElse(true)) {
 				throw validationError(
-						"Veteran layer primary species height %s should be greater than or equal to %s",
-						veteranHeight.map(Object::toString).orElse("N/A"), veteranMinHeight
+						"Age Total and Trees Per Hectare must be positive for a PRIMARY layer in mode YOUNG"
+				);
+			}
+		} else {
+			if (height.map(x -> x <= 0f).orElse(true)) {
+				throw validationError(
+						"Height must be positive for a VETERAN layer or a PRIMARY layer not in mode YOUNG"
 				);
 			}
 		}
 	}
+
+	static final String SITE_INDEX_PROPERTY_NAME = "Site index";
+	static final String AGE_TOTAL_PROPERTY_NAME = "Age total";
+	static final String BREAST_HEIGHT_AGE_PROPERTY_NAME = "Breast height age";
+	static final String YEARS_TO_BREAST_HEIGHT_PROPERTY_NAME = "Years to breast height";
+	static final String HEIGHT_PROPERTY_NAME = "Height";
+	static final String BASE_AREA_PROPERTY_NAME = "Base area";
+	static final String TREES_PER_HECTARE_PROPERTY_NAME = "Trees per hectare";
+	static final String CROWN_CLOSURE_PROPERTY_NAME = "Crown closure";
 
 	protected void checkPolygonForMode(VriPolygon polygon, BecDefinition bec) throws StandProcessingException {
 		VriLayer primaryLayer = polygon.getLayers().get(LayerType.PRIMARY);
@@ -388,33 +409,33 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			switch (mode) {
 
 			case START:
-				validateMinimum("Site index", siteIndex, 0f);
-				validateMinimum("Age total", ageTotal, 0f);
-				validateMinimum("Breast height age", primaryBreastHeightAge, 0f);
-				validateMinimum("Height", height, 4.5f);
-				validateMinimum("Base area", baseArea, 0f);
-				validateMinimum("Trees per hectare", treesPerHectare, 0f);
+				validateMinimum(SITE_INDEX_PROPERTY_NAME, siteIndex, 0f, false);
+				validateMinimum(AGE_TOTAL_PROPERTY_NAME, ageTotal, 0f, false);
+				validateMinimum(BREAST_HEIGHT_AGE_PROPERTY_NAME, primaryBreastHeightAge, 0f, false);
+				validateMinimum(HEIGHT_PROPERTY_NAME, height, 4.5f, false);
+				validateMinimum(BASE_AREA_PROPERTY_NAME, baseArea, 0f, false);
+				validateMinimum(TREES_PER_HECTARE_PROPERTY_NAME, treesPerHectare, 0f, false);
 				break;
 
 			case YOUNG:
-				validateMinimum("Site index", siteIndex, 0f);
-				validateMinimum("Age total", ageTotal, 0f);
-				validateMinimum("Years to breast height", yearsToBreastHeight, 0f);
+				validateMinimum(SITE_INDEX_PROPERTY_NAME, siteIndex, 0f, false);
+				validateMinimum(AGE_TOTAL_PROPERTY_NAME, ageTotal, 0f, false);
+				validateMinimum(YEARS_TO_BREAST_HEIGHT_PROPERTY_NAME, yearsToBreastHeight, 0f, false);
 				break;
 
 			case BATN:
-				validateMinimum("Site index", siteIndex, 0f);
-				validateMinimum("Age total", ageTotal, 0f);
-				validateMinimum("Breast height age", primaryBreastHeightAge, 0f);
-				validateMinimum("Height", height, 1.3f);
+				validateMinimum(SITE_INDEX_PROPERTY_NAME, siteIndex, 0f, false);
+				validateMinimum(AGE_TOTAL_PROPERTY_NAME, ageTotal, 0f, false);
+				validateMinimum(BREAST_HEIGHT_AGE_PROPERTY_NAME, primaryBreastHeightAge, 0f, false);
+				validateMinimum(HEIGHT_PROPERTY_NAME, height, 1.3f, false);
 				break;
 
 			case BATC:
-				validateMinimum("Site index", siteIndex, 0f);
-				validateMinimum("Age total", ageTotal, 0f);
-				validateMinimum("Breast height age", primaryBreastHeightAge, 0f);
-				validateMinimum("Height", height, 1.3f);
-				validateMinimum("Crown closure", crownClosure, 0f);
+				validateMinimum(SITE_INDEX_PROPERTY_NAME, siteIndex, 0f, false);
+				validateMinimum(AGE_TOTAL_PROPERTY_NAME, ageTotal, 0f, false);
+				validateMinimum(BREAST_HEIGHT_AGE_PROPERTY_NAME, primaryBreastHeightAge, 0f, false);
+				validateMinimum(HEIGHT_PROPERTY_NAME, height, 1.3f, false);
+				validateMinimum(CROWN_CLOSURE_PROPERTY_NAME, crownClosure, 0f, false);
 				break;
 
 			case DONT_PROCESS:
@@ -427,13 +448,20 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		}
 	}
 
-	void validateMinimum(String fieldName, float value, float minimum) throws StandProcessingException {
-		if (value <= minimum)
-			throw validationError("%s %s should be greater than %s", fieldName, value, minimum);
+	void validateMinimum(String fieldName, float value, float minimum, boolean inclusive)
+			throws StandProcessingException {
+		if (value < minimum || (value == minimum && !inclusive))
+			throw validationError(
+					"%s %s should be %s %s", fieldName, value, inclusive ? "greater than or equal to" : "greater than",
+					minimum
+			);
 	}
 
-	void validateMinimum(String fieldName, Optional<Float> value, float minimum) throws StandProcessingException {
-		validateMinimum(fieldName, value.orElseThrow(() -> validationError("%s is not present", fieldName)), minimum);
+	void validateMinimum(String fieldName, Optional<Float> value, float minimum, boolean inclusive)
+			throws StandProcessingException {
+		validateMinimum(
+				fieldName, value.orElseThrow(() -> validationError("%s is not present", fieldName)), minimum, inclusive
+		);
 	}
 
 	// EMP106

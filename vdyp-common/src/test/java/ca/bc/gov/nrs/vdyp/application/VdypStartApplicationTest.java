@@ -28,9 +28,6 @@ import org.easymock.IMocksControl;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.Utils;
-import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
@@ -221,6 +218,7 @@ class VdypStartApplicationTest {
 
 		app.init(resolver, controlMap);
 
+		@SuppressWarnings("resource")
 		var ex = assertThrows(
 				ProcessingException.class, () -> app.getStreamingParser(ControlKey.FIP_INPUT_YIELD_LAYER)
 		);
@@ -250,6 +248,7 @@ class VdypStartApplicationTest {
 
 		app.init(resolver, controlMap);
 
+		@SuppressWarnings("resource")
 		var ex = assertThrows(
 				ProcessingException.class, () -> app.getStreamingParser(ControlKey.FIP_INPUT_YIELD_LAYER)
 		);

@@ -48,7 +48,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	public static final int CONFIG_LOAD_ERROR = 1;
 	public static final int PROCESSING_ERROR = 2;
 
-	public static final Map<String, Integer> ITG_PURE = Utils.constMap(map -> {
+	protected static final Map<String, Integer> ITG_PURE = Utils.constMap(map -> {
 		map.put("AC", 36);
 		map.put("AT", 42);
 		map.put("B", 18);
@@ -113,7 +113,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	/**
 	 * When finding primary species these genera should be combined
 	 */
-	public static final Collection<Collection<String>> PRIMARY_SPECIES_TO_COMBINE = Arrays
+	protected static final Collection<Collection<String>> PRIMARY_SPECIES_TO_COMBINE = Arrays
 			.asList(Arrays.asList("PL", "PA"), Arrays.asList("C", "Y"));
 
 	protected VdypStartApplication() {
@@ -295,6 +295,13 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	 * @return
 	 * @throws ProcessingException
 	 */
+	@SuppressWarnings(
+		{ //
+				"java:S1301", // Using switch instead of if for consistency
+				"java:S3776" // Inherently a lot of branching in a consistent manner, breaking into more
+								// functions would make it less comprehensible
+		}
+	)
 	protected int findItg(List<S> primarySecondary) throws StandProcessingException {
 		var primary = primarySecondary.get(0);
 
@@ -447,6 +454,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	}
 
 	protected static StandProcessingException validationError(String template, Object... values) {
+
 		return new StandProcessingException(String.format(template, values));
 	}
 

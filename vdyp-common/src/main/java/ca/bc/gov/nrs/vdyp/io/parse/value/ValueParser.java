@@ -143,6 +143,8 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 	public static final ValueParser<Float> PERCENTAGE = ValueParser
 			.range(FLOAT, 0.0f, true, 100.0f, true, "Percentage");
 
+	static final String RANGE_ERROR_TEMPLATE = "%s must be %s %s.";
+
 	/**
 	 * Validate that a parsed value is within a range
 	 *
@@ -159,14 +161,15 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 			if (x.compareTo(min) < (includeMin ? 0 : 1)) {
 				return Optional.of(
 						String.format(
-								"%s must be %s %s.", name, includeMin ? "greater than or equal to" : "greater than", min
+								RANGE_ERROR_TEMPLATE, name, includeMin ? "greater than or equal to" : "greater than",
+								min
 						)
 				);
 			}
 			if (x.compareTo(max) > (includeMax ? 0 : -1)) {
 				return Optional.of(
 						String.format(
-								"%s must be %s %s.", name, includeMax ? "less than or equal to" : "less than", max
+								RANGE_ERROR_TEMPLATE, name, includeMax ? "less than or equal to" : "less than", max
 						)
 				);
 			}
@@ -196,7 +199,7 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 		}, result -> {
 			return result.filter(x -> x.compareTo(max) > (includeMax ? 0 : -1)).map(
 					x -> String
-							.format("%s must be %s %s.", name, includeMax ? "less than or equal to" : "less than", max)
+							.format(RANGE_ERROR_TEMPLATE, name, includeMax ? "less than or equal to" : "less than", max)
 			);
 		});
 	}

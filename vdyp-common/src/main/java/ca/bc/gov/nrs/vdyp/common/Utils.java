@@ -267,4 +267,41 @@ public class Utils {
 		return expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class).get(biogeoclimaticZone)
 				.orElseThrow(() -> new ProcessingException("Reference to unexpected BEC " + biogeoclimaticZone));
 	}
+
+	/**
+	 * Returns the value of the optional if it's present, otherwise the string "N/A"
+	 *
+	 * @param <T>
+	 * @param value
+	 * @param stringify
+	 * @return
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static Object optNa(Optional<?> value) {
+		return ((Optional) value).orElse("N/A");
+	}
+
+	/**
+	 * If the value is present, returns the default string representation otherwise returns "N/A"
+	 *
+	 * @param <T>
+	 * @param value
+	 * @param stringify
+	 * @return
+	 */
+	public static String optPretty(Optional<?> value) {
+		return optPretty(value, Object::toString);
+	}
+
+	/**
+	 * If the value is present, returns the result of the stringify function otherwise returns "N/A"
+	 *
+	 * @param <T>
+	 * @param value
+	 * @param stringify
+	 * @return
+	 */
+	public static <T> String optPretty(Optional<T> value, Function<T, String> stringify) {
+		return (String) optNa(value.map(stringify));
+	}
 }

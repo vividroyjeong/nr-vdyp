@@ -159,6 +159,8 @@ class VriInputValidationTest {
 		});
 
 		app.checkPolygon(poly);
+
+		app.close();
 	}
 
 	@Test
@@ -241,6 +243,8 @@ class VriInputValidationTest {
 		});
 
 		assertThrows(StandProcessingException.class, () -> app.checkPolygon(poly));
+
+		app.close();
 	}
 
 	@Test
@@ -248,9 +252,6 @@ class VriInputValidationTest {
 		var app = new VriStart();
 
 		MockFileResolver resolver = dummyInput();
-
-		final var polygonId = "Test";
-		final var layerType = LayerType.PRIMARY;
 
 		app.init(resolver, controlMap);
 
@@ -326,6 +327,8 @@ class VriInputValidationTest {
 		});
 
 		assertThrows(StandProcessingException.class, () -> app.checkPolygon(poly));
+
+		app.close();
 	}
 
 	private MockFileResolver dummyInput() {
@@ -427,6 +430,8 @@ class VriInputValidationTest {
 		});
 
 		assertThrows(StandProcessingException.class, () -> app.checkPolygon(poly));
+
+		app.close();
 	}
 
 	@Test
@@ -517,6 +522,8 @@ class VriInputValidationTest {
 		});
 
 		assertThrows(StandProcessingException.class, () -> app.checkPolygon(poly));
+
+		app.close();
 	}
 
 	@Test
@@ -607,6 +614,8 @@ class VriInputValidationTest {
 		});
 
 		assertDoesNotThrow(() -> app.checkPolygon(poly));
+
+		app.close();
 	}
 
 	@Test
@@ -697,6 +706,8 @@ class VriInputValidationTest {
 		});
 
 		assertDoesNotThrow(() -> app.checkPolygon(poly));
+
+		app.close();
 	}
 
 	@Test
@@ -786,6 +797,8 @@ class VriInputValidationTest {
 		});
 
 		assertThrows(StandProcessingException.class, () -> app.checkPolygon(poly));
+
+		app.close();
 	}
 
 	@ParameterizedTest
@@ -848,6 +861,8 @@ class VriInputValidationTest {
 
 			assertThat(ex, hasProperty("message", is("Site index is not present")));
 		}
+
+		app.close();
 	}
 
 	@ParameterizedTest
@@ -910,6 +925,8 @@ class VriInputValidationTest {
 
 			assertThat(ex, hasProperty("message", is("Site index 0.0 should be greater than 0.0")));
 		}
+
+		app.close();
 	}
 
 	@ParameterizedTest
@@ -973,6 +990,8 @@ class VriInputValidationTest {
 
 			assertThat(ex, hasProperty("message", is("Age total is not present")));
 		}
+
+		app.close();
 	}
 
 	@ParameterizedTest
@@ -1036,6 +1055,8 @@ class VriInputValidationTest {
 
 			assertThat(ex, hasProperty("message", is("Age total 0.0 should be greater than 0.0")));
 		}
+
+		app.close();
 	}
 
 	@ParameterizedTest
@@ -1102,6 +1123,8 @@ class VriInputValidationTest {
 
 			assertThat(ex, hasProperty("message", is("Breast height age 0.0 should be greater than 0.0")));
 		}
+
+		app.close();
 	}
 
 	@ParameterizedTest
@@ -1166,6 +1189,8 @@ class VriInputValidationTest {
 
 			assertThat(ex, hasProperty("message", is("Years to breast height 0.0 should be greater than 0.0")));
 		}
+
+		app.close();
 	}
 
 	@ParameterizedTest
@@ -1239,6 +1264,8 @@ class VriInputValidationTest {
 
 			assertThat(ex, hasProperty("message", startsWith("Height " + heightS + " should be greater than ")));
 		}
+
+		app.close();
 	}
 
 	@ParameterizedTest
@@ -1303,6 +1330,8 @@ class VriInputValidationTest {
 
 			assertThat(ex, hasProperty("message", is("Base area 0.0 should be greater than 0.0")));
 		}
+
+		app.close();
 	}
 
 	@ParameterizedTest
@@ -1370,6 +1399,8 @@ class VriInputValidationTest {
 
 			assertThat(ex, hasProperty("message", is("Trees per hectare 0.0 should be greater than 0.0")));
 		}
+
+		app.close();
 	}
 
 	@ParameterizedTest
@@ -1434,6 +1465,8 @@ class VriInputValidationTest {
 
 			assertThat(ex, hasProperty("message", is("Crown closure 0.0 should be greater than 0.0")));
 		}
+
+		app.close();
 	}
 
 	@ParameterizedTest
@@ -1498,6 +1531,8 @@ class VriInputValidationTest {
 
 			assertThat(ex, hasProperty("message", is("Crown closure 0.0 should be greater than 0.0")));
 		}
+
+		app.close();
 	}
 
 	@Test
@@ -1624,6 +1659,8 @@ class VriInputValidationTest {
 						is("Veteran layer primary species height 34.0 should be greater than or equal to 36.0")
 				)
 		);
+
+		app.close();
 	}
 
 }
