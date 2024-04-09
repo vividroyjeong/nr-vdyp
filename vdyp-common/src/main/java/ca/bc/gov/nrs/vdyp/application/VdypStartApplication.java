@@ -205,7 +205,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	}
 
 	protected L requireLayer(P polygon, LayerType type) throws ProcessingException {
-		if (!polygon.getLayers().containsKey(LayerType.PRIMARY)) {
+		if (!polygon.getLayers().containsKey(type)) {
 			throw validationError(
 					"Polygon %s has no %s layer, or that layer has non-positive height or crown closure.",
 					polygon.getPolygonIdentifier(), type

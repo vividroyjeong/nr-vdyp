@@ -33,9 +33,12 @@ import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
@@ -766,4 +769,25 @@ class VdypStartApplicationTest {
 				)
 		);
 	}
+
+	@Test
+	void testRequireLayer() throws ProcessingException, IOException {
+		var mockControl = EasyMock.createControl();
+		BaseVdypPolygon poly = mockControl.createMock(BaseVdypPolygon.class);
+		BaseVdypLayer layer = mockControl.createMock(BaseVdypLayer.class);
+		EasyMock.expect(poly.getLayers()).andStubReturn(Collections.singletonMap(LayerType.PRIMARY, layer));
+		EasyMock.expect(poly.getPolygonIdentifier()).andStubReturn("TestPoly");
+	
+		try (VdypStartApplication app = getTestUnit(mockControl)) {
+			mockControl.replay();
+
+			var result = app.requireLayer(poly, LayerType.PRIMARY);
+			assertThat(result, is(layer));
+			var ex = assertThrows(StandProcessingException.class, ()->app.requireLayer(poly, LayerType.VETERAN));
+			assertThat(ex, hasProperty("message", is("Polygon TestPoly has no VETERAN layer, or that layer has non-positive height or crown closure.")));
+			
+		}
+
+	}
+
 }
