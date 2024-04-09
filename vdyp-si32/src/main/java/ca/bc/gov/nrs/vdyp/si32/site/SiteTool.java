@@ -190,7 +190,7 @@ public class SiteTool {
 	 */
 	public static boolean SiteTool_IsDeciduous(int sp64Index) {
 	
-		return VdypMethods.VDYP_IsDeciduous(SP64Name.forIndex(sp64Index));
+		return VdypMethods.isDeciduous(SP64Name.forIndex(sp64Index));
 	}
 
 	/** 
@@ -202,7 +202,7 @@ public class SiteTool {
 	public static boolean SiteTool_IsSoftwood(String spName) {
 		
 		// Note that if spName is not a recognized species name, the correct default value is returned.
-		return VdypMethods.speciesTable.getByCode(spName).isSoftwood();
+		return VdypMethods.speciesTable.getByCode(spName).details().isSoftwood();
 	}
 
 	/**
@@ -214,7 +214,7 @@ public class SiteTool {
 	 */
 	public static boolean SiteTool_IsPine(String spName) {
 		
-		String sSP0 = VdypMethods.VDYP_GetVDYP7Species(spName);
+		String sSP0 = VdypMethods.getVDYP7Species(spName);
 		if (sSP0 != null) {
 			switch (sSP0) {
 			case "PA", "PL", "PW", "PY":
@@ -239,7 +239,7 @@ public class SiteTool {
 	public static CfsTreeSpecies SiteTool_GetSpeciesCFSSpcs(String spName) {
 
 		// Note that if spName is not a recognized species name, the correct default value is returned.
-		return VdypMethods.speciesTable.getByCode(spName).cfsSpecies();
+		return VdypMethods.speciesTable.getByCode(spName).details().cfsSpecies();
 	}
 
 	/**
@@ -413,36 +413,36 @@ public class SiteTool {
 	}
 
 	public static int SiteTool_NumSpecies() {
-		return VdypMethods.VDYP_NumDefinedSpecies();
+		return VdypMethods.getNumDefinedSpecies();
 	}
 
 	public static String SiteTool_SpeciesShortName(int sp64Index) {
-		return VdypMethods.VDYP_GetSpeciesShortName(SP64Name.forIndex(sp64Index));
+		return VdypMethods.getSpeciesShortName(SP64Name.forIndex(sp64Index));
 	}
 
 	public static int SiteTool_SpeciesIndex(String spcsCodeName) {
-		return VdypMethods.VDYP_SpeciesIndex(spcsCodeName);
+		return VdypMethods.speciesIndex(spcsCodeName);
 	}
 
 	public static String SiteTool_SpeciesFullName(String spcsCodeName) {
-		return VdypMethods.VDYP_GetSpeciesFullName(SP64Name.forText(spcsCodeName));
+		return VdypMethods.getSpeciesFullName(SP64Name.forText(spcsCodeName));
 	}
 
 	public static String SiteTool_SpeciesLatinName(String spcsCodeName) {
-		return VdypMethods.VDYP_GetSpeciesLatinName(SP64Name.forText(spcsCodeName));
+		return VdypMethods.getSpeciesLatinName(SP64Name.forText(spcsCodeName));
 	}
 
 	public static String SiteTool_SpeciesGenusCode(String spcsCodeName) {
-		return VdypMethods.VDYP_GetSpeciesGenus(SP64Name.forText(spcsCodeName));
+		return VdypMethods.getSpeciesGenus(SP64Name.forText(spcsCodeName));
 	}
 
 	public static String SiteTool_SpeciesSINDEXCode(String spcsCode, boolean isCoastal) {
-		return VdypMethods.VDYP_GetSINDEXSpecies(spcsCode, 
+		return VdypMethods.getSINDEXSpecies(spcsCode, 
 				isCoastal ? SpeciesRegion.spcsRgn_Coast : SpeciesRegion.spcsRgn_Interior);
 	}
 
 	public static String SiteTool_SpeciesVDYP7Code(String spcsCode) {
-		return VdypMethods.VDYP_GetVDYP7Species(spcsCode);
+		return VdypMethods.getVDYP7Species(spcsCode);
 	}
 
 	/**
@@ -458,7 +458,7 @@ public class SiteTool {
 	public static int SiteTool_SetSICurve(String speciesCodeName, boolean coastalInd, int siCurve) {
 		
 		SpeciesRegion region = (coastalInd ? SpeciesRegion.spcsRgn_Coast : SpeciesRegion.spcsRgn_Interior);
-		return VdypMethods.VDYP_SetCurrentSICurve(speciesCodeName, region, siCurve);
+		return VdypMethods.setCurrentSICurve(speciesCodeName, region, siCurve);
 	}
 
 	/**
@@ -470,7 +470,7 @@ public class SiteTool {
 	 */
 	public static int SiteTool_GetSICurve(String spcsCode, boolean isCoastal) {
 
-		return VdypMethods.VDYP_GetCurrentSICurve(spcsCode, 
+		return VdypMethods.getCurrentSICurve(spcsCode, 
 				isCoastal ? SpeciesRegion.spcsRgn_Coast : SpeciesRegion.spcsRgn_Interior);
 	}
 
@@ -484,7 +484,7 @@ public class SiteTool {
 	 */
 	public static String SiteTool_SiteCurveSINDEXSpecies(int siCurve) {
 		
-		int spcsNdx = VdypMethods.VDYP_GetSICurveSpeciesIndex(siCurve);
+		int spcsNdx = VdypMethods.getSICurveSpeciesIndex(siCurve);
 
 		String spcsNm;
 		if (spcsNdx >= 0) {
@@ -507,7 +507,7 @@ public class SiteTool {
 	 *         recognized or no default CC has been assigned to that species and region.
 	 */
 	public static float SiteTool_SpeciesDefaultCrownClosure(String speciesCodeName, boolean isCoastal) {
-		return VdypMethods.VDYP_GetDefaultCrownClosure(
+		return VdypMethods.getDefaultCrownClosure(
 				speciesCodeName, (isCoastal ? SpeciesRegion.spcsRgn_Coast : SpeciesRegion.spcsRgn_Interior)
 		);
 	}

@@ -73,7 +73,7 @@ public enum CfsTreeGenus implements SI32Enum<CfsTreeGenus> {
 	@Override
 	public int getOffset() {
 		if (this.equals(cfsGenus_UNKNOWN) || this.equals(cfsGenus_NotApplicable) || this.equals(cfsGenus_MissingValue)) {
-			throw new UnsupportedOperationException(MessageFormat.format("Cannot call getIndex on {} as it's not a standard member of the enumeration", this));
+			throw new UnsupportedOperationException(MessageFormat.format("Cannot call getIndex on {0} as it's not a standard member of the enumeration", this));
 		}
 		
 		return index - 1;
@@ -83,7 +83,7 @@ public enum CfsTreeGenus implements SI32Enum<CfsTreeGenus> {
 	public String getText() {
 		if (this.equals(cfsGenus_UNKNOWN)) {
 			throw new UnsupportedOperationException(MessageFormat
-					.format("Cannot call getText on {} as it's not a standard member of the enumeration", this));
+					.format("Cannot call getText on {0} as it's not a standard member of the enumeration", this));
 		}
 		
 		return this.toString().substring("cfsGenus_".length());

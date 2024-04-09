@@ -1,6 +1,9 @@
 package ca.bc.gov.nrs.vdyp.si32.vdyp;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -10,7 +13,9 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CodeErrorExceptio
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ForestInventoryZoneException;
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SpeciesRegion;
+import ca.bc.gov.nrs.vdyp.si32.vdyp.SpeciesTable.SpeciesTableItem;
 import ca.bc.gov.nrs.vdyp.sindex.Sindxdll;
 
 public class VdypMethods {
@@ -27,7 +32,7 @@ public class VdypMethods {
 	 *
 	 * @return as described.
 	 */
-	public static int VDYP_NumDefinedSpecies() {
+	public static int getNumDefinedSpecies() {
 		return speciesTable.getNSpecies();
 	}
 
@@ -38,13 +43,13 @@ public class VdypMethods {
 	 * @return the index into the Species table for the corresponding species, and SpeciesTable.UNKNOWN_ENTRY_INDEX if
 	 *         the species was not recognized.
 	 */
-	public static int VDYP_SpeciesIndex(String sp64Name) {
+	public static int speciesIndex(String sp64Name) {
 		int result;
 
 		if (StringUtils.isNotBlank(sp64Name)) {
 			try {
-				SpeciesTableItem spsc = speciesTable.getByCode(sp64Name.toUpperCase());
-				result = spsc.cfsSpecies().getOffset();
+				SpeciesTableItem spsc = speciesTable.getByCode(sp64Name);
+				result = spsc.index();
 			} catch (IllegalArgumentException e) {
 				result = SpeciesTable.UNKNOWN_ENTRY_INDEX;
 			}
@@ -62,8 +67,8 @@ public class VdypMethods {
      * @param spName the species name to test.
 	 * @return a boolean indicating the result of the test.
 	 */
-	public static boolean VDYP_IsValidSpecies(String sp64Name) {
-		return VDYP_SpeciesIndex(sp64Name) >= 0;
+	public static boolean isValidSpecies(String sp64Name) {
+		return speciesIndex(sp64Name) > 0;
 	}
 
 	/**
@@ -72,8 +77,12 @@ public class VdypMethods {
 	 * @param sp64Name the name of tree species to be tested.
 	 * @return a boolean with the result
 	 */
-	public static boolean VDYP_IsDeciduous(SP64Name sp64Name) {
-		return speciesTable.getByCode(sp64Name.getText()).isDeciduous();
+	public static boolean isDeciduous(SP64Name sp64Name) {
+		if (sp64Name != null) {
+			return speciesTable.getByCode(sp64Name.getText()).details().isDeciduous();
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -82,8 +91,12 @@ public class VdypMethods {
 	 * @param sp64Name the species in question
 	 * @return a boolean with the result
 	 */
-	public static boolean VDYP_IsCommercial(SP64Name sp64Name) {
-		return speciesTable.getByCode(sp64Name.getText()).isCommercial();
+	public static boolean isCommercial(SP64Name sp64Name) {
+		if (sp64Name != null) {
+			return speciesTable.getByCode(sp64Name.getText()).details().isCommercial();
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -92,8 +105,12 @@ public class VdypMethods {
 	 * @param sp64Name the species in question
 	 * @return the short ("code") name of the species.
 	 */
-	public static String VDYP_GetSpeciesShortName(SP64Name sp64Name) {
-		return sp64Name.getText();
+	public static String getSpeciesShortName(SP64Name sp64Name) {
+		if (sp64Name != null) {
+			return sp64Name.getText();
+		} else {
+			return SP64Name.sp64_UNKNOWN.getText();
+		}
 	}
 
 	/**
@@ -102,8 +119,12 @@ public class VdypMethods {
 	 * @param sp64Name the species in question
 	 * @return the full ("common") name of the species.
 	 */
-	public static String VDYP_GetSpeciesFullName(SP64Name sp64Name) {
-		return speciesTable.getByCode(sp64Name.getText()).fullName();
+	public static String getSpeciesFullName(SP64Name sp64Name) {
+		if (sp64Name != null) {
+			return speciesTable.getByCode(sp64Name.getText()).details().fullName();
+		} else {
+			return SpeciesTable.DefaultEntry.fullName();
+		}
 	}
 
 	/**
@@ -112,8 +133,12 @@ public class VdypMethods {
 	 * @param sp64Name the species
 	 * @return the latin name of the species.
 	 */
-	public static String VDYP_GetSpeciesLatinName(SP64Name sp64Name) {
-		return speciesTable.getByCode(sp64Name.getText()).latinName();
+	public static String getSpeciesLatinName(SP64Name sp64Name) {
+		if (sp64Name != null) {
+			return speciesTable.getByCode(sp64Name.getText()).details().latinName();
+		} else {
+			return SpeciesTable.DefaultEntry.latinName();
+		}
 	}
 
 	/**
@@ -122,8 +147,12 @@ public class VdypMethods {
 	 * @param sp64 the species
 	 * @return the latin name of the species.
 	 */
-	public static String VDYP_GetSpeciesGenus(SP64Name sp64Name) {
-		return speciesTable.getByCode(sp64Name.getText()).genusName();
+	public static String getSpeciesGenus(SP64Name sp64Name) {
+		if (sp64Name != null) {
+			return speciesTable.getByCode(sp64Name.getText()).details().genusName();
+		} else {
+			return SpeciesTable.DefaultEntry.genusName();
+		}
 	}
 
 	/**
@@ -133,13 +162,13 @@ public class VdypMethods {
 	 * @param region indicates which provincial region to set the site curve for,
 	 *
 	 * @return the equivalent SINDEX species code. "" is returned if the species 
-	 * is not supported by SINDEX and no mapping exists.
+	 * is null or is not supported by SINDEX and no mapping exists.
 	 */
-	public static String VDYP_GetSINDEXSpecies(String speciesName, SpeciesRegion region) {
+	public static String getSINDEXSpecies(String speciesName, SpeciesRegion region) {
 
-		String speciesCode = SpeciesTable.UNKNOWN_ENTRY_CODE_NAME;
+		String speciesCode = "";
 
-		if (speciesName != null) {
+		if (speciesName != null && region != null) {
 
 			char fiz;
 
@@ -180,8 +209,12 @@ public class VdypMethods {
 	 * @return the equivalent VDYP7 species code. "" is returned if the 
 	 * species is not supported by VDYP7 and no mapping exists.
 	 */
-	public static String VDYP_GetVDYP7Species(String sp64Name) {
-		return speciesTable.getByCode(sp64Name).sp0Name();
+	public static String getVDYP7Species(String sp64Name) {
+		if (sp64Name != null) {
+			return speciesTable.getByCode(sp64Name).details().sp0Name();
+		} else {
+			return SpeciesTable.DefaultEntry.sp0Name();
+		}
 	}
 
 	/**
@@ -195,12 +228,12 @@ public class VdypMethods {
 	 * @param sp0 the species whose name is to be fetched.
 	 * @return the name sought, or "" if the SP0 number is not recognized.
 	 */
-	public static String VDYP_GetSP0Species(SP0Name sp0) {
+	public static String getSP0Species(SP0Name sp0) {
 
-		if (sp0 != null && !SP0Name.sp0_UNKNOWN.equals(sp0)) {
+		if (sp0 != null) {
 			return sp0.getText();
 		} else {
-			return "";
+			return SP0Name.sp0_UNKNOWN.getText();
 		}
 	}
 
@@ -217,66 +250,63 @@ public class VdypMethods {
 	 * The curves assigned to specific species may be reassigned through calls to 'VDYP_SetCurrentSICurve'. If no such
 	 * curve assignment has been made, the default curve from SINDEX will be returned.
 	 *
-	 * @param spName The 2 letter name of the species.
-	 * @param region Indicates which provincial region to look up the site curve for,
+	 * @param sp64Name the species short ("code") name such as "ABAL"
+	 * @param region the region under consideration
 	 * @return The Site Index curve type to use for this species. -1 if the species or region was not recognized.
 	 */
-	public static int VDYP_GetCurrentSICurve(String spName, SpeciesRegion region) {
+	public static int getCurrentSICurve(String sp64Name, SpeciesRegion region) {
 
-		var entry = speciesTable.getByCode(spName);
-		int siCurve = entry.currentSICurve()[region.ordinal()];
-
-		// If the curve for this species is not set, look it up from SINDEX.
-
-		if (siCurve < 0) {
-			int sindexSpcs;
-			try {
-				sindexSpcs = Sindxdll.SpecRemap(spName, region == SpeciesRegion.spcsRgn_Coast ? 'A' : 'D');
-
-				siCurve = Sindxdll.DefCurve(sindexSpcs);
-			} catch (CommonCalculatorException e) {
-				siCurve = -1;
+		int siCurve = -1;
+		
+		if (sp64Name != null && region != null) {
+			var entry = speciesTable.getByCode(sp64Name);
+			siCurve = entry.details().currentSICurve()[region.ordinal()];
+	
+			// If the curve for this species is not set, look it up from SINDEX.
+	
+			if (siCurve < 0) {
+				int sindexSpcs;
+				try {
+					sindexSpcs = Sindxdll.SpecRemap(sp64Name, region == SpeciesRegion.spcsRgn_Coast ? 'A' : 'D');
+	
+					siCurve = Sindxdll.DefCurve(sindexSpcs);
+				} catch (CommonCalculatorException e) {
+					siCurve = -1;
+				}
+				entry.details().currentSICurve()[region.ordinal()] = siCurve;
 			}
-			entry.currentSICurve()[region.ordinal()] = siCurve;
-		} else {
-			siCurve = -1;
 		}
-
+		
 		return siCurve;
 	}
 
 	/**
-	 * Determines the BC default Site Index curve type to use for the specified species.
+	 * Determines the BC default Site Index curve type to use for the given species and region.
 	 * <p>
 	 * Within this program, there a number of core "Freddie" routines which use this 
 	 * value as an input parameter instead of a species name.
 	 *
-	 * @param spName the species short ("code") name such as "ABAL".
-	 * @param region the region under consideration.
+	 * @param sp64Name the species short ("code") name such as "ABAL"
+	 * @param region the region under consideration
 	 *
 	 * @return the BC default Site Index curve type to use for this species. Returns -2 
 	 * for non-commercial species.
 	 */
-	public static int VDYP_GetDefaultSICurve(String spName, SpeciesRegion region) {
+	public static int getDefaultSICurve(String sp64Name, SpeciesRegion region) {
 		
-		int siCurve;
+		int siCurve = -1;
 
-		if (spName != null && region != null && speciesTable.getByCode(spName) != SpeciesTable.DefaultEntry) {
+		if (sp64Name != null && region != null && speciesTable.getByCode(sp64Name).details() != SpeciesTable.DefaultEntry) {
 
-			int sindxSpcs;
 			try {
-				sindxSpcs = Sindxdll.SpecRemap(spName, (region == SpeciesRegion.spcsRgn_Coast) ? 'A' : 'D');
+				int sindxSpcs = Sindxdll.SpecRemap(sp64Name, (region == SpeciesRegion.spcsRgn_Coast) ? 'A' : 'D');
 
 				if (sindxSpcs >= 0) {
 					siCurve = Sindxdll.DefCurve(sindxSpcs);
-				} else {
-					siCurve = -1;
 				}
 			} catch (CommonCalculatorException e) {
-				siCurve = -1;
+				// fall through
 			}
-		} else {
-			siCurve = -1;
 		}
 
 		return siCurve;
@@ -285,20 +315,19 @@ public class VdypMethods {
 	/**
 	 * Sets the Site Index curve to use for a particular species.
 	 *
-	 * @param spName the 2 letter name of the species.
-	 * @param region indicates which provincial region to set the site curve for,
-	 * @param siCurve the site index curve to use for the specified species. -1 
+	 * @param sp64Name the species short ("code") name such as "ABAL"
+	 * @param region the region under consideration
+	 * @param siCurve the site index curve to use for the specified species. -1.0f
 	 * resets the curve to the default.
 	 *
 	 * @return the previous value.
 	 */
-	public static int VDYP_SetCurrentSICurve(String spName, SpeciesRegion region, int siCurve) {
+	public static int setCurrentSICurve(String sp64Name, SpeciesRegion region, int siCurve) {
 		
-		int oldCurve = VDYP_GetCurrentSICurve(spName, region);
-		var species = speciesTable.getByCode(spName);
-		if (region != null && species != SpeciesTable.DefaultEntry) {
-
-			species.currentSICurve()[region.ordinal()] = siCurve;
+		int oldCurve = getCurrentSICurve(sp64Name, region);
+		var speciesEntry = speciesTable.getByCode(sp64Name);
+		if (region != null && speciesEntry.details() != SpeciesTable.DefaultEntry) {
+			speciesEntry.details().currentSICurve()[region.ordinal()] = siCurve;
 		}
 
 		return oldCurve;
@@ -314,7 +343,7 @@ public class VdypMethods {
 	 * <li><b>false</b> the count of all curves is returned, regardless of species
 	 *          and provincial location.
 	 * </ul>
-	 * @param spName the short ("code") name of the species.
+	 * @param sp64Name the short ("code") name of the species.
 	 * @param mixInteriorCoastalInd
 	 * <ul>
 	 * <li><b>true</b> curves from the interior and the coast are counted in the
@@ -332,87 +361,74 @@ public class VdypMethods {
 	 *          curves, the count may be the same as when treating these regions 
 	 *          separately.
 	 */
-	public static int VDYP_GetNumSICurves(boolean respectSpeciesBoundariesInd, String spName, 
+	public static int getNumSICurves(boolean respectSpeciesBoundariesInd, String sp64Name, 
 			boolean mixInteriorCoastalInd, SpeciesRegion region) {
 
 		int numCurves = 0;
-		int specNum = VDYP_SpeciesIndex(spName);
-
-		boolean[] countedCurve = new boolean[SI_MAX_CURVES];
-		Arrays.fill(countedCurve, 0, SI_MAX_CURVES, false);
-
-		// Check if we have a valid species. This doesn't matter if we are not respecting species boundaries.
-		if (respectSpeciesBoundariesInd && (specNum < 0)) {
-			return 0;
-		}
-
+		
 		// Check if we are going to return a count of all curves regardless of region.
 		if (!respectSpeciesBoundariesInd) {
 			return SI_MAX_CURVES;
 		}
 
-		// Count the available coastal curves.
-		if (mixInteriorCoastalInd || SpeciesRegion.spcsRgn_Coast.equals(region)) {
-			try {
-				int sindexSpcs = Sindxdll.SpecRemap(spName, 'A');
-
-				if (sindexSpcs >= 0) {
-					// Track each of the curves in the range of curves for the species.
-
-					int curveNum = Sindxdll.FirstCurve(sindexSpcs);
-
-					while (curveNum >= 0) {
-						if (!countedCurve[curveNum]) {
-							numCurves++;
-							countedCurve[curveNum] = true;
-						}
-						curveNum = Sindxdll.NextCurve(sindexSpcs, curveNum);
-					}
-
-					// Make sure we track the default curve just in case it lies outside of the range of curves
-					// enumerated above.
-
-					curveNum = Sindxdll.DefCurve(sindexSpcs);
-					if (curveNum >= 0 && !countedCurve[curveNum]) {
-						numCurves++;
-						countedCurve[curveNum] = true;
-					}
-				}
-			} catch (CommonCalculatorException e) {
-				// do nothing
+		if (sp64Name != null && (mixInteriorCoastalInd || region != null)) {
+			
+			int specNum = speciesIndex(sp64Name);
+	
+			if (specNum == SpeciesTable.UNKNOWN_ENTRY_INDEX) {
+				return 0;
 			}
-		}
-
-		// Add in the number of available interior curves if we are selecting from the available interior curves.
-
-		if (mixInteriorCoastalInd || SpeciesRegion.spcsRgn_Interior.equals(region)) {
-			try {
-				int sindexSpcs = Sindxdll.SpecRemap(spName, 'D');
-
-				if (sindexSpcs >= 0) {
-					// Track each of the curves in the range of curves for the species.
-
-					int curveNum = Sindxdll.FirstCurve(sindexSpcs);
-
-					while (curveNum >= 0) {
-						if (!countedCurve[curveNum]) {
+			
+			boolean[] countedCurve = new boolean[SI_MAX_CURVES];
+			Arrays.fill(countedCurve, 0, SI_MAX_CURVES, false);
+	
+			List<Character> forestInventoryZones = new ArrayList<>();
+			if (mixInteriorCoastalInd || SpeciesRegion.spcsRgn_Coast.equals(region)) {
+				// Add in the number of available coastal curves.
+				forestInventoryZones.add('A');
+			}
+			if (mixInteriorCoastalInd || SpeciesRegion.spcsRgn_Interior.equals(region)) {
+				// Add in the number of available interior curves.
+				forestInventoryZones.add('D');
+			}
+			
+			// Count the available coastal curves.
+			for (Character fiz: forestInventoryZones) {
+				try {
+					int sindxSpeciesIndex = Sindxdll.SpecRemap(sp64Name, fiz);
+	
+					if (sindxSpeciesIndex >= 0) {
+						
+						// Count each of the curves in the range of curves for the species.
+	
+						int curveNum = Sindxdll.FirstCurve(sindxSpeciesIndex);
+	
+						while (curveNum >= 0) {
+							if (!countedCurve[curveNum]) {
+								numCurves++;
+								countedCurve[curveNum] = true;
+							}
+							
+							try {
+								curveNum = Sindxdll.NextCurve(sindxSpeciesIndex, curveNum);
+							} catch (NoAnswerException e) {
+								break;
+							}
+						}
+	
+						// Make sure we track the default curve just in case it lies outside of the range of curves
+						// enumerated above.
+	
+						curveNum = Sindxdll.DefCurve(sindxSpeciesIndex);
+						if (curveNum >= 0 && !countedCurve[curveNum]) {
 							numCurves++;
 							countedCurve[curveNum] = true;
 						}
-
-						curveNum = Sindxdll.NextCurve(sindexSpcs, curveNum);
 					}
-
-					// Make sure we track the default curve just in case it lies outside of the range of curves enumerated
-
-					curveNum = Sindxdll.DefCurve(sindexSpcs);
-					if (curveNum >= 0 && !countedCurve[curveNum]) {
-						numCurves++;
-						countedCurve[curveNum] = true;
-					}
+				} catch (CommonCalculatorException e) {
+					logger.warn(MessageFormat.format("CommonCalculatorException during evaluation of species {0}, fiz {2}"
+							, sp64Name, fiz));
 				}
-			} catch (CommonCalculatorException e) {
-				// do nothing
 			}
 		}
 
@@ -426,7 +442,7 @@ public class VdypMethods {
 	 * @return species index, for use in other Sindex functions. -1 is returned if the curve
 	 * was not recognized.
 	 */
-	public static int VDYP_GetSICurveSpeciesIndex(int siCurve) {
+	public static int getSICurveSpeciesIndex(int siCurve) {
 		try {
 			return Sindxdll.CurveToSpecies(siCurve);
 		} catch (CurveErrorException e) {
@@ -444,14 +460,18 @@ public class VdypMethods {
 	 * @return the default CC associated with the species in that particular region and -1.0 if the species was not
 	 *         recognized or no default CC has been assigned to that species and region.
 	 */
-	public static float VDYP_GetDefaultCrownClosure(String spName, SpeciesRegion region) {
+	public static float getDefaultCrownClosure(String spName, SpeciesRegion region) {
 
 		// Note that if spName is invalid, the default entry is returned, which in
 		// turn contains the right default value of -1.0f.
 
-		return speciesTable.getByCode(spName).defaultCrownClosure()[region.ordinal()];
+		if (spName != null && region != null) {
+			return speciesTable.getByCode(spName).details().defaultCrownClosure()[region.ordinal()];
+		} else {
+			return -1.0f;
+		}
 	}
-
+	
 	/**
 	 * Convert a VDYP7 SP0 Species Name into an enumSP0Name.
 	 *
@@ -460,7 +480,7 @@ public class VdypMethods {
 	 * @return The enumSP0Name corresponding to the supplied species, and sp0_UNKNOWN if the species name was not
 	 *         supplied or was not recognized. Note that the returned index is a zero-based index.
 	 */
-	public static SP0Name VDYP_VDYP7SpeciesIndex(String sp0Name) {
+	public static SP0Name getVDYP7SpeciesIndex(String sp0Name) {
 		SP0Name sp0Index = SP0Name.sp0_UNKNOWN;
 
 		if (sp0Name != null) {

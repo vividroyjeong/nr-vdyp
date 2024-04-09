@@ -102,7 +102,7 @@ public enum CfsBiomassConversionSupportedSpecies implements SI32Enum<CfsBiomassC
 	@Override
 	public int getOffset() {
 		if (this.equals(spcsInt_UNKNOWN)) {
-			throw new UnsupportedOperationException(MessageFormat.format("Cannot call getIndex on {} as it's not a standard member of the enumeration", this));
+			throw new UnsupportedOperationException(MessageFormat.format("Cannot call getIndex on {0} as it's not a standard member of the enumeration", this));
 		}
 		
 		return index;
@@ -111,8 +111,7 @@ public enum CfsBiomassConversionSupportedSpecies implements SI32Enum<CfsBiomassC
 	@Override
 	public String getText() {
 		if (this.equals(spcsInt_UNKNOWN)) {
-			throw new UnsupportedOperationException(MessageFormat
-					.format("Cannot call getText on {} as it's not a standard member of the enumeration", this));
+			return "";
 		}
 		
 		return this.toString().substring("spcsInt_".length());

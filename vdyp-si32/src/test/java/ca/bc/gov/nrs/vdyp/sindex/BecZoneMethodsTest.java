@@ -38,4 +38,14 @@ class BecZoneMethodsTest {
 		assertThat(BecZoneMethods.becZoneToCode(BecZone.bec_AT), equalTo(BecZone.bec_AT.getText()));
 		assertThat(BecZoneMethods.becZoneToCode(null), equalTo(BecZoneMethods.UNKNOWN_BEC_ZONE_TEXT));
 	}
+	
+	@Test 
+	void test_VDYP_MofBiomassCoefficient() {
+		assertThat(BecZoneMethods.mofBiomassCoefficient(BecZone.bec_AT.getText(), SP64Name.sp64_A.getText())
+				, equalTo(0.75226f));
+		assertThat(BecZoneMethods.mofBiomassCoefficient(null, SP64Name.sp64_A.getText())
+				, equalTo(-1.0f));
+		assertThat(BecZoneMethods.mofBiomassCoefficient(BecZone.bec_AT.getText(), null)
+				, equalTo(-1.0f));
+	}
 }
