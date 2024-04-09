@@ -5,7 +5,7 @@ import ca.bc.gov.nrs.vdyp.si32.cfs.CfsTreeSpecies;
 /**
  * Records all of the information regarding a particular CSF species.
  */
-public record SpeciesTableItem(
+public record SpeciesDetails(
 	
 	/** The short standard code name for the species */
 	String codeName,

@@ -140,7 +140,7 @@ public class BecZoneMethods {
 		if (mofBiomassCoeffs.length != SP0Name.size()) {
 			throw new IllegalStateException(
 					MessageFormat.format(
-							"mofBiomassCoeffs does not contain one row for each of the {} BEC Zones", BecZone
+							"mofBiomassCoeffs does not contain one row for each of the {0} BEC Zones", BecZone
 									.size()
 					)
 			);
@@ -150,7 +150,7 @@ public class BecZoneMethods {
 			if (mofBiomassCoeffs[i].length != BecZone.size()) {
 				throw new IllegalStateException(
 						MessageFormat.format(
-								"mofBiomassCoeffs {} does not contain one entry for each of the {} SP0 Zones", i, SP0Name
+								"mofBiomassCoeffs {} does not contain one entry for each of the {0} SP0 Zones", i, SP0Name
 										.size()
 						)
 				);
@@ -168,17 +168,21 @@ public class BecZoneMethods {
 	 */
 	public static float mofBiomassCoefficient(String becZoneName, String sp64CodeName) {
 	
-		BecZone becZone = BecZoneMethods.becZoneToIndex(becZoneName);
-	
-		if (becZone != BecZone.bec_UNKNOWN && VdypMethods.VDYP_IsValidSpecies(sp64CodeName)) {
-			String sp0Name = VdypMethods.VDYP_GetVDYP7Species(sp64CodeName);
-			int sp0Index = VdypMethods.VDYP_VDYP7SpeciesIndex(sp0Name).getIndex();
-	
-			if (sp0Index != SP0Name.sp0_UNKNOWN.getIndex()) {
-				return mofBiomassCoeffs[sp0Index][becZone.getOffset()];
+		float result = -1.0f;
+		
+		if (becZoneName != null && sp64CodeName != null) {
+			BecZone becZone = BecZoneMethods.becZoneToIndex(becZoneName);
+		
+			if (becZone != BecZone.bec_UNKNOWN && VdypMethods.isValidSpecies(sp64CodeName)) {
+				String sp0Name = VdypMethods.getVDYP7Species(sp64CodeName);
+				int sp0Index = VdypMethods.getVDYP7SpeciesIndex(sp0Name).getIndex();
+		
+				if (sp0Index != SP0Name.sp0_UNKNOWN.getIndex()) {
+					result = mofBiomassCoeffs[sp0Index][becZone.getOffset()];
+				}
 			}
 		}
 	
-		return -1.0f;
+		return result;
 	}
 }

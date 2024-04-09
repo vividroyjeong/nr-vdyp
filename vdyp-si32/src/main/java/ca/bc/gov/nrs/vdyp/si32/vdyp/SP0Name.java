@@ -51,11 +51,10 @@ public enum SP0Name implements SI32Enum<SP0Name> {
 	@Override
 	public String getText() {
 		if (this.equals(sp0_UNKNOWN)) {
-			throw new UnsupportedOperationException(MessageFormat
-					.format("Cannot call getText on {0} as it's not a standard member of the enumeration", this));
+			return "";
+		} else {
+			return toString().substring("sp0_".length());
 		}
-		
-		return this.toString().substring("sp0_".length());
 	}
 
 	/**
