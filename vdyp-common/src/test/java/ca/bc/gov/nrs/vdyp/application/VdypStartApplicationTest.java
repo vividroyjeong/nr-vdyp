@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.application;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.causedBy;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.describedAs;
@@ -34,6 +35,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
+import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
@@ -727,5 +729,41 @@ class VdypStartApplicationTest {
 
 			assertThat(result, is(42));
 		}
+	}
+
+	@Test
+	void testWeightedCoefficientSum() {
+		var result = VdypStartApplication
+				.weightedCoefficientSum(List.of(2, 4, 6), 6, 1, List.of("A", "B", "C", "D"), s -> {
+					switch (s) {
+					case "A":
+						return 0.2f;
+					case "B":
+						return 0.4f;
+					case "C":
+						return 0.1f;
+					default:
+						return 0.3f;
+					}
+				}, s -> {
+					switch (s) {
+					case "A":
+						return new Coefficients(new float[] { 2.0f, 10.0f, 7.0f, 0.0f, 9.0f, 0.0f }, 1);
+					case "B":
+						return new Coefficients(new float[] { 2.0f, 0.0f, 7.0f, 6.0f, 9.0f, 4.0f }, 1);
+					case "C":
+						return new Coefficients(new float[] { 2.0f, 3.0f, 7.0f, -3.0f, 9.0f, 3.0f }, 1);
+					default:
+						return new Coefficients(new float[] { 2.0f, 1.0f, 7.0f, 1.0f, 9.0f, 1.0f }, 1);
+					}
+				});
+
+		assertThat(
+				result,
+				coe(
+						1, 2f, 2f + 0.3f + 0.3f, 7f, 6f * 0.4f - 3f * 0.1f + 0.3f * 1f, 9f,
+						4f * 0.4f + 3f * 0.1f + 0.3f * 1f
+				)
+		);
 	}
 }
