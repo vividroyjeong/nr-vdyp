@@ -6,6 +6,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,14 +15,19 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.EnumSource.Mode;
 
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
+import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.MockStreamingParser;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
@@ -33,6 +39,7 @@ import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
 import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
 import ca.bc.gov.nrs.vdyp.vri.model.VriPolygon;
+import ca.bc.gov.nrs.vdyp.vri.model.VriSite;
 import ca.bc.gov.nrs.vdyp.vri.model.VriSpecies;
 import ca.bc.gov.nrs.vdyp.vri.test.VriTestUtils;
 
@@ -40,15 +47,24 @@ class VriStartTest {
 
 	Map<String, Object> controlMap = new HashMap<>();
 
+	ByteArrayOutputStream polyOut;
+	ByteArrayOutputStream specOut;
+	ByteArrayOutputStream utilOut;
+
 	private MockFileResolver dummyInput() {
 		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
 		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
 		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
 
 		MockFileResolver resolver = new MockFileResolver("Test");
-		resolver.addStream("DUMMY1", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
-		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
+
+		polyOut = new ByteArrayOutputStream();
+		specOut = new ByteArrayOutputStream();
+		utilOut = new ByteArrayOutputStream();
+
+		resolver.addStream("DUMMY1", (OutputStream) polyOut);
+		resolver.addStream("DUMMY2", (OutputStream) specOut);
+		resolver.addStream("DUMMY3", (OutputStream) utilOut);
 		return resolver;
 	}
 
@@ -478,12 +494,6 @@ class VriStartTest {
 
 		MockFileResolver resolver = dummyInput();
 
-		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
-			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
-			map.put(VriControlParser.MINIMUM_HEIGHT, 0f);
-			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
-		}));
-
 		var poly = VriPolygon.build(pb -> {
 			pb.polygonIdentifier("TestPoly");
 			pb.biogeoclimaticZone("IDF");
@@ -514,12 +524,6 @@ class VriStartTest {
 
 		MockFileResolver resolver = dummyInput();
 
-		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
-			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
-			map.put(VriControlParser.MINIMUM_HEIGHT, 0f);
-			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
-		}));
-
 		var poly = VriPolygon.build(pb -> {
 			pb.polygonIdentifier("TestPoly");
 			pb.biogeoclimaticZone("IDF");
@@ -536,6 +540,146 @@ class VriStartTest {
 		var result = app.processPolygon(0, poly);
 
 		assertThat(result, notPresent());
+
+		app.close();
+
+		control.verify();
+	}
+
+	<T> void mockInputStreamFactory(
+			Map<String, Object> controlMap, ControlKey key, StreamingParser<T> stream, IMocksControl control
+	) throws IOException {
+		StreamingParserFactory<T> factory = control.createMock("factory_" + key.name(), StreamingParserFactory.class);
+
+		EasyMock.expect(factory.get()).andReturn(stream);
+
+		controlMap.put(key.name(), factory);
+	}
+
+	<T> StreamingParser<T>
+			easyMockInputStreamFactory(Map<String, Object> controlMap, ControlKey key, IMocksControl control)
+					throws IOException {
+		StreamingParser<T> stream = control.createMock("stream_" + key.name(), StreamingParser.class);
+		mockInputStreamFactory(controlMap, key, stream, control);
+		return stream;
+	}
+
+	<T> MockStreamingParser<T>
+			fillableMockInputStreamFactory(Map<String, Object> controlMap, ControlKey key, IMocksControl control)
+					throws IOException {
+		MockStreamingParser<T> stream = new MockStreamingParser<>();
+		mockInputStreamFactory(controlMap, key, stream, control);
+		return stream;
+	}
+
+	@Test
+	void testProcessEmpty() throws Exception {
+		var control = EasyMock.createControl();
+
+		VriStart app = EasyMock.createMockBuilder(VriStart.class)//
+				.addMockedMethod("getVriWriter") //
+				.addMockedMethod("checkPolygon") //
+				.addMockedMethod("getPolygon") //
+				.createMock(control);
+
+		MockFileResolver resolver = dummyInput();
+
+		var poly = VriPolygon.build(pb -> {
+			pb.polygonIdentifier("TestPoly");
+			pb.biogeoclimaticZone("IDF");
+			pb.yieldFactor(1.0f);
+			pb.modeFip(PolygonMode.START);
+		});
+
+		StreamingParser<VriPolygon> polyStream = easyMockInputStreamFactory(
+				controlMap, ControlKey.VRI_INPUT_YIELD_POLY, control
+		);
+		StreamingParser<Map<LayerType, VriLayer.Builder>> layerStream = easyMockInputStreamFactory(
+				controlMap, ControlKey.VRI_INPUT_YIELD_LAYER, control
+		);
+		StreamingParser<Collection<VriSpecies>> specStream = easyMockInputStreamFactory(
+				controlMap, ControlKey.VRI_INPUT_YIELD_SPEC_DIST, control
+		);
+		StreamingParser<Collection<VriSite>> siteStream = easyMockInputStreamFactory(
+				controlMap, ControlKey.VRI_INPUT_YIELD_HEIGHT_AGE_SI, control
+		);
+
+		EasyMock.expect(polyStream.hasNext()).andReturn(false);
+
+		// Expect no other calls
+
+		polyStream.close();
+		EasyMock.expectLastCall();
+		layerStream.close();
+		EasyMock.expectLastCall();
+		specStream.close();
+		EasyMock.expectLastCall();
+		siteStream.close();
+		EasyMock.expectLastCall();
+
+		control.replay();
+
+		app.init(resolver, controlMap);
+
+		app.process();
+
+		app.close();
+
+		control.verify();
+	}
+
+	@Test
+	void testProcessIgnored() throws Exception {
+		var control = EasyMock.createControl();
+
+		VriStart app = EasyMock.createMockBuilder(VriStart.class)//
+				.addMockedMethod("getVriWriter") //
+				.addMockedMethod("checkPolygon") //
+				.addMockedMethod("getPolygon") //
+				.createMock(control);
+
+		MockFileResolver resolver = dummyInput();
+
+		var poly = VriPolygon.build(pb -> {
+			pb.polygonIdentifier("TestPoly");
+			pb.biogeoclimaticZone("IDF");
+			pb.yieldFactor(1.0f);
+			pb.modeFip(PolygonMode.DONT_PROCESS);
+		});
+
+		StreamingParser<VriPolygon> polyStream = easyMockInputStreamFactory(
+				controlMap, ControlKey.VRI_INPUT_YIELD_POLY, control
+		);
+		StreamingParser<Map<LayerType, VriLayer.Builder>> layerStream = easyMockInputStreamFactory(
+				controlMap, ControlKey.VRI_INPUT_YIELD_LAYER, control
+		);
+		StreamingParser<Collection<VriSpecies>> specStream = easyMockInputStreamFactory(
+				controlMap, ControlKey.VRI_INPUT_YIELD_SPEC_DIST, control
+		);
+		StreamingParser<Collection<VriSite>> siteStream = easyMockInputStreamFactory(
+				controlMap, ControlKey.VRI_INPUT_YIELD_HEIGHT_AGE_SI, control
+		);
+
+		EasyMock.expect(polyStream.hasNext()).andReturn(true);
+		EasyMock.expect(app.getPolygon(polyStream, layerStream, specStream, siteStream)).andReturn(poly);
+		EasyMock.expect(polyStream.hasNext()).andReturn(false);
+
+		// Expect no other calls
+
+		polyStream.close();
+		EasyMock.expectLastCall();
+		layerStream.close();
+		EasyMock.expectLastCall();
+		specStream.close();
+		EasyMock.expectLastCall();
+		siteStream.close();
+		EasyMock.expectLastCall();
+
+		control.replay();
+
+		app.init(resolver, controlMap);
+
+		app.process();
 
 		app.close();
 

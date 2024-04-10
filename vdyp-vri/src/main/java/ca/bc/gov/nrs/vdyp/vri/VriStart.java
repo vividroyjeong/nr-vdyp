@@ -87,7 +87,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 						polygonsRead++;
 
 						// Output
-						vriWriter.writePolygonWithSpeciesAndUtilization(resultPoly.get());
+						getVriWriter().writePolygonWithSpeciesAndUtilization(resultPoly.get());
 
 						polygonsWritten++;
 					}

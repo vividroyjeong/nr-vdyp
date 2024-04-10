@@ -436,6 +436,10 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		return group;
 	}
 
+	protected VriAdjustInputWriter getVriWriter() {
+		return vriWriter;
+	}
+
 	protected static <E extends Throwable> void throwIfPresent(Optional<E> opt) throws E {
 		if (opt.isPresent()) {
 			throw opt.get();
