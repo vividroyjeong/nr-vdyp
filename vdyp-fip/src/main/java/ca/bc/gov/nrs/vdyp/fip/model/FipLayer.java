@@ -13,8 +13,6 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> {
 
 	private float crownClosure; // FIPL_1/CC_L1 or FIP:_V/CC_V1
 
-	// TODO move to FipSite
-
 	public FipLayer(
 			String polygonIdentifier, LayerType layer, Optional<Integer> inventoryTypeGroup, float crownClosure
 	) {
