@@ -96,7 +96,7 @@ class ParsersTogetherTest {
 		assertThat(
 				primaryResult, allOf(
 						hasProperty("polygonIdentifier", is(polygonId)), //
-						hasProperty("layer", is(LayerType.PRIMARY)), //
+						hasProperty("layerType", is(LayerType.PRIMARY)), //
 						hasProperty("crownClosure", is(0.95f)), //
 						hasProperty("utilization", is(7.5f)), // Raised to minimum
 						hasProperty("baseArea", present(is(20f))), //
@@ -108,7 +108,7 @@ class ParsersTogetherTest {
 		assertThat(
 				veteranResult, allOf(
 						hasProperty("polygonIdentifier", is(polygonId)), //
-						hasProperty("layer", is(LayerType.VETERAN)), //
+						hasProperty("layerType", is(LayerType.VETERAN)), //
 						hasProperty("crownClosure", is(0f)), //
 						hasProperty("utilization", is(7.5f)), //
 						hasProperty("baseArea", present(is(0f))), //
@@ -181,7 +181,7 @@ class ParsersTogetherTest {
 		assertThat(
 				veteranResult, allOf(
 						hasProperty("polygonIdentifier", is(polygonId)), //
-						hasProperty("layer", is(LayerType.VETERAN)), //
+						hasProperty("layerType", is(LayerType.VETERAN)), //
 						hasProperty("crownClosure", is(0.95f)), //
 						hasProperty("utilization", is(7.5f)), // Raised to minimum
 						hasProperty("baseArea", present(is(20f))), //
@@ -195,7 +195,7 @@ class ParsersTogetherTest {
 		assertThat(
 				primaryResult, allOf(
 						hasProperty("polygonIdentifier", is(polygonId)), //
-						hasProperty("layer", is(LayerType.PRIMARY)), //
+						hasProperty("layerType", is(LayerType.PRIMARY)), //
 						hasProperty("crownClosure", is(0f)), //
 						hasProperty("utilization", is(7.5f)), //
 						hasProperty("baseArea", notPresent()), //
@@ -278,7 +278,7 @@ class ParsersTogetherTest {
 		assertThat(
 				primaryResult, allOf(
 						hasProperty("polygonIdentifier", is(polygonId)), //
-						hasProperty("layer", is(LayerType.PRIMARY)), //
+						hasProperty("layerType", is(LayerType.PRIMARY)), //
 						hasProperty("crownClosure", is(0.95f)), //
 						hasProperty("utilization", is(9f)), hasProperty("baseArea", present(closeTo(20f * 0.75f))), // Apply
 																													// Layer
@@ -292,7 +292,7 @@ class ParsersTogetherTest {
 		assertThat(
 				veteranResult, allOf(
 						hasProperty("polygonIdentifier", is(polygonId)), //
-						hasProperty("layer", is(LayerType.VETERAN)), //
+						hasProperty("layerType", is(LayerType.VETERAN)), //
 						hasProperty("crownClosure", is(0.8f)), //
 						hasProperty("utilization", is(8f)), //
 						hasProperty("baseArea", present(is(30f))), //

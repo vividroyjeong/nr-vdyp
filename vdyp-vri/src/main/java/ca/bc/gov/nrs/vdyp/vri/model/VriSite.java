@@ -76,7 +76,7 @@ public class VriSite extends BaseVdypSite {
 		protected VriSite doBuild() {
 			return new VriSite(
 					this.polygonIdentifier.get(), //
-					this.layer.get(), //
+					this.layerType.get(), //
 					this.siteGenus.get(), //
 					this.siteCurveNumber, //
 					this.siteIndex, //

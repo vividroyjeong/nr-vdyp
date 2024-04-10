@@ -66,7 +66,7 @@ public class VriPolygonParser implements ControlMapValueReplacer<StreamingParser
 						builder.polygonIdentifier(polygonId);
 						builder.biogeoclimaticZone(becId);
 						builder.percentAvailable(percentForestLandWithDefault);
-						builder.modeFip(fipMode);
+						builder.mode(fipMode);
 						builder.nonproductiveDescription(nonproductiveDesc);
 						builder.yieldFactor(yieldFactor.orElse(1.0f));
 					});

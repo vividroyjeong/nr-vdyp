@@ -91,7 +91,7 @@ class VriLayerParserTest {
 						VdypMatchers.builds(
 								allOf(
 										hasProperty("polygonIdentifier", is("082F074/0071         2001")), //
-										hasProperty("layer", is(LayerType.PRIMARY)), //
+										hasProperty("layerType", is(LayerType.PRIMARY)), //
 										hasProperty("crownClosure", is(57.8f)), //
 										hasProperty("baseArea", present(is(66.0f))), //
 										hasProperty("treesPerHectare", present(is(850f))), //
@@ -142,7 +142,7 @@ class VriLayerParserTest {
 						VdypMatchers.builds(
 								allOf(
 										hasProperty("polygonIdentifier", is("082F074/0071         2001")), //
-										hasProperty("layer", is(LayerType.VETERAN)), //
+										hasProperty("layerType", is(LayerType.VETERAN)), //
 										hasProperty("crownClosure", is(57.8f)), //
 										hasProperty("baseArea", present(is(66.0f))), //
 										hasProperty("treesPerHectare", present(is(850f))), //
@@ -195,7 +195,7 @@ class VriLayerParserTest {
 						VdypMatchers.builds(
 								allOf(
 										hasProperty("polygonIdentifier", is("082F074/0071         2001")), //
-										hasProperty("layer", is(LayerType.PRIMARY)), //
+										hasProperty("layerType", is(LayerType.PRIMARY)), //
 										hasProperty("crownClosure", is(57.8f)), //
 										hasProperty("baseArea", present(is(66.0f))), //
 										hasProperty("treesPerHectare", present(is(850f))), //
@@ -211,7 +211,7 @@ class VriLayerParserTest {
 						VdypMatchers.builds(
 								allOf(
 										hasProperty("polygonIdentifier", is("082F074/0071         2001")), //
-										hasProperty("layer", is(LayerType.VETERAN)), //
+										hasProperty("layerType", is(LayerType.VETERAN)), //
 										hasProperty("crownClosure", is(30.0f)), //
 										hasProperty("baseArea", notPresent()), //
 										hasProperty("treesPerHectare", notPresent()), //

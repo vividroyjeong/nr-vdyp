@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import ca.bc.gov.nrs.vdyp.common.Computed;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 
@@ -14,18 +13,16 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 	private final Optional<Float> baseArea; // VRIL/BAL
 	private final Optional<Float> treesPerHectare; // VRIL/TPHL
 	private final float utilization; // VRIL/UTLL
-	private final Optional<String> primaryGenus; // FIPL_1C/JPRIME_L1
 
 	public VriLayer(
 			String polygonIdentifier, LayerType layer, float crownClosure, Optional<Float> baseArea,
-			Optional<Float> treesPerHectare, float utilization, Optional<String> primaryGenus
+			Optional<Float> treesPerHectare, float utilization
 	) {
 		super(polygonIdentifier, layer, Optional.empty());
 		this.crownClosure = crownClosure;
 		this.baseArea = baseArea;
 		this.treesPerHectare = treesPerHectare;
 		this.utilization = utilization;
-		this.primaryGenus = primaryGenus;
 	}
 
 	public float getCrownClosure() {
@@ -42,15 +39,6 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 
 	public float getUtilization() {
 		return utilization;
-	}
-
-	public Optional<String> getPrimaryGenus() {
-		return primaryGenus;
-	}
-
-	@Computed
-	public Optional<VriSpecies> getPrimarySpeciesRecord() {
-		return primaryGenus.map(this.getSpecies()::get);
 	}
 
 	/**
@@ -72,7 +60,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 			builder.polygonIdentifier(polygon.getPolygonIdentifier());
 			config.accept(builder);
 		});
-		polygon.getLayers().put(layer.getLayer(), layer);
+		polygon.getLayers().put(layer.getLayerType(), layer);
 		return layer;
 	}
 
@@ -83,7 +71,6 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 		protected Optional<Float> treesPerHectare = Optional.empty();
 		protected Optional<Float> utilization = Optional.empty();
 		protected Optional<Float> percentAvailable = Optional.empty();
-		protected Optional<String> primaryGenus = Optional.empty();
 
 		public Builder crownClosure(float crownClosure) {
 			this.crownClosure = Optional.of(crownClosure);
@@ -122,23 +109,6 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 			return percentAvailable(Optional.of(percentAvailable));
 		}
 
-		public Optional<Float> getBaseArea() {
-			return baseArea;
-		}
-
-		public Optional<Float> getTreesPerHectare() {
-			return treesPerHectare;
-		}
-
-		public Builder primaryGenus(Optional<String> primaryGenus) {
-			this.primaryGenus = primaryGenus;
-			return this;
-		}
-
-		public Builder primaryGenus(String primaryGenus) {
-			return primaryGenus(Optional.of(primaryGenus));
-		}
-
 		@Override
 		protected void check(Collection<String> errors) {
 			super.check(errors);
@@ -149,24 +119,21 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 		@Override
 		protected VriLayer doBuild() {
 			float multiplier = percentAvailable.orElse(100f) / 100f;
-			VriLayer result = new VriLayer(
+			return (new VriLayer(
 					polygonIdentifier.get(), //
-					layer.get(), //
+					layerType.get(), //
 					crownClosure.get(), //
 					baseArea.map(x -> x * multiplier), //
 					treesPerHectare.map(x -> x * multiplier), //
-					Math.max(utilization.get(), 7.5f), primaryGenus
-			);
-			result.setInventoryTypeGroup(inventoryTypeGroup);
-			return result;
+					Math.max(utilization.get(), 7.5f)
+			));
 		}
 
 		@Override
 		protected VriSpecies buildSpecies(Consumer<VriSpecies.Builder> config) {
 			return VriSpecies.build(builder -> {
 				builder.polygonIdentifier(polygonIdentifier.get());
-				builder.layerType(layer.get());
-				config.accept(builder);
+				builder.layerType(layerType.get());
 			});
 		}
 
@@ -174,8 +141,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 		protected VriSite buildSite(Consumer<VriSite.Builder> config) {
 			return VriSite.build(builder -> {
 				builder.polygonIdentifier(polygonIdentifier.get());
-				builder.layerType(layer.get());
-				config.accept(builder);
+				builder.layerType(layerType.get());
 			});
 		}
 

@@ -181,8 +181,8 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 	/**
 	 * Builds a layer and adds it to the polygon.
 	 *
-	 * @param layer  Layer to create the species for.
-	 * @param config Configuration function for the builder.
+	 * @param layerType Layer to create the species for.
+	 * @param config    Configuration function for the builder.
 	 * @return the new species.
 	 */
 	public static VdypLayer build(VdypPolygon polygon, Consumer<Builder> config) {
@@ -191,7 +191,7 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 
 			config.accept(builder);
 		});
-		polygon.getLayers().put(result.getLayer(), result);
+		polygon.getLayers().put(result.getLayerType(), result);
 		return result;
 	}
 
@@ -212,7 +212,7 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 		protected VdypLayer doBuild() {
 			return (new VdypLayer(
 					polygonIdentifier.get(), //
-					layer.get(), //
+					layerType.get(), //
 					inventoryTypeGroup, //
 					empericalRelationshipParameterIndex
 			));
@@ -222,7 +222,7 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 		protected VdypSpecies buildSpecies(Consumer<VdypSpecies.Builder> config) {
 			return VdypSpecies.build(builder -> {
 				builder.polygonIdentifier(this.polygonIdentifier.get());
-				builder.layerType(this.layer.get());
+				builder.layerType(this.layerType.get());
 				config.accept(builder);
 			});
 		}
@@ -231,7 +231,7 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 		protected VdypSite buildSite(Consumer<VdypSite.Builder> config) {
 			return VdypSite.build(builder -> {
 				builder.polygonIdentifier(polygonIdentifier.get());
-				builder.layerType(layer.get());
+				builder.layerType(layerType.get());
 				config.accept(builder);
 			});
 		}

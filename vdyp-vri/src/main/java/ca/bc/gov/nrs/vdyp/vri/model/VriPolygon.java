@@ -91,7 +91,7 @@ public class VriPolygon extends BaseVdypPolygon<VriLayer, Optional<Float>> {
 					FIZ, // FIZ is always " "
 					biogeoclimaticZone.get(), //
 					percentAvailable.get(), //
-					modeFip, //
+					mode, //
 					nonproductiveDescription, //
 					yieldFactor.get() //
 			));

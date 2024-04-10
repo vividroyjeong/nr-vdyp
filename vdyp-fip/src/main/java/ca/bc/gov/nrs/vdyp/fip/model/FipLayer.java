@@ -13,8 +13,6 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> {
 
 	private float crownClosure; // FIPL_1/CC_L1 or FIP:_V/CC_V1
 
-	// TODO move to FipSite
-
 	public FipLayer(
 			String polygonIdentifier, LayerType layer, Optional<Integer> inventoryTypeGroup, float crownClosure
 	) {
@@ -82,7 +80,7 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> {
 			builder.polygonIdentifier(polygon.getPolygonIdentifier());
 			config.accept(builder);
 		});
-		polygon.getLayers().put(layer.getLayer(), layer);
+		polygon.getLayers().put(layer.getLayerType(), layer);
 		return layer;
 	}
 
@@ -111,7 +109,7 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> {
 			 */
 			return (new FipLayer(
 					polygonIdentifier.get(), //
-					layer.get(), //
+					layerType.get(), //
 					inventoryTypeGroup, //
 					crownClosure.get() //
 			));
@@ -129,7 +127,7 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> {
 		protected FipSite buildSite(Consumer<FipSite.Builder> config) {
 			return FipSite.build(builder -> {
 				builder.polygonIdentifier(polygonIdentifier.get());
-				builder.layerType(layer.get());
+				builder.layerType(layerType.get());
 				config.accept(builder);
 			});
 		}

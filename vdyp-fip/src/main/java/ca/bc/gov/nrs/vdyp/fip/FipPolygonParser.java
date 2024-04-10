@@ -62,7 +62,7 @@ public class FipPolygonParser implements ControlMapValueReplacer<StreamingParser
 						builder.forestInventoryZone(fizId);
 						builder.biogeoclimaticZone(becId);
 						builder.percentAvailable(percentForestLand);
-						builder.modeFip(fipMode.flatMap(PolygonMode::getByCode));
+						builder.mode(fipMode.flatMap(PolygonMode::getByCode));
 						builder.nonproductiveDescription(nonproductiveDesc);
 						builder.yieldFactor(yieldFactor.orElse(1.0f));
 					});

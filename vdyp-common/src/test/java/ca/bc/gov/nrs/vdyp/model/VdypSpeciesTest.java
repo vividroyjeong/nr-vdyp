@@ -25,7 +25,7 @@ class VdypSpeciesTest {
 			builder.breakageGroup(3);
 		});
 		assertThat(result, hasProperty("polygonIdentifier", is("Test")));
-		assertThat(result, hasProperty("layer", is(LayerType.PRIMARY)));
+		assertThat(result, hasProperty("layerType", is(LayerType.PRIMARY)));
 		assertThat(result, hasProperty("genus", is("B")));
 		assertThat(result, hasProperty("percentGenus", is(50f)));
 		assertThat(result, hasProperty("volumeGroup", is(1)));
@@ -77,7 +77,7 @@ class VdypSpeciesTest {
 		});
 
 		assertThat(result, hasProperty("polygonIdentifier", is("Test")));
-		assertThat(result, hasProperty("layer", is(LayerType.PRIMARY)));
+		assertThat(result, hasProperty("layerType", is(LayerType.PRIMARY)));
 		assertThat(result, hasProperty("genus", is("B")));
 		assertThat(result, hasProperty("percentGenus", is(50f)));
 		assertThat(result, hasProperty("volumeGroup", is(1)));

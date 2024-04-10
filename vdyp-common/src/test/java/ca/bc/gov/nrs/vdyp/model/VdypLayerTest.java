@@ -31,7 +31,7 @@ class VdypLayerTest {
 
 		});
 		assertThat(result, hasProperty("polygonIdentifier", is("Test")));
-		assertThat(result, hasProperty("layer", is(LayerType.PRIMARY)));
+		assertThat(result, hasProperty("layerType", is(LayerType.PRIMARY)));
 		assertThat(result, hasProperty("ageTotal", present(is(42f))));
 		assertThat(result, hasProperty("yearsToBreastHeight", present(is(2f))));
 		assertThat(result, hasProperty("height", present(is(10f))));
@@ -69,7 +69,7 @@ class VdypLayerTest {
 		});
 
 		assertThat(result, hasProperty("polygonIdentifier", is("Test")));
-		assertThat(result, hasProperty("layer", is(LayerType.PRIMARY)));
+		assertThat(result, hasProperty("layerType", is(LayerType.PRIMARY)));
 		assertThat(result, hasProperty("ageTotal", present(is(42f))));
 		assertThat(result, hasProperty("yearsToBreastHeight", present(is(2f))));
 		assertThat(result, hasProperty("height", present(is(10f))));
@@ -81,7 +81,7 @@ class VdypLayerTest {
 	@Test
 	void buildAddSpecies() throws Exception {
 		VdypSpecies mock = EasyMock.mock(VdypSpecies.class);
-		EasyMock.expect(mock.getLayer()).andStubReturn(LayerType.PRIMARY);
+		EasyMock.expect(mock.getLayerType()).andStubReturn(LayerType.PRIMARY);
 		EasyMock.expect(mock.getGenus()).andStubReturn("B");
 		EasyMock.replay(mock);
 		var result = VdypLayer.build(builder -> {

@@ -76,7 +76,7 @@ public class FipLayerPrimary extends FipLayer {
 			builder.polygonIdentifier(polygon.getPolygonIdentifier());
 			config.accept(builder);
 		});
-		polygon.getLayers().put(layer.getLayer(), layer);
+		polygon.getLayers().put(layer.getLayerType(), layer);
 		return layer;
 	}
 
