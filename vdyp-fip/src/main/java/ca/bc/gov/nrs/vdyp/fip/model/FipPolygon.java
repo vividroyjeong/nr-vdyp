@@ -103,7 +103,7 @@ public class FipPolygon extends BaseVdypPolygon<FipLayer, Optional<Float>> {
 					forestInventoryZone.get(), //
 					biogeoclimaticZone.get(), //
 					percentAvailable.get(), //
-					modeFip, //
+					mode, //
 					nonproductiveDescription, //
 					yieldFactor.get() //
 			));

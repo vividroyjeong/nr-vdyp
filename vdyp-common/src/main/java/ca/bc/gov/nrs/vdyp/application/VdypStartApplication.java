@@ -84,7 +84,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	}
 
 	/**
-	 * Initialize FipStart
+	 * Initialize application
 	 *
 	 * @param resolver
 	 * @param controlFilePath
@@ -117,7 +117,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	}
 
 	/**
-	 * Initialize FipStart
+	 * Initialize application
 	 *
 	 * @param controlMap
 	 * @throws IOException

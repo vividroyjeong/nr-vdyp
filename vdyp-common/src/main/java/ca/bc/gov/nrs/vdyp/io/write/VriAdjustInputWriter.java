@@ -124,7 +124,7 @@ public class VriAdjustInputWriter implements Closeable {
 				polygon.getPercentAvailable().intValue(), //
 				polygon.getLayers().get(LayerType.PRIMARY).getInventoryTypeGroup().orElse(EMPTY_INT), //
 				polygon.getLayers().get(LayerType.PRIMARY).getEmpiricalRelationshipParameterIndex().orElse(EMPTY_INT), //
-				polygon.getModeFip().orElse(PolygonMode.START).getCode()
+				polygon.getMode().orElse(PolygonMode.START).getCode()
 		);
 	}
 

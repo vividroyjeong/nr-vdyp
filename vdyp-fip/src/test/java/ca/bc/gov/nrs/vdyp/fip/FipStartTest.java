@@ -333,7 +333,7 @@ class FipStartTest {
 			var polygonId = polygonId("Test Polygon", 2023);
 
 			var polygon = getTestPolygon(polygonId, x -> {
-				x.setModeFip(Optional.of(PolygonMode.YOUNG));
+				x.setMode(Optional.of(PolygonMode.YOUNG));
 			});
 			var layer = this.getTestPrimaryLayer("Test Polygon", valid(), valid());
 			polygon.setLayers(List.of(layer));
@@ -4244,7 +4244,7 @@ class FipStartTest {
 				builder.polygonIdentifier("Test");
 				builder.forestInventoryZone("D");
 				builder.biogeoclimaticZone("IDF");
-				builder.modeFip(PolygonMode.START);
+				builder.mode(PolygonMode.START);
 				builder.yieldFactor(1f);
 			});
 
@@ -4305,7 +4305,7 @@ class FipStartTest {
 				builder.polygonIdentifier("Test");
 				builder.forestInventoryZone("D");
 				builder.biogeoclimaticZone("IDF");
-				builder.modeFip(PolygonMode.START);
+				builder.mode(PolygonMode.START);
 				builder.yieldFactor(1f);
 
 				builder.percentAvailable(42f);
@@ -4372,7 +4372,7 @@ class FipStartTest {
 				builder.polygonIdentifier("Test");
 				builder.forestInventoryZone("D");
 				builder.biogeoclimaticZone("IDF");
-				builder.modeFip(PolygonMode.YOUNG);
+				builder.mode(PolygonMode.YOUNG);
 				builder.yieldFactor(1f);
 			});
 
@@ -4928,7 +4928,7 @@ class FipStartTest {
 			builder.biogeoclimaticZone("CWH");
 			builder.yieldFactor(1f);
 			builder.forestInventoryZone("0");
-			builder.modeFip(PolygonMode.START);
+			builder.mode(PolygonMode.START);
 		});
 
 		var layer = FipLayerPrimary.buildPrimary(poly, builder -> {
@@ -5072,7 +5072,7 @@ class FipStartTest {
 			builder.polygonIdentifier(polygonId);
 			builder.forestInventoryZone("0");
 			builder.biogeoclimaticZone("BG");
-			builder.modeFip(PolygonMode.START);
+			builder.mode(PolygonMode.START);
 			builder.yieldFactor(1.0f);
 		});
 		mutator.accept(result);

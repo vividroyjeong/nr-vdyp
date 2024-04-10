@@ -194,7 +194,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 		// if (MODE .eq. -1) go to 100
 
-		final var mode = polygon.getModeFip().orElse(PolygonMode.START);
+		final var mode = polygon.getMode().orElse(PolygonMode.START);
 
 		if (!ACCEPTABLE_MODES.contains(mode)) {
 			log.atInfo().setMessage("Skipping polygon with mode {}").addArgument(mode).log();
@@ -311,7 +311,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 					&& fipVetLayer.getCrownClosure() > 0f; // LAYERV
 
 			if (getId() == VdypApplicationIdentifier.FIP_START
-					&& fipPolygon.getModeFip().map(mode -> mode == PolygonMode.YOUNG).orElse(false)) {
+					&& fipPolygon.getMode().map(mode -> mode == PolygonMode.YOUNG).orElse(false)) {
 				return 100f;
 			}
 			if (getId() == VdypApplicationIdentifier.VRI_START) {
@@ -2630,7 +2630,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			);
 		}
 
-		if (polygon.getModeFip().map(x -> x == PolygonMode.YOUNG).orElse(false)) {
+		if (polygon.getMode().map(x -> x == PolygonMode.YOUNG).orElse(false)) {
 			throw validationError(
 					"Polygon %s is using unsupported mode %s.", polygon.getPolygonIdentifier(), PolygonMode.YOUNG
 			);
