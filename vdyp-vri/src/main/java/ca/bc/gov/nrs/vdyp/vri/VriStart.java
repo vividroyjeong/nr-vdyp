@@ -304,7 +304,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		final var mode = polygon.getModeFip().orElse(PolygonMode.START);
 
-		if (mode != PolygonMode.DONT_PROCESS) {
+		if (mode == PolygonMode.DONT_PROCESS) {
 			log.atInfo().setMessage("Skipping polygon with mode {}").addArgument(mode).log();
 			return Optional.empty();
 		}

@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.vri;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.closeTo;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -12,7 +13,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.easymock.EasyMock;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.EnumSource.Mode;
 
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
@@ -462,6 +467,79 @@ class VriStartTest {
 		assertThat(result, is(PolygonMode.START));
 
 		app.close();
+	}
+
+	@ParameterizedTest
+	@EnumSource(value = PolygonMode.class, names = { "START", "YOUNG", "BATC", "BATN" })
+	void testProcessPolygonDontSkip(PolygonMode mode) throws Exception {
+		var control = EasyMock.createControl();
+
+		VriStart app = EasyMock.createMockBuilder(VriStart.class).addMockedMethod("checkPolygon").createMock(control);
+
+		MockFileResolver resolver = dummyInput();
+
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 0f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		}));
+
+		var poly = VriPolygon.build(pb -> {
+			pb.polygonIdentifier("TestPoly");
+			pb.biogeoclimaticZone("IDF");
+			pb.yieldFactor(1.0f);
+			pb.modeFip(mode);
+		});
+
+		app.checkPolygon(poly);
+		EasyMock.expectLastCall().once();
+
+		control.replay();
+
+		app.init(resolver, controlMap);
+
+		var result = app.processPolygon(0, poly);
+
+		app.close();
+
+		control.verify();
+	}
+
+	@ParameterizedTest
+	@EnumSource(value = PolygonMode.class, mode = Mode.EXCLUDE, names = { "START", "YOUNG", "BATC", "BATN" })
+	void testProcessPolygonDoSkip(PolygonMode mode) throws Exception {
+		var control = EasyMock.createControl();
+
+		VriStart app = EasyMock.createMockBuilder(VriStart.class).addMockedMethod("checkPolygon").createMock(control);
+
+		MockFileResolver resolver = dummyInput();
+
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 0f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		}));
+
+		var poly = VriPolygon.build(pb -> {
+			pb.polygonIdentifier("TestPoly");
+			pb.biogeoclimaticZone("IDF");
+			pb.yieldFactor(1.0f);
+			pb.modeFip(mode);
+		});
+
+		// expect no calls
+
+		control.replay();
+
+		app.init(resolver, controlMap);
+
+		var result = app.processPolygon(0, poly);
+
+		assertThat(result, notPresent());
+
+		app.close();
+
+		control.verify();
 	}
 
 }
