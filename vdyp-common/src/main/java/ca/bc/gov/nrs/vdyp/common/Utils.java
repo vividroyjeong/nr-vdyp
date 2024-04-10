@@ -1,14 +1,17 @@
 package ca.bc.gov.nrs.vdyp.common;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -51,10 +54,34 @@ public class Utils {
 		return Optional.ofNullable(value).flatMap(x -> x instanceof Optional o ? o : (Optional) Optional.of(x));
 	}
 
+	/**
+	 * Passes both operands to the consumer only if both are present.
+	 *
+	 * @return
+	 */
 	public static <T, U> void ifBothPresent(Optional<T> opt1, Optional<U> opt2, BiConsumer<T, U> consumer) {
 		opt1.ifPresent(v1 -> {
 			opt2.ifPresent(v2 -> consumer.accept(v1, v2));
 		});
+	}
+
+	/**
+	 * Returns the result of the function applied to the operands if both are present, otherwise empty.
+	 *
+	 * @return
+	 */
+	public static <T, U, V> Optional<V> mapBoth(Optional<T> opt1, Optional<U> opt2, BiFunction<T, U, V> function) {
+		return opt1.flatMap(v1 -> opt2.map(v2 -> function.apply(v1, v2)));
+	}
+
+	/**
+	 * Returns the result of the function applied to the operands if both are present, otherwise empty.
+	 *
+	 * @return
+	 */
+	public static <T, U, V> Optional<V>
+			flatMapBoth(Optional<T> opt1, Optional<U> opt2, BiFunction<T, U, Optional<V>> function) {
+		return opt1.flatMap(v1 -> opt2.flatMap(v2 -> function.apply(v1, v2)));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -218,5 +245,34 @@ public class Utils {
 	 */
 	public static boolean nullOrEmpty(@Nullable String string) {
 		return string == null || string.isEmpty();
+	}
+
+	public static boolean parsesBlankOrNonPositive(String string) {
+		if (string == null || string.isBlank())
+			return true;
+		var value = Float.valueOf(string);
+		return value != null && value <= 0;
+	}
+
+	public static <T> Optional<T> getIfPresent(List<T> list, int index) {
+		if (list.size() > index)
+			return Optional.of(list.get(index));
+		return Optional.empty();
+	}
+
+	/**
+	 * Iterates over all but the last entry, passing them to the first consumer then passes the last entry to the second
+	 * consumer
+	 */
+	public static <T> void eachButLast(Collection<T> items, Consumer<T> body, Consumer<T> lastBody) {
+		var it = items.iterator();
+		while (it.hasNext()) {
+			var value = it.next();
+			if (it.hasNext()) {
+				body.accept(value);
+			} else {
+				lastBody.accept(value);
+			}
+		}
 	}
 }

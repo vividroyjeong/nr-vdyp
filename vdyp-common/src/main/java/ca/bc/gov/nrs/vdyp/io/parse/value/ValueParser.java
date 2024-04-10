@@ -124,6 +124,20 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 	public static final ValueParser<Float> FLOAT = numberParser(Float::parseFloat, Float.class);
 
 	/**
+	 * Parser for single precision floats >0
+	 */
+	public static final ValueParser<Optional<Float>> SAFE_POSITIVE_FLOAT = rangeSilentLow(
+			FLOAT, 0f, false, Float.MAX_VALUE, true, "positive float"
+	);
+
+	/**
+	 * Parser for single precision floats >=0
+	 */
+	public static final ValueParser<Optional<Float>> SAFE_NONNEGATIVE_FLOAT = rangeSilentLow(
+			FLOAT, 0f, true, Float.MAX_VALUE, true, "non-negative float"
+	);
+
+	/**
 	 * Parser for percentages
 	 */
 	public static final ValueParser<Float> PERCENTAGE = ValueParser
@@ -157,6 +171,33 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 				);
 			}
 			return Optional.empty();
+		});
+	}
+
+	/**
+	 * Validate that a parsed value is within a range. Returns empty if out of bounds low and throws an exception if out
+	 * of bounds high.
+	 *
+	 * @param parser     underlying parser
+	 * @param min        the lower bound
+	 * @param includeMin is the lower bound inclusive
+	 * @param max        the upper bound
+	 * @param includeMax is the upper bound inclusive
+	 * @param name       Name for the value to use in the parse error if it is out of the range.
+	 */
+	public static <T extends Comparable<T>> ValueParser<Optional<T>>
+			rangeSilentLow(ValueParser<T> parser, T min, boolean includeMin, T max, boolean includeMax, String name) {
+		return validate(s -> {
+			var result = parser.parse(s);
+			if (result.compareTo(min) < (includeMin ? 0 : 1)) {
+				return Optional.empty();
+			}
+			return Optional.of(result);
+		}, result -> {
+			return result.filter(x -> x.compareTo(max) > (includeMax ? 0 : -1)).map(
+					x -> String
+							.format("%s must be %s %s.", name, includeMax ? "less than or equal to" : "less than", max)
+			);
 		});
 	}
 

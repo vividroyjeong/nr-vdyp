@@ -47,7 +47,7 @@ public class FipSpecies extends BaseVdypSpecies {
 	public static FipSpecies build(FipLayer layer, Consumer<Builder> config) {
 		var result = build(builder -> {
 			builder.polygonIdentifier(layer.getPolygonIdentifier());
-			builder.layerType(layer.getLayer());
+			builder.layerType(layer.getLayerType());
 
 			config.accept(builder);
 		});
@@ -61,7 +61,7 @@ public class FipSpecies extends BaseVdypSpecies {
 		protected FipSpecies doBuild() {
 			return new FipSpecies(
 					this.polygonIdentifier.get(), //
-					this.layer.get(), //
+					this.layerType.get(), //
 					this.genus.get(), //
 					this.percentGenus.get()
 			);

@@ -20,6 +20,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.application.ApplicationTestUtils;
 import ca.bc.gov.nrs.vdyp.fip.test.FipTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
@@ -33,7 +34,7 @@ class RootFinderTest {
 	void testRootFunction() throws IOException {
 		var control = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(control);
+			ApplicationTestUtils.setControlMap(app, control);
 
 			var diameterBase = new double[] { 31.7022133, 26.4500256, 33.9676628, 21.4272919, 34.4568748 };
 			var x = new double[] { 1d, 7d, 74d, 9d, 0d };
@@ -57,7 +58,7 @@ class RootFinderTest {
 	void testRootFunctionJacobian() throws IOException {
 		var control = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(control);
+			ApplicationTestUtils.setControlMap(app, control);
 
 			var diameterBase = new double[] { 31.7022133, 26.4500256, 33.9676628, 21.4272919, 34.4568748 };
 			var x = new double[] { 1d, 7d, 74d, 9d, 0d };
@@ -94,7 +95,7 @@ class RootFinderTest {
 	void testRootFunctionSolve() throws IOException {
 		var control = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(control);
+			ApplicationTestUtils.setControlMap(app, control);
 
 			var diameterBase = new double[] { 31.7022133, 26.4500256, 33.9676628, 21.4272919, 34.4568748 };
 			var goal = new double[] { 1d, 7d, 74d, 9d, 30.2601795d };
@@ -118,9 +119,15 @@ class RootFinderTest {
 		final var layer = VdypLayer.build(builder -> {
 			builder.polygonIdentifier("Test");
 			builder.layerType(LayerType.PRIMARY);
-			builder.ageTotal(50f);
-			builder.yearsToBreastHeight(1f);
-			builder.height(20f);
+
+			builder.addSite(siteBuilder -> {
+				siteBuilder.ageTotal(50f);
+				siteBuilder.yearsToBreastHeight(1f);
+				siteBuilder.height(20f);
+
+				siteBuilder.siteIndex(5f);
+				siteBuilder.siteGenus("L");
+			});
 		});
 
 		var spec3 = VdypSpecies.build(layer, builder -> {

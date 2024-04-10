@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
-import ca.bc.gov.nrs.vdyp.model.FipMode;
+import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 
 public class FipPolygon extends BaseVdypPolygon<FipLayer, Optional<Float>> {
 
@@ -14,7 +14,7 @@ public class FipPolygon extends BaseVdypPolygon<FipLayer, Optional<Float>> {
 
 	public FipPolygon(
 			String polygonIdentifier, String fiz, String becIdentifier, Optional<Float> percentAvailable,
-			Optional<FipMode> modeFip, Optional<String> nonproductiveDescription, float yieldFactor
+			Optional<PolygonMode> modeFip, Optional<String> nonproductiveDescription, float yieldFactor
 	) {
 		super(polygonIdentifier, percentAvailable, fiz, becIdentifier, modeFip);
 		this.nonproductiveDescription = nonproductiveDescription;
@@ -103,7 +103,7 @@ public class FipPolygon extends BaseVdypPolygon<FipLayer, Optional<Float>> {
 					forestInventoryZone.get(), //
 					biogeoclimaticZone.get(), //
 					percentAvailable.get(), //
-					modeFip, //
+					mode, //
 					nonproductiveDescription, //
 					yieldFactor.get() //
 			));

@@ -90,13 +90,13 @@ class FipLayerParserTest {
 				hasSpecificEntry(
 						LayerType.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")), //
-								hasProperty("layer", is(LayerType.PRIMARY)), //
+								hasProperty("layerType", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotalSafe", is(55f)), //
 								hasProperty("heightSafe", is(35.3f)), //
 								hasProperty("siteIndex", present(is(35.0f))), //
 								hasProperty("crownClosure", is(87.4f)), //
 								hasProperty("siteGenus", present(is("D"))), //
-								hasProperty("siteSpecies", is("D")), //
+								hasProperty("siteSpecies", present(is("D"))), //
 								hasProperty("yearsToBreastHeightSafe", is(1.0f)), //
 								hasProperty("stockingClass", present(is('0'))), //
 								hasProperty("inventoryTypeGroup", notPresent()), //
@@ -147,13 +147,13 @@ class FipLayerParserTest {
 				hasSpecificEntry(
 						LayerType.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
-								hasProperty("layer", is(LayerType.PRIMARY)), //
+								hasProperty("layerType", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotalSafe", is(85f)), //
 								hasProperty("heightSafe", is(42.3f)), //
 								hasProperty("siteIndex", present(is(31.9f))), //
 								hasProperty("crownClosure", is(82.8f)), //
 								hasProperty("siteGenus", present(is("H"))), //
-								hasProperty("siteSpecies", is("H")), //
+								hasProperty("siteSpecies", present(is("H"))), //
 								hasProperty("yearsToBreastHeightSafe", is(4.9f)), //
 								hasProperty("stockingClass", present(is('0'))), //
 								hasProperty("inventoryTypeGroup", notPresent()), //
@@ -166,13 +166,13 @@ class FipLayerParserTest {
 				hasSpecificEntry(
 						LayerType.VETERAN, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
-								hasProperty("layer", is(LayerType.VETERAN)), //
+								hasProperty("layerType", is(LayerType.VETERAN)), //
 								hasProperty("ageTotalSafe", is(195f)), //
 								hasProperty("heightSafe", is(45.2f)), //
 								hasProperty("siteIndex", present(is(22.3f))), //
 								hasProperty("crownClosure", is(4.0f)), //
 								hasProperty("siteGenus", present(is("B"))), //
-								hasProperty("siteSpecies", is("B")), //
+								hasProperty("siteSpecies", present(is("B"))), //
 								hasProperty("yearsToBreastHeightSafe", is(9.4f))
 								// hasProperty("stockingClass", present(is("2"))),
 								// hasProperty("siteCurveNumber", present(is(8)))
@@ -222,13 +222,13 @@ class FipLayerParserTest {
 				hasSpecificEntry(
 						LayerType.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
-								hasProperty("layer", is(LayerType.PRIMARY)), //
+								hasProperty("layerType", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotalSafe", is(85f)), //
 								hasProperty("heightSafe", is(42.3f)), //
 								hasProperty("siteIndex", present(is(31.9f))), //
 								hasProperty("crownClosure", is(82.8f)), //
 								hasProperty("siteGenus", present(is("H"))), //
-								hasProperty("siteSpecies", is("H")), //
+								hasProperty("siteSpecies", present(is("H"))), //
 								hasProperty("yearsToBreastHeightSafe", is(4.9f)), //
 								hasProperty("stockingClass", present(is('0'))), //
 								hasProperty("inventoryTypeGroup", notPresent()), //
@@ -279,13 +279,13 @@ class FipLayerParserTest {
 				hasSpecificEntry(
 						LayerType.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
-								hasProperty("layer", is(LayerType.PRIMARY)), //
+								hasProperty("layerType", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotalSafe", is(85f)), //
 								hasProperty("heightSafe", is(42.3f)), //
 								hasProperty("siteIndex", present(is(31.9f))), //
 								hasProperty("crownClosure", is(82.8f)), //
 								hasProperty("siteGenus", present(is("H"))), //
-								hasProperty("siteSpecies", is("H")), //
+								hasProperty("siteSpecies", present(is("H"))), //
 								hasProperty("yearsToBreastHeightSafe", is(4.9f)),
 								hasProperty("stockingClass", present(is('0'))), //
 								hasProperty("inventoryTypeGroup", notPresent()), //

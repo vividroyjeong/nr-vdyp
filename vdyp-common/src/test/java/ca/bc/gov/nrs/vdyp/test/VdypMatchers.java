@@ -38,6 +38,7 @@ import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
+import ca.bc.gov.nrs.vdyp.model.ModelClassBuilder;
 
 /**
  * Custom Hamcrest Matchers
@@ -551,5 +552,27 @@ public class VdypMatchers {
 
 		};
 
+	}
+
+	public static <T extends ModelClassBuilder<U>, U> Matcher<T> builds(Matcher<U> builtMatcher) {
+		return new TypeSafeDiagnosingMatcher<T>() {
+
+			@Override
+			public void describeTo(Description description) {
+				description.appendText("is a ModelClassBuilder which builds and object that ");
+			}
+
+			@Override
+			protected boolean matchesSafely(T item, Description mismatchDescription) {
+				var result = item.build();
+				if (builtMatcher.matches(result)) {
+					return true;
+				}
+				mismatchDescription.appendText("built object was ");
+				builtMatcher.describeMismatch(result, mismatchDescription);
+				return false;
+			}
+
+		};
 	}
 }
