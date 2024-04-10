@@ -25,6 +25,7 @@ import java.util.stream.IntStream;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
+import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
@@ -358,4 +359,5 @@ public class TestUtils {
 	public static void assumeThat(java.lang.Object actual, @SuppressWarnings("rawtypes") org.hamcrest.Matcher matcher) {
 		assumeTrue(matcher.matches(actual));
 	}
+
 }

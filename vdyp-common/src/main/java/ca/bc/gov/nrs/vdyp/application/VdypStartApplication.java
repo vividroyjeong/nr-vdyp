@@ -120,7 +120,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		}
 	}
 
-	public void setControlMap(Map<String, Object> controlMap) {
+	void setControlMap(Map<String, Object> controlMap) {
 		this.controlMap = controlMap;
 	}
 

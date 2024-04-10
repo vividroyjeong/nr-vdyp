@@ -44,6 +44,7 @@ import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.application.ApplicationTestUtils;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
@@ -147,7 +148,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -176,7 +177,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -205,7 +206,7 @@ class FipStartTest {
 	void testVeteranLayerHeightLessThanMinimum() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -236,7 +237,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -269,7 +270,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -299,7 +300,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -328,7 +329,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -355,7 +356,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -387,7 +388,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -419,7 +420,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -443,7 +444,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -478,7 +479,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -610,7 +611,7 @@ class FipStartTest {
 				.populateControlMapNetBreakage(controlMap, bgrp -> new Coefficients(new float[] { 0f, 0f, 0f, 0f }, 1));
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var result = app.processLayerAsVeteran(fipPolygon, fipLayer);
 
@@ -689,7 +690,7 @@ class FipStartTest {
 
 		VdypLayer result;
 		try (var app = new FipStart();) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			result = app.processLayerAsVeteran(fipPolygon, fipLayer);
 		}
@@ -953,7 +954,7 @@ class FipStartTest {
 				.populateControlMapNetBreakage(controlMap, bgrp -> new Coefficients(new float[] { 0f, 0f, 0f, 0f }, 1));
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var result = app.processLayerAsVeteran(fipPolygon, fipLayer);
 
@@ -1003,7 +1004,7 @@ class FipStartTest {
 				.populateControlMapNetBreakage(controlMap, bgrp -> new Coefficients(new float[] { 0f, 0f, 0f, 0f }, 1));
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var result = app.processLayerAsVeteran(fipPolygon, fipLayer);
 
@@ -1081,7 +1082,7 @@ class FipStartTest {
 		var controlMap = FipTestUtils.loadControlMap();
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var result = app.processLayerAsPrimary(fipPolygon, fipLayer, 0f);
 
@@ -1453,7 +1454,7 @@ class FipStartTest {
 		var controlMap = FipTestUtils.loadControlMap();
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var result = app.processLayerAsPrimary(fipPolygon, fipLayer, 2.24055195f);
 
@@ -1554,7 +1555,7 @@ class FipStartTest {
 		var controlMap = FipTestUtils.loadControlMap();
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var result = app.estimateVeteranBaseArea(26.2000008f, 4f, "H", Region.COASTAL);
 
@@ -1603,7 +1604,7 @@ class FipStartTest {
 				.populateControlMapNetBreakage(controlMap, bgrp -> new Coefficients(new float[] { 0f, 0f, 0f, 0f }, 1));
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var result = app.processLayerAsVeteran(fipPolygon, fipLayer);
 
@@ -1660,7 +1661,7 @@ class FipStartTest {
 				.populateControlMapNetBreakage(controlMap, bgrp -> new Coefficients(new float[] { 0f, 0f, 0f, 0f }, 1));
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var result = app.processLayerAsVeteran(fipPolygon, fipLayer).getSpecies().get("B");
 
@@ -1725,7 +1726,7 @@ class FipStartTest {
 				.populateControlMapNetBreakage(controlMap, bgrp -> new Coefficients(new float[] { 0f, 0f, 0f, 0f }, 1));
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var result = app.processLayerAsVeteran(fipPolygon, fipLayer);
 
@@ -1862,7 +1863,7 @@ class FipStartTest {
 		TestUtils.populateControlMapWholeStemVolume(controlMap, wholeStemMap(12));
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var utilizationClass = UtilizationClass.OVER225;
 			var aAdjust = 0.10881f;
@@ -1896,7 +1897,7 @@ class FipStartTest {
 		TestUtils.populateControlMapCloseUtilization(controlMap, closeUtilMap(12));
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var utilizationClass = UtilizationClass.OVER225;
 			var aAdjust = new Coefficients(new float[] { 0f, 0f, 0f, -0.0981800035f }, 1);
@@ -1935,7 +1936,7 @@ class FipStartTest {
 		);
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var utilizationClass = UtilizationClass.OVER225;
 			var aAdjust = new Coefficients(new float[] { 0f, 0f, 0f, 0.000479999988f }, 1);
@@ -1984,7 +1985,7 @@ class FipStartTest {
 		);
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var utilizationClass = UtilizationClass.OVER225;
 			var aAdjust = new Coefficients(new float[] { 0f, 0f, 0f, -0.00295000011f }, 1);
@@ -2028,7 +2029,7 @@ class FipStartTest {
 		);
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var utilizationClass = UtilizationClass.OVER225;
 			var breakageGroup = 5;
@@ -2060,7 +2061,7 @@ class FipStartTest {
 		var controlMap = FipTestUtils.loadControlMap();
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var utilizationClass = UtilizationClass.ALL;
 			var breakageGroup = 20;
@@ -2132,7 +2133,7 @@ class FipStartTest {
 		var controlMap = FipTestUtils.loadControlMap();
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var result = app.processLayerAsVeteran(fipPolygon, fipLayer);
 
@@ -2215,7 +2216,7 @@ class FipStartTest {
 	void testFindPrimarySpeciesNoSpecies() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			Map<String, FipSpecies> allSpecies = Collections.emptyMap();
 			assertThrows(IllegalArgumentException.class, () -> app.findPrimarySpecies(allSpecies));
@@ -2226,7 +2227,7 @@ class FipStartTest {
 	void testFindPrimarySpeciesOneSpecies() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var spec = this.getTestSpecies("test polygon", LayerType.PRIMARY, "B", valid());
 
@@ -2244,7 +2245,7 @@ class FipStartTest {
 	void testFindPrimaryCombinePAIntoPL() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "PA", spec -> {
 				spec.setPercentGenus(25);
@@ -2270,7 +2271,7 @@ class FipStartTest {
 	void testFindPrimaryCombinePLIntoPA() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "PA", spec -> {
 				spec.setPercentGenus(75);
@@ -2296,7 +2297,7 @@ class FipStartTest {
 	void testFindPrimaryCombineCIntoY() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "C", spec -> {
 				spec.setPercentGenus(25);
@@ -2322,7 +2323,7 @@ class FipStartTest {
 	void testFindPrimaryCombineYIntoC() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "C", spec -> {
 				spec.setPercentGenus(75);
@@ -2348,7 +2349,7 @@ class FipStartTest {
 	void testFindPrimarySort() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "B", spec -> {
 				spec.setPercentGenus(20);
@@ -2381,7 +2382,7 @@ class FipStartTest {
 	void testFindItg80PercentPure() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "F", spec -> {
 				spec.setPercentGenus(80);
@@ -2402,7 +2403,7 @@ class FipStartTest {
 	void testFindItgNoSecondary() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "F", spec -> {
 				spec.setPercentGenus(100);
@@ -2450,7 +2451,7 @@ class FipStartTest {
 	void testFindItgMixed() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		var app = new FipStart();
-		app.setControlMap(controlMap);
+		ApplicationTestUtils.setControlMap(app, controlMap);
 
 		assertItgMixed(app, 2, "F", /*  */ "Y", "C");
 		assertItgMixed(app, 3, "F", /*  */ "B", "H");
@@ -2528,7 +2529,7 @@ class FipStartTest {
 	void testFindEquationGroupDefault() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("ESSF").get();
@@ -2545,7 +2546,7 @@ class FipStartTest {
 	void testFindEquationGroupModified() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("PP").get();
@@ -2562,7 +2563,7 @@ class FipStartTest {
 	void testEstimatePrimaryBaseArea() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -2605,7 +2606,7 @@ class FipStartTest {
 	void testEstimatePrimaryBaseAreaHeightCloseToA2() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -2647,7 +2648,7 @@ class FipStartTest {
 	void testEstimatePrimaryBaseAreaLowCrownClosure() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -2689,7 +2690,7 @@ class FipStartTest {
 	void testEstimatePrimaryBaseAreaLowResult() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -2734,7 +2735,7 @@ class FipStartTest {
 	void testEstimatePrimaryQuadMeanDiameter() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -2776,7 +2777,7 @@ class FipStartTest {
 	void testEstimatePrimaryQuadMeanDiameterHeightLessThanA5() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -2818,7 +2819,7 @@ class FipStartTest {
 	void testEstimatePrimaryQuadMeanDiameterResultLargerThanUpperBound() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -2862,7 +2863,7 @@ class FipStartTest {
 	void testEstimatePrimaryLayerNonPrimarySpeciesHeightEqn1() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -2896,7 +2897,7 @@ class FipStartTest {
 	void testEstimatePrimaryLayerNonPrimarySpeciesHeightEqn2() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("ESSF").get();
@@ -2937,7 +2938,7 @@ class FipStartTest {
 	void testFindRootsForPrimaryLayerDiameterAndAreaOneSpecies() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -3020,7 +3021,7 @@ class FipStartTest {
 	void testFindRootsForPrimaryLayerDiameterAndAreaMultipleSpeciesPass1() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -3298,7 +3299,7 @@ class FipStartTest {
 	void testFindRootsForPrimaryLayerDiameterAndAreaMultipleSpeciesPass1Test2() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -3555,7 +3556,7 @@ class FipStartTest {
 	void testFindEmpericalRelationshipParameterIndex() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart();) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var bec = BecDefinitionParser.getBecs(controlMap).get("CWH").get();
 
@@ -3569,7 +3570,7 @@ class FipStartTest {
 	void testEstimateQuadMeanDiameterForSpecies() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var layer = VdypLayer.build(builder -> {
 				builder.polygonIdentifier("Test");
@@ -3653,7 +3654,7 @@ class FipStartTest {
 	void testEstimateSmallComponents() {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var fPoly = FipPolygon.build(builder -> {
 				builder.polygonIdentifier("Test");
@@ -3787,7 +3788,7 @@ class FipStartTest {
 	void testEstimateQuadMeanDiameterByUtilization() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var coe = Utils.utilizationVector();
 			coe.setCoe(FipStart.UTIL_ALL, 31.6622887f);
@@ -3817,7 +3818,7 @@ class FipStartTest {
 	void testEstimateQuadMeanDiameterByUtilization2() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var coe = Utils.utilizationVector();
 			coe.setCoe(FipStart.UTIL_ALL, 13.4943399f);
@@ -3847,7 +3848,7 @@ class FipStartTest {
 	void testEstimateBaseAreaByUtilization() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var dq = Utils.utilizationVector();
 			var ba = Utils.utilizationVector();
@@ -3884,7 +3885,7 @@ class FipStartTest {
 	void testReconcileComponentsMode1() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var dq = Utils.utilizationVector();
 			var ba = Utils.utilizationVector();
@@ -3926,7 +3927,7 @@ class FipStartTest {
 	void testReconcileComponentsMode2() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var dq = Utils.utilizationVector();
 			var ba = Utils.utilizationVector();
@@ -3964,7 +3965,7 @@ class FipStartTest {
 	void testReconcileComponentsMode3() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var dq = Utils.utilizationVector();
 			var ba = Utils.utilizationVector();
@@ -4005,7 +4006,7 @@ class FipStartTest {
 	void testEstimateWholeStemVolumeByUtilizationClass() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var dq = Utils.utilizationVector();
 			var ba = Utils.utilizationVector();
@@ -4039,7 +4040,7 @@ class FipStartTest {
 	void testComputeUtilizationComponentsPrimaryByUtilNoCV() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var bec = BecDefinitionParser.getBecs(controlMap).get("IDF").get();
 
@@ -4238,7 +4239,7 @@ class FipStartTest {
 	void testCreateVdypPolygon() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var fipPolygon = FipPolygon.build(builder -> {
 				builder.polygonIdentifier("Test");
@@ -4299,7 +4300,7 @@ class FipStartTest {
 	void testCreateVdypPolygonPercentForestLandGiven() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var fipPolygon = FipPolygon.build(builder -> {
 				builder.polygonIdentifier("Test");
@@ -4366,7 +4367,7 @@ class FipStartTest {
 	void testCreateVdypPolygonFipYoung() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var fipPolygon = FipPolygon.build(builder -> {
 				builder.polygonIdentifier("Test");
@@ -4434,7 +4435,7 @@ class FipStartTest {
 				.put('R', Region.INTERIOR, Optional.of(new StockingClassFactor('R', Region.INTERIOR, 0.42f, 100)));
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			// var fipVeteranLayer = new FipLayer("Test", LayerType.VETERAN);
 			var fipPrimaryLayer = FipLayerPrimary.buildPrimary(builder -> {
@@ -4586,7 +4587,7 @@ class FipStartTest {
 		stockingClassMap.put('R', Region.INTERIOR, new StockingClassFactor('R', Region.INTERIOR, 0.42f, 100));
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			// var fipVeteranLayer = new FipLayer("Test", LayerType.VETERAN);
 			var fipPrimaryLayer = FipLayerPrimary.buildPrimary(builder -> {
@@ -4753,7 +4754,7 @@ class FipStartTest {
 		stockingClassMap.remove('R', Region.INTERIOR);
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			// var fipVeteranLayer = new FipLayer("Test", LayerType.VETERAN);
 			var fipPrimaryLayer = FipLayerPrimary.buildPrimary(builder -> {
@@ -4953,7 +4954,7 @@ class FipStartTest {
 		});
 
 		var app = new FipStart();
-		app.setControlMap(controlMap);
+		ApplicationTestUtils.setControlMap(app, controlMap);
 
 		var result = app.processPolygon(0, poly);
 
@@ -5039,7 +5040,7 @@ class FipStartTest {
 		mockWith(layerStream, layers);
 		mockWith(speciesStream, species);
 
-		app.setControlMap(controlMap);
+		ApplicationTestUtils.setControlMap(app, controlMap);
 
 		control.replay();
 
