@@ -4,13 +4,11 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,22 +51,6 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		} catch (Exception ex) {
 			log.error("Error during processing", ex);
 			System.exit(PROCESSING_ERROR);
-		}
-	}
-
-	/**
-	 * Iterates over all but the last entry, passing them to the first consumer then passes the last entry to the second
-	 * consumer
-	 */
-	protected static <T> void eachButLast(Collection<T> items, Consumer<T> body, Consumer<T> lastBody) {
-		var it = items.iterator();
-		while (it.hasNext()) {
-			var value = it.next();
-			if (it.hasNext()) {
-				body.accept(value);
-			} else {
-				lastBody.accept(value);
-			}
 		}
 	}
 

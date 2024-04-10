@@ -641,7 +641,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			// that must be more than 1
 			// Fill in target and trial values
 
-			eachButLast(result.getSpecies().values(), spec -> {
+			Utils.eachButLast(result.getSpecies().values(), spec -> {
 				goal.put(spec.getGenus(), spec.getPercentGenus());
 				xMap.put(spec.getGenus(), spec.getPercentGenus());
 			}, spec -> {
