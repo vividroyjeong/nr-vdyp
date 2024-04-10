@@ -88,7 +88,7 @@ public class VriSpeciesParserTest {
 				containsInAnyOrder(
 						allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
-								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
+								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
 						)
@@ -135,7 +135,7 @@ public class VriSpeciesParserTest {
 				containsInAnyOrder(
 						allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
-								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
+								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
 						)
@@ -182,7 +182,7 @@ public class VriSpeciesParserTest {
 				containsInAnyOrder(
 						allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
-								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
+								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
 						)
@@ -229,7 +229,7 @@ public class VriSpeciesParserTest {
 				containsInAnyOrder(
 						allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
-								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
+								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
 						)
@@ -276,13 +276,13 @@ public class VriSpeciesParserTest {
 				containsInAnyOrder(
 						allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
-								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
+								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(75.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
 						),
 						allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
-								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("genus", is("C")),
+								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("C")),
 								hasProperty("percentGenus", is(25.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("C", is(100.0f))))
 						)
@@ -330,13 +330,13 @@ public class VriSpeciesParserTest {
 				containsInAnyOrder(
 						allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
-								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
+								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
 						),
 						allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
-								hasProperty("layer", is(LayerType.VETERAN)), hasProperty("genus", is("B")),
+								hasProperty("layerType", is(LayerType.VETERAN)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
 						)
@@ -384,7 +384,7 @@ public class VriSpeciesParserTest {
 				containsInAnyOrder(
 						allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
-								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
+								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
 						)
@@ -398,7 +398,7 @@ public class VriSpeciesParserTest {
 				containsInAnyOrder(
 						allOf(
 								hasProperty("polygonIdentifier", is("01002 S000002 00     1970")),
-								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
+								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
 						)
@@ -444,7 +444,7 @@ public class VriSpeciesParserTest {
 				containsInAnyOrder(
 						allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
-								hasProperty("layer", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
+								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty(
 										"speciesPercent",

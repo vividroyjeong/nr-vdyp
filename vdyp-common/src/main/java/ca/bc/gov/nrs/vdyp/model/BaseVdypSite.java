@@ -6,7 +6,7 @@ import java.util.Optional;
 public class BaseVdypSite {
 
 	private final String polygonIdentifier;
-	private final LayerType layer;
+	private final LayerType layerType;
 	private final String siteGenus; // FIPL_1A/SITESP0_L1, VRISIA/SITESP0
 	private final Optional<Integer> siteCurveNumber; // VRISI/VR_SCN
 	private final Optional<Float> siteIndex; // VRISI/VR_SI
@@ -16,13 +16,13 @@ public class BaseVdypSite {
 	private final Optional<Float> yearsToBreastHeight; // LVCOM3/YTBHLV, L1COM3/YTBHL1, VRISI/VR_YTBH
 
 	public BaseVdypSite(
-			String polygonIdentifier, LayerType layer, String siteGenus, Optional<Integer> siteCurveNumber,
+			String polygonIdentifier, LayerType layerType, String siteGenus, Optional<Integer> siteCurveNumber,
 			Optional<Float> siteIndex, Optional<Float> height, Optional<Float> ageTotal,
 			Optional<Float> yearsToBreastHeight
 	) {
 		super();
 		this.polygonIdentifier = polygonIdentifier;
-		this.layer = layer;
+		this.layerType = layerType;
 		this.siteGenus = siteGenus;
 		this.siteCurveNumber = siteCurveNumber;
 		this.siteIndex = siteIndex;
@@ -35,8 +35,8 @@ public class BaseVdypSite {
 		return polygonIdentifier;
 	}
 
-	public LayerType getLayer() {
-		return layer;
+	public LayerType getLayerType() {
+		return layerType;
 	}
 
 	public String getSiteGenus() {
@@ -65,7 +65,7 @@ public class BaseVdypSite {
 
 	public abstract static class Builder<T extends BaseVdypSite> extends ModelClassBuilder<T> {
 		protected Optional<String> polygonIdentifier = Optional.empty();
-		protected Optional<LayerType> layer = Optional.empty();
+		protected Optional<LayerType> layerType = Optional.empty();
 		protected Optional<String> siteGenus = Optional.empty();
 
 		protected Optional<Integer> siteCurveNumber = Optional.empty();
@@ -80,8 +80,8 @@ public class BaseVdypSite {
 			return this;
 		}
 
-		public Builder<T> layerType(LayerType layer) {
-			this.layer = Optional.of(layer);
+		public Builder<T> layerType(LayerType layerType) {
+			this.layerType = Optional.of(layerType);
 			return this;
 		}
 
@@ -142,7 +142,7 @@ public class BaseVdypSite {
 
 		public Builder<T> copy(BaseVdypSite toCopy) {
 			polygonIdentifier(toCopy.getPolygonIdentifier());
-			layerType(toCopy.getLayer());
+			layerType(toCopy.getLayerType());
 			ageTotal(toCopy.getAgeTotal());
 			yearsToBreastHeight(toCopy.getYearsToBreastHeight());
 			height(toCopy.getHeight());
@@ -155,7 +155,7 @@ public class BaseVdypSite {
 		@Override
 		protected void check(Collection<String> errors) {
 			requirePresent(polygonIdentifier, "polygonIdentifier", errors);
-			requirePresent(layer, "layer", errors);
+			requirePresent(layerType, "layerType", errors);
 			requirePresent(siteGenus, "siteGenus", errors);
 		}
 

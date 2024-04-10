@@ -952,7 +952,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 		var polygonIdentifier = fipLayer.getPolygonIdentifier();
 
-		assert fipLayer.getLayer().equals(LayerType.VETERAN) : "Layer must be VETERAN";
+		assert fipLayer.getLayerType().equals(LayerType.VETERAN) : "Layer must be VETERAN";
 		assert fipPolygon.getPolygonIdentifier().equals(fipLayer.getPolygonIdentifier()) : String.format(
 				"Polygon polygonIdentifier '%s' doesn't match that of layer '%s'", fipPolygon.getPolygonIdentifier(),
 				fipLayer.getPolygonIdentifier()
@@ -2548,7 +2548,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		}
 
 		for (var spec : species) {
-			var layer = layers.get(spec.getLayer());
+			var layer = layers.get(spec.getLayerType());
 			// Validate that species belong to the correct polygon
 			if (!spec.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
 				throw validationError(
@@ -2621,10 +2621,10 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			var height = layer.getHeight().orElse(0f);
 
 			throwIfPresent(
-					heightMinimum(layer.getLayer()).filter(minimum -> height < minimum).map(
+					heightMinimum(layer.getLayerType()).filter(minimum -> height < minimum).map(
 							minimum -> validationError(
 									"Polygon %s has %s layer where height %.1f is less than minimum %.1f.",
-									polygon.getPolygonIdentifier(), layer.getLayer(), layer.getHeightSafe(), minimum
+									polygon.getPolygonIdentifier(), layer.getLayerType(), layer.getHeightSafe(), minimum
 							)
 					)
 			);
@@ -2663,7 +2663,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			}
 			// VDYP7 performs this step which should be negligible but might have a small
 			// impact due to the 0.01 percent variation and floating point errors.
-			if (layer.getLayer() == LayerType.PRIMARY) {
+			if (layer.getLayerType() == LayerType.PRIMARY) {
 				layer.getSpecies().values()
 						.forEach(species -> species.setFractionGenus(species.getPercentGenus() / percentTotal));
 			}

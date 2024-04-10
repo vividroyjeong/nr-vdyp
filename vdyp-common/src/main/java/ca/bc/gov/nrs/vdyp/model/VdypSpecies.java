@@ -211,7 +211,7 @@ public class VdypSpecies extends BaseVdypSpecies implements VdypUtilizationHolde
 	public static VdypSpecies build(VdypLayer layer, Consumer<Builder> config) {
 		var result = build(builder -> {
 			builder.polygonIdentifier(layer.getPolygonIdentifier());
-			builder.layerType(layer.getLayer());
+			builder.layerType(layer.getLayerType());
 
 			config.accept(builder);
 		});
@@ -236,7 +236,7 @@ public class VdypSpecies extends BaseVdypSpecies implements VdypUtilizationHolde
 		protected VdypSpecies doBuild() {
 			return new VdypSpecies(
 					polygonIdentifier.get(), //
-					layer.get(), //
+					layerType.get(), //
 					genus.get(), //
 					percentGenus.get(), //
 					volumeGroup.get(), //

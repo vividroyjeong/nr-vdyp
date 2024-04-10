@@ -53,7 +53,7 @@ public class FipSite extends BaseVdypSite {
 		protected FipSite doBuild() {
 			return new FipSite(
 					this.polygonIdentifier.get(), //
-					this.layer.get(), //
+					this.layerType.get(), //
 					this.siteGenus.get(), //
 					this.siteCurveNumber, //
 					this.siteIndex, //

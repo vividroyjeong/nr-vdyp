@@ -130,7 +130,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				}
 
 				return builder;
-			}).map(VriLayer.Builder::build).collect(Collectors.toUnmodifiableMap(VriLayer::getLayer, x -> x));
+			}).map(VriLayer.Builder::build).collect(Collectors.toUnmodifiableMap(VriLayer::getLayerType, x -> x));
 
 		} catch (NoSuchElementException ex) {
 			throw validationError("Layers file has fewer records than polygon file.", ex);
@@ -164,7 +164,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		}
 
 		for (var spec : species) {
-			var layer = layers.get(spec.getLayer());
+			var layer = layers.get(spec.getLayerType());
 			// Validate that species belong to the correct polygon
 			if (!spec.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
 				throw validationError(
@@ -182,7 +182,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		}
 
 		for (var site : sites) {
-			var layer = layers.get(site.getLayer());
+			var layer = layers.get(site.getLayerType());
 			// Validate that species belong to the correct polygon
 			if (!site.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
 				throw validationError(

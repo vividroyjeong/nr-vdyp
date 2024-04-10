@@ -150,7 +150,7 @@ public class VriAdjustInputWriter implements Closeable {
 				SPEC_FORMAT, //
 
 				spec.getPolygonIdentifier(), //
-				spec.getLayer().getAlias(), //
+				spec.getLayerType().getAlias(), //
 
 				specIndex.orElse(0), //
 				spec.getGenus(), //
@@ -213,7 +213,7 @@ public class VriAdjustInputWriter implements Closeable {
 					UTIL_FORMAT, //
 
 					layer.getPolygonIdentifier(), //
-					layer.getLayer().getAlias(), //
+					layer.getLayerType().getAlias(), //
 
 					specIndex.orElse(0), //
 					specId.orElse("  "), //
@@ -230,7 +230,7 @@ public class VriAdjustInputWriter implements Closeable {
 					utils.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization().getCoe(uc.index), //
 					utils.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization().getCoe(uc.index), //
 
-					quadMeanDiameter.orElse(layer.getLayer() == LayerType.PRIMARY ? //
+					quadMeanDiameter.orElse(layer.getLayerType() == LayerType.PRIMARY ? //
 							EMPTY_FLOAT : 0f
 					) // FIXME: VDYP7 is being inconsistent. Should consider using -9 for both.
 			);

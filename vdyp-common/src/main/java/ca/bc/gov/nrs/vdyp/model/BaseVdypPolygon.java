@@ -63,7 +63,7 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?, ?>, PA> {
 
 	public void setLayers(Collection<L> layers) {
 		this.layers = new EnumMap<>(LayerType.class);
-		layers.forEach(spec -> this.layers.put(spec.getLayer(), spec));
+		layers.forEach(spec -> this.layers.put(spec.getLayerType(), spec));
 	}
 
 	public PA getPercentAvailable() {
@@ -179,7 +179,7 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?, ?>, PA> {
 
 			// Add species
 			for (L layer : layers) {
-				result.getLayers().put(layer.getLayer(), layer);
+				result.getLayers().put(layer.getLayerType(), layer);
 			}
 		}
 

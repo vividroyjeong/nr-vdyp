@@ -618,7 +618,7 @@ class FipStartTest {
 
 			// Keys
 			assertThat(result, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(result, hasProperty("layer", is(LayerType.VETERAN)));
+			assertThat(result, hasProperty("layerType", is(LayerType.VETERAN)));
 
 			// Direct Copy
 			assertThat(result, hasProperty("ageTotal", present(is(8f))));
@@ -641,7 +641,7 @@ class FipStartTest {
 
 			// Keys
 			assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(speciesResult, hasProperty("layer", is(LayerType.VETERAN)));
+			assertThat(speciesResult, hasProperty("layerType", is(LayerType.VETERAN)));
 			assertThat(speciesResult, hasProperty("genus", is("B")));
 
 			// Copied
@@ -698,7 +698,7 @@ class FipStartTest {
 
 		// Keys
 		assertThat(result, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(result, hasProperty("layer", is(LayerType.VETERAN)));
+		assertThat(result, hasProperty("layerType", is(LayerType.VETERAN)));
 
 		// Direct Copy
 		assertThat(result, hasProperty("ageTotal", present(is(105f))));
@@ -724,7 +724,7 @@ class FipStartTest {
 
 		// Keys
 		assertThat(speciesResult1, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(speciesResult1, hasProperty("layer", is(LayerType.VETERAN)));
+		assertThat(speciesResult1, hasProperty("layerType", is(LayerType.VETERAN)));
 		assertThat(speciesResult1, hasProperty("genus", is("B")));
 
 		// Copied
@@ -737,7 +737,7 @@ class FipStartTest {
 
 		// Keys
 		assertThat(speciesResult2, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(speciesResult2, hasProperty("layer", is(LayerType.VETERAN)));
+		assertThat(speciesResult2, hasProperty("layerType", is(LayerType.VETERAN)));
 		assertThat(speciesResult2, hasProperty("genus", is("H")));
 
 		// Copied
@@ -750,7 +750,7 @@ class FipStartTest {
 
 		// Keys
 		assertThat(speciesResult3, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(speciesResult3, hasProperty("layer", is(LayerType.VETERAN)));
+		assertThat(speciesResult3, hasProperty("layerType", is(LayerType.VETERAN)));
 		assertThat(speciesResult3, hasProperty("genus", is("S")));
 
 		// Copied
@@ -1022,7 +1022,7 @@ class FipStartTest {
 
 			// Keys
 			assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(speciesResult, hasProperty("layer", is(LayerType.VETERAN)));
+			assertThat(speciesResult, hasProperty("layerType", is(LayerType.VETERAN)));
 			assertThat(speciesResult, hasProperty("genus", is("B")));
 
 			// Copied
@@ -1088,7 +1088,7 @@ class FipStartTest {
 			assertThat(result, notNullValue());
 
 			assertThat(result, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(result, hasProperty("layer", is(LayerType.PRIMARY)));
+			assertThat(result, hasProperty("layerType", is(LayerType.PRIMARY)));
 
 			assertThat(result, hasProperty("ageTotal", present(is(55f))));
 			assertThat(result, hasProperty("height", present(is(35.3f))));
@@ -1158,7 +1158,7 @@ class FipStartTest {
 			var speciesResult = result.getSpecies().get("B");
 
 			assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(speciesResult, hasProperty("layer", is(LayerType.PRIMARY)));
+			assertThat(speciesResult, hasProperty("layerType", is(LayerType.PRIMARY)));
 			assertThat(speciesResult, hasProperty("genus", is("B")));
 
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.00890319888f)));
@@ -1209,7 +1209,7 @@ class FipStartTest {
 			speciesResult = result.getSpecies().get("C");
 
 			assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(speciesResult, hasProperty("layer", is(LayerType.PRIMARY)));
+			assertThat(speciesResult, hasProperty("layerType", is(LayerType.PRIMARY)));
 			assertThat(speciesResult, hasProperty("genus", is("C")));
 
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.114011094f)));
@@ -1262,7 +1262,7 @@ class FipStartTest {
 			speciesResult = result.getSpecies().get("D");
 
 			assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(speciesResult, hasProperty("layer", is(LayerType.PRIMARY)));
+			assertThat(speciesResult, hasProperty("layerType", is(LayerType.PRIMARY)));
 			assertThat(speciesResult, hasProperty("genus", is("D")));
 
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.661987007f)));
@@ -1316,7 +1316,7 @@ class FipStartTest {
 			speciesResult = result.getSpecies().get("H");
 
 			assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(speciesResult, hasProperty("layer", is(LayerType.PRIMARY)));
+			assertThat(speciesResult, hasProperty("layerType", is(LayerType.PRIMARY)));
 			assertThat(speciesResult, hasProperty("genus", is("H")));
 
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.123297341f)));
@@ -1361,7 +1361,7 @@ class FipStartTest {
 			speciesResult = result.getSpecies().get("S");
 
 			assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(speciesResult, hasProperty("layer", is(LayerType.PRIMARY)));
+			assertThat(speciesResult, hasProperty("layerType", is(LayerType.PRIMARY)));
 			assertThat(speciesResult, hasProperty("genus", is("S")));
 
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.0918014571f)));
@@ -1460,7 +1460,7 @@ class FipStartTest {
 			assertThat(result, notNullValue());
 
 			assertThat(result, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(result, hasProperty("layer", is(LayerType.PRIMARY)));
+			assertThat(result, hasProperty("layerType", is(LayerType.PRIMARY)));
 
 			assertThat(result, hasProperty("ageTotal", present(is(45f))));
 			assertThat(result, hasProperty("height", present(is(24.3f))));
@@ -1486,7 +1486,7 @@ class FipStartTest {
 			var speciesResult = result.getSpecies().get("H");
 
 			assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(speciesResult, hasProperty("layer", is(LayerType.PRIMARY)));
+			assertThat(speciesResult, hasProperty("layerType", is(LayerType.PRIMARY)));
 			assertThat(speciesResult, hasProperty("genus", is("H")));
 
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.787526369f)));
@@ -2137,7 +2137,7 @@ class FipStartTest {
 			var result = app.processLayerAsVeteran(fipPolygon, fipLayer);
 
 			assertThat(result, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(result, hasProperty("layer", is(LayerType.VETERAN)));
+			assertThat(result, hasProperty("layerType", is(LayerType.VETERAN)));
 
 			assertThat(result, hasProperty("ageTotal", present(closeTo(105f)))); // LVCOM3/AGETOTLV
 			assertThat(result, hasProperty("breastHeightAge", present(closeTo(97.9000015f)))); // LVCOM3/AGEBHLV
@@ -5062,7 +5062,7 @@ class FipStartTest {
 	static Map<LayerType, FipLayer> layerMap(FipLayer... layers) {
 		Map<LayerType, FipLayer> result = new HashMap<>();
 		for (var layer : layers) {
-			result.put(layer.getLayer(), layer);
+			result.put(layer.getLayerType(), layer);
 		}
 		return result;
 	}

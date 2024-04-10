@@ -46,7 +46,7 @@ public class VdypSite extends BaseVdypSite {
 
 		var result = build(builder -> {
 			builder.polygonIdentifier(layer.getPolygonIdentifier());
-			builder.layerType(layer.getLayer());
+			builder.layerType(layer.getLayerType());
 			config.accept(builder);
 		});
 		layer.getSites().put(result.getSiteGenus(), result);
@@ -58,8 +58,8 @@ public class VdypSite extends BaseVdypSite {
 		@Override
 		protected VdypSite doBuild() {
 			return new VdypSite(
-					polygonIdentifier.get(), layer.get(), siteGenus.get(), siteCurveNumber, siteIndex, height, ageTotal,
-					yearsToBreastHeight
+					polygonIdentifier.get(), layerType.get(), siteGenus.get(), siteCurveNumber, siteIndex, height,
+					ageTotal, yearsToBreastHeight
 			);
 		}
 	}
