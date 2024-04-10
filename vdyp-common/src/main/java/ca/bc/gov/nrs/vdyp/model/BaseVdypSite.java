@@ -3,7 +3,7 @@ package ca.bc.gov.nrs.vdyp.model;
 import java.util.Collection;
 import java.util.Optional;
 
-public class BaseVdypSite {
+public abstract class BaseVdypSite {
 
 	private final String polygonIdentifier;
 	private final LayerType layerType;
@@ -15,7 +15,7 @@ public class BaseVdypSite {
 	private final Optional<Float> height; // LVCOM3/HDLV, L1COM3/HDL1, VRISI/VR_HD
 	private final Optional<Float> yearsToBreastHeight; // LVCOM3/YTBHLV, L1COM3/YTBHL1, VRISI/VR_YTBH
 
-	public BaseVdypSite(
+	protected BaseVdypSite(
 			String polygonIdentifier, LayerType layerType, String siteGenus, Optional<Integer> siteCurveNumber,
 			Optional<Float> siteIndex, Optional<Float> height, Optional<Float> ageTotal,
 			Optional<Float> yearsToBreastHeight

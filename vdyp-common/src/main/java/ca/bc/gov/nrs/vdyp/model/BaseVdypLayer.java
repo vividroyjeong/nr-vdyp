@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdypSite> {
+public abstract class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdypSite> {
 
 	private final String polygonIdentifier;
 	private final LayerType layerType;
