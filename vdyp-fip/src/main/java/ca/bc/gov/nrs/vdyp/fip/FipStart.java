@@ -3076,7 +3076,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 	// EMP086
 	private float meanVolumeSmall(VdypSpecies spec, float quadMeanDiameterSpecSmall, float loreyHeightSpecSmall) {
-		Coefficients coe = getCoeForSpec(spec, ControlKey.SMALL_COMP_WS_VOLUME);
+		Coefficients coe = getCoeForSpecies(spec, ControlKey.SMALL_COMP_WS_VOLUME);
 
 		// EQN 1 in IPSJF119.doc
 
@@ -3093,7 +3093,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 	// EMP085
 	private float smallComponentLoreyHeight(VdypSpecies spec, float quadMeanDiameterSpecSmall) {
-		Coefficients coe = getCoeForSpec(spec, ControlKey.SMALL_COMP_HL);
+		Coefficients coe = getCoeForSpecies(spec, ControlKey.SMALL_COMP_HL);
 
 		// EQN 1 in IPSJF119.doc
 
@@ -3108,7 +3108,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 	// EMP082
 	private float smallComponentQuadMeanDiameter(VdypSpecies spec) {
-		Coefficients coe = getCoeForSpec(spec, ControlKey.SMALL_COMP_DQ);
+		Coefficients coe = getCoeForSpecies(spec, ControlKey.SMALL_COMP_DQ);
 
 		// EQN 5 in IPSJF118.doc
 
@@ -3123,7 +3123,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 	// EMP081
 	private float conditionalExpectedBaseArea(VdypSpecies spec, float baseAreaSpec, Region region) {
-		Coefficients coe = getCoeForSpec(spec, ControlKey.SMALL_COMP_BA);
+		Coefficients coe = getCoeForSpecies(spec, ControlKey.SMALL_COMP_BA);
 
 		// EQN 3 in IPSJF118.doc
 
@@ -3150,7 +3150,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 	// EMP080
 	private float smallComponentProbability(VdypLayer layer, VdypSpecies spec, Region region) {
-		Coefficients coe = getCoeForSpec(spec, ControlKey.SMALL_COMP_PROBABILITY);
+		Coefficients coe = getCoeForSpecies(spec, ControlKey.SMALL_COMP_PROBABILITY);
 
 		// EQN 1 in IPSJF118.doc
 

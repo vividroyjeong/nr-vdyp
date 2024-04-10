@@ -144,9 +144,9 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		closeVriWriter();
 	}
 
-	protected Coefficients getCoeForSpec(VdypSpecies spec, ControlKey controlKey) {
+	protected Coefficients getCoeForSpecies(VdypSpecies species, ControlKey controlKey) {
 		var coeMap = Utils.<Map<String, Coefficients>>expectParsedControl(controlMap, controlKey, java.util.Map.class);
-		return coeMap.get(spec.getGenus());
+		return coeMap.get(species.getGenus());
 	}
 
 	protected static <E extends Throwable> void throwIfPresent(Optional<E> opt) throws E {
