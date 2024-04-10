@@ -254,7 +254,7 @@ public class Utils {
 	}
 
 	public static <T> Optional<T> getIfPresent(List<T> list, int index) {
-		if (list.size() >= index)
+		if (list.size() > index)
 			return Optional.of(list.get(index));
 		return Optional.empty();
 	}
