@@ -531,7 +531,8 @@ class VriSiteParserTest {
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat", TestUtils.makeInputStream(
+				"test.dat",
+				TestUtils.makeInputStream(
 						"082F074/0071         2001 P 1.7 -9.0 14.3        C CW 19.6            0.0 11",
 						"082F074/0071         2001 Z   0  0.0  0.0"
 				)

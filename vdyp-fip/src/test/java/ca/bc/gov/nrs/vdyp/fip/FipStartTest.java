@@ -2210,40 +2210,6 @@ class FipStartTest {
 	}
 
 	@Test
-	void testFindEquationGroupDefault() throws Exception {
-		var controlMap = FipTestUtils.loadControlMap();
-		try (VdypStartApplication<FipPolygon, FipLayer, FipSpecies, FipSite> app = new FipStart()) {
-			app.setControlMap(controlMap);
-
-			var becLookup = BecDefinitionParser.getBecs(controlMap);
-			var bec = becLookup.get("ESSF").get();
-
-			var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "F", valid());
-
-			var result = app.findBaseAreaGroup(spec1, bec, 3);
-
-			assertThat(result, is(55));
-		}
-	}
-
-	@Test
-	void testFindEquationGroupModified() throws Exception {
-		var controlMap = FipTestUtils.loadControlMap();
-		try (VdypStartApplication<FipPolygon, FipLayer, FipSpecies, FipSite> app = new FipStart()) {
-			app.setControlMap(controlMap);
-
-			var becLookup = BecDefinitionParser.getBecs(controlMap);
-			var bec = becLookup.get("PP").get();
-
-			var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "F", valid());
-
-			var result = app.findBaseAreaGroup(spec1, bec, 2);
-
-			assertThat(result, is(61)); // Modified from 57
-		}
-	}
-
-	@Test
 	void testEstimatePrimaryBaseArea() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {

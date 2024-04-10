@@ -424,19 +424,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		}
 	}
 
-	public int findBaseAreaGroup(BaseVdypSpecies fipSpecies, BecDefinition bec, int itg) {
-		var growthBec = bec.getGrowthBec();
-		final var defaultGroupsMap = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
-				controlMap, ControlKey.DEFAULT_EQ_NUM, MatrixMap2.class
-		);
-		final var modifierMap = Utils.<MatrixMap2<Integer, Integer, Optional<Integer>>>expectParsedControl(
-				controlMap, ControlKey.EQN_MODIFIERS, MatrixMap2.class
-		);
-		var defaultGroup = defaultGroupsMap.get(fipSpecies.getGenus(), growthBec.getAlias());
-		return modifierMap.getM(defaultGroup, itg).orElse(defaultGroup);
-	}
-
-	protected int findEmpiricalRelationshipParameterIndex(String specAlias, BecDefinition bec, int itg) {
+	public int findEmpiricalRelationshipParameterIndex(String specAlias, BecDefinition bec, int itg) {
 		var groupMap = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
 				controlMap, ControlKey.DEFAULT_EQ_NUM, ca.bc.gov.nrs.vdyp.model.MatrixMap2.class
 		);

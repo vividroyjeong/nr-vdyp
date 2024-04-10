@@ -777,15 +777,23 @@ class VdypStartApplicationTest {
 		BaseVdypLayer layer = mockControl.createMock(BaseVdypLayer.class);
 		EasyMock.expect(poly.getLayers()).andStubReturn(Collections.singletonMap(LayerType.PRIMARY, layer));
 		EasyMock.expect(poly.getPolygonIdentifier()).andStubReturn("TestPoly");
-	
+
 		try (VdypStartApplication app = getTestUnit(mockControl)) {
 			mockControl.replay();
 
 			var result = app.requireLayer(poly, LayerType.PRIMARY);
 			assertThat(result, is(layer));
-			var ex = assertThrows(StandProcessingException.class, ()->app.requireLayer(poly, LayerType.VETERAN));
-			assertThat(ex, hasProperty("message", is("Polygon TestPoly has no VETERAN layer, or that layer has non-positive height or crown closure.")));
-			
+			var ex = assertThrows(StandProcessingException.class, () -> app.requireLayer(poly, LayerType.VETERAN));
+			assertThat(
+					ex,
+					hasProperty(
+							"message",
+							is(
+									"Polygon TestPoly has no VETERAN layer, or that layer has non-positive height or crown closure."
+							)
+					)
+			);
+
 		}
 
 	}
