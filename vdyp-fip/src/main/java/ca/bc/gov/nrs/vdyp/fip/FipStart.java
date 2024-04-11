@@ -167,7 +167,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 		// if (MODE .eq. -1) go to 100
 
-		final var mode = polygon.getModeFip().orElse(PolygonMode.START);
+		final var mode = polygon.getMode().orElse(PolygonMode.START);
 
 		if (!ACCEPTABLE_MODES.contains(mode)) {
 			log.atInfo().setMessage("Skipping polygon with mode {}").addArgument(mode).log();
@@ -284,7 +284,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 					&& fipVetLayer.getCrownClosure() > 0f; // LAYERV
 
 			if (getId() == VdypApplicationIdentifier.FIP_START
-					&& fipPolygon.getModeFip().map(mode -> mode == PolygonMode.YOUNG).orElse(false)) {
+					&& fipPolygon.getMode().map(mode -> mode == PolygonMode.YOUNG).orElse(false)) {
 				return 100f;
 			}
 			if (getId() == VdypApplicationIdentifier.VRI_START) {
@@ -601,7 +601,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			// that must be more than 1
 			// Fill in target and trial values
 
-			eachButLast(result.getSpecies().values(), spec -> {
+			Utils.eachButLast(result.getSpecies().values(), spec -> {
 				goal.put(spec.getGenus(), spec.getPercentGenus());
 				xMap.put(spec.getGenus(), spec.getPercentGenus());
 			}, spec -> {
@@ -912,7 +912,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 		var polygonIdentifier = fipLayer.getPolygonIdentifier();
 
-		assert fipLayer.getLayer().equals(LayerType.VETERAN) : "Layer must be VETERAN";
+		assert fipLayer.getLayerType().equals(LayerType.VETERAN) : "Layer must be VETERAN";
 		assert fipPolygon.getPolygonIdentifier().equals(fipLayer.getPolygonIdentifier()) : String.format(
 				"Polygon polygonIdentifier '%s' doesn't match that of layer '%s'", fipPolygon.getPolygonIdentifier(),
 				fipLayer.getPolygonIdentifier()
@@ -2318,7 +2318,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		}
 
 		for (var spec : species) {
-			var layer = layers.get(spec.getLayer());
+			var layer = layers.get(spec.getLayerType());
 			// Validate that species belong to the correct polygon
 			if (!spec.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
 				throw validationError(
@@ -2384,16 +2384,16 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			var height = layer.getHeight().orElse(0f);
 
 			throwIfPresent(
-					heightMinimum(layer.getLayer()).filter(minimum -> height < minimum).map(
+					heightMinimum(layer.getLayerType()).filter(minimum -> height < minimum).map(
 							minimum -> validationError(
 									"Polygon %s has %s layer where height %.1f is less than minimum %.1f.",
-									polygon.getPolygonIdentifier(), layer.getLayer(), layer.getHeightSafe(), minimum
+									polygon.getPolygonIdentifier(), layer.getLayerType(), layer.getHeightSafe(), minimum
 							)
 					)
 			);
 		}
 
-		if (polygon.getModeFip().map(x -> x == PolygonMode.YOUNG).orElse(false)) {
+		if (polygon.getMode().map(x -> x == PolygonMode.YOUNG).orElse(false)) {
 			throw validationError(
 					"Polygon %s is using unsupported mode %s.", polygon.getPolygonIdentifier(), PolygonMode.YOUNG
 			);
@@ -2418,7 +2418,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			var percentTotal = getPercentTotal(layer);
 			// VDYP7 performs this step which should be negligible but might have a small
 			// impact due to the 0.01 percent variation and floating point errors.
-			if (layer.getLayer() == LayerType.PRIMARY) {
+			if (layer.getLayerType() == LayerType.PRIMARY) {
 				layer.getSpecies().values()
 						.forEach(species -> species.setFractionGenus(species.getPercentGenus() / percentTotal));
 			}
@@ -2784,7 +2784,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 	// EMP086
 	private float meanVolumeSmall(VdypSpecies spec, float quadMeanDiameterSpecSmall, float loreyHeightSpecSmall) {
-		Coefficients coe = getCoeForSpec(spec, ControlKey.SMALL_COMP_WS_VOLUME);
+		Coefficients coe = getCoeForSpecies(spec, ControlKey.SMALL_COMP_WS_VOLUME);
 
 		// EQN 1 in IPSJF119.doc
 
@@ -2801,7 +2801,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 	// EMP085
 	private float smallComponentLoreyHeight(VdypSpecies spec, float quadMeanDiameterSpecSmall) {
-		Coefficients coe = getCoeForSpec(spec, ControlKey.SMALL_COMP_HL);
+		Coefficients coe = getCoeForSpecies(spec, ControlKey.SMALL_COMP_HL);
 
 		// EQN 1 in IPSJF119.doc
 
@@ -2816,7 +2816,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 	// EMP082
 	private float smallComponentQuadMeanDiameter(VdypSpecies spec) {
-		Coefficients coe = getCoeForSpec(spec, ControlKey.SMALL_COMP_DQ);
+		Coefficients coe = getCoeForSpecies(spec, ControlKey.SMALL_COMP_DQ);
 
 		// EQN 5 in IPSJF118.doc
 
@@ -2831,7 +2831,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 	// EMP081
 	private float conditionalExpectedBaseArea(VdypSpecies spec, float baseAreaSpec, Region region) {
-		Coefficients coe = getCoeForSpec(spec, ControlKey.SMALL_COMP_BA);
+		Coefficients coe = getCoeForSpecies(spec, ControlKey.SMALL_COMP_BA);
 
 		// EQN 3 in IPSJF118.doc
 
@@ -2858,7 +2858,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 	// EMP080
 	private float smallComponentProbability(VdypLayer layer, VdypSpecies spec, Region region) {
-		Coefficients coe = getCoeForSpec(spec, ControlKey.SMALL_COMP_PROBABILITY);
+		Coefficients coe = getCoeForSpecies(spec, ControlKey.SMALL_COMP_PROBABILITY);
 
 		// EQN 1 in IPSJF118.doc
 

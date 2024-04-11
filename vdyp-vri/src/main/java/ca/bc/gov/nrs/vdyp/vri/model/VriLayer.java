@@ -100,7 +100,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 			builder.polygonIdentifier(polygon.getPolygonIdentifier());
 			config.accept(builder);
 		});
-		polygon.getLayers().put(layer.getLayer(), layer);
+		polygon.getLayers().put(layer.getLayerType(), layer);
 		return layer;
 	}
 
@@ -203,7 +203,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 			float multiplier = percentAvailable.orElse(100f) / 100f;
 			VriLayer result = new VriLayer(
 					polygonIdentifier.get(), //
-					layer.get(), //
+					layerType.get(), //
 					crownClosure.get(), //
 					baseArea.map(x -> x * multiplier), //
 					treesPerHectare.map(x -> x * multiplier), //
@@ -220,7 +220,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 		protected VriSpecies buildSpecies(Consumer<VriSpecies.Builder> config) {
 			return VriSpecies.build(builder -> {
 				builder.polygonIdentifier(polygonIdentifier.get());
-				builder.layerType(layer.get());
+				builder.layerType(layerType.get());
 				config.accept(builder);
 			});
 		}
@@ -229,10 +229,11 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 		protected VriSite buildSite(Consumer<VriSite.Builder> config) {
 			return VriSite.build(builder -> {
 				builder.polygonIdentifier(polygonIdentifier.get());
-				builder.layerType(layer.get());
+				builder.layerType(layerType.get());
 				config.accept(builder);
 			});
 		}
+
 	}
 
 }

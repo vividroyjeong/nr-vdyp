@@ -223,7 +223,7 @@ class VdypStartApplicationTest {
 
 		app.init(resolver, controlMap);
 
-		@SuppressWarnings("resource")
+		@SuppressWarnings("resource") // mock object can't leak anything
 		var ex = assertThrows(
 				ProcessingException.class, () -> app.getStreamingParser(ControlKey.FIP_INPUT_YIELD_LAYER)
 		);
@@ -253,7 +253,7 @@ class VdypStartApplicationTest {
 
 		app.init(resolver, controlMap);
 
-		@SuppressWarnings("resource")
+		@SuppressWarnings("resource") // mock object can't leak anything
 		var ex = assertThrows(
 				ProcessingException.class, () -> app.getStreamingParser(ControlKey.FIP_INPUT_YIELD_LAYER)
 		);

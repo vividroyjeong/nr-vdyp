@@ -21,6 +21,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.EnumSource.Mode;
 
+import ca.bc.gov.nrs.vdyp.application.ApplicationTestUtils;
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
@@ -73,7 +74,7 @@ class VriStartTest {
 	void testEstimateBaseAreaYield() throws StandProcessingException {
 		Map<String, Object> controlMap = VriTestUtils.loadControlMap();
 		VriStart app = new VriStart();
-		app.setControlMap(controlMap);
+		ApplicationTestUtils.setControlMap(app, controlMap);
 
 		var polygon = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("Test");
@@ -120,7 +121,7 @@ class VriStartTest {
 	void testEstimateBaseAreaYieldCoefficients() throws StandProcessingException {
 		Map<String, Object> controlMap = VriTestUtils.loadControlMap();
 		VriStart app = new VriStart();
-		app.setControlMap(controlMap);
+		ApplicationTestUtils.setControlMap(app, controlMap);
 
 		var polygon = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("Test");
@@ -498,7 +499,7 @@ class VriStartTest {
 			pb.polygonIdentifier("TestPoly");
 			pb.biogeoclimaticZone("IDF");
 			pb.yieldFactor(1.0f);
-			pb.modeFip(mode);
+			pb.mode(mode);
 		});
 
 		app.checkPolygon(poly);
@@ -528,7 +529,7 @@ class VriStartTest {
 			pb.polygonIdentifier("TestPoly");
 			pb.biogeoclimaticZone("IDF");
 			pb.yieldFactor(1.0f);
-			pb.modeFip(mode);
+			pb.mode(mode);
 		});
 
 		// expect no calls
@@ -588,7 +589,7 @@ class VriStartTest {
 			pb.polygonIdentifier("TestPoly");
 			pb.biogeoclimaticZone("IDF");
 			pb.yieldFactor(1.0f);
-			pb.modeFip(PolygonMode.START);
+			pb.mode(PolygonMode.START);
 		});
 
 		StreamingParser<VriPolygon> polyStream = easyMockInputStreamFactory(
@@ -644,7 +645,7 @@ class VriStartTest {
 			pb.polygonIdentifier("TestPoly");
 			pb.biogeoclimaticZone("IDF");
 			pb.yieldFactor(1.0f);
-			pb.modeFip(PolygonMode.DONT_PROCESS);
+			pb.mode(PolygonMode.DONT_PROCESS);
 		});
 
 		StreamingParser<VriPolygon> polyStream = easyMockInputStreamFactory(

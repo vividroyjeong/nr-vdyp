@@ -10,18 +10,18 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdypSite> {
+public abstract class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdypSite> {
 
 	private final String polygonIdentifier;
-	private final LayerType layer;
+	private final LayerType layerType;
 	private LinkedHashMap<String, S> species = new LinkedHashMap<>();
 	private LinkedHashMap<String, I> sites = new LinkedHashMap<>();
 	private Optional<Integer> inventoryTypeGroup = Optional.empty();
 
-	protected BaseVdypLayer(String polygonIdentifier, LayerType layer, Optional<Integer> inventoryTypeGroup) {
+	protected BaseVdypLayer(String polygonIdentifier, LayerType layerType, Optional<Integer> inventoryTypeGroup) {
 		super();
 		this.polygonIdentifier = polygonIdentifier;
-		this.layer = layer;
+		this.layerType = layerType;
 
 		this.inventoryTypeGroup = inventoryTypeGroup;
 	}
@@ -30,8 +30,8 @@ public class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdypSite> {
 		return polygonIdentifier;
 	}
 
-	public LayerType getLayer() {
-		return layer;
+	public LayerType getLayerType() {
+		return layerType;
 	}
 
 	public LinkedHashMap<String, S> getSpecies() {
@@ -73,7 +73,7 @@ public class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdypSite> {
 	public abstract static class Builder<T extends BaseVdypLayer<S, I>, S extends BaseVdypSpecies, I extends BaseVdypSite, SB extends BaseVdypSpecies.Builder<S>, IB extends BaseVdypSite.Builder<I>>
 			extends ModelClassBuilder<T> {
 		protected Optional<String> polygonIdentifier = Optional.empty();
-		protected Optional<LayerType> layer = Optional.empty();
+		protected Optional<LayerType> layerType = Optional.empty();
 
 		protected Optional<Integer> inventoryTypeGroup = Optional.empty();
 
@@ -88,12 +88,12 @@ public class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdypSite> {
 		}
 
 		public Builder<T, S, I, SB, IB> layerType(LayerType layer) {
-			this.layer = Optional.of(layer);
+			this.layerType = Optional.of(layer);
 			return this;
 		}
 
 		public Optional<LayerType> getLayerType() {
-			return layer;
+			return layerType;
 		}
 
 		public Builder<T, S, I, SB, IB> addSpecies(Consumer<SB> config) {
@@ -132,7 +132,7 @@ public class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdypSite> {
 
 		public Builder<T, S, I, SB, IB> copy(BaseVdypLayer<?, ?> toCopy) {
 			polygonIdentifier(toCopy.getPolygonIdentifier());
-			layerType(toCopy.getLayer());
+			layerType(toCopy.getLayerType());
 			inventoryTypeGroup(toCopy.getInventoryTypeGroup());
 			return this;
 		}
@@ -154,7 +154,7 @@ public class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdypSite> {
 		@Override
 		protected void check(Collection<String> errors) {
 			requirePresent(polygonIdentifier, "polygonIdentifier", errors);
-			requirePresent(layer, "layer", errors);
+			requirePresent(layerType, "layerType", errors);
 		}
 
 		protected abstract S buildSpecies(Consumer<SB> config);

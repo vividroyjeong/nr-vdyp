@@ -251,7 +251,7 @@ class VriSiteParserTest {
 		assertThat(
 				sites, containsInAnyOrder(
 						allOf(
-								hasProperty("layer", is(LayerType.PRIMARY)), //
+								hasProperty("layerType", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotal", present(closeTo(200.0f))), //
 								hasProperty("height", present(closeTo(28.0f))), //
 								hasProperty("siteIndex", present(closeTo(14.3f))), //
@@ -262,7 +262,7 @@ class VriSiteParserTest {
 								hasProperty("siteCurveNumber", present(is(11)))
 						),
 						allOf(
-								hasProperty("layer", is(LayerType.SECONDARY)), //
+								hasProperty("layerType", is(LayerType.SECONDARY)), //
 								hasProperty("ageTotal", present(closeTo(200.0f))), //
 								hasProperty("height", present(closeTo(32.0f))), //
 								hasProperty("siteIndex", present(closeTo(14.6f))), //
@@ -315,7 +315,7 @@ class VriSiteParserTest {
 		assertThat(
 				sites.iterator().next(), allOf(
 						hasProperty("polygonIdentifier", is("082F074/0072         2002")), //
-						hasProperty("layer", is(LayerType.PRIMARY)), //
+						hasProperty("layerType", is(LayerType.PRIMARY)), //
 						hasProperty("ageTotal", present(closeTo(200.0f))), //
 						hasProperty("height", present(closeTo(28.0f))), //
 						hasProperty("siteIndex", present(closeTo(14.3f))), //
@@ -333,7 +333,7 @@ class VriSiteParserTest {
 		assertThat(
 				sites.iterator().next(), allOf(
 						hasProperty("polygonIdentifier", is("082F074/0071         2001")), //
-						hasProperty("layer", is(LayerType.PRIMARY)), //
+						hasProperty("layerType", is(LayerType.PRIMARY)), //
 						hasProperty("ageTotal", present(closeTo(200.0f))), //
 						hasProperty("height", present(closeTo(32.0f))), //
 						hasProperty("siteIndex", present(closeTo(14.6f))), //

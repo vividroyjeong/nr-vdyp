@@ -133,7 +133,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		Map<LayerType, VriLayer.Builder> layersBuilders = layerStream.next();
 
 		for (var spec : species) {
-			var layerBuilder = layersBuilders.get(spec.getLayer());
+			var layerBuilder = layersBuilders.get(spec.getLayerType());
 			// Validate that species belong to the correct polygon
 			if (!spec.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
 				throw validationError(
@@ -143,7 +143,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			}
 			if (Objects.isNull(layerBuilder)) {
 				throw validationError(
-						"Species entry references layer %s of polygon %s but it is not present.", spec.getLayer(),
+						"Species entry references layer %s of polygon %s but it is not present.", spec.getLayerType(),
 						polygon.getPolygonIdentifier()
 				);
 			}
@@ -159,7 +159,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		}
 
 		for (var site : sites) {
-			var layerBuilder = layersBuilders.get(site.getLayer());
+			var layerBuilder = layersBuilders.get(site.getLayerType());
 			// Validate that species belong to the correct polygon
 			if (!site.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
 				throw validationError(
@@ -169,7 +169,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			}
 			if (Objects.isNull(layerBuilder)) {
 				throw validationError(
-						"Site entry references layer %s of polygon %s but it is not present.", site.getLayer(),
+						"Site entry references layer %s of polygon %s but it is not present.", site.getLayerType(),
 						polygon.getPolygonIdentifier()
 				);
 			}
@@ -233,7 +233,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					modifyVeteranLayerBuild(layersBuilders, builder);
 				}
 				return builder;
-			}).map(VriLayer.Builder::build).collect(Collectors.toUnmodifiableMap(VriLayer::getLayer, x -> x));
+			}).map(VriLayer.Builder::build).collect(Collectors.toUnmodifiableMap(VriLayer::getLayerType, x -> x));
 
 		} catch (NoSuchElementException ex) {
 			throw validationError("Layers file has fewer records than polygon file.", ex);
@@ -302,7 +302,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		// if (MODE .eq. -1) go to 100
 
-		final var mode = polygon.getModeFip().orElse(PolygonMode.START);
+		final var mode = polygon.getMode().orElse(PolygonMode.START);
 
 		if (mode == PolygonMode.DONT_PROCESS) {
 			log.atInfo().setMessage("Skipping polygon with mode {}").addArgument(mode).log();
@@ -359,14 +359,14 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	private void checkLayer(VriPolygon polygon, VriLayer layer) throws StandProcessingException {
 		if (layer.getSpecies().isEmpty())
 			return;
-		if (layer.getLayer() == LayerType.PRIMARY)
+		if (layer.getLayerType() == LayerType.PRIMARY)
 			this.getPercentTotal(layer); // Validate that percent total is close to 100%
 		Optional<VriSite> primarySite = layer.getPrimaryGenus().flatMap(id -> Utils.optSafe(layer.getSites().get(id)));
 		var ageTotal = primarySite.flatMap(VriSite::getAgeTotal);
 		var treesPerHectare = layer.getTreesPerHectare();
 		var height = primarySite.flatMap(VriSite::getHeight);
-		if (polygon.getModeFip().map(x -> x == PolygonMode.YOUNG).orElse(false)
-				&& layer.getLayer() == LayerType.PRIMARY) {
+		if (polygon.getMode().map(x -> x == PolygonMode.YOUNG).orElse(false)
+				&& layer.getLayerType() == LayerType.PRIMARY) {
 			if (ageTotal.map(x -> x <= 0f).orElse(true) || treesPerHectare.map(x -> x <= 0f).orElse(true)) {
 				throw validationError(
 						"Age Total and Trees Per Hectare must be positive for a PRIMARY layer in mode YOUNG"
@@ -404,7 +404,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		var percentForest = polygon.getPercentAvailable();
 
 		try {
-			PolygonMode mode = polygon.getModeFip().orElseGet(() -> {
+			PolygonMode mode = polygon.getMode().orElseGet(() -> {
 				try {
 					return findDefaultPolygonMode(
 							ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest,
@@ -415,7 +415,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					throw new RuntimeStandProcessingException(e);
 				}
 			});
-			polygon.setModeFip(Optional.of(mode));
+			polygon.setMode(Optional.of(mode));
 			Optional<Float> primaryBreastHeightAge = Utils.mapBoth(
 					primaryLayer.getPrimarySite().flatMap(VriSite::getAgeTotal),
 					primaryLayer.getPrimarySite().flatMap(VriSite::getYearsToBreastHeight), (at, ytbh) -> at - ytbh

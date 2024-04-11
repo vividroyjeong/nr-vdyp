@@ -141,7 +141,7 @@ class ParsersTogetherTest {
 		assertThat(
 				primaryResult, allOf(
 						hasProperty("polygonIdentifier", is(polygonId)), //
-						hasProperty("layer", is(LayerType.PRIMARY)), //
+						hasProperty("layerType", is(LayerType.PRIMARY)), //
 						hasProperty("crownClosure", is(95f)), //
 						hasProperty("utilization", is(7.5f)), // Raised to minimum
 						hasProperty("baseArea", present(is(20f))), //
@@ -209,7 +209,7 @@ class ParsersTogetherTest {
 		assertThat(
 				veteranResult, allOf(
 						hasProperty("polygonIdentifier", is(polygonId)), //
-						hasProperty("layer", is(LayerType.VETERAN)), //
+						hasProperty("layerType", is(LayerType.VETERAN)), //
 						hasProperty("crownClosure", is(95f)), //
 						hasProperty("utilization", is(7.5f)), // Raised to minimum
 						hasProperty("baseArea", present(is(20f))), //
@@ -288,7 +288,7 @@ class ParsersTogetherTest {
 		assertThat(
 				primaryResult, allOf(
 						hasProperty("polygonIdentifier", is(polygonId)), //
-						hasProperty("layer", is(LayerType.PRIMARY)), //
+						hasProperty("layerType", is(LayerType.PRIMARY)), //
 						hasProperty("crownClosure", is(95f)), //
 						hasProperty("utilization", is(9f)), hasProperty(
 								"baseArea", //
@@ -301,7 +301,7 @@ class ParsersTogetherTest {
 		assertThat(
 				veteranResult, allOf(
 						hasProperty("polygonIdentifier", is(polygonId)), //
-						hasProperty("layer", is(LayerType.VETERAN)), //
+						hasProperty("layerType", is(LayerType.VETERAN)), //
 						hasProperty("crownClosure", is(80f)), //
 						hasProperty("utilization", is(8f)), //
 						hasProperty("baseArea", present(is(30f))), // Don't Apply Layer Percent Available
@@ -365,7 +365,7 @@ class ParsersTogetherTest {
 		assertThat(
 				primaryResult, allOf(
 						hasProperty("polygonIdentifier", is(polygonId)), //
-						hasProperty("layer", is(LayerType.PRIMARY)), //
+						hasProperty("layerType", is(LayerType.PRIMARY)), //
 						hasProperty("crownClosure", is(95f)), //
 						hasProperty("utilization", is(7.5f)), // Raised to minimum
 						hasProperty("baseArea", present(is(20f))), //
@@ -621,7 +621,7 @@ class ParsersTogetherTest {
 		assertThat(
 				veteranResult, allOf(
 						hasProperty("polygonIdentifier", is(polygonId)), //
-						hasProperty("layer", is(LayerType.VETERAN)), //
+						hasProperty("layerType", is(LayerType.VETERAN)), //
 						hasProperty("crownClosure", is(88f)), //
 						hasProperty("utilization", is(8f)), //
 						hasProperty("baseArea", present(closeTo(expectedBaseArea))),

@@ -48,7 +48,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	public static final int CONFIG_LOAD_ERROR = 1;
 	public static final int PROCESSING_ERROR = 2;
 
-	protected static final Map<String, Integer> ITG_PURE = Utils.constMap(map -> {
+	static final Map<String, Integer> ITG_PURE = Utils.constMap(map -> {
 		map.put("AC", 36);
 		map.put("AT", 42);
 		map.put("B", 18);
@@ -67,7 +67,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		map.put("Y", 9);
 	});
 
-	public static final Set<String> HARDWOODS = Set.of("AC", "AT", "D", "E", "MB");
+	static final Set<String> HARDWOODS = Set.of("AC", "AT", "D", "E", "MB");
 
 	protected static void doMain(VdypStartApplication<?, ?, ?, ?> app, final String... args) {
 		var resolver = new FileSystemFileResolver();
@@ -84,22 +84,6 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		} catch (Exception ex) {
 			log.error("Error during processing", ex);
 			System.exit(PROCESSING_ERROR);
-		}
-	}
-
-	/**
-	 * Iterates over all but the last entry, passing them to the first consumer then passes the last entry to the second
-	 * consumer
-	 */
-	protected static <T> void eachButLast(Collection<T> items, Consumer<T> body, Consumer<T> lastBody) {
-		var it = items.iterator();
-		while (it.hasNext()) {
-			var value = it.next();
-			if (it.hasNext()) {
-				body.accept(value);
-			} else {
-				lastBody.accept(value);
-			}
 		}
 	}
 
@@ -121,7 +105,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	}
 
 	/**
-	 * Initialize FipStart
+	 * Initialize application
 	 *
 	 * @param resolver
 	 * @param controlFilePath
@@ -154,7 +138,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	}
 
 	/**
-	 * Initialize FipStart
+	 * Initialize application
 	 *
 	 * @param controlMap
 	 * @throws IOException
@@ -175,7 +159,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		}
 	}
 
-	public void setControlMap(Map<String, Object> controlMap) {
+	void setControlMap(Map<String, Object> controlMap) {
 		this.controlMap = controlMap;
 	}
 
@@ -199,9 +183,9 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		closeVriWriter();
 	}
 
-	protected Coefficients getCoeForSpec(VdypSpecies spec, ControlKey controlKey) {
+	protected Coefficients getCoeForSpecies(VdypSpecies species, ControlKey controlKey) {
 		var coeMap = Utils.<Map<String, Coefficients>>expectParsedControl(controlMap, controlKey, java.util.Map.class);
-		return coeMap.get(spec.getGenus());
+		return coeMap.get(species.getGenus());
 	}
 
 	protected L requireLayer(P polygon, LayerType type) throws ProcessingException {

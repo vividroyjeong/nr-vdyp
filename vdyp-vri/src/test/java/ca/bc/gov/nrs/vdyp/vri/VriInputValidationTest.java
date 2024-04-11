@@ -361,7 +361,7 @@ class VriInputValidationTest {
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.modeFip(PolygonMode.YOUNG);
+			pBuilder.mode(PolygonMode.YOUNG);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
@@ -452,7 +452,7 @@ class VriInputValidationTest {
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.modeFip(PolygonMode.YOUNG);
+			pBuilder.mode(PolygonMode.YOUNG);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
@@ -544,7 +544,7 @@ class VriInputValidationTest {
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.modeFip(PolygonMode.YOUNG);
+			pBuilder.mode(PolygonMode.YOUNG);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
@@ -636,7 +636,7 @@ class VriInputValidationTest {
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.modeFip(PolygonMode.START);
+			pBuilder.mode(PolygonMode.START);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
@@ -728,7 +728,7 @@ class VriInputValidationTest {
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.modeFip(PolygonMode.START);
+			pBuilder.mode(PolygonMode.START);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
@@ -823,7 +823,7 @@ class VriInputValidationTest {
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.modeFip(mode);
+			pBuilder.mode(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
@@ -887,7 +887,7 @@ class VriInputValidationTest {
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.modeFip(mode);
+			pBuilder.mode(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
@@ -951,7 +951,7 @@ class VriInputValidationTest {
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.modeFip(mode);
+			pBuilder.mode(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
@@ -1016,7 +1016,7 @@ class VriInputValidationTest {
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.modeFip(mode);
+			pBuilder.mode(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
@@ -1081,7 +1081,7 @@ class VriInputValidationTest {
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.modeFip(mode);
+			pBuilder.mode(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
@@ -1149,7 +1149,7 @@ class VriInputValidationTest {
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.modeFip(mode);
+			pBuilder.mode(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
@@ -1224,7 +1224,7 @@ class VriInputValidationTest {
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.modeFip(mode);
+			pBuilder.mode(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
@@ -1290,7 +1290,7 @@ class VriInputValidationTest {
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.modeFip(mode);
+			pBuilder.mode(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
@@ -1359,7 +1359,7 @@ class VriInputValidationTest {
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.modeFip(mode);
+			pBuilder.mode(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
@@ -1425,7 +1425,7 @@ class VriInputValidationTest {
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.modeFip(mode);
+			pBuilder.mode(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(0.0f);
@@ -1491,7 +1491,7 @@ class VriInputValidationTest {
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.modeFip(mode);
+			pBuilder.mode(mode);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);

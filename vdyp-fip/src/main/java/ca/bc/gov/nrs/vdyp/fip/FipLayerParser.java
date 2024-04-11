@@ -170,7 +170,7 @@ public class FipLayerParser
 							// we've filtered out
 							// markers
 							.flatMap(Optional::stream) // Skip if empty (and unknown layer type)
-							.collect(Collectors.toMap(FipLayer::getLayer, x -> x));
+							.collect(Collectors.toMap(FipLayer::getLayerType, x -> x));
 				}
 
 			};

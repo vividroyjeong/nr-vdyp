@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.common;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -257,7 +258,7 @@ public class Utils {
 	}
 
 	public static <T> Optional<T> getIfPresent(List<T> list, int index) {
-		if (list.size() >= index)
+		if (list.size() > index)
 			return Optional.of(list.get(index));
 		return Optional.empty();
 	}
@@ -303,5 +304,21 @@ public class Utils {
 	 */
 	public static <T> String optPretty(Optional<T> value, Function<T, String> stringify) {
 		return (String) optNa(value.map(stringify));
+	}
+
+	/**
+	 * Iterates over all but the last entry, passing them to the first consumer then passes the last entry to the second
+	 * consumer
+	 */
+	public static <T> void eachButLast(Collection<T> items, Consumer<T> body, Consumer<T> lastBody) {
+		var it = items.iterator();
+		while (it.hasNext()) {
+			var value = it.next();
+			if (it.hasNext()) {
+				body.accept(value);
+			} else {
+				lastBody.accept(value);
+			}
+		}
 	}
 }

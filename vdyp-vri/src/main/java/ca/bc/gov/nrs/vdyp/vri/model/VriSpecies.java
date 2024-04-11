@@ -39,7 +39,7 @@ public class VriSpecies extends BaseVdypSpecies {
 		protected VriSpecies doBuild() {
 			return new VriSpecies(
 					this.polygonIdentifier.get(), //
-					this.layer.get(), //
+					this.layerType.get(), //
 					this.genus.get(), //
 					this.percentGenus.get()
 			);

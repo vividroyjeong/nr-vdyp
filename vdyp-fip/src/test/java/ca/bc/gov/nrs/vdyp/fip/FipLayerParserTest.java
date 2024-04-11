@@ -90,7 +90,7 @@ class FipLayerParserTest {
 				hasSpecificEntry(
 						LayerType.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")), //
-								hasProperty("layer", is(LayerType.PRIMARY)), //
+								hasProperty("layerType", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotalSafe", is(55f)), //
 								hasProperty("heightSafe", is(35.3f)), //
 								hasProperty("siteIndex", present(is(35.0f))), //
@@ -147,7 +147,7 @@ class FipLayerParserTest {
 				hasSpecificEntry(
 						LayerType.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
-								hasProperty("layer", is(LayerType.PRIMARY)), //
+								hasProperty("layerType", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotalSafe", is(85f)), //
 								hasProperty("heightSafe", is(42.3f)), //
 								hasProperty("siteIndex", present(is(31.9f))), //
@@ -166,7 +166,7 @@ class FipLayerParserTest {
 				hasSpecificEntry(
 						LayerType.VETERAN, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
-								hasProperty("layer", is(LayerType.VETERAN)), //
+								hasProperty("layerType", is(LayerType.VETERAN)), //
 								hasProperty("ageTotalSafe", is(195f)), //
 								hasProperty("heightSafe", is(45.2f)), //
 								hasProperty("siteIndex", present(is(22.3f))), //
@@ -222,7 +222,7 @@ class FipLayerParserTest {
 				hasSpecificEntry(
 						LayerType.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
-								hasProperty("layer", is(LayerType.PRIMARY)), //
+								hasProperty("layerType", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotalSafe", is(85f)), //
 								hasProperty("heightSafe", is(42.3f)), //
 								hasProperty("siteIndex", present(is(31.9f))), //
@@ -279,7 +279,7 @@ class FipLayerParserTest {
 				hasSpecificEntry(
 						LayerType.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
-								hasProperty("layer", is(LayerType.PRIMARY)), //
+								hasProperty("layerType", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotalSafe", is(85f)), //
 								hasProperty("heightSafe", is(42.3f)), //
 								hasProperty("siteIndex", present(is(31.9f))), //
