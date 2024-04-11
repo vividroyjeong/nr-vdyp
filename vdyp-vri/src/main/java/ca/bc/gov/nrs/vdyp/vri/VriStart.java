@@ -489,8 +489,25 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		// UPPERGEN Method 1
 		var upperBoundsMap = Utils
 				.<Map<Integer, Coefficients>>expectParsedControl(controlMap, ControlKey.BA_DQ_UPPER_BOUNDS, Map.class);
-		var upperBounds = Utils.<Coefficients>optSafe(upperBoundsMap.get(baseAreaGroup))
-				.orElseThrow(() -> new IllegalStateException("Could not find base area group " + baseAreaGroup));
+		float upperBoundBaseArea = Utils.<Coefficients>optSafe(upperBoundsMap.get(baseAreaGroup))
+				.orElseThrow(
+						() -> new IllegalStateException("Could not limits for find base area group " + baseAreaGroup)
+				).getCoe(1); // Entry 1 is base area
+
+		/*
+		 * The original Fortran had the following comment and a commented out modification to upperBoundsBaseArea
+		 * (BATOP98). I have included them here.
+		 */
+
+		/*
+		 * And one POSSIBLY one last vestage of grouping by ITG That limit applies to full occupancy and Empirical
+		 * occupancy. They were derived as the 98th percentile of Empirical stocking, though adjusted PSP's were
+		 * included. If the ouput of this routine is bumped up from empirical to full, MIGHT adjust this limit DOWN
+		 * here, so that at end, it is correct. Tentatively decide NOT to do this.
+		 */
+
+		// if (fullOccupancy)
+		// upperBoundsBaseArea *= EMPOC;
 
 		float ageToUse = breastHeightAge;
 
@@ -511,6 +528,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		} else {
 			bap = a00 * FloatMath.pow(dominantHeight - coe.getCoe(2), ap)
 					* FloatMath.exp(coe.getCoe(5) * dominantHeight + coe.getCoe(6) * baseAreaOverstory.orElse(0f));
+			bap = Math.min(bap, upperBoundBaseArea);
 		}
 
 		if (fullOccupancy)
