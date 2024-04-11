@@ -300,23 +300,12 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		log.atInfo().setMessage("Read polygon {}, preparing to process").addArgument(polygon.getPolygonIdentifier())
 				.log();
 
-		// if (MODE .eq. -1) go to 100
-
 		final var mode = polygon.getMode().orElse(PolygonMode.START);
 
 		if (mode == PolygonMode.DONT_PROCESS) {
 			log.atInfo().setMessage("Skipping polygon with mode {}").addArgument(mode).log();
 			return Optional.empty();
 		}
-
-		// IP_IN = IP_IN+1
-		// if (IP_IN .gt. MAXPOLY) go to 200
-
-		// IPASS = 1
-		// CALL FIP_CHK( IPASS, IER)
-		// if (ier .gt. 0) go to 1000
-		//
-		// if (IPASS .le. 0) GO TO 120
 
 		log.atInfo().setMessage("Checking validity of polygon {}:{}").addArgument(polygonsRead)
 				.addArgument(polygon.getPolygonIdentifier()).log();
