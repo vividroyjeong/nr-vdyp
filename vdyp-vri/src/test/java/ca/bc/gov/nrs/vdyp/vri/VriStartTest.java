@@ -686,4 +686,30 @@ class VriStartTest {
 		control.verify();
 	}
 
+	@Test
+	void testProcessYoung() throws Exception {
+		var control = EasyMock.createControl();
+
+		VriStart app = new VriStart();
+
+		MockFileResolver resolver = dummyInput();
+
+		var poly = VriPolygon.build(pb -> {
+			pb.polygonIdentifier("TestPoly");
+			pb.biogeoclimaticZone("IDF");
+			pb.yieldFactor(1.0f);
+			pb.mode(PolygonMode.YOUNG);
+		});
+
+		control.replay();
+
+		app.init(resolver, controlMap);
+
+		app.processYoung(poly);
+
+		app.close();
+
+		control.verify();
+	}
+
 }

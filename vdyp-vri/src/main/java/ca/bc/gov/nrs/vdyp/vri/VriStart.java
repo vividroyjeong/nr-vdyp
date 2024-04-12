@@ -44,6 +44,8 @@ import ca.bc.gov.nrs.vdyp.vri.model.VriSpecies;
 
 public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpecies, VriSite> implements Closeable {
 
+	private static final String SPECIAL_PROCESSING_LOG_TEMPLATE = "Doing special processing for mode {}";
+
 	static final Logger log = LoggerFactory.getLogger(VriStart.class);
 
 	static final float EMPOC = 0.85f;
@@ -93,14 +95,14 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					}
 
 					log.atInfo().setMessage("Read {} polygons and wrote {}").addArgument(polygonsRead)
-							.addArgument(polygonsWritten);
+							.addArgument(polygonsWritten).log();
 
 				} catch (StandProcessingException ex) {
 					// TODO include some sort of hook for different forms of user output
 					// TODO Implement single stand mode that propagates the exception
 
 					log.atWarn().setMessage("Polygon {} bypassed").addArgument(polygon.getPolygonIdentifier())
-							.setCause(ex);
+							.setCause(ex).log();
 				}
 
 			}
@@ -296,11 +298,10 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	static final EnumSet<PolygonMode> ACCEPTABLE_MODES = EnumSet.of(PolygonMode.START, PolygonMode.YOUNG);
 
 	Optional<VdypPolygon> processPolygon(int polygonsRead, VriPolygon polygon) throws ProcessingException {
-		VdypPolygon resultPoly;
 		log.atInfo().setMessage("Read polygon {}, preparing to process").addArgument(polygon.getPolygonIdentifier())
 				.log();
 
-		final var mode = polygon.getMode().orElse(PolygonMode.START);
+		var mode = polygon.getMode().orElse(PolygonMode.START);
 
 		if (mode == PolygonMode.DONT_PROCESS) {
 			log.atInfo().setMessage("Skipping polygon with mode {}").addArgument(mode).log();
@@ -309,10 +310,27 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		log.atInfo().setMessage("Checking validity of polygon {}:{}").addArgument(polygonsRead)
 				.addArgument(polygon.getPolygonIdentifier()).log();
-		checkPolygon(polygon);
-		
-		
-		
+
+		mode = checkPolygon(polygon);
+
+		switch (mode) {
+		case YOUNG:
+			log.atTrace().setMessage(SPECIAL_PROCESSING_LOG_TEMPLATE).addArgument(mode).log();
+			polygon = processYoung(polygon);
+			break;
+		case BATC:
+			log.atTrace().setMessage(SPECIAL_PROCESSING_LOG_TEMPLATE).addArgument(mode).log();
+			polygon = processBatc(polygon);
+			break;
+		case BATN:
+			log.atTrace().setMessage(SPECIAL_PROCESSING_LOG_TEMPLATE).addArgument(mode).log();
+			polygon = processBatn(polygon);
+			break;
+		default:
+			log.atTrace().setMessage("No special processing for mode {}").addArgument(mode).log();
+			break;
+		}
+
 		// TODO
 		return Optional.empty();
 
@@ -335,7 +353,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		PolygonMode mode = checkPolygonForMode(polygon, bec);
 
-
 		Map<String, Float> minMap = Utils.expectParsedControl(controlMap, ControlKey.MINIMA, Map.class);
 
 		float veteranMinHeight = minMap.get(VriControlParser.MINIMUM_VETERAN_HEIGHT);
@@ -345,7 +362,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			Optional<Float> veteranHeight = veteranLayer.getPrimarySite().flatMap(VriSite::getHeight);
 			validateMinimum("Veteran layer primary species height", veteranHeight, veteranMinHeight, true);
 		}
-		
+
 		return mode;
 	}
 
@@ -413,7 +430,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					primaryLayer.getPrimarySite().flatMap(VriSite::getAgeTotal),
 					primaryLayer.getPrimarySite().flatMap(VriSite::getYearsToBreastHeight), (at, ytbh) -> at - ytbh
 			);
-			log.atDebug().setMessage("Polygon mode {} checks").addArgument(mode);
+			log.atDebug().setMessage("Polygon mode {} checks").addArgument(mode).log();
 			switch (mode) {
 
 			case START:
@@ -630,5 +647,19 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		return VriSpecies.build(builder -> {
 			builder.copy(toCopy);
 		});
+	}
+
+	VriPolygon processYoung(VriPolygon poly) throws StandProcessingException {
+		return poly;
+	}
+
+	VriPolygon processBatc(VriPolygon poly) throws StandProcessingException {
+		// TODO
+		return poly;
+	}
+
+	VriPolygon processBatn(VriPolygon poly) throws StandProcessingException {
+		// TODO
+		return poly;
 	}
 }
