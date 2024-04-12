@@ -156,7 +156,8 @@ class VriInputValidationTest {
 			});
 		});
 
-		app.checkPolygon(poly);
+		PolygonMode result = assertDoesNotThrow(() -> app.checkPolygon(poly));
+		assertThat(result, is(PolygonMode.START));
 
 		app.close();
 	}
@@ -611,7 +612,8 @@ class VriInputValidationTest {
 			});
 		});
 
-		assertDoesNotThrow(() -> app.checkPolygon(poly));
+		PolygonMode result = assertDoesNotThrow(() -> app.checkPolygon(poly));
+		assertThat(result, is(PolygonMode.YOUNG));
 
 		app.close();
 	}
@@ -703,7 +705,8 @@ class VriInputValidationTest {
 			});
 		});
 
-		assertDoesNotThrow(() -> app.checkPolygon(poly));
+		PolygonMode result = assertDoesNotThrow(() -> app.checkPolygon(poly));
+		assertThat(result, is(PolygonMode.START));
 
 		app.close();
 	}
@@ -853,7 +856,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -917,7 +921,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -982,7 +987,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -1047,7 +1053,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -1115,7 +1122,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -1181,7 +1189,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -1256,7 +1265,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -1322,7 +1332,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -1391,7 +1402,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -1457,7 +1469,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -1523,7 +1536,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 

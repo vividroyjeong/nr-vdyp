@@ -310,14 +310,16 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		log.atInfo().setMessage("Checking validity of polygon {}:{}").addArgument(polygonsRead)
 				.addArgument(polygon.getPolygonIdentifier()).log();
 		checkPolygon(polygon);
-
+		
+		
+		
 		// TODO
 		return Optional.empty();
 
 	}
 
 	// VRI_CHK
-	void checkPolygon(VriPolygon polygon) throws ProcessingException {
+	PolygonMode checkPolygon(VriPolygon polygon) throws ProcessingException {
 
 		BecDefinition bec = Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap);
 
@@ -331,18 +333,20 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			checkLayer(polygon, layer);
 		}
 
-		checkPolygonForMode(polygon, bec);
+		PolygonMode mode = checkPolygonForMode(polygon, bec);
 
-		VriLayer veteranLayer = polygon.getLayers().get(LayerType.VETERAN);
 
 		Map<String, Float> minMap = Utils.expectParsedControl(controlMap, ControlKey.MINIMA, Map.class);
 
 		float veteranMinHeight = minMap.get(VriControlParser.MINIMUM_VETERAN_HEIGHT);
 
+		VriLayer veteranLayer = polygon.getLayers().get(LayerType.VETERAN);
 		if (veteranLayer != null) {
 			Optional<Float> veteranHeight = veteranLayer.getPrimarySite().flatMap(VriSite::getHeight);
 			validateMinimum("Veteran layer primary species height", veteranHeight, veteranMinHeight, true);
 		}
+		
+		return mode;
 	}
 
 	private void checkLayer(VriPolygon polygon, VriLayer layer) throws StandProcessingException {
@@ -379,7 +383,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	static final String TREES_PER_HECTARE_PROPERTY_NAME = "Trees per hectare";
 	static final String CROWN_CLOSURE_PROPERTY_NAME = "Crown closure";
 
-	protected void checkPolygonForMode(VriPolygon polygon, BecDefinition bec) throws StandProcessingException {
+	protected PolygonMode checkPolygonForMode(VriPolygon polygon, BecDefinition bec) throws StandProcessingException {
 		VriLayer primaryLayer = polygon.getLayers().get(LayerType.PRIMARY);
 		Optional<VriSite> primarySite = primaryLayer.getPrimaryGenus()
 				.flatMap(id -> Utils.optSafe(primaryLayer.getSites().get(id)));
@@ -447,6 +451,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				// Do Nothing
 				break;
 			}
+			return mode;
 		} catch (RuntimeStandProcessingException e) {
 			throw e.getCause();
 		}

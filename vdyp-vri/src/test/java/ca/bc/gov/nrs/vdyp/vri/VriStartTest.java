@@ -502,8 +502,7 @@ class VriStartTest {
 			pb.mode(mode);
 		});
 
-		app.checkPolygon(poly);
-		EasyMock.expectLastCall().once();
+		EasyMock.expect(app.checkPolygon(poly)).andReturn(mode).once();
 
 		control.replay();
 
