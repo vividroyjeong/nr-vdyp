@@ -10,8 +10,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon.Builder;
-
 public abstract class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdypSite> {
 
 	private final PolygonIdentifier polygonIdentifier;

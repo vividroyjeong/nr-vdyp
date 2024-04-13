@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import ca.bc.gov.nrs.vdyp.common.Computed;
-import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon.Builder;
 
 public abstract class BaseVdypSpecies {
 	private final PolygonIdentifier polygonIdentifier; // FIP_P/POLYDESC

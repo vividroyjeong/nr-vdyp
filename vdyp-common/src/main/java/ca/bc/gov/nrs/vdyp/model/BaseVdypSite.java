@@ -3,8 +3,6 @@ package ca.bc.gov.nrs.vdyp.model;
 import java.util.Collection;
 import java.util.Optional;
 
-import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon.Builder;
-
 public abstract class BaseVdypSite {
 
 	private final PolygonIdentifier polygonIdentifier;
