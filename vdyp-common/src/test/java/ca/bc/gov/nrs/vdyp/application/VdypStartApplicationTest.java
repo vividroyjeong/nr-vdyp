@@ -40,6 +40,7 @@ import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
@@ -776,7 +777,7 @@ class VdypStartApplicationTest {
 		BaseVdypPolygon poly = mockControl.createMock(BaseVdypPolygon.class);
 		BaseVdypLayer layer = mockControl.createMock(BaseVdypLayer.class);
 		EasyMock.expect(poly.getLayers()).andStubReturn(Collections.singletonMap(LayerType.PRIMARY, layer));
-		EasyMock.expect(poly.getPolygonIdentifier()).andStubReturn("TestPoly");
+		EasyMock.expect(poly.getPolygonIdentifier()).andStubReturn(new PolygonIdentifier("TestPoly", 2024));
 
 		try (VdypStartApplication app = getTestUnit(mockControl)) {
 			mockControl.replay();
@@ -789,7 +790,7 @@ class VdypStartApplicationTest {
 					hasProperty(
 							"message",
 							is(
-									"Polygon TestPoly has no VETERAN layer, or that layer has non-positive height or crown closure."
+									"Polygon \"TestPoly             2024\" has no VETERAN layer, or that layer has non-positive height or crown closure."
 							)
 					)
 			);

@@ -67,20 +67,20 @@ class PolygonIdentifierTest {
 	)
 	void testIdWrongLength(String id) {
 		var ex = assertThrows(IllegalArgumentException.class, () -> PolygonIdentifier.split(id));
-		assertThat(ex, hasProperty("message", is("Polygon identifier \""+id+"\" must be exactly 25 characters.")));
+		assertThat(ex, hasProperty("message", is("Polygon identifier \"" + id + "\" must be exactly 25 characters.")));
 	}
 
 	@ParameterizedTest
 	@ValueSource(strings = { "TestPolygonxxxxxxxxxxx" })
 	void testBaseWrongLength(String base) {
 		var ex = assertThrows(IllegalArgumentException.class, () -> new PolygonIdentifier(base, 2024));
-		assertThat(ex, hasProperty("message", is("Polygon identifier base \""+base+"\" is too long.")));
+		assertThat(ex, hasProperty("message", is("Polygon identifier base \"" + base + "\" is too long.")));
 	}
-	
+
 	@ParameterizedTest
 	@ValueSource(ints = { 0, -1, -2024 })
 	void testBaseWrongYear(int year) {
 		var ex = assertThrows(IllegalArgumentException.class, () -> new PolygonIdentifier("TestPolygon", year));
-		assertThat(ex, hasProperty("message", is("Polygon identifier year "+year+" must be positive.")));
+		assertThat(ex, hasProperty("message", is("Polygon identifier year " + year + " must be positive.")));
 	}
 }

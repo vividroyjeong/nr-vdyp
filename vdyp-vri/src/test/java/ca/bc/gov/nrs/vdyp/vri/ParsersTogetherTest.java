@@ -39,6 +39,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.MockStreamingParser;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
@@ -91,7 +92,7 @@ class ParsersTogetherTest {
 	void testPrimaryOnly() throws IOException, StandProcessingException, ResourceParseException {
 		var app = new VriStart();
 
-		final var polygonId = "Test";
+		final var polygonId = new PolygonIdentifier("Test", 2024);
 		final var layerType = LayerType.PRIMARY;
 
 		mockControl.replay();
@@ -120,13 +121,13 @@ class ParsersTogetherTest {
 		layerStream.addValue(Collections.singletonMap(layerType, layerBuilder));
 
 		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
-			specBuilder.polygonIdentifier("Test");
+			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
 			specBuilder.genus("B");
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
-			siteBuilder.polygonIdentifier("Test");
+			siteBuilder.polygonIdentifier(polygonId);
 			siteBuilder.layerType(layerType);
 			siteBuilder.siteGenus("B");
 			siteBuilder.siteSpecies("B");
@@ -160,7 +161,7 @@ class ParsersTogetherTest {
 	void testVeteranOnly() throws IOException, StandProcessingException, ResourceParseException {
 		var app = new VriStart();
 
-		final var polygonId = "Test";
+		final var polygonId = new PolygonIdentifier("Test", 2024);
 		final var layerType = LayerType.VETERAN;
 
 		mockControl.replay();
@@ -189,13 +190,13 @@ class ParsersTogetherTest {
 		layerStream.addValue(Collections.singletonMap(layerType, layerBuilder));
 
 		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
-			specBuilder.polygonIdentifier("Test");
+			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
 			specBuilder.genus("B");
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
-			siteBuilder.polygonIdentifier("Test");
+			siteBuilder.polygonIdentifier(polygonId);
 			siteBuilder.layerType(layerType);
 			siteBuilder.siteGenus("B");
 			siteBuilder.siteSpecies("B");
@@ -229,7 +230,7 @@ class ParsersTogetherTest {
 			throws IOException, StandProcessingException, ResourceParseException {
 		var app = new VriStart();
 
-		final var polygonId = "Test";
+		final var polygonId = new PolygonIdentifier("Test", 2024);
 		final var layerType = LayerType.VETERAN;
 
 		mockControl.replay();
@@ -268,13 +269,13 @@ class ParsersTogetherTest {
 		}));
 
 		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
-			specBuilder.polygonIdentifier("Test");
+			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
 			specBuilder.genus("B");
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
-			siteBuilder.polygonIdentifier("Test");
+			siteBuilder.polygonIdentifier(polygonId);
 			siteBuilder.layerType(layerType);
 			siteBuilder.siteGenus("B");
 			siteBuilder.siteSpecies("B");
@@ -316,7 +317,7 @@ class ParsersTogetherTest {
 	void testPrimaryWithSmallComputedDiameter() throws IOException, StandProcessingException, ResourceParseException {
 		var app = new VriStart();
 
-		final var polygonId = "Test";
+		final var polygonId = new PolygonIdentifier("Test", 2024);
 		final var layerType = LayerType.PRIMARY;
 
 		mockControl.replay();
@@ -345,13 +346,13 @@ class ParsersTogetherTest {
 		layerStream.addValue(Collections.singletonMap(layerType, layerBuilder));
 
 		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
-			specBuilder.polygonIdentifier("Test");
+			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
 			specBuilder.genus("B");
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
-			siteBuilder.polygonIdentifier("Test");
+			siteBuilder.polygonIdentifier(polygonId);
 			siteBuilder.layerType(layerType);
 			siteBuilder.siteGenus("B");
 			siteBuilder.siteSpecies("B");
@@ -381,7 +382,7 @@ class ParsersTogetherTest {
 	void testFindsPrimaryGenusAndITG() throws IOException, StandProcessingException, ResourceParseException {
 		var app = new VriStart();
 
-		final var polygonId = "Test";
+		final var polygonId = new PolygonIdentifier("Test", 2024);
 		final var layerType = LayerType.PRIMARY;
 
 		mockControl.replay();
@@ -421,23 +422,23 @@ class ParsersTogetherTest {
 		}));
 
 		speciesStream.addValue(List.of(VriSpecies.build(specBuilder -> {
-			specBuilder.polygonIdentifier("Test");
+			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
 			specBuilder.genus("B");
 			specBuilder.percentGenus(80f);
 		}), VriSpecies.build(specBuilder -> {
-			specBuilder.polygonIdentifier("Test");
+			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
 			specBuilder.genus("S");
 			specBuilder.percentGenus(20f);
 		})));
 		siteStream.addValue(List.of(VriSite.build(siteBuilder -> {
-			siteBuilder.polygonIdentifier("Test");
+			siteBuilder.polygonIdentifier(polygonId);
 			siteBuilder.layerType(layerType);
 			siteBuilder.siteGenus("B");
 			siteBuilder.siteSpecies("B");
 		}), VriSite.build(siteBuilder -> {
-			siteBuilder.polygonIdentifier("Test");
+			siteBuilder.polygonIdentifier(polygonId);
 			siteBuilder.layerType(layerType);
 			siteBuilder.siteGenus("S");
 			siteBuilder.siteSpecies("S");
@@ -472,7 +473,7 @@ class ParsersTogetherTest {
 	void testFindsGRPBA1() throws IOException, StandProcessingException, ResourceParseException {
 		var app = new VriStart();
 
-		final var polygonId = "Test";
+		final var polygonId = new PolygonIdentifier("Test", 2024);
 		final var layerType = LayerType.PRIMARY;
 
 		mockControl.replay();
@@ -501,23 +502,23 @@ class ParsersTogetherTest {
 		layerStream.addValue(Collections.singletonMap(layerType, layerBuilder));
 
 		speciesStream.addValue(List.of(VriSpecies.build(specBuilder -> {
-			specBuilder.polygonIdentifier("Test");
+			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
 			specBuilder.genus("B");
 			specBuilder.percentGenus(80f);
 		}), VriSpecies.build(specBuilder -> {
-			specBuilder.polygonIdentifier("Test");
+			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
 			specBuilder.genus("S");
 			specBuilder.percentGenus(20f);
 		})));
 		siteStream.addValue(List.of(VriSite.build(siteBuilder -> {
-			siteBuilder.polygonIdentifier("Test");
+			siteBuilder.polygonIdentifier(polygonId);
 			siteBuilder.layerType(layerType);
 			siteBuilder.siteGenus("B");
 			siteBuilder.siteSpecies("B");
 		}), VriSite.build(siteBuilder -> {
-			siteBuilder.polygonIdentifier("Test");
+			siteBuilder.polygonIdentifier(polygonId);
 			siteBuilder.layerType(layerType);
 			siteBuilder.siteGenus("S");
 			siteBuilder.siteSpecies("S");
@@ -563,7 +564,7 @@ class ParsersTogetherTest {
 	) throws IOException, StandProcessingException, ResourceParseException {
 		var app = new VriStart();
 
-		final var polygonId = "Test";
+		final var polygonId = new PolygonIdentifier("Test", 2024);
 		final var layerType = LayerType.VETERAN;
 
 		mockControl.replay();
@@ -602,13 +603,13 @@ class ParsersTogetherTest {
 		}));
 
 		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
-			specBuilder.polygonIdentifier("Test");
+			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
 			specBuilder.genus("B");
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
-			siteBuilder.polygonIdentifier("Test");
+			siteBuilder.polygonIdentifier(polygonId);
 			siteBuilder.layerType(layerType);
 			siteBuilder.siteGenus("B");
 			siteBuilder.siteSpecies("B");
@@ -645,7 +646,7 @@ class ParsersTogetherTest {
 			throws IOException, StandProcessingException, ResourceParseException {
 		var app = new VriStart();
 
-		final var polygonId = "Test";
+		final var polygonId = new PolygonIdentifier("Test", 2024);
 		final var layerType = LayerType.VETERAN;
 
 		mockControl.replay();
@@ -684,13 +685,13 @@ class ParsersTogetherTest {
 		}));
 
 		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
-			specBuilder.polygonIdentifier("Test");
+			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
 			specBuilder.genus("B");
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
-			siteBuilder.polygonIdentifier("Test");
+			siteBuilder.polygonIdentifier(polygonId);
 			siteBuilder.layerType(layerType);
 			siteBuilder.siteGenus("B");
 			siteBuilder.siteSpecies("B");

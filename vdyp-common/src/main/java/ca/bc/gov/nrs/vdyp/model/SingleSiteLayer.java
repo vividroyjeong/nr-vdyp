@@ -7,7 +7,9 @@ import java.util.Optional;
 
 public class SingleSiteLayer<S extends BaseVdypSpecies, I extends BaseVdypSite> extends BaseVdypLayer<S, I> {
 
-	protected SingleSiteLayer(String polygonIdentifier, LayerType layer, Optional<Integer> inventoryTypeGroup) {
+	protected SingleSiteLayer(
+			PolygonIdentifier polygonIdentifier, LayerType layer, Optional<Integer> inventoryTypeGroup
+	) {
 		super(polygonIdentifier, layer, inventoryTypeGroup);
 	}
 

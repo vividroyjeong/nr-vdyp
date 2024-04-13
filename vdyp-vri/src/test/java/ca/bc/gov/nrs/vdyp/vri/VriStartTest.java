@@ -77,16 +77,16 @@ class VriStartTest {
 		ApplicationTestUtils.setControlMap(app, controlMap);
 
 		var polygon = VriPolygon.build(pBuilder -> {
-			pBuilder.polygonIdentifier("Test");
+			pBuilder.polygonIdentifier("Test", 2024);
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(66f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
-				((VriLayer.Builder) lBuilder).empiricalRelationshipParameterIndex(76);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(66f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
+				lBuilder.empiricalRelationshipParameterIndex(76);
 
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B"); // 3
@@ -124,16 +124,16 @@ class VriStartTest {
 		ApplicationTestUtils.setControlMap(app, controlMap);
 
 		var polygon = VriPolygon.build(pBuilder -> {
-			pBuilder.polygonIdentifier("Test");
+			pBuilder.polygonIdentifier("Test", 2024);
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(66f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
-				((VriLayer.Builder) lBuilder).empiricalRelationshipParameterIndex(76);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(66f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
+				lBuilder.empiricalRelationshipParameterIndex(76);
 
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B"); // 3
@@ -204,7 +204,7 @@ class VriStartTest {
 		Optional<Float> percentForest = Optional.of(90f);
 
 		Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.genus("B");
 			builder.percentGenus(100f);
@@ -257,7 +257,7 @@ class VriStartTest {
 		Optional<Float> percentForest = Optional.of(90f);
 
 		Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.genus("B");
 			builder.percentGenus(100f);
@@ -310,7 +310,7 @@ class VriStartTest {
 		Optional<Float> percentForest = Optional.of(90f);
 
 		Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.genus("B");
 			builder.percentGenus(100f);
@@ -363,7 +363,7 @@ class VriStartTest {
 		Optional<Float> percentForest = Optional.of(90f);
 
 		Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.genus("B");
 			builder.percentGenus(100f);
@@ -416,7 +416,7 @@ class VriStartTest {
 		Optional<Float> percentForest = Optional.of(95f); // Set this high
 
 		Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.genus("B");
 			builder.percentGenus(100f);
@@ -469,7 +469,7 @@ class VriStartTest {
 		Optional<Float> percentForest = Optional.of(85f);
 
 		Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.genus("B");
 			builder.percentGenus(100f);
@@ -496,7 +496,7 @@ class VriStartTest {
 		MockFileResolver resolver = dummyInput();
 
 		var poly = VriPolygon.build(pb -> {
-			pb.polygonIdentifier("TestPoly");
+			pb.polygonIdentifier("TestPoly", 2024);
 			pb.biogeoclimaticZone("IDF");
 			pb.yieldFactor(1.0f);
 			pb.mode(mode);
@@ -526,7 +526,7 @@ class VriStartTest {
 		MockFileResolver resolver = dummyInput();
 
 		var poly = VriPolygon.build(pb -> {
-			pb.polygonIdentifier("TestPoly");
+			pb.polygonIdentifier("TestPoly", 2024);
 			pb.biogeoclimaticZone("IDF");
 			pb.yieldFactor(1.0f);
 			pb.mode(mode);
@@ -586,7 +586,7 @@ class VriStartTest {
 		MockFileResolver resolver = dummyInput();
 
 		var poly = VriPolygon.build(pb -> {
-			pb.polygonIdentifier("TestPoly");
+			pb.polygonIdentifier("TestPoly", 2024);
 			pb.biogeoclimaticZone("IDF");
 			pb.yieldFactor(1.0f);
 			pb.mode(PolygonMode.START);
@@ -642,7 +642,7 @@ class VriStartTest {
 		MockFileResolver resolver = dummyInput();
 
 		var poly = VriPolygon.build(pb -> {
-			pb.polygonIdentifier("TestPoly");
+			pb.polygonIdentifier("TestPoly", 2024);
 			pb.biogeoclimaticZone("IDF");
 			pb.yieldFactor(1.0f);
 			pb.mode(PolygonMode.DONT_PROCESS);

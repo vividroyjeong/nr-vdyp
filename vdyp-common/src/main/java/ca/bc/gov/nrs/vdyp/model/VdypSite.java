@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 public class VdypSite extends BaseVdypSite {
 
 	public VdypSite(
-			String polygonIdentifier, LayerType layer, String siteGenus, Optional<Integer> siteCurveNumber,
+			PolygonIdentifier polygonIdentifier, LayerType layer, String siteGenus, Optional<Integer> siteCurveNumber,
 			Optional<Float> siteIndex, Optional<Float> height, Optional<Float> ageTotal,
 			Optional<Float> yearsToBreastHeight
 	) {

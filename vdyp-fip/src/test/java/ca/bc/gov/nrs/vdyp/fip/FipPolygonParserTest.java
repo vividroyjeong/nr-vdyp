@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.vdyp.fip;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.assertEmpty;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.assertNext;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -22,10 +23,10 @@ import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 
-public class FipPolygonParserTest {
+class FipPolygonParserTest {
 
 	@Test
-	public void testParseEmpty() throws Exception {
+	void testParseEmpty() throws Exception {
 
 		var parser = new FipPolygonParser();
 
@@ -51,7 +52,7 @@ public class FipPolygonParserTest {
 	}
 
 	@Test
-	public void testParsePolygon() throws Exception {
+	void testParsePolygon() throws Exception {
 
 		var parser = new FipPolygonParser();
 
@@ -61,7 +62,7 @@ public class FipPolygonParserTest {
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat", TestUtils.makeInputStream("Test Polygon              A CWH  90.0  2 BLAH  0.95")
+				"test.dat", TestUtils.makeInputStream("Test Polygon         1970 A CWH  90.0  2 BLAH  0.95")
 		);
 
 		parser.modify(controlMap, fileResolver);
@@ -77,7 +78,7 @@ public class FipPolygonParserTest {
 
 		var poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("Test Polygon")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("Test Polygon", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", present(is(90.0f))));
@@ -89,7 +90,7 @@ public class FipPolygonParserTest {
 	}
 
 	@Test
-	public void testParsePolygonWithBlanks() throws Exception {
+	void testParsePolygonWithBlanks() throws Exception {
 
 		var parser = new FipPolygonParser();
 
@@ -115,7 +116,7 @@ public class FipPolygonParserTest {
 
 		var poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01002 S000001 00     1970")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -127,7 +128,7 @@ public class FipPolygonParserTest {
 	}
 
 	@Test
-	public void testParseMultiple() throws Exception {
+	void testParseMultiple() throws Exception {
 
 		var parser = new FipPolygonParser();
 
@@ -165,7 +166,7 @@ public class FipPolygonParserTest {
 
 		var poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01002 S000001 00     1970")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -175,7 +176,7 @@ public class FipPolygonParserTest {
 
 		poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01002 S000002 00     1970")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000002 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -185,7 +186,7 @@ public class FipPolygonParserTest {
 
 		poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01002 S000003 00     1970")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000003 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -195,7 +196,7 @@ public class FipPolygonParserTest {
 
 		poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01002 S000004 00     1970")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000004 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -205,7 +206,7 @@ public class FipPolygonParserTest {
 
 		poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01003AS000001 00     1953")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01003AS000001 00", 1953)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("B")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -215,7 +216,7 @@ public class FipPolygonParserTest {
 
 		poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01003AS000003 00     1953")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01003AS000003 00", 1953)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("B")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -225,7 +226,7 @@ public class FipPolygonParserTest {
 
 		poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01004 S000002 00     1953")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01004 S000002 00", 1953)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("B")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -235,7 +236,7 @@ public class FipPolygonParserTest {
 
 		poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01004 S000036 00     1957")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01004 S000036 00", 1957)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("B")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -245,7 +246,7 @@ public class FipPolygonParserTest {
 
 		poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01004 S000037 00     1957")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01004 S000037 00", 1957)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("B")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -255,7 +256,7 @@ public class FipPolygonParserTest {
 
 		poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01004 S000038 00     1957")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01004 S000038 00", 1957)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("B")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -267,7 +268,7 @@ public class FipPolygonParserTest {
 	}
 
 	@Test
-	public void testParsePolygonZeroAsDefault() throws Exception {
+	void testParsePolygonZeroAsDefault() throws Exception {
 
 		var parser = new FipPolygonParser();
 
@@ -293,7 +294,7 @@ public class FipPolygonParserTest {
 
 		var poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01002 S000001 00     1970")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -305,7 +306,7 @@ public class FipPolygonParserTest {
 	}
 
 	@Test
-	public void testParsePolygonNegativeAsDefault() throws Exception {
+	void testParsePolygonNegativeAsDefault() throws Exception {
 
 		var parser = new FipPolygonParser();
 
@@ -331,7 +332,7 @@ public class FipPolygonParserTest {
 
 		var poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01002 S000001 00     1970")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));

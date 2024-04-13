@@ -32,7 +32,7 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 	private Optional<Integer> empericalRelationshipParameterIndex = Optional.empty(); // INXL1/GRPBA1
 
 	public VdypLayer(
-			String polygonIdentifier, LayerType layer, Optional<Integer> inventoryTypeGroup,
+			PolygonIdentifier polygonIdentifier, LayerType layer, Optional<Integer> inventoryTypeGroup,
 			Optional<Integer> empericalRelationshipParameterIndex
 	) {
 		super(polygonIdentifier, layer, inventoryTypeGroup);

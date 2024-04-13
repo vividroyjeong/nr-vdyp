@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.model;
 
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
@@ -11,12 +12,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
+
 class VdypSpeciesTest {
 
 	@Test
 	void build() throws Exception {
 		var result = VdypSpecies.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.genus("B");
 			builder.percentGenus(50f);
@@ -24,7 +27,7 @@ class VdypSpeciesTest {
 			builder.decayGroup(2);
 			builder.breakageGroup(3);
 		});
-		assertThat(result, hasProperty("polygonIdentifier", is("Test")));
+		assertThat(result, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
 		assertThat(result, hasProperty("layerType", is(LayerType.PRIMARY)));
 		assertThat(result, hasProperty("genus", is("B")));
 		assertThat(result, hasProperty("percentGenus", is(50f)));
@@ -55,7 +58,7 @@ class VdypSpeciesTest {
 	void buildForLayer() throws Exception {
 
 		var layer = VdypLayer.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 
 			builder.addSite(siteBuilder -> {
@@ -68,7 +71,7 @@ class VdypSpeciesTest {
 		});
 
 		var result = VdypSpecies.build(layer, builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.genus("B");
 			builder.percentGenus(50f);
 			builder.volumeGroup(1);
@@ -76,7 +79,7 @@ class VdypSpeciesTest {
 			builder.breakageGroup(3);
 		});
 
-		assertThat(result, hasProperty("polygonIdentifier", is("Test")));
+		assertThat(result, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
 		assertThat(result, hasProperty("layerType", is(LayerType.PRIMARY)));
 		assertThat(result, hasProperty("genus", is("B")));
 		assertThat(result, hasProperty("percentGenus", is(50f)));
@@ -91,7 +94,7 @@ class VdypSpeciesTest {
 	@Test
 	void buildAddSpeciesPercent() throws Exception {
 		var result = VdypSpecies.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.genus("B");
 			builder.percentGenus(50f);
