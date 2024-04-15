@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.vri;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.assertEmpty;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.assertNext;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.closeTo;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -314,7 +315,7 @@ class VriSiteParserTest {
 		assertThat(sites, iterableWithSize(1));
 		assertThat(
 				sites.iterator().next(), allOf(
-						hasProperty("polygonIdentifier", is("082F074/0072         2002")), //
+						hasProperty("polygonIdentifier", isPolyId("082F074/0072", 2002)), //
 						hasProperty("layerType", is(LayerType.PRIMARY)), //
 						hasProperty("ageTotal", present(closeTo(200.0f))), //
 						hasProperty("height", present(closeTo(28.0f))), //
@@ -332,7 +333,7 @@ class VriSiteParserTest {
 		assertThat(sites, iterableWithSize(1));
 		assertThat(
 				sites.iterator().next(), allOf(
-						hasProperty("polygonIdentifier", is("082F074/0071         2001")), //
+						hasProperty("polygonIdentifier", isPolyId("082F074/0071", 2001)), //
 						hasProperty("layerType", is(LayerType.PRIMARY)), //
 						hasProperty("ageTotal", present(closeTo(200.0f))), //
 						hasProperty("height", present(closeTo(32.0f))), //

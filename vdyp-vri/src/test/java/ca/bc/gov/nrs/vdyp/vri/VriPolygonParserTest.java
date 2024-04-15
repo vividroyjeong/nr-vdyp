@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.vdyp.vri;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.assertEmpty;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.assertNext;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -77,7 +78,7 @@ class VriPolygonParserTest {
 
 		var poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("082F074/0071         2001")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("082F074/0071", 2001)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("IDF")));
 		assertThat(poly, hasProperty("percentAvailable", present(is(90.0f))));
@@ -115,7 +116,7 @@ class VriPolygonParserTest {
 
 		var poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("082F074/0071         2001")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("082F074/0071", 2001)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("IDF")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -165,7 +166,7 @@ class VriPolygonParserTest {
 
 		var poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01002 S000001 00     1970")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -175,7 +176,7 @@ class VriPolygonParserTest {
 
 		poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01002 S000002 00     1970")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000002 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -185,7 +186,7 @@ class VriPolygonParserTest {
 
 		poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01002 S000003 00     1970")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000003 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -195,7 +196,7 @@ class VriPolygonParserTest {
 
 		poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01002 S000004 00     1970")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000004 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -205,7 +206,7 @@ class VriPolygonParserTest {
 
 		poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01003AS000001 00     1953")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01003AS000001 00", 1953)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -215,7 +216,7 @@ class VriPolygonParserTest {
 
 		poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01003AS000003 00     1953")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01003AS000003 00", 1953)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -225,7 +226,7 @@ class VriPolygonParserTest {
 
 		poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01004 S000002 00     1953")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01004 S000002 00", 1953)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -235,7 +236,7 @@ class VriPolygonParserTest {
 
 		poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01004 S000036 00     1957")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01004 S000036 00", 1957)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -245,7 +246,7 @@ class VriPolygonParserTest {
 
 		poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01004 S000037 00     1957")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01004 S000037 00", 1957)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -255,7 +256,7 @@ class VriPolygonParserTest {
 
 		poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01004 S000038 00     1957")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01004 S000038 00", 1957)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -293,7 +294,7 @@ class VriPolygonParserTest {
 
 		var poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01002 S000001 00     1970")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -331,7 +332,7 @@ class VriPolygonParserTest {
 
 		var poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("01002 S000001 00     1970")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
@@ -369,7 +370,7 @@ class VriPolygonParserTest {
 
 		var poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("082F074/0071         2001")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("082F074/0071", 2001)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("IDF")));
 		assertThat(poly, hasProperty("percentAvailable", present(is(85.0f))));
@@ -407,7 +408,7 @@ class VriPolygonParserTest {
 
 		var poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("polygonIdentifier", is("082F074/0071         2001")));
+		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("082F074/0071", 2001)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", is("IDF")));
 		assertThat(poly, hasProperty("percentAvailable", present(is(90.0f))));

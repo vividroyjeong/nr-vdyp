@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.fip;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.assertEmpty;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.assertNext;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.hasSpecificEntry;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -89,7 +90,7 @@ class FipLayerParserTest {
 				layers,
 				hasSpecificEntry(
 						LayerType.PRIMARY, allOf(
-								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")), //
+								hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)), //
 								hasProperty("layerType", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotalSafe", is(55f)), //
 								hasProperty("heightSafe", is(35.3f)), //
@@ -146,7 +147,7 @@ class FipLayerParserTest {
 				layers,
 				hasSpecificEntry(
 						LayerType.PRIMARY, allOf(
-								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
+								hasProperty("polygonIdentifier", isPolyId("01002 S000004 00", 1970)), //
 								hasProperty("layerType", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotalSafe", is(85f)), //
 								hasProperty("heightSafe", is(42.3f)), //
@@ -165,7 +166,7 @@ class FipLayerParserTest {
 				layers,
 				hasSpecificEntry(
 						LayerType.VETERAN, allOf(
-								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
+								hasProperty("polygonIdentifier", isPolyId("01002 S000004 00", 1970)), //
 								hasProperty("layerType", is(LayerType.VETERAN)), //
 								hasProperty("ageTotalSafe", is(195f)), //
 								hasProperty("heightSafe", is(45.2f)), //
@@ -221,7 +222,7 @@ class FipLayerParserTest {
 				layers,
 				hasSpecificEntry(
 						LayerType.PRIMARY, allOf(
-								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
+								hasProperty("polygonIdentifier", isPolyId("01002 S000004 00", 1970)), //
 								hasProperty("layerType", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotalSafe", is(85f)), //
 								hasProperty("heightSafe", is(42.3f)), //
@@ -278,7 +279,7 @@ class FipLayerParserTest {
 				layers,
 				hasSpecificEntry(
 						LayerType.PRIMARY, allOf(
-								hasProperty("polygonIdentifier", is("01002 S000004 00     1970")), //
+								hasProperty("polygonIdentifier", isPolyId("01002 S000004 00", 1970)), //
 								hasProperty("layerType", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotalSafe", is(85f)), //
 								hasProperty("heightSafe", is(42.3f)), //

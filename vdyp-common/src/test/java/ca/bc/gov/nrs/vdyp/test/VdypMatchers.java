@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.describedAs;
 import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 import static org.hamcrest.Matchers.notNullValue;
@@ -39,6 +40,7 @@ import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.ModelClassBuilder;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 
 /**
  * Custom Hamcrest Matchers
@@ -574,5 +576,9 @@ public class VdypMatchers {
 			}
 
 		};
+	}
+
+	public static Matcher<PolygonIdentifier> isPolyId(String base, int year) {
+		return allOf(instanceOf(PolygonIdentifier.class), hasProperty("base", is(base)), hasProperty("year", is(year)));
 	}
 }

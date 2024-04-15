@@ -117,7 +117,7 @@ class RootFinderTest {
 	VdypLayer mockLayer1(Map<String, Object> control) {
 
 		final var layer = VdypLayer.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 
 			builder.addSite(siteBuilder -> {

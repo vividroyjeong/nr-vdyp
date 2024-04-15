@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.fip;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.assertEmpty;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.assertNext;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.hasSpecificEntry;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.allOf;
@@ -24,10 +25,10 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
-public class FipSpeciesParserTest {
+class FipSpeciesParserTest {
 
 	@Test
-	public void testParseEmpty() throws Exception {
+	void testParseEmpty() throws Exception {
 
 		var parser = new FipSpeciesParser();
 
@@ -53,7 +54,7 @@ public class FipSpeciesParserTest {
 	}
 
 	@Test
-	public void testParseOneGenus() throws Exception {
+	void testParseOneGenus() throws Exception {
 
 		var parser = new FipSpeciesParser();
 
@@ -87,7 +88,7 @@ public class FipSpeciesParserTest {
 				genera,
 				containsInAnyOrder(
 						allOf(
-								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
+								hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)),
 								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
@@ -99,7 +100,7 @@ public class FipSpeciesParserTest {
 	}
 
 	@Test
-	public void testParseTwoGenera() throws Exception {
+	void testParseTwoGenera() throws Exception {
 
 		var parser = new FipSpeciesParser();
 
@@ -134,13 +135,13 @@ public class FipSpeciesParserTest {
 				genera,
 				containsInAnyOrder(
 						allOf(
-								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
+								hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)),
 								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(75.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
 						),
 						allOf(
-								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
+								hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)),
 								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("C")),
 								hasProperty("percentGenus", is(25.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("C", is(100.0f))))
@@ -153,7 +154,7 @@ public class FipSpeciesParserTest {
 	}
 
 	@Test
-	public void testParseTwoLayers() throws Exception {
+	void testParseTwoLayers() throws Exception {
 
 		var parser = new FipSpeciesParser();
 
@@ -188,13 +189,13 @@ public class FipSpeciesParserTest {
 				genera,
 				containsInAnyOrder(
 						allOf(
-								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
+								hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)),
 								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
 						),
 						allOf(
-								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
+								hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)),
 								hasProperty("layerType", is(LayerType.VETERAN)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
@@ -206,7 +207,7 @@ public class FipSpeciesParserTest {
 	}
 
 	@Test
-	public void testParseTwoPolygons() throws Exception {
+	void testParseTwoPolygons() throws Exception {
 
 		var parser = new FipSpeciesParser();
 
@@ -242,7 +243,7 @@ public class FipSpeciesParserTest {
 				genera,
 				containsInAnyOrder(
 						allOf(
-								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
+								hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)),
 								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
@@ -256,7 +257,7 @@ public class FipSpeciesParserTest {
 				genera,
 				containsInAnyOrder(
 						allOf(
-								hasProperty("polygonIdentifier", is("01002 S000002 00     1970")),
+								hasProperty("polygonIdentifier", isPolyId("01002 S000002 00", 1970)),
 								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty("speciesPercent", allOf(aMapWithSize(1), hasSpecificEntry("B", is(100.0f))))
@@ -268,7 +269,7 @@ public class FipSpeciesParserTest {
 	}
 
 	@Test
-	public void testParseMutipleSpecies() throws Exception {
+	void testParseMutipleSpecies() throws Exception {
 
 		var parser = new FipSpeciesParser();
 
@@ -302,7 +303,7 @@ public class FipSpeciesParserTest {
 				genera,
 				containsInAnyOrder(
 						allOf(
-								hasProperty("polygonIdentifier", is("01002 S000001 00     1970")),
+								hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)),
 								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")),
 								hasProperty("percentGenus", is(100.0f)),
 								hasProperty(
