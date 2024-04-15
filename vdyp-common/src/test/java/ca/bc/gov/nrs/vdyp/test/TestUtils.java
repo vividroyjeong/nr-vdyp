@@ -367,4 +367,10 @@ public class TestUtils {
 			return parser.parse(is, TestUtils.fileResolver(klazz), new HashMap<>());
 		}
 	}
+
+	public static String polygonId(String name, int year) {
+		String result = String.format("%-21s%4d", name, year);
+		assert result.length() == 25;
+		return result;
+	}
 }

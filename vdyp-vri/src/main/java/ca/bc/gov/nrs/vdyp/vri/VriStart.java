@@ -650,6 +650,13 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	}
 
 	VriPolygon processYoung(VriPolygon poly) throws StandProcessingException {
+
+		int year = poly.getPolygonIdentifier().getYear();
+
+		if (year < 1900) {
+			throw new StandProcessingException("Year for YOUNG stand should be at least 1900 but was " + year);
+		}
+
 		return poly;
 	}
 

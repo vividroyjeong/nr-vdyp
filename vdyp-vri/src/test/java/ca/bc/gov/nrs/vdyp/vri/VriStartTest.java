@@ -3,7 +3,10 @@ package ca.bc.gov.nrs.vdyp.vri;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.closeTo;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,6 +39,7 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
+import ca.bc.gov.nrs.vdyp.test.TestUtils;
 import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
 import ca.bc.gov.nrs.vdyp.vri.model.VriPolygon;
@@ -686,7 +690,7 @@ class VriStartTest {
 	}
 
 	@Test
-	void testProcessYoung() throws Exception {
+	void testProcessYoungToOld() throws Exception {
 		var control = EasyMock.createControl();
 
 		VriStart app = new VriStart();
@@ -694,7 +698,7 @@ class VriStartTest {
 		MockFileResolver resolver = dummyInput();
 
 		var poly = VriPolygon.build(pb -> {
-			pb.polygonIdentifier("TestPoly");
+			pb.polygonIdentifier(TestUtils.polygonId("TestPolygon", 1899));
 			pb.biogeoclimaticZone("IDF");
 			pb.yieldFactor(1.0f);
 			pb.mode(PolygonMode.YOUNG);
@@ -704,7 +708,9 @@ class VriStartTest {
 
 		app.init(resolver, controlMap);
 
-		app.processYoung(poly);
+		var ex = assertThrows(StandProcessingException.class, () -> app.processYoung(poly));
+
+		assertThat(ex, hasProperty("message", is("Year for YOUNG stand should be at least 1900 but was 1899")));
 
 		app.close();
 
