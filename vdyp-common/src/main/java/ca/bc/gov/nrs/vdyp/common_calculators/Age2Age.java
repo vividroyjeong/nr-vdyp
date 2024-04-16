@@ -3,8 +3,7 @@ package ca.bc.gov.nrs.vdyp.common_calculators;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.AgeTypeErrorException;
 
 /**
- * Age2Age.java
- * given age and type, converts to other type of age.
+ * Given age and type, converts to other type of age.
  *
  * @throws AgeTypeErrorException if unnkown age type is provided
  */

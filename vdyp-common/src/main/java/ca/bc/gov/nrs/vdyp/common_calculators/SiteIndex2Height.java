@@ -7,23 +7,23 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Excepti
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 
 /**
- * SiteIndex2Height.java
- * - given site index and age, computes site height
- * - age can be given as total age or breast height age
- * - if total age is given, y2bh must be the number of years to breast height
- * - all heights input/output are in metres.
- * - site index must be based on breast height age 50
- * - where breast height age is less than 0, a quadratic function is used
- * - error codes (returned as height value):
- * SI_ERR_LT13: site index < 1.3m
- * SI_ERR_GI_MIN: variable height growth intercept formulation; bhage < 0.5 years
- * SI_ERR_GI_MAX: variable height growth intercept formulation; bhage > range
- * SI_ERR_NO_ANS: iteration could not converge (projected height > 999)
- * SI_ERR_CURVE: unknown curve index
- * SI_ERR_GI_TOT: cannot compute growth intercept when using total age
+ * SiteIndex2Height.java 
+ * - given site index and age, computes site height 
+ * - age can be given as total age or breast height age 
+ * - if total age is given, y2bh must be the number of years to breast height 
+ * - all heights input/output are in metres. 
+ * - site index must be based on breast height age 50 
+ * - where breast height age is less than 0, a quadratic function is used 
+ * - error codes (returned as height value): 
+ *     SI_ERR_LT13: site index < 1.3m 
+ *     SI_ERR_GI_MIN: variable height growth intercept formulation; bhage < 0.5 years 
+ *     SI_ERR_GI_MAX: variable height growth intercept formulation; bhage > range 
+ *     SI_ERR_NO_ANS: iteration could not converge (projected height > 999) 
+ *     SI_ERR_CURVE: unknown curve index
+ *	   SI_ERR_GI_TOT: cannot compute growth intercept when using total age
  */
 public class SiteIndex2Height {
-	//Taken from sindex.h
+	// Taken from sindex.h
 	/*
 	 * age types
 	 */
@@ -176,12 +176,11 @@ public class SiteIndex2Height {
 	}
 
 	public static double index_to_height(
-			int cu_index,
-			double iage,
-			int age_type,
-			double site_index,
-			double y2bh,
-			double pi /* proportion of height growth between breast height */
+			int cu_index, double iage, int age_type, double site_index, double y2bh, double pi /*
+																								 * proportion of height
+																								 * growth between breast
+																								 * height
+																								 */
 	) throws CommonCalculatorException
 	// ages 0 and 1 that occurs below breast height
 	{
@@ -263,20 +262,11 @@ public class SiteIndex2Height {
 
 				x1 = Math.log(bhage);
 
-				x2 = 0.3621734 +
-						1.149181 * x1 -
-						0.005617852 * ppow(x1, 3.0) -
-						7.267547E-6 * ppow(x1, 7.0) +
-						1.708195E-16 * ppow(x1, 22.0) -
-						2.482794E-22 * ppow(x1, 30.0);
+				x2 = 0.3621734 + 1.149181 * x1 - 0.005617852 * ppow(x1, 3.0) - 7.267547E-6 * ppow(x1, 7.0)
+						+ 1.708195E-16 * ppow(x1, 22.0) - 2.482794E-22 * ppow(x1, 30.0);
 
-				x3 = -2.146617 -
-						0.109007 * x1 +
-						0.0994030 * ppow(x1, 3.0) -
-						0.003853396 * ppow(x1, 5.0) +
-						1.193933E-8 * ppow(x1, 12.0) -
-						9.486544E-20 * ppow(x1, 27.0) +
-						1.431925E-26 * ppow(x1, 36.0);
+				x3 = -2.146617 - 0.109007 * x1 + 0.0994030 * ppow(x1, 3.0) - 0.003853396 * ppow(x1, 5.0)
+						+ 1.193933E-8 * ppow(x1, 12.0) - 9.486544E-20 * ppow(x1, 27.0) + 1.431925E-26 * ppow(x1, 36.0);
 
 				height = 4.5 + Math.exp(x2) - Math.exp(x3) * (83.20 - (site_index - 4.5));
 
@@ -302,11 +292,10 @@ public class SiteIndex2Height {
 				/* convert to base 100 */
 				site_index = -1.73 + 3.149 * ppow(site_index, 0.8279);
 
-				height = 1.37 + (22.87 + 0.9502 * (site_index - 1.37)) *
-						ppow(
-								1 - Math.exp(-0.0020647 * ppow(site_index - 1.37, 0.5) * bhage), 1.3656
-										+ 2.046 / (site_index - 1.37)
-						);
+				height = 1.37 + (22.87 + 0.9502 * (site_index - 1.37)) * ppow(
+						1 - Math.exp(-0.0020647 * ppow(site_index - 1.37, 0.5) * bhage),
+						1.3656 + 2.046 / (site_index - 1.37)
+				);
 			} else
 				height = tage * tage * 1.37 / y2bh / y2bh;
 			break;
@@ -315,53 +304,34 @@ public class SiteIndex2Height {
 				/* convert to base 100 */
 				site_index = -1.73 + 3.149 * ppow(site_index, 0.8279);
 
-				height = 1.37 + (22.87 + 0.9502 * (site_index - 1.37)) *
-						ppow(
-								1 - Math.exp(-0.0020647 * ppow(site_index - 1.37, 0.5) * (bhage - 0.5)), 1.3656
-										+ 2.046 / (site_index - 1.37)
-						);
+				height = 1.37 + (22.87 + 0.9502 * (site_index - 1.37)) * ppow(
+						1 - Math.exp(-0.0020647 * ppow(site_index - 1.37, 0.5) * (bhage - 0.5)),
+						1.3656 + 2.046 / (site_index - 1.37)
+				);
 			} else {
 				height = tage * tage * 1.37 / y2bh / y2bh;
 			}
 			break;
-		//Couldn't find the constant
+		// Couldn't find the constant
 		/*
-		 * case SI_HM_WILEY:
-		 * if (bhage > 0.0){
-		 * if (site_index > 60 + 1.667 * bhage){
-		 * // function starts going nuts at high sites and low ages
-		 * // evaluate at a safe age, and interpolate
-		 * x1 = (site_index - 60) / 1.667 + 0.1;
-		 * x2 = index_to_height (cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
-		 * height = 1.37 + (x2-1.37) * bhage / x1;
-		 * break;
-		 * }
-		 * 
-		 * // convert to imperial
-		 * site_index /= 0.3048;
-		 * 
+		 * case SI_HM_WILEY: if (bhage > 0.0){ if (site_index > 60 + 1.667 * bhage){ // function starts going nuts at
+		 * high sites and low ages // evaluate at a safe age, and interpolate x1 = (site_index - 60) / 1.667 + 0.1; x2 =
+		 * index_to_height (cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi); height = 1.37 + (x2-1.37) * bhage / x1;
+		 * break; }
+		 *
+		 * // convert to imperial site_index /= 0.3048;
+		 *
 		 * x1 = 2500 / (site_index - 4.5);
-		 * 
-		 * x2 = -1.7307 + 0.1394 * x1;
-		 * x3 = -0.0616 + 0.0137 * x1;
-		 * x4 = 0.00192428 + 0.00007024 * x1;
-		 * 
+		 *
+		 * x2 = -1.7307 + 0.1394 * x1; x3 = -0.0616 + 0.0137 * x1; x4 = 0.00192428 + 0.00007024 * x1;
+		 *
 		 * height = 4.5 + bhage * bhage / (x2 + x3 * bhage + x4 * bhage * bhage);
-		 * 
-		 * if (bhage < 5){
-		 * height += (0.3 * bhage);
-		 * }
-		 * else if (bhage < 10){
-		 * height += (3.0 - 0.3 * bhage);
-		 * }
-		 * 
-		 * // convert back to metric
-		 * height *= 0.3048;
-		 * 
-		 * }else{
-		 * height = tage * tage * 1.37 / y2bh / y2bh;
-		 * }
-		 * break;
+		 *
+		 * if (bhage < 5){ height += (0.3 * bhage); } else if (bhage < 10){ height += (3.0 - 0.3 * bhage); }
+		 *
+		 * // convert back to metric height *= 0.3048;
+		 *
+		 * }else{ height = tage * tage * 1.37 / y2bh / y2bh; } break;
 		 */
 
 		case SI_HWC_WILEY:
@@ -552,8 +522,8 @@ public class SiteIndex2Height {
 			if (site_index < 19.5) {
 				if (bhage > 0.5) {
 					/* Goudie */
-					x1 = (1.0 + Math.exp(9.7936 - 1.2866 * llog(site_index - 1.3) - 1.4661 * Math.log(49.5))) /
-							(1.0 + Math.exp(9.7936 - 1.2866 * llog(site_index - 1.3) - 1.4661 * Math.log(bhage - 0.5)));
+					x1 = (1.0 + Math.exp(9.7936 - 1.2866 * llog(site_index - 1.3) - 1.4661 * Math.log(49.5))) / (1.0
+							+ Math.exp(9.7936 - 1.2866 * llog(site_index - 1.3) - 1.4661 * Math.log(bhage - 0.5)));
 
 					height = 1.3 + (site_index - 1.3) * x1;
 				} else {
@@ -562,34 +532,20 @@ public class SiteIndex2Height {
 			} else {
 				if (tage < y2bh - 0.5) {
 					/* use Nigh's total age curve */
-					height = (-0.01666 + 0.001722 * site_index) * ppow(tage, 1.858) *
-							ppow(0.9982, tage);
+					height = (-0.01666 + 0.001722 * site_index) * ppow(tage, 1.858) * ppow(0.9982, tage);
 				} else if (tage > y2bh + 2 - 0.5) {
 					/* use Goudie's breast-height age curve */
-					x1 = (1.0 + Math.exp(
-							9.7936 - 1.2866 * llog(site_index - 1.3)
-									- 1.4661 * Math.log(49.5)
-					)) /
-							(1.0 + Math.exp(
-									9.7936 - 1.2866 * llog(site_index - 1.3)
-											- 1.4661 * Math.log(bhage - 0.5)
-							));
+					x1 = (1.0 + Math.exp(9.7936 - 1.2866 * llog(site_index - 1.3) - 1.4661 * Math.log(49.5))) / (1.0
+							+ Math.exp(9.7936 - 1.2866 * llog(site_index - 1.3) - 1.4661 * Math.log(bhage - 0.5)));
 
 					height = 1.3 + (site_index - 1.3) * x1;
 				} else {
 					/* use Nigh's total age curve */
-					x4 = (-0.01666 + 0.001722 * site_index) * ppow(y2bh - 0.5, 1.858) *
-							ppow(0.9982, y2bh - 0.5);
+					x4 = (-0.01666 + 0.001722 * site_index) * ppow(y2bh - 0.5, 1.858) * ppow(0.9982, y2bh - 0.5);
 
 					/* use Goudie's breast-height age curve */
-					x1 = (1.0 + Math.exp(
-							9.7936 - 1.2866 * llog(site_index - 1.3)
-									- 1.4661 * Math.log(49.5)
-					)) /
-							(1.0 + Math.exp(
-									9.7936 - 1.2866 * llog(site_index - 1.3)
-											- 1.4661 * Math.log(2 - 0.5)
-							));
+					x1 = (1.0 + Math.exp(9.7936 - 1.2866 * llog(site_index - 1.3) - 1.4661 * Math.log(49.5)))
+							/ (1.0 + Math.exp(9.7936 - 1.2866 * llog(site_index - 1.3) - 1.4661 * Math.log(2 - 0.5)));
 
 					x5 = 1.3 + (site_index - 1.3) * x1;
 
@@ -600,14 +556,8 @@ public class SiteIndex2Height {
 		case SI_PLI_THROWNIGH:
 			if (site_index < 18.5) {
 				if (bhage > 0.5) {
-					x1 = (1.0 + Math.exp(
-							7.6298 - 0.8940 * llog(site_index - 1.3)
-									- 1.3563 * Math.log(49.5)
-					)) /
-							(1.0 + Math.exp(
-									7.6298 - 0.8940 * llog(site_index - 1.3)
-											- 1.3563 * Math.log(bhage - 0.5)
-							));
+					x1 = (1.0 + Math.exp(7.6298 - 0.8940 * llog(site_index - 1.3) - 1.3563 * Math.log(49.5))) / (1.0
+							+ Math.exp(7.6298 - 0.8940 * llog(site_index - 1.3) - 1.3563 * Math.log(bhage - 0.5)));
 
 					height = 1.3 + (site_index - 1.3) * x1;
 				} else {
@@ -616,34 +566,20 @@ public class SiteIndex2Height {
 			} else {
 				if (tage < y2bh - 0.5) {
 					/* use Nigh's total age curve */
-					height = (-0.03993 + 0.004828 * site_index) * ppow(tage, 1.902) *
-							ppow(0.9645, tage);
+					height = (-0.03993 + 0.004828 * site_index) * ppow(tage, 1.902) * ppow(0.9645, tage);
 				} else if (tage > y2bh + 2 - 0.5) {
 					/* use Thrower's breast-height age curve */
-					x1 = (1.0 + Math.exp(
-							7.6298 - 0.8940 * llog(site_index - 1.3)
-									- 1.3563 * Math.log(49.5)
-					)) /
-							(1.0 + Math.exp(
-									7.6298 - 0.8940 * llog(site_index - 1.3)
-											- 1.3563 * Math.log(bhage - 0.5)
-							));
+					x1 = (1.0 + Math.exp(7.6298 - 0.8940 * llog(site_index - 1.3) - 1.3563 * Math.log(49.5))) / (1.0
+							+ Math.exp(7.6298 - 0.8940 * llog(site_index - 1.3) - 1.3563 * Math.log(bhage - 0.5)));
 
 					height = 1.3 + (site_index - 1.3) * x1;
 				} else {
 					/* use Nigh's total age curve */
-					x4 = (-0.03993 + 0.004828 * site_index) * ppow(y2bh - 0.5, 1.902) *
-							ppow(0.9645, y2bh - 0.5);
+					x4 = (-0.03993 + 0.004828 * site_index) * ppow(y2bh - 0.5, 1.902) * ppow(0.9645, y2bh - 0.5);
 
 					/* use Thrower's breast-height age curve */
-					x1 = (1.0 + Math.exp(
-							7.6298 - 0.8940 * llog(site_index - 1.3)
-									- 1.3563 * Math.log(49.5)
-					)) /
-							(1.0 + Math.exp(
-									7.6298 - 0.8940 * llog(site_index - 1.3)
-											- 1.3563 * Math.log(2 - 0.5)
-							));
+					x1 = (1.0 + Math.exp(7.6298 - 0.8940 * llog(site_index - 1.3) - 1.3563 * Math.log(49.5)))
+							/ (1.0 + Math.exp(7.6298 - 0.8940 * llog(site_index - 1.3) - 1.3563 * Math.log(2 - 0.5)));
 
 					x5 = 1.3 + (site_index - 1.3) * x1;
 
@@ -653,14 +589,8 @@ public class SiteIndex2Height {
 			break;
 		case SI_PLI_THROWER:
 			if (bhage > pi) {
-				x1 = (1.0 + Math.exp(
-						7.6298 - 0.8940 * llog(site_index - 1.3)
-								- 1.3563 * Math.log(50 - pi)
-				)) /
-						(1.0 + Math.exp(
-								7.6298 - 0.8940 * llog(site_index - 1.3)
-										- 1.3563 * Math.log(bhage - pi)
-						));
+				x1 = (1.0 + Math.exp(7.6298 - 0.8940 * llog(site_index - 1.3) - 1.3563 * Math.log(50 - pi)))
+						/ (1.0 + Math.exp(7.6298 - 0.8940 * llog(site_index - 1.3) - 1.3563 * Math.log(bhage - pi)));
 
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
@@ -679,8 +609,7 @@ public class SiteIndex2Height {
 			break;
 		case SI_PLI_NIGHTA98:
 			if (tage <= 15) {
-				height = (-0.03993 + 0.004828 * site_index) * ppow(tage, 1.902) *
-						ppow(0.9645, tage);
+				height = (-0.03993 + 0.004828 * site_index) * ppow(tage, 1.902) * ppow(0.9645, tage);
 			} else {
 				height = SI_ERR_NO_ANS;
 			}
@@ -694,16 +623,14 @@ public class SiteIndex2Height {
 			break;
 		case SI_SW_NIGHTA:
 			if (tage <= 20 && site_index >= 14.2) {
-				height = (-0.01666 + 0.001722 * site_index) * ppow(tage, 1.858) *
-						ppow(0.9982, tage);
+				height = (-0.01666 + 0.001722 * site_index) * ppow(tage, 1.858) * ppow(0.9982, tage);
 			} else {
 				height = SI_ERR_NO_ANS;
 			}
 			break;
 		case SI_FDC_NIGHTA:
 			if (tage <= 25) {
-				height = (-0.002355 + 0.0003156 * site_index) * ppow(tage, 2.861) *
-						ppow(0.9337, tage);
+				height = (-0.002355 + 0.0003156 * site_index) * ppow(tage, 2.861) * ppow(0.9337, tage);
 			} else {
 				height = SI_ERR_NO_ANS;
 			}
@@ -807,14 +734,13 @@ public class SiteIndex2Height {
 				x1 = 0.20372424;
 				x2 = 97.37473618;
 				x3 = 20 * x2 / (ppow(50.0, 1 + x1));
-				x4 = site_index - 1.3 +
-						Math.sqrt(
-								(site_index - 1.3 - x3) * (site_index - 1.3 - x3) +
-										80 * x2 * (site_index - 1.3) * ppow(50.0, - (1 + x1))
+				x4 = site_index - 1.3
+						+ Math.sqrt(
+								(site_index - 1.3 - x3) * (site_index - 1.3 - x3)
+										+ 80 * x2 * (site_index - 1.3) * ppow(50.0, - (1 + x1))
 						);
 
-				height = 1.3 + (x4 + x3) /
-						(2 + 80 * x2 * ppow(bhage, - (1 + x1)) / (x4 - x3));
+				height = 1.3 + (x4 + x3) / (2 + 80 * x2 * ppow(bhage, - (1 + x1)) / (x4 - x3));
 			} else {
 				height = tage * tage * 1.3 / y2bh / y2bh;
 			}
@@ -824,14 +750,13 @@ public class SiteIndex2Height {
 				x1 = 0.3235139;
 				x2 = 260.9162652;
 				x3 = 20 * x2 / (ppow(50.0, 1 + x1));
-				x4 = site_index - 1.3 +
-						Math.sqrt(
-								(site_index - 1.3 - x3) * (site_index - 1.3 - x3) +
-										80 * x2 * (site_index - 1.3) * ppow(50.0, - (1 + x1))
+				x4 = site_index - 1.3
+						+ Math.sqrt(
+								(site_index - 1.3 - x3) * (site_index - 1.3 - x3)
+										+ 80 * x2 * (site_index - 1.3) * ppow(50.0, - (1 + x1))
 						);
 
-				height = 1.3 + (x4 + x3) /
-						(2 + 80 * x2 * ppow(bhage, - (1 + x1)) / (x4 - x3));
+				height = 1.3 + (x4 + x3) / (2 + 80 * x2 * ppow(bhage, - (1 + x1)) / (x4 - x3));
 			} else {
 				height = tage * tage * 1.3 / y2bh / y2bh;
 			}
@@ -841,14 +766,13 @@ public class SiteIndex2Height {
 				x1 = 0.1992266;
 				x2 = 114.8730018;
 				x3 = 20 * x2 / (ppow(50.0, 1 + x1));
-				x4 = site_index - 1.3 +
-						Math.sqrt(
-								(site_index - 1.3 - x3) * (site_index - 1.3 - x3) +
-										80 * x2 * (site_index - 1.3) * ppow(50.0, - (1 + x1))
+				x4 = site_index - 1.3
+						+ Math.sqrt(
+								(site_index - 1.3 - x3) * (site_index - 1.3 - x3)
+										+ 80 * x2 * (site_index - 1.3) * ppow(50.0, - (1 + x1))
 						);
 
-				height = 1.3 + (x4 + x3) /
-						(2 + 80 * x2 * ppow(bhage, - (1 + x1)) / (x4 - x3));
+				height = 1.3 + (x4 + x3) / (2 + 80 * x2 * ppow(bhage, - (1 + x1)) / (x4 - x3));
 			} else {
 				height = tage * tage * 1.3 / y2bh / y2bh;
 			}
@@ -858,53 +782,34 @@ public class SiteIndex2Height {
 				x1 = 0.2644606;
 				x2 = 117.3695371;
 				x3 = 20 * x2 / (ppow(50.0, 1 + x1));
-				x4 = site_index - 1.3 +
-						Math.sqrt(
-								(site_index - 1.3 - x3) * (site_index - 1.3 - x3) +
-										80 * x2 * (site_index - 1.3) * ppow(50.0, - (1 + x1))
+				x4 = site_index - 1.3
+						+ Math.sqrt(
+								(site_index - 1.3 - x3) * (site_index - 1.3 - x3)
+										+ 80 * x2 * (site_index - 1.3) * ppow(50.0, - (1 + x1))
 						);
 
-				height = 1.3 + (x4 + x3) /
-						(2 + 80 * x2 * ppow(bhage, - (1 + x1)) / (x4 - x3));
+				height = 1.3 + (x4 + x3) / (2 + 80 * x2 * ppow(bhage, - (1 + x1)) / (x4 - x3));
 			} else {
 				height = tage * tage * 1.3 / y2bh / y2bh;
 			}
 			break;
 		// Couldn't find constant
 		/*
-		 * case SI_PF_GOUDIE_WET:
-		 * if (bhage > 0.0){
-		 * x1 = -0.935;
-		 * x2 = 7.81498;
-		 * x3 = -1.28517;
-		 * 
-		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) /
-		 * (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * x1;
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_PF_GOUDIE_WET: if (bhage > 0.0){ x1 = -0.935; x2 = 7.81498; x3 = -1.28517;
+		 *
+		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) / (1.0 + Math.exp (x2 + x1 *
+		 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
+		 *
+		 * height = 1.3 + (site_index - 1.3) * x1; } else{ height = tage * tage * 1.3 / y2bh / y2bh; } break;
 		 */
 		// Couldn't find constant
 		/*
-		 * case SI_PF_GOUDIE_DRY:
-		 * if (bhage > 0.0){
-		 * x1 = -1.00726;
-		 * x2 = 7.81498;
-		 * x3 = -1.28517;
-		 * 
-		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) /
-		 * (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * x1;
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_PF_GOUDIE_DRY: if (bhage > 0.0){ x1 = -1.00726; x2 = 7.81498; x3 = -1.28517;
+		 *
+		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) / (1.0 + Math.exp (x2 + x1 *
+		 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
+		 *
+		 * height = 1.3 + (site_index - 1.3) * x1; } else{ height = tage * tage * 1.3 / y2bh / y2bh; } break;
 		 */
 		case SI_PLI_GOUDIE_WET:
 			if (bhage > 0.0) {
@@ -912,8 +817,8 @@ public class SiteIndex2Height {
 				x2 = 7.81498;
 				x3 = -1.28517;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
 
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
@@ -926,49 +831,31 @@ public class SiteIndex2Height {
 				x2 = 7.81498;
 				x3 = -1.28517;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
 
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
 				height = tage * tage * 1.3 / y2bh / y2bh;
 			}
 			break;
-		//Couldn't find constant
+		// Couldn't find constant
 		/*
-		 * case SI_PA_GOUDIE_WET:
-		 * if (bhage > 0.0){
-		 * x1 = -0.935;
-		 * x2 = 7.81498;
-		 * x3 = -1.28517;
-		 * 
-		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) /
-		 * (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * x1;
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_PA_GOUDIE_WET: if (bhage > 0.0){ x1 = -0.935; x2 = 7.81498; x3 = -1.28517;
+		 *
+		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) / (1.0 + Math.exp (x2 + x1 *
+		 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
+		 *
+		 * height = 1.3 + (site_index - 1.3) * x1; } else{ height = tage * tage * 1.3 / y2bh / y2bh; } break;
 		 */
 		// Couldn't find constant
 		/*
-		 * case SI_PA_GOUDIE_DRY:
-		 * if (bhage > 0.0){
-		 * x1 = -1.00726;
-		 * x2 = 7.81498;
-		 * x3 = -1.28517;
-		 * 
-		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) /
-		 * (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * x1;
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_PA_GOUDIE_DRY: if (bhage > 0.0){ x1 = -1.00726; x2 = 7.81498; x3 = -1.28517;
+		 *
+		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) / (1.0 + Math.exp (x2 + x1 *
+		 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
+		 *
+		 * height = 1.3 + (site_index - 1.3) * x1; } else{ height = tage * tage * 1.3 / y2bh / y2bh; } break;
 		 */
 		case SI_PLI_DEMPSTER:
 			if (bhage > 0.0) {
@@ -976,8 +863,8 @@ public class SiteIndex2Height {
 				x2 = 7.4871;
 				x3 = -1.2036;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
 
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
@@ -986,39 +873,21 @@ public class SiteIndex2Height {
 			break;
 		// Couldn't find constant
 		/*
-		 * case SI_SE_GOUDIE_PLA:
-		 * if (bhage > 0.0){
-		 * x1 = -1.2866;
-		 * x2 = 9.7936;
-		 * x3 = -1.4661;
-		 * 
-		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) /
-		 * (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * x1;
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_SE_GOUDIE_PLA: if (bhage > 0.0){ x1 = -1.2866; x2 = 9.7936; x3 = -1.4661;
+		 *
+		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) / (1.0 + Math.exp (x2 + x1 *
+		 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
+		 *
+		 * height = 1.3 + (site_index - 1.3) * x1; } else{ height = tage * tage * 1.3 / y2bh / y2bh; } break;
 		 */
 		// Couldn't find constant
 		/*
-		 * case SI_SE_GOUDIE_NAT:
-		 * if (bhage > 0.0){
-		 * x1 = -1.2866;
-		 * x2 = 9.7936;
-		 * x3 = -1.4661;
-		 * 
-		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) /
-		 * (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * x1;
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_SE_GOUDIE_NAT: if (bhage > 0.0){ x1 = -1.2866; x2 = 9.7936; x3 = -1.4661;
+		 *
+		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) / (1.0 + Math.exp (x2 + x1 *
+		 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
+		 *
+		 * height = 1.3 + (site_index - 1.3) * x1; } else{ height = tage * tage * 1.3 / y2bh / y2bh; } break;
 		 */
 		case SI_SW_GOUDIE_PLA:
 			if (bhage > 0.0) {
@@ -1026,8 +895,8 @@ public class SiteIndex2Height {
 				x2 = 9.7936;
 				x3 = -1.4661;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
 
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
@@ -1040,8 +909,8 @@ public class SiteIndex2Height {
 				x2 = 9.7936;
 				x3 = -1.4661;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
 
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
@@ -1054,8 +923,8 @@ public class SiteIndex2Height {
 				x2 = 9.6183;
 				x3 = -1.4627;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
 
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
@@ -1068,8 +937,8 @@ public class SiteIndex2Height {
 				x2 = 8.5594;
 				x3 = -1.1484;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
 
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
@@ -1082,8 +951,8 @@ public class SiteIndex2Height {
 				x2 = 11.0605;
 				x3 = -1.5108;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
 
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
@@ -1096,8 +965,8 @@ public class SiteIndex2Height {
 				x2 = 5.780089777;
 				x3 = -1.150039266;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
 
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
@@ -1110,49 +979,31 @@ public class SiteIndex2Height {
 				x2 = 6.879;
 				x3 = -1.32;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
 
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
 				height = tage * tage * 1.3 / y2bh / y2bh;
 			}
 			break;
-		//Couldn't find constant
+		// Couldn't find constant
 		/*
-		 * case SI_EP_GOUDIE:
-		 * if (bhage > 0.0){
-		 * x1 = -0.618;
-		 * x2 = 6.879;
-		 * x3 = -1.32;
-		 * 
-		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) /
-		 * (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * x1;
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_EP_GOUDIE: if (bhage > 0.0){ x1 = -0.618; x2 = 6.879; x3 = -1.32;
+		 *
+		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) / (1.0 + Math.exp (x2 + x1 *
+		 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
+		 *
+		 * height = 1.3 + (site_index - 1.3) * x1; } else{ height = tage * tage * 1.3 / y2bh / y2bh; } break;
 		 */
 		// Couldn't find constant
 		/*
-		 * case SI_EA_GOUDIE:
-		 * if (bhage > 0.0){
-		 * x1 = -0.618;
-		 * x2 = 6.879;
-		 * x3 = -1.32;
-		 * 
-		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) /
-		 * (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * x1;
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_EA_GOUDIE: if (bhage > 0.0){ x1 = -0.618; x2 = 6.879; x3 = -1.32;
+		 *
+		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) / (1.0 + Math.exp (x2 + x1 *
+		 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
+		 *
+		 * height = 1.3 + (site_index - 1.3) * x1; } else{ height = tage * tage * 1.3 / y2bh / y2bh; } break;
 		 */
 		case SI_SW_GOUDIE_NATAC:
 			if (bhage > pi) {
@@ -1160,8 +1011,8 @@ public class SiteIndex2Height {
 				x2 = 9.7936;
 				x3 = -1.4661;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50 - pi))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage - pi)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50 - pi)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage - pi)));
 
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
@@ -1175,8 +1026,8 @@ public class SiteIndex2Height {
 				x2 = 9.7936;
 				x3 = -1.4661;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50 - pi))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage - pi)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50 - pi)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage - pi)));
 
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
@@ -1188,8 +1039,8 @@ public class SiteIndex2Height {
 				x1 = -0.237724692;
 				x2 = 5.780089777;
 				x3 = -1.150039266;
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(49.5))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage - 0.5)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(49.5)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage - 0.5)));
 
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
@@ -1202,8 +1053,8 @@ public class SiteIndex2Height {
 				x2 = -1.357;
 				x3 = -1.013;
 
-				x1 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
+				x1 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
 				height = tage * tage * 1.3 / y2bh / y2bh;
@@ -1226,8 +1077,8 @@ public class SiteIndex2Height {
 				x2 = -1.113;
 				x3 = -1.849;
 
-				x1 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
+				x1 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
 				height = tage * tage * 1.3 / y2bh / y2bh;
@@ -1239,8 +1090,8 @@ public class SiteIndex2Height {
 				x2 = -1.340;
 				x3 = -1.244;
 
-				x1 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
+				x1 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
 				height = tage * tage * 1.3 / y2bh / y2bh;
@@ -1252,8 +1103,8 @@ public class SiteIndex2Height {
 				x2 = -1.434;
 				x3 = -1.051;
 
-				x1 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
+				x1 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
 				height = tage * tage * 1.3 / y2bh / y2bh;
@@ -1265,12 +1116,12 @@ public class SiteIndex2Height {
 				x2 = -1.385;
 				x3 = -0.8498;
 
-				x1 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
+				x1 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
-				height = (1.3 * Math.pow(tage, 1.137) * Math.pow(1.016, tage)) /
-						(Math.pow(y2bh, 1.137) * Math.pow(1.016, y2bh));
+				height = (1.3 * Math.pow(tage, 1.137) * Math.pow(1.016, tage))
+						/ (Math.pow(y2bh, 1.137) * Math.pow(1.016, y2bh));
 			}
 			break;
 		case SI_ACT_THROWER:
@@ -1280,8 +1131,8 @@ public class SiteIndex2Height {
 				x2 = 10.3861;
 				x3 = -1.6555;
 
-				x1 = (1.0 + Math.exp(x2 + x3 * llog(site_index - 1.3) + x1 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x3 * llog(site_index - 1.3) + x1 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x3 * llog(site_index - 1.3) + x1 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x3 * llog(site_index - 1.3) + x1 * Math.log(bhage)));
 
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
@@ -1294,8 +1145,8 @@ public class SiteIndex2Height {
 				x2 = 10.3861;
 				x3 = -1.6555;
 
-				x1 = (1.0 + Math.exp(x2 + x3 * llog(site_index - 1.3) + x1 * Math.log(49.5))) /
-						(1.0 + Math.exp(x2 + x3 * Math.log(site_index - 1.3) + x1 * Math.log(bhage - 0.5)));
+				x1 = (1.0 + Math.exp(x2 + x3 * llog(site_index - 1.3) + x1 * Math.log(49.5)))
+						/ (1.0 + Math.exp(x2 + x3 * Math.log(site_index - 1.3) + x1 * Math.log(bhage - 0.5)));
 
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else
@@ -1327,14 +1178,8 @@ public class SiteIndex2Height {
 			break;
 		case SI_SW_THROWER:
 			if (bhage > 0.5) {
-				x1 = (1.0 + Math.exp(
-						10.1654 - 1.4002 * llog(site_index - 1.3)
-								- 1.4482 * Math.log(50.0 - 0.5)
-				)) /
-						(1.0 + Math.exp(
-								10.1654 - 1.4002 * llog(site_index - 1.3)
-										- 1.4482 * Math.log(bhage - 0.5)
-						));
+				x1 = (1.0 + Math.exp(10.1654 - 1.4002 * llog(site_index - 1.3) - 1.4482 * Math.log(50.0 - 0.5)))
+						/ (1.0 + Math.exp(10.1654 - 1.4002 * llog(site_index - 1.3) - 1.4482 * Math.log(bhage - 0.5)));
 
 				height = 1.3 + (site_index - 1.3) * x1;
 			} else {
@@ -1358,18 +1203,11 @@ public class SiteIndex2Height {
 
 				x3 = llog(bhage);
 
-				x1 = -0.20505 +
-						1.449615 * x3 -
-						0.01780992 * ppow(x3, 3.0) +
-						6.519748E-5 * ppow(x3, 5.0) -
-						1.095593E-23 * ppow(x3, 30.0);
+				x1 = -0.20505 + 1.449615 * x3 - 0.01780992 * ppow(x3, 3.0) + 6.519748E-5 * ppow(x3, 5.0)
+						- 1.095593E-23 * ppow(x3, 30.0);
 
-				x2 = -5.61188 +
-						2.418604 * x3 -
-						0.259311 * ppow(x3, 2.0) +
-						1.351445E-4 * ppow(x3, 5.0) -
-						1.701139E-12 * ppow(x3, 16.0) +
-						7.964197E-27 * ppow(x3, 36.0);
+				x2 = -5.61188 + 2.418604 * x3 - 0.259311 * ppow(x3, 2.0) + 1.351445E-4 * ppow(x3, 5.0)
+						- 1.701139E-12 * ppow(x3, 16.0) + 7.964197E-27 * ppow(x3, 36.0);
 
 				height = 4.5 + Math.exp(x1) - Math.exp(x2) * (86.43 - (site_index - 4.5));
 
@@ -1385,16 +1223,13 @@ public class SiteIndex2Height {
 				site_index /= 0.3048;
 
 				x1 = 1.0 - Math.exp(
-						-Math.exp(
-								-9.975053 + (1.747353 - 0.38583) * Math.log(bhage) +
-										1.119438 * Math.log(site_index)
-						)
+						-Math.exp(-9.975053 + (1.747353 - 0.38583) * Math.log(bhage) + 1.119438 * Math.log(site_index))
 				);
 
 				x2 = 1.0 - Math.exp(
 						-Math.exp(
-								-9.975053 + 1.747353 * Math.log(50.0) -
-										0.38583 * Math.log(bhage) + 1.119438 * Math.log(site_index)
+								-9.975053 + 1.747353 * Math.log(50.0) - 0.38583 * Math.log(bhage)
+										+ 1.119438 * Math.log(site_index)
 						)
 				);
 
@@ -1413,15 +1248,15 @@ public class SiteIndex2Height {
 
 				x1 = 1.0 - Math.exp(
 						-Math.exp(
-								-9.975053 + (1.747353 - 0.38583) * Math.log(bhage - 0.5) +
-										1.119438 * Math.log(site_index)
+								-9.975053 + (1.747353 - 0.38583) * Math.log(bhage - 0.5)
+										+ 1.119438 * Math.log(site_index)
 						)
 				);
 
 				x2 = 1.0 - Math.exp(
 						-Math.exp(
-								-9.975053 + 1.747353 * Math.log(49.5) -
-										0.38583 * Math.log(bhage - 0.5) + 1.119438 * Math.log(site_index)
+								-9.975053 + 1.747353 * Math.log(49.5) - 0.38583 * Math.log(bhage - 0.5)
+										+ 1.119438 * Math.log(site_index)
 						)
 				);
 
@@ -1456,7 +1291,7 @@ public class SiteIndex2Height {
 		}
 			break;
 		case SI_CWC_KURUCZ:
-			//case SI_YC_KURUCZ: Cannot find constant
+			// case SI_YC_KURUCZ: Cannot find constant
 			if (bhage > 0.0) {
 				if (site_index > 43 + 1.667 * bhage) {
 					/* function starts going nuts at high sites and low ages */
@@ -1482,16 +1317,13 @@ public class SiteIndex2Height {
 				if (bhage > 50.0) {
 					if (bhage > 200) {
 						/*
-						 * The "standard" correction applied above 50 years would
-						 * overpower the uncorrected curve at around 400 years.
-						 * So, after consultation with Robert Macdonald and Ian
-						 * Cameron, it was decided to use a correction beyond 200
-						 * years with the same ratio as at age 200.
+						 * The "standard" correction applied above 50 years would overpower the uncorrected curve at
+						 * around 400 years. So, after consultation with Robert Macdonald and Ian Cameron, it was
+						 * decided to use a correction beyond 200 years with the same ratio as at age 200.
 						 */
 						bhage = 200;
 					}
-					height = height - (-0.02379545 * height +
-							0.000475909 * bhage * height);
+					height = height - (-0.02379545 * height + 0.000475909 * bhage * height);
 				}
 			} else {
 				height = tage * tage * 1.3 / y2bh / y2bh;
@@ -1523,16 +1355,13 @@ public class SiteIndex2Height {
 				if (bhage > 50.0) {
 					if (bhage > 200) {
 						/*
-						 * The "standard" correction applied above 50 years would
-						 * overpower the uncorrected curve at around 400 years.
-						 * So, after consultation with Robert Macdonald and Ian
-						 * Cameron, it was decided to use a correction beyond 200
-						 * years with the same ratio as at age 200.
+						 * The "standard" correction applied above 50 years would overpower the uncorrected curve at
+						 * around 400 years. So, after consultation with Robert Macdonald and Ian Cameron, it was
+						 * decided to use a correction beyond 200 years with the same ratio as at age 200.
 						 */
 						bhage = 200;
 					}
-					height = height - (-0.02379545 * height +
-							0.000475909 * bhage * height);
+					height = height - (-0.02379545 * height + 0.000475909 * bhage * height);
 				}
 			} else {
 				height = tage * tage * 1.3 / y2bh / y2bh;
@@ -1550,14 +1379,8 @@ public class SiteIndex2Height {
 			break;
 		case SI_BA_DILUCCA:
 			if (bhage > 0.0) {
-				x1 = 1 + Math.exp(
-						8.377148582 - 1.27351813 * Math.log(50.0) -
-								0.975226632 * Math.log(site_index)
-				);
-				x2 = 1 + Math.exp(
-						8.377148582 - 1.27351813 * Math.log(bhage) -
-								0.975226632 * Math.log(site_index)
-				);
+				x1 = 1 + Math.exp(8.377148582 - 1.27351813 * Math.log(50.0) - 0.975226632 * Math.log(site_index));
+				x2 = 1 + Math.exp(8.377148582 - 1.27351813 * Math.log(bhage) - 0.975226632 * Math.log(site_index));
 				height = 1.3 + (site_index - 1.3) * x1 / x2;
 			} else {
 				height = tage * tage * 1.3 / y2bh / y2bh;
@@ -1589,7 +1412,7 @@ public class SiteIndex2Height {
 			}
 			break;
 		case SI_BA_KURUCZ82, SI_BL_KURUCZ82:
-			//case SI_BG_KURUCZ82: Cannot find constants
+			// case SI_BG_KURUCZ82: Cannot find constants
 			if (bhage > 0.0) {
 				if (site_index > 60 + 1.667 * bhage) {
 					/* function starts going nuts at high sites and low ages */
@@ -1685,8 +1508,7 @@ public class SiteIndex2Height {
 				/* convert to imperial */
 				site_index /= 0.3048;
 
-				height = 4.5 + (1.9965 * (site_index - 4.5) /
-						(1 + Math.exp(5.479 - 1.4016 * Math.log(bhage))));
+				height = 4.5 + (1.9965 * (site_index - 4.5) / (1 + Math.exp(5.479 - 1.4016 * Math.log(bhage))));
 
 				/* convert back to metric */
 				height *= 0.3048;
@@ -1699,8 +1521,7 @@ public class SiteIndex2Height {
 				/* convert to imperial */
 				site_index /= 0.3048;
 
-				height = 4.5 + (1.79897 * (site_index - 4.5) /
-						(1 + Math.exp(6.0678 - 1.6085 * Math.log(bhage))));
+				height = 4.5 + (1.79897 * (site_index - 4.5) / (1 + Math.exp(6.0678 - 1.6085 * Math.log(bhage))));
 
 				/* convert back to metric */
 				height *= 0.3048;
@@ -1818,44 +1639,21 @@ public class SiteIndex2Height {
 				double si25;
 
 				si25 = 0.3094 + 0.7616 * site_index;
-				height = 1.3 + (1.693 * (si25 - 1.3)) /
-						(1 + Math.exp(3.6 - 1.24 * Math.log(bhage - 0.5)));
+				height = 1.3 + (1.693 * (si25 - 1.3)) / (1 + Math.exp(3.6 - 1.24 * Math.log(bhage - 0.5)));
 			} else {
 				height = tage * tage * 1.3 / y2bh / y2bh;
 			}
 			break;
 		// Cannot Find Constant
 		/*
-		 * case SI_BG_COCHRAN:
-		 * if (bhage > 0.0){
-		 * // convert to imperial
-		 * site_index /= 0.3048;
-		 * 
-		 * x1 = Math.log (bhage);
-		 * x2 = -0.30935 +
-		 * 1.2383 * x1 +
-		 * 0.001762 * ppow(x1, 4.0) -
-		 * 5.4e-6 * ppow(x1, 9.0) +
-		 * 2.046e-7 * ppow(x1, 11.0) -
-		 * 4.04e-13 * ppow(x1, 18.0);
-		 * x3 = -6.2056 +
-		 * 2.097 * x1 -
-		 * 0.09411 * ppow(x1, 2) -
-		 * 4.382e-5 * ppow(x1, 7) +
-		 * 2.007e-11 * ppow(x1, 16) -
-		 * 2.054e-17 * ppow(x1, 24);
-		 * height = 4.5 +
-		 * Math.exp (x2) -
-		 * 84.93 * Math.exp (x3) +
-		 * (site_index - 4.5) * Math.exp (x3);
-		 * 
-		 * // convert back to metric
-		 * height *= 0.3048;
-		 * }
-		 * else{
-		 * height = tage * tage * 1.37 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_BG_COCHRAN: if (bhage > 0.0){ // convert to imperial site_index /= 0.3048;
+		 *
+		 * x1 = Math.log (bhage); x2 = -0.30935 + 1.2383 * x1 + 0.001762 * ppow(x1, 4.0) - 5.4e-6 * ppow(x1, 9.0) +
+		 * 2.046e-7 * ppow(x1, 11.0) - 4.04e-13 * ppow(x1, 18.0); x3 = -6.2056 + 2.097 * x1 - 0.09411 * ppow(x1, 2) -
+		 * 4.382e-5 * ppow(x1, 7) + 2.007e-11 * ppow(x1, 16) - 2.054e-17 * ppow(x1, 24); height = 4.5 + Math.exp (x2) -
+		 * 84.93 * Math.exp (x3) + (site_index - 4.5) * Math.exp (x3);
+		 *
+		 * // convert back to metric height *= 0.3048; } else{ height = tage * tage * 1.37 / y2bh / y2bh; } break;
 		 */
 		case SI_PY_MILNER:
 			if (bhage > 0.0) {
@@ -1904,7 +1702,7 @@ public class SiteIndex2Height {
 			}
 			break;
 
-		//case SI_LT_MILNER: Couldn't find constant
+		// case SI_LT_MILNER: Couldn't find constant
 		case SI_LW_MILNER:
 			// case SI_LA_MILNER: Couldn't find constant
 			if (bhage > 0.0) {
@@ -1924,8 +1722,8 @@ public class SiteIndex2Height {
 		case SI_LW_NIGH:
 			if (bhage > 0.5) {
 				x1 = Math.log(Math.pow(site_index - 1.3, 1 - 0.8566) / 3.027) / Math.log(1 - Math.exp(-0.01588 * 49.5));
-				height = 1.3 + 3.027 * Math.pow(site_index - 1.3, 0.8566) *
-						Math.pow(1 - Math.exp(-0.01588 * (bhage - 0.5)), x1);
+				height = 1.3 + 3.027 * Math.pow(site_index - 1.3, 0.8566)
+						* Math.pow(1 - Math.exp(-0.01588 * (bhage - 0.5)), x1);
 			} else {
 				height = tage * tage * 1.3 / y2bh / y2bh;
 			}
@@ -1946,24 +1744,16 @@ public class SiteIndex2Height {
 				height = 1.3 + (site_index - 1.3) * x1 / x2;
 			} else {
 				/*
-				 * was
-				 * height = tage * tage * 1.3 / y2bh / y2bh;
+				 * was height = tage * tage * 1.3 / y2bh / y2bh;
 				 */
 				height = Math.pow(tage / y2bh, 1.5) * 1.3;
 			}
 			break;
 		// Cannot find constant
 		/*
-		 * case SI_TE_GOUDIE:
-		 * if (bhage > 0.0){
-		 * x1 = (1-Math.exp(-0.0227 * bhage)) / (1-Math.exp(-0.0227 * 50));
-		 * x2 = 6.525 * ppow(site_index, -0.7606);
-		 * height = site_index * ppow(x1, x2);
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_TE_GOUDIE: if (bhage > 0.0){ x1 = (1-Math.exp(-0.0227 * bhage)) / (1-Math.exp(-0.0227 * 50)); x2 =
+		 * 6.525 * ppow(site_index, -0.7606); height = site_index * ppow(x1, x2); } else{ height = tage * tage * 1.3 /
+		 * y2bh / y2bh; } break;
 		 */
 		case SI_SW_HUANG_PLA:
 			double x0;
@@ -1978,8 +1768,7 @@ public class SiteIndex2Height {
 				x5 = 0.325438;
 				age_huang = 50.0;
 
-				x0 = -x0 * ppow(site_index - 1.3, x1) *
-						Math.pow(x2, (site_index - 1.3) / age_huang);
+				x0 = -x0 * ppow(site_index - 1.3, x1) * Math.pow(x2, (site_index - 1.3) / age_huang);
 				x0 = (1.0 - Math.exp(x0 * bhage)) / (1 - Math.exp(x0 * 50.0));
 				x1 = ppow(site_index - 1.3, x4);
 				x2 = Math.pow(50.0, x5);
@@ -2000,8 +1789,7 @@ public class SiteIndex2Height {
 				x5 = 0.325438;
 				age_huang = 50.0;
 
-				x0 = -x0 * ppow(site_index - 1.3, x1) *
-						Math.pow(x2, (site_index - 1.3) / age_huang);
+				x0 = -x0 * ppow(site_index - 1.3, x1) * Math.pow(x2, (site_index - 1.3) / age_huang);
 				x0 = (1.0 - Math.exp(x0 * bhage)) / (1 - Math.exp(x0 * 50.0));
 				x1 = ppow(site_index - 1.3, x4);
 				x2 = Math.pow(50.0, x5);
@@ -2021,8 +1809,7 @@ public class SiteIndex2Height {
 				x5 = 0.401374;
 				age_huang = 1;
 
-				x0 = -x0 * ppow(site_index - 1.3, x1) *
-						Math.pow(x2, (site_index - 1.3) / age_huang);
+				x0 = -x0 * ppow(site_index - 1.3, x1) * Math.pow(x2, (site_index - 1.3) / age_huang);
 				x0 = (1.0 - Math.exp(x0 * bhage)) / (1 - Math.exp(x0 * 50.0));
 				x1 = ppow(site_index - 1.3, x4);
 				x2 = Math.pow(50.0, x5);
@@ -2043,8 +1830,7 @@ public class SiteIndex2Height {
 				x5 = 0.401374;
 				age_huang = 1;
 
-				x0 = -x0 * ppow(site_index - 1.3, x1) *
-						Math.pow(x2, (site_index - 1.3) / age_huang);
+				x0 = -x0 * ppow(site_index - 1.3, x1) * Math.pow(x2, (site_index - 1.3) / age_huang);
 				x0 = (1.0 - Math.exp(x0 * bhage)) / (1 - Math.exp(x0 * 50.0));
 				x1 = ppow(site_index - 1.3, x4);
 				x2 = Math.pow(50.0, x5);
@@ -2056,59 +1842,29 @@ public class SiteIndex2Height {
 			break;
 		// Cannot Find Constant
 		/*
-		 * case SI_PJ_HUANG_PLA:
-		 * double x0;
-		 * double age_huang; // used in HUANG's equations
-		 * 
-		 * if (bhage > 0.0){
-		 * x0 = 0.023405;
-		 * x1 = -0.371557;
-		 * x2 = 1.048011;
-		 * x3 = 0.715449;
-		 * x4 = -0.503105;
-		 * x5 = 0.444505;
+		 * case SI_PJ_HUANG_PLA: double x0; double age_huang; // used in HUANG's equations
+		 *
+		 * if (bhage > 0.0){ x0 = 0.023405; x1 = -0.371557; x2 = 1.048011; x3 = 0.715449; x4 = -0.503105; x5 = 0.444505;
 		 * age_huang = 1;
-		 * 
-		 * x0 = -x0 * ppow(site_index - 1.3, x1) *
-		 * Math.pow (x2, (site_index - 1.3) / age_huang);
-		 * x0 = (1.0 - Math.exp (x0 * bhage)) / (1 - Math.exp (x0 * 50.0));
-		 * x1 = ppow(site_index - 1.3, x4);
-		 * x2 = Math.pow (50.0, x5);
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2);
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 *
+		 * x0 = -x0 * ppow(site_index - 1.3, x1) * Math.pow (x2, (site_index - 1.3) / age_huang); x0 = (1.0 - Math.exp
+		 * (x0 * bhage)) / (1 - Math.exp (x0 * 50.0)); x1 = ppow(site_index - 1.3, x4); x2 = Math.pow (50.0, x5);
+		 *
+		 * height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2); } else{ height = tage * tage * 1.3 / y2bh / y2bh;
+		 * } break;
 		 */
 		// Cannot Find Constant
 		/*
-		 * case SI_PJ_HUANG_NAT:
-		 * double x0;
-		 * double age_huang; // used in HUANG's equations
-		 * 
-		 * if (bhage > 0.0){
-		 * x0 = 0.023405;
-		 * x1 = -0.371557;
-		 * x2 = 1.048011;
-		 * x3 = 0.715449;
-		 * x4 = -0.503105;
-		 * x5 = 0.444505;
+		 * case SI_PJ_HUANG_NAT: double x0; double age_huang; // used in HUANG's equations
+		 *
+		 * if (bhage > 0.0){ x0 = 0.023405; x1 = -0.371557; x2 = 1.048011; x3 = 0.715449; x4 = -0.503105; x5 = 0.444505;
 		 * age_huang = 1;
-		 * 
-		 * x0 = -x0 * ppow(site_index - 1.3, x1) *
-		 * Math.pow (x2, (site_index - 1.3) / age_huang);
-		 * x0 = (1.0 - Math.exp (x0 * bhage)) / (1 - Math.exp (x0 * 50.0));
-		 * x1 = ppow(site_index - 1.3, x4);
-		 * x2 = Math.pow (50.0, x5);
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2);
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 *
+		 * x0 = -x0 * ppow(site_index - 1.3, x1) * Math.pow (x2, (site_index - 1.3) / age_huang); x0 = (1.0 - Math.exp
+		 * (x0 * bhage)) / (1 - Math.exp (x0 * 50.0)); x1 = ppow(site_index - 1.3, x4); x2 = Math.pow (50.0, x5);
+		 *
+		 * height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2); } else{ height = tage * tage * 1.3 / y2bh / y2bh;
+		 * } break;
 		 */
 
 		case SI_FDI_HUANG_PLA:
@@ -2121,8 +1877,7 @@ public class SiteIndex2Height {
 				x5 = 0.405321;
 				age_huang = 50.0;
 
-				x0 = -x0 * ppow(site_index - 1.3, x1) *
-						Math.pow(x2, (site_index - 1.3) / age_huang);
+				x0 = -x0 * ppow(site_index - 1.3, x1) * Math.pow(x2, (site_index - 1.3) / age_huang);
 				x0 = (1.0 - Math.exp(x0 * bhage)) / (1 - Math.exp(x0 * 50.0));
 				x1 = ppow(site_index - 1.3, x4);
 				x2 = Math.pow(50.0, x5);
@@ -2143,8 +1898,7 @@ public class SiteIndex2Height {
 				x5 = 0.405321;
 				age_huang = 50.0;
 
-				x0 = -x0 * ppow(site_index - 1.3, x1) *
-						Math.pow(x2, (site_index - 1.3) / age_huang);
+				x0 = -x0 * ppow(site_index - 1.3, x1) * Math.pow(x2, (site_index - 1.3) / age_huang);
 				x0 = (1.0 - Math.exp(x0 * bhage)) / (1 - Math.exp(x0 * 50.0));
 				x1 = ppow(site_index - 1.3, x4);
 				x2 = Math.pow(50.0, x5);
@@ -2165,8 +1919,7 @@ public class SiteIndex2Height {
 				x5 = 0.522558;
 				age_huang = 1;
 
-				x0 = -x0 * ppow(site_index - 1.3, x1) *
-						Math.pow(x2, (site_index - 1.3) / age_huang);
+				x0 = -x0 * ppow(site_index - 1.3, x1) * Math.pow(x2, (site_index - 1.3) / age_huang);
 				x0 = (1.0 - Math.exp(x0 * bhage)) / (1 - Math.exp(x0 * 50.0));
 				x1 = ppow(site_index - 1.3, x4);
 				x2 = Math.pow(50.0, x5);
@@ -2187,8 +1940,7 @@ public class SiteIndex2Height {
 				x5 = 0.387445;
 				age_huang = 1;
 
-				x0 = -x0 * ppow(site_index - 1.3, x1) *
-						Math.pow(x2, (site_index - 1.3) / age_huang);
+				x0 = -x0 * ppow(site_index - 1.3, x1) * Math.pow(x2, (site_index - 1.3) / age_huang);
 				x0 = (1.0 - Math.exp(x0 * bhage)) / (1 - Math.exp(x0 * 50.0));
 				x1 = ppow(site_index - 1.3, x4);
 				x2 = Math.pow(50.0, x5);
@@ -2209,8 +1961,7 @@ public class SiteIndex2Height {
 				x5 = 0.526901;
 				age_huang = 1;
 
-				x0 = -x0 * ppow(site_index - 1.3, x1) *
-						Math.pow(x2, (site_index - 1.3) / age_huang);
+				x0 = -x0 * ppow(site_index - 1.3, x1) * Math.pow(x2, (site_index - 1.3) / age_huang);
 				x0 = (1.0 - Math.exp(x0 * bhage)) / (1 - Math.exp(x0 * 50.0));
 				x1 = ppow(site_index - 1.3, x4);
 				x2 = Math.pow(50.0, x5);
@@ -2224,31 +1975,16 @@ public class SiteIndex2Height {
 
 		// Cannot Find Constant
 		/*
-		 * case SI_BB_HUANG:
-		 * double x0;
-		 * double age_huang; // used in HUANG's equations
-		 * 
-		 * if (bhage > 0.0){
-		 * x0 = 0.010190;
-		 * x1 = 0.013957;
-		 * x2 = 3.876735;
-		 * x3 = 0.647527;
-		 * x4 = -0.274343;
-		 * x5 = 0.378078;
+		 * case SI_BB_HUANG: double x0; double age_huang; // used in HUANG's equations
+		 *
+		 * if (bhage > 0.0){ x0 = 0.010190; x1 = 0.013957; x2 = 3.876735; x3 = 0.647527; x4 = -0.274343; x5 = 0.378078;
 		 * age_huang = 50.0;
-		 * 
-		 * x0 = -x0 * ppow(site_index - 1.3, x1) *
-		 * Math.pow (x2, (site_index - 1.3) / age_huang);
-		 * x0 = (1.0 - Math.exp (x0 * bhage)) / (1 - Math.exp (x0 * 50.0));
-		 * x1 = ppow(site_index - 1.3, x4);
-		 * x2 = Math.pow (50.0, x5);
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2);
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 *
+		 * x0 = -x0 * ppow(site_index - 1.3, x1) * Math.pow (x2, (site_index - 1.3) / age_huang); x0 = (1.0 - Math.exp
+		 * (x0 * bhage)) / (1 - Math.exp (x0 * 50.0)); x1 = ppow(site_index - 1.3, x4); x2 = Math.pow (50.0, x5);
+		 *
+		 * height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2); } else{ height = tage * tage * 1.3 / y2bh / y2bh;
+		 * } break;
 		 */
 
 		case SI_ACB_HUANGAC: {
@@ -2261,8 +1997,7 @@ public class SiteIndex2Height {
 				x5 = 0.526901;
 				age_huang = 1;
 
-				x0 = -x0 * ppow(site_index - 1.3, x1) *
-						Math.pow(x2, (site_index - 1.3) / age_huang);
+				x0 = -x0 * ppow(site_index - 1.3, x1) * Math.pow(x2, (site_index - 1.3) / age_huang);
 				x0 = (1.0 - Math.exp(x0 * (bhage - 0.5))) / (1 - Math.exp(x0 * 49.5));
 				x1 = ppow(site_index - 1.3, x4);
 				x2 = Math.pow(49.5, x5);
@@ -2279,8 +2014,8 @@ public class SiteIndex2Height {
 				x2 = -1.4945;
 				x3 = -1.2159;
 
-				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(50.0) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage) + x3 * llog(site_index - 1.3)));
+				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(50.0) + x3 * llog(site_index - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(bhage) + x3 * llog(site_index - 1.3)));
 
 				height = 1.3 + (site_index - 1.3) * x4;
 			} else {
@@ -2294,8 +2029,8 @@ public class SiteIndex2Height {
 				x2 = -1.5269;
 				x3 = -0.7805;
 
-				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(50.0) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage) + x3 * llog(site_index - 1.3)));
+				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(50.0) + x3 * llog(site_index - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(bhage) + x3 * llog(site_index - 1.3)));
 
 				height = 1.3 + (site_index - 1.3) * x4;
 			} else {
@@ -2309,8 +2044,8 @@ public class SiteIndex2Height {
 				x2 = -1.2875;
 				x3 = -0.5904;
 
-				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(50.0) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage) + x3 * llog(site_index - 1.3)));
+				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(50.0) + x3 * llog(site_index - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(bhage) + x3 * llog(site_index - 1.3)));
 
 				height = 1.3 + (site_index - 1.3) * x4;
 			} else {
@@ -2319,21 +2054,12 @@ public class SiteIndex2Height {
 			break;
 		// Couldn't Find Constant
 		/*
-		 * case SI_EP_CHEN:
-		 * if (bhage > 0.0){
-		 * x1 = 9.9045;
-		 * x2 = -1.1736;
-		 * x3 = -1.8361;
-		 * 
-		 * x4 = (1.0 + Math.exp (x1 + x2 * Math.log (50.0) + x3 * llog(site_index - 1.3))) /
-		 * (1.0 + Math.exp (x1 + x2 * Math.log (bhage)+ x3 * llog(site_index - 1.3)));
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * x4;
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_EP_CHEN: if (bhage > 0.0){ x1 = 9.9045; x2 = -1.1736; x3 = -1.8361;
+		 *
+		 * x4 = (1.0 + Math.exp (x1 + x2 * Math.log (50.0) + x3 * llog(site_index - 1.3))) / (1.0 + Math.exp (x1 + x2 *
+		 * Math.log (bhage)+ x3 * llog(site_index - 1.3)));
+		 *
+		 * height = 1.3 + (site_index - 1.3) * x4; } else{ height = tage * tage * 1.3 / y2bh / y2bh; } break;
 		 */
 		case SI_DR_CHEN:
 			if (bhage > 0.0) {
@@ -2341,8 +2067,8 @@ public class SiteIndex2Height {
 				x2 = -1.0807;
 				x3 = -1.0176;
 
-				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(50.0) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage) + x3 * llog(site_index - 1.3)));
+				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(50.0) + x3 * llog(site_index - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(bhage) + x3 * llog(site_index - 1.3)));
 
 				height = 1.3 + (site_index - 1.3) * x4;
 			} else {
@@ -2356,8 +2082,8 @@ public class SiteIndex2Height {
 				x2 = -1.4945;
 				x3 = -1.2159;
 
-				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
+				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
 
 				height = 1.3 + (site_index - 1.3) * x4;
 			} else {
@@ -2371,8 +2097,8 @@ public class SiteIndex2Height {
 				x2 = -1.5269;
 				x3 = -0.7805;
 
-				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
+				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
 
 				height = 1.3 + (site_index - 1.3) * x4;
 			} else {
@@ -2385,10 +2111,8 @@ public class SiteIndex2Height {
 
 		case SI_AT_CHEN:
 			if (bhage > 0.0) {
-				x1 = llog(ppow(site_index - 1.3, -0.076) / 1.418) /
-						llog(1 - Math.exp(-0.017 * 50));
-				height = 1.3 + 1.418 * (ppow(site_index - 1.3, 1.076) *
-						ppow(1 - Math.exp(-0.017 * bhage), x1));
+				x1 = llog(ppow(site_index - 1.3, -0.076) / 1.418) / llog(1 - Math.exp(-0.017 * 50));
+				height = 1.3 + 1.418 * (ppow(site_index - 1.3, 1.076) * ppow(1 - Math.exp(-0.017 * bhage), x1));
 			} else {
 				height = tage * tage * 1.3 / y2bh / y2bh;
 			}
@@ -2401,8 +2125,8 @@ public class SiteIndex2Height {
 				x4 = 1.719841;
 
 				x5 = (1.0 + x1 * (site_index - 1.3)
-						+ Math.exp(x2 + x3 * Math.log(50 + x4) - Math.log(site_index - 1.3))) /
-						(1.0 + x1 * (site_index - 1.3)
+						+ Math.exp(x2 + x3 * Math.log(50 + x4) - Math.log(site_index - 1.3)))
+						/ (1.0 + x1 * (site_index - 1.3)
 								+ Math.exp(x2 + x3 * Math.log(bhage + x4) - Math.log(site_index - 1.3)));
 
 				height = 1.3 + (site_index - 1.3) * x5;
@@ -2419,8 +2143,8 @@ public class SiteIndex2Height {
 				x4 = 1.719841;
 
 				x5 = (1.0 + x1 * (site_index - 1.3)
-						+ Math.exp(x2 + x3 * Math.log(49.5 + x4) - Math.log(site_index - 1.3))) /
-						(1.0 + x1 * (site_index - 1.3)
+						+ Math.exp(x2 + x3 * Math.log(49.5 + x4) - Math.log(site_index - 1.3)))
+						/ (1.0 + x1 * (site_index - 1.3)
 								+ Math.exp(x2 + x3 * Math.log(bhage - 0.5 + x4) - Math.log(site_index - 1.3)));
 
 				height = 1.3 + (site_index - 1.3) * x5;
@@ -2430,18 +2154,13 @@ public class SiteIndex2Height {
 			break;
 		// Couldn't Find Constant
 		/*
-		 * case SI_EP_CAMERON:
-		 * if (bhage > 0.0)
-		 * height = 1.76928 * (site_index - 1.3) * ppow(1 - Math.exp (-0.01558 * bhage), 0.92908);
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_EP_CAMERON: if (bhage > 0.0) height = 1.76928 * (site_index - 1.3) * ppow(1 - Math.exp (-0.01558 *
+		 * bhage), 0.92908); else{ height = tage * tage * 1.3 / y2bh / y2bh; } break;
 		 */
 
 		case SI_BA_NIGHGI, SI_BL_THROWERGI, SI_PY_NIGHGI, SI_CWI_NIGHGI, SI_FDC_NIGHGI, SI_FDI_NIGHGI, SI_HWC_NIGHGI,
 				SI_HWC_NIGHGI99, SI_HWI_NIGHGI, SI_LW_NIGHGI,
-				//case SI_PLI_NIGHGI: Couldnt Find constant
+				// case SI_PLI_NIGHGI: Couldnt Find constant
 				SI_PLI_NIGHGI97, SI_SE_NIGHGI, SI_SS_NIGHGI, SI_SS_NIGHGI99, SI_SW_NIGHGI, SI_SW_NIGHGI99,
 				SI_SW_NIGHGI2004:
 
@@ -2459,11 +2178,7 @@ public class SiteIndex2Height {
 		return height;
 	}
 
-	public static double gi_si2ht(
-			int cu_index,
-			double age,
-			double site_index
-	) throws CommonCalculatorException {
+	public static double gi_si2ht(int cu_index, double age, double site_index) throws CommonCalculatorException {
 		double si2ht;
 		double step;
 		double test_site;
@@ -2486,19 +2201,18 @@ public class SiteIndex2Height {
 		do {
 			test_site = Height2SiteIndex.height_to_index(cu_index, age, (int) SI_AT_BREAST, si2ht, (int) SI_EST_DIRECT);
 			/*
-			 * printf ("age=%3.0f, site=%5.2f, test_site=%5.2f, si2ht=%5.2f, step=%9.7f\n",
-			 * age, site_index, test_site, si2ht, step);
+			 * printf ("age=%3.0f, site=%5.2f, test_site=%5.2f, si2ht=%5.2f, step=%9.7f\n", age, site_index, test_site,
+			 * si2ht, step);
 			 */
 
-			//This code could probably be removed
+			// This code could probably be removed
 			if (test_site < 0) /* error */
 			{
 				si2ht = test_site;
 				break;
 			}
 
-			if ( (test_site - site_index > 0.01) ||
-					(test_site - site_index < -0.01)) {
+			if ( (test_site - site_index > 0.01) || (test_site - site_index < -0.01)) {
 				/* not close enough */
 				if (test_site > site_index) {
 					if (step > 0) {

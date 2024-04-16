@@ -16,6 +16,6 @@ public class SiteCurve {
 			return coastalRegionValue;
 		else if (region.equals(Region.INTERIOR))
 			return interiorRegionValue;
-		throw new IllegalStateException(MessageFormat.format("{} is not a supported region", region));
+		throw new IllegalStateException(MessageFormat.format("{0} is not a supported region", region));
 	}
 }

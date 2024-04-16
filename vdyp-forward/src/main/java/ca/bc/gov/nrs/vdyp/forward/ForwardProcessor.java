@@ -318,7 +318,7 @@ public class ForwardProcessor {
 
 		if (thePolygon == null) {
 			throw new ProcessingException(
-					MessageFormat.format("Unable to find the definition of {}", polygonDescription)
+					MessageFormat.format("Unable to find the definition of {0}", polygonDescription)
 			);
 		}
 

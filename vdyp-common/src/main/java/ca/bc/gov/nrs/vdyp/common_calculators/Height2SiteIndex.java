@@ -7,14 +7,13 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Excepti
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 
 /**
- * Height2SiteIndex.java
- *  - given age and height, computes site index.
- * - if age is total, site index and years to breast height are iterated until
- *   stable.
+ * Height2SiteIndex.java 
+ * - given age and height, computes site index. 
+ * - if age is total, site index and years to breast height are iterated until stable.
  */
 public class Height2SiteIndex {
 	// Taken from sindex.h
-	
+
 	/*
 	 * age types
 	 */
@@ -81,7 +80,7 @@ public class Height2SiteIndex {
 		return ( (x) <= 0.0) ? Math.log(.00001) : Math.log(x);
 	}
 
-	public static double height_to_index(int cu_index, double age, int age_type, double height, int si_est_type) 
+	public static double height_to_index(int cu_index, double age, int age_type, double height, int si_est_type)
 			throws CommonCalculatorException {
 		double index;
 		double x1, x2;
@@ -130,7 +129,7 @@ public class Height2SiteIndex {
 		return (index);
 	}
 
-	public static double ba_height_to_index(int cu_index, double bhage, double height, int si_est_type) 
+	public static double ba_height_to_index(int cu_index, double bhage, double height, int si_est_type)
 			throws CommonCalculatorException {
 		double index;
 		double x1, x2;
@@ -3855,7 +3854,7 @@ public class Height2SiteIndex {
 		return index;
 	}
 
-	public static double site_iterate(int cu_index, double age, int age_type, double height) 
+	public static double site_iterate(int cu_index, double age, int age_type, double height)
 			throws CommonCalculatorException {
 		double site;
 		double step;

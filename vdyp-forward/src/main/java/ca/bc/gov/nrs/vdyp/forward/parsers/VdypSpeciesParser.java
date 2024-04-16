@@ -83,7 +83,7 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 					.value(6, TOTAL_AGE, ValueParser.FLOAT).value(6, AGE_AT_BREAST_HEIGHT, ValueParser.FLOAT)
 					.value(6, YEARS_TO_BREAST_HEIGHT, ValueParser.FLOAT)
 					.value(2, IS_PRIMARY_SPECIES, ControlledValueParser.optional(ValueParser.LOGICAL_0_1))
-					.value(3, SITE_CURVE_NUMBER, ValueParser.posttestOptional(ValueParser.INTEGER, x -> x >= 0));
+					.value(3, SITE_CURVE_NUMBER, ValueParser.INTEGER);
 
 			var is = fileResolver.resolveForInput(fileName);
 

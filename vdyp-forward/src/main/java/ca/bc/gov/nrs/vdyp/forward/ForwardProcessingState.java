@@ -61,7 +61,7 @@ class ForwardProcessingState {
 		switch (layerType) {
 			case PRIMARY: return 0;
 			case VETERAN: return 1;
-			default: throw new IllegalStateException(MessageFormat.format("Unsupported LayerType {}", layerType));
+			default: throw new IllegalStateException(MessageFormat.format("Unsupported LayerType {0}", layerType));
 		}
 	}
 }

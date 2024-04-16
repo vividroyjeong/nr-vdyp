@@ -1,17 +1,16 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CodeErrorException;
-import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ForestInventoryZoneException;
 
 /**
- * SpecRMap.java
- * - determines the default species/curve index for a given species code.
- * - initial species code remappings provided by Inventory Branch.
+ * SpecRMap.java 
+ * - determines the default species/curve index for a given species code. 
+ * - initial species code remappings provided by Inventory Branch. 
  * - species codes can be 1-3 letters, in upper or lower case.
  */
 public class SpecRMap {
 	// Taken from sindex.h
-	
+
 	/* define species and equation indices */
 	private static final int SI_SPEC_A = 0;
 	private static final int SI_SPEC_ABAL = 1;
@@ -150,7 +149,7 @@ public class SpecRMap {
 	private static final int SI_SPEC_ZH = 134;
 
 	public static int species_map(String sc) throws CodeErrorException {
-		
+
 		// This can be done more elegantly with Java
 		String sc2 = sc.replaceAll(" ", "").toUpperCase();
 
@@ -572,8 +571,8 @@ public class SpecRMap {
 		throw new CodeErrorException("Unknown species code: " + sc2);
 	}
 
-	public static int species_remap(String sc, char fiz) throws CodeErrorException, ForestInventoryZoneException {
-		
+	public static int species_remap(String sc, char fiz) throws CodeErrorException {
+
 		// This can be done more elegantly with Java
 		String sc2 = sc.replaceAll(" ", "").toUpperCase();
 
@@ -583,10 +582,10 @@ public class SpecRMap {
 		 *
 		 * i2 = 0; 
 		 * for (i = 0; i < sc.length && i < 10; i++) { 
-		 *     if (sc[i] != ' ') { 
+		 * 	   if (sc[i] != ' ') { 
 		 *         sc2[i2] = Character.toUpperCase(sc[i]); i2++; 
-		 *     }
-		 * }
+		 *     } 
+		 * } 
 		 * sc2[i2] = '\0';
 		 */
 
@@ -656,7 +655,7 @@ public class SpecRMap {
 		if (sc2.equals("BP")) {
 			return SI_SPEC_BP;
 		}
-		// if (sc2.equals("BV")) { 
+		// if (sc2.equals("BV")) {
 		//     return SI_SPEC_AT;
 		// }
 		if (sc2.equals("C")) {
@@ -1025,16 +1024,16 @@ public class SpecRMap {
 
 		throw new CodeErrorException("Unknown species code: " + sc2);
 	}
-	
+
 	private static int speciesByFizCategory(char fiz, int coastalSpecies, int interiorSpecies)
-			throws ForestInventoryZoneException {
+			throws CodeErrorException {
 		switch (FizCheck.fiz_check(fiz)) {
 		case FizCheck.FIZ_COAST:
 			return coastalSpecies;
 		case FizCheck.FIZ_INTERIOR:
 			return interiorSpecies;
 		default:
-			throw new ForestInventoryZoneException("Unknown forest inventory code: " + fiz);
+			throw new CodeErrorException("Unknown forest inventory code: " + fiz);
 		}
 	}
 }

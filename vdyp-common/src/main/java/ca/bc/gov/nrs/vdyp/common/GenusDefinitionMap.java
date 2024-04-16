@@ -15,12 +15,12 @@ public class GenusDefinitionMap {
 	public GenusDefinitionMap(List<GenusDefinition> genusDefinitionList) {
 
 		maxIndex = genusDefinitionList.size();
-		
+
 		int currentIndex = 1;
 		for (GenusDefinition g : genusDefinitionList) {
 			genusByAliasMap.put(g.getAlias(), g);
 			indexByAliasMap.put(g.getAlias(), g.getPreference().orElse(currentIndex));
-			
+
 			currentIndex += 1;
 		}
 	}
@@ -39,12 +39,12 @@ public class GenusDefinitionMap {
 		Integer index = indexByAliasMap.get(alias);
 		if (index == null) {
 			throw new IllegalArgumentException(
-				MessageFormat.format("Unable to find GenusDefinition for alias {0}", alias)
+					MessageFormat.format("Unable to find GenusDefinition for alias {0}", alias)
 			);
 		}
 		return index;
 	}
-	
+
 	public int getMaxIndex() {
 		return maxIndex;
 	}

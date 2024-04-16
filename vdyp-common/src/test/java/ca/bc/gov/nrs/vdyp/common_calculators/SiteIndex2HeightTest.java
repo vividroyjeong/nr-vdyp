@@ -176,7 +176,8 @@ class SiteIndex2HeightTest {
 		}
 
 		@Test
-		void testSI_HWC_FARRBhageLessThanZero() throws CommonCalculatorException { // LessThanOrEqual is meant but omitted
+		void testSI_HWC_FARRBhageLessThanZero() throws CommonCalculatorException { // LessThanOrEqual is meant but
+																					// omitted
 			double actualResult = SiteIndex2Height.index_to_height(SI_HWC_FARR, 0.0, SI_AT_BREAST, 1.31, 2.0, 0.0);
 			double expectedResult = 1.37;
 
@@ -481,10 +482,10 @@ class SiteIndex2HeightTest {
 	}
 
 	@Test
-	void testHuGarciaQ() throws CommonCalculatorException { 
+	void testHuGarciaQ() throws CommonCalculatorException {
 		// the way I've done these tests is to validate them with the original C code and
 		// compare them with the output of the java code
-		
+
 		// Test case 1
 		double siteIndex1 = 20.0;
 		double bhAge1 = 30.0;

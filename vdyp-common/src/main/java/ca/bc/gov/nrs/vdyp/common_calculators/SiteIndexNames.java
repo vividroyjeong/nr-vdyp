@@ -5,7 +5,7 @@ package ca.bc.gov.nrs.vdyp.common_calculators;
  */
 public class SiteIndexNames {
 	// Taken from sindex.h
-	
+
 	/* define species and equation indices */
 	private static final int SI_SPEC_AT = 8;
 	private static final int SI_SPEC_BA = 11;
@@ -429,7 +429,7 @@ public class SiteIndexNames {
 
 			// SI_SPEC_ZH
 			"Zh", };
-	
+
 	public static final String[] si_spec_name = {
 			// SI_SPEC_A
 			"Aspen",
@@ -2178,6 +2178,5 @@ public class SiteIndexNames {
 			1.3,
 
 			// SI_CWC_NIGH
-			1.3
-	};
+			1.3 };
 }

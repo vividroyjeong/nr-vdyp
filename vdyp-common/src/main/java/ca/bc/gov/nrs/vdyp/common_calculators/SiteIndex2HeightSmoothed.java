@@ -6,12 +6,12 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException
 
 /**
  * SiteIndex2HeightSmoothed
- * 
+ *
  * Defines {@code index_to_height_smoothed}
  */
 public class SiteIndex2HeightSmoothed {
 	// Taken from sindex
-	
+
 	/*
 	 * age types
 	 */
@@ -35,15 +35,15 @@ public class SiteIndex2HeightSmoothed {
 	 * @param seedling_ht
 	 * @return
 	 * @throws LessThan13Exception when {@code site_index} is less than 1.3
-	 * @throws NoAnswerException when the iteration will not converge
+	 * @throws NoAnswerException   when the iteration will not converge
 	 */
 	public static double index_to_height_smoothed(
 			int cu_index, double iage, int age_type, double site_index, double y2bh, double seedling_age,
 			double seedling_ht
 	) throws CommonCalculatorException {
-		
+
 		double result; // return value
-		
+
 		double tage; // total age
 		double bhage; // breast-height age
 		double pi; // proportion of height growth between breast height
@@ -77,7 +77,7 @@ public class SiteIndex2HeightSmoothed {
 
 		double k0;
 		double k1;
-		
+
 		bhage = 2;
 		do {
 			result = SiteIndex2Height.index_to_height(cu_index, bhage, SI_AT_BREAST, site_index, y2bh, pi);

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CodeErrorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ForestInventoryZoneException;
 
 class SpecRMapTest {
 	// Taken from sindex.h

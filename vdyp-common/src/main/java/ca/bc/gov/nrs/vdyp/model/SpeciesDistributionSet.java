@@ -17,9 +17,10 @@ public class SpeciesDistributionSet {
 
 	private SpeciesDistributionSet(SpeciesDistributionSet other) {
 		speciesDistributionMap = new HashMap<>();
-		
-		for (var e: other.speciesDistributionMap.entrySet()) {
-			speciesDistributionMap.put(e.getKey(), new SpeciesDistribution(e.getValue().getSpecies(), e.getValue().getPercentage()));
+
+		for (var e : other.speciesDistributionMap.entrySet()) {
+			speciesDistributionMap
+					.put(e.getKey(), new SpeciesDistribution(e.getValue().getSpecies(), e.getValue().getPercentage()));
 		}
 	}
 
