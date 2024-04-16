@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
-
 import ca.bc.gov.nrs.vdyp.common.Computed;
 
 public abstract class BaseVdypSpecies {

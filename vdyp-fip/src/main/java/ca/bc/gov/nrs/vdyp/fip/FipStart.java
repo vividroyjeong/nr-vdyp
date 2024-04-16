@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -493,19 +492,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 	public static <T> List<T> utilizationArray(VdypLayer layer, Function<VdypUtilizationHolder, T> accessor) {
 		return Stream.concat(Stream.of(layer), layer.getSpecies().values().stream()).map(accessor).toList();
-	}
-
-	int findEmpiricalRelationshipParameterIndex(String specAlias, BecDefinition bec, int itg)
-			throws ProcessingException {
-		var groupMap = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
-				controlMap, ControlKey.DEFAULT_EQ_NUM, MatrixMap2.class
-		);
-		var modMap = Utils.<MatrixMap2<Integer, Integer, Optional<Integer>>>expectParsedControl(
-				controlMap, ControlKey.EQN_MODIFIERS, MatrixMap2.class
-		);
-		var group = groupMap.get(specAlias, bec.getGrowthBec().getAlias());
-		group = MatrixMap.safeGet(modMap, group, itg).orElse(group);
-		return group;
 	}
 
 	// ROOTF01
@@ -1855,19 +1841,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		return exp(logit);
 	}
 
-	// GRPBA1FD
-	int findBaseAreaGroup(FipSpecies fipSpecies, BecDefinition bec, int itg) {
-		var growthBec = bec.getGrowthBec();
-		final var defaultGroupsMap = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
-				controlMap, ControlKey.DEFAULT_EQ_NUM, MatrixMap2.class
-		);
-		final var modifierMap = Utils.<MatrixMap2<Integer, Integer, Optional<Integer>>>expectParsedControl(
-				controlMap, ControlKey.EQN_MODIFIERS, MatrixMap2.class
-		);
-		var defaultGroup = defaultGroupsMap.get(fipSpecies.getGenus(), growthBec.getAlias());
-		return modifierMap.getM(defaultGroup, itg).orElse(defaultGroup);
-	}
-
 	private float heightMultiplier(String genus, Region region, float treesPerHectarePrimary) {
 		final var coeMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
 				controlMap, ControlKey.HL_PRIMARY_SP_EQN_P1, MatrixMap2.class
@@ -2549,53 +2522,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		return estimatePrimaryBaseArea(
 				fipLayer, bec, yieldFactor, breastHeightAge, baseAreaOverstory, fipLayer.getCrownClosure()
 		);
-	}
-
-	/**
-	 * Create a coefficients object where its values are either a weighted sum of those for each of the given entities,
-	 * or the value from one arbitrarily chose entity.
-	 *
-	 * @param <T>             The type of entity
-	 * @param weighted        the indicies of the coefficients that should be weighted sums, those that are not included
-	 *                        are assumed to be constant across all entities and one is choses arbitrarily.
-	 * @param size            Size of the resulting coefficients object
-	 * @param indexFrom       index from of the resulting coefficients object
-	 * @param entities        the entities to do weighted sums over
-	 * @param weight          the weight for a given entity
-	 * @param getCoefficients the coefficients for a given entity
-	 */
-	<T> Coefficients weightedCoefficientSum(
-			Collection<Integer> weighted, int size, int indexFrom, Collection<T> entities, ToDoubleFunction<T> weight,
-			Function<T, Coefficients> getCoefficients
-	) {
-		Coefficients coe = Coefficients.empty(size, indexFrom);
-
-		// Do the summation in double precision
-		var coeWorking = new double[size];
-		Arrays.fill(coeWorking, 0.0);
-
-		for (var entity : entities) {
-			var entityCoe = getCoefficients.apply(entity);
-			double fraction = weight.applyAsDouble(entity);
-			for (int i : weighted) {
-				coeWorking[i - indexFrom] += (entityCoe.getCoe(i)) * fraction;
-			}
-		}
-		// Reduce back to float once done
-		for (int i : weighted) {
-			coe.setCoe(i, (float) coeWorking[i - indexFrom]);
-		}
-
-		// Pick one entity to fill in the fixed coefficients
-		// Choice is arbitrary, they should all be the same
-		var anyCoe = getCoefficients.apply(entities.iterator().next());
-
-		for (int i = indexFrom; i < size + indexFrom; i++) {
-			if (weighted.contains(i))
-				continue;
-			coe.setCoe(i, anyCoe.getCoe(i));
-		}
-		return coe;
 	}
 
 	FipSpecies leadGenus(FipLayer fipLayer) {
