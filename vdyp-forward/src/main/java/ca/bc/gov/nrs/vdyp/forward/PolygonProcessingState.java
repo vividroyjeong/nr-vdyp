@@ -162,7 +162,7 @@ class PolygonProcessingState {
 		Optional<Integer>[] t = new Optional[a.length];
 
 		for (int i = 0; i < a.length; i++)
-			t[i] = a[i].isPresent() ? Optional.of(Integer.valueOf(a[i].get())) : Optional.empty();
+			t[i] = a[i];
 
 		return t;
 	}
