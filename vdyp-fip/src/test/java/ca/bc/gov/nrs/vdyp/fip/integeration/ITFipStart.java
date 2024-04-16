@@ -21,7 +21,12 @@ import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
+import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.fip.FipStart;
+import ca.bc.gov.nrs.vdyp.fip.model.FipLayer;
+import ca.bc.gov.nrs.vdyp.fip.model.FipPolygon;
+import ca.bc.gov.nrs.vdyp.fip.model.FipSite;
+import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
 import ca.bc.gov.nrs.vdyp.fip.test.FipTestUtils;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -103,7 +108,7 @@ class ITFipStart {
 
 	@Test
 	void noControlFile() throws IOException, ResourceParseException, ProcessingException {
-		try (var app = new FipStart();) {
+		try (VdypStartApplication<FipPolygon, FipLayer, FipSpecies, FipSite> app = new FipStart();) {
 
 			var resolver = new FileSystemFileResolver(configDir);
 
@@ -113,7 +118,7 @@ class ITFipStart {
 
 	@Test
 	void controlFileDoesntExist() throws IOException, ResourceParseException, ProcessingException {
-		try (var app = new FipStart();) {
+		try (VdypStartApplication<FipPolygon, FipLayer, FipSpecies, FipSite> app = new FipStart();) {
 
 			var resolver = new FileSystemFileResolver(configDir);
 
@@ -255,7 +260,7 @@ class ITFipStart {
 
 	@Test
 	void controlFile() throws IOException, ResourceParseException, ProcessingException {
-		try (var app = new FipStart();) {
+		try (VdypStartApplication<FipPolygon, FipLayer, FipSpecies, FipSite> app = new FipStart();) {
 
 			var resolver = new FileSystemFileResolver(configDir);
 

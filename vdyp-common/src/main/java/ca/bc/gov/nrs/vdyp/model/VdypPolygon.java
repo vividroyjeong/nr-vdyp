@@ -4,7 +4,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float> {
+public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float, VdypSpecies, VdypSite> {
 
 	public VdypPolygon(
 			String polygonIdentifier, Float percentAvailable, String fiz, String becIdentifier,
@@ -21,7 +21,9 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float> {
 	 * @param toCopy                  The polygon to copy
 	 * @param convertPercentAvailable Function to convert
 	 */
-	public <O extends BaseVdypPolygon<?, U>, U> VdypPolygon(O toCopy, Function<U, Float> convertPercentAvailable) {
+	public <O extends BaseVdypPolygon<?, U, ?, ?>, U> VdypPolygon(
+			O toCopy, Function<U, Float> convertPercentAvailable
+	) {
 		super(toCopy, convertPercentAvailable);
 	}
 
@@ -45,7 +47,8 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float> {
 		return builder.build();
 	}
 
-	public static class Builder extends BaseVdypPolygon.Builder<VdypPolygon, VdypLayer, Float> {
+	public static class Builder extends
+			BaseVdypPolygon.Builder<VdypPolygon, VdypLayer, Float, VdypSpecies, VdypSite, VdypLayer.Builder, VdypSpecies.Builder, VdypSite.Builder> {
 
 		@Override
 		protected VdypPolygon doBuild() {

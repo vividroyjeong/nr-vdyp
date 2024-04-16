@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
-
 import ca.bc.gov.nrs.vdyp.common.Computed;
 
 public abstract class BaseVdypSpecies {
@@ -86,6 +85,7 @@ public abstract class BaseVdypSpecies {
 		protected Optional<LayerType> layerType = Optional.empty();
 		protected Optional<String> genus = Optional.empty();
 		protected Optional<Float> percentGenus = Optional.empty();
+		protected Optional<Float> fractionGenus = Optional.empty();
 		protected Map<String, Float> speciesPercent = new LinkedHashMap<>();
 
 		public Builder<T> polygonIdentifier(String polygonIdentifier) {
@@ -108,6 +108,11 @@ public abstract class BaseVdypSpecies {
 			return this;
 		}
 
+		protected Builder<T> fractionGenus(float fractionGenus) {
+			this.fractionGenus = Optional.of(fractionGenus);
+			return this;
+		}
+
 		public Builder<T> addSpecies(String id, float percent) {
 			this.speciesPercent.put(id, percent);
 			return this;
@@ -123,6 +128,8 @@ public abstract class BaseVdypSpecies {
 			layerType(toCopy.getLayerType());
 			genus(toCopy.getGenus());
 			percentGenus(toCopy.getPercentGenus());
+
+			fractionGenus(toCopy.getFractionGenus());
 			return this;
 		}
 
@@ -138,6 +145,7 @@ public abstract class BaseVdypSpecies {
 		protected void postProcess(T result) {
 			super.postProcess(result);
 			result.setSpeciesPercent(speciesPercent);
+			this.fractionGenus.ifPresent(result::setFractionGenus);
 		}
 
 	}

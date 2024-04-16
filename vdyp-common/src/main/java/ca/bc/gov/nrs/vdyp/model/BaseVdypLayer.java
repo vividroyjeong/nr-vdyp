@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.model;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -77,6 +78,7 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdy
 		protected Optional<Integer> inventoryTypeGroup = Optional.empty();
 
 		protected List<S> species = new LinkedList<>();
+		protected List<I> sites = new LinkedList<>();
 		protected List<Consumer<SB>> speciesBuilders = new LinkedList<>();
 		protected List<Consumer<IB>> siteBuilders = new LinkedList<>();
 
@@ -104,8 +106,18 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdy
 			return this;
 		}
 
+		public Builder<T, S, I, SB, IB> addSpecies(S species) {
+			this.species.add(species);
+			return this;
+		}
+
 		public Builder<T, S, I, SB, IB> addSite(Consumer<IB> config) {
 			siteBuilders.add(config);
+			return this;
+		}
+
+		public Builder<T, S, I, SB, IB> addSite(I site) {
+			this.sites.add(site);
 			return this;
 		}
 
@@ -125,6 +137,20 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdy
 			return this;
 		}
 
+		public List<S> getSpecies() {
+			if (!speciesBuilders.isEmpty()) {
+				throw new IllegalStateException("Tried to get species when there are unbuilt species builders");
+			}
+			return Collections.unmodifiableList(species);
+		}
+
+		public List<I> getSites() {
+			if (!siteBuilders.isEmpty()) {
+				throw new IllegalStateException("Tried to get sites when there are unbuilt site builders");
+			}
+			return Collections.unmodifiableList(sites);
+		}
+
 		@Override
 		protected void check(Collection<String> errors) {
 			requirePresent(polygonIdentifier, "polygonIdentifier", errors);
@@ -135,12 +161,20 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdy
 
 		protected abstract I buildSite(Consumer<IB> config);
 
+		/**
+		 * Build any builders for child objects and store the results. This will clear the stored child builders.
+		 */
+		public void buildChildren() {
+			speciesBuilders.stream().map(this::buildSpecies).collect(Collectors.toCollection(() -> species));
+			speciesBuilders.clear();
+			siteBuilders.stream().map(this::buildSite).collect(Collectors.toCollection(() -> sites));
+			siteBuilders.clear();
+		}
+
 		@Override
 		protected void postProcess(T result) {
 			super.postProcess(result);
-			var species = this.species;
-			speciesBuilders.stream().map(this::buildSpecies).collect(Collectors.toCollection(() -> species));
-			var sites = siteBuilders.stream().map(this::buildSite).toList();
+			buildChildren();
 			result.setSpecies(species);
 			result.setSites(sites);
 		}
