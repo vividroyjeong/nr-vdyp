@@ -1533,7 +1533,7 @@ class SindxdllTest {
 			);
 		}
 
-		private void testHelper(int inputIndex, int expectedValue) throws SpeciesErrorException { 
+		private void testHelper(int inputIndex, int expectedValue) throws SpeciesErrorException {
 			// helper function to reduce repetive code
 			int actualValue = Sindxdll.SpecUse((int) inputIndex);
 			assertEquals((int) actualValue, expectedValue);
@@ -2274,7 +2274,7 @@ class SindxdllTest {
 			);
 		}
 
-		private void testHelper(int inputIndex, int expectedValue) throws SpeciesErrorException, NoAnswerException { 
+		private void testHelper(int inputIndex, int expectedValue) throws SpeciesErrorException, NoAnswerException {
 			// helper function to reduce repetitive code
 			int actualValue = Sindxdll.DefGICurve((int) inputIndex);
 			assertEquals(actualValue, expectedValue);
@@ -3758,8 +3758,7 @@ class SindxdllTest {
 			double x4 = SiteIndex2Age.llog(1.372 / site_index) / (SiteIndex2Age.ppow(y2bh, x2) - x3);
 			x1 = SiteIndex2Age.llog(site_height / site_index) / x4 + x3;
 
-			double actualResult = Sindxdll
-					.HtSIToAge((int) SI_FDC_BRUCE, site_height, (int) 1, site_index, 12.0, site);
+			double actualResult = Sindxdll.HtSIToAge((int) SI_FDC_BRUCE, site_height, (int) 1, site_index, 12.0, site);
 			double expectedSiteValue = (SiteIndex2Age.ppow(x1, 1 / x2)) - y2bh;
 			double expectedResult = 0;
 

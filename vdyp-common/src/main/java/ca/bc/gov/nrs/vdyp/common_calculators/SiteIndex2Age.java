@@ -12,9 +12,9 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException
 /**
  * Given site index and site height, computes age.
  *
- * @throws LessThan13Exception site index or height < 1.3m
- * @throws NoAnswerException iteration could not converge (or projected age > 999)
- * @throws CurveEroorException unknown curve index
+ * @throws LessThan13Exception           site index or height < 1.3m
+ * @throws NoAnswerException             iteration could not converge (or projected age > 999)
+ * @throws CurveEroorException           unknown curve index
  * @throws GrowthInterceptTotalException cannot compute growth intercept when using total age
  */
 public class SiteIndex2Age {
@@ -205,7 +205,7 @@ public class SiteIndex2Age {
 						site_height -= (1 - ( (ht5 - site_height) / ht5)) * 1.5;
 					} else {
 						// 0.5 may have to change
-						ht10 = SiteIndex2Height.index_to_height(cu_index, 10.0, SI_AT_BREAST, site_index, y2bh, 0.5); 
+						ht10 = SiteIndex2Height.index_to_height(cu_index, 10.0, SI_AT_BREAST, site_index, y2bh, 0.5);
 						site_height -= ( ( (ht10 - site_height) / (ht10 - ht5))) * 1.5;
 					}
 				}

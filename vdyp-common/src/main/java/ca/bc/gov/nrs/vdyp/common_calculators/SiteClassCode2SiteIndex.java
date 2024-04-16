@@ -6,13 +6,10 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ForestInventoryZo
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.SpeciesErrorException;
 
 /**
- * SiteClassCode2SiteIndex.java 
- * - translates site class code to site index (height in metres) for a given species, 
- *   site class, and FIZ. 
- * - the translation is intended to be used where total age is small (under 30 years), 
- *   where site index based on height may not be reliable. 
- * - primarily used by VDYP and FredTab. 
- * - the origin of the values used here is Inventory Branch.
+ * SiteClassCode2SiteIndex.java - translates site class code to site index (height in metres) for a given species, site
+ * class, and FIZ. - the translation is intended to be used where total age is small (under 30 years), where site index
+ * based on height may not be reliable. - primarily used by VDYP and FredTab. - the origin of the values used here is
+ * Inventory Branch.
  */
 public class SiteClassCode2SiteIndex {
 	// Taken from sindex.h

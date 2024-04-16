@@ -557,8 +557,7 @@ class VdypForwardControlParserTest {
 		}
 	}
 
-	Map<String, ?> parse(ForwardControlParser parser, String resourceName)
-			throws IOException, ResourceParseException {
+	Map<String, ?> parse(ForwardControlParser parser, String resourceName) throws IOException, ResourceParseException {
 
 		Class<?> klazz = TestUtils.class;
 		try (var is = klazz.getResourceAsStream(resourceName)) {

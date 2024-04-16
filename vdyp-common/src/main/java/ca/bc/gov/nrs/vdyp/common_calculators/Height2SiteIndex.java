@@ -7,9 +7,8 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Excepti
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 
 /**
- * Height2SiteIndex.java 
- * - given age and height, computes site index. 
- * - if age is total, site index and years to breast height are iterated until stable.
+ * Height2SiteIndex.java - given age and height, computes site index. - if age is total, site index and years to breast
+ * height are iterated until stable.
  */
 public class Height2SiteIndex {
 	// Taken from sindex.h

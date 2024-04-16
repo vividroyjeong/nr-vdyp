@@ -56,9 +56,8 @@ public class VdypForwardTestUtils {
 
 	}
 
-	public static Map<String, Object>
-			loadControlMap(ForwardControlParser parser, Class<?> klazz, String resourceName)
-					throws IOException, ResourceParseException {
+	public static Map<String, Object> loadControlMap(ForwardControlParser parser, Class<?> klazz, String resourceName)
+			throws IOException, ResourceParseException {
 		try (var is = klazz.getResourceAsStream(resourceName)) {
 
 			return parser.parse(is, TestUtils.fileResolver(klazz), new HashMap<>());

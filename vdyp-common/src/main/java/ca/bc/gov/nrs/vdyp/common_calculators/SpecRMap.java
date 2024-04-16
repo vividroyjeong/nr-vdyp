@@ -3,10 +3,8 @@ package ca.bc.gov.nrs.vdyp.common_calculators;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CodeErrorException;
 
 /**
- * SpecRMap.java 
- * - determines the default species/curve index for a given species code. 
- * - initial species code remappings provided by Inventory Branch. 
- * - species codes can be 1-3 letters, in upper or lower case.
+ * SpecRMap.java - determines the default species/curve index for a given species code. - initial species code
+ * remappings provided by Inventory Branch. - species codes can be 1-3 letters, in upper or lower case.
  */
 public class SpecRMap {
 	// Taken from sindex.h
@@ -580,13 +578,8 @@ public class SpecRMap {
 		/*
 		 * int i, i2; char[] sc2 = new char[10];
 		 *
-		 * i2 = 0; 
-		 * for (i = 0; i < sc.length && i < 10; i++) { 
-		 * 	   if (sc[i] != ' ') { 
-		 *         sc2[i2] = Character.toUpperCase(sc[i]); i2++; 
-		 *     } 
-		 * } 
-		 * sc2[i2] = '\0';
+		 * i2 = 0; for (i = 0; i < sc.length && i < 10; i++) { if (sc[i] != ' ') { sc2[i2] =
+		 * Character.toUpperCase(sc[i]); i2++; } } sc2[i2] = '\0';
 		 */
 
 		if (sc2.equals("A")) {
@@ -656,7 +649,7 @@ public class SpecRMap {
 			return SI_SPEC_BP;
 		}
 		// if (sc2.equals("BV")) {
-		//     return SI_SPEC_AT;
+		// return SI_SPEC_AT;
 		// }
 		if (sc2.equals("C")) {
 			return speciesByFizCategory(fiz, SI_SPEC_CWC, SI_SPEC_CWI);

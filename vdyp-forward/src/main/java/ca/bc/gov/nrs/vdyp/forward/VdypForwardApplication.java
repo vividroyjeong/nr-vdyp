@@ -42,9 +42,7 @@ public class VdypForwardApplication extends VdypApplication {
 
 	public static final String DEFAULT_VDYP_CONTROL_FILE_NAME = "vdyp.ctr";
 
-	private static Set<ForwardPass> vdypPassSet = new HashSet<>(
-			Arrays.asList(PASS_1, PASS_2, PASS_3, PASS_4, PASS_5)
-	);
+	private static Set<ForwardPass> vdypPassSet = new HashSet<>(Arrays.asList(PASS_1, PASS_2, PASS_3, PASS_4, PASS_5));
 
 	@SuppressWarnings("java:S106")
 	public static void main(final String... args) {

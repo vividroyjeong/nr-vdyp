@@ -32,19 +32,17 @@ import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
 /**
  *
- * The algorithmic part of VDYP7 GROWTH Program. In October, 2000 this was split
- * off from the main PROGRAM, which now just defines units and fills /C_CNTR/
+ * The algorithmic part of VDYP7 GROWTH Program. In October, 2000 this was split off from the main PROGRAM, which now
+ * just defines units and fills /C_CNTR/
  *
  * VDYPPASS IN/OUT I*4(10) Major Control Functions
  * <ul>
  * <li>(1) IN Perform Initiation activities? (0=No, 1=Yes)
  * <li>(2) IN Open the stand data files (0=No, 1=Yes)
  * <li>(3) IN Process stands (0=No, 1=Yes)
- * <li>(4) IN Allow multiple polygons (0=No, 1=Yes) (Subset of stand processing.
- * May limit to 1 stand)
+ * <li>(4) IN Allow multiple polygons (0=No, 1=Yes) (Subset of stand processing. May limit to 1 stand)
  * <li>(5) IN CLOSE data files.
- * <li>(10) OUT Indicator variable that in the case of single stand processing
- * with VDYPPASS(4) set, behaves as follows:
+ * <li>(10) OUT Indicator variable that in the case of single stand processing with VDYPPASS(4) set, behaves as follows:
  * <ul>
  * <li>-100 due to EOF, nothing to read
  * <li>other -ve value, incl -99. Could not process the stand.
@@ -137,24 +135,28 @@ public class ForwardProcessor {
 						(List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name())
 				);
 
-				var polygonDescriptionStreamFactory = (StreamingParserFactory<VdypPolygonDescription>)controlMap.get(ControlKey.FORWARD_INPUT_GROWTO.name());
+				var polygonDescriptionStreamFactory = (StreamingParserFactory<VdypPolygonDescription>) controlMap
+						.get(ControlKey.FORWARD_INPUT_GROWTO.name());
 				var polygonDescriptionStream = polygonDescriptionStreamFactory.get();
 
 				var polygonStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_POLY.name());
 				var polygonStream = ((StreamingParserFactory<VdypPolygon>) polygonStreamFactory).get();
 
 				var layerSpeciesStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SPECIES.name());
-				var layerSpeciesStream = ((StreamingParserFactory<Collection<VdypLayerSpecies>>) layerSpeciesStreamFactory).get();
+				var layerSpeciesStream = ((StreamingParserFactory<Collection<VdypLayerSpecies>>) layerSpeciesStreamFactory)
+						.get();
 
-				var speciesUtilizationStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name());
-				var speciesUtilizationStream = ((StreamingParserFactory<Collection<VdypSpeciesUtilization>>) speciesUtilizationStreamFactory).get();
+				var speciesUtilizationStreamFactory = controlMap
+						.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name());
+				var speciesUtilizationStream = ((StreamingParserFactory<Collection<VdypSpeciesUtilization>>) speciesUtilizationStreamFactory)
+						.get();
 
 				var fpe = new ForwardProcessingEngine(genusDefinitionMap);
 
 				// Fetch the next polygon to process.
 				int nPolygonsProcessed = 0;
 				while (polygonDescriptionStream.hasNext()) {
-					
+
 					if (nPolygonsProcessed == maxPoly) {
 						logger.info(
 								"Prematurely terminating polygon processing since MAX_POLY ({}) polygons have been processed",
@@ -170,7 +172,7 @@ public class ForwardProcessor {
 					);
 
 					fpe.processPolygon(polygon);
-					
+
 					nPolygonsProcessed += 1;
 				}
 
@@ -225,7 +227,7 @@ public class ForwardProcessor {
 
 				var utilizationCollection = speciesUtilizationStream.next();
 				var utilizationsBySpeciesMap = new HashMap<UtilizationBySpeciesKey, Map<UtilizationClass, VdypSpeciesUtilization>>();
-				for (var utilization: utilizationCollection) {
+				for (var utilization : utilizationCollection) {
 					logger.trace("Saw utilization {}", utilization);
 
 					var key = new UtilizationBySpeciesKey(utilization.getLayerType(), utilization.getGenusIndex());
@@ -236,22 +238,22 @@ public class ForwardProcessor {
 				var speciesCollection = layerSpeciesStream.next();
 				var primarySpecies = new HashMap<GenusDefinition, VdypLayerSpecies>();
 				var veteranSpecies = new HashMap<GenusDefinition, VdypLayerSpecies>();
-				for (var species: speciesCollection) {
+				for (var species : speciesCollection) {
 					logger.trace("Saw species {}", species);
 
 					var key = new UtilizationBySpeciesKey(species.getLayerType(), species.getGenusIndex());
 					var speciesUtilizations = utilizationsBySpeciesMap.get(key);
-					
+
 					if (speciesUtilizations != null) {
 						species.setUtilizations(Optional.of(speciesUtilizations));
-						
-						for (VdypSpeciesUtilization u: speciesUtilizations.values()) {
+
+						for (VdypSpeciesUtilization u : speciesUtilizations.values()) {
 							u.setParent(species);
 						}
 					} else {
 						species.setUtilizations(Optional.empty());
 					}
-					
+
 					GenusDefinition genus = genusDefinitionMap.get(
 							species.getGenus().orElseThrow(
 									() -> new ProcessingException(
@@ -280,28 +282,32 @@ public class ForwardProcessor {
 				if (primarySpecies.size() > 0) {
 
 					var key = new UtilizationBySpeciesKey(LayerType.PRIMARY, 0);
-					Map<UtilizationClass, VdypSpeciesUtilization> defaultSpeciesUtilization = utilizationsBySpeciesMap.get(key);
+					Map<UtilizationClass, VdypSpeciesUtilization> defaultSpeciesUtilization = utilizationsBySpeciesMap
+							.get(key);
 
 					primaryLayer = new VdypPolygonLayer(
-							LayerType.PRIMARY, polygon, primarySpecies, Optional.ofNullable(defaultSpeciesUtilization));
+							LayerType.PRIMARY, polygon, primarySpecies, Optional.ofNullable(defaultSpeciesUtilization)
+					);
 
 					polygon.setPrimaryLayer(primaryLayer);
 					for (VdypLayerSpecies v : primarySpecies.values()) {
 						v.setParent(primaryLayer);
 					}
 				}
-				
+
 				VdypPolygonLayer veteranLayer = null;
 				if (veteranSpecies.size() > 0) {
 
 					var key = new UtilizationBySpeciesKey(LayerType.VETERAN, 0);
-					Map<UtilizationClass, VdypSpeciesUtilization> defaultSpeciesUtilization = utilizationsBySpeciesMap.get(key);
+					Map<UtilizationClass, VdypSpeciesUtilization> defaultSpeciesUtilization = utilizationsBySpeciesMap
+							.get(key);
 
 					veteranLayer = new VdypPolygonLayer(
-							LayerType.VETERAN, polygon, veteranSpecies, Optional.ofNullable(defaultSpeciesUtilization));
+							LayerType.VETERAN, polygon, veteranSpecies, Optional.ofNullable(defaultSpeciesUtilization)
+					);
 
 					polygon.setPrimaryLayer(veteranLayer);
-					for (VdypLayerSpecies v: veteranSpecies.values()) {
+					for (VdypLayerSpecies v : veteranSpecies.values()) {
 						v.setParent(veteranLayer);
 					}
 				} else {

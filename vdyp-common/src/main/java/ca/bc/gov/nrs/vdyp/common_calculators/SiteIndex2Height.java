@@ -7,20 +7,13 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Excepti
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 
 /**
- * SiteIndex2Height.java 
- * - given site index and age, computes site height 
- * - age can be given as total age or breast height age 
- * - if total age is given, y2bh must be the number of years to breast height 
- * - all heights input/output are in metres. 
- * - site index must be based on breast height age 50 
- * - where breast height age is less than 0, a quadratic function is used 
- * - error codes (returned as height value): 
- *     SI_ERR_LT13: site index < 1.3m 
- *     SI_ERR_GI_MIN: variable height growth intercept formulation; bhage < 0.5 years 
- *     SI_ERR_GI_MAX: variable height growth intercept formulation; bhage > range 
- *     SI_ERR_NO_ANS: iteration could not converge (projected height > 999) 
- *     SI_ERR_CURVE: unknown curve index
- *	   SI_ERR_GI_TOT: cannot compute growth intercept when using total age
+ * SiteIndex2Height.java - given site index and age, computes site height - age can be given as total age or breast
+ * height age - if total age is given, y2bh must be the number of years to breast height - all heights input/output are
+ * in metres. - site index must be based on breast height age 50 - where breast height age is less than 0, a quadratic
+ * function is used - error codes (returned as height value): SI_ERR_LT13: site index < 1.3m SI_ERR_GI_MIN: variable
+ * height growth intercept formulation; bhage < 0.5 years SI_ERR_GI_MAX: variable height growth intercept formulation;
+ * bhage > range SI_ERR_NO_ANS: iteration could not converge (projected height > 999) SI_ERR_CURVE: unknown curve index
+ * SI_ERR_GI_TOT: cannot compute growth intercept when using total age
  */
 public class SiteIndex2Height {
 	// Taken from sindex.h

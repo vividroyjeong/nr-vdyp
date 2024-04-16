@@ -7,15 +7,10 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Excepti
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 
 /**
- * siy2bh.c 
- * - computes number of years from seed to breast height. 
- * - returns unrounded real number. 
- * - assumes "site_index" in metres, based on breast-height age 50. 
- * - error codes (returned as y2bh value): 
- *     SI_ERR_LT13: site index < 1.3m 
- *     SI_ERR_CURVE: unknown curve index 
- *     SI_ERR_GI_TOT: cannot use with GI equations 
- *     SI_ERR_NO_ANS: site index out of range
+ * siy2bh.c - computes number of years from seed to breast height. - returns unrounded real number. - assumes
+ * "site_index" in metres, based on breast-height age 50. - error codes (returned as y2bh value): SI_ERR_LT13: site
+ * index < 1.3m SI_ERR_CURVE: unknown curve index SI_ERR_GI_TOT: cannot use with GI equations SI_ERR_NO_ANS: site index
+ * out of range
  */
 public class SiteIndexYears2BreastHeight {
 	// Taken from sindex.h
