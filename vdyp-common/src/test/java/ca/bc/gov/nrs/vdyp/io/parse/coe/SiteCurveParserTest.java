@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.mmHasEntry;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasEntry;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseValidException;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
+import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 class SiteCurveParserTest {
@@ -35,7 +37,8 @@ class SiteCurveParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, hasEntry(is("S1"), allOf(hasProperty("value1", is(1)), hasProperty("value2", is(2)))));
+		assertThat(result, mmHasEntry(is(1), "S1", Region.COASTAL));
+		assertThat(result, mmHasEntry(is(2), "S1", Region.INTERIOR));
 	}
 
 	@Test
@@ -52,8 +55,10 @@ class SiteCurveParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, hasEntry(is("S1"), allOf(hasProperty("value1", is(1)), hasProperty("value2", is(2)))));
-		assertThat(result, hasEntry(is("X2"), allOf(hasProperty("value1", is(3)), hasProperty("value2", is(4)))));
+		assertThat(result, mmHasEntry(is(1), "S1", Region.COASTAL));
+		assertThat(result, mmHasEntry(is(2), "S1", Region.INTERIOR));
+		assertThat(result, mmHasEntry(is(3), "X2", Region.COASTAL));
+		assertThat(result, mmHasEntry(is(4), "X2", Region.INTERIOR));
 	}
 
 	@Test
@@ -88,7 +93,8 @@ class SiteCurveParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, hasEntry(is("S1"), allOf(hasProperty("value1", is(1)), hasProperty("value2", is(2)))));
+		assertThat(result, mmHasEntry(is(1), "S1", Region.COASTAL));
+		assertThat(result, mmHasEntry(is(2), "S1", Region.INTERIOR));
 	}
 
 	@Test
@@ -105,7 +111,8 @@ class SiteCurveParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, hasEntry(is("S1"), allOf(hasProperty("value1", is(1)), hasProperty("value2", is(2)))));
+		assertThat(result, mmHasEntry(is(1), "S1", Region.COASTAL));
+		assertThat(result, mmHasEntry(is(2), "S1", Region.INTERIOR));
 	}
 
 	@Test
@@ -122,7 +129,8 @@ class SiteCurveParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, hasEntry(is("S1"), allOf(hasProperty("value1", is(1)), hasProperty("value2", is(2)))));
+		assertThat(result, mmHasEntry(is(1), "S1", Region.COASTAL));
+		assertThat(result, mmHasEntry(is(2), "S1", Region.INTERIOR));
 	}
 
 }

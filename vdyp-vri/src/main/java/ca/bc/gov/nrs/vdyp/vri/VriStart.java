@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.vri;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
+import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
@@ -668,5 +670,27 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	VriPolygon processBatn(VriPolygon poly) throws StandProcessingException {
 		// TODO
 		return poly;
+	}
+
+	/**
+	 * Returns the siteCurveNumber for the first of the given ids that has one.
+	 *
+	 * @param region
+	 * @param ids
+	 * @return
+	 * @throws StandProcessingException if no entry for any of the given species IDs is present.
+	 */
+	int findSiteCurveNumber(Region region, String... ids) throws StandProcessingException {
+		var scnMap = Utils.<MatrixMap2<String, Region, Integer>>expectParsedControl(
+				controlMap, ControlKey.SITE_CURVE_NUMBERS, MatrixMap2.class
+		);
+
+		for (String id : ids) {
+			if (scnMap.hasM(id, region))
+				return scnMap.get(id, region);
+		}
+		throw new StandProcessingException(
+				"Could not find Site Curve Number for inst of the following species: " + String.join(", ", ids)
+		);
 	}
 }

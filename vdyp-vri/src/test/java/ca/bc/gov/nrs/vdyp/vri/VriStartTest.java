@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,7 @@ import ca.bc.gov.nrs.vdyp.application.ApplicationTestUtils;
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.MockStreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
@@ -35,6 +37,7 @@ import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.Region;
@@ -711,6 +714,41 @@ class VriStartTest {
 		var ex = assertThrows(StandProcessingException.class, () -> app.processYoung(poly));
 
 		assertThat(ex, hasProperty("message", is("Year for YOUNG stand should be at least 1900 but was 1899")));
+
+		app.close();
+
+		control.verify();
+	}
+
+	@Test
+	void testFindSiteCurveNumber() throws Exception {
+		var control = EasyMock.createControl();
+
+		VriStart app = new VriStart();
+
+		MockFileResolver resolver = dummyInput();
+
+		TestUtils.populateControlMapGenusReal(controlMap);
+		TestUtils.populateControlMapFromResource(controlMap, new SiteCurveParser(), "SIEQN.PRM");
+
+		control.replay();
+
+		app.init(resolver, controlMap);
+
+		assertThat(app.findSiteCurveNumber(Region.COASTAL, "MB"), is(10));
+		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "MB"), is(10));
+
+		assertThat(app.findSiteCurveNumber(Region.COASTAL, "B"), is(12));
+		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "B"), is(42));
+
+		assertThat(app.findSiteCurveNumber(Region.COASTAL, "ZZZ", "B"), is(12));
+		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "ZZZ", "B"), is(42));
+
+		assertThat(app.findSiteCurveNumber(Region.COASTAL, "YYY", "B"), is(42));
+		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "YYY", "B"), is(06));
+
+		assertThrows(StandProcessingException.class, () -> app.findSiteCurveNumber(Region.COASTAL, "ZZZ"));
+		assertThrows(StandProcessingException.class, () -> app.findSiteCurveNumber(Region.INTERIOR, "ZZZ"));
 
 		app.close();
 
