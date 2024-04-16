@@ -14,11 +14,14 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 	private final Optional<Float> baseArea; // VRIL/BAL
 	private final Optional<Float> treesPerHectare; // VRIL/TPHL
 	private final float utilization; // VRIL/UTLL
-	private final Optional<String> primaryGenus; // FIPL_1C/JPRIME_L1
+	private final Optional<String> primaryGenus; // FIPL_1C/JPRIME_L1 ISPP
+	private final Optional<String> secondaryGenus; // FIPL_1C/JPRIME_L1 ISPS
+	private final Optional<Integer> empericalRelationshipParameterIndex; // INXL1/GRPBA1
 
 	public VriLayer(
 			String polygonIdentifier, LayerType layer, float crownClosure, Optional<Float> baseArea,
-			Optional<Float> treesPerHectare, float utilization, Optional<String> primaryGenus
+			Optional<Float> treesPerHectare, float utilization, Optional<String> primaryGenus,
+			Optional<String> secondaryGenus, Optional<Integer> empericalRelationshipParameterIndex
 	) {
 		super(polygonIdentifier, layer, Optional.empty());
 		this.crownClosure = crownClosure;
@@ -26,6 +29,8 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 		this.treesPerHectare = treesPerHectare;
 		this.utilization = utilization;
 		this.primaryGenus = primaryGenus;
+		this.secondaryGenus = secondaryGenus;
+		this.empericalRelationshipParameterIndex = empericalRelationshipParameterIndex;
 	}
 
 	public float getCrownClosure() {
@@ -48,9 +53,32 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 		return primaryGenus;
 	}
 
+	public Optional<String> getSecondaryGenus() {
+		return secondaryGenus;
+	}
+
 	@Computed
 	public Optional<VriSpecies> getPrimarySpeciesRecord() {
 		return primaryGenus.map(this.getSpecies()::get);
+	}
+
+	@Computed
+	public Optional<VriSpecies> getSecondarySpeciesRecord() {
+		return secondaryGenus.map(this.getSpecies()::get);
+	}
+
+	@Computed
+	public Optional<VriSite> getPrimarySite() {
+		return primaryGenus.map(this.getSites()::get);
+	}
+
+	@Computed
+	public Optional<VriSite> getSecondarySite() {
+		return secondaryGenus.map(this.getSites()::get);
+	}
+
+	public Optional<Integer> getEmpericalRelationshipParameterIndex() {
+		return empericalRelationshipParameterIndex;
 	}
 
 	/**
@@ -72,7 +100,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 			builder.polygonIdentifier(polygon.getPolygonIdentifier());
 			config.accept(builder);
 		});
-		polygon.getLayers().put(layer.getLayer(), layer);
+		polygon.getLayers().put(layer.getLayerType(), layer);
 		return layer;
 	}
 
@@ -84,6 +112,17 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 		protected Optional<Float> utilization = Optional.empty();
 		protected Optional<Float> percentAvailable = Optional.empty();
 		protected Optional<String> primaryGenus = Optional.empty();
+		protected Optional<String> secondaryGenus = Optional.empty();
+		protected Optional<Integer> empericalRelationshipParameterIndex = Optional.empty();
+
+		public Builder empiricalRelationshipParameterIndex(Optional<Integer> empiricalRelationshipParameterIndex) {
+			this.empericalRelationshipParameterIndex = empiricalRelationshipParameterIndex;
+			return this;
+		}
+
+		public Builder empiricalRelationshipParameterIndex(int empiricalRelationshipParameterIndex) {
+			return this.empiricalRelationshipParameterIndex(Optional.of(empiricalRelationshipParameterIndex));
+		}
 
 		public Builder crownClosure(float crownClosure) {
 			this.crownClosure = Optional.of(crownClosure);
@@ -130,6 +169,10 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 			return treesPerHectare;
 		}
 
+		public Optional<Float> getCrownClosure() {
+			return crownClosure;
+		}
+
 		public Builder primaryGenus(Optional<String> primaryGenus) {
 			this.primaryGenus = primaryGenus;
 			return this;
@@ -137,6 +180,15 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 
 		public Builder primaryGenus(String primaryGenus) {
 			return primaryGenus(Optional.of(primaryGenus));
+		}
+
+		public Builder secondaryGenus(Optional<String> secondaryGenus) {
+			this.secondaryGenus = secondaryGenus;
+			return this;
+		}
+
+		public Builder secondaryGenus(String secondaryGenus) {
+			return secondaryGenus(Optional.of(secondaryGenus));
 		}
 
 		@Override
@@ -151,11 +203,14 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 			float multiplier = percentAvailable.orElse(100f) / 100f;
 			VriLayer result = new VriLayer(
 					polygonIdentifier.get(), //
-					layer.get(), //
+					layerType.get(), //
 					crownClosure.get(), //
 					baseArea.map(x -> x * multiplier), //
 					treesPerHectare.map(x -> x * multiplier), //
-					Math.max(utilization.get(), 7.5f), primaryGenus
+					Math.max(utilization.get(), 7.5f), //
+					primaryGenus, //
+					secondaryGenus, //
+					empericalRelationshipParameterIndex
 			);
 			result.setInventoryTypeGroup(inventoryTypeGroup);
 			return result;
@@ -165,7 +220,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 		protected VriSpecies buildSpecies(Consumer<VriSpecies.Builder> config) {
 			return VriSpecies.build(builder -> {
 				builder.polygonIdentifier(polygonIdentifier.get());
-				builder.layerType(layer.get());
+				builder.layerType(layerType.get());
 				config.accept(builder);
 			});
 		}
@@ -174,7 +229,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 		protected VriSite buildSite(Consumer<VriSite.Builder> config) {
 			return VriSite.build(builder -> {
 				builder.polygonIdentifier(polygonIdentifier.get());
-				builder.layerType(layer.get());
+				builder.layerType(layerType.get());
 				config.accept(builder);
 			});
 		}

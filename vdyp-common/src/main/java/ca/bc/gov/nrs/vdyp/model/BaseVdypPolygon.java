@@ -10,23 +10,22 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?, ?>, PA> {
+public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP extends BaseVdypSpecies, SI extends BaseVdypSite> {
 
 	private String polygonIdentifier; // FIP_P/POLYDESC
 	private PA percentAvailable; // FIP_P2/PCTFLAND
 	private Map<LayerType, L> layers = new LinkedHashMap<>();
 	protected String biogeoclimaticZone;
 	protected String forestInventoryZone;
-	protected Optional<PolygonMode> modeFip;
+	protected Optional<PolygonMode> mode;
 
 	protected BaseVdypPolygon(
-			String polygonIdentifier, PA percentAvailable, String fiz, String becIdentifier,
-			Optional<PolygonMode> modeFip
+			String polygonIdentifier, PA percentAvailable, String fiz, String becIdentifier, Optional<PolygonMode> mode
 	) {
 		super();
 		this.forestInventoryZone = fiz;
 		this.biogeoclimaticZone = becIdentifier;
-		this.modeFip = modeFip;
+		this.mode = mode;
 		this.polygonIdentifier = polygonIdentifier;
 		this.percentAvailable = percentAvailable;
 	}
@@ -39,10 +38,12 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?, ?>, PA> {
 	 * @param toCopy                  The polygon to copy
 	 * @param convertPercentAvailable Function to convert
 	 */
-	protected <O extends BaseVdypPolygon<?, U>, U> BaseVdypPolygon(O toCopy, Function<U, PA> convertPercentAvailable) {
+	protected <O extends BaseVdypPolygon<?, U, ?, ?>, U> BaseVdypPolygon(
+			O toCopy, Function<U, PA> convertPercentAvailable
+	) {
 		this(
 				toCopy.getPolygonIdentifier(), convertPercentAvailable.apply(toCopy.getPercentAvailable()),
-				toCopy.getForestInventoryZone(), toCopy.getBiogeoclimaticZone(), toCopy.getModeFip()
+				toCopy.getForestInventoryZone(), toCopy.getBiogeoclimaticZone(), toCopy.getMode()
 		);
 	}
 
@@ -64,7 +65,7 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?, ?>, PA> {
 
 	public void setLayers(Collection<L> layers) {
 		this.layers = new EnumMap<>(LayerType.class);
-		layers.forEach(spec -> this.layers.put(spec.getLayer(), spec));
+		layers.forEach(spec -> this.layers.put(spec.getLayerType(), spec));
 	}
 
 	public PA getPercentAvailable() {
@@ -91,64 +92,73 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?, ?>, PA> {
 		this.forestInventoryZone = forestInventoryZone;
 	}
 
-	public Optional<PolygonMode> getModeFip() {
-		return modeFip;
+	public Optional<PolygonMode> getMode() {
+		return mode;
 	}
 
-	public void setModeFip(Optional<PolygonMode> modeFip) {
-		this.modeFip = modeFip;
+	public void setMode(Optional<PolygonMode> mode) {
+		this.mode = mode;
 	}
 
-	protected abstract static class Builder<T extends BaseVdypPolygon<L, PA>, L extends BaseVdypLayer<?, ?>, PA>
+	protected abstract static class Builder< //
+			T extends BaseVdypPolygon<L, PA, SP, SI>, //
+			L extends BaseVdypLayer<SP, SI>, //
+			PA, //
+			SP extends BaseVdypSpecies, //
+			SI extends BaseVdypSite, //
+			LB extends BaseVdypLayer.Builder<L, SP, SI, SPB, SIB>, //
+			SPB extends BaseVdypSpecies.Builder<SP>, //
+			SIB extends BaseVdypSite.Builder<SI>> //
+
 			extends ModelClassBuilder<T> {
 		protected Optional<String> polygonIdentifier = Optional.empty();
 		protected Optional<PA> percentAvailable = Optional.empty();
 		protected Optional<String> biogeoclimaticZone = Optional.empty();
 		protected Optional<String> forestInventoryZone = Optional.empty();
-		protected Optional<PolygonMode> modeFip = Optional.empty();
+		protected Optional<PolygonMode> mode = Optional.empty();
 
 		protected List<L> layers = new LinkedList<>();
 
-		public Builder<T, L, PA> polygonIdentifier(String polygonIdentifier) {
+		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> polygonIdentifier(String polygonIdentifier) {
 			this.polygonIdentifier = Optional.of(polygonIdentifier);
 			return this;
 		}
 
-		public Builder<T, L, PA> percentAvailable(PA pa) {
+		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> percentAvailable(PA pa) {
 			this.percentAvailable = Optional.of(pa);
 			return this;
 		}
 
-		public Builder<T, L, PA> biogeoclimaticZone(String biogeoclimaticZone) {
+		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> biogeoclimaticZone(String biogeoclimaticZone) {
 			this.biogeoclimaticZone = Optional.of(biogeoclimaticZone);
 			return this;
 		}
 
-		public Builder<T, L, PA> forestInventoryZone(String forestInventoryZone) {
+		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> forestInventoryZone(String forestInventoryZone) {
 			this.forestInventoryZone = Optional.of(forestInventoryZone);
 			return this;
 		}
 
-		public Builder<T, L, PA> modeFip(Optional<PolygonMode> modeFip) {
-			this.modeFip = modeFip;
+		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> mode(Optional<PolygonMode> mode) {
+			this.mode = mode;
 			return this;
 		}
 
-		public Builder<T, L, PA> modeFip(PolygonMode modeFip) {
-			return modeFip(Optional.of(modeFip));
+		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> mode(PolygonMode mode) {
+			return mode(Optional.of(mode));
 		}
 
-		public Builder<T, L, PA> addLayer(L layer) {
+		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> addLayer(L layer) {
 			this.layers.add(layer);
 			return this;
 		}
 
-		public Builder<T, L, PA> addLayers(Collection<L> layers) {
+		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> addLayers(Collection<L> layers) {
 			this.layers.addAll(layers);
 			return this;
 		}
 
-		public Builder<T, L, PA> buildLayer(Consumer<BaseVdypLayer.Builder<L, ?, ?, ?, ?>> specConfig) {
+		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> buildLayer(Consumer<LB> specConfig) {
 			var layerBuilder = getLayerBuilder();
 			layerBuilder.polygonIdentifier(this.polygonIdentifier.get());
 			specConfig.accept(layerBuilder);
@@ -156,9 +166,10 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?, ?>, PA> {
 			return this;
 		}
 
-		protected abstract BaseVdypLayer.Builder<L, ?, ?, ?, ?> getLayerBuilder();
+		protected abstract LB getLayerBuilder();
 
-		public <PA2> Builder<T, L, PA> copy(BaseVdypPolygon<?, PA2> toCopy, Function<PA2, PA> paConvert) {
+		public <PA2> Builder<T, L, PA, SP, SI, LB, SPB, SIB>
+				copy(BaseVdypPolygon<?, PA2, ?, ?> toCopy, Function<PA2, PA> paConvert) {
 			polygonIdentifier(toCopy.getPolygonIdentifier());
 			percentAvailable(paConvert.apply(toCopy.getPercentAvailable()));
 			biogeoclimaticZone(toCopy.getBiogeoclimaticZone());
@@ -180,7 +191,7 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<?, ?>, PA> {
 
 			// Add species
 			for (L layer : layers) {
-				result.getLayers().put(layer.getLayer(), layer);
+				result.getLayers().put(layer.getLayerType(), layer);
 			}
 		}
 

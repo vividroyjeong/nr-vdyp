@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.model;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,18 +10,18 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdypSite> {
+public abstract class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdypSite> {
 
 	private final String polygonIdentifier;
-	private final LayerType layer;
+	private final LayerType layerType;
 	private LinkedHashMap<String, S> species = new LinkedHashMap<>();
 	private LinkedHashMap<String, I> sites = new LinkedHashMap<>();
 	private Optional<Integer> inventoryTypeGroup = Optional.empty();
 
-	protected BaseVdypLayer(String polygonIdentifier, LayerType layer, Optional<Integer> inventoryTypeGroup) {
+	protected BaseVdypLayer(String polygonIdentifier, LayerType layerType, Optional<Integer> inventoryTypeGroup) {
 		super();
 		this.polygonIdentifier = polygonIdentifier;
-		this.layer = layer;
+		this.layerType = layerType;
 
 		this.inventoryTypeGroup = inventoryTypeGroup;
 	}
@@ -29,8 +30,8 @@ public class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdypSite> {
 		return polygonIdentifier;
 	}
 
-	public LayerType getLayer() {
-		return layer;
+	public LayerType getLayerType() {
+		return layerType;
 	}
 
 	public LinkedHashMap<String, S> getSpecies() {
@@ -72,11 +73,12 @@ public class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdypSite> {
 	public abstract static class Builder<T extends BaseVdypLayer<S, I>, S extends BaseVdypSpecies, I extends BaseVdypSite, SB extends BaseVdypSpecies.Builder<S>, IB extends BaseVdypSite.Builder<I>>
 			extends ModelClassBuilder<T> {
 		protected Optional<String> polygonIdentifier = Optional.empty();
-		protected Optional<LayerType> layer = Optional.empty();
+		protected Optional<LayerType> layerType = Optional.empty();
 
 		protected Optional<Integer> inventoryTypeGroup = Optional.empty();
 
 		protected List<S> species = new LinkedList<>();
+		protected List<I> sites = new LinkedList<>();
 		protected List<Consumer<SB>> speciesBuilders = new LinkedList<>();
 		protected List<Consumer<IB>> siteBuilders = new LinkedList<>();
 
@@ -86,12 +88,12 @@ public class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdypSite> {
 		}
 
 		public Builder<T, S, I, SB, IB> layerType(LayerType layer) {
-			this.layer = Optional.of(layer);
+			this.layerType = Optional.of(layer);
 			return this;
 		}
 
 		public Optional<LayerType> getLayerType() {
-			return layer;
+			return layerType;
 		}
 
 		public Builder<T, S, I, SB, IB> addSpecies(Consumer<SB> config) {
@@ -104,8 +106,18 @@ public class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdypSite> {
 			return this;
 		}
 
+		public Builder<T, S, I, SB, IB> addSpecies(S species) {
+			this.species.add(species);
+			return this;
+		}
+
 		public Builder<T, S, I, SB, IB> addSite(Consumer<IB> config) {
 			siteBuilders.add(config);
+			return this;
+		}
+
+		public Builder<T, S, I, SB, IB> addSite(I site) {
+			this.sites.add(site);
 			return this;
 		}
 
@@ -120,27 +132,49 @@ public class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdypSite> {
 
 		public Builder<T, S, I, SB, IB> copy(BaseVdypLayer<?, ?> toCopy) {
 			polygonIdentifier(toCopy.getPolygonIdentifier());
-			layerType(toCopy.getLayer());
+			layerType(toCopy.getLayerType());
 			inventoryTypeGroup(toCopy.getInventoryTypeGroup());
 			return this;
+		}
+
+		public List<S> getSpecies() {
+			if (!speciesBuilders.isEmpty()) {
+				throw new IllegalStateException("Tried to get species when there are unbuilt species builders");
+			}
+			return Collections.unmodifiableList(species);
+		}
+
+		public List<I> getSites() {
+			if (!siteBuilders.isEmpty()) {
+				throw new IllegalStateException("Tried to get sites when there are unbuilt site builders");
+			}
+			return Collections.unmodifiableList(sites);
 		}
 
 		@Override
 		protected void check(Collection<String> errors) {
 			requirePresent(polygonIdentifier, "polygonIdentifier", errors);
-			requirePresent(layer, "layer", errors);
+			requirePresent(layerType, "layerType", errors);
 		}
 
 		protected abstract S buildSpecies(Consumer<SB> config);
 
 		protected abstract I buildSite(Consumer<IB> config);
 
+		/**
+		 * Build any builders for child objects and store the results. This will clear the stored child builders.
+		 */
+		public void buildChildren() {
+			speciesBuilders.stream().map(this::buildSpecies).collect(Collectors.toCollection(() -> species));
+			speciesBuilders.clear();
+			siteBuilders.stream().map(this::buildSite).collect(Collectors.toCollection(() -> sites));
+			siteBuilders.clear();
+		}
+
 		@Override
 		protected void postProcess(T result) {
 			super.postProcess(result);
-			var species = this.species;
-			speciesBuilders.stream().map(this::buildSpecies).collect(Collectors.toCollection(() -> species));
-			var sites = siteBuilders.stream().map(this::buildSite).toList();
+			buildChildren();
 			result.setSpecies(species);
 			result.setSites(sites);
 		}

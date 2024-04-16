@@ -95,7 +95,7 @@ class VriAdjustInputWriterTest {
 				builder.percentAvailable(90f);
 				builder.biogeoclimaticZone("IDF");
 				builder.forestInventoryZone("D");
-				builder.modeFip(PolygonMode.START);
+				builder.mode(PolygonMode.START);
 			});
 			var layer = VdypLayer.build(polygon, builder -> {
 				builder.polygonIdentifier("082E004    615       1988");
@@ -328,7 +328,7 @@ class VriAdjustInputWriterTest {
 				builder.percentAvailable(90f);
 				builder.biogeoclimaticZone("IDF");
 				builder.forestInventoryZone("D");
-				builder.modeFip(PolygonMode.START);
+				builder.mode(PolygonMode.START);
 			});
 
 			var layer = VdypLayer.build(polygon, builder -> {

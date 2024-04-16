@@ -4,12 +4,11 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
-
 import ca.bc.gov.nrs.vdyp.common.Computed;
 
 public abstract class BaseVdypSpecies {
 	private final String polygonIdentifier; // FIP_P/POLYDESC
-	private final LayerType layer; // This is also represents the distinction between data stored in
+	private final LayerType layerType; // This is also represents the distinction between data stored in
 	// FIPL_1(A) and FIP_V(A). Where VDYP7 stores both and looks at certain values
 	// to determine if a layer is "present". VDYP8 stores them in a map keyed by
 	// this value
@@ -25,9 +24,9 @@ public abstract class BaseVdypSpecies {
 
 	private Map<String, Float> speciesPercent; // Map from
 
-	protected BaseVdypSpecies(String polygonIdentifier, LayerType layer, String genus, float percentGenus) {
+	protected BaseVdypSpecies(String polygonIdentifier, LayerType layerType, String genus, float percentGenus) {
 		this.polygonIdentifier = polygonIdentifier;
-		this.layer = layer;
+		this.layerType = layerType;
 		this.genus = genus;
 		this.setPercentGenus(percentGenus);
 	}
@@ -35,7 +34,7 @@ public abstract class BaseVdypSpecies {
 	protected BaseVdypSpecies(BaseVdypSpecies toCopy) {
 		this(
 				toCopy.getPolygonIdentifier(), //
-				toCopy.getLayer(), //
+				toCopy.getLayerType(), //
 				toCopy.getGenus(), //
 				toCopy.getPercentGenus()
 		);
@@ -46,8 +45,8 @@ public abstract class BaseVdypSpecies {
 		return polygonIdentifier;
 	}
 
-	public LayerType getLayer() {
-		return layer;
+	public LayerType getLayerType() {
+		return layerType;
 	}
 
 	public float getPercentGenus() {
@@ -83,7 +82,7 @@ public abstract class BaseVdypSpecies {
 
 	public abstract static class Builder<T extends BaseVdypSpecies> extends ModelClassBuilder<T> {
 		protected Optional<String> polygonIdentifier = Optional.empty();
-		protected Optional<LayerType> layer = Optional.empty();
+		protected Optional<LayerType> layerType = Optional.empty();
 		protected Optional<String> genus = Optional.empty();
 		protected Optional<Float> percentGenus = Optional.empty();
 		protected Optional<Float> fractionGenus = Optional.empty();
@@ -95,7 +94,7 @@ public abstract class BaseVdypSpecies {
 		}
 
 		public Builder<T> layerType(LayerType layer) {
-			this.layer = Optional.of(layer);
+			this.layerType = Optional.of(layer);
 			return this;
 		}
 
@@ -126,7 +125,7 @@ public abstract class BaseVdypSpecies {
 
 		public Builder<T> copy(BaseVdypSpecies toCopy) {
 			polygonIdentifier(toCopy.getPolygonIdentifier());
-			layerType(toCopy.getLayer());
+			layerType(toCopy.getLayerType());
 			genus(toCopy.getGenus());
 			percentGenus(toCopy.getPercentGenus());
 
@@ -137,7 +136,7 @@ public abstract class BaseVdypSpecies {
 		@Override
 		protected void check(Collection<String> errors) {
 			requirePresent(polygonIdentifier, "polygonIdentifier", errors);
-			requirePresent(layer, "layer", errors);
+			requirePresent(layerType, "layerType", errors);
 			requirePresent(genus, "genus", errors);
 			requirePresent(percentGenus, "percentGenus", errors);
 		}

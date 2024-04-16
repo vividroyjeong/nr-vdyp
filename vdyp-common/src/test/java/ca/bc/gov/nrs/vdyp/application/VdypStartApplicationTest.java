@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.application;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.causedBy;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.describedAs;
@@ -13,11 +14,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.easymock.Capture;
@@ -30,30 +33,29 @@ import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
+import ca.bc.gov.nrs.vdyp.model.BecDefinition;
+import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
+import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 class VdypStartApplicationTest {
 
+	private Map<String, Object> controlMap = new HashMap<>();
+
 	@Test
 	void testInitWithoutErrors() throws IOException, ResourceParseException {
 		BaseControlParser controlParser = EasyMock.createMock(BaseControlParser.class);
-		MockFileResolver resolver = new MockFileResolver("Test");
+		MockFileResolver resolver = dummyIo();
 
 		InputStream inputStream = TestUtils.makeInputStream("");
 		resolver.addStream("testControl", inputStream);
-
-		var controlMap = new HashMap<String, Object>();
-
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
-
-		resolver.addStream("DUMMY1", new ByteArrayOutputStream());
-		resolver.addStream("DUMMY2", new ByteArrayOutputStream());
-		resolver.addStream("DUMMY3", new ByteArrayOutputStream());
 
 		EasyMock.expect(
 				controlParser.parse(EasyMock.anyObject(List.class), EasyMock.same(resolver), EasyMock.anyObject())
@@ -89,6 +91,18 @@ class VdypStartApplicationTest {
 
 		EasyMock.verify(controlParser);
 		app.close();
+	}
+
+	private MockFileResolver dummyIo() {
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
+		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+
+		MockFileResolver resolver = new MockFileResolver("Test");
+		resolver.addStream("DUMMY1", (OutputStream) new ByteArrayOutputStream());
+		resolver.addStream("DUMMY2", (OutputStream) new ByteArrayOutputStream());
+		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
+		return resolver;
 	}
 
 	@Test
@@ -134,17 +148,9 @@ class VdypStartApplicationTest {
 		StreamingParserFactory streamingParserFactory = EasyMock.createMock(StreamingParserFactory.class);
 		StreamingParser streamingParser = EasyMock.createMock(StreamingParser.class);
 
-		MockFileResolver resolver = new MockFileResolver("Test");
-		var controlMap = new HashMap<String, Object>();
+		MockFileResolver resolver = dummyIo();
 
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
 		controlMap.put(ControlKey.FIP_INPUT_YIELD_LAYER.name(), streamingParserFactory);
-
-		resolver.addStream("DUMMY1", new ByteArrayOutputStream());
-		resolver.addStream("DUMMY2", new ByteArrayOutputStream());
-		resolver.addStream("DUMMY3", new ByteArrayOutputStream());
 
 		EasyMock.expect(streamingParserFactory.get()).andReturn(streamingParser);
 
@@ -188,16 +194,7 @@ class VdypStartApplicationTest {
 	void testGetStreamingParserMapEntryMissing() throws IOException, ResourceParseException, ProcessingException {
 		BaseControlParser controlParser = EasyMock.createMock(BaseControlParser.class);
 
-		MockFileResolver resolver = new MockFileResolver("Test");
-		var controlMap = new HashMap<String, Object>();
-
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
-
-		resolver.addStream("DUMMY1", new ByteArrayOutputStream());
-		resolver.addStream("DUMMY2", new ByteArrayOutputStream());
-		resolver.addStream("DUMMY3", new ByteArrayOutputStream());
+		MockFileResolver resolver = dummyIo();
 
 		var app = new VdypStartApplication() {
 
@@ -226,6 +223,7 @@ class VdypStartApplicationTest {
 
 		app.init(resolver, controlMap);
 
+		@SuppressWarnings("resource") // mock object can't leak anything
 		var ex = assertThrows(
 				ProcessingException.class, () -> app.getStreamingParser(ControlKey.FIP_INPUT_YIELD_LAYER)
 		);
@@ -242,17 +240,9 @@ class VdypStartApplicationTest {
 
 		StreamingParserFactory streamingParserFactory = mockControl.createMock(StreamingParserFactory.class);
 
-		MockFileResolver resolver = new MockFileResolver("Test");
-		var controlMap = new HashMap<String, Object>();
-
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+		MockFileResolver resolver = dummyIo();
+		;
 		controlMap.put(ControlKey.FIP_INPUT_YIELD_LAYER.name(), streamingParserFactory);
-
-		resolver.addStream("DUMMY1", new ByteArrayOutputStream());
-		resolver.addStream("DUMMY2", new ByteArrayOutputStream());
-		resolver.addStream("DUMMY3", new ByteArrayOutputStream());
 
 		IOException exception = new IOException("This is a Test");
 		EasyMock.expect(streamingParserFactory.get()).andThrow(exception);
@@ -263,6 +253,7 @@ class VdypStartApplicationTest {
 
 		app.init(resolver, controlMap);
 
+		@SuppressWarnings("resource") // mock object can't leak anything
 		var ex = assertThrows(
 				ProcessingException.class, () -> app.getStreamingParser(ControlKey.FIP_INPUT_YIELD_LAYER)
 		);
@@ -679,6 +670,132 @@ class VdypStartApplicationTest {
 			assertItgMixed(app, 42, "AT", /**/ "AC", "D", "E", "MB");
 
 		}
+	}
+
+	@Test
+	void testFindEmpericalRelationshipParameterIndexModified() throws Exception {
+		var mockControl = EasyMock.createControl();
+
+		controlMap.put(
+				ControlKey.DEFAULT_EQ_NUM.name(),
+				new MatrixMap2Impl(Collections.singletonList("D"), Collections.singletonList("CDF"), (x, y) -> 42)
+		);
+		controlMap.put(
+				ControlKey.EQN_MODIFIERS.name(),
+				new MatrixMap2Impl(
+						Collections.singletonList(42), Collections.singletonList(37), (x, y) -> Optional.of(64)
+				)
+		);
+
+		try (VdypStartApplication app = getTestUnit(mockControl)) {
+
+			MockFileResolver resolver = dummyIo();
+
+			mockControl.replay();
+
+			app.init(resolver, controlMap);
+
+			var bec = new BecDefinition("CDF", Region.COASTAL, "Coastal Douglas Fir");
+
+			int result = app.findEmpiricalRelationshipParameterIndex("D", bec, 37);
+
+			assertThat(result, is(64));
+		}
+	}
+
+	@Test
+	void testFindEmpericalRelationshipParameterIndexUnmodified() throws Exception {
+		var mockControl = EasyMock.createControl();
+
+		controlMap.put(
+				ControlKey.DEFAULT_EQ_NUM.name(),
+				new MatrixMap2Impl(Collections.singletonList("D"), Collections.singletonList("CDF"), (x, y) -> 42)
+		);
+		controlMap.put(
+				ControlKey.EQN_MODIFIERS.name(),
+				new MatrixMap2Impl(
+						Collections.singletonList(42), Collections.singletonList(37), (x, y) -> Optional.empty()
+				)
+		);
+
+		try (VdypStartApplication app = getTestUnit(mockControl)) {
+
+			MockFileResolver resolver = dummyIo();
+
+			mockControl.replay();
+
+			app.init(resolver, controlMap);
+
+			var bec = new BecDefinition("CDF", Region.COASTAL, "Coastal Douglas Fir");
+
+			int result = app.findEmpiricalRelationshipParameterIndex("D", bec, 37);
+
+			assertThat(result, is(42));
+		}
+	}
+
+	@Test
+	void testWeightedCoefficientSum() {
+		var result = VdypStartApplication
+				.weightedCoefficientSum(List.of(2, 4, 6), 6, 1, List.of("A", "B", "C", "D"), s -> {
+					switch (s) {
+					case "A":
+						return 0.2f;
+					case "B":
+						return 0.4f;
+					case "C":
+						return 0.1f;
+					default:
+						return 0.3f;
+					}
+				}, s -> {
+					switch (s) {
+					case "A":
+						return new Coefficients(new float[] { 2.0f, 10.0f, 7.0f, 0.0f, 9.0f, 0.0f }, 1);
+					case "B":
+						return new Coefficients(new float[] { 2.0f, 0.0f, 7.0f, 6.0f, 9.0f, 4.0f }, 1);
+					case "C":
+						return new Coefficients(new float[] { 2.0f, 3.0f, 7.0f, -3.0f, 9.0f, 3.0f }, 1);
+					default:
+						return new Coefficients(new float[] { 2.0f, 1.0f, 7.0f, 1.0f, 9.0f, 1.0f }, 1);
+					}
+				});
+
+		assertThat(
+				result,
+				coe(
+						1, 2f, 2f + 0.3f + 0.3f, 7f, 6f * 0.4f - 3f * 0.1f + 0.3f * 1f, 9f,
+						4f * 0.4f + 3f * 0.1f + 0.3f * 1f
+				)
+		);
+	}
+
+	@Test
+	void testRequireLayer() throws ProcessingException, IOException {
+		var mockControl = EasyMock.createControl();
+		BaseVdypPolygon poly = mockControl.createMock(BaseVdypPolygon.class);
+		BaseVdypLayer layer = mockControl.createMock(BaseVdypLayer.class);
+		EasyMock.expect(poly.getLayers()).andStubReturn(Collections.singletonMap(LayerType.PRIMARY, layer));
+		EasyMock.expect(poly.getPolygonIdentifier()).andStubReturn("TestPoly");
+
+		try (VdypStartApplication app = getTestUnit(mockControl)) {
+			mockControl.replay();
+
+			var result = app.requireLayer(poly, LayerType.PRIMARY);
+			assertThat(result, is(layer));
+			var ex = assertThrows(StandProcessingException.class, () -> app.requireLayer(poly, LayerType.VETERAN));
+			assertThat(
+					ex,
+					hasProperty(
+							"message",
+							is(
+									"Polygon TestPoly has no VETERAN layer, or that layer has non-positive height or crown closure."
+							)
+					)
+			);
+
+		}
+
 	}
 
 }

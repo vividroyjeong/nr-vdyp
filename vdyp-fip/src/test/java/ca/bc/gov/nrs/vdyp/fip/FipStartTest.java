@@ -9,16 +9,13 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.describedAs;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
@@ -44,6 +41,7 @@ import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.application.ApplicationTestUtils;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
@@ -148,7 +146,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -177,7 +175,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -206,7 +204,7 @@ class FipStartTest {
 	void testVeteranLayerHeightLessThanMinimum() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -237,7 +235,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -270,7 +268,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -300,7 +298,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -329,12 +327,12 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
 			var polygon = getTestPolygon(polygonId, x -> {
-				x.setModeFip(Optional.of(PolygonMode.YOUNG));
+				x.setMode(Optional.of(PolygonMode.YOUNG));
 			});
 			var layer = this.getTestPrimaryLayer("Test Polygon", valid(), valid());
 			polygon.setLayers(List.of(layer));
@@ -356,7 +354,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -388,7 +386,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -420,7 +418,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -444,7 +442,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -479,7 +477,7 @@ class FipStartTest {
 
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var polygonId = polygonId("Test Polygon", 2023);
 
@@ -611,7 +609,7 @@ class FipStartTest {
 				.populateControlMapNetBreakage(controlMap, bgrp -> new Coefficients(new float[] { 0f, 0f, 0f, 0f }, 1));
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var result = app.processLayerAsVeteran(fipPolygon, fipLayer);
 
@@ -619,7 +617,7 @@ class FipStartTest {
 
 			// Keys
 			assertThat(result, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(result, hasProperty("layer", is(LayerType.VETERAN)));
+			assertThat(result, hasProperty("layerType", is(LayerType.VETERAN)));
 
 			// Direct Copy
 			assertThat(result, hasProperty("ageTotal", present(is(8f))));
@@ -642,7 +640,7 @@ class FipStartTest {
 
 			// Keys
 			assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(speciesResult, hasProperty("layer", is(LayerType.VETERAN)));
+			assertThat(speciesResult, hasProperty("layerType", is(LayerType.VETERAN)));
 			assertThat(speciesResult, hasProperty("genus", is("B")));
 
 			// Copied
@@ -690,7 +688,7 @@ class FipStartTest {
 
 		VdypLayer result;
 		try (var app = new FipStart();) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			result = app.processLayerAsVeteran(fipPolygon, fipLayer);
 		}
@@ -699,7 +697,7 @@ class FipStartTest {
 
 		// Keys
 		assertThat(result, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(result, hasProperty("layer", is(LayerType.VETERAN)));
+		assertThat(result, hasProperty("layerType", is(LayerType.VETERAN)));
 
 		// Direct Copy
 		assertThat(result, hasProperty("ageTotal", present(is(105f))));
@@ -725,7 +723,7 @@ class FipStartTest {
 
 		// Keys
 		assertThat(speciesResult1, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(speciesResult1, hasProperty("layer", is(LayerType.VETERAN)));
+		assertThat(speciesResult1, hasProperty("layerType", is(LayerType.VETERAN)));
 		assertThat(speciesResult1, hasProperty("genus", is("B")));
 
 		// Copied
@@ -738,7 +736,7 @@ class FipStartTest {
 
 		// Keys
 		assertThat(speciesResult2, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(speciesResult2, hasProperty("layer", is(LayerType.VETERAN)));
+		assertThat(speciesResult2, hasProperty("layerType", is(LayerType.VETERAN)));
 		assertThat(speciesResult2, hasProperty("genus", is("H")));
 
 		// Copied
@@ -751,7 +749,7 @@ class FipStartTest {
 
 		// Keys
 		assertThat(speciesResult3, hasProperty("polygonIdentifier", is(polygonId)));
-		assertThat(speciesResult3, hasProperty("layer", is(LayerType.VETERAN)));
+		assertThat(speciesResult3, hasProperty("layerType", is(LayerType.VETERAN)));
 		assertThat(speciesResult3, hasProperty("genus", is("S")));
 
 		// Copied
@@ -954,7 +952,7 @@ class FipStartTest {
 				.populateControlMapNetBreakage(controlMap, bgrp -> new Coefficients(new float[] { 0f, 0f, 0f, 0f }, 1));
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var result = app.processLayerAsVeteran(fipPolygon, fipLayer);
 
@@ -1004,7 +1002,7 @@ class FipStartTest {
 				.populateControlMapNetBreakage(controlMap, bgrp -> new Coefficients(new float[] { 0f, 0f, 0f, 0f }, 1));
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var result = app.processLayerAsVeteran(fipPolygon, fipLayer);
 
@@ -1023,7 +1021,7 @@ class FipStartTest {
 
 			// Keys
 			assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(speciesResult, hasProperty("layer", is(LayerType.VETERAN)));
+			assertThat(speciesResult, hasProperty("layerType", is(LayerType.VETERAN)));
 			assertThat(speciesResult, hasProperty("genus", is("B")));
 
 			// Copied
@@ -1082,14 +1080,14 @@ class FipStartTest {
 		var controlMap = FipTestUtils.loadControlMap();
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var result = app.processLayerAsPrimary(fipPolygon, fipLayer, 0f);
 
 			assertThat(result, notNullValue());
 
 			assertThat(result, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(result, hasProperty("layer", is(LayerType.PRIMARY)));
+			assertThat(result, hasProperty("layerType", is(LayerType.PRIMARY)));
 
 			assertThat(result, hasProperty("ageTotal", present(is(55f))));
 			assertThat(result, hasProperty("height", present(is(35.3f))));
@@ -1159,7 +1157,7 @@ class FipStartTest {
 			var speciesResult = result.getSpecies().get("B");
 
 			assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(speciesResult, hasProperty("layer", is(LayerType.PRIMARY)));
+			assertThat(speciesResult, hasProperty("layerType", is(LayerType.PRIMARY)));
 			assertThat(speciesResult, hasProperty("genus", is("B")));
 
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.00890319888f)));
@@ -1210,7 +1208,7 @@ class FipStartTest {
 			speciesResult = result.getSpecies().get("C");
 
 			assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(speciesResult, hasProperty("layer", is(LayerType.PRIMARY)));
+			assertThat(speciesResult, hasProperty("layerType", is(LayerType.PRIMARY)));
 			assertThat(speciesResult, hasProperty("genus", is("C")));
 
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.114011094f)));
@@ -1263,7 +1261,7 @@ class FipStartTest {
 			speciesResult = result.getSpecies().get("D");
 
 			assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(speciesResult, hasProperty("layer", is(LayerType.PRIMARY)));
+			assertThat(speciesResult, hasProperty("layerType", is(LayerType.PRIMARY)));
 			assertThat(speciesResult, hasProperty("genus", is("D")));
 
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.661987007f)));
@@ -1317,7 +1315,7 @@ class FipStartTest {
 			speciesResult = result.getSpecies().get("H");
 
 			assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(speciesResult, hasProperty("layer", is(LayerType.PRIMARY)));
+			assertThat(speciesResult, hasProperty("layerType", is(LayerType.PRIMARY)));
 			assertThat(speciesResult, hasProperty("genus", is("H")));
 
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.123297341f)));
@@ -1362,7 +1360,7 @@ class FipStartTest {
 			speciesResult = result.getSpecies().get("S");
 
 			assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(speciesResult, hasProperty("layer", is(LayerType.PRIMARY)));
+			assertThat(speciesResult, hasProperty("layerType", is(LayerType.PRIMARY)));
 			assertThat(speciesResult, hasProperty("genus", is("S")));
 
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.0918014571f)));
@@ -1454,14 +1452,14 @@ class FipStartTest {
 		var controlMap = FipTestUtils.loadControlMap();
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var result = app.processLayerAsPrimary(fipPolygon, fipLayer, 2.24055195f);
 
 			assertThat(result, notNullValue());
 
 			assertThat(result, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(result, hasProperty("layer", is(LayerType.PRIMARY)));
+			assertThat(result, hasProperty("layerType", is(LayerType.PRIMARY)));
 
 			assertThat(result, hasProperty("ageTotal", present(is(45f))));
 			assertThat(result, hasProperty("height", present(is(24.3f))));
@@ -1487,7 +1485,7 @@ class FipStartTest {
 			var speciesResult = result.getSpecies().get("H");
 
 			assertThat(speciesResult, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(speciesResult, hasProperty("layer", is(LayerType.PRIMARY)));
+			assertThat(speciesResult, hasProperty("layerType", is(LayerType.PRIMARY)));
 			assertThat(speciesResult, hasProperty("genus", is("H")));
 
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.787526369f)));
@@ -1555,7 +1553,7 @@ class FipStartTest {
 		var controlMap = FipTestUtils.loadControlMap();
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var result = app.estimateVeteranBaseArea(26.2000008f, 4f, "H", Region.COASTAL);
 
@@ -1604,7 +1602,7 @@ class FipStartTest {
 				.populateControlMapNetBreakage(controlMap, bgrp -> new Coefficients(new float[] { 0f, 0f, 0f, 0f }, 1));
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var result = app.processLayerAsVeteran(fipPolygon, fipLayer);
 
@@ -1661,7 +1659,7 @@ class FipStartTest {
 				.populateControlMapNetBreakage(controlMap, bgrp -> new Coefficients(new float[] { 0f, 0f, 0f, 0f }, 1));
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var result = app.processLayerAsVeteran(fipPolygon, fipLayer).getSpecies().get("B");
 
@@ -1726,7 +1724,7 @@ class FipStartTest {
 				.populateControlMapNetBreakage(controlMap, bgrp -> new Coefficients(new float[] { 0f, 0f, 0f, 0f }, 1));
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var result = app.processLayerAsVeteran(fipPolygon, fipLayer);
 
@@ -1863,7 +1861,7 @@ class FipStartTest {
 		TestUtils.populateControlMapWholeStemVolume(controlMap, wholeStemMap(12));
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var utilizationClass = UtilizationClass.OVER225;
 			var aAdjust = 0.10881f;
@@ -1897,7 +1895,7 @@ class FipStartTest {
 		TestUtils.populateControlMapCloseUtilization(controlMap, closeUtilMap(12));
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var utilizationClass = UtilizationClass.OVER225;
 			var aAdjust = new Coefficients(new float[] { 0f, 0f, 0f, -0.0981800035f }, 1);
@@ -1936,7 +1934,7 @@ class FipStartTest {
 		);
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var utilizationClass = UtilizationClass.OVER225;
 			var aAdjust = new Coefficients(new float[] { 0f, 0f, 0f, 0.000479999988f }, 1);
@@ -1985,7 +1983,7 @@ class FipStartTest {
 		);
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var utilizationClass = UtilizationClass.OVER225;
 			var aAdjust = new Coefficients(new float[] { 0f, 0f, 0f, -0.00295000011f }, 1);
@@ -2029,7 +2027,7 @@ class FipStartTest {
 		);
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var utilizationClass = UtilizationClass.OVER225;
 			var breakageGroup = 5;
@@ -2061,7 +2059,7 @@ class FipStartTest {
 		var controlMap = FipTestUtils.loadControlMap();
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var utilizationClass = UtilizationClass.ALL;
 			var breakageGroup = 20;
@@ -2133,12 +2131,12 @@ class FipStartTest {
 		var controlMap = FipTestUtils.loadControlMap();
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var result = app.processLayerAsVeteran(fipPolygon, fipLayer);
 
 			assertThat(result, hasProperty("polygonIdentifier", is(polygonId)));
-			assertThat(result, hasProperty("layer", is(LayerType.VETERAN)));
+			assertThat(result, hasProperty("layerType", is(LayerType.VETERAN)));
 
 			assertThat(result, hasProperty("ageTotal", present(closeTo(105f)))); // LVCOM3/AGETOTLV
 			assertThat(result, hasProperty("breastHeightAge", present(closeTo(97.9000015f)))); // LVCOM3/AGEBHLV
@@ -2213,44 +2211,10 @@ class FipStartTest {
 	}
 
 	@Test
-	void testFindEquationGroupDefault() throws Exception {
-		var controlMap = FipTestUtils.loadControlMap();
-		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
-
-			var becLookup = BecDefinitionParser.getBecs(controlMap);
-			var bec = becLookup.get("ESSF").get();
-
-			var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "F", valid());
-
-			var result = app.findBaseAreaGroup(spec1, bec, 3);
-
-			assertThat(result, is(55));
-		}
-	}
-
-	@Test
-	void testFindEquationGroupModified() throws Exception {
-		var controlMap = FipTestUtils.loadControlMap();
-		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
-
-			var becLookup = BecDefinitionParser.getBecs(controlMap);
-			var bec = becLookup.get("PP").get();
-
-			var spec1 = this.getTestSpecies("test polygon", LayerType.PRIMARY, "F", valid());
-
-			var result = app.findBaseAreaGroup(spec1, bec, 2);
-
-			assertThat(result, is(61)); // Modified from 57
-		}
-	}
-
-	@Test
 	void testEstimatePrimaryBaseArea() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -2293,7 +2257,7 @@ class FipStartTest {
 	void testEstimatePrimaryBaseAreaHeightCloseToA2() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -2335,7 +2299,7 @@ class FipStartTest {
 	void testEstimatePrimaryBaseAreaLowCrownClosure() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -2377,7 +2341,7 @@ class FipStartTest {
 	void testEstimatePrimaryBaseAreaLowResult() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -2422,7 +2386,7 @@ class FipStartTest {
 	void testEstimatePrimaryQuadMeanDiameter() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -2464,7 +2428,7 @@ class FipStartTest {
 	void testEstimatePrimaryQuadMeanDiameterHeightLessThanA5() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -2506,7 +2470,7 @@ class FipStartTest {
 	void testEstimatePrimaryQuadMeanDiameterResultLargerThanUpperBound() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -2550,7 +2514,7 @@ class FipStartTest {
 	void testEstimatePrimaryLayerNonPrimarySpeciesHeightEqn1() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -2584,7 +2548,7 @@ class FipStartTest {
 	void testEstimatePrimaryLayerNonPrimarySpeciesHeightEqn2() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("ESSF").get();
@@ -2625,7 +2589,7 @@ class FipStartTest {
 	void testFindRootsForPrimaryLayerDiameterAndAreaOneSpecies() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -2708,7 +2672,7 @@ class FipStartTest {
 	void testFindRootsForPrimaryLayerDiameterAndAreaMultipleSpeciesPass1() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -2986,7 +2950,7 @@ class FipStartTest {
 	void testFindRootsForPrimaryLayerDiameterAndAreaMultipleSpeciesPass1Test2() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var becLookup = BecDefinitionParser.getBecs(controlMap);
 			var bec = becLookup.get("CWH").get();
@@ -3240,24 +3204,10 @@ class FipStartTest {
 	}
 
 	@Test
-	void testFindEmpericalRelationshipParameterIndex() throws Exception {
-		var controlMap = FipTestUtils.loadControlMap();
-		try (var app = new FipStart();) {
-			app.setControlMap(controlMap);
-
-			var bec = BecDefinitionParser.getBecs(controlMap).get("CWH").get();
-
-			int result = app.findEmpiricalRelationshipParameterIndex("D", bec, 37);
-
-			assertThat(result, is(1));
-		}
-	}
-
-	@Test
 	void testEstimateQuadMeanDiameterForSpecies() throws Exception {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var layer = VdypLayer.build(builder -> {
 				builder.polygonIdentifier("Test");
@@ -3341,7 +3291,7 @@ class FipStartTest {
 	void testEstimateSmallComponents() {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var fPoly = FipPolygon.build(builder -> {
 				builder.polygonIdentifier("Test");
@@ -3475,7 +3425,7 @@ class FipStartTest {
 	void testEstimateQuadMeanDiameterByUtilization() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var coe = Utils.utilizationVector();
 			coe.setCoe(FipStart.UTIL_ALL, 31.6622887f);
@@ -3505,7 +3455,7 @@ class FipStartTest {
 	void testEstimateQuadMeanDiameterByUtilization2() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var coe = Utils.utilizationVector();
 			coe.setCoe(FipStart.UTIL_ALL, 13.4943399f);
@@ -3535,7 +3485,7 @@ class FipStartTest {
 	void testEstimateBaseAreaByUtilization() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var dq = Utils.utilizationVector();
 			var ba = Utils.utilizationVector();
@@ -3572,7 +3522,7 @@ class FipStartTest {
 	void testReconcileComponentsMode1() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var dq = Utils.utilizationVector();
 			var ba = Utils.utilizationVector();
@@ -3614,7 +3564,7 @@ class FipStartTest {
 	void testReconcileComponentsMode2() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var dq = Utils.utilizationVector();
 			var ba = Utils.utilizationVector();
@@ -3652,7 +3602,7 @@ class FipStartTest {
 	void testReconcileComponentsMode3() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var dq = Utils.utilizationVector();
 			var ba = Utils.utilizationVector();
@@ -3693,7 +3643,7 @@ class FipStartTest {
 	void testEstimateWholeStemVolumeByUtilizationClass() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var dq = Utils.utilizationVector();
 			var ba = Utils.utilizationVector();
@@ -3727,7 +3677,7 @@ class FipStartTest {
 	void testComputeUtilizationComponentsPrimaryByUtilNoCV() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var bec = BecDefinitionParser.getBecs(controlMap).get("IDF").get();
 
@@ -3926,13 +3876,13 @@ class FipStartTest {
 	void testCreateVdypPolygon() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var fipPolygon = FipPolygon.build(builder -> {
 				builder.polygonIdentifier("Test");
 				builder.forestInventoryZone("D");
 				builder.biogeoclimaticZone("IDF");
-				builder.modeFip(PolygonMode.START);
+				builder.mode(PolygonMode.START);
 				builder.yieldFactor(1f);
 			});
 
@@ -3987,13 +3937,13 @@ class FipStartTest {
 	void testCreateVdypPolygonPercentForestLandGiven() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var fipPolygon = FipPolygon.build(builder -> {
 				builder.polygonIdentifier("Test");
 				builder.forestInventoryZone("D");
 				builder.biogeoclimaticZone("IDF");
-				builder.modeFip(PolygonMode.START);
+				builder.mode(PolygonMode.START);
 				builder.yieldFactor(1f);
 
 				builder.percentAvailable(42f);
@@ -4054,13 +4004,13 @@ class FipStartTest {
 	void testCreateVdypPolygonFipYoung() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			var fipPolygon = FipPolygon.build(builder -> {
 				builder.polygonIdentifier("Test");
 				builder.forestInventoryZone("D");
 				builder.biogeoclimaticZone("IDF");
-				builder.modeFip(PolygonMode.YOUNG);
+				builder.mode(PolygonMode.YOUNG);
 				builder.yieldFactor(1f);
 			});
 
@@ -4122,7 +4072,7 @@ class FipStartTest {
 				.put('R', Region.INTERIOR, Optional.of(new StockingClassFactor('R', Region.INTERIOR, 0.42f, 100)));
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			// var fipVeteranLayer = new FipLayer("Test", LayerType.VETERAN);
 			var fipPrimaryLayer = FipLayerPrimary.buildPrimary(builder -> {
@@ -4274,7 +4224,7 @@ class FipStartTest {
 		stockingClassMap.put('R', Region.INTERIOR, new StockingClassFactor('R', Region.INTERIOR, 0.42f, 100));
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			// var fipVeteranLayer = new FipLayer("Test", LayerType.VETERAN);
 			var fipPrimaryLayer = FipLayerPrimary.buildPrimary(builder -> {
@@ -4441,7 +4391,7 @@ class FipStartTest {
 		stockingClassMap.remove('R', Region.INTERIOR);
 
 		try (var app = new FipStart()) {
-			app.setControlMap(controlMap);
+			ApplicationTestUtils.setControlMap(app, controlMap);
 
 			// var fipVeteranLayer = new FipLayer("Test", LayerType.VETERAN);
 			var fipPrimaryLayer = FipLayerPrimary.buildPrimary(builder -> {
@@ -4616,7 +4566,7 @@ class FipStartTest {
 			builder.biogeoclimaticZone("CWH");
 			builder.yieldFactor(1f);
 			builder.forestInventoryZone("0");
-			builder.modeFip(PolygonMode.START);
+			builder.mode(PolygonMode.START);
 		});
 
 		var layer = FipLayerPrimary.buildPrimary(poly, builder -> {
@@ -4641,7 +4591,7 @@ class FipStartTest {
 		});
 
 		var app = new FipStart();
-		app.setControlMap(controlMap);
+		ApplicationTestUtils.setControlMap(app, controlMap);
 
 		var result = app.processPolygon(0, poly);
 
@@ -4696,7 +4646,7 @@ class FipStartTest {
 			List<Collection<FipSpecies>> species, TestConsumer<FipStart> test
 	) throws Exception {
 
-		VdypStartApplication<FipPolygon, FipLayer, FipSpecies, FipSite> app = new FipStart();
+		var app = new FipStart();
 
 		Map<String, Object> controlMap = new HashMap<>();
 
@@ -4727,7 +4677,7 @@ class FipStartTest {
 		mockWith(layerStream, layers);
 		mockWith(speciesStream, species);
 
-		app.setControlMap(controlMap);
+		ApplicationTestUtils.setControlMap(app, controlMap);
 
 		control.replay();
 
@@ -4750,7 +4700,7 @@ class FipStartTest {
 	static Map<LayerType, FipLayer> layerMap(FipLayer... layers) {
 		Map<LayerType, FipLayer> result = new HashMap<>();
 		for (var layer : layers) {
-			result.put(layer.getLayer(), layer);
+			result.put(layer.getLayerType(), layer);
 		}
 		return result;
 	}
@@ -4760,7 +4710,7 @@ class FipStartTest {
 			builder.polygonIdentifier(polygonId);
 			builder.forestInventoryZone("0");
 			builder.biogeoclimaticZone("BG");
-			builder.modeFip(PolygonMode.START);
+			builder.mode(PolygonMode.START);
 			builder.yieldFactor(1.0f);
 		});
 		mutator.accept(result);

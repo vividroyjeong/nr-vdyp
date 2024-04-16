@@ -42,7 +42,7 @@ class VdypPolygonTest {
 	@Test
 	void buildAddLayer() throws Exception {
 		VdypLayer mock = EasyMock.mock(VdypLayer.class);
-		EasyMock.expect(mock.getLayer()).andStubReturn(LayerType.PRIMARY);
+		EasyMock.expect(mock.getLayerType()).andStubReturn(LayerType.PRIMARY);
 		EasyMock.replay(mock);
 		var result = VdypPolygon.build(builder -> {
 			builder.polygonIdentifier("Test");

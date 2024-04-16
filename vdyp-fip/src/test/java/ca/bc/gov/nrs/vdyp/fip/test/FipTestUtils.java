@@ -57,21 +57,13 @@ public class FipTestUtils {
 
 	}
 
-	public static Map<String, Object> loadControlMap(BaseControlParser parser, Class<?> klazz, String resourceName)
-			throws IOException, ResourceParseException {
-		try (var is = klazz.getResourceAsStream(resourceName)) {
-
-			return parser.parse(is, TestUtils.fileResolver(klazz), new HashMap<>());
-		}
-	}
-
 	/**
 	 * Load the control map from resources in the test package using the full control map parser.
 	 */
 	public static Map<String, Object> loadControlMap() {
 		BaseControlParser parser = new FipControlParser();
 		try {
-			return loadControlMap(parser, TestUtils.class, "FIPSTART.CTR");
+			return TestUtils.loadControlMap(parser, TestUtils.class, "FIPSTART.CTR");
 		} catch (IOException | ResourceParseException ex) {
 			throw new AssertionFailedError(null, ex);
 		}

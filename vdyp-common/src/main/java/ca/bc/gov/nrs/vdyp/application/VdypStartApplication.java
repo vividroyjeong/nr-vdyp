@@ -14,6 +14,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,11 +33,14 @@ import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
+import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 
-public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional<Float>>, L extends BaseVdypLayer<S, I>, S extends BaseVdypSpecies, I extends BaseVdypSite>
+public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional<Float>, S, I>, L extends BaseVdypLayer<S, I>, S extends BaseVdypSpecies, I extends BaseVdypSite>
 		extends VdypApplication implements Closeable {
 
 	private static final Logger log = LoggerFactory.getLogger(VdypStartApplication.class);
@@ -42,7 +48,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	public static final int CONFIG_LOAD_ERROR = 1;
 	public static final int PROCESSING_ERROR = 2;
 
-	public static final Map<String, Integer> ITG_PURE = Utils.constMap(map -> {
+	static final Map<String, Integer> ITG_PURE = Utils.constMap(map -> {
 		map.put("AC", 36);
 		map.put("AT", 42);
 		map.put("B", 18);
@@ -61,7 +67,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		map.put("Y", 9);
 	});
 
-	public static final Set<String> HARDWOODS = Set.of("AC", "AT", "D", "E", "MB");
+	static final Set<String> HARDWOODS = Set.of("AC", "AT", "D", "E", "MB");
 
 	protected static void doMain(VdypStartApplication<?, ?, ?, ?> app, final String... args) {
 		var resolver = new FileSystemFileResolver();
@@ -81,22 +87,6 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		}
 	}
 
-	/**
-	 * Iterates over all but the last entry, passing them to the first consumer then passes the last entry to the second
-	 * consumer
-	 */
-	protected static <T> void eachButLast(Collection<T> items, Consumer<T> body, Consumer<T> lastBody) {
-		var it = items.iterator();
-		while (it.hasNext()) {
-			var value = it.next();
-			if (it.hasNext()) {
-				body.accept(value);
-			} else {
-				lastBody.accept(value);
-			}
-		}
-	}
-
 	protected VriAdjustInputWriter vriWriter;
 
 	protected Map<String, Object> controlMap = new HashMap<>();
@@ -107,7 +97,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	/**
 	 * When finding primary species these genera should be combined
 	 */
-	public static final Collection<Collection<String>> PRIMARY_SPECIES_TO_COMBINE = Arrays
+	protected static final Collection<Collection<String>> PRIMARY_SPECIES_TO_COMBINE = Arrays
 			.asList(Arrays.asList("PL", "PA"), Arrays.asList("C", "Y"));
 
 	protected VdypStartApplication() {
@@ -115,7 +105,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	}
 
 	/**
-	 * Initialize FipStart
+	 * Initialize application
 	 *
 	 * @param resolver
 	 * @param controlFilePath
@@ -148,7 +138,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	}
 
 	/**
-	 * Initialize FipStart
+	 * Initialize application
 	 *
 	 * @param controlMap
 	 * @throws IOException
@@ -169,7 +159,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		}
 	}
 
-	public void setControlMap(Map<String, Object> controlMap) {
+	void setControlMap(Map<String, Object> controlMap) {
 		this.controlMap = controlMap;
 	}
 
@@ -193,13 +183,13 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		closeVriWriter();
 	}
 
-	protected Coefficients getCoeForSpec(VdypSpecies spec, ControlKey controlKey) {
+	protected Coefficients getCoeForSpecies(VdypSpecies species, ControlKey controlKey) {
 		var coeMap = Utils.<Map<String, Coefficients>>expectParsedControl(controlMap, controlKey, java.util.Map.class);
-		return coeMap.get(spec.getGenus());
+		return coeMap.get(species.getGenus());
 	}
 
 	protected L requireLayer(P polygon, LayerType type) throws ProcessingException {
-		if (!polygon.getLayers().containsKey(LayerType.PRIMARY)) {
+		if (!polygon.getLayers().containsKey(type)) {
 			throw validationError(
 					"Polygon %s has no %s layer, or that layer has non-positive height or crown closure.",
 					polygon.getPolygonIdentifier(), type
@@ -253,7 +243,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				continue;
 			}
 			var groupPrimary = copySpecies(
-					groupSpecies.stream().sorted(PERCENT_GENUS_DESCENDING).findFirst().get(), builder -> {
+					// groupSpecies.size() is at least 2 so findFirest will not be empty
+					groupSpecies.stream().sorted(PERCENT_GENUS_DESCENDING).findFirst().orElseThrow(), builder -> {
 						var total = (float) groupSpecies.stream().mapToDouble(BaseVdypSpecies::getPercentGenus).sum();
 						builder.percentGenus(total);
 					}
@@ -289,6 +280,13 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	 * @return
 	 * @throws ProcessingException
 	 */
+	@SuppressWarnings(
+		{ //
+				"java:S1301", // Using switch instead of if for consistency
+				"java:S3776" // Inherently a lot of branching in a consistent manner, breaking into more
+								// functions would make it less comprehensible
+		}
+	)
 	protected int findItg(List<S> primarySecondary) throws StandProcessingException {
 		var primary = primarySecondary.get(0);
 
@@ -410,6 +408,22 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		}
 	}
 
+	public int findEmpiricalRelationshipParameterIndex(String specAlias, BecDefinition bec, int itg) {
+		var groupMap = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
+				controlMap, ControlKey.DEFAULT_EQ_NUM, ca.bc.gov.nrs.vdyp.model.MatrixMap2.class
+		);
+		var modMap = Utils.<MatrixMap2<Integer, Integer, Optional<Integer>>>expectParsedControl(
+				controlMap, ControlKey.EQN_MODIFIERS, ca.bc.gov.nrs.vdyp.model.MatrixMap2.class
+		);
+		var group = groupMap.get(specAlias, bec.getGrowthBec().getAlias());
+		group = MatrixMap.safeGet(modMap, group, itg).orElse(group);
+		return group;
+	}
+
+	protected VriAdjustInputWriter getVriWriter() {
+		return vriWriter;
+	}
+
 	protected static <E extends Throwable> void throwIfPresent(Optional<E> opt) throws E {
 		if (opt.isPresent()) {
 			throw opt.get();
@@ -417,6 +431,73 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	}
 
 	protected static StandProcessingException validationError(String template, Object... values) {
+
 		return new StandProcessingException(String.format(template, values));
+	}
+
+	/**
+	 * Create a coefficients object where its values are either a weighted sum of those for each of the given entities,
+	 * or the value from one arbitrarily chose entity.
+	 *
+	 * @param <T>             The type of entity
+	 * @param weighted        the indicies of the coefficients that should be weighted sums, those that are not included
+	 *                        are assumed to be constant across all entities and one is choses arbitrarily.
+	 * @param size            Size of the resulting coefficients object
+	 * @param indexFrom       index from of the resulting coefficients object
+	 * @param entities        the entities to do weighted sums over
+	 * @param weight          the weight for a given entity
+	 * @param getCoefficients the coefficients for a given entity
+	 */
+	public static <T> Coefficients weightedCoefficientSum(
+			Collection<Integer> weighted, int size, int indexFrom, Collection<T> entities, ToDoubleFunction<T> weight,
+			Function<T, Coefficients> getCoefficients
+	) {
+		Coefficients coe = Coefficients.empty(size, indexFrom);
+
+		// Do the summation in double precision
+		var coeWorking = new double[size];
+		Arrays.fill(coeWorking, 0.0);
+
+		for (var entity : entities) {
+			var entityCoe = getCoefficients.apply(entity);
+			double fraction = weight.applyAsDouble(entity);
+			for (int i : weighted) {
+				coeWorking[i - indexFrom] += (entityCoe.getCoe(i)) * fraction;
+			}
+		}
+		// Reduce back to float once done
+		for (int i : weighted) {
+			coe.setCoe(i, (float) coeWorking[i - indexFrom]);
+		}
+
+		// Pick one entity to fill in the fixed coefficients
+		// Choice is arbitrary, they should all be the same
+		var anyCoe = getCoefficients.apply(entities.iterator().next());
+
+		for (int i = indexFrom; i < size + indexFrom; i++) {
+			if (weighted.contains(i))
+				continue;
+			coe.setCoe(i, anyCoe.getCoe(i));
+		}
+		return coe;
+	}
+
+	/**
+	 * Create a coefficients object where its values are either a weighted sum of those for each of the given entities,
+	 * or the value from one arbitrarily chose entity.
+	 *
+	 * @param <T>             The type of entity
+	 * @param size            Size of the resulting coefficients object
+	 * @param indexFrom       index from of the resulting coefficients object
+	 * @param entities        the entities to do weighted sums over
+	 * @param weight          the weight for a given entity
+	 * @param getCoefficients the coefficients for a given entity
+	 */
+	public static <T> Coefficients weightedCoefficientSum(
+			int size, int indexFrom, Collection<T> entities, ToDoubleFunction<T> weight,
+			Function<T, Coefficients> getCoefficients
+	) {
+		var weighted = IntStream.range(indexFrom, size + indexFrom).boxed().toList();
+		return weightedCoefficientSum(weighted, size, indexFrom, entities, weight, getCoefficients);
 	}
 }

@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.common;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -18,6 +19,9 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.math3.util.Pair;
 
+import ca.bc.gov.nrs.vdyp.application.ProcessingException;
+import ca.bc.gov.nrs.vdyp.model.BecDefinition;
+import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 
 public class Utils {
@@ -254,8 +258,67 @@ public class Utils {
 	}
 
 	public static <T> Optional<T> getIfPresent(List<T> list, int index) {
-		if (list.size() >= index)
+		if (list.size() > index)
 			return Optional.of(list.get(index));
 		return Optional.empty();
+	}
+
+	public static BecDefinition getBec(String biogeoclimaticZone, Map<String, Object> controlMap)
+			throws ProcessingException {
+		return expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class).get(biogeoclimaticZone)
+				.orElseThrow(() -> new ProcessingException("Reference to unexpected BEC " + biogeoclimaticZone));
+	}
+
+	/**
+	 * Returns the value of the optional if it's present, otherwise the string "N/A"
+	 *
+	 * @param <T>
+	 * @param value
+	 * @param stringify
+	 * @return
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static Object optNa(Optional<?> value) {
+		return ((Optional) value).orElse("N/A");
+	}
+
+	/**
+	 * If the value is present, returns the default string representation otherwise returns "N/A"
+	 *
+	 * @param <T>
+	 * @param value
+	 * @param stringify
+	 * @return
+	 */
+	public static String optPretty(Optional<?> value) {
+		return optPretty(value, Object::toString);
+	}
+
+	/**
+	 * If the value is present, returns the result of the stringify function otherwise returns "N/A"
+	 *
+	 * @param <T>
+	 * @param value
+	 * @param stringify
+	 * @return
+	 */
+	public static <T> String optPretty(Optional<T> value, Function<T, String> stringify) {
+		return (String) optNa(value.map(stringify));
+	}
+
+	/**
+	 * Iterates over all but the last entry, passing them to the first consumer then passes the last entry to the second
+	 * consumer
+	 */
+	public static <T> void eachButLast(Collection<T> items, Consumer<T> body, Consumer<T> lastBody) {
+		var it = items.iterator();
+		while (it.hasNext()) {
+			var value = it.next();
+			if (it.hasNext()) {
+				body.accept(value);
+			} else {
+				lastBody.accept(value);
+			}
+		}
 	}
 }

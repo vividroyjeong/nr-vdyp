@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
@@ -26,10 +28,10 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 import ca.bc.gov.nrs.vdyp.vri.model.VriSite;
 
-public class VriSiteParserTest {
+class VriSiteParserTest {
 
 	@Test
-	public void testParseEmpty() throws Exception {
+	void testParseEmpty() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -55,7 +57,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testParseOneSite() throws Exception {
+	void testParseOneSite() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -103,7 +105,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testIgnoreIfNotPrimaryOrSecondary() throws Exception {
+	void testIgnoreIfNotPrimaryOrSecondary() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -154,7 +156,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testParseTwoSites() throws Exception {
+	void testParseTwoSites() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -215,7 +217,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testParseTwoLayers() throws Exception {
+	void testParseTwoLayers() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -249,7 +251,7 @@ public class VriSiteParserTest {
 		assertThat(
 				sites, containsInAnyOrder(
 						allOf(
-								hasProperty("layer", is(LayerType.PRIMARY)), //
+								hasProperty("layerType", is(LayerType.PRIMARY)), //
 								hasProperty("ageTotal", present(closeTo(200.0f))), //
 								hasProperty("height", present(closeTo(28.0f))), //
 								hasProperty("siteIndex", present(closeTo(14.3f))), //
@@ -260,7 +262,7 @@ public class VriSiteParserTest {
 								hasProperty("siteCurveNumber", present(is(11)))
 						),
 						allOf(
-								hasProperty("layer", is(LayerType.SECONDARY)), //
+								hasProperty("layerType", is(LayerType.SECONDARY)), //
 								hasProperty("ageTotal", present(closeTo(200.0f))), //
 								hasProperty("height", present(closeTo(32.0f))), //
 								hasProperty("siteIndex", present(closeTo(14.6f))), //
@@ -277,7 +279,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testParseTwoPolygons() throws Exception {
+	void testParseTwoPolygons() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -313,7 +315,7 @@ public class VriSiteParserTest {
 		assertThat(
 				sites.iterator().next(), allOf(
 						hasProperty("polygonIdentifier", is("082F074/0072         2002")), //
-						hasProperty("layer", is(LayerType.PRIMARY)), //
+						hasProperty("layerType", is(LayerType.PRIMARY)), //
 						hasProperty("ageTotal", present(closeTo(200.0f))), //
 						hasProperty("height", present(closeTo(28.0f))), //
 						hasProperty("siteIndex", present(closeTo(14.3f))), //
@@ -331,7 +333,7 @@ public class VriSiteParserTest {
 		assertThat(
 				sites.iterator().next(), allOf(
 						hasProperty("polygonIdentifier", is("082F074/0071         2001")), //
-						hasProperty("layer", is(LayerType.PRIMARY)), //
+						hasProperty("layerType", is(LayerType.PRIMARY)), //
 						hasProperty("ageTotal", present(closeTo(200.0f))), //
 						hasProperty("height", present(closeTo(32.0f))), //
 						hasProperty("siteIndex", present(closeTo(14.6f))), //
@@ -348,7 +350,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testBreastHeightAgeZeroAndTotalEmpty() throws Exception {
+	void testBreastHeightAgeZeroAndTotalEmpty() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -390,7 +392,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testBreastHeightAgeZeroAndNotCloseToExpected() throws Exception {
+	void testBreastHeightAgeZeroAndNotCloseToExpected() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -432,7 +434,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testBreastHeightAgeZeroAndIsCloseToExpected() throws Exception {
+	void testBreastHeightAgeZeroAndIsCloseToExpected() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -474,7 +476,7 @@ public class VriSiteParserTest {
 	}
 
 	@Test
-	public void testDefaultHeight() throws Exception {
+	void testDefaultHeight() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -510,8 +512,16 @@ public class VriSiteParserTest {
 		assertEmpty(stream);
 	}
 
-	@Test
-	public void testNoDefaultHeightIfTotalAgeTooHigh() throws Exception {
+	@ParameterizedTest
+	@ValueSource(
+			strings = { //
+					"082F074/0071         2001 P 1.7 -9.0 14.3        C CW 19.6            0.0 11", // Total Age High
+					"082F074/0071         2001 P 0.3 -9.0 14.3        C CW 19.6            0.0 11", // Total Age Low
+					"082F074/0071         2001 P   1 -9.0  2.9        C CW 19.6            0.0 11" // Site Index Low
+
+			}
+	)
+	void testNoDefaultHeight() throws Exception {
 
 		var parser = new VriSiteParser();
 
@@ -521,83 +531,9 @@ public class VriSiteParserTest {
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat", TestUtils.makeInputStream(
-						// height empty, ageTotal within 0.6 of 1, siteIndex >=3
+				"test.dat",
+				TestUtils.makeInputStream(
 						"082F074/0071         2001 P 1.7 -9.0 14.3        C CW 19.6            0.0 11",
-						"082F074/0071         2001 Z   0  0.0  0.0"
-				)
-		);
-
-		parser.modify(controlMap, fileResolver);
-
-		var parserFactory = controlMap.get(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name());
-
-		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
-
-		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<Collection<VriSite>>) parserFactory).get();
-
-		assertThat(stream, instanceOf(StreamingParser.class));
-
-		var sites = assertNext(stream);
-
-		assertThat(sites, iterableWithSize(1));
-		assertThat(sites.iterator().next(), allOf(hasProperty("height", notPresent())));
-
-		assertEmpty(stream);
-	}
-
-	@Test
-	public void testNoDefaultHeightIfTotalAgeTooLow() throws Exception {
-
-		var parser = new VriSiteParser();
-
-		Map<String, Object> controlMap = new HashMap<>();
-
-		controlMap.put(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name(), "test.dat");
-		TestUtils.populateControlMapGenusReal(controlMap);
-
-		var fileResolver = TestUtils.fileResolver(
-				"test.dat", TestUtils.makeInputStream(
-						// height empty, ageTotal within 0.6 of 1, siteIndex >=3
-						"082F074/0071         2001 P 0.3 -9.0 14.3        C CW 19.6            0.0 11",
-						"082F074/0071         2001 Z   0  0.0  0.0"
-				)
-		);
-
-		parser.modify(controlMap, fileResolver);
-
-		var parserFactory = controlMap.get(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name());
-
-		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
-
-		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<Collection<VriSite>>) parserFactory).get();
-
-		assertThat(stream, instanceOf(StreamingParser.class));
-
-		var sites = assertNext(stream);
-
-		assertThat(sites, iterableWithSize(1));
-		assertThat(sites.iterator().next(), allOf(hasProperty("height", notPresent())));
-
-		assertEmpty(stream);
-	}
-
-	@Test
-	public void testNoDefaultHeightIfSiteIndexTooLow() throws Exception {
-
-		var parser = new VriSiteParser();
-
-		Map<String, Object> controlMap = new HashMap<>();
-
-		controlMap.put(ControlKey.VRI_INPUT_YIELD_SPEC_DIST.name(), "test.dat");
-		TestUtils.populateControlMapGenusReal(controlMap);
-
-		var fileResolver = TestUtils.fileResolver(
-				"test.dat", TestUtils.makeInputStream(
-						// height empty, ageTotal within 0.6 of 1, siteIndex >=3
-						"082F074/0071         2001 P   1 -9.0  2.9        C CW 19.6            0.0 11",
 						"082F074/0071         2001 Z   0  0.0  0.0"
 				)
 		);
