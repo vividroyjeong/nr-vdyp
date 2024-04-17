@@ -13,6 +13,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +32,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.Region;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
@@ -508,15 +511,17 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				).getCoe(1); // Entry 1 is base area
 
 		/*
-		 * The original Fortran had the following comment and a commented out modification to upperBoundsBaseArea
-		 * (BATOP98). I have included them here.
+		 * The original Fortran had the following comment and a commented out
+		 * modification to upperBoundsBaseArea (BATOP98). I have included them here.
 		 */
 
 		/*
-		 * And one POSSIBLY one last vestage of grouping by ITG That limit applies to full occupancy and Empirical
-		 * occupancy. They were derived as the 98th percentile of Empirical stocking, though adjusted PSP's were
-		 * included. If the ouput of this routine is bumped up from empirical to full, MIGHT adjust this limit DOWN
-		 * here, so that at end, it is correct. Tentatively decide NOT to do this.
+		 * And one POSSIBLY one last vestage of grouping by ITG That limit applies to
+		 * full occupancy and Empirical occupancy. They were derived as the 98th
+		 * percentile of Empirical stocking, though adjusted PSP's were included. If the
+		 * ouput of this routine is bumped up from empirical to full, MIGHT adjust this
+		 * limit DOWN here, so that at end, it is correct. Tentatively decide NOT to do
+		 * this.
 		 */
 
 		// if (fullOccupancy)
@@ -651,7 +656,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		});
 	}
 
-	VriPolygon processYoung(VriPolygon poly) throws StandProcessingException {
+	VriPolygon processYoung(VriPolygon poly) throws ProcessingException {
 
 		int year = poly.getPolygonIdentifier().getYear();
 
@@ -659,6 +664,61 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			throw new StandProcessingException("Year for YOUNG stand should be at least 1900 but was " + year);
 		}
 
+		var bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+
+		var primaryLayer = poly.getLayers().get(LayerType.PRIMARY);
+		var primarySite = primaryLayer.getPrimarySite().orElseThrow();
+		try {
+			int siteCurveNumber = primaryLayer.getPrimarySite().flatMap(BaseVdypSite::getSiteCurveNumber)
+					.orElseGet(() -> {
+						try {
+							return this.findSiteCurveNumber(
+									bec.getRegion(), primarySite.getSiteSpecies(), primarySite.getSiteGenus()
+							);
+						} catch (StandProcessingException e) {
+							throw new RuntimeStandProcessingException(e);
+						}
+					});
+
+			float primaryAgeTotal = primarySite.getAgeTotal().orElseThrow(); // AGETOT_L1
+			float primaryYearsToBreastHeight = primarySite.getYearsToBreastHeight().orElseThrow(); // YTBH_L1
+
+			float primaryBreastHeightAge0 = primaryAgeTotal - primaryYearsToBreastHeight; // AGEBH0
+			float ageIncrement = primaryBreastHeightAge0 <= 0f ? 1f - primaryBreastHeightAge0 : 0f; // AGE_INCR
+
+			int ageType = 1; // AGE_TYPE TODO handle this with an enum, multiple methods, functors, etc.
+			float siteIndex = primarySite.getSiteIndex().orElseThrow(); // SID
+
+			int[] sci = new int[] { siteCurveNumber, 2 }; // SCI TODO this can probably be handled better
+
+			Map<String, Float> minimaMap = Utils.expectParsedControl(controlMap, ControlKey.MINIMA, Map.class);
+
+			float minimumPredictedBaseArea = minimaMap.get(BaseControlParser.MINIMUM_PREDICTED_BASE_AREA); // VMINBAeqn
+			float minimumHeight = minimaMap.get(BaseControlParser.MINIMUM_HEIGHT); // VMINH
+
+			float baseAreaTarget = minimumPredictedBaseArea; // BATARGET
+			float heightTarget = minimumHeight; // HTARGET
+			float ageTarget = 5f; // AGETARGET
+
+			float percentAvailable = poly.getPercentAvailable().filter(x -> x >= 0f).orElse(85.0f); // PCT
+
+			if (percentAvailable < 10f) {
+				float factor = Math.min(10f / percentAvailable, 4f);
+				baseAreaTarget *= factor;
+			}
+			
+			float dominantHeight0 = 0f; // HD0
+			
+			int moreYears =Math.max(80, (int) (130-primaryAgeTotal));
+			
+			for(int increase = 0; increase<moreYears; increase++) {
+				// TODO
+			}
+			
+
+		} catch (RuntimeStandProcessingException e) {
+			throw e.getCause();
+		}
 		return poly;
 	}
 
@@ -678,7 +738,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	 * @param region
 	 * @param ids
 	 * @return
-	 * @throws StandProcessingException if no entry for any of the given species IDs is present.
+	 * @throws StandProcessingException if no entry for any of the given species IDs
+	 *                                  is present.
 	 */
 	int findSiteCurveNumber(Region region, String... ids) throws StandProcessingException {
 		var scnMap = Utils.<MatrixMap2<String, Region, Integer>>expectParsedControl(
