@@ -497,7 +497,12 @@ class VriStartTest {
 	void testProcessPolygonDontSkip(PolygonMode mode) throws Exception {
 		var control = EasyMock.createControl();
 
-		VriStart app = EasyMock.createMockBuilder(VriStart.class).addMockedMethod("checkPolygon").createMock(control);
+		VriStart app = EasyMock.createMockBuilder(VriStart.class) //
+				.addMockedMethod("processYoung") //
+				.addMockedMethod("processBatc") //
+				.addMockedMethod("processBatn") //
+				.addMockedMethod("checkPolygon") //
+				.createMock(control);
 
 		MockFileResolver resolver = dummyInput();
 
@@ -508,7 +513,29 @@ class VriStartTest {
 			pb.mode(mode);
 		});
 
+		var polyYoung = VriPolygon.build(pb -> {
+			pb.polygonIdentifier("TestPolyYoung", 2024);
+			pb.biogeoclimaticZone("IDF");
+			pb.yieldFactor(1.0f);
+			pb.mode(mode);
+		});
+		var polyBatc = VriPolygon.build(pb -> {
+			pb.polygonIdentifier("TestPolyBatc", 2024);
+			pb.biogeoclimaticZone("IDF");
+			pb.yieldFactor(1.0f);
+			pb.mode(mode);
+		});
+		var polyBatn = VriPolygon.build(pb -> {
+			pb.polygonIdentifier("TestPolyBatn", 2024);
+			pb.biogeoclimaticZone("IDF");
+			pb.yieldFactor(1.0f);
+			pb.mode(mode);
+		});
+
 		EasyMock.expect(app.checkPolygon(poly)).andReturn(mode).once();
+		EasyMock.expect(app.processYoung(poly)).andReturn(polyYoung).times(0, 1);
+		EasyMock.expect(app.processBatc(poly)).andReturn(polyBatc).times(0, 1);
+		EasyMock.expect(app.processBatn(poly)).andReturn(polyBatn).times(0, 1);
 
 		control.replay();
 
@@ -735,17 +762,17 @@ class VriStartTest {
 
 		app.init(resolver, controlMap);
 
-		assertThat(app.findSiteCurveNumber(Region.COASTAL, "MB"), is(10));
-		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "MB"), is(10));
+		assertThat(app.findSiteCurveNumber(Region.COASTAL, "MB"), is((short) 10));
+		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "MB"), is((short) 10));
 
-		assertThat(app.findSiteCurveNumber(Region.COASTAL, "B"), is(12));
-		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "B"), is(42));
+		assertThat(app.findSiteCurveNumber(Region.COASTAL, "B"), is((short) 12));
+		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "B"), is((short) 42));
 
-		assertThat(app.findSiteCurveNumber(Region.COASTAL, "ZZZ", "B"), is(12));
-		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "ZZZ", "B"), is(42));
+		assertThat(app.findSiteCurveNumber(Region.COASTAL, "ZZZ", "B"), is((short) 12));
+		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "ZZZ", "B"), is((short) 42));
 
-		assertThat(app.findSiteCurveNumber(Region.COASTAL, "YYY", "B"), is(42));
-		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "YYY", "B"), is(06));
+		assertThat(app.findSiteCurveNumber(Region.COASTAL, "YYY", "B"), is((short) 42));
+		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "YYY", "B"), is((short) 06));
 
 		assertThrows(StandProcessingException.class, () -> app.findSiteCurveNumber(Region.COASTAL, "ZZZ"));
 		assertThrows(StandProcessingException.class, () -> app.findSiteCurveNumber(Region.INTERIOR, "ZZZ"));

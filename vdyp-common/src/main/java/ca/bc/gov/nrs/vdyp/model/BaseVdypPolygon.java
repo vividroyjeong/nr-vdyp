@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -180,11 +181,42 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 		protected abstract LB getLayerBuilder();
 
 		public <PA2> Builder<T, L, PA, SP, SI, LB, SPB, SIB>
-				copy(BaseVdypPolygon<?, PA2, ?, ?> toCopy, Function<PA2, PA> paConvert) {
+				adapt(BaseVdypPolygon<?, PA2, ?, ?> toCopy, Function<PA2, PA> paConvert) {
 			polygonIdentifier(toCopy.getPolygonIdentifier());
 			percentAvailable(paConvert.apply(toCopy.getPercentAvailable()));
 			biogeoclimaticZone(toCopy.getBiogeoclimaticZone());
 			forestInventoryZone(toCopy.getForestInventoryZone());
+			return this;
+		}
+
+		public <PA2> Builder<T, L, PA, SP, SI, LB, SPB, SIB> copy(T toCopy) {
+			polygonIdentifier(toCopy.getPolygonIdentifier());
+			percentAvailable(toCopy.getPercentAvailable());
+			biogeoclimaticZone(toCopy.getBiogeoclimaticZone());
+			forestInventoryZone(toCopy.getForestInventoryZone());
+			return this;
+		}
+
+		public <PA2, L2 extends BaseVdypLayer<?, ?>> Builder<T, L, PA, SP, SI, LB, SPB, SIB>
+				adaptLayers(BaseVdypPolygon<L2, PA2, ?, ?> toCopy, BiConsumer<LB, L2> layerConfig) {
+			toCopy.getLayers().values().forEach(layer -> {
+				this.buildLayer(lBuilder -> {
+					lBuilder.adapt(layer);
+					lBuilder.polygonIdentifier = Optional.empty();
+					layerConfig.accept(lBuilder, layer);
+				});
+			});
+			return this;
+		}
+
+		public <PA2> Builder<T, L, PA, SP, SI, LB, SPB, SIB> copyLayers(T toCopy, BiConsumer<LB, L> layerConfig) {
+			toCopy.getLayers().values().forEach(layer -> {
+				this.buildLayer(lBuilder -> {
+					lBuilder.copy(layer);
+					lBuilder.polygonIdentifier = Optional.empty();
+					layerConfig.accept(lBuilder, layer);
+				});
+			});
 			return this;
 		}
 

@@ -26,6 +26,8 @@ import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
+import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndex2Height;
+import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexAgeType;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
@@ -40,6 +42,7 @@ import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
@@ -50,6 +53,7 @@ import ca.bc.gov.nrs.vdyp.vri.model.VriSpecies;
 public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpecies, VriSite> implements Closeable {
 
 	private static final String SPECIAL_PROCESSING_LOG_TEMPLATE = "Doing special processing for mode {}";
+	static final float FRACTION_AVAILABLE_N = 0.85f; // PCTFLAND_N;
 
 	static final Logger log = LoggerFactory.getLogger(VriStart.class);
 
@@ -511,17 +515,15 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				).getCoe(1); // Entry 1 is base area
 
 		/*
-		 * The original Fortran had the following comment and a commented out
-		 * modification to upperBoundsBaseArea (BATOP98). I have included them here.
+		 * The original Fortran had the following comment and a commented out modification to upperBoundsBaseArea
+		 * (BATOP98). I have included them here.
 		 */
 
 		/*
-		 * And one POSSIBLY one last vestage of grouping by ITG That limit applies to
-		 * full occupancy and Empirical occupancy. They were derived as the 98th
-		 * percentile of Empirical stocking, though adjusted PSP's were included. If the
-		 * ouput of this routine is bumped up from empirical to full, MIGHT adjust this
-		 * limit DOWN here, so that at end, it is correct. Tentatively decide NOT to do
-		 * this.
+		 * And one POSSIBLY one last vestage of grouping by ITG That limit applies to full occupancy and Empirical
+		 * occupancy. They were derived as the 98th percentile of Empirical stocking, though adjusted PSP's were
+		 * included. If the ouput of this routine is bumped up from empirical to full, MIGHT adjust this limit DOWN
+		 * here, so that at end, it is correct. Tentatively decide NOT to do this.
 		 */
 
 		// if (fullOccupancy)
@@ -633,7 +635,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		// TODO expand this
 
-		var vdypPolygon = VdypPolygon.build(builder -> builder.copy(sourcePolygon, x -> x.get()));
+		var vdypPolygon = VdypPolygon.build(builder -> builder.adapt(sourcePolygon, x -> x.get()));
 		vdypPolygon.setLayers(processedLayers);
 		return vdypPolygon;
 	}
@@ -658,7 +660,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 	VriPolygon processYoung(VriPolygon poly) throws ProcessingException {
 
-		int year = poly.getPolygonIdentifier().getYear();
+		PolygonIdentifier polygonIdentifier = poly.getPolygonIdentifier();
+		int year = polygonIdentifier.getYear();
 
 		if (year < 1900) {
 			throw new StandProcessingException("Year for YOUNG stand should be at least 1900 but was " + year);
@@ -669,8 +672,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		var primaryLayer = poly.getLayers().get(LayerType.PRIMARY);
 		var primarySite = primaryLayer.getPrimarySite().orElseThrow();
 		try {
-			int siteCurveNumber = primaryLayer.getPrimarySite().flatMap(BaseVdypSite::getSiteCurveNumber)
-					.orElseGet(() -> {
+			short siteCurveNumber = primaryLayer.getPrimarySite().flatMap(BaseVdypSite::getSiteCurveNumber)
+					.map(Short.class::cast).orElseGet(() -> {
 						try {
 							return this.findSiteCurveNumber(
 									bec.getRegion(), primarySite.getSiteSpecies(), primarySite.getSiteGenus()
@@ -684,10 +687,11 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			float primaryYearsToBreastHeight = primarySite.getYearsToBreastHeight().orElseThrow(); // YTBH_L1
 
 			float primaryBreastHeightAge0 = primaryAgeTotal - primaryYearsToBreastHeight; // AGEBH0
-			float ageIncrement = primaryBreastHeightAge0 <= 0f ? 1f - primaryBreastHeightAge0 : 0f; // AGE_INCR
+			float ageIncrease = primaryBreastHeightAge0 <= 0f ? 1f - primaryBreastHeightAge0 : 0f; // AGE_INCR
 
-			int ageType = 1; // AGE_TYPE TODO handle this with an enum, multiple methods, functors, etc.
+			SiteIndexAgeType ageType = SiteIndexAgeType.TOTAL;
 			float siteIndex = primarySite.getSiteIndex().orElseThrow(); // SID
+			float yeastToBreastHeight = primaryYearsToBreastHeight; // YTBHD
 
 			int[] sci = new int[] { siteCurveNumber, 2 }; // SCI TODO this can probably be handled better
 
@@ -706,20 +710,86 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				float factor = Math.min(10f / percentAvailable, 4f);
 				baseAreaTarget *= factor;
 			}
-			
+
 			float dominantHeight0 = 0f; // HD0
-			
-			int moreYears =Math.max(80, (int) (130-primaryAgeTotal));
-			
-			for(int increase = 0; increase<moreYears; increase++) {
-				// TODO
+
+			int moreYears = Math.max(80, (int) (130 - primaryAgeTotal));
+
+			float primaryHeight = primarySite.getHeight().orElseThrow(); // HT_L1
+
+			float dominantHeight;
+
+			foundIncrease: {
+				for (int increase = 0; increase <= moreYears; increase++) {
+					float primaryBreastHeightAge = primaryBreastHeightAge0 + increase; // AGEBH
+
+					if (primaryBreastHeightAge > 1f) {
+
+						float ageD = primaryBreastHeightAge; // AGED
+
+						float dominantHeightD = (float) SiteIndex2Height.index_to_height(
+								siteCurveNumber, ageD, ageType.getIndex(), siteIndex, ageD, yeastToBreastHeight
+						); // HDD
+
+						if (increase == 0) {
+							dominantHeight0 = dominantHeightD;
+						}
+						dominantHeight = dominantHeightD; // HD
+						if (primaryHeight > 0f && dominantHeight0 > 0f) {
+							dominantHeight = primaryHeight + (dominantHeight - dominantHeight0);
+						}
+
+						float predictedBaseArea = estimateBaseAreaYield(
+								dominantHeight, primaryBreastHeightAge, Optional.empty(), false,
+								primaryLayer.getSpecies().values(), bec,
+								primaryLayer.getEmpericalRelationshipParameterIndex().orElseThrow()
+						); // BAP
+
+						predictedBaseArea *= FRACTION_AVAILABLE_N;
+
+						if (dominantHeight >= heightTarget && primaryBreastHeightAge >= baseAreaTarget
+								&& predictedBaseArea >= baseAreaTarget) {
+							ageIncrease = increase;
+							break foundIncrease;
+						}
+					}
+				}
+				throw new StandProcessingException("Unable to increase to target height.");
 			}
-			
+
+			final float ageIncreaseFinal = ageIncrease;
+			final float newPrimaryHeight = dominantHeight;
+
+			return VriPolygon.build(pBuilder -> {
+				pBuilder.copy(poly);
+				pBuilder.polygonIdentifier(polygonIdentifier.forYear(year + (int) ageIncreaseFinal));
+				pBuilder.copyLayers(poly, (lBuilder, layer) -> {
+
+					lBuilder.copySites(layer, (iBuilder, site) -> {
+						if (layer.getLayerType() == LayerType.PRIMARY) {
+							iBuilder.height(newPrimaryHeight);
+						} else {
+							iBuilder.height(Optional.empty());
+						}
+
+						float ageTotal = site.getAgeTotal().map(x -> x + ageIncreaseFinal).orElseThrow();
+
+						iBuilder.ageTotal(ageTotal);
+						iBuilder.breastHeightAge(
+								site.getYearsToBreastHeight()//
+										.map(ytbh -> ageTotal - ytbh)
+										.or(() -> site.getBreastHeightAge().map(bha -> bha + ageIncreaseFinal))
+						);
+					});
+					lBuilder.copySpecies(layer, (sBuilder, species) -> {
+						// No changes, just copy
+					});
+				});
+			});
 
 		} catch (RuntimeStandProcessingException e) {
 			throw e.getCause();
 		}
-		return poly;
 	}
 
 	VriPolygon processBatc(VriPolygon poly) throws StandProcessingException {
@@ -738,17 +808,16 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	 * @param region
 	 * @param ids
 	 * @return
-	 * @throws StandProcessingException if no entry for any of the given species IDs
-	 *                                  is present.
+	 * @throws StandProcessingException if no entry for any of the given species IDs is present.
 	 */
-	int findSiteCurveNumber(Region region, String... ids) throws StandProcessingException {
+	short findSiteCurveNumber(Region region, String... ids) throws StandProcessingException {
 		var scnMap = Utils.<MatrixMap2<String, Region, Integer>>expectParsedControl(
 				controlMap, ControlKey.SITE_CURVE_NUMBERS, MatrixMap2.class
 		);
 
 		for (String id : ids) {
 			if (scnMap.hasM(id, region))
-				return scnMap.get(id, region);
+				return scnMap.get(id, region).shortValue();
 		}
 		throw new StandProcessingException(
 				"Could not find Site Curve Number for inst of the following species: " + String.join(", ", ids)

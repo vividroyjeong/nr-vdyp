@@ -205,11 +205,6 @@ public class SiteIndex2Height {
  */
 /* @formatter:off */
     //Taken from sindex.h
-    /*
-    * age types
-    */
-    private static final short SI_AT_TOTAL   = 0;
-    private static final short SI_AT_BREAST  = 1;
 
     /*
     * site index estimation (from height and age) types
@@ -378,13 +373,13 @@ public static double index_to_height (
   // should this line be removed?
   y2bh = ((int) y2bh) + 0.5;
 
-  if (age_type == SI_AT_TOTAL){
+  if (age_type == SiteIndexAgeType.TOTAL.getIndex()){
     tage = iage;
-    bhage = Age2Age.age_to_age(cu_index, tage, SI_AT_TOTAL, SI_AT_BREAST, y2bh);
+    bhage = Age2Age.age_to_age(cu_index, tage, SiteIndexAgeType.TOTAL.getIndex(), SiteIndexAgeType.BREAST_HEIGHT.getIndex(), y2bh);
     }
   else{
     bhage = iage;
-    tage = Age2Age.age_to_age(cu_index, bhage, SI_AT_BREAST, SI_AT_TOTAL, y2bh);
+    tage = Age2Age.age_to_age(cu_index, bhage, SiteIndexAgeType.BREAST_HEIGHT.getIndex(), SiteIndexAgeType.TOTAL.getIndex(), y2bh);
     }
   if (tage < 0.0){
     throw new NoAnswerException("Iteration could not converge (projected height > 999), age: " + tage);
@@ -552,7 +547,7 @@ public static double index_to_height (
             // function starts going nuts at high sites and low ages
             // evaluate at a safe age, and interpolate
             x1 = (site_index - 60) / 1.667 + 0.1;
-            x2 = index_to_height (cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
+            x2 = index_to_height (cu_index, x1, SiteIndexAgeType.BREAST_HEIGHT.getIndex(), site_index, y2bh, pi);
             height = 1.37 + (x2-1.37) * bhage / x1;
             break;
             }
@@ -587,7 +582,7 @@ public static double index_to_height (
             // function starts going nuts at high sites and low ages
             // evaluate at a safe age, and interpolate
             x1 = (site_index - 60) / 1.667 + 0.1;
-            x2 = index_to_height (cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
+            x2 = index_to_height (cu_index, x1, SiteIndexAgeType.BREAST_HEIGHT.getIndex(), site_index, y2bh, pi);
             height = 1.37 + (x2-1.37) * bhage / x1;
             break;
             }
@@ -630,7 +625,7 @@ public static double index_to_height (
             // function starts going nuts at high sites and low ages
             // evaluate at a safe age, and interpolate
             x1 = (site_index - 60) / 1.667 + 0.1;
-            x2 = index_to_height (cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
+            x2 = index_to_height (cu_index, x1, SiteIndexAgeType.BREAST_HEIGHT.getIndex(), site_index, y2bh, pi);
             height = 1.37 + (x2-1.37) * bhage / x1;
             break;
             }
@@ -670,7 +665,7 @@ public static double index_to_height (
           /* function starts going nuts at high sites and low ages */
           /* evaluate at a safe age, and interpolate */
           x1 = (site_index - 60) / 1.667 + 0.1 + pi;
-          x2 = index_to_height (cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
+          x2 = index_to_height (cu_index, x1, SiteIndexAgeType.BREAST_HEIGHT.getIndex(), site_index, y2bh, pi);
           height = 1.37 + (x2-1.37) * (bhage-pi) / x1;
           break;
         }
@@ -918,7 +913,7 @@ public static double index_to_height (
 
       x4 = Math.log (1.372 / site_index) / (ppow(y2bh, x2) - x3);
 
-      if (age_type == SI_AT_TOTAL){
+      if (age_type == SiteIndexAgeType.TOTAL.getIndex()){
         height = site_index * Math.exp (x4 * (ppow(tage, x2) - x3));
       }
       else{
@@ -937,7 +932,7 @@ public static double index_to_height (
 
       x4 = Math.log (1.372 / site_index) / (ppow(y2bh, x2) - x3);
 
-      if (age_type == SI_AT_TOTAL){
+      if (age_type == SiteIndexAgeType.TOTAL.getIndex()){
         height = site_index * Math.exp (x4 * (ppow(tage, x2) - x3));
       }
       else{
@@ -1646,7 +1641,7 @@ public static double index_to_height (
           /* function starts going nuts at high sites and low ages */
           /* evaluate at a safe age, and interpolate */
           x1 = (site_index - 43) / 1.667 + 0.1;
-          x2 = index_to_height (cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
+          x2 = index_to_height (cu_index, x1, SiteIndexAgeType.BREAST_HEIGHT.getIndex(), site_index, y2bh, pi);
           height = 1.3 + (x2-1.3) * bhage / x1;
           break;
         }
@@ -1689,7 +1684,7 @@ public static double index_to_height (
           /* function starts going nuts at high sites and low ages */
           /* evaluate at a safe age, and interpolate */
           x1 = (site_index - 43) / 1.667 + 0.1 + 0.5;
-          x2 = index_to_height (cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
+          x2 = index_to_height (cu_index, x1, SiteIndexAgeType.BREAST_HEIGHT.getIndex(), site_index, y2bh, pi);
           height = 1.3 + (x2-1.3) * (bhage-0.5) / x1;
           break;
         }
@@ -1782,7 +1777,7 @@ public static double index_to_height (
           /* function starts going nuts at high sites and low ages */
           /* evaluate at a safe age, and interpolate */
           x1 = (site_index - 60) / 1.667 + 0.1;
-          x2 = index_to_height (cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
+          x2 = index_to_height (cu_index, x1, SiteIndexAgeType.BREAST_HEIGHT.getIndex(), site_index, y2bh, pi);
           height = 1.3 + (x2-1.3) * bhage / x1;
           break;
         }
@@ -1822,7 +1817,7 @@ public static double index_to_height (
           /* function starts going nuts at high sites and low ages */
           /* evaluate at a safe age, and interpolate */
           x1 = (site_index - 60) / 1.667 + 0.1 + 0.5;
-          x2 = index_to_height (cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
+          x2 = index_to_height (cu_index, x1, SiteIndexAgeType.BREAST_HEIGHT.getIndex(), site_index, y2bh, pi);
           height = 1.3 + (x2-1.3) * (bhage-0.5) / x1;
           break;
         }
@@ -2001,7 +1996,7 @@ public static double index_to_height (
         /* function starts going nuts at high sites and low ages */
         /* evaluate at a safe age, and interpolate */
         x1 = (site_index - 45) / 2.5 + 0.1;
-        x2 = index_to_height (cu_index, x1, SI_AT_TOTAL, site_index, y2bh, pi);
+        x2 = index_to_height (cu_index, x1, SiteIndexAgeType.TOTAL.getIndex(), site_index, y2bh, pi);
         height = x2 * tage / x1;
       }
       else{
@@ -2707,7 +2702,7 @@ public static double gi_si2ht (
   /* loop until real close */
   do
     {
-    test_site = Height2SiteIndex.height_to_index(cu_index, age, (short)SI_AT_BREAST, si2ht, (short) SI_EST_DIRECT);
+    test_site = Height2SiteIndex.height_to_index(cu_index, age, (short)SiteIndexAgeType.BREAST_HEIGHT.getIndex(), si2ht, (short) SI_EST_DIRECT);
 /*
 printf ("age=%3.0f, site=%5.2f, test_site=%5.2f, si2ht=%5.2f, step=%9.7f\n",
   age, site_index, test_site, si2ht, step);
