@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.forward.test;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -73,6 +74,15 @@ public class VdypForwardTestUtils {
 			return loadControlMap(parser, ForwardControlParser.class, "FIPSTART.CTR");
 		} catch (IOException | ResourceParseException ex) {
 			throw new AssertionFailedError(null, ex);
+		}
+	}
+
+	public static Map<String, ?> parse(ForwardControlParser parser, String resourceName) throws IOException, ResourceParseException {
+	
+		Class<?> klazz = TestUtils.class;
+		try (var is = klazz.getResourceAsStream(resourceName)) {
+	
+			return parser.parse(is, TestUtils.fileResolver(klazz), new HashMap<>());
 		}
 	}
 }

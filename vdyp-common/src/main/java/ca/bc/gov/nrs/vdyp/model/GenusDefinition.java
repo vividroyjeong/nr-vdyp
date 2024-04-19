@@ -14,4 +14,9 @@ public class GenusDefinition extends AliasedEntity {
 	public Optional<Integer> getPreference() {
 		return preference;
 	}
+	
+	@Override
+	public int hashCode() {
+		return ((this.getAlias().hashCode() * 17) + this.getName().hashCode()) * 17 + preference.hashCode();
+	}
 }

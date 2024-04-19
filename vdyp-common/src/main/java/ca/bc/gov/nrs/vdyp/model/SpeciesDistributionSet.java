@@ -1,12 +1,13 @@
 package ca.bc.gov.nrs.vdyp.model;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class SpeciesDistributionSet {
+public class SpeciesDistributionSet implements Comparable<SpeciesDistributionSet> {
 	private Map<String, SpeciesDistribution> speciesDistributionMap = new HashMap<>();
 
 	public SpeciesDistributionSet(List<SpeciesDistribution> speciesDistributionList) {
@@ -37,5 +38,38 @@ public class SpeciesDistributionSet {
 
 	public SpeciesDistributionSet copy() {
 		return new SpeciesDistributionSet(this);
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof SpeciesDistributionSet that) {
+			return compareTo(that) == 0;
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public int compareTo(SpeciesDistributionSet that) {
+		if (that != null) {
+			if (that.speciesDistributionMap.size() != speciesDistributionMap.size()) {
+				return speciesDistributionMap.size() - that.speciesDistributionMap.size();
+			} 
+			var sdListThat = new ArrayList<>(that.speciesDistributionMap.values());
+			Collections.sort(sdListThat);
+			var sdListThis = new ArrayList<>(this.speciesDistributionMap.values());
+			Collections.sort(sdListThis);
+			
+			for (int i = 0; i < sdListThat.size(); i++) {
+				int result = sdListThis.get(i).compareTo(sdListThat.get(i));
+				if (result != 0)
+					return result;
+			}
+			
+			return 0;
+		} else {
+			// null is less than non-null, per ObjectUtils.compare()
+			return 1;
+		}
 	}
 }

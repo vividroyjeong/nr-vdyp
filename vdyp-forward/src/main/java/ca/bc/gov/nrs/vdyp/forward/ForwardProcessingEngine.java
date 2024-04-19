@@ -1,9 +1,12 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
 import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +22,7 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.SiteCurve;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.si32.site.SiteTool;
 
 public class ForwardProcessingEngine {
 
@@ -26,10 +30,10 @@ public class ForwardProcessingEngine {
 
 	private static final float MIN_BASAL_AREA = 0.001f;
 
-	private ForwardProcessingState fps;
-	private GenusDefinitionMap genusDefinitionMap;
-	private BecLookup becLookup;
-	private Map<String, SiteCurve> siteCurveMap;
+	private final ForwardProcessingState fps;
+	private final GenusDefinitionMap genusDefinitionMap;
+	private final BecLookup becLookup;
+	private final Map<String, SiteCurve> siteCurveMap;
 
 	@SuppressWarnings("unchecked")
 	public ForwardProcessingEngine(Map<String, Object> controlMap) {
@@ -41,8 +45,16 @@ public class ForwardProcessingEngine {
 		fps = new ForwardProcessingState(genusDefinitionMap);
 	}
 
-	public ForwardProcessingEngine(GenusDefinitionMap genusDefinitionMap2) {
-		// TODO Auto-generated constructor stub
+	public GenusDefinitionMap getGenusDefinitionMap() {
+		return genusDefinitionMap;
+	}
+
+	public BecLookup getBecLookup() {
+		return becLookup;
+	}
+
+	public Map<String, SiteCurve> getSiteCurveMap() {
+		return Collections.unmodifiableMap(siteCurveMap);
 	}
 
 	public void processPolygon(VdypPolygon polygon) throws ProcessingException {
@@ -64,7 +76,7 @@ public class ForwardProcessingEngine {
 
 		boolean isCoastalBecZone = becZone.getRegion().equals(Region.COASTAL);
 
-		for (int i = 0; i < pps.nSpecies; i++) {
+		for (int i = 0; i < pps.getNSpecies(); i++) {
 
 			if (pps.siteCurveNumber[i].isEmpty()) {
 
@@ -76,7 +88,8 @@ public class ForwardProcessingEngine {
 					if (siteCurveMap.size() > 0) {
 						sc = siteCurveMap.get(pps.speciesName[i]);
 					} else {
-						// TODO - invoke SiteTool_FOR_GetSICurve
+						int scIndex = SiteTool.SiteTool_GetSICurve(pps.speciesName[i], isCoastalBecZone);
+						
 					}
 				}
 			}
@@ -102,25 +115,23 @@ public class ForwardProcessingEngine {
 
 		PolygonProcessingState a = fps.getBank(LayerType.PRIMARY, 0);
 
-		int lossCount = 0;
-		for (int i = 1; i < a.nSpecies; i++) {
+		Set<Integer> speciesToRemoveByIndex = new HashSet<>();
+		
+		for (int i = 1; i < a.getNSpecies(); i++) {
 			if (a.basalArea[i][UtilizationClass.ALL.ordinal()] < MIN_BASAL_AREA) {
-				lossCount += 1;
-			} else if (lossCount > 0) {
-				a.replace(i - lossCount, i);
+				speciesToRemoveByIndex.add(i);
 			}
 		}
 
-		if (lossCount > 0) {
-			a.nSpecies -= lossCount;
-			if (a.nSpecies == 0) {
+		a.remove(speciesToRemoveByIndex);
+		
+		if (a.getNSpecies() == 0) {
 				throw new ProcessingException(
 						MessageFormat.format(
-								"Polygon {} layer 0 has no species with basal area above {}", 12,
+								"Polygon {0} layer 0 has no species with basal area above {1}",
 								polygon.getDescription().getName(), MIN_BASAL_AREA
 						)
 				);
-			}
 		}
 	}
 }

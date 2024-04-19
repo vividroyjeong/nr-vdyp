@@ -131,10 +131,6 @@ public class ForwardProcessor {
 		if (vdypPassSet.contains(ForwardPass.PASS_3)) {
 
 			try {
-				var genusDefinitionMap = new GenusDefinitionMap(
-						(List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name())
-				);
-
 				var polygonDescriptionStreamFactory = (StreamingParserFactory<VdypPolygonDescription>) controlMap
 						.get(ControlKey.FORWARD_INPUT_GROWTO.name());
 				var polygonDescriptionStream = polygonDescriptionStreamFactory.get();
@@ -151,7 +147,7 @@ public class ForwardProcessor {
 				var speciesUtilizationStream = ((StreamingParserFactory<Collection<VdypSpeciesUtilization>>) speciesUtilizationStreamFactory)
 						.get();
 
-				var fpe = new ForwardProcessingEngine(genusDefinitionMap);
+				var fpe = new ForwardProcessingEngine(controlMap);
 
 				// Fetch the next polygon to process.
 				int nPolygonsProcessed = 0;
@@ -167,7 +163,7 @@ public class ForwardProcessor {
 					var polygonDescription = polygonDescriptionStream.next();
 
 					var polygon = readPolygon(
-							genusDefinitionMap, polygonDescription, polygonStream, layerSpeciesStream,
+							fpe.getGenusDefinitionMap(), polygonDescription, polygonStream, layerSpeciesStream,
 							speciesUtilizationStream
 					);
 

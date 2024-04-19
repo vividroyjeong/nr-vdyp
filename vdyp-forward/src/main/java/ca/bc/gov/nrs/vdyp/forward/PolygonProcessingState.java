@@ -1,7 +1,10 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
+import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
@@ -12,27 +15,37 @@ import ca.bc.gov.nrs.vdyp.model.SpeciesDistributionSet;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
 class PolygonProcessingState {
-	public int nSpecies; // BANK1 NSPB
+	
+	/** 
+	 * The number of species in the state. Note that all arrays have one more element in them; the
+	 * element at index 0 is unused for the species values and contains the default utilization
+	 * in the Utilization values.
+	 */
+	private int nSpecies; // BANK1 NSPB
 
-	public String speciesName[/* species */]; // BANK2 SP0B
-	public SpeciesDistributionSet sp64Distribution[/* species */]; // BANK2 SP64DISTB
-	public float siteIndex[/* species */]; // BANK3 SIB
-	public float dominantHeight[/* species */]; // BANK3 HDB
-	public float ageTotal[/* species */]; // BANK3 AGETOTB
-	public float ageBreastHeight[/* species */]; // BANK3 AGEBHB
-	public float yearsToBreastHeight[/* species */]; // BANK3 YTBHB
-	public Optional<Integer> siteCurveNumber[/* species */]; // BANK3 SCNB
-	public int speciesIndex[/* species */]; // BANK1 ISPB
-	public float percentForestedLand[/* species */]; // BANK1 PCTB
+	// Species information
+	
+	public String speciesName[/* nSpecies + 1 */]; // BANK2 SP0B
+	public SpeciesDistributionSet sp64Distribution[/* nSpecies + 1 */]; // BANK2 SP64DISTB
+	public float siteIndex[/* nSpecies + 1 */]; // BANK3 SIB
+	public float dominantHeight[/* nSpecies + 1 */]; // BANK3 HDB
+	public float ageTotal[/* nSpecies + 1 */]; // BANK3 AGETOTB
+	public float ageBreastHeight[/* nSpecies + 1 */]; // BANK3 AGEBHB
+	public float yearsToBreastHeight[/* nSpecies + 1 */]; // BANK3 YTBHB
+	public Optional<Integer> siteCurveNumber[/* nSpecies + 1 */]; // BANK3 SCNB
+	public int speciesIndex[/* nSpecies + 1 */]; // BANK1 ISPB
+	public float percentForestedLand[/* nSpecies + 1 */]; // BANK1 PCTB
 
-	public float basalArea[/* species, including 0 */][/* all ucs */]; // BANK1 BAB
-	public float closeUtilizationVolume[/* species, including 0 */][/* all ucs */]; // BANK1 VOLCUB
-	public float cuVolumeMinusDecay[/* species, including 0 */][/* all ucs */]; // BANK1 VOL_DB
-	public float cuVolumeMinusDecayWastage[/* species, including 0 */][/* all ucs */]; // BANK1 VOL_DW_B
-	public float loreyHeight[/* species, including 0 */][/* uc -1 and 0 only */]; // BANK1 HLB
-	public float quadMeanDiameter[/* species, including 0 */][/* all ucs */]; // BANK1 DQB
-	public float treesPerHectare[/* species, including 0 */][/* all ucs */]; // BANK1 TPHB
-	public float wholeStemVolume[/* species, including 0 */][/* all ucs */]; // BANK1 VOLWSB
+	// Utilization information, per Species
+	
+	public float basalArea[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 BAB
+	public float closeUtilizationVolume[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 VOLCUB
+	public float cuVolumeMinusDecay[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 VOL_DB
+	public float cuVolumeMinusDecayWastage[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 VOL_DW_B
+	public float loreyHeight[/* nSpecies + 1, including 0 */][/* uc -1 and 0 only */]; // BANK1 HLB
+	public float quadMeanDiameter[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 DQB
+	public float treesPerHectare[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 TPHB
+	public float wholeStemVolume[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 VOLWSB
 
 	private final GenusDefinitionMap genera;
 
@@ -44,33 +57,33 @@ class PolygonProcessingState {
 		this.nSpecies = genera.getMaxIndex();
 
 		// In the following, index 0 is unused
-		speciesName = new String[nSpecies + 1];
-		sp64Distribution = new SpeciesDistributionSet[nSpecies + 1];
-		siteIndex = new float[nSpecies + 1];
-		dominantHeight = new float[nSpecies + 1];
-		ageTotal = new float[nSpecies + 1];
-		ageBreastHeight = new float[nSpecies + 1];
-		yearsToBreastHeight = new float[nSpecies + 1];
-		siteCurveNumber = new Optional[nSpecies + 1];
-		speciesIndex = new int[nSpecies + 1];
-		percentForestedLand = new float[nSpecies + 1];
+		speciesName = new String[getNSpecies() + 1];
+		sp64Distribution = new SpeciesDistributionSet[getNSpecies() + 1];
+		siteIndex = new float[getNSpecies() + 1];
+		dominantHeight = new float[getNSpecies() + 1];
+		ageTotal = new float[getNSpecies() + 1];
+		ageBreastHeight = new float[getNSpecies() + 1];
+		yearsToBreastHeight = new float[getNSpecies() + 1];
+		siteCurveNumber = new Optional[getNSpecies() + 1];
+		speciesIndex = new int[getNSpecies() + 1];
+		percentForestedLand = new float[getNSpecies() + 1];
 
 		int nUtilizationClasses = UtilizationClass.values().length;
 
 		// In the following, index 0 is used for the default species utilization
-		basalArea = new float[nSpecies + 1][nUtilizationClasses];
-		closeUtilizationVolume = new float[nSpecies + 1][nUtilizationClasses];
-		cuVolumeMinusDecay = new float[nSpecies + 1][nUtilizationClasses];
-		cuVolumeMinusDecayWastage = new float[nSpecies + 1][nUtilizationClasses];
-		loreyHeight = new float[nSpecies + 1][2];
-		quadMeanDiameter = new float[nSpecies + 1][nUtilizationClasses];
-		treesPerHectare = new float[nSpecies + 1][nUtilizationClasses];
-		wholeStemVolume = new float[nSpecies + 1][nUtilizationClasses];
+		basalArea = new float[getNSpecies() + 1][nUtilizationClasses];
+		closeUtilizationVolume = new float[getNSpecies() + 1][nUtilizationClasses];
+		cuVolumeMinusDecay = new float[getNSpecies() + 1][nUtilizationClasses];
+		cuVolumeMinusDecayWastage = new float[getNSpecies() + 1][nUtilizationClasses];
+		loreyHeight = new float[getNSpecies() + 1][2];
+		quadMeanDiameter = new float[getNSpecies() + 1][nUtilizationClasses];
+		treesPerHectare = new float[getNSpecies() + 1][nUtilizationClasses];
+		wholeStemVolume = new float[getNSpecies() + 1][nUtilizationClasses];
 	}
 
 	public PolygonProcessingState(PolygonProcessingState s) {
 		this.genera = s.genera;
-		this.nSpecies = s.nSpecies;
+		this.nSpecies = s.getNSpecies();
 
 		this.ageBreastHeight = copy(s.ageBreastHeight);
 		this.ageTotal = copy(s.ageTotal);
@@ -92,35 +105,49 @@ class PolygonProcessingState {
 		this.yearsToBreastHeight = copy(s.yearsToBreastHeight);
 	}
 
+	public int getNSpecies() {
+		return nSpecies;
+	}
+
+	public GenusDefinitionMap getGenera() {
+		return genera;
+	}
+
+	/**
+	 * Set this State to that of the given layer.
+	 * 
+	 * @param layer the layer in question
+	 */
 	public void set(VdypPolygonLayer layer) {
 
 		if (layer.getDefaultUtilizationMap().isPresent()) {
 			recordUtilizations(0, layer.getDefaultUtilizationMap().get());
 		}
 
-		for (var ge : layer.getGenus().entrySet()) {
+		for (var ge: layer.getGenus().entrySet()) {
 			recordSpecies(ge.getKey(), ge.getValue());
 		}
 	}
 
-	private void recordSpecies(GenusDefinition key, VdypLayerSpecies layer) {
+	private void recordSpecies(GenusDefinition key, VdypLayerSpecies species) {
 
 		int spIndex = genera.getIndex(key.getAlias());
+
 		GenusDefinition genus = genera.get(key.getAlias());
 
 		speciesName[spIndex] = genus.getName();
-		sp64Distribution[spIndex] = layer.getSpeciesDistributions();
-		siteIndex[spIndex] = layer.getSiteIndex();
-		dominantHeight[spIndex] = layer.getDominantHeight();
-		ageTotal[spIndex] = layer.getAgeTotal();
-		ageBreastHeight[spIndex] = layer.getAgeAtBreastHeight();
-		yearsToBreastHeight[spIndex] = layer.getYearsToBreastHeight();
-		siteCurveNumber[spIndex] = layer.getSiteCurveNumber();
-		speciesIndex[spIndex] = layer.getGenusIndex();
+		sp64Distribution[spIndex] = species.getSpeciesDistributions();
+		siteIndex[spIndex] = species.getSiteIndex();
+		dominantHeight[spIndex] = species.getDominantHeight();
+		ageTotal[spIndex] = species.getAgeTotal();
+		ageBreastHeight[spIndex] = species.getAgeAtBreastHeight();
+		yearsToBreastHeight[spIndex] = species.getYearsToBreastHeight();
+		siteCurveNumber[spIndex] = species.getSiteCurveNumber();
+		speciesIndex[spIndex] = species.getGenusIndex();
 		// percentForestedLand is output-only and so not assigned here.
 
-		if (layer.getUtilizations().isPresent()) {
-			recordUtilizations(spIndex, layer.getUtilizations().get());
+		if (species.getUtilizations().isPresent()) {
+			recordUtilizations(spIndex, species.getUtilizations().get());
 		}
 	}
 
@@ -143,16 +170,16 @@ class PolygonProcessingState {
 
 	public PolygonProcessingState copy() {
 
-		PolygonProcessingState s = new PolygonProcessingState(this);
-
-		return s;
+		return new PolygonProcessingState(this);
 	}
 
 	private SpeciesDistributionSet[] copy(SpeciesDistributionSet[] a) {
 		SpeciesDistributionSet[] t = new SpeciesDistributionSet[a.length];
 
 		for (int i = 0; i < a.length; i++)
-			t[i] = a[i].copy();
+			if (a[i] != null) {
+				t[i] = a[i].copy();
+			}
 
 		return t;
 	}
@@ -171,8 +198,9 @@ class PolygonProcessingState {
 		String[] t = new String[a.length];
 
 		for (int i = 0; i < a.length; i++)
-			t[i] = new String(a[i]);
-
+			if (a[i] != null) {
+				t[i] = new String(a[i]);
+			}
 		return t;
 	}
 
@@ -208,33 +236,76 @@ class PolygonProcessingState {
 	 * Replace species at index <code>i</code> with that at index <code>j</code>, i < j.
 	 *
 	 * @param i the index of the species to remove, i >= 1
-	 * @param j the index of the species to replace it with, j > i
+	 * @param j the index of the species to replace it with, j >= i and j <= nSpecies
 	 */
-	public void replace(int i, int j) {
-		if (i >= j || i < 1) {
+	private void replace(int i, int j) {
+		if (i > j || i < 1 || j > getNSpecies()) {
 			throw new IllegalArgumentException(
-					"PolygonProcessingState.replace - illegal arguments i = " + i + " j = " + j
-			);
+					MessageFormat.format("PolygonProcessingState.replace - illegal arguments i = {0}, j = {1}, nSpecies = {2}",
+							i, j, getNSpecies()));
 		}
+		
+		if (i < j) {
+			
+			speciesName[i] = speciesName[j];
+			sp64Distribution[i] = sp64Distribution[j];
+			siteIndex[i] = siteIndex[j];
+			dominantHeight[i] = dominantHeight[j];
+			ageTotal[i] = ageTotal[j];
+			ageBreastHeight[i] = ageBreastHeight[j];
+			yearsToBreastHeight[i] = yearsToBreastHeight[j];
+			siteCurveNumber[i] = siteCurveNumber[j];
+			speciesIndex[i] = speciesIndex[j];
+			percentForestedLand[i] = percentForestedLand[j];
+	
+			basalArea[i] = basalArea[j];
+			closeUtilizationVolume[i] = closeUtilizationVolume[j];
+			cuVolumeMinusDecay[i] = cuVolumeMinusDecay[j];
+			cuVolumeMinusDecayWastage[i] = cuVolumeMinusDecayWastage[j];
+			loreyHeight[i] = loreyHeight[j];
+			quadMeanDiameter[i] = quadMeanDiameter[j];
+			treesPerHectare[i] = treesPerHectare[j];
+			wholeStemVolume[i] = wholeStemVolume[j];
 
-		speciesName[i] = speciesName[j];
-		sp64Distribution[i] = sp64Distribution[j];
-		siteIndex[i] = siteIndex[j];
-		dominantHeight[i] = dominantHeight[j];
-		ageTotal[i] = ageTotal[j];
-		ageBreastHeight[i] = ageBreastHeight[j];
-		yearsToBreastHeight[i] = yearsToBreastHeight[j];
-		siteCurveNumber[i] = siteCurveNumber[j];
-		speciesIndex[i] = speciesIndex[j];
-		percentForestedLand[i] = percentForestedLand[j];
+			genera.removeGenus(genera.getByIndex(i).getAlias());
+		}
+	}
 
-		basalArea[i] = basalArea[j];
-		closeUtilizationVolume[i] = closeUtilizationVolume[j];
-		cuVolumeMinusDecay[i] = cuVolumeMinusDecay[j];
-		cuVolumeMinusDecayWastage[i] = cuVolumeMinusDecayWastage[j];
-		loreyHeight[i] = loreyHeight[j];
-		quadMeanDiameter[i] = quadMeanDiameter[j];
-		treesPerHectare[i] = treesPerHectare[j];
-		wholeStemVolume[i] = wholeStemVolume[j];
+	public void remove(Set<Integer> speciesToRemove) {
+		
+		int nRemoved = 0;
+		for (int i = 1; i + nRemoved < (nSpecies + 1); i++) {
+			
+			if (speciesToRemove.contains(i)) {
+				nRemoved += 1;
+			}
+		
+			replace(i, i + nRemoved);
+		}
+		
+		if (nRemoved > 0) {
+			nSpecies = getNSpecies() - nRemoved;
+			int nElements = nSpecies + 1;
+			
+			speciesName = Arrays.copyOf(speciesName, nElements);
+			sp64Distribution = Arrays.copyOf(sp64Distribution, nElements);
+			siteIndex = Arrays.copyOf(siteIndex, nElements);
+			dominantHeight = Arrays.copyOf(dominantHeight, nElements);
+			ageTotal = Arrays.copyOf(ageTotal, nElements);
+			ageBreastHeight = Arrays.copyOf(ageBreastHeight, nElements);
+			yearsToBreastHeight = Arrays.copyOf(yearsToBreastHeight, nElements);
+			siteCurveNumber = Arrays.copyOf(siteCurveNumber, nElements);
+			speciesIndex = Arrays.copyOf(speciesIndex, nElements);
+			percentForestedLand = Arrays.copyOf(percentForestedLand, nElements);
+	
+			basalArea = Arrays.copyOf(basalArea, nElements);
+			closeUtilizationVolume = Arrays.copyOf(closeUtilizationVolume, nElements);
+			cuVolumeMinusDecay = Arrays.copyOf(cuVolumeMinusDecay, nElements);
+			cuVolumeMinusDecayWastage = Arrays.copyOf(cuVolumeMinusDecayWastage, nElements);
+			loreyHeight = Arrays.copyOf(loreyHeight, nElements);
+			quadMeanDiameter = Arrays.copyOf(quadMeanDiameter, nElements);
+			treesPerHectare = Arrays.copyOf(treesPerHectare, nElements);
+			wholeStemVolume = Arrays.copyOf(wholeStemVolume, nElements);
+		}
 	}
 }
