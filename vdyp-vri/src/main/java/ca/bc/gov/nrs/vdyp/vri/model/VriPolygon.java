@@ -87,6 +87,14 @@ public class VriPolygon extends BaseVdypPolygon<VriLayer, Optional<Float>, VriSp
 		}
 
 		@Override
+		public Builder copy(VriPolygon toCopy) {
+			super.copy(toCopy);
+			yieldFactor(toCopy.getYieldFactor());
+			nonproductiveDescription(toCopy.getNonproductiveDescription());
+			return this;
+		}
+
+		@Override
 		protected VriPolygon doBuild() {
 			return (new VriPolygon(
 					polygonIdentifier.get(), //

@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.vri.model;
 
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
@@ -46,4 +47,18 @@ public class VriSpecies extends BaseVdypSpecies {
 			);
 		}
 	}
+
+	@Override
+	public String toString() {
+		return String.format(
+				"VRISpecies[\"%s\", %s, %s, %s%%, {%s}]", //
+				this.getPolygonIdentifier(), //
+				this.getLayerType(), //
+				this.getGenus(), //
+				this.getPercentGenus(),
+				this.getSpeciesPercent().entrySet().stream()
+						.map(e -> String.format("%s: %s%%", e.getKey(), e.getValue())).collect(Collectors.joining(", "))
+		);
+	}
+
 }

@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSite.Builder;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 
@@ -71,6 +72,14 @@ public class VriSite extends BaseVdypSite {
 		protected void check(Collection<String> errors) {
 			super.check(errors);
 			requirePresent(siteSpecies, "siteSpecies", errors);
+		}
+
+		@Override
+		public Builder copy(VriSite toCopy) {
+			super.copy(toCopy);
+			siteSpecies(toCopy.getSiteSpecies());
+			breastHeightAge(toCopy.getBreastHeightAge());
+			return this;
 		}
 
 		@Override

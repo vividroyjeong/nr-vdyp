@@ -673,7 +673,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		var primarySite = primaryLayer.getPrimarySite().orElseThrow();
 		try {
 			short siteCurveNumber = primaryLayer.getPrimarySite().flatMap(BaseVdypSite::getSiteCurveNumber)
-					.map(Short.class::cast).orElseGet(() -> {
+					.map(Integer::shortValue).orElseGet(() -> {
 						try {
 							return this.findSiteCurveNumber(
 									bec.getRegion(), primarySite.getSiteSpecies(), primarySite.getSiteGenus()
@@ -763,23 +763,28 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			return VriPolygon.build(pBuilder -> {
 				pBuilder.copy(poly);
 				pBuilder.polygonIdentifier(polygonIdentifier.forYear(year + (int) ageIncreaseFinal));
+				pBuilder.mode(PolygonMode.BATN);
 				pBuilder.copyLayers(poly, (lBuilder, layer) -> {
 
 					lBuilder.copySites(layer, (iBuilder, site) -> {
-						if (layer.getLayerType() == LayerType.PRIMARY) {
+						if (layer.getLayerType() == LayerType.PRIMARY
+								&& primaryLayer.getPrimaryGenus().map(site.getSiteGenus()::equals).orElse(false)) {
 							iBuilder.height(newPrimaryHeight);
 						} else {
 							iBuilder.height(Optional.empty());
 						}
 
-						float ageTotal = site.getAgeTotal().map(x -> x + ageIncreaseFinal).orElseThrow();
+						site.getAgeTotal().map(x -> x + ageIncreaseFinal).ifPresentOrElse(ageTotal -> {
+							iBuilder.ageTotal(ageTotal);
+							iBuilder.breastHeightAge(
+									site.getYearsToBreastHeight()//
+											.map(ytbh -> ageTotal - ytbh)
+											.or(() -> site.getBreastHeightAge().map(bha -> bha + ageIncreaseFinal))
+							);
+						}, () -> {
+							iBuilder.breastHeightAge(site.getBreastHeightAge().map(bha -> bha + ageIncreaseFinal));
+						});
 
-						iBuilder.ageTotal(ageTotal);
-						iBuilder.breastHeightAge(
-								site.getYearsToBreastHeight()//
-										.map(ytbh -> ageTotal - ytbh)
-										.or(() -> site.getBreastHeightAge().map(bha -> bha + ageIncreaseFinal))
-						);
 					});
 					lBuilder.copySpecies(layer, (sBuilder, species) -> {
 						// No changes, just copy

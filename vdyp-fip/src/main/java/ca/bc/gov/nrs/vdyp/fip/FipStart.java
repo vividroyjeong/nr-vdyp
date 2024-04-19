@@ -383,7 +383,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			builder.empiricalRelationshipParameterIndex(empiricalRelationshipParameterIndex);
 			fipLayer.getSite().ifPresent(site -> {
 				builder.addSite(siteBuilder -> {
-					siteBuilder.copy(site);
+					siteBuilder.adapt(site);
 				});
 			});
 

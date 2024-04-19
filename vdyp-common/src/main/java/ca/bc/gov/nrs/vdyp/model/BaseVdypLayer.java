@@ -158,8 +158,8 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdy
 		public <I2 extends BaseVdypSite> Builder<T, S, I, SB, IB>
 				adaptSites(BaseVdypLayer<?, I2> toCopy, BiConsumer<IB, I2> config) {
 			toCopy.getSites().values().forEach(siteToCopy -> {
-				this.buildSite(builder -> {
-					builder.copy(siteToCopy);
+				this.addSite(builder -> {
+					builder.adapt(siteToCopy);
 					builder.polygonIdentifier = Optional.empty();
 					builder.layerType = Optional.empty();
 					config.accept(builder, siteToCopy);
@@ -170,7 +170,7 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdy
 
 		public Builder<T, S, I, SB, IB> copySites(T toCopy, BiConsumer<IB, I> config) {
 			toCopy.getSites().values().forEach(siteToCopy -> {
-				this.buildSite(builder -> {
+				this.addSite(builder -> {
 					builder.copy(siteToCopy);
 					builder.polygonIdentifier = Optional.empty();
 					builder.layerType = Optional.empty();
@@ -183,8 +183,8 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdy
 		public <S2 extends BaseVdypSpecies> Builder<T, S, I, SB, IB>
 				adaptSpecies(BaseVdypLayer<S2, ?> toCopy, BiConsumer<SB, S2> config) {
 			toCopy.getSpecies().values().forEach(speciesToCopy -> {
-				this.buildSpecies(builder -> {
-					builder.copy(speciesToCopy);
+				this.addSpecies(builder -> {
+					builder.adapt(speciesToCopy);
 					builder.polygonIdentifier = Optional.empty();
 					builder.layerType = Optional.empty();
 					config.accept(builder, speciesToCopy);
@@ -195,7 +195,7 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdy
 
 		public Builder<T, S, I, SB, IB> copySpecies(T toCopy, BiConsumer<SB, S> config) {
 			toCopy.getSpecies().values().forEach(speciesToCopy -> {
-				this.buildSpecies(builder -> {
+				this.addSpecies(builder -> {
 					builder.copy(speciesToCopy);
 					builder.polygonIdentifier = Optional.empty();
 					builder.layerType = Optional.empty();
