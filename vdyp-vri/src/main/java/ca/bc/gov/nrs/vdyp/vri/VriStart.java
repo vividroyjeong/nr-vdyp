@@ -689,7 +689,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			float primaryBreastHeightAge0 = primaryAgeTotal - primaryYearsToBreastHeight; // AGEBH0
 			float ageIncrease = primaryBreastHeightAge0 <= 0f ? 1f - primaryBreastHeightAge0 : 0f; // AGE_INCR
 
-			SiteIndexAgeType ageType = SiteIndexAgeType.TOTAL;
 			float siteIndex = primarySite.getSiteIndex().orElseThrow(); // SID
 			float yeastToBreastHeight = primaryYearsToBreastHeight; // YTBHD
 
@@ -700,9 +699,16 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			float minimumPredictedBaseArea = minimaMap.get(BaseControlParser.MINIMUM_PREDICTED_BASE_AREA); // VMINBAeqn
 			float minimumHeight = minimaMap.get(BaseControlParser.MINIMUM_HEIGHT); // VMINH
 
+			// Find an increase that puts stand into suitable condition with EMP106
+			// predicting reasonable BA
+
 			float baseAreaTarget = minimumPredictedBaseArea; // BATARGET
 			float heightTarget = minimumHeight; // HTARGET
 			float ageTarget = 5f; // AGETARGET
+
+			// If PCTFLAND is very low, INCREASE the target BA, so as to avoid rounding
+			// problems on output. But Target never increased by more than a factor of 4.
+			// Before Jan 2008, this all started at PCTFLAND < 50.
 
 			float percentAvailable = poly.getPercentAvailable().filter(x -> x >= 0f).orElse(85.0f); // PCT
 
@@ -728,7 +734,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 						float ageD = primaryBreastHeightAge; // AGED
 
 						float dominantHeightD = (float) SiteIndex2Height.index_to_height(
-								siteCurveNumber, ageD, ageType.getIndex(), siteIndex, ageD, yeastToBreastHeight
+								siteCurveNumber, ageD, SiteIndexAgeType.BREAST_HEIGHT.getIndex(), siteIndex, ageD,
+								yeastToBreastHeight
 						); // HDD
 
 						if (increase == 0) {
@@ -739,15 +746,20 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 							dominantHeight = primaryHeight + (dominantHeight - dominantHeight0);
 						}
 
+						// check empirical BA assuming BAV = 0
+
 						float predictedBaseArea = estimateBaseAreaYield(
 								dominantHeight, primaryBreastHeightAge, Optional.empty(), false,
 								primaryLayer.getSpecies().values(), bec,
 								primaryLayer.getEmpericalRelationshipParameterIndex().orElseThrow()
 						); // BAP
 
+						// Calculate the full occupancy BA Hence the BA we will test is the Full
+						// occupanct BA
+
 						predictedBaseArea *= FRACTION_AVAILABLE_N;
 
-						if (dominantHeight >= heightTarget && primaryBreastHeightAge >= baseAreaTarget
+						if (dominantHeight >= heightTarget && primaryBreastHeightAge >= ageTarget
 								&& predictedBaseArea >= baseAreaTarget) {
 							ageIncrease = increase;
 							break foundIncrease;

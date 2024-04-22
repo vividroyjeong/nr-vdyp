@@ -64,6 +64,10 @@ public class VriPolygon extends BaseVdypPolygon<VriLayer, Optional<Float>, VriSp
 			this.percentAvailable = Optional.of(Optional.empty());
 		}
 
+		public Builder percentAvailable(float percentAvailable) {
+			return (Builder) percentAvailable(Optional.of(percentAvailable));
+		}
+
 		public Builder nonproductiveDescription(Optional<String> nonproductiveDescription) {
 			this.nonproductiveDescription = nonproductiveDescription;
 			return this;
