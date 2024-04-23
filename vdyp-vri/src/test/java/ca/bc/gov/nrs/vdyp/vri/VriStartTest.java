@@ -994,10 +994,12 @@ class VriStartTest {
 		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
 			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
 			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
-			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 10f); // Set this high
 		}));
 		TestUtils.populateControlMapFromResource(controlMap, new BasalAreaYieldParser(), "YLDBA407.COE");
 		TestUtils.populateControlMapFromResource(controlMap, new UpperBoundsParser(), "PCT_407.coe");
+
+		// Target BA should be 11.11111111 due to low PCTFLAND
 
 		var poly = VriPolygon.build(pb -> {
 			pb.polygonIdentifier("082F074/0142", 1997);
@@ -1087,7 +1089,7 @@ class VriStartTest {
 
 		// Assertions
 
-		final var forPolygon = hasProperty("polygonIdentifier", isPolyId("082F074/0142", 1997));
+		final var forPolygon = hasProperty("polygonIdentifier", isPolyId("082F074/0142", 1999));
 		final var forPrimeLayer = both(forPolygon).and(hasProperty("layerType", is(LayerType.PRIMARY)));
 
 		assertThat(result, forPolygon);
@@ -1158,10 +1160,10 @@ class VriStartTest {
 				primarySite, allOf(
 						hasProperty("siteGenus", is("F")), //
 						hasProperty("siteIndex", present(closeTo(19.7f))), //
-						hasProperty("height", present(closeTo(7.6f))), //
-						hasProperty("ageTotal", present(closeTo(24f))), //
+						hasProperty("height", present(closeTo(8.43922043f))), //
+						hasProperty("ageTotal", present(closeTo(26f))), //
 						hasProperty("yearsToBreastHeight", present(closeTo(9f))), //
-						hasProperty("breastHeightAge", present(closeTo(15f)))
+						hasProperty("breastHeightAge", present(closeTo(17f)))
 				)
 		);
 

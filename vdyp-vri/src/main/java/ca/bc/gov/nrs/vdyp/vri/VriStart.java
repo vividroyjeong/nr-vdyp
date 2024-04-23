@@ -515,15 +515,17 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				).getCoe(1); // Entry 1 is base area
 
 		/*
-		 * The original Fortran had the following comment and a commented out modification to upperBoundsBaseArea
-		 * (BATOP98). I have included them here.
+		 * The original Fortran had the following comment and a commented out
+		 * modification to upperBoundsBaseArea (BATOP98). I have included them here.
 		 */
 
 		/*
-		 * And one POSSIBLY one last vestage of grouping by ITG That limit applies to full occupancy and Empirical
-		 * occupancy. They were derived as the 98th percentile of Empirical stocking, though adjusted PSP's were
-		 * included. If the ouput of this routine is bumped up from empirical to full, MIGHT adjust this limit DOWN
-		 * here, so that at end, it is correct. Tentatively decide NOT to do this.
+		 * And one POSSIBLY one last vestage of grouping by ITG That limit applies to
+		 * full occupancy and Empirical occupancy. They were derived as the 98th
+		 * percentile of Empirical stocking, though adjusted PSP's were included. If the
+		 * ouput of this routine is bumped up from empirical to full, MIGHT adjust this
+		 * limit DOWN here, so that at end, it is correct. Tentatively decide NOT to do
+		 * this.
 		 */
 
 		// if (fullOccupancy)
@@ -687,7 +689,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			float primaryYearsToBreastHeight = primarySite.getYearsToBreastHeight().orElseThrow(); // YTBH_L1
 
 			float primaryBreastHeightAge0 = primaryAgeTotal - primaryYearsToBreastHeight; // AGEBH0
-			float ageIncrease = primaryBreastHeightAge0 <= 0f ? 1f - primaryBreastHeightAge0 : 0f; // AGE_INCR
+			float ageIncrease; // AGE_INCR original fortran had some logic to set this, but it will always be
+								// overwritten before being used.
 
 			float siteIndex = primarySite.getSiteIndex().orElseThrow(); // SID
 			float yeastToBreastHeight = primaryYearsToBreastHeight; // YTBHD
@@ -757,7 +760,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 						// Calculate the full occupancy BA Hence the BA we will test is the Full
 						// occupanct BA
 
-						predictedBaseArea *= FRACTION_AVAILABLE_N;
+						predictedBaseArea /= FRACTION_AVAILABLE_N;
 
 						if (dominantHeight >= heightTarget && primaryBreastHeightAge >= ageTarget
 								&& predictedBaseArea >= baseAreaTarget) {
@@ -825,7 +828,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	 * @param region
 	 * @param ids
 	 * @return
-	 * @throws StandProcessingException if no entry for any of the given species IDs is present.
+	 * @throws StandProcessingException if no entry for any of the given species IDs
+	 *                                  is present.
 	 */
 	short findSiteCurveNumber(Region region, String... ids) throws StandProcessingException {
 		var scnMap = Utils.<MatrixMap2<String, Region, Integer>>expectParsedControl(
