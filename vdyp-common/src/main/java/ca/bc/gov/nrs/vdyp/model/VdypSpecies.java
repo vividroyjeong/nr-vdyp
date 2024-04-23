@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder;
+
 public class VdypSpecies extends BaseVdypSpecies implements VdypUtilizationHolder {
 
 	private Coefficients baseAreaByUtilization = new Coefficients(Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1); // LVCOM/BA
@@ -230,6 +232,15 @@ public class VdypSpecies extends BaseVdypSpecies implements VdypUtilizationHolde
 			requirePresent(volumeGroup, "volumeGroup", errors);
 			requirePresent(decayGroup, "decayGroup", errors);
 			requirePresent(breakageGroup, "breakageGroup", errors);
+		}
+
+		@Override
+		public Builder copy(VdypSpecies toCopy) {
+			super.copy(toCopy);
+			volumeGroup(toCopy.getVolumeGroup());
+			decayGroup(toCopy.getDecayGroup());
+			breakageGroup(toCopy.getBreakageGroup());
+			return this;
 		}
 
 		@Override

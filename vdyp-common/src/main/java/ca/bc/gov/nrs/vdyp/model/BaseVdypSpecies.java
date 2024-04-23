@@ -135,7 +135,7 @@ public abstract class BaseVdypSpecies {
 			return this;
 		}
 
-		public Builder<T> copy(BaseVdypSpecies toCopy) {
+		public Builder<T> copy(T toCopy) {
 			return adapt(toCopy);
 		}
 
