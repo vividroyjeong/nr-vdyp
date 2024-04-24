@@ -13,6 +13,7 @@ public class CfsBiomassConversionCoefficientsForGenus {
 
 	private static final String PREAMBLE = "CfsBiomassConversionCoefficientsForGenus at";
 
+	@SuppressWarnings("java:S6218")
 	public record Details(
 			boolean containsData,
 			float[] parms)

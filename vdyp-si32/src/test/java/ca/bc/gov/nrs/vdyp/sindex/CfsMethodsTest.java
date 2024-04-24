@@ -69,7 +69,7 @@ class CfsMethodsTest {
 	}
 	
 	@Test
-	public static void testGetSpeciesBySpeciesName() {
+	public void testGetSpeciesBySpeciesName() {
 		String name = CfsTreeSpecies.ALDER_RED.getCfsSpeciesName();
 		CfsTreeSpecies ts;
 		
@@ -87,21 +87,21 @@ class CfsMethodsTest {
 	}
 
 	@Test
-	public static void testGetGenusBySpecies() {
+	public void testGetGenusBySpecies() {
 		CfsTreeGenus g = CfsSpeciesMethods.getGenusBySpecies(CfsTreeSpecies.ALDER_RED);
 		assertThat(g, equalTo(CfsTreeGenus.OTHER_BROAD_LEAVES));
 		assertThat(CfsSpeciesMethods.getGenusBySpecies(null), equalTo(CfsTreeGenus.UNKNOWN));
 	}
 	
 	@Test
-	public static void testGetSpeciesIndexBySpecies() {
+	public void testGetSpeciesIndexBySpecies() {
 		int r = CfsSpeciesMethods.getSpeciesIndexBySpecies(CfsTreeSpecies.ALDER_RED);
 		assertThat(r, equalTo(1802));
 		assertThat(CfsSpeciesMethods.getSpeciesIndexBySpecies(null), equalTo(-1));
 	}
 	
 	@Test
-	public static void testCfsSP0Densities() {
+	public void testCfsSP0Densities() {
 		assertThat(CfsSP0Densities.getValue(SP0Name.B, CfsDensity.MEAN_DENSITY_INDEX), equalTo(379.25F));
 		assertThat(CfsSP0Densities.getValue(null, CfsDensity.MEAN_DENSITY_INDEX), equalTo(CfsSP0Densities.DEFAULT_VALUE));
 		assertThat(CfsSP0Densities.getValue(SP0Name.B, null), equalTo(CfsSP0Densities.DEFAULT_VALUE));
