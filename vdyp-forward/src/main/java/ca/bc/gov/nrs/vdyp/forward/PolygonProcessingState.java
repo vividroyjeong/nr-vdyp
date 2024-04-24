@@ -1,10 +1,15 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
@@ -15,7 +20,10 @@ import ca.bc.gov.nrs.vdyp.model.SpeciesDistributionSet;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
 class PolygonProcessingState {
-	
+
+	@SuppressWarnings("unused")
+	private static final Logger logger = LoggerFactory.getLogger(PolygonProcessingState.class);
+
 	/** 
 	 * The number of species in the state. Note that all arrays have one more element in them; the
 	 * element at index 0 is unused for the species values and contains the default utilization
@@ -24,7 +32,7 @@ class PolygonProcessingState {
 	private int nSpecies; // BANK1 NSPB
 
 	// Species information
-	
+
 	public String speciesName[/* nSpecies + 1 */]; // BANK2 SP0B
 	public SpeciesDistributionSet sp64Distribution[/* nSpecies + 1 */]; // BANK2 SP64DISTB
 	public float siteIndex[/* nSpecies + 1 */]; // BANK3 SIB
@@ -32,12 +40,12 @@ class PolygonProcessingState {
 	public float ageTotal[/* nSpecies + 1 */]; // BANK3 AGETOTB
 	public float ageBreastHeight[/* nSpecies + 1 */]; // BANK3 AGEBHB
 	public float yearsToBreastHeight[/* nSpecies + 1 */]; // BANK3 YTBHB
-	public Optional<Integer> siteCurveNumber[/* nSpecies + 1 */]; // BANK3 SCNB
+	public int siteCurveNumber[/* nSpecies + 1 */]; // BANK3 SCNB
 	public int speciesIndex[/* nSpecies + 1 */]; // BANK1 ISPB
 	public float percentForestedLand[/* nSpecies + 1 */]; // BANK1 PCTB
 
 	// Utilization information, per Species
-	
+
 	public float basalArea[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 BAB
 	public float closeUtilizationVolume[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 VOLCUB
 	public float cuVolumeMinusDecay[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 VOL_DB
@@ -47,14 +55,10 @@ class PolygonProcessingState {
 	public float treesPerHectare[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 TPHB
 	public float wholeStemVolume[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 VOLWSB
 
-	private final GenusDefinitionMap genera;
 
-	@SuppressWarnings("unchecked")
-	public PolygonProcessingState(GenusDefinitionMap genera) {
+	public PolygonProcessingState(GenusDefinitionMap genusDefinitionMap, VdypPolygonLayer layer) {
 
-		this.genera = genera;
-
-		this.nSpecies = genera.getMaxIndex();
+		this.nSpecies = genusDefinitionMap.getMaxIndex();
 
 		// In the following, index 0 is unused
 		speciesName = new String[getNSpecies() + 1];
@@ -64,7 +68,7 @@ class PolygonProcessingState {
 		ageTotal = new float[getNSpecies() + 1];
 		ageBreastHeight = new float[getNSpecies() + 1];
 		yearsToBreastHeight = new float[getNSpecies() + 1];
-		siteCurveNumber = new Optional[getNSpecies() + 1];
+		siteCurveNumber = new int[getNSpecies() + 1];
 		speciesIndex = new int[getNSpecies() + 1];
 		percentForestedLand = new float[getNSpecies() + 1];
 
@@ -79,10 +83,19 @@ class PolygonProcessingState {
 		quadMeanDiameter = new float[getNSpecies() + 1][nUtilizationClasses];
 		treesPerHectare = new float[getNSpecies() + 1][nUtilizationClasses];
 		wholeStemVolume = new float[getNSpecies() + 1][nUtilizationClasses];
+
+		if (layer.getDefaultUtilizationMap().isPresent()) {
+			recordUtilizations(0, layer.getDefaultUtilizationMap().get());
+		}
+
+		for (var ge : layer.getGenus().entrySet()) {
+			int spIndex = genusDefinitionMap.getIndex(ge.getKey().getAlias());
+			recordSpecies(spIndex, ge.getKey(), ge.getValue());
+		}
 	}
 
 	public PolygonProcessingState(PolygonProcessingState s) {
-		this.genera = s.genera;
+
 		this.nSpecies = s.getNSpecies();
 
 		this.ageBreastHeight = copy(s.ageBreastHeight);
@@ -109,33 +122,9 @@ class PolygonProcessingState {
 		return nSpecies;
 	}
 
-	public GenusDefinitionMap getGenera() {
-		return genera;
-	}
+	private void recordSpecies(int spIndex, GenusDefinition key, VdypLayerSpecies species) {
 
-	/**
-	 * Set this State to that of the given layer.
-	 * 
-	 * @param layer the layer in question
-	 */
-	public void set(VdypPolygonLayer layer) {
-
-		if (layer.getDefaultUtilizationMap().isPresent()) {
-			recordUtilizations(0, layer.getDefaultUtilizationMap().get());
-		}
-
-		for (var ge: layer.getGenus().entrySet()) {
-			recordSpecies(ge.getKey(), ge.getValue());
-		}
-	}
-
-	private void recordSpecies(GenusDefinition key, VdypLayerSpecies species) {
-
-		int spIndex = genera.getIndex(key.getAlias());
-
-		GenusDefinition genus = genera.get(key.getAlias());
-
-		speciesName[spIndex] = genus.getName();
+		speciesName[spIndex] = key.getName();
 		sp64Distribution[spIndex] = species.getSpeciesDistributions();
 		siteIndex[spIndex] = species.getSiteIndex();
 		dominantHeight[spIndex] = species.getDominantHeight();
@@ -184,16 +173,6 @@ class PolygonProcessingState {
 		return t;
 	}
 
-	private Optional<Integer>[] copy(Optional<Integer>[] a) {
-		@SuppressWarnings("unchecked")
-		Optional<Integer>[] t = new Optional[a.length];
-
-		for (int i = 0; i < a.length; i++)
-			t[i] = a[i];
-
-		return t;
-	}
-
 	private String[] copy(String[] a) {
 		String[] t = new String[a.length];
 
@@ -235,58 +214,60 @@ class PolygonProcessingState {
 	/**
 	 * Replace species at index <code>i</code> with that at index <code>j</code>, i < j.
 	 *
-	 * @param i the index of the species to remove, i >= 1
-	 * @param j the index of the species to replace it with, j >= i and j <= nSpecies
+	 * @param toIndex the index of the species to remove, i >= 1
+	 * @param fromIndex the index of the species to replace it with, j >= i and j <= nSpecies
 	 */
-	private void replace(int i, int j) {
-		if (i > j || i < 1 || j > getNSpecies()) {
+	private void move(int toIndex, int fromIndex) {
+		if (toIndex > fromIndex || toIndex < 1 || fromIndex > getNSpecies()) {
 			throw new IllegalArgumentException(
-					MessageFormat.format("PolygonProcessingState.replace - illegal arguments i = {0}, j = {1}, nSpecies = {2}",
-							i, j, getNSpecies()));
+					MessageFormat.format(
+							"PolygonProcessingState.replace - illegal arguments i = {0}, j = {1}, nSpecies = {2}", toIndex, fromIndex, getNSpecies()
+					)
+			);
 		}
 		
-		if (i < j) {
-			
-			speciesName[i] = speciesName[j];
-			sp64Distribution[i] = sp64Distribution[j];
-			siteIndex[i] = siteIndex[j];
-			dominantHeight[i] = dominantHeight[j];
-			ageTotal[i] = ageTotal[j];
-			ageBreastHeight[i] = ageBreastHeight[j];
-			yearsToBreastHeight[i] = yearsToBreastHeight[j];
-			siteCurveNumber[i] = siteCurveNumber[j];
-			speciesIndex[i] = speciesIndex[j];
-			percentForestedLand[i] = percentForestedLand[j];
-	
-			basalArea[i] = basalArea[j];
-			closeUtilizationVolume[i] = closeUtilizationVolume[j];
-			cuVolumeMinusDecay[i] = cuVolumeMinusDecay[j];
-			cuVolumeMinusDecayWastage[i] = cuVolumeMinusDecayWastage[j];
-			loreyHeight[i] = loreyHeight[j];
-			quadMeanDiameter[i] = quadMeanDiameter[j];
-			treesPerHectare[i] = treesPerHectare[j];
-			wholeStemVolume[i] = wholeStemVolume[j];
+		if (toIndex < fromIndex) {
 
-			genera.removeGenus(genera.getByIndex(i).getAlias());
+			speciesName[toIndex] = speciesName[fromIndex];
+			sp64Distribution[toIndex] = sp64Distribution[fromIndex];
+			siteIndex[toIndex] = siteIndex[fromIndex];
+			dominantHeight[toIndex] = dominantHeight[fromIndex];
+			ageTotal[toIndex] = ageTotal[fromIndex];
+			ageBreastHeight[toIndex] = ageBreastHeight[fromIndex];
+			yearsToBreastHeight[toIndex] = yearsToBreastHeight[fromIndex];
+			siteCurveNumber[toIndex] = siteCurveNumber[fromIndex];
+			speciesIndex[toIndex] = speciesIndex[fromIndex];
+			percentForestedLand[toIndex] = percentForestedLand[fromIndex];
+
+			basalArea[toIndex] = basalArea[fromIndex];
+			closeUtilizationVolume[toIndex] = closeUtilizationVolume[fromIndex];
+			cuVolumeMinusDecay[toIndex] = cuVolumeMinusDecay[fromIndex];
+			cuVolumeMinusDecayWastage[toIndex] = cuVolumeMinusDecayWastage[fromIndex];
+			loreyHeight[toIndex] = loreyHeight[fromIndex];
+			quadMeanDiameter[toIndex] = quadMeanDiameter[fromIndex];
+			treesPerHectare[toIndex] = treesPerHectare[fromIndex];
+			wholeStemVolume[toIndex] = wholeStemVolume[fromIndex];
 		}
 	}
 
-	public void remove(Set<Integer> speciesToRemove) {
-		
-		int nRemoved = 0;
-		for (int i = 1; i + nRemoved < (nSpecies + 1); i++) {
-			
-			if (speciesToRemove.contains(i)) {
-				nRemoved += 1;
+	private void retainOnly(Set<Integer> speciesToRetainByIndexSet) {
+
+		var speciesToRetainByIndex = new ArrayList<>(speciesToRetainByIndexSet);
+
+		speciesToRetainByIndex.sort(Integer::compareTo);
+
+		int nextAvailableSlot = 1;
+		for (int speciesIndex : speciesToRetainByIndex) {
+			if (nextAvailableSlot != speciesIndex) {
+				move(nextAvailableSlot, speciesIndex);
 			}
-		
-			replace(i, i + nRemoved);
+			nextAvailableSlot += 1;
 		}
-		
-		if (nRemoved > 0) {
-			nSpecies = getNSpecies() - nRemoved;
+
+		if (nextAvailableSlot > 1) {
+			nSpecies = speciesToRetainByIndex.size();
 			int nElements = nSpecies + 1;
-			
+
 			speciesName = Arrays.copyOf(speciesName, nElements);
 			sp64Distribution = Arrays.copyOf(sp64Distribution, nElements);
 			siteIndex = Arrays.copyOf(siteIndex, nElements);
@@ -297,7 +278,7 @@ class PolygonProcessingState {
 			siteCurveNumber = Arrays.copyOf(siteCurveNumber, nElements);
 			speciesIndex = Arrays.copyOf(speciesIndex, nElements);
 			percentForestedLand = Arrays.copyOf(percentForestedLand, nElements);
-	
+
 			basalArea = Arrays.copyOf(basalArea, nElements);
 			closeUtilizationVolume = Arrays.copyOf(closeUtilizationVolume, nElements);
 			cuVolumeMinusDecay = Arrays.copyOf(cuVolumeMinusDecay, nElements);
@@ -307,5 +288,17 @@ class PolygonProcessingState {
 			treesPerHectare = Arrays.copyOf(treesPerHectare, nElements);
 			wholeStemVolume = Arrays.copyOf(wholeStemVolume, nElements);
 		}
+	}
+
+	public void removeSpecies(Predicate<Integer> removeCriteria) {
+
+		Set<Integer> speciesToRetainByIndex = new HashSet<>();
+		for (int i = 1; i <= getNSpecies(); i++) {
+			if (!removeCriteria.test(i)) {
+				speciesToRetainByIndex.add(i);
+			}
+		}
+
+		retainOnly(speciesToRetainByIndex);
 	}
 }

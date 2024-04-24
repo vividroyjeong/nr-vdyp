@@ -2,11 +2,9 @@ package ca.bc.gov.nrs.vdyp.forward;
 
 import java.text.MessageFormat;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
+import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
@@ -21,6 +20,7 @@ import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.SiteCurve;
+import ca.bc.gov.nrs.vdyp.model.SpeciesDistribution;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.si32.site.SiteTool;
 
@@ -63,8 +63,10 @@ public class ForwardProcessingEngine {
 
 		fps.setStartingState(polygon);
 
+		// All of BANKCHK1 that we need
 		validatePolygon(polygon);
 
+		// SCINXSET
 		completeSiteCurveMap(polygon.getBiogeoclimaticZone(), LayerType.PRIMARY, 0);
 
 		fps.setActive(LayerType.PRIMARY, 0);
@@ -74,22 +76,29 @@ public class ForwardProcessingEngine {
 
 		PolygonProcessingState pps = fps.getBank(layerType, instanceNumber);
 
-		boolean isCoastalBecZone = becZone.getRegion().equals(Region.COASTAL);
-
 		for (int i = 0; i < pps.getNSpecies(); i++) {
 
-			if (pps.siteCurveNumber[i].isEmpty()) {
+			if (pps.siteCurveNumber[i] == VdypEntity.MISSING_INTEGER_VALUE) {
 
-				SiteCurve sc = null;
+				Optional<Integer> scIndex = Optional.empty();
+				
+				Optional<SpeciesDistribution> sp0Dist = pps.sp64Distribution[i].getSpeciesDistribution(0);
 
-				Optional<Float> sp1Dist = pps.sp64Distribution[i].getSpeciesDistribution(pps.speciesName[i]);
-
-				if (sp1Dist.isPresent()) {
+				if (sp0Dist.isPresent()) {
 					if (siteCurveMap.size() > 0) {
-						sc = siteCurveMap.get(pps.speciesName[i]);
+						SiteCurve sc = siteCurveMap.get(sp0Dist.get().getSpecies());
+						scIndex = Optional.of(sc.getValue(becZone.getRegion()));
 					} else {
-						int scIndex = SiteTool.SiteTool_GetSICurve(pps.speciesName[i], isCoastalBecZone);
-						
+						scIndex = Optional.of(SiteTool.SiteTool_GetSICurve(pps.speciesName[i], becZone.getRegion().equals(Region.COASTAL)));
+					}
+				}
+				
+				if (scIndex.isEmpty()) {
+					if (siteCurveMap.size() > 0) {
+						SiteCurve sc = siteCurveMap.get(pps.speciesName[i]);
+						scIndex = Optional.of(sc.getValue(becZone.getRegion()));
+					} else {
+						scIndex = Optional.of(SiteTool.SiteTool_GetSICurve(pps.speciesName[i], becZone.getRegion().equals(Region.COASTAL)));
 					}
 				}
 			}
@@ -113,19 +122,11 @@ public class ForwardProcessingEngine {
 
 		// => all that is done is that species with basal area < MIN_BASAL_AREA are removed.
 
-		PolygonProcessingState a = fps.getBank(LayerType.PRIMARY, 0);
+		PolygonProcessingState pps = fps.getBank(LayerType.PRIMARY, 0);
 
-		Set<Integer> speciesToRemoveByIndex = new HashSet<>();
+		pps.removeSpecies(i -> pps.basalArea[i][UtilizationClass.ALL.ordinal()] < MIN_BASAL_AREA);
 		
-		for (int i = 1; i < a.getNSpecies(); i++) {
-			if (a.basalArea[i][UtilizationClass.ALL.ordinal()] < MIN_BASAL_AREA) {
-				speciesToRemoveByIndex.add(i);
-			}
-		}
-
-		a.remove(speciesToRemoveByIndex);
-		
-		if (a.getNSpecies() == 0) {
+		if (pps.getNSpecies() == 0) {
 				throw new ProcessingException(
 						MessageFormat.format(
 								"Polygon {0} layer 0 has no species with basal area above {1}",

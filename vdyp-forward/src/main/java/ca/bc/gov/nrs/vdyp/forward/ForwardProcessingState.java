@@ -16,20 +16,19 @@ class ForwardProcessingState {
 	 */
 	private static final int MAX_RECORDS = 2 * MAX_INSTANCES;
 
+	private final GenusDefinitionMap genusDefinitionMap;
 	private final PolygonProcessingState[] banks;
 	private PolygonProcessingState active;
 
 	public ForwardProcessingState(GenusDefinitionMap genusDefinitionMap) {
 
-		// Move the primary layer of the given polygon to bank zero.
+		this.genusDefinitionMap = genusDefinitionMap;
 		banks = new PolygonProcessingState[MAX_RECORDS];
-		for (int i = 0; i < MAX_RECORDS; i++) {
-			banks[i] = new PolygonProcessingState(genusDefinitionMap);
-		}
 	}
 
 	public void setStartingState(VdypPolygon polygon) {
-		banks[0].set(polygon.getPrimaryLayer());
+		// Move the primary layer of the given polygon to bank zero.
+		banks[0] = new PolygonProcessingState(genusDefinitionMap, polygon.getPrimaryLayer());
 	}
 
 	public void setActive(LayerType layerType, int instanceNumber) {

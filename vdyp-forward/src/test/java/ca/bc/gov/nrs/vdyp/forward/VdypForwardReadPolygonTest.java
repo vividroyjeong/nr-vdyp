@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,14 +21,10 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonDescription;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypSpeciesUtilization;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
-import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
@@ -43,28 +38,13 @@ class VdypForwardReadPolygonTest {
 		var parser = new ForwardControlParser();
 		Map<String, Object> controlMap = parse(parser, "VDYP.CTR");
 
-		var processor = new ForwardProcessor();
 		try {
-			var genusDefinitionMap = new GenusDefinitionMap(
-					(List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name())
-			);
-
 			var polygonDescriptionStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_GROWTO.name());
 			var polygonDescriptionStream = ((StreamingParserFactory<VdypPolygonDescription>) polygonDescriptionStreamFactory)
 					.get();
 
-			var polygonStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_POLY.name());
-			var polygonStream = ((StreamingParserFactory<VdypPolygon>) polygonStreamFactory).get();
-
-			var layerSpeciesStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SPECIES.name());
-			var layerSpeciesStream = ((StreamingParserFactory<Collection<VdypLayerSpecies>>) layerSpeciesStreamFactory)
-					.get();
-
-			var speciesUtilizationStreamFactory = controlMap
-					.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name());
-			var speciesUtilizationStream = ((StreamingParserFactory<Collection<VdypSpeciesUtilization>>) speciesUtilizationStreamFactory)
-					.get();
-
+			ForwardDataStreamReader reader = new ForwardDataStreamReader(controlMap);
+					
 			// Fetch the next polygon to process.
 			List<VdypPolygon> polygons = new ArrayList<>();
 
@@ -72,10 +52,7 @@ class VdypForwardReadPolygonTest {
 
 				var polygonDescription = polygonDescriptionStream.next();
 
-				var polygon = processor.readPolygon(
-						genusDefinitionMap, polygonDescription, polygonStream, layerSpeciesStream,
-						speciesUtilizationStream
-				);
+				var polygon = reader.readNextPolygon(polygonDescription);
 
 				polygons.add(polygon);
 			}

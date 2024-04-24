@@ -20,6 +20,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
 import ca.bc.gov.nrs.vdyp.forward.parsers.VdypSpeciesParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
@@ -98,18 +99,22 @@ class VdypForwardSpeciesParserTest {
 										hasProperty(
 												"speciesDistributionMap",
 												hasEntry(
-														is("S"),
+														is(0),
 														allOf(
+																hasProperty("index", is(0)),
 																hasProperty("species", is("S")),
 																hasProperty("percentage", is(100.0f))
 														)
 												)
 										)
-								), hasProperty("siteIndex", is(-9.0f)), hasProperty("dominantHeight", is(-9.0f)),
-								hasProperty("ageTotal", is(-9.0f)), hasProperty("ageAtBreastHeight", is(-9.0f)),
-								hasProperty("yearsToBreastHeight", is(-9.0f)),
+								), 
+								hasProperty("siteIndex", is(Float.NaN)), 
+								hasProperty("dominantHeight", is(Float.NaN)),
+								hasProperty("ageTotal", is(Float.NaN)), 
+								hasProperty("ageAtBreastHeight", is(Float.NaN)),
+								hasProperty("yearsToBreastHeight", is(Float.NaN)),
 								hasProperty("isPrimary", is(Optional.of(false))),
-								hasProperty("siteCurveNumber", is(Optional.of(-9)))
+								hasProperty("siteCurveNumber", is(VdypEntity.MISSING_INTEGER_VALUE))
 						)
 				)
 		);
@@ -197,7 +202,8 @@ class VdypForwardSpeciesParserTest {
 				genera,
 				hasItems(
 						allOf(
-								hasProperty("ageTotal", is(20.0f)), hasProperty("ageAtBreastHeight", is(12.0f)),
+								hasProperty("ageTotal", is(20.0f)),
+								hasProperty("ageAtBreastHeight", is(12.0f)),
 								hasProperty("yearsToBreastHeight", is(8.0f)),
 								hasProperty("isPrimary", is(Optional.of(false)))
 						),
@@ -208,14 +214,14 @@ class VdypForwardSpeciesParserTest {
 												"speciesDistributionMap",
 												allOf(
 														hasEntry(
-																is("B"),
+																is(0),
 																allOf(
 																		hasProperty("species", is("B")),
 																		hasProperty("percentage", is(50.0f))
 																)
 														),
 														hasEntry(
-																is("S"),
+																is(1),
 																allOf(
 																		hasProperty("species", is("S")),
 																		hasProperty("percentage", is(50.0f))
@@ -234,28 +240,28 @@ class VdypForwardSpeciesParserTest {
 												"speciesDistributionMap",
 												allOf(
 														hasEntry(
-																is("L"),
+																is(0),
 																allOf(
 																		hasProperty("species", is("L")),
 																		hasProperty("percentage", is(50.0f))
 																)
 														),
 														hasEntry(
-																is("LA"),
+																is(1),
 																allOf(
 																		hasProperty("species", is("LA")),
 																		hasProperty("percentage", is(25.0f))
 																)
 														),
 														hasEntry(
-																is("LT"),
+																is(2),
 																allOf(
 																		hasProperty("species", is("LT")),
 																		hasProperty("percentage", is(15.0f))
 																)
 														),
 														hasEntry(
-																is("LW"),
+																is(3),
 																allOf(
 																		hasProperty("species", is("LW")),
 																		hasProperty("percentage", is(10.0f))
@@ -317,18 +323,20 @@ class VdypForwardSpeciesParserTest {
 										hasProperty(
 												"speciesDistributionMap",
 												hasEntry(
-														is("S"),
+														is(0),
 														allOf(
+																hasProperty("index", is(0)),
 																hasProperty("species", is("S")),
 																hasProperty("percentage", is(100.0f))
 														)
 												)
 										)
-								), hasProperty("siteIndex", is(-9.0f)), hasProperty("dominantHeight", is(-9.0f)),
-								hasProperty("ageTotal", is(-9.0f)), hasProperty("ageAtBreastHeight", is(-9.0f)),
-								hasProperty("yearsToBreastHeight", is(-9.0f)),
+								), 
+								hasProperty("siteIndex", is(Float.NaN)), hasProperty("dominantHeight", is(Float.NaN)),
+								hasProperty("ageTotal", is(Float.NaN)), hasProperty("ageAtBreastHeight", is(Float.NaN)),
+								hasProperty("yearsToBreastHeight", is(Float.NaN)),
 								hasProperty("isPrimary", is(Optional.of(false))),
-								hasProperty("siteCurveNumber", is(Optional.of(-9)))
+								hasProperty("siteCurveNumber", is(VdypEntity.MISSING_INTEGER_VALUE))
 						),
 						allOf(
 								hasProperty("polygonId", hasProperty("description", is("01002 S000002 00     1970"))),
@@ -340,26 +348,31 @@ class VdypForwardSpeciesParserTest {
 												"speciesDistributionMap",
 												allOf(
 														hasEntry(
-																is("B"),
+																is(0),
 																allOf(
+																		hasProperty("index", is(0)),
 																		hasProperty("species", is("B")),
 																		hasProperty("percentage", is(50.0f))
 																)
 														),
 														hasEntry(
-																is("S"),
+																is(1),
 																allOf(
+																		hasProperty("index", is(1)),
 																		hasProperty("species", is("S")),
 																		hasProperty("percentage", is(50.0f))
 																)
 														)
 												)
 										)
-								), hasProperty("siteIndex", is(-9.0f)), hasProperty("dominantHeight", is(-9.0f)),
-								hasProperty("ageTotal", is(-9.0f)), hasProperty("ageAtBreastHeight", is(-9.0f)),
-								hasProperty("yearsToBreastHeight", is(-9.0f)),
+								), 
+								hasProperty("siteIndex", is(Float.NaN)), 
+								hasProperty("dominantHeight", is(Float.NaN)),
+								hasProperty("ageTotal", is(Float.NaN)), 
+								hasProperty("ageAtBreastHeight", is(Float.NaN)),
+								hasProperty("yearsToBreastHeight", is(Float.NaN)),
 								hasProperty("isPrimary", is(Optional.empty())),
-								hasProperty("siteCurveNumber", is(Optional.empty()))
+								hasProperty("siteCurveNumber", is(VdypEntity.MISSING_INTEGER_VALUE))
 						)
 				)
 		);

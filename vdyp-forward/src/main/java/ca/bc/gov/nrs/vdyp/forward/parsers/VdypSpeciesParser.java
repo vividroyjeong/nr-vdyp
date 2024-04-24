@@ -10,9 +10,11 @@ import java.util.Optional;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
+import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
 import ca.bc.gov.nrs.vdyp.io.EndOfRecord;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
+import ca.bc.gov.nrs.vdyp.io.parse.common.InvalidSpeciesDistributionSet;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapValueReplacer;
@@ -32,14 +34,14 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 	private static final String GENUS_INDEX = "SPECIES_INDEX"; // ISP
 	private static final String GENUS = "SPECIES"; // SP0
 
+	private static final String SPECIES_0 = "SPECIES_0"; // SP640
+	private static final String PERCENT_SPECIES_0 = "PERCENT_SPECIES_0"; // PCT0
 	private static final String SPECIES_1 = "SPECIES_1"; // SP641
 	private static final String PERCENT_SPECIES_1 = "PERCENT_SPECIES_1"; // PCT1
 	private static final String SPECIES_2 = "SPECIES_2"; // SP642
 	private static final String PERCENT_SPECIES_2 = "PERCENT_SPECIES_2"; // PCT2
 	private static final String SPECIES_3 = "SPECIES_3"; // SP643
 	private static final String PERCENT_SPECIES_3 = "PERCENT_SPECIES_3"; // PCT3
-	private static final String SPECIES_4 = "SPECIES_4"; // SP644
-	private static final String PERCENT_SPECIES_4 = "PERCENT_SPECIES_4"; // PCT4
 
 	private static final String SITE_INDEX = "SITE_INDEX"; // SI
 	private static final String DOMINANT_HEIGHT = "DOMINANT_HEIGHT"; // HD
@@ -71,19 +73,21 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 							)
 					).space(1).value(2, GENUS_INDEX, ValueParser.INTEGER).space(1)
 					.value(2, GENUS, ControlledValueParser.optional(ControlledValueParser.GENUS)).space(1)
-					.value(3, SPECIES_1, ControlledValueParser.SPECIES)
-					.value(5, PERCENT_SPECIES_1, ValueParser.PERCENTAGE)
+					.value(3, SPECIES_0, ControlledValueParser.SPECIES)
+					.value(5, PERCENT_SPECIES_0, ValueParser.PERCENTAGE)
+					.value(3, SPECIES_1, ControlledValueParser.optional(ControlledValueParser.SPECIES))
+					.value(5, PERCENT_SPECIES_1, ControlledValueParser.optional(ValueParser.PERCENTAGE))
 					.value(3, SPECIES_2, ControlledValueParser.optional(ControlledValueParser.SPECIES))
 					.value(5, PERCENT_SPECIES_2, ControlledValueParser.optional(ValueParser.PERCENTAGE))
 					.value(3, SPECIES_3, ControlledValueParser.optional(ControlledValueParser.SPECIES))
 					.value(5, PERCENT_SPECIES_3, ControlledValueParser.optional(ValueParser.PERCENTAGE))
-					.value(3, SPECIES_4, ControlledValueParser.optional(ControlledValueParser.SPECIES))
-					.value(5, PERCENT_SPECIES_4, ControlledValueParser.optional(ValueParser.PERCENTAGE))
-					.value(6, SITE_INDEX, ValueParser.FLOAT).value(6, DOMINANT_HEIGHT, ValueParser.FLOAT)
-					.value(6, TOTAL_AGE, ValueParser.FLOAT).value(6, AGE_AT_BREAST_HEIGHT, ValueParser.FLOAT)
-					.value(6, YEARS_TO_BREAST_HEIGHT, ValueParser.FLOAT)
+					.value(6, SITE_INDEX, VdypForwardDefaultingParser.FLOAT_WITH_DEFAULT)
+					.value(6, DOMINANT_HEIGHT, VdypForwardDefaultingParser.FLOAT_WITH_DEFAULT)
+					.value(6, TOTAL_AGE, VdypForwardDefaultingParser.FLOAT_WITH_DEFAULT)
+					.value(6, AGE_AT_BREAST_HEIGHT, VdypForwardDefaultingParser.FLOAT_WITH_DEFAULT)
+					.value(6, YEARS_TO_BREAST_HEIGHT, VdypForwardDefaultingParser.FLOAT_WITH_DEFAULT)
 					.value(2, IS_PRIMARY_SPECIES, ControlledValueParser.optional(ValueParser.LOGICAL_0_1))
-					.value(3, SITE_CURVE_NUMBER, ValueParser.INTEGER);
+					.value(3, SITE_CURVE_NUMBER, VdypForwardDefaultingParser.INTEGER_WITH_DEFAULT);
 
 			var is = fileResolver.resolveForInput(fileName);
 
@@ -103,38 +107,45 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 					}
 					var genusIndex = (Integer) entry.get(GENUS_INDEX);
 					var genus = (Optional<String>) entry.get(GENUS);
-					var species1 = (String) entry.get(SPECIES_1);
-					var percentSpecies1 = (Float) entry.get(PERCENT_SPECIES_1);
+					var species0 = (String) entry.get(SPECIES_0);
+					var percentSpecies0 = (Float) entry.get(PERCENT_SPECIES_0);
+					var species1 = (Optional<String>) entry.get(SPECIES_1);
+					var percentSpecies1 = (Optional<Float>) entry.get(PERCENT_SPECIES_1);
 					var species2 = (Optional<String>) entry.get(SPECIES_2);
 					var percentSpecies2 = (Optional<Float>) entry.get(PERCENT_SPECIES_2);
 					var species3 = (Optional<String>) entry.get(SPECIES_3);
 					var percentSpecies3 = (Optional<Float>) entry.get(PERCENT_SPECIES_3);
-					var species4 = (Optional<String>) entry.get(SPECIES_4);
-					var percentSpecies4 = (Optional<Float>) entry.get(PERCENT_SPECIES_4);
-					var siteIndex = (Float) entry.get(SITE_INDEX);
-					var dominantHeight = (Float) entry.get(DOMINANT_HEIGHT);
-					var totalAge = (Float) entry.get(TOTAL_AGE);
-					var ageAtBreastHeight = (Float) entry.get(AGE_AT_BREAST_HEIGHT);
-					var yearsToBreastHeight = (Float) entry.get(YEARS_TO_BREAST_HEIGHT);
+					var siteIndex = (Float)(entry.get(SITE_INDEX));
+					var dominantHeight = (Float)(entry.get(DOMINANT_HEIGHT));
+					var totalAge = (Float)(entry.get(TOTAL_AGE));
+					var ageAtBreastHeight = (Float)(entry.get(AGE_AT_BREAST_HEIGHT));
+					var yearsToBreastHeight = (Float)(entry.get(YEARS_TO_BREAST_HEIGHT));
 					var isPrimarySpecies = Utils.<Boolean>optSafe(entry.get(IS_PRIMARY_SPECIES));
-					var siteCurveNumber = Utils.<Integer>optSafe(entry.get(SITE_CURVE_NUMBER));
+					var siteCurveNumber = Utils.<Integer>optSafe(entry.get(SITE_CURVE_NUMBER))
+							.orElse(VdypEntity.MISSING_INTEGER_VALUE);
 
 					var builder = new ValueOrMarker.Builder<Optional<VdypLayerSpecies>, EndOfRecord>();
 					return layerType.handle(l -> builder.value(l.map(lt -> {
 
 						List<SpeciesDistribution> sdList = new ArrayList<>();
-						sdList.add(new SpeciesDistribution(species1, percentSpecies1));
+						sdList.add(new SpeciesDistribution(0, species0, percentSpecies0));
 						Utils.ifBothPresent(
-								species2, percentSpecies2, (s, p) -> sdList.add(new SpeciesDistribution(s, p))
+								species1, percentSpecies1, (s, p) -> sdList.add(new SpeciesDistribution(1, s, p))
 						);
 						Utils.ifBothPresent(
-								species3, percentSpecies3, (s, p) -> sdList.add(new SpeciesDistribution(s, p))
+								species2, percentSpecies2, (s, p) -> sdList.add(new SpeciesDistribution(2, s, p))
 						);
 						Utils.ifBothPresent(
-								species4, percentSpecies4, (s, p) -> sdList.add(new SpeciesDistribution(s, p))
+								species3, percentSpecies3, (s, p) -> sdList.add(new SpeciesDistribution(3, s, p))
 						);
 
-						SpeciesDistributionSet speciesDistributionSet = new SpeciesDistributionSet(sdList);
+						try {
+							SpeciesDistributionSet.validate(4, sdList);
+						} catch (InvalidSpeciesDistributionSet e) {
+							new ResourceParseException(e);
+						}
+						
+						SpeciesDistributionSet speciesDistributionSet = new SpeciesDistributionSet(4, sdList);
 
 						return new VdypLayerSpecies(
 								polygonId, lt, genusIndex, genus, speciesDistributionSet, siteIndex, dominantHeight,
@@ -167,7 +178,7 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 			};
 		};
 	}
-
+	
 	@Override
 	public ValueParser<Object> getValueParser() {
 		return FILENAME;
