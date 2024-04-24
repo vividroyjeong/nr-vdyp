@@ -22,55 +22,55 @@ class CfsMethodsTest {
 	@Test
 	void test_CFS_CFSTreeClassToString() {
 		assertThat(
-				CfsMethods.cfsTreeClassToString(CfsTreeClass.cfsTreeCls_LiveNoPath.getIndex()), equalTo(
-						CfsTreeClass.cfsTreeCls_LiveNoPath.getDescription()
+				CfsMethods.cfsTreeClassToString(CfsTreeClass.LIVE_NO_PATH.getIndex()), equalTo(
+						CfsTreeClass.LIVE_NO_PATH.getDescription()
 				)
 		);
-		assertThat(CfsMethods.cfsTreeClassToString(100), equalTo(CfsTreeClass.cfsTreeCls_UNKNOWN.getDescription()));
+		assertThat(CfsMethods.cfsTreeClassToString(100), equalTo(CfsTreeClass.UNKNOWN.getDescription()));
 	}
 
 	@Test
 	void test_CFS_CFSGenusToString() {
 		assertThat(
-				CfsMethods.cfsGenusToString(CfsTreeGenus.cfsGenus_Birch), equalTo(
-						CfsTreeGenus.cfsGenus_Birch.getGenusName()
+				CfsMethods.cfsGenusToString(CfsTreeGenus.BIRCH), equalTo(
+						CfsTreeGenus.BIRCH.getGenusName()
 				)
 		);
-		assertThat(CfsMethods.cfsGenusToString(null), equalTo(CfsTreeGenus.cfsGenus_UNKNOWN.getGenusName()));
+		assertThat(CfsMethods.cfsGenusToString(null), equalTo(CfsTreeGenus.UNKNOWN.getGenusName()));
 	}
 	
 	@Test
 	void test_CFS_CFSSP0DensityFunctions() {
 		assertThat(CfsMethods.cfsSP0DensityMax(null), equalTo(CfsSP0Densities.DEFAULT_VALUE));
-		assertThat(CfsMethods.cfsSP0DensityMax(SP0Name.sp0_AC), equalTo(564.00F));
-		assertThat(CfsMethods.cfsSP0DensityMean(SP0Name.sp0_AC), equalTo(295.00F));
-		assertThat(CfsMethods.cfsSP0DensityMin(SP0Name.sp0_AC), equalTo(229.00F));
+		assertThat(CfsMethods.cfsSP0DensityMax(SP0Name.AC), equalTo(564.00F));
+		assertThat(CfsMethods.cfsSP0DensityMean(SP0Name.AC), equalTo(295.00F));
+		assertThat(CfsMethods.cfsSP0DensityMin(SP0Name.AC), equalTo(229.00F));
 	}
 	
 	@Test
 	void test_CFS_StringToCfsSpeciesTest() {
-		assertThat(CfsMethods.stringToCfsSpecies("Black Spruce"), equalTo(CfsTreeSpecies.cfsSpcs_SpruceBlack));
-		assertThat(CfsMethods.stringToCfsSpecies("Black spruce"), equalTo(CfsTreeSpecies.cfsSpcs_SpruceBlack));
-		assertThat(CfsMethods.stringToCfsSpecies("something"), equalTo(CfsTreeSpecies.cfsSpcs_UNKNOWN));
-		assertThat(CfsMethods.stringToCfsSpecies(null), equalTo(CfsTreeSpecies.cfsSpcs_UNKNOWN));
+		assertThat(CfsMethods.stringToCfsSpecies("Black Spruce"), equalTo(CfsTreeSpecies.SpruceBlack));
+		assertThat(CfsMethods.stringToCfsSpecies("Black spruce"), equalTo(CfsTreeSpecies.SpruceBlack));
+		assertThat(CfsMethods.stringToCfsSpecies("something"), equalTo(CfsTreeSpecies.UNKNOWN));
+		assertThat(CfsMethods.stringToCfsSpecies(null), equalTo(CfsTreeSpecies.UNKNOWN));
 	}
 	
 	@Test
 	void test_CFS_CFSSpcsNumToCFSGenus() {
-		assertThat(CfsMethods.cfsSpcsNumToCFSGenus(CfsTreeSpecies.cfsSpcs_SpruceBlack), equalTo(CfsTreeGenus.cfsGenus_Spruce));
-		assertThat(CfsMethods.cfsSpcsNumToCFSGenus(null), equalTo(CfsTreeGenus.cfsGenus_UNKNOWN));
+		assertThat(CfsMethods.cfsSpcsNumToCFSGenus(CfsTreeSpecies.SpruceBlack), equalTo(CfsTreeGenus.SPRUCE));
+		assertThat(CfsMethods.cfsSpcsNumToCFSGenus(null), equalTo(CfsTreeGenus.UNKNOWN));
 	}
 	
 	@Test
 	void test_CFS_CFSBiomassConversionCoefficientArrays() {
-		assertThat(CfsBiomassConversionCoefficientsDead.array[1][1].parms()[1], equalTo(0.29900000f));
-		assertThat(CfsBiomassConversionCoefficientsForSpecies.array[1][1].parms()[1], equalTo(0.84904177f));
-		assertThat(CfsBiomassConversionCoefficientsForGenus.array[1][1].parms()[1], equalTo(0.95456459f));
+		assertThat(CfsBiomassConversionCoefficientsDead.get(1, 1).parms()[1], equalTo(0.29900000f));
+		assertThat(CfsBiomassConversionCoefficientsForSpecies.get(1, 1).parms()[1], equalTo(0.84904177f));
+		assertThat(CfsBiomassConversionCoefficientsForGenus.get(1, 1).parms()[1], equalTo(0.95456459f));
 	}
 	
 	@Test
 	public static void testGetSpeciesBySpeciesName() {
-		String name = CfsTreeSpecies.cfsSpcs_AlderRed.getCfsSpeciesName();
+		String name = CfsTreeSpecies.AlderRed.getCfsSpeciesName();
 		CfsTreeSpecies ts;
 		
 		ts = CfsSpeciesMethods.getSpeciesBySpeciesName(name);
@@ -88,22 +88,22 @@ class CfsMethodsTest {
 
 	@Test
 	public static void testGetGenusBySpecies() {
-		CfsTreeGenus g = CfsSpeciesMethods.getGenusBySpecies(CfsTreeSpecies.cfsSpcs_AlderRed);
-		assertThat(g, equalTo(CfsTreeGenus.cfsGenus_OtherBroadleaves));
-		assertThat(CfsSpeciesMethods.getGenusBySpecies(null), equalTo(CfsTreeGenus.cfsGenus_UNKNOWN));
+		CfsTreeGenus g = CfsSpeciesMethods.getGenusBySpecies(CfsTreeSpecies.AlderRed);
+		assertThat(g, equalTo(CfsTreeGenus.OTHER_BROAD_LEAVES));
+		assertThat(CfsSpeciesMethods.getGenusBySpecies(null), equalTo(CfsTreeGenus.UNKNOWN));
 	}
 	
 	@Test
 	public static void testGetSpeciesIndexBySpecies() {
-		int r = CfsSpeciesMethods.getSpeciesIndexBySpecies(CfsTreeSpecies.cfsSpcs_AlderRed);
+		int r = CfsSpeciesMethods.getSpeciesIndexBySpecies(CfsTreeSpecies.AlderRed);
 		assertThat(r, equalTo(1802));
 		assertThat(CfsSpeciesMethods.getSpeciesIndexBySpecies(null), equalTo(-1));
 	}
 	
 	@Test
 	public static void testCfsSP0Densities() {
-		assertThat(CfsSP0Densities.getValue(SP0Name.sp0_B, CfsDensity.MEAN_DENSITY_INDEX), equalTo(379.25F));
+		assertThat(CfsSP0Densities.getValue(SP0Name.B, CfsDensity.MEAN_DENSITY_INDEX), equalTo(379.25F));
 		assertThat(CfsSP0Densities.getValue(null, CfsDensity.MEAN_DENSITY_INDEX), equalTo(CfsSP0Densities.DEFAULT_VALUE));
-		assertThat(CfsSP0Densities.getValue(SP0Name.sp0_B, null), equalTo(CfsSP0Densities.DEFAULT_VALUE));
+		assertThat(CfsSP0Densities.getValue(SP0Name.B, null), equalTo(CfsSP0Densities.DEFAULT_VALUE));
 	}
 }

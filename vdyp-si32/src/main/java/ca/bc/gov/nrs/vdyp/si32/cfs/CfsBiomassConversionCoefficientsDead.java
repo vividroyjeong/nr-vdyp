@@ -11,12 +11,18 @@ import java.text.MessageFormat;
  */
 public class CfsBiomassConversionCoefficientsDead {
 
+	private static final String PREAMBLE = "CfsBiomassConversionCoefficientsDead at";
+
 	public record Details(
 			boolean containsData, 
 			float[] parms
 	) {}
 	
-	public final static Details[][] array = new Details[][]
+	public static Details get(int i, int j) {
+		return array[i][j];
+	}
+	
+	private static final Details[][] array = new Details[][]
 	{ 
 		{
 			new Details(true, new float[] { 0.04000000f, 0.04100000f, 0.05300000f, 0.08900000f, 0.13500000f, 108.00000000f, 263.50000000f, 495.50000000f, 934.00000000f }), 
@@ -134,7 +140,7 @@ public class CfsBiomassConversionCoefficientsDead {
 
 		for (int i = 0; i < array.length; i++) {
 			if (array[i].length != CfsBiomassConversionSupportedGenera.size()) {
-				throw new IllegalStateException(MessageFormat.format("CfsBiomassConversionCoefficientsDead at" 
+				throw new IllegalStateException(MessageFormat.format(PREAMBLE 
 						+ " index {0} does not contain exactly one "
 						+ " entry for each CfsBiomassConversionSupportedGenera", i));
 			}
@@ -143,20 +149,20 @@ public class CfsBiomassConversionCoefficientsDead {
 		for (int i = 0; i < array.length; i++) {
 			for (int j = 0; j < array[i].length; j++) {
 				if (array[i][j].parms.length != CfsDeadConversionParams.size()) {
-					throw new IllegalStateException(MessageFormat.format("CfsBiomassConversionCoefficientsDead at" 
+					throw new IllegalStateException(MessageFormat.format(PREAMBLE 
 							+ " index {0} {1} contains {2} elements, but {3} were expected", i, j, array[i][j].parms.length, CfsDeadConversionParams.size()));
 				}
 				if (array[i][j].containsData) {
 					for (int k = 0; k < CfsDeadConversionParams.size(); k++) {
 						if (array[i][j].parms[k] == -9.0f) {
-							throw new IllegalStateException(MessageFormat.format("CfsBiomassConversionCoefficientsDead at" 
+							throw new IllegalStateException(MessageFormat.format(PREAMBLE 
 									+ " index {0} {1} {2} is recorded as containing data, but contains -9.0f", i, j, k));
 						}
 					}
 				} else {
 					for (int k = 0; k < CfsDeadConversionParams.size(); k++) {
 						if (array[i][j].parms[k] != -9.0f) {
-							throw new IllegalStateException(MessageFormat.format("CfsBiomassConversionCoefficientsDead at" 
+							throw new IllegalStateException(MessageFormat.format(PREAMBLE 
 									+ " index {0} {1} {2} is recorded as not containing data, but contains {3}", i, j, k, array[i][j].parms[k]));
 						}
 					}

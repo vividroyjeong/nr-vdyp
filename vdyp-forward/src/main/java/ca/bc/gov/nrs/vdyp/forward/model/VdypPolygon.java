@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 
-public class VdypPolygon implements VdypEntity {
+public class VdypPolygon extends VdypEntity {
 
 	// See IPSJF155.doc
 

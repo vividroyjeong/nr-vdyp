@@ -24,9 +24,9 @@ public class SiteTool {
 	private static final Logger logger = LoggerFactory.getLogger(SiteTool.class);
 
 	/**
-	 * Converts a MoF sp64 species name (e.g, "AC" from SP64Name.sp64_AC) to its equivalent
+	 * Converts a MoF sp64 species name (e.g, "AC" from SP64Name.AC) to its equivalent
 	 * in {@link CfsBiomassConversionSupportedSpecies}, should one exist. If one doesn't,
-	 * CFSBiomassConversionSupportedSpecies.spcsInt_UNKNOWN is returned.
+	 * CFSBiomassConversionSupportedSpecies.UNKNOWN is returned.
 	 * 
 	 * @param spcsNm the text portion of a SP64Name
 	 * @return as described
@@ -36,45 +36,45 @@ public class SiteTool {
 		SP64Name sp64Name = SP64Name.forText(spcsNm);
 		
 		switch (sp64Name) {
-		   case sp64_AC: return CfsBiomassConversionSupportedSpecies.spcsInt_AC;
-		   case sp64_ACB: return CfsBiomassConversionSupportedSpecies.spcsInt_ACB;
-		   case sp64_AT: return CfsBiomassConversionSupportedSpecies.spcsInt_AT;
-		   case sp64_B: return CfsBiomassConversionSupportedSpecies.spcsInt_B;
-		   case sp64_BA: return CfsBiomassConversionSupportedSpecies.spcsInt_BA;
-		   case sp64_BG: return CfsBiomassConversionSupportedSpecies.spcsInt_BG;
-		   case sp64_BL: return CfsBiomassConversionSupportedSpecies.spcsInt_BL;
-		   case sp64_CW: return CfsBiomassConversionSupportedSpecies.spcsInt_CW;
-		   case sp64_DR: return CfsBiomassConversionSupportedSpecies.spcsInt_DR;
-		   case sp64_EA: return CfsBiomassConversionSupportedSpecies.spcsInt_EA;
-		   case sp64_EP: return CfsBiomassConversionSupportedSpecies.spcsInt_EP;
-		   case sp64_EXP: return CfsBiomassConversionSupportedSpecies.spcsInt_EXP;
-		   case sp64_FD: return CfsBiomassConversionSupportedSpecies.spcsInt_FD;
-		   case sp64_FDC: return CfsBiomassConversionSupportedSpecies.spcsInt_FDC;
-		   case sp64_FDI: return CfsBiomassConversionSupportedSpecies.spcsInt_FDI;
-		   case sp64_H: return CfsBiomassConversionSupportedSpecies.spcsInt_H;
-		   case sp64_HM: return CfsBiomassConversionSupportedSpecies.spcsInt_HM;
-		   case sp64_HW: return CfsBiomassConversionSupportedSpecies.spcsInt_HW;
-		   case sp64_L: return CfsBiomassConversionSupportedSpecies.spcsInt_L;
-		   case sp64_LA: return CfsBiomassConversionSupportedSpecies.spcsInt_LA;
-		   case sp64_LT: return CfsBiomassConversionSupportedSpecies.spcsInt_LT;
-		   case sp64_LW: return CfsBiomassConversionSupportedSpecies.spcsInt_LW;
-		   case sp64_MB: return CfsBiomassConversionSupportedSpecies.spcsInt_MB;
-		   case sp64_PA: return CfsBiomassConversionSupportedSpecies.spcsInt_PA;
-		   case sp64_PL:
-		   case sp64_PLI: return CfsBiomassConversionSupportedSpecies.spcsInt_PL;
-		   case sp64_PLC: return CfsBiomassConversionSupportedSpecies.spcsInt_PLC;
-		   case sp64_PW: return CfsBiomassConversionSupportedSpecies.spcsInt_PW;
-		   case sp64_PY: return CfsBiomassConversionSupportedSpecies.spcsInt_PY;
-		   case sp64_S: return CfsBiomassConversionSupportedSpecies.spcsInt_S;
-		   case sp64_SB: return CfsBiomassConversionSupportedSpecies.spcsInt_SB;
-		   case sp64_SE: return CfsBiomassConversionSupportedSpecies.spcsInt_SE;
-		   case sp64_SS: return CfsBiomassConversionSupportedSpecies.spcsInt_SS;
-		   case sp64_SW: return CfsBiomassConversionSupportedSpecies.spcsInt_SW;
-		   case sp64_SX: return CfsBiomassConversionSupportedSpecies.spcsInt_SX;
-		   case sp64_W: return CfsBiomassConversionSupportedSpecies.spcsInt_W;
-		   case sp64_X: return CfsBiomassConversionSupportedSpecies.spcsInt_XC;
-		   case sp64_YC: return CfsBiomassConversionSupportedSpecies.spcsInt_YC;
-		   default: return CfsBiomassConversionSupportedSpecies.spcsInt_UNKNOWN;
+		   case AC: return CfsBiomassConversionSupportedSpecies.AC;
+		   case ACB: return CfsBiomassConversionSupportedSpecies.ACB;
+		   case AT: return CfsBiomassConversionSupportedSpecies.AT;
+		   case B: return CfsBiomassConversionSupportedSpecies.B;
+		   case BA: return CfsBiomassConversionSupportedSpecies.BA;
+		   case BG: return CfsBiomassConversionSupportedSpecies.BG;
+		   case BL: return CfsBiomassConversionSupportedSpecies.BL;
+		   case CW: return CfsBiomassConversionSupportedSpecies.CW;
+		   case DR: return CfsBiomassConversionSupportedSpecies.DR;
+		   case EA: return CfsBiomassConversionSupportedSpecies.EA;
+		   case EP: return CfsBiomassConversionSupportedSpecies.EP;
+		   case EXP: return CfsBiomassConversionSupportedSpecies.EXP;
+		   case FD: return CfsBiomassConversionSupportedSpecies.FD;
+		   case FDC: return CfsBiomassConversionSupportedSpecies.FDC;
+		   case FDI: return CfsBiomassConversionSupportedSpecies.FDI;
+		   case H: return CfsBiomassConversionSupportedSpecies.H;
+		   case HM: return CfsBiomassConversionSupportedSpecies.HM;
+		   case HW: return CfsBiomassConversionSupportedSpecies.HW;
+		   case L: return CfsBiomassConversionSupportedSpecies.L;
+		   case LA: return CfsBiomassConversionSupportedSpecies.LA;
+		   case LT: return CfsBiomassConversionSupportedSpecies.LT;
+		   case LW: return CfsBiomassConversionSupportedSpecies.LW;
+		   case MB: return CfsBiomassConversionSupportedSpecies.MB;
+		   case PA: return CfsBiomassConversionSupportedSpecies.PA;
+		   case PL:
+		   case PLI: return CfsBiomassConversionSupportedSpecies.PL;
+		   case PLC: return CfsBiomassConversionSupportedSpecies.PLC;
+		   case PW: return CfsBiomassConversionSupportedSpecies.PW;
+		   case PY: return CfsBiomassConversionSupportedSpecies.PY;
+		   case S: return CfsBiomassConversionSupportedSpecies.S;
+		   case SB: return CfsBiomassConversionSupportedSpecies.SB;
+		   case SE: return CfsBiomassConversionSupportedSpecies.SE;
+		   case SS: return CfsBiomassConversionSupportedSpecies.SS;
+		   case SW: return CfsBiomassConversionSupportedSpecies.SW;
+		   case SX: return CfsBiomassConversionSupportedSpecies.SX;
+		   case W: return CfsBiomassConversionSupportedSpecies.W;
+		   case X: return CfsBiomassConversionSupportedSpecies.XC;
+		   case YC: return CfsBiomassConversionSupportedSpecies.YC;
+		   default: return CfsBiomassConversionSupportedSpecies.UNKNOWN;
 		}
 	}
 
@@ -83,12 +83,12 @@ public class SiteTool {
 	 *
 	 * @param intSpeciesNdx the internal species index to be converted into a string.
 	 * @return the string corresponding to the supplied internal species index. If 
-	 * {@code intSpeciesNdx} is null or has the value "spcsInt_UNKNOWN", "??" is 
+	 * {@code intSpeciesNdx} is null or has the value "UNKNOWN", "??" is 
 	 * returned.
 	 */
 	public static String lcl_InternalSpeciesIndexToString(CfsBiomassConversionSupportedSpecies intSpeciesNdx)
 	{
-		if (intSpeciesNdx == null || CfsBiomassConversionSupportedSpecies.spcsInt_UNKNOWN.equals(intSpeciesNdx)) {
+		if (intSpeciesNdx == null || CfsBiomassConversionSupportedSpecies.UNKNOWN.equals(intSpeciesNdx)) {
 			return "??";
 		} else {
 			return intSpeciesNdx.getText();
@@ -104,8 +104,8 @@ public class SiteTool {
 	 * "genusInt_INVALID" is returned.
 	 */
 	public static String lcl_InternalGenusIndexToString(CfsBiomassConversionSupportedGenera intGenusNdx) {
-		if (intGenusNdx == null || intGenusNdx.equals(CfsBiomassConversionSupportedGenera.genusInt_INVALID))
-			return "genusInt_INVALID";
+		if (intGenusNdx == null || intGenusNdx.equals(CfsBiomassConversionSupportedGenera.INVALID))
+			return "INVALID";
 		else
 			return intGenusNdx.getText();
 	}
@@ -117,12 +117,12 @@ public class SiteTool {
 	 * @param nameFormat indicates in what format the enumeration constant is to be 
 	 * converted.
 	 * @return a string representation for the live conversion parameter. If
-	 * {@code liveParam} has the value null or <code>cfsLiveParm_UNKNOWN</code>, 
-	 * "cfsLiveParm_UNKNOWN" is returned.
+	 * {@code liveParam} has the value null or <code>UNKNOWN</code>, 
+	 * "UNKNOWN" is returned.
 	 */
 	public static String lcl_LiveConversionParamToString(CfsLiveConversionParams liveParam, NameFormat nameFormat) {
-		if (liveParam == null || liveParam.equals(CfsLiveConversionParams.cfsLiveParm_UNKNOWN)) {
-			return "cfsLiveParm_UNKNOWN";
+		if (liveParam == null || liveParam.equals(CfsLiveConversionParams.UNKNOWN)) {
+			return "UNKNOWN";
 		} else if (nameFormat == null) {
 			return liveParam.toString();
 		} else {
@@ -150,8 +150,8 @@ public class SiteTool {
 	 * is returned if the parameter was not recognized.
 	 */
 	public static String lcl_DeadConversionParamToString(CfsDeadConversionParams deadParam, NameFormat nameFormat) {
-		if (deadParam == null || deadParam.equals(CfsDeadConversionParams.cfsDeadParm_UNKNOWN)) {
-			return "cfsDeadParm_UNKNOWN";
+		if (deadParam == null || deadParam.equals(CfsDeadConversionParams.UNKNOWN)) {
+			return "UNKNOWN";
 		} else if (nameFormat == null) {
 			return deadParam.toString();
 		} else {
@@ -233,7 +233,7 @@ public class SiteTool {
 	 * The list of species mappings is defined in the file 'BCSpcsToCFSSpcs-SAS.txt' found in 'Documents/CFS-Biomass'.
 	 * 
 	 * @param spName the species short ("code") name.
-	 * @return the mapping to the equivalent CFS defined tree species (if a mapping exists). {@code cfsSpcs_UNKNOWN} is
+	 * @return the mapping to the equivalent CFS defined tree species (if a mapping exists). {@code UNKNOWN} is
 	 *         returned if the species was not recognized or a mapping does not exist.
 	 */
 	public static CfsTreeSpecies SiteTool_GetSpeciesCFSSpcs(String spName) {
@@ -255,7 +255,7 @@ public class SiteTool {
 		
 		CfsTreeSpecies cfsSpcs = SiteTool_GetSpeciesCFSSpcs(spName);
 
-		if (cfsSpcs != CfsTreeSpecies.cfsSpcs_UNKNOWN) {
+		if (cfsSpcs != CfsTreeSpecies.UNKNOWN) {
 			return SiteTool_CFSSpcsToCFSSpcsNum(cfsSpcs);
 		} else {
 			return -1;
@@ -438,7 +438,7 @@ public class SiteTool {
 
 	public static String SiteTool_SpeciesSINDEXCode(String spcsCode, boolean isCoastal) {
 		return VdypMethods.getSINDEXSpecies(spcsCode, 
-				isCoastal ? SpeciesRegion.spcsRgn_Coast : SpeciesRegion.spcsRgn_Interior);
+				isCoastal ? SpeciesRegion.Coast : SpeciesRegion.Interior);
 	}
 
 	public static String SiteTool_SpeciesVDYP7Code(String spcsCode) {
@@ -457,7 +457,7 @@ public class SiteTool {
 	 */
 	public static int SiteTool_SetSICurve(String speciesCodeName, boolean coastalInd, int siCurve) {
 		
-		SpeciesRegion region = (coastalInd ? SpeciesRegion.spcsRgn_Coast : SpeciesRegion.spcsRgn_Interior);
+		SpeciesRegion region = (coastalInd ? SpeciesRegion.Coast : SpeciesRegion.Interior);
 		return VdypMethods.setCurrentSICurve(speciesCodeName, region, siCurve);
 	}
 
@@ -471,7 +471,7 @@ public class SiteTool {
 	public static int SiteTool_GetSICurve(String spcsCode, boolean isCoastal) {
 
 		return VdypMethods.getCurrentSICurve(spcsCode, 
-				isCoastal ? SpeciesRegion.spcsRgn_Coast : SpeciesRegion.spcsRgn_Interior);
+				isCoastal ? SpeciesRegion.Coast : SpeciesRegion.Interior);
 	}
 
 	/**
@@ -508,7 +508,7 @@ public class SiteTool {
 	 */
 	public static float SiteTool_SpeciesDefaultCrownClosure(String speciesCodeName, boolean isCoastal) {
 		return VdypMethods.getDefaultCrownClosure(
-				speciesCodeName, (isCoastal ? SpeciesRegion.spcsRgn_Coast : SpeciesRegion.spcsRgn_Interior)
+				speciesCodeName, (isCoastal ? SpeciesRegion.Coast : SpeciesRegion.Interior)
 		);
 	}
 

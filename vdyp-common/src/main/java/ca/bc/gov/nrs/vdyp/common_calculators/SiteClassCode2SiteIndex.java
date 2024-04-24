@@ -202,6 +202,8 @@ public class SiteClassCode2SiteIndex {
 					return 12;
 				case 'L':
 					return 4;
+				default:
+					break;
 				}
 
 			default:

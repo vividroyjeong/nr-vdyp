@@ -108,7 +108,7 @@ public class VdypMethods {
 		if (sp64Name != null) {
 			return sp64Name.getText();
 		} else {
-			return SP64Name.sp64_UNKNOWN.getText();
+			return SP64Name.UNKNOWN.getText();
 		}
 	}
 
@@ -172,10 +172,10 @@ public class VdypMethods {
 			char fiz;
 
 			switch (region) {
-			case spcsRgn_Coast:
+			case Coast:
 				fiz = 'A';
 				break;
-			case spcsRgn_Interior:
+			case Interior:
 				fiz = 'D';
 				break;
 			default:
@@ -232,7 +232,7 @@ public class VdypMethods {
 		if (sp0 != null) {
 			return sp0.getText();
 		} else {
-			return SP0Name.sp0_UNKNOWN.getText();
+			return SP0Name.UNKNOWN.getText();
 		}
 	}
 
@@ -266,7 +266,7 @@ public class VdypMethods {
 			if (siCurve < 0) {
 				int sindexSpcs;
 				try {
-					sindexSpcs = Sindxdll.SpecRemap(sp64Name, region == SpeciesRegion.spcsRgn_Coast ? 'A' : 'D');
+					sindexSpcs = Sindxdll.SpecRemap(sp64Name, region == SpeciesRegion.Coast ? 'A' : 'D');
 	
 					siCurve = Sindxdll.DefCurve(sindexSpcs);
 				} catch (CommonCalculatorException e) {
@@ -298,7 +298,7 @@ public class VdypMethods {
 		if (sp64Name != null && region != null && speciesTable.getByCode(sp64Name).details() != SpeciesTable.DefaultEntry) {
 
 			try {
-				int sindxSpcs = Sindxdll.SpecRemap(sp64Name, (region == SpeciesRegion.spcsRgn_Coast) ? 'A' : 'D');
+				int sindxSpcs = Sindxdll.SpecRemap(sp64Name, (region == SpeciesRegion.Coast) ? 'A' : 'D');
 
 				if (sindxSpcs >= 0) {
 					siCurve = Sindxdll.DefCurve(sindxSpcs);
@@ -382,11 +382,11 @@ public class VdypMethods {
 			Arrays.fill(countedCurve, 0, SI_MAX_CURVES, false);
 	
 			List<Character> forestInventoryZones = new ArrayList<>();
-			if (mixInteriorCoastalInd || SpeciesRegion.spcsRgn_Coast.equals(region)) {
+			if (mixInteriorCoastalInd || SpeciesRegion.Coast.equals(region)) {
 				// Add in the number of available coastal curves.
 				forestInventoryZones.add('A');
 			}
-			if (mixInteriorCoastalInd || SpeciesRegion.spcsRgn_Interior.equals(region)) {
+			if (mixInteriorCoastalInd || SpeciesRegion.Interior.equals(region)) {
 				// Add in the number of available interior curves.
 				forestInventoryZones.add('D');
 			}
@@ -476,17 +476,17 @@ public class VdypMethods {
 	 *
 	 * @param sp0Name the VDYP7 Species Name to be converted into a species index.
 	 *
-	 * @return The enumSP0Name corresponding to the supplied species, and sp0_UNKNOWN if the species name was not
+	 * @return The enumSP0Name corresponding to the supplied species, and UNKNOWN if the species name was not
 	 *         supplied or was not recognized. Note that the returned index is a zero-based index.
 	 */
 	public static SP0Name getVDYP7SpeciesIndex(String sp0Name) {
-		SP0Name sp0Index = SP0Name.sp0_UNKNOWN;
+		SP0Name sp0Index = SP0Name.UNKNOWN;
 
 		if (sp0Name != null) {
 			try {
 				sp0Index = SP0Name.forText(sp0Name);
 			} catch (IllegalArgumentException e) {
-				sp0Index = SP0Name.sp0_UNKNOWN;
+				sp0Index = SP0Name.UNKNOWN;
 			}
 		}
 

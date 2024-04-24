@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.model;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class GenusDefinition extends AliasedEntity {
@@ -18,5 +19,14 @@ public class GenusDefinition extends AliasedEntity {
 	@Override
 	public int hashCode() {
 		return ((this.getAlias().hashCode() * 17) + this.getName().hashCode()) * 17 + preference.hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof GenusDefinition that) {
+			return Objects.equals(this.preference, that.preference) && super.equals(that);
+		} else {
+			return false;
+		}
 	}
 }

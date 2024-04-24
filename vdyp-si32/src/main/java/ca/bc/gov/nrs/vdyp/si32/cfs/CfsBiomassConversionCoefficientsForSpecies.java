@@ -11,13 +11,19 @@ import java.text.MessageFormat;
  */
 public class CfsBiomassConversionCoefficientsForSpecies {
 	
+	private static final String PREAMBLE = "CfsBiomassConversionCoefficientsForSpecies at";
+
 	public record Details(
 			boolean containsData,
 			float[] parms)
 	{}
 
-	public static final Details[][] array = new Details[][]
-            /*                                                            cfsLiveParm_A                             cfsLiveParm_b_nonmerch                       cfsLiveParm_a_sap                             cfsLiveParm_cap_sap                            cfsLiveParm_a3                               cfsLiveParm_b3                              cfsLiveParm_c3                        cfsLiveParm_low_stemwood_prop                cfsLiveParm_high_stembark_prop                 cfsLiveParm_low_foliage_prop                    */
+	public static Details get(int i, int j) {
+		return array[i][j];
+	}
+	
+	private static final Details[][] array = new Details[][]
+	        /*                                                            cfsLiveParm_A                             cfsLiveParm_b_nonmerch                       cfsLiveParm_a_sap                             cfsLiveParm_cap_sap                            cfsLiveParm_a3                               cfsLiveParm_b3                              cfsLiveParm_c3                        cfsLiveParm_low_stemwood_prop                cfsLiveParm_high_stembark_prop                 cfsLiveParm_low_foliage_prop                    */
             /*                                                                           cfsLiveParm_B                             cfsLiveParm_k_nonmerch                        cfsLiveParm_b_sap                              cfsLiveParm_a1                                cfsLiveParm_b1                              cfsLiveParm_c1                           cfsLiveParm_min_volume                     cfsLiveParm_high_stemwood_prop               cfsLiveParm_low_branches_prop                  cfsLiveParm_high_foliage_prop  */
 {           /*                                 containsData                                          cfsLiveParm_a_nonmerch                       cfsLiveParm_cap_nonmerch                      cfsLiveParm_k_sap                             cfsLiveParm_a2                                cfsLiveParm_b2                               cfsLiveParm_c2                         cfsLiveParm_max_volume                       cfsLiveParm_low_stembark_prop               cfsLiveParm_high_branches_prop                                  */
 /*   0,  4, "AC"            */    {   new Details( true, new float[]  {    1.07157321f,   0.83163575f,  23.67908183f,  -0.89872209f,   0.80661864f,   6.45706268f,  38.20710600f,  -1.70180922f,   0.99582731f,   1.07813018f,  -1.12446400f,  -0.00022040f,  -0.07336560f,  -1.72842500f,  -0.00049290f,  -0.05739890f,  -2.12738200f,   0.00029220f,  -0.29629950f,   0.44816285f,1054.28216650f,   0.65790191f,   0.80266937f,   0.18869236f,   0.12397727f,   0.10596436f,   0.05682969f,   0.04744137f,    0.01652366f } ),
@@ -220,7 +226,7 @@ public class CfsBiomassConversionCoefficientsForSpecies {
 	
 		for (int i = 0; i < array.length; i++) {
 			if (array[i].length != CfsBiomassConversionSupportedSpecies.size()) {
-				throw new IllegalStateException(MessageFormat.format("CfsBiomassConversionCoefficientsForSpecies at" 
+				throw new IllegalStateException(MessageFormat.format(PREAMBLE 
 						+ " index {0} does not contain exactly one "
 						+ " entry for each CfsBiomassConversionSupportedSpecies", i));
 			}
@@ -229,20 +235,20 @@ public class CfsBiomassConversionCoefficientsForSpecies {
 		for (int i = 0; i < array.length; i++) {
 			for (int j = 0; j < array[i].length; j++) {
 				if (array[i][j].parms.length != CfsLiveConversionParams.size()) {
-					throw new IllegalStateException(MessageFormat.format("CfsBiomassConversionCoefficientsForSpecies at" 
+					throw new IllegalStateException(MessageFormat.format(PREAMBLE 
 							+ " index {0} {1} contains {2} elements, but {3} were expected", i, j, array[i][j].parms.length, CfsLiveConversionParams.size()));
 				}
 				if (array[i][j].containsData) {
 					for (int k = 0; k < CfsLiveConversionParams.size(); k++) {
 						if (array[i][j].parms[k] == -9.0f) {
-							throw new IllegalStateException(MessageFormat.format("CfsBiomassConversionCoefficientsForSpecies at" 
+							throw new IllegalStateException(MessageFormat.format(PREAMBLE 
 									+ " index {0} {1} {2} is recorded as not containing data, but contains -9.0f", i, j, k));
 						}
 					}
 				} else {
 					for (int k = 0; k < CfsLiveConversionParams.size(); k++) {
 						if (array[i][j].parms[k] != -9.0f) {
-							throw new IllegalStateException(MessageFormat.format("CfsBiomassConversionCoefficientsForSpecies at" 
+							throw new IllegalStateException(MessageFormat.format(PREAMBLE 
 									+ " index {0} {1} {2} is recorded as not containing data, but contains {3}", i, j, k, array[i][j].parms[k]));
 						}
 					}

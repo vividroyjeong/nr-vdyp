@@ -9,24 +9,24 @@ import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
  * An enumeration holding each of the valid SP0 genera known to VDYP7.
  */
 public enum SP0Name implements SI32Enum<SP0Name> {
-	sp0_UNKNOWN(-1),
+	UNKNOWN(-1),
 
-	sp0_AC(0), //
-	sp0_AT(1), //
-	sp0_B(2), //
-	sp0_C(3), //
-	sp0_D(4), //
-	sp0_E(5), //
-	sp0_F(6), //
-	sp0_H(7), //
-	sp0_L(8), //
-	sp0_MB(9), //
-	sp0_PA(10), //
-	sp0_PL(11), //
-	sp0_PW(12), //
-	sp0_PY(13), // 
-	sp0_S(14), //
-	sp0_Y(15);
+	AC(0), //
+	AT(1), //
+	B(2), //
+	C(3), //
+	D(4), //
+	E(5), //
+	F(6), //
+	H(7), //
+	L(8), //
+	MB(9), //
+	PA(10), //
+	PL(11), //
+	PW(12), //
+	PY(13), // 
+	S(14), //
+	Y(15);
 
 	private final int index;
 
@@ -41,7 +41,7 @@ public enum SP0Name implements SI32Enum<SP0Name> {
 
 	@Override
 	public int getOffset() {
-		if (this.equals(sp0_UNKNOWN)) {
+		if (this.equals(UNKNOWN)) {
 			throw new UnsupportedOperationException(MessageFormat.format("Cannot call getOffset on {0} as it's not a standard member of the enumeration", this));
 		}
 		
@@ -50,10 +50,10 @@ public enum SP0Name implements SI32Enum<SP0Name> {
 	
 	@Override
 	public String getText() {
-		if (this.equals(sp0_UNKNOWN)) {
+		if (this.equals(UNKNOWN)) {
 			return "";
 		} else {
-			return toString().substring("sp0_".length());
+			return toString();
 		}
 	}
 
@@ -65,9 +65,9 @@ public enum SP0Name implements SI32Enum<SP0Name> {
 	 */
 	public static SP0Name forText(String text) {
 		try {
-			return valueOf("sp0_" + text.toUpperCase());
+			return valueOf("" + text.toUpperCase());
 		} catch (IllegalArgumentException | NullPointerException e) {
-			return sp0_UNKNOWN;
+			return UNKNOWN;
 		}
 	}
 
@@ -90,12 +90,12 @@ public enum SP0Name implements SI32Enum<SP0Name> {
 	 * @return the number of non-housekeeping entries in the enumeration
 	 */
 	public static int size() {
-		return sp0_Y.index - sp0_AC.index + 1;
+		return Y.index - AC.index + 1;
 	}
 
 	public static class Iterator extends SI32EnumIterator<SP0Name> {
 		public Iterator() {
-			super(sp0_AC, sp0_Y, values());
+			super(AC, Y, values());
 		}
 	}
 }

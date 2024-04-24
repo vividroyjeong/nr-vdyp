@@ -8,9 +8,9 @@ import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 /**
  * Lists the different conversion parameters that support the calculation of Dead CFS Biomass.
  * <ul>
- * <li> cfsDeadParm_UNKNOWN: Indicates an error condition or an uninitialized value. This value
+ * <li> UNKNOWN: Indicates an error condition or an uninitialized value. This value
  *       should never be used as an index for a specific conversion parameter.
- * <li> cfsDeadParm_...: Indices into the {@link CfsBiomassConversionCoefficientsDead} array for each
+ * <li> others: Indices into the {@link CfsBiomassConversionCoefficientsDead} array for each
  *       of the CFS Biomass conversion parameters/coefficients.
  * </ul>
  * The CFS Biomass Conversion process is based on a number of hard coded constants/coefficients which 
@@ -27,17 +27,17 @@ import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
  * </ol>
  */
 public enum CfsDeadConversionParams implements SI32Enum<CfsDeadConversionParams> {
-	cfsDeadParm_UNKNOWN(-1), 
+	UNKNOWN(-1), 
 
-	cfsDeadParm_Prop1(0),
-	cfsDeadParm_Prop2(1),
-	cfsDeadParm_Prop3(2),
-	cfsDeadParm_Prop4(3),
-	cfsDeadParm_Prop5(4),
-	cfsDeadParm_V1(5),
-	cfsDeadParm_V2(6),
-	cfsDeadParm_V3(7),
-	cfsDeadParm_V4(8);
+	PROP1(0),
+	PROP2(1),
+	PROP3(2),
+	PROP4(3),
+	PROP5(4),
+	V1(5),
+	V2(6),
+	V3(7),
+	V4(8);
 
 	private final int index;
 	
@@ -52,7 +52,7 @@ public enum CfsDeadConversionParams implements SI32Enum<CfsDeadConversionParams>
 	
 	@Override
 	public int getOffset() {
-		if (this.equals(cfsDeadParm_UNKNOWN)) {
+		if (this.equals(UNKNOWN)) {
 			throw new UnsupportedOperationException(MessageFormat
 					.format("Cannot call getIndex on {} as it's not a standard member of the enumeration", this));
 		}
@@ -62,24 +62,24 @@ public enum CfsDeadConversionParams implements SI32Enum<CfsDeadConversionParams>
 	
 	@Override
 	public String getText() {
-		if (this.equals(cfsDeadParm_UNKNOWN)) {
+		if (this.equals(UNKNOWN)) {
 			throw new UnsupportedOperationException(MessageFormat
 					.format("Cannot call getText on {} as it's not a standard member of the enumeration", this));
 		}
 		
-		return this.toString().substring("cfsDeadParm_".length());
+		return this.toString();
 	}
 	
 	/**
 	 * @return the number of non-housekeeping entries in the enumeration
 	 */
 	public static int size() {
-		return cfsDeadParm_V4.index - cfsDeadParm_Prop1.index + 1;
+		return V4.index - PROP1.index + 1;
 	}
 
 	public static class Iterator extends SI32EnumIterator<CfsDeadConversionParams> {
 		public Iterator() {
-			super(cfsDeadParm_Prop1, cfsDeadParm_V4, values());
+			super(PROP1, V4, values());
 		}
 	}
 }

@@ -11,48 +11,48 @@ import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
  * These values are used as an index into the {@link CfsBiomassConversionCoefficientsForGenus} array.
  */
 public enum CfsBiomassConversionSupportedGenera implements SI32Enum<CfsBiomassConversionSupportedGenera> {
-	genusInt_INVALID(-1),
+	INVALID(-1),
 
 	/* 0 */
-	genusInt_AC(0),
+	AC(0),
 	/* 1 */
-	genusInt_B(1),
+	B(1),
 	/* 2 */
-	genusInt_C(2),
+	C(2),
 	/* 3 */
-	genusInt_D(3),
+	D(3),
 	/* 4 */
-	genusInt_E(4),
+	E(4),
 	/* 5 */
-	genusInt_F(5),
+	F(5),
 	/* 6 */
-	genusInt_G(6),
+	G(6),
 	/* 7 */
-	genusInt_H(7),
+	H(7),
 	/* 8 */
-	genusInt_L(8),
+	L(8),
 	/* 9 */
-	genusInt_M(9),
+	M(9),
 	/* 10 */
-	genusInt_PL(10),
+	PL(10),
 	/* 11 */
-	genusInt_Q(11),
+	Q(11),
 	/* 12 */
-	genusInt_R(12),
+	R(12),
 	/* 13 */
-	genusInt_S(13),
+	S(13),
 	/* 14 */
-	genusInt_U(14),
+	U(14),
 	/* 15 */
-	genusInt_V(15),
+	V(15),
 	/* 16 */
-	genusInt_W(16),
+	W(16),
 	/* 17 */
-	genusInt_XH(17),
+	XH(17),
 	/* 18 */
-	genusInt_ZC(18),
+	ZC(18),
 	/* 19 */
-	genusInt_ZH(19);
+	ZH(19);
 
 	private final int index;
 
@@ -67,7 +67,7 @@ public enum CfsBiomassConversionSupportedGenera implements SI32Enum<CfsBiomassCo
 
 	@Override
 	public int getOffset() {
-		if (this.equals(genusInt_INVALID)) {
+		if (this.equals(INVALID)) {
 			throw new UnsupportedOperationException(MessageFormat
 					.format("Cannot call getIndex on {} as it's not a standard member of the enumeration", this));
 		}
@@ -77,12 +77,12 @@ public enum CfsBiomassConversionSupportedGenera implements SI32Enum<CfsBiomassCo
 	
 	@Override
 	public String getText() {
-		if (this.equals(genusInt_INVALID)) {
+		if (this.equals(INVALID)) {
 			throw new UnsupportedOperationException(MessageFormat
 					.format("Cannot call getText on {} as it's not a standard member of the enumeration", this));
 		}
 		
-		return this.toString().substring("genusInt_".length());
+		return this.toString();
 	}
 	
 	/**
@@ -104,12 +104,12 @@ public enum CfsBiomassConversionSupportedGenera implements SI32Enum<CfsBiomassCo
 	 * @return the number of non-housekeeping entries in the enumeration
 	 */
 	public static int size() {
-		return genusInt_ZH.index - genusInt_AC.index + 1;
+		return ZH.index - AC.index + 1;
 	}
 
 	public static class Iterator extends SI32EnumIterator<CfsBiomassConversionSupportedGenera> {
 		public Iterator() {
-			super(genusInt_AC, genusInt_ZH, values());
+			super(AC, ZH, values());
 		}
 	}
 }
