@@ -4,19 +4,19 @@ public abstract class CommonCalculatorException extends Exception {
 
 	private static final long serialVersionUID = -2731778673508981452L;
 
-	public CommonCalculatorException(String message) {
+	protected CommonCalculatorException(String message) {
 		super(message);
 	}
 
-	public CommonCalculatorException(Throwable cause) {
+	protected CommonCalculatorException(Throwable cause) {
 		super(cause);
 	}
 
-	public CommonCalculatorException(String message, Throwable cause) {
+	protected CommonCalculatorException(String message, Throwable cause) {
 		super(cause);
 	}
 
-	public CommonCalculatorException() {
+	protected CommonCalculatorException() {
 		super();
 	}
 }

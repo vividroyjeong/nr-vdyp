@@ -114,7 +114,7 @@ public enum CfsTreeClass implements SI32Enum<CfsTreeClass> {
 
 	public static class Iterator extends SI32EnumIterator<CfsTreeClass> {
 		public Iterator() {
-			super(MISSING, NO_LONGER_USED, values());
+			super(values(), MISSING, NO_LONGER_USED);
 		}
 	}
 }

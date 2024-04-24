@@ -52,9 +52,8 @@ public class VdypLayerSpecies {
 		} else if (Float.isNaN(ageTotal)) {
 			if (ageAtBreastHeight > 0.0 && yearsToBreastHeight > 0.0)
 				ageTotal = ageAtBreastHeight + yearsToBreastHeight;
-		} else if (Float.isNaN(yearsToBreastHeight)) {
-			if (ageAtBreastHeight > 0.0 && ageTotal > ageAtBreastHeight)
-				yearsToBreastHeight = ageTotal - ageAtBreastHeight;
+		} else if (Float.isNaN(yearsToBreastHeight) && ageAtBreastHeight > 0.0 && ageTotal > ageAtBreastHeight) {
+			yearsToBreastHeight = ageTotal - ageAtBreastHeight;
 		}
 
 		this.ageTotal = ageTotal;

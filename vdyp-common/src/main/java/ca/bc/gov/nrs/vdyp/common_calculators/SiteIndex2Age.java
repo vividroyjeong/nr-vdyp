@@ -84,7 +84,7 @@ public class SiteIndex2Age {
 	 * moved the file stuff into the functions where it happens #endif
 	 */
 
-	public static double index_to_age(int cu_index, double site_height, int age_type, double site_index, double y2bh)
+	public static double indexToAge(int cu_index, double site_height, int age_type, double site_index, double y2bh)
 			throws CommonCalculatorException {
 		double x1, x2, x3, x4;
 		double a, b, c;
@@ -148,8 +148,8 @@ public class SiteIndex2Age {
 		case SI_SW_HU_GARCIA: {
 			double q;
 
-			q = hu_garcia_q(site_index, 50.0);
-			age = hu_garcia_bha(q, site_height);
+			q = huGarciaQ(site_index, 50.0);
+			age = huGarciaBha(q, site_height);
 			if (age_type == SI_AT_TOTAL) {
 				age += y2bh;
 			}
@@ -198,14 +198,14 @@ public class SiteIndex2Age {
 			if (age < 10 && age > 0) {
 				age = iterate(cu_index, site_height, age_type, site_index, y2bh);
 				if (HOOP) {
-					ht5 = SiteIndex2Height.index_to_height(cu_index, 5.0, SI_AT_BREAST, site_index, y2bh, 0.5);
+					ht5 = SiteIndex2Height.indexToHeight(cu_index, 5.0, SI_AT_BREAST, site_index, y2bh, 0.5);
 					// 0.5 may have to change
 
 					if (site_height <= ht5) {
 						site_height -= (1 - ( (ht5 - site_height) / ht5)) * 1.5;
 					} else {
 						// 0.5 may have to change
-						ht10 = SiteIndex2Height.index_to_height(cu_index, 10.0, SI_AT_BREAST, site_index, y2bh, 0.5);
+						ht10 = SiteIndex2Height.indexToHeight(cu_index, 10.0, SI_AT_BREAST, site_index, y2bh, 0.5);
 						site_height -= ( ( (ht10 - site_height) / (ht10 - ht5))) * 1.5;
 					}
 				}
@@ -465,47 +465,47 @@ public class SiteIndex2Age {
 			}
 			break;
 		case SI_BL_THROWERGI:
-			age = gi_iterate(cu_index, site_height, age_type, site_index);
+			age = giIterate(cu_index, site_height, age_type, site_index);
 			break;
 		case SI_CWI_NIGHGI:
-			age = gi_iterate(cu_index, site_height, age_type, site_index);
+			age = giIterate(cu_index, site_height, age_type, site_index);
 			break;
 		case SI_FDC_NIGHGI:
-			age = gi_iterate(cu_index, site_height, age_type, site_index);
+			age = giIterate(cu_index, site_height, age_type, site_index);
 			break;
 		case SI_FDI_NIGHGI:
-			age = gi_iterate(cu_index, site_height, age_type, site_index);
+			age = giIterate(cu_index, site_height, age_type, site_index);
 			break;
 		case SI_HWC_NIGHGI:
-			age = gi_iterate(cu_index, site_height, age_type, site_index);
+			age = giIterate(cu_index, site_height, age_type, site_index);
 			break;
 		case SI_HWC_NIGHGI99:
-			age = gi_iterate(cu_index, site_height, age_type, site_index);
+			age = giIterate(cu_index, site_height, age_type, site_index);
 			break;
 		case SI_HWI_NIGHGI:
-			age = gi_iterate(cu_index, site_height, age_type, site_index);
+			age = giIterate(cu_index, site_height, age_type, site_index);
 			break;
 		case SI_LW_NIGHGI:
-			age = gi_iterate(cu_index, site_height, age_type, site_index);
+			age = giIterate(cu_index, site_height, age_type, site_index);
 			break;
 		// Couldn't find constant
 		/*
 		 * case SI_PLI_NIGHGI: age = gi_iterate (cu_index, site_height, age_type, site_index); break;
 		 */
 		case SI_PLI_NIGHGI97:
-			age = gi_iterate(cu_index, site_height, age_type, site_index);
+			age = giIterate(cu_index, site_height, age_type, site_index);
 			break;
 		case SI_SS_NIGHGI:
-			age = gi_iterate(cu_index, site_height, age_type, site_index);
+			age = giIterate(cu_index, site_height, age_type, site_index);
 			break;
 		case SI_SS_NIGHGI99:
-			age = gi_iterate(cu_index, site_height, age_type, site_index);
+			age = giIterate(cu_index, site_height, age_type, site_index);
 			break;
 		case SI_SW_NIGHGI:
-			age = gi_iterate(cu_index, site_height, age_type, site_index);
+			age = giIterate(cu_index, site_height, age_type, site_index);
 			break;
 		case SI_SW_NIGHGI99:
-			age = gi_iterate(cu_index, site_height, age_type, site_index);
+			age = giIterate(cu_index, site_height, age_type, site_index);
 			break;
 
 		default:
@@ -567,7 +567,7 @@ public class SiteIndex2Age {
 
 		/* do a preliminary test to catch some obvious errors */
 		test_ht = SiteIndex2Height
-				.index_to_height(cu_index, si2age, SI_AT_TOTAL, site_index, y2bh, 0.5 /* may have to change */);
+				.indexToHeight(cu_index, si2age, SI_AT_TOTAL, site_index, y2bh, 0.5 /* may have to change */);
 		// This would throw an illegal argument exception and move up the stack
 
 		/* loop until real close, or other end condition */
@@ -597,7 +597,7 @@ public class SiteIndex2Age {
 
 			try {
 				// 0.5 may have to change
-				test_ht = SiteIndex2Height.index_to_height(cu_index, si2age, SI_AT_TOTAL, site_index, y2bh, 0.5);
+				test_ht = SiteIndex2Height.indexToHeight(cu_index, si2age, SI_AT_TOTAL, site_index, y2bh, 0.5);
 
 				if (TEST) {
 					try {
@@ -688,7 +688,7 @@ public class SiteIndex2Age {
 		return (si2age);
 	}
 
-	public static double gi_iterate(int cu_index, double site_height, int age_type, double site_index)
+	public static double giIterate(int cu_index, double site_height, int age_type, double site_index)
 			throws CommonCalculatorException {
 		double age;
 		double si2age;
@@ -726,7 +726,7 @@ public class SiteIndex2Age {
 				}
 
 			}
-			test_site = Height2SiteIndex.height_to_index(cu_index, age, SI_AT_BREAST, site_height, SI_EST_DIRECT);
+			test_site = Height2SiteIndex.heightToIndex(cu_index, age, SI_AT_BREAST, site_height, SI_EST_DIRECT);
 
 			if (TEST) {
 				try {
@@ -786,7 +786,7 @@ public class SiteIndex2Age {
 		return si2age;
 	}
 
-	public static double hu_garcia_q(double site_index, double bhage) {
+	public static double huGarciaQ(double site_index, double bhage) {
 		double h, q, step, diff, lastdiff;
 
 		q = 0.02;
@@ -795,7 +795,7 @@ public class SiteIndex2Age {
 		diff = 0;
 
 		do {
-			h = hu_garcia_h(q, bhage);
+			h = huGarciaH(q, bhage);
 			lastdiff = diff;
 			diff = site_index - h;
 			if (diff > 0.0000001) {
@@ -822,7 +822,7 @@ public class SiteIndex2Age {
 		return q;
 	}
 
-	public static double hu_garcia_h(double q, double bhage) {
+	public static double huGarciaH(double q, double bhage) {
 		double a, height;
 
 		a = 283.9 * Math.pow(q, 0.5137);
@@ -830,7 +830,7 @@ public class SiteIndex2Age {
 		return height;
 	}
 
-	public static double hu_garcia_bha(double q, double height) {
+	public static double huGarciaBha(double q, double height) {
 		double a, bhage;
 
 		a = 283.9 * Math.pow(q, 0.5137);

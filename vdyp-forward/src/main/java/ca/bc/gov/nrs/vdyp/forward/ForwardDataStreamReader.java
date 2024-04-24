@@ -40,22 +40,19 @@ public class ForwardDataStreamReader {
 	@SuppressWarnings("unchecked")
 	public ForwardDataStreamReader(Map<String, Object> controlMap) throws IOException 
 	{
+		genusDefinitionMap = new GenusDefinitionMap((List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name()));
+
 		var polygonStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_POLY.name());
-		var polygonStream = ((StreamingParserFactory<VdypPolygon>) polygonStreamFactory).get();
+		polygonStream = ((StreamingParserFactory<VdypPolygon>) polygonStreamFactory).get();
 
 		var layerSpeciesStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SPECIES.name());
-		var layerSpeciesStream = ((StreamingParserFactory<Collection<VdypLayerSpecies>>) layerSpeciesStreamFactory)
+		layerSpeciesStream = ((StreamingParserFactory<Collection<VdypLayerSpecies>>) layerSpeciesStreamFactory)
 				.get();
 
 		var speciesUtilizationStreamFactory = controlMap
 				.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name());
-		var speciesUtilizationStream = ((StreamingParserFactory<Collection<VdypSpeciesUtilization>>) speciesUtilizationStreamFactory)
+		speciesUtilizationStream = ((StreamingParserFactory<Collection<VdypSpeciesUtilization>>) speciesUtilizationStreamFactory)
 				.get();
-
-		this.genusDefinitionMap = new GenusDefinitionMap((List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name()));
-		this.polygonStream = polygonStream;
-		this.layerSpeciesStream = layerSpeciesStream;
-		this.speciesUtilizationStream = speciesUtilizationStream;
 	}
 	
 	public VdypPolygon readNextPolygon(VdypPolygonDescription polygonDescription) 

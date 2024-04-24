@@ -127,11 +127,11 @@ public class SiteTool {
 			return liveParam.toString();
 		} else {
 			switch (nameFormat) {
-			case catOnly:
+			case CAT_ONLY:
 				return liveParam.getCategory();
-			case nameOnly:
+			case NAME_ONLY:
 				return liveParam.getText();
-			case catName:
+			case CAT_NAME:
 				return MessageFormat.format("{0} {1}", liveParam.getCategory(), liveParam.getText());
 			default:
 				throw new IllegalStateException(MessageFormat.format("Unsupported enumNameFormat {0}", nameFormat));
@@ -156,11 +156,11 @@ public class SiteTool {
 			return deadParam.toString();
 		} else {
 			switch (nameFormat) {
-			case catOnly:
+			case CAT_ONLY:
 				return "Dead";
-			case nameOnly:
+			case NAME_ONLY:
 				return deadParam.getText();
-			case catName:
+			case CAT_NAME:
 				return MessageFormat.format("Dead {0}", deadParam, deadParam.getText());
 			default:
 				throw new IllegalStateException(MessageFormat.format("Unsupported enumNameFormat {0}", nameFormat));
@@ -438,7 +438,7 @@ public class SiteTool {
 
 	public static String SiteTool_SpeciesSINDEXCode(String spcsCode, boolean isCoastal) {
 		return VdypMethods.getSINDEXSpecies(spcsCode, 
-				isCoastal ? SpeciesRegion.Coast : SpeciesRegion.Interior);
+				isCoastal ? SpeciesRegion.COAST : SpeciesRegion.INTERIOR);
 	}
 
 	public static String SiteTool_SpeciesVDYP7Code(String spcsCode) {
@@ -457,7 +457,7 @@ public class SiteTool {
 	 */
 	public static int SiteTool_SetSICurve(String speciesCodeName, boolean coastalInd, int siCurve) {
 		
-		SpeciesRegion region = (coastalInd ? SpeciesRegion.Coast : SpeciesRegion.Interior);
+		SpeciesRegion region = (coastalInd ? SpeciesRegion.COAST : SpeciesRegion.INTERIOR);
 		return VdypMethods.setCurrentSICurve(speciesCodeName, region, siCurve);
 	}
 
@@ -471,7 +471,7 @@ public class SiteTool {
 	public static int SiteTool_GetSICurve(String spcsCode, boolean isCoastal) {
 
 		return VdypMethods.getCurrentSICurve(spcsCode, 
-				isCoastal ? SpeciesRegion.Coast : SpeciesRegion.Interior);
+				isCoastal ? SpeciesRegion.COAST : SpeciesRegion.INTERIOR);
 	}
 
 	/**
@@ -508,7 +508,7 @@ public class SiteTool {
 	 */
 	public static float SiteTool_SpeciesDefaultCrownClosure(String speciesCodeName, boolean isCoastal) {
 		return VdypMethods.getDefaultCrownClosure(
-				speciesCodeName, (isCoastal ? SpeciesRegion.Coast : SpeciesRegion.Interior)
+				speciesCodeName, (isCoastal ? SpeciesRegion.COAST : SpeciesRegion.INTERIOR)
 		);
 	}
 

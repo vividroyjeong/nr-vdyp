@@ -11,6 +11,8 @@ import java.text.MessageFormat;
  */
 public class CfsBiomassConversionCoefficientsForGenus {
 
+	private static final String PREAMBLE = "CfsBiomassConversionCoefficientsForGenus at";
+
 	public record Details(
 			boolean containsData,
 			float[] parms)
@@ -142,7 +144,7 @@ public class CfsBiomassConversionCoefficientsForGenus {
 
 		for (int i = 0; i < array.length; i++) {
 			if (array[i].length != CfsBiomassConversionSupportedGenera.size()) {
-				throw new IllegalStateException(MessageFormat.format("CfsBiomassConversionCoefficientsForGenus at" 
+				throw new IllegalStateException(MessageFormat.format(PREAMBLE 
 						+ " index {0} does not contain exactly one "
 						+ " entry for each CfsBiomassConversionSupportedGenera", i));
 			}
@@ -151,20 +153,20 @@ public class CfsBiomassConversionCoefficientsForGenus {
 		for (int i = 0; i < array.length; i++) {
 			for (int j = 0; j < array[i].length; j++) {
 				if (array[i][j].parms.length != CfsLiveConversionParams.size()) {
-					throw new IllegalStateException(MessageFormat.format("CfsBiomassConversionCoefficientsForGenus at" 
+					throw new IllegalStateException(MessageFormat.format(PREAMBLE 
 							+ " index {0} {1} contains {2} elements, but {3} were expected", i, j, array[i][j].parms.length, CfsLiveConversionParams.size()));
 				}
 				if (array[i][j].containsData) {
 					for (int k = 0; k < CfsLiveConversionParams.size(); k++) {
 						if (array[i][j].parms[k] == -9.0f) {
-							throw new IllegalStateException(MessageFormat.format("CfsBiomassConversionCoefficientsForGenus at" 
+							throw new IllegalStateException(MessageFormat.format(PREAMBLE 
 									+ " index {0} {1} {2} is recorded as not containing data, but contains -9.0f", i, j, k));
 						}
 					}
 				} else {
 					for (int k = 0; k < CfsLiveConversionParams.size(); k++) {
 						if (array[i][j].parms[k] != -9.0f) {
-							throw new IllegalStateException(MessageFormat.format("CfsBiomassConversionCoefficientsForGenus at" 
+							throw new IllegalStateException(MessageFormat.format(PREAMBLE 
 									+ " index {0} {1} {2} is recorded as not containing data, but contains {3}", i, j, k, array[i][j].parms[k]));
 						}
 					}

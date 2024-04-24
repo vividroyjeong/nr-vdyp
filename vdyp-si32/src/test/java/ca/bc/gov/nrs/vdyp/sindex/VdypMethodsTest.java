@@ -73,9 +73,9 @@ class VdypMethodsTest {
 	
 	@Test
 	void test_VDYP_GetSINDEXSpecies() {
-		assertThat(VdypMethods.getSINDEXSpecies(SP64Name.A.getText(), SpeciesRegion.Coast), equalTo("At"));
-		assertThat(VdypMethods.getSINDEXSpecies("ZZZ", SpeciesRegion.Coast), equalTo(""));
-		assertThat(VdypMethods.getSINDEXSpecies(null, SpeciesRegion.Interior), equalTo(""));
+		assertThat(VdypMethods.getSINDEXSpecies(SP64Name.A.getText(), SpeciesRegion.COAST), equalTo("At"));
+		assertThat(VdypMethods.getSINDEXSpecies("ZZZ", SpeciesRegion.COAST), equalTo(""));
+		assertThat(VdypMethods.getSINDEXSpecies(null, SpeciesRegion.INTERIOR), equalTo(""));
 		assertThat(VdypMethods.getSINDEXSpecies(SP64Name.A.getText(), null), equalTo(""));
 	}
 	
@@ -93,25 +93,25 @@ class VdypMethodsTest {
 	
 	@Test
 	void test_VDYP_GetCurrentSICurve() {
-		assertThat(VdypMethods.getCurrentSICurve(SP0Name.AC.getText(), SpeciesRegion.Interior), equalTo(97));
+		assertThat(VdypMethods.getCurrentSICurve(SP0Name.AC.getText(), SpeciesRegion.INTERIOR), equalTo(97));
 		// ensure result from previous call was cached properly.
 		assertThat(VdypMethods.speciesTable.getByCode(SP0Name.AC.getText()).details()
-				.currentSICurve()[SpeciesRegion.Interior.ordinal()], equalTo(97));
-		assertThat(VdypMethods.getCurrentSICurve(null, SpeciesRegion.Interior), equalTo(-1));
+				.currentSICurve()[SpeciesRegion.INTERIOR.ordinal()], equalTo(97));
+		assertThat(VdypMethods.getCurrentSICurve(null, SpeciesRegion.INTERIOR), equalTo(-1));
 		assertThat(VdypMethods.getCurrentSICurve(SP0Name.AC.getText(), null), equalTo(-1));
 	}
 	
 	@Test
 	void test_VDYP_GetDefaultSICurve() {
-		assertThat(VdypMethods.getDefaultSICurve(SP0Name.AC.getText(), SpeciesRegion.Coast), equalTo(97));
-		assertThat(VdypMethods.getDefaultSICurve(null, SpeciesRegion.Interior), equalTo(-1));
+		assertThat(VdypMethods.getDefaultSICurve(SP0Name.AC.getText(), SpeciesRegion.COAST), equalTo(97));
+		assertThat(VdypMethods.getDefaultSICurve(null, SpeciesRegion.INTERIOR), equalTo(-1));
 		assertThat(VdypMethods.getDefaultSICurve(SP0Name.AC.getText(), null), equalTo(-1));
 	}
 	
 	@Test 
 	void test_VDYP_SetCurrentSICurve() {
 		String sp64Name = SP0Name.AC.getText();
-		SpeciesRegion region = SpeciesRegion.Coast;
+		SpeciesRegion region = SpeciesRegion.COAST;
 		
 		int oldCurve = VdypMethods.getCurrentSICurve(sp64Name, region);
 		int result = VdypMethods.setCurrentSICurve(sp64Name, region, oldCurve + 1);
@@ -133,10 +133,10 @@ class VdypMethodsTest {
 		int atAllRegionsCurveCount = VdypMethods.getNumSICurves(true, sp64Name, true, null);
 		assertThat(atAllRegionsCurveCount, equalTo(5));
 
-		int atInteriorCurveCount = VdypMethods.getNumSICurves(true, sp64Name, false, SpeciesRegion.Interior);
+		int atInteriorCurveCount = VdypMethods.getNumSICurves(true, sp64Name, false, SpeciesRegion.INTERIOR);
 		assertThat(atInteriorCurveCount, equalTo(5));
 
-		int atCoastCurveCount = VdypMethods.getNumSICurves(true, sp64Name, false, SpeciesRegion.Coast);
+		int atCoastCurveCount = VdypMethods.getNumSICurves(true, sp64Name, false, SpeciesRegion.COAST);
 		assertThat(atCoastCurveCount, equalTo(5));
 	}
 	
@@ -149,7 +149,7 @@ class VdypMethodsTest {
 	@Test
 	void test_VDYP_GetDefaultCrownClosure() {
 		String sp64Name = SP64Name.AC.getText();
-		SpeciesRegion region = SpeciesRegion.Coast;
+		SpeciesRegion region = SpeciesRegion.COAST;
 		
 		float result = VdypMethods.getDefaultCrownClosure(sp64Name, region);
 		assertThat(result, equalTo(61.0f /* from speciesTable[1 == AC].defaultCrownClosure[0] */));

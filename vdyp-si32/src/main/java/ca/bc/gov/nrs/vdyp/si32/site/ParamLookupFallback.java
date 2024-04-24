@@ -7,11 +7,11 @@ import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
  * were resolved from.
  */
 public enum ParamLookupFallback implements SI32Enum<ParamLookupFallback> {
-	Species, //
-	Genus, //
-	DefaultConifer, //
-	DefaultHardwood, //
-	NotFound;
+	SPECIES, //
+	GENUS, //
+	DEFAULT_CONIFER, //
+	DEFAULT_HARDWOOD, //
+	NOT_FOUND;
 
 	@Override
 	public int getIndex() {

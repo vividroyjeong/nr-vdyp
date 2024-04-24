@@ -91,7 +91,7 @@ public enum BecZone implements SI32Enum<BecZone> {
 
 	public static class Iterator extends SI32EnumIterator<BecZone> {
 		public Iterator() {
-			super(AT, SWB, values());
+			super(values(), AT, SWB);
 		}
 	}
 }

@@ -111,11 +111,16 @@ public class SpeciesDistributionSet implements Comparable<SpeciesDistributionSet
 		if (distributionTotal > 100.05f || distributionTotal < 99.95) {
 			throw new InvalidSpeciesDistributionSet(
 					MessageFormat
-							.format("Sum {0} of species distributions isn't within 0.05 of 100.0", distributionTotal)
+							.format("Sum {0} of species distributions is not within 0.05 of 100.0", distributionTotal)
 			);
 		}
 	}
 
+	@Override
+	public int hashCode() {
+		return speciesDistributionMap.hashCode() * 17 + maxIndex;
+	}
+	
 	@Override
 	public boolean equals(Object other) {
 		if (other instanceof SpeciesDistributionSet that) {

@@ -10,6 +10,7 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException
  * Height2SiteIndex.java - given age and height, computes site index. - if age is total, site index and years to breast
  * height are iterated until stable.
  */
+@SuppressWarnings("java:S1479")
 public class Height2SiteIndex {
 	// Taken from sindex.h
 
@@ -79,13 +80,13 @@ public class Height2SiteIndex {
 		return ( (x) <= 0.0) ? Math.log(.00001) : Math.log(x);
 	}
 
-	public static double height_to_index(int cu_index, double age, int age_type, double height, int si_est_type)
+	public static double heightToIndex(int cu_index, double age, int ageType, double height, int si_est_type)
 			throws CommonCalculatorException {
 		double index;
 		double x1, x2;
 
 		/* handle simple cases */
-		if (age_type == SI_AT_BREAST) {
+		if (ageType == SI_AT_BREAST) {
 			if (height < 1.3) {
 				throw new LessThan13Exception("Height < 1.3 for breast height age: " + height);
 			}
@@ -101,8 +102,8 @@ public class Height2SiteIndex {
 			throw new NoAnswerException("Iteration could not converge (projected site index > 999), Age: " + age);
 		}
 
-		if (age_type == SI_AT_BREAST) {
-			index = ba_height_to_index(cu_index, age, height, si_est_type);
+		if (ageType == SI_AT_BREAST) {
+			index = baHeightToIndex(cu_index, age, height, si_est_type);
 		} else {
 			if (si_est_type == SI_EST_DIRECT) {
 				switch (cu_index) {
@@ -119,21 +120,21 @@ public class Height2SiteIndex {
 					}
 					break;
 				default:
-					index = site_iterate(cu_index, age, SI_AT_TOTAL, height);
+					index = siteIterate(cu_index, age, SI_AT_TOTAL, height);
 					break;
 				}
 			} else
-				index = site_iterate(cu_index, age, SI_AT_TOTAL, height);
+				index = siteIterate(cu_index, age, SI_AT_TOTAL, height);
 		}
 		return (index);
 	}
 
-	public static double ba_height_to_index(int cu_index, double bhage, double height, int si_est_type)
+	public static double baHeightToIndex(int cu_index, double bhage, double height, int si_est_type)
 			throws CommonCalculatorException {
 		double index;
 		double x1, x2;
-		double log_bhage;
-		double ht_13;
+		double logBhAge;
+		double ht13;
 
 		if (bhage <= 0.5) {
 			/* indicator that it can't be done */
@@ -199,12 +200,12 @@ public class Height2SiteIndex {
 					index *= 0.3048;
 					break;
 				case SI_PLI_DEMPSTER:
-					log_bhage = Math.log(bhage);
+					logBhAge = Math.log(bhage);
 
-					ht_13 = height - 1.3;
+					ht13 = height - 1.3;
 
-					index = 1.3 + 10.9408 + 1.6753 * ht_13 - 0.9322 * log_bhage * log_bhage + 0.0054 * bhage * log_bhage
-							+ 8.2281 * ht_13 / bhage - 0.2569 * ht_13 * llog(ht_13);
+					index = 1.3 + 10.9408 + 1.6753 * ht13 - 0.9322 * logBhAge * logBhAge + 0.0054 * bhage * logBhAge
+							+ 8.2281 * ht13 / bhage - 0.2569 * ht13 * llog(ht13);
 					break;
 				case SI_PLI_MILNER:
 					/* convert to imperial */
@@ -242,25 +243,25 @@ public class Height2SiteIndex {
 				case SI_SW_HU_GARCIA: {
 					double q;
 
-					q = hu_garcia_q(height, bhage);
-					index = hu_garcia_h(q, 50.0);
+					q = huGarciaQ(height, bhage);
+					index = huGarciaH(q, 50.0);
 				}
 					break;
 				case SI_SW_DEMPSTER:
-					log_bhage = Math.log(bhage);
+					logBhAge = Math.log(bhage);
 
-					ht_13 = height - 1.3;
+					ht13 = height - 1.3;
 
-					index = 1.3 + 10.3981 + 0.3244 * ht_13 + 0.006 * bhage * log_bhage - 0.838 * log_bhage * log_bhage
-							+ 27.4874 * ht_13 / bhage + 1.1914 * llog(ht_13);
+					index = 1.3 + 10.3981 + 0.3244 * ht13 + 0.006 * bhage * logBhAge - 0.838 * logBhAge * logBhAge
+							+ 27.4874 * ht13 / bhage + 1.1914 * llog(ht13);
 					break;
 				case SI_SB_DEMPSTER:
-					log_bhage = Math.log(bhage);
+					logBhAge = Math.log(bhage);
 
-					ht_13 = height - 1.3;
+					ht13 = height - 1.3;
 
-					index = 1.3 + 4.9038 + 0.8118 * ht_13 - 0.3638 * log_bhage * log_bhage + 24.0308 * ht_13 / bhage
-							- 0.1021 * ht_13 * llog(ht_13);
+					index = 1.3 + 4.9038 + 0.8118 * ht13 - 0.3638 * logBhAge * logBhAge + 24.0308 * ht13 / bhage
+							- 0.1021 * ht13 * llog(ht13);
 					break;
 
 				// #ifdef SI_EA_GOUDIE Couldn't find constant so removed
@@ -282,10 +283,10 @@ public class Height2SiteIndex {
 					// endif
 
 					// #ifdef SI_AT_GOUDIE
-					log_bhage = Math.log(bhage);
+					logBhAge = Math.log(bhage);
 
-					index = 1.3 + 17.0101 + 0.8784 * (height - 1.3) + 1.8364 * log_bhage
-							- 1.4018 * log_bhage * log_bhage + 0.4374 * llog(height - 1.3) / bhage;
+					index = 1.3 + 17.0101 + 0.8784 * (height - 1.3) + 1.8364 * logBhAge
+							- 1.4018 * logBhAge * logBhAge + 0.4374 * llog(height - 1.3) / bhage;
 					break;
 				case SI_FDI_VDP_MONT:
 					/* convert to imperial */
@@ -314,9 +315,9 @@ public class Height2SiteIndex {
 					x1 = 0.4948;
 					x2 = 25.315;
 
-					log_bhage = Math.log(bhage);
+					logBhAge = Math.log(bhage);
 
-					index = 4.5 + 38.787 - 2.805 * log_bhage * log_bhage + 0.0216 * bhage * log_bhage + x1 * height
+					index = 4.5 + 38.787 - 2.805 * logBhAge * logBhAge + 0.0216 * bhage * logBhAge + x1 * height
 							+ x2 * height / bhage;
 
 					/* convert back to metric */
@@ -329,9 +330,9 @@ public class Height2SiteIndex {
 					x1 = 0.4305;
 					x2 = 28.415;
 
-					log_bhage = Math.log(bhage);
+					logBhAge = Math.log(bhage);
 
-					index = 4.5 + 38.787 - 2.805 * log_bhage * log_bhage + 0.0216 * bhage * log_bhage + x1 * height
+					index = 4.5 + 38.787 - 2.805 * logBhAge * logBhAge + 0.0216 * bhage * logBhAge + x1 * height
 							+ x2 * height / bhage;
 
 					/* convert back to metric */
@@ -344,9 +345,9 @@ public class Height2SiteIndex {
 					x1 = 0.4305;
 					x2 = 28.415;
 
-					log_bhage = Math.log(bhage);
+					logBhAge = Math.log(bhage);
 
-					index = 4.5 + 38.787 - 2.805 * log_bhage * log_bhage + 0.0216 * bhage * log_bhage + x1 * height
+					index = 4.5 + 38.787 - 2.805 * logBhAge * logBhAge + 0.0216 * bhage * logBhAge + x1 * height
 							+ x2 * height / bhage;
 
 					/* convert back to metric */
@@ -359,9 +360,9 @@ public class Height2SiteIndex {
 					x1 = 0.3964;
 					x2 = 30.008;
 
-					log_bhage = Math.log(bhage);
+					logBhAge = Math.log(bhage);
 
-					index = 4.5 + 38.787 - 2.805 * log_bhage * log_bhage + 0.0216 * bhage * log_bhage + x1 * height
+					index = 4.5 + 38.787 - 2.805 * logBhAge * logBhAge + 0.0216 * bhage * logBhAge + x1 * height
 							+ x2 * height / bhage;
 
 					/* convert back to metric */
@@ -374,9 +375,9 @@ public class Height2SiteIndex {
 					x1 = 0.3964;
 					x2 = 30.008;
 
-					log_bhage = Math.log(bhage);
+					logBhAge = Math.log(bhage);
 
-					index = 4.5 + 38.787 - 2.805 * log_bhage * log_bhage + 0.0216 * bhage * log_bhage + x1 * height
+					index = 4.5 + 38.787 - 2.805 * logBhAge * logBhAge + 0.0216 * bhage * logBhAge + x1 * height
 							+ x2 * height / bhage;
 
 					/* convert back to metric */
@@ -3844,16 +3845,16 @@ public class Height2SiteIndex {
 					}
 					break;
 				default:
-					index = site_iterate(cu_index, bhage, SI_AT_BREAST, height);
+					index = siteIterate(cu_index, bhage, SI_AT_BREAST, height);
 					break;
 				}
 			} else
-				index = site_iterate(cu_index, bhage, SI_AT_BREAST, height);
+				index = siteIterate(cu_index, bhage, SI_AT_BREAST, height);
 		}
 		return index;
 	}
 
-	public static double site_iterate(int cu_index, double age, int age_type, double height)
+	public static double siteIterate(int cu_index, double age, int age_type, double height)
 			throws CommonCalculatorException {
 		double site;
 		double step;
@@ -3874,12 +3875,12 @@ public class Height2SiteIndex {
 			y2bh = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site);
 
 			if (age_type == SI_AT_BREAST) {
-				test_top = SiteIndex2Height.index_to_height(cu_index, age, SI_AT_BREAST, site, y2bh, 0.5); // 0.5 may
+				test_top = SiteIndex2Height.indexToHeight(cu_index, age, SI_AT_BREAST, site, y2bh, 0.5); // 0.5 may
 																											// have to
 																											// change
 			} else {
 				/* was age - y2bh */
-				test_top = SiteIndex2Height.index_to_height(
+				test_top = SiteIndex2Height.indexToHeight(
 						cu_index, Age2Age.age_to_age(cu_index, age, SI_AT_TOTAL, SI_AT_BREAST, y2bh), SI_AT_BREAST,
 						site, y2bh, 0.5
 				); // 0.5 may have to change
@@ -3936,7 +3937,7 @@ public class Height2SiteIndex {
 
 	}
 
-	public static double hu_garcia_q(double site_index, double bhage) {
+	public static double huGarciaQ(double site_index, double bhage) {
 		double h, q, step, diff, lastdiff;
 
 		q = 0.02;
@@ -3945,7 +3946,7 @@ public class Height2SiteIndex {
 		diff = 0;
 
 		do {
-			h = hu_garcia_h(q, bhage);
+			h = huGarciaH(q, bhage);
 			lastdiff = diff;
 			diff = site_index - h;
 			if (diff > 0.0000001) {
@@ -3974,7 +3975,7 @@ public class Height2SiteIndex {
 		return q;
 	}
 
-	public static double hu_garcia_h(double q, double bhage) {
+	public static double huGarciaH(double q, double bhage) {
 		double a, height;
 
 		a = 283.9 * Math.pow(q, 0.5137);

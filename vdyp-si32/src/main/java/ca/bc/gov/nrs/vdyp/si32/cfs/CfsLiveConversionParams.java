@@ -118,7 +118,7 @@ public enum CfsLiveConversionParams implements SI32Enum<CfsLiveConversionParams>
 
 	public static class Iterator extends SI32EnumIterator<CfsLiveConversionParams> {
 		public Iterator() {
-			super(A, HIGH_FOLIAGE_PROP, values());
+			super(values(), A, HIGH_FOLIAGE_PROP);
 		}
 	}
 }

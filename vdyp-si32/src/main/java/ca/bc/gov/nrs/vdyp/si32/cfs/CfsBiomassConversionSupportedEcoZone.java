@@ -82,7 +82,7 @@ public enum CfsBiomassConversionSupportedEcoZone implements SI32Enum<CfsBiomassC
 
 	public static class Iterator extends SI32EnumIterator<CfsBiomassConversionSupportedEcoZone> {
 		public Iterator() {
-			super(TAIGA_PLAINS, MONTANE_CORDILLERA, values());
+			super(values(), TAIGA_PLAINS, MONTANE_CORDILLERA);
 		}
 	}
 }

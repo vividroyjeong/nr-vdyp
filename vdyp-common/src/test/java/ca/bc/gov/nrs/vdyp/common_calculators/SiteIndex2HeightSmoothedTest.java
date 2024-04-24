@@ -31,7 +31,7 @@ class SiteIndex2HeightSmoothedTest {
 			assertThrows(
 					LessThan13Exception.class,
 					() -> SiteIndex2HeightSmoothed
-							.index_to_height_smoothed((short) 0, 0.0, (short) 0, 1.2, 0.0, 0.0, 0.0)
+							.indexToHeightSmoothed((short) 0, 0.0, (short) 0, 1.2, 0.0, 0.0, 0.0)
 			);
 		}
 
@@ -40,7 +40,7 @@ class SiteIndex2HeightSmoothedTest {
 			assertThrows(
 					NoAnswerException.class,
 					() -> SiteIndex2HeightSmoothed
-							.index_to_height_smoothed((short) 0, 0.0, (short) 0, 1.31, -1.0, 0.0, 0.0)
+							.indexToHeightSmoothed((short) 0, 0.0, (short) 0, 1.31, -1.0, 0.0, 0.0)
 			);
 		}
 
@@ -49,11 +49,11 @@ class SiteIndex2HeightSmoothedTest {
 			assertThrows(
 					NoAnswerException.class,
 					() -> SiteIndex2HeightSmoothed
-							.index_to_height_smoothed((short) 0, -1.0, SI_AT_BREAST, 1.31, 0.0, 0.0, 0.0)
+							.indexToHeightSmoothed((short) 0, -1.0, SI_AT_BREAST, 1.31, 0.0, 0.0, 0.0)
 			);
 
 			double actualResult = SiteIndex2HeightSmoothed
-					.index_to_height_smoothed((short) 0, 0.0, SI_AT_BREAST, 1.31, 0.0, 0.0, 0.0);
+					.indexToHeightSmoothed((short) 0, 0.0, SI_AT_BREAST, 1.31, 0.0, 0.0, 0.0);
 			double expectedResult = 0;
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 		}
@@ -63,19 +63,19 @@ class SiteIndex2HeightSmoothedTest {
 			assertThrows(
 					NoAnswerException.class,
 					() -> SiteIndex2HeightSmoothed
-							.index_to_height_smoothed(SI_PLI_THROWER, 0.0, SI_AT_BREAST, 1.31, 1.0, 0, 0)
+							.indexToHeightSmoothed(SI_PLI_THROWER, 0.0, SI_AT_BREAST, 1.31, 1.0, 0, 0)
 			);
 		}
 
 		@Test
 		void testValidInput() throws CommonCalculatorException {
 			double actualResult = SiteIndex2HeightSmoothed
-					.index_to_height_smoothed((short) 21, 3.0, SI_AT_TOTAL, 16.0, 4.0, 3.1, 1.3);
+					.indexToHeightSmoothed((short) 21, 3.0, SI_AT_TOTAL, 16.0, 4.0, 3.1, 1.3);
 			double expectedResult = 1.3 / 3.1 * 3;
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 
 			actualResult = SiteIndex2HeightSmoothed
-					.index_to_height_smoothed((short) 21, 3.0, SI_AT_TOTAL, 16.0, 4.0, 0.0, 1.0);
+					.indexToHeightSmoothed((short) 21, 3.0, SI_AT_TOTAL, 16.0, 4.0, 0.0, 1.0);
 
 			double k1 = 2.6120353509515746; // based on calculation with traced values
 			double k0 = (.3) / Math.pow(4, k1);
@@ -83,7 +83,7 @@ class SiteIndex2HeightSmoothedTest {
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 
 			actualResult = SiteIndex2HeightSmoothed
-					.index_to_height_smoothed((short) 21, 3.0, SI_AT_TOTAL, 16.0, 4.0, 3.0, 1.0);
+					.indexToHeightSmoothed((short) 21, 3.0, SI_AT_TOTAL, 16.0, 4.0, 3.0, 1.0);
 
 			expectedResult = 1; // since k0 * Math.pow(0, k1) should be 0
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));

@@ -229,7 +229,7 @@ public enum SP64Name implements SI32Enum<SP64Name> {
 
 	public static class Iterator extends SI32EnumIterator<SP64Name> {
 		public Iterator() {
-			super(A, ZH, values());
+			super(values(), A, ZH);
 		}
 	}
 }

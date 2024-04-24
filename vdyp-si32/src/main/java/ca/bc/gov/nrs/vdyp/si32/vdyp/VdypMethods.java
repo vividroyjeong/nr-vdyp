@@ -172,10 +172,10 @@ public class VdypMethods {
 			char fiz;
 
 			switch (region) {
-			case Coast:
+			case COAST:
 				fiz = 'A';
 				break;
-			case Interior:
+			case INTERIOR:
 				fiz = 'D';
 				break;
 			default:
@@ -266,7 +266,7 @@ public class VdypMethods {
 			if (siCurve < 0) {
 				int sindexSpcs;
 				try {
-					sindexSpcs = Sindxdll.SpecRemap(sp64Name, region == SpeciesRegion.Coast ? 'A' : 'D');
+					sindexSpcs = Sindxdll.SpecRemap(sp64Name, region == SpeciesRegion.COAST ? 'A' : 'D');
 	
 					siCurve = Sindxdll.DefCurve(sindexSpcs);
 				} catch (CommonCalculatorException e) {
@@ -298,7 +298,7 @@ public class VdypMethods {
 		if (sp64Name != null && region != null && speciesTable.getByCode(sp64Name).details() != SpeciesTable.DefaultEntry) {
 
 			try {
-				int sindxSpcs = Sindxdll.SpecRemap(sp64Name, (region == SpeciesRegion.Coast) ? 'A' : 'D');
+				int sindxSpcs = Sindxdll.SpecRemap(sp64Name, (region == SpeciesRegion.COAST) ? 'A' : 'D');
 
 				if (sindxSpcs >= 0) {
 					siCurve = Sindxdll.DefCurve(sindxSpcs);
@@ -382,11 +382,11 @@ public class VdypMethods {
 			Arrays.fill(countedCurve, 0, SI_MAX_CURVES, false);
 	
 			List<Character> forestInventoryZones = new ArrayList<>();
-			if (mixInteriorCoastalInd || SpeciesRegion.Coast.equals(region)) {
+			if (mixInteriorCoastalInd || SpeciesRegion.COAST.equals(region)) {
 				// Add in the number of available coastal curves.
 				forestInventoryZones.add('A');
 			}
-			if (mixInteriorCoastalInd || SpeciesRegion.Interior.equals(region)) {
+			if (mixInteriorCoastalInd || SpeciesRegion.INTERIOR.equals(region)) {
 				// Add in the number of available interior curves.
 				forestInventoryZones.add('D');
 			}

@@ -15,6 +15,7 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException
  * bhage > range SI_ERR_NO_ANS: iteration could not converge (projected height > 999) SI_ERR_CURVE: unknown curve index
  * SI_ERR_GI_TOT: cannot compute growth intercept when using total age
  */
+@SuppressWarnings("java:S1479")
 public class SiteIndex2Height {
 	// Taken from sindex.h
 	/*
@@ -168,12 +169,9 @@ public class SiteIndex2Height {
 		return ( (x) <= 0.0) ? Math.log(.00001) : Math.log(x);
 	}
 
-	public static double index_to_height(
-			int cu_index, double iage, int age_type, double site_index, double y2bh, double pi /*
-																								 * proportion of height
-																								 * growth between breast
-																								 * height
-																								 */
+	public static double indexToHeight(
+			int cu_index, double iage, int age_type, double site_index, double y2bh, double pi 
+			/* proportion of height growth between breast height */
 	) throws CommonCalculatorException
 	// ages 0 and 1 that occurs below breast height
 	{
@@ -333,7 +331,7 @@ public class SiteIndex2Height {
 					// function starts going nuts at high sites and low ages
 					// evaluate at a safe age, and interpolate
 					x1 = (site_index - 60) / 1.667 + 0.1;
-					x2 = index_to_height(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
+					x2 = indexToHeight(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
 					height = 1.37 + (x2 - 1.37) * bhage / x1;
 					break;
 				}
@@ -367,7 +365,7 @@ public class SiteIndex2Height {
 					// function starts going nuts at high sites and low ages
 					// evaluate at a safe age, and interpolate
 					x1 = (site_index - 60) / 1.667 + 0.1;
-					x2 = index_to_height(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
+					x2 = indexToHeight(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
 					height = 1.37 + (x2 - 1.37) * bhage / x1;
 					break;
 				}
@@ -409,7 +407,7 @@ public class SiteIndex2Height {
 					// function starts going nuts at high sites and low ages
 					// evaluate at a safe age, and interpolate
 					x1 = (site_index - 60) / 1.667 + 0.1;
-					x2 = index_to_height(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
+					x2 = indexToHeight(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
 					height = 1.37 + (x2 - 1.37) * bhage / x1;
 					break;
 				}
@@ -448,7 +446,7 @@ public class SiteIndex2Height {
 					/* function starts going nuts at high sites and low ages */
 					/* evaluate at a safe age, and interpolate */
 					x1 = (site_index - 60) / 1.667 + 0.1 + pi;
-					x2 = index_to_height(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
+					x2 = indexToHeight(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
 					height = 1.37 + (x2 - 1.37) * (bhage - pi) / x1;
 					break;
 				}
@@ -1183,8 +1181,8 @@ public class SiteIndex2Height {
 			if (bhage > 0.5) {
 				double q;
 
-				q = hu_garcia_q(site_index, 50.0);
-				height = hu_garcia_h(q, bhage);
+				q = huGarciaQ(site_index, 50.0);
+				height = huGarciaH(q, bhage);
 			} else {
 				height = tage * tage * 1.3 / y2bh / y2bh;
 			}
@@ -1290,7 +1288,7 @@ public class SiteIndex2Height {
 					/* function starts going nuts at high sites and low ages */
 					/* evaluate at a safe age, and interpolate */
 					x1 = (site_index - 43) / 1.667 + 0.1;
-					x2 = index_to_height(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
+					x2 = indexToHeight(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
 					height = 1.3 + (x2 - 1.3) * bhage / x1;
 					break;
 				}
@@ -1328,7 +1326,7 @@ public class SiteIndex2Height {
 					/* function starts going nuts at high sites and low ages */
 					/* evaluate at a safe age, and interpolate */
 					x1 = (site_index - 43) / 1.667 + 0.1 + 0.5;
-					x2 = index_to_height(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
+					x2 = indexToHeight(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
 					height = 1.3 + (x2 - 1.3) * (bhage - 0.5) / x1;
 					break;
 				}
@@ -1411,7 +1409,7 @@ public class SiteIndex2Height {
 					/* function starts going nuts at high sites and low ages */
 					/* evaluate at a safe age, and interpolate */
 					x1 = (site_index - 60) / 1.667 + 0.1;
-					x2 = index_to_height(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
+					x2 = indexToHeight(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
 					height = 1.3 + (x2 - 1.3) * bhage / x1;
 					break;
 				}
@@ -1449,7 +1447,7 @@ public class SiteIndex2Height {
 					/* function starts going nuts at high sites and low ages */
 					/* evaluate at a safe age, and interpolate */
 					x1 = (site_index - 60) / 1.667 + 0.1 + 0.5;
-					x2 = index_to_height(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
+					x2 = indexToHeight(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
 					height = 1.3 + (x2 - 1.3) * (bhage - 0.5) / x1;
 					break;
 				}
@@ -1615,7 +1613,7 @@ public class SiteIndex2Height {
 				/* function starts going nuts at high sites and low ages */
 				/* evaluate at a safe age, and interpolate */
 				x1 = (site_index - 45) / 2.5 + 0.1;
-				x2 = index_to_height(cu_index, x1, SI_AT_TOTAL, site_index, y2bh, pi);
+				x2 = indexToHeight(cu_index, x1, SI_AT_TOTAL, site_index, y2bh, pi);
 				height = x2 * tage / x1;
 			} else {
 				double si20;
@@ -2157,7 +2155,7 @@ public class SiteIndex2Height {
 				SI_PLI_NIGHGI97, SI_SE_NIGHGI, SI_SS_NIGHGI, SI_SS_NIGHGI99, SI_SW_NIGHGI, SI_SW_NIGHGI99,
 				SI_SW_NIGHGI2004:
 
-			height = gi_si2ht(cu_index, bhage, site_index);
+			height = giSi2Ht(cu_index, bhage, site_index);
 			break;
 
 		default:
@@ -2171,7 +2169,7 @@ public class SiteIndex2Height {
 		return height;
 	}
 
-	public static double gi_si2ht(int cu_index, double age, double site_index) throws CommonCalculatorException {
+	public static double giSi2Ht(int cu_index, double age, double site_index) throws CommonCalculatorException {
 		double si2ht;
 		double step;
 		double test_site;
@@ -2192,7 +2190,7 @@ public class SiteIndex2Height {
 
 		/* loop until real close */
 		do {
-			test_site = Height2SiteIndex.height_to_index(cu_index, age, (int) SI_AT_BREAST, si2ht, (int) SI_EST_DIRECT);
+			test_site = Height2SiteIndex.heightToIndex(cu_index, age, (int) SI_AT_BREAST, si2ht, (int) SI_EST_DIRECT);
 			/*
 			 * printf ("age=%3.0f, site=%5.2f, test_site=%5.2f, si2ht=%5.2f, step=%9.7f\n", age, site_index, test_site,
 			 * si2ht, step);
@@ -2248,7 +2246,7 @@ public class SiteIndex2Height {
 		return si2ht;
 	}
 
-	public static double hu_garcia_q(double site_index, double bhage) {
+	public static double huGarciaQ(double site_index, double bhage) {
 		double h, q, step, diff, lastdiff;
 
 		q = 0.02;
@@ -2257,7 +2255,7 @@ public class SiteIndex2Height {
 		diff = 0;
 
 		do {
-			h = hu_garcia_h(q, bhage);
+			h = huGarciaH(q, bhage);
 			lastdiff = diff;
 			diff = site_index - h;
 			if (diff > 0.0000001) {
@@ -2284,7 +2282,7 @@ public class SiteIndex2Height {
 		return q;
 	}
 
-	public static double hu_garcia_h(double q, double bhage) {
+	public static double huGarciaH(double q, double bhage) {
 		double a, height;
 
 		a = 283.9 * Math.pow(q, 0.5137);

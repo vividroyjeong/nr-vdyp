@@ -126,7 +126,7 @@ public enum CfsBiomassConversionSupportedSpecies implements SI32Enum<CfsBiomassC
 
 	public static class Iterator extends SI32EnumIterator<CfsBiomassConversionSupportedSpecies> {
 		public Iterator() {
-			super(AC, YC, values());
+			super(values(), AC, YC);
 		}
 	}
 }

@@ -55,12 +55,12 @@ class SiteIndex2AgeTest {
 			// Test where SiteHeight < 1.3, AgeType = 1 (SI_AT_BREAST)
 			assertThrows(
 					LessThan13Exception.class,
-					() -> SiteIndex2Age.index_to_age(SI_BL_THROWERGI, 0.0, SI_AT_BREAST, SI_AT_BREAST, 0.0)
+					() -> SiteIndex2Age.indexToAge(SI_BL_THROWERGI, 0.0, SI_AT_BREAST, SI_AT_BREAST, 0.0)
 			);
 
 			// Test where SiteHeight <= 0.0001
 			double expectedResult = 0;
-			double actualResult = SiteIndex2Age.index_to_age(SI_AT_TOTAL, 0.0001, SI_AT_TOTAL, SI_AT_BREAST, 0.0);
+			double actualResult = SiteIndex2Age.indexToAge(SI_AT_TOTAL, 0.0001, SI_AT_TOTAL, SI_AT_BREAST, 0.0);
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 		}
 
@@ -69,7 +69,7 @@ class SiteIndex2AgeTest {
 			// Test where SiteHeight < 1.3, AgeType = 1 (SI_AT_BREAST)
 			assertThrows(
 					LessThan13Exception.class,
-					() -> SiteIndex2Age.index_to_age(SI_BL_THROWERGI, 1.4, SI_AT_BREAST, SI_AT_BREAST, 0.0)
+					() -> SiteIndex2Age.indexToAge(SI_BL_THROWERGI, 1.4, SI_AT_BREAST, SI_AT_BREAST, 0.0)
 			);
 		}
 
@@ -85,7 +85,7 @@ class SiteIndex2AgeTest {
 			double x4 = SiteIndex2Age.llog(1.372 / site_index) / (SiteIndex2Age.ppow(y2bh, x2) - x3);
 			x1 = SiteIndex2Age.llog(site_height / site_index) / x4 + x3;
 
-			double actualResult = SiteIndex2Age.index_to_age(SI_FDC_BRUCE, site_height, SI_AT_BREAST, site_index, 12.0);
+			double actualResult = SiteIndex2Age.indexToAge(SI_FDC_BRUCE, site_height, SI_AT_BREAST, site_index, 12.0);
 			double expectedResult = (SiteIndex2Age.ppow(x1, 1 / x2)) - y2bh;
 
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
@@ -98,7 +98,7 @@ class SiteIndex2AgeTest {
 
 			assertThrows(
 					ArithmeticException.class,
-					() -> SiteIndex2Age.index_to_age(SI_FDC_BRUCE, site_height, SI_FDC_BRUCE, site_index, 12)
+					() -> SiteIndex2Age.indexToAge(SI_FDC_BRUCE, site_height, SI_FDC_BRUCE, site_index, 12)
 			);
 		}
 
@@ -109,7 +109,7 @@ class SiteIndex2AgeTest {
 
 			assertThrows(
 					NoAnswerException.class,
-					() -> SiteIndex2Age.index_to_age(SI_FDC_BRUCE, site_height, SI_AT_BREAST, site_index, 12.0)
+					() -> SiteIndex2Age.indexToAge(SI_FDC_BRUCE, site_height, SI_AT_BREAST, site_index, 12.0)
 			);
 		}
 
@@ -120,7 +120,7 @@ class SiteIndex2AgeTest {
 
 			assertThrows(
 					NoAnswerException.class,
-					() -> SiteIndex2Age.index_to_age(SI_FDC_BRUCE, site_height, SI_AT_BREAST, site_index, 12.0)
+					() -> SiteIndex2Age.indexToAge(SI_FDC_BRUCE, site_height, SI_AT_BREAST, site_index, 12.0)
 			);
 		}
 
@@ -129,9 +129,9 @@ class SiteIndex2AgeTest {
 			double site_index = 2;
 			double site_height = 1.6;
 
-			double expectedResult = SiteIndex2Age.hu_garcia_bha(0.002242150170898438, 1.6);
+			double expectedResult = SiteIndex2Age.huGarciaBha(0.002242150170898438, 1.6);
 			double actualResult = SiteIndex2Age
-					.index_to_age(SI_SW_HU_GARCIA, site_height, SI_AT_BREAST, site_index, 12.0);
+					.indexToAge(SI_SW_HU_GARCIA, site_height, SI_AT_BREAST, site_index, 12.0);
 
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 		}
@@ -141,9 +141,9 @@ class SiteIndex2AgeTest {
 			double site_index = 2;
 			double site_height = 1.6;
 
-			double expectedResult = 12 + SiteIndex2Age.hu_garcia_bha(0.002242150170898438, 1.6);
+			double expectedResult = 12 + SiteIndex2Age.huGarciaBha(0.002242150170898438, 1.6);
 			double actualResult = SiteIndex2Age
-					.index_to_age(SI_SW_HU_GARCIA, site_height, SI_AT_TOTAL, site_index, 12.0);
+					.indexToAge(SI_SW_HU_GARCIA, site_height, SI_AT_TOTAL, site_index, 12.0);
 
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 		}
@@ -155,7 +155,7 @@ class SiteIndex2AgeTest {
 		double bhage = 15.0;
 		double expectedResult = 0.0452838897705078; // Expected result based on input values
 
-		double actualResult = SiteIndex2Age.hu_garcia_q(site_index, bhage);
+		double actualResult = SiteIndex2Age.huGarciaQ(site_index, bhage);
 
 		assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 	}
@@ -166,7 +166,7 @@ class SiteIndex2AgeTest {
 		double bhage = 15.0;
 		double expectedResult = 405.32603588881113; // Expected result based on input values
 
-		double actualResult = SiteIndex2Age.hu_garcia_h(q, bhage);
+		double actualResult = SiteIndex2Age.huGarciaH(q, bhage);
 
 		assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 	}
@@ -177,7 +177,7 @@ class SiteIndex2AgeTest {
 		double bhage = 15.0;
 		double expectedResult = 0.5612209407277136; // Expected result based on input values
 
-		double actualResult = SiteIndex2Age.hu_garcia_bha(q, bhage);
+		double actualResult = SiteIndex2Age.huGarciaBha(q, bhage);
 
 		assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 	}

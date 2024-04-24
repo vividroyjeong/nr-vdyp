@@ -49,15 +49,15 @@ class CfsMethodsTest {
 	
 	@Test
 	void test_CFS_StringToCfsSpeciesTest() {
-		assertThat(CfsMethods.stringToCfsSpecies("Black Spruce"), equalTo(CfsTreeSpecies.SpruceBlack));
-		assertThat(CfsMethods.stringToCfsSpecies("Black spruce"), equalTo(CfsTreeSpecies.SpruceBlack));
+		assertThat(CfsMethods.stringToCfsSpecies("Black Spruce"), equalTo(CfsTreeSpecies.SPRUCE_BLACK));
+		assertThat(CfsMethods.stringToCfsSpecies("Black spruce"), equalTo(CfsTreeSpecies.SPRUCE_BLACK));
 		assertThat(CfsMethods.stringToCfsSpecies("something"), equalTo(CfsTreeSpecies.UNKNOWN));
 		assertThat(CfsMethods.stringToCfsSpecies(null), equalTo(CfsTreeSpecies.UNKNOWN));
 	}
 	
 	@Test
 	void test_CFS_CFSSpcsNumToCFSGenus() {
-		assertThat(CfsMethods.cfsSpcsNumToCFSGenus(CfsTreeSpecies.SpruceBlack), equalTo(CfsTreeGenus.SPRUCE));
+		assertThat(CfsMethods.cfsSpcsNumToCFSGenus(CfsTreeSpecies.SPRUCE_BLACK), equalTo(CfsTreeGenus.SPRUCE));
 		assertThat(CfsMethods.cfsSpcsNumToCFSGenus(null), equalTo(CfsTreeGenus.UNKNOWN));
 	}
 	
@@ -70,7 +70,7 @@ class CfsMethodsTest {
 	
 	@Test
 	public static void testGetSpeciesBySpeciesName() {
-		String name = CfsTreeSpecies.AlderRed.getCfsSpeciesName();
+		String name = CfsTreeSpecies.ALDER_RED.getCfsSpeciesName();
 		CfsTreeSpecies ts;
 		
 		ts = CfsSpeciesMethods.getSpeciesBySpeciesName(name);
@@ -88,14 +88,14 @@ class CfsMethodsTest {
 
 	@Test
 	public static void testGetGenusBySpecies() {
-		CfsTreeGenus g = CfsSpeciesMethods.getGenusBySpecies(CfsTreeSpecies.AlderRed);
+		CfsTreeGenus g = CfsSpeciesMethods.getGenusBySpecies(CfsTreeSpecies.ALDER_RED);
 		assertThat(g, equalTo(CfsTreeGenus.OTHER_BROAD_LEAVES));
 		assertThat(CfsSpeciesMethods.getGenusBySpecies(null), equalTo(CfsTreeGenus.UNKNOWN));
 	}
 	
 	@Test
 	public static void testGetSpeciesIndexBySpecies() {
-		int r = CfsSpeciesMethods.getSpeciesIndexBySpecies(CfsTreeSpecies.AlderRed);
+		int r = CfsSpeciesMethods.getSpeciesIndexBySpecies(CfsTreeSpecies.ALDER_RED);
 		assertThat(r, equalTo(1802));
 		assertThat(CfsSpeciesMethods.getSpeciesIndexBySpecies(null), equalTo(-1));
 	}

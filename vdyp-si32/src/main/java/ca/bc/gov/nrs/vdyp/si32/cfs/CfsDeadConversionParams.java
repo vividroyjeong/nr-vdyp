@@ -79,7 +79,7 @@ public enum CfsDeadConversionParams implements SI32Enum<CfsDeadConversionParams>
 
 	public static class Iterator extends SI32EnumIterator<CfsDeadConversionParams> {
 		public Iterator() {
-			super(PROP1, V4, values());
+			super(values(), PROP1, V4);
 		}
 	}
 }

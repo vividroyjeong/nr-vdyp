@@ -12,8 +12,8 @@ import java.util.Map;
  */
 public enum SpeciesRegion implements SI32Enum<SpeciesRegion> {
 	
-	Coast(0), // 
-	Interior(1);
+	COAST(0), // 
+	INTERIOR(1);
 
 	private static Map<Integer, SpeciesRegion> index2EnumMap = null;
 
@@ -60,12 +60,12 @@ public enum SpeciesRegion implements SI32Enum<SpeciesRegion> {
 	 * @return the number of non-housekeeping entries in the enumeration
 	 */
 	public static int size() {
-		return Interior.index - Coast.index + 1;
+		return INTERIOR.index - COAST.index + 1;
 	}
 
 	public static class Iterator extends SI32EnumIterator<SpeciesRegion> {
 		public Iterator() {
-			super(Coast, Interior, values());
+			super(values(), COAST, INTERIOR);
 		}
 	}
 }

@@ -56,12 +56,12 @@ public class Age2Age {
 	private static final int SI_SW_NIGHTA2004 = 111;
 	private static final int SI_PLI_NIGHTA2004 = 109;
 
-	public static double age_to_age(int cu_index, double age1, int age1_type, int age2_type, double y2bh)
+	public static double age_to_age(int cuIndex, double age1, int age1Type, int age2Type, double y2bh)
 			throws AgeTypeErrorException {
 		double returnValue;
 
 		boolean shouldBranch;
-		switch (cu_index) {
+		switch (cuIndex) {
 		case SI_ACB_HUANGAC:
 			shouldBranch = true;
 			break;
@@ -178,8 +178,8 @@ public class Age2Age {
 		}
 
 		if (shouldBranch) {
-			if (age1_type == SI_AT_BREAST) {
-				if (age2_type == SI_AT_TOTAL) {
+			if (age1Type == SI_AT_BREAST) {
+				if (age2Type == SI_AT_TOTAL) {
 					/* convert to total age */
 					returnValue = age1 + y2bh - 0.5;
 					if (returnValue < 0) {
@@ -190,8 +190,8 @@ public class Age2Age {
 				throw new AgeTypeErrorException("Unkown age type provided");
 			}
 
-			if (age1_type == SI_AT_TOTAL) {
-				if (age2_type == SI_AT_BREAST) {
+			if (age1Type == SI_AT_TOTAL) {
+				if (age2Type == SI_AT_BREAST) {
 					/* convert to breast-height age */
 					returnValue = age1 - y2bh + 0.5;
 					if (returnValue < 0) {
@@ -202,8 +202,8 @@ public class Age2Age {
 				throw new AgeTypeErrorException("Unkown age type provided");
 			}
 		} else {
-			if (age1_type == SI_AT_BREAST) {
-				if (age2_type == SI_AT_TOTAL) {
+			if (age1Type == SI_AT_BREAST) {
+				if (age2Type == SI_AT_TOTAL) {
 					/* convert to total age */
 					returnValue = age1 + y2bh;
 					if (returnValue < 0) {
@@ -214,8 +214,8 @@ public class Age2Age {
 				throw new AgeTypeErrorException("Unkown age type provided");
 			}
 
-			if (age1_type == SI_AT_TOTAL) {
-				if (age2_type == SI_AT_BREAST) {
+			if (age1Type == SI_AT_TOTAL) {
+				if (age2Type == SI_AT_BREAST) {
 					/* convert to breast-height age */
 					returnValue = age1 - y2bh;
 					if (returnValue < 0) {
@@ -228,5 +228,4 @@ public class Age2Age {
 		}
 		throw new AgeTypeErrorException("Unkown age type provided");
 	}
-
 }

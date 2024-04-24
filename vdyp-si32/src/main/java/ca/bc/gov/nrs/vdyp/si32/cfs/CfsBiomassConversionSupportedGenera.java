@@ -109,7 +109,7 @@ public enum CfsBiomassConversionSupportedGenera implements SI32Enum<CfsBiomassCo
 
 	public static class Iterator extends SI32EnumIterator<CfsBiomassConversionSupportedGenera> {
 		public Iterator() {
-			super(AC, ZH, values());
+			super(values(), AC, ZH);
 		}
 	}
 }

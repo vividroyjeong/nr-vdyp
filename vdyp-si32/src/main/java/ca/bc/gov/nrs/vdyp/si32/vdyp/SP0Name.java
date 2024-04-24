@@ -95,7 +95,7 @@ public enum SP0Name implements SI32Enum<SP0Name> {
 
 	public static class Iterator extends SI32EnumIterator<SP0Name> {
 		public Iterator() {
-			super(AC, Y, values());
+			super(values(), AC, Y);
 		}
 	}
 }

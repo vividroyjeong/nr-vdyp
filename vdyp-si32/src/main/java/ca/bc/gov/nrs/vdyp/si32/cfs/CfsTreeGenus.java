@@ -113,7 +113,7 @@ public enum CfsTreeGenus implements SI32Enum<CfsTreeGenus> {
 
 	public static class Iterator extends SI32EnumIterator<CfsTreeGenus> {
 		public Iterator() {
-			super(SPRUCE, UNSPECIFIED_BROAD_LEAVES, values());
+			super(values(), SPRUCE, UNSPECIFIED_BROAD_LEAVES);
 		}
 	}
 }

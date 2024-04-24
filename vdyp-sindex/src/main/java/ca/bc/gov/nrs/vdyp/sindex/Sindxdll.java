@@ -25,6 +25,7 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.SpeciesErrorExcep
 /**
  * Sindxdll.java Interface Module to the Sindex Library
  */
+@SuppressWarnings("java:S1192")
 public class Sindxdll {
 /* @formatter:off */
 /*
@@ -3149,7 +3150,7 @@ public class Sindxdll {
 	public static int HtAgeToSI(int curve, double age, int ageType, double height, int estType, Reference<Double> site)
 			throws CommonCalculatorException {
 
-		site.set(Height2SiteIndex.height_to_index(curve, age, ageType, height, estType));
+		site.set(Height2SiteIndex.heightToIndex(curve, age, ageType, height, estType));
 
 		return 0;
 	}
@@ -3177,7 +3178,7 @@ public class Sindxdll {
 			HtSIToAge(int curve, double height, int ageType, double siteIndex, double y2bh, Reference<Double> age)
 					throws CommonCalculatorException {
 
-		age.set(SiteIndex2Age.index_to_age(curve, height, ageType, siteIndex, y2bh));
+		age.set(SiteIndex2Age.indexToAge(curve, height, ageType, siteIndex, y2bh));
 
 		return 0;
 	}
@@ -3209,7 +3210,7 @@ public class Sindxdll {
 			AgeSIToHt(int curve, double age, int ageType, double siteIndex, double y2bh, Reference<Double> height)
 					throws CommonCalculatorException {
 
-		height.set(SiteIndex2Height.index_to_height(curve, age, ageType, siteIndex, y2bh, 0.5));
+		height.set(SiteIndex2Height.indexToHeight(curve, age, ageType, siteIndex, y2bh, 0.5));
 
 		return 0;
 	}
@@ -3246,7 +3247,7 @@ public class Sindxdll {
 	) throws CommonCalculatorException {
 		height.set(
 				SiteIndex2HeightSmoothed
-						.index_to_height_smoothed(curve, age, ageType, siteIndex, y2bh, seedling_age, seedling_ht)
+						.indexToHeightSmoothed(curve, age, ageType, siteIndex, y2bh, seedling_age, seedling_ht)
 		);
 
 		return 0;
@@ -3349,7 +3350,7 @@ public class Sindxdll {
 	public static int SCToSI(int sp_index, char sitecl, char fiz, Reference<Double> site)
 			throws CommonCalculatorException {
 
-		site.set(SiteClassCode2SiteIndex.class_to_index(sp_index, sitecl, fiz));
+		site.set(SiteClassCode2SiteIndex.classToIndex(sp_index, sitecl, fiz));
 
 		return 0;
 	}

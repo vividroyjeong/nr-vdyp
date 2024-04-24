@@ -43,13 +43,13 @@ public class SiteClassCode2SiteIndex {
 	private static final int SI_SPEC_SW = 100;
 	private static final int SI_SPEC_YC = 130;
 
-	public static double class_to_index(int sp_index, char sitecl, char fiz) throws CommonCalculatorException {
+	public static double classToIndex(int spIndex, char sitecl, char fiz) throws CommonCalculatorException {
 
 		if (sitecl != 'G' && sitecl != 'M' && sitecl != 'P' && sitecl != 'L') {
 			throw new ClassErrorException("Unknown site class code: " + sitecl);
 		}
 
-		switch (sp_index) {
+		switch (spIndex) {
 		case SI_SPEC_ACT, SI_SPEC_MB:
 			switch (sitecl) {
 			case 'G':
@@ -192,6 +192,7 @@ public class SiteClassCode2SiteIndex {
 					break;
 				}
 				break;
+
 			case FizCheck.FIZ_INTERIOR:
 				switch (sitecl) {
 				case 'G':
@@ -205,10 +206,10 @@ public class SiteClassCode2SiteIndex {
 				default:
 					break;
 				}
+				break;
 
 			default:
 				throw new ForestInventoryZoneException("Unknown FIZ code: " + fiz);
-
 			}
 
 		case SI_SPEC_HWI:

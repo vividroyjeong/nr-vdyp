@@ -37,7 +37,7 @@ public class SiteIndex2HeightSmoothed {
 	 * @throws LessThan13Exception when {@code site_index} is less than 1.3
 	 * @throws NoAnswerException   when the iteration will not converge
 	 */
-	public static double index_to_height_smoothed(
+	public static double indexToHeightSmoothed(
 			int cu_index, double iage, int age_type, double site_index, double y2bh, double seedling_age,
 			double seedling_ht
 	) throws CommonCalculatorException {
@@ -80,7 +80,7 @@ public class SiteIndex2HeightSmoothed {
 
 		bhage = 2;
 		do {
-			result = SiteIndex2Height.index_to_height(cu_index, bhage, SI_AT_BREAST, site_index, y2bh, pi);
+			result = SiteIndex2Height.indexToHeight(cu_index, bhage, SI_AT_BREAST, site_index, y2bh, pi);
 			if (result < 0) {
 				return result;
 			}
@@ -103,7 +103,7 @@ public class SiteIndex2HeightSmoothed {
 			if (itage <= tage) {
 				result = k0 * Math.pow(itage, k1);
 			} else {
-				result = SiteIndex2Height.index_to_height(cu_index, itage, SI_AT_TOTAL, site_index, y2bh, pi);
+				result = SiteIndex2Height.indexToHeight(cu_index, itage, SI_AT_TOTAL, site_index, y2bh, pi);
 			}
 		} else {
 			if (itage < seedling_age) {
@@ -111,7 +111,7 @@ public class SiteIndex2HeightSmoothed {
 			} else if (itage < tage) {
 				result = seedling_ht + k0 * Math.pow(itage - seedling_age, k1);
 			} else {
-				result = SiteIndex2Height.index_to_height(cu_index, itage, SI_AT_TOTAL, site_index, y2bh, pi);
+				result = SiteIndex2Height.indexToHeight(cu_index, itage, SI_AT_TOTAL, site_index, y2bh, pi);
 			}
 		}
 

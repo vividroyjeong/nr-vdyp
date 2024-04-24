@@ -178,7 +178,7 @@ class PolygonProcessingState {
 
 		for (int i = 0; i < a.length; i++)
 			if (a[i] != null) {
-				t[i] = new String(a[i]);
+				t[i] = a[i];
 			}
 		return t;
 	}
@@ -257,9 +257,9 @@ class PolygonProcessingState {
 		speciesToRetainByIndex.sort(Integer::compareTo);
 
 		int nextAvailableSlot = 1;
-		for (int speciesIndex : speciesToRetainByIndex) {
-			if (nextAvailableSlot != speciesIndex) {
-				move(nextAvailableSlot, speciesIndex);
+		for (int index : speciesToRetainByIndex) {
+			if (nextAvailableSlot != index) {
+				move(nextAvailableSlot, index);
 			}
 			nextAvailableSlot += 1;
 		}
