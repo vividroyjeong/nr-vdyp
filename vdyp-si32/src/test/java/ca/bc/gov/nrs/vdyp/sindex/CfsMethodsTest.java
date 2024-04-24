@@ -70,20 +70,23 @@ class CfsMethodsTest {
 	
 	@Test
 	public void testGetSpeciesBySpeciesName() {
-		String name = CfsTreeSpecies.ALDER_RED.getCfsSpeciesName();
+		String name = CfsTreeSpecies.ALDER_RED.getName();
 		CfsTreeSpecies ts;
 		
 		ts = CfsSpeciesMethods.getSpeciesBySpeciesName(name);
-		assertThat(ts, equalTo("Red alder"));
+		assertThat(ts, equalTo(CfsTreeSpecies.ALDER_RED));
 		
 		ts = CfsSpeciesMethods.getSpeciesBySpeciesName(name.toLowerCase());
-		assertThat(ts, equalTo("Red alder"));
+		assertThat(ts.getName(), equalTo("Red alder"));
 		
 		ts = CfsSpeciesMethods.getSpeciesBySpeciesName(name.toUpperCase());
-		assertThat(ts, equalTo("Red alder"));
+		assertThat(ts.getNumber(), equalTo(1802));
+		
+		ts = CfsSpeciesMethods.getSpeciesBySpeciesName(name.toUpperCase());
+		assertThat(ts.getIndex(), equalTo(114));
 		
 		ts = CfsSpeciesMethods.getSpeciesBySpeciesName(null);
-		assertThat(ts, equalTo("Unknown Species"));
+		assertThat(ts, equalTo(CfsTreeSpecies.UNKNOWN));
 	}
 
 	@Test

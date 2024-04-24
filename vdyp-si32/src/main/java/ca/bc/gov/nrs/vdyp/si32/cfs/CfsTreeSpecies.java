@@ -248,11 +248,11 @@ public enum CfsTreeSpecies implements SI32Enum<CfsTreeSpecies> {
 		return index;
 	}
 	
-	public int getCfsSpeciesNumber() {
+	public int getNumber() {
 		return cfsSpeciesNumber;
 	}
 
-	public String getCfsSpeciesName() {
+	public String getName() {
 		return cfsSpeciesName;
 	}
 

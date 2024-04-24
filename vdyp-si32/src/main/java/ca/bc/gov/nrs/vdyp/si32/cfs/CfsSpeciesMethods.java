@@ -55,16 +55,16 @@ public class CfsSpeciesMethods {
 	public static int getSpeciesIndexBySpecies(CfsTreeSpecies cfsSpecies) {
 		
 		if (cfsSpecies != null) {
-			return cfsSpecies.getCfsSpeciesNumber();
+			return cfsSpecies.getNumber();
 		} else {
-			return CfsTreeSpecies.UNKNOWN.getCfsSpeciesNumber();
+			return CfsTreeSpecies.UNKNOWN.getNumber();
 		}
 	}
 
 	static {
 		// Build the lookup assistance maps
 		for (CfsTreeSpecies s: CfsTreeSpecies.values()) {
-			speciesByName.put(s.getCfsSpeciesName().toUpperCase(), s);
+			speciesByName.put(s.getName().toUpperCase(), s);
 		}
 	}
 }
