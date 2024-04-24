@@ -189,10 +189,10 @@ public class SiteIndex2Height {
 
 		if (age_type == SI_AT_TOTAL) {
 			tage = iage;
-			bhage = Age2Age.age_to_age(cu_index, tage, SI_AT_TOTAL, SI_AT_BREAST, y2bh);
+			bhage = Age2Age.ageToAge(cu_index, tage, SI_AT_TOTAL, SI_AT_BREAST, y2bh);
 		} else {
 			bhage = iage;
-			tage = Age2Age.age_to_age(cu_index, bhage, SI_AT_BREAST, SI_AT_TOTAL, y2bh);
+			tage = Age2Age.ageToAge(cu_index, bhage, SI_AT_BREAST, SI_AT_TOTAL, y2bh);
 		}
 		if (tage < 0.0) {
 			throw new NoAnswerException("Iteration could not converge (projected height > 999), age: " + tage);

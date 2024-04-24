@@ -3881,7 +3881,7 @@ public class Height2SiteIndex {
 			} else {
 				/* was age - y2bh */
 				test_top = SiteIndex2Height.indexToHeight(
-						cu_index, Age2Age.age_to_age(cu_index, age, SI_AT_TOTAL, SI_AT_BREAST, y2bh), SI_AT_BREAST,
+						cu_index, Age2Age.ageToAge(cu_index, age, SI_AT_TOTAL, SI_AT_BREAST, y2bh), SI_AT_BREAST,
 						site, y2bh, 0.5
 				); // 0.5 may have to change
 			}

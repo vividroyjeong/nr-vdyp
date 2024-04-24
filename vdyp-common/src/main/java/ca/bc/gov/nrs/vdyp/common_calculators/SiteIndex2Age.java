@@ -677,7 +677,7 @@ public class SiteIndex2Age {
 				/*
 				 * was si2age -= y2bh;
 				 */
-				si2age = Age2Age.age_to_age(cu_index, si2age, SI_AT_TOTAL, SI_AT_BREAST, y2bh);
+				si2age = Age2Age.ageToAge(cu_index, si2age, SI_AT_TOTAL, SI_AT_BREAST, y2bh);
 			}
 		}
 		if (si2age == SI_ERR_NO_ANS) {

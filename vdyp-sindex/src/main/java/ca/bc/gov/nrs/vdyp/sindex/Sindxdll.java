@@ -3555,7 +3555,7 @@ public class Sindxdll {
 			AgeToAge(int cu_index, double age1, int age_type1, double y2bh, Reference<Double> result, int age_type2)
 					throws AgeTypeErrorException {
 
-		result.set(Age2Age.age_to_age(cu_index, age1, age_type1, age_type2, y2bh));
+		result.set(Age2Age.ageToAge(cu_index, age1, age_type1, age_type2, y2bh));
 
 		return 0;
 	}

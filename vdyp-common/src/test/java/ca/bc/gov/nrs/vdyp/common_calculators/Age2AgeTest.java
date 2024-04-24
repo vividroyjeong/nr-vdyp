@@ -54,43 +54,43 @@ class Age2AgeTest {
 	@Test
 	void testShouldBranchInvalid() {
 		assertThrows(
-				AgeTypeErrorException.class, () -> Age2Age.age_to_age(SI_ACB_HUANGAC, 0.0, SI_AT_BREAST, (short) 1, 0.0)
+				AgeTypeErrorException.class, () -> Age2Age.ageToAge(SI_ACB_HUANGAC, 0.0, SI_AT_BREAST, (short) 1, 0.0)
 		);
 
 		assertThrows(
 				AgeTypeErrorException.class,
-				() -> Age2Age.age_to_age(SI_ACT_THROWERAC, 0.0, SI_AT_TOTAL, (short) 0, 0.0)
+				() -> Age2Age.ageToAge(SI_ACT_THROWERAC, 0.0, SI_AT_TOTAL, (short) 0, 0.0)
 		);
 	}
 
 	@Test
 	void testShouldNotBranchInvalid() {
 		assertThrows(
-				AgeTypeErrorException.class, () -> Age2Age.age_to_age((short) 600, 0.0, SI_AT_BREAST, (short) 1, 0.0)
+				AgeTypeErrorException.class, () -> Age2Age.ageToAge((short) 600, 0.0, SI_AT_BREAST, (short) 1, 0.0)
 		);
 
 		assertThrows(
-				AgeTypeErrorException.class, () -> Age2Age.age_to_age((short) 600, 0.0, SI_AT_TOTAL, (short) 0, 0.0)
+				AgeTypeErrorException.class, () -> Age2Age.ageToAge((short) 600, 0.0, SI_AT_TOTAL, (short) 0, 0.0)
 		);
 	}
 
 	@Test
 	void testShouldBranchReturnValue() throws AgeTypeErrorException {
 		double expectedResult = 3.0; // normal calculated test
-		double actualResult = Age2Age.age_to_age(SI_AT_NIGH, 1.5, SI_AT_BREAST, SI_AT_TOTAL, 2);
+		double actualResult = Age2Age.ageToAge(SI_AT_NIGH, 1.5, SI_AT_BREAST, SI_AT_TOTAL, 2);
 
 		assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 
 		expectedResult = 0; // returnValue < 0
-		actualResult = Age2Age.age_to_age(SI_BA_KURUCZ82AC, 0, SI_AT_BREAST, SI_AT_TOTAL, 0);
+		actualResult = Age2Age.ageToAge(SI_BA_KURUCZ82AC, 0, SI_AT_BREAST, SI_AT_TOTAL, 0);
 
 		expectedResult = 1.0; // normal calculated test
-		actualResult = Age2Age.age_to_age(SI_BA_NIGH, 1.5, SI_AT_TOTAL, SI_AT_BREAST, 1);
+		actualResult = Age2Age.ageToAge(SI_BA_NIGH, 1.5, SI_AT_TOTAL, SI_AT_BREAST, 1);
 
 		assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 
 		expectedResult = 0; // returnValue < 0
-		actualResult = Age2Age.age_to_age(SI_BL_CHENAC, 0, SI_AT_TOTAL, SI_AT_BREAST, 1);
+		actualResult = Age2Age.ageToAge(SI_BL_CHENAC, 0, SI_AT_TOTAL, SI_AT_BREAST, 1);
 
 		assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 	}
@@ -98,27 +98,27 @@ class Age2AgeTest {
 	@Test
 	void testShouldNotBranchReturnValue() throws AgeTypeErrorException {
 		double expectedResult = 3.0; // normal calculated test
-		double actualResult = Age2Age.age_to_age((short) 600, 1, SI_AT_BREAST, SI_AT_TOTAL, 2);
+		double actualResult = Age2Age.ageToAge((short) 600, 1, SI_AT_BREAST, SI_AT_TOTAL, 2);
 
 		assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 
 		expectedResult = 0; // returnValue < 0
-		actualResult = Age2Age.age_to_age((short) 600, 0, SI_AT_BREAST, SI_AT_TOTAL, -2);
+		actualResult = Age2Age.ageToAge((short) 600, 0, SI_AT_BREAST, SI_AT_TOTAL, -2);
 
 		expectedResult = 1.0; // normal calculated test
-		actualResult = Age2Age.age_to_age((short) 600, 2, SI_AT_TOTAL, SI_AT_BREAST, 1);
+		actualResult = Age2Age.ageToAge((short) 600, 2, SI_AT_TOTAL, SI_AT_BREAST, 1);
 
 		assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 
 		expectedResult = 0; // returnValue < 0
-		actualResult = Age2Age.age_to_age((short) 600, 0, SI_AT_TOTAL, SI_AT_BREAST, 1);
+		actualResult = Age2Age.ageToAge((short) 600, 0, SI_AT_TOTAL, SI_AT_BREAST, 1);
 
 		assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 	}
 
 	@Test
 	void testShouldBranchNoIfMatch() {
-		assertThrows(AgeTypeErrorException.class, () -> Age2Age.age_to_age(SI_SS_NIGH, 0.0, (short) 5, (short) 6, 0.0));
+		assertThrows(AgeTypeErrorException.class, () -> Age2Age.ageToAge(SI_SS_NIGH, 0.0, (short) 5, (short) 6, 0.0));
 	}
 
 	@Test
@@ -130,7 +130,7 @@ class Age2AgeTest {
 				SI_SE_NIGHTA, SI_SW_GOUDIE_NATAC, SI_SW_GOUDIE_PLAAC, SI_SW_NIGHTA2004, SI_SW_NIGHTA };
 
 		for (short caseValue : cases) {
-			double actualResult = Age2Age.age_to_age(caseValue, 1.5, SI_AT_BREAST, SI_AT_TOTAL, 2);
+			double actualResult = Age2Age.ageToAge(caseValue, 1.5, SI_AT_BREAST, SI_AT_TOTAL, 2);
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 		}
 
