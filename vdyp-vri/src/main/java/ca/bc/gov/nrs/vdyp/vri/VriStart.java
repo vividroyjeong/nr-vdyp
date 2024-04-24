@@ -3,7 +3,6 @@ package ca.bc.gov.nrs.vdyp.vri;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -13,9 +12,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
@@ -692,8 +688,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 			float siteIndex = primarySite.getSiteIndex().orElseThrow(); // SID
 			float yeastToBreastHeight = primaryYearsToBreastHeight; // YTBHD
-
-			int[] sci = new int[] { siteCurveNumber, 2 }; // SCI TODO this can probably be handled better
 
 			Map<String, Float> minimaMap = Utils.expectParsedControl(controlMap, ControlKey.MINIMA, Map.class);
 
