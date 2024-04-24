@@ -56,7 +56,7 @@ public class Age2Age {
 	private static final int SI_SW_NIGHTA2004 = 111;
 	private static final int SI_PLI_NIGHTA2004 = 109;
 
-	@SuppressWarnings("java:S3776")
+	@SuppressWarnings("java:S3776, java:S6541, java:S1479")
 	public static double ageToAge(int cuIndex, double age1, int age1Type, int age2Type, double y2bh)
 			throws AgeTypeErrorException {
 		double returnValue;

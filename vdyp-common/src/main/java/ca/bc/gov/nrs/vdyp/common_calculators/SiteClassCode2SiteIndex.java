@@ -312,8 +312,8 @@ public class SiteClassCode2SiteIndex {
 			}
 			break;
 
+		default:
+			throw new SpeciesErrorException("Unknown species index: " + sitecl);
 		}
-		throw new SpeciesErrorException("Unknown species index: " + sitecl);
 	}
-
 }

@@ -77,10 +77,11 @@ public class Height2SiteIndex {
 
 	// private; public for testing only
 	public static double llog(double x) {
-		return ( (x) <= 0.0) ? Math.log(.00001) : Math.log(x);
+		return (x <= 0.0) ? Math.log(.00001) : Math.log(x);
 	}
 
-	public static double heightToIndex(int cu_index, double age, int ageType, double height, int si_est_type)
+	@SuppressWarnings("java:S3776, java:S6541")
+	public static double heightToIndex(int cuIndex, double age, int ageType, double height, int siEstType)
 			throws CommonCalculatorException {
 		double index;
 		double x1, x2;
@@ -103,10 +104,10 @@ public class Height2SiteIndex {
 		}
 
 		if (ageType == SI_AT_BREAST) {
-			index = baHeightToIndex(cu_index, age, height, si_est_type);
+			index = baHeightToIndex(cuIndex, age, height, siEstType);
 		} else {
-			if (si_est_type == SI_EST_DIRECT) {
-				switch (cu_index) {
+			if (siEstType == SI_EST_DIRECT) {
+				switch (cuIndex) {
 				case SI_FDI_THROWER:
 					if (age <= 4) {
 						/* means less than 1.3m, so can't generate site index */
@@ -120,16 +121,17 @@ public class Height2SiteIndex {
 					}
 					break;
 				default:
-					index = siteIterate(cu_index, age, SI_AT_TOTAL, height);
+					index = siteIterate(cuIndex, age, SI_AT_TOTAL, height);
 					break;
 				}
 			} else
-				index = siteIterate(cu_index, age, SI_AT_TOTAL, height);
+				index = siteIterate(cuIndex, age, SI_AT_TOTAL, height);
 		}
 		return (index);
 	}
 
-	public static double baHeightToIndex(int cu_index, double bhage, double height, int si_est_type)
+	@SuppressWarnings("java:S3776, java:S6541")
+	public static double baHeightToIndex(int cuIndex, double bhage, double height, int siEstType)
 			throws CommonCalculatorException {
 		double index;
 		double x1, x2;
@@ -142,8 +144,8 @@ public class Height2SiteIndex {
 					"Bhage < 0.5 years which indicates that it can't be done, bhage: " + bhage
 			);
 		} else {
-			if (si_est_type == SI_EST_DIRECT) {
-				switch (cu_index) {
+			if (siEstType == SI_EST_DIRECT) {
+				switch (cuIndex) {
 				case SI_BA_DILUCCA:
 					index = height * (1 + Math.exp(6.300852572 + 0.85314673 * Math.log(50.0) - 2.533284275 * (height)))
 							/ (1 + Math.exp(6.300852572 + 0.8314673 * Math.log(bhage) - 2.533284275 * llog(height)));
@@ -3845,20 +3847,20 @@ public class Height2SiteIndex {
 					}
 					break;
 				default:
-					index = siteIterate(cu_index, bhage, SI_AT_BREAST, height);
+					index = siteIterate(cuIndex, bhage, SI_AT_BREAST, height);
 					break;
 				}
 			} else
-				index = siteIterate(cu_index, bhage, SI_AT_BREAST, height);
+				index = siteIterate(cuIndex, bhage, SI_AT_BREAST, height);
 		}
 		return index;
 	}
 
-	public static double siteIterate(int cu_index, double age, int age_type, double height)
+	public static double siteIterate(int cuIndex, double age, int ageType, double height)
 			throws CommonCalculatorException {
 		double site;
 		double step;
-		double test_top;
+		double testTop;
 		double y2bh;
 
 		/* initial guess */
@@ -3872,16 +3874,16 @@ public class Height2SiteIndex {
 		do {
 
 			/* estimate y2bh */
-			y2bh = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site);
+			y2bh = SiteIndexYears2BreastHeight.si_y2bh(cuIndex, site);
 
-			if (age_type == SI_AT_BREAST) {
-				test_top = SiteIndex2Height.indexToHeight(cu_index, age, SI_AT_BREAST, site, y2bh, 0.5); // 0.5 may
+			if (ageType == SI_AT_BREAST) {
+				testTop = SiteIndex2Height.indexToHeight(cuIndex, age, SI_AT_BREAST, site, y2bh, 0.5); // 0.5 may
 																											// have to
 																											// change
 			} else {
 				/* was age - y2bh */
-				test_top = SiteIndex2Height.indexToHeight(
-						cu_index, Age2Age.ageToAge(cu_index, age, SI_AT_TOTAL, SI_AT_BREAST, y2bh), SI_AT_BREAST,
+				testTop = SiteIndex2Height.indexToHeight(
+						cuIndex, Age2Age.ageToAge(cuIndex, age, SI_AT_TOTAL, SI_AT_BREAST, y2bh), SI_AT_BREAST,
 						site, y2bh, 0.5
 				); // 0.5 may have to change
 			}
@@ -3892,9 +3894,9 @@ public class Height2SiteIndex {
 			 *
 			 */
 
-			if ( (test_top - height > 0.01) || (test_top - height < -0.01)) {
+			if ( (testTop - height > 0.01) || (testTop - height < -0.01)) {
 				/* not close enough */
-				if (test_top > height) {
+				if (testTop > height) {
 					if (step > 0) {
 						step = -step / 2.0;
 					}
@@ -3937,7 +3939,8 @@ public class Height2SiteIndex {
 
 	}
 
-	public static double huGarciaQ(double site_index, double bhage) {
+	@SuppressWarnings("java:S3776, java:S6541")
+	public static double huGarciaQ(double siteIndex, double bhAge) {
 		double h, q, step, diff, lastdiff;
 
 		q = 0.02;
@@ -3946,9 +3949,9 @@ public class Height2SiteIndex {
 		diff = 0;
 
 		do {
-			h = huGarciaH(q, bhage);
+			h = huGarciaH(q, bhAge);
 			lastdiff = diff;
-			diff = site_index - h;
+			diff = siteIndex - h;
 			if (diff > 0.0000001) {
 				if (lastdiff < 0) {
 					step = step / 2.0;
@@ -3975,11 +3978,11 @@ public class Height2SiteIndex {
 		return q;
 	}
 
-	public static double huGarciaH(double q, double bhage) {
+	public static double huGarciaH(double q, double bhAge) {
 		double a, height;
 
 		a = 283.9 * Math.pow(q, 0.5137);
-		height = a * Math.pow(1 - (1 - Math.pow(1.3 / a, 0.5829)) * Math.exp(-q * (bhage - 0.5)), 1.71556);
+		height = a * Math.pow(1 - (1 - Math.pow(1.3 / a, 0.5829)) * Math.exp(-q * (bhAge - 0.5)), 1.71556);
 		return height;
 	}
 

@@ -25,6 +25,7 @@ import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
  * <li> 'Documents/CFS-Biomass' folder.
  * </ol>
  */
+@SuppressWarnings("java:S1192")
 public enum CfsLiveConversionParams implements SI32Enum<CfsLiveConversionParams> {
 	UNKNOWN(-1, "UNKNOWN"),
 
