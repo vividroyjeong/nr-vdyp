@@ -27,27 +27,39 @@ import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
  * </ol>
  */
 public enum CfsDeadConversionParams implements SI32Enum<CfsDeadConversionParams> {
-	UNKNOWN(-1), 
+	UNKNOWN(-1, "Dead", "??"), 
 
-	PROP1(0),
-	PROP2(1),
-	PROP3(2),
-	PROP4(3),
-	PROP5(4),
-	V1(5),
-	V2(6),
-	V3(7),
-	V4(8);
+	PROP1(0, "Dead", "P1"),
+	PROP2(1, "Dead", "P2"),
+	PROP3(2, "Dead", "P3"),
+	PROP4(3, "Dead", "P4"),
+	PROP5(4, "Dead", "P5"),
+	V1(5, "Dead", "V1"),
+	V2(6, "Dead", "V2"),
+	V3(7, "Dead", "V3"),
+	V4(8, "Dead", "V4");
 
 	private final int index;
+	private final String shortName;
+	private final String category;
 	
-	private CfsDeadConversionParams(int index) {
+	private CfsDeadConversionParams(int index, String category, String shortName) {
 		this.index = index;
+		this.shortName = shortName;
+		this.category = category;
 	}
 
 	@Override
 	public int getIndex() {
 		return index;
+	}
+	
+	public String getShortName() {
+		return shortName;
+	}
+	
+	public String getCategory() {
+		return category;
 	}
 	
 	@Override
