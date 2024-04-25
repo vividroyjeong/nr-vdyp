@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -344,7 +345,7 @@ public class TestUtils {
 
 			@Override
 			public String toString(String filename) throws IOException {
-				return klazz.getResource(filename).toString();
+				return klazz.getResource(filename).getPath();
 			}
 
 			@Override

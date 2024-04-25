@@ -1,5 +1,7 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
+import java.text.MessageFormat;
+
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ClassErrorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ForestInventoryZoneException;
@@ -313,7 +315,9 @@ public class SiteClassCode2SiteIndex {
 			break;
 
 		default:
-			throw new SpeciesErrorException("Unknown species index: " + sitecl);
+			break /* fall through */;
 		}
+
+		throw new SpeciesErrorException(MessageFormat.format("classToIndex: not found: spIndex {0}, sitecl {1}, fiz {2}", spIndex, sitecl, fiz));
 	}
 }
