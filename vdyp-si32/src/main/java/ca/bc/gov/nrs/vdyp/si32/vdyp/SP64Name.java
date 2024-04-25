@@ -6,7 +6,8 @@ import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 
 /**
- * An enumeration holding each of the valid SP0 Species known to VDYP7.
+ * An enumeration holding each of the valid SP0 Species known to VDYP7. The index
+ * value <b>must</b> match the index of this species in {@code SpeciesTable}.
  * <p>
  * <b>UNKNOWN</b> represents an error condition or an uninitialized state. 
  * This value should not be used as a species constant.
@@ -196,7 +197,7 @@ public enum SP64Name implements SI32Enum<SP64Name> {
 		
 		if (text != null) {
 			try {
-				return valueOf(SP64Name.class, "" + text.toUpperCase());
+				return valueOf(SP64Name.class, text.toUpperCase());
 			} catch (IllegalArgumentException e) {
 				return UNKNOWN;
 			}

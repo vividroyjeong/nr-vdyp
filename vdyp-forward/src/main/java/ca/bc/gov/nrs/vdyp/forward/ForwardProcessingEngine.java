@@ -89,7 +89,7 @@ public class ForwardProcessingEngine {
 						SiteCurve sc = siteCurveMap.get(sp0Dist.get().getSpecies());
 						scIndex = Optional.of(sc.getValue(becZone.getRegion()));
 					} else {
-						scIndex = Optional.of(SiteTool.SiteTool_GetSICurve(pps.speciesName[i], becZone.getRegion().equals(Region.COASTAL)));
+						scIndex = Optional.of(SiteTool.getSICurve(pps.speciesName[i], becZone.getRegion().equals(Region.COASTAL)));
 					}
 				}
 				
@@ -98,7 +98,7 @@ public class ForwardProcessingEngine {
 						SiteCurve sc = siteCurveMap.get(pps.speciesName[i]);
 						scIndex = Optional.of(sc.getValue(becZone.getRegion()));
 					} else {
-						scIndex = Optional.of(SiteTool.SiteTool_GetSICurve(pps.speciesName[i], becZone.getRegion().equals(Region.COASTAL)));
+						scIndex = Optional.of(SiteTool.getSICurve(pps.speciesName[i], becZone.getRegion().equals(Region.COASTAL)));
 					}
 				}
 			}

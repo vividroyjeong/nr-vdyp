@@ -14,19 +14,15 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException
 public class Height2SiteIndex {
 	// Taken from sindex.h
 
-	/*
-	 * age types
-	 */
-	private static final int SI_AT_TOTAL = 0;
-	private static final int SI_AT_BREAST = 1;
-	/*
-	 * site index estimation (from height and age) types
-	 */
-	private static final int SI_EST_DIRECT = 1;
+	/* age types */
+	public static final int SI_AT_TOTAL = 0;
+	public static final int SI_AT_BREAST = 1;
+	
+	/* site index estimation (from height and age) types */
+	public static final int SI_EST_ITERATE = 0;
+	public static final int SI_EST_DIRECT = 1;
 
-	/*
-	 * error codes
-	 */
+	/* error codes */
 	private static final int SI_ERR_NO_ANS = -4;
 
 	/* define species and equation indices */

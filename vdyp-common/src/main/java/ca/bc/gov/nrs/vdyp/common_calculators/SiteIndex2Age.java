@@ -95,7 +95,7 @@ public class SiteIndex2Age {
 
 		// #ifdef HOOP
 		double ht5, ht10;
-		// This is intialzied because otherwise it will cause issues later.
+		// This is initialized because otherwise it will cause issues later.
 		// #endif
 		double age;
 

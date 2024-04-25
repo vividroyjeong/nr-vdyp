@@ -36,18 +36,18 @@ public class VdypMethods {
 	}
 
 	/**
-	 * Converts a CFS species code name into an index into the Species table.
+	 * Converts a SP64 code name into an index into the Species table.
 	 * 
-	 * @param sp64Name the name of the CFS species.
+	 * @param sp64CodeName the code name of the SP64 name in question
 	 * @return the index into the Species table for the corresponding species, and SpeciesTable.UNKNOWN_ENTRY_INDEX if
 	 *         the species was not recognized.
 	 */
-	public static int speciesIndex(String sp64Name) {
+	public static int speciesIndex(String sp64CodeName) {
 		int result;
 
-		if (StringUtils.isNotBlank(sp64Name)) {
+		if (StringUtils.isNotBlank(sp64CodeName)) {
 			try {
-				SpeciesTableItem spsc = speciesTable.getByCode(sp64Name);
+				SpeciesTableItem spsc = speciesTable.getByCode(sp64CodeName);
 				result = spsc.index();
 			} catch (IllegalArgumentException e) {
 				result = SpeciesTable.UNKNOWN_ENTRY_INDEX;
@@ -204,13 +204,13 @@ public class VdypMethods {
 	/**
 	 * Converts a CFS species name to an equivalent VDYP7 species (genus) name.
 	 * 
-	 * @param sp64Name the name of the species to convert.
+	 * @param sp64CodeName the SP64 code name of the species to convert.
 	 * @return the equivalent VDYP7 species code. "" is returned if the 
 	 * species is not supported by VDYP7 and no mapping exists.
 	 */
-	public static String getVDYP7Species(String sp64Name) {
-		if (sp64Name != null) {
-			return speciesTable.getByCode(sp64Name).details().sp0Name();
+	public static String getVDYP7Species(String sp64CodeName) {
+		if (sp64CodeName != null) {
+			return speciesTable.getByCode(sp64CodeName).details().sp0Name();
 		} else {
 			return SpeciesTable.DefaultEntry.sp0Name();
 		}
@@ -314,17 +314,17 @@ public class VdypMethods {
 	/**
 	 * Sets the Site Index curve to use for a particular species.
 	 *
-	 * @param sp64Name the species short ("code") name such as "ABAL"
+	 * @param sp64CodeName the species short ("code") name such as "ABAL"
 	 * @param region the region under consideration
 	 * @param siCurve the site index curve to use for the specified species. -1.0f
 	 * resets the curve to the default.
 	 *
 	 * @return the previous value.
 	 */
-	public static int setCurrentSICurve(String sp64Name, SpeciesRegion region, int siCurve) {
+	public static int setCurrentSICurve(String sp64CodeName, SpeciesRegion region, int siCurve) {
 		
-		int oldCurve = getCurrentSICurve(sp64Name, region);
-		var speciesEntry = speciesTable.getByCode(sp64Name);
+		int oldCurve = getCurrentSICurve(sp64CodeName, region);
+		var speciesEntry = speciesTable.getByCode(sp64CodeName);
 		if (region != null && speciesEntry.details() != SpeciesTable.DefaultEntry) {
 			speciesEntry.details().currentSICurve()[region.ordinal()] = siCurve;
 		}
@@ -453,19 +453,19 @@ public class VdypMethods {
 	 * For a specific species, returns the default Crown Closure associated with that species within a particular region
 	 * of the province.
 	 *
-	 * @param sp64Name the species name to be looked up.
+	 * @param sp64CodeName the species name to be looked up.
 	 * @param region indicates which provincial region to get the default CC for.
 	 *
 	 * @return the default CC associated with the species in that particular region and -1.0 if the species was not
 	 *         recognized or no default CC has been assigned to that species and region.
 	 */
-	public static float getDefaultCrownClosure(String sp64Name, SpeciesRegion region) {
+	public static float getDefaultCrownClosure(String sp64CodeName, SpeciesRegion region) {
 
 		// Note that if spName is invalid, the default entry is returned, which in
 		// turn contains the right default value of -1.0f.
 
-		if (sp64Name != null && region != null) {
-			return speciesTable.getByCode(sp64Name).details().defaultCrownClosure()[region.ordinal()];
+		if (sp64CodeName != null && region != null) {
+			return speciesTable.getByCode(sp64CodeName).details().defaultCrownClosure()[region.ordinal()];
 		} else {
 			return -1.0f;
 		}
