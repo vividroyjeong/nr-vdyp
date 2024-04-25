@@ -23,6 +23,8 @@ public class SiteTool {
 	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(SiteTool.class);
 
+	public static final String UNKNOWN_CURVE_RESULT = "Unknown Curve";
+
 	/**
 	 * Converts a MoF sp64 species name (e.g, "AC" from SP64Name.AC) to its equivalent
 	 * in {@link CfsBiomassConversionSupportedSpecies}, should one exist. If one doesn't,
@@ -34,80 +36,116 @@ public class SiteTool {
 	public static CfsBiomassConversionSupportedSpecies lcl_MoFSP64ToCFSSpecies(String spcsNm) {
 
 		SP64Name sp64Name = SP64Name.forText(spcsNm);
-		
+
 		switch (sp64Name) {
-		   case AC: return CfsBiomassConversionSupportedSpecies.AC;
-		   case ACB: return CfsBiomassConversionSupportedSpecies.ACB;
-		   case AT: return CfsBiomassConversionSupportedSpecies.AT;
-		   case B: return CfsBiomassConversionSupportedSpecies.B;
-		   case BA: return CfsBiomassConversionSupportedSpecies.BA;
-		   case BG: return CfsBiomassConversionSupportedSpecies.BG;
-		   case BL: return CfsBiomassConversionSupportedSpecies.BL;
-		   case CW: return CfsBiomassConversionSupportedSpecies.CW;
-		   case DR: return CfsBiomassConversionSupportedSpecies.DR;
-		   case EA: return CfsBiomassConversionSupportedSpecies.EA;
-		   case EP: return CfsBiomassConversionSupportedSpecies.EP;
-		   case EXP: return CfsBiomassConversionSupportedSpecies.EXP;
-		   case FD: return CfsBiomassConversionSupportedSpecies.FD;
-		   case FDC: return CfsBiomassConversionSupportedSpecies.FDC;
-		   case FDI: return CfsBiomassConversionSupportedSpecies.FDI;
-		   case H: return CfsBiomassConversionSupportedSpecies.H;
-		   case HM: return CfsBiomassConversionSupportedSpecies.HM;
-		   case HW: return CfsBiomassConversionSupportedSpecies.HW;
-		   case L: return CfsBiomassConversionSupportedSpecies.L;
-		   case LA: return CfsBiomassConversionSupportedSpecies.LA;
-		   case LT: return CfsBiomassConversionSupportedSpecies.LT;
-		   case LW: return CfsBiomassConversionSupportedSpecies.LW;
-		   case MB: return CfsBiomassConversionSupportedSpecies.MB;
-		   case PA: return CfsBiomassConversionSupportedSpecies.PA;
-		   case PL:
-		   case PLI: return CfsBiomassConversionSupportedSpecies.PL;
-		   case PLC: return CfsBiomassConversionSupportedSpecies.PLC;
-		   case PW: return CfsBiomassConversionSupportedSpecies.PW;
-		   case PY: return CfsBiomassConversionSupportedSpecies.PY;
-		   case S: return CfsBiomassConversionSupportedSpecies.S;
-		   case SB: return CfsBiomassConversionSupportedSpecies.SB;
-		   case SE: return CfsBiomassConversionSupportedSpecies.SE;
-		   case SS: return CfsBiomassConversionSupportedSpecies.SS;
-		   case SW: return CfsBiomassConversionSupportedSpecies.SW;
-		   case SX: return CfsBiomassConversionSupportedSpecies.SX;
-		   case W: return CfsBiomassConversionSupportedSpecies.W;
-		   case X: return CfsBiomassConversionSupportedSpecies.XC;
-		   case YC: return CfsBiomassConversionSupportedSpecies.YC;
-		   default: return CfsBiomassConversionSupportedSpecies.UNKNOWN;
+		case AC:
+			return CfsBiomassConversionSupportedSpecies.AC;
+		case ACB:
+			return CfsBiomassConversionSupportedSpecies.ACB;
+		case AT:
+			return CfsBiomassConversionSupportedSpecies.AT;
+		case B:
+			return CfsBiomassConversionSupportedSpecies.B;
+		case BA:
+			return CfsBiomassConversionSupportedSpecies.BA;
+		case BG:
+			return CfsBiomassConversionSupportedSpecies.BG;
+		case BL:
+			return CfsBiomassConversionSupportedSpecies.BL;
+		case CW:
+			return CfsBiomassConversionSupportedSpecies.CW;
+		case DR:
+			return CfsBiomassConversionSupportedSpecies.DR;
+		case EA:
+			return CfsBiomassConversionSupportedSpecies.EA;
+		case EP:
+			return CfsBiomassConversionSupportedSpecies.EP;
+		case EXP:
+			return CfsBiomassConversionSupportedSpecies.EXP;
+		case FD:
+			return CfsBiomassConversionSupportedSpecies.FD;
+		case FDC:
+			return CfsBiomassConversionSupportedSpecies.FDC;
+		case FDI:
+			return CfsBiomassConversionSupportedSpecies.FDI;
+		case H:
+			return CfsBiomassConversionSupportedSpecies.H;
+		case HM:
+			return CfsBiomassConversionSupportedSpecies.HM;
+		case HW:
+			return CfsBiomassConversionSupportedSpecies.HW;
+		case L:
+			return CfsBiomassConversionSupportedSpecies.L;
+		case LA:
+			return CfsBiomassConversionSupportedSpecies.LA;
+		case LT:
+			return CfsBiomassConversionSupportedSpecies.LT;
+		case LW:
+			return CfsBiomassConversionSupportedSpecies.LW;
+		case MB:
+			return CfsBiomassConversionSupportedSpecies.MB;
+		case PA:
+			return CfsBiomassConversionSupportedSpecies.PA;
+		case PL:
+		case PLI:
+			return CfsBiomassConversionSupportedSpecies.PL;
+		case PLC:
+			return CfsBiomassConversionSupportedSpecies.PLC;
+		case PW:
+			return CfsBiomassConversionSupportedSpecies.PW;
+		case PY:
+			return CfsBiomassConversionSupportedSpecies.PY;
+		case S:
+			return CfsBiomassConversionSupportedSpecies.S;
+		case SB:
+			return CfsBiomassConversionSupportedSpecies.SB;
+		case SE:
+			return CfsBiomassConversionSupportedSpecies.SE;
+		case SS:
+			return CfsBiomassConversionSupportedSpecies.SS;
+		case SW:
+			return CfsBiomassConversionSupportedSpecies.SW;
+		case SX:
+			return CfsBiomassConversionSupportedSpecies.SX;
+		case W:
+			return CfsBiomassConversionSupportedSpecies.W;
+		case X:
+			return CfsBiomassConversionSupportedSpecies.XC;
+		case YC:
+			return CfsBiomassConversionSupportedSpecies.YC;
+		default:
+			return CfsBiomassConversionSupportedSpecies.UNKNOWN;
 		}
 	}
 
 	/**
 	 * Convert the supplied Internal Species Index into its corresponding string.
 	 *
-	 * @param intSpeciesNdx the internal species index to be converted into a string.
-	 * @return the string corresponding to the supplied internal species index. If 
-	 * {@code intSpeciesNdx} is null or has the value "UNKNOWN", "??" is 
+	 * @param cfsSpecies the species to be converted into a string.
+	 * @return the string corresponding to the supplied species. If 
+	 * {@code cfsSpecies} is null or has the value "UNKNOWN", "??" is 
 	 * returned.
 	 */
-	public static String lcl_InternalSpeciesIndexToString(CfsBiomassConversionSupportedSpecies intSpeciesNdx)
-	{
-		if (intSpeciesNdx == null || CfsBiomassConversionSupportedSpecies.UNKNOWN.equals(intSpeciesNdx)) {
+	public static String lcl_InternalSpeciesIndexToString(CfsBiomassConversionSupportedSpecies cfsSpecies) {
+		if (cfsSpecies == null || CfsBiomassConversionSupportedSpecies.UNKNOWN.equals(cfsSpecies)) {
 			return "??";
 		} else {
-			return intSpeciesNdx.getText();
+			return cfsSpecies.getText();
 		}
 	}
 
 	/**
 	 * Convert the supplied Internal Genus Index into its corresponding string.
 	 *
-	 * @param intGenusNdx the internal genus index to be converted into a string.
-	 * @return the string corresponding to the supplied internal genus index. If 
-	 * {@code intGenusNdx} is null or has the value "genusInt_INVALID", 
-	 * "genusInt_INVALID" is returned.
+	 * @param genera the internal genus index to be converted into a string.
+	 * @return the string corresponding to the supplied internal genus index. If {@code genera} is null 
+	 * or has the value "INVALID", "genusInt_INVALID" is returned.
 	 */
-	public static String lcl_InternalGenusIndexToString(CfsBiomassConversionSupportedGenera intGenusNdx) {
-		if (intGenusNdx == null || intGenusNdx.equals(CfsBiomassConversionSupportedGenera.INVALID))
-			return "INVALID";
+	public static String lcl_InternalGenusIndexToString(CfsBiomassConversionSupportedGenera genera) {
+		if (genera == null || genera.equals(CfsBiomassConversionSupportedGenera.INVALID))
+			return "genusInt_INVALID";
 		else
-			return intGenusNdx.getText();
+			return genera.getText();
 	}
 
 	/**
@@ -116,54 +154,68 @@ public class SiteTool {
 	 * @param liveParam the conversion parameter to be converted into a string.
 	 * @param nameFormat indicates in what format the enumeration constant is to be 
 	 * converted.
-	 * @return a string representation for the live conversion parameter. If
-	 * {@code liveParam} has the value null or <code>UNKNOWN</code>, 
-	 * "UNKNOWN" is returned.
+	 * @return a string representation of the parameter. If {@code liveParam} has the value 
+	 * null or <code>UNKNOWN</code> then if {@code nameFormat} is null or not CAT_ONLY, NAME_ONLY 
+	 * or CAT_NAME, "cfsLiveParam_UNKNOWN" is returned. Otherwise, "??" is returned. 
+	 * <p>On the other hand ({@code liveParam} is not null and not <code>UNKNOWN</code>), the result 
+	 * is a function of the value of {@code nameFormat}, unless that is null or not CAT_ONLY, 
+	 * NAME_ONLY or CAT_NAME, in which case the text of {@code liveParam} is returned.
 	 */
 	public static String lcl_LiveConversionParamToString(CfsLiveConversionParams liveParam, NameFormat nameFormat) {
 		if (liveParam == null || liveParam.equals(CfsLiveConversionParams.UNKNOWN)) {
-			return "UNKNOWN";
+			if (nameFormat == null || nameFormat.equals(NameFormat.ENUM_STR)) {
+				return "cfsLiveParam_UNKNOWN";
+			} else {
+				return "??";
+			}
 		} else if (nameFormat == null) {
-			return liveParam.toString();
+			return liveParam.getText();
 		} else {
 			switch (nameFormat) {
 			case CAT_ONLY:
 				return liveParam.getCategory();
 			case NAME_ONLY:
-				return liveParam.getText();
+				return liveParam.getShortName();
 			case CAT_NAME:
-				return MessageFormat.format("{0} {1}", liveParam.getCategory(), liveParam.getText());
+				return MessageFormat.format("{0} {1}", liveParam.getCategory(), liveParam.getShortName());
 			default:
-				throw new IllegalStateException(MessageFormat.format("Unsupported enumNameFormat {0}", nameFormat));
+				return liveParam.getText();
 			}
 		}
 	}
 
 	/**
 	 * Convert the supplied Dead Conversion Parameter into an identifying string.
-	 * <p>
-	 * These strings are meant to be int names for the parameters.
-	 * 
+	 *
 	 * @param deadParam the conversion parameter to be converted into a string.
-	 * @param nameFormat indicates into which format the enumeration constant is to be converted.
-	 * @return a string representation for the dead conversion parameter. "cfsDeadParm_UNKNOWN" 
-	 * is returned if the parameter was not recognized.
+	 * @param nameFormat indicates in what format the enumeration constant is to be 
+	 * converted.
+	 * @return a string representation of the parameter. If {@code deadParam} has the value 
+	 * null or <code>UNKNOWN</code> then if {@code nameFormat} is null or not CAT_ONLY, NAME_ONLY 
+	 * or CAT_NAME, "cfsDeadParam_UNKNOWN" is returned. Otherwise, "??" is returned. 
+	 * <p>On the other hand ({@code deadParam} is not null and not <code>UNKNOWN</code>), the result 
+	 * is a function of the value of {@code nameFormat}, unless that is null or not CAT_ONLY, 
+	 * NAME_ONLY or CAT_NAME, in which case the text of {@code deadParam} is returned.
 	 */
 	public static String lcl_DeadConversionParamToString(CfsDeadConversionParams deadParam, NameFormat nameFormat) {
 		if (deadParam == null || deadParam.equals(CfsDeadConversionParams.UNKNOWN)) {
-			return "UNKNOWN";
+			if (nameFormat == null || nameFormat.equals(NameFormat.ENUM_STR)) {
+				return "cfsDeadParam_UNKNOWN";
+			} else {
+				return "??";
+			}
 		} else if (nameFormat == null) {
-			return deadParam.toString();
+			return deadParam.getText();
 		} else {
 			switch (nameFormat) {
 			case CAT_ONLY:
-				return "Dead";
+				return deadParam.getCategory();
 			case NAME_ONLY:
-				return deadParam.getText();
+				return deadParam.getShortName();
 			case CAT_NAME:
-				return MessageFormat.format("Dead {0}", deadParam, deadParam.getText());
+				return MessageFormat.format("{0} {1}", deadParam.getCategory(), deadParam.getShortName());
 			default:
-				throw new IllegalStateException(MessageFormat.format("Unsupported enumNameFormat {0}", nameFormat));
+				return deadParam.getText();
 			}
 		}
 	}
@@ -178,7 +230,7 @@ public class SiteTool {
 	 * 
 	 * @return as described.
 	 */
-	public static int SiteTool_CFSSpcsToCFSSpcsNum(CfsTreeSpecies cfsSpcs) {
+	public static int cfsSpcsToCfsSpcsNum(CfsTreeSpecies cfsSpcs) {
 		return CfsSpeciesMethods.getSpeciesIndexBySpecies(cfsSpcs);
 	}
 
@@ -188,42 +240,42 @@ public class SiteTool {
 	 * @param sp64Index the SP64Name's -index- of species in question.
 	 * @return as described
 	 */
-	public static boolean SiteTool_IsDeciduous(int sp64Index) {
-	
+	public static boolean getIsDeciduous(int sp64Index) {
+
 		return VdypMethods.isDeciduous(SP64Name.forIndex(sp64Index));
 	}
 
 	/** 
 	 * Determines if the supplied species is a softwood species.
 	 * 
-	 * @param spName the species short ("code") name.
+	 * @param sp64CodeName the species short ("code") name.
 	 * @return as described
 	 */
-	public static boolean SiteTool_IsSoftwood(String spName) {
-		
+	public static boolean getIsSoftwood(String sp64CodeName) {
+
 		// Note that if spName is not a recognized species name, the correct default value is returned.
-		return VdypMethods.speciesTable.getByCode(spName).details().isSoftwood();
+		return VdypMethods.speciesTable.getByCode(sp64CodeName).details().isSoftwood();
 	}
 
 	/**
 	 * Determines if the supplied species corresponds to a Pine species or not.
 	 * 
-	 * @param spName the species short ("code") name.
+	 * @param sp64CodeName the species short ("code") name.
 	 * @return {@code true} when the supplied species is a Pine related species and false if not, or the supplied
 	 *         species was not recognized.
 	 */
-	public static boolean SiteTool_IsPine(String spName) {
-		
-		String sSP0 = VdypMethods.getVDYP7Species(spName);
-		if (sSP0 != null) {
-			switch (sSP0) {
+	public static boolean getIsPine(String sp64CodeName) {
+
+		String sp0Name = VdypMethods.getVDYP7Species(sp64CodeName);
+		if (sp0Name != null) {
+			switch (sp0Name) {
 			case "PA", "PL", "PW", "PY":
 				return true;
 			default:
 				return false;
 			}
 		}
-	
+
 		return false;
 	}
 
@@ -232,14 +284,14 @@ public class SiteTool {
 	 * <p>
 	 * The list of species mappings is defined in the file 'BCSpcsToCFSSpcs-SAS.txt' found in 'Documents/CFS-Biomass'.
 	 * 
-	 * @param spName the species short ("code") name.
+	 * @param sp64CodeName the species short ("code") name.
 	 * @return the mapping to the equivalent CFS defined tree species (if a mapping exists). {@code UNKNOWN} is
 	 *         returned if the species was not recognized or a mapping does not exist.
 	 */
-	public static CfsTreeSpecies SiteTool_GetSpeciesCFSSpcs(String spName) {
+	public static CfsTreeSpecies getSpeciesCFSSpcs(String sp64CodeName) {
 
 		// Note that if spName is not a recognized species name, the correct default value is returned.
-		return VdypMethods.speciesTable.getByCode(spName).details().cfsSpecies();
+		return VdypMethods.speciesTable.getByCode(sp64CodeName).details().cfsSpecies();
 	}
 
 	/**
@@ -247,16 +299,16 @@ public class SiteTool {
 	 * <p>
 	 * The mapping from MoF Species is defined in 'BCSpcsToCFSSpcs-SAS.txt' found in 'Documents/CFS-Biomass'.
 	 *
-	 * @param spName the species short ("code") name.
+	 * @param sp64CodeName the species short ("code") name.
 	 * @return the CFS Species Number corresponding to the MoF Species index, and -1 if the species 
 	 * index is not in range or there is no mapping from the MoF Species to the CFS Species.
 	 */
-	public static int SiteTool_GetSpeciesCFSSpcsNum(String spName) {
-		
-		CfsTreeSpecies cfsSpcs = SiteTool_GetSpeciesCFSSpcs(spName);
+	public static int getSpeciesCFSSpcsNum(String sp64CodeName) {
+
+		CfsTreeSpecies cfsSpcs = getSpeciesCFSSpcs(sp64CodeName);
 
 		if (cfsSpcs != CfsTreeSpecies.UNKNOWN) {
-			return SiteTool_CFSSpcsToCFSSpcsNum(cfsSpcs);
+			return cfsSpcsToCfsSpcsNum(cfsSpcs);
 		} else {
 			return -1;
 		}
@@ -271,35 +323,36 @@ public class SiteTool {
 	 *			interpretation of this age is modified by the 'ageType' parameter.
 	 * @param ageType must be one of:
 	 * <ul>
-	 * <li>AT_TOTAL the age is the total age of the stand in years since planting.
-	 * <li>AT_BREAST the age indicates the number of years since the stand reached breast height.
+	 * <li>Height2SiteIndex.SI_AT_TOTAL the age is the total age of the stand in years since planting.
+	 * <li>Height2SiteIndex.SI_AT_BREAST the age indicates the number of years since the stand reached breast height.
 	 * </ul>
 	 * @param height the height of the species in meters.
 	 * @param estType must be one of:
 	 * <ul>
-	 * <li>SI_EST_DIRECT compute the site index based on direct equations if available. If 
+	 * <li>Height2SiteIndex.SI_EST_DIRECT compute the site index based on direct equations if available. If 
 	 * 		the equations are not available, then automatically fall to the SI_EST_ITERATE
 	 *		method.
-	 * <li> SI_EST_ITERATE compute the site index based on an iterative method which converges
+	 * <li>Height2SiteIndex.SI_EST_ITERATE compute the site index based on an iterative method which converges
 	 * 		on the true site index.
 	 * </ul>
 	 * @return the site index of the pure species stand given the height and age.
 	 */
-	public static double SiteTool_HtAgeToSI(int curve, double age, int ageType, double height, int estType)
+	public static double heightAndAgeToSiteIndex(int curve, double age, int ageType, double height, int estType)
 			throws CommonCalculatorException {
-		
+
 		Reference<Double> siRef = new Reference<>();
+		
 		// This method always returns 0; in the event of an error, an exception is thrown.
 		Sindxdll.HtAgeToSI(curve, age, ageType, height, estType, siRef);
-		
-		double SI = siRef.get();
+
+		double siteIndex = siRef.get();
 
 		// Round SI off to two decimals.
-		SI = ((int) (SI * 100.0 + 0.5)) / 100.0;
+		siteIndex = Math.round(siteIndex * 100.0) / 100.0;
 
-		return SI;
+		return siteIndex;
 	}
-	
+
 	/**
 	 * Converts a Height and Site Index to an Age for a particular Site Index Curve.
 	 *
@@ -308,8 +361,8 @@ public class SiteTool {
 	 * @param height the height of the species in meters.
 	 * @param ageType must be one of:
 	 * <ul>
-	 * <li>AT_TOTAL the age is the total age of the stand in years since planting.
-	 * <li>AT_BREAST the age indicates the number of years since the stand reached breast height.
+	 * <li>Height2SiteIndex.SI_AT_TOTAL the age is the total age of the stand in years since planting.
+	 * <li>Height2SiteIndex.SI_AT_BREAST the age indicates the number of years since the stand reached breast height.
 	 * </ul>
 	 * @param siteIndex the site index value of the stand.
 	 * @param years2BreastHeight the number of years it takes the stand to reach breast height.
@@ -317,15 +370,17 @@ public class SiteTool {
 	 * @return the age of the stand (given the ageType) at which point it has reached the 
 	 * height specified.
 	 */
-	public static double SiteTool_HtSIToAge(int curve, double height, int ageType, double siteIndex, 
-			double years2BreastHeight)
-				throws CommonCalculatorException {
-		
+	public static double heightAndSiteIndexToAge(
+			int curve, double height, int ageType, double siteIndex,
+			double years2BreastHeight
+	)
+			throws CommonCalculatorException {
+
 		Reference<Double> tempRef_rtrn = new Reference<>();
-		
+
 		// This call always returns 0; in the event of an error, an exception is thrown.
 		Sindxdll.HtSIToAge(curve, height, ageType, siteIndex, years2BreastHeight, tempRef_rtrn);
-		
+
 		return tempRef_rtrn.get();
 	}
 
@@ -340,8 +395,8 @@ public class SiteTool {
 	 *
 	 * @param ageType must be one of:
 	 * <ul>
-	 * <li>AT_TOTAL the age is the total age of the stand in years since planting.
-	 * <li>AT_BREAST the age indicates the number of years since the stand reached breast height.
+	 * <li>Height2SiteIndex.SI_AT_TOTAL the age is the total age of the stand in years since planting.
+	 * <li>Height2SiteIndex.SI_AT_BREAST the age indicates the number of years since the stand reached breast height.
 	 * </ul>
 	 * @param siteIndex the site index value of the stand.
 	 * @param years2BreastHeight the number of years it takes the stand to reach breast height.
@@ -350,20 +405,16 @@ public class SiteTool {
 	 * 
 	 * @throws CommonCalculatorException
 	 */
-	public static double SiteTool_AgeSIToHt(int curve, double age, int ageType, double siteIndex, 
-				double years2BreastHeight)
+	public static double ageAndSiteIndexToHeight(
+			int curve, double age, int ageType, double siteIndex,
+			double years2BreastHeight
+	)
 			throws CommonCalculatorException {
-		
-		int freddieCurve = curve;
-		int freddieAgeType = ageType;
-		double freddieAge = age;
-		double freddieSI = siteIndex;
-		double freddieY2BH = years2BreastHeight;
 
 		Reference<Double> tempRef_rtrn = new Reference<>();
-		
+
 		// This call always returns 0; if an error occurs, an exception is thrown.
-		Sindxdll.AgeSIToHt(freddieCurve, freddieAge, freddieAgeType, freddieSI, freddieY2BH, tempRef_rtrn);
+		Sindxdll.AgeSIToHt(curve, age, ageType, siteIndex, years2BreastHeight, tempRef_rtrn);
 
 		return tempRef_rtrn.get();
 	}
@@ -377,18 +428,18 @@ public class SiteTool {
 	 * @return the number of years to grow from seed to breast height.
 	 * @throws CommonCalculatorException in the event of an error
 	 */
-	public static double SiteTool_YearsToBreastHeight(int curve, double siteIndex) throws CommonCalculatorException {
+	public static double yearsToBreastHeight(int curve, double siteIndex) throws CommonCalculatorException {
 		double rtrn = 0.0;
 
 		Reference<Double> tempRef_rtrn = new Reference<>(rtrn);
-		
+
 		// This call always returns 0; if an error occurs, an exception is thrown.
 		Sindxdll.Y2BH(curve, siteIndex, tempRef_rtrn);
 
 		rtrn = tempRef_rtrn.get();
 
 		// Round off to 1 decimal.
-		rtrn = Math.round((int) (rtrn * 10.0 + 0.5)) / 10.0;
+		rtrn = Math.round(rtrn * 10.0) / 10.0;
 
 		return rtrn;
 	}
@@ -400,78 +451,76 @@ public class SiteTool {
 	 * @return string corresponding the name of the supplied curve number. "Unknown 
 	 * 		Curve" is returned for unrecognized curves.
 	 */
-	public static String SiteTool_SICurveName(int siCurve) {
+	public static String getSICurveName(int siCurve) {
 		String retStr;
 
 		try {
 			retStr = Sindxdll.CurveName(siCurve);
 		} catch (CurveErrorException e) {
-			retStr = "Unknown Curve";
+			retStr = UNKNOWN_CURVE_RESULT;
 		}
 
 		return retStr;
 	}
 
-	public static int SiteTool_NumSpecies() {
+	public static int getNumSpecies() {
 		return VdypMethods.getNumDefinedSpecies();
 	}
 
-	public static String SiteTool_SpeciesShortName(int sp64Index) {
+	public static String getSpeciesShortName(int sp64Index) {
 		return VdypMethods.getSpeciesShortName(SP64Name.forIndex(sp64Index));
 	}
 
-	public static int SiteTool_SpeciesIndex(String spcsCodeName) {
+	public static int getSpeciesIndex(String spcsCodeName) {
 		return VdypMethods.speciesIndex(spcsCodeName);
 	}
 
-	public static String SiteTool_SpeciesFullName(String spcsCodeName) {
+	public static String getSpeciesFullName(String spcsCodeName) {
 		return VdypMethods.getSpeciesFullName(SP64Name.forText(spcsCodeName));
 	}
 
-	public static String SiteTool_SpeciesLatinName(String spcsCodeName) {
+	public static String getSpeciesLatinName(String spcsCodeName) {
 		return VdypMethods.getSpeciesLatinName(SP64Name.forText(spcsCodeName));
 	}
 
-	public static String SiteTool_SpeciesGenusCode(String spcsCodeName) {
+	public static String getSpeciesGenusCode(String spcsCodeName) {
 		return VdypMethods.getSpeciesGenus(SP64Name.forText(spcsCodeName));
 	}
 
-	public static String SiteTool_SpeciesSINDEXCode(String spcsCode, boolean isCoastal) {
-		return VdypMethods.getSINDEXSpecies(spcsCode, 
-				isCoastal ? SpeciesRegion.COAST : SpeciesRegion.INTERIOR);
+	public static String getSpeciesSINDEXCode(String spcsCode, boolean isCoastal) {
+		return VdypMethods.getSINDEXSpecies(spcsCode, isCoastal ? SpeciesRegion.COAST : SpeciesRegion.INTERIOR);
 	}
 
-	public static String SiteTool_SpeciesVDYP7Code(String spcsCode) {
-		return VdypMethods.getVDYP7Species(spcsCode);
+	public static String getSpeciesVDYP7Code(String sp64CodeName) {
+		return VdypMethods.getVDYP7Species(sp64CodeName);
 	}
 
 	/**
 	 * Sets the Site Index curve to use for a particular species.
 	 *
-	 * @param speciesCodeName the short ("code") name of the species.
+	 * @param sp64CodeName the short ("code") name of the species.
 	 * @param coastalInd if <code>true</code>, the Coastal region is used and otherwise Interior is used.
 	 * @param siCurve the site index curve to use for the specified species. -1 resets the curve 
 	 * 		to the default.
 	 *
 	 * @return the previous value.
 	 */
-	public static int SiteTool_SetSICurve(String speciesCodeName, boolean coastalInd, int siCurve) {
-		
+	public static int setSICurve(String sp64CodeName, boolean coastalInd, int siCurve) {
+
 		SpeciesRegion region = (coastalInd ? SpeciesRegion.COAST : SpeciesRegion.INTERIOR);
-		return VdypMethods.setCurrentSICurve(speciesCodeName, region, siCurve);
+		return VdypMethods.setCurrentSICurve(sp64CodeName, region, siCurve);
 	}
 
 	/**
 	 * Maps a Species code name to a specific SI Curve.
 	 *
-	 * @param spcsCodeName the species short ("code") name.
+	 * @param sp64CodeName the species short ("code") name.
 	 * @param isCoastal <code>true</code> if coastal, <code>false</code> if interior.
 	 * @return the SI Curve number for the species, or -1 if the species was not recognized.
 	 */
-	public static int SiteTool_GetSICurve(String spcsCode, boolean isCoastal) {
+	public static int getSICurve(String sp64CodeName, boolean isCoastal) {
 
-		return VdypMethods.getCurrentSICurve(spcsCode, 
-				isCoastal ? SpeciesRegion.COAST : SpeciesRegion.INTERIOR);
+		return VdypMethods.getCurrentSICurve(sp64CodeName, isCoastal ? SpeciesRegion.COAST : SpeciesRegion.INTERIOR);
 	}
 
 	/**
@@ -482,8 +531,8 @@ public class SiteTool {
 	 * @return the short ("code") name of the species, in SIndex33 format (leading character
 	 * in upper case; following characters in lower case.)
 	 */
-	public static String SiteTool_SiteCurveSINDEXSpecies(int siCurve) {
-		
+	public static String getSiteCurveSINDEXSpecies(int siCurve) {
+
 		int spcsNdx = VdypMethods.getSICurveSpeciesIndex(siCurve);
 
 		String spcsNm;
@@ -506,9 +555,9 @@ public class SiteTool {
 	 * @return the default CC associated with the species in that particular region and -1.0 if the species was not
 	 *         recognized or no default CC has been assigned to that species and region.
 	 */
-	public static float SiteTool_SpeciesDefaultCrownClosure(String speciesCodeName, boolean isCoastal) {
+	public static float getSpeciesDefaultCrownClosure(String sp64CodeName, boolean isCoastal) {
 		return VdypMethods.getDefaultCrownClosure(
-				speciesCodeName, (isCoastal ? SpeciesRegion.COAST : SpeciesRegion.INTERIOR)
+				sp64CodeName, (isCoastal ? SpeciesRegion.COAST : SpeciesRegion.INTERIOR)
 		);
 	}
 
@@ -580,9 +629,11 @@ public class SiteTool {
 	 * @return always returns zero. In the future, this routine will return an error code, but none has
 	 *         been defined for this library yet.
 	 */
-	public static int SiteTool_FillInAgeTriplet(Reference<Double> rTotalAge, Reference<Double> rBreastHeightAge,
-			Reference<Double> rYTBH) {
-		
+	public static int fillInAgeTriplet(
+			Reference<Double> rTotalAge, Reference<Double> rBreastHeightAge,
+			Reference<Double> rYTBH
+	) {
+
 		int rtrnCode = 0;
 
 		// Ensure the parameters have values - one of them must be set to "unknown".
