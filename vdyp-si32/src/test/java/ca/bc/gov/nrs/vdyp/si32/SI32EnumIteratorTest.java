@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.sindex;
+package ca.bc.gov.nrs.vdyp.si32;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
