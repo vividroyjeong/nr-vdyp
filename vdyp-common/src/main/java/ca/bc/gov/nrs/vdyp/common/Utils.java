@@ -155,6 +155,26 @@ public class Utils {
 	}
 
 	/**
+	 * Compares two Optionals of comparables of the same type, treating "empty" as equal to "empty" and
+	 * before "present".
+	 * @param <T> the base type of the Optional
+	 * @param t1 the lhs of the comparison
+	 * @param t2 the rhs of the comparison
+	 * @return as described.
+	 */
+	public static <T extends Comparable<T>> int compareOptionals(Optional<T> t1, Optional<T> t2) {
+		if (t1.isEmpty() && t2.isEmpty()) {
+			return 0;
+		} else if (t1.isEmpty()) {
+			return -1;
+		} else if (t2.isEmpty()) {
+			return 1;
+		} else {
+			return t1.get().compareTo(t2.get());
+		}
+	}
+
+	/**
 	 * Create map, allow it to be modified, then return an unmodifiable view of it.
 	 *
 	 * @param <K>

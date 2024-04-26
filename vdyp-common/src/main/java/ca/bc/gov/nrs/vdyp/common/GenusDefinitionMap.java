@@ -27,6 +27,10 @@ public class GenusDefinitionMap {
 		}
 	}
 
+	public boolean contains(String alias) {
+		return genusByAliasMap.get(alias) != null;
+	}
+
 	public GenusDefinition get(String alias) {
 		GenusDefinition g = genusByAliasMap.get(alias);
 		if (g == null) {

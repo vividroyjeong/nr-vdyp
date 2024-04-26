@@ -2,7 +2,7 @@ package ca.bc.gov.nrs.vdyp.model;
 
 import java.util.Objects;
 
-public class AliasedEntity {
+public abstract class AliasedEntity {
 
 	private final String alias;
 	private final String name;

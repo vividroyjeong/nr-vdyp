@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.forward.parsers;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -8,13 +9,14 @@ import java.util.Map;
 import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
 import ca.bc.gov.nrs.vdyp.io.EndOfRecord;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.common.InvalidSpeciesDistributionSet;
+import ca.bc.gov.nrs.vdyp.io.parse.common.InvalidGenusDistributionSet;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapValueReplacer;
@@ -23,9 +25,10 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.GroupingStreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ControlledValueParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
+import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
-import ca.bc.gov.nrs.vdyp.model.SpeciesDistribution;
-import ca.bc.gov.nrs.vdyp.model.SpeciesDistributionSet;
+import ca.bc.gov.nrs.vdyp.model.GenusDistribution;
+import ca.bc.gov.nrs.vdyp.model.GenusDistributionSet;
 
 public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String> {
 
@@ -63,12 +66,10 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 		return () -> {
 			var lineParser = new LineParser().strippedString(25, DESCRIPTION).space(1)
 					.value(
-							1, LAYER_TYPE,
-							ValueParser.valueOrMarker(
-									ValueParser.LAYER,
-									ValueParser.optionalSingleton(
-											x -> x == null || x.trim().length() == 0 || x.trim().equals("Z"),
-											EndOfRecord.END_OF_RECORD
+							1, LAYER_TYPE, ValueParser.valueOrMarker(
+									ValueParser.LAYER, ValueParser.optionalSingleton(
+											x -> x == null || x.trim().length() == 0
+													|| x.trim().equals("Z"), EndOfRecord.END_OF_RECORD
 									)
 							)
 					).space(1).value(2, GENUS_INDEX, ValueParser.INTEGER).space(1)
@@ -91,6 +92,11 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 
 			var is = fileResolver.resolveForInput(fileName);
 
+			@SuppressWarnings("unchecked")
+			var genusDefinitionMap = new GenusDefinitionMap(
+					(List<GenusDefinition>) control.get(ControlKey.SP0_DEF.name())
+			);
+
 			var delegateStream = new AbstractStreamingParser<ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord>>(
 					is, lineParser, control
 			) {
@@ -107,19 +113,19 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 					}
 					var genusIndex = (Integer) entry.get(GENUS_INDEX);
 					var genus = (Optional<String>) entry.get(GENUS);
-					var species0 = (String) entry.get(SPECIES_0);
-					var percentSpecies0 = (Float) entry.get(PERCENT_SPECIES_0);
-					var species1 = (Optional<String>) entry.get(SPECIES_1);
-					var percentSpecies1 = (Optional<Float>) entry.get(PERCENT_SPECIES_1);
-					var species2 = (Optional<String>) entry.get(SPECIES_2);
-					var percentSpecies2 = (Optional<Float>) entry.get(PERCENT_SPECIES_2);
-					var species3 = (Optional<String>) entry.get(SPECIES_3);
-					var percentSpecies3 = (Optional<Float>) entry.get(PERCENT_SPECIES_3);
-					var siteIndex = (Float)(entry.get(SITE_INDEX));
-					var dominantHeight = (Float)(entry.get(DOMINANT_HEIGHT));
-					var totalAge = (Float)(entry.get(TOTAL_AGE));
-					var ageAtBreastHeight = (Float)(entry.get(AGE_AT_BREAST_HEIGHT));
-					var yearsToBreastHeight = (Float)(entry.get(YEARS_TO_BREAST_HEIGHT));
+					var genusNameText0 = (String) entry.get(SPECIES_0);
+					var percentGenus0 = (Float) entry.get(PERCENT_SPECIES_0);
+					var genusNameText1 = (Optional<String>) entry.get(SPECIES_1);
+					var percentGenus1 = (Optional<Float>) entry.get(PERCENT_SPECIES_1);
+					var genusNameText2 = (Optional<String>) entry.get(SPECIES_2);
+					var percentGenus2 = (Optional<Float>) entry.get(PERCENT_SPECIES_2);
+					var genusNameText3 = (Optional<String>) entry.get(SPECIES_3);
+					var percentGenus3 = (Optional<Float>) entry.get(PERCENT_SPECIES_3);
+					var siteIndex = (Float) (entry.get(SITE_INDEX));
+					var dominantHeight = (Float) (entry.get(DOMINANT_HEIGHT));
+					var totalAge = (Float) (entry.get(TOTAL_AGE));
+					var ageAtBreastHeight = (Float) (entry.get(AGE_AT_BREAST_HEIGHT));
+					var yearsToBreastHeight = (Float) (entry.get(YEARS_TO_BREAST_HEIGHT));
 					var isPrimarySpecies = Utils.<Boolean>optSafe(entry.get(IS_PRIMARY_SPECIES));
 					var siteCurveNumber = Utils.<Integer>optSafe(entry.get(SITE_CURVE_NUMBER))
 							.orElse(VdypEntity.MISSING_INTEGER_VALUE);
@@ -127,25 +133,44 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 					var builder = new ValueOrMarker.Builder<Optional<VdypLayerSpecies>, EndOfRecord>();
 					return layerType.handle(l -> builder.value(l.map(lt -> {
 
-						List<SpeciesDistribution> sdList = new ArrayList<>();
-						sdList.add(new SpeciesDistribution(0, species0, percentSpecies0));
+						List<GenusDistribution> gdList = new ArrayList<>();
+
+						if (!genusDefinitionMap.contains(genusNameText0)) {
+							new ResourceParseException(
+									MessageFormat.format("Genus {0} is not known a known genus", genusNameText0)
+							);
+						}
+						
+						gdList.add(new GenusDistribution(0, genusDefinitionMap.get(genusNameText0), percentGenus0));
+
 						Utils.ifBothPresent(
-								species1, percentSpecies1, (s, p) -> sdList.add(new SpeciesDistribution(1, s, p))
+								genusNameText1.filter(
+										t -> genusDefinitionMap.contains(t)
+								), percentGenus1, (s, p) -> gdList
+										.add(new GenusDistribution(1, genusDefinitionMap.get(s), p))
 						);
+
 						Utils.ifBothPresent(
-								species2, percentSpecies2, (s, p) -> sdList.add(new SpeciesDistribution(2, s, p))
+								genusNameText2.filter(
+										t -> genusDefinitionMap.contains(t)
+								), percentGenus2, (s, p) -> gdList
+										.add(new GenusDistribution(2, genusDefinitionMap.get(s), p))
 						);
+
 						Utils.ifBothPresent(
-								species3, percentSpecies3, (s, p) -> sdList.add(new SpeciesDistribution(3, s, p))
+								genusNameText3.filter(
+										t -> genusDefinitionMap.contains(t)
+								), percentGenus3, (s, p) -> gdList
+										.add(new GenusDistribution(3, genusDefinitionMap.get(s), p))
 						);
 
 						try {
-							SpeciesDistributionSet.validate(4, sdList);
-						} catch (InvalidSpeciesDistributionSet e) {
+							GenusDistributionSet.validate(3, gdList);
+						} catch (InvalidGenusDistributionSet e) {
 							new ResourceParseException(e);
 						}
-						
-						SpeciesDistributionSet speciesDistributionSet = new SpeciesDistributionSet(4, sdList);
+
+						GenusDistributionSet speciesDistributionSet = new GenusDistributionSet(3, gdList);
 
 						return new VdypLayerSpecies(
 								polygonId, lt, genusIndex, genus, speciesDistributionSet, siteIndex, dominantHeight,
@@ -178,7 +203,7 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 			};
 		};
 	}
-	
+
 	@Override
 	public ValueParser<Object> getValueParser() {
 		return FILENAME;

@@ -20,7 +20,7 @@ import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.SiteCurve;
-import ca.bc.gov.nrs.vdyp.model.SpeciesDistribution;
+import ca.bc.gov.nrs.vdyp.model.GenusDistribution;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.si32.site.SiteTool;
 
@@ -82,11 +82,11 @@ public class ForwardProcessingEngine {
 
 				Optional<Integer> scIndex = Optional.empty();
 				
-				Optional<SpeciesDistribution> sp0Dist = pps.sp64Distribution[i].getSpeciesDistribution(0);
+				Optional<GenusDistribution> sp0Dist = pps.sp64Distribution[i].getSpeciesDistribution(0);
 
 				if (sp0Dist.isPresent()) {
 					if (siteCurveMap.size() > 0) {
-						SiteCurve sc = siteCurveMap.get(sp0Dist.get().getSpecies());
+						SiteCurve sc = siteCurveMap.get(sp0Dist.get().getGenus());
 						scIndex = Optional.of(sc.getValue(becZone.getRegion()));
 					} else {
 						scIndex = Optional.of(SiteTool.getSICurve(pps.speciesName[i], becZone.getRegion().equals(Region.COASTAL)));

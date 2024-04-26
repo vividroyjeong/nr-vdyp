@@ -16,7 +16,7 @@ import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonLayer;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypSpeciesUtilization;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
-import ca.bc.gov.nrs.vdyp.model.SpeciesDistributionSet;
+import ca.bc.gov.nrs.vdyp.model.GenusDistributionSet;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
 class PolygonProcessingState {
@@ -34,7 +34,7 @@ class PolygonProcessingState {
 	// Species information
 
 	public String speciesName[/* nSpecies + 1 */]; // BANK2 SP0B
-	public SpeciesDistributionSet sp64Distribution[/* nSpecies + 1 */]; // BANK2 SP64DISTB
+	public GenusDistributionSet sp64Distribution[/* nSpecies + 1 */]; // BANK2 SP64DISTB
 	public float siteIndex[/* nSpecies + 1 */]; // BANK3 SIB
 	public float dominantHeight[/* nSpecies + 1 */]; // BANK3 HDB
 	public float ageTotal[/* nSpecies + 1 */]; // BANK3 AGETOTB
@@ -62,7 +62,7 @@ class PolygonProcessingState {
 
 		// In the following, index 0 is unused
 		speciesName = new String[getNSpecies() + 1];
-		sp64Distribution = new SpeciesDistributionSet[getNSpecies() + 1];
+		sp64Distribution = new GenusDistributionSet[getNSpecies() + 1];
 		siteIndex = new float[getNSpecies() + 1];
 		dominantHeight = new float[getNSpecies() + 1];
 		ageTotal = new float[getNSpecies() + 1];
@@ -162,8 +162,8 @@ class PolygonProcessingState {
 		return new PolygonProcessingState(this);
 	}
 
-	private SpeciesDistributionSet[] copy(SpeciesDistributionSet[] a) {
-		SpeciesDistributionSet[] t = new SpeciesDistributionSet[a.length];
+	private GenusDistributionSet[] copy(GenusDistributionSet[] a) {
+		GenusDistributionSet[] t = new GenusDistributionSet[a.length];
 
 		for (int i = 0; i < a.length; i++)
 			if (a[i] != null) {
