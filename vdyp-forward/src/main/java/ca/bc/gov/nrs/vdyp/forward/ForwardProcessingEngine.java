@@ -86,7 +86,7 @@ public class ForwardProcessingEngine {
 
 				if (sp0Dist.isPresent()) {
 					if (siteCurveMap.size() > 0) {
-						SiteCurve sc = siteCurveMap.get(sp0Dist.get().getGenus());
+						SiteCurve sc = siteCurveMap.get(sp0Dist.get().getGenus().getAlias());
 						scIndex = Optional.of(sc.getValue(becZone.getRegion()));
 					} else {
 						scIndex = Optional.of(SiteTool.getSICurve(pps.speciesName[i], becZone.getRegion().equals(Region.COASTAL)));
