@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.si32.cfs;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
 
 /**
  * An two-dimensional array indexed by {@link CfsBiomassConversionSupportedEcoZone} and 
@@ -19,12 +20,12 @@ public class CfsBiomassConversionCoefficientsForGenus {
 	{
 		@Override 
 		public String toString() {
-			return MessageFormat.format("ContainsData: {0}; parms: {1}", containsData, parms);
+			return MessageFormat.format("ContainsData: {0}; parms: {1}", containsData, Arrays.toString(parms));
 		}
 		
 		@Override
 		public int hashCode() {
-			return Boolean.valueOf(containsData).hashCode() * 17 + parms.hashCode();
+			return Boolean.valueOf(containsData).hashCode() * 17 + Arrays.hashCode(parms);
 		}
 		
 		@Override
