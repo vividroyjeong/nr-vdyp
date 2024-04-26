@@ -50,30 +50,8 @@ class NonFipControlParserTest {
 
 	static final String CONTROL_FILE = "VRISTART.CTR";
 
-	private class TestNonFipControlParser extends NonFipControlParser {
-
-		public TestNonFipControlParser() {
-			initialize();
-		}
-
-		@Override
-		protected List<ControlMapValueReplacer<Object, String>> inputFileParsers() {
-			return Collections.emptyList();
-		}
-
-		@Override
-		protected List<ControlKey> outputFileParsers() {
-			return Collections.emptyList();
-		}
-
-		@Override
-		protected VdypApplicationIdentifier getProgramId() {
-			return VdypApplicationIdentifier.VRI_START;
-		}
-	};
-
-	private NonFipControlParser getUnit() {
-		return new TestNonFipControlParser();
+	private StartApplicationControlParser getUnit() {
+		return TestUtils.startAppControlParser();
 	}
 
 	// Most of these tests are the same as in FipControlParserTest TODO consider

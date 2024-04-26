@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -29,18 +30,22 @@ import org.easymock.IMocksControl;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
+import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
@@ -49,6 +54,93 @@ import ca.bc.gov.nrs.vdyp.test.TestUtils;
 class VdypStartApplicationTest {
 
 	private Map<String, Object> controlMap = new HashMap<>();
+
+	static class TestSpecies extends BaseVdypSpecies {
+
+		protected TestSpecies(
+				PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, float percentGenus
+		) {
+			super(polygonIdentifier, layerType, genus, percentGenus);
+			// TODO Auto-generated constructor stub
+		}
+
+	}
+
+	static class TestSite extends BaseVdypSite {
+
+		protected TestSite(
+				PolygonIdentifier polygonIdentifier, LayerType layerType, String siteGenus,
+				Optional<Integer> siteCurveNumber, Optional<Float> siteIndex, Optional<Float> height,
+				Optional<Float> ageTotal, Optional<Float> yearsToBreastHeight
+		) {
+			super(
+					polygonIdentifier, layerType, siteGenus, siteCurveNumber, siteIndex, height, ageTotal,
+					yearsToBreastHeight
+			);
+		}
+
+	}
+	
+	static class TestLayer extends BaseVdypLayer<TestSpecies, TestSite> implements InputLayer {
+
+		protected TestLayer(PolygonIdentifier polygonIdentifier, LayerType layerType, Optional inventoryTypeGroup) {
+			super(polygonIdentifier, layerType, inventoryTypeGroup);
+		}
+
+		@Override
+		public float getCrownClosure() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+	}
+
+	static class TestPolygon extends BaseVdypPolygon<TestLayer, Optional<Float>, TestSpecies, TestSite> {
+
+		protected TestPolygon(
+				PolygonIdentifier polygonIdentifier, Optional<Float> percentAvailable, String fiz, String becIdentifier,
+				Optional<PolygonMode> mode
+		) {
+			super(polygonIdentifier, percentAvailable, fiz, becIdentifier, mode);
+		}
+
+	};
+
+	static class TestStartApplication
+			extends VdypStartApplication<TestPolygon, TestLayer, TestSpecies, TestSite> {
+		BaseControlParser controlParser;
+
+		public TestStartApplication(BaseControlParser controlParser) {
+			this.controlParser = controlParser;
+		}
+
+		@Override
+		protected BaseControlParser getControlFileParser() {
+			return controlParser;
+		}
+
+		@Override
+		public void process() throws ProcessingException {
+			// Do Nothing
+		}
+
+		@Override
+		public VdypApplicationIdentifier getId() {
+			return VdypApplicationIdentifier.FIP_START;
+		}
+
+		@Override
+		protected TestSpecies copySpecies(TestSpecies toCopy, Consumer config) {
+			return null;
+		}
+
+		@Override
+		protected Optional<Float> getLayerHeight(TestLayer layer) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+	}
 
 	@Test
 	void testInitWithoutErrors() throws IOException, ResourceParseException {
@@ -62,28 +154,7 @@ class VdypStartApplicationTest {
 				controlParser.parse(EasyMock.anyObject(List.class), EasyMock.same(resolver), EasyMock.anyObject())
 		).andReturn(controlMap);
 
-		var app = new VdypStartApplication() {
-
-			@Override
-			protected BaseControlParser getControlFileParser() {
-				return controlParser;
-			}
-
-			@Override
-			public void process() throws ProcessingException {
-				// Do Nothing
-			}
-
-			@Override
-			public VdypApplicationIdentifier getId() {
-				return VdypApplicationIdentifier.FIP_START;
-			}
-
-			@Override
-			protected BaseVdypSpecies copySpecies(BaseVdypSpecies toCopy, Consumer config) {
-				return null;
-			}
-		};
+		var app = new TestStartApplication(controlParser);
 
 		EasyMock.replay(controlParser);
 
@@ -111,28 +182,7 @@ class VdypStartApplicationTest {
 		BaseControlParser controlParser = EasyMock.createMock(BaseControlParser.class);
 		MockFileResolver resolver = new MockFileResolver("Test");
 
-		var app = new VdypStartApplication() {
-
-			@Override
-			protected BaseControlParser getControlFileParser() {
-				return controlParser;
-			}
-
-			@Override
-			public void process() throws ProcessingException {
-				// Do Nothing
-			}
-
-			@Override
-			public VdypApplicationIdentifier getId() {
-				return VdypApplicationIdentifier.FIP_START;
-			}
-
-			@Override
-			protected BaseVdypSpecies copySpecies(BaseVdypSpecies toCopy, Consumer config) {
-				return null;
-			}
-		};
+		var app = new TestStartApplication(controlParser);
 
 		EasyMock.replay(controlParser);
 
@@ -155,28 +205,7 @@ class VdypStartApplicationTest {
 
 		EasyMock.expect(streamingParserFactory.get()).andReturn(streamingParser);
 
-		var app = new VdypStartApplication() {
-
-			@Override
-			protected BaseControlParser getControlFileParser() {
-				return controlParser;
-			}
-
-			@Override
-			public void process() throws ProcessingException {
-				// Do Nothing
-			}
-
-			@Override
-			public VdypApplicationIdentifier getId() {
-				return VdypApplicationIdentifier.FIP_START;
-			}
-
-			@Override
-			protected BaseVdypSpecies copySpecies(BaseVdypSpecies toCopy, Consumer config) {
-				return null;
-			}
-		};
+		var app = new TestStartApplication(controlParser);
 
 		EasyMock.replay(controlParser, streamingParserFactory, streamingParser);
 
@@ -197,28 +226,7 @@ class VdypStartApplicationTest {
 
 		MockFileResolver resolver = dummyIo();
 
-		var app = new VdypStartApplication() {
-
-			@Override
-			protected BaseControlParser getControlFileParser() {
-				return controlParser;
-			}
-
-			@Override
-			public void process() throws ProcessingException {
-				// Do Nothing
-			}
-
-			@Override
-			public VdypApplicationIdentifier getId() {
-				return VdypApplicationIdentifier.FIP_START;
-			}
-
-			@Override
-			protected BaseVdypSpecies copySpecies(BaseVdypSpecies toCopy, Consumer config) {
-				return null;
-			}
-		};
+		var app = new TestStartApplication(controlParser);
 
 		EasyMock.replay(controlParser);
 
@@ -797,6 +805,180 @@ class VdypStartApplicationTest {
 
 		}
 
+	}
+
+	@Test
+	void testEstimatePrimaryBaseArea() throws Exception {
+		var controlMap = TestUtils.loadControlMap();
+		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
+		try (TestStartApplication app = new TestStartApplication(null)) {
+			ApplicationTestUtils.setControlMap(app, controlMap);
+
+			var bec = Utils.getBec("CWH", controlMap);
+
+			var layer = this.getTestPrimaryLayer(polygonId, l -> {
+				l.crownClosure(82.8000031f);
+
+			}, s -> {
+				s.ageTotal(Optional.of(85f));
+				s.height(Optional.of(38.2999992f));
+				s.siteIndex(Optional.of(28.6000004f));
+				s.yearsToBreastHeight(Optional.of(5.4000001f));
+				s.siteCurveNumber(Optional.of(34));
+				s.siteGenus(Optional.of("H"));
+				s.siteSpecies("H");
+			});
+
+			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
+				s.setPercentGenus(33f);
+				s.setFractionGenus(0.330000013f);
+			});
+			var spec2 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
+				s.setPercentGenus(67f);
+				s.setFractionGenus(0.670000017f);
+			});
+
+			Map<String, FipSpecies> allSpecies = new LinkedHashMap<>();
+			allSpecies.put(spec1.getGenus(), spec1);
+			allSpecies.put(spec2.getGenus(), spec2);
+
+			layer.setSpecies(allSpecies);
+
+			var result = app.estimatePrimaryBaseArea(layer, bec, 1f, 79.5999985f, 3.13497972f);
+
+			assertThat(result, closeTo(62.6653595f));
+		}
+	}
+
+	@Test
+	void testEstimatePrimaryBaseAreaHeightCloseToA2() throws Exception {
+		var controlMap = TestUtils.loadControlMap();
+		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
+		try (TestStartApplication app = new FipStart()) {
+			ApplicationTestUtils.setControlMap(app, controlMap);
+
+			var bec = Utils.getBec("CWH", controlMap);
+
+			var layer = this.getTestPrimaryLayer(polygonId, l -> {
+				l.crownClosure(82.8000031f);
+			}, s -> {
+				s.ageTotal(Optional.of(85f));
+				s.height(Optional.of(10.1667995f)); // Altered this in the debugger while running VDYP7
+				s.siteIndex(Optional.of(28.6000004f));
+				s.yearsToBreastHeight(Optional.of(5.4000001f));
+				s.siteCurveNumber(Optional.of(34));
+				s.siteGenus(Optional.of("H"));
+				s.siteSpecies("H");
+			});
+
+			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
+				s.setPercentGenus(33f);
+				s.setFractionGenus(0.330000013f);
+			});
+			var spec2 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
+				s.setPercentGenus(67f);
+				s.setFractionGenus(0.670000017f);
+			});
+
+			Map<String, FipSpecies> allSpecies = new LinkedHashMap<>();
+			allSpecies.put(spec1.getGenus(), spec1);
+			allSpecies.put(spec2.getGenus(), spec2);
+
+			layer.setSpecies(allSpecies);
+
+			var result = app.estimatePrimaryBaseArea(layer, bec, 1f, 79.5999985f, 3.13497972f);
+
+			assertThat(result, closeTo(23.1988659f));
+		}
+	}
+
+	@Test
+	void testEstimatePrimaryBaseAreaLowCrownClosure() throws Exception {
+		var controlMap = TestUtils.loadControlMap();
+		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
+		try (TestStartApplication app = new FipStart()) {
+			ApplicationTestUtils.setControlMap(app, controlMap);
+
+			var bec = Utils.getBec("CWH", controlMap);
+
+
+			var layer = this.getTestPrimaryLayer(polygonId, l -> {
+				l.crownClosure(9f); // Altered this in the debugger while running VDYP7
+			}, s -> {
+				s.ageTotal(Optional.of(85f));
+				s.height(Optional.of(38.2999992f));
+				s.siteIndex(Optional.of(28.6000004f));
+				s.yearsToBreastHeight(Optional.of(5.4000001f));
+				s.siteCurveNumber(Optional.of(34));
+				s.siteGenus(Optional.of("H"));
+				s.siteSpecies("H");
+			});
+
+			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
+				s.setPercentGenus(33f);
+				s.setFractionGenus(0.330000013f);
+			});
+			var spec2 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
+				s.setPercentGenus(67f);
+				s.setFractionGenus(0.670000017f);
+			});
+
+			Map<String, FipSpecies> allSpecies = new LinkedHashMap<>();
+			allSpecies.put(spec1.getGenus(), spec1);
+			allSpecies.put(spec2.getGenus(), spec2);
+
+			layer.setSpecies(allSpecies);
+
+			var result = app.estimatePrimaryBaseArea(layer, bec, 1f, 79.5999985f, 3.13497972f);
+
+			assertThat(result, closeTo(37.6110077f));
+		}
+	}
+
+	@Test
+	void testEstimatePrimaryBaseAreaLowResult() throws Exception {
+		var controlMap = TestUtils.loadControlMap();
+		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
+		try (TestStartApplication app = new FipStart()) {
+			ApplicationTestUtils.setControlMap(app, controlMap);
+
+			var bec = Utils.getBec("CWH", controlMap);
+
+
+			FipLayer layer = this.getTestPrimaryLayer(polygonId, l -> {
+				l.crownClosure(82.8000031f);
+			}, s -> {
+				s.ageTotal(85f);
+				s.height(7f); // Altered this in the debugger while running VDYP7
+				s.siteIndex(28.6000004f);
+				s.yearsToBreastHeight(5.4000001f);
+				s.siteCurveNumber(34);
+				s.siteGenus("H");
+				s.siteSpecies("H");
+			});
+
+			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
+				s.setPercentGenus(33f);
+				s.setFractionGenus(0.330000013f);
+			});
+			var spec2 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
+				s.setPercentGenus(67f);
+				s.setFractionGenus(0.670000017f);
+			});
+
+			Map<String, FipSpecies> allSpecies = new LinkedHashMap<>();
+			allSpecies.put(spec1.getGenus(), spec1);
+			allSpecies.put(spec2.getGenus(), spec2);
+
+			layer.setSpecies(allSpecies);
+
+			var ex = assertThrows(
+					LowValueException.class, () -> app.estimatePrimaryBaseArea(layer, bec, 1f, 79.5999985f, 3.13497972f)
+			);
+
+			assertThat(ex, hasProperty("value", is(0f)));
+			assertThat(ex, hasProperty("threshold", is(0.05f)));
+		}
 	}
 
 }

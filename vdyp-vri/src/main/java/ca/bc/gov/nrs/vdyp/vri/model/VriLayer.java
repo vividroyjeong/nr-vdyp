@@ -6,10 +6,11 @@ import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.common.Computed;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
+import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 
-public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
+public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements InputLayer {
 
 	private final float crownClosure; // VRIL/CCL
 	private final Optional<Float> baseArea; // VRIL/BAL
@@ -34,6 +35,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 		this.empericalRelationshipParameterIndex = empericalRelationshipParameterIndex;
 	}
 
+	@Override
 	public float getCrownClosure() {
 		return crownClosure;
 	}

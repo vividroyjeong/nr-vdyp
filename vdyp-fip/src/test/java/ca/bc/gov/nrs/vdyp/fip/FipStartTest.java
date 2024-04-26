@@ -42,6 +42,7 @@ import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.ApplicationTestUtils;
+import ca.bc.gov.nrs.vdyp.application.LowValueException;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
@@ -2206,182 +2207,6 @@ class FipStartTest {
 			});
 		}
 
-	}
-
-	@Test
-	void testEstimatePrimaryBaseArea() throws Exception {
-		var controlMap = FipTestUtils.loadControlMap();
-		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
-		try (var app = new FipStart()) {
-			ApplicationTestUtils.setControlMap(app, controlMap);
-
-			var becLookup = BecDefinitionParser.getBecs(controlMap);
-			var bec = becLookup.get("CWH").get();
-
-			var layer = this.getTestPrimaryLayer(polygonId, l -> {
-				l.crownClosure(82.8000031f);
-
-			}, s -> {
-				s.ageTotal(Optional.of(85f));
-				s.height(Optional.of(38.2999992f));
-				s.siteIndex(Optional.of(28.6000004f));
-				s.yearsToBreastHeight(Optional.of(5.4000001f));
-				s.siteCurveNumber(Optional.of(34));
-				s.siteGenus(Optional.of("H"));
-				s.siteSpecies("H");
-			});
-
-			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
-				s.setPercentGenus(33f);
-				s.setFractionGenus(0.330000013f);
-			});
-			var spec2 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
-				s.setPercentGenus(67f);
-				s.setFractionGenus(0.670000017f);
-			});
-
-			Map<String, FipSpecies> allSpecies = new LinkedHashMap<>();
-			allSpecies.put(spec1.getGenus(), spec1);
-			allSpecies.put(spec2.getGenus(), spec2);
-
-			layer.setSpecies(allSpecies);
-
-			var result = app.estimatePrimaryBaseArea(layer, bec, 1f, 79.5999985f, 3.13497972f);
-
-			assertThat(result, closeTo(62.6653595f));
-		}
-	}
-
-	@Test
-	void testEstimatePrimaryBaseAreaHeightCloseToA2() throws Exception {
-		var controlMap = FipTestUtils.loadControlMap();
-		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
-		try (var app = new FipStart()) {
-			ApplicationTestUtils.setControlMap(app, controlMap);
-
-			var becLookup = BecDefinitionParser.getBecs(controlMap);
-			var bec = becLookup.get("CWH").get();
-
-			var layer = this.getTestPrimaryLayer(polygonId, l -> {
-				l.crownClosure(82.8000031f);
-			}, s -> {
-				s.ageTotal(Optional.of(85f));
-				s.height(Optional.of(10.1667995f)); // Altered this in the debugger while running VDYP7
-				s.siteIndex(Optional.of(28.6000004f));
-				s.yearsToBreastHeight(Optional.of(5.4000001f));
-				s.siteCurveNumber(Optional.of(34));
-				s.siteGenus(Optional.of("H"));
-				s.siteSpecies("H");
-			});
-
-			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
-				s.setPercentGenus(33f);
-				s.setFractionGenus(0.330000013f);
-			});
-			var spec2 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
-				s.setPercentGenus(67f);
-				s.setFractionGenus(0.670000017f);
-			});
-
-			Map<String, FipSpecies> allSpecies = new LinkedHashMap<>();
-			allSpecies.put(spec1.getGenus(), spec1);
-			allSpecies.put(spec2.getGenus(), spec2);
-
-			layer.setSpecies(allSpecies);
-
-			var result = app.estimatePrimaryBaseArea(layer, bec, 1f, 79.5999985f, 3.13497972f);
-
-			assertThat(result, closeTo(23.1988659f));
-		}
-	}
-
-	@Test
-	void testEstimatePrimaryBaseAreaLowCrownClosure() throws Exception {
-		var controlMap = FipTestUtils.loadControlMap();
-		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
-		try (var app = new FipStart()) {
-			ApplicationTestUtils.setControlMap(app, controlMap);
-
-			var becLookup = BecDefinitionParser.getBecs(controlMap);
-			var bec = becLookup.get("CWH").get();
-
-			var layer = this.getTestPrimaryLayer(polygonId, l -> {
-				l.crownClosure(9f); // Altered this in the debugger while running VDYP7
-			}, s -> {
-				s.ageTotal(Optional.of(85f));
-				s.height(Optional.of(38.2999992f));
-				s.siteIndex(Optional.of(28.6000004f));
-				s.yearsToBreastHeight(Optional.of(5.4000001f));
-				s.siteCurveNumber(Optional.of(34));
-				s.siteGenus(Optional.of("H"));
-				s.siteSpecies("H");
-			});
-
-			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
-				s.setPercentGenus(33f);
-				s.setFractionGenus(0.330000013f);
-			});
-			var spec2 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
-				s.setPercentGenus(67f);
-				s.setFractionGenus(0.670000017f);
-			});
-
-			Map<String, FipSpecies> allSpecies = new LinkedHashMap<>();
-			allSpecies.put(spec1.getGenus(), spec1);
-			allSpecies.put(spec2.getGenus(), spec2);
-
-			layer.setSpecies(allSpecies);
-
-			var result = app.estimatePrimaryBaseArea(layer, bec, 1f, 79.5999985f, 3.13497972f);
-
-			assertThat(result, closeTo(37.6110077f));
-		}
-	}
-
-	@Test
-	void testEstimatePrimaryBaseAreaLowResult() throws Exception {
-		var controlMap = FipTestUtils.loadControlMap();
-		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
-		try (var app = new FipStart()) {
-			ApplicationTestUtils.setControlMap(app, controlMap);
-
-			var becLookup = BecDefinitionParser.getBecs(controlMap);
-			var bec = becLookup.get("CWH").get();
-
-			FipLayer layer = this.getTestPrimaryLayer(polygonId, l -> {
-				l.crownClosure(82.8000031f);
-			}, s -> {
-				s.ageTotal(85f);
-				s.height(7f); // Altered this in the debugger while running VDYP7
-				s.siteIndex(28.6000004f);
-				s.yearsToBreastHeight(5.4000001f);
-				s.siteCurveNumber(34);
-				s.siteGenus("H");
-				s.siteSpecies("H");
-			});
-
-			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
-				s.setPercentGenus(33f);
-				s.setFractionGenus(0.330000013f);
-			});
-			var spec2 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
-				s.setPercentGenus(67f);
-				s.setFractionGenus(0.670000017f);
-			});
-
-			Map<String, FipSpecies> allSpecies = new LinkedHashMap<>();
-			allSpecies.put(spec1.getGenus(), spec1);
-			allSpecies.put(spec2.getGenus(), spec2);
-
-			layer.setSpecies(allSpecies);
-
-			var ex = assertThrows(
-					LowValueException.class, () -> app.estimatePrimaryBaseArea(layer, bec, 1f, 79.5999985f, 3.13497972f)
-			);
-
-			assertThat(ex, hasProperty("value", is(0f)));
-			assertThat(ex, hasProperty("threshold", is(0.05f)));
-		}
 	}
 
 	@Test
@@ -4654,7 +4479,7 @@ class FipStartTest {
 			List<Collection<FipSpecies>> species, TestConsumer<FipStart> test
 	) throws Exception {
 
-		var app = new FipStart();
+		VdypStartApplication<FipPolygon, FipLayer, FipSpecies, FipSite> app = new FipStart();
 
 		Map<String, Object> controlMap = new HashMap<>();
 

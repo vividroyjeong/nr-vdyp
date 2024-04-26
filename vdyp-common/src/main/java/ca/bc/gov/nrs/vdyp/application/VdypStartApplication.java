@@ -1,5 +1,10 @@
 package ca.bc.gov.nrs.vdyp.application;
 
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.clamp;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.exp;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.pow;
+import static java.lang.Math.min;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,29 +29,36 @@ import org.slf4j.LoggerFactory;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.write.VriAdjustInputWriter;
+import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
+import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 
-public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional<Float>, S, I>, L extends BaseVdypLayer<S, I>, S extends BaseVdypSpecies, I extends BaseVdypSite>
+public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional<Float>, S, I>, L extends BaseVdypLayer<S, I> & InputLayer, S extends BaseVdypSpecies, I extends BaseVdypSite>
 		extends VdypApplication implements Closeable {
 
 	private static final Logger log = LoggerFactory.getLogger(VdypStartApplication.class);
 
 	public static final int CONFIG_LOAD_ERROR = 1;
 	public static final int PROCESSING_ERROR = 2;
+
+	public static final float LOW_CROWN_CLOSURE = 10f;
 
 	static final Map<String, Integer> ITG_PURE = Utils.constMap(map -> {
 		map.put("AC", 36);
@@ -200,8 +212,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	}
 
 	/**
-	 * Get the sum of the percentages of the species in a layer. Throws an exception if this differs from the expected
-	 * 100% by too much.
+	 * Get the sum of the percentages of the species in a layer. Throws an exception
+	 * if this differs from the expected 100% by too much.
 	 *
 	 * @param layer
 	 * @return
@@ -223,7 +235,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	protected abstract S copySpecies(S toCopy, Consumer<BaseVdypSpecies.Builder<S>> config);
 
 	/**
-	 * Returns the primary, and secondary if present species records as a one or two element list.
+	 * Returns the primary, and secondary if present species records as a one or two
+	 * element list.
 	 */
 	protected List<S> findPrimarySpecies(Collection<S> allSpecies) {
 		if (allSpecies.isEmpty()) {
@@ -424,6 +437,109 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		return vriWriter;
 	}
 
+	protected float estimatePrimaryBaseArea(
+			L layer, BecDefinition bec, float yieldFactor, float breastHeightAge, float baseAreaOverstory,
+			float crownClosure
+	) throws LowValueException {
+		boolean lowCrownClosure = layer.getCrownClosure() < LOW_CROWN_CLOSURE;
+		crownClosure = lowCrownClosure ? LOW_CROWN_CLOSURE : crownClosure;
+
+		var coeMap = Utils.<MatrixMap2<String, String, Coefficients>>expectParsedControl(
+				controlMap, ControlKey.COE_BA, ca.bc.gov.nrs.vdyp.model.MatrixMap2.class
+		);
+		var modMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
+				controlMap, ControlKey.BA_MODIFIERS, ca.bc.gov.nrs.vdyp.model.MatrixMap2.class
+		);
+		var upperBoundMap = Utils.<MatrixMap3<Region, String, Integer, Float>>expectParsedControl(
+				controlMap, ControlKey.UPPER_BA_BY_CI_S0_P, MatrixMap3.class
+		);
+
+		var leadGenus = leadGenus(layer);
+
+		var decayBecAlias = bec.getDecayBec().getAlias();
+		Coefficients coe = weightedCoefficientSum(
+				List.of(0, 1, 2, 3, 4, 5), 9, 0, layer.getSpecies().values(), BaseVdypSpecies::getFractionGenus,
+				s -> coeMap.get(decayBecAlias, s.getGenus())
+		);
+
+		float ageToUse = clamp(breastHeightAge, 5f, 350f);
+		float trAge = FloatMath.log(ageToUse);
+
+		/* @formatter:off */
+						//      A00 = exp(A(0)) * ( 1.0 +  A(1) * TR_AGE  )
+						/* @formatter:on */
+		var a00 = exp(coe.getCoe(0)) * (1f + coe.getCoe(1) * trAge);
+
+		/* @formatter:off */
+						//      AP  = exp( A(3)) + exp(A(4)) * TR_AGE
+						/* @formatter:on */
+		float ap = FloatMath.exp(coe.getCoe(3)) + exp(coe.getCoe(4)) * trAge;
+
+		var baseArea = 0f;
+
+		float height = getLayerHeight(layer).orElse(0f);
+		if (height > coe.getCoe(2) - 3f) {
+			/* @formatter:off */
+							//  if (HD .le. A(2) - 3.0) then
+							//      BAP = 0.0
+							//      GO TO 90
+							//  else if (HD .lt. A(2)+3.0) then
+							//      FHD = (HD- (A(2)-3.00) )**2 / 12.0
+							//  else
+							//      FHD = HD-A(2)
+							//  end if
+							/* @formatter:on */
+			var fHeight = height <= coe.getCoe(2) + 3f ? //
+					pow(height - (coe.getCoe(2) - 3), 2) / 12f //
+					: height - coe.getCoe(2);
+
+			/* @formatter:off */
+							//      BAP =  A00 * (CCUSE/100) ** ( A(7) + A(8)*log(HD) )   *
+							//     &      FHD**AP * exp( A(5)*HD  + A(6) * BAV )
+							/* @formatter:on */
+			baseArea = a00 * FloatMath.pow(crownClosure / 100, coe.getCoe(7) + coe.getCoe(8) * FloatMath.log(height))
+					* FloatMath.pow(fHeight, ap) * exp(coe.getCoe(5) * height + coe.getCoe(6) * baseAreaOverstory);
+
+			baseArea *= modMap.get(leadGenus.getGenus(), bec.getRegion());
+
+			// TODO
+			var NDEBUG_1 = 0;
+			if (NDEBUG_1 <= 0) {
+				// See ISPSJF128
+				var upperBound = upperBoundMap.get(bec.getRegion(), leadGenus.getGenus(), UpperCoefficientParser.BA);
+				baseArea = min(baseArea, upperBound);
+			}
+
+			if (lowCrownClosure) {
+				baseArea *= layer.getCrownClosure() / LOW_CROWN_CLOSURE;
+			}
+
+		}
+
+		baseArea *= yieldFactor;
+
+		// This is to prevent underflow errors in later calculations
+		if (baseArea <= 0.05f) {
+			throw new LowValueException("Estimated base area", baseArea, 0.05f);
+		}
+		return baseArea;
+	}
+
+	protected abstract Optional<Float> getLayerHeight(L layer);
+
+	protected float estimatePrimaryBaseArea(
+			L layer, BecDefinition bec, float yieldFactor, float breastHeightAge, float baseAreaOverstory
+	) throws LowValueException {
+		return estimatePrimaryBaseArea(
+				layer, bec, yieldFactor, breastHeightAge, baseAreaOverstory, layer.getCrownClosure()
+		);
+	}
+
+	public S leadGenus(L fipLayer) {
+		return fipLayer.getSpecies().values().stream()
+				.sorted(Utils.compareUsing(BaseVdypSpecies::getFractionGenus).reversed()).findFirst().orElseThrow();
+	}
+
 	protected static <E extends Throwable> void throwIfPresent(Optional<E> opt) throws E {
 		if (opt.isPresent()) {
 			throw opt.get();
@@ -436,12 +552,15 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	}
 
 	/**
-	 * Create a coefficients object where its values are either a weighted sum of those for each of the given entities,
-	 * or the value from one arbitrarily chose entity.
+	 * Create a coefficients object where its values are either a weighted sum of
+	 * those for each of the given entities, or the value from one arbitrarily chose
+	 * entity.
 	 *
 	 * @param <T>             The type of entity
-	 * @param weighted        the indicies of the coefficients that should be weighted sums, those that are not included
-	 *                        are assumed to be constant across all entities and one is choses arbitrarily.
+	 * @param weighted        the indicies of the coefficients that should be
+	 *                        weighted sums, those that are not included are assumed
+	 *                        to be constant across all entities and one is choses
+	 *                        arbitrarily.
 	 * @param size            Size of the resulting coefficients object
 	 * @param indexFrom       index from of the resulting coefficients object
 	 * @param entities        the entities to do weighted sums over
@@ -483,8 +602,9 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	}
 
 	/**
-	 * Create a coefficients object where its values are either a weighted sum of those for each of the given entities,
-	 * or the value from one arbitrarily chose entity.
+	 * Create a coefficients object where its values are either a weighted sum of
+	 * those for each of the given entities, or the value from one arbitrarily chose
+	 * entity.
 	 *
 	 * @param <T>             The type of entity
 	 * @param size            Size of the resulting coefficients object

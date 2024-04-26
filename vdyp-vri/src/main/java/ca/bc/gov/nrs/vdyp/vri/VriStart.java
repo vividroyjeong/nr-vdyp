@@ -805,6 +805,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	}
 
 	VriPolygon processBatc(VriPolygon poly) throws StandProcessingException {
+		
+		float percentAvailable = poly.getPercentAvailable().orElseGet((this.estimatePrimaryBaseArea())->)
 		// TODO
 		return poly;
 	}
