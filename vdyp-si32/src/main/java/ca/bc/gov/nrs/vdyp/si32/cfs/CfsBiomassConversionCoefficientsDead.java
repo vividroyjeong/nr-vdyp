@@ -16,7 +16,37 @@ public class CfsBiomassConversionCoefficientsDead {
 	public record Details(
 			boolean containsData, 
 			float[] parms
-	) {}
+	) {
+		@Override 
+		public String toString() {
+			return MessageFormat.format("ContainsData: {0}; parms: {1}", containsData, parms);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Boolean.valueOf(containsData).hashCode() * 17 + parms.hashCode();
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (o instanceof Details that) {
+				if (this.containsData != that.containsData) {
+					return false;
+				}
+				if (this.parms.length != that.parms.length) {
+					return false;
+				}
+				for (int i = 0; i < this.parms.length; i++) {
+					if (this.parms[i] != that.parms[i])
+						return false;
+				}
+				
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
 	
 	public static Details get(int i, int j) {
 		return array[i][j];
