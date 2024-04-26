@@ -11,19 +11,23 @@ public class GenusDefinitionMap {
 	private final Map<String, GenusDefinition> genusByAliasMap = new HashMap<>();
 	private final Map<String, Integer> indexByAliasMap = new HashMap<>();
 	private final Map<Integer, GenusDefinition> genusByIndexMap = new HashMap<>();
-	private int maxIndex;
+	private int nSpecies;
 
 	public GenusDefinitionMap(List<GenusDefinition> genusDefinitionList) {
 
-		maxIndex = genusDefinitionList.size();
-
-		int currentIndex = 1;
-		for (GenusDefinition g : genusDefinitionList) {
-			genusByAliasMap.put(g.getAlias(), g);
-			indexByAliasMap.put(g.getAlias(), g.getPreference().orElse(currentIndex));
-			genusByIndexMap.put(g.getPreference().orElse(currentIndex), g);
-
-			currentIndex += 1;
+		if (genusDefinitionList != null) {
+			nSpecies = genusDefinitionList.size();
+	
+			int currentIndex = 1;
+			for (GenusDefinition g : genusDefinitionList) {
+				genusByAliasMap.put(g.getAlias(), g);
+				indexByAliasMap.put(g.getAlias(), g.getPreference().orElse(currentIndex));
+				genusByIndexMap.put(g.getPreference().orElse(currentIndex), g);
+	
+				currentIndex += 1;
+			}
+		} else {
+			nSpecies = 0;
 		}
 	}
 
@@ -60,24 +64,8 @@ public class GenusDefinitionMap {
 		}
 		return index;
 	}
-	
-	public void removeGenus(String alias) {
-		if (! indexByAliasMap.containsKey(alias)) {
-			throw new IllegalArgumentException(MessageFormat.format("GenusDefinitionMap does not contain alias {}", alias));
-		}
-		
-		genusByIndexMap.remove(indexByAliasMap.get(alias));
-		indexByAliasMap.remove(alias);
-		genusByAliasMap.remove(alias);
-		
-		maxIndex -= 1;
-	}
-	
-	public void removeGenus(int index) {
-		removeGenus(genusByIndexMap.get(index).getAlias());
-	}
 
-	public int getMaxIndex() {
-		return maxIndex;
+	public int getNSpecies() {
+		return nSpecies;
 	}
 }

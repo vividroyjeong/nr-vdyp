@@ -58,7 +58,7 @@ class PolygonProcessingState {
 
 	public PolygonProcessingState(GenusDefinitionMap genusDefinitionMap, VdypPolygonLayer layer) {
 
-		this.nSpecies = genusDefinitionMap.getMaxIndex();
+		this.nSpecies = genusDefinitionMap.getNSpecies();
 
 		// In the following, index 0 is unused
 		speciesName = new String[getNSpecies() + 1];

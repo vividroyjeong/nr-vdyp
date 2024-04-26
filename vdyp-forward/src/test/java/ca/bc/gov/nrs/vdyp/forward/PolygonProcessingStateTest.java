@@ -75,7 +75,7 @@ class PolygonProcessingStateTest {
 		
 		PolygonProcessingState pps = new PolygonProcessingState(gdMap, pLayer);
 
-		int nSpecies = gdMap.getMaxIndex();
+		int nSpecies = gdMap.getNSpecies();
 
 		assertThat(pps, notNullValue());
 		assertThat(pps.ageBreastHeight.length, is(nSpecies + 1));

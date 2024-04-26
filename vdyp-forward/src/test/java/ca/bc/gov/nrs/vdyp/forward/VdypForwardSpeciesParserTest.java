@@ -102,7 +102,7 @@ class VdypForwardSpeciesParserTest {
 														is(0),
 														allOf(
 																hasProperty("index", is(0)),
-																hasProperty("species", is("S")),
+																hasProperty("genus", hasProperty("alias", is("S"))),
 																hasProperty("percentage", is(100.0f))
 														)
 												)
@@ -179,7 +179,7 @@ class VdypForwardSpeciesParserTest {
 				TestUtils.makeInputStream(
 						"01002 S000002 00     1970 P 15 S  S  100.0     0.0     0.0     0.0 -9.00 -9.00  20.0  12.0  -9.0 0 -9",
 						"01002 S000002 00     1970 V  3 B  B   50.0 S  50.0     0.0     0.0 -9.00 -9.00  -9.0   8.0   4.0",
-						"01002 S000002 00     1970 V  5 L  L   50.0 LA 25.0 LT 15.0 LW 10.0 -9.00 -9.00  14.0  -9.0   6.0 1",
+						"01002 S000002 00     1970 V  5 L  L   50.0 S  25.0 AC 15.0 B  10.0 -9.00 -9.00  14.0  -9.0   6.0 1",
 						"01002 S000002 00     1970"
 				)
 		);
@@ -216,14 +216,14 @@ class VdypForwardSpeciesParserTest {
 														hasEntry(
 																is(0),
 																allOf(
-																		hasProperty("species", is("B")),
+																		hasProperty("genus", hasProperty("alias", is("B"))),
 																		hasProperty("percentage", is(50.0f))
 																)
 														),
 														hasEntry(
 																is(1),
 																allOf(
-																		hasProperty("species", is("S")),
+																		hasProperty("genus", hasProperty("alias", is("S"))),
 																		hasProperty("percentage", is(50.0f))
 																)
 														)
@@ -242,28 +242,28 @@ class VdypForwardSpeciesParserTest {
 														hasEntry(
 																is(0),
 																allOf(
-																		hasProperty("species", is("L")),
+																		hasProperty("genus", hasProperty("alias", is("L"))),
 																		hasProperty("percentage", is(50.0f))
 																)
 														),
 														hasEntry(
 																is(1),
 																allOf(
-																		hasProperty("species", is("LA")),
+																		hasProperty("genus", hasProperty("alias", is("S"))),
 																		hasProperty("percentage", is(25.0f))
 																)
 														),
 														hasEntry(
 																is(2),
 																allOf(
-																		hasProperty("species", is("LT")),
+																		hasProperty("genus", hasProperty("alias", is("AC"))),
 																		hasProperty("percentage", is(15.0f))
 																)
 														),
 														hasEntry(
 																is(3),
 																allOf(
-																		hasProperty("species", is("LW")),
+																		hasProperty("genus", hasProperty("alias", is("B"))),
 																		hasProperty("percentage", is(10.0f))
 																)
 														)
@@ -326,7 +326,7 @@ class VdypForwardSpeciesParserTest {
 														is(0),
 														allOf(
 																hasProperty("index", is(0)),
-																hasProperty("species", is("S")),
+																hasProperty("genus", hasProperty("alias", is("S"))),
 																hasProperty("percentage", is(100.0f))
 														)
 												)
@@ -351,7 +351,7 @@ class VdypForwardSpeciesParserTest {
 																is(0),
 																allOf(
 																		hasProperty("index", is(0)),
-																		hasProperty("species", is("B")),
+																		hasProperty("genus", hasProperty("alias", is("B"))),
 																		hasProperty("percentage", is(50.0f))
 																)
 														),
@@ -359,7 +359,7 @@ class VdypForwardSpeciesParserTest {
 																is(1),
 																allOf(
 																		hasProperty("index", is(1)),
-																		hasProperty("species", is("S")),
+																		hasProperty("genus", hasProperty("alias", is("S"))),
 																		hasProperty("percentage", is(50.0f))
 																)
 														)
