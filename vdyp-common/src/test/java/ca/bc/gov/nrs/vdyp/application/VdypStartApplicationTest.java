@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.application;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.causedBy;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.closeTo;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -18,11 +19,11 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -31,8 +32,10 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
+import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapValueReplacer;
+import ca.bc.gov.nrs.vdyp.io.parse.control.NonFipControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
@@ -61,9 +64,22 @@ class VdypStartApplicationTest {
 				PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, float percentGenus
 		) {
 			super(polygonIdentifier, layerType, genus, percentGenus);
-			// TODO Auto-generated constructor stub
 		}
 
+		public static TestSpecies build(Consumer<Builder> config) {
+			var builder = new Builder();
+			config.accept(builder);
+			return builder.build();
+		}
+
+		public static class Builder extends BaseVdypSpecies.Builder<TestSpecies> {
+
+			@Override
+			protected TestSpecies doBuild() {
+				return new TestSpecies(polygonIdentifier.get(), layerType.get(), genus.get(), percentGenus.get());
+			}
+
+		}
 	}
 
 	static class TestSite extends BaseVdypSite {
@@ -79,23 +95,103 @@ class VdypStartApplicationTest {
 			);
 		}
 
+		public static TestSite build(Consumer<Builder> config) {
+			var builder = new Builder();
+			config.accept(builder);
+			return builder.build();
+		}
+
+		public static class Builder extends BaseVdypSite.Builder<TestSite> {
+
+			protected Optional<String> siteSpecies = Optional.empty();
+
+			@Override
+			protected TestSite doBuild() {
+				return new TestSite(
+						this.polygonIdentifier.get(), //
+						this.layerType.get(), //
+						this.siteGenus.get(), //
+						this.siteCurveNumber, //
+						this.siteIndex, //
+						this.height, //
+						this.ageTotal, //
+						this.yearsToBreastHeight //
+				);
+			}
+		}
 	}
-	
+
 	static class TestLayer extends BaseVdypLayer<TestSpecies, TestSite> implements InputLayer {
 
-		protected TestLayer(PolygonIdentifier polygonIdentifier, LayerType layerType, Optional inventoryTypeGroup) {
+		final float crownClosure;
+
+		protected TestLayer(
+				PolygonIdentifier polygonIdentifier, LayerType layerType, Optional inventoryTypeGroup,
+				float crownClosure
+		) {
 			super(polygonIdentifier, layerType, inventoryTypeGroup);
+			this.crownClosure = crownClosure;
 		}
 
 		@Override
 		public float getCrownClosure() {
-			// TODO Auto-generated method stub
-			return 0;
+			return crownClosure;
 		}
 
+		public static TestLayer build(Consumer<Builder> config) {
+			var builder = new Builder();
+			config.accept(builder);
+			return builder.build();
+		}
+
+		public static class Builder
+				extends BaseVdypLayer.Builder<TestLayer, TestSpecies, TestSite, TestSpecies.Builder, TestSite.Builder> {
+
+			protected Optional<Float> crownClosure = Optional.empty();
+
+			public Builder crownClosure(float crownClosure) {
+				this.crownClosure = Optional.of(crownClosure);
+				return this;
+			}
+
+			@Override
+			protected TestLayer doBuild() {
+
+				return (new TestLayer(
+						polygonIdentifier.get(), //
+						layerType.get(), //
+						inventoryTypeGroup, //
+						crownClosure.get() //
+				));
+			}
+
+			@Override
+			protected TestSpecies buildSpecies(Consumer<TestSpecies.Builder> config) {
+				return TestSpecies.build(sb -> {
+					sb.polygonIdentifier(polygonIdentifier.get());
+					sb.layerType(layerType.get());
+					config.accept(sb);
+				});
+			}
+
+			@Override
+			protected TestSite buildSite(Consumer<TestSite.Builder> config) {
+				return TestSite.build(si -> {
+					si.polygonIdentifier(polygonIdentifier.get());
+					si.layerType(layerType.get());
+					config.accept(si);
+				});
+			}
+		}
 	}
 
 	static class TestPolygon extends BaseVdypPolygon<TestLayer, Optional<Float>, TestSpecies, TestSite> {
+
+		public static TestPolygon build(Consumer<Builder> config) {
+			var builder = new Builder();
+			config.accept(builder);
+			return builder.build();
+		}
 
 		protected TestPolygon(
 				PolygonIdentifier polygonIdentifier, Optional<Float> percentAvailable, String fiz, String becIdentifier,
@@ -104,19 +200,75 @@ class VdypStartApplicationTest {
 			super(polygonIdentifier, percentAvailable, fiz, becIdentifier, mode);
 		}
 
+		public static class Builder extends
+				BaseVdypPolygon.Builder<TestPolygon, TestLayer, Optional<Float>, TestSpecies, TestSite, TestLayer.Builder, TestSpecies.Builder, TestSite.Builder> {
+
+			@Override
+			protected TestLayer.Builder getLayerBuilder() {
+				var builder = new TestLayer.Builder();
+				return builder;
+			}
+
+			@Override
+			protected TestPolygon doBuild() {
+				return (new TestPolygon(
+						polygonIdentifier.get(), //
+						percentAvailable.flatMap(x -> x), //
+						forestInventoryZone.get(), //
+						biogeoclimaticZone.get(), //
+						mode //
+				));
+
+			}
+
+		}
+
 	};
 
-	static class TestStartApplication
-			extends VdypStartApplication<TestPolygon, TestLayer, TestSpecies, TestSite> {
-		BaseControlParser controlParser;
+	static class TestStartApplication extends VdypStartApplication<TestPolygon, TestLayer, TestSpecies, TestSite> {
 
-		public TestStartApplication(BaseControlParser controlParser) {
-			this.controlParser = controlParser;
+		boolean realInit;
+
+		public TestStartApplication(Map<String, Object> controlMap, boolean realInit) {
+			this.setControlMap(controlMap);
+			this.realInit = realInit;
 		}
 
 		@Override
-		protected BaseControlParser getControlFileParser() {
-			return controlParser;
+		public void init(FileSystemFileResolver resolver, String... controlFilePaths)
+				throws IOException, ResourceParseException {
+			if (realInit) {
+				super.init(resolver, controlFilePaths);
+			}
+		}
+
+		@Override
+		public void init(FileSystemFileResolver resolver, Map<String, Object> controlMap) throws IOException {
+			if (realInit) {
+				super.init(resolver, controlMap);
+			}
+		}
+
+		@Override
+		protected NonFipControlParser getControlFileParser() {
+			return new NonFipControlParser() {
+
+				@Override
+				protected List<ControlMapValueReplacer<Object, String>> inputFileParsers() {
+					return List.of();
+				}
+
+				@Override
+				protected List<ControlKey> outputFileParsers() {
+					return List.of();
+				}
+
+				@Override
+				protected VdypApplicationIdentifier getProgramId() {
+					return VdypApplicationIdentifier.VRI_START;
+				}
+
+			};
 		}
 
 		@Override
@@ -126,7 +278,7 @@ class VdypStartApplicationTest {
 
 		@Override
 		public VdypApplicationIdentifier getId() {
-			return VdypApplicationIdentifier.FIP_START;
+			return VdypApplicationIdentifier.VRI_START;
 		}
 
 		@Override
@@ -136,32 +288,25 @@ class VdypStartApplicationTest {
 
 		@Override
 		protected Optional<Float> getLayerHeight(TestLayer layer) {
-			// TODO Auto-generated method stub
-			return null;
+			return layer.getSites().values().iterator().next().getHeight();
 		}
 
 	}
 
 	@Test
 	void testInitWithoutErrors() throws IOException, ResourceParseException {
-		BaseControlParser controlParser = EasyMock.createMock(BaseControlParser.class);
+		controlMap = TestUtils.loadControlMap();
+
 		MockFileResolver resolver = dummyIo();
 
 		InputStream inputStream = TestUtils.makeInputStream("");
 		resolver.addStream("testControl", inputStream);
 
-		EasyMock.expect(
-				controlParser.parse(EasyMock.anyObject(List.class), EasyMock.same(resolver), EasyMock.anyObject())
-		).andReturn(controlMap);
-
-		var app = new TestStartApplication(controlParser);
-
-		EasyMock.replay(controlParser);
+		var app = new TestStartApplication(controlMap, false);
 
 		app.init(resolver, "testControl");
 		assertThat(app.controlMap, is(controlMap));
 
-		EasyMock.verify(controlParser);
 		app.close();
 	}
 
@@ -179,23 +324,18 @@ class VdypStartApplicationTest {
 
 	@Test
 	void testInitNoControlFiles() throws IOException, ResourceParseException {
-		BaseControlParser controlParser = EasyMock.createMock(BaseControlParser.class);
 		MockFileResolver resolver = new MockFileResolver("Test");
 
-		var app = new TestStartApplication(controlParser);
-
-		EasyMock.replay(controlParser);
+		var app = new TestStartApplication(controlMap, true);
 
 		var ex = assertThrows(IllegalArgumentException.class, () -> app.init(resolver));
 		assertThat(ex, hasProperty("message", is("At least one control file must be specified.")));
 
-		EasyMock.verify(controlParser);
 		app.close();
 	}
 
 	@Test
 	void testGetStreamingParser() throws IOException, ResourceParseException, ProcessingException {
-		BaseControlParser controlParser = EasyMock.createMock(BaseControlParser.class);
 		StreamingParserFactory streamingParserFactory = EasyMock.createMock(StreamingParserFactory.class);
 		StreamingParser streamingParser = EasyMock.createMock(StreamingParser.class);
 
@@ -205,9 +345,9 @@ class VdypStartApplicationTest {
 
 		EasyMock.expect(streamingParserFactory.get()).andReturn(streamingParser);
 
-		var app = new TestStartApplication(controlParser);
+		var app = new TestStartApplication(controlMap, false);
 
-		EasyMock.replay(controlParser, streamingParserFactory, streamingParser);
+		EasyMock.replay(streamingParserFactory, streamingParser);
 
 		app.init(resolver, controlMap);
 
@@ -215,20 +355,17 @@ class VdypStartApplicationTest {
 
 		assertThat(result, is(streamingParser));
 
-		EasyMock.verify(controlParser, streamingParserFactory, streamingParser);
+		EasyMock.verify(streamingParserFactory, streamingParser);
 
 		app.close();
 	}
 
 	@Test
 	void testGetStreamingParserMapEntryMissing() throws IOException, ResourceParseException, ProcessingException {
-		BaseControlParser controlParser = EasyMock.createMock(BaseControlParser.class);
 
 		MockFileResolver resolver = dummyIo();
 
-		var app = new TestStartApplication(controlParser);
-
-		EasyMock.replay(controlParser);
+		var app = new TestStartApplication(controlMap, false);
 
 		app.init(resolver, controlMap);
 
@@ -237,8 +374,6 @@ class VdypStartApplicationTest {
 				ProcessingException.class, () -> app.getStreamingParser(ControlKey.FIP_INPUT_YIELD_LAYER)
 		);
 		assertThat(ex, hasProperty("message", is("Data file FIP_INPUT_YIELD_LAYER not specified in control map.")));
-
-		EasyMock.verify(controlParser);
 
 		app.close();
 	}
@@ -811,8 +946,7 @@ class VdypStartApplicationTest {
 	void testEstimatePrimaryBaseArea() throws Exception {
 		var controlMap = TestUtils.loadControlMap();
 		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
-		try (TestStartApplication app = new TestStartApplication(null)) {
-			ApplicationTestUtils.setControlMap(app, controlMap);
+		try (TestStartApplication app = new TestStartApplication(controlMap, false)) {
 
 			var bec = Utils.getBec("CWH", controlMap);
 
@@ -826,7 +960,6 @@ class VdypStartApplicationTest {
 				s.yearsToBreastHeight(Optional.of(5.4000001f));
 				s.siteCurveNumber(Optional.of(34));
 				s.siteGenus(Optional.of("H"));
-				s.siteSpecies("H");
 			});
 
 			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
@@ -838,7 +971,7 @@ class VdypStartApplicationTest {
 				s.setFractionGenus(0.670000017f);
 			});
 
-			Map<String, FipSpecies> allSpecies = new LinkedHashMap<>();
+			Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
 			allSpecies.put(spec1.getGenus(), spec1);
 			allSpecies.put(spec2.getGenus(), spec2);
 
@@ -852,10 +985,9 @@ class VdypStartApplicationTest {
 
 	@Test
 	void testEstimatePrimaryBaseAreaHeightCloseToA2() throws Exception {
-		var controlMap = TestUtils.loadControlMap();
+		controlMap = TestUtils.loadControlMap();
 		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
-		try (TestStartApplication app = new FipStart()) {
-			ApplicationTestUtils.setControlMap(app, controlMap);
+		try (TestStartApplication app = new TestStartApplication(controlMap, false)) {
 
 			var bec = Utils.getBec("CWH", controlMap);
 
@@ -868,7 +1000,6 @@ class VdypStartApplicationTest {
 				s.yearsToBreastHeight(Optional.of(5.4000001f));
 				s.siteCurveNumber(Optional.of(34));
 				s.siteGenus(Optional.of("H"));
-				s.siteSpecies("H");
 			});
 
 			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
@@ -880,7 +1011,7 @@ class VdypStartApplicationTest {
 				s.setFractionGenus(0.670000017f);
 			});
 
-			Map<String, FipSpecies> allSpecies = new LinkedHashMap<>();
+			Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
 			allSpecies.put(spec1.getGenus(), spec1);
 			allSpecies.put(spec2.getGenus(), spec2);
 
@@ -894,13 +1025,11 @@ class VdypStartApplicationTest {
 
 	@Test
 	void testEstimatePrimaryBaseAreaLowCrownClosure() throws Exception {
-		var controlMap = TestUtils.loadControlMap();
+		controlMap = TestUtils.loadControlMap();
 		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
-		try (TestStartApplication app = new FipStart()) {
-			ApplicationTestUtils.setControlMap(app, controlMap);
+		try (TestStartApplication app = new TestStartApplication(controlMap, false)) {
 
 			var bec = Utils.getBec("CWH", controlMap);
-
 
 			var layer = this.getTestPrimaryLayer(polygonId, l -> {
 				l.crownClosure(9f); // Altered this in the debugger while running VDYP7
@@ -911,7 +1040,6 @@ class VdypStartApplicationTest {
 				s.yearsToBreastHeight(Optional.of(5.4000001f));
 				s.siteCurveNumber(Optional.of(34));
 				s.siteGenus(Optional.of("H"));
-				s.siteSpecies("H");
 			});
 
 			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
@@ -923,7 +1051,7 @@ class VdypStartApplicationTest {
 				s.setFractionGenus(0.670000017f);
 			});
 
-			Map<String, FipSpecies> allSpecies = new LinkedHashMap<>();
+			Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
 			allSpecies.put(spec1.getGenus(), spec1);
 			allSpecies.put(spec2.getGenus(), spec2);
 
@@ -937,15 +1065,13 @@ class VdypStartApplicationTest {
 
 	@Test
 	void testEstimatePrimaryBaseAreaLowResult() throws Exception {
-		var controlMap = TestUtils.loadControlMap();
+		controlMap = TestUtils.loadControlMap();
 		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
-		try (TestStartApplication app = new FipStart()) {
-			ApplicationTestUtils.setControlMap(app, controlMap);
+		try (TestStartApplication app = new TestStartApplication(controlMap, false)) {
 
 			var bec = Utils.getBec("CWH", controlMap);
 
-
-			FipLayer layer = this.getTestPrimaryLayer(polygonId, l -> {
+			TestLayer layer = this.getTestPrimaryLayer(polygonId, l -> {
 				l.crownClosure(82.8000031f);
 			}, s -> {
 				s.ageTotal(85f);
@@ -954,7 +1080,6 @@ class VdypStartApplicationTest {
 				s.yearsToBreastHeight(5.4000001f);
 				s.siteCurveNumber(34);
 				s.siteGenus("H");
-				s.siteSpecies("H");
 			});
 
 			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
@@ -966,7 +1091,7 @@ class VdypStartApplicationTest {
 				s.setFractionGenus(0.670000017f);
 			});
 
-			Map<String, FipSpecies> allSpecies = new LinkedHashMap<>();
+			Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
 			allSpecies.put(spec1.getGenus(), spec1);
 			allSpecies.put(spec2.getGenus(), spec2);
 
@@ -980,5 +1105,78 @@ class VdypStartApplicationTest {
 			assertThat(ex, hasProperty("threshold", is(0.05f)));
 		}
 	}
+
+	TestPolygon getTestPolygon(PolygonIdentifier polygonId, Consumer<TestPolygon.Builder> mutator) {
+		return TestPolygon.build(builder -> {
+			builder.polygonIdentifier(polygonId);
+			builder.forestInventoryZone("0");
+			builder.biogeoclimaticZone("BG");
+			builder.mode(PolygonMode.START);
+			mutator.accept(builder);
+		});
+	};
+
+	TestLayer getTestPrimaryLayer(
+			PolygonIdentifier polygonId, Consumer<TestLayer.Builder> mutator, Consumer<TestSite.Builder> siteMutator
+	) {
+		var result = TestLayer.build(builder -> {
+			builder.polygonIdentifier(polygonId);
+			builder.layerType(LayerType.PRIMARY);
+			builder.addSite(siteBuilder -> {
+				siteBuilder.ageTotal(8f);
+				siteBuilder.yearsToBreastHeight(7f);
+				siteBuilder.height(6f);
+				siteBuilder.siteIndex(5f);
+				siteBuilder.siteGenus("B");
+				siteMutator.accept(siteBuilder);
+			});
+
+			builder.crownClosure(0.9f);
+			mutator.accept(builder);
+		});
+
+		return result;
+	};
+
+	TestLayer getTestVeteranLayer(
+			PolygonIdentifier polygonId, Consumer<TestLayer.Builder> mutator, Consumer<TestSite.Builder> siteMutator
+	) {
+		var result = TestLayer.build(builder -> {
+			builder.polygonIdentifier(polygonId);
+			builder.layerType(LayerType.VETERAN);
+
+			builder.addSite(siteBuilder -> {
+				siteBuilder.ageTotal(8f);
+				siteBuilder.yearsToBreastHeight(7f);
+				siteBuilder.height(6f);
+				siteBuilder.siteIndex(5f);
+				siteBuilder.siteGenus("B");
+				siteMutator.accept(siteBuilder);
+			});
+
+			builder.crownClosure(0.9f);
+			mutator.accept(builder);
+		});
+
+		return result;
+	};
+
+	TestSpecies getTestSpecies(PolygonIdentifier polygonId, LayerType layer, Consumer<TestSpecies> mutator) {
+		return getTestSpecies(polygonId, layer, "B", mutator);
+	};
+
+	TestSpecies getTestSpecies(
+			PolygonIdentifier polygonId, LayerType layer, String genusId, Consumer<TestSpecies> mutator
+	) {
+		var result = TestSpecies.build(builder -> {
+			builder.polygonIdentifier(polygonId);
+			builder.layerType(layer);
+			builder.genus(genusId);
+			builder.percentGenus(100.0f);
+			builder.addSpecies(genusId, 100f);
+		});
+		mutator.accept(result);
+		return result;
+	};
 
 }

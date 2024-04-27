@@ -804,14 +804,16 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		}
 	}
 
-	VriPolygon processBatc(VriPolygon poly) throws StandProcessingException {
-		
-		float percentAvailable = poly.getPercentAvailable().orElseGet((this.estimatePrimaryBaseArea())->)
+	VriPolygon processBatc(VriPolygon poly) throws ProcessingException {
+
+		VriLayer primaryLayer = getPrimaryLayer(poly);
+		BecDefinition bec = getBec(poly);
+
 		// TODO
 		return poly;
 	}
 
-	VriPolygon processBatn(VriPolygon poly) throws StandProcessingException {
+	VriPolygon processBatn(VriPolygon poly) throws ProcessingException {
 		// TODO
 		return poly;
 	}
@@ -836,5 +838,10 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		throw new StandProcessingException(
 				"Could not find Site Curve Number for inst of the following species: " + String.join(", ", ids)
 		);
+	}
+
+	@Override
+	protected Optional<Float> getLayerHeight(VriLayer layer) {
+		return layer.getPrimarySite().flatMap(site -> site.getHeight());
 	}
 }

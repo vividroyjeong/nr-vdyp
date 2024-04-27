@@ -373,7 +373,6 @@ public class TestUtils {
 		}
 	}
 
-	
 	public static Map<String, Object> loadControlMap() {
 		BaseControlParser parser = new TestNonFipControlParser();
 		try {
@@ -394,7 +393,7 @@ public class TestUtils {
 	public static StartApplicationControlParser startAppControlParser() {
 		return new TestNonFipControlParser();
 	}
-	
+
 	static private class TestNonFipControlParser extends NonFipControlParser {
 
 		public TestNonFipControlParser() {
@@ -416,8 +415,5 @@ public class TestUtils {
 			return VdypApplicationIdentifier.VRI_START;
 		}
 	};
-	
-	
 
-	
 }

@@ -212,8 +212,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	}
 
 	/**
-	 * Get the sum of the percentages of the species in a layer. Throws an exception
-	 * if this differs from the expected 100% by too much.
+	 * Get the sum of the percentages of the species in a layer. Throws an exception if this differs from the expected
+	 * 100% by too much.
 	 *
 	 * @param layer
 	 * @return
@@ -235,8 +235,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	protected abstract S copySpecies(S toCopy, Consumer<BaseVdypSpecies.Builder<S>> config);
 
 	/**
-	 * Returns the primary, and secondary if present species records as a one or two
-	 * element list.
+	 * Returns the primary, and secondary if present species records as a one or two element list.
 	 */
 	protected List<S> findPrimarySpecies(Collection<S> allSpecies) {
 		if (allSpecies.isEmpty()) {
@@ -540,6 +539,18 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				.sorted(Utils.compareUsing(BaseVdypSpecies::getFractionGenus).reversed()).findFirst().orElseThrow();
 	}
 
+	protected L getPrimaryLayer(P poly) throws StandProcessingException {
+		L primaryLayer = poly.getLayers().get(LayerType.PRIMARY);
+		if (primaryLayer == null) {
+			throw new StandProcessingException("Polygon does not have a primary layer");
+		}
+		return primaryLayer;
+	}
+
+	protected BecDefinition getBec(P poly) throws ProcessingException {
+		return Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+	}
+
 	protected static <E extends Throwable> void throwIfPresent(Optional<E> opt) throws E {
 		if (opt.isPresent()) {
 			throw opt.get();
@@ -552,15 +563,12 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	}
 
 	/**
-	 * Create a coefficients object where its values are either a weighted sum of
-	 * those for each of the given entities, or the value from one arbitrarily chose
-	 * entity.
+	 * Create a coefficients object where its values are either a weighted sum of those for each of the given entities,
+	 * or the value from one arbitrarily chose entity.
 	 *
 	 * @param <T>             The type of entity
-	 * @param weighted        the indicies of the coefficients that should be
-	 *                        weighted sums, those that are not included are assumed
-	 *                        to be constant across all entities and one is choses
-	 *                        arbitrarily.
+	 * @param weighted        the indicies of the coefficients that should be weighted sums, those that are not included
+	 *                        are assumed to be constant across all entities and one is choses arbitrarily.
 	 * @param size            Size of the resulting coefficients object
 	 * @param indexFrom       index from of the resulting coefficients object
 	 * @param entities        the entities to do weighted sums over
@@ -602,9 +610,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	}
 
 	/**
-	 * Create a coefficients object where its values are either a weighted sum of
-	 * those for each of the given entities, or the value from one arbitrarily chose
-	 * entity.
+	 * Create a coefficients object where its values are either a weighted sum of those for each of the given entities,
+	 * or the value from one arbitrarily chose entity.
 	 *
 	 * @param <T>             The type of entity
 	 * @param size            Size of the resulting coefficients object

@@ -34,6 +34,7 @@ import org.junit.jupiter.params.provider.EnumSource.Mode;
 
 import ca.bc.gov.nrs.vdyp.application.ApplicationTestUtils;
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
+import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BasalAreaYieldParser;
@@ -617,7 +618,7 @@ class VriStartTest {
 	void testProcessEmpty() throws Exception {
 		var control = EasyMock.createControl();
 
-		VriStart app = EasyMock.createMockBuilder(VriStart.class)//
+		VdypStartApplication<VriPolygon, VriLayer, VriSpecies, VriSite> app = EasyMock.createMockBuilder(VriStart.class)//
 				.addMockedMethod("getVriWriter") //
 				.addMockedMethod("checkPolygon") //
 				.addMockedMethod("getPolygon") //
