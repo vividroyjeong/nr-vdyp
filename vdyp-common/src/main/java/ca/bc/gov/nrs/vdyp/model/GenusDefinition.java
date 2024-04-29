@@ -10,6 +10,7 @@ public class GenusDefinition extends AliasedEntity implements Comparable<GenusDe
 
 	private final Optional<Integer> preference;
 
+	@SuppressWarnings("java:S2789")
 	public GenusDefinition(String alias, Optional<Integer> preference, String name) {
 		super(alias, name);
 
