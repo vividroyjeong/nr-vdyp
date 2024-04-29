@@ -2,7 +2,9 @@ package ca.bc.gov.nrs.vdyp.application;
 
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.clamp;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.exp;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.floor;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.pow;
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 import java.io.Closeable;
@@ -47,6 +49,7 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
+import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 
@@ -524,7 +527,21 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		return baseArea;
 	}
 
-	protected abstract Optional<Float> getLayerHeight(L layer);
+	protected abstract float getYieldFactor(P polygon);
+
+	protected abstract Optional<I> getPrimarySite(L layer);
+
+	protected Optional<Float> getLayerHeight(L layer) {
+		return getPrimarySite(layer).flatMap(BaseVdypSite::getHeight);
+	}
+
+	protected Optional<Float> getLayerAgeTotal(L layer) {
+		return getPrimarySite(layer).flatMap(BaseVdypSite::getAgeTotal);
+	}
+
+	protected Optional<Float> getLayerYearstoBreastHhight(L layer) {
+		return getPrimarySite(layer).flatMap(BaseVdypSite::getYearsToBreastHeight);
+	}
 
 	protected float estimatePrimaryBaseArea(
 			L layer, BecDefinition bec, float yieldFactor, float breastHeightAge, float baseAreaOverstory
@@ -627,4 +644,89 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		var weighted = IntStream.range(indexFrom, size + indexFrom).boxed().toList();
 		return weightedCoefficientSum(weighted, size, indexFrom, entities, weight, getCoefficients);
 	}
+
+	// FIPLAND
+	@SuppressWarnings("java:S3655")
+	public float estimatePercentForestLand(P polygon, Optional<L> fipVetLayer, L primaryLayer)
+			throws ProcessingException {
+		if (polygon.getPercentAvailable().isPresent()) {
+			return polygon.getPercentAvailable().get();
+		} else {
+
+			boolean veteran = fipVetLayer//
+					.filter(layer -> getLayerHeight(layer).orElse(0f) > 0f) //
+					.filter(layer -> layer.getCrownClosure() > 0f)//
+					.isPresent(); // LAYERV
+
+			if (getId() == VdypApplicationIdentifier.FIP_START
+					&& polygon.getMode().map(mode -> mode == PolygonMode.YOUNG).orElse(false)) {
+				return 100f;
+			}
+			if (getId() == VdypApplicationIdentifier.VRI_START) {
+				veteran = fipVetLayer != null;
+			}
+
+			assert primaryLayer != null;
+
+			float crownClosure = primaryLayer.getCrownClosure();
+
+			float primaryAgeTotal = getLayerAgeTotal(primaryLayer).orElseThrow();
+			// Assume crown closure linear with age, to 25.
+			if (primaryAgeTotal < 25f) {
+				crownClosure *= 25f / primaryAgeTotal;
+			}
+			// define crown closure as the SUM of two layers
+			if (veteran) {
+				crownClosure += fipVetLayer.map(InputLayer::getCrownClosure).orElse(0f);
+			}
+
+			crownClosure = clamp(crownClosure, 0, 100);
+
+			/*
+			 * assume that CC occurs at age 25 and that most land goes to 90% occupancy but that occupancy increases
+			 * only 1% /yr with no increases after ages 25. });
+			 */
+
+			// Obtain the percent yield (in comparison with CC = 90%)
+
+			float crownClosureTop = 90f;
+			float breastHeightAge = primaryAgeTotal
+					- getPrimarySite(primaryLayer).flatMap(BaseVdypSite::getYearsToBreastHeight).orElseThrow();
+
+			float yieldFactor = getYieldFactor(polygon);
+
+			var bec = Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap);
+
+			breastHeightAge = max(5.0f, breastHeightAge);
+			// EMP040
+			float baseAreaTop = estimatePrimaryBaseArea(
+					primaryLayer, bec, yieldFactor, breastHeightAge, 0f, crownClosureTop
+			);
+			// EMP040
+			float baseAreaHat = estimatePrimaryBaseArea(
+					primaryLayer, bec, yieldFactor, breastHeightAge, 0f, crownClosure
+			);
+
+			float percentYield;
+			if (baseAreaTop > 0f && baseAreaHat > 0f) {
+				percentYield = min(100f, 100f * baseAreaHat / baseAreaTop);
+			} else {
+				percentYield = 90f;
+			}
+
+			float gainMax;
+			if (primaryAgeTotal > 125f) {
+				gainMax = 0f;
+			} else if (primaryAgeTotal < 25f) {
+				gainMax = max(90f - percentYield, 0);
+			} else {
+				gainMax = max(90f - percentYield, 0);
+				gainMax = min(gainMax, 125 - primaryAgeTotal);
+			}
+
+			return floor(min(percentYield + gainMax, 100f));
+
+		}
+	}
+
 }

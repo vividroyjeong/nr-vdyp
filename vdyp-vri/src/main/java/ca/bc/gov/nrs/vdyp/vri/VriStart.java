@@ -841,7 +841,12 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	}
 
 	@Override
-	protected Optional<Float> getLayerHeight(VriLayer layer) {
-		return layer.getPrimarySite().flatMap(site -> site.getHeight());
+	protected Optional<VriSite> getPrimarySite(VriLayer layer) {
+		return layer.getPrimarySite();
+	}
+
+	@Override
+	protected float getYieldFactor(VriPolygon polygon) {
+		return polygon.getYieldFactor();
 	}
 }

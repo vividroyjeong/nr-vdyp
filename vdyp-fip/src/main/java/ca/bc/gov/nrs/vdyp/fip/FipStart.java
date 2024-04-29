@@ -263,95 +263,14 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 	VdypPolygon createVdypPolygon(FipPolygon fipPolygon, Map<LayerType, VdypLayer> processedLayers)
 			throws ProcessingException {
-		var fipVetLayer = fipPolygon.getLayers().get(LayerType.VETERAN);
-		var fipPrimaryLayer = (FipLayerPrimary) fipPolygon.getLayers().get(LayerType.PRIMARY);
+		Optional<FipLayer> fipVetLayer = Utils.optSafe(fipPolygon.getLayers().get(LayerType.VETERAN));
+		FipLayerPrimary fipPrimaryLayer = (FipLayerPrimary) fipPolygon.getLayers().get(LayerType.PRIMARY);
 
 		float percentAvailable = estimatePercentForestLand(fipPolygon, fipVetLayer, fipPrimaryLayer);
 
 		var vdypPolygon = VdypPolygon.build(builder -> builder.adapt(fipPolygon, x -> percentAvailable));
 		vdypPolygon.setLayers(processedLayers);
 		return vdypPolygon;
-	}
-
-	// FIPLAND
-	@SuppressWarnings("java:S3655")
-	float estimatePercentForestLand(FipPolygon fipPolygon, FipLayer fipVetLayer, FipLayerPrimary fipPrimaryLayer)
-			throws ProcessingException {
-		if (fipPolygon.getPercentAvailable().isPresent()) {
-			return fipPolygon.getPercentAvailable().get();
-		} else {
-
-			boolean veteran = fipVetLayer != null && fipVetLayer.getHeight().orElse(0f) > 0f
-					&& fipVetLayer.getCrownClosure() > 0f; // LAYERV
-
-			if (getId() == VdypApplicationIdentifier.FIP_START
-					&& fipPolygon.getMode().map(mode -> mode == PolygonMode.YOUNG).orElse(false)) {
-				return 100f;
-			}
-			if (getId() == VdypApplicationIdentifier.VRI_START) {
-				veteran = fipVetLayer != null;
-			}
-
-			assert fipPrimaryLayer != null;
-
-			float crownClosure = fipPrimaryLayer.getCrownClosure();
-
-			// Assume crown closure linear with age, to 25.
-			if (fipPrimaryLayer.getAgeTotalSafe() < 25f) {
-				crownClosure *= 25f / fipPrimaryLayer.getAgeTotalSafe();
-			}
-			// define crown closure as the SUM of two layers
-			if (veteran) {
-				crownClosure += fipVetLayer.getCrownClosure();
-			}
-			crownClosure = clamp(crownClosure, 0, 100);
-
-			/*
-			 * assume that CC occurs at age 25 and that most land goes to 90% occupancy but that occupancy increases
-			 * only 1% /yr with no increases after ages 25. });
-			 */
-
-			// Obtain the percent yield (in comparison with CC = 90%)
-
-			float crownClosureTop = 90f;
-			float breastHeightAge = fipPrimaryLayer.getAgeTotalSafe() - fipPrimaryLayer.getYearsToBreastHeightSafe();
-
-			float yieldFactor = fipPolygon.getYieldFactor();
-
-			var bec = BecDefinitionParser.getBecs(controlMap).get(fipPolygon.getBiogeoclimaticZone()).orElseThrow(
-					() -> new ProcessingException("Could not find BEC " + fipPolygon.getBiogeoclimaticZone())
-			);
-
-			breastHeightAge = max(5.0f, breastHeightAge);
-			// EMP040
-			float baseAreaTop = estimatePrimaryBaseArea(
-					fipPrimaryLayer, bec, yieldFactor, breastHeightAge, 0f, crownClosureTop
-			);
-			// EMP040
-			float baseAreaHat = estimatePrimaryBaseArea(
-					fipPrimaryLayer, bec, yieldFactor, breastHeightAge, 0f, crownClosure
-			);
-
-			float percentYield;
-			if (baseAreaTop > 0f && baseAreaHat > 0f) {
-				percentYield = min(100f, 100f * baseAreaHat / baseAreaTop);
-			} else {
-				percentYield = 90f;
-			}
-
-			float gainMax;
-			if (fipPrimaryLayer.getAgeTotalSafe() > 125f) {
-				gainMax = 0f;
-			} else if (fipPrimaryLayer.getAgeTotalSafe() < 25f) {
-				gainMax = max(90f - percentYield, 0);
-			} else {
-				gainMax = max(90f - percentYield, 0);
-				gainMax = min(gainMax, 125 - fipPrimaryLayer.getAgeTotalSafe());
-			}
-
-			return floor(min(percentYield + gainMax, 100f));
-
-		}
 	}
 
 	// FIPCALC1
@@ -2870,8 +2789,14 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 	}
 
 	@Override
-	protected Optional<Float> getLayerHeight(FipLayer layer) {
-		return layer.getHeight();
+	protected Optional<FipSite> getPrimarySite(FipLayer layer) {
+		return layer.getSite();
+	}
+
+	@Override
+	protected float getYieldFactor(FipPolygon polygon) {
+		return polygon.getYieldFactor();
+		// TODO Make an InputPolygon interface that has this.
 	}
 
 }

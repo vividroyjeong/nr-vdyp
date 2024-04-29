@@ -287,8 +287,14 @@ class VdypStartApplicationTest {
 		}
 
 		@Override
-		protected Optional<Float> getLayerHeight(TestLayer layer) {
-			return layer.getSites().values().iterator().next().getHeight();
+		protected Optional<TestSite> getPrimarySite(TestLayer layer) {
+			return Utils.optSafe(layer.getSites().values().iterator().next());
+		}
+
+		@Override
+		protected float getYieldFactor(TestPolygon polygon) {
+			// TODO Auto-generated method stub
+			return 0;
 		}
 
 	}
