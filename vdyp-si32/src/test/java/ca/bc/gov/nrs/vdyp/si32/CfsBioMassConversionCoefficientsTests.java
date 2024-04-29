@@ -8,6 +8,7 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.si32.cfs.CfsBiomassConversionCoefficientsDead;
+import ca.bc.gov.nrs.vdyp.si32.cfs.CfsBiomassConversionCoefficientsDetails;
 import ca.bc.gov.nrs.vdyp.si32.cfs.CfsBiomassConversionCoefficientsForGenus;
 import ca.bc.gov.nrs.vdyp.si32.cfs.CfsBiomassConversionCoefficientsForSpecies;
 
@@ -15,8 +16,8 @@ class CfsBioMassConversionCoefficientsTests {
 
 	@Test
 	void test_dead() {
-		CfsBiomassConversionCoefficientsDead.Details d1 = CfsBiomassConversionCoefficientsDead.get(1, 1);
-		CfsBiomassConversionCoefficientsDead.Details d2 = CfsBiomassConversionCoefficientsDead.get(1, 2);
+		CfsBiomassConversionCoefficientsDetails d1 = CfsBiomassConversionCoefficientsDead.get(1, 1);
+		CfsBiomassConversionCoefficientsDetails d2 = CfsBiomassConversionCoefficientsDead.get(1, 2);
 		
 		assertTrue(d1.equals(d1));
 		assertFalse(d1.equals(d2));
@@ -26,8 +27,8 @@ class CfsBioMassConversionCoefficientsTests {
 
 	@Test
 	void test_forGenus() {
-		CfsBiomassConversionCoefficientsForGenus.Details d1 = CfsBiomassConversionCoefficientsForGenus.get(1, 1);
-		CfsBiomassConversionCoefficientsForGenus.Details d2 = CfsBiomassConversionCoefficientsForGenus.get(1, 2);
+		CfsBiomassConversionCoefficientsDetails d1 = CfsBiomassConversionCoefficientsForGenus.get(1, 1);
+		CfsBiomassConversionCoefficientsDetails d2 = CfsBiomassConversionCoefficientsForGenus.get(1, 2);
 		
 		assertTrue(d1.equals(d1));
 		assertFalse(d1.equals(d2));
@@ -37,8 +38,8 @@ class CfsBioMassConversionCoefficientsTests {
 
 	@Test
 	void test_forSpecies() {
-		CfsBiomassConversionCoefficientsForSpecies.Details d1 = CfsBiomassConversionCoefficientsForSpecies.get(1, 1);
-		CfsBiomassConversionCoefficientsForSpecies.Details d2 = CfsBiomassConversionCoefficientsForSpecies.get(1, 2);
+		CfsBiomassConversionCoefficientsDetails d1 = CfsBiomassConversionCoefficientsForSpecies.get(1, 1);
+		CfsBiomassConversionCoefficientsDetails d2 = CfsBiomassConversionCoefficientsForSpecies.get(1, 2);
 		
 		assertTrue(d1.equals(d1));
 		assertFalse(d1.equals(d2));
