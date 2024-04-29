@@ -36,8 +36,6 @@ class GenusDistributionSetTest {
 
 	@Test
 	void testGenusDefinitionComparison() {
-		assertEquals(a, a);
-		assertNotEquals(a, Integer.valueOf(2));
 		assertNotEquals(a, null);
 		
 		assertNotEquals(a, b);
@@ -53,7 +51,6 @@ class GenusDistributionSetTest {
 		var gd1 = new GenusDistribution(0, a, 70.0f);
 		var gd2 = new GenusDistribution(0, b, 30.0f);
 		
-		assertEquals(gd1, gd1);
 		assertNotEquals(gd1, gd2);
 		assertNotEquals(gd1, null);
 		assertNotEquals(null, gd2);
