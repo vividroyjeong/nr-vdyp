@@ -13,16 +13,14 @@ public class GenusDefinition extends AliasedEntity implements Comparable<GenusDe
 	public GenusDefinition(String alias, Optional<Integer> preference, String name) {
 		super(alias, name);
 
-		try {
-			preference.get();
-			this.preference = preference;
-		} catch (NullPointerException e) {
+		if (preference == null) {
 			throw new IllegalArgumentException(
 					MessageFormat.format(
 							"GenusDefinition preference may not be null; provide Optional.empty() instead (alias {0})", alias
 					)
 			);
 		}
+		this.preference = preference;
 	}
 
 	public Optional<Integer> getPreference() {

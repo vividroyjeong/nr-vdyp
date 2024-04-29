@@ -148,7 +148,7 @@ public class SiteIndexYears2BreastHeight {
 
 		case SI_HWC_WILEY_MB:
 			/* seed (root collar) */
-			min1(y2bh = 9.43 - siteIndex / 7.088);
+			y2bh = min1(9.43 - siteIndex / 7.088);
 			break;
 
 		// Couldn't find constant
