@@ -1,26 +1,10 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.*;
 
 /**
  * SiteIndexNames.java
  */
 public class SiteIndexNames {
-	// Taken from sindex.h
-
-	/* define species and equation indices */
-	private static final int SI_SPEC_AT = 8;
-	private static final int SI_SPEC_BA = 11;
-	private static final int SI_SPEC_BL = 16;
-	private static final int SI_SPEC_CWC = 23;
-	private static final int SI_SPEC_FDC = 39;
-	private static final int SI_SPEC_FDI = 40;
-	private static final int SI_SPEC_HWC = 47;
-	private static final int SI_SPEC_HWI = 48;
-	private static final int SI_SPEC_LW = 60;
-	private static final int SI_SPEC_PLI = 81;
-	private static final int SI_SPEC_SB = 95;
-	private static final int SI_SPEC_SS = 99;
-	private static final int SI_SPEC_SW = 100;
-
 	public static final String[] si_spec_code = {
 			// SI_SPEC_A
 			"A",
@@ -430,7 +414,7 @@ public class SiteIndexNames {
 			// SI_SPEC_ZH
 			"Zh", };
 
-	public static final String[] si_spec_name = {
+	public static final String[] siSpeciesName = {
 			// SI_SPEC_A
 			"Aspen",
 
@@ -838,10 +822,9 @@ public class SiteIndexNames {
 
 			// SI_SPEC_ZH
 			"Other hardwood",
-
 	};
 
-	public static String[] si_curve_name = {
+	public static String[] siCurveName = {
 			// SI_ACB_HUANG
 			"Huang, Titus, and Lakusta (1994)",
 
@@ -1277,33 +1260,53 @@ public class SiteIndexNames {
 			// SI_CWC_NIGH
 			"Nigh (2016)", };
 
-	/*
+	/**
 	 * Site index conversion between species. Here's how to use the following array: The four elements are: reference
 	 * species, target species, coeff_a, coeff_b.
-	 *
+	 * <p>
 	 * Target_SI = coeff_a + coeff_b * Reference_SI
 	 */
-	public static final double[][] si_convert = { { SI_SPEC_AT, SI_SPEC_SW, 3.804, 0.7978 },
-			{ SI_SPEC_BA, SI_SPEC_HWC, 2.005, 1.014 }, { SI_SPEC_CWC, SI_SPEC_HWC, 1.256, 1.048 },
-			{ SI_SPEC_FDC, SI_SPEC_HWC, -0.432, 0.899 }, { SI_SPEC_HWC, SI_SPEC_BA, -1.97731755, 0.98619329 },
-			{ SI_SPEC_HWC, SI_SPEC_CWC, -1.19847328, 0.95419847 }, { SI_SPEC_HWC, SI_SPEC_FDC, 0.48053393, 1.11234705 },
-			{ SI_SPEC_HWC, SI_SPEC_SS, -4.94382022, 1.24843945 }, { SI_SPEC_HWI, SI_SPEC_FDI, 4.56, 0.887 },
-			{ SI_SPEC_SS, SI_SPEC_HWC, 3.96, 0.801 }, { SI_SPEC_PLI, SI_SPEC_SW, -2.14130435, 1.08695652 },
-			{ SI_SPEC_PLI, SI_SPEC_FDI, 0.70841121, 0.93457944 }, { SI_SPEC_PLI, SI_SPEC_BL, 0.47431193, 0.91743119 },
-			{ SI_SPEC_PLI, SI_SPEC_LW, 1.92307692, 0.96153846 }, { SI_SPEC_PLI, SI_SPEC_SB, 2.76436782, 0.6385696 },
-			{ SI_SPEC_SB, SI_SPEC_PLI, -4.329, 1.566 }, { SI_SPEC_SW, SI_SPEC_AT, -4.768112309, 1.253446979 },
-			{ SI_SPEC_SW, SI_SPEC_PLI, 1.97, 0.92 }, { SI_SPEC_SW, SI_SPEC_FDI, 4.75, 0.737 },
-			{ SI_SPEC_SW, SI_SPEC_BL, 1.68, 0.86 }, { SI_SPEC_FDI, SI_SPEC_PLI, -0.758, 1.07 },
-			{ SI_SPEC_FDI, SI_SPEC_SW, -6.44504749, 1.3568521 }, { SI_SPEC_FDI, SI_SPEC_HWI, -5.14092446, 1.12739572 },
-			{ SI_SPEC_FDI, SI_SPEC_LW, 0.70193286, 1.017294 }, { SI_SPEC_BL, SI_SPEC_PLI, -0.517, 1.09 },
-			{ SI_SPEC_BL, SI_SPEC_SW, -1.95348837, 1.1627907 }, { SI_SPEC_LW, SI_SPEC_PLI, -2, 1.04 },
-			{ SI_SPEC_LW, SI_SPEC_FDI, -0.69, 0.983 }, };
+	public static final double[][] siSpeciesConversionParameters = { 
+			{ SI_SPEC_AT, SI_SPEC_SW, 3.804, 0.7978 }, //
+			{ SI_SPEC_BA, SI_SPEC_HWC, 2.005, 1.014 }, //
+			{ SI_SPEC_CWC, SI_SPEC_HWC, 1.256, 1.048 }, //
+			{ SI_SPEC_FDC, SI_SPEC_HWC, -0.432, 0.899 }, // 
+			{ SI_SPEC_HWC, SI_SPEC_BA, -1.97731755, 0.98619329 }, //
+			{ SI_SPEC_HWC, SI_SPEC_CWC, -1.19847328, 0.95419847 }, // 
+			{ SI_SPEC_HWC, SI_SPEC_FDC, 0.48053393, 1.11234705 }, //
+			{ SI_SPEC_HWC, SI_SPEC_SS, -4.94382022, 1.24843945 }, // 
+			{ SI_SPEC_HWI, SI_SPEC_FDI, 4.56, 0.887 }, //
+			{ SI_SPEC_SS, SI_SPEC_HWC, 3.96, 0.801 }, // 
+			{ SI_SPEC_PLI, SI_SPEC_SW, -2.14130435, 1.08695652 }, //
+			{ SI_SPEC_PLI, SI_SPEC_FDI, 0.70841121, 0.93457944 }, // 
+			{ SI_SPEC_PLI, SI_SPEC_BL, 0.47431193, 0.91743119 }, //
+			{ SI_SPEC_PLI, SI_SPEC_LW, 1.92307692, 0.96153846 }, // 
+			{ SI_SPEC_PLI, SI_SPEC_SB, 2.76436782, 0.6385696 }, //
+			{ SI_SPEC_SB, SI_SPEC_PLI, -4.329, 1.566 }, // 
+			{ SI_SPEC_SW, SI_SPEC_AT, -4.768112309, 1.253446979 }, //
+			{ SI_SPEC_SW, SI_SPEC_PLI, 1.97, 0.92 }, // 
+			{ SI_SPEC_SW, SI_SPEC_FDI, 4.75, 0.737 }, //
+			{ SI_SPEC_SW, SI_SPEC_BL, 1.68, 0.86 }, // 
+			{ SI_SPEC_FDI, SI_SPEC_PLI, -0.758, 1.07 }, //
+			{ SI_SPEC_FDI, SI_SPEC_SW, -6.44504749, 1.3568521 }, // 
+			{ SI_SPEC_FDI, SI_SPEC_HWI, -5.14092446, 1.12739572 }, //
+			{ SI_SPEC_FDI, SI_SPEC_LW, 0.70193286, 1.017294 }, // 
+			{ SI_SPEC_BL, SI_SPEC_PLI, -0.517, 1.09 }, //
+			{ SI_SPEC_BL, SI_SPEC_SW, -1.95348837, 1.1627907 }, // 
+			{ SI_SPEC_LW, SI_SPEC_PLI, -2, 1.04 }, //
+			{ SI_SPEC_LW, SI_SPEC_FDI, -0.69, 0.983 }
+		};
 
-	/*
-	 * indicates what equations are available (these are additive): 1: ht = fn (si, age) 2: si = fn (ht, age) 4: y2bh =
-	 * fn (si) 8: si = fn (ht, age) growth intercept
+	/**
+	 * Indicates what equations are available (these are additive):
+	 * <ul>
+	 * <li>1: ht = fn (si, age)
+	 * <li>2: si = fn (ht, age) 
+	 * <li>4: y2bh = fn (si) 
+	 * <li>8: si = fn (ht, age) (growth intercept)
+	 * </ul>
 	 */
-	public static char[] si_curve_types = {
+	public static char[] siCurveAvailableTypes = {
 			// SI_ACB_HUANG
 			5,
 
@@ -1742,9 +1745,9 @@ public class SiteIndexNames {
 	};
 
 	/**
-	 * height(m) of breast height (typically 1.3, 1.37, 1.3716)
+	 * Height(m) of breast height (typically 1.3, 1.37, 1.3716).
 	 */
-	public static double[] si_curve_bh = {
+	public static double[] siCurveBreastHeight = {
 			// SI_ACB_HUANG
 			1.3,
 
@@ -2178,5 +2181,6 @@ public class SiteIndexNames {
 			1.3,
 
 			// SI_CWC_NIGH
-			1.3 };
+			1.3 
+		};
 }

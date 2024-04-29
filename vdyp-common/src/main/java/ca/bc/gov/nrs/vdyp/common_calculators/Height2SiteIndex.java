@@ -5,6 +5,7 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMa
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMinimumException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.*;
 
 /**
  * Height2SiteIndex.java - given age and height, computes site index. - if age is total, site index and years to breast
@@ -14,57 +15,8 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException
 public class Height2SiteIndex {
 	// Taken from sindex.h
 
-	/* age types */
-	public static final int SI_AT_TOTAL = 0;
-	public static final int SI_AT_BREAST = 1;
-	
-	/* site index estimation (from height and age) types */
-	public static final int SI_EST_ITERATE = 0;
-	public static final int SI_EST_DIRECT = 1;
-
 	/* error codes */
 	private static final int SI_ERR_NO_ANS = -4;
-
-	/* define species and equation indices */
-	private static final int SI_AT_GOUDIE = 4;
-	private static final int SI_BA_DILUCCA = 5;
-	private static final int SI_BA_NIGHGI = 117;
-	private static final int SI_BL_THROWERGI = 9;
-	private static final int SI_CWI_NIGHGI = 84;
-	private static final int SI_DR_NIGH = 13;
-	private static final int SI_FDC_NIGHGI = 15;
-	private static final int SI_FDI_MILNER = 22;
-	private static final int SI_FDI_MONS_DF = 26;
-	private static final int SI_FDI_MONS_GF = 27;
-	private static final int SI_FDI_MONS_SAF = 30;
-	private static final int SI_FDI_MONS_WH = 29;
-	private static final int SI_FDI_MONS_WRC = 28;
-	private static final int SI_FDI_NIGHGI = 19;
-	private static final int SI_FDI_THROWER = 23;
-	private static final int SI_FDI_VDP_MONT = 24;
-	private static final int SI_FDI_VDP_WASH = 25;
-	private static final int SI_HM_MEANS = 86;
-	private static final int SI_HWC_NIGHGI = 31;
-	private static final int SI_HWC_NIGHGI99 = 79;
-	private static final int SI_HWI_NIGHGI = 38;
-	private static final int SI_LW_MILNER = 39;
-	private static final int SI_LW_NIGHGI = 82;
-	private static final int SI_PLI_DEMPSTER = 50;
-	private static final int SI_PLI_MILNER = 46;
-	private static final int SI_PLI_NIGHGI97 = 42;
-	private static final int SI_PLI_THROWER = 45;
-	private static final int SI_PW_CURTIS = 51;
-	private static final int SI_PY_MILNER = 52;
-	private static final int SI_PY_NIGHGI = 108;
-	private static final int SI_SB_DEMPSTER = 57;
-	private static final int SI_SE_NIGHGI = 120;
-	private static final int SI_SS_NIGHGI = 58;
-	private static final int SI_SS_NIGHGI99 = 80;
-	private static final int SI_SW_DEMPSTER = 72;
-	private static final int SI_SW_HU_GARCIA = 119;
-	private static final int SI_SW_NIGHGI = 63;
-	private static final int SI_SW_NIGHGI99 = 81;
-	private static final int SI_SW_NIGHGI2004 = 115;
 
 	// private; public for testing only
 	public static double ppow(double x, double y) {
@@ -3873,9 +3825,7 @@ public class Height2SiteIndex {
 			y2bh = SiteIndexYears2BreastHeight.si_y2bh(cuIndex, site);
 
 			if (ageType == SI_AT_BREAST) {
-				testTop = SiteIndex2Height.indexToHeight(cuIndex, age, SI_AT_BREAST, site, y2bh, 0.5); // 0.5 may
-																											// have to
-																											// change
+				testTop = SiteIndex2Height.indexToHeight(cuIndex, age, SI_AT_BREAST, site, y2bh, 0.5 /* may have to change */); 
 			} else {
 				/* was age - y2bh */
 				testTop = SiteIndex2Height.indexToHeight(
@@ -3936,7 +3886,7 @@ public class Height2SiteIndex {
 	}
 
 	@SuppressWarnings("java:S3776, java:S6541")
-	public static double huGarciaQ(double siteIndex, double bhAge) {
+	public static double huGarciaQ(double siteIndex, double breastHeightAge) {
 		double h, q, step, diff, lastdiff;
 
 		q = 0.02;
@@ -3945,7 +3895,7 @@ public class Height2SiteIndex {
 		diff = 0;
 
 		do {
-			h = huGarciaH(q, bhAge);
+			h = huGarciaH(q, breastHeightAge);
 			lastdiff = diff;
 			diff = siteIndex - h;
 			if (diff > 0.0000001) {
@@ -3974,11 +3924,11 @@ public class Height2SiteIndex {
 		return q;
 	}
 
-	public static double huGarciaH(double q, double bhAge) {
+	public static double huGarciaH(double q, double breastHeightAge) {
 		double a, height;
 
 		a = 283.9 * Math.pow(q, 0.5137);
-		height = a * Math.pow(1 - (1 - Math.pow(1.3 / a, 0.5829)) * Math.exp(-q * (bhAge - 0.5)), 1.71556);
+		height = a * Math.pow(1 - (1 - Math.pow(1.3 / a, 0.5829)) * Math.exp(-q * (breastHeightAge - 0.5)), 1.71556);
 		return height;
 	}
 

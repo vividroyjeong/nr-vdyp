@@ -6,54 +6,38 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ClassErrorExcepti
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ForestInventoryZoneException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.SpeciesErrorException;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.*;
 
 /**
  * SiteClassCode2SiteIndex.java - translates site class code to site index (height in metres) for a given species, site
- * class, and FIZ. - the translation is intended to be used where total age is small (under 30 years), where site index
- * based on height may not be reliable. - primarily used by VDYP and FredTab. - the origin of the values used here is
- * Inventory Branch.
+ * class, and FIZ.
+ * <p>
+ * The translation is intended to be used where total age is small (under 30 years) and where site index
+ * based on height may not be reliable.
+ * <p>
+ * Primarily used by VDYP and FredTab.
+ * <p>
+ * The origin of the values used here is Inventory Branch.
  */
 public class SiteClassCode2SiteIndex {
-	// Taken from sindex.h
+	/**
+	 * Convert a species, site class and forest inventory zone to a site index (in m).
+	 * @param spIndex the species' index.
+	 * @param siteClass (one of G, M, P or L)
+	 * @param forestInventoryZone (A through L, with A, B and C coastal and the others interior)
+	 * @return the site index, in metres
+	 * @throws CommonCalculatorException
+	 */
+	public static double classToIndex(int spIndex, char siteClass, char forestInventoryZone)
+			throws CommonCalculatorException {
 
-	/* define species and equation indices */
-	private static final int SI_SPEC_ACT = 5;
-	private static final int SI_SPEC_AT = 8;
-	private static final int SI_SPEC_BA = 11;
-	private static final int SI_SPEC_BL = 16;
-	private static final int SI_SPEC_CWC = 23;
-	private static final int SI_SPEC_CWI = 24;
-	private static final int SI_SPEC_DR = 29;
-	private static final int SI_SPEC_EA = 31;
-	private static final int SI_SPEC_EP = 34;
-	private static final int SI_SPEC_FDC = 39;
-	private static final int SI_SPEC_FDI = 40;
-	private static final int SI_SPEC_HWC = 47;
-	private static final int SI_SPEC_HWI = 48;
-	private static final int SI_SPEC_LA = 57;
-	private static final int SI_SPEC_LT = 59;
-	private static final int SI_SPEC_LW = 60;
-	private static final int SI_SPEC_MB = 62;
-	private static final int SI_SPEC_PA = 76;
-	private static final int SI_SPEC_PF = 77;
-	private static final int SI_SPEC_PLI = 81;
-	private static final int SI_SPEC_PW = 85;
-	private static final int SI_SPEC_PY = 87;
-	private static final int SI_SPEC_SB = 95;
-	private static final int SI_SPEC_SE = 96;
-	private static final int SI_SPEC_SS = 99;
-	private static final int SI_SPEC_SW = 100;
-	private static final int SI_SPEC_YC = 130;
-
-	public static double classToIndex(int spIndex, char sitecl, char fiz) throws CommonCalculatorException {
-
-		if (sitecl != 'G' && sitecl != 'M' && sitecl != 'P' && sitecl != 'L') {
-			throw new ClassErrorException("Unknown site class code: " + sitecl);
+		if (siteClass != 'G' && siteClass != 'M' && siteClass != 'P' && siteClass != 'L') {
+			throw new ClassErrorException("Unknown site class code: " + siteClass);
 		}
 
 		switch (spIndex) {
 		case SI_SPEC_ACT, SI_SPEC_MB:
-			switch (sitecl) {
+			switch (siteClass) {
 			case 'G':
 				return 26;
 			case 'M':
@@ -67,7 +51,7 @@ public class SiteClassCode2SiteIndex {
 			}
 			break;
 		case SI_SPEC_AT, SI_SPEC_EA, SI_SPEC_EP:
-			switch (sitecl) {
+			switch (siteClass) {
 			case 'G':
 				return 27;
 			case 'M':
@@ -81,7 +65,7 @@ public class SiteClassCode2SiteIndex {
 			}
 			break;
 		case SI_SPEC_BA:
-			switch (sitecl) {
+			switch (siteClass) {
 			case 'G':
 				return 29;
 			case 'M':
@@ -95,7 +79,7 @@ public class SiteClassCode2SiteIndex {
 			}
 			break;
 		case SI_SPEC_BL:
-			switch (sitecl) {
+			switch (siteClass) {
 			case 'G':
 				return 18;
 			case 'M':
@@ -109,7 +93,7 @@ public class SiteClassCode2SiteIndex {
 			}
 			break;
 		case SI_SPEC_CWC, SI_SPEC_YC:
-			switch (sitecl) {
+			switch (siteClass) {
 			case 'G':
 				return 29;
 			case 'M':
@@ -123,7 +107,7 @@ public class SiteClassCode2SiteIndex {
 			}
 			break;
 		case SI_SPEC_CWI:
-			switch (sitecl) {
+			switch (siteClass) {
 			case 'G':
 				return 22;
 			case 'M':
@@ -137,7 +121,7 @@ public class SiteClassCode2SiteIndex {
 			}
 			break;
 		case SI_SPEC_DR:
-			switch (sitecl) {
+			switch (siteClass) {
 			case 'G':
 				return 33;
 			case 'M':
@@ -151,7 +135,7 @@ public class SiteClassCode2SiteIndex {
 			}
 			break;
 		case SI_SPEC_FDC:
-			switch (sitecl) {
+			switch (siteClass) {
 			case 'G':
 				return 32;
 			case 'M':
@@ -165,7 +149,7 @@ public class SiteClassCode2SiteIndex {
 			}
 			break;
 		case SI_SPEC_FDI:
-			switch (sitecl) {
+			switch (siteClass) {
 			case 'G':
 				return 20;
 			case 'M':
@@ -179,9 +163,9 @@ public class SiteClassCode2SiteIndex {
 			}
 			break;
 		case SI_SPEC_HWC:
-			switch (FizCheck.fiz_check(fiz)) {
-			case FizCheck.FIZ_COAST:
-				switch (sitecl) {
+			switch (FizCheck.fiz2Region(forestInventoryZone)) {
+			case FIZ_COAST:
+				switch (siteClass) {
 				case 'G':
 					return 28;
 				case 'M':
@@ -195,8 +179,8 @@ public class SiteClassCode2SiteIndex {
 				}
 				break;
 
-			case FizCheck.FIZ_INTERIOR:
-				switch (sitecl) {
+			case FIZ_INTERIOR:
+				switch (siteClass) {
 				case 'G':
 					return 21;
 				case 'M':
@@ -211,11 +195,11 @@ public class SiteClassCode2SiteIndex {
 				break;
 
 			default:
-				throw new ForestInventoryZoneException("Unknown FIZ code: " + fiz);
+				throw new ForestInventoryZoneException("Unknown FIZ code: " + forestInventoryZone);
 			}
 
 		case SI_SPEC_HWI:
-			switch (sitecl) {
+			switch (siteClass) {
 			case 'G':
 				return 21;
 			case 'M':
@@ -229,7 +213,7 @@ public class SiteClassCode2SiteIndex {
 			}
 			break;
 		case SI_SPEC_LA, SI_SPEC_LT, SI_SPEC_LW:
-			switch (sitecl) {
+			switch (siteClass) {
 			case 'G':
 				return 20;
 			case 'M':
@@ -243,7 +227,7 @@ public class SiteClassCode2SiteIndex {
 			}
 			break;
 		case SI_SPEC_PLI, SI_SPEC_PA, SI_SPEC_PF:
-			switch (sitecl) {
+			switch (siteClass) {
 			case 'G':
 				return 20;
 			case 'M':
@@ -257,7 +241,7 @@ public class SiteClassCode2SiteIndex {
 			}
 			break;
 		case SI_SPEC_PY:
-			switch (sitecl) {
+			switch (siteClass) {
 			case 'G':
 				return 17;
 			case 'M':
@@ -271,7 +255,7 @@ public class SiteClassCode2SiteIndex {
 			}
 			break;
 		case SI_SPEC_PW:
-			switch (sitecl) {
+			switch (siteClass) {
 			case 'G':
 				return 28;
 			case 'M':
@@ -285,7 +269,7 @@ public class SiteClassCode2SiteIndex {
 			}
 			break;
 		case SI_SPEC_SS:
-			switch (sitecl) {
+			switch (siteClass) {
 			case 'G':
 				return 28;
 			case 'M':
@@ -300,7 +284,7 @@ public class SiteClassCode2SiteIndex {
 			break;
 
 		case SI_SPEC_SB, SI_SPEC_SW, SI_SPEC_SE:
-			switch (sitecl) {
+			switch (siteClass) {
 			case 'G':
 				return 19;
 			case 'M':
@@ -318,6 +302,10 @@ public class SiteClassCode2SiteIndex {
 			break /* fall through */;
 		}
 
-		throw new SpeciesErrorException(MessageFormat.format("classToIndex: not found: spIndex {0}, sitecl {1}, fiz {2}", spIndex, sitecl, fiz));
+		throw new SpeciesErrorException(
+				MessageFormat.format(
+						"classToIndex: not found: spIndex {0}, sitecl {1}, fiz {2}", spIndex, siteClass, forestInventoryZone
+				)
+		);
 	}
 }

@@ -2256,7 +2256,7 @@ public class Sindxdll {
 			throw new IllegalArgumentException("Input parameter is not a valid species index: " + sp_index);
 		}
 
-		return SiteIndexNames.si_spec_name[sp_index];
+		return SiteIndexNames.siSpeciesName[sp_index];
 	}
 
 	/**
@@ -3092,7 +3092,7 @@ public class Sindxdll {
 	public static String CurveName(int cu_index) throws CurveErrorException {
 
 		if (cu_index >= 0 && cu_index < SI_MAX_CURVES) {
-			return SiteIndexNames.si_curve_name[cu_index];
+			return SiteIndexNames.siCurveName[cu_index];
 		}
 
 		throw new CurveErrorException("Input parameter is not a valid curve index: " + cu_index);
@@ -3116,7 +3116,7 @@ public class Sindxdll {
 	public static int CurveUse(int cu_index) throws CurveErrorException {
 
 		if (cu_index >= 0 && cu_index < SI_MAX_CURVES) {
-			return (int) (SiteIndexNames.si_curve_types[cu_index]);
+			return (int) (SiteIndexNames.siCurveAvailableTypes[cu_index]);
 		}
 
 		throw new CurveErrorException("If input curve is not a valid curve index: " + cu_index);
@@ -3324,8 +3324,8 @@ public class Sindxdll {
 		}
 
 		for (i = 0; i < SI_MAX_CONVERT; i++) {
-			if (SiteIndexNames.si_convert[i][0] == sp_index1 && SiteIndexNames.si_convert[i][1] == sp_index2) {
-				result.set(Double.valueOf(SiteIndexNames.si_convert[i][2] + SiteIndexNames.si_convert[i][3] * site));
+			if (SiteIndexNames.siSpeciesConversionParameters[i][0] == sp_index1 && SiteIndexNames.siSpeciesConversionParameters[i][1] == sp_index2) {
+				result.set(Double.valueOf(SiteIndexNames.siSpeciesConversionParameters[i][2] + SiteIndexNames.siSpeciesConversionParameters[i][3] * site));
 				return 0;
 			}
 		}

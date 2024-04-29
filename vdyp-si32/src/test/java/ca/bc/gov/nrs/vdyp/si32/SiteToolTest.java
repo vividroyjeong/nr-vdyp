@@ -1,5 +1,9 @@
 package ca.bc.gov.nrs.vdyp.si32;
 
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.SI_AT_BREAST;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.SI_AT_TOTAL;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.SI_EST_DIRECT;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.SI_EST_ITERATE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -8,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.common_calculators.Height2SiteIndex;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexNames;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
@@ -168,34 +171,34 @@ class SiteToolTest {
 	void test_htAgeToSI() throws CommonCalculatorException {
 		assertThrows(
 				LessThan13Exception.class, () -> SiteTool
-						.heightAndAgeToSiteIndex(0, 0, Height2SiteIndex.SI_AT_BREAST, 1.0, 0)
+						.heightAndAgeToSiteIndex(0, 0, SI_AT_BREAST, 1.0, 0)
 		);
 		assertThrows(
 				NoAnswerException.class, () -> SiteTool
-						.heightAndAgeToSiteIndex(0, 0, Height2SiteIndex.SI_AT_TOTAL, 0.0, 0)
+						.heightAndAgeToSiteIndex(0, 0, SI_AT_TOTAL, 0.0, 0)
 		);
 		assertThrows(
 				NoAnswerException.class, () -> SiteTool
-						.heightAndAgeToSiteIndex(0, 0, Height2SiteIndex.SI_AT_TOTAL, 23.0, 0)
+						.heightAndAgeToSiteIndex(0, 0, SI_AT_TOTAL, 23.0, 0)
 		);
 		assertThat(
 				SiteTool.heightAndAgeToSiteIndex(
-						Sindxdll.SI_AT_GOUDIE, 10.0, Height2SiteIndex.SI_AT_BREAST, 23.0, Height2SiteIndex.SI_EST_DIRECT
+						Sindxdll.SI_AT_GOUDIE, 10.0, SI_AT_BREAST, 23.0, SI_EST_DIRECT
 				), is(34.30)
 		);
 		assertThat(
 				SiteTool.heightAndAgeToSiteIndex(
-						Sindxdll.SI_AT_GOUDIE, 10.0, Height2SiteIndex.SI_AT_BREAST, 23.0, Height2SiteIndex.SI_EST_ITERATE
+						Sindxdll.SI_AT_GOUDIE, 10.0, SI_AT_BREAST, 23.0, SI_EST_ITERATE
 				), is(69.45)
 		);
 		assertThat(
 				SiteTool.heightAndAgeToSiteIndex(
-						Sindxdll.SI_FDI_THROWER, 10.0, Height2SiteIndex.SI_AT_BREAST, 23.0, Height2SiteIndex.SI_EST_DIRECT
+						Sindxdll.SI_FDI_THROWER, 10.0, SI_AT_BREAST, 23.0, SI_EST_DIRECT
 				), is(84.31)
 		);
 		assertThat(
 				SiteTool.heightAndAgeToSiteIndex(
-						Sindxdll.SI_FDI_THROWER, 10.0, Height2SiteIndex.SI_AT_BREAST, 23.0, Height2SiteIndex.SI_EST_ITERATE
+						Sindxdll.SI_FDI_THROWER, 10.0, SI_AT_BREAST, 23.0, SI_EST_ITERATE
 				), is(87.60)
 		);
 	}
@@ -204,17 +207,17 @@ class SiteToolTest {
 	void test_htSIToAge() throws CommonCalculatorException {
 		assertThrows(
 				LessThan13Exception.class, () -> SiteTool
-						.heightAndSiteIndexToAge(0, 1.0, Height2SiteIndex.SI_AT_BREAST, 1.0, 0)
+						.heightAndSiteIndexToAge(0, 1.0, SI_AT_BREAST, 1.0, 0)
 		);
 		assertThrows(
 				LessThan13Exception.class, () -> SiteTool
-						.heightAndSiteIndexToAge(0, 10.0, Height2SiteIndex.SI_AT_BREAST, 1.1, 0.0)
+						.heightAndSiteIndexToAge(0, 10.0, SI_AT_BREAST, 1.1, 0.0)
 		);
-		assertThat(SiteTool.heightAndSiteIndexToAge(0, 0.0, Height2SiteIndex.SI_AT_TOTAL, 1.0, 0), is(0.0));
+		assertThat(SiteTool.heightAndSiteIndexToAge(0, 0.0, SI_AT_TOTAL, 1.0, 0), is(0.0));
 		assertThat(
 				round(
 						SiteTool.heightAndSiteIndexToAge(
-								Sindxdll.SI_FDI_THROWER, 10.0, Height2SiteIndex.SI_AT_BREAST, 47.0, 5.0
+								Sindxdll.SI_FDI_THROWER, 10.0, SI_AT_BREAST, 47.0, 5.0
 						), 2
 				), is(8.54)
 		);
@@ -225,7 +228,7 @@ class SiteToolTest {
 		assertThat(
 				round(
 						SiteTool.ageAndSiteIndexToHeight(
-								Sindxdll.SI_FDI_THROWER, 10.0, Height2SiteIndex.SI_AT_TOTAL, 30.0, 5.0
+								Sindxdll.SI_FDI_THROWER, 10.0, SI_AT_TOTAL, 30.0, 5.0
 						), 2
 				), is(4.10)
 		);
@@ -243,7 +246,7 @@ class SiteToolTest {
 		assertThat(SiteTool.getSICurveName(1000), is(SiteTool.UNKNOWN_CURVE_RESULT));
 		assertThat(
 				SiteTool.getSICurveName(Sindxdll.SI_ACT_THROWER), is(
-						SiteIndexNames.si_curve_name[Sindxdll.SI_ACT_THROWER]
+						SiteIndexNames.siCurveName[Sindxdll.SI_ACT_THROWER]
 				)
 		);
 	}

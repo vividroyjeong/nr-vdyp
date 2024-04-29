@@ -1,15 +1,17 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.*;
+
 /**
  * Determines whether a given FIZ code represents the coast or interior.
  */
 public class FizCheck {
-	// From sindex.h
-	public static final short FIZ_UNKNOWN = 0;
-	public static final short FIZ_COAST = 1;
-	public static final short FIZ_INTERIOR = 2;
 
-	public static short fiz_check(char fiz) {
+	/**
+	 * @param fiz a character identifying the forest inventory zone (A - L)
+	 * @return the region containing the zone
+	 */
+	public static short fiz2Region(char fiz) {
 		switch (fiz) {
 		case 'A', 'B', 'C':
 			return FIZ_COAST;

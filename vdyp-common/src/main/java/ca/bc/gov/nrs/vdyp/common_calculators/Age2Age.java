@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.AgeTypeErrorException;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.*;
 
 /**
  * Given age and type, converts to other type of age.
@@ -8,56 +9,9 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.AgeTypeErrorExcep
  * @throws AgeTypeErrorException if unnkown age type is provided
  */
 public class Age2Age {
-	// Taken from sindex.h
-
-	/*
-	 * age types
-	 */
-	private static final int SI_AT_TOTAL = 0;
-	private static final int SI_AT_BREAST = 1;
-
-	/* define species and equation indices */
-	private static final int SI_ACB_HUANGAC = 97;
-	private static final int SI_ACT_THROWERAC = 103;
-	private static final int SI_AT_NIGH = 92;
-	private static final int SI_BA_KURUCZ82AC = 102;
-	private static final int SI_BA_NIGH = 118;
-	private static final int SI_BL_CHENAC = 93;
-	private static final int SI_BP_CURTISAC = 94;
-	private static final int SI_CWC_KURUCZAC = 101;
-	private static final int SI_CWI_NIGH = 77;
-	private static final int SI_DR_NIGH = 13;
-	private static final int SI_EP_NIGH = 116;
-	private static final int SI_FDC_BRUCEAC = 100;
-	private static final int SI_FDC_NIGHTA = 88;
-	private static final int SI_FDI_THROWERAC = 96;
-	private static final int SI_HM_MEANSAC = 95;
-	private static final int SI_HWC_WILEYAC = 99;
-	private static final int SI_HWI_NIGH = 37;
-	private static final int SI_LW_NIGH = 90;
-	private static final int SI_PJ_HUANG = 113;
-	private static final int SI_PJ_HUANGAC = 114;
-	private static final int SI_PLI_NIGHTA98 = 41;
-	private static final int SI_PLI_THROWER = 45;
-	private static final int SI_PLI_THROWNIGH = 40;
-	private static final int SI_PW_CURTISAC = 98;
-	private static final int SI_PY_HANNAC = 104;
-	private static final int SI_PY_NIGH = 107;
-	private static final int SI_SB_NIGH = 91;
-	private static final int SI_SE_CHENAC = 105;
-	private static final int SI_SS_NIGH = 59;
-	private static final int SI_FDC_BRUCENIGH = 89;
-	private static final int SI_SW_GOUDIE_NATAC = 106;
-	private static final int SI_SW_GOUDIE_PLAAC = 112;
-	private static final int SI_SW_GOUDNIGH = 85;
-	private static final int SI_SW_NIGHTA = 83;
-	/* not used, but must be defined for array positioning */
-	private static final int SI_SE_NIGHTA = 110;
-	private static final int SI_SW_NIGHTA2004 = 111;
-	private static final int SI_PLI_NIGHTA2004 = 109;
 
 	@SuppressWarnings("java:S3776, java:S6541, java:S1479")
-	public static double ageToAge(int cuIndex, double age1, int age1Type, int age2Type, double y2bh)
+	public static double ageToAge(int cuIndex, double sourceAge, int sourceAgeType, int targetAgeType, double years2BreastHeight)
 			throws AgeTypeErrorException {
 		double returnValue;
 
@@ -179,10 +133,10 @@ public class Age2Age {
 		}
 
 		if (shouldBranch) {
-			if (age1Type == SI_AT_BREAST) {
-				if (age2Type == SI_AT_TOTAL) {
+			if (sourceAgeType == SI_AT_BREAST) {
+				if (targetAgeType == SI_AT_TOTAL) {
 					/* convert to total age */
-					returnValue = age1 + y2bh - 0.5;
+					returnValue = sourceAge + years2BreastHeight - 0.5;
 					if (returnValue < 0) {
 						returnValue = 0;
 					}
@@ -191,10 +145,10 @@ public class Age2Age {
 				throw new AgeTypeErrorException("Unkown age type provided");
 			}
 
-			if (age1Type == SI_AT_TOTAL) {
-				if (age2Type == SI_AT_BREAST) {
+			if (sourceAgeType == SI_AT_TOTAL) {
+				if (targetAgeType == SI_AT_BREAST) {
 					/* convert to breast-height age */
-					returnValue = age1 - y2bh + 0.5;
+					returnValue = sourceAge - years2BreastHeight + 0.5;
 					if (returnValue < 0) {
 						returnValue = 0;
 					}
@@ -203,10 +157,10 @@ public class Age2Age {
 				throw new AgeTypeErrorException("Unkown age type provided");
 			}
 		} else {
-			if (age1Type == SI_AT_BREAST) {
-				if (age2Type == SI_AT_TOTAL) {
+			if (sourceAgeType == SI_AT_BREAST) {
+				if (targetAgeType == SI_AT_TOTAL) {
 					/* convert to total age */
-					returnValue = age1 + y2bh;
+					returnValue = sourceAge + years2BreastHeight;
 					if (returnValue < 0) {
 						returnValue = 0;
 					}
@@ -215,10 +169,10 @@ public class Age2Age {
 				throw new AgeTypeErrorException("Unkown age type provided");
 			}
 
-			if (age1Type == SI_AT_TOTAL) {
-				if (age2Type == SI_AT_BREAST) {
+			if (sourceAgeType == SI_AT_TOTAL) {
+				if (targetAgeType == SI_AT_BREAST) {
 					/* convert to breast-height age */
-					returnValue = age1 - y2bh;
+					returnValue = sourceAge - years2BreastHeight;
 					if (returnValue < 0) {
 						returnValue = 0;
 					}
