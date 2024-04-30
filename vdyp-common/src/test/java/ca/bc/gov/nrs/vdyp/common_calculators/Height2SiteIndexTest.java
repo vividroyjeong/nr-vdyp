@@ -1,9 +1,48 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.SI_AT_BREAST;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.SI_AT_TOTAL;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.SI_EST_DIRECT;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation.*;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEstimationType.*;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_BREAST;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_TOTAL;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_AT_GOUDIE;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_BA_DILUCCA;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_BA_NIGHGI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_BL_KURUCZ82;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_BL_THROWERGI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_CWI_NIGHGI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_DR_NIGH;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_FDC_NIGHGI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_FDI_MILNER;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_FDI_MONS_DF;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_FDI_MONS_GF;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_FDI_MONS_SAF;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_FDI_MONS_WH;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_FDI_MONS_WRC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_FDI_NIGHGI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_FDI_THROWER;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_FDI_VDP_MONT;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_FDI_VDP_WASH;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_HM_MEANS;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_HWC_NIGHGI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_HWC_NIGHGI99;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_HWI_NIGHGI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_LW_MILNER;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_LW_NIGHGI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_PLI_DEMPSTER;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_PLI_MILNER;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_PLI_NIGHGI97;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_PLI_THROWER;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_PW_CURTIS;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_PY_MILNER;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_PY_NIGHGI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SB_DEMPSTER;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SE_NIGHGI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SS_NIGHGI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SS_NIGHGI99;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SW_DEMPSTER;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SW_HU_GARCIA;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SW_NIGHGI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SW_NIGHGI2004;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SW_NIGHGI99;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -15,7 +54,10 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorE
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMaximumException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMinimumException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
-import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException; 
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEstimationType; 
 
 class Height2SiteIndexTest {
 
@@ -49,7 +91,7 @@ class Height2SiteIndexTest {
 		void testInvalidHeightForBreastHeightAge() {
 			assertThrows(
 					LessThan13Exception.class,
-					() -> Height2SiteIndex.heightToIndex(null, 0.0, SI_AT_BREAST, 1.2, (short) 0)
+					() -> Height2SiteIndex.heightToIndex(null, 0.0, SI_AT_BREAST, 1.2, SI_EST_ITERATE)
 			);
 		}
 
@@ -57,7 +99,7 @@ class Height2SiteIndexTest {
 		void testInvalidHeightForIteration() {
 			assertThrows(
 					NoAnswerException.class,
-					() -> Height2SiteIndex.heightToIndex(null, 0.0, (short) 0, 0, (short) 0)
+					() -> Height2SiteIndex.heightToIndex(null, 0.0, SI_AT_TOTAL, 0, SI_EST_ITERATE)
 			);
 		}
 
@@ -65,7 +107,7 @@ class Height2SiteIndexTest {
 		void testInvalidAgeForIteration() {
 			assertThrows(
 					NoAnswerException.class,
-					() -> Height2SiteIndex.heightToIndex(null, 0.0, (short) 0, 1.3, (short) 0)
+					() -> Height2SiteIndex.heightToIndex(null, 0.0, SI_AT_TOTAL, 1.3, SI_EST_ITERATE)
 			);
 		}
 
@@ -77,7 +119,7 @@ class Height2SiteIndexTest {
 			double expectedResult = 0.39 + 0.3104 * height + 33.3828 * height / age;
 
 			double actualResult = Height2SiteIndex
-					.heightToIndex(SI_FDI_THROWER, age, (short) SI_AT_BREAST, height, (short) SI_EST_DIRECT);
+					.heightToIndex(SI_FDI_THROWER, age, SI_AT_BREAST, height, SI_EST_DIRECT);
 
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 		}
@@ -90,7 +132,7 @@ class Height2SiteIndexTest {
 			double expectedResult = 1.3;
 
 			double actualResult = Height2SiteIndex
-					.heightToIndex(SI_FDI_THROWER, age, (short) 2, height, (short) SI_EST_DIRECT);
+					.heightToIndex(SI_FDI_THROWER, age, null, height, SI_EST_DIRECT);
 
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 
@@ -101,7 +143,7 @@ class Height2SiteIndexTest {
 			expectedResult = (x2 + Math.sqrt(x2 * x2 - 4 * 99 * x1)) / (2 * (age - 4));
 
 			actualResult = Height2SiteIndex
-					.heightToIndex(SI_FDI_THROWER, age, (short) 2, height, (short) SI_EST_DIRECT);
+					.heightToIndex(SI_FDI_THROWER, age, null, height, SI_EST_DIRECT);
 
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 		}
@@ -115,7 +157,7 @@ class Height2SiteIndexTest {
 			double expectedResult = Height2SiteIndex.siteIterate(cuIndex, age, SI_AT_TOTAL, height);
 
 			double actualResult = Height2SiteIndex
-					.heightToIndex(cuIndex, age, (short) 2, height, (short) SI_EST_DIRECT);
+					.heightToIndex(cuIndex, age, null, height, SI_EST_DIRECT);
 
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 		}
@@ -129,7 +171,7 @@ class Height2SiteIndexTest {
 			double expectedResult = Height2SiteIndex.siteIterate(cuIndex, age, SI_AT_TOTAL, height);
 
 			double actualResult = Height2SiteIndex
-					.heightToIndex(cuIndex, age, (short) 2, height, (short) (SI_EST_DIRECT + 1));
+					.heightToIndex(cuIndex, age, null, height, null);
 
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 		}
@@ -141,7 +183,7 @@ class Height2SiteIndexTest {
 		void testInvalidBhage() {
 			assertThrows(
 					GrowthInterceptMinimumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(null, 0.5, SI_AT_TOTAL, SI_AT_TOTAL)
+					() -> Height2SiteIndex.baHeightToIndex(null, 0.5, 1.0, SiteIndexEstimationType.SI_EST_DIRECT)
 			); // SI_AT_TOTAL = 0
 		}
 
@@ -157,7 +199,7 @@ class Height2SiteIndexTest {
 					));
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex(SI_BA_DILUCCA, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex(SI_BA_DILUCCA, bhage, height, SI_EST_DIRECT);
 
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 		}
@@ -171,7 +213,7 @@ class Height2SiteIndexTest {
 			expectedResult = -0.4063 + 1.313 * expectedResult;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex(SI_DR_NIGH, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex(SI_DR_NIGH, bhage, height, SI_EST_DIRECT);
 
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 		}
@@ -186,7 +228,7 @@ class Height2SiteIndexTest {
 			expectedResult = SiteIndexUtilities.ppow( (expectedResult + 1.73) / 3.149, 1.2079);
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex(SI_HM_MEANS, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex(SI_HM_MEANS, bhage, height, SI_EST_DIRECT);
 
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 		}
@@ -196,7 +238,7 @@ class Height2SiteIndexTest {
 			double height = 1.3;
 			double bhage = 1;
 
-			double actualResult = Height2SiteIndex.baHeightToIndex(SI_FDI_MILNER, bhage, height, (short) SI_EST_DIRECT);
+			double actualResult = Height2SiteIndex.baHeightToIndex(SI_FDI_MILNER, bhage, height, SI_EST_DIRECT);
 
 			height /= 0.3048;
 			double expectedResult = 57.3 + (7.06 + 0.02275 * bhage - 1.858 * Math.log(bhage) + 5.496 / (bhage * bhage))
@@ -214,7 +256,7 @@ class Height2SiteIndexTest {
 			double expectedResult = 0.39 + 0.3104 * height + 33.3828 * height / bhage;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex( SI_FDI_THROWER, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex( SI_FDI_THROWER, bhage, height, SI_EST_DIRECT);
 
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 		}
@@ -230,7 +272,7 @@ class Height2SiteIndexTest {
 			double expectedResult = height * x1 / x2;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex( SI_PLI_THROWER, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex( SI_PLI_THROWER, bhage, height, SI_EST_DIRECT);
 
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 		}
@@ -241,7 +283,7 @@ class Height2SiteIndexTest {
 			double bhage = 1;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex( SI_LW_MILNER, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex( SI_LW_MILNER, bhage, height, SI_EST_DIRECT);
 
 			height /= 0.3048;
 			double expectedResult = 69.0
@@ -258,7 +300,7 @@ class Height2SiteIndexTest {
 			double bhage = 1;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex(SI_PLI_DEMPSTER, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex(SI_PLI_DEMPSTER, bhage, height, SI_EST_DIRECT);
 
 			double log_bhage = Math.log(bhage);
 
@@ -277,7 +319,7 @@ class Height2SiteIndexTest {
 			double bhage = 1;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex(SI_PLI_MILNER, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex(SI_PLI_MILNER, bhage, height, SI_EST_DIRECT);
 
 			height /= 0.3048;
 			double expectedResult = 59.6 + (1.055 - 0.006344 * bhage + 14.82 / bhage - 5.212 / (bhage * bhage))
@@ -293,7 +335,7 @@ class Height2SiteIndexTest {
 			double bhage = 1;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex(SI_PY_MILNER, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex(SI_PY_MILNER, bhage, height, SI_EST_DIRECT);
 
 			height /= 0.3048;
 			double expectedResult = 59.6
@@ -310,7 +352,7 @@ class Height2SiteIndexTest {
 			double bhage = 1;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex(SI_PW_CURTIS, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex(SI_PW_CURTIS, bhage, height, SI_EST_DIRECT);
 
 			height /= 0.3048;
 			double x1 = Math.log(bhage) - Math.log(50.0);
@@ -328,7 +370,7 @@ class Height2SiteIndexTest {
 			double bhage = 1;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex(SI_SW_HU_GARCIA, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex(SI_SW_HU_GARCIA, bhage, height, SI_EST_DIRECT);
 
 			double q = Height2SiteIndex.huGarciaQ(height, bhage);
 			double expectedResult = Height2SiteIndex.huGarciaH(q, 50.0);
@@ -342,7 +384,7 @@ class Height2SiteIndexTest {
 			double bhage = 1;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex(SI_SW_DEMPSTER, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex(SI_SW_DEMPSTER, bhage, height, SI_EST_DIRECT);
 
 			double log_bhage = Math.log(bhage);
 			double ht_13 = height - 1.3;
@@ -359,7 +401,7 @@ class Height2SiteIndexTest {
 			double bhage = 1;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex(SI_SB_DEMPSTER, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex(SI_SB_DEMPSTER, bhage, height, SI_EST_DIRECT);
 
 			double log_bhage = Math.log(bhage);
 			double ht_13 = height - 1.3;
@@ -376,7 +418,7 @@ class Height2SiteIndexTest {
 			double bhage = 1;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex(SI_AT_GOUDIE, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex(SI_AT_GOUDIE, bhage, height, SI_EST_DIRECT);
 
 			double log_bhage = Math.log(bhage);
 
@@ -392,7 +434,7 @@ class Height2SiteIndexTest {
 			double bhage = 1;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex(SI_FDI_VDP_MONT, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex(SI_FDI_VDP_MONT, bhage, height, SI_EST_DIRECT);
 
 			height /= 0.3048;
 			double expectedResult = 4.5 + 111.832 + 0.721 * (height - 4.5) - 28.2175 * Math.log(bhage)
@@ -408,7 +450,7 @@ class Height2SiteIndexTest {
 			double bhage = 1;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex(SI_FDI_VDP_WASH, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex(SI_FDI_VDP_WASH, bhage, height, SI_EST_DIRECT);
 
 			height /= 0.3048;
 			double expectedResult = 4.5 + 146.274 + 0.809 * (height - 4.5) - 37.218 * Math.log(bhage)
@@ -424,7 +466,7 @@ class Height2SiteIndexTest {
 			double bhage = 1;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex(SI_FDI_MONS_DF, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex(SI_FDI_MONS_DF, bhage, height, SI_EST_DIRECT);
 
 			height /= 0.3048;
 			double expectedResult = 4.5 + 38.787 - 2.805 * Math.log(bhage) * Math.log(bhage)
@@ -440,7 +482,7 @@ class Height2SiteIndexTest {
 			double bhage = 1;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex(SI_FDI_MONS_GF, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex(SI_FDI_MONS_GF, bhage, height, SI_EST_DIRECT);
 
 			height /= 0.3048;
 			double expectedResult = 4.5 + 38.787 - 2.805 * Math.log(bhage) * Math.log(bhage)
@@ -456,7 +498,7 @@ class Height2SiteIndexTest {
 			double bhage = 1;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex(SI_FDI_MONS_WRC, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex(SI_FDI_MONS_WRC, bhage, height, SI_EST_DIRECT);
 
 			height /= 0.3048;
 			double expectedResult = 4.5 + 38.787 - 2.805 * Math.log(bhage) * Math.log(bhage)
@@ -472,7 +514,7 @@ class Height2SiteIndexTest {
 			double bhage = 1;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex(SI_FDI_MONS_WH, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex(SI_FDI_MONS_WH, bhage, height, SI_EST_DIRECT);
 
 			height /= 0.3048;
 			double expectedResult = 4.5 + 38.787 - 2.805 * Math.log(bhage) * Math.log(bhage)
@@ -488,7 +530,7 @@ class Height2SiteIndexTest {
 			double bhage = 1;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex(SI_FDI_MONS_SAF, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex(SI_FDI_MONS_SAF, bhage, height, SI_EST_DIRECT);
 
 			height /= 0.3048;
 			double expectedResult = 4.5 + 38.787 - 2.805 * Math.log(bhage) * Math.log(bhage)
@@ -504,7 +546,7 @@ class Height2SiteIndexTest {
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
 				double actualResult = Height2SiteIndex
-						.baHeightToIndex(SI_FDI_NIGHGI, bhage, height, (short) SI_EST_DIRECT);
+						.baHeightToIndex(SI_FDI_NIGHGI, bhage, height, SI_EST_DIRECT);
 
 				double expectedResult = calculateExpectedResultSI_FDI_NIGHGI(bhage, height);
 
@@ -735,7 +777,7 @@ class Height2SiteIndexTest {
 			double height = 1.3;
 			assertThrows(
 					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_FDI_NIGHGI, 51, height, (short) SI_EST_DIRECT)
+					() -> Height2SiteIndex.baHeightToIndex(SI_FDI_NIGHGI, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -745,7 +787,7 @@ class Height2SiteIndexTest {
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
 				double actualResult = Height2SiteIndex
-						.baHeightToIndex(SI_PLI_NIGHGI97, bhage, height, (short) SI_EST_DIRECT);
+						.baHeightToIndex(SI_PLI_NIGHGI97, bhage, height, SI_EST_DIRECT);
 
 				double expectedResult = calculateExpectedResultSI_PLI_NIGHGI97(bhage, height);
 
@@ -977,7 +1019,7 @@ class Height2SiteIndexTest {
 			assertThrows(
 					GrowthInterceptMaximumException.class,
 					() -> Height2SiteIndex
-							.baHeightToIndex(SI_PLI_NIGHGI97, 51, height, (short) SI_EST_DIRECT)
+							.baHeightToIndex(SI_PLI_NIGHGI97, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -987,7 +1029,7 @@ class Height2SiteIndexTest {
 
 			for (int bhage = 1; bhage <= 30; bhage++) {
 				double actualResult = Height2SiteIndex
-						.baHeightToIndex(SI_SW_NIGHGI, bhage, height, (short) SI_EST_DIRECT);
+						.baHeightToIndex(SI_SW_NIGHGI, bhage, height, SI_EST_DIRECT);
 
 				double expectedResult = calculateExpectedResultSI_SW_NIGHGI(bhage, height);
 
@@ -1137,7 +1179,7 @@ class Height2SiteIndexTest {
 			double height = 1.3;
 			assertThrows(
 					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_SW_NIGHGI, 31, height, (short) SI_EST_DIRECT)
+					() -> Height2SiteIndex.baHeightToIndex(SI_SW_NIGHGI, 31, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -1147,7 +1189,7 @@ class Height2SiteIndexTest {
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
 				double actualResult = Height2SiteIndex
-						.baHeightToIndex(SI_SW_NIGHGI99, bhage, height, (short) SI_EST_DIRECT);
+						.baHeightToIndex(SI_SW_NIGHGI99, bhage, height, SI_EST_DIRECT);
 
 				double expectedResult = calculateExpectedResultSI_SW_NIGHGI99(bhage, height);
 
@@ -1377,7 +1419,7 @@ class Height2SiteIndexTest {
 			double height = 1.3;
 			assertThrows(
 					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_SW_NIGHGI99, 51, height, (short) SI_EST_DIRECT)
+					() -> Height2SiteIndex.baHeightToIndex(SI_SW_NIGHGI99, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -1387,7 +1429,7 @@ class Height2SiteIndexTest {
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
 				double actualResult = Height2SiteIndex
-						.baHeightToIndex(SI_SW_NIGHGI2004, bhage, height, (short) SI_EST_DIRECT);
+						.baHeightToIndex(SI_SW_NIGHGI2004, bhage, height, SI_EST_DIRECT);
 
 				double expectedResult = calculateExpectedResultSI_SW_NIGHGI2004(bhage, height);
 
@@ -1619,7 +1661,7 @@ class Height2SiteIndexTest {
 			assertThrows(
 					GrowthInterceptMaximumException.class,
 					() -> Height2SiteIndex
-							.baHeightToIndex(SI_SW_NIGHGI2004, 51, height, (short) SI_EST_DIRECT)
+							.baHeightToIndex(SI_SW_NIGHGI2004, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -1629,7 +1671,7 @@ class Height2SiteIndexTest {
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
 				double actualResult = Height2SiteIndex
-						.baHeightToIndex(SI_HWC_NIGHGI99, bhage, height, (short) SI_EST_DIRECT);
+						.baHeightToIndex(SI_HWC_NIGHGI99, bhage, height, SI_EST_DIRECT);
 
 				double expectedResult = calculateExpectedResultSI_HWC_NIGHGI99(bhage, height);
 
@@ -1861,7 +1903,7 @@ class Height2SiteIndexTest {
 			assertThrows(
 					GrowthInterceptMaximumException.class,
 					() -> Height2SiteIndex
-							.baHeightToIndex(SI_HWC_NIGHGI99, 51, height, (short) SI_EST_DIRECT)
+							.baHeightToIndex(SI_HWC_NIGHGI99, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -1871,7 +1913,7 @@ class Height2SiteIndexTest {
 
 			for (int bhage = 1; bhage <= 30; bhage++) {
 				double actualResult = Height2SiteIndex
-						.baHeightToIndex(SI_HWC_NIGHGI, bhage, height, (short) SI_EST_DIRECT);
+						.baHeightToIndex(SI_HWC_NIGHGI, bhage, height, SI_EST_DIRECT);
 
 				double expectedResult = calculateExpectedResultSI_HWC_NIGHGI(bhage, height);
 
@@ -2022,7 +2064,7 @@ class Height2SiteIndexTest {
 			double height = 1.3;
 			assertThrows(
 					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_HWC_NIGHGI, 31, height, (short) SI_EST_DIRECT)
+					() -> Height2SiteIndex.baHeightToIndex(SI_HWC_NIGHGI, 31, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -2032,7 +2074,7 @@ class Height2SiteIndexTest {
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
 				double actualResult = Height2SiteIndex
-						.baHeightToIndex(SI_HWI_NIGHGI, bhage, height, (short) SI_EST_DIRECT);
+						.baHeightToIndex(SI_HWI_NIGHGI, bhage, height, SI_EST_DIRECT);
 
 				double expectedResult = calculateExpectedResultSI_HWI_NIGHGI(bhage, height);
 
@@ -2263,7 +2305,7 @@ class Height2SiteIndexTest {
 			double height = 1.3;
 			assertThrows(
 					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_HWI_NIGHGI, 51, height, (short) SI_EST_DIRECT)
+					() -> Height2SiteIndex.baHeightToIndex(SI_HWI_NIGHGI, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -2273,7 +2315,7 @@ class Height2SiteIndexTest {
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
 				double actualResult = Height2SiteIndex
-						.baHeightToIndex(SI_FDC_NIGHGI, bhage, height, (short) SI_EST_DIRECT);
+						.baHeightToIndex(SI_FDC_NIGHGI, bhage, height, SI_EST_DIRECT);
 
 				double expectedResult = calculateExpectedResultSI_FDC_NIGHGI(bhage, height);
 
@@ -2504,7 +2546,7 @@ class Height2SiteIndexTest {
 			double height = 1.3;
 			assertThrows(
 					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_FDC_NIGHGI, 51, height, (short) SI_EST_DIRECT)
+					() -> Height2SiteIndex.baHeightToIndex(SI_FDC_NIGHGI, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -2514,7 +2556,7 @@ class Height2SiteIndexTest {
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
 				double actualResult = Height2SiteIndex
-						.baHeightToIndex(SI_SE_NIGHGI, bhage, height, (short) SI_EST_DIRECT);
+						.baHeightToIndex(SI_SE_NIGHGI, bhage, height, SI_EST_DIRECT);
 
 				double expectedResult = calculateExpectedResultSI_SE_NIGHGI(bhage, height);
 
@@ -2742,7 +2784,7 @@ class Height2SiteIndexTest {
 			double height = 1.3;
 			assertThrows(
 					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_SE_NIGHGI, 51, height, (short) SI_EST_DIRECT)
+					() -> Height2SiteIndex.baHeightToIndex(SI_SE_NIGHGI, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -2752,7 +2794,7 @@ class Height2SiteIndexTest {
 
 			for (int bhage = 1; bhage <= 30; bhage++) {
 				double actualResult = Height2SiteIndex
-						.baHeightToIndex(SI_SS_NIGHGI, bhage, height, (short) SI_EST_DIRECT);
+						.baHeightToIndex(SI_SS_NIGHGI, bhage, height, SI_EST_DIRECT);
 
 				double expectedResult = calculateExpectedResultSI_SS_NIGHGI(bhage, height);
 
@@ -2901,7 +2943,7 @@ class Height2SiteIndexTest {
 			double height = 1.3;
 			assertThrows(
 					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_SS_NIGHGI, 31, height, (short) SI_EST_DIRECT)
+					() -> Height2SiteIndex.baHeightToIndex(SI_SS_NIGHGI, 31, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -2911,7 +2953,7 @@ class Height2SiteIndexTest {
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
 				double actualResult = Height2SiteIndex
-						.baHeightToIndex(SI_SS_NIGHGI99, bhage, height, (short) SI_EST_DIRECT);
+						.baHeightToIndex(SI_SS_NIGHGI99, bhage, height, SI_EST_DIRECT);
 
 				double expectedResult = calculateExpectedResultSI_SS_NIGHGI99(bhage, height);
 
@@ -3141,7 +3183,7 @@ class Height2SiteIndexTest {
 			double height = 1.3;
 			assertThrows(
 					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_SS_NIGHGI99, 51, height, (short) SI_EST_DIRECT)
+					() -> Height2SiteIndex.baHeightToIndex(SI_SS_NIGHGI99, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -3151,7 +3193,7 @@ class Height2SiteIndexTest {
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
 				double actualResult = Height2SiteIndex
-						.baHeightToIndex(SI_CWI_NIGHGI, bhage, height, (short) SI_EST_DIRECT);
+						.baHeightToIndex(SI_CWI_NIGHGI, bhage, height, SI_EST_DIRECT);
 
 				double expectedResult = calculateExpectedResultSI_CWI_NIGHGI(bhage, height);
 
@@ -3380,7 +3422,7 @@ class Height2SiteIndexTest {
 			double height = 1.3;
 			assertThrows(
 					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_CWI_NIGHGI, 51, height, (short) SI_EST_DIRECT)
+					() -> Height2SiteIndex.baHeightToIndex(SI_CWI_NIGHGI, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -3390,7 +3432,7 @@ class Height2SiteIndexTest {
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
 				double actualResult = Height2SiteIndex
-						.baHeightToIndex(SI_LW_NIGHGI, bhage, height, (short) SI_EST_DIRECT);
+						.baHeightToIndex(SI_LW_NIGHGI, bhage, height, SI_EST_DIRECT);
 
 				double expectedResult = calculateExpectedResultSI_LW_NIGHGI(bhage, height);
 
@@ -3619,7 +3661,7 @@ class Height2SiteIndexTest {
 			double height = 1.3;
 			assertThrows(
 					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_LW_NIGHGI, 51, height, (short) SI_EST_DIRECT)
+					() -> Height2SiteIndex.baHeightToIndex(SI_LW_NIGHGI, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -3629,7 +3671,7 @@ class Height2SiteIndexTest {
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
 				double actualResult = Height2SiteIndex
-						.baHeightToIndex(SI_PY_NIGHGI, bhage, height, (short) SI_EST_DIRECT);
+						.baHeightToIndex(SI_PY_NIGHGI, bhage, height, SI_EST_DIRECT);
 
 				double expectedResult = calculateExpectedResultSI_PY_NIGHGI(bhage, height);
 
@@ -3858,7 +3900,7 @@ class Height2SiteIndexTest {
 			double height = 1.3;
 			assertThrows(
 					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_PY_NIGHGI, 51, height, (short) SI_EST_DIRECT)
+					() -> Height2SiteIndex.baHeightToIndex(SI_PY_NIGHGI, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -3868,7 +3910,7 @@ class Height2SiteIndexTest {
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
 				double actualResult = Height2SiteIndex
-						.baHeightToIndex(SI_BA_NIGHGI, bhage, height, (short) SI_EST_DIRECT);
+						.baHeightToIndex(SI_BA_NIGHGI, bhage, height, SI_EST_DIRECT);
 
 				double expectedResult = calculateExpectedResultSI_BA_NIGHGI(bhage, height);
 
@@ -4097,7 +4139,7 @@ class Height2SiteIndexTest {
 			double height = 1.3;
 			assertThrows(
 					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_BA_NIGHGI, 51, height, (short) SI_EST_DIRECT)
+					() -> Height2SiteIndex.baHeightToIndex(SI_BA_NIGHGI, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -4107,7 +4149,7 @@ class Height2SiteIndexTest {
 
 			for (int bhage = 1; bhage <= 50; bhage++) {
 				double actualResult = Height2SiteIndex
-						.baHeightToIndex(SI_BL_THROWERGI, bhage, height, (short) SI_EST_DIRECT);
+						.baHeightToIndex(SI_BL_THROWERGI, bhage, height, SI_EST_DIRECT);
 
 				double expectedResult = calculateExpectedResultSI_BL_THROWERGI(bhage, height);
 
@@ -4337,7 +4379,7 @@ class Height2SiteIndexTest {
 			assertThrows(
 					GrowthInterceptMaximumException.class,
 					() -> Height2SiteIndex
-							.baHeightToIndex(SI_BL_THROWERGI, 51, height, (short) SI_EST_DIRECT)
+							.baHeightToIndex(SI_BL_THROWERGI, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -4347,7 +4389,7 @@ class Height2SiteIndexTest {
 			double bhage = 4;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex(SI_BL_KURUCZ82, bhage, height, (short) SI_EST_DIRECT);
+					.baHeightToIndex(SI_BL_KURUCZ82, bhage, height, SI_EST_DIRECT);
 
 			double expectedResult = Height2SiteIndex
 					.siteIterate(SI_BL_KURUCZ82, bhage, SI_AT_BREAST, height);
@@ -4361,7 +4403,7 @@ class Height2SiteIndexTest {
 			double bhage = 4;
 
 			double actualResult = Height2SiteIndex
-					.baHeightToIndex(SI_PLI_THROWER, bhage, height, (short) (SI_EST_DIRECT + 1));
+					.baHeightToIndex(SI_PLI_THROWER, bhage, height, null);
 
 			double expectedResult = 1.31; // site_iterate call
 
@@ -4377,7 +4419,7 @@ class Height2SiteIndexTest {
 			SiteIndexEquation cuIndex = SI_PLI_THROWER;
 			double age = 4.0; // we are passing this value in so that we have the SI_PLI_THOWER case where
 								// bhage > pi within SiteIndex2Height
-			short age_type = SI_AT_BREAST;
+			SiteIndexAgeType age_type = SI_AT_BREAST;
 			double height = 1.31;
 			// Site index is set to height as a first guess so
 			double site = 1.31;
