@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -43,6 +44,7 @@ import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
+import ca.bc.gov.nrs.vdyp.model.ModelClassBuilder;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
@@ -809,6 +811,12 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		}
 	}
 
+	static final <T, B extends ModelClassBuilder<T>> BiConsumer<B, T> noChange() {
+		return (builder, toCopy) -> {
+			/* Do Nothing */
+		};
+	}
+
 	VriPolygon processBatc(VriPolygon poly) throws ProcessingException {
 
 		VriLayer primaryLayer = getPrimaryLayer(poly);
@@ -838,12 +846,37 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					primaryLayer, bec, poly.getYieldFactor(), primaryBreastHeightAge, veteranBaseArea.orElse(0.0f) // BAP
 			);
 
+			final float primaryQuadMeanDiameter = this.estimatePrimaryQuadMeanDiameter(
+					primaryLayer, bec, primaryBreastHeightAge, veteranBaseArea.orElse(0f)
+			);
+
+			return VriPolygon.build(pBuilder -> {
+				pBuilder.copy(poly);
+
+				pBuilder.addLayer(lBuilder -> {
+					lBuilder.copy(primaryLayer);
+					lBuilder.baseArea(primaryBaseArea * (percentForestLand / 100));
+					lBuilder.treesPerHectare(
+							BaseAreaTreeDensityDiameter.treesPerHectare(primaryBaseArea, primaryQuadMeanDiameter)
+					);
+					lBuilder.copySites(primaryLayer, noChange());
+					lBuilder.copySpecies(primaryLayer, noChange());
+				});
+				veteranLayer.ifPresent(vLayer -> {
+					pBuilder.addLayer(lBuilder -> {
+						lBuilder.copy(vLayer);
+						lBuilder.baseArea(veteranBaseArea);
+
+						lBuilder.copySites(primaryLayer, noChange());
+						lBuilder.copySpecies(primaryLayer, noChange());
+					});
+				});
+
+			});
+
 		} catch (RuntimeProcessingException ex) {
 			throw ex.getCause();
 		}
-
-		// TODO
-		return poly;
 	}
 
 	VriPolygon processBatn(VriPolygon poly) throws ProcessingException {
