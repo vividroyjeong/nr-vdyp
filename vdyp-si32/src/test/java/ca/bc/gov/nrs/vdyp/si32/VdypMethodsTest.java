@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation;
+import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SpeciesRegion;
 import ca.bc.gov.nrs.vdyp.si32.vdyp.SP0Name;
 import ca.bc.gov.nrs.vdyp.si32.vdyp.SP64Name;
@@ -144,8 +145,9 @@ class VdypMethodsTest {
 	
 	@Test
 	void test_VDYP_GetSICurveSpeciesIndex() {
-		int speciesIndex = VdypMethods.getSICurveSpeciesIndex(97);
-		assertThat(speciesIndex, equalTo(4 /* SI_SPEC_ACB (SI_ACB_HUANGAC) from si_curve_intend in Sindxdll */));
+		SiteIndexSpecies speciesIndex = VdypMethods.getSICurveSpeciesIndex(SiteIndexEquation.SI_ACB_HUANGAC);
+		
+		assertThat(speciesIndex, equalTo(SiteIndexSpecies.SI_SPEC_ACB /* from siCurveIntend in Sindxdll */));
 	}
 	
 	@Test

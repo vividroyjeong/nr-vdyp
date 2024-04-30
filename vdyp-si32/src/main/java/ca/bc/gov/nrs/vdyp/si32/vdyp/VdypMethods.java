@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation;
+import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CodeErrorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorException;
@@ -185,16 +186,16 @@ public class VdypMethods {
 			}
 
 			if (fiz != ' ') {
-				int ndx = -1;
+				SiteIndexSpecies s = SiteIndexSpecies.SI_NO_SPECIES;
 
 				try {
-					ndx = Sindxdll.SpecRemap(speciesName, fiz);
+					s = Sindxdll.SpecRemap(speciesName, fiz);
 				} catch (CodeErrorException | ForestInventoryZoneException e) {
 					// fall through
 				}
 
-				if (ndx >= 0) {
-					speciesCode = Sindxdll.SpecCode(ndx);
+				if (s != SiteIndexSpecies.SI_NO_SPECIES) {
+					speciesCode = Sindxdll.SpecCode(s);
 				}
 			}
 		}
@@ -265,7 +266,7 @@ public class VdypMethods {
 			// If the curve for this species is not set, look it up from SINDEX.
 	
 			if (siCurve == SiteIndexEquation.SI_NO_EQUATION) {
-				int sindexSpcs;
+				SiteIndexSpecies sindexSpcs;
 				try {
 					sindexSpcs = Sindxdll.SpecRemap(sp64Name, region == SpeciesRegion.COAST ? 'A' : 'D');
 	
@@ -299,11 +300,9 @@ public class VdypMethods {
 		if (sp64Name != null && region != null && speciesTable.getByCode(sp64Name).details() != SpeciesTable.DefaultEntry) {
 
 			try {
-				int sindxSpcs = Sindxdll.SpecRemap(sp64Name, (region == SpeciesRegion.COAST) ? 'A' : 'D');
+				SiteIndexSpecies sindxSpcs = Sindxdll.SpecRemap(sp64Name, (region == SpeciesRegion.COAST) ? 'A' : 'D');
 
-				if (sindxSpcs >= 0) {
-					siCurve = Sindxdll.DefCurve(sindxSpcs);
-				}
+				siCurve = Sindxdll.DefCurve(sindxSpcs);
 			} catch (CommonCalculatorException e) {
 				// fall through
 			}
@@ -395,35 +394,34 @@ public class VdypMethods {
 			// Count the available coastal curves.
 			for (Character fiz: forestInventoryZones) {
 				try {
-					int sindxSpeciesIndex = Sindxdll.SpecRemap(sp64Name, fiz);
+					SiteIndexSpecies sindxSpeciesIndex = Sindxdll.SpecRemap(sp64Name, fiz);
 	
-					if (sindxSpeciesIndex >= 0) {
+					// Count each of the curves in the range of curves for the species.
+
+					SiteIndexEquation curve = Sindxdll.FirstCurve(sindxSpeciesIndex);
+
+					while (true) {
 						
-						// Count each of the curves in the range of curves for the species.
-	
-						SiteIndexEquation curve = Sindxdll.FirstCurve(sindxSpeciesIndex);
-	
-						while (true) {
-							if (!countedCurve[curve.n()]) {
-								numCurves++;
-								countedCurve[curve.n()] = true;
-							}
-							
-							try {
-								curve = Sindxdll.NextCurve(sindxSpeciesIndex, curve);
-							} catch (NoAnswerException e) {
-								break;
-							}
-						}
-	
-						// Make sure we track the default curve just in case it lies outside of the range of curves
-						// enumerated above.
-	
-						curve = Sindxdll.DefCurve(sindxSpeciesIndex);
-						if (!SiteIndexEquation.SI_NO_EQUATION.equals(curve) && !countedCurve[curve.n()]) {
+						if (!countedCurve[curve.n()]) {
 							numCurves++;
 							countedCurve[curve.n()] = true;
 						}
+						
+						try {
+							curve = Sindxdll.NextCurve(sindxSpeciesIndex, curve);
+						} catch (NoAnswerException e) {
+							break;
+						}
+					}
+
+					// Make sure we track the default curve just in case it lies outside of the range of curves
+					// enumerated above.
+
+					curve = Sindxdll.DefCurve(sindxSpeciesIndex);
+					
+					if (!SiteIndexEquation.SI_NO_EQUATION.equals(curve) && !countedCurve[curve.n()]) {
+						numCurves++;
+						countedCurve[curve.n()] = true;
 					}
 				} catch (CommonCalculatorException e) {
 					logger.warn(MessageFormat.format("CommonCalculatorException during evaluation of species {0}, fiz {2}"
@@ -439,14 +437,14 @@ public class VdypMethods {
 	 * Obtains the SINDEX species index most closely associated with a particular site curve.
 	 *
 	 * @param siCurve the Site Index curve to convert into a species name.
-	 * @return species index, for use in other Sindex functions. -1 is returned if the curve
-	 * was not recognized.
+	 * @return species index, for use in other Sindex functions. SI_NO_SPECIES is returned if
+	 * the curve was not recognized.
 	 */
-	public static int getSICurveSpeciesIndex(int siCurve) {
+	public static SiteIndexSpecies getSICurveSpeciesIndex(SiteIndexEquation siCurve) {
 		try {
 			return Sindxdll.CurveToSpecies(siCurve);
 		} catch (CurveErrorException e) {
-			return -1;
+			return SiteIndexSpecies.SI_NO_SPECIES;
 		}
 	}
 

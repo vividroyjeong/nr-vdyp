@@ -1,7 +1,32 @@
 package ca.bc.gov.nrs.vdyp.sindex;
 
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.*;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.SI_ESTAB_NAT;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.SI_ESTAB_PLA;
 import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation.*;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_ACB;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_ACT;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_AT;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_BA;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_BL;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_BP;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_CWC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_CWI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_DR;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_EP;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_FDC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_FDI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_HM;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_HWC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_HWI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_LW;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_PJ;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_PLI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_PW;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_PY;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_SB;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_SE;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_SS;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_SW;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.Age2Age;
 import ca.bc.gov.nrs.vdyp.common_calculators.Height2SiteIndex;
@@ -11,6 +36,7 @@ import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndex2Height;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndex2HeightSmoothed;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexNames;
+import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexYears2BreastHeight;
 import ca.bc.gov.nrs.vdyp.common_calculators.SpecRMap;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.AgeTypeErrorException;
@@ -146,7 +172,7 @@ public class Sindxdll {
  *      oct 8  - Change to many coeffs of site index conversions.
  *             - Added notes for Fdc Bruce/Nigh.
  *          9  - Added At Nigh as default.
- *          31 - Changed si_curve_intend[] for SI_BL_KURUCZ82 to say it is
+ *          31 - Changed siCurveIntend[] for SI_BL_KURUCZ82 to say it is
  *               intended for Bl, not Ba.
  *      nov 29 - Changed BAC to BA, PP to PY.
  *             - Added many more species.
@@ -226,10 +252,6 @@ public class Sindxdll {
 	 * When looping through the array, reject entries that have 0 for both reference and target species.
 	 */
 	private static final int SI_MAX_CONVERT = 28;
-
-	// From sindxdll.c
-	private static final int SI_SPEC_START = SI_SPEC_A;
-	private static final int SI_SPEC_END = SI_SPEC_ZH;
 
 	private static final SiteIndexEquation SI_A_START = SI_NO_EQUATION;
 	private static final SiteIndexEquation SI_ABAL_START = SI_NO_EQUATION;
@@ -1494,7 +1516,7 @@ public class Sindxdll {
 			SI_WT_START, SI_X_START, SI_XC_START, SI_XH_START, SI_Y_START, SI_YC_START, SI_YP_START, SI_Z_START,
 			SI_ZC_START, SI_ZH_START };
 
-	private static final SiteIndexEquation[] si_curve_default = { 
+	private static final SiteIndexEquation[] siCurveDefault = { 
 			SI_NO_EQUATION, // A
 			SI_NO_EQUATION, // ABAL
 			SI_NO_EQUATION, // ABCO
@@ -1632,7 +1654,8 @@ public class Sindxdll {
 			SI_NO_EQUATION, // ZH
 	};
 
-	private static final int[] si_curve_intend = { SI_SPEC_ACB, /* SI_ACB_HUANG */
+	private static final SiteIndexSpecies[] siCurveIntend = { 
+			SI_SPEC_ACB, /* SI_ACB_HUANG */
 			SI_SPEC_ACT, /* SI_ACT_THROWER */
 			SI_SPEC_AT, /* SI_AT_HUANG */
 			SI_SPEC_AT, /* SI_AT_CIESZEWSKI */
@@ -1782,37 +1805,25 @@ public class Sindxdll {
 	}
 
 	/**
-	 * Returns a species index for the first species defined in Sindex.
-	 * <p>
-	 * No assumption should be made about the ordering of the species.
-	 *
-	 * @param None
-	 * @return int Species index, for use in other Sindex functions
-	 */
-	public static int FirstSpecies() {
-		return SI_SPEC_START;
-	}
-
-	/**
 	 * Given a species index, returns the next species defined in Sindex.
 	 * <p>
 	 * No assumption should be made about the ordering of the species.
 	 *
-	 * @param sp_index Integer species index
-	 * @return sp_index + 1 Integer species index, for use in other Sindex functions
+	 * @param spIndex Integer species index
+	 * @return spIndex + 1 Integer species index, for use in other Sindex functions
 	 *
 	 * @throws SpeciesErrorException when the input parameter is not a valid species index
 	 * @throws NoAnswerException     when the input parameter is the last defined species index
 	 */
-	public static int NextSpecies(int sp_index) throws SpeciesErrorException, NoAnswerException {
+	public static SiteIndexSpecies NextSpecies(SiteIndexSpecies spIndex) throws SpeciesErrorException, NoAnswerException {
 
-		if (sp_index < 0 || sp_index >= SI_MAX_SPECIES) {
-			throw new SpeciesErrorException("Input parameter is not a valid species index: " + sp_index);
-		} else if (sp_index == SI_SPEC_END) {
-			throw new NoAnswerException("Input parameter is the last defined species index: " + sp_index);
+		if (spIndex == null) {
+			throw new SpeciesErrorException("Input parameter is not a valid species index: " + spIndex);
+		} else if (spIndex == SiteIndexSpecies.getLastSpecies()) {
+			throw new NoAnswerException("Input parameter is the last defined species index: " + spIndex);
 		}
 
-		return sp_index + 1;
+		return SiteIndexSpecies.getByIndex(spIndex.n() + 1);
 	}
 
 	/**
@@ -1820,16 +1831,16 @@ public class Sindxdll {
 	 * <p>
 	 * Species code string takes the form "Xx" or "Xxx", such as "Sw" or "Fdc".
 	 *
-	 * @param sp_index Integer species index
+	 * @param spIndex Integer species index
 	 * @return String containing species code
 	 * @throws IllegalArgumentException when input parameter is not a valid species index
 	 */
-	public static String SpecCode(int sp_index) throws IllegalArgumentException {
-		if (sp_index < 0 || sp_index >= SI_MAX_SPECIES) {
-			throw new IllegalArgumentException("Input parameter is not a valid species index: " + sp_index);
+	public static String SpecCode(SiteIndexSpecies spIndex) throws IllegalArgumentException {
+		if (spIndex == null) {
+			throw new IllegalArgumentException("Input parameter is not a valid species index: " + spIndex);
 		}
 
-		return SiteIndexNames.si_spec_code[sp_index];
+		return spIndex.getCode();
 	}
 
 	/**
@@ -1837,16 +1848,16 @@ public class Sindxdll {
 	 * <p>
 	 * Species name string examples: "Coastal Douglas-fir", "Sitka Spruce".
 	 *
-	 * @param sp_index Integer species index
+	 * @param spIndex Integer species index
 	 * @return Sstring containing species name
 	 * @throws IllegalArgumentException when input parameter is not a valid species index
 	 */
-	public static String SpecName(int sp_index) throws IllegalArgumentException {
-		if (sp_index < 0 || sp_index >= SI_MAX_SPECIES) {
-			throw new IllegalArgumentException("Input parameter is not a valid species index: " + sp_index);
+	public static String SpecName(SiteIndexSpecies spIndex) throws IllegalArgumentException {
+		if (spIndex == null) {
+			throw new IllegalArgumentException("Input parameter is not a valid species index: " + spIndex);
 		}
 
-		return SiteIndexNames.siSpeciesName[sp_index];
+		return SiteIndexNames.siSpeciesName[spIndex.n()];
 	}
 
 	/**
@@ -1859,19 +1870,19 @@ public class Sindxdll {
 	 * <li>100: common species in BC (0 means uncommon)
 	 * </ul>
 	 *
-	 * @param sp_index Integer species index
+	 * @param spIndex Integer species index
 	 * @return code
 	 * @throws SpeciesErrorException when input parameter is not a valid species index
 	 */
-	public static int SpecUse(int sp_index) throws SpeciesErrorException {
-		if (sp_index < 0 || sp_index >= SI_MAX_SPECIES) {
-			throw new SpeciesErrorException("Input parameter is not a valid species index: " + sp_index);
+	public static int SpecUse(SiteIndexSpecies spIndex) throws SpeciesErrorException {
+		if (spIndex == null) {
+			throw new SpeciesErrorException("Input parameter is not a valid species index: " + spIndex);
 		}
 
 		/*
 		 * Code bits are set as follows: 1: BC coast 10: BC interior 100: common in BC
 		 */
-		switch (sp_index) {
+		switch (spIndex) {
 		case SI_SPEC_A:
 			return 0x00;
 		case SI_SPEC_ABAL:
@@ -2142,45 +2153,47 @@ public class Sindxdll {
 			return 0x00;
 		case SI_SPEC_ZH:
 			return 0x00;
+		default:
+			break;
 		}
 
-		throw new SpeciesErrorException("Input parameter is not a valid species index: " + sp_index); // not reachable?
+		throw new SpeciesErrorException("Input parameter is not a valid species index: " + spIndex); // not reachable?
 	}
 
 	/**
 	 * Returns default curve index for a species.
 	 *
-	 * @param sp_index Integer species index
+	 * @param spIndex Integer species index
 	 * @return Integer curve index, for use in other Sindex functions
 	 *
 	 * @throws SpeciesErrorException when the input parameter is not a valid species index
 	 * @throws NoAnswerException     when the input parameter is the last defined species index
 	 */
-	public static SiteIndexEquation DefCurve(int sp_index) throws SpeciesErrorException, NoAnswerException {
-		if (sp_index < 0 || sp_index >= SI_MAX_SPECIES) {
-			throw new SpeciesErrorException("Input parameter is not a valid species index: " + sp_index);
-		} else if (sp_index == SI_SPEC_END) {
-			throw new NoAnswerException("Input parameter is the last defined species index: " + sp_index);
+	public static SiteIndexEquation DefCurve(SiteIndexSpecies spIndex) throws SpeciesErrorException, NoAnswerException {
+		if (spIndex == null) {
+			throw new SpeciesErrorException("Input parameter is not a valid species index: " + spIndex);
+		} else if (spIndex == SiteIndexSpecies.getLastSpecies()) {
+			throw new NoAnswerException("Input parameter is the last defined species index: " + spIndex);
 		}
 
-		return si_curve_default[sp_index];
+		return siCurveDefault[spIndex.n()];
 	}
 
 	/**
 	 * Returns default GI curve index for a species.
 	 *
-	 * @param sp_index Integer species index
+	 * @param spIndex Integer species index
 	 * @return Integer curve index, for use in other Sindex functions
 	 *
 	 * @throws SpeciesErrorException when the input parameter is not a valid species index
 	 * @throws NoAnswerException     when no GI equations defined for this species
 	 */
-	public static SiteIndexEquation DefGICurve(int sp_index) throws SpeciesErrorException, NoAnswerException {
-		if (sp_index < 0 || sp_index >= SI_MAX_SPECIES) { // spec
-			throw new SpeciesErrorException("Input parameter is not a valid species index: " + sp_index);
+	public static SiteIndexEquation DefGICurve(SiteIndexSpecies spIndex) throws SpeciesErrorException, NoAnswerException {
+		if (spIndex == null) { // spec
+			throw new SpeciesErrorException("Input parameter is not a valid species index: " + spIndex);
 		}
 
-		switch (sp_index) {
+		switch (spIndex) {
 		case SI_SPEC_BA:
 			return SI_BA_NIGHGI;
 		case SI_SPEC_BL:
@@ -2207,9 +2220,13 @@ public class Sindxdll {
 			return SI_SS_NIGHGI99;
 		case SI_SPEC_SW:
 			return SI_SW_NIGHGI2004;
+		default:
+			/* fall through */
+			break;
 		}
+		
 		// no answer
-		throw new NoAnswerException("No GI equations defined for this species: " + sp_index);
+		throw new NoAnswerException("No GI equations defined for this species: " + spIndex);
 	}
 
 	/**
@@ -2218,7 +2235,7 @@ public class Sindxdll {
 	 * Originally said to return SI_ERR_NO_ANS if no curves are defined for the species. I've added an additional check
 	 * to see if it would return this and thrown the NoAnswerException there instead.
 	 *
-	 * @param sp_index Integer species index
+	 * @param spIndex Integer species index
 	 * @param estab    Integer establishment type
 	 * @return Integer curve index, for use in other Sindex functions
 	 *
@@ -2226,13 +2243,13 @@ public class Sindxdll {
 	 * @throws EstablishmentErrorException species index or establishment type
 	 * @throws NoAnswerException           when no curves defined for this species
 	 */
-	public static SiteIndexEquation DefCurveEst(int sp_index, int estab)
+	public static SiteIndexEquation DefCurveEst(SiteIndexSpecies spIndex, int estab)
 			throws SpeciesErrorException, EstablishmentErrorException, NoAnswerException {
-		if (sp_index < 0 || sp_index >= SI_MAX_SPECIES) { // spec
-			throw new SpeciesErrorException("Input parameter is not a valid species index: " + sp_index);
+		if (spIndex == null) { // spec
+			throw new SpeciesErrorException("Input parameter is not a valid species index: " + spIndex);
 		}
 
-		if (sp_index == SI_SPEC_SW) {
+		if (spIndex == SI_SPEC_SW) {
 			switch (estab) {
 			case SI_ESTAB_NAT:
 				return SI_SW_GOUDIE_NATAC;
@@ -2241,10 +2258,10 @@ public class Sindxdll {
 			default:
 				throw new EstablishmentErrorException("Input parameter is not a valid establishment type: " + estab);
 			}
-		} else if (si_curve_default[sp_index] == SI_NO_EQUATION) {
-			throw new NoAnswerException("No curves defined for this species: " + sp_index);
+		} else if (siCurveDefault[spIndex.n()] == SI_NO_EQUATION) {
+			throw new NoAnswerException("No curves defined for this species: " + spIndex);
 		} else {
-			return si_curve_default[sp_index];
+			return siCurveDefault[spIndex.n()];
 		}
 	}
 
@@ -2256,20 +2273,20 @@ public class Sindxdll {
 	 * Originally said to return SI_ERR_NO_ANS if no curves are defined for the species. I've added an additional check
 	 * to see if it would return this and thrown the NoAnswerException there instead.
 	 *
-	 * @param sp_index Integer species index
+	 * @param spIndex Integer species index
 	 * @return Integer curve index, for use in other Sindex functions
 	 *
 	 * @throws SpeciesErrorException when the input parameter is not a valid species index
 	 * @throws NoAnswerException     when no curves defined for this species
 	 */
-	public static SiteIndexEquation FirstCurve(int sp_index) throws SpeciesErrorException, NoAnswerException {
-		if (sp_index < 0 || sp_index >= SI_MAX_SPECIES) {
-			throw new SpeciesErrorException("Input parameter is not a valid species index: " + sp_index);
-		} else if (si_sclist_start[sp_index] == SI_NO_EQUATION) {
-			throw new NoAnswerException("No curves defined for this species: " + sp_index);
+	public static SiteIndexEquation FirstCurve(SiteIndexSpecies spIndex) throws SpeciesErrorException, NoAnswerException {
+		if (spIndex == null) {
+			throw new SpeciesErrorException("Input parameter is not a valid species index: " + spIndex);
+		} else if (si_sclist_start[spIndex.n()] == SI_NO_EQUATION) {
+			throw new NoAnswerException("No curves defined for this species: " + spIndex);
 		}
 
-		return si_sclist_start[sp_index];
+		return si_sclist_start[spIndex.n()];
 	}
 
 	/**
@@ -2277,7 +2294,7 @@ public class Sindxdll {
 	 * <p>
 	 * No assumption should be made about the ordering of the curves.
 	 *
-	 * @param sp_index Integer species index
+	 * @param spIndex Integer species index
 	 * @param cuIndex Integer curve index
 	 *
 	 * @return Integer curve index, for use in other Sindex functions
@@ -2286,13 +2303,13 @@ public class Sindxdll {
 	 * @throws CurveErrorException   when input curve is not a valid curve index for this species
 	 * @throws NoAnswerException     when input parameter is last defined index for this species
 	 */
-	public static SiteIndexEquation NextCurve(int sp_index, SiteIndexEquation cuIndex)
+	public static SiteIndexEquation NextCurve(SiteIndexSpecies spIndex, SiteIndexEquation cuIndex)
 			throws SpeciesErrorException, CurveErrorException, NoAnswerException {
-		if (sp_index < 0 || sp_index >= SI_MAX_SPECIES) {
-			throw new SpeciesErrorException("Input species is not a valid species index: " + sp_index);
+		if (spIndex == null) {
+			throw new SpeciesErrorException("Input species is not a valid species index: " + spIndex);
 		}
 
-		if (cuIndex == null || si_curve_intend[cuIndex.n()] != sp_index) {
+		if (cuIndex == null || siCurveIntend[cuIndex.n()] != spIndex) {
 			throw new CurveErrorException("Input curve is not a valid curve index for this species: " + cuIndex);
 		}
 
@@ -2662,7 +2679,7 @@ public class Sindxdll {
 		}
 
 		if (cuIndex == SI_NO_EQUATION) {
-			throw new NoAnswerException("Input parameter is last defined index for this species: " + sp_index);
+			throw new NoAnswerException("Input parameter is last defined index for this species: " + spIndex);
 		} else {
 			return cuIndex;
 		}
@@ -2888,33 +2905,33 @@ public class Sindxdll {
 	/**
 	 * Site index conversion between species
 	 *
-	 * @param sp_index1 Integer source species index
-	 * @param site      Floating point source species site index
-	 * @param sp_index2 Integer target species index
-	 * @param result    Floating point target species site index. (computed)
+	 * @param spIndex1 Source species
+	 * @param siteIndex Floating point source species site index
+	 * @param spIndex2 Target species
+	 * @param result Floating point target species site index. (computed)
 	 *
 	 * @return 0, or an exception
 	 *
 	 * @throws SpeciesErrorException when source or target species index is not valid
 	 * @throws NoAnswerException     when there is no conversion defined
 	 */
-	public static int SIToSI(int sp_index1, double site, int sp_index2, Reference<Double> result)
+	public static int SIToSI(SiteIndexSpecies spIndex1, double siteIndex, SiteIndexSpecies spIndex2, Reference<Double> result)
 			throws SpeciesErrorException, NoAnswerException {
 		int i;
 
-		if (sp_index1 < 0 || sp_index1 >= SI_MAX_SPECIES) {
+		if (spIndex1 == null) {
 			result.set(Double.valueOf(SI_ERR_SPEC));
-			throw new SpeciesErrorException("Source or target species index is not valid" + sp_index1);
+			throw new SpeciesErrorException("Source or target species index is not valid" + spIndex1);
 		}
 
-		if (sp_index2 < 0 || sp_index2 >= SI_MAX_SPECIES) {
+		if (spIndex2 == null) {
 			result.set(Double.valueOf(SI_ERR_SPEC));
-			throw new SpeciesErrorException("Source or target species index is not valid" + sp_index2);
+			throw new SpeciesErrorException("Source or target species index is not valid" + spIndex2);
 		}
 
 		for (i = 0; i < SI_MAX_CONVERT; i++) {
-			if (SiteIndexNames.siSpeciesConversionParameters[i][0] == sp_index1 && SiteIndexNames.siSpeciesConversionParameters[i][1] == sp_index2) {
-				result.set(Double.valueOf(SiteIndexNames.siSpeciesConversionParameters[i][2] + SiteIndexNames.siSpeciesConversionParameters[i][3] * site));
+			if (SiteIndexNames.siSpeciesConversionParameters[i].sourceSpecies() == spIndex1 && SiteIndexNames.siSpeciesConversionParameters[i].targetSpecies() == spIndex2) {
+				result.set(SiteIndexNames.siSpeciesConversionParameters[i].param1() + SiteIndexNames.siSpeciesConversionParameters[i].param2() * siteIndex);
 				return 0;
 			}
 		}
@@ -2926,7 +2943,7 @@ public class Sindxdll {
 	/**
 	 * Get site index based on site class.
 	 *
-	 * @param sp_index Integer species index
+	 * @param spIndex Integer species index
 	 * @param sitecl   Character site class ('G', 'M', 'P', 'L')
 	 * @param fiz      Character FIZ code (A,B,C)=coast, (D,E,F,G,H,I,J,K,L)=interior
 	 * @param site     Floating point site index. (computed)
@@ -2936,10 +2953,10 @@ public class Sindxdll {
 	 * @throws ClassErrorException          when site class is unknown
 	 * @throws ForestInventoryZoneException when FIZ code is unknown
 	 */
-	public static int SCToSI(int sp_index, char sitecl, char fiz, Reference<Double> site)
+	public static int SCToSI(SiteIndexSpecies spIndex, char sitecl, char fiz, Reference<Double> site)
 			throws CommonCalculatorException {
 
-		site.set(SiteClassCode2SiteIndex.classToIndex(sp_index, sitecl, fiz));
+		site.set(SiteClassCode2SiteIndex.classToIndex(spIndex, sitecl, fiz));
 
 		return 0;
 	}
@@ -2947,18 +2964,13 @@ public class Sindxdll {
 	/**
 	 * Determine species index from species code
 	 *
-	 * @param sc Character string species code
+	 * @param speciesCode Character string species code. It can be 1, 2, or 3 letters; upper/lower case is ignored.
 	 *
-	 * @return Species index
-	 *
+	 * @return the species with the given code
 	 * @throws CodeErrorException when species code is unknown
-	 *
-	 * @remarks Species code string can be 1, 2, or 3 letters; upper/lower case is ignored.
 	 */
-	public static int SpecMap(String sc) throws CodeErrorException {
-		int speciesIndex = SpecRMap.species_map(sc);
-
-		return speciesIndex;
+	public static SiteIndexSpecies SpecMap(String speciesCode) throws CodeErrorException {
+		return SiteIndexSpecies.getByCode(speciesCode);
 	}
 
 	/**
@@ -2975,10 +2987,8 @@ public class Sindxdll {
 	 * @throws CodeErrorException           when species code is unknown
 	 * @throws ForestInventoryZoneException when FIZ code is unknown
 	 */
-	public static int SpecRemap(String sc, char fiz) throws CodeErrorException, ForestInventoryZoneException {
-		int speciesIndex = SpecRMap.species_remap(sc, fiz);
-
-		return speciesIndex;
+	public static SiteIndexSpecies SpecRemap(String sc, char fiz) throws CodeErrorException, ForestInventoryZoneException {
+		return SpecRMap.species_remap(sc, fiz);
 	}
 
 	/**
@@ -3163,11 +3173,11 @@ public class Sindxdll {
 	 *
 	 * @throws CurveErrorException when input curve is not a valid curve index for any species
 	 */
-	public static int CurveToSpecies(int cu_index) throws CurveErrorException {
-		if (cu_index < 0 || cu_index >= SI_MAX_CURVES) {
+	public static SiteIndexSpecies CurveToSpecies(SiteIndexEquation cuIndex) throws CurveErrorException {
+		if (cuIndex == null) {
 			throw new CurveErrorException("Input curve is not a valid curve index for any species");
 		}
 
-		return si_curve_intend[cu_index];
+		return siCurveIntend[cuIndex.n()];
 	}
 }

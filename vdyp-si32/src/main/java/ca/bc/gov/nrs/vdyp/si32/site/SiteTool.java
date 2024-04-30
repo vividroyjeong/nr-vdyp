@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation;
+import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorException;
 import ca.bc.gov.nrs.vdyp.si32.cfs.CfsBiomassConversionSupportedGenera;
@@ -532,18 +533,18 @@ public class SiteTool {
 	 * @return the short ("code") name of the species, in SIndex33 format (leading character
 	 * in upper case; following characters in lower case.)
 	 */
-	public static String getSiteCurveSINDEXSpecies(int siCurve) {
+	public static String getSiteCurveSINDEXSpecies(SiteIndexEquation siCurve) {
 
-		int spcsNdx = VdypMethods.getSICurveSpeciesIndex(siCurve);
+		String speciesName;
 
-		String spcsNm;
-		if (spcsNdx >= 0) {
-			spcsNm = Sindxdll.SpecCode(spcsNdx);
+		SiteIndexSpecies species = VdypMethods.getSICurveSpeciesIndex(siCurve);
+		if (species != SiteIndexSpecies.SI_NO_SPECIES) {
+			speciesName = Sindxdll.SpecCode(species);
 		} else {
-			spcsNm = "";
+			speciesName = "";
 		}
 
-		return spcsNm;
+		return speciesName;
 	}
 
 	/**

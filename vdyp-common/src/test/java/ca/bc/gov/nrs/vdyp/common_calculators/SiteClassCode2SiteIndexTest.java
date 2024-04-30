@@ -1,5 +1,32 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_ACT;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_AT;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_BA;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_BL;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_CWC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_CWI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_DR;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_EA;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_EP;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_FDC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_FDI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_HWC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_HWI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_LA;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_LT;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_LW;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_MB;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_PA;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_PF;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_PLI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_PW;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_PY;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_SB;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_SE;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_SS;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_SW;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_YC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -9,7 +36,6 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ClassErrorExcepti
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ForestInventoryZoneException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.SpeciesErrorException;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.*;
 
 class SiteClassCode2SiteIndexTest {
 	private static final char[] validSiteCl = { 'G', 'M', 'P', 'L' };
@@ -295,7 +321,7 @@ class SiteClassCode2SiteIndexTest {
 	void testSpeciesErrorException() throws CommonCalculatorException {
 		assertThrows(
 				SpeciesErrorException.class,
-				() -> SiteClassCode2SiteIndex.classToIndex((short) 150, validSiteCl[3], 'X')
+				() -> SiteClassCode2SiteIndex.classToIndex(null, validSiteCl[3], 'X')
 		);
 	}
 }

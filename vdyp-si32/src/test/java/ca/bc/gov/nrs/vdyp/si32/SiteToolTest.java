@@ -310,13 +310,13 @@ class SiteToolTest {
 
 	@Test
 	void test_getSICurve() {
-		assertThat(SiteTool.getSICurve("ABAL", true), is(119));
+		assertThat(SiteTool.getSICurve("ABAL", true), is(SI_AT_CHEN));
 	}
 
 	@Test
 	void test_getSiteCurveSINDEXSpecies() {
-		assertThat(SiteTool.getSiteCurveSINDEXSpecies(2000), is(""));
-		assertThat(SiteTool.getSiteCurveSINDEXSpecies(119), is("Sw"));
+		assertThat(SiteTool.getSiteCurveSINDEXSpecies(null), is(""));
+		assertThat(SiteTool.getSiteCurveSINDEXSpecies(SI_SW_HU_GARCIA), is("Sw"));
 	}
 
 	@Test
