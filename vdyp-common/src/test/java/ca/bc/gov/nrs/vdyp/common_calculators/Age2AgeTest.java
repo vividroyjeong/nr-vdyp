@@ -1,5 +1,39 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_BREAST;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_TOTAL;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_ACB_HUANGAC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_ACT_THROWERAC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_AT_NIGH;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_BA_KURUCZ82AC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_BA_NIGH;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_BL_CHENAC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_CWI_NIGH;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_DR_NIGH;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_EP_NIGH;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_FDC_BRUCEAC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_FDC_BRUCENIGH;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_FDC_NIGHTA;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_FDI_THROWERAC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_HWI_NIGH;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_LW_MILNER;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_LW_NIGH;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_PJ_HUANG;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_PJ_HUANGAC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_PLI_NIGHTA2004;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_PLI_NIGHTA98;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_PLI_THROWNIGH;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_PW_CURTISAC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_PY_HANNAC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_PY_NIGH;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SB_NIGH;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SE_CHENAC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SE_NIGHTA;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SS_NIGH;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SW_GOUDIE_NATAC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SW_GOUDIE_PLAAC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SW_NIGHTA;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SW_NIGHTA2004;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -7,8 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.AgeTypeErrorException;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.*;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation.*;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 
 class Age2AgeTest {
 
@@ -17,12 +50,12 @@ class Age2AgeTest {
 	@Test
 	void testShouldBranchInvalid() {
 		assertThrows(
-				AgeTypeErrorException.class, () -> Age2Age.ageToAge(SI_ACB_HUANGAC, 0.0, SI_AT_BREAST, (short) 1, 0.0)
+				AgeTypeErrorException.class, () -> Age2Age.ageToAge(SI_ACB_HUANGAC, 0.0, SI_AT_BREAST, SI_AT_BREAST, 0.0)
 		);
 
 		assertThrows(
 				AgeTypeErrorException.class,
-				() -> Age2Age.ageToAge(SI_ACT_THROWERAC, 0.0, SI_AT_TOTAL, (short) 0, 0.0)
+				() -> Age2Age.ageToAge(SI_ACT_THROWERAC, 0.0, SI_AT_TOTAL, SI_AT_TOTAL, 0.0)
 		);
 	}
 
@@ -70,7 +103,7 @@ class Age2AgeTest {
 
 	@Test
 	void testShouldBranchNoIfMatch() {
-		assertThrows(AgeTypeErrorException.class, () -> Age2Age.ageToAge(SI_SS_NIGH, 0.0, (short) 5, (short) 6, 0.0));
+		assertThrows(AgeTypeErrorException.class, () -> Age2Age.ageToAge(SI_SS_NIGH, 0.0, null, null, 0.0));
 	}
 
 	@Test

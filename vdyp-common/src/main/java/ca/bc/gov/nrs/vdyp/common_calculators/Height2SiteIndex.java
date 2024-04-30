@@ -1,16 +1,19 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.SI_AT_BREAST;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.SI_AT_TOTAL;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.SI_EST_DIRECT;
 import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexUtilities.llog;
 import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexUtilities.ppow;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_BREAST;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_TOTAL;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEstimationType.*;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMaximumException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMinimumException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
-import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException; 
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEstimationType; 
 
 /**
  * Height2SiteIndex.java - given age and height, computes site index. - if age is total, site index and years to breast
@@ -24,11 +27,21 @@ public class Height2SiteIndex {
 	private static final int SI_ERR_NO_ANS = -4;
 
 	@SuppressWarnings("java:S3776, java:S6541")
-	public static double heightToIndex(SiteIndexEquation cuIndex, double age, int ageType, double height, int siEstType)
+	public static double heightToIndex(SiteIndexEquation cuIndex, double age, SiteIndexAgeType ageType, 
+			double height, SiteIndexEstimationType siEstType)
 			throws CommonCalculatorException {
 		double index;
 		double x1, x2;
 
+		if (siEstType == null) {
+			// This is the default value.
+			siEstType = SI_EST_ITERATE;
+		}
+
+		if (ageType == null) {
+			ageType = SI_AT_TOTAL;
+		}
+		
 		/* handle simple cases */
 		if (ageType == SI_AT_BREAST) {
 			if (height < 1.3) {
@@ -70,16 +83,22 @@ public class Height2SiteIndex {
 			} else
 				index = siteIterate(cuIndex, age, SI_AT_TOTAL, height);
 		}
-		return (index);
+		
+		return index;
 	}
 
 	@SuppressWarnings("java:S3776, java:S6541")
-	public static double baHeightToIndex(SiteIndexEquation cuIndex, double bhage, double height, int siEstType)
+	public static double baHeightToIndex(SiteIndexEquation cuIndex, double bhage, double height, SiteIndexEstimationType siEstType)
 			throws CommonCalculatorException {
 		double index;
 		double x1, x2;
 		double logBhAge;
 		double ht13;
+
+		if (siEstType == null) {
+			// This is the default value.
+			siEstType = SI_EST_ITERATE;
+		}
 
 		if (bhage <= 0.5) {
 			/* indicator that it can't be done */
@@ -3799,7 +3818,7 @@ public class Height2SiteIndex {
 		return index;
 	}
 
-	public static double siteIterate(SiteIndexEquation cuIndex, double age, int ageType, double height)
+	public static double siteIterate(SiteIndexEquation cuIndex, double age, SiteIndexAgeType ageType, double height)
 			throws CommonCalculatorException {
 		double site;
 		double step;

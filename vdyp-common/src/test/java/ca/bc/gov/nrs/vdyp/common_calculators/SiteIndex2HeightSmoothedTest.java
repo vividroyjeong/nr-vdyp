@@ -1,5 +1,9 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_BREAST;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_TOTAL;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_FDI_HUANG_NAT;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_PLI_THROWER;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -10,8 +14,6 @@ import org.junit.jupiter.api.Test;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.*;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation.*;
 
 class SiteIndex2HeightSmoothedTest {
 	private static final double ERROR_TOLERANCE = 0.00001;
@@ -23,7 +25,7 @@ class SiteIndex2HeightSmoothedTest {
 			assertThrows(
 					LessThan13Exception.class,
 					() -> SiteIndex2HeightSmoothed
-							.indexToHeightSmoothed(null, 0.0, (short) 0, 1.2, 0.0, 0.0, 0.0)
+							.indexToHeightSmoothed(null, 0.0, SI_AT_TOTAL, 1.2, 0.0, 0.0, 0.0)
 			);
 		}
 
@@ -32,7 +34,7 @@ class SiteIndex2HeightSmoothedTest {
 			assertThrows(
 					NoAnswerException.class,
 					() -> SiteIndex2HeightSmoothed
-							.indexToHeightSmoothed(null, 0.0, (short) 0, 1.31, -1.0, 0.0, 0.0)
+							.indexToHeightSmoothed(null, 0.0, SI_AT_TOTAL, 1.31, -1.0, 0.0, 0.0)
 			);
 		}
 

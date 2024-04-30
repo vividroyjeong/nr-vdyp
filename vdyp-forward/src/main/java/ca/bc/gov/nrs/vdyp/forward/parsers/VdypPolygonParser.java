@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
-import ca.bc.gov.nrs.vdyp.common_calculators.FizCheck;
-import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants;
+import ca.bc.gov.nrs.vdyp.common_calculators.ForestInventoryZone;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexForestInventoryZone;
 import ca.bc.gov.nrs.vdyp.forward.model.FipMode;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
@@ -78,7 +78,7 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 					BecDefinition bec = becLookup.get(becAlias)
 							.orElseThrow(() -> new ResourceParseException(becAlias + " is not a recognized BEC alias"));
 
-					if (FizCheck.fiz2Region(fizId) == SiteIndexConstants.FIZ_UNKNOWN) {
+					if (ForestInventoryZone.toRegion(fizId) == SiteIndexForestInventoryZone.FIZ_UNKNOWN) {
 						throw new ResourceParseException(
 								"Forest Inventory Zone " + fizId
 										+ " is not a recognized FIZ (only 'A' ... 'L' are supported)"

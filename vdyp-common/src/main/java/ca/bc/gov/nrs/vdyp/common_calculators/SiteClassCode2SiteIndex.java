@@ -1,14 +1,12 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.FIZ_COAST;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.FIZ_INTERIOR;
-
 import java.text.MessageFormat;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ClassErrorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ForestInventoryZoneException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.SpeciesErrorException;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies;
 
 /**
  * SiteClassCode2SiteIndex.java - translates site class code to site index (height in metres) for a given species, site
@@ -167,7 +165,7 @@ public class SiteClassCode2SiteIndex {
 				}
 				break;
 			case SI_SPEC_HWC:
-				switch (FizCheck.fiz2Region(forestInventoryZone)) {
+				switch (ForestInventoryZone.toRegion(forestInventoryZone)) {
 				case FIZ_COAST:
 					switch (siteClass) {
 					case 'G':

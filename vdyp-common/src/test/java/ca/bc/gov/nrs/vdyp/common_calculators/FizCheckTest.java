@@ -1,16 +1,20 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexForestInventoryZone.FIZ_COAST;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexForestInventoryZone.FIZ_INTERIOR;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexForestInventoryZone.FIZ_UNKNOWN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.*;
+
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexForestInventoryZone;
 
 class FizCheckTest {
 
 	@Test
 	void testCoastalFiz() {
 		for (char fiz = 'A'; fiz <= 'C'; fiz++) {
-			short result = FizCheck.fiz2Region(fiz);
+			SiteIndexForestInventoryZone result = ForestInventoryZone.toRegion(fiz);
 			assertEquals(FIZ_COAST, result);
 		}
 	}
@@ -18,7 +22,7 @@ class FizCheckTest {
 	@Test
 	void testInteriorFiz() {
 		for (char fiz = 'D'; fiz <= 'L'; fiz++) {
-			short result = FizCheck.fiz2Region(fiz);
+			SiteIndexForestInventoryZone result = ForestInventoryZone.toRegion(fiz);
 			assertEquals(FIZ_INTERIOR, result);
 		}
 	}
@@ -26,7 +30,7 @@ class FizCheckTest {
 	@Test
 	void testUnknownFiz() {
 		char fiz = 'X'; // Replace with any unknown fiz value
-		short result = FizCheck.fiz2Region(fiz);
+		SiteIndexForestInventoryZone result = ForestInventoryZone.toRegion(fiz);
 		assertEquals(FIZ_UNKNOWN, result);
 	}
 }

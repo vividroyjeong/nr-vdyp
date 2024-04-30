@@ -183,7 +183,7 @@ class Height2SiteIndexTest {
 		void testInvalidBhage() {
 			assertThrows(
 					GrowthInterceptMinimumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(null, 0.5, 1.0, SiteIndexEstimationType.SI_EST_DIRECT)
+					() -> Height2SiteIndex.baHeightToIndex(null, 0.5, 1.0, SiteIndexEstimationType.SI_EST_ITERATE)
 			); // SI_AT_TOTAL = 0
 		}
 

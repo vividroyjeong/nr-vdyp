@@ -5,10 +5,12 @@ import java.text.MessageFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation;
-import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorException;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEstimationType;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies;
 import ca.bc.gov.nrs.vdyp.si32.cfs.CfsBiomassConversionSupportedGenera;
 import ca.bc.gov.nrs.vdyp.si32.cfs.CfsBiomassConversionSupportedSpecies;
 import ca.bc.gov.nrs.vdyp.si32.cfs.CfsDeadConversionParams;
@@ -339,7 +341,8 @@ public class SiteTool {
 	 * </ul>
 	 * @return the site index of the pure species stand given the height and age.
 	 */
-	public static double heightAndAgeToSiteIndex(SiteIndexEquation curve, double age, int ageType, double height, int estType)
+	public static double heightAndAgeToSiteIndex(SiteIndexEquation curve, double age, SiteIndexAgeType ageType, 
+			double height, SiteIndexEstimationType estType)
 			throws CommonCalculatorException {
 
 		Reference<Double> siRef = new Reference<>();
@@ -373,7 +376,7 @@ public class SiteTool {
 	 * height specified.
 	 */
 	public static double heightAndSiteIndexToAge(
-			SiteIndexEquation curve, double height, int ageType, double siteIndex,
+			SiteIndexEquation curve, double height, SiteIndexAgeType ageType, double siteIndex,
 			double years2BreastHeight
 	)
 			throws CommonCalculatorException {
@@ -408,7 +411,7 @@ public class SiteTool {
 	 * @throws CommonCalculatorException
 	 */
 	public static double ageAndSiteIndexToHeight(
-			SiteIndexEquation curve, double age, int ageType, double siteIndex,
+			SiteIndexEquation curve, double age, SiteIndexAgeType ageType, double siteIndex,
 			double years2BreastHeight
 	)
 			throws CommonCalculatorException {

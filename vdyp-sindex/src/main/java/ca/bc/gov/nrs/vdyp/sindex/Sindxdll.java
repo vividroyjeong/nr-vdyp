@@ -1,32 +1,30 @@
 package ca.bc.gov.nrs.vdyp.sindex;
 
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.SI_ESTAB_NAT;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.SI_ESTAB_PLA;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation.*;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_ACB;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_ACT;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_AT;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_BA;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_BL;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_BP;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_CWC;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_CWI;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_DR;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_EP;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_FDC;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_FDI;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_HM;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_HWC;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_HWI;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_LW;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_PJ;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_PLI;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_PW;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_PY;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_SB;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_SE;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_SS;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.SI_SPEC_SW;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.*;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_ACB;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_ACT;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_AT;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_BA;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_BL;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_BP;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_CWC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_CWI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_DR;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_EP;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_FDC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_FDI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_HM;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_HWC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_HWI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_LW;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_PJ;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_PLI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_PW;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_PY;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_SB;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_SE;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_SS;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_SW;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.Age2Age;
 import ca.bc.gov.nrs.vdyp.common_calculators.Height2SiteIndex;
@@ -34,9 +32,7 @@ import ca.bc.gov.nrs.vdyp.common_calculators.SiteClassCode2SiteIndex;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndex2Age;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndex2Height;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndex2HeightSmoothed;
-import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexNames;
-import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexYears2BreastHeight;
 import ca.bc.gov.nrs.vdyp.common_calculators.SpecRMap;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.AgeTypeErrorException;
@@ -52,6 +48,11 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptTo
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.SpeciesErrorException;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEstablishmentType;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEstimationType;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies;
 
 /**
  * Sindxdll.java Interface Module to the Sindex Library
@@ -2243,10 +2244,13 @@ public class Sindxdll {
 	 * @throws EstablishmentErrorException species index or establishment type
 	 * @throws NoAnswerException           when no curves defined for this species
 	 */
-	public static SiteIndexEquation DefCurveEst(SiteIndexSpecies spIndex, int estab)
+	public static SiteIndexEquation DefCurveEst(SiteIndexSpecies spIndex, SiteIndexEstablishmentType estab)
 			throws SpeciesErrorException, EstablishmentErrorException, NoAnswerException {
 		if (spIndex == null) { // spec
 			throw new SpeciesErrorException("Input parameter is not a valid species index: " + spIndex);
+		}
+		if (estab == null) { 
+			throw new EstablishmentErrorException("Input parameter is not a valid establishment type: " + estab);
 		}
 
 		if (spIndex == SI_SPEC_SW) {
@@ -2256,7 +2260,7 @@ public class Sindxdll {
 			case SI_ESTAB_PLA:
 				return SI_SW_GOUDIE_PLAAC;
 			default:
-				throw new EstablishmentErrorException("Input parameter is not a valid establishment type: " + estab);
+				throw new EstablishmentErrorException("Input parameter is not a known establishment type: " + estab);
 			}
 		} else if (siCurveDefault[spIndex.n()] == SI_NO_EQUATION) {
 			throw new NoAnswerException("No curves defined for this species: " + spIndex);
@@ -2753,8 +2757,9 @@ public class Sindxdll {
 	 * @throws GrowthInterceptMaximumException    when bhage > GI range
 	 * @throws GrowthInterceptTotalErrorException when total age and GI curve
 	 */
-	public static int HtAgeToSI(SiteIndexEquation curve, double age, int ageType, double height, int estType, Reference<Double> site)
-			throws CommonCalculatorException {
+	public static int HtAgeToSI(SiteIndexEquation curve, double age, SiteIndexAgeType ageType, double height, 
+			SiteIndexEstimationType estType, Reference<Double> site)
+		throws CommonCalculatorException {
 
 		site.set(Height2SiteIndex.heightToIndex(curve, age, ageType, height, estType));
 
@@ -2780,9 +2785,9 @@ public class Sindxdll {
 	 * @throws IGrowthInterceptMaximumException when bhage > GI range
 	 * @throws GrowthInterceptTotalException    when total age and GI curve
 	 */
-	public static int
-			HtSIToAge(SiteIndexEquation curve, double height, int ageType, double siteIndex, double y2bh, Reference<Double> age)
-					throws CommonCalculatorException {
+	public static int HtSIToAge(SiteIndexEquation curve, double height, SiteIndexAgeType ageType, double siteIndex, 
+			double y2bh, Reference<Double> age)
+		throws CommonCalculatorException {
 
 		age.set(SiteIndex2Age.indexToAge(curve, height, ageType, siteIndex, y2bh));
 
@@ -2813,7 +2818,7 @@ public class Sindxdll {
 	 * @throws LessThan13Exception             when site index <= 1.3
 	 */
 	public static int
-			AgeSIToHt(SiteIndexEquation curve, double age, int ageType, double siteIndex, double y2bh, Reference<Double> height)
+			AgeSIToHt(SiteIndexEquation curve, double age, SiteIndexAgeType ageType, double siteIndex, double y2bh, Reference<Double> height)
 					throws CommonCalculatorException {
 
 		height.set(SiteIndex2Height.indexToHeight(curve, age, ageType, siteIndex, y2bh, 0.5));
@@ -2848,7 +2853,7 @@ public class Sindxdll {
 	 * @throws LessThan13Exception             when site index <= 1.3
 	 */
 	public static int AgeSIToHtSmooth(
-			SiteIndexEquation curve, double age, int ageType, double siteIndex, double y2bh, double seedling_age, double seedling_ht,
+			SiteIndexEquation curve, double age, SiteIndexAgeType ageType, double siteIndex, double y2bh, double seedling_age, double seedling_ht,
 			Reference<Double> height
 	) throws CommonCalculatorException {
 		height.set(
@@ -3156,8 +3161,8 @@ public class Sindxdll {
 	 * @throws CurveErrorException   input curve is not a valid curve index for this species
 	 * @throw AgeTypeErrorException when age type is unknown
 	 */
-	public static int AgeToAge(SiteIndexEquation cu_index, double age1, int age_type1, double y2bh, 
-			Reference<Double> result, int age_type2)
+	public static int AgeToAge(SiteIndexEquation cu_index, double age1, SiteIndexAgeType age_type1, double y2bh, 
+			Reference<Double> result, SiteIndexAgeType age_type2)
 		throws AgeTypeErrorException {
 
 		result.set(Age2Age.ageToAge(cu_index, age1, age_type1, age_type2, y2bh));

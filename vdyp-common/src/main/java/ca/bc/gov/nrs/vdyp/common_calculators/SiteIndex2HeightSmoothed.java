@@ -1,11 +1,17 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.*;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation.*;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_FDC_BRUCEAC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_HWC_WILEYAC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_PLI_THROWER;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SW_GOUDIE_NATAC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SW_GOUDIE_PLAAC;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.*;
 
 /**
  * SiteIndex2HeightSmoothed
@@ -27,7 +33,7 @@ public class SiteIndex2HeightSmoothed {
 	 * @throws NoAnswerException when the iteration will not converge
 	 */
 	public static double indexToHeightSmoothed(
-			SiteIndexEquation cuIndex, double age, int ageType, double siteIndex, double yearsToBreastHeight, 
+			SiteIndexEquation cuIndex, double age, SiteIndexAgeType ageType, double siteIndex, double yearsToBreastHeight, 
 			double seedlingAge, double seedlingHeight
 	) throws CommonCalculatorException {
 

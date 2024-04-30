@@ -1,9 +1,14 @@
 package ca.bc.gov.nrs.vdyp.si32;
 
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.SI_AT_BREAST;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.SI_AT_TOTAL;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.SI_EST_DIRECT;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.SI_EST_ITERATE;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_BREAST;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_TOTAL;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_ACT_THROWER;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_AT_CHEN;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_AT_GOUDIE;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_FDI_THROWER;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SW_HU_GARCIA;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEstimationType.SI_EST_DIRECT;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEstimationType.SI_EST_ITERATE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -12,11 +17,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexNames;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.si32.cfs.CfsBiomassConversionSupportedGenera;
 import ca.bc.gov.nrs.vdyp.si32.cfs.CfsBiomassConversionSupportedSpecies;
 import ca.bc.gov.nrs.vdyp.si32.cfs.CfsDeadConversionParams;
@@ -28,8 +33,6 @@ import ca.bc.gov.nrs.vdyp.si32.site.SiteTool;
 import ca.bc.gov.nrs.vdyp.si32.vdyp.SP64Name;
 import ca.bc.gov.nrs.vdyp.si32.vdyp.SpeciesTable;
 import ca.bc.gov.nrs.vdyp.sindex.Reference;
-
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation.*;
 
 class SiteToolTest {
 
@@ -173,15 +176,15 @@ class SiteToolTest {
 	void test_htAgeToSI() throws CommonCalculatorException {
 		assertThrows(
 				LessThan13Exception.class, () -> SiteTool
-						.heightAndAgeToSiteIndex(null, 0, SI_AT_BREAST, 1.0, 0)
+						.heightAndAgeToSiteIndex(null, 0, SI_AT_BREAST, 1.0, SI_EST_ITERATE)
 		);
 		assertThrows(
 				NoAnswerException.class, () -> SiteTool
-						.heightAndAgeToSiteIndex(null, 0, SI_AT_TOTAL, 0.0, 0)
+						.heightAndAgeToSiteIndex(null, 0, SI_AT_TOTAL, 0.0, SI_EST_ITERATE)
 		);
 		assertThrows(
 				NoAnswerException.class, () -> SiteTool
-						.heightAndAgeToSiteIndex(null, 0, SI_AT_TOTAL, 23.0, 0)
+						.heightAndAgeToSiteIndex(null, 0, SI_AT_TOTAL, 23.0, SI_EST_ITERATE)
 		);
 		assertThat(
 				SiteTool.heightAndAgeToSiteIndex(

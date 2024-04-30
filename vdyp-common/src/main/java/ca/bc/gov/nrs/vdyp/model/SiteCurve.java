@@ -2,7 +2,7 @@ package ca.bc.gov.nrs.vdyp.model;
 
 import java.text.MessageFormat;
 
-import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 
 public class SiteCurve {
 	private final SiteIndexEquation coastalRegionValue;

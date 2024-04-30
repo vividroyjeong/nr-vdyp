@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.common_calculators;
+package ca.bc.gov.nrs.vdyp.common_calculators.enumerations;
 
 import java.text.MessageFormat;
 import java.util.HashMap;

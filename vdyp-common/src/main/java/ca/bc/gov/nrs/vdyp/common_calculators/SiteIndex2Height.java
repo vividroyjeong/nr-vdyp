@@ -1,12 +1,18 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexUtilities.llog;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexUtilities.ppow;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_BREAST;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_TOTAL;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEstimationType.SI_EST_DIRECT;
+
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMinimumException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.*;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexUtilities.*; 
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation; 
 
 /**
  * SiteIndex2Height.java - given site index and age, computes site height.
@@ -36,7 +42,7 @@ public class SiteIndex2Height {
 	 * error codes (returned as height value):
 	 */
 	public static double indexToHeight(
-			SiteIndexEquation cuIndex, double age, int ageType, double siteIndex, double years2BreastHeight, double pi 
+			SiteIndexEquation cuIndex, double age, SiteIndexAgeType ageType, double siteIndex, double years2BreastHeight, double pi 
 	) throws CommonCalculatorException
 	{
 		double height; // return value
@@ -2054,7 +2060,7 @@ public class SiteIndex2Height {
 
 		/* loop until real close */
 		do {
-			test_site = Height2SiteIndex.heightToIndex(cuIndex, age, (int) SI_AT_BREAST, si2ht, (int) SI_EST_DIRECT);
+			test_site = Height2SiteIndex.heightToIndex(cuIndex, age, SI_AT_BREAST, si2ht, SI_EST_DIRECT);
 			/*
 			 * printf ("age=%3.0f, site=%5.2f, test_site=%5.2f, si2ht=%5.2f, step=%9.7f\n", age, site_index, test_site,
 			 * si2ht, step);

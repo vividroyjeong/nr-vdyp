@@ -1,9 +1,11 @@
 package ca.bc.gov.nrs.vdyp.sindex;
 
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.SI_ESTAB_NAT;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.SI_ESTAB_PLA;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation.*;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies.*;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_BREAST;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_TOTAL;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.*;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.*;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEstimationType.*;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEstablishmentType.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -13,8 +15,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation;
-import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexSpecies;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexUtilities;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.AgeTypeErrorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ClassErrorException;
@@ -25,6 +25,8 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.EstablishmentErro
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.SpeciesErrorException;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies;
 
 class SindxdllTest {
 
@@ -2044,7 +2046,7 @@ class SindxdllTest {
 		@Test
 		void testEstNullIndex() throws CommonCalculatorException {
 			assertThrows(
-					SpeciesErrorException.class, () -> Sindxdll.DefCurveEst(null, (int) 0),
+					SpeciesErrorException.class, () -> Sindxdll.DefCurveEst(null, SI_ESTAB_NAT),
 					"DefCurveEst should throw SpeciesErrorException for invalid index"
 			);
 		}
@@ -2064,20 +2066,20 @@ class SindxdllTest {
 		@Test
 		void testInvalidEstablishment() throws CommonCalculatorException {
 			assertThrows(EstablishmentErrorException.class, () -> {
-				Sindxdll.DefCurveEst(SI_SPEC_SW, (int) -1);
+				Sindxdll.DefCurveEst(SI_SPEC_SW, null);
 			});
 		}
 
 		@Test
 		void testNoCurvesDefined() throws CommonCalculatorException {
 			assertThrows(NoAnswerException.class, () -> {
-				Sindxdll.DefCurveEst(SI_SPEC_ABAL, (int) SI_ESTAB_NAT);
+				Sindxdll.DefCurveEst(SI_SPEC_ABAL, SI_ESTAB_NAT);
 			});
 		}
 
 		@Test
 		void testDefaultCase() throws CommonCalculatorException {
-			SiteIndexEquation result = Sindxdll.DefCurveEst(SI_SPEC_ACB, (int) 0);
+			SiteIndexEquation result = Sindxdll.DefCurveEst(SI_SPEC_ACB, SI_ESTAB_NAT);
 			assertEquals(SI_ACB_HUANGAC, result);
 		}
 	}
@@ -3341,7 +3343,7 @@ class SindxdllTest {
 		void testHtAgeToSIError() throws CommonCalculatorException {
 			Reference<Double> site = new Reference<>();
 			assertThrows(
-					LessThan13Exception.class, () -> Sindxdll.HtAgeToSI(null, 0.0, (int) 1, 1.2, (int) 0, site)
+					LessThan13Exception.class, () -> Sindxdll.HtAgeToSI(null, 0.0, SI_AT_BREAST, 1.2, SI_EST_ITERATE, site)
 			);
 		}
 
@@ -3352,7 +3354,7 @@ class SindxdllTest {
 			double age = 1;
 
 			double expectedResult = 0;
-			double actualResult = Sindxdll.HtAgeToSI(SI_FDI_THROWER, age, (int) 1, height, (int) 1, site);
+			double actualResult = Sindxdll.HtAgeToSI(SI_FDI_THROWER, age, SI_AT_BREAST, height, SI_EST_DIRECT, site);
 			double expectedSiteValue = 0.39 + 0.3104 * height + 33.3828 * height / age;
 
 			assertEquals(actualResult, expectedResult);
@@ -3366,7 +3368,7 @@ class SindxdllTest {
 		void testHtSIToAgeError() throws CommonCalculatorException {
 			Reference<Double> site = new Reference<>();
 			assertThrows(
-					LessThan13Exception.class, () -> Sindxdll.HtSIToAge(null, 0.0, (int) 1, 1.2, (int) 0, site)
+					LessThan13Exception.class, () -> Sindxdll.HtSIToAge(null, 0.0, SI_AT_BREAST, 1.2, (int) 0, site)
 			);
 		}
 
@@ -3383,7 +3385,7 @@ class SindxdllTest {
 			double x4 = SiteIndexUtilities.llog(1.372 / site_index) / (SiteIndexUtilities.ppow(y2bh, x2) - x3);
 			x1 = SiteIndexUtilities.llog(site_height / site_index) / x4 + x3;
 
-			double actualResult = Sindxdll.HtSIToAge(SI_FDC_BRUCE, site_height, (int) 1, site_index, 12.0, site);
+			double actualResult = Sindxdll.HtSIToAge(SI_FDC_BRUCE, site_height, SI_AT_BREAST, site_index, 12.0, site);
 			double expectedSiteValue = (SiteIndexUtilities.ppow(x1, 1 / x2)) - y2bh;
 			double expectedResult = 0;
 
@@ -3398,7 +3400,7 @@ class SindxdllTest {
 		void testAgeSIToHtError() throws CommonCalculatorException {
 			Reference<Double> site = new Reference<>();
 			assertThrows(
-					LessThan13Exception.class, () -> Sindxdll.AgeSIToHt(null, 0.0, (int) 1, 1.2, (int) 0, site)
+					LessThan13Exception.class, () -> Sindxdll.AgeSIToHt(null, 0.0, SI_AT_BREAST, 1.2, (int) 0, site)
 			);
 		}
 
@@ -3406,7 +3408,7 @@ class SindxdllTest {
 		void testAgeSIToHtValid() throws CommonCalculatorException {
 			Reference<Double> site = new Reference<>();
 
-			double actualResult = Sindxdll.AgeSIToHt(SI_HWC_WILEY, 0.0, (int) 1, 1.31, 1.0, site);
+			double actualResult = Sindxdll.AgeSIToHt(SI_HWC_WILEY, 0.0, SI_AT_BREAST, 1.31, 1.0, site);
 			double expectedSiteValue = 1.37;
 			double expectedResult = 0;
 
@@ -3422,7 +3424,7 @@ class SindxdllTest {
 			Reference<Double> height = new Reference<>();
 			assertThrows(
 					LessThan13Exception.class,
-					() -> Sindxdll.AgeSIToHtSmooth(null, 0.0, (int) 0, 1.2, 0.0, 0.0, 0.0, height)
+					() -> Sindxdll.AgeSIToHtSmooth(null, 0.0, SI_AT_TOTAL, 1.2, 0.0, 0.0, 0.0, height)
 			);
 		}
 
@@ -3431,7 +3433,7 @@ class SindxdllTest {
 			Reference<Double> height = new Reference<>();
 
 			double expectedHeightValue = 1.3 / 3.1 * 3;
-			double actualResult = Sindxdll.AgeSIToHtSmooth(SI_FDI_HUANG_NAT, 3.0, (int) 0, 16.0, 4.0, 3.1, 1.3, height);
+			double actualResult = Sindxdll.AgeSIToHtSmooth(SI_FDI_HUANG_NAT, 3.0, SI_AT_TOTAL, 16.0, 4.0, 3.1, 1.3, height);
 			double expectedResult = 0;
 
 			assertEquals(actualResult, expectedResult);
@@ -3840,7 +3842,7 @@ class SindxdllTest {
 			Reference<Double> age = new Reference<>();
 			assertThrows(
 					AgeTypeErrorException.class,
-					() -> Sindxdll.AgeToAge(SI_ACB_HUANGAC, 0.0, (int) 1, 0.0, age, (int) 1)
+					() -> Sindxdll.AgeToAge(SI_ACB_HUANGAC, 0.0, SI_AT_BREAST, 0.0, age, SI_AT_BREAST)
 			);
 		}
 
@@ -3849,7 +3851,7 @@ class SindxdllTest {
 			Reference<Double> age = new Reference<>();
 
 			double expectedAgeValue = 3.0;
-			double actualResult = Sindxdll.AgeToAge(SI_AT_NIGH, 1.5, (int) 1, 2, age, (int) 0);
+			double actualResult = Sindxdll.AgeToAge(SI_AT_NIGH, 1.5, SI_AT_BREAST, 2, age, SI_AT_TOTAL);
 			double expectedResult = 0;
 
 			assertEquals(actualResult, expectedResult);

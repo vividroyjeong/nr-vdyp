@@ -1,5 +1,10 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_BREAST;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_TOTAL;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_BL_THROWERGI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_FDC_BRUCE;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SW_HU_GARCIA;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -10,8 +15,6 @@ import org.junit.jupiter.api.Test;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.*;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation.*;
 
 class SiteIndex2AgeTest {
 	private static final double ERROR_TOLERANCE = 0.00001;
@@ -45,12 +48,12 @@ class SiteIndex2AgeTest {
 			// Test where SiteHeight < 1.3, AgeType = 1 (SI_AT_BREAST)
 			assertThrows(
 					LessThan13Exception.class,
-					() -> SiteIndex2Age.indexToAge(SI_BL_THROWERGI, 0.0, SI_AT_BREAST, SI_AT_BREAST, 0.0)
+					() -> SiteIndex2Age.indexToAge(SI_BL_THROWERGI, 0.0, SI_AT_BREAST, 1.0, 0.0)
 			);
 
 			// Test where SiteHeight <= 0.0001
 			double expectedResult = 0;
-			double actualResult = SiteIndex2Age.indexToAge(null, 0.0001, SI_AT_TOTAL, SI_AT_BREAST, 0.0);
+			double actualResult = SiteIndex2Age.indexToAge(null, 0.0001, SI_AT_TOTAL, 1.0, 0.0);
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 		}
 
@@ -59,7 +62,7 @@ class SiteIndex2AgeTest {
 			// Test where SiteHeight < 1.3, AgeType = 1 (SI_AT_BREAST)
 			assertThrows(
 					LessThan13Exception.class,
-					() -> SiteIndex2Age.indexToAge(SI_BL_THROWERGI, 1.4, SI_AT_BREAST, SI_AT_BREAST, 0.0)
+					() -> SiteIndex2Age.indexToAge(SI_BL_THROWERGI, 1.4, SI_AT_BREAST, 1.0, 0.0)
 			);
 		}
 
@@ -88,7 +91,7 @@ class SiteIndex2AgeTest {
 
 			assertThrows(
 					ArithmeticException.class,
-					() -> SiteIndex2Age.indexToAge(SI_FDC_BRUCE, site_height, 16, site_index, 12)
+					() -> SiteIndex2Age.indexToAge(SI_FDC_BRUCE, site_height, null, site_index, 12)
 			);
 		}
 
