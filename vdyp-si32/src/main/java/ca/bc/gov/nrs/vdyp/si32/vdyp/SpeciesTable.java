@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.si32.cfs.CfsTreeSpecies;
 
 /**
@@ -48,7 +49,7 @@ public class SpeciesTable {
 			UNKNOWN_ENTRY_SP0_NAME_VALUE, CfsTreeSpecies.UNKNOWN, UNKNOWN_ENTRY_IS_COMMERCIAL_VALUE,
 			UNKNOWN_ENTRY_IS_DECIDUOUS_VALUE, UNKNOWN_ENTRY_IS_SOFTWOOD_VALUE, 
 			new float[] { UNKNOWN_ENTRY_CROWN_CLOSURE_VALUE, UNKNOWN_ENTRY_CROWN_CLOSURE_VALUE }, 
-			new int[] { UNKNOWN_ENTRY_CURRENT_SI_CURVE_VALUE, UNKNOWN_ENTRY_CURRENT_SI_CURVE_VALUE });
+			getDefaultSiteIndexCurves());
 	
 	public static final SpeciesTableItem DefaultTableItem = new SpeciesTableItem(0, DefaultEntry);
 	
@@ -693,11 +694,11 @@ public class SpeciesTable {
 		));
 	}
 
-	private float[] getDefaultCrownClosure(float coastal, float interior) {
+	private static float[] getDefaultCrownClosure(float coastal, float interior) {
 		return new float[] { coastal, interior };
 	}
 	
-	private int[] getDefaultSiteIndexCurves() {
-		return new int[] { -1, -1 };
+	private static SiteIndexEquation[] getDefaultSiteIndexCurves() {
+		return new SiteIndexEquation[] { SiteIndexEquation.SI_NO_EQUATION, SiteIndexEquation.SI_NO_EQUATION };
 	}
 }

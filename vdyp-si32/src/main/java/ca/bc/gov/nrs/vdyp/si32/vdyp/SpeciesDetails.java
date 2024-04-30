@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.vdyp.si32.vdyp;
 
 import java.text.MessageFormat;
 
+import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.si32.cfs.CfsTreeSpecies;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SpeciesRegion;
 
@@ -66,7 +67,7 @@ public record SpeciesDetails(
 	 * the species. In certain applications, the standard curve number for a species may be modified to
 	 * other experimental or alternative curves rather than the standard curve.
 	 */
-	int[] currentSICurve) 
+	SiteIndexEquation[] currentSICurve) 
 {
 	@Override 
 	public String toString() {

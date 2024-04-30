@@ -9,6 +9,7 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptTo
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.*;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexUtilities.*; 
 
 public class SiteIndex2Age {
 
@@ -17,14 +18,6 @@ public class SiteIndex2Age {
 	 */
 	private static final int SI_ERR_GI_MAX = -3;
 	private static final int SI_ERR_NO_ANS = -4;
-
-	public static double ppow(double x, double y) {
-		return (x <= 0) ? 0.0 : Math.pow(x, y);
-	}
-
-	public static double llog(double x) {
-		return ( (x) <= 0.0) ? Math.log(.00001) : Math.log(x);
-	}
 
 	public static final double MAX_AGE = 999.0;
 
@@ -50,9 +43,10 @@ public class SiteIndex2Age {
 	 * @throws CurveEroorException           unknown curve index
 	 * @throws GrowthInterceptTotalException cannot compute growth intercept when using total age
 	 */
-	public static double
-			indexToAge(int cuIndex, double siteHeight, int ageType, double siteIndex, double yearsToBreastHeight)
-					throws CommonCalculatorException {
+	public static double indexToAge(SiteIndexEquation cuIndex, double siteHeight, int ageType, double siteIndex, 
+			double yearsToBreastHeight)
+		throws CommonCalculatorException {
+		
 		double x1, x2, x3, x4;
 		double a, b, c;
 		/*
@@ -522,9 +516,10 @@ public class SiteIndex2Age {
 		return (age);
 	}
 
-	public static double
-			iterate(int cuIndex, double siteHeight, int ageType, double siteIndex, double yearsToBreastHeight)
-					throws CommonCalculatorException {
+	public static double iterate(SiteIndexEquation cuIndex, double siteHeight, int ageType, double siteIndex
+			, double yearsToBreastHeight)
+		throws CommonCalculatorException {
+		
 		double si2age;
 		double step;
 		double test_ht;
@@ -660,7 +655,7 @@ public class SiteIndex2Age {
 		return (si2age);
 	}
 
-	public static double giIterate(int cuIndex, double siteHeight, int ageType, double siteIndex)
+	public static double giIterate(SiteIndexEquation cuIndex, double siteHeight, int ageType, double siteIndex)
 			throws CommonCalculatorException {
 		double age;
 		double si2age;

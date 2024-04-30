@@ -5,6 +5,7 @@ import java.text.MessageFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorException;
 import ca.bc.gov.nrs.vdyp.si32.cfs.CfsBiomassConversionSupportedGenera;
@@ -337,7 +338,7 @@ public class SiteTool {
 	 * </ul>
 	 * @return the site index of the pure species stand given the height and age.
 	 */
-	public static double heightAndAgeToSiteIndex(int curve, double age, int ageType, double height, int estType)
+	public static double heightAndAgeToSiteIndex(SiteIndexEquation curve, double age, int ageType, double height, int estType)
 			throws CommonCalculatorException {
 
 		Reference<Double> siRef = new Reference<>();
@@ -371,7 +372,7 @@ public class SiteTool {
 	 * height specified.
 	 */
 	public static double heightAndSiteIndexToAge(
-			int curve, double height, int ageType, double siteIndex,
+			SiteIndexEquation curve, double height, int ageType, double siteIndex,
 			double years2BreastHeight
 	)
 			throws CommonCalculatorException {
@@ -406,7 +407,7 @@ public class SiteTool {
 	 * @throws CommonCalculatorException
 	 */
 	public static double ageAndSiteIndexToHeight(
-			int curve, double age, int ageType, double siteIndex,
+			SiteIndexEquation curve, double age, int ageType, double siteIndex,
 			double years2BreastHeight
 	)
 			throws CommonCalculatorException {
@@ -428,7 +429,7 @@ public class SiteTool {
 	 * @return the number of years to grow from seed to breast height.
 	 * @throws CommonCalculatorException in the event of an error
 	 */
-	public static double yearsToBreastHeight(int curve, double siteIndex) throws CommonCalculatorException {
+	public static double yearsToBreastHeight(SiteIndexEquation curve, double siteIndex) throws CommonCalculatorException {
 		double rtrn = 0.0;
 
 		Reference<Double> tempRef_rtrn = new Reference<>(rtrn);
@@ -451,7 +452,7 @@ public class SiteTool {
 	 * @return string corresponding the name of the supplied curve number. "Unknown 
 	 * 		Curve" is returned for unrecognized curves.
 	 */
-	public static String getSICurveName(int siCurve) {
+	public static String getSICurveName(SiteIndexEquation siCurve) {
 		String retStr;
 
 		try {
@@ -505,7 +506,7 @@ public class SiteTool {
 	 *
 	 * @return the previous value.
 	 */
-	public static int setSICurve(String sp64CodeName, boolean coastalInd, int siCurve) {
+	public static SiteIndexEquation setSICurve(String sp64CodeName, boolean coastalInd, SiteIndexEquation siCurve) {
 
 		SpeciesRegion region = (coastalInd ? SpeciesRegion.COAST : SpeciesRegion.INTERIOR);
 		return VdypMethods.setCurrentSICurve(sp64CodeName, region, siCurve);
@@ -518,7 +519,7 @@ public class SiteTool {
 	 * @param isCoastal <code>true</code> if coastal, <code>false</code> if interior.
 	 * @return the SI Curve number for the species, or -1 if the species was not recognized.
 	 */
-	public static int getSICurve(String sp64CodeName, boolean isCoastal) {
+	public static SiteIndexEquation getSICurve(String sp64CodeName, boolean isCoastal) {
 
 		return VdypMethods.getCurrentSICurve(sp64CodeName, isCoastal ? SpeciesRegion.COAST : SpeciesRegion.INTERIOR);
 	}

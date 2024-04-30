@@ -14,6 +14,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseValidException;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.Region;
@@ -36,8 +37,8 @@ class SiteCurveParserTest {
 		var result = parser.parse(is, controlMap);
 
 		assertThat(result, hasKey("S1"));
-		assertThat(result.get("S1").getValue(Region.COASTAL), is(1));
-		assertThat(result.get("S1").getValue(Region.INTERIOR), is(2));
+		assertThat(result.get("S1").getValue(Region.COASTAL), is(SiteIndexEquation.SI_ACT_THROWER));
+		assertThat(result.get("S1").getValue(Region.INTERIOR), is(SiteIndexEquation.SI_AT_HUANG));
 	}
 
 	@Test
@@ -55,11 +56,11 @@ class SiteCurveParserTest {
 		var result = parser.parse(is, controlMap);
 
 		assertThat(result, hasKey("S1"));
-		assertThat(result.get("S1").getValue(Region.COASTAL), is(1));
-		assertThat(result.get("S1").getValue(Region.INTERIOR), is(2));
+		assertThat(result.get("S1").getValue(Region.COASTAL), is(SiteIndexEquation.SI_ACT_THROWER));
+		assertThat(result.get("S1").getValue(Region.INTERIOR), is(SiteIndexEquation.SI_AT_HUANG));
 		assertThat(result, hasKey("X2"));
-		assertThat(result.get("X2").getValue(Region.COASTAL), is(3));
-		assertThat(result.get("X2").getValue(Region.INTERIOR), is(4));
+		assertThat(result.get("X2").getValue(Region.COASTAL), is(SiteIndexEquation.SI_AT_CIESZEWSKI));
+		assertThat(result.get("X2").getValue(Region.INTERIOR), is(SiteIndexEquation.SI_AT_GOUDIE));
 	}
 
 	@Test
@@ -95,8 +96,8 @@ class SiteCurveParserTest {
 		var result = parser.parse(is, controlMap);
 
 		assertThat(result, hasKey("S1"));
-		assertThat(result.get("S1").getValue(Region.COASTAL), is(1));
-		assertThat(result.get("S1").getValue(Region.INTERIOR), is(2));
+		assertThat(result.get("S1").getValue(Region.COASTAL), is(SiteIndexEquation.SI_ACT_THROWER));
+		assertThat(result.get("S1").getValue(Region.INTERIOR), is(SiteIndexEquation.SI_AT_HUANG));
 	}
 
 	@Test
@@ -114,8 +115,8 @@ class SiteCurveParserTest {
 		var result = parser.parse(is, controlMap);
 
 		assertThat(result, hasKey("S1"));
-		assertThat(result.get("S1").getValue(Region.COASTAL), is(1));
-		assertThat(result.get("S1").getValue(Region.INTERIOR), is(2));
+		assertThat(result.get("S1").getValue(Region.COASTAL), is(SiteIndexEquation.SI_ACT_THROWER));
+		assertThat(result.get("S1").getValue(Region.INTERIOR), is(SiteIndexEquation.SI_AT_HUANG));
 	}
 
 	@Test
@@ -133,8 +134,8 @@ class SiteCurveParserTest {
 		var result = parser.parse(is, controlMap);
 
 		assertThat(result, hasKey("S1"));
-		assertThat(result.get("S1").getValue(Region.COASTAL), is(1));
-		assertThat(result.get("S1").getValue(Region.INTERIOR), is(2));
+		assertThat(result.get("S1").getValue(Region.COASTAL), is(SiteIndexEquation.SI_ACT_THROWER));
+		assertThat(result.get("S1").getValue(Region.INTERIOR), is(SiteIndexEquation.SI_AT_HUANG));
 	}
 
 }

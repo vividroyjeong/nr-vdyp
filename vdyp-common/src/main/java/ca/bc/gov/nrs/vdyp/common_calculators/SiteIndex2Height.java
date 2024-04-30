@@ -6,37 +6,38 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMi
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.*;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexUtilities.*; 
 
 /**
- * SiteIndex2Height.java - given site index and age, computes site height - age can be given as total age or breast
- * height age - if total age is given, y2bh must be the number of years to breast height - all heights input/output are
- * in metres. - site index must be based on breast height age 50 - where breast height age is less than 0, a quadratic
- * function is used - error codes (returned as height value): SI_ERR_LT13: site index < 1.3m SI_ERR_GI_MIN: variable
- * height growth intercept formulation; bhage < 0.5 years SI_ERR_GI_MAX: variable height growth intercept formulation;
- * bhage > range SI_ERR_NO_ANS: iteration could not converge (projected height > 999) SI_ERR_CURVE: unknown curve index
- * SI_ERR_GI_TOT: cannot compute growth intercept when using total age
+ * SiteIndex2Height.java - given site index and age, computes site height.
  */
 @SuppressWarnings("java:S1479")
 public class SiteIndex2Height {
-	/*
-	 * error codes as return values from functions
+
+	/**
+	 * Given site index and age, computes site height.
+	 * <ul>
+	 * <li><code>age</code> can be given as total age or breast height age
+	 * <li>if total age is given, years2BreastHeight must be the number of years to breast height
+	 * <li>all heights input/output are in metres.
+	 * <li>site index must be based on breast height age 50
+	 * <li>where breast height age is less than 0, a quadratic function is used
+	 * </ul>
+	 * @param cuIndex the index of the site curve
+	 * @param age the current age, of type <code>ageType</code>
+	 * @param ageType one of SI_AT_TOTAL or SI_AT_BREAST
+	 * @param siteIndex the site index
+	 * @param years2BreastHeight if <code>ageType</code> is SI_AT_TOTAL, this value must be supplied and 
+	 * indicates years to breast height
+	 * @param pi proportion of height growth between breast height ages 0 and 1 that occurs below breast height
+	 * @returns as described
+	 * @throws LessThan13Exception site index < 1.3m 
+	 * @throws CurveErrorException when cuIndex does not identify a known curve.
+	 * error codes (returned as height value):
 	 */
-	private static final int SI_ERR_NO_ANS = -4;
-
-	/* define species and equation indices */
-	public static double ppow(double x, double y) {
-		return (x <= 0) ? 0.0 : Math.pow(x, y);
-	}
-
-	public static double llog(double x) {
-		return ( (x) <= 0.0) ? Math.log(.00001) : Math.log(x);
-	}
-
 	public static double indexToHeight(
-			int cuIndex, double age, int ageType, double siteIndex, double years2BreastHeight, double pi 
-			/* proportion of height growth between breast height */
+			SiteIndexEquation cuIndex, double age, int ageType, double siteIndex, double years2BreastHeight, double pi 
 	) throws CommonCalculatorException
-	// ages 0 and 1 that occurs below breast height
 	{
 		double height; // return value
 		double x1, x2, x3, x4, x5; // equation coefficients
@@ -62,6 +63,10 @@ public class SiteIndex2Height {
 		}
 		if (totalAge < 0.00001) {
 			return 0.0;
+		}
+
+		if (cuIndex == null) {
+			throw new CurveErrorException("Unknown curve index");
 		}
 
 		switch (cuIndex) {
@@ -253,7 +258,7 @@ public class SiteIndex2Height {
 				// convert back to metric
 				height *= 0.3048;
 
-				if (cuIndex == SI_HWC_WILEY_BC) {
+				if (cuIndex == SiteIndexEquation.SI_HWC_WILEY_BC) {
 					x1 = -1.34105 + 0.0009 * breastHeightAge * height;
 					if (x1 > 0.0) {
 						height -= x1;
@@ -295,7 +300,7 @@ public class SiteIndex2Height {
 				// convert back to metric
 				height *= 0.3048;
 
-				if (cuIndex == SI_HWC_WILEY_MB) {
+				if (cuIndex == SiteIndexEquation.SI_HWC_WILEY_MB) {
 					x1 = 0.0972129 + 0.000419315 * breastHeightAge * height;
 					height -= x1;
 				}
@@ -458,35 +463,35 @@ public class SiteIndex2Height {
 			if (totalAge <= 15) {
 				height = 1.3 * Math.pow(totalAge / years2BreastHeight, 1.77 - 0.1028 * years2BreastHeight) * Math.pow(1.179, totalAge - years2BreastHeight);
 			} else {
-				height = SI_ERR_NO_ANS;
+				throw new NoAnswerException("Iteration could not converge (projected height > 999)");
 			}
 			break;
 		case SI_PLI_NIGHTA98:
 			if (totalAge <= 15) {
 				height = (-0.03993 + 0.004828 * siteIndex) * ppow(totalAge, 1.902) * ppow(0.9645, totalAge);
 			} else {
-				height = SI_ERR_NO_ANS;
+				throw new NoAnswerException("Iteration could not converge (projected height > 999)");
 			}
 			break;
 		case SI_SW_NIGHTA2004:
 			if (totalAge <= 20) {
 				height = 1.3 * Math.pow(totalAge / years2BreastHeight, 1.628 - 0.05991 * years2BreastHeight) * Math.pow(1.127, totalAge - years2BreastHeight);
 			} else {
-				height = SI_ERR_NO_ANS;
+				throw new NoAnswerException("Iteration could not converge (projected height > 999)");
 			}
 			break;
 		case SI_SW_NIGHTA:
 			if (totalAge <= 20 && siteIndex >= 14.2) {
 				height = (-0.01666 + 0.001722 * siteIndex) * ppow(totalAge, 1.858) * ppow(0.9982, totalAge);
 			} else {
-				height = SI_ERR_NO_ANS;
+				throw new NoAnswerException("Iteration could not converge (projected height > 999)");
 			}
 			break;
 		case SI_FDC_NIGHTA:
 			if (totalAge <= 25) {
 				height = (-0.002355 + 0.0003156 * siteIndex) * ppow(totalAge, 2.861) * ppow(0.9337, totalAge);
 			} else {
-				height = SI_ERR_NO_ANS;
+				throw new NoAnswerException("Iteration could not converge (projected height > 999)");
 			}
 			break;
 		case SI_SE_NIGH:
@@ -504,7 +509,7 @@ public class SiteIndex2Height {
 			if (totalAge <= 20) {
 				height = 1.3 * Math.pow(totalAge / years2BreastHeight, 1.628 - 0.05991 * years2BreastHeight) * Math.pow(1.127, totalAge - years2BreastHeight);
 			} else {
-				height = SI_ERR_NO_ANS;
+				throw new NoAnswerException("Iteration could not converge (projected height > 999)");
 			}
 			break;
 		case SI_FDC_BRUCE:
@@ -2025,14 +2030,10 @@ public class SiteIndex2Height {
 			throw new CurveErrorException("Unknown curve index");
 		}
 
-		if (height == SI_ERR_NO_ANS) {
-			throw new NoAnswerException("Iteration could not converge (projected height > 999)");
-		}
-
 		return height;
 	}
 
-	public static double giSi2Ht(int cuIndex, double age, double siteIndex) throws CommonCalculatorException {
+	public static double giSi2Ht(SiteIndexEquation cuIndex, double age, double siteIndex) throws CommonCalculatorException {
 		double si2ht;
 		double step;
 		double test_site;
@@ -2089,8 +2090,7 @@ public class SiteIndex2Height {
 				break;
 			}
 			if (si2ht > 999.0) {
-				si2ht = SI_ERR_NO_ANS;
-				break;
+				throw new NoAnswerException("Iteration could not converge (projected height > 999)");
 			}
 			/* site index must be at least 1.3 */
 			if (si2ht < 1.3) {
@@ -2103,9 +2103,6 @@ public class SiteIndex2Height {
 			}
 		} while (true);
 
-		if (si2ht == SI_ERR_NO_ANS) {
-			throw new NoAnswerException("Iteration could not converge (projected height > 999)");
-		}
 		return si2ht;
 	}
 

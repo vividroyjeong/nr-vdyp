@@ -1,7 +1,5 @@
 package ca.bc.gov.nrs.vdyp.si32.cfs;
 
-import java.text.MessageFormat;
-
 /**
  * An two-dimensional array indexed by {@link CfsBiomassConversionSupportedEcoZone} and 
  * then {@link CfsBiomassConversionSupportedGenera} giving the dead biomass conversion 
@@ -10,8 +8,6 @@ import java.text.MessageFormat;
  * floats indexed by {@link CfsDeadConversionParams}.
  */
 public class CfsBiomassConversionCoefficientsDead {
-
-	private static final String PREAMBLE = "CfsBiomassConversionCoefficientsDead at";
 
 	public static CfsBiomassConversionCoefficientsDetails get(int i, int j) {
 		return array[i][j];

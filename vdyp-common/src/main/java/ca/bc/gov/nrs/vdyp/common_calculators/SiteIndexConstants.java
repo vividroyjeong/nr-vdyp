@@ -2,6 +2,10 @@ package ca.bc.gov.nrs.vdyp.common_calculators;
 
 public interface SiteIndexConstants {
 	
+	/* establishment types */
+	int SI_ESTAB_NAT = 0;
+	int SI_ESTAB_PLA = 1;
+
 	/* site index estimation (from height and age) types */
 	int SI_EST_ITERATE = 0;
 	int SI_EST_DIRECT = 1;
@@ -15,7 +19,7 @@ public interface SiteIndexConstants {
 	short FIZ_COAST = 1;
 	short FIZ_INTERIOR = 2;
 
-	/* define species and equation indices */
+	/* species indices */
 	int SI_SPEC_A = 0;
 	int SI_SPEC_ABAL = 1;
 	int SI_SPEC_ABCO = 2;
@@ -152,128 +156,6 @@ public interface SiteIndexConstants {
 	int SI_SPEC_ZC = 133;
 	int SI_SPEC_ZH = 134;
 	
-	/* species and equation indices */
-	int SI_ACB_HUANG = 0;
-	int SI_ACB_HUANGAC = 97;
-	int SI_ACT_THROWER = 1;
-	int SI_ACT_THROWERAC = 103;
-	int SI_AT_CHEN = 74;
-	int SI_AT_CIESZEWSKI = 3;
-	int SI_AT_GOUDIE = 4;
-	int SI_AT_HUANG = 2;
-	int SI_AT_NIGH = 92;
-	int SI_BA_DILUCCA = 5;
-	int SI_BA_KURUCZ82 = 8;
-	int SI_BA_KURUCZ82AC = 102;
-	int SI_BA_KURUCZ86 = 7;
-	int SI_BA_NIGH = 118;
-	int SI_BA_NIGHGI = 117;
-	int SI_BB_KER = 6;
-	int SI_BL_CHEN = 73;
-	int SI_BL_CHENAC = 93;
-	int SI_BL_KURUCZ82 = 10;
-	int SI_BL_THROWERGI = 9;
-	int SI_BP_CURTIS = 78;
-	int SI_BP_CURTISAC = 94;
-	int SI_CWC_BARKER = 12;
-	int SI_CWC_KURUCZ = 11;
-	int SI_CWC_KURUCZAC = 101;
-	int SI_CWC_NIGH = 122;
-	int SI_CWI_NIGH = 77;
-	int SI_CWI_NIGHGI = 84;
-	int SI_DR_CHEN = 75;
-	int SI_DR_HARRING = 14;
-	int SI_DR_NIGH = 13;
-	int SI_EP_NIGH = 116;
-	int SI_FDC_BRUCE = 16;
-	int SI_FDC_BRUCEAC = 100;
-	int SI_FDC_BRUCENIGH = 89;
-	int SI_FDC_COCHRAN = 17;
-	int SI_FDC_KING = 18;
-	int SI_FDC_NIGHGI = 15;
-	int SI_FDC_NIGHTA = 88;
-	int SI_FDI_HUANG_NAT = 21;
-	int SI_FDI_HUANG_PLA = 20;
-	int SI_FDI_MILNER = 22;
-	int SI_FDI_MONS_DF = 26;
-	int SI_FDI_MONS_GF = 27;
-	int SI_FDI_MONS_SAF = 30;
-	int SI_FDI_MONS_WH = 29;
-	int SI_FDI_MONS_WRC = 28;
-	int SI_FDI_NIGHGI = 19;
-	int SI_FDI_THROWER = 23;
-	int SI_FDI_THROWERAC = 96;
-	int SI_FDI_VDP_MONT = 24;
-	int SI_FDI_VDP_WASH = 25;
-	int SI_HM_MEANS = 86;
-	int SI_HM_MEANSAC = 95;
-	int SI_HWC_BARKER = 33;
-	int SI_HWC_FARR = 32;
-	int SI_HWC_NIGHGI = 31;
-	int SI_HWC_NIGHGI99 = 79;
-	int SI_HWC_WILEY = 34;
-	int SI_HWC_WILEY_BC = 35;
-	int SI_HWC_WILEY_MB = 36;
-	int SI_HWC_WILEYAC = 99;
-	int SI_HWI_NIGH = 37;
-	int SI_HWI_NIGHGI = 38;
-	int SI_LW_MILNER = 39;
-	int SI_LW_NIGH = 90;
-	int SI_LW_NIGHGI = 82;
-	int SI_PJ_HUANG = 113;
-	int SI_PJ_HUANGAC = 114;
-	int SI_PL_CHEN = 76;
-	int SI_PLI_CIESZEWSKI = 47;
-	int SI_PLI_DEMPSTER = 50;
-	int SI_PLI_GOUDIE_DRY = 48;
-	int SI_PLI_GOUDIE_WET = 49;
-	int SI_PLI_HUANG_NAT = 44;
-	int SI_PLI_HUANG_PLA = 43;
-	int SI_PLI_MILNER = 46;
-	int SI_PLI_NIGHGI97 = 42;
-	int SI_PLI_NIGHTA2004 = 109;
-	int SI_PLI_NIGHTA98 = 41;
-	int SI_PLI_THROWER = 45;
-	int SI_PLI_THROWNIGH = 40;
-	int SI_PW_CURTIS = 51;
-	int SI_PW_CURTISAC = 98;
-	int SI_PY_HANN = 53;
-	int SI_PY_HANNAC = 104;
-	int SI_PY_MILNER = 52;
-	int SI_PY_NIGH = 107;
-	int SI_PY_NIGHGI = 108;
-	int SI_SB_CIESZEWSKI = 55;
-	int SI_SB_DEMPSTER = 57;
-	int SI_SB_HUANG = 54;
-	int SI_SB_KER = 56;
-	int SI_SB_NIGH = 91;
-	int SI_SE_CHEN = 87;
-	int SI_SE_CHENAC = 105;
-	int SI_SE_NIGH = 121;
-	int SI_SE_NIGHGI = 120;
-	int SI_SE_NIGHTA = 110;
-	int SI_SS_BARKER = 62;
-	int SI_SS_FARR = 61;
-	int SI_SS_GOUDIE = 60;
-	int SI_SS_NIGH = 59;
-	int SI_SS_NIGHGI = 58;
-	int SI_SS_NIGHGI99 = 80;
-	int SI_SW_CIESZEWSKI = 67;
-	int SI_SW_DEMPSTER = 72;
-	int SI_SW_GOUDIE_NAT = 71;
-	int SI_SW_GOUDIE_NATAC = 106;
-	int SI_SW_GOUDIE_PLA = 70;
-	int SI_SW_GOUDIE_PLAAC = 112;
-	int SI_SW_GOUDNIGH = 85;
-	int SI_SW_HU_GARCIA = 119;
-	int SI_SW_HUANG_NAT = 65;
-	int SI_SW_HUANG_PLA = 64;
-	int SI_SW_KER_NAT = 69;
-	int SI_SW_KER_PLA = 68;
-	int SI_SW_NIGHGI = 63;
-	int SI_SW_NIGHGI2004 = 115;
-	int SI_SW_NIGHGI99 = 81;
-	int SI_SW_NIGHTA = 83;
-	int SI_SW_NIGHTA2004 = 111;
-	int SI_SW_THROWER = 66;
+	/* equation indices */
+
 }

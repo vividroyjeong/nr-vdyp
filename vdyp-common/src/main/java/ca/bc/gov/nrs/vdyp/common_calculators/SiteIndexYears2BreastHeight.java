@@ -1,29 +1,29 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexUtilities.llog;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexUtilities.ppow;
+
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptTotalException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
-import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
-import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.*;
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException; 
 
 /**
- * siy2bh.c - computes number of years from seed to breast height. - returns unrounded real number. - assumes
- * "site_index" in metres, based on breast-height age 50. - error codes (returned as y2bh value): SI_ERR_LT13: site
- * index < 1.3m SI_ERR_CURVE: unknown curve index SI_ERR_GI_TOT: cannot use with GI equations SI_ERR_NO_ANS: site index
- * out of range
+ * SiteIndexYears2BreastHeight - computes number of years from seed to breast height.
  */
 public class SiteIndexYears2BreastHeight {
 
-	public static double ppow(double x, double y) {
-		return (x <= 0) ? 0.0 : Math.pow(x, y);
-	}
-
-	public static double llog(double x) {
-		return ( (x) <= 0.0) ? Math.log(.00001) : Math.log(x);
-	}
-
-	public static double si_y2bh(int cuIndex, double siteIndex) throws CommonCalculatorException {
+	/**
+	 * Calculate years-to-breast-height from a curve and site.
+	 * @param cuIndex the index of the site curve
+	 * @param siteIndex the index of the site, in metres, based on a breast height age 50.
+	 * @return as described. The result has not been rounded.
+	 * @throws LessThan13Exception when the site index is < 1.3.
+	 * @throws GrowthInterceptTotalException when cuIndex identifies a Growth Intercept curve.
+	 * @throws NoAnswerException when the calculation will not converge.
+	 */
+	public static double y2bh(SiteIndexEquation cuIndex, double siteIndex) throws CommonCalculatorException {
 		double y2bh;
 		double si20;
 
@@ -31,6 +31,10 @@ public class SiteIndexYears2BreastHeight {
 			throw new LessThan13Exception("Site index < 1.3m: " + siteIndex);
 		}
 
+		if (cuIndex == null) {
+			throw new CurveErrorException("cuIndex is null");
+		}
+		
 		switch (cuIndex) {
 		case SI_FDC_NIGHGI:
 			throw new GrowthInterceptTotalException("Cannot use with GI equations, case SI_FDC_NIGHGI: " + cuIndex);
@@ -897,15 +901,15 @@ public class SiteIndexYears2BreastHeight {
 	}
 
 	/**
-	 * 
-	 * @param cuIndex
-	 * @param siteIndex
-	 * @return
+	 * Calculates years-to-breast-height and then converts all results r, x <= r < (x + 1) to x + 0.5.
+	 * @param cuIndex site curve index
+	 * @param siteIndex site index
+	 * @return as described
 	 * @throws CommonCalculatorException
 	 */
-	public static double si_y2bh05(int cuIndex, double siteIndex) throws CommonCalculatorException {
+	public static double y2bh05(SiteIndexEquation cuIndex, double siteIndex) throws CommonCalculatorException {
 		
-		double y2bh = si_y2bh(cuIndex, siteIndex);
+		double y2bh = y2bh(cuIndex, siteIndex);
 
 		/* force answer to be in steps 0.5, 1.5, 2.5, etc. */
 		return ((int) y2bh) + 0.5;

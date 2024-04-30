@@ -4,19 +4,19 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 
 public record CfsBiomassConversionCoefficientsDetails(
-		boolean containsData, 
+		boolean containsData,
 		float[] parms
 ) {
-	@Override 
+	@Override
 	public String toString() {
 		return MessageFormat.format("ContainsData: {0}; parms: {1}", containsData, Arrays.toString(parms));
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return Boolean.valueOf(containsData).hashCode() * 17 + Arrays.hashCode(parms);
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof CfsBiomassConversionCoefficientsDetails that) {
@@ -30,7 +30,7 @@ public record CfsBiomassConversionCoefficientsDetails(
 				if (this.parms[i] != that.parms[i])
 					return false;
 			}
-			
+
 			return true;
 		} else {
 			return false;

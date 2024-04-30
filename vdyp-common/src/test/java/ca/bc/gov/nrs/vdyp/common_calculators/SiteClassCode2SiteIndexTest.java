@@ -9,38 +9,9 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ClassErrorExcepti
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.ForestInventoryZoneException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.SpeciesErrorException;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.*;
 
 class SiteClassCode2SiteIndexTest {
-	// Taken from sindex.h
-	/* define species and equation indices */
-	private static final short SI_SPEC_ACT = 5;
-	private static final short SI_SPEC_AT = 8;
-	private static final short SI_SPEC_BA = 11;
-	private static final short SI_SPEC_BL = 16;
-	private static final short SI_SPEC_CWC = 23;
-	private static final short SI_SPEC_CWI = 24;
-	private static final short SI_SPEC_DR = 29;
-	private static final short SI_SPEC_EA = 31;
-	private static final short SI_SPEC_EP = 34;
-	private static final short SI_SPEC_FDC = 39;
-	private static final short SI_SPEC_FDI = 40;
-	private static final short SI_SPEC_HWC = 47;
-	private static final short SI_SPEC_HWI = 48;
-	private static final short SI_SPEC_LA = 57;
-	private static final short SI_SPEC_LT = 59;
-	private static final short SI_SPEC_LW = 60;
-	private static final short SI_SPEC_MB = 62;
-	private static final short SI_SPEC_PA = 76;
-	private static final short SI_SPEC_PF = 77;
-	private static final short SI_SPEC_PLI = 81;
-	private static final short SI_SPEC_PW = 85;
-	private static final short SI_SPEC_PY = 87;
-	private static final short SI_SPEC_SB = 95;
-	private static final short SI_SPEC_SE = 96;
-	private static final short SI_SPEC_SS = 99;
-	private static final short SI_SPEC_SW = 100;
-	private static final short SI_SPEC_YC = 130;
-
 	private static final char[] validSiteCl = { 'G', 'M', 'P', 'L' };
 
 	@Test

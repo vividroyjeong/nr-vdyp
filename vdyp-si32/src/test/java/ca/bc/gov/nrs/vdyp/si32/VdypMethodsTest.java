@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SpeciesRegion;
 import ca.bc.gov.nrs.vdyp.si32.vdyp.SP0Name;
 import ca.bc.gov.nrs.vdyp.si32.vdyp.SP64Name;
@@ -93,19 +94,19 @@ class VdypMethodsTest {
 	
 	@Test
 	void test_VDYP_GetCurrentSICurve() {
-		assertThat(VdypMethods.getCurrentSICurve(SP0Name.AC.getText(), SpeciesRegion.INTERIOR), equalTo(97));
+		assertThat(VdypMethods.getCurrentSICurve(SP0Name.AC.getText(), SpeciesRegion.INTERIOR), equalTo(SiteIndexEquation.SI_ACB_HUANGAC));
 		// ensure result from previous call was cached properly.
 		assertThat(VdypMethods.speciesTable.getByCode(SP0Name.AC.getText()).details()
-				.currentSICurve()[SpeciesRegion.INTERIOR.ordinal()], equalTo(97));
-		assertThat(VdypMethods.getCurrentSICurve(null, SpeciesRegion.INTERIOR), equalTo(-1));
-		assertThat(VdypMethods.getCurrentSICurve(SP0Name.AC.getText(), null), equalTo(-1));
+				.currentSICurve()[SpeciesRegion.INTERIOR.ordinal()], equalTo(SiteIndexEquation.SI_ACB_HUANGAC));
+		assertThat(VdypMethods.getCurrentSICurve(null, SpeciesRegion.INTERIOR), equalTo(SiteIndexEquation.SI_NO_EQUATION));
+		assertThat(VdypMethods.getCurrentSICurve(SP0Name.AC.getText(), null), equalTo(SiteIndexEquation.SI_NO_EQUATION));
 	}
 	
 	@Test
 	void test_VDYP_GetDefaultSICurve() {
-		assertThat(VdypMethods.getDefaultSICurve(SP0Name.AC.getText(), SpeciesRegion.COAST), equalTo(97));
-		assertThat(VdypMethods.getDefaultSICurve(null, SpeciesRegion.INTERIOR), equalTo(-1));
-		assertThat(VdypMethods.getDefaultSICurve(SP0Name.AC.getText(), null), equalTo(-1));
+		assertThat(VdypMethods.getDefaultSICurve(SP0Name.AC.getText(), SpeciesRegion.COAST), equalTo(SiteIndexEquation.SI_ACB_HUANGAC));
+		assertThat(VdypMethods.getDefaultSICurve(null, SpeciesRegion.INTERIOR), equalTo(SiteIndexEquation.SI_NO_EQUATION));
+		assertThat(VdypMethods.getDefaultSICurve(SP0Name.AC.getText(), null), equalTo(SiteIndexEquation.SI_NO_EQUATION));
 	}
 	
 	@Test 
@@ -113,11 +114,12 @@ class VdypMethodsTest {
 		String sp64Name = SP0Name.AC.getText();
 		SpeciesRegion region = SpeciesRegion.COAST;
 		
-		int oldCurve = VdypMethods.getCurrentSICurve(sp64Name, region);
-		int result = VdypMethods.setCurrentSICurve(sp64Name, region, oldCurve + 1);
+		SiteIndexEquation oldCurve = VdypMethods.getCurrentSICurve(sp64Name, region);
+		SiteIndexEquation newCurve = oldCurve == SiteIndexEquation.SI_AT_CHEN ? SiteIndexEquation.SI_AT_NIGH : SiteIndexEquation.SI_AT_CHEN;
+		SiteIndexEquation result = VdypMethods.setCurrentSICurve(sp64Name, region, newCurve);
 		
 		assertThat(result, equalTo(oldCurve));
-		assertThat(VdypMethods.getCurrentSICurve(sp64Name, region), equalTo(oldCurve + 1));
+		assertThat(VdypMethods.getCurrentSICurve(sp64Name, region), equalTo(newCurve));
 	}
 	
 	@Test

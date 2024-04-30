@@ -1,11 +1,15 @@
 package ca.bc.gov.nrs.vdyp.sindex;
 
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.*;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation.*;
+
 import ca.bc.gov.nrs.vdyp.common_calculators.Age2Age;
 import ca.bc.gov.nrs.vdyp.common_calculators.Height2SiteIndex;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteClassCode2SiteIndex;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndex2Age;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndex2Height;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndex2HeightSmoothed;
+import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexNames;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexYears2BreastHeight;
 import ca.bc.gov.nrs.vdyp.common_calculators.SpecRMap;
@@ -201,294 +205,16 @@ public class Sindxdll {
  */
 /* @formatter:on */
 
-//Taken from sindxdll.h (I have commented out the unused ones and labeled them as such)
-	/*
-	 * age types
-	 */
-// private static final int SI_AT_TOTAL   = 0; Unused
-// private static final int SI_AT_BREAST  = 1; Unused
-
-	/*
-	 * establishment types
-	 */
-	private static final int SI_ESTAB_NAT = 0;
-	private static final int SI_ESTAB_PLA = 1;
-
-	/*
-	 * site index estimation (from height and age) types
-	 */
-// private static final int SI_EST_ITERATE = 0; Unused
-// private static final int SI_EST_DIRECT  = 1; Unused
-
 	/*
 	 * error codes as return values from functions
 	 */
-	// private static final int SI_ERR_LT13 = -1; Replaced with Java exception
-	// private static final int SI_ERR_GI_MIN = -2; Replaced with Java exception
-	// private static final int SI_ERR_GI_MAX = -3; Replaced with Java exception
 	private static final int SI_ERR_NO_ANS = -4;
-	// private static final int SI_ERR_CURVE = -5; Replaced with Java exception
-	// private static final int SI_ERR_CLASS = -6; Replaced with Java exception
-	// private static final int SI_ERR_FIZ = -7; Replaced with Java exception
-	// private static final int SI_ERR_CODE = -8; Replaced with Java exception
-	// private static final int SI_ERR_GI_TOT = -9; Replaced with Java exception
 	private static final int SI_ERR_SPEC = -10;
-	// private static final int SI_ERR_AGE_TYPE = -11; Replaced with Java exception
-// private static final int SI_ERR_ESTAB     = -12; Replaced with Java exception
 
 //These are taken from sindex.h (since it was missing everywhere else). These were not defined in the orginal sindxdll.c
 
-	/* define species and equation indices */
-	public static final int SI_SPEC_A = 0;
-	public static final int SI_SPEC_ABAL = 1;
-	public static final int SI_SPEC_ABCO = 2;
-	public static final int SI_SPEC_AC = 3;
-	public static final int SI_SPEC_ACB = 4;
-	public static final int SI_SPEC_ACT = 5;
-	public static final int SI_SPEC_AD = 6;
-	public static final int SI_SPEC_AH = 7;
-	public static final int SI_SPEC_AT = 8;
-	public static final int SI_SPEC_AX = 9;
-	public static final int SI_SPEC_B = 10;
-	public static final int SI_SPEC_BA = 11;
-	public static final int SI_SPEC_BB = 12;
-	public static final int SI_SPEC_BC = 13;
-	public static final int SI_SPEC_BG = 14;
-	public static final int SI_SPEC_BI = 15;
-	public static final int SI_SPEC_BL = 16;
-	public static final int SI_SPEC_BM = 17;
-	public static final int SI_SPEC_BP = 18;
-	public static final int SI_SPEC_C = 19;
-	public static final int SI_SPEC_CI = 20;
-	public static final int SI_SPEC_CP = 21;
-	public static final int SI_SPEC_CW = 22;
-	public static final int SI_SPEC_CWC = 23;
-	public static final int SI_SPEC_CWI = 24;
-	public static final int SI_SPEC_CY = 25;
-	public static final int SI_SPEC_D = 26;
-	public static final int SI_SPEC_DG = 27;
-	public static final int SI_SPEC_DM = 28;
-	public static final int SI_SPEC_DR = 29;
-	public static final int SI_SPEC_E = 30;
-	public static final int SI_SPEC_EA = 31;
-	public static final int SI_SPEC_EB = 32;
-	public static final int SI_SPEC_EE = 33;
-	public static final int SI_SPEC_EP = 34;
-	public static final int SI_SPEC_ES = 35;
-	public static final int SI_SPEC_EW = 36;
-	public static final int SI_SPEC_EXP = 37;
-	public static final int SI_SPEC_FD = 38;
-	public static final int SI_SPEC_FDC = 39;
-	public static final int SI_SPEC_FDI = 40;
-	public static final int SI_SPEC_G = 41;
-	public static final int SI_SPEC_GP = 42;
-	public static final int SI_SPEC_GR = 43;
-	public static final int SI_SPEC_H = 44;
-	public static final int SI_SPEC_HM = 45;
-	public static final int SI_SPEC_HW = 46;
-	public static final int SI_SPEC_HWC = 47;
-	public static final int SI_SPEC_HWI = 48;
-	public static final int SI_SPEC_HXM = 49;
-	public static final int SI_SPEC_IG = 50;
-	public static final int SI_SPEC_IS = 51;
-	public static final int SI_SPEC_J = 52;
-	public static final int SI_SPEC_JR = 53;
-	public static final int SI_SPEC_K = 54;
-	public static final int SI_SPEC_KC = 55;
-	public static final int SI_SPEC_L = 56;
-	public static final int SI_SPEC_LA = 57;
-	public static final int SI_SPEC_LE = 58;
-	public static final int SI_SPEC_LT = 59;
-	public static final int SI_SPEC_LW = 60;
-	public static final int SI_SPEC_M = 61;
-	public static final int SI_SPEC_MB = 62;
-	public static final int SI_SPEC_ME = 63;
-	public static final int SI_SPEC_MN = 64;
-	public static final int SI_SPEC_MR = 65;
-	public static final int SI_SPEC_MS = 66;
-	public static final int SI_SPEC_MV = 67;
-	public static final int SI_SPEC_OA = 68;
-	public static final int SI_SPEC_OB = 69;
-	public static final int SI_SPEC_OC = 70;
-	public static final int SI_SPEC_OD = 71;
-	public static final int SI_SPEC_OE = 72;
-	public static final int SI_SPEC_OF = 73;
-	public static final int SI_SPEC_OG = 74;
-	public static final int SI_SPEC_P = 75;
-	public static final int SI_SPEC_PA = 76;
-	public static final int SI_SPEC_PF = 77;
-	public static final int SI_SPEC_PJ = 78;
-	public static final int SI_SPEC_PL = 79;
-	public static final int SI_SPEC_PLC = 80;
-	public static final int SI_SPEC_PLI = 81;
-	public static final int SI_SPEC_PM = 82;
-	public static final int SI_SPEC_PR = 83;
-	public static final int SI_SPEC_PS = 84;
-	public static final int SI_SPEC_PW = 85;
-	public static final int SI_SPEC_PXJ = 86;
-	public static final int SI_SPEC_PY = 87;
-	public static final int SI_SPEC_Q = 88;
-	public static final int SI_SPEC_QE = 89;
-	public static final int SI_SPEC_QG = 90;
-	public static final int SI_SPEC_R = 91;
-	public static final int SI_SPEC_RA = 92;
-	public static final int SI_SPEC_S = 93;
-	public static final int SI_SPEC_SA = 94;
-	public static final int SI_SPEC_SB = 95;
-	public static final int SI_SPEC_SE = 96;
-	public static final int SI_SPEC_SI = 97;
-	public static final int SI_SPEC_SN = 98;
-	public static final int SI_SPEC_SS = 99;
-	public static final int SI_SPEC_SW = 100;
-	public static final int SI_SPEC_SX = 101;
-	public static final int SI_SPEC_SXB = 102;
-	public static final int SI_SPEC_SXE = 103;
-	public static final int SI_SPEC_SXL = 104;
-	public static final int SI_SPEC_SXS = 105;
-	public static final int SI_SPEC_SXW = 106;
-	public static final int SI_SPEC_SXX = 107;
-	public static final int SI_SPEC_T = 108;
-	public static final int SI_SPEC_TW = 109;
-	public static final int SI_SPEC_U = 110;
-	public static final int SI_SPEC_UA = 111;
-	public static final int SI_SPEC_UP = 112;
-	public static final int SI_SPEC_V = 113;
-	public static final int SI_SPEC_VB = 114;
-	public static final int SI_SPEC_VP = 115;
-	public static final int SI_SPEC_VS = 116;
-	public static final int SI_SPEC_VV = 117;
-	public static final int SI_SPEC_W = 118;
-	public static final int SI_SPEC_WA = 119;
-	public static final int SI_SPEC_WB = 120;
-	public static final int SI_SPEC_WD = 121;
-	public static final int SI_SPEC_WI = 122;
-	public static final int SI_SPEC_WP = 123;
-	public static final int SI_SPEC_WS = 124;
-	public static final int SI_SPEC_WT = 125;
-	public static final int SI_SPEC_X = 126;
-	public static final int SI_SPEC_XC = 127;
-	public static final int SI_SPEC_XH = 128;
-	public static final int SI_SPEC_Y = 129;
-	public static final int SI_SPEC_YC = 130;
-	public static final int SI_SPEC_YP = 131;
-	public static final int SI_SPEC_Z = 132;
-	public static final int SI_SPEC_ZC = 133;
-	public static final int SI_SPEC_ZH = 134;
 	public static final int SI_MAX_SPECIES = 135;
 
-	public static final int SI_ACB_HUANGAC = 97;
-	public static final int SI_ACB_HUANG = 0;
-	public static final int SI_ACT_THROWERAC = 103;
-	public static final int SI_ACT_THROWER = 1;
-	public static final int SI_AT_CHEN = 74;
-	public static final int SI_AT_CIESZEWSKI = 3;
-	public static final int SI_AT_GOUDIE = 4;
-	public static final int SI_AT_HUANG = 2;
-	public static final int SI_AT_NIGH = 92;
-	public static final int SI_BA_DILUCCA = 5;
-	public static final int SI_BA_KURUCZ82AC = 102;
-	public static final int SI_BA_KURUCZ82 = 8;
-	public static final int SI_BA_KURUCZ86 = 7;
-	public static final int SI_BA_NIGHGI = 117;
-	public static final int SI_BA_NIGH = 118;
-	public static final int SI_BL_CHENAC = 93;
-	public static final int SI_BL_CHEN = 73;
-	public static final int SI_BL_KURUCZ82 = 10;
-	public static final int SI_BL_THROWERGI = 9;
-	public static final int SI_BP_CURTISAC = 94;
-	public static final int SI_BP_CURTIS = 78;
-	public static final int SI_CWC_BARKER = 12;
-	public static final int SI_CWC_KURUCZAC = 101;
-	public static final int SI_CWC_KURUCZ = 11;
-	public static final int SI_CWC_NIGH = 122;
-	public static final int SI_CWI_NIGH = 77;
-	public static final int SI_CWI_NIGHGI = 84;
-	public static final int SI_DR_HARRING = 14;
-	public static final int SI_DR_NIGH = 13;
-	public static final int SI_EP_NIGH = 116;
-	public static final int SI_FDC_BRUCEAC = 100;
-	public static final int SI_FDC_BRUCE = 16;
-	public static final int SI_FDC_COCHRAN = 17;
-	public static final int SI_FDC_KING = 18;
-	public static final int SI_FDC_NIGHGI = 15;
-	public static final int SI_FDC_NIGHTA = 88;
-	public static final int SI_FDI_HUANG_NAT = 21;
-	public static final int SI_FDI_HUANG_PLA = 20;
-	public static final int SI_FDI_MILNER = 22;
-	public static final int SI_FDI_MONS_DF = 26;
-	public static final int SI_FDI_MONS_GF = 27;
-	public static final int SI_FDI_MONS_SAF = 30;
-	public static final int SI_FDI_MONS_WH = 29;
-	public static final int SI_FDI_MONS_WRC = 28;
-	public static final int SI_FDI_NIGHGI = 19;
-	public static final int SI_FDI_THROWERAC = 96;
-	public static final int SI_FDI_THROWER = 23;
-	public static final int SI_FDI_VDP_MONT = 24;
-	public static final int SI_FDI_VDP_WASH = 25;
-	public static final int SI_HM_MEANSAC = 95;
-	public static final int SI_HM_MEANS = 86;
-	public static final int SI_HWC_BARKER = 33;
-	public static final int SI_HWC_FARR = 32;
-	public static final int SI_HWC_NIGHGI99 = 79;
-	public static final int SI_HWC_WILEYAC = 99;
-	public static final int SI_HWC_WILEY = 34;
-	public static final int SI_HWC_WILEY_BC = 35;
-	public static final int SI_HWC_WILEY_MB = 36;
-	public static final int SI_HWI_NIGH = 37;
-	public static final int SI_HWI_NIGHGI = 38;
-	public static final int SI_LW_MILNER = 39;
-	public static final int SI_LW_NIGH = 90;
-	public static final int SI_LW_NIGHGI = 82;
-	public static final int SI_PJ_HUANG = 113;
-	public static final int SI_PJ_HUANGAC = 114;
-	public static final int SI_PLI_CIESZEWSKI = 47;
-	public static final int SI_PLI_DEMPSTER = 50;
-	public static final int SI_PLI_GOUDIE_DRY = 48;
-	public static final int SI_PLI_GOUDIE_WET = 49;
-	public static final int SI_PLI_HUANG_NAT = 44;
-	public static final int SI_PLI_HUANG_PLA = 43;
-	public static final int SI_PLI_MILNER = 46;
-	public static final int SI_PLI_NIGHGI97 = 42;
-	public static final int SI_PLI_NIGHTA98 = 41;
-	public static final int SI_PLI_THROWER = 45;
-	public static final int SI_PLI_THROWNIGH = 40;
-	public static final int SI_PL_CHEN = 76;
-	public static final int SI_PW_CURTISAC = 98;
-	public static final int SI_PW_CURTIS = 51;
-	public static final int SI_PY_HANNAC = 104;
-	public static final int SI_PY_HANN = 53;
-	public static final int SI_PY_MILNER = 52;
-	public static final int SI_PY_NIGH = 107;
-	public static final int SI_PY_NIGHGI = 108;
-	public static final int SI_SB_CIESZEWSKI = 55;
-	public static final int SI_SB_DEMPSTER = 57;
-	public static final int SI_SB_HUANG = 54;
-	public static final int SI_SB_KER = 56;
-	public static final int SI_SB_NIGH = 91;
-	public static final int SI_SE_CHENAC = 105;
-	public static final int SI_SE_CHEN = 87;
-	public static final int SI_SE_NIGHGI = 120;
-	public static final int SI_SE_NIGH = 121;
-	public static final int SI_SS_BARKER = 62;
-	public static final int SI_SS_FARR = 61;
-	public static final int SI_SS_GOUDIE = 60;
-	public static final int SI_SS_NIGH = 59;
-	public static final int SI_SS_NIGHGI99 = 80;
-	public static final int SI_SW_CIESZEWSKI = 67;
-	public static final int SI_SW_DEMPSTER = 72;
-	public static final int SI_SW_GOUDIE_NAT = 71;
-	public static final int SI_SW_GOUDIE_NATAC = 106;
-	public static final int SI_SW_GOUDIE_PLA = 70;
-	public static final int SI_SW_GOUDIE_PLAAC = 112;
-	public static final int SI_SW_GOUDNIGH = 85;
-	public static final int SI_SW_HU_GARCIA = 119;
-	public static final int SI_SW_HUANG_NAT = 65;
-	public static final int SI_SW_HUANG_PLA = 64;
-	public static final int SI_SW_KER_NAT = 69;
-	public static final int SI_SW_KER_PLA = 68;
-	public static final int SI_SW_NIGHGI2004 = 115;
-	public static final int SI_SW_NIGHTA = 83;
-	public static final int SI_SW_THROWER = 66;
 	public static final int SI_MAX_CURVES = 123;
 
 	/*
@@ -505,278 +231,141 @@ public class Sindxdll {
 	private static final int SI_SPEC_START = SI_SPEC_A;
 	private static final int SI_SPEC_END = SI_SPEC_ZH;
 
-	private static final int SI_A_START = SI_ERR_NO_ANS;
-//private static final int SI_A_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_ABAL_START = SI_ERR_NO_ANS;
-//private static final int SI_ABAL_END    = SI_ERR_NO_ANS; Unused
-	private static final int SI_ABCO_START = SI_ERR_NO_ANS;
-//private static final int SI_ABCO_END    = SI_ERR_NO_ANS; Unused
-	private static final int SI_AC_START = SI_ERR_NO_ANS;
-//private static final int SI_AC_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_ACB_START = SI_ACB_HUANGAC;
-//private static final int SI_ACB_END     = SI_ACB_HUANG; Unused
-	private static final int SI_ACT_START = SI_ACT_THROWERAC;
-//private static final int SI_ACT_END     = SI_ACT_THROWER; Unused
-	private static final int SI_AD_START = SI_ERR_NO_ANS;
-//private static final int SI_AD_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_AH_START = SI_ERR_NO_ANS;
-//private static final int SI_AH_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_AT_START = SI_AT_NIGH;
-//private static final int SI_AT_END      = SI_AT_GOUDIE; Unused
-	private static final int SI_AX_START = SI_ERR_NO_ANS;
-//private static final int SI_AX_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_B_START = SI_ERR_NO_ANS;
-//private static final int SI_B_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_BA_START = SI_BA_NIGHGI;
-//private static final int SI_BA_END      = SI_BA_KURUCZ82; Unused
-	private static final int SI_BB_START = SI_ERR_NO_ANS;
-//private static final int SI_BB_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_BC_START = SI_ERR_NO_ANS;
-//private static final int SI_BC_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_BG_START = SI_ERR_NO_ANS;
-//private static final int SI_BG_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_BI_START = SI_ERR_NO_ANS;
-//private static final int SI_BI_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_BL_START = SI_BL_CHENAC;
-//private static final int SI_BL_END      = SI_BL_KURUCZ82; Unused
-	private static final int SI_BM_START = SI_ERR_NO_ANS;
-//private static final int SI_BM_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_BP_START = SI_BP_CURTISAC;
-//private static final int SI_BP_END      = SI_BP_CURTIS; Unused
-//private static final int SI_BV_START   = SI_ERR_NO_ANS; Commented out in orginial
-//private static final int SI_BV_END     = SI_ERR_NO_ANS; Commented out in orginial
-	private static final int SI_C_START = SI_ERR_NO_ANS;
-//private static final int SI_C_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_CI_START = SI_ERR_NO_ANS;
-//private static final int SI_CI_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_CP_START = SI_ERR_NO_ANS;
-//private static final int SI_CP_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_CW_START = SI_ERR_NO_ANS;
-//private static final int SI_CW_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_CWC_START = SI_CWC_NIGH;
-//private static final int SI_CWC_END     = SI_CWC_BARKER; Unused
-	private static final int SI_CWI_START = SI_CWI_NIGH;
-//private static final int SI_CWI_END     = SI_CWI_NIGHGI; Unused
-	private static final int SI_CY_START = SI_ERR_NO_ANS;
-//private static final int SI_CY_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_D_START = SI_ERR_NO_ANS;
-//private static final int SI_D_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_DG_START = SI_ERR_NO_ANS;
-//private static final int SI_DG_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_DM_START = SI_ERR_NO_ANS;
-//private static final int SI_DM_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_DR_START = SI_DR_NIGH;
-//private static final int SI_DR_END      = SI_DR_HARRING; Unused
-	private static final int SI_E_START = SI_ERR_NO_ANS;
-//private static final int SI_E_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_EA_START = SI_ERR_NO_ANS;
-//private static final int SI_EA_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_EB_START = SI_ERR_NO_ANS;
-//private static final int SI_EB_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_EE_START = SI_ERR_NO_ANS;
-//private static final int SI_EE_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_EP_START = SI_EP_NIGH;
-//private static final int SI_EP_END      = SI_EP_NIGH; Unused
-	private static final int SI_ES_START = SI_ERR_NO_ANS;
-//private static final int SI_ES_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_EW_START = SI_ERR_NO_ANS;
-//private static final int SI_EW_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_EXP_START = SI_ERR_NO_ANS;
-//private static final int SI_EXP_END     = SI_ERR_NO_ANS; Unused
-	private static final int SI_FD_START = SI_ERR_NO_ANS;
-//private static final int SI_FD_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_FDC_START = SI_FDC_BRUCEAC;
-//private static final int SI_FDC_END     = SI_FDC_KING; Unused
-	private static final int SI_FDI_START = SI_FDI_THROWERAC;
-//private static final int SI_FDI_END     = SI_FDI_MONS_SAF; Unused
-	private static final int SI_G_START = SI_ERR_NO_ANS;
-//private static final int SI_G_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_GP_START = SI_ERR_NO_ANS;
-//private static final int SI_GP_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_GR_START = SI_ERR_NO_ANS;
-//private static final int SI_GR_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_H_START = SI_ERR_NO_ANS;
-//private static final int SI_H_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_HM_START = SI_HM_MEANSAC;
-//private static final int SI_HM_END      = SI_HM_MEANS; Unused
-	private static final int SI_HW_START = SI_ERR_NO_ANS;
-//private static final int SI_HW_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_HWC_START = SI_HWC_WILEYAC;
-//private static final int SI_HWC_END     = SI_HWC_WILEY_MB; Unused
-	private static final int SI_HWI_START = SI_HWI_NIGH;
-//private static final int SI_HWI_END     = SI_HWI_NIGHGI; Unused
-	private static final int SI_HXM_START = SI_ERR_NO_ANS;
-//private static final int SI_HXM_END     = SI_ERR_NO_ANS; Unused
-	private static final int SI_IG_START = SI_ERR_NO_ANS;
-//private static final int SI_IG_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_IS_START = SI_ERR_NO_ANS;
-//private static final int SI_IS_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_J_START = SI_ERR_NO_ANS;
-//private static final int SI_J_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_JR_START = SI_ERR_NO_ANS;
-//private static final int SI_JR_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_K_START = SI_ERR_NO_ANS;
-//private static final int SI_K_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_KC_START = SI_ERR_NO_ANS;
-//private static final int SI_KC_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_L_START = SI_ERR_NO_ANS;
-//private static final int SI_L_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_LA_START = SI_ERR_NO_ANS;
-//private static final int SI_LA_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_LE_START = SI_ERR_NO_ANS;
-//private static final int SI_LE_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_LT_START = SI_ERR_NO_ANS;
-//private static final int SI_LT_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_LW_START = SI_LW_NIGH;
-//private static final int SI_LW_END      = SI_LW_MILNER; Unused
-	private static final int SI_M_START = SI_ERR_NO_ANS;
-//private static final int SI_M_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_MB_START = SI_ERR_NO_ANS;
-//private static final int SI_MB_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_ME_START = SI_ERR_NO_ANS;
-//private static final int SI_ME_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_MN_START = SI_ERR_NO_ANS;
-//private static final int SI_MN_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_MR_START = SI_ERR_NO_ANS;
-//private static final int SI_MR_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_MS_START = SI_ERR_NO_ANS;
-//private static final int SI_MS_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_MV_START = SI_ERR_NO_ANS;
-//private static final int SI_MV_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_OA_START = SI_ERR_NO_ANS;
-//private static final int SI_OA_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_OB_START = SI_ERR_NO_ANS;
-//private static final int SI_OB_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_OC_START = SI_ERR_NO_ANS;
-//private static final int SI_OC_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_OD_START = SI_ERR_NO_ANS;
-//private static final int SI_OD_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_OE_START = SI_ERR_NO_ANS;
-//private static final int SI_OE_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_OF_START = SI_ERR_NO_ANS;
-//private static final int SI_OF_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_OG_START = SI_ERR_NO_ANS;
-//private static final int SI_OG_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_P_START = SI_ERR_NO_ANS;
-//private static final int SI_P_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_PA_START = SI_ERR_NO_ANS;
-//private static final int SI_PA_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_PF_START = SI_ERR_NO_ANS;
-//private static final int SI_PF_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_PJ_START = SI_PJ_HUANG;
-//private static final int SI_PJ_END      = SI_PJ_HUANGAC; Unused
-	private static final int SI_PL_START = SI_ERR_NO_ANS;
-//private static final int SI_PL_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_PLC_START = SI_ERR_NO_ANS;
-//private static final int SI_PLC_END     = SI_ERR_NO_ANS; Unused
-	private static final int SI_PLI_START = SI_PL_CHEN;
-//private static final int SI_PLI_END     = SI_PLI_DEMPSTER; Unused
-	private static final int SI_PM_START = SI_ERR_NO_ANS;
-//private static final int SI_PM_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_PR_START = SI_ERR_NO_ANS;
-//private static final int SI_PR_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_PS_START = SI_ERR_NO_ANS;
-//private static final int SI_PS_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_PW_START = SI_PW_CURTISAC;
-//private static final int SI_PW_END      = SI_PW_CURTIS; Unused
-	private static final int SI_PXJ_START = SI_ERR_NO_ANS;
-//private static final int SI_PXJ_END     = SI_ERR_NO_ANS; Unused
-	private static final int SI_PY_START = SI_PY_NIGH;
-//private static final int SI_PY_END      = SI_PY_HANN; Unused
-	private static final int SI_Q_START = SI_ERR_NO_ANS;
-//private static final int SI_Q_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_QE_START = SI_ERR_NO_ANS;
-//private static final int SI_QE_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_QG_START = SI_ERR_NO_ANS;
-//private static final int SI_QG_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_R_START = SI_ERR_NO_ANS;
-//private static final int SI_R_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_RA_START = SI_ERR_NO_ANS;
-//private static final int SI_RA_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_S_START = SI_ERR_NO_ANS;
-//private static final int SI_S_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_SA_START = SI_ERR_NO_ANS;
-//private static final int SI_SA_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_SB_START = SI_SB_NIGH;
-//private static final int SI_SB_END      = SI_SB_DEMPSTER; Unused
-	private static final int SI_SE_START = SI_SE_CHENAC;
-//private static final int SI_SE_END      = SI_SE_NIGH; Unused
-	private static final int SI_SI_START = SI_ERR_NO_ANS;
-//private static final int SI_SI_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_SN_START = SI_ERR_NO_ANS;
-//private static final int SI_SN_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_SS_START = SI_SS_NIGHGI99;
-//private static final int SI_SS_END      = SI_SS_GOUDIE; Unused
-	private static final int SI_SW_START = SI_SW_GOUDNIGH;
-//private static final int SI_SW_END      = SI_SW_GOUDIE_NAT; Unused
-	private static final int SI_SX_START = SI_ERR_NO_ANS;
-//private static final int SI_SX_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_SXB_START = SI_ERR_NO_ANS;
-//private static final int SI_SXB_END     = SI_ERR_NO_ANS; Unused
-	private static final int SI_SXE_START = SI_ERR_NO_ANS;
-//private static final int SI_SXE_END     = SI_ERR_NO_ANS; Unused
-	private static final int SI_SXL_START = SI_ERR_NO_ANS;
-//private static final int SI_SXL_END     = SI_ERR_NO_ANS; Unused
-	private static final int SI_SXS_START = SI_ERR_NO_ANS;
-//private static final int SI_SXS_END     = SI_ERR_NO_ANS; Unused
-	private static final int SI_SXW_START = SI_ERR_NO_ANS;
-//private static final int SI_SXW_END     = SI_ERR_NO_ANS; Unused
-	private static final int SI_SXX_START = SI_ERR_NO_ANS;
-//private static final int SI_SXX_END     = SI_ERR_NO_ANS; Unused
-	private static final int SI_T_START = SI_ERR_NO_ANS;
-//private static final int SI_T_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_TW_START = SI_ERR_NO_ANS;
-//private static final int SI_TW_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_U_START = SI_ERR_NO_ANS;
-//private static final int SI_U_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_UA_START = SI_ERR_NO_ANS;
-//private static final int SI_UA_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_UP_START = SI_ERR_NO_ANS;
-//private static final int SI_UP_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_V_START = SI_ERR_NO_ANS;
-//private static final int SI_V_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_VB_START = SI_ERR_NO_ANS;
-//private static final int SI_VB_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_VP_START = SI_ERR_NO_ANS;
-//private static final int SI_VP_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_VS_START = SI_ERR_NO_ANS;
-//private static final int SI_VS_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_VV_START = SI_ERR_NO_ANS;
-//private static final int SI_VV_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_W_START = SI_ERR_NO_ANS;
-//private static final int SI_W_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_WA_START = SI_ERR_NO_ANS;
-//private static final int SI_WA_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_WB_START = SI_ERR_NO_ANS;
-//private static final int SI_WB_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_WD_START = SI_ERR_NO_ANS;
-//private static final int SI_WD_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_WI_START = SI_ERR_NO_ANS;
-//private static final int SI_WI_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_WP_START = SI_ERR_NO_ANS;
-//private static final int SI_WP_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_WS_START = SI_ERR_NO_ANS;
-//private static final int SI_WS_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_WT_START = SI_ERR_NO_ANS;
-//private static final int SI_WT_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_X_START = SI_ERR_NO_ANS;
-//private static final int SI_X_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_XC_START = SI_ERR_NO_ANS;
-//private static final int SI_XC_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_XH_START = SI_ERR_NO_ANS;
-//private static final int SI_XH_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_Y_START = SI_ERR_NO_ANS;
-//private static final int SI_Y_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_YC_START = SI_ERR_NO_ANS;
-//private static final int SI_YC_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_YP_START = SI_ERR_NO_ANS;
-//private static final int SI_YP_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_Z_START = SI_ERR_NO_ANS;
-//private static final int SI_Z_END       = SI_ERR_NO_ANS; Unused
-	private static final int SI_ZC_START = SI_ERR_NO_ANS;
-//private static final int SI_ZC_END      = SI_ERR_NO_ANS; Unused
-	private static final int SI_ZH_START = SI_ERR_NO_ANS;
-//private static final int SI_ZH_END      = SI_ERR_NO_ANS; Unused
+	private static final SiteIndexEquation SI_A_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_ABAL_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_ABCO_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_AC_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_ACB_START = SI_ACB_HUANGAC;
+	private static final SiteIndexEquation SI_ACT_START = SI_ACT_THROWERAC;
+	private static final SiteIndexEquation SI_AD_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_AH_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_AT_START = SI_AT_NIGH;
+	private static final SiteIndexEquation SI_AX_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_B_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_BA_START = SI_BA_NIGHGI;
+	private static final SiteIndexEquation SI_BB_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_BC_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_BG_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_BI_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_BL_START = SI_BL_CHENAC;
+	private static final SiteIndexEquation SI_BM_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_BP_START = SI_BP_CURTISAC;
+	private static final SiteIndexEquation SI_C_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_CI_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_CP_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_CW_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_CWC_START = SI_CWC_NIGH;
+	private static final SiteIndexEquation SI_CWI_START = SI_CWI_NIGH;
+	private static final SiteIndexEquation SI_CY_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_D_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_DG_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_DM_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_DR_START = SI_DR_NIGH;
+	private static final SiteIndexEquation SI_E_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_EA_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_EB_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_EE_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_EP_START = SI_EP_NIGH;
+	private static final SiteIndexEquation SI_ES_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_EW_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_EXP_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_FD_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_FDC_START = SI_FDC_BRUCEAC;
+	private static final SiteIndexEquation SI_FDI_START = SI_FDI_THROWERAC;
+	private static final SiteIndexEquation SI_G_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_GP_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_GR_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_H_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_HM_START = SI_HM_MEANSAC;
+	private static final SiteIndexEquation SI_HW_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_HWC_START = SI_HWC_WILEYAC;
+	private static final SiteIndexEquation SI_HWI_START = SI_HWI_NIGH;
+	private static final SiteIndexEquation SI_HXM_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_IG_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_IS_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_J_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_JR_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_K_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_KC_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_L_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_LA_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_LE_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_LT_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_LW_START = SI_LW_NIGH;
+	private static final SiteIndexEquation SI_M_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_MB_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_ME_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_MN_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_MR_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_MS_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_MV_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_OA_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_OB_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_OC_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_OD_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_OE_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_OF_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_OG_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_P_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_PA_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_PF_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_PJ_START = SI_PJ_HUANG;
+	private static final SiteIndexEquation SI_PL_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_PLC_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_PLI_START = SI_PL_CHEN;
+	private static final SiteIndexEquation SI_PM_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_PR_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_PS_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_PW_START = SI_PW_CURTISAC;
+	private static final SiteIndexEquation SI_PXJ_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_PY_START = SI_PY_NIGH;
+	private static final SiteIndexEquation SI_Q_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_QE_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_QG_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_R_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_RA_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_S_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_SA_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_SB_START = SI_SB_NIGH;
+	private static final SiteIndexEquation SI_SE_START = SI_SE_CHENAC;
+	private static final SiteIndexEquation SI_SI_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_SN_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_SS_START = SI_SS_NIGHGI99;
+	private static final SiteIndexEquation SI_SW_START = SI_SW_GOUDNIGH;
+	private static final SiteIndexEquation SI_SX_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_SXB_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_SXE_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_SXL_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_SXS_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_SXW_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_SXX_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_T_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_TW_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_U_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_UA_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_UP_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_V_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_VB_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_VP_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_VS_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_VV_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_W_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_WA_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_WB_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_WD_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_WI_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_WP_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_WS_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_WT_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_X_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_XC_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_XH_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_Y_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_YC_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_YP_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_Z_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_ZC_START = SI_NO_EQUATION;
+	private static final SiteIndexEquation SI_ZH_START = SI_NO_EQUATION;
 
 	private static final String[][] si_curve_notes = { {
 			/* SI_ACB_HUANG */
@@ -1886,7 +1475,7 @@ public class Sindxdll {
 							+ "Brunswick. The trees ranged in age from 51 to 175 years at breast height and "
 							+ "ranged in site index from 7.2 m to 21.0 m at 50 years breast height age." } };
 
-	private static final int[] si_sclist_start = { SI_A_START, SI_ABAL_START, SI_ABCO_START, SI_AC_START, SI_ACB_START,
+	private static final SiteIndexEquation[] si_sclist_start = { SI_A_START, SI_ABAL_START, SI_ABCO_START, SI_AC_START, SI_ACB_START,
 			SI_ACT_START, SI_AD_START, SI_AH_START, SI_AT_START, SI_AX_START, SI_B_START, SI_BA_START, SI_BB_START,
 			SI_BC_START, SI_BG_START, SI_BI_START, SI_BL_START, SI_BM_START, SI_BP_START, SI_C_START, SI_CI_START,
 			SI_CP_START, SI_CW_START, SI_CWC_START, SI_CWI_START, SI_CY_START, SI_D_START, SI_DG_START, SI_DM_START,
@@ -1905,141 +1494,142 @@ public class Sindxdll {
 			SI_WT_START, SI_X_START, SI_XC_START, SI_XH_START, SI_Y_START, SI_YC_START, SI_YP_START, SI_Z_START,
 			SI_ZC_START, SI_ZH_START };
 
-	private static final int[] si_curve_default = { SI_ERR_NO_ANS, // A
-			SI_ERR_NO_ANS, // ABAL
-			SI_ERR_NO_ANS, // ABCO
-			SI_ERR_NO_ANS, // AC
+	private static final SiteIndexEquation[] si_curve_default = { 
+			SI_NO_EQUATION, // A
+			SI_NO_EQUATION, // ABAL
+			SI_NO_EQUATION, // ABCO
+			SI_NO_EQUATION, // AC
 			SI_ACB_HUANGAC, // ACB
 			SI_ACT_THROWERAC, // ACT
-			SI_ERR_NO_ANS, // AD
-			SI_ERR_NO_ANS, // AH
+			SI_NO_EQUATION, // AD
+			SI_NO_EQUATION, // AH
 			SI_AT_NIGH, // AT
-			SI_ERR_NO_ANS, // AX
-			SI_ERR_NO_ANS, // B
+			SI_NO_EQUATION, // AX
+			SI_NO_EQUATION, // B
 			SI_BA_NIGH, // BA
-			SI_ERR_NO_ANS, // BB
-			SI_ERR_NO_ANS, // BC
-			SI_ERR_NO_ANS, // BG
-			SI_ERR_NO_ANS, // BI
+			SI_NO_EQUATION, // BB
+			SI_NO_EQUATION, // BC
+			SI_NO_EQUATION, // BG
+			SI_NO_EQUATION, // BI
 			SI_BL_CHENAC, // BL
-			SI_ERR_NO_ANS, // BM
+			SI_NO_EQUATION, // BM
 			SI_BP_CURTISAC, // BP
-			SI_ERR_NO_ANS, // C
-			SI_ERR_NO_ANS, // CI
-			SI_ERR_NO_ANS, // CP
-			SI_ERR_NO_ANS, // CW
+			SI_NO_EQUATION, // C
+			SI_NO_EQUATION, // CI
+			SI_NO_EQUATION, // CP
+			SI_NO_EQUATION, // CW
 			SI_CWC_NIGH, // CWC
 			SI_CWI_NIGH, // CWI
-			SI_ERR_NO_ANS, // CY
-			SI_ERR_NO_ANS, // D
-			SI_ERR_NO_ANS, // DG
-			SI_ERR_NO_ANS, // DM
+			SI_NO_EQUATION, // CY
+			SI_NO_EQUATION, // D
+			SI_NO_EQUATION, // DG
+			SI_NO_EQUATION, // DM
 			SI_DR_NIGH, // DR
-			SI_ERR_NO_ANS, // E
-			SI_ERR_NO_ANS, // EA
-			SI_ERR_NO_ANS, // EB
-			SI_ERR_NO_ANS, // EE
+			SI_NO_EQUATION, // E
+			SI_NO_EQUATION, // EA
+			SI_NO_EQUATION, // EB
+			SI_NO_EQUATION, // EE
 			SI_EP_NIGH, // EP
-			SI_ERR_NO_ANS, // ES
-			SI_ERR_NO_ANS, // EW
-			SI_ERR_NO_ANS, // EXP
-			SI_ERR_NO_ANS, // FD
+			SI_NO_EQUATION, // ES
+			SI_NO_EQUATION, // EW
+			SI_NO_EQUATION, // EXP
+			SI_NO_EQUATION, // FD
 			SI_FDC_BRUCEAC, // FDC
 			SI_FDI_THROWERAC, // FDI
-			SI_ERR_NO_ANS, // G
-			SI_ERR_NO_ANS, // GP
-			SI_ERR_NO_ANS, // GR
-			SI_ERR_NO_ANS, // H
+			SI_NO_EQUATION, // G
+			SI_NO_EQUATION, // GP
+			SI_NO_EQUATION, // GR
+			SI_NO_EQUATION, // H
 			SI_HM_MEANSAC, // HM
-			SI_ERR_NO_ANS, // HW
+			SI_NO_EQUATION, // HW
 			SI_HWC_WILEYAC, // HWC
 			SI_HWI_NIGH, // HWI
-			SI_ERR_NO_ANS, // HXM
-			SI_ERR_NO_ANS, // IG
-			SI_ERR_NO_ANS, // IS
-			SI_ERR_NO_ANS, // J
-			SI_ERR_NO_ANS, // JR
-			SI_ERR_NO_ANS, // K
-			SI_ERR_NO_ANS, // KC
-			SI_ERR_NO_ANS, // L
-			SI_ERR_NO_ANS, // LA
-			SI_ERR_NO_ANS, // LE
-			SI_ERR_NO_ANS, // LT
+			SI_NO_EQUATION, // HXM
+			SI_NO_EQUATION, // IG
+			SI_NO_EQUATION, // IS
+			SI_NO_EQUATION, // J
+			SI_NO_EQUATION, // JR
+			SI_NO_EQUATION, // K
+			SI_NO_EQUATION, // KC
+			SI_NO_EQUATION, // L
+			SI_NO_EQUATION, // LA
+			SI_NO_EQUATION, // LE
+			SI_NO_EQUATION, // LT
 			SI_LW_NIGH, // LW
-			SI_ERR_NO_ANS, // M
-			SI_ERR_NO_ANS, // MB
-			SI_ERR_NO_ANS, // ME
-			SI_ERR_NO_ANS, // MN
-			SI_ERR_NO_ANS, // MR
-			SI_ERR_NO_ANS, // MS
-			SI_ERR_NO_ANS, // MV
-			SI_ERR_NO_ANS, // OA
-			SI_ERR_NO_ANS, // OB
-			SI_ERR_NO_ANS, // OC
-			SI_ERR_NO_ANS, // OD
-			SI_ERR_NO_ANS, // OE
-			SI_ERR_NO_ANS, // OF
-			SI_ERR_NO_ANS, // OG
-			SI_ERR_NO_ANS, // P
-			SI_ERR_NO_ANS, // PA
-			SI_ERR_NO_ANS, // PF
+			SI_NO_EQUATION, // M
+			SI_NO_EQUATION, // MB
+			SI_NO_EQUATION, // ME
+			SI_NO_EQUATION, // MN
+			SI_NO_EQUATION, // MR
+			SI_NO_EQUATION, // MS
+			SI_NO_EQUATION, // MV
+			SI_NO_EQUATION, // OA
+			SI_NO_EQUATION, // OB
+			SI_NO_EQUATION, // OC
+			SI_NO_EQUATION, // OD
+			SI_NO_EQUATION, // OE
+			SI_NO_EQUATION, // OF
+			SI_NO_EQUATION, // OG
+			SI_NO_EQUATION, // P
+			SI_NO_EQUATION, // PA
+			SI_NO_EQUATION, // PF
 			SI_PJ_HUANGAC, // PJ
-			SI_ERR_NO_ANS, // PL
-			SI_ERR_NO_ANS, // PLC
+			SI_NO_EQUATION, // PL
+			SI_NO_EQUATION, // PLC
 			SI_PLI_THROWER, // PLI
-			SI_ERR_NO_ANS, // PM
-			SI_ERR_NO_ANS, // PR
-			SI_ERR_NO_ANS, // PS
+			SI_NO_EQUATION, // PM
+			SI_NO_EQUATION, // PR
+			SI_NO_EQUATION, // PS
 			SI_PW_CURTISAC, // PW
-			SI_ERR_NO_ANS, // PXJ
+			SI_NO_EQUATION, // PXJ
 			SI_PY_NIGH, // PY
-			SI_ERR_NO_ANS, // Q
-			SI_ERR_NO_ANS, // QE
-			SI_ERR_NO_ANS, // QG
-			SI_ERR_NO_ANS, // R
-			SI_ERR_NO_ANS, // RA
-			SI_ERR_NO_ANS, // S
-			SI_ERR_NO_ANS, // SA
+			SI_NO_EQUATION, // Q
+			SI_NO_EQUATION, // QE
+			SI_NO_EQUATION, // QG
+			SI_NO_EQUATION, // R
+			SI_NO_EQUATION, // RA
+			SI_NO_EQUATION, // S
+			SI_NO_EQUATION, // SA
 			SI_SB_NIGH, // SB
 			SI_SE_NIGH, // SE
-			SI_ERR_NO_ANS, // SI
-			SI_ERR_NO_ANS, // SN
+			SI_NO_EQUATION, // SI
+			SI_NO_EQUATION, // SN
 			SI_SS_NIGH, // SS
 			SI_SW_GOUDIE_PLAAC, // SW
-			SI_ERR_NO_ANS, // SX
-			SI_ERR_NO_ANS, // SXB
-			SI_ERR_NO_ANS, // SXE
-			SI_ERR_NO_ANS, // SXL
-			SI_ERR_NO_ANS, // SXS
-			SI_ERR_NO_ANS, // SXW
-			SI_ERR_NO_ANS, // SXX
-			SI_ERR_NO_ANS, // T
-			SI_ERR_NO_ANS, // TW
-			SI_ERR_NO_ANS, // U
-			SI_ERR_NO_ANS, // UA
-			SI_ERR_NO_ANS, // UP
-			SI_ERR_NO_ANS, // V
-			SI_ERR_NO_ANS, // VB
-			SI_ERR_NO_ANS, // VP
-			SI_ERR_NO_ANS, // VS
-			SI_ERR_NO_ANS, // VV
-			SI_ERR_NO_ANS, // W
-			SI_ERR_NO_ANS, // WA
-			SI_ERR_NO_ANS, // WB
-			SI_ERR_NO_ANS, // WD
-			SI_ERR_NO_ANS, // WI
-			SI_ERR_NO_ANS, // WP
-			SI_ERR_NO_ANS, // WS
-			SI_ERR_NO_ANS, // WT
-			SI_ERR_NO_ANS, // X
-			SI_ERR_NO_ANS, // XC
-			SI_ERR_NO_ANS, // XH
-			SI_ERR_NO_ANS, // Y
-			SI_ERR_NO_ANS, // YC
-			SI_ERR_NO_ANS, // YP
-			SI_ERR_NO_ANS, // Z
-			SI_ERR_NO_ANS, // ZC
-			SI_ERR_NO_ANS, // ZH
+			SI_NO_EQUATION, // SX
+			SI_NO_EQUATION, // SXB
+			SI_NO_EQUATION, // SXE
+			SI_NO_EQUATION, // SXL
+			SI_NO_EQUATION, // SXS
+			SI_NO_EQUATION, // SXW
+			SI_NO_EQUATION, // SXX
+			SI_NO_EQUATION, // T
+			SI_NO_EQUATION, // TW
+			SI_NO_EQUATION, // U
+			SI_NO_EQUATION, // UA
+			SI_NO_EQUATION, // UP
+			SI_NO_EQUATION, // V
+			SI_NO_EQUATION, // VB
+			SI_NO_EQUATION, // VP
+			SI_NO_EQUATION, // VS
+			SI_NO_EQUATION, // VV
+			SI_NO_EQUATION, // W
+			SI_NO_EQUATION, // WA
+			SI_NO_EQUATION, // WB
+			SI_NO_EQUATION, // WD
+			SI_NO_EQUATION, // WI
+			SI_NO_EQUATION, // WP
+			SI_NO_EQUATION, // WS
+			SI_NO_EQUATION, // WT
+			SI_NO_EQUATION, // X
+			SI_NO_EQUATION, // XC
+			SI_NO_EQUATION, // XH
+			SI_NO_EQUATION, // Y
+			SI_NO_EQUATION, // YC
+			SI_NO_EQUATION, // YP
+			SI_NO_EQUATION, // Z
+			SI_NO_EQUATION, // ZC
+			SI_NO_EQUATION, // ZH
 	};
 
 	private static final int[] si_curve_intend = { SI_SPEC_ACB, /* SI_ACB_HUANG */
@@ -2566,14 +2156,14 @@ public class Sindxdll {
 	 * @throws SpeciesErrorException when the input parameter is not a valid species index
 	 * @throws NoAnswerException     when the input parameter is the last defined species index
 	 */
-	public static int DefCurve(int sp_index) throws SpeciesErrorException, NoAnswerException {
+	public static SiteIndexEquation DefCurve(int sp_index) throws SpeciesErrorException, NoAnswerException {
 		if (sp_index < 0 || sp_index >= SI_MAX_SPECIES) {
 			throw new SpeciesErrorException("Input parameter is not a valid species index: " + sp_index);
 		} else if (sp_index == SI_SPEC_END) {
 			throw new NoAnswerException("Input parameter is the last defined species index: " + sp_index);
 		}
 
-		return (int) si_curve_default[sp_index];
+		return si_curve_default[sp_index];
 	}
 
 	/**
@@ -2585,7 +2175,7 @@ public class Sindxdll {
 	 * @throws SpeciesErrorException when the input parameter is not a valid species index
 	 * @throws NoAnswerException     when no GI equations defined for this species
 	 */
-	public static int DefGICurve(int sp_index) throws SpeciesErrorException, NoAnswerException {
+	public static SiteIndexEquation DefGICurve(int sp_index) throws SpeciesErrorException, NoAnswerException {
 		if (sp_index < 0 || sp_index >= SI_MAX_SPECIES) { // spec
 			throw new SpeciesErrorException("Input parameter is not a valid species index: " + sp_index);
 		}
@@ -2636,7 +2226,7 @@ public class Sindxdll {
 	 * @throws EstablishmentErrorException species index or establishment type
 	 * @throws NoAnswerException           when no curves defined for this species
 	 */
-	public static int DefCurveEst(int sp_index, int estab)
+	public static SiteIndexEquation DefCurveEst(int sp_index, int estab)
 			throws SpeciesErrorException, EstablishmentErrorException, NoAnswerException {
 		if (sp_index < 0 || sp_index >= SI_MAX_SPECIES) { // spec
 			throw new SpeciesErrorException("Input parameter is not a valid species index: " + sp_index);
@@ -2651,10 +2241,10 @@ public class Sindxdll {
 			default:
 				throw new EstablishmentErrorException("Input parameter is not a valid establishment type: " + estab);
 			}
-		} else if (si_curve_default[sp_index] == SI_ERR_NO_ANS) {
+		} else if (si_curve_default[sp_index] == SI_NO_EQUATION) {
 			throw new NoAnswerException("No curves defined for this species: " + sp_index);
 		} else {
-			return (int) (si_curve_default[sp_index]);
+			return si_curve_default[sp_index];
 		}
 	}
 
@@ -2672,14 +2262,14 @@ public class Sindxdll {
 	 * @throws SpeciesErrorException when the input parameter is not a valid species index
 	 * @throws NoAnswerException     when no curves defined for this species
 	 */
-	public static int FirstCurve(int sp_index) throws SpeciesErrorException, NoAnswerException {
+	public static SiteIndexEquation FirstCurve(int sp_index) throws SpeciesErrorException, NoAnswerException {
 		if (sp_index < 0 || sp_index >= SI_MAX_SPECIES) {
 			throw new SpeciesErrorException("Input parameter is not a valid species index: " + sp_index);
-		} else if (si_sclist_start[sp_index] == SI_ERR_NO_ANS) {
+		} else if (si_sclist_start[sp_index] == SI_NO_EQUATION) {
 			throw new NoAnswerException("No curves defined for this species: " + sp_index);
 		}
 
-		return (int) (si_sclist_start[sp_index]);
+		return si_sclist_start[sp_index];
 	}
 
 	/**
@@ -2688,7 +2278,7 @@ public class Sindxdll {
 	 * No assumption should be made about the ordering of the curves.
 	 *
 	 * @param sp_index Integer species index
-	 * @param cu_index Integer curve index
+	 * @param cuIndex Integer curve index
 	 *
 	 * @return Integer curve index, for use in other Sindex functions
 	 *
@@ -2696,386 +2286,385 @@ public class Sindxdll {
 	 * @throws CurveErrorException   when input curve is not a valid curve index for this species
 	 * @throws NoAnswerException     when input parameter is last defined index for this species
 	 */
-	public static int NextCurve(int sp_index, int cu_index)
+	public static SiteIndexEquation NextCurve(int sp_index, SiteIndexEquation cuIndex)
 			throws SpeciesErrorException, CurveErrorException, NoAnswerException {
 		if (sp_index < 0 || sp_index >= SI_MAX_SPECIES) {
 			throw new SpeciesErrorException("Input species is not a valid species index: " + sp_index);
 		}
 
-		if (cu_index < 0 || cu_index >= SI_MAX_CURVES) {
-			throw new CurveErrorException("Input curve is not a valid curve index for this species: " + cu_index);
+		if (cuIndex == null || si_curve_intend[cuIndex.n()] != sp_index) {
+			throw new CurveErrorException("Input curve is not a valid curve index for this species: " + cuIndex);
 		}
 
-		if (si_curve_intend[cu_index] != sp_index) {
-			throw new CurveErrorException("Input curve is not a valid curve index for this species: " + cu_index);
-		}
-
-		switch (cu_index) {
+		switch (cuIndex) {
 		case SI_ACB_HUANGAC:
-			cu_index = SI_ACB_HUANG;
+			cuIndex = SI_ACB_HUANG;
 			break;
 		case SI_ACB_HUANG:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_ACT_THROWERAC:
-			cu_index = SI_ACT_THROWER;
+			cuIndex = SI_ACT_THROWER;
 			break;
 		case SI_ACT_THROWER:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_AT_NIGH:
-			cu_index = SI_AT_CHEN;
+			cuIndex = SI_AT_CHEN;
 			break;
 		case SI_AT_CHEN:
-			cu_index = SI_AT_HUANG;
+			cuIndex = SI_AT_HUANG;
 			break;
 		case SI_AT_HUANG:
-			cu_index = SI_AT_CIESZEWSKI;
+			cuIndex = SI_AT_CIESZEWSKI;
 			break;
 		case SI_AT_CIESZEWSKI:
-			cu_index = SI_AT_GOUDIE;
+			cuIndex = SI_AT_GOUDIE;
 			break;
 		case SI_AT_GOUDIE:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_BA_NIGHGI:
-			cu_index = SI_BA_NIGH;
+			cuIndex = SI_BA_NIGH;
 			break;
 		case SI_BA_NIGH:
-			cu_index = SI_BA_KURUCZ82AC;
+			cuIndex = SI_BA_KURUCZ82AC;
 			break;
 		case SI_BA_KURUCZ82AC:
-			cu_index = SI_BA_DILUCCA;
+			cuIndex = SI_BA_DILUCCA;
 			break;
 		case SI_BA_DILUCCA:
-			cu_index = SI_BA_KURUCZ86;
+			cuIndex = SI_BA_KURUCZ86;
 			break;
 		case SI_BA_KURUCZ86:
-			cu_index = SI_BA_KURUCZ82;
+			cuIndex = SI_BA_KURUCZ82;
 			break;
 		case SI_BA_KURUCZ82:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_BL_CHENAC:
-			cu_index = SI_BL_CHEN;
+			cuIndex = SI_BL_CHEN;
 			break;
 		case SI_BL_CHEN:
-			cu_index = SI_BL_THROWERGI;
+			cuIndex = SI_BL_THROWERGI;
 			break;
 		case SI_BL_THROWERGI:
-			cu_index = SI_BL_KURUCZ82;
+			cuIndex = SI_BL_KURUCZ82;
 			break;
 		case SI_BL_KURUCZ82:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_BP_CURTISAC:
-			cu_index = SI_BP_CURTIS;
+			cuIndex = SI_BP_CURTIS;
 			break;
 		case SI_BP_CURTIS:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_CWC_NIGH:
-			cu_index = SI_CWC_KURUCZAC;
+			cuIndex = SI_CWC_KURUCZAC;
 			break;
 		case SI_CWC_KURUCZAC:
-			cu_index = SI_CWC_KURUCZ;
+			cuIndex = SI_CWC_KURUCZ;
 			break;
 		case SI_CWC_KURUCZ:
-			cu_index = SI_CWC_BARKER;
+			cuIndex = SI_CWC_BARKER;
 			break;
 		case SI_CWC_BARKER:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_CWI_NIGH:
-			cu_index = SI_CWI_NIGHGI;
+			cuIndex = SI_CWI_NIGHGI;
 			break;
 		case SI_CWI_NIGHGI:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_DR_NIGH:
-			cu_index = SI_DR_HARRING;
+			cuIndex = SI_DR_HARRING;
 			break;
 		case SI_DR_HARRING:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_EP_NIGH:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_FDC_BRUCEAC:
-			cu_index = SI_FDC_NIGHTA;
+			cuIndex = SI_FDC_NIGHTA;
 			break;
 		case SI_FDC_NIGHTA:
-			cu_index = SI_FDC_NIGHGI;
+			cuIndex = SI_FDC_NIGHGI;
 			break;
 		case SI_FDC_NIGHGI:
-			cu_index = SI_FDC_BRUCE;
+			cuIndex = SI_FDC_BRUCE;
 			break;
 		case SI_FDC_BRUCE:
-			cu_index = SI_FDC_COCHRAN;
+			cuIndex = SI_FDC_COCHRAN;
 			break;
 		case SI_FDC_COCHRAN:
-			cu_index = SI_FDC_KING;
+			cuIndex = SI_FDC_KING;
 			break;
 		case SI_FDC_KING:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_FDI_THROWERAC:
-			cu_index = SI_FDI_NIGHGI;
+			cuIndex = SI_FDI_NIGHGI;
 			break;
 		case SI_FDI_NIGHGI:
-			cu_index = SI_FDI_HUANG_PLA;
+			cuIndex = SI_FDI_HUANG_PLA;
 			break;
 		case SI_FDI_HUANG_PLA:
-			cu_index = SI_FDI_HUANG_NAT;
+			cuIndex = SI_FDI_HUANG_NAT;
 			break;
 		case SI_FDI_HUANG_NAT:
-			cu_index = SI_FDI_MILNER;
+			cuIndex = SI_FDI_MILNER;
 			break;
 		case SI_FDI_MILNER:
-			cu_index = SI_FDI_THROWER;
+			cuIndex = SI_FDI_THROWER;
 			break;
 		case SI_FDI_THROWER:
-			cu_index = SI_FDI_VDP_MONT;
+			cuIndex = SI_FDI_VDP_MONT;
 			break;
 		case SI_FDI_VDP_MONT:
-			cu_index = SI_FDI_VDP_WASH;
+			cuIndex = SI_FDI_VDP_WASH;
 			break;
 		case SI_FDI_VDP_WASH:
-			cu_index = SI_FDI_MONS_DF;
+			cuIndex = SI_FDI_MONS_DF;
 			break;
 		case SI_FDI_MONS_DF:
-			cu_index = SI_FDI_MONS_GF;
+			cuIndex = SI_FDI_MONS_GF;
 			break;
 		case SI_FDI_MONS_GF:
-			cu_index = SI_FDI_MONS_WRC;
+			cuIndex = SI_FDI_MONS_WRC;
 			break;
 		case SI_FDI_MONS_WRC:
-			cu_index = SI_FDI_MONS_WH;
+			cuIndex = SI_FDI_MONS_WH;
 			break;
 		case SI_FDI_MONS_WH:
-			cu_index = SI_FDI_MONS_SAF;
+			cuIndex = SI_FDI_MONS_SAF;
 			break;
 		case SI_FDI_MONS_SAF:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_HM_MEANSAC:
-			cu_index = SI_HM_MEANS;
+			cuIndex = SI_HM_MEANS;
 			break;
 		case SI_HM_MEANS:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_HWC_WILEYAC:
-			cu_index = SI_HWC_NIGHGI99;
+			cuIndex = SI_HWC_NIGHGI99;
 			break;
 		case SI_HWC_NIGHGI99:
-			cu_index = SI_HWC_FARR;
+			cuIndex = SI_HWC_FARR;
 			break;
 		case SI_HWC_FARR:
-			cu_index = SI_HWC_BARKER;
+			cuIndex = SI_HWC_BARKER;
 			break;
 		case SI_HWC_BARKER:
-			cu_index = SI_HWC_WILEY;
+			cuIndex = SI_HWC_WILEY;
 			break;
 		case SI_HWC_WILEY:
-			cu_index = SI_HWC_WILEY_BC;
+			cuIndex = SI_HWC_WILEY_BC;
 			break;
 		case SI_HWC_WILEY_BC:
-			cu_index = SI_HWC_WILEY_MB;
+			cuIndex = SI_HWC_WILEY_MB;
 			break;
 		case SI_HWC_WILEY_MB:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_HWI_NIGH:
-			cu_index = SI_HWI_NIGHGI;
+			cuIndex = SI_HWI_NIGHGI;
 			break;
 		case SI_HWI_NIGHGI:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_LW_NIGH:
-			cu_index = SI_LW_NIGHGI;
+			cuIndex = SI_LW_NIGHGI;
 			break;
 		case SI_LW_NIGHGI:
-			cu_index = SI_LW_MILNER;
+			cuIndex = SI_LW_MILNER;
 			break;
 		case SI_LW_MILNER:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_PJ_HUANG:
-			cu_index = SI_PJ_HUANGAC;
+			cuIndex = SI_PJ_HUANGAC;
 			break;
 		case SI_PJ_HUANGAC:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_PL_CHEN:
-			cu_index = SI_PLI_THROWNIGH;
+			cuIndex = SI_PLI_THROWNIGH;
 			break;
 		case SI_PLI_THROWNIGH:
-			cu_index = SI_PLI_NIGHTA98;
+			cuIndex = SI_PLI_NIGHTA98;
 			break;
 		case SI_PLI_NIGHTA98:
-			cu_index = SI_PLI_NIGHGI97;
+			cuIndex = SI_PLI_NIGHGI97;
 			break;
 		case SI_PLI_NIGHGI97:
-			cu_index = SI_PLI_HUANG_PLA;
+			cuIndex = SI_PLI_HUANG_PLA;
 			break;
 		case SI_PLI_HUANG_PLA:
-			cu_index = SI_PLI_HUANG_NAT;
+			cuIndex = SI_PLI_HUANG_NAT;
 			break;
 		case SI_PLI_HUANG_NAT:
-			cu_index = SI_PLI_THROWER;
+			cuIndex = SI_PLI_THROWER;
 			break;
 		case SI_PLI_THROWER:
-			cu_index = SI_PLI_MILNER;
+			cuIndex = SI_PLI_MILNER;
 			break;
 		case SI_PLI_MILNER:
-			cu_index = SI_PLI_CIESZEWSKI;
+			cuIndex = SI_PLI_CIESZEWSKI;
 			break;
 		case SI_PLI_CIESZEWSKI:
-			cu_index = SI_PLI_GOUDIE_DRY;
+			cuIndex = SI_PLI_GOUDIE_DRY;
 			break;
 		case SI_PLI_GOUDIE_DRY:
-			cu_index = SI_PLI_GOUDIE_WET;
+			cuIndex = SI_PLI_GOUDIE_WET;
 			break;
 		case SI_PLI_GOUDIE_WET:
-			cu_index = SI_PLI_DEMPSTER;
+			cuIndex = SI_PLI_DEMPSTER;
 			break;
 		case SI_PLI_DEMPSTER:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_PW_CURTISAC:
-			cu_index = SI_PW_CURTIS;
+			cuIndex = SI_PW_CURTIS;
 			break;
 		case SI_PW_CURTIS:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_PY_NIGH:
-			cu_index = SI_PY_NIGHGI;
+			cuIndex = SI_PY_NIGHGI;
 			break;
 		case SI_PY_NIGHGI:
-			cu_index = SI_PY_HANNAC;
+			cuIndex = SI_PY_HANNAC;
 			break;
 		case SI_PY_HANNAC:
-			cu_index = SI_PY_MILNER;
+			cuIndex = SI_PY_MILNER;
 			break;
 		case SI_PY_MILNER:
-			cu_index = SI_PY_HANN;
+			cuIndex = SI_PY_HANN;
 			break;
 		case SI_PY_HANN:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_SB_NIGH:
-			cu_index = SI_SB_HUANG;
+			cuIndex = SI_SB_HUANG;
 			break;
 		case SI_SB_HUANG:
-			cu_index = SI_SB_CIESZEWSKI;
+			cuIndex = SI_SB_CIESZEWSKI;
 			break;
 		case SI_SB_CIESZEWSKI:
-			cu_index = SI_SB_KER;
+			cuIndex = SI_SB_KER;
 			break;
 		case SI_SB_KER:
-			cu_index = SI_SB_DEMPSTER;
+			cuIndex = SI_SB_DEMPSTER;
 			break;
 		case SI_SB_DEMPSTER:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_SE_CHENAC:
-			cu_index = SI_SE_CHEN;
+			cuIndex = SI_SE_CHEN;
 			break;
 		case SI_SE_CHEN:
-			cu_index = SI_SE_NIGHGI;
+			cuIndex = SI_SE_NIGHGI;
 			break;
 		case SI_SE_NIGHGI:
-			cu_index = SI_SE_NIGH;
+			cuIndex = SI_SE_NIGH;
 			break;
 		case SI_SE_NIGH:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_SS_NIGHGI99:
-			cu_index = SI_SS_NIGH;
+			cuIndex = SI_SS_NIGH;
 			break;
 		case SI_SS_NIGH:
-			cu_index = SI_SS_GOUDIE;
+			cuIndex = SI_SS_GOUDIE;
 			break;
 		case SI_SS_GOUDIE:
-			cu_index = SI_SS_FARR;
+			cuIndex = SI_SS_FARR;
 			break;
 		case SI_SS_FARR:
-			cu_index = SI_SS_BARKER;
+			cuIndex = SI_SS_BARKER;
 			break;
 		case SI_SS_BARKER:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
 			break;
 
 		case SI_SW_GOUDNIGH:
-			cu_index = SI_SW_HU_GARCIA;
+			cuIndex = SI_SW_HU_GARCIA;
 			break;
 		case SI_SW_HU_GARCIA:
-			cu_index = SI_SW_NIGHTA;
+			cuIndex = SI_SW_NIGHTA;
 			break;
 		case SI_SW_NIGHTA:
-			cu_index = SI_SW_NIGHGI2004;
+			cuIndex = SI_SW_NIGHGI2004;
 			break;
 		case SI_SW_NIGHGI2004:
-			cu_index = SI_SW_HUANG_PLA;
+			cuIndex = SI_SW_HUANG_PLA;
 			break;
 		case SI_SW_HUANG_PLA:
-			cu_index = SI_SW_HUANG_NAT;
+			cuIndex = SI_SW_HUANG_NAT;
 			break;
 		case SI_SW_HUANG_NAT:
-			cu_index = SI_SW_THROWER;
+			cuIndex = SI_SW_THROWER;
 			break;
 		case SI_SW_THROWER:
-			cu_index = SI_SW_CIESZEWSKI;
+			cuIndex = SI_SW_CIESZEWSKI;
 			break;
 		case SI_SW_CIESZEWSKI:
-			cu_index = SI_SW_KER_PLA;
+			cuIndex = SI_SW_KER_PLA;
 			break;
 		case SI_SW_KER_PLA:
-			cu_index = SI_SW_KER_NAT;
+			cuIndex = SI_SW_KER_NAT;
 			break;
 		case SI_SW_KER_NAT:
-			cu_index = SI_SW_GOUDIE_PLAAC;
+			cuIndex = SI_SW_GOUDIE_PLAAC;
 			break;
 		case SI_SW_GOUDIE_PLAAC:
-			cu_index = SI_SW_GOUDIE_PLA;
+			cuIndex = SI_SW_GOUDIE_PLA;
 			break;
 		case SI_SW_GOUDIE_PLA:
-			cu_index = SI_SW_GOUDIE_NATAC;
+			cuIndex = SI_SW_GOUDIE_NATAC;
 			break;
 		case SI_SW_GOUDIE_NATAC:
-			cu_index = SI_SW_GOUDIE_NAT;
+			cuIndex = SI_SW_GOUDIE_NAT;
 			break;
 		case SI_SW_GOUDIE_NAT:
-			cu_index = SI_ERR_NO_ANS;
+			cuIndex = SI_NO_EQUATION;
+			break;
+		default:
+			/* fall through */
 			break;
 		}
 
-		if (cu_index == SI_ERR_NO_ANS) {
+		if (cuIndex == SI_NO_EQUATION) {
 			throw new NoAnswerException("Input parameter is last defined index for this species: " + sp_index);
 		} else {
-			return cu_index;
+			return cuIndex;
 		}
 	}
 
@@ -3084,18 +2673,18 @@ public class Sindxdll {
 	 * <p>
 	 * Curve name string examples: "Bruce (1981)", "Nigh (1998)".
 	 *
-	 * @param cu_index Integer curve index
+	 * @param cuIndex Integer curve index
 	 * @return curve author and date
 	 *
 	 * @throws CurveErrorException when input parameter is not a valid curve index
 	 */
-	public static String CurveName(int cu_index) throws CurveErrorException {
+	public static String CurveName(SiteIndexEquation cuIndex) throws CurveErrorException {
 
-		if (cu_index >= 0 && cu_index < SI_MAX_CURVES) {
-			return SiteIndexNames.siCurveName[cu_index];
+		if (cuIndex != null) {
+			return SiteIndexNames.siCurveName[cuIndex.n()];
 		}
 
-		throw new CurveErrorException("Input parameter is not a valid curve index: " + cu_index);
+		throw new CurveErrorException("Input parameter is not a valid curve index: " + cuIndex);
 	}
 
 	/**
@@ -3109,17 +2698,17 @@ public class Sindxdll {
 	 * <li>1000: si = fn (ht, age) growth intercept
 	 * </ul>
 	 *
-	 * @param cu_index Integer curve index
+	 * @param cuIndex Integer curve index
 	 * @return code
 	 * @throws CurveErrorException when input curve is not a valid curve index
 	 */
-	public static int CurveUse(int cu_index) throws CurveErrorException {
+	public static int CurveUse(SiteIndexEquation cuIndex) throws CurveErrorException {
 
-		if (cu_index >= 0 && cu_index < SI_MAX_CURVES) {
-			return (int) (SiteIndexNames.siCurveAvailableTypes[cu_index]);
+		if (cuIndex != null) {
+			return (int) (SiteIndexNames.siCurveAvailableTypes[cuIndex.n()]);
 		}
 
-		throw new CurveErrorException("If input curve is not a valid curve index: " + cu_index);
+		throw new CurveErrorException("If input curve is not a valid curve index: " + cuIndex);
 	}
 
 	/**
@@ -3147,7 +2736,7 @@ public class Sindxdll {
 	 * @throws GrowthInterceptMaximumException    when bhage > GI range
 	 * @throws GrowthInterceptTotalErrorException when total age and GI curve
 	 */
-	public static int HtAgeToSI(int curve, double age, int ageType, double height, int estType, Reference<Double> site)
+	public static int HtAgeToSI(SiteIndexEquation curve, double age, int ageType, double height, int estType, Reference<Double> site)
 			throws CommonCalculatorException {
 
 		site.set(Height2SiteIndex.heightToIndex(curve, age, ageType, height, estType));
@@ -3175,7 +2764,7 @@ public class Sindxdll {
 	 * @throws GrowthInterceptTotalException    when total age and GI curve
 	 */
 	public static int
-			HtSIToAge(int curve, double height, int ageType, double siteIndex, double y2bh, Reference<Double> age)
+			HtSIToAge(SiteIndexEquation curve, double height, int ageType, double siteIndex, double y2bh, Reference<Double> age)
 					throws CommonCalculatorException {
 
 		age.set(SiteIndex2Age.indexToAge(curve, height, ageType, siteIndex, y2bh));
@@ -3207,7 +2796,7 @@ public class Sindxdll {
 	 * @throws LessThan13Exception             when site index <= 1.3
 	 */
 	public static int
-			AgeSIToHt(int curve, double age, int ageType, double siteIndex, double y2bh, Reference<Double> height)
+			AgeSIToHt(SiteIndexEquation curve, double age, int ageType, double siteIndex, double y2bh, Reference<Double> height)
 					throws CommonCalculatorException {
 
 		height.set(SiteIndex2Height.indexToHeight(curve, age, ageType, siteIndex, y2bh, 0.5));
@@ -3242,7 +2831,7 @@ public class Sindxdll {
 	 * @throws LessThan13Exception             when site index <= 1.3
 	 */
 	public static int AgeSIToHtSmooth(
-			int curve, double age, int ageType, double siteIndex, double y2bh, double seedling_age, double seedling_ht,
+			SiteIndexEquation curve, double age, int ageType, double siteIndex, double y2bh, double seedling_age, double seedling_ht,
 			Reference<Double> height
 	) throws CommonCalculatorException {
 		height.set(
@@ -3269,9 +2858,9 @@ public class Sindxdll {
 	 * @throws GrowthInterceptTotalException when GI curve
 	 * @throws LessThan13Exception           when site index <= 1.3
 	 */
-	public static int Y2BH05(int curve, double siteIndex, Reference<Double> y2bh) throws CommonCalculatorException {
+	public static int Y2BH05(SiteIndexEquation curve, double siteIndex, Reference<Double> y2bh) throws CommonCalculatorException {
 
-		y2bh.set(SiteIndexYears2BreastHeight.si_y2bh05(curve, siteIndex));
+		y2bh.set(SiteIndexYears2BreastHeight.y2bh05(curve, siteIndex));
 
 		return 0;
 	}
@@ -3289,9 +2878,9 @@ public class Sindxdll {
 	 * @throws LessThan13Exception           when site index <= 1.3
 	 * @throws GrowthInterceptTotalException when GI curve
 	 */
-	public static int Y2BH(int curve, double siteIndex, Reference<Double> y2bh) throws CommonCalculatorException {
+	public static int Y2BH(SiteIndexEquation curve, double siteIndex, Reference<Double> y2bh) throws CommonCalculatorException {
 
-		y2bh.set(SiteIndexYears2BreastHeight.si_y2bh(curve, siteIndex));
+		y2bh.set(SiteIndexYears2BreastHeight.y2bh(curve, siteIndex));
 
 		return 0;
 	}
@@ -3395,144 +2984,150 @@ public class Sindxdll {
 	/**
 	 * Returns string containing publication source.
 	 *
-	 * @param cu_index Integer curve index
+	 * @param cuIndex Integer curve index
 	 *
 	 * @return A string containing publication citation
 	 *
 	 * @throws IllegalArgumentException when input parameter is not a valid curve index
 	 */
-	public static String CurveSource(int cu_index) throws IllegalArgumentException {
-		if (cu_index < 0 || cu_index >= SI_MAX_CURVES) {
-			throw new IllegalArgumentException("Invalid curve index: " + cu_index);
+	public static String CurveSource(SiteIndexEquation cuIndex) throws IllegalArgumentException {
+		if (cuIndex == null) {
+			throw new IllegalArgumentException("cuIndex is null");
 		}
-
-		switch (cu_index) {
+		
+		switch (cuIndex) {
 		case SI_BA_NIGH:
-			cu_index = SI_BA_NIGHGI;
+			cuIndex = SI_BA_NIGHGI;
 			break;
 
 		case SI_CWI_NIGHGI:
-			cu_index = SI_CWI_NIGH;
+			cuIndex = SI_CWI_NIGH;
 			break;
 
 		case SI_AT_HUANG, SI_SB_HUANG, SI_FDI_HUANG_PLA, SI_FDI_HUANG_NAT, SI_PLI_HUANG_PLA, SI_PLI_HUANG_NAT,
 				SI_SW_HUANG_PLA, SI_SW_HUANG_NAT:
-			cu_index = SI_ACB_HUANG;
+			cuIndex = SI_ACB_HUANG;
 			break;
 
 		case SI_PLI_CIESZEWSKI, SI_SB_CIESZEWSKI, SI_SW_CIESZEWSKI:
-			cu_index = SI_AT_CIESZEWSKI;
+			cuIndex = SI_AT_CIESZEWSKI;
 			break;
 
 		case SI_PLI_DEMPSTER, SI_SB_DEMPSTER, SI_SW_DEMPSTER:
-			cu_index = SI_AT_GOUDIE;
+			cuIndex = SI_AT_GOUDIE;
 			break;
 
 		case SI_SW_KER_PLA, SI_SW_KER_NAT:
-			cu_index = SI_SB_KER;
+			cuIndex = SI_SB_KER;
 			break;
 
 		case SI_BL_KURUCZ82:
-			cu_index = SI_BA_KURUCZ82;
+			cuIndex = SI_BA_KURUCZ82;
 			break;
 
 		case SI_HWC_BARKER, SI_SS_BARKER:
-			cu_index = SI_CWC_BARKER;
+			cuIndex = SI_CWC_BARKER;
 			break;
 
 		case SI_LW_MILNER, SI_PLI_MILNER, SI_PY_MILNER:
-			cu_index = SI_FDI_MILNER;
+			cuIndex = SI_FDI_MILNER;
 			break;
 
 		case SI_FDI_VDP_WASH:
-			cu_index = SI_FDI_VDP_MONT;
+			cuIndex = SI_FDI_VDP_MONT;
 			break;
 
 		case SI_FDI_MONS_GF, SI_FDI_MONS_WRC, SI_FDI_MONS_WH, SI_FDI_MONS_SAF:
-			cu_index = SI_FDI_MONS_DF;
+			cuIndex = SI_FDI_MONS_DF;
 			break;
 
 		case SI_SS_FARR:
-			cu_index = SI_HWC_FARR;
+			cuIndex = SI_HWC_FARR;
 			break;
 
 		case SI_HWC_WILEY_BC, SI_HWC_WILEY_MB:
-			cu_index = SI_HWC_WILEY;
+			cuIndex = SI_HWC_WILEY;
 			break;
 
 		case SI_SW_THROWER:
-			cu_index = SI_PLI_THROWER;
+			cuIndex = SI_PLI_THROWER;
 			break;
 
 		case SI_PLI_GOUDIE_WET, SI_SW_GOUDIE_PLA, SI_SW_GOUDIE_NAT:
-			cu_index = SI_PLI_GOUDIE_DRY;
+			cuIndex = SI_PLI_GOUDIE_DRY;
 			break;
-
+			
+		default:
+			/* fall through */
+			break;
 		}
-		return si_curve_notes[cu_index][0];
+		return si_curve_notes[cuIndex.n()][0];
 	}
 
 	/**
 	 * Returns string containing notes on use.
 	 *
-	 * @param cu_index Integer curve index
+	 * @param cuIndex Integer curve index
 	 *
 	 * @return String containing notes on use of curve
 	 *
 	 * @throws IllegalArgumentException when input parameter is not a valid curve index
 	 */
-	public static String CurveNotes(int cu_index) throws IllegalArgumentException {
-		if (cu_index < 0 || cu_index >= SI_MAX_CURVES) {
-			throw new IllegalArgumentException("Invalid curve index: " + cu_index);
+	public static String CurveNotes(SiteIndexEquation cuIndex) throws IllegalArgumentException {
+		if (cuIndex == null) {
+			throw new IllegalArgumentException("Sindxdll.CurveNotes: cuIndex is null");
 		}
-
-		switch (cu_index) {
+		switch (cuIndex) {
 		case SI_BA_NIGH:
-			cu_index = SI_BA_NIGHGI;
+			cuIndex = SI_BA_NIGHGI;
 			break;
 
 		case SI_CWI_NIGHGI:
-			cu_index = SI_CWI_NIGH;
+			cuIndex = SI_CWI_NIGH;
 			break;
 
 		case SI_FDI_HUANG_NAT:
-			cu_index = SI_FDI_HUANG_PLA;
+			cuIndex = SI_FDI_HUANG_PLA;
 			break;
 
 		case SI_PLI_HUANG_NAT:
-			cu_index = SI_PLI_HUANG_PLA;
+			cuIndex = SI_PLI_HUANG_PLA;
 			break;
 
 		case SI_SW_HUANG_NAT:
-			cu_index = SI_SW_HUANG_PLA;
+			cuIndex = SI_SW_HUANG_PLA;
 			break;
 
 		case SI_SW_KER_NAT:
-			cu_index = SI_SW_KER_PLA;
+			cuIndex = SI_SW_KER_PLA;
 			break;
 
 		case SI_FDI_VDP_WASH:
-			cu_index = SI_FDI_VDP_MONT;
+			cuIndex = SI_FDI_VDP_MONT;
 			break;
 
 		case SI_FDI_MONS_GF, SI_FDI_MONS_WRC, SI_FDI_MONS_WH, SI_FDI_MONS_SAF:
-			cu_index = SI_FDI_MONS_DF;
+			cuIndex = SI_FDI_MONS_DF;
 			break;
 
 		case SI_PLI_GOUDIE_WET:
-			cu_index = SI_PLI_GOUDIE_DRY;
+			cuIndex = SI_PLI_GOUDIE_DRY;
 			break;
 
 		case SI_SW_GOUDIE_NAT:
-			cu_index = SI_SW_GOUDIE_PLA;
+			cuIndex = SI_SW_GOUDIE_PLA;
 			break;
 
 		case SI_PY_NIGHGI:
-			cu_index = SI_PY_NIGH;
+			cuIndex = SI_PY_NIGH;
+			break;
+
+		default:
+			/* fall through */
 			break;
 		}
 
-		return si_curve_notes[cu_index][1];
+		return si_curve_notes[cuIndex.n()][1];
 	}
 
 	/**
@@ -3551,12 +3146,11 @@ public class Sindxdll {
 	 * @throws CurveErrorException   input curve is not a valid curve index for this species
 	 * @throw AgeTypeErrorException when age type is unknown
 	 */
-	public static int
-			AgeToAge(int cu_index, double age1, int age_type1, double y2bh, Reference<Double> result, int age_type2)
-					throws AgeTypeErrorException {
+	public static int AgeToAge(SiteIndexEquation cu_index, double age1, int age_type1, double y2bh, 
+			Reference<Double> result, int age_type2)
+		throws AgeTypeErrorException {
 
 		result.set(Age2Age.ageToAge(cu_index, age1, age_type1, age_type2, y2bh));
-
 		return 0;
 	}
 

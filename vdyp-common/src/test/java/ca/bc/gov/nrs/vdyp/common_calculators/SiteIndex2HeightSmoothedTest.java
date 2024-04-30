@@ -10,18 +10,10 @@ import org.junit.jupiter.api.Test;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexConstants.*;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation.*;
 
 class SiteIndex2HeightSmoothedTest {
-	// Taken from sindex.h
-	/*
-	 * age types
-	 */
-	private static final short SI_AT_TOTAL = 0;
-	private static final short SI_AT_BREAST = 1;
-
-	/* define species and equation indices */
-	private static final short SI_PLI_THROWER = 45;
-
 	private static final double ERROR_TOLERANCE = 0.00001;
 
 	@Nested
@@ -31,7 +23,7 @@ class SiteIndex2HeightSmoothedTest {
 			assertThrows(
 					LessThan13Exception.class,
 					() -> SiteIndex2HeightSmoothed
-							.indexToHeightSmoothed((short) 0, 0.0, (short) 0, 1.2, 0.0, 0.0, 0.0)
+							.indexToHeightSmoothed(null, 0.0, (short) 0, 1.2, 0.0, 0.0, 0.0)
 			);
 		}
 
@@ -40,7 +32,7 @@ class SiteIndex2HeightSmoothedTest {
 			assertThrows(
 					NoAnswerException.class,
 					() -> SiteIndex2HeightSmoothed
-							.indexToHeightSmoothed((short) 0, 0.0, (short) 0, 1.31, -1.0, 0.0, 0.0)
+							.indexToHeightSmoothed(null, 0.0, (short) 0, 1.31, -1.0, 0.0, 0.0)
 			);
 		}
 
@@ -49,11 +41,11 @@ class SiteIndex2HeightSmoothedTest {
 			assertThrows(
 					NoAnswerException.class,
 					() -> SiteIndex2HeightSmoothed
-							.indexToHeightSmoothed((short) 0, -1.0, SI_AT_BREAST, 1.31, 0.0, 0.0, 0.0)
+							.indexToHeightSmoothed(null, -1.0, SI_AT_BREAST, 1.31, 0.0, 0.0, 0.0)
 			);
 
 			double actualResult = SiteIndex2HeightSmoothed
-					.indexToHeightSmoothed((short) 0, 0.0, SI_AT_BREAST, 1.31, 0.0, 0.0, 0.0);
+					.indexToHeightSmoothed(null, 0.0, SI_AT_BREAST, 1.31, 0.0, 0.0, 0.0);
 			double expectedResult = 0;
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 		}
@@ -70,12 +62,12 @@ class SiteIndex2HeightSmoothedTest {
 		@Test
 		void testValidInput() throws CommonCalculatorException {
 			double actualResult = SiteIndex2HeightSmoothed
-					.indexToHeightSmoothed((short) 21, 3.0, SI_AT_TOTAL, 16.0, 4.0, 3.1, 1.3);
+					.indexToHeightSmoothed(SI_FDI_HUANG_NAT, 3.0, SI_AT_TOTAL, 16.0, 4.0, 3.1, 1.3);
 			double expectedResult = 1.3 / 3.1 * 3;
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 
 			actualResult = SiteIndex2HeightSmoothed
-					.indexToHeightSmoothed((short) 21, 3.0, SI_AT_TOTAL, 16.0, 4.0, 0.0, 1.0);
+					.indexToHeightSmoothed(SI_FDI_HUANG_NAT, 3.0, SI_AT_TOTAL, 16.0, 4.0, 0.0, 1.0);
 
 			double k1 = 2.6120353509515746; // based on calculation with traced values
 			double k0 = (.3) / Math.pow(4, k1);
@@ -83,7 +75,7 @@ class SiteIndex2HeightSmoothedTest {
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 
 			actualResult = SiteIndex2HeightSmoothed
-					.indexToHeightSmoothed((short) 21, 3.0, SI_AT_TOTAL, 16.0, 4.0, 3.0, 1.0);
+					.indexToHeightSmoothed(SI_FDI_HUANG_NAT, 3.0, SI_AT_TOTAL, 16.0, 4.0, 3.0, 1.0);
 
 			expectedResult = 1; // since k0 * Math.pow(0, k1) should be 0
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));

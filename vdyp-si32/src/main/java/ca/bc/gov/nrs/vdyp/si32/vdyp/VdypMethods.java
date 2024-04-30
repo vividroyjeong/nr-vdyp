@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CodeErrorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorException;
@@ -253,9 +254,9 @@ public class VdypMethods {
 	 * @param region the region under consideration
 	 * @return The Site Index curve type to use for this species. -1 if the species or region was not recognized.
 	 */
-	public static int getCurrentSICurve(String sp64Name, SpeciesRegion region) {
+	public static SiteIndexEquation getCurrentSICurve(String sp64Name, SpeciesRegion region) {
 
-		int siCurve = -1;
+		SiteIndexEquation siCurve = SiteIndexEquation.SI_NO_EQUATION;
 		
 		if (sp64Name != null && region != null) {
 			var entry = speciesTable.getByCode(sp64Name);
@@ -263,14 +264,14 @@ public class VdypMethods {
 	
 			// If the curve for this species is not set, look it up from SINDEX.
 	
-			if (siCurve < 0) {
+			if (siCurve == SiteIndexEquation.SI_NO_EQUATION) {
 				int sindexSpcs;
 				try {
 					sindexSpcs = Sindxdll.SpecRemap(sp64Name, region == SpeciesRegion.COAST ? 'A' : 'D');
 	
 					siCurve = Sindxdll.DefCurve(sindexSpcs);
 				} catch (CommonCalculatorException e) {
-					siCurve = -1;
+					siCurve = SiteIndexEquation.SI_NO_EQUATION;
 				}
 				entry.details().currentSICurve()[region.ordinal()] = siCurve;
 			}
@@ -291,9 +292,9 @@ public class VdypMethods {
 	 * @return the BC default Site Index curve type to use for this species. Returns -2 
 	 * for non-commercial species.
 	 */
-	public static int getDefaultSICurve(String sp64Name, SpeciesRegion region) {
+	public static SiteIndexEquation getDefaultSICurve(String sp64Name, SpeciesRegion region) {
 		
-		int siCurve = -1;
+		SiteIndexEquation siCurve = SiteIndexEquation.SI_NO_EQUATION;
 
 		if (sp64Name != null && region != null && speciesTable.getByCode(sp64Name).details() != SpeciesTable.DefaultEntry) {
 
@@ -321,9 +322,9 @@ public class VdypMethods {
 	 *
 	 * @return the previous value.
 	 */
-	public static int setCurrentSICurve(String sp64CodeName, SpeciesRegion region, int siCurve) {
+	public static SiteIndexEquation setCurrentSICurve(String sp64CodeName, SpeciesRegion region, SiteIndexEquation siCurve) {
 		
-		int oldCurve = getCurrentSICurve(sp64CodeName, region);
+		SiteIndexEquation oldCurve = getCurrentSICurve(sp64CodeName, region);
 		var speciesEntry = speciesTable.getByCode(sp64CodeName);
 		if (region != null && speciesEntry.details() != SpeciesTable.DefaultEntry) {
 			speciesEntry.details().currentSICurve()[region.ordinal()] = siCurve;
@@ -400,16 +401,16 @@ public class VdypMethods {
 						
 						// Count each of the curves in the range of curves for the species.
 	
-						int curveNum = Sindxdll.FirstCurve(sindxSpeciesIndex);
+						SiteIndexEquation curve = Sindxdll.FirstCurve(sindxSpeciesIndex);
 	
-						while (curveNum >= 0) {
-							if (!countedCurve[curveNum]) {
+						while (true) {
+							if (!countedCurve[curve.n()]) {
 								numCurves++;
-								countedCurve[curveNum] = true;
+								countedCurve[curve.n()] = true;
 							}
 							
 							try {
-								curveNum = Sindxdll.NextCurve(sindxSpeciesIndex, curveNum);
+								curve = Sindxdll.NextCurve(sindxSpeciesIndex, curve);
 							} catch (NoAnswerException e) {
 								break;
 							}
@@ -418,10 +419,10 @@ public class VdypMethods {
 						// Make sure we track the default curve just in case it lies outside of the range of curves
 						// enumerated above.
 	
-						curveNum = Sindxdll.DefCurve(sindxSpeciesIndex);
-						if (curveNum >= 0 && !countedCurve[curveNum]) {
+						curve = Sindxdll.DefCurve(sindxSpeciesIndex);
+						if (!SiteIndexEquation.SI_NO_EQUATION.equals(curve) && !countedCurve[curve.n()]) {
 							numCurves++;
-							countedCurve[curveNum] = true;
+							countedCurve[curve.n()] = true;
 						}
 					}
 				} catch (CommonCalculatorException e) {
