@@ -12,9 +12,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import org.apache.commons.math3.ml.neuralnet.twod.util.TopographicErrorHistogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
+import ca.bc.gov.nrs.vdyp.application.RuntimeProcessingException;
 import ca.bc.gov.nrs.vdyp.application.RuntimeStandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
@@ -30,12 +33,14 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.Region;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
@@ -807,7 +812,35 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	VriPolygon processBatc(VriPolygon poly) throws ProcessingException {
 
 		VriLayer primaryLayer = getPrimaryLayer(poly);
+		Optional<VriLayer> veteranLayer = getVeteranLayer(poly);
 		BecDefinition bec = getBec(poly);
+
+		try {
+			//
+			final float percentForestLand = poly.getPercentAvailable().orElseGet(() -> {
+				try {
+					return this.estimatePercentForestLand(poly, veteranLayer, primaryLayer);
+				} catch (ProcessingException ex) {
+					throw new RuntimeProcessingException(ex);
+				}
+			}); // PCTFLAND
+
+			final float primaryBreastHeightAge = getLayerBreastHeightAge(primaryLayer).orElseThrow();
+
+			// EMP040
+			final float initialPrimaryBaseArea = this
+					.estimatePrimaryBaseArea(primaryLayer, bec, poly.getYieldFactor(), primaryBreastHeightAge, 0.0f);
+
+			final Optional<Float> veteranBaseArea = veteranLayer.map(InputLayer::getCrownClosure) // BAV
+					.map(ccV -> ccV * initialPrimaryBaseArea / primaryLayer.getCrownClosure());
+
+			final float primaryBaseArea = this.estimatePrimaryBaseArea(
+					primaryLayer, bec, poly.getYieldFactor(), primaryBreastHeightAge, veteranBaseArea.orElse(0.0f) // BAP
+			);
+
+		} catch (RuntimeProcessingException ex) {
+			throw ex.getCause();
+		}
 
 		// TODO
 		return poly;

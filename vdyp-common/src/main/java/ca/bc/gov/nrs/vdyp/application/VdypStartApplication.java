@@ -439,6 +439,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		return vriWriter;
 	}
 
+	// EMP040
 	protected float estimatePrimaryBaseArea(
 			L layer, BecDefinition bec, float yieldFactor, float breastHeightAge, float baseAreaOverstory,
 			float crownClosure
@@ -543,6 +544,13 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		return getPrimarySite(layer).flatMap(BaseVdypSite::getYearsToBreastHeight);
 	}
 
+	protected Optional<Float> getLayerBreastHeightAge(L layer) {
+		// TODO implement accessor for VRI and FIP Site. InputSite interface?
+		return getPrimarySite(layer).flatMap(
+				site -> Utils.mapBoth(site.getAgeTotal(), site.getYearsToBreastHeight(), (at, ytbh) -> at - ytbh)
+		);
+	}
+
 	protected float estimatePrimaryBaseArea(
 			L layer, BecDefinition bec, float yieldFactor, float breastHeightAge, float baseAreaOverstory
 	) throws LowValueException {
@@ -562,6 +570,10 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			throw new StandProcessingException("Polygon does not have a primary layer");
 		}
 		return primaryLayer;
+	}
+
+	protected Optional<L> getVeteranLayer(P poly) throws StandProcessingException {
+		return Utils.optSafe(poly.getLayers().get(LayerType.VETERAN));
 	}
 
 	protected BecDefinition getBec(P poly) throws ProcessingException {
