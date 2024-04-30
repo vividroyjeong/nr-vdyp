@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapValueReplacer;
 import ca.bc.gov.nrs.vdyp.io.parse.control.NonFipControlParser;
@@ -1109,6 +1110,131 @@ class VdypStartApplicationTest {
 
 			assertThat(ex, hasProperty("value", is(0f)));
 			assertThat(ex, hasProperty("threshold", is(0.05f)));
+		}
+	}
+
+	@Test
+	void testEstimatePrimaryQuadMeanDiameter() throws Exception {
+		var controlMap = TestUtils.loadControlMap();
+		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
+		try (var app = new TestStartApplication(controlMap, false)) {
+
+			var becLookup = BecDefinitionParser.getBecs(controlMap);
+			var bec = becLookup.get("CWH").get();
+
+			var layer = this.getTestPrimaryLayer(polygonId, l -> {
+				l.crownClosure(82.8000031f);
+			}, s -> {
+				s.ageTotal(85f);
+				s.height(38.2999992f);
+				s.siteIndex(28.6000004f);
+				s.yearsToBreastHeight(5.4000001f);
+				s.siteCurveNumber(34);
+				s.siteGenus("H");
+			});
+
+			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
+				s.setPercentGenus(33f);
+				s.setFractionGenus(0.330000013f);
+			});
+			var spec2 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
+				s.setPercentGenus(67f);
+				s.setFractionGenus(0.670000017f);
+			});
+
+			Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
+			allSpecies.put(spec1.getGenus(), spec1);
+			allSpecies.put(spec2.getGenus(), spec2);
+
+			layer.setSpecies(allSpecies);
+
+			var result = app.estimatePrimaryQuadMeanDiameter(layer, bec, 79.5999985f, 3.13497972f);
+
+			assertThat(result, closeTo(32.5390053f));
+		}
+	}
+
+	@Test
+	void testEstimatePrimaryQuadMeanDiameterHeightLessThanA5() throws Exception {
+		var controlMap = TestUtils.loadControlMap();
+		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
+		try (var app = new TestStartApplication(controlMap, false)) {
+
+			var becLookup = BecDefinitionParser.getBecs(controlMap);
+			var bec = becLookup.get("CWH").get();
+
+			var layer = this.getTestPrimaryLayer(polygonId, l -> {
+				l.crownClosure(82.8000031f);
+			}, s -> {
+				s.ageTotal(85f);
+				s.height(4.74730005f);
+				s.siteIndex(28.6000004f);
+				s.yearsToBreastHeight(5.4000001f);
+				s.siteCurveNumber(34);
+				s.siteGenus("H");
+			});
+
+			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
+				s.setPercentGenus(33f);
+				s.setFractionGenus(0.330000013f);
+			});
+			var spec2 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
+				s.setPercentGenus(67f);
+				s.setFractionGenus(0.670000017f);
+			});
+
+			Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
+			allSpecies.put(spec1.getGenus(), spec1);
+			allSpecies.put(spec2.getGenus(), spec2);
+
+			layer.setSpecies(allSpecies);
+
+			var result = app.estimatePrimaryQuadMeanDiameter(layer, bec, 79.5999985f, 3.13497972f);
+
+			assertThat(result, closeTo(7.6f));
+		}
+	}
+
+	@Test
+	void testEstimatePrimaryQuadMeanDiameterResultLargerThanUpperBound() throws Exception {
+		var controlMap = TestUtils.loadControlMap();
+		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
+		try (var app = new TestStartApplication(controlMap, false)) {
+
+			var becLookup = BecDefinitionParser.getBecs(controlMap);
+			var bec = becLookup.get("CWH").get();
+
+			// Tweak the values to produce a very large DQ
+			var layer = this.getTestPrimaryLayer(polygonId, l -> {
+				l.crownClosure(82.8000031f);
+			}, s -> {
+				s.ageTotal(350f);
+				s.height(80f);
+				s.siteIndex(28.6000004f);
+				s.yearsToBreastHeight(5.4000001f);
+				s.siteCurveNumber(34);
+				s.siteGenus("H");
+			});
+
+			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
+				s.setPercentGenus(33f);
+				s.setFractionGenus(0.330000013f);
+			});
+			var spec2 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
+				s.setPercentGenus(67f);
+				s.setFractionGenus(0.670000017f);
+			});
+
+			Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
+			allSpecies.put(spec1.getGenus(), spec1);
+			allSpecies.put(spec2.getGenus(), spec2);
+
+			layer.setSpecies(allSpecies);
+
+			var result = app.estimatePrimaryQuadMeanDiameter(layer, bec, 350f - 5.4000001f, 3.13497972f);
+
+			assertThat(result, closeTo(61.1f)); // Clamp to the COE043/UPPER_BA_BY_CI_S0_P DQ value for this species and
+			// region
 		}
 	}
 

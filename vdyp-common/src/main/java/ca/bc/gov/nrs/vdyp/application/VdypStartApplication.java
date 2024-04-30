@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.application;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.clamp;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.exp;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.floor;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.log;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.pow;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -739,6 +740,70 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			return floor(min(percentYield + gainMax, 100f));
 
 		}
+	}
+
+	// EMP041
+	protected float estimatePrimaryQuadMeanDiameter(
+			L layer, BecDefinition bec, float breastHeightAge, float baseAreaOverstory
+	) {
+		var coeMap = Utils.<MatrixMap2<String, String, Coefficients>>expectParsedControl(
+				controlMap, ControlKey.COE_DQ, MatrixMap2.class
+		);
+		var modMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
+				controlMap, ControlKey.DQ_MODIFIERS, MatrixMap2.class
+		);
+		var upperBoundMap = Utils.<MatrixMap3<Region, String, Integer, Float>>expectParsedControl(
+				controlMap, ControlKey.UPPER_BA_BY_CI_S0_P, MatrixMap3.class
+		);
+
+		var leadGenus = leadGenus(layer);
+
+		var decayBecAlias = bec.getDecayBec().getAlias();
+		Coefficients coe = weightedCoefficientSum(
+				List.of(0, 1, 2, 3, 4), 8, 0, layer.getSpecies().values(), BaseVdypSpecies::getFractionGenus,
+				s -> coeMap.get(decayBecAlias, s.getGenus())
+		);
+
+		var trAge = log(clamp(breastHeightAge, 5f, 350f));
+		var height = getLayerHeight(layer).orElse(0f);
+
+		if (height <= coe.getCoe(5)) {
+			return 7.6f;
+		}
+
+		/* @formatter:off */
+		//    C0 = A(0)
+		//    C1 = EXP(A(1)) + EXP(A(2)) * TR_AGE
+		//    C2 = EXP(A(3)) + EXP(A(4)) * TR_AGE
+		/* @formatter:on */
+		var c0 = coe.get(0);
+		var c1 = exp(coe.getCoe(1)) + exp(coe.getCoe(2)) * trAge;
+		var c2 = exp(coe.getCoe(3)) + exp(coe.getCoe(4)) * trAge;
+
+		/* @formatter:off */
+		//      DQ = C0 + ( C1*(HD - A(5))**C2 )**2 * exp(A(7)*BAV)
+		//     &        * (1.0 - A(6)*CC/100.0)
+		/* @formatter:on */
+
+		var quadMeanDiameter = c0 + pow(c1 * pow(height - coe.getCoe(5), c2), 2)
+				* exp(coe.getCoe(7) * baseAreaOverstory) * (1f - coe.getCoe(6) * layer.getCrownClosure() / 100f);
+
+		/* @formatter:off */
+		//      DQ = DQ * DQMOD200(JLEAD, INDEX_IC)
+		/* @formatter:on */
+		quadMeanDiameter *= modMap.get(leadGenus.getGenus(), bec.getRegion());
+
+		quadMeanDiameter = max(quadMeanDiameter, 7.6f);
+
+		// TODO
+		var NDEBUG_2 = 0;
+		if (NDEBUG_2 <= 0) {
+			// See ISPSJF129
+			var upperBound = upperBoundMap.get(bec.getRegion(), leadGenus.getGenus(), UpperCoefficientParser.DQ);
+			quadMeanDiameter = min(quadMeanDiameter, upperBound);
+		}
+
+		return quadMeanDiameter;
 	}
 
 }
