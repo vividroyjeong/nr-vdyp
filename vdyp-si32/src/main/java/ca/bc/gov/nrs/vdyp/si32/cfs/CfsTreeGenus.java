@@ -2,8 +2,8 @@ package ca.bc.gov.nrs.vdyp.si32.cfs;
 
 import java.text.MessageFormat;
 
+import ca.bc.gov.nrs.vdyp.model.EnumIterator;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
-import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 
 /**
  * Enumerate the different Tree Genus as defined by the Canadian Forest Service for 
@@ -111,7 +111,7 @@ public enum CfsTreeGenus implements SI32Enum<CfsTreeGenus> {
 		return UNSPECIFIED_BROAD_LEAVES.index - SPRUCE.index + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<CfsTreeGenus> {
+	public static class Iterator extends EnumIterator<CfsTreeGenus> {
 		public Iterator() {
 			super(values(), SPRUCE, UNSPECIFIED_BROAD_LEAVES);
 		}

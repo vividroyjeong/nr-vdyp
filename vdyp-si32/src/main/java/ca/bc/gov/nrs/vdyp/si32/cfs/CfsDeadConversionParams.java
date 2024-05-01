@@ -2,8 +2,8 @@ package ca.bc.gov.nrs.vdyp.si32.cfs;
 
 import java.text.MessageFormat;
 
+import ca.bc.gov.nrs.vdyp.model.EnumIterator;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
-import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 
 /**
  * Lists the different conversion parameters that support the calculation of Dead CFS Biomass.
@@ -89,7 +89,7 @@ public enum CfsDeadConversionParams implements SI32Enum<CfsDeadConversionParams>
 		return V4.index - PROP1.index + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<CfsDeadConversionParams> {
+	public static class Iterator extends EnumIterator<CfsDeadConversionParams> {
 		public Iterator() {
 			super(values(), PROP1, V4);
 		}

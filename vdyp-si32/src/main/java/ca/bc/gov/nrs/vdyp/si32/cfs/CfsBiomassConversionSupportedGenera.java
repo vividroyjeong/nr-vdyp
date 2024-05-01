@@ -2,8 +2,8 @@ package ca.bc.gov.nrs.vdyp.si32.cfs;
 
 import java.text.MessageFormat;
 
+import ca.bc.gov.nrs.vdyp.model.EnumIterator;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
-import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 
 /**
  * Lists the indices for CFS Genus for looking up CFS Conversion Params at the Genus level.
@@ -107,7 +107,7 @@ public enum CfsBiomassConversionSupportedGenera implements SI32Enum<CfsBiomassCo
 		return ZH.index - AC.index + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<CfsBiomassConversionSupportedGenera> {
+	public static class Iterator extends EnumIterator<CfsBiomassConversionSupportedGenera> {
 		public Iterator() {
 			super(values(), AC, ZH);
 		}

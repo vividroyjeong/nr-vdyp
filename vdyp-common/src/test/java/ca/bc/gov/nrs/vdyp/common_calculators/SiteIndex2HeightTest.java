@@ -22,14 +22,18 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorException;
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMaximumException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMinimumException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 
 class SiteIndex2HeightTest {
 
@@ -79,6 +83,24 @@ class SiteIndex2HeightTest {
 					NoAnswerException.class,
 					() -> SiteIndex2Height.indexToHeight(SI_CWC_KURUCZAC, (short) -1, SI_AT_TOTAL, 1.31, 0.0, 0.0)
 			);
+		}
+
+		@Test
+		void runAllCalls()  {
+			
+			var equationIterator = SiteIndexEquation.getIterator();
+			while (equationIterator.hasNext()) {
+				var eq = equationIterator.next();
+				for (SiteIndexAgeType t: SiteIndexAgeType.values()) {
+					try {
+						SiteIndex2Height.indexToHeight(eq, 0.0, t, 1.31, 1.0, 0.0);
+					} catch (GrowthInterceptMaximumException | GrowthInterceptMinimumException | NoAnswerException e) {
+						// ok - continue
+					} catch (CommonCalculatorException e) {
+						Assertions.fail(e);
+					}
+				}
+			}
 		}
 
 		@Test

@@ -2,8 +2,8 @@ package ca.bc.gov.nrs.vdyp.si32.cfs;
 
 import java.text.MessageFormat;
 
+import ca.bc.gov.nrs.vdyp.model.EnumIterator;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
-import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 
 /**
  * Live CFS Biomass definitions.
@@ -122,7 +122,7 @@ public enum CfsLiveConversionParams implements SI32Enum<CfsLiveConversionParams>
 		return HIGH_FOLIAGE_PROP.index - A.index + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<CfsLiveConversionParams> {
+	public static class Iterator extends EnumIterator<CfsLiveConversionParams> {
 		public Iterator() {
 			super(values(), A, HIGH_FOLIAGE_PROP);
 		}

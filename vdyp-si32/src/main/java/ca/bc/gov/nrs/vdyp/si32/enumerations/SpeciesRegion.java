@@ -3,6 +3,8 @@ package ca.bc.gov.nrs.vdyp.si32.enumerations;
 import java.util.HashMap;
 import java.util.Map;
 
+import ca.bc.gov.nrs.vdyp.model.EnumIterator;
+
 /**
  * Enumerates each of the potential regions a species can be found in.
  * <ul>
@@ -63,7 +65,7 @@ public enum SpeciesRegion implements SI32Enum<SpeciesRegion> {
 		return INTERIOR.index - COAST.index + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<SpeciesRegion> {
+	public static class Iterator extends EnumIterator<SpeciesRegion> {
 		public Iterator() {
 			super(values(), COAST, INTERIOR);
 		}

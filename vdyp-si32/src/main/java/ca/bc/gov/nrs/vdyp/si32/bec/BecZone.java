@@ -4,8 +4,8 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import ca.bc.gov.nrs.vdyp.model.EnumIterator;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
-import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 
 /**
  * Identifies each of the BEC Zones known to the system.
@@ -89,7 +89,7 @@ public enum BecZone implements SI32Enum<BecZone> {
 		return SWB.index - AT.index + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<BecZone> {
+	public static class Iterator extends EnumIterator<BecZone> {
 		public Iterator() {
 			super(values(), AT, SWB);
 		}

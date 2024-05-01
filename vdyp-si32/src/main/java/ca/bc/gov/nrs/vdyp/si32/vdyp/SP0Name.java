@@ -2,8 +2,8 @@ package ca.bc.gov.nrs.vdyp.si32.vdyp;
 
 import java.text.MessageFormat;
 
+import ca.bc.gov.nrs.vdyp.model.EnumIterator;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
-import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 
 /**
  * An enumeration holding each of the valid SP0 genera known to VDYP7.
@@ -93,7 +93,7 @@ public enum SP0Name implements SI32Enum<SP0Name> {
 		return Y.index - AC.index + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<SP0Name> {
+	public static class Iterator extends EnumIterator<SP0Name> {
 		public Iterator() {
 			super(values(), AC, Y);
 		}

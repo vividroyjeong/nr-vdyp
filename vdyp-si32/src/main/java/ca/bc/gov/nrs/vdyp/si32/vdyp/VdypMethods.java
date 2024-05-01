@@ -65,7 +65,7 @@ public class VdypMethods {
 	 * Determines if the given species name is valid; that is, if it is either a Commercial 
 	 * or Non-Commercial tree species as defined by MoF..
 	 *
-     * @param spName the species name to test.
+	 * @param spName the species name to test.
 	 * @return a boolean indicating the result of the test.
 	 */
 	public static boolean isValidSpecies(String sp64Name) {
@@ -258,18 +258,18 @@ public class VdypMethods {
 	public static SiteIndexEquation getCurrentSICurve(String sp64Name, SpeciesRegion region) {
 
 		SiteIndexEquation siCurve = SiteIndexEquation.SI_NO_EQUATION;
-		
+
 		if (sp64Name != null && region != null) {
 			var entry = speciesTable.getByCode(sp64Name);
 			siCurve = entry.details().currentSICurve()[region.ordinal()];
-	
+
 			// If the curve for this species is not set, look it up from SINDEX.
-	
+
 			if (siCurve == SiteIndexEquation.SI_NO_EQUATION) {
 				SiteIndexSpecies sindexSpcs;
 				try {
 					sindexSpcs = Sindxdll.SpecRemap(sp64Name, region == SpeciesRegion.COAST ? 'A' : 'D');
-	
+
 					siCurve = Sindxdll.DefCurve(sindexSpcs);
 				} catch (CommonCalculatorException e) {
 					siCurve = SiteIndexEquation.SI_NO_EQUATION;
@@ -277,7 +277,7 @@ public class VdypMethods {
 				entry.details().currentSICurve()[region.ordinal()] = siCurve;
 			}
 		}
-		
+
 		return siCurve;
 	}
 
@@ -294,10 +294,11 @@ public class VdypMethods {
 	 * for non-commercial species.
 	 */
 	public static SiteIndexEquation getDefaultSICurve(String sp64Name, SpeciesRegion region) {
-		
+
 		SiteIndexEquation siCurve = SiteIndexEquation.SI_NO_EQUATION;
 
-		if (sp64Name != null && region != null && speciesTable.getByCode(sp64Name).details() != SpeciesTable.DefaultEntry) {
+		if (sp64Name != null && region != null
+				&& speciesTable.getByCode(sp64Name).details() != SpeciesTable.DefaultEntry) {
 
 			try {
 				SiteIndexSpecies sindxSpcs = Sindxdll.SpecRemap(sp64Name, (region == SpeciesRegion.COAST) ? 'A' : 'D');
@@ -321,8 +322,9 @@ public class VdypMethods {
 	 *
 	 * @return the previous value.
 	 */
-	public static SiteIndexEquation setCurrentSICurve(String sp64CodeName, SpeciesRegion region, SiteIndexEquation siCurve) {
-		
+	public static SiteIndexEquation
+			setCurrentSICurve(String sp64CodeName, SpeciesRegion region, SiteIndexEquation siCurve) {
+
 		SiteIndexEquation oldCurve = getCurrentSICurve(sp64CodeName, region);
 		var speciesEntry = speciesTable.getByCode(sp64CodeName);
 		if (region != null && speciesEntry.details() != SpeciesTable.DefaultEntry) {
@@ -360,27 +362,29 @@ public class VdypMethods {
 	 *          curves, the count may be the same as when treating these regions 
 	 *          separately.
 	 */
-	public static int getNumSICurves(boolean respectSpeciesBoundariesInd, String sp64Name, 
-			boolean mixInteriorCoastalInd, SpeciesRegion region) {
+	public static int getNumSICurves(
+			boolean respectSpeciesBoundariesInd, String sp64Name,
+			boolean mixInteriorCoastalInd, SpeciesRegion region
+	) {
 
 		int numCurves = 0;
-		
+
 		// Check if we are going to return a count of all curves regardless of region.
 		if (!respectSpeciesBoundariesInd) {
 			return SI_MAX_CURVES;
 		}
 
 		if (sp64Name != null && (mixInteriorCoastalInd || region != null)) {
-			
+
 			int specNum = speciesIndex(sp64Name);
-	
+
 			if (specNum == SpeciesTable.UNKNOWN_ENTRY_INDEX) {
 				return 0;
 			}
-			
+
 			boolean[] countedCurve = new boolean[SI_MAX_CURVES];
 			Arrays.fill(countedCurve, 0, SI_MAX_CURVES, false);
-	
+
 			List<Character> forestInventoryZones = new ArrayList<>();
 			if (mixInteriorCoastalInd || SpeciesRegion.COAST.equals(region)) {
 				// Add in the number of available coastal curves.
@@ -390,23 +394,23 @@ public class VdypMethods {
 				// Add in the number of available interior curves.
 				forestInventoryZones.add('D');
 			}
-			
+
 			// Count the available coastal curves.
-			for (Character fiz: forestInventoryZones) {
+			for (Character fiz : forestInventoryZones) {
 				try {
 					SiteIndexSpecies sindxSpeciesIndex = Sindxdll.SpecRemap(sp64Name, fiz);
-	
+
 					// Count each of the curves in the range of curves for the species.
 
 					SiteIndexEquation curve = Sindxdll.FirstCurve(sindxSpeciesIndex);
 
 					while (true) {
-						
+
 						if (!countedCurve[curve.n()]) {
 							numCurves++;
 							countedCurve[curve.n()] = true;
 						}
-						
+
 						try {
 							curve = Sindxdll.NextCurve(sindxSpeciesIndex, curve);
 						} catch (NoAnswerException e) {
@@ -418,14 +422,17 @@ public class VdypMethods {
 					// enumerated above.
 
 					curve = Sindxdll.DefCurve(sindxSpeciesIndex);
-					
+
 					if (!SiteIndexEquation.SI_NO_EQUATION.equals(curve) && !countedCurve[curve.n()]) {
 						numCurves++;
 						countedCurve[curve.n()] = true;
 					}
 				} catch (CommonCalculatorException e) {
-					logger.warn(MessageFormat.format("CommonCalculatorException during evaluation of species {0}, fiz {2}"
-							, sp64Name, fiz));
+					logger.warn(
+							MessageFormat.format(
+									"CommonCalculatorException during evaluation of species {0}, fiz {2}", sp64Name, fiz
+							)
+					);
 				}
 			}
 		}
@@ -469,7 +476,7 @@ public class VdypMethods {
 			return -1.0f;
 		}
 	}
-	
+
 	/**
 	 * Convert a VDYP7 SP0 Species Name into an enumSP0Name.
 	 *

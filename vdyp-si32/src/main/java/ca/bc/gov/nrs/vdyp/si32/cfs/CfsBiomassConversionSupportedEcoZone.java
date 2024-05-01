@@ -2,8 +2,8 @@ package ca.bc.gov.nrs.vdyp.si32.cfs;
 
 import java.text.MessageFormat;
 
+import ca.bc.gov.nrs.vdyp.model.EnumIterator;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
-import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 
 /**
  * Lists indices to Eco Zone conversion factors for the supported CFS Biomass 
@@ -80,7 +80,7 @@ public enum CfsBiomassConversionSupportedEcoZone implements SI32Enum<CfsBiomassC
 		return MONTANE_CORDILLERA.index - TAIGA_PLAINS.index + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<CfsBiomassConversionSupportedEcoZone> {
+	public static class Iterator extends EnumIterator<CfsBiomassConversionSupportedEcoZone> {
 		public Iterator() {
 			super(values(), TAIGA_PLAINS, MONTANE_CORDILLERA);
 		}

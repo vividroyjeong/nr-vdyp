@@ -1,20 +1,27 @@
-package ca.bc.gov.nrs.vdyp.si32.enumerations;
+package ca.bc.gov.nrs.vdyp.model;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class SI32EnumIterator<T extends Enum<T>> implements Iterator<T> {
+/** 
+ * This class supports iterating over (portions of) enumerations. It is most useful
+ * for enumerations that contain some values that need to be included but are not
+ * formally part of the item set such as "not an element" entries and the like.
+ * 
+ * @param <T> the enum type
+ */
+public class EnumIterator<T extends Enum<T>> implements Iterator<T> {
 
 	private final int lastIndex;
 	private int currentIndex;
 	private final T[] valueArray;
 
-	public SI32EnumIterator(T[] values) {
+	public EnumIterator(T[] values) {
 		
 		this(values, values[0], values[values.length - 1]);
 	}
 
-	public SI32EnumIterator(T[] values, T first, T last) {
+	public EnumIterator(T[] values, T first, T last) {
 		
 		if (values == null) {
 			throw new IllegalArgumentException("values parameter to SI32EnumIterator may not be null");

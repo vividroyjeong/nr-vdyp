@@ -555,7 +555,7 @@ public class SiteIndex2Age {
 						// Write to the file
 						fileWriter.write(
 								String.format(
-										"before index_to_height(age=%.2f, age_type=%d, site_index=%.2f, y2bh=%.2f)%n", si2age, ageType, siteIndex, yearsToBreastHeight
+										"before index_to_height(age=%.2f, age_type=%s, site_index=%.2f, y2bh=%.2f)%n", si2age, ageType.toString(), siteIndex, yearsToBreastHeight
 								)
 						);
 

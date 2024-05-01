@@ -2,8 +2,8 @@ package ca.bc.gov.nrs.vdyp.si32.cfs;
 
 import java.text.MessageFormat;
 
+import ca.bc.gov.nrs.vdyp.model.EnumIterator;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
-import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 
 /**
  * Provides an enumeration of the different types of Tree Classes as defined by the
@@ -112,7 +112,7 @@ public enum CfsTreeClass implements SI32Enum<CfsTreeClass> {
 		return NO_LONGER_USED.index - MISSING.index + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<CfsTreeClass> {
+	public static class Iterator extends EnumIterator<CfsTreeClass> {
 		public Iterator() {
 			super(values(), MISSING, NO_LONGER_USED);
 		}
