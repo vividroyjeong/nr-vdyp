@@ -2,16 +2,16 @@ package ca.bc.gov.nrs.vdyp.si32.cfs;
 
 import java.text.MessageFormat;
 
+import ca.bc.gov.nrs.vdyp.model.EnumIterator;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
-import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 
 /**
  * Live CFS Biomass definitions.
  * <ul>
- * <li><b>cfsLiveParm_UNKNOWN</b>
+ * <li><b>UNKNOWN</b>
  * 	     Indicates an error condition or an uninitialized value. This value
  *       should never be used as an index for a specific conversion parameter.
- * <li><b>cfsLiveParm_...</b>
+ * <li><b>others</b>
  *       Indices into the {@link CfsBiomassConversionCoefficientsForSpecies} array for each
  *       of the CFS Biomass conversion parameters/coefficients.
  * </ul>
@@ -26,45 +26,47 @@ import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
  * </ol>
  */
 public enum CfsLiveConversionParams implements SI32Enum<CfsLiveConversionParams> {
-	cfsLiveParm_UNKNOWN(-1, "UNKNOWN"),
+	UNKNOWN(-1, "UNKNOWN", "??"),
 
 	/* Rows copied from spreadsheet appear below. */
-	cfsLiveParm_A(0, "Merch"), //
-	cfsLiveParm_B(1, "Merch"), //
-	cfsLiveParm_a_nonmerch(2, "Non-Merch"), //
-	cfsLiveParm_b_nonmerch(3, "Non-Merch"), //
-	cfsLiveParm_k_nonmerch(4, "Non-Merch"), //
-	cfsLiveParm_cap_nonmerch(5, "Non-Merch"), //
-	cfsLiveParm_a_sap(6, "Sapling"), //
-	cfsLiveParm_b_sap(7, "Sapling"), //
-	cfsLiveParm_k_sap(8, "Sapling"), //
-	cfsLiveParm_cap_sap(9, "Sapling"), //
-	cfsLiveParm_a1(10, "Prop Parm"), //
-	cfsLiveParm_a2(11, "Prop Parm"), //
-	cfsLiveParm_a3(12, "Prop Parm"), //
-	cfsLiveParm_b1(13, "Prop Parm"), //
-	cfsLiveParm_b2(14, "Prop Parm"), //
-	cfsLiveParm_b3(15, "Prop Parm"), //
-	cfsLiveParm_c1(16, "Prop Parm"), //
-	cfsLiveParm_c2(17, "Prop Parm"), //
-	cfsLiveParm_c3(18, "Prop Parm"), //
-	cfsLiveParm_min_volume(19, "Volume"), //
-	cfsLiveParm_max_volume(20, "Volume"), //
-	cfsLiveParm_low_stemwood_prop(21, "Stemwood"), //
-	cfsLiveParm_high_stemwood_prop(22, "Stemwood"), //
-	cfsLiveParm_low_stembark_prop(23, "Stembark"), //
-	cfsLiveParm_high_stembark_prop(24, "Stembark"), //
-	cfsLiveParm_low_branches_prop(25, "Branches"), //
-	cfsLiveParm_high_branches_prop(26, "Branches"), //
-	cfsLiveParm_low_foliage_prop(27, "Foliage"), //
-	cfsLiveParm_high_foliage_prop(28, "Foliage");
+	A(0, "Merch", "A"), //
+	B(1, "Merch", "B"), //
+	A_NONMERCH(2, "Non-Merch", "A"), //
+	B_NONMERCH(3, "Non-Merch", "B"), //
+	K_NONMERCH(4, "Non-Merch", "K"), //
+	CAP_NONMERCH(5, "Non-Merch", "CAP"), //
+	A_SAP(6, "Sapling", "A"), //
+	B_SAP(7, "Sapling", "B"), //
+	K_SAP(8, "Sapling", "K"), //
+	CAP_SAP(9, "Sapling", "CAP"), //
+	A1(10, "Prop Parm", "A1"), //
+	A2(11, "Prop Parm", "A2"), //
+	A3(12, "Prop Parm", "A3"), //
+	B1(13, "Prop Parm", "B1"), //
+	B2(14, "Prop Parm", "B2"), //
+	B3(15, "Prop Parm", "B3"), //
+	C1(16, "Prop Parm", "C1"), //
+	C2(17, "Prop Parm", "C2"), //
+	C3(18, "Prop Parm", "C3"), //
+	MIN_VOLUME(19, "Volume", "Min"), //
+	MAX_VOLUME(20, "Volume", "Max"), //
+	LOW_STEMWOOD_PROP(21, "Stemwood", "Min"), //
+	HIGH_STEMWOOD_PROP(22, "Stemwood", "Max"), //
+	LOW_STEMBARK_PROP(23, "Stembark", "Min"), //
+	HIGH_STEMBARK_PROP(24, "Stembark", "Max"), //
+	LOW_BRANCHES_PROP(25, "Branches", "Min"), //
+	HIGH_BRANCHES_PROP(26, "Branches", "Max"), //
+	LOW_FOLIAGE_PROP(27, "Foliage", "Min"), //
+	HIGH_FOLIAGE_PROP(28, "Foliage", "Max");
 
 	private final int index;
 	private final String category;
+	private final String shortName;
 
-	private CfsLiveConversionParams(int index, String category) {
+	private CfsLiveConversionParams(int index, String category, String shortName) {
 		this.index = index;
 		this.category = category;
+		this.shortName = shortName;
 	}
 
 	@Override
@@ -76,9 +78,13 @@ public enum CfsLiveConversionParams implements SI32Enum<CfsLiveConversionParams>
 		return category;
 	}
 
+	public String getShortName() {
+		return shortName;
+	}
+
 	@Override
 	public int getOffset() {
-		if (this.equals(cfsLiveParm_UNKNOWN)) {
+		if (this.equals(UNKNOWN)) {
 			throw new UnsupportedOperationException(MessageFormat.format("Cannot call getIndex on {0} as it's not a standard member of the enumeration", this));
 		}
 		
@@ -87,11 +93,11 @@ public enum CfsLiveConversionParams implements SI32Enum<CfsLiveConversionParams>
 	
 	@Override
 	public String getText() {
-		if (this.equals(cfsLiveParm_UNKNOWN)) {
+		if (this.equals(UNKNOWN)) {
 			return "";
 		}
 		
-		return this.toString().substring("cfsLiveParm_".length());
+		return this.toString();
 	}
 
 	/**
@@ -113,12 +119,12 @@ public enum CfsLiveConversionParams implements SI32Enum<CfsLiveConversionParams>
 	 * @return the number of non-housekeeping entries in the enumeration
 	 */
 	public static int size() {
-		return cfsLiveParm_high_foliage_prop.index - cfsLiveParm_A.index + 1;
+		return HIGH_FOLIAGE_PROP.index - A.index + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<CfsLiveConversionParams> {
+	public static class Iterator extends EnumIterator<CfsLiveConversionParams> {
 		public Iterator() {
-			super(cfsLiveParm_A, cfsLiveParm_high_foliage_prop, values());
+			super(values(), A, HIGH_FOLIAGE_PROP);
 		}
 	}
 }

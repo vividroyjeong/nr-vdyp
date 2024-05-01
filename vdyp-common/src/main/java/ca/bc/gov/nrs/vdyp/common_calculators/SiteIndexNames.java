@@ -1,436 +1,26 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_AT;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_BA;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_BL;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_CWC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_FDC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_FDI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_HWC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_HWI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_LW;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_PLI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_SB;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_SS;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_SW;
+
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies;
 
 /**
- * SiteIndexNames.java
+ * SiteIndexNames - full names of species and curves.
  */
 public class SiteIndexNames {
-	// Taken from sindex.h
-	
-	/* define species and equation indices */
-	private static final int SI_SPEC_AT = 8;
-	private static final int SI_SPEC_BA = 11;
-	private static final int SI_SPEC_BL = 16;
-	private static final int SI_SPEC_CWC = 23;
-	private static final int SI_SPEC_FDC = 39;
-	private static final int SI_SPEC_FDI = 40;
-	private static final int SI_SPEC_HWC = 47;
-	private static final int SI_SPEC_HWI = 48;
-	private static final int SI_SPEC_LW = 60;
-	private static final int SI_SPEC_PLI = 81;
-	private static final int SI_SPEC_SB = 95;
-	private static final int SI_SPEC_SS = 99;
-	private static final int SI_SPEC_SW = 100;
 
-	public static final String[] si_spec_code = {
-			// SI_SPEC_A
-			"A",
-
-			// SI_SPEC_ABAL
-			"Abal",
-
-			// SI_SPEC_ABCO
-			"Abco",
-
-			// SI_SPEC_AC
-			"Ac",
-
-			// SI_SPEC_ACB
-			"Acb",
-
-			// SI_SPEC_ACT
-			"Act",
-
-			// SI_SPEC_AD
-			"Ad",
-
-			// SI_SPEC_AH
-			"Ah",
-
-			// SI_SPEC_AT
-			"At",
-
-			// SI_SPEC_AX
-			"Ax",
-
-			// SI_SPEC_B
-			"B",
-
-			// SI_SPEC_BA
-			"Ba",
-
-			// SI_SPEC_BB
-			"Bb",
-
-			// SI_SPEC_BC
-			"Bc",
-
-			// SI_SPEC_BG
-			"Bg",
-
-			// SI_SPEC_BI
-			"Bi",
-
-			// SI_SPEC_BL
-			"Bl",
-
-			// SI_SPEC_BM
-			"Bm",
-
-			// SI_SPEC_BP
-			"Bp",
-
-			// SI_SPEC_BV
-			// "Bv", Constant removed from sindex in 2015 so commented out here
-
-			// SI_SPEC_C
-			"C",
-
-			// SI_SPEC_CI
-			"Ci",
-
-			// SI_SPEC_CP
-			"Cp",
-
-			// SI_SPEC_CW
-			"Cw",
-
-			// SI_SPEC_CWC
-			"Cwc",
-
-			// SI_SPEC_CWI
-			"Cwi",
-
-			// SI_SPEC_CY
-			"Cy",
-
-			// SI_SPEC_D
-			"D",
-
-			// SI_SPEC_DG
-			"Dg",
-
-			// SI_SPEC_DM
-			"Dm",
-
-			// SI_SPEC_DR
-			"Dr",
-
-			// SI_SPEC_E
-			"E",
-
-			// SI_SPEC_EA
-			"Ea",
-
-			// SI_SPEC_EB
-			"Eb",
-
-			// SI_SPEC_EE
-			"Ee",
-
-			// SI_SPEC_EP
-			"Ep",
-
-			// SI_SPEC_ES
-			"Es",
-
-			// SI_SPEC_EW
-			"Ew",
-
-			// SI_SPEC_EXP
-			"Exp",
-
-			// SI_SPEC_FD
-			"Fd",
-
-			// SI_SPEC_FDC
-			"Fdc",
-
-			// SI_SPEC_FDI
-			"Fdi",
-
-			// SI_SPEC_G
-			"G",
-
-			// SI_SPEC_GP
-			"Gp",
-
-			// SI_SPEC_GR
-			"Gr",
-
-			// SI_SPEC_H
-			"H",
-
-			// SI_SPEC_HM
-			"Hm",
-
-			// SI_SPEC_HW
-			"Hw",
-
-			// SI_SPEC_HWC
-			"Hwc",
-
-			// SI_SPEC_HWI
-			"Hwi",
-
-			// SI_SPEC_HXM
-			"Hxm",
-
-			// SI_SPEC_IG
-			"Ig",
-
-			// SI_SPEC_IS
-			"Is",
-
-			// SI_SPEC_J
-			"J",
-
-			// SI_SPEC_JR
-			"Jr",
-
-			// SI_SPEC_K
-			"K",
-
-			// SI_SPEC_KC
-			"Kc",
-
-			// SI_SPEC_L
-			"L",
-
-			// SI_SPEC_LA
-			"La",
-
-			// SI_SPEC_LE
-			"Le",
-
-			// SI_SPEC_LT
-			"Lt",
-
-			// SI_SPEC_LW
-			"Lw",
-
-			// SI_SPEC_M
-			"M",
-
-			// SI_SPEC_MB
-			"Mb",
-
-			// SI_SPEC_ME
-			"Me",
-
-			// SI_SPEC_MN
-			"Mn",
-
-			// SI_SPEC_MR
-			"Mr",
-
-			// SI_SPEC_MS
-			"Ms",
-
-			// SI_SPEC_MV
-			"Mv",
-
-			// SI_SPEC_OA
-			"Oa",
-
-			// SI_SPEC_OB
-			"Ob",
-
-			// SI_SPEC_OC
-			"Oc",
-
-			// SI_SPEC_OD
-			"Od",
-
-			// SI_SPEC_OE
-			"Oe",
-
-			// SI_SPEC_OF
-			"Of",
-
-			// SI_SPEC_OG
-			"Og",
-
-			// SI_SPEC_P
-			"P",
-
-			// SI_SPEC_PA
-			"Pa",
-
-			// SI_SPEC_PF
-			"Pf",
-
-			// SI_SPEC_PJ
-			"Pj",
-
-			// SI_SPEC_PL
-			"Pl",
-
-			// SI_SPEC_PLC
-			"Plc",
-
-			// SI_SPEC_PLI
-			"Pli",
-
-			// SI_SPEC_PM
-			"Pm",
-
-			// SI_SPEC_PR
-			"Pr",
-
-			// SI_SPEC_PS
-			"Ps",
-
-			// SI_SPEC_PW
-			"Pw",
-
-			// SI_SPEC_PXJ
-			"Pxj",
-
-			// SI_SPEC_PY
-			"Py",
-
-			// SI_SPEC_Q
-			"Q",
-
-			// SI_SPEC_QE
-			"Qe",
-
-			// SI_SPEC_QG
-			"Qg",
-
-			// SI_SPEC_R
-			"R",
-
-			// SI_SPEC_RA
-			"Ra",
-
-			// SI_SPEC_S
-			"S",
-
-			// SI_SPEC_SA
-			"Sa",
-
-			// SI_SPEC_SB
-			"Sb",
-
-			// SI_SPEC_SE
-			"Se",
-
-			// SI_SPEC_SI
-			"Si",
-
-			// SI_SPEC_SN
-			"Sn",
-
-			// SI_SPEC_SS
-			"Ss",
-
-			// SI_SPEC_SW
-			"Sw",
-
-			// SI_SPEC_SX
-			"Sx",
-
-			// SI_SPEC_SXB
-			"Sxb",
-
-			// SI_SPEC_SXE
-			"Sxe",
-
-			// SI_SPEC_SXL
-			"Sxl",
-
-			// SI_SPEC_SXS
-			"Sxs",
-
-			// SI_SPEC_SXW
-			"Sxw",
-
-			// SI_SPEC_SXX
-			"Sxx",
-
-			// SI_SPEC_T
-			"T",
-
-			// SI_SPEC_TW
-			"Tw",
-
-			// SI_SPEC_U
-			"U",
-
-			// SI_SPEC_UA
-			"Ua",
-
-			// SI_SPEC_UP
-			"Up",
-
-			// SI_SPEC_V
-			"V",
-
-			// SI_SPEC_VB
-			"Vb",
-
-			// SI_SPEC_VP
-			"Vp",
-
-			// SI_SPEC_VS
-			"Vs",
-
-			// SI_SPEC_VV
-			"Vv",
-
-			// SI_SPEC_W
-			"W",
-
-			// SI_SPEC_WA
-			"Wa",
-
-			// SI_SPEC_WB
-			"Wb",
-
-			// SI_SPEC_WD
-			"Wd",
-
-			// SI_SPEC_WI
-			"Wi",
-
-			// SI_SPEC_WP
-			"Wp",
-
-			// SI_SPEC_WS
-			"Ws",
-
-			// SI_SPEC_WT
-			"Wt",
-
-			// SI_SPEC_X
-			"X",
-
-			// SI_SPEC_XC
-			"Xc",
-
-			// SI_SPEC_XH
-			"Xh",
-
-			// SI_SPEC_Y
-			"Y",
-
-			// SI_SPEC_YC
-			"Yc",
-
-			// SI_SPEC_YP
-			"Yp",
-
-			// SI_SPEC_Z
-			"Z",
-
-			// SI_SPEC_ZC
-			"Zc",
-
-			// SI_SPEC_ZH
-			"Zh", };
-	
-	public static final String[] si_spec_name = {
+	public static final String[] siSpeciesName = {
 			// SI_SPEC_A
 			"Aspen",
 
@@ -838,10 +428,9 @@ public class SiteIndexNames {
 
 			// SI_SPEC_ZH
 			"Other hardwood",
-
 	};
 
-	public static String[] si_curve_name = {
+	public static String[] siCurveName = {
 			// SI_ACB_HUANG
 			"Huang, Titus, and Lakusta (1994)",
 
@@ -1277,33 +866,60 @@ public class SiteIndexNames {
 			// SI_CWC_NIGH
 			"Nigh (2016)", };
 
-	/*
+	/**
 	 * Site index conversion between species. Here's how to use the following array: The four elements are: reference
 	 * species, target species, coeff_a, coeff_b.
-	 *
+	 * <p>
 	 * Target_SI = coeff_a + coeff_b * Reference_SI
 	 */
-	public static final double[][] si_convert = { { SI_SPEC_AT, SI_SPEC_SW, 3.804, 0.7978 },
-			{ SI_SPEC_BA, SI_SPEC_HWC, 2.005, 1.014 }, { SI_SPEC_CWC, SI_SPEC_HWC, 1.256, 1.048 },
-			{ SI_SPEC_FDC, SI_SPEC_HWC, -0.432, 0.899 }, { SI_SPEC_HWC, SI_SPEC_BA, -1.97731755, 0.98619329 },
-			{ SI_SPEC_HWC, SI_SPEC_CWC, -1.19847328, 0.95419847 }, { SI_SPEC_HWC, SI_SPEC_FDC, 0.48053393, 1.11234705 },
-			{ SI_SPEC_HWC, SI_SPEC_SS, -4.94382022, 1.24843945 }, { SI_SPEC_HWI, SI_SPEC_FDI, 4.56, 0.887 },
-			{ SI_SPEC_SS, SI_SPEC_HWC, 3.96, 0.801 }, { SI_SPEC_PLI, SI_SPEC_SW, -2.14130435, 1.08695652 },
-			{ SI_SPEC_PLI, SI_SPEC_FDI, 0.70841121, 0.93457944 }, { SI_SPEC_PLI, SI_SPEC_BL, 0.47431193, 0.91743119 },
-			{ SI_SPEC_PLI, SI_SPEC_LW, 1.92307692, 0.96153846 }, { SI_SPEC_PLI, SI_SPEC_SB, 2.76436782, 0.6385696 },
-			{ SI_SPEC_SB, SI_SPEC_PLI, -4.329, 1.566 }, { SI_SPEC_SW, SI_SPEC_AT, -4.768112309, 1.253446979 },
-			{ SI_SPEC_SW, SI_SPEC_PLI, 1.97, 0.92 }, { SI_SPEC_SW, SI_SPEC_FDI, 4.75, 0.737 },
-			{ SI_SPEC_SW, SI_SPEC_BL, 1.68, 0.86 }, { SI_SPEC_FDI, SI_SPEC_PLI, -0.758, 1.07 },
-			{ SI_SPEC_FDI, SI_SPEC_SW, -6.44504749, 1.3568521 }, { SI_SPEC_FDI, SI_SPEC_HWI, -5.14092446, 1.12739572 },
-			{ SI_SPEC_FDI, SI_SPEC_LW, 0.70193286, 1.017294 }, { SI_SPEC_BL, SI_SPEC_PLI, -0.517, 1.09 },
-			{ SI_SPEC_BL, SI_SPEC_SW, -1.95348837, 1.1627907 }, { SI_SPEC_LW, SI_SPEC_PLI, -2, 1.04 },
-			{ SI_SPEC_LW, SI_SPEC_FDI, -0.69, 0.983 }, };
+	
+	public record SpeciesConversionParametersDetails(
+			SiteIndexSpecies sourceSpecies,
+			SiteIndexSpecies targetSpecies,
+			double param1,
+			double param2) {}
+	
+	public static final SpeciesConversionParametersDetails[] siSpeciesConversionParameters = { 
+			new SpeciesConversionParametersDetails(SI_SPEC_AT, SI_SPEC_SW, 3.804, 0.7978), //
+			new SpeciesConversionParametersDetails(SI_SPEC_BA, SI_SPEC_HWC, 2.005, 1.014), //
+			new SpeciesConversionParametersDetails(SI_SPEC_CWC, SI_SPEC_HWC, 1.256, 1.048), //
+			new SpeciesConversionParametersDetails(SI_SPEC_FDC, SI_SPEC_HWC, -0.432, 0.899), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_HWC, SI_SPEC_BA, -1.97731755, 0.98619329), //
+			new SpeciesConversionParametersDetails(SI_SPEC_HWC, SI_SPEC_CWC, -1.19847328, 0.95419847), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_HWC, SI_SPEC_FDC, 0.48053393, 1.11234705), //
+			new SpeciesConversionParametersDetails(SI_SPEC_HWC, SI_SPEC_SS, -4.94382022, 1.24843945), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_HWI, SI_SPEC_FDI, 4.56, 0.887), //
+			new SpeciesConversionParametersDetails(SI_SPEC_SS, SI_SPEC_HWC, 3.96, 0.801), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_PLI, SI_SPEC_SW, -2.14130435, 1.08695652), //
+			new SpeciesConversionParametersDetails(SI_SPEC_PLI, SI_SPEC_FDI, 0.70841121, 0.93457944), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_PLI, SI_SPEC_BL, 0.47431193, 0.91743119), //
+			new SpeciesConversionParametersDetails(SI_SPEC_PLI, SI_SPEC_LW, 1.92307692, 0.96153846), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_PLI, SI_SPEC_SB, 2.76436782, 0.6385696), //
+			new SpeciesConversionParametersDetails(SI_SPEC_SB, SI_SPEC_PLI, -4.329, 1.566), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_SW, SI_SPEC_AT, -4.768112309, 1.253446979), //
+			new SpeciesConversionParametersDetails(SI_SPEC_SW, SI_SPEC_PLI, 1.97, 0.92), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_SW, SI_SPEC_FDI, 4.75, 0.737), //
+			new SpeciesConversionParametersDetails(SI_SPEC_SW, SI_SPEC_BL, 1.68, 0.86), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_FDI, SI_SPEC_PLI, -0.758, 1.07), //
+			new SpeciesConversionParametersDetails(SI_SPEC_FDI, SI_SPEC_SW, -6.44504749, 1.3568521), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_FDI, SI_SPEC_HWI, -5.14092446, 1.12739572), //
+			new SpeciesConversionParametersDetails(SI_SPEC_FDI, SI_SPEC_LW, 0.70193286, 1.017294), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_BL, SI_SPEC_PLI, -0.517, 1.09), //
+			new SpeciesConversionParametersDetails(SI_SPEC_BL, SI_SPEC_SW, -1.95348837, 1.1627907), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_LW, SI_SPEC_PLI, -2, 1.04), //
+			new SpeciesConversionParametersDetails(SI_SPEC_LW, SI_SPEC_FDI, -0.69, 0.983)
+		};
 
-	/*
-	 * indicates what equations are available (these are additive): 1: ht = fn (si, age) 2: si = fn (ht, age) 4: y2bh =
-	 * fn (si) 8: si = fn (ht, age) growth intercept
+	/**
+	 * Indicates what equations are available (these are additive):
+	 * <ul>
+	 * <li>1: ht = fn (si, age)
+	 * <li>2: si = fn (ht, age) 
+	 * <li>4: y2bh = fn (si) 
+	 * <li>8: si = fn (ht, age) (growth intercept)
+	 * </ul>
 	 */
-	public static char[] si_curve_types = {
+	public static char[] siCurveAvailableTypes = {
 			// SI_ACB_HUANG
 			5,
 
@@ -1742,9 +1358,9 @@ public class SiteIndexNames {
 	};
 
 	/**
-	 * height(m) of breast height (typically 1.3, 1.37, 1.3716)
+	 * Height(m) of breast height (typically 1.3, 1.37, 1.3716).
 	 */
-	public static double[] si_curve_bh = {
+	public static double[] siCurveBreastHeight = {
 			// SI_ACB_HUANG
 			1.3,
 
@@ -2178,6 +1794,6 @@ public class SiteIndexNames {
 			1.3,
 
 			// SI_CWC_NIGH
-			1.3
-	};
+			1.3 
+		};
 }

@@ -19,38 +19,38 @@ public class BecZoneMethods {
 	private static final Map<String, BecZone> becZoneToIndexMap = new HashMap<>();
 
 	static {
-		becZoneToIndexMap.put("AT", BecZone.bec_AT);
-		becZoneToIndexMap.put("BG", BecZone.bec_BG);
-		becZoneToIndexMap.put("BWBS", BecZone.bec_BWBS);
-		becZoneToIndexMap.put("CDF", BecZone.bec_CDF);
-		becZoneToIndexMap.put("CWH", BecZone.bec_CWH);
-		becZoneToIndexMap.put("ESSF", BecZone.bec_ESSF);
-		becZoneToIndexMap.put("ICH", BecZone.bec_ICH);
-		becZoneToIndexMap.put("IDF", BecZone.bec_IDF);
-		becZoneToIndexMap.put("MH", BecZone.bec_MH);
-		becZoneToIndexMap.put("MS", BecZone.bec_MS);
-		becZoneToIndexMap.put("PP", BecZone.bec_PP);
-		becZoneToIndexMap.put("SBSP", BecZone.bec_SBPS);
-		becZoneToIndexMap.put("SBS", BecZone.bec_SBS);
-		becZoneToIndexMap.put("SWB", BecZone.bec_SWB);
+		becZoneToIndexMap.put("AT", BecZone.AT);
+		becZoneToIndexMap.put("BG", BecZone.BG);
+		becZoneToIndexMap.put("BWBS", BecZone.BWBS);
+		becZoneToIndexMap.put("CDF", BecZone.CDF);
+		becZoneToIndexMap.put("CWH", BecZone.CWH);
+		becZoneToIndexMap.put("ESSF", BecZone.ESSF);
+		becZoneToIndexMap.put("ICH", BecZone.ICH);
+		becZoneToIndexMap.put("IDF", BecZone.IDF);
+		becZoneToIndexMap.put("MH", BecZone.MH);
+		becZoneToIndexMap.put("MS", BecZone.MS);
+		becZoneToIndexMap.put("PP", BecZone.PP);
+		becZoneToIndexMap.put("SBSP", BecZone.SBPS);
+		becZoneToIndexMap.put("SBS", BecZone.SBS);
+		becZoneToIndexMap.put("SWB", BecZone.SWB);
 	}
 
 	private static final Map<BecZone, String> enumToBecZoneMap = new HashMap<>();
 	static {
-		enumToBecZoneMap.put(BecZone.bec_AT, "AT");
-		enumToBecZoneMap.put(BecZone.bec_BG, "BG");
-		enumToBecZoneMap.put(BecZone.bec_BWBS, "BWBS");
-		enumToBecZoneMap.put(BecZone.bec_CDF, "CDF");
-		enumToBecZoneMap.put(BecZone.bec_CWH, "CWH");
-		enumToBecZoneMap.put(BecZone.bec_ESSF, "ESSF");
-		enumToBecZoneMap.put(BecZone.bec_ICH, "ICH");
-		enumToBecZoneMap.put(BecZone.bec_IDF, "IDF");
-		enumToBecZoneMap.put(BecZone.bec_MH, "MH");
-		enumToBecZoneMap.put(BecZone.bec_MS, "MS");
-		enumToBecZoneMap.put(BecZone.bec_PP, "PP");
-		enumToBecZoneMap.put(BecZone.bec_SBPS, "SBSP");
-		enumToBecZoneMap.put(BecZone.bec_SBS, "SBS");
-		enumToBecZoneMap.put(BecZone.bec_SWB, "SWB");
+		enumToBecZoneMap.put(BecZone.AT, "AT");
+		enumToBecZoneMap.put(BecZone.BG, "BG");
+		enumToBecZoneMap.put(BecZone.BWBS, "BWBS");
+		enumToBecZoneMap.put(BecZone.CDF, "CDF");
+		enumToBecZoneMap.put(BecZone.CWH, "CWH");
+		enumToBecZoneMap.put(BecZone.ESSF, "ESSF");
+		enumToBecZoneMap.put(BecZone.ICH, "ICH");
+		enumToBecZoneMap.put(BecZone.IDF, "IDF");
+		enumToBecZoneMap.put(BecZone.MH, "MH");
+		enumToBecZoneMap.put(BecZone.MS, "MS");
+		enumToBecZoneMap.put(BecZone.PP, "PP");
+		enumToBecZoneMap.put(BecZone.SBPS, "SBSP");
+		enumToBecZoneMap.put(BecZone.SBS, "SBS");
+		enumToBecZoneMap.put(BecZone.SWB, "SWB");
 	}
 
 	/** 
@@ -70,7 +70,7 @@ public class BecZoneMethods {
 			}
 		}
 
-		return BecZone.bec_UNKNOWN;
+		return BecZone.UNKNOWN;
 	}
 
 	/** 
@@ -173,11 +173,11 @@ public class BecZoneMethods {
 		if (becZoneName != null && sp64CodeName != null) {
 			BecZone becZone = BecZoneMethods.becZoneToIndex(becZoneName);
 		
-			if (becZone != BecZone.bec_UNKNOWN && VdypMethods.isValidSpecies(sp64CodeName)) {
+			if (becZone != BecZone.UNKNOWN && VdypMethods.isValidSpecies(sp64CodeName)) {
 				String sp0Name = VdypMethods.getVDYP7Species(sp64CodeName);
 				int sp0Index = VdypMethods.getVDYP7SpeciesIndex(sp0Name).getIndex();
 		
-				if (sp0Index != SP0Name.sp0_UNKNOWN.getIndex()) {
+				if (sp0Index != SP0Name.UNKNOWN.getIndex()) {
 					result = mofBiomassCoeffs[sp0Index][becZone.getOffset()];
 				}
 			}

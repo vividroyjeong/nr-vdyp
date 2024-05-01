@@ -2,22 +2,22 @@ package ca.bc.gov.nrs.vdyp.si32.cfs;
 
 import java.text.MessageFormat;
 
+import ca.bc.gov.nrs.vdyp.model.EnumIterator;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
-import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 
 /**
  * Enumerate the different Tree Genus as defined by the Canadian Forest Service for 
  * the purposes of Biomass.
  * <ul>
- * <li><b>cfsGenus_UNKNOWN</b> represents an uninitialized value or error state. This value should
+ * <li><b>UNKNOWN</b> represents an uninitialized value or error state. This value should
  *        not be used as a valid Genus value.</b>
- * <li><b>cfsGenus_NotApplicable</b> for records that are not stocked forest land.
- * <li><b>cfsGenus_MissingValue</b> no information is available.
- * <li><b>cfsGenus_...</b>individual Genus values.
+ * <li><b>NotApplicable</b> for records that are not stocked forest land.
+ * <li><b>MissingValue</b> no information is available.
+ * <li><b>others</b>individual Genus values.
  * </ul>
  * <p><b>Remarks</b>
  * <p>
- *    The values for 'cfsGenus_NotApplicable' and 'cfsGenus_MissingValue' are 
+ *    The values for 'NotApplicable' and 'MissingValue' are 
  *    defined in the CFS source table but should never be used in the context
  *    of VDYP as all CFS species have a Genus mapping. They are included for
  *    completeness of the source definitions. They should never be used as a
@@ -34,24 +34,24 @@ import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
  * </ol>
  */
 public enum CfsTreeGenus implements SI32Enum<CfsTreeGenus> {
-	cfsGenus_UNKNOWN(-1, "UNKNOWN"), //
+	UNKNOWN(-1, "UNKNOWN"), //
 	
-	cfsGenus_NotApplicable(-9, "Not applicable"), //
-	cfsGenus_MissingValue(-8, "Missing Value"), //
+	NOT_APPLICABLE(-9, "Not applicable"), //
+	MISSING_VALUE(-8, "Missing Value"), //
 	
-	cfsGenus_Spruce(1, "Spruce"), //
-	cfsGenus_Pine(2, "Pine"), //
-	cfsGenus_Fir(3, "Fir"), //
-	cfsGenus_Hemlock(4, "Hemlock"), //
-	cfsGenus_DouglasFir(5, "Douglas-fir"), //
-	cfsGenus_Larch(6, "Larch"), //
-	cfsGenus_CedarAndOtherConifers(7, "Cedar and other conifers"), //
-	cfsGenus_UnspecifiedConifers(8, "Unspecified conifers"), //
-	cfsGenus_Poplar(9, "Poplar"), //
-	cfsGenus_Birch(10, "Birch"), //
-	cfsGenus_Maple(11, "Maple"), //
-	cfsGenus_OtherBroadleaves(12, "Other broadleaved species"), //
-	cfsGenus_UnspecifiedBroadleaves(13, "Unspecified broadleaved species"); //
+	SPRUCE(1, "Spruce"), //
+	PINE(2, "Pine"), //
+	FIR(3, "Fir"), //
+	HEMLOCK(4, "Hemlock"), //
+	DOUGLAS_FIR(5, "Douglas-fir"), //
+	LARCH(6, "Larch"), //
+	CEDAR_AND_OTHER_CONIFERS(7, "Cedar and other conifers"), //
+	UNSPECIFIED_CONIFERS(8, "Unspecified conifers"), //
+	POPLAR(9, "Poplar"), //
+	BIRCH(10, "Birch"), //
+	MAPLE(11, "Maple"), //
+	OTHER_BROAD_LEAVES(12, "Other broadleaved species"), //
+	UNSPECIFIED_BROAD_LEAVES(13, "Unspecified broadleaved species"); //
 
 	private final int index;
 	private final String genusName;
@@ -72,7 +72,7 @@ public enum CfsTreeGenus implements SI32Enum<CfsTreeGenus> {
 
 	@Override
 	public int getOffset() {
-		if (this.equals(cfsGenus_UNKNOWN) || this.equals(cfsGenus_NotApplicable) || this.equals(cfsGenus_MissingValue)) {
+		if (this.equals(UNKNOWN) || this.equals(NOT_APPLICABLE) || this.equals(MISSING_VALUE)) {
 			throw new UnsupportedOperationException(MessageFormat.format("Cannot call getIndex on {0} as it's not a standard member of the enumeration", this));
 		}
 		
@@ -81,12 +81,12 @@ public enum CfsTreeGenus implements SI32Enum<CfsTreeGenus> {
 	
 	@Override
 	public String getText() {
-		if (this.equals(cfsGenus_UNKNOWN)) {
+		if (this.equals(UNKNOWN)) {
 			throw new UnsupportedOperationException(MessageFormat
 					.format("Cannot call getText on {0} as it's not a standard member of the enumeration", this));
 		}
 		
-		return this.toString().substring("cfsGenus_".length());
+		return this.toString();
 	}
 
 	/**
@@ -108,12 +108,12 @@ public enum CfsTreeGenus implements SI32Enum<CfsTreeGenus> {
 	 * @return the number of non-housekeeping entries in the enumeration
 	 */
 	public static int size() {
-		return cfsGenus_UnspecifiedBroadleaves.index - cfsGenus_Spruce.index + 1;
+		return UNSPECIFIED_BROAD_LEAVES.index - SPRUCE.index + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<CfsTreeGenus> {
+	public static class Iterator extends EnumIterator<CfsTreeGenus> {
 		public Iterator() {
-			super(cfsGenus_Spruce, cfsGenus_UnspecifiedBroadleaves, values());
+			super(values(), SPRUCE, UNSPECIFIED_BROAD_LEAVES);
 		}
 	}
 }

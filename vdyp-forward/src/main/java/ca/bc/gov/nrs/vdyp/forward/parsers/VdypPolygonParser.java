@@ -9,7 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
-import ca.bc.gov.nrs.vdyp.common_calculators.FizCheck;
+import ca.bc.gov.nrs.vdyp.common_calculators.ForestInventoryZone;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexForestInventoryZone;
 import ca.bc.gov.nrs.vdyp.forward.model.FipMode;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
@@ -26,7 +27,7 @@ import ca.bc.gov.nrs.vdyp.model.BecLookup;
 public class VdypPolygonParser implements ControlMapValueReplacer<Object, String> {
 
 	private static final Logger logger = LoggerFactory.getLogger(VdypPolygonParser.class);
-	
+
 	private static final Float DEFAULT_FORESTED_LAND_PERCENTAGE = 90.0f;
 
 	private static final String DESCRIPTION = "DESCRIPTION"; // POLYDESC
@@ -52,15 +53,12 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 				public boolean isStopLine(String line) {
 					return line.substring(0, Math.min(25, line.length())).trim().length() == 0;
 				}
-			}.strippedString(25, DESCRIPTION)
-				.space(1)
-				.value(4, BIOGEOCLIMATIC_ZONE, ControlledValueParser.BEC)
-				.space(1)
-				.value(1, FOREST_INVENTORY_ZONE, ValueParser.CHARACTER) // TODO: add ValueParser.FIZ
-				.value(6, PERCENT_FOREST_LAND, ValueParser.FLOAT)
-				.value(3, INVENTORY_TYPE_GROUP, ControlledValueParser.optional(ValueParser.INTEGER))
-				.value(3, BASAL_AREA_GROUP, ValueParser.optional(ValueParser.INTEGER))
-				.value(3, FIP_MODE, ValueParser.optional(ValueParser.INTEGER));
+			}.strippedString(25, DESCRIPTION).space(1).value(4, BIOGEOCLIMATIC_ZONE, ControlledValueParser.BEC).space(1)
+					.value(1, FOREST_INVENTORY_ZONE, ValueParser.CHARACTER) // TODO: add ValueParser.FIZ
+					.value(6, PERCENT_FOREST_LAND, ValueParser.FLOAT)
+					.value(3, INVENTORY_TYPE_GROUP, ControlledValueParser.optional(ValueParser.INTEGER))
+					.value(3, BASAL_AREA_GROUP, ValueParser.optional(ValueParser.INTEGER))
+					.value(3, FIP_MODE, ValueParser.optional(ValueParser.INTEGER));
 
 			var is = fileResolver.resolveForInput(fileName);
 
@@ -80,25 +78,29 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 					BecDefinition bec = becLookup.get(becAlias)
 							.orElseThrow(() -> new ResourceParseException(becAlias + " is not a recognized BEC alias"));
 
-					if (FizCheck.fiz_check(fizId) == FizCheck.FIZ_UNKNOWN) {
+					if (ForestInventoryZone.toRegion(fizId) == SiteIndexForestInventoryZone.FIZ_UNKNOWN) {
 						throw new ResourceParseException(
 								"Forest Inventory Zone " + fizId
 										+ " is not a recognized FIZ (only 'A' ... 'L' are supported)"
 						);
 					}
-					
+
 					var description = VdypPolygonDescriptionParser.parse(descriptionText);
-					
+
 					if (percentForestLand <= 0.0) {
 						// VDYPGETP.for lines 146 - 154
-						logger.warn(MessageFormat.format("Polygon {} percent-forested-land value {} is <= 0.0; replacing with default {}"
-								, description.getName(), percentForestLand, DEFAULT_FORESTED_LAND_PERCENTAGE));
+						logger.warn(
+								MessageFormat.format(
+										"Polygon {0} percent-forested-land value {1} is <= 0.0; replacing with default {2}",
+										description.getName(), percentForestLand, DEFAULT_FORESTED_LAND_PERCENTAGE
+								)
+						);
 						percentForestLand = DEFAULT_FORESTED_LAND_PERCENTAGE;
 					}
 
 					return new VdypPolygon(
-							description, bec, fizId, percentForestLand,
-							inventoryTypeGroup, basalAreaGroup, fipMode.flatMap(FipMode::getByCode)
+							description, bec, fizId, percentForestLand, inventoryTypeGroup, basalAreaGroup,
+							fipMode.flatMap(FipMode::getByCode)
 					);
 				}
 			};

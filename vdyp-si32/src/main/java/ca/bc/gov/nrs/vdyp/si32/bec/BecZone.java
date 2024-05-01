@@ -4,42 +4,38 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import ca.bc.gov.nrs.vdyp.model.EnumIterator;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
-import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 
 /**
  * Identifies each of the BEC Zones known to the system.
  * <ul>
- * <li> bec_UNKNOWN: Represents an unknown BEC Zone or an error condition.
- * <li> bec_...: Individual BEC Zones recognized.
+ * <li> UNKNOWN: Represents an unknown BEC Zone or an error condition.
+ * <li> others: Individual BEC Zones recognized.
  */
 public enum BecZone implements SI32Enum<BecZone> {
-	bec_UNKNOWN(-1),
+	UNKNOWN(-1),
 	
-	bec_AT(0), 
-	bec_BG(1), 
-	bec_BWBS(2), 
-	bec_CDF(3),
-	bec_CWH(4), 
-	bec_ESSF(5), 
-	bec_ICH(6),
-	bec_IDF(7),
-	bec_MH(8), 
-	bec_MS(9), 
-	bec_PP(10), 
-	bec_SBPS(11),
-	bec_SBS(12), 
-	bec_SWB(13);
+	AT(0), 
+	BG(1), 
+	BWBS(2), 
+	CDF(3),
+	CWH(4), 
+	ESSF(5), 
+	ICH(6),
+	IDF(7),
+	MH(8), 
+	MS(9), 
+	PP(10), 
+	SBPS(11),
+	SBS(12), 
+	SWB(13);
 
 	private static Map<Integer, BecZone> index2EnumMap = null;
 
-	private static Map<Integer, BecZone> getIndex2EnumMap() {
+	private static synchronized Map<Integer, BecZone> getIndex2EnumMap() {
 		if (index2EnumMap == null) {
-			synchronized (BecZone.class) {
-				if (index2EnumMap == null) {
-					index2EnumMap = new HashMap<>();
-				}
-			}
+			index2EnumMap = new HashMap<>();
 		}
 		return index2EnumMap;
 	}
@@ -58,7 +54,7 @@ public enum BecZone implements SI32Enum<BecZone> {
 
 	@Override
 	public int getOffset() {
-		if (this.equals(bec_UNKNOWN)) {
+		if (this.equals(UNKNOWN)) {
 			throw new UnsupportedOperationException(MessageFormat
 					.format("Cannot call getIndex on {} as it's not a standard member of the enumeration", this));
 		}
@@ -68,12 +64,12 @@ public enum BecZone implements SI32Enum<BecZone> {
 	
 	@Override
 	public String getText() {
-		if (this.equals(bec_UNKNOWN)) {
+		if (this.equals(UNKNOWN)) {
 			throw new UnsupportedOperationException(MessageFormat
 					.format("Cannot call getText on {} as it's not a standard member of the enumeration", this));
 		}
 		
-		return this.toString().substring("bec_".length());
+		return this.toString();
 	}
 
 	/**
@@ -90,12 +86,12 @@ public enum BecZone implements SI32Enum<BecZone> {
 	 * @return the number of non-housekeeping entries in the enumeration
 	 */
 	public static int size() {
-		return bec_SWB.index - bec_AT.index + 1;
+		return SWB.index - AT.index + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<BecZone> {
+	public static class Iterator extends EnumIterator<BecZone> {
 		public Iterator() {
-			super(bec_AT, bec_SWB, values());
+			super(values(), AT, SWB);
 		}
 	}
 }

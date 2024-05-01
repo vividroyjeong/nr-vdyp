@@ -1,289 +1,144 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexUtilities.llog;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexUtilities.ppow;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_BREAST;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_TOTAL;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEstimationType.SI_EST_DIRECT;
+
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMinimumException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation; 
 
 /**
- * SiteIndex2Height.java
- * - given site index and age, computes site height
- * - age can be given as total age or breast height age
- * - if total age is given, y2bh must be the number of years to breast height
- * - all heights input/output are in metres.
- * - site index must be based on breast height age 50
- * - where breast height age is less than 0, a quadratic function is used
- * - error codes (returned as height value):
- * SI_ERR_LT13: site index < 1.3m
- * SI_ERR_GI_MIN: variable height growth intercept formulation; bhage < 0.5 years
- * SI_ERR_GI_MAX: variable height growth intercept formulation; bhage > range
- * SI_ERR_NO_ANS: iteration could not converge (projected height > 999)
- * SI_ERR_CURVE: unknown curve index
- * SI_ERR_GI_TOT: cannot compute growth intercept when using total age
+ * SiteIndex2Height.java - given site index and age, computes site height.
  */
+@SuppressWarnings("java:S1479")
 public class SiteIndex2Height {
-	//Taken from sindex.h
-	/*
-	 * age types
+
+	/**
+	 * Given site index and age, computes site height.
+	 * <ul>
+	 * <li><code>age</code> can be given as total age or breast height age
+	 * <li>if total age is given, years2BreastHeight must be the number of years to breast height
+	 * <li>all heights input/output are in metres.
+	 * <li>site index must be based on breast height age 50
+	 * <li>where breast height age is less than 0, a quadratic function is used
+	 * </ul>
+	 * @param cuIndex the index of the site curve
+	 * @param age the current age, of type <code>ageType</code>
+	 * @param ageType one of SI_AT_TOTAL or SI_AT_BREAST
+	 * @param siteIndex the site index
+	 * @param years2BreastHeight if <code>ageType</code> is SI_AT_TOTAL, this value must be supplied and 
+	 * indicates years to breast height
+	 * @param pi proportion of height growth between breast height ages 0 and 1 that occurs below breast height
+	 * @returns as described
+	 * @throws LessThan13Exception site index < 1.3m 
+	 * @throws CurveErrorException when cuIndex does not identify a known curve.
+	 * error codes (returned as height value):
 	 */
-	private static final int SI_AT_TOTAL = 0;
-	private static final int SI_AT_BREAST = 1;
-
-	/*
-	 * site index estimation (from height and age) types
-	 */
-	private static final int SI_EST_DIRECT = 1;
-
-	/*
-	 * error codes as return values from functions
-	 */
-	private static final int SI_ERR_NO_ANS = -4;
-
-	/* define species and equation indices */
-	private static final int SI_ACB_HUANGAC = 97;
-	private static final int SI_ACB_HUANG = 0;
-	private static final int SI_ACT_THROWERAC = 103;
-	private static final int SI_ACT_THROWER = 1;
-	private static final int SI_AT_CHEN = 74;
-	private static final int SI_AT_CIESZEWSKI = 3;
-	private static final int SI_AT_GOUDIE = 4;
-	private static final int SI_AT_HUANG = 2;
-	private static final int SI_AT_NIGH = 92;
-	private static final int SI_BA_DILUCCA = 5;
-	private static final int SI_BA_KURUCZ82AC = 102;
-	private static final int SI_BA_KURUCZ82 = 8;
-	private static final int SI_BA_KURUCZ86 = 7;
-	private static final int SI_BA_NIGHGI = 117;
-	private static final int SI_BA_NIGH = 118;
-	private static final int SI_BL_CHENAC = 93;
-	private static final int SI_BL_CHEN = 73;
-	private static final int SI_BL_KURUCZ82 = 10;
-	private static final int SI_BL_THROWERGI = 9;
-	private static final int SI_BP_CURTISAC = 94;
-	private static final int SI_BP_CURTIS = 78;
-	private static final int SI_CWC_BARKER = 12;
-	private static final int SI_CWC_KURUCZAC = 101;
-	private static final int SI_CWC_KURUCZ = 11;
-	private static final int SI_CWC_NIGH = 122;
-	private static final int SI_CWI_NIGH = 77;
-	private static final int SI_CWI_NIGHGI = 84;
-	private static final int SI_DR_HARRING = 14;
-	private static final int SI_DR_NIGH = 13;
-	private static final int SI_EP_NIGH = 116;
-	private static final int SI_FDC_BRUCEAC = 100;
-	private static final int SI_FDC_BRUCE = 16;
-	private static final int SI_FDC_BRUCENIGH = 89;
-	private static final int SI_FDC_COCHRAN = 17;
-	private static final int SI_FDC_KING = 18;
-	private static final int SI_FDC_NIGHGI = 15;
-	private static final int SI_FDC_NIGHTA = 88;
-	private static final int SI_FDI_HUANG_NAT = 21;
-	private static final int SI_FDI_HUANG_PLA = 20;
-	private static final int SI_FDI_MILNER = 22;
-	private static final int SI_FDI_MONS_DF = 26;
-	private static final int SI_FDI_MONS_GF = 27;
-	private static final int SI_FDI_MONS_SAF = 30;
-	private static final int SI_FDI_MONS_WH = 29;
-	private static final int SI_FDI_MONS_WRC = 28;
-	private static final int SI_FDI_NIGHGI = 19;
-	private static final int SI_FDI_THROWERAC = 96;
-	private static final int SI_FDI_THROWER = 23;
-	private static final int SI_FDI_VDP_MONT = 24;
-	private static final int SI_FDI_VDP_WASH = 25;
-	private static final int SI_HM_MEANSAC = 95;
-	private static final int SI_HM_MEANS = 86;
-	private static final int SI_HWC_BARKER = 33;
-	private static final int SI_HWC_FARR = 32;
-	private static final int SI_HWC_NIGHGI = 31;
-	private static final int SI_HWC_NIGHGI99 = 79;
-	private static final int SI_HWC_WILEYAC = 99;
-	private static final int SI_HWC_WILEY = 34;
-	private static final int SI_HWC_WILEY_BC = 35;
-	private static final int SI_HWC_WILEY_MB = 36;
-	private static final int SI_HWI_NIGH = 37;
-	private static final int SI_HWI_NIGHGI = 38;
-	private static final int SI_LW_MILNER = 39;
-	private static final int SI_LW_NIGH = 90;
-	private static final int SI_LW_NIGHGI = 82;
-	private static final int SI_PJ_HUANG = 113;
-	private static final int SI_PJ_HUANGAC = 114;
-	private static final int SI_PLI_CIESZEWSKI = 47;
-	private static final int SI_PLI_DEMPSTER = 50;
-	private static final int SI_PLI_GOUDIE_DRY = 48;
-	private static final int SI_PLI_GOUDIE_WET = 49;
-	private static final int SI_PLI_HUANG_NAT = 44;
-	private static final int SI_PLI_HUANG_PLA = 43;
-	private static final int SI_PLI_MILNER = 46;
-	private static final int SI_PLI_NIGHGI97 = 42;
-	private static final int SI_PLI_NIGHTA98 = 41;
-	private static final int SI_PLI_THROWER = 45;
-	private static final int SI_PLI_THROWNIGH = 40;
-	private static final int SI_PL_CHEN = 76;
-	private static final int SI_PW_CURTISAC = 98;
-	private static final int SI_PW_CURTIS = 51;
-	private static final int SI_PY_HANNAC = 104;
-	private static final int SI_PY_HANN = 53;
-	private static final int SI_PY_MILNER = 52;
-	private static final int SI_PY_NIGH = 107;
-	private static final int SI_PY_NIGHGI = 108;
-	private static final int SI_SB_CIESZEWSKI = 55;
-	private static final int SI_SB_DEMPSTER = 57;
-	private static final int SI_SB_HUANG = 54;
-	private static final int SI_SB_KER = 56;
-	private static final int SI_SB_NIGH = 91;
-	private static final int SI_SE_CHENAC = 105;
-	private static final int SI_SE_CHEN = 87;
-	private static final int SI_SE_NIGHGI = 120;
-	private static final int SI_SE_NIGH = 121;
-	private static final int SI_SS_BARKER = 62;
-	private static final int SI_SS_FARR = 61;
-	private static final int SI_SS_GOUDIE = 60;
-	private static final int SI_SS_NIGH = 59;
-	private static final int SI_SS_NIGHGI = 58;
-	private static final int SI_SS_NIGHGI99 = 80;
-	private static final int SI_SW_CIESZEWSKI = 67;
-	private static final int SI_SW_DEMPSTER = 72;
-	private static final int SI_SW_GOUDIE_NAT = 71;
-	private static final int SI_SW_GOUDIE_NATAC = 106;
-	private static final int SI_SW_GOUDIE_PLA = 70;
-	private static final int SI_SW_GOUDIE_PLAAC = 112;
-	private static final int SI_SW_GOUDNIGH = 85;
-	private static final int SI_SW_HU_GARCIA = 119;
-	private static final int SI_SW_HUANG_NAT = 65;
-	private static final int SI_SW_HUANG_PLA = 64;
-	private static final int SI_SW_KER_NAT = 69;
-	private static final int SI_SW_KER_PLA = 68;
-	private static final int SI_SW_NIGHGI = 63;
-	private static final int SI_SW_NIGHGI99 = 81;
-	private static final int SI_SW_NIGHGI2004 = 115;
-	private static final int SI_SW_NIGHTA = 83;
-	private static final int SI_SW_THROWER = 66;
-
-	/* not used, but must be defined for array positioning */
-	private static final int SI_BB_KER = 6;
-	private static final int SI_DR_CHEN = 75;
-	private static final int SI_PLI_NIGHTA2004 = 109;
-	private static final int SI_SE_NIGHTA = 110;
-	private static final int SI_SW_NIGHTA2004 = 111;
-
-	public static double ppow(double x, double y) {
-		return (x <= 0) ? 0.0 : Math.pow(x, y);
-	}
-
-	public static double llog(double x) {
-		return ( (x) <= 0.0) ? Math.log(.00001) : Math.log(x);
-	}
-
-	public static double index_to_height(
-			int cu_index,
-			double iage,
-			int age_type,
-			double site_index,
-			double y2bh,
-			double pi /* proportion of height growth between breast height */
+	public static double indexToHeight(
+			SiteIndexEquation cuIndex, double age, SiteIndexAgeType ageType, double siteIndex, double years2BreastHeight, double pi 
 	) throws CommonCalculatorException
-	// ages 0 and 1 that occurs below breast height
 	{
 		double height; // return value
 		double x1, x2, x3, x4, x5; // equation coefficients
-		double tage; // total age
-		double bhage; // breast-height age
+		double totalAge; // total age
+		double breastHeightAge; // breast-height age
 
-		if (site_index < 1.3) {
-			throw new LessThan13Exception("Site index < 1.3m: " + site_index);
+		if (siteIndex < 1.3) {
+			throw new LessThan13Exception("Site index < 1.3m: " + siteIndex);
 		}
 
 		// should this line be removed?
-		y2bh = ((int) y2bh) + 0.5;
+		years2BreastHeight = ((int) years2BreastHeight) + 0.5;
 
-		if (age_type == SI_AT_TOTAL) {
-			tage = iage;
-			bhage = Age2Age.age_to_age(cu_index, tage, SI_AT_TOTAL, SI_AT_BREAST, y2bh);
+		if (ageType == SI_AT_TOTAL) {
+			totalAge = age;
+			breastHeightAge = Age2Age.ageToAge(cuIndex, totalAge, SI_AT_TOTAL, SI_AT_BREAST, years2BreastHeight);
 		} else {
-			bhage = iage;
-			tage = Age2Age.age_to_age(cu_index, bhage, SI_AT_BREAST, SI_AT_TOTAL, y2bh);
+			breastHeightAge = age;
+			totalAge = Age2Age.ageToAge(cuIndex, breastHeightAge, SI_AT_BREAST, SI_AT_TOTAL, years2BreastHeight);
 		}
-		if (tage < 0.0) {
-			throw new NoAnswerException("Iteration could not converge (projected height > 999), age: " + tage);
+		if (totalAge < 0.0) {
+			throw new NoAnswerException("Iteration could not converge (projected height > 999), age: " + totalAge);
 		}
-		if (tage < 0.00001) {
+		if (totalAge < 0.00001) {
 			return 0.0;
 		}
 
-		switch (cu_index) {
+		if (cuIndex == null) {
+			throw new CurveErrorException("Unknown curve index");
+		}
+
+		switch (cuIndex) {
 		case SI_FDC_COCHRAN:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 
-				x1 = Math.log(bhage);
+				x1 = Math.log(breastHeightAge);
 				x1 = Math.exp(-0.37496 + 1.36164 * x1 - 0.00243434 * ppow(x1, 4));
-				x2 = -0.2828 + 1.87947 * ppow(1 - Math.exp(-0.022399 * bhage), 0.966998);
+				x2 = -0.2828 + 1.87947 * ppow(1 - Math.exp(-0.022399 * breastHeightAge), 0.966998);
 
-				height = 4.5 + x1 - x2 * (79.97 - (site_index - 4.5));
+				height = 4.5 + x1 - x2 * (79.97 - (siteIndex - 4.5));
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_FDC_KING:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 
-				x1 = 2500 / (site_index - 4.5);
+				x1 = 2500 / (siteIndex - 4.5);
 
 				x2 = -0.954038 + 0.109757 * x1;
 				x3 = 0.0558178 + 0.00792236 * x1;
 				x4 = -0.000733819 + 0.000197693 * x1;
 
-				height = 4.5 + bhage * bhage / (x2 + x3 * bhage + x4 * bhage * bhage);
+				height = 4.5 + breastHeightAge * breastHeightAge / (x2 + x3 * breastHeightAge + x4 * breastHeightAge * breastHeightAge);
 
-				if (bhage < 5) {
-					height += (0.22 * bhage);
+				if (breastHeightAge < 5) {
+					height += (0.22 * breastHeightAge);
 				}
 
-				if (bhage >= 5 && bhage < 10) {
-					height += (2.2 - 0.22 * bhage);
+				if (breastHeightAge >= 5 && breastHeightAge < 10) {
+					height += (2.2 - 0.22 * breastHeightAge);
 				}
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_HWC_FARR:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 
-				x1 = Math.log(bhage);
+				x1 = Math.log(breastHeightAge);
 
-				x2 = 0.3621734 +
-						1.149181 * x1 -
-						0.005617852 * ppow(x1, 3.0) -
-						7.267547E-6 * ppow(x1, 7.0) +
-						1.708195E-16 * ppow(x1, 22.0) -
-						2.482794E-22 * ppow(x1, 30.0);
+				x2 = 0.3621734 + 1.149181 * x1 - 0.005617852 * ppow(x1, 3.0) - 7.267547E-6 * ppow(x1, 7.0)
+						+ 1.708195E-16 * ppow(x1, 22.0) - 2.482794E-22 * ppow(x1, 30.0);
 
-				x3 = -2.146617 -
-						0.109007 * x1 +
-						0.0994030 * ppow(x1, 3.0) -
-						0.003853396 * ppow(x1, 5.0) +
-						1.193933E-8 * ppow(x1, 12.0) -
-						9.486544E-20 * ppow(x1, 27.0) +
-						1.431925E-26 * ppow(x1, 36.0);
+				x3 = -2.146617 - 0.109007 * x1 + 0.0994030 * ppow(x1, 3.0) - 0.003853396 * ppow(x1, 5.0)
+						+ 1.193933E-8 * ppow(x1, 12.0) - 9.486544E-20 * ppow(x1, 27.0) + 1.431925E-26 * ppow(x1, 36.0);
 
-				height = 4.5 + Math.exp(x2) - Math.exp(x3) * (83.20 - (site_index - 4.5));
+				height = 4.5 + Math.exp(x2) - Math.exp(x3) * (83.20 - (siteIndex - 4.5));
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_HWC_BARKER: {
@@ -292,213 +147,193 @@ public class SiteIndex2Height {
 			/*
 			 * convert from SI 50b to SI 50t
 			 */
-			si50t = -10.45 + 1.30049 * site_index - 0.0022 * site_index * site_index;
+			si50t = -10.45 + 1.30049 * siteIndex - 0.0022 * siteIndex * siteIndex;
 
-			height = Math.exp(4.35753) * ppow(si50t / Math.exp(4.35753), ppow(50.0 / tage, 0.756313));
+			height = Math.exp(4.35753) * ppow(si50t / Math.exp(4.35753), ppow(50.0 / totalAge, 0.756313));
 		}
 			break;
 		case SI_HM_MEANS:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				/* convert to base 100 */
-				site_index = -1.73 + 3.149 * ppow(site_index, 0.8279);
+				siteIndex = -1.73 + 3.149 * ppow(siteIndex, 0.8279);
 
-				height = 1.37 + (22.87 + 0.9502 * (site_index - 1.37)) *
-						ppow(
-								1 - Math.exp(-0.0020647 * ppow(site_index - 1.37, 0.5) * bhage), 1.3656
-										+ 2.046 / (site_index - 1.37)
-						);
+				height = 1.37 + (22.87 + 0.9502 * (siteIndex - 1.37)) * ppow(
+						1 - Math.exp(-0.0020647 * ppow(siteIndex - 1.37, 0.5) * breastHeightAge),
+						1.3656 + 2.046 / (siteIndex - 1.37)
+				);
 			} else
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			break;
 		case SI_HM_MEANSAC:
-			if (bhage > 0.5) {
+			if (breastHeightAge > 0.5) {
 				/* convert to base 100 */
-				site_index = -1.73 + 3.149 * ppow(site_index, 0.8279);
+				siteIndex = -1.73 + 3.149 * ppow(siteIndex, 0.8279);
 
-				height = 1.37 + (22.87 + 0.9502 * (site_index - 1.37)) *
-						ppow(
-								1 - Math.exp(-0.0020647 * ppow(site_index - 1.37, 0.5) * (bhage - 0.5)), 1.3656
-										+ 2.046 / (site_index - 1.37)
-						);
+				height = 1.37 + (22.87 + 0.9502 * (siteIndex - 1.37)) * ppow(
+						1 - Math.exp(-0.0020647 * ppow(siteIndex - 1.37, 0.5) * (breastHeightAge - 0.5)),
+						1.3656 + 2.046 / (siteIndex - 1.37)
+				);
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
-		//Couldn't find the constant
+		// Couldn't find the constant
 		/*
-		 * case SI_HM_WILEY:
-		 * if (bhage > 0.0){
-		 * if (site_index > 60 + 1.667 * bhage){
-		 * // function starts going nuts at high sites and low ages
-		 * // evaluate at a safe age, and interpolate
-		 * x1 = (site_index - 60) / 1.667 + 0.1;
-		 * x2 = index_to_height (cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
-		 * height = 1.37 + (x2-1.37) * bhage / x1;
-		 * break;
-		 * }
-		 * 
-		 * // convert to imperial
-		 * site_index /= 0.3048;
-		 * 
+		 * case SI_HM_WILEY: if (bhage > 0.0){ if (site_index > 60 + 1.667 * bhage){ // function starts going nuts at
+		 * high sites and low ages // evaluate at a safe age, and interpolate x1 = (site_index - 60) / 1.667 + 0.1; x2 =
+		 * index_to_height (cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi); height = 1.37 + (x2-1.37) * bhage / x1;
+		 * break; }
+		 *
+		 * // convert to imperial site_index /= 0.3048;
+		 *
 		 * x1 = 2500 / (site_index - 4.5);
-		 * 
-		 * x2 = -1.7307 + 0.1394 * x1;
-		 * x3 = -0.0616 + 0.0137 * x1;
-		 * x4 = 0.00192428 + 0.00007024 * x1;
-		 * 
+		 *
+		 * x2 = -1.7307 + 0.1394 * x1; x3 = -0.0616 + 0.0137 * x1; x4 = 0.00192428 + 0.00007024 * x1;
+		 *
 		 * height = 4.5 + bhage * bhage / (x2 + x3 * bhage + x4 * bhage * bhage);
-		 * 
-		 * if (bhage < 5){
-		 * height += (0.3 * bhage);
-		 * }
-		 * else if (bhage < 10){
-		 * height += (3.0 - 0.3 * bhage);
-		 * }
-		 * 
-		 * // convert back to metric
-		 * height *= 0.3048;
-		 * 
-		 * }else{
-		 * height = tage * tage * 1.37 / y2bh / y2bh;
-		 * }
-		 * break;
+		 *
+		 * if (bhage < 5){ height += (0.3 * bhage); } else if (bhage < 10){ height += (3.0 - 0.3 * bhage); }
+		 *
+		 * // convert back to metric height *= 0.3048;
+		 *
+		 * }else{ height = tage * tage * 1.37 / y2bh / y2bh; } break;
 		 */
 
 		case SI_HWC_WILEY:
-			if (bhage > 0.0) {
-				if (site_index > 60 + 1.667 * bhage) {
+			if (breastHeightAge > 0.0) {
+				if (siteIndex > 60 + 1.667 * breastHeightAge) {
 					// function starts going nuts at high sites and low ages
 					// evaluate at a safe age, and interpolate
-					x1 = (site_index - 60) / 1.667 + 0.1;
-					x2 = index_to_height(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
-					height = 1.37 + (x2 - 1.37) * bhage / x1;
+					x1 = (siteIndex - 60) / 1.667 + 0.1;
+					x2 = indexToHeight(cuIndex, x1, SI_AT_BREAST, siteIndex, years2BreastHeight, pi);
+					height = 1.37 + (x2 - 1.37) * breastHeightAge / x1;
 					break;
 				}
 
 				// convert to imperial
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 
-				x1 = 2500 / (site_index - 4.5);
+				x1 = 2500 / (siteIndex - 4.5);
 
 				x2 = -1.7307 + 0.1394 * x1;
 				x3 = -0.0616 + 0.0137 * x1;
 				x4 = 0.00192428 + 0.00007024 * x1;
 
-				height = 4.5 + bhage * bhage / (x2 + x3 * bhage + x4 * bhage * bhage);
+				height = 4.5 + breastHeightAge * breastHeightAge / (x2 + x3 * breastHeightAge + x4 * breastHeightAge * breastHeightAge);
 
-				if (bhage < 5) {
-					height += (0.3 * bhage);
-				} else if (bhage < 10) {
-					height += (3.0 - 0.3 * bhage);
+				if (breastHeightAge < 5) {
+					height += (0.3 * breastHeightAge);
+				} else if (breastHeightAge < 10) {
+					height += (3.0 - 0.3 * breastHeightAge);
 				}
 
 				// convert back to metric
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_HWC_WILEY_BC:
-			if (bhage > 0.0) {
-				if (site_index > 60 + 1.667 * bhage) {
+			if (breastHeightAge > 0.0) {
+				if (siteIndex > 60 + 1.667 * breastHeightAge) {
 					// function starts going nuts at high sites and low ages
 					// evaluate at a safe age, and interpolate
-					x1 = (site_index - 60) / 1.667 + 0.1;
-					x2 = index_to_height(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
-					height = 1.37 + (x2 - 1.37) * bhage / x1;
+					x1 = (siteIndex - 60) / 1.667 + 0.1;
+					x2 = indexToHeight(cuIndex, x1, SI_AT_BREAST, siteIndex, years2BreastHeight, pi);
+					height = 1.37 + (x2 - 1.37) * breastHeightAge / x1;
 					break;
 				}
 
 				// convert to imperial
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 
-				x1 = 2500 / (site_index - 4.5);
+				x1 = 2500 / (siteIndex - 4.5);
 
 				x2 = -1.7307 + 0.1394 * x1;
 				x3 = -0.0616 + 0.0137 * x1;
 				x4 = 0.00192428 + 0.00007024 * x1;
 
-				height = 4.5 + bhage * bhage / (x2 + x3 * bhage + x4 * bhage * bhage);
+				height = 4.5 + breastHeightAge * breastHeightAge / (x2 + x3 * breastHeightAge + x4 * breastHeightAge * breastHeightAge);
 
-				if (bhage < 5) {
-					height += (0.3 * bhage);
-				} else if (bhage < 10) {
-					height += (3.0 - 0.3 * bhage);
+				if (breastHeightAge < 5) {
+					height += (0.3 * breastHeightAge);
+				} else if (breastHeightAge < 10) {
+					height += (3.0 - 0.3 * breastHeightAge);
 				}
 
 				// convert back to metric
 				height *= 0.3048;
 
-				if (cu_index == SI_HWC_WILEY_BC) {
-					x1 = -1.34105 + 0.0009 * bhage * height;
+				if (cuIndex == SiteIndexEquation.SI_HWC_WILEY_BC) {
+					x1 = -1.34105 + 0.0009 * breastHeightAge * height;
 					if (x1 > 0.0) {
 						height -= x1;
 					}
 				}
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 
 		case SI_HWC_WILEY_MB:
-			if (bhage > 0.0) {
-				if (site_index > 60 + 1.667 * bhage) {
+			if (breastHeightAge > 0.0) {
+				if (siteIndex > 60 + 1.667 * breastHeightAge) {
 					// function starts going nuts at high sites and low ages
 					// evaluate at a safe age, and interpolate
-					x1 = (site_index - 60) / 1.667 + 0.1;
-					x2 = index_to_height(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
-					height = 1.37 + (x2 - 1.37) * bhage / x1;
+					x1 = (siteIndex - 60) / 1.667 + 0.1;
+					x2 = indexToHeight(cuIndex, x1, SI_AT_BREAST, siteIndex, years2BreastHeight, pi);
+					height = 1.37 + (x2 - 1.37) * breastHeightAge / x1;
 					break;
 				}
 
 				// convert to imperial
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 
-				x1 = 2500 / (site_index - 4.5);
+				x1 = 2500 / (siteIndex - 4.5);
 
 				x2 = -1.7307 + 0.1394 * x1;
 				x3 = -0.0616 + 0.0137 * x1;
 				x4 = 0.00192428 + 0.00007024 * x1;
 
-				height = 4.5 + bhage * bhage / (x2 + x3 * bhage + x4 * bhage * bhage);
+				height = 4.5 + breastHeightAge * breastHeightAge / (x2 + x3 * breastHeightAge + x4 * breastHeightAge * breastHeightAge);
 
-				if (bhage < 5) {
-					height += (0.3 * bhage);
-				} else if (bhage < 10) {
-					height += (3.0 - 0.3 * bhage);
+				if (breastHeightAge < 5) {
+					height += (0.3 * breastHeightAge);
+				} else if (breastHeightAge < 10) {
+					height += (3.0 - 0.3 * breastHeightAge);
 				}
 
 				// convert back to metric
 				height *= 0.3048;
 
-				if (cu_index == SI_HWC_WILEY_MB) {
-					x1 = 0.0972129 + 0.000419315 * bhage * height;
+				if (cuIndex == SiteIndexEquation.SI_HWC_WILEY_MB) {
+					x1 = 0.0972129 + 0.000419315 * breastHeightAge * height;
 					height -= x1;
 				}
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_HWC_WILEYAC:
-			if (bhage >= pi) {
-				if (site_index > 60 + 1.667 * (bhage - pi)) {
+			if (breastHeightAge >= pi) {
+				if (siteIndex > 60 + 1.667 * (breastHeightAge - pi)) {
 					/* function starts going nuts at high sites and low ages */
 					/* evaluate at a safe age, and interpolate */
-					x1 = (site_index - 60) / 1.667 + 0.1 + pi;
-					x2 = index_to_height(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
-					height = 1.37 + (x2 - 1.37) * (bhage - pi) / x1;
+					x1 = (siteIndex - 60) / 1.667 + 0.1 + pi;
+					x2 = indexToHeight(cuIndex, x1, SI_AT_BREAST, siteIndex, years2BreastHeight, pi);
+					height = 1.37 + (x2 - 1.37) * (breastHeightAge - pi) / x1;
 					break;
 				}
 
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 
-				x1 = Math.pow(49 + (1 - pi), 2.0) / (site_index - 4.5);
+				x1 = Math.pow(49 + (1 - pi), 2.0) / (siteIndex - 4.5);
 
 				x2 = -1.7307 + 0.1394 * x1;
 				x3 = -0.0616 + 0.0137 * x1;
 				x4 = 0.00195078 + 0.00007446 * x1;
-				x5 = bhage - pi;
+				x5 = breastHeightAge - pi;
 				height = 4.5 + x5 * x5 / (x2 + x3 * x5 + x4 * x5 * x5);
 
 				if (x5 < 5) {
@@ -510,927 +345,792 @@ public class SiteIndex2Height {
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 
 			break;
 		case SI_BP_CURTIS:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 
-				x1 = Math.log(site_index - 4.5) + 1.649871 * (Math.log(bhage) - Math.log(50))
-						+ 0.147245 * Math.pow(Math.log(bhage) - Math.log(50), 2.0);
-				x2 = 1.0 + 0.164927 * (Math.log(bhage) - Math.log(50))
-						+ 0.052467 * Math.pow(Math.log(bhage) - Math.log(50), 2.0);
+				x1 = Math.log(siteIndex - 4.5) + 1.649871 * (Math.log(breastHeightAge) - Math.log(50))
+						+ 0.147245 * Math.pow(Math.log(breastHeightAge) - Math.log(50), 2.0);
+				x2 = 1.0 + 0.164927 * (Math.log(breastHeightAge) - Math.log(50))
+						+ 0.052467 * Math.pow(Math.log(breastHeightAge) - Math.log(50), 2.0);
 				height = 4.5 + Math.exp(x1 / x2);
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_BP_CURTISAC:
-			if (bhage > 0.5) {
+			if (breastHeightAge > 0.5) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 
-				x1 = Math.log(site_index - 4.5) + 1.649871 * (Math.log(bhage - 0.5) - Math.log(49.5))
-						+ 0.147245 * Math.pow(Math.log(bhage - 0.5) - Math.log(49.5), 2.0);
-				x2 = 1.0 + 0.164927 * (Math.log(bhage - 0.5) - Math.log(49.5))
-						+ 0.052467 * Math.pow(Math.log(bhage - 0.5) - Math.log(49.5), 2.0);
+				x1 = Math.log(siteIndex - 4.5) + 1.649871 * (Math.log(breastHeightAge - 0.5) - Math.log(49.5))
+						+ 0.147245 * Math.pow(Math.log(breastHeightAge - 0.5) - Math.log(49.5), 2.0);
+				x2 = 1.0 + 0.164927 * (Math.log(breastHeightAge - 0.5) - Math.log(49.5))
+						+ 0.052467 * Math.pow(Math.log(breastHeightAge - 0.5) - Math.log(49.5), 2.0);
 				height = 4.5 + Math.exp(x1 / x2);
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_SW_GOUDNIGH:
-			if (site_index < 19.5) {
-				if (bhage > 0.5) {
+			if (siteIndex < 19.5) {
+				if (breastHeightAge > 0.5) {
 					/* Goudie */
-					x1 = (1.0 + Math.exp(9.7936 - 1.2866 * llog(site_index - 1.3) - 1.4661 * Math.log(49.5))) /
-							(1.0 + Math.exp(9.7936 - 1.2866 * llog(site_index - 1.3) - 1.4661 * Math.log(bhage - 0.5)));
+					x1 = (1.0 + Math.exp(9.7936 - 1.2866 * llog(siteIndex - 1.3) - 1.4661 * Math.log(49.5))) / (1.0
+							+ Math.exp(9.7936 - 1.2866 * llog(siteIndex - 1.3) - 1.4661 * Math.log(breastHeightAge - 0.5)));
 
-					height = 1.3 + (site_index - 1.3) * x1;
+					height = 1.3 + (siteIndex - 1.3) * x1;
 				} else {
-					height = tage * tage * 1.3 / y2bh / y2bh;
+					height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 				}
 			} else {
-				if (tage < y2bh - 0.5) {
+				if (totalAge < years2BreastHeight - 0.5) {
 					/* use Nigh's total age curve */
-					height = (-0.01666 + 0.001722 * site_index) * ppow(tage, 1.858) *
-							ppow(0.9982, tage);
-				} else if (tage > y2bh + 2 - 0.5) {
+					height = (-0.01666 + 0.001722 * siteIndex) * ppow(totalAge, 1.858) * ppow(0.9982, totalAge);
+				} else if (totalAge > years2BreastHeight + 2 - 0.5) {
 					/* use Goudie's breast-height age curve */
-					x1 = (1.0 + Math.exp(
-							9.7936 - 1.2866 * llog(site_index - 1.3)
-									- 1.4661 * Math.log(49.5)
-					)) /
-							(1.0 + Math.exp(
-									9.7936 - 1.2866 * llog(site_index - 1.3)
-											- 1.4661 * Math.log(bhage - 0.5)
-							));
+					x1 = (1.0 + Math.exp(9.7936 - 1.2866 * llog(siteIndex - 1.3) - 1.4661 * Math.log(49.5))) / (1.0
+							+ Math.exp(9.7936 - 1.2866 * llog(siteIndex - 1.3) - 1.4661 * Math.log(breastHeightAge - 0.5)));
 
-					height = 1.3 + (site_index - 1.3) * x1;
+					height = 1.3 + (siteIndex - 1.3) * x1;
 				} else {
 					/* use Nigh's total age curve */
-					x4 = (-0.01666 + 0.001722 * site_index) * ppow(y2bh - 0.5, 1.858) *
-							ppow(0.9982, y2bh - 0.5);
+					x4 = (-0.01666 + 0.001722 * siteIndex) * ppow(years2BreastHeight - 0.5, 1.858) * ppow(0.9982, years2BreastHeight - 0.5);
 
 					/* use Goudie's breast-height age curve */
-					x1 = (1.0 + Math.exp(
-							9.7936 - 1.2866 * llog(site_index - 1.3)
-									- 1.4661 * Math.log(49.5)
-					)) /
-							(1.0 + Math.exp(
-									9.7936 - 1.2866 * llog(site_index - 1.3)
-											- 1.4661 * Math.log(2 - 0.5)
-							));
+					x1 = (1.0 + Math.exp(9.7936 - 1.2866 * llog(siteIndex - 1.3) - 1.4661 * Math.log(49.5)))
+							/ (1.0 + Math.exp(9.7936 - 1.2866 * llog(siteIndex - 1.3) - 1.4661 * Math.log(2 - 0.5)));
 
-					x5 = 1.3 + (site_index - 1.3) * x1;
+					x5 = 1.3 + (siteIndex - 1.3) * x1;
 
-					height = x4 + (x5 - x4) * bhage / 2.0;
+					height = x4 + (x5 - x4) * breastHeightAge / 2.0;
 				}
 			}
 			break;
 		case SI_PLI_THROWNIGH:
-			if (site_index < 18.5) {
-				if (bhage > 0.5) {
-					x1 = (1.0 + Math.exp(
-							7.6298 - 0.8940 * llog(site_index - 1.3)
-									- 1.3563 * Math.log(49.5)
-					)) /
-							(1.0 + Math.exp(
-									7.6298 - 0.8940 * llog(site_index - 1.3)
-											- 1.3563 * Math.log(bhage - 0.5)
-							));
+			if (siteIndex < 18.5) {
+				if (breastHeightAge > 0.5) {
+					x1 = (1.0 + Math.exp(7.6298 - 0.8940 * llog(siteIndex - 1.3) - 1.3563 * Math.log(49.5))) / (1.0
+							+ Math.exp(7.6298 - 0.8940 * llog(siteIndex - 1.3) - 1.3563 * Math.log(breastHeightAge - 0.5)));
 
-					height = 1.3 + (site_index - 1.3) * x1;
+					height = 1.3 + (siteIndex - 1.3) * x1;
 				} else {
-					height = 1.3 * Math.pow(tage / y2bh, 1.8);
+					height = 1.3 * Math.pow(totalAge / years2BreastHeight, 1.8);
 				}
 			} else {
-				if (tage < y2bh - 0.5) {
+				if (totalAge < years2BreastHeight - 0.5) {
 					/* use Nigh's total age curve */
-					height = (-0.03993 + 0.004828 * site_index) * ppow(tage, 1.902) *
-							ppow(0.9645, tage);
-				} else if (tage > y2bh + 2 - 0.5) {
+					height = (-0.03993 + 0.004828 * siteIndex) * ppow(totalAge, 1.902) * ppow(0.9645, totalAge);
+				} else if (totalAge > years2BreastHeight + 2 - 0.5) {
 					/* use Thrower's breast-height age curve */
-					x1 = (1.0 + Math.exp(
-							7.6298 - 0.8940 * llog(site_index - 1.3)
-									- 1.3563 * Math.log(49.5)
-					)) /
-							(1.0 + Math.exp(
-									7.6298 - 0.8940 * llog(site_index - 1.3)
-											- 1.3563 * Math.log(bhage - 0.5)
-							));
+					x1 = (1.0 + Math.exp(7.6298 - 0.8940 * llog(siteIndex - 1.3) - 1.3563 * Math.log(49.5))) / (1.0
+							+ Math.exp(7.6298 - 0.8940 * llog(siteIndex - 1.3) - 1.3563 * Math.log(breastHeightAge - 0.5)));
 
-					height = 1.3 + (site_index - 1.3) * x1;
+					height = 1.3 + (siteIndex - 1.3) * x1;
 				} else {
 					/* use Nigh's total age curve */
-					x4 = (-0.03993 + 0.004828 * site_index) * ppow(y2bh - 0.5, 1.902) *
-							ppow(0.9645, y2bh - 0.5);
+					x4 = (-0.03993 + 0.004828 * siteIndex) * ppow(years2BreastHeight - 0.5, 1.902) * ppow(0.9645, years2BreastHeight - 0.5);
 
 					/* use Thrower's breast-height age curve */
-					x1 = (1.0 + Math.exp(
-							7.6298 - 0.8940 * llog(site_index - 1.3)
-									- 1.3563 * Math.log(49.5)
-					)) /
-							(1.0 + Math.exp(
-									7.6298 - 0.8940 * llog(site_index - 1.3)
-											- 1.3563 * Math.log(2 - 0.5)
-							));
+					x1 = (1.0 + Math.exp(7.6298 - 0.8940 * llog(siteIndex - 1.3) - 1.3563 * Math.log(49.5)))
+							/ (1.0 + Math.exp(7.6298 - 0.8940 * llog(siteIndex - 1.3) - 1.3563 * Math.log(2 - 0.5)));
 
-					x5 = 1.3 + (site_index - 1.3) * x1;
+					x5 = 1.3 + (siteIndex - 1.3) * x1;
 
-					height = x4 + (x5 - x4) * bhage / 2.0;
+					height = x4 + (x5 - x4) * breastHeightAge / 2.0;
 				}
 			}
 			break;
 		case SI_PLI_THROWER:
-			if (bhage > pi) {
-				x1 = (1.0 + Math.exp(
-						7.6298 - 0.8940 * llog(site_index - 1.3)
-								- 1.3563 * Math.log(50 - pi)
-				)) /
-						(1.0 + Math.exp(
-								7.6298 - 0.8940 * llog(site_index - 1.3)
-										- 1.3563 * Math.log(bhage - pi)
-						));
+			if (breastHeightAge > pi) {
+				x1 = (1.0 + Math.exp(7.6298 - 0.8940 * llog(siteIndex - 1.3) - 1.3563 * Math.log(50 - pi)))
+						/ (1.0 + Math.exp(7.6298 - 0.8940 * llog(siteIndex - 1.3) - 1.3563 * Math.log(breastHeightAge - pi)));
 
-				height = 1.3 + (site_index - 1.3) * x1;
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
 				/*
 				 * height = tage * tage * 1.3 / y2bh / y2bh;
 				 */
-				height = 1.3 * Math.pow(tage / y2bh, 1.77 - 0.1028 * y2bh) * Math.pow(1.179, tage - y2bh);
+				height = 1.3 * Math.pow(totalAge / years2BreastHeight, 1.77 - 0.1028 * years2BreastHeight) * Math.pow(1.179, totalAge - years2BreastHeight);
 			}
 			break;
 		case SI_PLI_NIGHTA2004:
-			if (tage <= 15) {
-				height = 1.3 * Math.pow(tage / y2bh, 1.77 - 0.1028 * y2bh) * Math.pow(1.179, tage - y2bh);
+			if (totalAge <= 15) {
+				height = 1.3 * Math.pow(totalAge / years2BreastHeight, 1.77 - 0.1028 * years2BreastHeight) * Math.pow(1.179, totalAge - years2BreastHeight);
 			} else {
-				height = SI_ERR_NO_ANS;
+				throw new NoAnswerException("Iteration could not converge (projected height > 999)");
 			}
 			break;
 		case SI_PLI_NIGHTA98:
-			if (tage <= 15) {
-				height = (-0.03993 + 0.004828 * site_index) * ppow(tage, 1.902) *
-						ppow(0.9645, tage);
+			if (totalAge <= 15) {
+				height = (-0.03993 + 0.004828 * siteIndex) * ppow(totalAge, 1.902) * ppow(0.9645, totalAge);
 			} else {
-				height = SI_ERR_NO_ANS;
+				throw new NoAnswerException("Iteration could not converge (projected height > 999)");
 			}
 			break;
 		case SI_SW_NIGHTA2004:
-			if (tage <= 20) {
-				height = 1.3 * Math.pow(tage / y2bh, 1.628 - 0.05991 * y2bh) * Math.pow(1.127, tage - y2bh);
+			if (totalAge <= 20) {
+				height = 1.3 * Math.pow(totalAge / years2BreastHeight, 1.628 - 0.05991 * years2BreastHeight) * Math.pow(1.127, totalAge - years2BreastHeight);
 			} else {
-				height = SI_ERR_NO_ANS;
+				throw new NoAnswerException("Iteration could not converge (projected height > 999)");
 			}
 			break;
 		case SI_SW_NIGHTA:
-			if (tage <= 20 && site_index >= 14.2) {
-				height = (-0.01666 + 0.001722 * site_index) * ppow(tage, 1.858) *
-						ppow(0.9982, tage);
+			if (totalAge <= 20 && siteIndex >= 14.2) {
+				height = (-0.01666 + 0.001722 * siteIndex) * ppow(totalAge, 1.858) * ppow(0.9982, totalAge);
 			} else {
-				height = SI_ERR_NO_ANS;
+				throw new NoAnswerException("Iteration could not converge (projected height > 999)");
 			}
 			break;
 		case SI_FDC_NIGHTA:
-			if (tage <= 25) {
-				height = (-0.002355 + 0.0003156 * site_index) * ppow(tage, 2.861) *
-						ppow(0.9337, tage);
+			if (totalAge <= 25) {
+				height = (-0.002355 + 0.0003156 * siteIndex) * ppow(totalAge, 2.861) * ppow(0.9337, totalAge);
 			} else {
-				height = SI_ERR_NO_ANS;
+				throw new NoAnswerException("Iteration could not converge (projected height > 999)");
 			}
 			break;
 		case SI_SE_NIGH:
-			if (bhage > 0.5) {
+			if (breastHeightAge > 0.5) {
 				// -1.71635 = 1.758 * log (1 - exp (-0.00955 * 49.5))
 				// 45.3824 = -4 * 11.6209 * log (1 - exp (-0.00955 * 49.5))
-				x1 = 0.5 * ( (Math.log(site_index - 1.3) - 1.71635)
-						+ Math.sqrt(Math.pow(Math.log(site_index - 1.3) - 1.71635, 2.0) + 45.3824));
-				height = 1.3 + Math.exp(x1) * Math.pow(1 - Math.exp(-0.00955 * (bhage - 0.5)), -1.758 + 11.6209 / x1);
+				x1 = 0.5 * ( (Math.log(siteIndex - 1.3) - 1.71635)
+						+ Math.sqrt(Math.pow(Math.log(siteIndex - 1.3) - 1.71635, 2.0) + 45.3824));
+				height = 1.3 + Math.exp(x1) * Math.pow(1 - Math.exp(-0.00955 * (breastHeightAge - 0.5)), -1.758 + 11.6209 / x1);
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_SE_NIGHTA:
-			if (tage <= 20) {
-				height = 1.3 * Math.pow(tage / y2bh, 1.628 - 0.05991 * y2bh) * Math.pow(1.127, tage - y2bh);
+			if (totalAge <= 20) {
+				height = 1.3 * Math.pow(totalAge / years2BreastHeight, 1.628 - 0.05991 * years2BreastHeight) * Math.pow(1.127, totalAge - years2BreastHeight);
 			} else {
-				height = SI_ERR_NO_ANS;
+				throw new NoAnswerException("Iteration could not converge (projected height > 999)");
 			}
 			break;
 		case SI_FDC_BRUCE:
 			// 2009 may 6: force a non-rounded y2bh
-			y2bh = 13.25 - site_index / 6.096;
+			years2BreastHeight = 13.25 - siteIndex / 6.096;
 
-			x1 = site_index / 30.48;
+			x1 = siteIndex / 30.48;
 
 			x2 = -0.477762 + x1 * (-0.894427 + x1 * (0.793548 - x1 * 0.171666));
 
-			x3 = ppow(50.0 + y2bh, x2);
+			x3 = ppow(50.0 + years2BreastHeight, x2);
 
-			x4 = Math.log(1.372 / site_index) / (ppow(y2bh, x2) - x3);
+			x4 = Math.log(1.372 / siteIndex) / (ppow(years2BreastHeight, x2) - x3);
 
-			if (age_type == SI_AT_TOTAL) {
-				height = site_index * Math.exp(x4 * (ppow(tage, x2) - x3));
+			if (ageType == SI_AT_TOTAL) {
+				height = siteIndex * Math.exp(x4 * (ppow(totalAge, x2) - x3));
 			} else {
-				height = site_index * Math.exp(x4 * (ppow(bhage + y2bh, x2) - x3));
+				height = siteIndex * Math.exp(x4 * (ppow(breastHeightAge + years2BreastHeight, x2) - x3));
 			}
 			break;
 		case SI_FDC_BRUCEAC:
 			// 2009 may 6: force a non-rounded y2bh
-			y2bh = 13.25 - site_index / 6.096;
+			years2BreastHeight = 13.25 - siteIndex / 6.096;
 
-			x1 = site_index / 30.48;
+			x1 = siteIndex / 30.48;
 
 			x2 = -0.477762 + x1 * (-0.894427 + x1 * (0.793548 - x1 * 0.171666));
 
-			x3 = ppow(49 + (1 - pi) + y2bh, x2);
+			x3 = ppow(49 + (1 - pi) + years2BreastHeight, x2);
 
-			x4 = Math.log(1.372 / site_index) / (ppow(y2bh, x2) - x3);
+			x4 = Math.log(1.372 / siteIndex) / (ppow(years2BreastHeight, x2) - x3);
 
-			if (age_type == SI_AT_TOTAL) {
-				height = site_index * Math.exp(x4 * (ppow(tage, x2) - x3));
+			if (ageType == SI_AT_TOTAL) {
+				height = siteIndex * Math.exp(x4 * (ppow(totalAge, x2) - x3));
 			} else {
-				height = site_index * Math.exp(x4 * (ppow(bhage + y2bh - pi, x2) - x3));
+				height = siteIndex * Math.exp(x4 * (ppow(breastHeightAge + years2BreastHeight - pi, x2) - x3));
 			}
 			break;
 		case SI_FDC_BRUCENIGH:
 			// 2009 may 6: force a non-rounded y2bh
-			y2bh = 13.25 - site_index / 6.096;
+			years2BreastHeight = 13.25 - siteIndex / 6.096;
 
-			if (tage < 50) {
+			if (totalAge < 50) {
 				/* compute Bruce at age 50 */
-				x1 = site_index / 30.48;
+				x1 = siteIndex / 30.48;
 				x2 = -0.477762 + x1 * (-0.894427 + x1 * (0.793548 - x1 * 0.171666));
-				x3 = ppow(50.0 + y2bh - 0.5, x2);
-				x4 = Math.log(1.372 / site_index) / (ppow(y2bh - 0.5, x2) - x3);
-				height = site_index * Math.exp(x4 * (ppow(50, x2) - x3));
+				x3 = ppow(50.0 + years2BreastHeight - 0.5, x2);
+				x4 = Math.log(1.372 / siteIndex) / (ppow(years2BreastHeight - 0.5, x2) - x3);
+				height = siteIndex * Math.exp(x4 * (ppow(50, x2) - x3));
 
 				/* now smooth it into the Nigh curve */
-				x4 = ppow(height * ppow(50, -2.037) / (-0.0123 + 0.00158 * site_index), 1.0 / 50);
+				x4 = ppow(height * ppow(50, -2.037) / (-0.0123 + 0.00158 * siteIndex), 1.0 / 50);
 
-				height = (-0.0123 + 0.00158 * site_index) * ppow(tage, 2.037) * ppow(x4, tage);
+				height = (-0.0123 + 0.00158 * siteIndex) * ppow(totalAge, 2.037) * ppow(x4, totalAge);
 			} else {
 				/* compute Bruce */
-				x1 = site_index / 30.48;
+				x1 = siteIndex / 30.48;
 				x2 = -0.477762 + x1 * (-0.894427 + x1 * (0.793548 - x1 * 0.171666));
-				x3 = ppow(50.0 + y2bh - 0.5, x2);
-				x4 = Math.log(1.372 / site_index) / (ppow(y2bh - 0.5, x2) - x3);
-				height = site_index * Math.exp(x4 * (ppow(tage, x2) - x3));
+				x3 = ppow(50.0 + years2BreastHeight - 0.5, x2);
+				x4 = Math.log(1.372 / siteIndex) / (ppow(years2BreastHeight - 0.5, x2) - x3);
+				height = siteIndex * Math.exp(x4 * (ppow(totalAge, x2) - x3));
 			}
 			break;
 		case SI_PLI_MILNER:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 
-				x1 = 96.93 * ppow(1 - Math.exp(-0.01955 * bhage), 1.216);
-				x2 = 1.41 * ppow(1 - Math.exp(-0.02656 * bhage), 1.297);
-				height = 4.5 + x1 + x2 * (site_index - 59.6);
+				x1 = 96.93 * ppow(1 - Math.exp(-0.01955 * breastHeightAge), 1.216);
+				x2 = 1.41 * ppow(1 - Math.exp(-0.02656 * breastHeightAge), 1.297);
+				height = 4.5 + x1 + x2 * (siteIndex - 59.6);
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_PLI_CIESZEWSKI:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x1 = 0.20372424;
 				x2 = 97.37473618;
 				x3 = 20 * x2 / (ppow(50.0, 1 + x1));
-				x4 = site_index - 1.3 +
-						Math.sqrt(
-								(site_index - 1.3 - x3) * (site_index - 1.3 - x3) +
-										80 * x2 * (site_index - 1.3) * ppow(50.0, - (1 + x1))
+				x4 = siteIndex - 1.3
+						+ Math.sqrt(
+								(siteIndex - 1.3 - x3) * (siteIndex - 1.3 - x3)
+										+ 80 * x2 * (siteIndex - 1.3) * ppow(50.0, - (1 + x1))
 						);
 
-				height = 1.3 + (x4 + x3) /
-						(2 + 80 * x2 * ppow(bhage, - (1 + x1)) / (x4 - x3));
+				height = 1.3 + (x4 + x3) / (2 + 80 * x2 * ppow(breastHeightAge, - (1 + x1)) / (x4 - x3));
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_SW_CIESZEWSKI:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x1 = 0.3235139;
 				x2 = 260.9162652;
 				x3 = 20 * x2 / (ppow(50.0, 1 + x1));
-				x4 = site_index - 1.3 +
-						Math.sqrt(
-								(site_index - 1.3 - x3) * (site_index - 1.3 - x3) +
-										80 * x2 * (site_index - 1.3) * ppow(50.0, - (1 + x1))
+				x4 = siteIndex - 1.3
+						+ Math.sqrt(
+								(siteIndex - 1.3 - x3) * (siteIndex - 1.3 - x3)
+										+ 80 * x2 * (siteIndex - 1.3) * ppow(50.0, - (1 + x1))
 						);
 
-				height = 1.3 + (x4 + x3) /
-						(2 + 80 * x2 * ppow(bhage, - (1 + x1)) / (x4 - x3));
+				height = 1.3 + (x4 + x3) / (2 + 80 * x2 * ppow(breastHeightAge, - (1 + x1)) / (x4 - x3));
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_SB_CIESZEWSKI:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x1 = 0.1992266;
 				x2 = 114.8730018;
 				x3 = 20 * x2 / (ppow(50.0, 1 + x1));
-				x4 = site_index - 1.3 +
-						Math.sqrt(
-								(site_index - 1.3 - x3) * (site_index - 1.3 - x3) +
-										80 * x2 * (site_index - 1.3) * ppow(50.0, - (1 + x1))
+				x4 = siteIndex - 1.3
+						+ Math.sqrt(
+								(siteIndex - 1.3 - x3) * (siteIndex - 1.3 - x3)
+										+ 80 * x2 * (siteIndex - 1.3) * ppow(50.0, - (1 + x1))
 						);
 
-				height = 1.3 + (x4 + x3) /
-						(2 + 80 * x2 * ppow(bhage, - (1 + x1)) / (x4 - x3));
+				height = 1.3 + (x4 + x3) / (2 + 80 * x2 * ppow(breastHeightAge, - (1 + x1)) / (x4 - x3));
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_AT_CIESZEWSKI:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x1 = 0.2644606;
 				x2 = 117.3695371;
 				x3 = 20 * x2 / (ppow(50.0, 1 + x1));
-				x4 = site_index - 1.3 +
-						Math.sqrt(
-								(site_index - 1.3 - x3) * (site_index - 1.3 - x3) +
-										80 * x2 * (site_index - 1.3) * ppow(50.0, - (1 + x1))
+				x4 = siteIndex - 1.3
+						+ Math.sqrt(
+								(siteIndex - 1.3 - x3) * (siteIndex - 1.3 - x3)
+										+ 80 * x2 * (siteIndex - 1.3) * ppow(50.0, - (1 + x1))
 						);
 
-				height = 1.3 + (x4 + x3) /
-						(2 + 80 * x2 * ppow(bhage, - (1 + x1)) / (x4 - x3));
+				height = 1.3 + (x4 + x3) / (2 + 80 * x2 * ppow(breastHeightAge, - (1 + x1)) / (x4 - x3));
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		// Couldn't find constant
 		/*
-		 * case SI_PF_GOUDIE_WET:
-		 * if (bhage > 0.0){
-		 * x1 = -0.935;
-		 * x2 = 7.81498;
-		 * x3 = -1.28517;
-		 * 
-		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) /
-		 * (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * x1;
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_PF_GOUDIE_WET: if (bhage > 0.0){ x1 = -0.935; x2 = 7.81498; x3 = -1.28517;
+		 *
+		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) / (1.0 + Math.exp (x2 + x1 *
+		 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
+		 *
+		 * height = 1.3 + (site_index - 1.3) * x1; } else{ height = tage * tage * 1.3 / y2bh / y2bh; } break;
 		 */
 		// Couldn't find constant
 		/*
-		 * case SI_PF_GOUDIE_DRY:
-		 * if (bhage > 0.0){
-		 * x1 = -1.00726;
-		 * x2 = 7.81498;
-		 * x3 = -1.28517;
-		 * 
-		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) /
-		 * (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * x1;
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_PF_GOUDIE_DRY: if (bhage > 0.0){ x1 = -1.00726; x2 = 7.81498; x3 = -1.28517;
+		 *
+		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) / (1.0 + Math.exp (x2 + x1 *
+		 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
+		 *
+		 * height = 1.3 + (site_index - 1.3) * x1; } else{ height = tage * tage * 1.3 / y2bh / y2bh; } break;
 		 */
 		case SI_PLI_GOUDIE_WET:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x1 = -0.935;
 				x2 = 7.81498;
 				x3 = -1.28517;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(breastHeightAge)));
 
-				height = 1.3 + (site_index - 1.3) * x1;
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_PLI_GOUDIE_DRY:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x1 = -1.00726;
 				x2 = 7.81498;
 				x3 = -1.28517;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(breastHeightAge)));
 
-				height = 1.3 + (site_index - 1.3) * x1;
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
-		//Couldn't find constant
+		// Couldn't find constant
 		/*
-		 * case SI_PA_GOUDIE_WET:
-		 * if (bhage > 0.0){
-		 * x1 = -0.935;
-		 * x2 = 7.81498;
-		 * x3 = -1.28517;
-		 * 
-		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) /
-		 * (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * x1;
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_PA_GOUDIE_WET: if (bhage > 0.0){ x1 = -0.935; x2 = 7.81498; x3 = -1.28517;
+		 *
+		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) / (1.0 + Math.exp (x2 + x1 *
+		 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
+		 *
+		 * height = 1.3 + (site_index - 1.3) * x1; } else{ height = tage * tage * 1.3 / y2bh / y2bh; } break;
 		 */
 		// Couldn't find constant
 		/*
-		 * case SI_PA_GOUDIE_DRY:
-		 * if (bhage > 0.0){
-		 * x1 = -1.00726;
-		 * x2 = 7.81498;
-		 * x3 = -1.28517;
-		 * 
-		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) /
-		 * (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * x1;
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_PA_GOUDIE_DRY: if (bhage > 0.0){ x1 = -1.00726; x2 = 7.81498; x3 = -1.28517;
+		 *
+		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) / (1.0 + Math.exp (x2 + x1 *
+		 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
+		 *
+		 * height = 1.3 + (site_index - 1.3) * x1; } else{ height = tage * tage * 1.3 / y2bh / y2bh; } break;
 		 */
 		case SI_PLI_DEMPSTER:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x1 = -0.9576;
 				x2 = 7.4871;
 				x3 = -1.2036;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(breastHeightAge)));
 
-				height = 1.3 + (site_index - 1.3) * x1;
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		// Couldn't find constant
 		/*
-		 * case SI_SE_GOUDIE_PLA:
-		 * if (bhage > 0.0){
-		 * x1 = -1.2866;
-		 * x2 = 9.7936;
-		 * x3 = -1.4661;
-		 * 
-		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) /
-		 * (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * x1;
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_SE_GOUDIE_PLA: if (bhage > 0.0){ x1 = -1.2866; x2 = 9.7936; x3 = -1.4661;
+		 *
+		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) / (1.0 + Math.exp (x2 + x1 *
+		 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
+		 *
+		 * height = 1.3 + (site_index - 1.3) * x1; } else{ height = tage * tage * 1.3 / y2bh / y2bh; } break;
 		 */
 		// Couldn't find constant
 		/*
-		 * case SI_SE_GOUDIE_NAT:
-		 * if (bhage > 0.0){
-		 * x1 = -1.2866;
-		 * x2 = 9.7936;
-		 * x3 = -1.4661;
-		 * 
-		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) /
-		 * (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * x1;
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_SE_GOUDIE_NAT: if (bhage > 0.0){ x1 = -1.2866; x2 = 9.7936; x3 = -1.4661;
+		 *
+		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) / (1.0 + Math.exp (x2 + x1 *
+		 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
+		 *
+		 * height = 1.3 + (site_index - 1.3) * x1; } else{ height = tage * tage * 1.3 / y2bh / y2bh; } break;
 		 */
 		case SI_SW_GOUDIE_PLA:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x1 = -1.2866;
 				x2 = 9.7936;
 				x3 = -1.4661;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(breastHeightAge)));
 
-				height = 1.3 + (site_index - 1.3) * x1;
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_SW_GOUDIE_NAT:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x1 = -1.2866;
 				x2 = 9.7936;
 				x3 = -1.4661;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(breastHeightAge)));
 
-				height = 1.3 + (site_index - 1.3) * x1;
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_SW_DEMPSTER:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x1 = -1.2240;
 				x2 = 9.6183;
 				x3 = -1.4627;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(breastHeightAge)));
 
-				height = 1.3 + (site_index - 1.3) * x1;
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_SB_DEMPSTER:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x1 = -1.3154;
 				x2 = 8.5594;
 				x3 = -1.1484;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(breastHeightAge)));
 
-				height = 1.3 + (site_index - 1.3) * x1;
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_SS_GOUDIE:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x1 = -1.5282;
 				x2 = 11.0605;
 				x3 = -1.5108;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(breastHeightAge)));
 
-				height = 1.3 + (site_index - 1.3) * x1;
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_FDI_THROWER:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x1 = -0.237724692;
 				x2 = 5.780089777;
 				x3 = -1.150039266;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(breastHeightAge)));
 
-				height = 1.3 + (site_index - 1.3) * x1;
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_AT_GOUDIE:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x1 = -0.618;
 				x2 = 6.879;
 				x3 = -1.32;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(breastHeightAge)));
 
-				height = 1.3 + (site_index - 1.3) * x1;
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
-		//Couldn't find constant
+		// Couldn't find constant
 		/*
-		 * case SI_EP_GOUDIE:
-		 * if (bhage > 0.0){
-		 * x1 = -0.618;
-		 * x2 = 6.879;
-		 * x3 = -1.32;
-		 * 
-		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) /
-		 * (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * x1;
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_EP_GOUDIE: if (bhage > 0.0){ x1 = -0.618; x2 = 6.879; x3 = -1.32;
+		 *
+		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) / (1.0 + Math.exp (x2 + x1 *
+		 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
+		 *
+		 * height = 1.3 + (site_index - 1.3) * x1; } else{ height = tage * tage * 1.3 / y2bh / y2bh; } break;
 		 */
 		// Couldn't find constant
 		/*
-		 * case SI_EA_GOUDIE:
-		 * if (bhage > 0.0){
-		 * x1 = -0.618;
-		 * x2 = 6.879;
-		 * x3 = -1.32;
-		 * 
-		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) /
-		 * (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * x1;
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_EA_GOUDIE: if (bhage > 0.0){ x1 = -0.618; x2 = 6.879; x3 = -1.32;
+		 *
+		 * x1 = (1.0 + Math.exp (x2 + x1 * llog(site_index - 1.3) + x3 * Math.log (50.0))) / (1.0 + Math.exp (x2 + x1 *
+		 * llog(site_index - 1.3) + x3 * Math.log (bhage)));
+		 *
+		 * height = 1.3 + (site_index - 1.3) * x1; } else{ height = tage * tage * 1.3 / y2bh / y2bh; } break;
 		 */
 		case SI_SW_GOUDIE_NATAC:
-			if (bhage > pi) {
+			if (breastHeightAge > pi) {
 				x1 = -1.2866;
 				x2 = 9.7936;
 				x3 = -1.4661;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50 - pi))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage - pi)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(50 - pi)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(breastHeightAge - pi)));
 
-				height = 1.3 + (site_index - 1.3) * x1;
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
-				height = 1.3 * Math.pow(tage / y2bh, 1.628 - 0.05991 * y2bh) * Math.pow(1.127, tage - y2bh);
+				height = 1.3 * Math.pow(totalAge / years2BreastHeight, 1.628 - 0.05991 * years2BreastHeight) * Math.pow(1.127, totalAge - years2BreastHeight);
 			}
 			break;
 
 		case SI_SW_GOUDIE_PLAAC:
-			if (bhage > pi) {
+			if (breastHeightAge > pi) {
 				x1 = -1.2866;
 				x2 = 9.7936;
 				x3 = -1.4661;
 
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(50 - pi))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage - pi)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(50 - pi)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(breastHeightAge - pi)));
 
-				height = 1.3 + (site_index - 1.3) * x1;
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
-				height = 1.3 * Math.pow(tage / y2bh, 1.628 - 0.05991 * y2bh) * Math.pow(1.127, tage - y2bh);
+				height = 1.3 * Math.pow(totalAge / years2BreastHeight, 1.628 - 0.05991 * years2BreastHeight) * Math.pow(1.127, totalAge - years2BreastHeight);
 			}
 			break;
 		case SI_FDI_THROWERAC:
-			if (bhage > 0.5) {
+			if (breastHeightAge > 0.5) {
 				x1 = -0.237724692;
 				x2 = 5.780089777;
 				x3 = -1.150039266;
-				x1 = (1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(49.5))) /
-						(1.0 + Math.exp(x2 + x1 * llog(site_index - 1.3) + x3 * Math.log(bhage - 0.5)));
+				x1 = (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(49.5)))
+						/ (1.0 + Math.exp(x2 + x1 * llog(siteIndex - 1.3) + x3 * Math.log(breastHeightAge - 0.5)));
 
-				height = 1.3 + (site_index - 1.3) * x1;
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_SS_NIGH:
-			if (bhage > 0.5) {
+			if (breastHeightAge > 0.5) {
 				x1 = 8.947;
 				x2 = -1.357;
 				x3 = -1.013;
 
-				x1 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
-				height = 1.3 + (site_index - 1.3) * x1;
+				x1 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(siteIndex - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(breastHeightAge - 0.5) + x3 * llog(siteIndex - 1.3)));
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_BA_NIGH:
-			if (bhage > 0.5) {
-				x5 = Math.pow(site_index - 1.3, 3.0) / 49.5;
-				x4 = x5 + Math.pow(x5 * x5 + 16692000.0 * Math.pow(site_index - 1.3, 3.0) / 299891.0, 0.5);
-				x2 = (8346000.0 + x4 * 6058.412) * Math.pow(bhage - 0.5, 3.232);
-				x3 = (8346000.0 + x4 * Math.pow(bhage - 0.5, 2.232)) * 299891.0;
-				height = 1.3 + (site_index - 1.3) * Math.pow(x2 / x3, 1 / 3.0);
+			if (breastHeightAge > 0.5) {
+				x5 = Math.pow(siteIndex - 1.3, 3.0) / 49.5;
+				x4 = x5 + Math.pow(x5 * x5 + 16692000.0 * Math.pow(siteIndex - 1.3, 3.0) / 299891.0, 0.5);
+				x2 = (8346000.0 + x4 * 6058.412) * Math.pow(breastHeightAge - 0.5, 3.232);
+				x3 = (8346000.0 + x4 * Math.pow(breastHeightAge - 0.5, 2.232)) * 299891.0;
+				height = 1.3 + (siteIndex - 1.3) * Math.pow(x2 / x3, 1 / 3.0);
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_EP_NIGH:
-			if (bhage > 0.5) {
+			if (breastHeightAge > 0.5) {
 				x1 = 9.604;
 				x2 = -1.113;
 				x3 = -1.849;
 
-				x1 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
-				height = 1.3 + (site_index - 1.3) * x1;
+				x1 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(siteIndex - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(breastHeightAge - 0.5) + x3 * llog(siteIndex - 1.3)));
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_CWI_NIGH:
-			if (bhage > 0.5) {
+			if (breastHeightAge > 0.5) {
 				x1 = 9.474;
 				x2 = -1.340;
 				x3 = -1.244;
 
-				x1 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
-				height = 1.3 + (site_index - 1.3) * x1;
+				x1 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(siteIndex - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(breastHeightAge - 0.5) + x3 * llog(siteIndex - 1.3)));
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_HWI_NIGH:
-			if (bhage > 0.5) {
+			if (breastHeightAge > 0.5) {
 				x1 = 8.998;
 				x2 = -1.434;
 				x3 = -1.051;
 
-				x1 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
-				height = 1.3 + (site_index - 1.3) * x1;
+				x1 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(siteIndex - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(breastHeightAge - 0.5) + x3 * llog(siteIndex - 1.3)));
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_PY_NIGH:
-			if (bhage > 0.5) {
+			if (breastHeightAge > 0.5) {
 				x1 = 8.519;
 				x2 = -1.385;
 				x3 = -0.8498;
 
-				x1 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
-				height = 1.3 + (site_index - 1.3) * x1;
+				x1 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(siteIndex - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(breastHeightAge - 0.5) + x3 * llog(siteIndex - 1.3)));
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
-				height = (1.3 * Math.pow(tage, 1.137) * Math.pow(1.016, tage)) /
-						(Math.pow(y2bh, 1.137) * Math.pow(1.016, y2bh));
+				height = (1.3 * Math.pow(totalAge, 1.137) * Math.pow(1.016, totalAge))
+						/ (Math.pow(years2BreastHeight, 1.137) * Math.pow(1.016, years2BreastHeight));
 			}
 			break;
 		case SI_ACT_THROWER:
 			// case SI_MB_THROWER: Cannot find constant
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x1 = -1.3481;
 				x2 = 10.3861;
 				x3 = -1.6555;
 
-				x1 = (1.0 + Math.exp(x2 + x3 * llog(site_index - 1.3) + x1 * Math.log(50.0))) /
-						(1.0 + Math.exp(x2 + x3 * llog(site_index - 1.3) + x1 * Math.log(bhage)));
+				x1 = (1.0 + Math.exp(x2 + x3 * llog(siteIndex - 1.3) + x1 * Math.log(50.0)))
+						/ (1.0 + Math.exp(x2 + x3 * llog(siteIndex - 1.3) + x1 * Math.log(breastHeightAge)));
 
-				height = 1.3 + (site_index - 1.3) * x1;
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_ACT_THROWERAC:
-			if (bhage > 0.5) {
+			if (breastHeightAge > 0.5) {
 				x1 = -1.3481;
 				x2 = 10.3861;
 				x3 = -1.6555;
 
-				x1 = (1.0 + Math.exp(x2 + x3 * llog(site_index - 1.3) + x1 * Math.log(49.5))) /
-						(1.0 + Math.exp(x2 + x3 * Math.log(site_index - 1.3) + x1 * Math.log(bhage - 0.5)));
+				x1 = (1.0 + Math.exp(x2 + x3 * llog(siteIndex - 1.3) + x1 * Math.log(49.5)))
+						/ (1.0 + Math.exp(x2 + x3 * Math.log(siteIndex - 1.3) + x1 * Math.log(breastHeightAge - 0.5)));
 
-				height = 1.3 + (site_index - 1.3) * x1;
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			break;
 		case SI_SB_KER:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x2 = 0.01741;
 				x3 = 8.7428;
 				x4 = -0.7346;
-				x1 = ppow(1 - Math.exp(-x2 * bhage), x3 * ppow(site_index, x4));
-				x2 = ppow(1 - Math.exp(-x2 * 50), x3 * ppow(site_index, x4));
-				height = 1.3 + (site_index - 1.3) * x1 / x2;
+				x1 = ppow(1 - Math.exp(-x2 * breastHeightAge), x3 * ppow(siteIndex, x4));
+				x2 = ppow(1 - Math.exp(-x2 * 50), x3 * ppow(siteIndex, x4));
+				height = 1.3 + (siteIndex - 1.3) * x1 / x2;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_SW_KER_PLA, SI_SW_KER_NAT:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x2 = 0.02081;
 				x3 = 11.1515;
 				x4 = -0.7518;
-				x1 = ppow(1 - Math.exp(-x2 * bhage), x3 * ppow(site_index, x4));
-				x2 = ppow(1 - Math.exp(-x2 * 50), x3 * ppow(site_index, x4));
-				height = 1.3 + (site_index - 1.3) * x1 / x2;
+				x1 = ppow(1 - Math.exp(-x2 * breastHeightAge), x3 * ppow(siteIndex, x4));
+				x2 = ppow(1 - Math.exp(-x2 * 50), x3 * ppow(siteIndex, x4));
+				height = 1.3 + (siteIndex - 1.3) * x1 / x2;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_SW_THROWER:
-			if (bhage > 0.5) {
-				x1 = (1.0 + Math.exp(
-						10.1654 - 1.4002 * llog(site_index - 1.3)
-								- 1.4482 * Math.log(50.0 - 0.5)
-				)) /
-						(1.0 + Math.exp(
-								10.1654 - 1.4002 * llog(site_index - 1.3)
-										- 1.4482 * Math.log(bhage - 0.5)
-						));
+			if (breastHeightAge > 0.5) {
+				x1 = (1.0 + Math.exp(10.1654 - 1.4002 * llog(siteIndex - 1.3) - 1.4482 * Math.log(50.0 - 0.5)))
+						/ (1.0 + Math.exp(10.1654 - 1.4002 * llog(siteIndex - 1.3) - 1.4482 * Math.log(breastHeightAge - 0.5)));
 
-				height = 1.3 + (site_index - 1.3) * x1;
+				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_SW_HU_GARCIA:
-			if (bhage > 0.5) {
+			if (breastHeightAge > 0.5) {
 				double q;
 
-				q = hu_garcia_q(site_index, 50.0);
-				height = hu_garcia_h(q, bhage);
+				q = huGarciaQ(siteIndex, 50.0);
+				height = huGarciaH(q, breastHeightAge);
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_SS_FARR:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 
-				x3 = llog(bhage);
+				x3 = llog(breastHeightAge);
 
-				x1 = -0.20505 +
-						1.449615 * x3 -
-						0.01780992 * ppow(x3, 3.0) +
-						6.519748E-5 * ppow(x3, 5.0) -
-						1.095593E-23 * ppow(x3, 30.0);
+				x1 = -0.20505 + 1.449615 * x3 - 0.01780992 * ppow(x3, 3.0) + 6.519748E-5 * ppow(x3, 5.0)
+						- 1.095593E-23 * ppow(x3, 30.0);
 
-				x2 = -5.61188 +
-						2.418604 * x3 -
-						0.259311 * ppow(x3, 2.0) +
-						1.351445E-4 * ppow(x3, 5.0) -
-						1.701139E-12 * ppow(x3, 16.0) +
-						7.964197E-27 * ppow(x3, 36.0);
+				x2 = -5.61188 + 2.418604 * x3 - 0.259311 * ppow(x3, 2.0) + 1.351445E-4 * ppow(x3, 5.0)
+						- 1.701139E-12 * ppow(x3, 16.0) + 7.964197E-27 * ppow(x3, 36.0);
 
-				height = 4.5 + Math.exp(x1) - Math.exp(x2) * (86.43 - (site_index - 4.5));
+				height = 4.5 + Math.exp(x1) - Math.exp(x2) * (86.43 - (siteIndex - 4.5));
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_PW_CURTIS:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 
 				x1 = 1.0 - Math.exp(
-						-Math.exp(
-								-9.975053 + (1.747353 - 0.38583) * Math.log(bhage) +
-										1.119438 * Math.log(site_index)
-						)
+						-Math.exp(-9.975053 + (1.747353 - 0.38583) * Math.log(breastHeightAge) + 1.119438 * Math.log(siteIndex))
 				);
 
 				x2 = 1.0 - Math.exp(
 						-Math.exp(
-								-9.975053 + 1.747353 * Math.log(50.0) -
-										0.38583 * Math.log(bhage) + 1.119438 * Math.log(site_index)
+								-9.975053 + 1.747353 * Math.log(50.0) - 0.38583 * Math.log(breastHeightAge)
+										+ 1.119438 * Math.log(siteIndex)
 						)
 				);
 
-				height = 4.5 + (site_index - 4.5) * x1 / x2;
+				height = 4.5 + (siteIndex - 4.5) * x1 / x2;
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_PW_CURTISAC:
-			if (bhage > 0.5) {
+			if (breastHeightAge > 0.5) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 
 				x1 = 1.0 - Math.exp(
 						-Math.exp(
-								-9.975053 + (1.747353 - 0.38583) * Math.log(bhage - 0.5) +
-										1.119438 * Math.log(site_index)
+								-9.975053 + (1.747353 - 0.38583) * Math.log(breastHeightAge - 0.5)
+										+ 1.119438 * Math.log(siteIndex)
 						)
 				);
 
 				x2 = 1.0 - Math.exp(
 						-Math.exp(
-								-9.975053 + 1.747353 * Math.log(49.5) -
-										0.38583 * Math.log(bhage - 0.5) + 1.119438 * Math.log(site_index)
+								-9.975053 + 1.747353 * Math.log(49.5) - 0.38583 * Math.log(breastHeightAge - 0.5)
+										+ 1.119438 * Math.log(siteIndex)
 						)
 				);
 
-				height = 4.5 + (site_index - 4.5) * x1 / x2;
+				height = 4.5 + (siteIndex - 4.5) * x1 / x2;
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_SS_BARKER: {
@@ -1439,9 +1139,9 @@ public class SiteIndex2Height {
 			/*
 			 * convert from SI 50b to SI 50t
 			 */
-			si50t = -10.59 + 1.24 * site_index - 0.001 * site_index * site_index;
+			si50t = -10.59 + 1.24 * siteIndex - 0.001 * siteIndex * siteIndex;
 
-			height = Math.exp(4.39751) * ppow(si50t / Math.exp(4.39751), ppow(50.0 / tage, 0.792329));
+			height = Math.exp(4.39751) * ppow(si50t / Math.exp(4.39751), ppow(50.0 / totalAge, 0.792329));
 		}
 			break;
 		case SI_CWC_BARKER: {
@@ -1450,526 +1150,481 @@ public class SiteIndex2Height {
 			/*
 			 * convert from SI 50b to SI 50t
 			 */
-			si50t = -5.85 + 1.12 * site_index;
+			si50t = -5.85 + 1.12 * siteIndex;
 
-			height = Math.exp(4.56128) * ppow(si50t / Math.exp(4.56128), ppow(50.0 / tage, 0.584627));
+			height = Math.exp(4.56128) * ppow(si50t / Math.exp(4.56128), ppow(50.0 / totalAge, 0.584627));
 		}
 			break;
 		case SI_CWC_KURUCZ:
-			//case SI_YC_KURUCZ: Cannot find constant
-			if (bhage > 0.0) {
-				if (site_index > 43 + 1.667 * bhage) {
+			// case SI_YC_KURUCZ: Cannot find constant
+			if (breastHeightAge > 0.0) {
+				if (siteIndex > 43 + 1.667 * breastHeightAge) {
 					/* function starts going nuts at high sites and low ages */
 					/* evaluate at a safe age, and interpolate */
-					x1 = (site_index - 43) / 1.667 + 0.1;
-					x2 = index_to_height(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
-					height = 1.3 + (x2 - 1.3) * bhage / x1;
+					x1 = (siteIndex - 43) / 1.667 + 0.1;
+					x2 = indexToHeight(cuIndex, x1, SI_AT_BREAST, siteIndex, years2BreastHeight, pi);
+					height = 1.3 + (x2 - 1.3) * breastHeightAge / x1;
 					break;
 				}
 
-				if (site_index <= 1.3) {
+				if (siteIndex <= 1.3) {
 					x1 = 99999.0;
 				} else {
-					x1 = 2500.0 / (site_index - 1.3);
+					x1 = 2500.0 / (siteIndex - 1.3);
 				}
 
 				x2 = -3.11785 + 0.05027 * x1;
 				x3 = -0.02465 + 0.01411 * x1;
 				x4 = 0.00174 + 0.000097667 * x1;
 
-				height = 1.3 + bhage * bhage / (x2 + x3 * bhage + x4 * bhage * bhage);
+				height = 1.3 + breastHeightAge * breastHeightAge / (x2 + x3 * breastHeightAge + x4 * breastHeightAge * breastHeightAge);
 
-				if (bhage > 50.0) {
-					if (bhage > 200) {
+				if (breastHeightAge > 50.0) {
+					if (breastHeightAge > 200) {
 						/*
-						 * The "standard" correction applied above 50 years would
-						 * overpower the uncorrected curve at around 400 years.
-						 * So, after consultation with Robert Macdonald and Ian
-						 * Cameron, it was decided to use a correction beyond 200
-						 * years with the same ratio as at age 200.
+						 * The "standard" correction applied above 50 years would overpower the uncorrected curve at
+						 * around 400 years. So, after consultation with Robert Macdonald and Ian Cameron, it was
+						 * decided to use a correction beyond 200 years with the same ratio as at age 200.
 						 */
-						bhage = 200;
+						breastHeightAge = 200;
 					}
-					height = height - (-0.02379545 * height +
-							0.000475909 * bhage * height);
+					height = height - (-0.02379545 * height + 0.000475909 * breastHeightAge * height);
 				}
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_CWC_KURUCZAC:
-			if (bhage >= 0.5) {
-				if (site_index > 43 + 1.667 * (bhage - 0.5)) {
+			if (breastHeightAge >= 0.5) {
+				if (siteIndex > 43 + 1.667 * (breastHeightAge - 0.5)) {
 					/* function starts going nuts at high sites and low ages */
 					/* evaluate at a safe age, and interpolate */
-					x1 = (site_index - 43) / 1.667 + 0.1 + 0.5;
-					x2 = index_to_height(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
-					height = 1.3 + (x2 - 1.3) * (bhage - 0.5) / x1;
+					x1 = (siteIndex - 43) / 1.667 + 0.1 + 0.5;
+					x2 = indexToHeight(cuIndex, x1, SI_AT_BREAST, siteIndex, years2BreastHeight, pi);
+					height = 1.3 + (x2 - 1.3) * (breastHeightAge - 0.5) / x1;
 					break;
 				}
 
-				if (site_index <= 1.3) {
+				if (siteIndex <= 1.3) {
 					x1 = 99999.0;
 				} else {
-					x1 = 2450.25 / (site_index - 1.3);
+					x1 = 2450.25 / (siteIndex - 1.3);
 				}
 
 				x2 = -3.11785 + 0.05027 * x1;
 				x3 = -0.02465 + 0.01411 * x1;
 				x4 = 0.00177044 + 0.000102554 * x1;
-				x5 = bhage - 0.5;
+				x5 = breastHeightAge - 0.5;
 				height = 1.3 + x5 * x5 / (x2 + x3 * x5 + x4 * x5 * x5);
 
-				if (bhage > 50.0) {
-					if (bhage > 200) {
+				if (breastHeightAge > 50.0) {
+					if (breastHeightAge > 200) {
 						/*
-						 * The "standard" correction applied above 50 years would
-						 * overpower the uncorrected curve at around 400 years.
-						 * So, after consultation with Robert Macdonald and Ian
-						 * Cameron, it was decided to use a correction beyond 200
-						 * years with the same ratio as at age 200.
+						 * The "standard" correction applied above 50 years would overpower the uncorrected curve at
+						 * around 400 years. So, after consultation with Robert Macdonald and Ian Cameron, it was
+						 * decided to use a correction beyond 200 years with the same ratio as at age 200.
 						 */
-						bhage = 200;
+						breastHeightAge = 200;
 					}
-					height = height - (-0.02379545 * height +
-							0.000475909 * bhage * height);
+					height = height - (-0.02379545 * height + 0.000475909 * breastHeightAge * height);
 				}
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 
 		case SI_CWC_NIGH:
-			if (bhage > 0.5) {
-				x1 = -3.004284755 + 2.5332489439 * site_index - 0.019027688 * site_index * site_index
-						+ 0.0000992968 * Math.pow(site_index, 3.0);
-				height = 1.3 + x1 * Math.pow(1 - Math.exp(-0.01449 * (bhage - 0.5)), 1.4026 - 0.005781 * x1);
+			if (breastHeightAge > 0.5) {
+				x1 = -3.004284755 + 2.5332489439 * siteIndex - 0.019027688 * siteIndex * siteIndex
+						+ 0.0000992968 * Math.pow(siteIndex, 3.0);
+				height = 1.3 + x1 * Math.pow(1 - Math.exp(-0.01449 * (breastHeightAge - 0.5)), 1.4026 - 0.005781 * x1);
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_BA_DILUCCA:
-			if (bhage > 0.0) {
-				x1 = 1 + Math.exp(
-						8.377148582 - 1.27351813 * Math.log(50.0) -
-								0.975226632 * Math.log(site_index)
-				);
-				x2 = 1 + Math.exp(
-						8.377148582 - 1.27351813 * Math.log(bhage) -
-								0.975226632 * Math.log(site_index)
-				);
-				height = 1.3 + (site_index - 1.3) * x1 / x2;
+			if (breastHeightAge > 0.0) {
+				x1 = 1 + Math.exp(8.377148582 - 1.27351813 * Math.log(50.0) - 0.975226632 * Math.log(siteIndex));
+				x2 = 1 + Math.exp(8.377148582 - 1.27351813 * Math.log(breastHeightAge) - 0.975226632 * Math.log(siteIndex));
+				height = 1.3 + (siteIndex - 1.3) * x1 / x2;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_BB_KER:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x2 = 0.01373;
 				x3 = 6.1299;
 				x4 = -0.6157;
-				x1 = ppow(1 - Math.exp(-x2 * bhage), x3 * ppow(site_index, x4));
-				x2 = ppow(1 - Math.exp(-x2 * 50), x3 * ppow(site_index, x4));
-				height = 1.3 + (site_index - 1.3) * x1 / x2;
+				x1 = ppow(1 - Math.exp(-x2 * breastHeightAge), x3 * ppow(siteIndex, x4));
+				x2 = ppow(1 - Math.exp(-x2 * 50), x3 * ppow(siteIndex, x4));
+				height = 1.3 + (siteIndex - 1.3) * x1 / x2;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_BA_KURUCZ86:
-			if (bhage > 0.0) {
-				x1 = (site_index - 1.3) * ppow(1.0 - Math.exp(-0.01303 * bhage), 1.024971);
+			if (breastHeightAge > 0.0) {
+				x1 = (siteIndex - 1.3) * ppow(1.0 - Math.exp(-0.01303 * breastHeightAge), 1.024971);
 
 				height = 1.3 + x1 / 0.470011;
 
-				if (bhage <= 50.0) {
-					height -= (4 * 0.4 * bhage * (50 - bhage) / 2500);
+				if (breastHeightAge <= 50.0) {
+					height -= (4 * 0.4 * breastHeightAge * (50 - breastHeightAge) / 2500);
 				}
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_BA_KURUCZ82, SI_BL_KURUCZ82:
-			//case SI_BG_KURUCZ82: Cannot find constants
-			if (bhage > 0.0) {
-				if (site_index > 60 + 1.667 * bhage) {
+			// case SI_BG_KURUCZ82: Cannot find constants
+			if (breastHeightAge > 0.0) {
+				if (siteIndex > 60 + 1.667 * breastHeightAge) {
 					/* function starts going nuts at high sites and low ages */
 					/* evaluate at a safe age, and interpolate */
-					x1 = (site_index - 60) / 1.667 + 0.1;
-					x2 = index_to_height(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
-					height = 1.3 + (x2 - 1.3) * bhage / x1;
+					x1 = (siteIndex - 60) / 1.667 + 0.1;
+					x2 = indexToHeight(cuIndex, x1, SI_AT_BREAST, siteIndex, years2BreastHeight, pi);
+					height = 1.3 + (x2 - 1.3) * breastHeightAge / x1;
 					break;
 				}
 
-				if (site_index <= 1.3) {
+				if (siteIndex <= 1.3) {
 					x1 = 99999.0;
 				} else {
-					x1 = 2500.0 / (site_index - 1.3);
+					x1 = 2500.0 / (siteIndex - 1.3);
 				}
 
 				x2 = -2.34655 + 0.0565 * x1;
 				x3 = -0.42007 + 0.01687 * x1;
 				x4 = 0.00934 + 0.00004 * x1;
 
-				height = 1.3 + bhage * bhage / (x2 + x3 * bhage + x4 * bhage * bhage);
+				height = 1.3 + breastHeightAge * breastHeightAge / (x2 + x3 * breastHeightAge + x4 * breastHeightAge * breastHeightAge);
 
-				if (bhage < 50.0 && bhage * height < 1695.3) {
-					x1 = 0.45773 - 0.00027 * bhage * height;
+				if (breastHeightAge < 50.0 && breastHeightAge * height < 1695.3) {
+					x1 = 0.45773 - 0.00027 * breastHeightAge * height;
 					if (x1 > 0.0) {
 						height -= x1;
 					}
 				}
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 
-				x1 = 0.45773 - 0.00027 * tage * height; /* flaw? total vs bh-age */
+				x1 = 0.45773 - 0.00027 * totalAge * height; /* flaw? total vs bh-age */
 				if (x1 > 0.0)
 					height -= x1;
 			}
 			break;
 
 		case SI_BA_KURUCZ82AC:
-			if (bhage >= 0.5) {
-				if (site_index > 60 + 1.667 * (bhage - 0.5)) {
+			if (breastHeightAge >= 0.5) {
+				if (siteIndex > 60 + 1.667 * (breastHeightAge - 0.5)) {
 					/* function starts going nuts at high sites and low ages */
 					/* evaluate at a safe age, and interpolate */
-					x1 = (site_index - 60) / 1.667 + 0.1 + 0.5;
-					x2 = index_to_height(cu_index, x1, SI_AT_BREAST, site_index, y2bh, pi);
-					height = 1.3 + (x2 - 1.3) * (bhage - 0.5) / x1;
+					x1 = (siteIndex - 60) / 1.667 + 0.1 + 0.5;
+					x2 = indexToHeight(cuIndex, x1, SI_AT_BREAST, siteIndex, years2BreastHeight, pi);
+					height = 1.3 + (x2 - 1.3) * (breastHeightAge - 0.5) / x1;
 					break;
 				}
 
-				if (site_index <= 1.3) {
+				if (siteIndex <= 1.3) {
 					x1 = 99999.0;
 				} else {
-					x1 = 2450.25 / (site_index - 1.3);
+					x1 = 2450.25 / (siteIndex - 1.3);
 				}
 
 				x2 = -2.09187 + 0.066925 * x1;
 				x3 = -0.42007 + 0.01687 * x1;
 				x4 = 0.00934 + 0.00004 * x1;
-				x5 = bhage - 0.5;
+				x5 = breastHeightAge - 0.5;
 				height = 1.3 + x5 * x5 / (x2 + x3 * x5 + x4 * x5 * x5);
 
-				if (bhage < 50.0 && bhage * height < 1695.3) {
-					x1 = 0.45773 - 0.00027 * bhage * height;
+				if (breastHeightAge < 50.0 && breastHeightAge * height < 1695.3) {
+					x1 = 0.45773 - 0.00027 * breastHeightAge * height;
 					if (x1 > 0.0) {
 						height -= x1;
 					}
 				}
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 
-				x1 = 0.45773 - 0.00027 * tage * height; /* flaw? total vs bh-age */
+				x1 = 0.45773 - 0.00027 * totalAge * height; /* flaw? total vs bh-age */
 				if (x1 > 0.0) {
 					height -= x1;
 				}
 			}
 			break;
 		case SI_FDI_MILNER:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 
-				x1 = 114.6 * ppow(1 - Math.exp(-0.01462 * bhage), 1.179);
-				x2 = 1.703 * ppow(1 - Math.exp(-0.02214 * bhage), 1.321);
-				height = 4.5 + x1 + x2 * (site_index - 57.3);
+				x1 = 114.6 * ppow(1 - Math.exp(-0.01462 * breastHeightAge), 1.179);
+				x2 = 1.703 * ppow(1 - Math.exp(-0.02214 * breastHeightAge), 1.321);
+				height = 4.5 + x1 + x2 * (siteIndex - 57.3);
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_FDI_VDP_MONT:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 
-				height = 4.5 + (1.9965 * (site_index - 4.5) /
-						(1 + Math.exp(5.479 - 1.4016 * Math.log(bhage))));
+				height = 4.5 + (1.9965 * (siteIndex - 4.5) / (1 + Math.exp(5.479 - 1.4016 * Math.log(breastHeightAge))));
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_FDI_VDP_WASH:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 
-				height = 4.5 + (1.79897 * (site_index - 4.5) /
-						(1 + Math.exp(6.0678 - 1.6085 * Math.log(bhage))));
+				height = 4.5 + (1.79897 * (siteIndex - 4.5) / (1 + Math.exp(6.0678 - 1.6085 * Math.log(breastHeightAge))));
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_FDI_MONS_DF:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 				x1 = 0.3197;
 				x2 = 1.0232;
 
-				x3 = 1.0 + Math.exp(9.7278 - 1.2934 * Math.log(bhage) - x2 * llog(site_index - 4.5));
+				x3 = 1.0 + Math.exp(9.7278 - 1.2934 * Math.log(breastHeightAge) - x2 * llog(siteIndex - 4.5));
 
-				height = 4.5 + 42.397 * ppow(site_index - 4.5, x1) / x3;
+				height = 4.5 + 42.397 * ppow(siteIndex - 4.5, x1) / x3;
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 
 		case SI_FDI_MONS_GF:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 				x1 = 0.3488;
 				x2 = 0.9779;
 
-				x3 = 1.0 + Math.exp(9.7278 - 1.2934 * Math.log(bhage) - x2 * llog(site_index - 4.5));
+				x3 = 1.0 + Math.exp(9.7278 - 1.2934 * Math.log(breastHeightAge) - x2 * llog(siteIndex - 4.5));
 
-				height = 4.5 + 42.397 * ppow(site_index - 4.5, x1) / x3;
+				height = 4.5 + 42.397 * ppow(siteIndex - 4.5, x1) / x3;
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 
 		case SI_FDI_MONS_WRC:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 				x1 = 0.3488;
 				x2 = 0.9779;
 
-				x3 = 1.0 + Math.exp(9.7278 - 1.2934 * Math.log(bhage) - x2 * llog(site_index - 4.5));
+				x3 = 1.0 + Math.exp(9.7278 - 1.2934 * Math.log(breastHeightAge) - x2 * llog(siteIndex - 4.5));
 
-				height = 4.5 + 42.397 * ppow(site_index - 4.5, x1) / x3;
+				height = 4.5 + 42.397 * ppow(siteIndex - 4.5, x1) / x3;
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 
 		case SI_FDI_MONS_WH:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 				x1 = 0.3656;
 				x2 = 0.9527;
 
-				x3 = 1.0 + Math.exp(9.7278 - 1.2934 * Math.log(bhage) - x2 * llog(site_index - 4.5));
+				x3 = 1.0 + Math.exp(9.7278 - 1.2934 * Math.log(breastHeightAge) - x2 * llog(siteIndex - 4.5));
 
-				height = 4.5 + 42.397 * ppow(site_index - 4.5, x1) / x3;
+				height = 4.5 + 42.397 * ppow(siteIndex - 4.5, x1) / x3;
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_FDI_MONS_SAF:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 				x1 = 0.3656;
 				x2 = 0.9527;
 
-				x3 = 1.0 + Math.exp(9.7278 - 1.2934 * Math.log(bhage) - x2 * llog(site_index - 4.5));
+				x3 = 1.0 + Math.exp(9.7278 - 1.2934 * Math.log(breastHeightAge) - x2 * llog(siteIndex - 4.5));
 
-				height = 4.5 + 42.397 * ppow(site_index - 4.5, x1) / x3;
+				height = 4.5 + 42.397 * ppow(siteIndex - 4.5, x1) / x3;
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_DR_HARRING:
-			if (site_index > 45 + 2.5 * tage) {
+			if (siteIndex > 45 + 2.5 * totalAge) {
 				/* function starts going nuts at high sites and low ages */
 				/* evaluate at a safe age, and interpolate */
-				x1 = (site_index - 45) / 2.5 + 0.1;
-				x2 = index_to_height(cu_index, x1, SI_AT_TOTAL, site_index, y2bh, pi);
-				height = x2 * tage / x1;
+				x1 = (siteIndex - 45) / 2.5 + 0.1;
+				x2 = indexToHeight(cuIndex, x1, SI_AT_TOTAL, siteIndex, years2BreastHeight, pi);
+				height = x2 * totalAge / x1;
 			} else {
 				double si20;
 
-				si20 = ppow(site_index, 1.5) / 8.0;
+				si20 = ppow(siteIndex, 1.5) / 8.0;
 				x1 = 18.1622 + 0.7953 * si20;
 				x2 = 0.00194 - 0.002441 * si20;
-				x3 = si20 + x1 * ppow(1.0 - Math.exp(x2 * tage), 0.9198);
+				x3 = si20 + x1 * ppow(1.0 - Math.exp(x2 * totalAge), 0.9198);
 				height = x3 - x1 * ppow(1.0 - Math.exp(x2 * 20), 0.9198);
 			}
 			break;
 		case SI_DR_NIGH:
-			if (bhage > 0.5) {
+			if (breastHeightAge > 0.5) {
 				double si25;
 
-				si25 = 0.3094 + 0.7616 * site_index;
-				height = 1.3 + (1.693 * (si25 - 1.3)) /
-						(1 + Math.exp(3.6 - 1.24 * Math.log(bhage - 0.5)));
+				si25 = 0.3094 + 0.7616 * siteIndex;
+				height = 1.3 + (1.693 * (si25 - 1.3)) / (1 + Math.exp(3.6 - 1.24 * Math.log(breastHeightAge - 0.5)));
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		// Cannot Find Constant
 		/*
-		 * case SI_BG_COCHRAN:
-		 * if (bhage > 0.0){
-		 * // convert to imperial
-		 * site_index /= 0.3048;
-		 * 
-		 * x1 = Math.log (bhage);
-		 * x2 = -0.30935 +
-		 * 1.2383 * x1 +
-		 * 0.001762 * ppow(x1, 4.0) -
-		 * 5.4e-6 * ppow(x1, 9.0) +
-		 * 2.046e-7 * ppow(x1, 11.0) -
-		 * 4.04e-13 * ppow(x1, 18.0);
-		 * x3 = -6.2056 +
-		 * 2.097 * x1 -
-		 * 0.09411 * ppow(x1, 2) -
-		 * 4.382e-5 * ppow(x1, 7) +
-		 * 2.007e-11 * ppow(x1, 16) -
-		 * 2.054e-17 * ppow(x1, 24);
-		 * height = 4.5 +
-		 * Math.exp (x2) -
-		 * 84.93 * Math.exp (x3) +
-		 * (site_index - 4.5) * Math.exp (x3);
-		 * 
-		 * // convert back to metric
-		 * height *= 0.3048;
-		 * }
-		 * else{
-		 * height = tage * tage * 1.37 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_BG_COCHRAN: if (bhage > 0.0){ // convert to imperial site_index /= 0.3048;
+		 *
+		 * x1 = Math.log (bhage); x2 = -0.30935 + 1.2383 * x1 + 0.001762 * ppow(x1, 4.0) - 5.4e-6 * ppow(x1, 9.0) +
+		 * 2.046e-7 * ppow(x1, 11.0) - 4.04e-13 * ppow(x1, 18.0); x3 = -6.2056 + 2.097 * x1 - 0.09411 * ppow(x1, 2) -
+		 * 4.382e-5 * ppow(x1, 7) + 2.007e-11 * ppow(x1, 16) - 2.054e-17 * ppow(x1, 24); height = 4.5 + Math.exp (x2) -
+		 * 84.93 * Math.exp (x3) + (site_index - 4.5) * Math.exp (x3);
+		 *
+		 * // convert back to metric height *= 0.3048; } else{ height = tage * tage * 1.37 / y2bh / y2bh; } break;
 		 */
 		case SI_PY_MILNER:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 
-				x1 = 121.4 * ppow(1 - Math.exp(-0.01756 * bhage), 1.483);
-				x2 = 1.189 * ppow(1 - Math.exp(-0.05799 * bhage), 2.63);
-				height = 4.5 + x1 + x2 * (site_index - 59.6);
+				x1 = 121.4 * ppow(1 - Math.exp(-0.01756 * breastHeightAge), 1.483);
+				x2 = 1.189 * ppow(1 - Math.exp(-0.05799 * breastHeightAge), 2.63);
+				height = 4.5 + x1 + x2 * (siteIndex - 59.6);
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_PY_HANN:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 
-				x1 = 1 - Math.exp(-Math.exp(-6.54707 + 0.288169 * llog(site_index - 4.5) + 1.21297 * Math.log(bhage)));
-				x2 = 1 - Math.exp(-Math.exp(-6.54707 + 0.288169 * llog(site_index - 4.5) + 1.21297 * Math.log(50.0)));
-				height = 4.5 + (site_index - 4.5) * x1 / x2;
+				x1 = 1 - Math.exp(-Math.exp(-6.54707 + 0.288169 * llog(siteIndex - 4.5) + 1.21297 * Math.log(breastHeightAge)));
+				x2 = 1 - Math.exp(-Math.exp(-6.54707 + 0.288169 * llog(siteIndex - 4.5) + 1.21297 * Math.log(50.0)));
+				height = 4.5 + (siteIndex - 4.5) * x1 / x2;
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_PY_HANNAC:
-			if (bhage > 0.5) {
+			if (breastHeightAge > 0.5) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 
 				x1 = 1 - Math
-						.exp(-Math.exp(-6.54707 + 0.288169 * llog(site_index - 4.5) + 1.21297 * Math.log(bhage - 0.5)));
-				x2 = 1 - Math.exp(-Math.exp(-6.54707 + 0.288169 * llog(site_index - 4.5) + 1.21297 * Math.log(49.5)));
-				height = 4.5 + (site_index - 4.5) * x1 / x2;
+						.exp(-Math.exp(-6.54707 + 0.288169 * llog(siteIndex - 4.5) + 1.21297 * Math.log(breastHeightAge - 0.5)));
+				x2 = 1 - Math.exp(-Math.exp(-6.54707 + 0.288169 * llog(siteIndex - 4.5) + 1.21297 * Math.log(49.5)));
+				height = 4.5 + (siteIndex - 4.5) * x1 / x2;
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 
-		//case SI_LT_MILNER: Couldn't find constant
+		// case SI_LT_MILNER: Couldn't find constant
 		case SI_LW_MILNER:
 			// case SI_LA_MILNER: Couldn't find constant
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				/* convert to imperial */
-				site_index /= 0.3048;
+				siteIndex /= 0.3048;
 
-				x1 = 127.8 * ppow(1 - Math.exp(-0.01655 * bhage), 1.196);
-				x2 = 1.289 * ppow(1 - Math.exp(-0.03211 * bhage), 1.047);
-				height = 4.5 + x1 + x2 * (site_index - 69.0);
+				x1 = 127.8 * ppow(1 - Math.exp(-0.01655 * breastHeightAge), 1.196);
+				x2 = 1.289 * ppow(1 - Math.exp(-0.03211 * breastHeightAge), 1.047);
+				height = 4.5 + x1 + x2 * (siteIndex - 69.0);
 
 				/* convert back to metric */
 				height *= 0.3048;
 			} else {
-				height = tage * tage * 1.37 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_LW_NIGH:
-			if (bhage > 0.5) {
-				x1 = Math.log(Math.pow(site_index - 1.3, 1 - 0.8566) / 3.027) / Math.log(1 - Math.exp(-0.01588 * 49.5));
-				height = 1.3 + 3.027 * Math.pow(site_index - 1.3, 0.8566) *
-						Math.pow(1 - Math.exp(-0.01588 * (bhage - 0.5)), x1);
+			if (breastHeightAge > 0.5) {
+				x1 = Math.log(Math.pow(siteIndex - 1.3, 1 - 0.8566) / 3.027) / Math.log(1 - Math.exp(-0.01588 * 49.5));
+				height = 1.3 + 3.027 * Math.pow(siteIndex - 1.3, 0.8566)
+						* Math.pow(1 - Math.exp(-0.01588 * (breastHeightAge - 0.5)), x1);
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_SB_NIGH:
-			if (bhage > 0.5) {
-				x1 = 1 + Math.exp(9.086 - 1.052 * Math.log(49.5) - 1.55 * Math.log(site_index - 1.3));
-				x2 = 1 + Math.exp(9.086 - 1.052 * Math.log(bhage - 0.5) - 1.55 * Math.log(site_index - 1.3));
-				height = 1.3 + (site_index - 1.3) * x1 / x2;
+			if (breastHeightAge > 0.5) {
+				x1 = 1 + Math.exp(9.086 - 1.052 * Math.log(49.5) - 1.55 * Math.log(siteIndex - 1.3));
+				x2 = 1 + Math.exp(9.086 - 1.052 * Math.log(breastHeightAge - 0.5) - 1.55 * Math.log(siteIndex - 1.3));
+				height = 1.3 + (siteIndex - 1.3) * x1 / x2;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_AT_NIGH:
-			if (bhage > 0.5) {
-				x1 = 1 + Math.exp(7.423 - 1.15 * Math.log(49.5) - 0.9614 * Math.log(site_index - 1.3));
-				x2 = 1 + Math.exp(7.423 - 1.15 * Math.log(bhage - 0.5) - 0.9614 * Math.log(site_index - 1.3));
-				height = 1.3 + (site_index - 1.3) * x1 / x2;
+			if (breastHeightAge > 0.5) {
+				x1 = 1 + Math.exp(7.423 - 1.15 * Math.log(49.5) - 0.9614 * Math.log(siteIndex - 1.3));
+				x2 = 1 + Math.exp(7.423 - 1.15 * Math.log(breastHeightAge - 0.5) - 0.9614 * Math.log(siteIndex - 1.3));
+				height = 1.3 + (siteIndex - 1.3) * x1 / x2;
 			} else {
 				/*
-				 * was
-				 * height = tage * tage * 1.3 / y2bh / y2bh;
+				 * was height = tage * tage * 1.3 / y2bh / y2bh;
 				 */
-				height = Math.pow(tage / y2bh, 1.5) * 1.3;
+				height = Math.pow(totalAge / years2BreastHeight, 1.5) * 1.3;
 			}
 			break;
 		// Cannot find constant
 		/*
-		 * case SI_TE_GOUDIE:
-		 * if (bhage > 0.0){
-		 * x1 = (1-Math.exp(-0.0227 * bhage)) / (1-Math.exp(-0.0227 * 50));
-		 * x2 = 6.525 * ppow(site_index, -0.7606);
-		 * height = site_index * ppow(x1, x2);
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_TE_GOUDIE: if (bhage > 0.0){ x1 = (1-Math.exp(-0.0227 * bhage)) / (1-Math.exp(-0.0227 * 50)); x2 =
+		 * 6.525 * ppow(site_index, -0.7606); height = site_index * ppow(x1, x2); } else{ height = tage * tage * 1.3 /
+		 * y2bh / y2bh; } break;
 		 */
 		case SI_SW_HUANG_PLA:
 			double x0;
 			double age_huang; /* used in HUANG's equations */
 
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x0 = 0.010168;
 				x1 = 0.004801;
 				x2 = 4.997735;
@@ -1978,20 +1633,19 @@ public class SiteIndex2Height {
 				x5 = 0.325438;
 				age_huang = 50.0;
 
-				x0 = -x0 * ppow(site_index - 1.3, x1) *
-						Math.pow(x2, (site_index - 1.3) / age_huang);
-				x0 = (1.0 - Math.exp(x0 * bhage)) / (1 - Math.exp(x0 * 50.0));
-				x1 = ppow(site_index - 1.3, x4);
+				x0 = -x0 * ppow(siteIndex - 1.3, x1) * Math.pow(x2, (siteIndex - 1.3) / age_huang);
+				x0 = (1.0 - Math.exp(x0 * breastHeightAge)) / (1 - Math.exp(x0 * 50.0));
+				x1 = ppow(siteIndex - 1.3, x4);
 				x2 = Math.pow(50.0, x5);
 
-				height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2);
+				height = 1.3 + (siteIndex - 1.3) * ppow(x0, x3 * x1 * x2);
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 
 		case SI_SW_HUANG_NAT:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x0 = 0.010168;
 				x1 = 0.004801;
 				x2 = 4.997735;
@@ -2000,19 +1654,18 @@ public class SiteIndex2Height {
 				x5 = 0.325438;
 				age_huang = 50.0;
 
-				x0 = -x0 * ppow(site_index - 1.3, x1) *
-						Math.pow(x2, (site_index - 1.3) / age_huang);
-				x0 = (1.0 - Math.exp(x0 * bhage)) / (1 - Math.exp(x0 * 50.0));
-				x1 = ppow(site_index - 1.3, x4);
+				x0 = -x0 * ppow(siteIndex - 1.3, x1) * Math.pow(x2, (siteIndex - 1.3) / age_huang);
+				x0 = (1.0 - Math.exp(x0 * breastHeightAge)) / (1 - Math.exp(x0 * 50.0));
+				x1 = ppow(siteIndex - 1.3, x4);
 				x2 = Math.pow(50.0, x5);
 
-				height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2);
+				height = 1.3 + (siteIndex - 1.3) * ppow(x0, x3 * x1 * x2);
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_PLI_HUANG_PLA:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x0 = 0.026714;
 				x1 = -0.314562;
 				x2 = 1.033165;
@@ -2021,20 +1674,19 @@ public class SiteIndex2Height {
 				x5 = 0.401374;
 				age_huang = 1;
 
-				x0 = -x0 * ppow(site_index - 1.3, x1) *
-						Math.pow(x2, (site_index - 1.3) / age_huang);
-				x0 = (1.0 - Math.exp(x0 * bhage)) / (1 - Math.exp(x0 * 50.0));
-				x1 = ppow(site_index - 1.3, x4);
+				x0 = -x0 * ppow(siteIndex - 1.3, x1) * Math.pow(x2, (siteIndex - 1.3) / age_huang);
+				x0 = (1.0 - Math.exp(x0 * breastHeightAge)) / (1 - Math.exp(x0 * 50.0));
+				x1 = ppow(siteIndex - 1.3, x4);
 				x2 = Math.pow(50.0, x5);
 
-				height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2);
+				height = 1.3 + (siteIndex - 1.3) * ppow(x0, x3 * x1 * x2);
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 
 		case SI_PLI_HUANG_NAT:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x0 = 0.026714;
 				x1 = -0.314562;
 				x2 = 1.033165;
@@ -2043,76 +1695,45 @@ public class SiteIndex2Height {
 				x5 = 0.401374;
 				age_huang = 1;
 
-				x0 = -x0 * ppow(site_index - 1.3, x1) *
-						Math.pow(x2, (site_index - 1.3) / age_huang);
-				x0 = (1.0 - Math.exp(x0 * bhage)) / (1 - Math.exp(x0 * 50.0));
-				x1 = ppow(site_index - 1.3, x4);
+				x0 = -x0 * ppow(siteIndex - 1.3, x1) * Math.pow(x2, (siteIndex - 1.3) / age_huang);
+				x0 = (1.0 - Math.exp(x0 * breastHeightAge)) / (1 - Math.exp(x0 * 50.0));
+				x1 = ppow(siteIndex - 1.3, x4);
 				x2 = Math.pow(50.0, x5);
 
-				height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2);
+				height = 1.3 + (siteIndex - 1.3) * ppow(x0, x3 * x1 * x2);
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		// Cannot Find Constant
 		/*
-		 * case SI_PJ_HUANG_PLA:
-		 * double x0;
-		 * double age_huang; // used in HUANG's equations
-		 * 
-		 * if (bhage > 0.0){
-		 * x0 = 0.023405;
-		 * x1 = -0.371557;
-		 * x2 = 1.048011;
-		 * x3 = 0.715449;
-		 * x4 = -0.503105;
-		 * x5 = 0.444505;
+		 * case SI_PJ_HUANG_PLA: double x0; double age_huang; // used in HUANG's equations
+		 *
+		 * if (bhage > 0.0){ x0 = 0.023405; x1 = -0.371557; x2 = 1.048011; x3 = 0.715449; x4 = -0.503105; x5 = 0.444505;
 		 * age_huang = 1;
-		 * 
-		 * x0 = -x0 * ppow(site_index - 1.3, x1) *
-		 * Math.pow (x2, (site_index - 1.3) / age_huang);
-		 * x0 = (1.0 - Math.exp (x0 * bhage)) / (1 - Math.exp (x0 * 50.0));
-		 * x1 = ppow(site_index - 1.3, x4);
-		 * x2 = Math.pow (50.0, x5);
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2);
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 *
+		 * x0 = -x0 * ppow(site_index - 1.3, x1) * Math.pow (x2, (site_index - 1.3) / age_huang); x0 = (1.0 - Math.exp
+		 * (x0 * bhage)) / (1 - Math.exp (x0 * 50.0)); x1 = ppow(site_index - 1.3, x4); x2 = Math.pow (50.0, x5);
+		 *
+		 * height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2); } else{ height = tage * tage * 1.3 / y2bh / y2bh;
+		 * } break;
 		 */
 		// Cannot Find Constant
 		/*
-		 * case SI_PJ_HUANG_NAT:
-		 * double x0;
-		 * double age_huang; // used in HUANG's equations
-		 * 
-		 * if (bhage > 0.0){
-		 * x0 = 0.023405;
-		 * x1 = -0.371557;
-		 * x2 = 1.048011;
-		 * x3 = 0.715449;
-		 * x4 = -0.503105;
-		 * x5 = 0.444505;
+		 * case SI_PJ_HUANG_NAT: double x0; double age_huang; // used in HUANG's equations
+		 *
+		 * if (bhage > 0.0){ x0 = 0.023405; x1 = -0.371557; x2 = 1.048011; x3 = 0.715449; x4 = -0.503105; x5 = 0.444505;
 		 * age_huang = 1;
-		 * 
-		 * x0 = -x0 * ppow(site_index - 1.3, x1) *
-		 * Math.pow (x2, (site_index - 1.3) / age_huang);
-		 * x0 = (1.0 - Math.exp (x0 * bhage)) / (1 - Math.exp (x0 * 50.0));
-		 * x1 = ppow(site_index - 1.3, x4);
-		 * x2 = Math.pow (50.0, x5);
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2);
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 *
+		 * x0 = -x0 * ppow(site_index - 1.3, x1) * Math.pow (x2, (site_index - 1.3) / age_huang); x0 = (1.0 - Math.exp
+		 * (x0 * bhage)) / (1 - Math.exp (x0 * 50.0)); x1 = ppow(site_index - 1.3, x4); x2 = Math.pow (50.0, x5);
+		 *
+		 * height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2); } else{ height = tage * tage * 1.3 / y2bh / y2bh;
+		 * } break;
 		 */
 
 		case SI_FDI_HUANG_PLA:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x0 = 0.007932;
 				x1 = 0.011994;
 				x2 = 7.053999;
@@ -2121,20 +1742,19 @@ public class SiteIndex2Height {
 				x5 = 0.405321;
 				age_huang = 50.0;
 
-				x0 = -x0 * ppow(site_index - 1.3, x1) *
-						Math.pow(x2, (site_index - 1.3) / age_huang);
-				x0 = (1.0 - Math.exp(x0 * bhage)) / (1 - Math.exp(x0 * 50.0));
-				x1 = ppow(site_index - 1.3, x4);
+				x0 = -x0 * ppow(siteIndex - 1.3, x1) * Math.pow(x2, (siteIndex - 1.3) / age_huang);
+				x0 = (1.0 - Math.exp(x0 * breastHeightAge)) / (1 - Math.exp(x0 * 50.0));
+				x1 = ppow(siteIndex - 1.3, x4);
 				x2 = Math.pow(50.0, x5);
 
-				height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2);
+				height = 1.3 + (siteIndex - 1.3) * ppow(x0, x3 * x1 * x2);
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 
 		case SI_FDI_HUANG_NAT:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x0 = 0.007932;
 				x1 = 0.011994;
 				x2 = 7.053999;
@@ -2143,20 +1763,19 @@ public class SiteIndex2Height {
 				x5 = 0.405321;
 				age_huang = 50.0;
 
-				x0 = -x0 * ppow(site_index - 1.3, x1) *
-						Math.pow(x2, (site_index - 1.3) / age_huang);
-				x0 = (1.0 - Math.exp(x0 * bhage)) / (1 - Math.exp(x0 * 50.0));
-				x1 = ppow(site_index - 1.3, x4);
+				x0 = -x0 * ppow(siteIndex - 1.3, x1) * Math.pow(x2, (siteIndex - 1.3) / age_huang);
+				x0 = (1.0 - Math.exp(x0 * breastHeightAge)) / (1 - Math.exp(x0 * 50.0));
+				x1 = ppow(siteIndex - 1.3, x4);
 				x2 = Math.pow(50.0, x5);
 
-				height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2);
+				height = 1.3 + (siteIndex - 1.3) * ppow(x0, x3 * x1 * x2);
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 
 		case SI_AT_HUANG:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x0 = 0.035930;
 				x1 = -0.486239;
 				x2 = 1.041916;
@@ -2165,20 +1784,19 @@ public class SiteIndex2Height {
 				x5 = 0.522558;
 				age_huang = 1;
 
-				x0 = -x0 * ppow(site_index - 1.3, x1) *
-						Math.pow(x2, (site_index - 1.3) / age_huang);
-				x0 = (1.0 - Math.exp(x0 * bhage)) / (1 - Math.exp(x0 * 50.0));
-				x1 = ppow(site_index - 1.3, x4);
+				x0 = -x0 * ppow(siteIndex - 1.3, x1) * Math.pow(x2, (siteIndex - 1.3) / age_huang);
+				x0 = (1.0 - Math.exp(x0 * breastHeightAge)) / (1 - Math.exp(x0 * 50.0));
+				x1 = ppow(siteIndex - 1.3, x4);
 				x2 = Math.pow(50.0, x5);
 
-				height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2);
+				height = 1.3 + (siteIndex - 1.3) * ppow(x0, x3 * x1 * x2);
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 
 		case SI_SB_HUANG:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x0 = 0.011117;
 				x1 = 0.030221;
 				x2 = 1.010399;
@@ -2187,20 +1805,19 @@ public class SiteIndex2Height {
 				x5 = 0.387445;
 				age_huang = 1;
 
-				x0 = -x0 * ppow(site_index - 1.3, x1) *
-						Math.pow(x2, (site_index - 1.3) / age_huang);
-				x0 = (1.0 - Math.exp(x0 * bhage)) / (1 - Math.exp(x0 * 50.0));
-				x1 = ppow(site_index - 1.3, x4);
+				x0 = -x0 * ppow(siteIndex - 1.3, x1) * Math.pow(x2, (siteIndex - 1.3) / age_huang);
+				x0 = (1.0 - Math.exp(x0 * breastHeightAge)) / (1 - Math.exp(x0 * 50.0));
+				x1 = ppow(siteIndex - 1.3, x4);
 				x2 = Math.pow(50.0, x5);
 
-				height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2);
+				height = 1.3 + (siteIndex - 1.3) * ppow(x0, x3 * x1 * x2);
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 
 		case SI_ACB_HUANG:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x0 = 0.041208;
 				x1 = -0.559626;
 				x2 = 1.038923;
@@ -2209,50 +1826,34 @@ public class SiteIndex2Height {
 				x5 = 0.526901;
 				age_huang = 1;
 
-				x0 = -x0 * ppow(site_index - 1.3, x1) *
-						Math.pow(x2, (site_index - 1.3) / age_huang);
-				x0 = (1.0 - Math.exp(x0 * bhage)) / (1 - Math.exp(x0 * 50.0));
-				x1 = ppow(site_index - 1.3, x4);
+				x0 = -x0 * ppow(siteIndex - 1.3, x1) * Math.pow(x2, (siteIndex - 1.3) / age_huang);
+				x0 = (1.0 - Math.exp(x0 * breastHeightAge)) / (1 - Math.exp(x0 * 50.0));
+				x1 = ppow(siteIndex - 1.3, x4);
 				x2 = Math.pow(50.0, x5);
 
-				height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2);
+				height = 1.3 + (siteIndex - 1.3) * ppow(x0, x3 * x1 * x2);
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 
 			}
 			break;
 
 		// Cannot Find Constant
 		/*
-		 * case SI_BB_HUANG:
-		 * double x0;
-		 * double age_huang; // used in HUANG's equations
-		 * 
-		 * if (bhage > 0.0){
-		 * x0 = 0.010190;
-		 * x1 = 0.013957;
-		 * x2 = 3.876735;
-		 * x3 = 0.647527;
-		 * x4 = -0.274343;
-		 * x5 = 0.378078;
+		 * case SI_BB_HUANG: double x0; double age_huang; // used in HUANG's equations
+		 *
+		 * if (bhage > 0.0){ x0 = 0.010190; x1 = 0.013957; x2 = 3.876735; x3 = 0.647527; x4 = -0.274343; x5 = 0.378078;
 		 * age_huang = 50.0;
-		 * 
-		 * x0 = -x0 * ppow(site_index - 1.3, x1) *
-		 * Math.pow (x2, (site_index - 1.3) / age_huang);
-		 * x0 = (1.0 - Math.exp (x0 * bhage)) / (1 - Math.exp (x0 * 50.0));
-		 * x1 = ppow(site_index - 1.3, x4);
-		 * x2 = Math.pow (50.0, x5);
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2);
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 *
+		 * x0 = -x0 * ppow(site_index - 1.3, x1) * Math.pow (x2, (site_index - 1.3) / age_huang); x0 = (1.0 - Math.exp
+		 * (x0 * bhage)) / (1 - Math.exp (x0 * 50.0)); x1 = ppow(site_index - 1.3, x4); x2 = Math.pow (50.0, x5);
+		 *
+		 * height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2); } else{ height = tage * tage * 1.3 / y2bh / y2bh;
+		 * } break;
 		 */
 
 		case SI_ACB_HUANGAC: {
-			if (bhage > 0.5) {
+			if (breastHeightAge > 0.5) {
 				x0 = 0.041208;
 				x1 = -0.559626;
 				x2 = 1.038923;
@@ -2261,209 +1862,184 @@ public class SiteIndex2Height {
 				x5 = 0.526901;
 				age_huang = 1;
 
-				x0 = -x0 * ppow(site_index - 1.3, x1) *
-						Math.pow(x2, (site_index - 1.3) / age_huang);
-				x0 = (1.0 - Math.exp(x0 * (bhage - 0.5))) / (1 - Math.exp(x0 * 49.5));
-				x1 = ppow(site_index - 1.3, x4);
+				x0 = -x0 * ppow(siteIndex - 1.3, x1) * Math.pow(x2, (siteIndex - 1.3) / age_huang);
+				x0 = (1.0 - Math.exp(x0 * (breastHeightAge - 0.5))) / (1 - Math.exp(x0 * 49.5));
+				x1 = ppow(siteIndex - 1.3, x4);
 				x2 = Math.pow(49.5, x5);
 
-				height = 1.3 + (site_index - 1.3) * ppow(x0, x3 * x1 * x2);
+				height = 1.3 + (siteIndex - 1.3) * ppow(x0, x3 * x1 * x2);
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 		}
 			break;
 		case SI_BL_CHEN:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x1 = 9.523;
 				x2 = -1.4945;
 				x3 = -1.2159;
 
-				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(50.0) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage) + x3 * llog(site_index - 1.3)));
+				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(50.0) + x3 * llog(siteIndex - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(breastHeightAge) + x3 * llog(siteIndex - 1.3)));
 
-				height = 1.3 + (site_index - 1.3) * x4;
+				height = 1.3 + (siteIndex - 1.3) * x4;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 
 		case SI_SE_CHEN:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x1 = 8.6126;
 				x2 = -1.5269;
 				x3 = -0.7805;
 
-				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(50.0) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage) + x3 * llog(site_index - 1.3)));
+				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(50.0) + x3 * llog(siteIndex - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(breastHeightAge) + x3 * llog(siteIndex - 1.3)));
 
-				height = 1.3 + (site_index - 1.3) * x4;
+				height = 1.3 + (siteIndex - 1.3) * x4;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 
 		case SI_PL_CHEN:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x1 = 6.9603;
 				x2 = -1.2875;
 				x3 = -0.5904;
 
-				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(50.0) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage) + x3 * llog(site_index - 1.3)));
+				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(50.0) + x3 * llog(siteIndex - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(breastHeightAge) + x3 * llog(siteIndex - 1.3)));
 
-				height = 1.3 + (site_index - 1.3) * x4;
+				height = 1.3 + (siteIndex - 1.3) * x4;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		// Couldn't Find Constant
 		/*
-		 * case SI_EP_CHEN:
-		 * if (bhage > 0.0){
-		 * x1 = 9.9045;
-		 * x2 = -1.1736;
-		 * x3 = -1.8361;
-		 * 
-		 * x4 = (1.0 + Math.exp (x1 + x2 * Math.log (50.0) + x3 * llog(site_index - 1.3))) /
-		 * (1.0 + Math.exp (x1 + x2 * Math.log (bhage)+ x3 * llog(site_index - 1.3)));
-		 * 
-		 * height = 1.3 + (site_index - 1.3) * x4;
-		 * }
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_EP_CHEN: if (bhage > 0.0){ x1 = 9.9045; x2 = -1.1736; x3 = -1.8361;
+		 *
+		 * x4 = (1.0 + Math.exp (x1 + x2 * Math.log (50.0) + x3 * llog(site_index - 1.3))) / (1.0 + Math.exp (x1 + x2 *
+		 * Math.log (bhage)+ x3 * llog(site_index - 1.3)));
+		 *
+		 * height = 1.3 + (site_index - 1.3) * x4; } else{ height = tage * tage * 1.3 / y2bh / y2bh; } break;
 		 */
 		case SI_DR_CHEN:
-			if (bhage > 0.0) {
+			if (breastHeightAge > 0.0) {
 				x1 = 6.6133;
 				x2 = -1.0807;
 				x3 = -1.0176;
 
-				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(50.0) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage) + x3 * llog(site_index - 1.3)));
+				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(50.0) + x3 * llog(siteIndex - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(breastHeightAge) + x3 * llog(siteIndex - 1.3)));
 
-				height = 1.3 + (site_index - 1.3) * x4;
+				height = 1.3 + (siteIndex - 1.3) * x4;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 
 		case SI_BL_CHENAC:
-			if (bhage > 0.5) {
+			if (breastHeightAge > 0.5) {
 				x1 = 9.523;
 				x2 = -1.4945;
 				x3 = -1.2159;
 
-				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
+				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(siteIndex - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(breastHeightAge - 0.5) + x3 * llog(siteIndex - 1.3)));
 
-				height = 1.3 + (site_index - 1.3) * x4;
+				height = 1.3 + (siteIndex - 1.3) * x4;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 
 		case SI_SE_CHENAC:
-			if (bhage > 0.5) {
+			if (breastHeightAge > 0.5) {
 				x1 = 8.6126;
 				x2 = -1.5269;
 				x3 = -0.7805;
 
-				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(site_index - 1.3))) /
-						(1.0 + Math.exp(x1 + x2 * Math.log(bhage - 0.5) + x3 * llog(site_index - 1.3)));
+				x4 = (1.0 + Math.exp(x1 + x2 * Math.log(49.5) + x3 * llog(siteIndex - 1.3)))
+						/ (1.0 + Math.exp(x1 + x2 * Math.log(breastHeightAge - 0.5) + x3 * llog(siteIndex - 1.3)));
 
-				height = 1.3 + (site_index - 1.3) * x4;
+				height = 1.3 + (siteIndex - 1.3) * x4;
 			} else {
 				/*
 				 * height = tage * tage * 1.3 / y2bh / y2bh;
 				 */
-				height = 1.3 * Math.pow(tage / y2bh, 1.628 - 0.05991 * y2bh) * Math.pow(1.127, tage - y2bh);
+				height = 1.3 * Math.pow(totalAge / years2BreastHeight, 1.628 - 0.05991 * years2BreastHeight) * Math.pow(1.127, totalAge - years2BreastHeight);
 			}
 			break;
 
 		case SI_AT_CHEN:
-			if (bhage > 0.0) {
-				x1 = llog(ppow(site_index - 1.3, -0.076) / 1.418) /
-						llog(1 - Math.exp(-0.017 * 50));
-				height = 1.3 + 1.418 * (ppow(site_index - 1.3, 1.076) *
-						ppow(1 - Math.exp(-0.017 * bhage), x1));
+			if (breastHeightAge > 0.0) {
+				x1 = llog(ppow(siteIndex - 1.3, -0.076) / 1.418) / llog(1 - Math.exp(-0.017 * 50));
+				height = 1.3 + 1.418 * (ppow(siteIndex - 1.3, 1.076) * ppow(1 - Math.exp(-0.017 * breastHeightAge), x1));
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		case SI_PJ_HUANG:
-			if (bhage > 0) {
+			if (breastHeightAge > 0) {
 				x1 = 0.073456;
 				x2 = 8.770517;
 				x3 = -1.334706;
 				x4 = 1.719841;
 
-				x5 = (1.0 + x1 * (site_index - 1.3)
-						+ Math.exp(x2 + x3 * Math.log(50 + x4) - Math.log(site_index - 1.3))) /
-						(1.0 + x1 * (site_index - 1.3)
-								+ Math.exp(x2 + x3 * Math.log(bhage + x4) - Math.log(site_index - 1.3)));
+				x5 = (1.0 + x1 * (siteIndex - 1.3)
+						+ Math.exp(x2 + x3 * Math.log(50 + x4) - Math.log(siteIndex - 1.3)))
+						/ (1.0 + x1 * (siteIndex - 1.3)
+								+ Math.exp(x2 + x3 * Math.log(breastHeightAge + x4) - Math.log(siteIndex - 1.3)));
 
-				height = 1.3 + (site_index - 1.3) * x5;
+				height = 1.3 + (siteIndex - 1.3) * x5;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 
 		case SI_PJ_HUANGAC:
-			if (bhage > 0.5) {
+			if (breastHeightAge > 0.5) {
 				x1 = 0.073456;
 				x2 = 8.770517;
 				x3 = -1.334706;
 				x4 = 1.719841;
 
-				x5 = (1.0 + x1 * (site_index - 1.3)
-						+ Math.exp(x2 + x3 * Math.log(49.5 + x4) - Math.log(site_index - 1.3))) /
-						(1.0 + x1 * (site_index - 1.3)
-								+ Math.exp(x2 + x3 * Math.log(bhage - 0.5 + x4) - Math.log(site_index - 1.3)));
+				x5 = (1.0 + x1 * (siteIndex - 1.3)
+						+ Math.exp(x2 + x3 * Math.log(49.5 + x4) - Math.log(siteIndex - 1.3)))
+						/ (1.0 + x1 * (siteIndex - 1.3)
+								+ Math.exp(x2 + x3 * Math.log(breastHeightAge - 0.5 + x4) - Math.log(siteIndex - 1.3)));
 
-				height = 1.3 + (site_index - 1.3) * x5;
+				height = 1.3 + (siteIndex - 1.3) * x5;
 			} else {
-				height = tage * tage * 1.3 / y2bh / y2bh;
+				height = totalAge * totalAge * 1.3 / years2BreastHeight / years2BreastHeight;
 			}
 			break;
 		// Couldn't Find Constant
 		/*
-		 * case SI_EP_CAMERON:
-		 * if (bhage > 0.0)
-		 * height = 1.76928 * (site_index - 1.3) * ppow(1 - Math.exp (-0.01558 * bhage), 0.92908);
-		 * else{
-		 * height = tage * tage * 1.3 / y2bh / y2bh;
-		 * }
-		 * break;
+		 * case SI_EP_CAMERON: if (bhage > 0.0) height = 1.76928 * (site_index - 1.3) * ppow(1 - Math.exp (-0.01558 *
+		 * bhage), 0.92908); else{ height = tage * tage * 1.3 / y2bh / y2bh; } break;
 		 */
 
 		case SI_BA_NIGHGI, SI_BL_THROWERGI, SI_PY_NIGHGI, SI_CWI_NIGHGI, SI_FDC_NIGHGI, SI_FDI_NIGHGI, SI_HWC_NIGHGI,
 				SI_HWC_NIGHGI99, SI_HWI_NIGHGI, SI_LW_NIGHGI,
-				//case SI_PLI_NIGHGI: Couldnt Find constant
+				// case SI_PLI_NIGHGI: Couldnt Find constant
 				SI_PLI_NIGHGI97, SI_SE_NIGHGI, SI_SS_NIGHGI, SI_SS_NIGHGI99, SI_SW_NIGHGI, SI_SW_NIGHGI99,
 				SI_SW_NIGHGI2004:
 
-			height = gi_si2ht(cu_index, bhage, site_index);
+			height = giSi2Ht(cuIndex, breastHeightAge, siteIndex);
 			break;
 
 		default:
 			throw new CurveErrorException("Unknown curve index");
 		}
 
-		if (height == SI_ERR_NO_ANS) {
-			throw new NoAnswerException("Iteration could not converge (projected height > 999)");
-		}
-
 		return height;
 	}
 
-	public static double gi_si2ht(
-			int cu_index,
-			double age,
-			double site_index
-	) throws CommonCalculatorException {
+	public static double giSi2Ht(SiteIndexEquation cuIndex, double age, double siteIndex) throws CommonCalculatorException {
 		double si2ht;
 		double step;
 		double test_site;
@@ -2476,7 +2052,7 @@ public class SiteIndex2Height {
 		}
 
 		/* initial guess */
-		si2ht = site_index;
+		si2ht = siteIndex;
 		if (si2ht < 1.3) {
 			si2ht = 1.3;
 		}
@@ -2484,23 +2060,22 @@ public class SiteIndex2Height {
 
 		/* loop until real close */
 		do {
-			test_site = Height2SiteIndex.height_to_index(cu_index, age, (int) SI_AT_BREAST, si2ht, (int) SI_EST_DIRECT);
+			test_site = Height2SiteIndex.heightToIndex(cuIndex, age, SI_AT_BREAST, si2ht, SI_EST_DIRECT);
 			/*
-			 * printf ("age=%3.0f, site=%5.2f, test_site=%5.2f, si2ht=%5.2f, step=%9.7f\n",
-			 * age, site_index, test_site, si2ht, step);
+			 * printf ("age=%3.0f, site=%5.2f, test_site=%5.2f, si2ht=%5.2f, step=%9.7f\n", age, site_index, test_site,
+			 * si2ht, step);
 			 */
 
-			//This code could probably be removed
+			// This code could probably be removed
 			if (test_site < 0) /* error */
 			{
 				si2ht = test_site;
 				break;
 			}
 
-			if ( (test_site - site_index > 0.01) ||
-					(test_site - site_index < -0.01)) {
+			if ( (test_site - siteIndex > 0.01) || (test_site - siteIndex < -0.01)) {
 				/* not close enough */
-				if (test_site > site_index) {
+				if (test_site > siteIndex) {
 					if (step > 0) {
 						step = -step / 2.0;
 					}
@@ -2521,8 +2096,7 @@ public class SiteIndex2Height {
 				break;
 			}
 			if (si2ht > 999.0) {
-				si2ht = SI_ERR_NO_ANS;
-				break;
+				throw new NoAnswerException("Iteration could not converge (projected height > 999)");
 			}
 			/* site index must be at least 1.3 */
 			if (si2ht < 1.3) {
@@ -2535,13 +2109,10 @@ public class SiteIndex2Height {
 			}
 		} while (true);
 
-		if (si2ht == SI_ERR_NO_ANS) {
-			throw new NoAnswerException("Iteration could not converge (projected height > 999)");
-		}
 		return si2ht;
 	}
 
-	public static double hu_garcia_q(double site_index, double bhage) {
+	public static double huGarciaQ(double siteIndex, double bhage) {
 		double h, q, step, diff, lastdiff;
 
 		q = 0.02;
@@ -2550,9 +2121,9 @@ public class SiteIndex2Height {
 		diff = 0;
 
 		do {
-			h = hu_garcia_h(q, bhage);
+			h = huGarciaH(q, bhage);
 			lastdiff = diff;
-			diff = site_index - h;
+			diff = siteIndex - h;
 			if (diff > 0.0000001) {
 				if (lastdiff < 0) {
 					step = step / 2.0;
@@ -2577,7 +2148,7 @@ public class SiteIndex2Height {
 		return q;
 	}
 
-	public static double hu_garcia_h(double q, double bhage) {
+	public static double huGarciaH(double q, double bhage) {
 		double a, height;
 
 		a = 283.9 * Math.pow(q, 0.5137);

@@ -62,12 +62,15 @@ public class VdypUtilizationParser implements ControlMapValueReplacer<Object, St
 					).value(3, GENUS_INDEX, ValueParser.INTEGER).space(1)
 					.value(2, GENUS, ControlledValueParser.optional(ValueParser.GENUS))
 					.value(3, UTILIZATION_CLASS_INDEX, ControlledValueParser.UTILIZATION_CLASS)
-					.value(9, BASAL_AREA, ValueParser.FLOAT).value(9, LIVE_TREES_PER_HECTARE, ValueParser.FLOAT)
-					.value(9, LOREY_HEIGHT, ValueParser.FLOAT).value(9, WHOLE_STEM_VOLUME, ValueParser.FLOAT)
-					.value(9, CLOSE_UTIL_VOLUME, ValueParser.FLOAT).value(9, CU_VOLUME_LESS_DECAY, ValueParser.FLOAT)
-					.value(9, CU_VOLUME_LESS_DECAY_WASTAGE, ValueParser.FLOAT)
-					.value(9, CU_VOLUME_LESS_DECAY_WASTAGE_BREAKAGE, ValueParser.FLOAT)
-					.value(6, QUADRATIC_MEAN_DIAMETER_BREAST_HEIGHT, ValueParser.FLOAT);
+					.value(9, BASAL_AREA, VdypForwardDefaultingParser.FLOAT_WITH_DEFAULT)
+					.value(9, LIVE_TREES_PER_HECTARE, VdypForwardDefaultingParser.FLOAT_WITH_DEFAULT)
+					.value(9, LOREY_HEIGHT, VdypForwardDefaultingParser.FLOAT_WITH_DEFAULT)
+					.value(9, WHOLE_STEM_VOLUME, VdypForwardDefaultingParser.FLOAT_WITH_DEFAULT)
+					.value(9, CLOSE_UTIL_VOLUME, VdypForwardDefaultingParser.FLOAT_WITH_DEFAULT)
+					.value(9, CU_VOLUME_LESS_DECAY, VdypForwardDefaultingParser.FLOAT_WITH_DEFAULT)
+					.value(9, CU_VOLUME_LESS_DECAY_WASTAGE, VdypForwardDefaultingParser.FLOAT_WITH_DEFAULT)
+					.value(9, CU_VOLUME_LESS_DECAY_WASTAGE_BREAKAGE, VdypForwardDefaultingParser.FLOAT_WITH_DEFAULT)
+					.value(6, QUADRATIC_MEAN_DIAMETER_BREAST_HEIGHT, VdypForwardDefaultingParser.FLOAT_WITH_DEFAULT);
 
 			var is = fileResolver.resolveForInput(fileName);
 
@@ -88,15 +91,15 @@ public class VdypUtilizationParser implements ControlMapValueReplacer<Object, St
 					var genusIndex = (Integer) entry.get(GENUS_INDEX);
 					var genus = (Optional<String>) entry.get(GENUS);
 					var utilizationClass = (UtilizationClass) entry.get(UTILIZATION_CLASS_INDEX);
-					var basalArea = (Float) entry.get(BASAL_AREA);
-					var liveTreesPerHectare = (Float) entry.get(LIVE_TREES_PER_HECTARE);
-					var loreyHeight = (Float) entry.get(LOREY_HEIGHT);
-					var wholeStemVolume = (Float) entry.get(WHOLE_STEM_VOLUME);
-					var closeUtilVolume = (Float) entry.get(CLOSE_UTIL_VOLUME);
-					var cuVolumeLessDecay = (Float) entry.get(CU_VOLUME_LESS_DECAY);
-					var cuVolumeLessDecayWastage = (Float) entry.get(CU_VOLUME_LESS_DECAY_WASTAGE);
-					var cuVolumeLessDecayWastageBreakage = (Float) entry.get(CU_VOLUME_LESS_DECAY_WASTAGE_BREAKAGE);
-					var quadraticMeanDBH = (Float) entry.get(QUADRATIC_MEAN_DIAMETER_BREAST_HEIGHT);
+					var basalArea = (Float)(entry.get(BASAL_AREA));
+					var liveTreesPerHectare = (Float)(entry.get(LIVE_TREES_PER_HECTARE));
+					var loreyHeight = (Float)(entry.get(LOREY_HEIGHT));
+					var wholeStemVolume = (Float)(entry.get(WHOLE_STEM_VOLUME));
+					var closeUtilVolume = (Float)(entry.get(CLOSE_UTIL_VOLUME));
+					var cuVolumeLessDecay = (Float)(entry.get(CU_VOLUME_LESS_DECAY));
+					var cuVolumeLessDecayWastage = (Float)(entry.get(CU_VOLUME_LESS_DECAY_WASTAGE));
+					var cuVolumeLessDecayWastageBreakage = (Float)(entry.get(CU_VOLUME_LESS_DECAY_WASTAGE_BREAKAGE));
+					var quadraticMeanDBH = (Float)(entry.get(QUADRATIC_MEAN_DIAMETER_BREAST_HEIGHT));
 
 					var builder = new ValueOrMarker.Builder<Optional<VdypSpeciesUtilization>, EndOfRecord>();
 					return layerType.handle(l -> {

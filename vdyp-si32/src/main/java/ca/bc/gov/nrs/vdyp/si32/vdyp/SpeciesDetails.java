@@ -1,13 +1,17 @@
 package ca.bc.gov.nrs.vdyp.si32.vdyp;
 
+import java.text.MessageFormat;
+
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.si32.cfs.CfsTreeSpecies;
+import ca.bc.gov.nrs.vdyp.si32.enumerations.SpeciesRegion;
 
 /**
  * Records all of the information regarding a particular CSF species.
  */
 public record SpeciesDetails(
 	
-	/** The short standard code name for the species */
+	/** UNIQUE KEY. The short standard code name for the species */
 	String codeName,
 	
 	/** The full common name for the species. */
@@ -63,5 +67,26 @@ public record SpeciesDetails(
 	 * the species. In certain applications, the standard curve number for a species may be modified to
 	 * other experimental or alternative curves rather than the standard curve.
 	 */
-	int[] currentSICurve) 
-{}
+	SiteIndexEquation[] currentSICurve) 
+{
+	@Override 
+	public String toString() {
+		return MessageFormat.format("code name: {0}; full name: {1}, sp0 name: {2}", codeName, fullName, sp0Name);
+	}
+	
+	@Override
+	public int hashCode() {
+		// codeName is the unique key for this class
+		return codeName.hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof SpeciesDetails that) {
+			// codeName is the unique key for this class
+			return this.codeName.equals(that.codeName);
+		} else {
+			return false;
+		}
+	}		
+}

@@ -3,27 +3,25 @@ package ca.bc.gov.nrs.vdyp.si32.enumerations;
 import java.util.HashMap;
 import java.util.Map;
 
+import ca.bc.gov.nrs.vdyp.model.EnumIterator;
+
 /**
  * Enumerates each of the potential regions a species can be found in.
  * <ul>
- * <li>spcsRgn_Coast
- * <li>spcsRgn_Interior
+ * <li>Coast
+ * <li>Interior
  * </ul>
  */
 public enum SpeciesRegion implements SI32Enum<SpeciesRegion> {
 	
-	spcsRgn_Coast(0), // 
-	spcsRgn_Interior(1);
+	COAST(0), // 
+	INTERIOR(1);
 
 	private static Map<Integer, SpeciesRegion> index2EnumMap = null;
 
-	private static Map<Integer, SpeciesRegion> getMappings() {
+	private static synchronized Map<Integer, SpeciesRegion> getMappings() {
 		if (index2EnumMap == null) {
-			synchronized (SpeciesRegion.class) {
-				if (index2EnumMap == null) {
-					index2EnumMap = new HashMap<>();
-				}
-			}
+			index2EnumMap = new HashMap<>();
 		}
 		return index2EnumMap;
 	}
@@ -47,7 +45,7 @@ public enum SpeciesRegion implements SI32Enum<SpeciesRegion> {
 	
 	@Override
 	public String getText() {
-		return this.toString().substring("spcsRgn_".length());
+		return this.toString();
 	}
 
 	/**
@@ -64,12 +62,12 @@ public enum SpeciesRegion implements SI32Enum<SpeciesRegion> {
 	 * @return the number of non-housekeeping entries in the enumeration
 	 */
 	public static int size() {
-		return spcsRgn_Interior.index - spcsRgn_Coast.index + 1;
+		return INTERIOR.index - COAST.index + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<SpeciesRegion> {
+	public static class Iterator extends EnumIterator<SpeciesRegion> {
 		public Iterator() {
-			super(spcsRgn_Coast, spcsRgn_Interior, values());
+			super(values(), COAST, INTERIOR);
 		}
 	}
 }

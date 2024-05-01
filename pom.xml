@@ -33,6 +33,7 @@
 		<module>vdyp-vri</module>
 		<module>vdyp-buildtools</module>
 		<module>vdyp-sindex</module>
+		<module>vdyp-si32</module>
 		<module>vdyp-forward</module>
 	</modules>
 
@@ -48,6 +49,12 @@
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-math3</artifactId>
 				<version>3.6.1</version>
+			</dependency>
+
+			<dependency>
+			    <groupId>org.apache.commons</groupId>
+			    <artifactId>commons-lang3</artifactId>
+			    <version>3.14.0</version>
 			</dependency>
 
 			<dependency>

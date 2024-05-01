@@ -25,7 +25,6 @@ import java.util.stream.IntStream;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
-import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
@@ -345,7 +344,7 @@ public class TestUtils {
 
 			@Override
 			public String toString(String filename) throws IOException {
-				return klazz.getResource(filename).toString();
+				return klazz.getResource(filename).getPath();
 			}
 
 			@Override

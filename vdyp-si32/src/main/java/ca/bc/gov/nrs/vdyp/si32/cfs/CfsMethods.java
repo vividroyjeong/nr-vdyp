@@ -23,7 +23,7 @@ public class CfsMethods {
 		if (cfsTreeCls != null) {
 			return cfsTreeCls.getDescription();
 		} else {
-			return CfsTreeClass.cfsTreeCls_UNKNOWN.getDescription();
+			return CfsTreeClass.UNKNOWN.getDescription();
 		}
 	}
 
@@ -46,13 +46,13 @@ public class CfsMethods {
 	 * </ol>
 	 * @param genus the CFS Tree Genus value to be converted to a string.
 	 * @return the string corresponding to the identified CFS Tree Genus.
-	 *    The string for 'cfsGenus_UNKNOWN' if the value is not recognized.
+	 *    The string for 'UNKNOWN' if the value is not recognized.
 	 */
 	public static String cfsGenusToString(CfsTreeGenus genus) {
 		if (genus != null) {
 			return genus.getGenusName();
 		} else {
-			return CfsTreeGenus.cfsGenus_UNKNOWN.getGenusName();
+			return CfsTreeGenus.UNKNOWN.getGenusName();
 		}
 	}
 
@@ -105,7 +105,7 @@ public class CfsMethods {
 	 * 'Model_based_volume_to_biomass_CFS.pdf' found in 'Documents/CFS-Biomass'.
 	 *
 	 * @param cfsSpeciesName the cfs name of the species.
-	 * @return the CFSTreeSpecies corresponding to the given name. cfsSpcs_UNKNOWN is 
+	 * @return the CFSTreeSpecies corresponding to the given name. UNKNOWN is 
 	 * returned if the given name doesn't match a known name.
 	 *
 	 */
@@ -121,7 +121,7 @@ public class CfsMethods {
 	 *
 	 * @param cfsSpcs the CFS Species whose genus is to be determined.
 	 * @return The CFS Genus code corresponding to the supplied CFS Species.
-	 *    cfsGenus_UNKNOWN if the 'cfsSpcs' code was not recognized.
+	 *    UNKNOWN if the 'cfsSpcs' code was not recognized.
 	 */
 	
 	public static CfsTreeGenus cfsSpcsNumToCFSGenus(CfsTreeSpecies cfsSpcs) {

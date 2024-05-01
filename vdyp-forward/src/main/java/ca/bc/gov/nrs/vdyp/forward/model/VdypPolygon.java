@@ -4,14 +4,14 @@ import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 
-public class VdypPolygon {
+public class VdypPolygon extends VdypEntity {
 
 	// See IPSJF155.doc
 
 	private final VdypPolygonDescription description; // POLYDESC
 	private final BecDefinition biogeoclimaticZone; // BEC
 	private final Character forestInventoryZone; // FIZ
-	private final Float percentForestLand; // PCTFLAND
+	private final float percentForestLand; // PCTFLAND
 	private final Optional<Integer> inventoryTypeGroup; // ITG
 	private final Optional<Integer> basalAreaGroup; // GRPBA1
 	private final Optional<FipMode> fipMode; // MODE
@@ -21,19 +21,19 @@ public class VdypPolygon {
 	private Optional<VdypPolygonLayer> veteranLayer;
 
 	public VdypPolygon(
-			VdypPolygonDescription vdypPolygonDescription, BecDefinition bec, Character fizId, Float percentForestLand,
+			VdypPolygonDescription vdypPolygonDescription, BecDefinition bec, Character fizId, float percentForestLand,
 			Optional<Integer> inventoryTypeGroup, Optional<Integer> basalAreaGroup, Optional<FipMode> fipMode
 	) {
 		this.description = vdypPolygonDescription;
 		this.biogeoclimaticZone = bec;
 		this.forestInventoryZone = fizId;
-		
+
 		// VDYPGETP lines 146-154
 		if (percentForestLand <= 0.0)
 			this.percentForestLand = 90.0f;
 		else
 			this.percentForestLand = percentForestLand;
-		
+
 		this.inventoryTypeGroup = inventoryTypeGroup;
 		this.basalAreaGroup = basalAreaGroup;
 		this.fipMode = fipMode;
@@ -76,7 +76,7 @@ public class VdypPolygon {
 		return forestInventoryZone;
 	}
 
-	public Float getPercentForestLand() {
+	public float getPercentForestLand() {
 		return percentForestLand;
 	}
 

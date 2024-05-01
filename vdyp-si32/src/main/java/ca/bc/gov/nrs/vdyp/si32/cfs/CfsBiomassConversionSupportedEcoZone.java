@@ -2,16 +2,16 @@ package ca.bc.gov.nrs.vdyp.si32.cfs;
 
 import java.text.MessageFormat;
 
+import ca.bc.gov.nrs.vdyp.model.EnumIterator;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
-import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
 
 /**
  * Lists indices to Eco Zone conversion factors for the supported CFS Biomass 
  * conversion factors.
  * <ul>
- * <li> ecoZoneInt_UNKNOWN: Indicates an uninitialized value or error condition. This should
+ * <li>UNKNOWN: Indicates an uninitialized value or error condition. This should
  *      never be used to indicate a valid Eco Zone Index.
- * <li> ecoZoneInt_...: Indices into the {@link CfsBiomassConversionCoefficients} array corresponding 
+ * <li>other: Indices into the {@link CfsBiomassConversionCoefficients} array corresponding 
  * 		to the identified CFS Eco Zone.
  * </ul>
  * For the BC implementation of the CFS Conversion Factors, only a subset Eco Zones are supported. 
@@ -29,18 +29,18 @@ import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32EnumIterator;
  * </ol>
  */
 public enum CfsBiomassConversionSupportedEcoZone implements SI32Enum<CfsBiomassConversionSupportedEcoZone> {
-	ecoZoneInt_UNKNOWN(-1), 
+	UNKNOWN(-1), 
 
 	/* 4 */
-	ecoZoneInt_TaigaPlains(0),
+	TAIGA_PLAINS(0),
 	/* 9 */
-	ecoZoneInt_BorealPlains(1),
+	BOREAL_PLAINS(1),
 	/* 12 */
-	ecoZoneInt_BorealCordillera(2),
+	BOREAL_CORDILLERA(2),
 	/* 13 */
-	ecoZoneInt_PacificMaritime(3),
+	PACIFIC_MARITIME(3),
 	/* 14 */
-	ecoZoneInt_MontaneCordillera(4);
+	MONTANE_CORDILLERA(4);
 
 	private final int index;
 
@@ -55,7 +55,7 @@ public enum CfsBiomassConversionSupportedEcoZone implements SI32Enum<CfsBiomassC
 
 	@Override
 	public int getOffset() {
-		if (this.equals(ecoZoneInt_UNKNOWN)) {
+		if (this.equals(UNKNOWN)) {
 			throw new UnsupportedOperationException(MessageFormat
 					.format("Cannot call getIndex on {} as it's not a standard member of the enumeration", this));
 		}
@@ -65,24 +65,24 @@ public enum CfsBiomassConversionSupportedEcoZone implements SI32Enum<CfsBiomassC
 	
 	@Override
 	public String getText() {
-		if (this.equals(ecoZoneInt_UNKNOWN)) {
+		if (this.equals(UNKNOWN)) {
 			throw new UnsupportedOperationException(MessageFormat
 					.format("Cannot call getText on {} as it's not a standard member of the enumeration", this));
 		}
 		
-		return this.toString().substring("ecoZoneInt_".length());
+		return this.toString();
 	}
 
 	/**
 	 * @return the number of non-housekeeping entries in the enumeration
 	 */
 	public static int size() {
-		return ecoZoneInt_MontaneCordillera.index - ecoZoneInt_TaigaPlains.index + 1;
+		return MONTANE_CORDILLERA.index - TAIGA_PLAINS.index + 1;
 	}
 
-	public static class Iterator extends SI32EnumIterator<CfsBiomassConversionSupportedEcoZone> {
+	public static class Iterator extends EnumIterator<CfsBiomassConversionSupportedEcoZone> {
 		public Iterator() {
-			super(ecoZoneInt_TaigaPlains, ecoZoneInt_MontaneCordillera, values());
+			super(values(), TAIGA_PLAINS, MONTANE_CORDILLERA);
 		}
 	}
 }

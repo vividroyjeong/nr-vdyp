@@ -56,9 +56,8 @@ public class VdypForwardTestUtils {
 
 	}
 
-	public static Map<String, Object>
-			loadControlMap(ForwardControlParser parser, Class<?> klazz, String resourceName)
-					throws IOException, ResourceParseException {
+	public static Map<String, Object> loadControlMap(ForwardControlParser parser, Class<?> klazz, String resourceName)
+			throws IOException, ResourceParseException {
 		try (var is = klazz.getResourceAsStream(resourceName)) {
 
 			return parser.parse(is, TestUtils.fileResolver(klazz), new HashMap<>());
@@ -74,6 +73,15 @@ public class VdypForwardTestUtils {
 			return loadControlMap(parser, ForwardControlParser.class, "FIPSTART.CTR");
 		} catch (IOException | ResourceParseException ex) {
 			throw new AssertionFailedError(null, ex);
+		}
+	}
+
+	public static Map<String, Object> parse(ForwardControlParser parser, String resourceName) throws IOException, ResourceParseException {
+	
+		Class<?> klazz = TestUtils.class;
+		try (var is = klazz.getResourceAsStream(resourceName)) {
+	
+			return parser.parse(is, TestUtils.fileResolver(klazz), new HashMap<>());
 		}
 	}
 }

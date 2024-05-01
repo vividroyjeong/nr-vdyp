@@ -35,7 +35,7 @@ public class VdypPolygonDescription {
 
 	@Override
 	public boolean equals(Object other) {
-		return other instanceof VdypPolygonDescription that && name.equals(that.name);
+		return other instanceof VdypPolygonDescription that && this.name.equals(that.name);
 	}
 
 	@Override

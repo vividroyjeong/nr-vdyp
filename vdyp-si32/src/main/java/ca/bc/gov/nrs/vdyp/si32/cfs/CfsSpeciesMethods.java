@@ -13,7 +13,7 @@ public class CfsSpeciesMethods {
 	/**
 	 * Perform a case-insensitive search for the attributes of the species with
 	 * the given name. If the parameter is null or doesn't match any species,
-	 * CFSTreeSpecies.cfsSpcs_UNKNOWN is returned.
+	 * CFSTreeSpecies.UNKNOWN is returned.
 	 * 
 	 * @param cfsSpeciesName the name of the species to look up
 	 * @return as described
@@ -27,11 +27,11 @@ public class CfsSpeciesMethods {
 			}
 		}
 		
-		return CfsTreeSpecies.cfsSpcs_UNKNOWN;
+		return CfsTreeSpecies.UNKNOWN;
 	}
 
 	/**
-	 * Return the genus of the given species, or CFSTreeGenus.cfsGenus_UNKNOWN 
+	 * Return the genus of the given species, or CFSTreeGenus.UNKNOWN 
 	 * if null.
 	 * 
 	 * @param cfsSpecies the name of the species to look up
@@ -42,12 +42,12 @@ public class CfsSpeciesMethods {
 		if (cfsSpecies != null) {
 			return cfsSpecies.getCfsTreeGenus();
 		} else {
-			return CfsTreeGenus.cfsGenus_UNKNOWN;
+			return CfsTreeGenus.UNKNOWN;
 		}
 	}
 	
 	/**
-	 * Returns the species index for the given CFS species, or that of <code>cfsSpcs_UNKNOWN</code> if null.
+	 * Returns the species index for the given CFS species, or that of <code>UNKNOWN</code> if null.
 	 * 
 	 * @param cfsSpecies the name of the species to look up
 	 * @return as described
@@ -55,16 +55,16 @@ public class CfsSpeciesMethods {
 	public static int getSpeciesIndexBySpecies(CfsTreeSpecies cfsSpecies) {
 		
 		if (cfsSpecies != null) {
-			return cfsSpecies.getCfsSpeciesNumber();
+			return cfsSpecies.getNumber();
 		} else {
-			return CfsTreeSpecies.cfsSpcs_UNKNOWN.getCfsSpeciesNumber();
+			return CfsTreeSpecies.UNKNOWN.getNumber();
 		}
 	}
 
 	static {
 		// Build the lookup assistance maps
 		for (CfsTreeSpecies s: CfsTreeSpecies.values()) {
-			speciesByName.put(s.getCfsSpeciesName().toUpperCase(), s);
+			speciesByName.put(s.getName().toUpperCase(), s);
 		}
 	}
 }

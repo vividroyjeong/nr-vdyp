@@ -27,16 +27,19 @@ public enum Region {
 
 	public static Optional<Region> fromIndex(int index) {
 		switch (index) {
-			case 1: return Optional.of(COASTAL);
-			case 2: return Optional.of(INTERIOR);
-			default: return Optional.empty();
+		case 1:
+			return Optional.of(COASTAL);
+		case 2:
+			return Optional.of(INTERIOR);
+		default:
+			return Optional.empty();
 		}
 	}
 
 	public char getCharacterAlias() {
 		return characterAlias;
 	}
-	
+
 	public int getIndex() {
 		return index;
 	}

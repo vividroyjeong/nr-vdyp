@@ -66,8 +66,7 @@ public class VdypPolygonDescriptionParser implements ControlMapValueReplacer<Obj
 				@Override
 				protected VdypPolygonDescription convert(Map<String, Object> entry) throws ResourceParseException {
 
-					var description = (String) entry.get(DESCRIPTION);
-					return parse(description);
+					return parse((String) entry.get(DESCRIPTION));
 				}
 			};
 		};
