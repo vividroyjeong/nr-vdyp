@@ -153,23 +153,23 @@ public enum SiteIndexSpecies {
 		this.n = n;
 		this.code = code;
 	}
-	
+
 	public String getCode() {
 		return code;
 	}
-	
+
 	public int n() {
 		return n;
 	}
-	
+
 	public static SiteIndexSpecies getFirstSpecies() {
 		return SI_SPEC_A;
 	}
-	
+
 	public static SiteIndexSpecies getLastSpecies() {
 		return SI_SPEC_ZH;
 	}
-	
+
 	public static SiteIndexSpecies getByCode(String code) throws CodeErrorException {
 		try {
 			if (code != null) {
@@ -182,14 +182,14 @@ public enum SiteIndexSpecies {
 
 		throw new CodeErrorException("Unknown species code: " + code);
 	}
-	
+
 	public static SiteIndexSpecies getByIndex(int n) {
 		SiteIndexSpecies e = null;
-		
+
 		if (n >= 0) {
 			e = byIndex.get(n);
 			if (e == null) {
-				for (SiteIndexSpecies v: values()) {
+				for (SiteIndexSpecies v : values()) {
 					if (v.n == n) {
 						byIndex.put(n, e = v);
 						break;
@@ -197,7 +197,7 @@ public enum SiteIndexSpecies {
 				}
 			}
 		}
-		
+
 		if (e == null) {
 			throw new IllegalArgumentException(MessageFormat.format("Index {} doesn't exist in SiteIndexSpecies", n));
 		} else {

@@ -7,8 +7,9 @@ import static ca.bc.gov.nrs.vdyp.math.FloatMath.sqrt;
  */
 public class BaseAreaTreeDensityDiameter {
 
-	private BaseAreaTreeDensityDiameter() {}
-	
+	private BaseAreaTreeDensityDiameter() {
+	}
+
 	/**
 	 * π/10⁴
 	 */
@@ -29,7 +30,7 @@ public class BaseAreaTreeDensityDiameter {
 		if (baseArea > 0 && quadraticMeanDiameter > 0.0f) {
 			return baseArea / PI_40K / (quadraticMeanDiameter * quadraticMeanDiameter);
 		}
-		
+
 		return 0f;
 	}
 

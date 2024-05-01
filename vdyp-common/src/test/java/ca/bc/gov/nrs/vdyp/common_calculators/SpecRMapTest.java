@@ -17,7 +17,7 @@ class SpecRMapTest {
 	class SpeciesMapTest {
 		@Test
 		void testAllSpeciesUppercase() throws CommonCalculatorException { // loop through each case
-			for (SiteIndexSpecies s: SiteIndexSpecies.values()) { // test all normal cases
+			for (SiteIndexSpecies s : SiteIndexSpecies.values()) { // test all normal cases
 				if (s != SiteIndexSpecies.SI_NO_SPECIES) {
 					SiteIndexSpecies expectedResult = s;
 					SiteIndexSpecies actualResult = SiteIndexSpecies.getByCode(s.getCode().toUpperCase());
