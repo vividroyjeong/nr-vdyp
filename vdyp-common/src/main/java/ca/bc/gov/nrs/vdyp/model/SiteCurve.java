@@ -1,21 +1,23 @@
 package ca.bc.gov.nrs.vdyp.model;
 
+import java.text.MessageFormat;
+
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
+
 public class SiteCurve {
-	private final int value1;
-	private final int value2;
+	private final SiteIndexEquation coastalRegionValue;
+	private final SiteIndexEquation interiorRegionValue;
 
-	public SiteCurve(int value1, int value2) {
-		super();
-		this.value1 = value1;
-		this.value2 = value2;
+	public SiteCurve(SiteIndexEquation coastalRegionValue, SiteIndexEquation interiorRegionValue) {
+		this.coastalRegionValue = coastalRegionValue;
+		this.interiorRegionValue = interiorRegionValue;
 	}
 
-	public int getValue1() {
-		return value1;
+	public SiteIndexEquation getValue(Region region) {
+		if (region.equals(Region.COASTAL))
+			return coastalRegionValue;
+		else if (region.equals(Region.INTERIOR))
+			return interiorRegionValue;
+		throw new IllegalStateException(MessageFormat.format("{0} is not a supported region", region));
 	}
-
-	public int getValue2() {
-		return value2;
-	}
-
 }

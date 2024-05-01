@@ -1,8 +1,6 @@
 package ca.bc.gov.nrs.vdyp.forward.test;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,8 +9,7 @@ import java.util.function.BiFunction;
 import org.opentest4j.AssertionFailedError;
 
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
-import ca.bc.gov.nrs.vdyp.forward.VdypForwardControlParser;
-import ca.bc.gov.nrs.vdyp.io.FileResolver;
+import ca.bc.gov.nrs.vdyp.forward.ForwardControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.model.Region;
@@ -59,12 +56,11 @@ public class VdypForwardTestUtils {
 
 	}
 
-	public static Map<String, Object>
-			loadControlMap(VdypForwardControlParser parser, Class<?> klazz, String resourceName)
-					throws IOException, ResourceParseException {
+	public static Map<String, Object> loadControlMap(ForwardControlParser parser, Class<?> klazz, String resourceName)
+			throws IOException, ResourceParseException {
 		try (var is = klazz.getResourceAsStream(resourceName)) {
 
-			return parser.parse(is, VdypForwardTestUtils.fileResolver(klazz), new HashMap<>());
+			return parser.parse(is, TestUtils.fileResolver(klazz), new HashMap<>());
 		}
 	}
 
@@ -72,39 +68,21 @@ public class VdypForwardTestUtils {
 	 * Load the control map from resources in the test package using the full control map parser.
 	 */
 	public static Map<String, Object> loadControlMap() {
-		var parser = new VdypForwardControlParser();
+		var parser = new ForwardControlParser();
 		try {
-			return loadControlMap(parser, VdypForwardControlParser.class, "FIPSTART.CTR");
+			return loadControlMap(parser, ForwardControlParser.class, "FIPSTART.CTR");
 		} catch (IOException | ResourceParseException ex) {
 			throw new AssertionFailedError(null, ex);
 		}
 	}
 
-	public static FileResolver fileResolver(Class<?> klazz) {
-		return new FileResolver() {
+	public static Map<String, Object> parse(ForwardControlParser parser, String resourceName)
+			throws IOException, ResourceParseException {
 
-			@Override
-			public InputStream resolveForInput(String filename) throws IOException {
-				InputStream resourceAsStream = klazz.getResourceAsStream(filename);
-				if (resourceAsStream == null)
-					throw new IOException("Could not load " + filename);
-				return resourceAsStream;
-			}
+		Class<?> klazz = TestUtils.class;
+		try (var is = klazz.getResourceAsStream(resourceName)) {
 
-			@Override
-			public OutputStream resolveForOutput(String filename) throws IOException {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public String toString(String filename) throws IOException {
-				return klazz.getResource(filename).toString();
-			}
-
-			@Override
-			public FileResolver relative(String path) throws IOException {
-				throw new UnsupportedOperationException();
-			}
-		};
+			return parser.parse(is, TestUtils.fileResolver(klazz), new HashMap<>());
+		}
 	}
 }

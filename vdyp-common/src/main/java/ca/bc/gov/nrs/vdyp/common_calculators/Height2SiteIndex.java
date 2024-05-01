@@ -1,210 +1,51 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexUtilities.llog;
+import static ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexUtilities.ppow;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_BREAST;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_TOTAL;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEstimationType.*;
+
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMaximumException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMinimumException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEstimationType;
 
-/* @formatter:off */
 /**
- * Height2SiteIndex.java
- *  - given age and height, computes site index.
- * - if age is total, site index and years to breast height are iterated until
- *   stable.
+ * Height2SiteIndex.java - given age and height, computes site index. - if age is total, site index and years to breast
+ * height are iterated until stable.
  */
-/* @formatter:on */
+@SuppressWarnings("java:S1479")
 public class Height2SiteIndex {
-/* @formatter:off */
-/*
- * 1990 may 31
- *      jun 8  - Added proper height to site index computation for Fdi Vander
- *               Ploeg & Moore equations.
- *             - Added Fdi Monserud's equations.
- *             - Added At Goudie's equation.
- *          11 - Added Dr Harrington & Curtis equation.
- *             - Added Bg Cochran's equation.
- *             - Added Bc Cochran's equation.
- *          15 - Changed most variable names, and file name, to include "si"
- *               at start.
- *      jul 26 - Fixed bug in site_iterate(); the abs() function was
- *               returning an integer.
- *             - Changed tolerance in site_iterate() routine from 0.1 to 0.01.
- *      aug 29 - Added Pp Hann & Scrivani's equation.
- *             - Added Lw Milner's equation.
- *      sep 21 - Removed y2bh from parameters to height_to_index().
- *             - Split height_to_index() into two internal routines, one for
- *               each age type.  The one for total age iterates calling the
- *               breast height function with varying values of years-to-
- *               breast-height.
- *      nov 1  - Bug fix to prevent site index from going non-positive in
- *               site_iterate().
- *          9  - Bug fix in Fdi Vander Ploeg curves.
- *      dec 13 - Added Dempster's Sw, Sb, and Pli.
- *          17 - Added ability to select type of estimation of site index,
- *               either by direct equation, or through iteration of the height
- *               function.
- * 1991 jan 14 - Subtracted y2bh from total age to make it breast height age,
- *               when computing site index from height and total age.
- *             - Completely removed ta_height_to_index().  Site_iterate() was
- *               modified to allow it to perform ta_...()'s function.
- *          15 - Crucial bug fix ig of site_iterate() loop.  Absolute
- *               value of step value must be checked.
- *          16 - Added Fdc, Cwi and Fdi, by Hegyi.
- *             - Added Hw, Cw, and Ss Barker.
- *          23 - Split Goudie's Pli, Sw, Pw, and Pa into natural and
- *               plantation versions.
- *          24 - Added Hegyi's black cottonwood.
- *      feb 4  - Changed EA to EP.
- *          12 - Added Curtis' Pw.
- *          14 - Bug fix in Curtis' Pw.
- *      mar 15 - Removed Goudie's Pw.
- *      apr 2  - Added care to taking Math.pow() and log() of numbers.
- *      jun 19 - Split balsam into coast and interior.
- *          21 - Added Ker & Bowling's Bac, Sb, and Sw.
- *      aug 2  - Added direct ht-to-si equation for Thrower's Fdi.
- *             - Smartened up the code to reduce the repetition for each
- *               species.
- *      dec 2  - Changed to independent Sindex functions.
- * 1992 jan 10 - Added defines for how function prototypes and definitions
- *               are handled.
- *      feb 11 - Added Milner's Pp, Fdi, Lw, and Pli.
- *      dec 2  - Added Mario Dilucca's coastal balsam fir.
- * 1993 aug 10 - Added Thrower's lodgepole pine site index equation.
- * 1995 sep 20 - Fixed bug in Milner's Lw and Pli equations.  Signs were
- *               wrong.  Presumably these were wrong since addition, in
- *               1990 for Lw and 1992 for Pli.
- * 1996 jun 10 - Incorporated Nigh's variable height growth intercept
- *               equations.
- *             - Establised a set of error codes for growth intercepts.
- *          11 - Rearranged site_iterate() code a bit.
- *          27 - Cleaned up error codes some more.  Eliminated returning
- *               999, instead returning -4.  Added checks for height
- *               less than 1.3, or breast-height age < 0.5.
- *      aug 2  - Added error code -9 to indicate that GI site index cannot
- *               be computed from total age.
- *             - Amalgamated SI_SW_NIGH_PLA and SI_SW_NIGH_NAT into
- *               SI_SW_NIGH.
- *          8  - Changed error codes to defined constants.
- *          9  - Moved check for total age and GI when computing y2bh
- *               in iterating loop.
- *      oct 22 - Modified Nigh's Fdc GI formuation to stop at age 30.
- * 1997 jan 23 - Bug fix in site_iterate() when cannot get answer.
- *      feb 5  - Changed check for top height or site index < 1.3 to be
- *               <= 1.3.
- *      mar 21 - Added Nigh's 1997 Hwi GI to age 30.
- *             - Changed define names: FDC_NIGH, HW_NIGH, PLI_NIGH, SW_NIGH
- *               all have "GI" added after them.
- *             - Added Nigh's 1997 Pli GI to age 30.
- *             - Added Nigh's 1997 Fdi GI to age 30.
- *          24 - Split HW into HWC and HWI.
- *      apr 3  - Bug fix: Added 1.3m to FDI_NIGHGI, PLI_NIGH97GI, and
- *               HWI_NIGHGI.
- *      jul 8  - Replaced checking height <= 1.3 and returning error code
- *               with checking and returning 0.
- *      sep 16 - Changed a "log(50)" to "log(50.0)" in BAC_DILUCCA
- *               and PLI_THROWER formulations.
- *      oct 28 - Added Thrower's Bl GI.
- *      nov 17 - Added Ea as At Goudie.
- *             - Added Lt and La as Lw Milner.
- * 1998 mar 27 - Bug fix in Nigh's Hwi GI for age 8.
- *      apr 7  - Added inclusion of sindex2.h.
- *      may 27 - If age or height is <= 0, return SI_ERR_NO_ANS.
- *             - if height is <= 1.3 and age type is breast height,
- *               return SI_ERR_LT13.
- *             - Changed iteration routine so that minimum site index is 1.3.
- *      nov 12 - Added Nigh & Courtin's Dr.
- * 1999 jan 8  - Changed int to short int.
- *      oct 18 - Added Nigh's Hwc GI, SS GI, Sw GI.
- * 2000 jan 27 - Added Nigh's Cw GI.
- *             - Enabled five GI curves to go from 30 to 50 years:
- *               Fdi, Pli, Hwi, Fdc, Bai.
- *      apr 25 - Added call to age_to_age() in site_iterate() when converting
- *               from total age to breast height age.
- *      jul 24 - Changed CW to CWI.
- *      oct 10 - Changed check for height <= 1.3 to < 1.3.
- *      nov 3  - Added Hm by Means/Campbell/Johnson.
- * 2004 apr 28 - Added Nigh's 2002 Py.
- * 2008 feb 28 - Added 2004 Sw Nigh GI.
- * 2010 mar 4  - Added 2009 Ba Nigh GI.
- *      apr 14 - Added 2010 Sw Hu and Garcia.
- * 2014 sep 2  - Added 2014 Se Nigh GI.
- * 2016 mar 9  - Added parameter to index_to_height().
- * 2023 jul 7  - Translated like for like from C to Java
- *             - Renamed from ht2si to Height2SiteIndex
- */
-/* @formatter:on */
-
 	// Taken from sindex.h
-	/*
-	 * age types
-	 */
-	private static final short SI_AT_TOTAL = 0;
-	private static final short SI_AT_BREAST = 1;
-	/*
-	 * site index estimation (from height and age) types
-	 */
-	private static final int SI_EST_DIRECT = 1;
 
-	/*
-	 * error codes
-	 */
+	/* error codes */
 	private static final int SI_ERR_NO_ANS = -4;
 
-	/* define species and equation indices */
-	private static final int SI_AT_GOUDIE = 4;
-	private static final int SI_BA_DILUCCA = 5;
-	private static final int SI_BA_NIGHGI = 117;
-	private static final int SI_BL_THROWERGI = 9;
-	private static final int SI_CWI_NIGHGI = 84;
-	private static final int SI_DR_NIGH = 13;
-	private static final int SI_FDC_NIGHGI = 15;
-	private static final int SI_FDI_MILNER = 22;
-	private static final int SI_FDI_MONS_DF = 26;
-	private static final int SI_FDI_MONS_GF = 27;
-	private static final int SI_FDI_MONS_SAF = 30;
-	private static final int SI_FDI_MONS_WH = 29;
-	private static final int SI_FDI_MONS_WRC = 28;
-	private static final int SI_FDI_NIGHGI = 19;
-	private static final int SI_FDI_THROWER = 23;
-	private static final int SI_FDI_VDP_MONT = 24;
-	private static final int SI_FDI_VDP_WASH = 25;
-	private static final int SI_HM_MEANS = 86;
-	private static final int SI_HWC_NIGHGI = 31;
-	private static final int SI_HWC_NIGHGI99 = 79;
-	private static final int SI_HWI_NIGHGI = 38;
-	private static final int SI_LW_MILNER = 39;
-	private static final int SI_LW_NIGHGI = 82;
-	private static final int SI_PLI_DEMPSTER = 50;
-	private static final int SI_PLI_MILNER = 46;
-	private static final int SI_PLI_NIGHGI97 = 42;
-	private static final int SI_PLI_THROWER = 45;
-	private static final int SI_PW_CURTIS = 51;
-	private static final int SI_PY_MILNER = 52;
-	private static final int SI_PY_NIGHGI = 108;
-	private static final int SI_SB_DEMPSTER = 57;
-	private static final int SI_SE_NIGHGI = 120;
-	private static final int SI_SS_NIGHGI = 58;
-	private static final int SI_SS_NIGHGI99 = 80;
-	private static final int SI_SW_DEMPSTER = 72;
-	private static final int SI_SW_HU_GARCIA = 119;
-	private static final int SI_SW_NIGHGI = 63;
-	private static final int SI_SW_NIGHGI99 = 81;
-	private static final int SI_SW_NIGHGI2004 = 115;
-
-	public static double ppow(double x, double y) {
-		return (x <= 0) ? 0.0 : Math.pow(x, y);
-	}
-
-	public static double llog(double x) {
-		return ( (x) <= 0.0) ? Math.log(.00001) : Math.log(x);
-	}
-
-	public static double height_to_index(short cu_index, double age, short age_type, double height, short si_est_type) {
+	@SuppressWarnings("java:S3776, java:S6541")
+	public static double heightToIndex(
+			SiteIndexEquation cuIndex, double age, SiteIndexAgeType ageType,
+			double height, SiteIndexEstimationType siEstType
+	)
+			throws CommonCalculatorException {
 		double index;
 		double x1, x2;
 
+		if (siEstType == null) {
+			// This is the default value.
+			siEstType = SI_EST_ITERATE;
+		}
+
+		if (ageType == null) {
+			ageType = SI_AT_TOTAL;
+		}
+
 		/* handle simple cases */
-		if (age_type == SI_AT_BREAST) {
+		if (ageType == SI_AT_BREAST) {
 			if (height < 1.3) {
 				throw new LessThan13Exception("Height < 1.3 for breast height age: " + height);
 			}
@@ -220,11 +61,11 @@ public class Height2SiteIndex {
 			throw new NoAnswerException("Iteration could not converge (projected site index > 999), Age: " + age);
 		}
 
-		if (age_type == SI_AT_BREAST) {
-			index = ba_height_to_index(cu_index, age, height, si_est_type);
+		if (ageType == SI_AT_BREAST) {
+			index = baHeightToIndex(cuIndex, age, height, siEstType);
 		} else {
-			if (si_est_type == SI_EST_DIRECT) {
-				switch (cu_index) {
+			if (siEstType == SI_EST_DIRECT) {
+				switch (cuIndex) {
 				case SI_FDI_THROWER:
 					if (age <= 4) {
 						/* means less than 1.3m, so can't generate site index */
@@ -238,20 +79,29 @@ public class Height2SiteIndex {
 					}
 					break;
 				default:
-					index = site_iterate(cu_index, age, SI_AT_TOTAL, height);
+					index = siteIterate(cuIndex, age, SI_AT_TOTAL, height);
 					break;
 				}
 			} else
-				index = site_iterate(cu_index, age, SI_AT_TOTAL, height);
+				index = siteIterate(cuIndex, age, SI_AT_TOTAL, height);
 		}
-		return (index);
+
+		return index;
 	}
 
-	public static double ba_height_to_index(short cu_index, double bhage, double height, short si_est_type) {
+	@SuppressWarnings("java:S3776, java:S6541")
+	public static double
+			baHeightToIndex(SiteIndexEquation cuIndex, double bhage, double height, SiteIndexEstimationType siEstType)
+					throws CommonCalculatorException {
 		double index;
 		double x1, x2;
-		double log_bhage;
-		double ht_13;
+		double logBhAge;
+		double ht13;
+
+		if (siEstType == null) {
+			// This is the default value.
+			siEstType = SI_EST_ITERATE;
+		}
 
 		if (bhage <= 0.5) {
 			/* indicator that it can't be done */
@@ -259,8 +109,8 @@ public class Height2SiteIndex {
 					"Bhage < 0.5 years which indicates that it can't be done, bhage: " + bhage
 			);
 		} else {
-			if (si_est_type == SI_EST_DIRECT) {
-				switch (cu_index) {
+			if (siEstType == SI_EST_DIRECT) {
+				switch (cuIndex) {
 				case SI_BA_DILUCCA:
 					index = height * (1 + Math.exp(6.300852572 + 0.85314673 * Math.log(50.0) - 2.533284275 * (height)))
 							/ (1 + Math.exp(6.300852572 + 0.8314673 * Math.log(bhage) - 2.533284275 * llog(height)));
@@ -317,12 +167,12 @@ public class Height2SiteIndex {
 					index *= 0.3048;
 					break;
 				case SI_PLI_DEMPSTER:
-					log_bhage = Math.log(bhage);
+					logBhAge = Math.log(bhage);
 
-					ht_13 = height - 1.3;
+					ht13 = height - 1.3;
 
-					index = 1.3 + 10.9408 + 1.6753 * ht_13 - 0.9322 * log_bhage * log_bhage + 0.0054 * bhage * log_bhage
-							+ 8.2281 * ht_13 / bhage - 0.2569 * ht_13 * llog(ht_13);
+					index = 1.3 + 10.9408 + 1.6753 * ht13 - 0.9322 * logBhAge * logBhAge + 0.0054 * bhage * logBhAge
+							+ 8.2281 * ht13 / bhage - 0.2569 * ht13 * llog(ht13);
 					break;
 				case SI_PLI_MILNER:
 					/* convert to imperial */
@@ -360,25 +210,25 @@ public class Height2SiteIndex {
 				case SI_SW_HU_GARCIA: {
 					double q;
 
-					q = hu_garcia_q(height, bhage);
-					index = hu_garcia_h(q, 50.0);
+					q = huGarciaQ(height, bhage);
+					index = huGarciaH(q, 50.0);
 				}
 					break;
 				case SI_SW_DEMPSTER:
-					log_bhage = Math.log(bhage);
+					logBhAge = Math.log(bhage);
 
-					ht_13 = height - 1.3;
+					ht13 = height - 1.3;
 
-					index = 1.3 + 10.3981 + 0.3244 * ht_13 + 0.006 * bhage * log_bhage - 0.838 * log_bhage * log_bhage
-							+ 27.4874 * ht_13 / bhage + 1.1914 * llog(ht_13);
+					index = 1.3 + 10.3981 + 0.3244 * ht13 + 0.006 * bhage * logBhAge - 0.838 * logBhAge * logBhAge
+							+ 27.4874 * ht13 / bhage + 1.1914 * llog(ht13);
 					break;
 				case SI_SB_DEMPSTER:
-					log_bhage = Math.log(bhage);
+					logBhAge = Math.log(bhage);
 
-					ht_13 = height - 1.3;
+					ht13 = height - 1.3;
 
-					index = 1.3 + 4.9038 + 0.8118 * ht_13 - 0.3638 * log_bhage * log_bhage + 24.0308 * ht_13 / bhage
-							- 0.1021 * ht_13 * llog(ht_13);
+					index = 1.3 + 4.9038 + 0.8118 * ht13 - 0.3638 * logBhAge * logBhAge + 24.0308 * ht13 / bhage
+							- 0.1021 * ht13 * llog(ht13);
 					break;
 
 				// #ifdef SI_EA_GOUDIE Couldn't find constant so removed
@@ -400,10 +250,10 @@ public class Height2SiteIndex {
 					// endif
 
 					// #ifdef SI_AT_GOUDIE
-					log_bhage = Math.log(bhage);
+					logBhAge = Math.log(bhage);
 
-					index = 1.3 + 17.0101 + 0.8784 * (height - 1.3) + 1.8364 * log_bhage
-							- 1.4018 * log_bhage * log_bhage + 0.4374 * llog(height - 1.3) / bhage;
+					index = 1.3 + 17.0101 + 0.8784 * (height - 1.3) + 1.8364 * logBhAge
+							- 1.4018 * logBhAge * logBhAge + 0.4374 * llog(height - 1.3) / bhage;
 					break;
 				case SI_FDI_VDP_MONT:
 					/* convert to imperial */
@@ -432,9 +282,9 @@ public class Height2SiteIndex {
 					x1 = 0.4948;
 					x2 = 25.315;
 
-					log_bhage = Math.log(bhage);
+					logBhAge = Math.log(bhage);
 
-					index = 4.5 + 38.787 - 2.805 * log_bhage * log_bhage + 0.0216 * bhage * log_bhage + x1 * height
+					index = 4.5 + 38.787 - 2.805 * logBhAge * logBhAge + 0.0216 * bhage * logBhAge + x1 * height
 							+ x2 * height / bhage;
 
 					/* convert back to metric */
@@ -447,9 +297,9 @@ public class Height2SiteIndex {
 					x1 = 0.4305;
 					x2 = 28.415;
 
-					log_bhage = Math.log(bhage);
+					logBhAge = Math.log(bhage);
 
-					index = 4.5 + 38.787 - 2.805 * log_bhage * log_bhage + 0.0216 * bhage * log_bhage + x1 * height
+					index = 4.5 + 38.787 - 2.805 * logBhAge * logBhAge + 0.0216 * bhage * logBhAge + x1 * height
 							+ x2 * height / bhage;
 
 					/* convert back to metric */
@@ -462,9 +312,9 @@ public class Height2SiteIndex {
 					x1 = 0.4305;
 					x2 = 28.415;
 
-					log_bhage = Math.log(bhage);
+					logBhAge = Math.log(bhage);
 
-					index = 4.5 + 38.787 - 2.805 * log_bhage * log_bhage + 0.0216 * bhage * log_bhage + x1 * height
+					index = 4.5 + 38.787 - 2.805 * logBhAge * logBhAge + 0.0216 * bhage * logBhAge + x1 * height
 							+ x2 * height / bhage;
 
 					/* convert back to metric */
@@ -477,9 +327,9 @@ public class Height2SiteIndex {
 					x1 = 0.3964;
 					x2 = 30.008;
 
-					log_bhage = Math.log(bhage);
+					logBhAge = Math.log(bhage);
 
-					index = 4.5 + 38.787 - 2.805 * log_bhage * log_bhage + 0.0216 * bhage * log_bhage + x1 * height
+					index = 4.5 + 38.787 - 2.805 * logBhAge * logBhAge + 0.0216 * bhage * logBhAge + x1 * height
 							+ x2 * height / bhage;
 
 					/* convert back to metric */
@@ -492,16 +342,16 @@ public class Height2SiteIndex {
 					x1 = 0.3964;
 					x2 = 30.008;
 
-					log_bhage = Math.log(bhage);
+					logBhAge = Math.log(bhage);
 
-					index = 4.5 + 38.787 - 2.805 * log_bhage * log_bhage + 0.0216 * bhage * log_bhage + x1 * height
+					index = 4.5 + 38.787 - 2.805 * logBhAge * logBhAge + 0.0216 * bhage * logBhAge + x1 * height
 							+ x2 * height / bhage;
 
 					/* convert back to metric */
 					index *= 0.3048;
 					break;
 				case SI_FDI_NIGHGI:
-					switch ((short) bhage) {
+					switch ((int) bhage) {
 					case 1:
 						x1 = 4.114;
 						x2 = 0.4540;
@@ -717,7 +567,7 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_PLI_NIGHGI97:
-					switch ((short) bhage) {
+					switch ((int) bhage) {
 					case 1:
 						x1 = 3.229;
 						x2 = 0.4774;
@@ -942,7 +792,7 @@ public class Height2SiteIndex {
 				/*
 				 * if (bhage < 0.5) { return SI_ERR_GI_MIN; }
 				 *
-				 * switch ((short) bhage) { case 1: x1 = 3.791; x2 = 0.4338; break; case 2: x1 = 3.460; x2 = 0.4592;
+				 * switch ((int) bhage) { case 1: x1 = 3.791; x2 = 0.4338; break; case 2: x1 = 3.460; x2 = 0.4592;
 				 * break; case 3: x1 = 3.440; x2 = 0.4615; break; case 4: x1 = 3.083; x2 = 0.4898; break; case 5: x1 =
 				 * 2.902; x2 = 0.5054; break; case 6: x1 = 2.962; x2 = 0.4989; break; case 7: x1 = 2.802; x2 = 0.5127;
 				 * break; case 8: x1 = 2.663; x2 = 0.5245; break; case 9: x1 = 2.608; x2 = 0.5288; break; case 10: x1 =
@@ -959,7 +809,7 @@ public class Height2SiteIndex {
 				 * ppow(index, x2); } break;
 				 */
 				case SI_SW_NIGHGI:
-					switch ((short) bhage) {
+					switch ((int) bhage) {
 					case 1:
 						x1 = 7.867;
 						x2 = 0.3516;
@@ -1095,7 +945,7 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_SW_NIGHGI99:
-					switch ((short) bhage) {
+					switch ((int) bhage) {
 					case 1:
 						x1 = 4.050;
 						x2 = 0.4630;
@@ -1311,7 +1161,7 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_SW_NIGHGI2004:
-					switch ((short) bhage) {
+					switch ((int) bhage) {
 					case 1:
 						x1 = 4.7650;
 						x2 = 0.4102;
@@ -1527,7 +1377,7 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_HWC_NIGHGI99:
-					switch ((short) bhage) {
+					switch ((int) bhage) {
 					case 1:
 						x1 = 4.361;
 						x2 = 0.4638;
@@ -1743,7 +1593,7 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_HWC_NIGHGI:
-					switch ((short) bhage) {
+					switch ((int) bhage) {
 					case 1:
 						x1 = 4.957;
 						x2 = 0.4325;
@@ -1880,7 +1730,7 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_HWI_NIGHGI:
-					switch ((short) bhage) {
+					switch ((int) bhage) {
 					case 1:
 						x1 = 4.309;
 						x2 = 0.4131;
@@ -2097,7 +1947,7 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_FDC_NIGHGI:
-					switch ((short) bhage) {
+					switch ((int) bhage) {
 					case 1:
 						x1 = 3.894;
 						x2 = 0.5382;
@@ -2313,7 +2163,7 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_SE_NIGHGI:
-					switch ((short) bhage) {
+					switch ((int) bhage) {
 					case 1:
 						x1 = 15.0367;
 						x2 = 0.1597;
@@ -2529,7 +2379,7 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_SS_NIGHGI:
-					switch ((short) bhage) {
+					switch ((int) bhage) {
 					case 1:
 						x1 = 3.317;
 						x2 = 0.5634;
@@ -2666,7 +2516,7 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_SS_NIGHGI99:
-					switch ((short) bhage) {
+					switch ((int) bhage) {
 					case 1:
 						x1 = 4.367;
 						x2 = 0.5034;
@@ -2882,7 +2732,7 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_CWI_NIGHGI:
-					switch ((short) bhage) {
+					switch ((int) bhage) {
 					case 1:
 						x1 = 3.744;
 						x2 = 0.4769;
@@ -3098,7 +2948,7 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_LW_NIGHGI:
-					switch ((short) bhage) {
+					switch ((int) bhage) {
 					case 1:
 						x1 = 6.347;
 						x2 = 0.2855;
@@ -3314,7 +3164,7 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_PY_NIGHGI:
-					switch ((short) bhage) {
+					switch ((int) bhage) {
 					case 1:
 						x1 = 5.631;
 						x2 = 0.2745;
@@ -3530,7 +3380,7 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_BA_NIGHGI:
-					switch ((short) bhage) {
+					switch ((int) bhage) {
 					case 1:
 						x1 = 12.14;
 						x2 = 0.1957;
@@ -3746,7 +3596,7 @@ public class Height2SiteIndex {
 					}
 					break;
 				case SI_BL_THROWERGI:
-					switch ((short) bhage) {
+					switch ((int) bhage) {
 					case 1:
 						x1 = 2.4623;
 						x2 = 0.5809;
@@ -3962,19 +3812,20 @@ public class Height2SiteIndex {
 					}
 					break;
 				default:
-					index = site_iterate(cu_index, bhage, SI_AT_BREAST, height);
+					index = siteIterate(cuIndex, bhage, SI_AT_BREAST, height);
 					break;
 				}
 			} else
-				index = site_iterate(cu_index, bhage, SI_AT_BREAST, height);
+				index = siteIterate(cuIndex, bhage, SI_AT_BREAST, height);
 		}
 		return index;
 	}
 
-	public static double site_iterate(short cu_index, double age, short age_type, double height) {
+	public static double siteIterate(SiteIndexEquation cuIndex, double age, SiteIndexAgeType ageType, double height)
+			throws CommonCalculatorException {
 		double site;
 		double step;
-		double test_top;
+		double testTop;
 		double y2bh;
 
 		/* initial guess */
@@ -3988,17 +3839,16 @@ public class Height2SiteIndex {
 		do {
 
 			/* estimate y2bh */
-			y2bh = SiteIndexYears2BreastHeight.si_y2bh(cu_index, site);
+			y2bh = SiteIndexYears2BreastHeight.y2bh(cuIndex, site);
 
-			if (age_type == SI_AT_BREAST) {
-				test_top = SiteIndex2Height.index_to_height(cu_index, age, SI_AT_BREAST, site, y2bh, 0.5); // 0.5 may
-																											// have to
-																											// change
+			if (ageType == SI_AT_BREAST) {
+				testTop = SiteIndex2Height
+						.indexToHeight(cuIndex, age, SI_AT_BREAST, site, y2bh, 0.5 /* may have to change */);
 			} else {
 				/* was age - y2bh */
-				test_top = SiteIndex2Height.index_to_height(
-						cu_index, Age2Age.age_to_age(cu_index, age, SI_AT_TOTAL, SI_AT_BREAST, y2bh), SI_AT_BREAST,
-						site, y2bh, 0.5
+				testTop = SiteIndex2Height.indexToHeight(
+						cuIndex, AgeToAge
+								.ageToAge(cuIndex, age, SI_AT_TOTAL, SI_AT_BREAST, y2bh), SI_AT_BREAST, site, y2bh, 0.5
 				); // 0.5 may have to change
 			}
 
@@ -4008,9 +3858,9 @@ public class Height2SiteIndex {
 			 *
 			 */
 
-			if ( (test_top - height > 0.01) || (test_top - height < -0.01)) {
+			if ( (testTop - height > 0.01) || (testTop - height < -0.01)) {
 				/* not close enough */
-				if (test_top > height) {
+				if (testTop > height) {
 					if (step > 0) {
 						step = -step / 2.0;
 					}
@@ -4053,7 +3903,8 @@ public class Height2SiteIndex {
 
 	}
 
-	public static double hu_garcia_q(double site_index, double bhage) {
+	@SuppressWarnings("java:S3776, java:S6541")
+	public static double huGarciaQ(double siteIndex, double breastHeightAge) {
 		double h, q, step, diff, lastdiff;
 
 		q = 0.02;
@@ -4062,9 +3913,9 @@ public class Height2SiteIndex {
 		diff = 0;
 
 		do {
-			h = hu_garcia_h(q, bhage);
+			h = huGarciaH(q, breastHeightAge);
 			lastdiff = diff;
-			diff = site_index - h;
+			diff = siteIndex - h;
 			if (diff > 0.0000001) {
 				if (lastdiff < 0) {
 					step = step / 2.0;
@@ -4091,11 +3942,11 @@ public class Height2SiteIndex {
 		return q;
 	}
 
-	public static double hu_garcia_h(double q, double bhage) {
+	public static double huGarciaH(double q, double breastHeightAge) {
 		double a, height;
 
 		a = 283.9 * Math.pow(q, 0.5137);
-		height = a * Math.pow(1 - (1 - Math.pow(1.3 / a, 0.5829)) * Math.exp(-q * (bhage - 0.5)), 1.71556);
+		height = a * Math.pow(1 - (1 - Math.pow(1.3 / a, 0.5829)) * Math.exp(-q * (breastHeightAge - 0.5)), 1.71556);
 		return height;
 	}
 

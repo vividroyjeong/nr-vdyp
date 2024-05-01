@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.forward.model.FipMode;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
+import ca.bc.gov.nrs.vdyp.forward.parsers.VdypPolygonParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
@@ -76,7 +77,7 @@ class VdypForwardPolygonParserTest {
 
 		var poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("description", is("01002 S000001 00     1970")));
+		assertThat(poly, hasProperty("description", hasProperty("description", is("01002 S000001 00     1970"))));
 		assertThat(poly, hasProperty("year", is(1970)));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("forestInventoryZone", is('A')));
@@ -114,7 +115,7 @@ class VdypForwardPolygonParserTest {
 
 		var poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("description", is("01002 S000001 00     1970")));
+		assertThat(poly, hasProperty("description", hasProperty("description", is("01002 S000001 00     1970"))));
 		assertThat(poly, hasProperty("year", is(1970)));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("forestInventoryZone", is('A')));
@@ -137,17 +138,8 @@ class VdypForwardPolygonParserTest {
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat",
-				TestUtils.makeInputStream(
-						"01002 S000001 00     1970 CWH  A    99 37  1  1",
-						"01002 S000002 00     1970 CWH  A    98 15 75  1",
-						"01002 S000003 00     1970 CWH  A    99 15 75  1",
-						"01002 S000004 00     1970 MH   A    99 15 75  1",
-						"01003AS000001 00     1953 CWH  B    91 11 31  2",
-						"01003AS000003 00     1953 SBS  B    92 11 31  1",
-						"01004 S000002 00     1953 CWH  B    96 11 31  1",
-						"01004 S000036 00     1957 MH   B    97 11 31", "01004 S000037 00     1957 SBS  B    94 11",
-						"01004 S000038 00     1957 CWH  B    90 ", "                          CWH  B    90 11 31  1"
+				"test.dat", TestUtils.makeInputStream(
+						"01002 S000001 00     1970 CWH  A    99 37  1  1", "01002 S000002 00     1970 CWH  A    98 15 75  1", "01002 S000003 00     1970 CWH  A    99 15 75  1", "01002 S000004 00     1970 MH   A    99 15 75  1", "01003AS000001 00     1953 CWH  B    91 11 31  2", "01003AS000003 00     1953 SBS  B    92 11 31  1", "01004 S000002 00     1953 CWH  B    96 11 31  1", "01004 S000036 00     1957 MH   B    97 11 31", "01004 S000037 00     1957 SBS  B    94 11", "01004 S000038 00     1957 CWH  B    90 ", "                          CWH  B    90 11 31  1"
 				)
 		);
 
@@ -164,7 +156,7 @@ class VdypForwardPolygonParserTest {
 
 		var poly = assertNext(stream); // 1
 
-		assertThat(poly, hasProperty("description", is("01002 S000001 00     1970")));
+		assertThat(poly, hasProperty("description", hasProperty("description", is("01002 S000001 00     1970"))));
 		assertThat(poly, hasProperty("year", is(1970)));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("forestInventoryZone", is('A')));
@@ -175,7 +167,7 @@ class VdypForwardPolygonParserTest {
 
 		poly = assertNext(stream); // 2
 
-		assertThat(poly, hasProperty("description", is("01002 S000002 00     1970")));
+		assertThat(poly, hasProperty("description", hasProperty("description", is("01002 S000002 00     1970"))));
 		assertThat(poly, hasProperty("year", is(1970)));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("forestInventoryZone", is('A')));
@@ -186,7 +178,7 @@ class VdypForwardPolygonParserTest {
 
 		poly = assertNext(stream); // 3
 
-		assertThat(poly, hasProperty("description", is("01002 S000003 00     1970")));
+		assertThat(poly, hasProperty("description", hasProperty("description", is("01002 S000003 00     1970"))));
 		assertThat(poly, hasProperty("year", is(1970)));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("forestInventoryZone", is('A')));
@@ -197,7 +189,7 @@ class VdypForwardPolygonParserTest {
 
 		poly = assertNext(stream); // 4
 
-		assertThat(poly, hasProperty("description", is("01002 S000004 00     1970")));
+		assertThat(poly, hasProperty("description", hasProperty("description", is("01002 S000004 00     1970"))));
 		assertThat(poly, hasProperty("year", is(1970)));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("MH"))));
 		assertThat(poly, hasProperty("forestInventoryZone", is('A')));
@@ -208,7 +200,7 @@ class VdypForwardPolygonParserTest {
 
 		poly = assertNext(stream); // 5
 
-		assertThat(poly, hasProperty("description", is("01003AS000001 00     1953")));
+		assertThat(poly, hasProperty("description", hasProperty("description", is("01003AS000001 00     1953"))));
 		assertThat(poly, hasProperty("year", is(1953)));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("forestInventoryZone", is('B')));
@@ -219,7 +211,7 @@ class VdypForwardPolygonParserTest {
 
 		poly = assertNext(stream); // 6
 
-		assertThat(poly, hasProperty("description", is("01003AS000003 00     1953")));
+		assertThat(poly, hasProperty("description", hasProperty("description", is("01003AS000003 00     1953"))));
 		assertThat(poly, hasProperty("year", is(1953)));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("SBS"))));
 		assertThat(poly, hasProperty("forestInventoryZone", is('B')));
@@ -230,7 +222,7 @@ class VdypForwardPolygonParserTest {
 
 		poly = assertNext(stream); // 7
 
-		assertThat(poly, hasProperty("description", is("01004 S000002 00     1953")));
+		assertThat(poly, hasProperty("description", hasProperty("description", is("01004 S000002 00     1953"))));
 		assertThat(poly, hasProperty("year", is(1953)));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("forestInventoryZone", is('B')));
@@ -241,7 +233,7 @@ class VdypForwardPolygonParserTest {
 
 		poly = assertNext(stream); // 8
 
-		assertThat(poly, hasProperty("description", is("01004 S000036 00     1957")));
+		assertThat(poly, hasProperty("description", hasProperty("description", is("01004 S000036 00     1957"))));
 		assertThat(poly, hasProperty("year", is(1957)));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("MH"))));
 		assertThat(poly, hasProperty("forestInventoryZone", is('B')));
@@ -252,7 +244,7 @@ class VdypForwardPolygonParserTest {
 
 		poly = assertNext(stream); // 9
 
-		assertThat(poly, hasProperty("description", is("01004 S000037 00     1957")));
+		assertThat(poly, hasProperty("description", hasProperty("description", is("01004 S000037 00     1957"))));
 		assertThat(poly, hasProperty("year", is(1957)));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("SBS"))));
 		assertThat(poly, hasProperty("forestInventoryZone", is('B')));
@@ -263,7 +255,8 @@ class VdypForwardPolygonParserTest {
 
 		poly = assertNext(stream); // 10
 
-		assertThat(poly, hasProperty("description", is("01004 S000038 00     1957")));
+		assertThat(poly, hasProperty("description", hasProperty("name", is("01004 S000038 00"))));
+		assertThat(poly, hasProperty("description", hasProperty("year", is(1957))));
 		assertThat(poly, hasProperty("year", is(1957)));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("forestInventoryZone", is('B')));
@@ -286,8 +279,7 @@ class VdypForwardPolygonParserTest {
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat",
-				TestUtils.makeInputStream(
+				"test.dat", TestUtils.makeInputStream(
 						"01002 S000001 00     1970 CWH  A   0.0", "01002 S000002 00     1970 CWH  A  -1.0"
 				)
 		);

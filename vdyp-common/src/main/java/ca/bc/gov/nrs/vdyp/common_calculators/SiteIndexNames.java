@@ -1,588 +1,27 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_AT;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_BA;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_BL;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_CWC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_FDC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_FDI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_HWC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_HWI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_LW;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_PLI;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_SB;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_SS;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_SW;
+
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies;
+
 /**
- * SiteIndexNames.java
+ * SiteIndexNames - full names of species and curves.
  */
 public class SiteIndexNames {
-/* @formatter:off */
-/*
- * 1991 dec 2  - Created.
- * 1992 feb 7  - Added Milner's Pp, Pli, and Fdi, and updated Lw.
- *          27 - Changed a lot of the species names, mainly to remove
- *               "coastal" and "interior" where they aren't necessary.
- *               Changed source of Fdi from Thrower 1989 to Thrower &
- *               Goudie 1992.
- *      mar 31 - Changed "Pll" to "Pli".
- *               Changed "Pp" to "Py".
- *               Changed "Bac" to "Ba".
- *               Changed "Bai" to "Bl".
- *      apr 29 - Removed difference between plantations and natural stands
- *               for Pli Goudie and Pa Goudie.
- *      jun 16 - Removed [Ba] from subalpine fir, as it has a different
- *               y2bh function.
- *      dec 2  - Added Mario Dilucca's coastal balsam fir.
- * 1993 jan 11 - Changed author of SS_GOUDIE from Goudie to Barker & Goudie.
- *             - Changed date on Milner's equations from 1992 to 1989, as
- *               the 1992 publication uses the same equations as in 1989.
- *      feb 4  - Added Thrower's draft height-age curve for lodgepole pine.
- *      mar 22 - Added Thrower's draft height-age curve for black cottonwood.
- *      aug 10 - Changed date of Thrower's Pli from draft 1992 to 1993.
- *      sep 16 - Added Thrower's draft height-age curve for white spruce.
- * 1994 sep 27 - Copied Kurucz' 1982 Ba equation to Bg and Bc.
- * 1995 may 17 - Added si_convert[][] for converting site index between
- *               species.
- *          23 - Added Ss <-> Hw SI conversion.
- *      jun 12 - Added Goudie's Teak.
- *          19 - Added growth intercept model indicators.
- *          26 - Changed date of Goudie's At from 1982 to 1986.
- *             - Changed date of Harrington & Curtis' Dr from 1986 to 1987.
- *      aug 31 - Update to include growth-intercept models for Hw and Sw.
- *      sep 20 - Added Huang, Titus, & Lakusta equations for Sw, Pli, At,
- *               Sb, Pj, Acb, Bb, Fdi.
- *      oct 13 - Changed date of Thrower's Pli and Sw to 1994.
- *      nov 3  - Added draft Ss Nigh.
- *          20 - Removed white fir.
- *      dec 8  - Changed Cieszewski & Bella's 1989 to 1991.
- *             - Added "& Moore" to "Vander Ploeg".
- *             - Changed date of Milner's 1989 equations to the published
- *               date of 1992.
- *             - Changed date of Harrington & Curtis' Dr back to 1986.
- *             - Changed credit of Goudie's At to Alberta Forest Service.
- *             - Changed credit of Dempster's Pli/Sb/Sw to Alberta Forest
- *               Service, and changed date from 1983 to 1985.
- *          18 - Changed "Interior White Spruce" to "White Spruce".
- *             - Changed "Interior Grand Fir" to "Grand Fir".
- *          19 - Added Mountain Hemlock (Hm) as Western Hemlock (Hw) using
- *               Wiley 1978.
- * 1996 feb 8  - Changed date of Nigh's draft Ss from 1995 to 1996.
- *      jun 10 - Added Nigh's variable growth intercept models as regular
- *               equations.
- *             - Removed array of growth intercept indicators.
- *      aug 2  - Amalgamated SI_SW_NIGH_PLA and SI_SW_NIGH_NAT into
- *               SI_SW_NIGH.
- *      oct 22 - Changed MB_HARRING to MB_THROWER.
- * 1997 mar 21 - Added Nigh's 1997 Hwi GI.
- *             - Changed define names: FDC_NIGH, HW_NIGH, PLI_NIGH, SW_NIGH
- *               all have "GI" added after them.
- *             - Added Nigh's 1997 Hwi.
- *             - Changed Nigh's Ss from "1996 draft" to "1997".
- *             - Added Nigh's 1997 Pl GI.
- *             - Added Nigh's 1997 Fdi GI.
- *          24 - Split HW into HWI and HWC.
- *      oct 17 - Changed "Hw" to "Hwc".
- *          20 - Added si_curve_types[].
- *          28 - Added Thrower's Bl GI.
- *             - Changed Nigh's Fdc GI from 1996 to 1997.
- *      nov 17 - Added Ea as At Goudie.
- *             - Changed "Yellow Cedar" to "Yellow-cedar".
- *             - Changed Ep's "Alberta Forest Service (1982) [At]" to
- *               "Alberta Forest Service (1985) [At]" (date correction).
- *             - Added Lt and La as Lw Milner.
- *             - Added Pf as Pli Goudie.
- *             - Added Se as Sw Goudie.
- * 1998 jan 29 - Corrected species conversion involving Hwi, as a result
- *               of the Hwc/Hwi split.
- *      mar 11 - Changed Nigh's Hwi from "1997 draft" to "1998".
- *          25 - Corrected Pf saying Pf not Pli as Goudie reference.
- *             - Changed how species refer to the curve they use.
- *      may 27 - Super minor bug fix in species conversion.  I had a
- *               HWC define enabling a HWI conversion.  Since both are
- *               always defined, it would likely never have been a problem.
- *      nov 12 - Added Nigh & Courtin's Dr.
- *             - Added Nigh & Love's Pli.
- *          13 - Added hybrid Pli Thrower 1994 with Pli Nigh & Love 1998.
- *      dec 8  - Added Chen's Se, Bl, Pl.
- * 1999 jan 8  - Changed int to char or short int.
- *      feb 15 - Added Chen's Ep, Dr.
- *      apr 14 - Added Chen's At.
- *          15 - Changed si_names to say y2bh is available for most curves.
- *          29 - Changed name from "Thrower (1994) + Nigh (1998)" to
- *               "Nigh (1999)", and "Nigh & Love (1998)" to "... (1999)".
- *             - Changed "&" to "and".
- *      may 28 - Added Ian Cameron's Ep.
- *      jun 3  - Removed "(GI) " from GI curves.
- *          9  - Added not-yet-finished Cwi Nigh.
- *      sep 24 - Added Curtis' Bp Noble Fir.
- *      oct 18 - Added Nigh's Hwc GI, SS GI, Sw GI, Lw GI.
- *             - Added Sb <-> Pli conversion.
- *             - Added Nigh/Love's Sw total age curve.
- * 2000 jan 27 - Added Nigh's Cw GI.
- *             - Bug fix in including Nigh/Love Sw total age curve.
- *      jul 24 - Changed Cw to Cwc, and added Cwi.
- *          25 - Added Goudie/Nigh's spliced Sw.
- *      aug 1  - Temporarily removed Cwi for SiteTools.
- *      oct 10 - Implemented Cwc/Cwi.
- *          11 - Changed BAI to BL.
- *      nov 2  - Added site index conversion between Cwc and Hwc.
- *          3  - Added Hm by Means/Campbell/Johnson.
- *          15 - Put HM_MEANS in proper place, at end of two arrays.
- *      dec 12 - Removed Dr-Chen.
- *             - Changed BAC_KER to BB_KER.
- *             - Updated date on Sw Nigh/Love.
- *             - Modified attribution of Sw-Nigh/Goudie.
- * 2001 jan 17 - Changed "Chen" to "Chen and Klinka" for Se, Bl, Pl.
- *             - Added Se curve.
- *      apr 9  - Added Bac <-> Hwc site index conversion.
- *             - Added Fdc Nigh total age curve, and spliced with Bruce.
- *      may 3  - Added Lw curve by Brisco, Klinka, Nigh.
- * 2002 feb 12 - Added Sb Nigh.
- *      oct 8  - Changed si_convert[] from int to float.
- *             - Changed many elements of si_convert to make conversions
- *               back and forth minimize round-off errors.
- *             - Added conversion from Cwc to Hwc that was missing.
- *          9  - Added Nigh's At.
- *      nov 29 - Major expansion of species list.
- * 2003 jun 13 - Copied several curves and "corrected" the origin from
- *               bhage=0 ht=1.3 to bhage=0.5 ht=1.3.
- *               Added "AC" to the end of the define.
- *      aug 7  - Added 40 more species.
- *      sep 11 - Added Fd, Pl, Hw, Cw.
- * 2004 mar 26 - Added SI_SW_GOUDIE_NATAC.
- *      apr 28 - Added Nigh's 2002 Py.
- *             - Added Nigh's 2004 Pl/Sw/Se total age curves.
- *      may 4  - Added SI_SW_GOUDIE_PLAAC.
- * 2005 oct 20 - Added Huang Pj.
- * 2006 jan 4  - Added site conversion between Sw and At.
- * 2008 feb 28 - Added 2004 Sw Nigh GI.
- * 2009 aug 28 - Added Nigh's 2009 Ep.
- * 2010 mar 4  - Added 2009 Ba Nigh GI.
- *             - Added 2009 Ba Nigh.
- *      apr 14 - Added 2010 Sw Hu and Garcia.
- * 2014 jul 30 - Added si_curve_bh[] to give breast height.
- *      sep 2  - Added 2014 Se Nigh GI.
- * 2015 may 13 - Added 2015 Se Nigh.
- *      aug 27 - Added the above two (missing) to the si_curve_bh[] array.
- * 2017 feb 2  - Added Nigh's 2016 Cwc equation.
- * 2023 jul 17 - Translated like for like from C to Java
- *             - Renamed from sinames to SiteIndexNames
- */
-/* @formatter:on */
 
-//Taken from sindex.h
-	/* define species and equation indices */
-	private static final int SI_SPEC_AT = 8;
-	private static final int SI_SPEC_BA = 11;
-	private static final int SI_SPEC_BL = 16;
-	private static final int SI_SPEC_CWC = 23;
-	private static final int SI_SPEC_FDC = 39;
-	private static final int SI_SPEC_FDI = 40;
-	private static final int SI_SPEC_HWC = 47;
-	private static final int SI_SPEC_HWI = 48;
-	private static final int SI_SPEC_LW = 60;
-	private static final int SI_SPEC_PLI = 81;
-	private static final int SI_SPEC_SB = 95;
-	private static final int SI_SPEC_SS = 99;
-	private static final int SI_SPEC_SW = 100;
-
-	public static final String[] si_spec_code = {
-			// SI_SPEC_A
-			"A",
-
-			// SI_SPEC_ABAL
-			"Abal",
-
-			// SI_SPEC_ABCO
-			"Abco",
-
-			// SI_SPEC_AC
-			"Ac",
-
-			// SI_SPEC_ACB
-			"Acb",
-
-			// SI_SPEC_ACT
-			"Act",
-
-			// SI_SPEC_AD
-			"Ad",
-
-			// SI_SPEC_AH
-			"Ah",
-
-			// SI_SPEC_AT
-			"At",
-
-			// SI_SPEC_AX
-			"Ax",
-
-			// SI_SPEC_B
-			"B",
-
-			// SI_SPEC_BA
-			"Ba",
-
-			// SI_SPEC_BB
-			"Bb",
-
-			// SI_SPEC_BC
-			"Bc",
-
-			// SI_SPEC_BG
-			"Bg",
-
-			// SI_SPEC_BI
-			"Bi",
-
-			// SI_SPEC_BL
-			"Bl",
-
-			// SI_SPEC_BM
-			"Bm",
-
-			// SI_SPEC_BP
-			"Bp",
-
-			// SI_SPEC_BV
-			// "Bv", Constant removed from sindex in 2015 so commented out here
-
-			// SI_SPEC_C
-			"C",
-
-			// SI_SPEC_CI
-			"Ci",
-
-			// SI_SPEC_CP
-			"Cp",
-
-			// SI_SPEC_CW
-			"Cw",
-
-			// SI_SPEC_CWC
-			"Cwc",
-
-			// SI_SPEC_CWI
-			"Cwi",
-
-			// SI_SPEC_CY
-			"Cy",
-
-			// SI_SPEC_D
-			"D",
-
-			// SI_SPEC_DG
-			"Dg",
-
-			// SI_SPEC_DM
-			"Dm",
-
-			// SI_SPEC_DR
-			"Dr",
-
-			// SI_SPEC_E
-			"E",
-
-			// SI_SPEC_EA
-			"Ea",
-
-			// SI_SPEC_EB
-			"Eb",
-
-			// SI_SPEC_EE
-			"Ee",
-
-			// SI_SPEC_EP
-			"Ep",
-
-			// SI_SPEC_ES
-			"Es",
-
-			// SI_SPEC_EW
-			"Ew",
-
-			// SI_SPEC_EXP
-			"Exp",
-
-			// SI_SPEC_FD
-			"Fd",
-
-			// SI_SPEC_FDC
-			"Fdc",
-
-			// SI_SPEC_FDI
-			"Fdi",
-
-			// SI_SPEC_G
-			"G",
-
-			// SI_SPEC_GP
-			"Gp",
-
-			// SI_SPEC_GR
-			"Gr",
-
-			// SI_SPEC_H
-			"H",
-
-			// SI_SPEC_HM
-			"Hm",
-
-			// SI_SPEC_HW
-			"Hw",
-
-			// SI_SPEC_HWC
-			"Hwc",
-
-			// SI_SPEC_HWI
-			"Hwi",
-
-			// SI_SPEC_HXM
-			"Hxm",
-
-			// SI_SPEC_IG
-			"Ig",
-
-			// SI_SPEC_IS
-			"Is",
-
-			// SI_SPEC_J
-			"J",
-
-			// SI_SPEC_JR
-			"Jr",
-
-			// SI_SPEC_K
-			"K",
-
-			// SI_SPEC_KC
-			"Kc",
-
-			// SI_SPEC_L
-			"L",
-
-			// SI_SPEC_LA
-			"La",
-
-			// SI_SPEC_LE
-			"Le",
-
-			// SI_SPEC_LT
-			"Lt",
-
-			// SI_SPEC_LW
-			"Lw",
-
-			// SI_SPEC_M
-			"M",
-
-			// SI_SPEC_MB
-			"Mb",
-
-			// SI_SPEC_ME
-			"Me",
-
-			// SI_SPEC_MN
-			"Mn",
-
-			// SI_SPEC_MR
-			"Mr",
-
-			// SI_SPEC_MS
-			"Ms",
-
-			// SI_SPEC_MV
-			"Mv",
-
-			// SI_SPEC_OA
-			"Oa",
-
-			// SI_SPEC_OB
-			"Ob",
-
-			// SI_SPEC_OC
-			"Oc",
-
-			// SI_SPEC_OD
-			"Od",
-
-			// SI_SPEC_OE
-			"Oe",
-
-			// SI_SPEC_OF
-			"Of",
-
-			// SI_SPEC_OG
-			"Og",
-
-			// SI_SPEC_P
-			"P",
-
-			// SI_SPEC_PA
-			"Pa",
-
-			// SI_SPEC_PF
-			"Pf",
-
-			// SI_SPEC_PJ
-			"Pj",
-
-			// SI_SPEC_PL
-			"Pl",
-
-			// SI_SPEC_PLC
-			"Plc",
-
-			// SI_SPEC_PLI
-			"Pli",
-
-			// SI_SPEC_PM
-			"Pm",
-
-			// SI_SPEC_PR
-			"Pr",
-
-			// SI_SPEC_PS
-			"Ps",
-
-			// SI_SPEC_PW
-			"Pw",
-
-			// SI_SPEC_PXJ
-			"Pxj",
-
-			// SI_SPEC_PY
-			"Py",
-
-			// SI_SPEC_Q
-			"Q",
-
-			// SI_SPEC_QE
-			"Qe",
-
-			// SI_SPEC_QG
-			"Qg",
-
-			// SI_SPEC_R
-			"R",
-
-			// SI_SPEC_RA
-			"Ra",
-
-			// SI_SPEC_S
-			"S",
-
-			// SI_SPEC_SA
-			"Sa",
-
-			// SI_SPEC_SB
-			"Sb",
-
-			// SI_SPEC_SE
-			"Se",
-
-			// SI_SPEC_SI
-			"Si",
-
-			// SI_SPEC_SN
-			"Sn",
-
-			// SI_SPEC_SS
-			"Ss",
-
-			// SI_SPEC_SW
-			"Sw",
-
-			// SI_SPEC_SX
-			"Sx",
-
-			// SI_SPEC_SXB
-			"Sxb",
-
-			// SI_SPEC_SXE
-			"Sxe",
-
-			// SI_SPEC_SXL
-			"Sxl",
-
-			// SI_SPEC_SXS
-			"Sxs",
-
-			// SI_SPEC_SXW
-			"Sxw",
-
-			// SI_SPEC_SXX
-			"Sxx",
-
-			// SI_SPEC_T
-			"T",
-
-			// SI_SPEC_TW
-			"Tw",
-
-			// SI_SPEC_U
-			"U",
-
-			// SI_SPEC_UA
-			"Ua",
-
-			// SI_SPEC_UP
-			"Up",
-
-			// SI_SPEC_V
-			"V",
-
-			// SI_SPEC_VB
-			"Vb",
-
-			// SI_SPEC_VP
-			"Vp",
-
-			// SI_SPEC_VS
-			"Vs",
-
-			// SI_SPEC_VV
-			"Vv",
-
-			// SI_SPEC_W
-			"W",
-
-			// SI_SPEC_WA
-			"Wa",
-
-			// SI_SPEC_WB
-			"Wb",
-
-			// SI_SPEC_WD
-			"Wd",
-
-			// SI_SPEC_WI
-			"Wi",
-
-			// SI_SPEC_WP
-			"Wp",
-
-			// SI_SPEC_WS
-			"Ws",
-
-			// SI_SPEC_WT
-			"Wt",
-
-			// SI_SPEC_X
-			"X",
-
-			// SI_SPEC_XC
-			"Xc",
-
-			// SI_SPEC_XH
-			"Xh",
-
-			// SI_SPEC_Y
-			"Y",
-
-			// SI_SPEC_YC
-			"Yc",
-
-			// SI_SPEC_YP
-			"Yp",
-
-			// SI_SPEC_Z
-			"Z",
-
-			// SI_SPEC_ZC
-			"Zc",
-
-			// SI_SPEC_ZH
-			"Zh", };
-	public static final String[] si_spec_name = {
+	public static final String[] siSpeciesName = {
 			// SI_SPEC_A
 			"Aspen",
 
@@ -990,10 +429,9 @@ public class SiteIndexNames {
 
 			// SI_SPEC_ZH
 			"Other hardwood",
-
 	};
 
-	public static String[] si_curve_name = {
+	public static String[] siCurveName = {
 			// SI_ACB_HUANG
 			"Huang, Titus, and Lakusta (1994)",
 
@@ -1429,33 +867,62 @@ public class SiteIndexNames {
 			// SI_CWC_NIGH
 			"Nigh (2016)", };
 
-	/*
+	/**
 	 * Site index conversion between species. Here's how to use the following array: The four elements are: reference
 	 * species, target species, coeff_a, coeff_b.
-	 *
+	 * <p>
 	 * Target_SI = coeff_a + coeff_b * Reference_SI
 	 */
-	public static final double[][] si_convert = { { SI_SPEC_AT, SI_SPEC_SW, 3.804, 0.7978 },
-			{ SI_SPEC_BA, SI_SPEC_HWC, 2.005, 1.014 }, { SI_SPEC_CWC, SI_SPEC_HWC, 1.256, 1.048 },
-			{ SI_SPEC_FDC, SI_SPEC_HWC, -0.432, 0.899 }, { SI_SPEC_HWC, SI_SPEC_BA, -1.97731755, 0.98619329 },
-			{ SI_SPEC_HWC, SI_SPEC_CWC, -1.19847328, 0.95419847 }, { SI_SPEC_HWC, SI_SPEC_FDC, 0.48053393, 1.11234705 },
-			{ SI_SPEC_HWC, SI_SPEC_SS, -4.94382022, 1.24843945 }, { SI_SPEC_HWI, SI_SPEC_FDI, 4.56, 0.887 },
-			{ SI_SPEC_SS, SI_SPEC_HWC, 3.96, 0.801 }, { SI_SPEC_PLI, SI_SPEC_SW, -2.14130435, 1.08695652 },
-			{ SI_SPEC_PLI, SI_SPEC_FDI, 0.70841121, 0.93457944 }, { SI_SPEC_PLI, SI_SPEC_BL, 0.47431193, 0.91743119 },
-			{ SI_SPEC_PLI, SI_SPEC_LW, 1.92307692, 0.96153846 }, { SI_SPEC_PLI, SI_SPEC_SB, 2.76436782, 0.6385696 },
-			{ SI_SPEC_SB, SI_SPEC_PLI, -4.329, 1.566 }, { SI_SPEC_SW, SI_SPEC_AT, -4.768112309, 1.253446979 },
-			{ SI_SPEC_SW, SI_SPEC_PLI, 1.97, 0.92 }, { SI_SPEC_SW, SI_SPEC_FDI, 4.75, 0.737 },
-			{ SI_SPEC_SW, SI_SPEC_BL, 1.68, 0.86 }, { SI_SPEC_FDI, SI_SPEC_PLI, -0.758, 1.07 },
-			{ SI_SPEC_FDI, SI_SPEC_SW, -6.44504749, 1.3568521 }, { SI_SPEC_FDI, SI_SPEC_HWI, -5.14092446, 1.12739572 },
-			{ SI_SPEC_FDI, SI_SPEC_LW, 0.70193286, 1.017294 }, { SI_SPEC_BL, SI_SPEC_PLI, -0.517, 1.09 },
-			{ SI_SPEC_BL, SI_SPEC_SW, -1.95348837, 1.1627907 }, { SI_SPEC_LW, SI_SPEC_PLI, -2, 1.04 },
-			{ SI_SPEC_LW, SI_SPEC_FDI, -0.69, 0.983 }, };
 
-	/*
-	 * indicates what equations are available (these are additive): 1: ht = fn (si, age) 2: si = fn (ht, age) 4: y2bh =
-	 * fn (si) 8: si = fn (ht, age) growth intercept
+	public record SpeciesConversionParametersDetails(
+			SiteIndexSpecies sourceSpecies,
+			SiteIndexSpecies targetSpecies,
+			double param1,
+			double param2
+	) {
+	}
+
+	public static final SpeciesConversionParametersDetails[] siSpeciesConversionParameters = {
+			new SpeciesConversionParametersDetails(SI_SPEC_AT, SI_SPEC_SW, 3.804, 0.7978), //
+			new SpeciesConversionParametersDetails(SI_SPEC_BA, SI_SPEC_HWC, 2.005, 1.014), //
+			new SpeciesConversionParametersDetails(SI_SPEC_CWC, SI_SPEC_HWC, 1.256, 1.048), //
+			new SpeciesConversionParametersDetails(SI_SPEC_FDC, SI_SPEC_HWC, -0.432, 0.899), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_HWC, SI_SPEC_BA, -1.97731755, 0.98619329), //
+			new SpeciesConversionParametersDetails(SI_SPEC_HWC, SI_SPEC_CWC, -1.19847328, 0.95419847), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_HWC, SI_SPEC_FDC, 0.48053393, 1.11234705), //
+			new SpeciesConversionParametersDetails(SI_SPEC_HWC, SI_SPEC_SS, -4.94382022, 1.24843945), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_HWI, SI_SPEC_FDI, 4.56, 0.887), //
+			new SpeciesConversionParametersDetails(SI_SPEC_SS, SI_SPEC_HWC, 3.96, 0.801), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_PLI, SI_SPEC_SW, -2.14130435, 1.08695652), //
+			new SpeciesConversionParametersDetails(SI_SPEC_PLI, SI_SPEC_FDI, 0.70841121, 0.93457944), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_PLI, SI_SPEC_BL, 0.47431193, 0.91743119), //
+			new SpeciesConversionParametersDetails(SI_SPEC_PLI, SI_SPEC_LW, 1.92307692, 0.96153846), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_PLI, SI_SPEC_SB, 2.76436782, 0.6385696), //
+			new SpeciesConversionParametersDetails(SI_SPEC_SB, SI_SPEC_PLI, -4.329, 1.566), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_SW, SI_SPEC_AT, -4.768112309, 1.253446979), //
+			new SpeciesConversionParametersDetails(SI_SPEC_SW, SI_SPEC_PLI, 1.97, 0.92), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_SW, SI_SPEC_FDI, 4.75, 0.737), //
+			new SpeciesConversionParametersDetails(SI_SPEC_SW, SI_SPEC_BL, 1.68, 0.86), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_FDI, SI_SPEC_PLI, -0.758, 1.07), //
+			new SpeciesConversionParametersDetails(SI_SPEC_FDI, SI_SPEC_SW, -6.44504749, 1.3568521), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_FDI, SI_SPEC_HWI, -5.14092446, 1.12739572), //
+			new SpeciesConversionParametersDetails(SI_SPEC_FDI, SI_SPEC_LW, 0.70193286, 1.017294), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_BL, SI_SPEC_PLI, -0.517, 1.09), //
+			new SpeciesConversionParametersDetails(SI_SPEC_BL, SI_SPEC_SW, -1.95348837, 1.1627907), // 
+			new SpeciesConversionParametersDetails(SI_SPEC_LW, SI_SPEC_PLI, -2, 1.04), //
+			new SpeciesConversionParametersDetails(SI_SPEC_LW, SI_SPEC_FDI, -0.69, 0.983)
+	};
+
+	/**
+	 * Indicates what equations are available (these are additive):
+	 * <ul>
+	 * <li>1: ht = fn (si, age)
+	 * <li>2: si = fn (ht, age) 
+	 * <li>4: y2bh = fn (si) 
+	 * <li>8: si = fn (ht, age) (growth intercept)
+	 * </ul>
 	 */
-	public static char[] si_curve_types = {
+	public static char[] siCurveAvailableTypes = {
 			// SI_ACB_HUANG
 			5,
 
@@ -1893,10 +1360,10 @@ public class SiteIndexNames {
 
 	};
 
-	/*
-	 * height(m) of breast height (typically 1.3, 1.37, 1.3716
+	/**
+	 * Height(m) of breast height (typically 1.3, 1.37, 1.3716).
 	 */
-	public static double[] si_curve_bh = {
+	public static double[] siCurveBreastHeight = {
 			// SI_ACB_HUANG
 			1.3,
 
@@ -2330,8 +1797,6 @@ public class SiteIndexNames {
 			1.3,
 
 			// SI_CWC_NIGH
-			1.3,
-
+			1.3
 	};
-
 }

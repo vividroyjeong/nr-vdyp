@@ -1,97 +1,96 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_FDC_BRUCEAC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_HWC_WILEYAC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_PLI_THROWER;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SW_GOUDIE_NATAC;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation.SI_SW_GOUDIE_PLAAC;
+
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
+import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.*;
 
 /**
- * SiteIndex2HeightSmoothed.java
+ * SiteIndex2HeightSmoothed
  *
- * @throws NoAnswerException   if iteration could not converge (projected height > 999)
- * @throws LessThan13Exception if site index < 1.3m
+ * Defines {@code index_to_height_smoothed}
  */
 public class SiteIndex2HeightSmoothed {
-/* @formatter:off */
-/*
- * 2016 mar 9  - Adjusted default equations for Pli, Sw, Fdc, Hwc
-               to incorporate height smoothing near 1.3m.
- * 2023 jul 17 - Translated like for like from C to Java
- *             - Renamed from si2hts to SiteIndex2HeightSmoothed
-*/
-/* @formatter:on */
 
-//Taken from sindex.h
-	/*
-	 * age types
+	/**
+	 * @param cuIndex
+	 * @param age
+	 * @param ageType
+	 * @param siteIndex
+	 * @param yearsToBreastHeight
+	 * @param seedlingAge
+	 * @param seedlingHeight
+	 * @return
+	 * @throws LessThan13Exception when {@code site_index} is less than 1.3
+	 * @throws NoAnswerException when the iteration will not converge
 	 */
-	private static final short SI_AT_TOTAL = 0;
-	private static final short SI_AT_BREAST = 1;
+	public static double indexToHeightSmoothed(
+			SiteIndexEquation cuIndex, double age, SiteIndexAgeType ageType, double siteIndex,
+			double yearsToBreastHeight,
+			double seedlingAge, double seedlingHeight
+	) throws CommonCalculatorException {
 
-	/* define species and equation indices */
-	private static final int SI_FDC_BRUCEAC = 100;
-	private static final int SI_HWC_WILEYAC = 99;
-	private static final int SI_PLI_THROWER = 45;
-	private static final int SI_SW_GOUDIE_NATAC = 106;
-	private static final int SI_SW_GOUDIE_PLAAC = 112;
+		double result; // return value
 
-//This doesn't seem to be used? It seems like this was copied over from SiteIndex2Height.java. Maybe be removable
-	public static double ppow(double x, double y) {
-		return (x <= 0) ? 0.0 : Math.pow(x, y);
-	}
-
-	public static double llog(double x) {
-		return ( (x) <= 0.0) ? Math.log(.00001) : Math.log(x);
-	}
-
-	public static double index_to_height_smoothed(
-			short cu_index, double iage, short age_type, double site_index, double y2bh, double seedling_age,
-			double seedling_ht
-	) {
-		double height; // return value
-		double k0, k1;
-		double itage; // user's total age
 		double tage; // total age
 		double bhage; // breast-height age
 		double pi; // proportion of height growth between breast height
 					// ages 0 and 1 that occurs below breast height
 
-		if (site_index < 1.3) {
-			throw new LessThan13Exception("Site index < 1.3m: " + site_index);
+		if (siteIndex < 1.3) {
+			throw new LessThan13Exception("Site index < 1.3m: " + siteIndex);
 		}
 
-		if (y2bh < 0) {
-			throw new NoAnswerException("Iteration could not converge (projected height > 999), y2bh: " + y2bh);
+		if (yearsToBreastHeight < 0) {
+			throw new NoAnswerException(
+					"Iteration could not converge (projected height > 999), y2bh: " + yearsToBreastHeight
+			);
 		}
 
-		itage = iage;
-		if (age_type == SI_AT_BREAST) {
-			itage = iage + y2bh;
+		double totalAge = age;
+		if (ageType == SI_AT_BREAST) {
+			totalAge = age + yearsToBreastHeight;
 		}
-		if (itage < 0.0) {
-			throw new NoAnswerException("Iteration could not converge (projected height > 999), itage: " + itage);
+		if (totalAge < 0.0) {
+			throw new NoAnswerException("Iteration could not converge (projected height > 999), itage: " + totalAge);
 		}
-		if (itage < 0.00001) {
+		if (totalAge < 0.00001) {
 			return 0.0;
 		}
 
-		if (cu_index == SI_PLI_THROWER || cu_index == SI_SW_GOUDIE_PLAAC || cu_index == SI_SW_GOUDIE_NATAC
-				|| cu_index == SI_FDC_BRUCEAC || cu_index == SI_HWC_WILEYAC) {
-			pi = y2bh - (int) y2bh;
+		if (cuIndex == null) {
+			throw new NoAnswerException("cuIndex is null");
+		}
+
+		if (cuIndex == SI_PLI_THROWER || cuIndex == SI_SW_GOUDIE_PLAAC || cuIndex == SI_SW_GOUDIE_NATAC
+				|| cuIndex == SI_FDC_BRUCEAC || cuIndex == SI_HWC_WILEYAC) {
+			pi = yearsToBreastHeight - (int) yearsToBreastHeight;
 		} else {
 			pi = 0.5;
 		}
 
+		double k0;
+		double k1;
+
 		bhage = 2;
 		do {
-			height = SiteIndex2Height.index_to_height(cu_index, bhage, SI_AT_BREAST, site_index, y2bh, pi);
-			if (height < 0) {
-				return height;
+			result = SiteIndex2Height.indexToHeight(cuIndex, bhage, SI_AT_BREAST, siteIndex, yearsToBreastHeight, pi);
+			if (result < 0) {
+				return result;
 			}
-			tage = bhage + (int) y2bh;
-			k1 = Math.log( (1.3 - seedling_ht) / (height - seedling_ht))
-					/ Math.log( (y2bh - seedling_age) / (tage - seedling_age));
-			// printf ("%f %f k1\n", tage, height, k1);
+			tage = bhage + (int) yearsToBreastHeight;
+			k1 = Math.log( (1.3 - seedlingHeight) / (result - seedlingHeight))
+					/ Math.log( (yearsToBreastHeight - seedlingAge) / (tage - seedlingAge));
 			if (k1 >= 1) {
-				k0 = (1.3 - seedling_ht) / Math.pow(y2bh - seedling_age, k1);
+				k0 = (1.3 - seedlingHeight) / Math.pow(yearsToBreastHeight - seedlingAge, k1);
 				break;
 			}
 			bhage++;
@@ -102,23 +101,24 @@ public class SiteIndex2HeightSmoothed {
 			}
 		} while (true);
 
-		if (seedling_age == 0) {
-			if (itage <= tage) {
-				height = k0 * Math.pow(itage, k1);
+		if (seedlingAge == 0) {
+			if (totalAge <= tage) {
+				result = k0 * Math.pow(totalAge, k1);
 			} else {
-				height = SiteIndex2Height.index_to_height(cu_index, itage, SI_AT_TOTAL, site_index, y2bh, pi);
+				result = SiteIndex2Height
+						.indexToHeight(cuIndex, totalAge, SI_AT_TOTAL, siteIndex, yearsToBreastHeight, pi);
 			}
 		} else {
-			if (itage < seedling_age) {
-				height = seedling_ht / seedling_age * itage;
-			} else if (itage < tage) {
-				height = seedling_ht + k0 * Math.pow(itage - seedling_age, k1);
+			if (totalAge < seedlingAge) {
+				result = seedlingHeight / seedlingAge * totalAge;
+			} else if (totalAge < tage) {
+				result = seedlingHeight + k0 * Math.pow(totalAge - seedlingAge, k1);
 			} else {
-				height = SiteIndex2Height.index_to_height(cu_index, itage, SI_AT_TOTAL, site_index, y2bh, pi);
+				result = SiteIndex2Height
+						.indexToHeight(cuIndex, totalAge, SI_AT_TOTAL, siteIndex, yearsToBreastHeight, pi);
 			}
 		}
 
-		return height;
+		return result;
 	}
-
 }
