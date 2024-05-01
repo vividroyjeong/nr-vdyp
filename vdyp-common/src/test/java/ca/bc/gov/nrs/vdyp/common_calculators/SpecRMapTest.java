@@ -46,7 +46,7 @@ class SpecRMapTest {
 		}
 
 		@Test
-		void testSpecieSpaces() throws CommonCalculatorException {
+		void testSpeciesSpaces() throws CommonCalculatorException {
 			SiteIndexSpecies actualResult = SiteIndexSpecies.getByCode("    c    W   I   ");
 			SiteIndexSpecies expectedResult = SI_SPEC_CWI;
 

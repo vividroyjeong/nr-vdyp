@@ -8,7 +8,7 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CodeErrorExceptio
 
 public enum SiteIndexSpecies {
 	SI_NO_SPECIES(-1, ""),
-	SI_SPEC_A(0, "A"), // first - if this changes, update getFirstSpecies.
+	SI_SPEC_A(0, "A"),
 	SI_SPEC_ABAL(1, "Abal"),
 	SI_SPEC_ABCO(2, "Abco"),
 	SI_SPEC_AC(3, "Ac"),
@@ -142,10 +142,26 @@ public enum SiteIndexSpecies {
 	SI_SPEC_YP(131, "Yp"),
 	SI_SPEC_Z(132, "Z"),
 	SI_SPEC_ZC(133, "Zc"),
-	SI_SPEC_ZH(134, "Zh"); // last - if this changes, update getLastSpecies.
-	
-	private static Map<Integer, SiteIndexSpecies> byIndex = new HashMap<>();
+	SI_SPEC_ZH(134, "Zh");
 
+	private static final Map<Integer, SiteIndexSpecies> byIndex = new HashMap<>();
+	private static final SiteIndexSpecies first, last;
+	
+	static {
+		first = SiteIndexSpecies.getByIndex(0);
+		
+		int firstMissingIndexCandidate = 0;
+		while (true) {
+			try {
+				getByIndex(firstMissingIndexCandidate);
+				firstMissingIndexCandidate += 1;
+			} catch (IllegalArgumentException e) {
+				break;
+			}
+		}
+		last = SiteIndexSpecies.getByIndex(firstMissingIndexCandidate - 1);
+	}
+	
 	private final int n;
 	private final String code;
 
@@ -163,11 +179,11 @@ public enum SiteIndexSpecies {
 	}
 
 	public static SiteIndexSpecies getFirstSpecies() {
-		return SI_SPEC_A;
+		return first;
 	}
 
 	public static SiteIndexSpecies getLastSpecies() {
-		return SI_SPEC_ZH;
+		return last;
 	}
 
 	public static SiteIndexSpecies getByCode(String code) throws CodeErrorException {

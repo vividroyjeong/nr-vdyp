@@ -24,7 +24,7 @@ public class EnumIterator<T extends Enum<T>> implements Iterator<T> {
 	public EnumIterator(T[] values, T first, T last) {
 
 		if (values == null) {
-			throw new IllegalArgumentException("values parameter to SI32EnumIterator may not be null");
+			throw new IllegalArgumentException("values parameter to EnumIterator may not be null");
 		}
 
 		this.valueArray = values;

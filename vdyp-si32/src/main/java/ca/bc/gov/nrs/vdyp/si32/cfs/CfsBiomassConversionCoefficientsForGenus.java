@@ -1,23 +1,62 @@
 package ca.bc.gov.nrs.vdyp.si32.cfs;
 
 /**
- * An two-dimensional array indexed by {@link CfsBiomassConversionSupportedEcoZone} and 
+ * A two-dimensional array indexed by {@link CfsBiomassConversionSupportedEcoZone} and 
  * then {@link CfsBiomassConversionSupportedGenera} given the biomass conversion coefficients 
  * for that Eco Zone and Genus. Each array element is a record indicating whether it "contains data" - 
  * that is, has meaningful values and, if so, an array of floats indexed by {@link 
  * CfsDeadConversionParams}.
+ * <p>
+ * The values are derived from
+ * <ul>
+ * <li>'C Conversion Factors Initializers' column of the 
+ * <li>'DerivedCTable' table found on the 
+ * <li>'Derived C Species Table' tab in the
+ * <li>'BC_Inventory_updates_by_CBMv2bs.xlsx' located in the
+ * <li>'Documents/CFS-Biomass' folder.
+ * </ul>
  */
 public class CfsBiomassConversionCoefficientsForGenus {
 
-	public static CfsBiomassConversionCoefficientsDetails get(int i, int j) {
-		return array[i][j];
+	public static CfsBiomassConversionCoefficientsDetails
+			get(int cfsSupportedEcoZone, int cfsSupportedGeneraIndex) {
+		return array[cfsSupportedEcoZone][cfsSupportedGeneraIndex];
 	}
 
 	private static CfsBiomassConversionCoefficientsDetails[][] array = new CfsBiomassConversionCoefficientsDetails[][] {
-			/*                                                                 cfsLiveParm_A                           cfsLiveParm_b_nonmerch                 cfsLiveParm_a_sap                         cfsLiveParm_cap_sap                       cfsLiveParm_a3                           cfsLiveParm_b3                            cfsLiveParm_c3                        cfsLiveParm_low_stemwood_prop    cfsLiveParm_high_stembark_prop           cfsLiveParm_low_foliage_prop                  */
-			/*                                                                              cfsLiveParm_B                        cfsLiveParm_k_nonmerch                    cfsLiveParm_b_sap                         cfsLiveParm_a1                           cfsLiveParm_b1                          cfsLiveParm_c1                           cfsLiveParm_min_volume              cfsLiveParm_high_stemwood_prop         cfsLiveParm_low_branches_prop           cfsLiveParm_high_foliage_prop  */
-			/*                                          containsData                                    cfsLiveParm_a_nonmerch                cfsLiveParm_cap_nonmerch                   cfsLiveParm_k_sap                        cfsLiveParm_a2                           cfsLiveParm_b2                            cfsLiveParm_c2                         cfsLiveParm_max_volume              cfsLiveParm_low_stembark_prop         cfsLiveParm_high_branches_prop                             */
 			{
+					// Order of values:
+					// containsData 
+					// cfsLiveParm_A
+					// cfsLiveParm_B 
+					// cfsLiveParm_a_nonmerch 
+					// cfsLiveParm_b_nonmerch 
+					// cfsLiveParm_k_nonmerch 
+					// cfsLiveParm_cap_nonmerch 
+					// cfsLiveParm_a_sap 
+					// cfsLiveParm_b_sap 
+					// cfsLiveParm_k_sap 
+					// cfsLiveParm_cap_sap 
+					// cfsLiveParm_a1 
+					// cfsLiveParm_a2 
+					// cfsLiveParm_a3 
+					// cfsLiveParm_b1 
+					// cfsLiveParm_b2 
+					// cfsLiveParm_b3 
+					// cfsLiveParm_c1 
+					// cfsLiveParm_c2 
+					// cfsLiveParm_c3 
+					// cfsLiveParm_min_volume 
+					// cfsLiveParm_max_volume 
+					// cfsLiveParm_low_stemwood_prop 
+					// cfsLiveParm_high_stemwood_prop 
+					// cfsLiveParm_low_stembark_prop 
+					// cfsLiveParm_high_stembark_prop 
+					// cfsLiveParm_low_branches_prop 
+					// cfsLiveParm_high_branches_prop 
+					// cfsLiveParm_low_foliage_prop 
+					// cfsLiveParm_high_foliage_prop 
+					
 					new CfsBiomassConversionCoefficientsDetails(
 							true,
 							new float[] { 1.22712652f, 0.81452013f, 30.54103246f, -0.85134424f, 0.66976961f,

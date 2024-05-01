@@ -26,7 +26,7 @@ import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecie
 import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_SS;
 import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_SW;
 
-import ca.bc.gov.nrs.vdyp.common_calculators.Age2Age;
+import ca.bc.gov.nrs.vdyp.common_calculators.AgeToAge;
 import ca.bc.gov.nrs.vdyp.common_calculators.Height2SiteIndex;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteClassCode2SiteIndex;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndex2Age;
@@ -3199,7 +3199,7 @@ public class Sindxdll {
 	)
 			throws AgeTypeErrorException {
 
-		result.set(Age2Age.ageToAge(cu_index, age1, age_type1, age_type2, y2bh));
+		result.set(AgeToAge.ageToAge(cu_index, age1, age_type1, age_type2, y2bh));
 		return 0;
 	}
 

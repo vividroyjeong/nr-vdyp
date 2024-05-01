@@ -59,10 +59,10 @@ public class SiteIndex2Height {
 
 		if (ageType == SI_AT_TOTAL) {
 			totalAge = age;
-			breastHeightAge = Age2Age.ageToAge(cuIndex, totalAge, SI_AT_TOTAL, SI_AT_BREAST, years2BreastHeight);
+			breastHeightAge = AgeToAge.ageToAge(cuIndex, totalAge, SI_AT_TOTAL, SI_AT_BREAST, years2BreastHeight);
 		} else {
 			breastHeightAge = age;
-			totalAge = Age2Age.ageToAge(cuIndex, breastHeightAge, SI_AT_BREAST, SI_AT_TOTAL, years2BreastHeight);
+			totalAge = AgeToAge.ageToAge(cuIndex, breastHeightAge, SI_AT_BREAST, SI_AT_TOTAL, years2BreastHeight);
 		}
 		if (totalAge < 0.0) {
 			throw new NoAnswerException("Iteration could not converge (projected height > 999), age: " + totalAge);
