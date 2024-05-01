@@ -67,39 +67,56 @@ public class ForwardProcessingEngine {
 		// All of BANKCHK1 that we need
 		validatePolygon(polygon);
 
+		PolygonProcessingState workingBank = fps.getBank(LayerType.PRIMARY, 0).copy();
+		
 		// SCINXSET
-		completeSiteCurveMap(polygon.getBiogeoclimaticZone(), LayerType.PRIMARY, 0);
+		completeSiteCurveMap(polygon.getBiogeoclimaticZone(), workingBank);
 
+		// VPRIME, method == 1
+		setSpecies(workingBank);
+		
 		fps.setActive(LayerType.PRIMARY, 0);
 	}
+	
+	private void setSpecies(PolygonProcessingState bank) {
+		
+		logger.atDebug().addArgument(bank.getNSpecies()).addArgument(bank.basalArea[0][0])
+			.log("Calculating Pcts as a ratio of Species BA over Total BA. # species: {}; Layer total 7.5cm+ basal area: {}");
+		
+		for (int i = 0; i < bank.getNSpecies(); i++) {
+			bank.percentForestedLand[i] = bank.basalArea[i][0] / bank.basalArea[0][0] * 100.0f;
 
-	private void completeSiteCurveMap(BecDefinition becZone, LayerType layerType, int instanceNumber) {
+			logger.atDebug().addArgument(i).addArgument(bank.speciesIndex[i]).addArgument(bank.speciesName[i])
+				.addArgument(bank.basalArea[i][0]).addArgument(bank.percentForestedLand[i])
+				.log("Species {}: SP0 {}, Name {}, Species 7.5cm+ BA {}, Calculated Percent {}");
+		}
+	}
 
-		PolygonProcessingState pps = fps.getBank(layerType, instanceNumber);
+	private void completeSiteCurveMap(BecDefinition becZone, PolygonProcessingState workingBank) {
 
-		for (int i = 0; i < pps.getNSpecies(); i++) {
+		for (int i = 0; i < workingBank.getNSpecies(); i++) {
 
-			if (pps.siteCurveNumber[i] == VdypEntity.MISSING_INTEGER_VALUE) {
+			if (workingBank.siteCurveNumber[i] == VdypEntity.MISSING_INTEGER_VALUE) {
 
 				Optional<SiteIndexEquation> scIndex = Optional.empty();
 				
-				Optional<GenusDistribution> sp0Dist = pps.sp64Distribution[i].getSpeciesDistribution(0);
+				Optional<GenusDistribution> sp0Dist = workingBank.sp64Distribution[i].getSpeciesDistribution(0);
 
 				if (sp0Dist.isPresent()) {
 					if (siteCurveMap.size() > 0) {
 						SiteCurve sc = siteCurveMap.get(sp0Dist.get().getGenus().getAlias());
 						scIndex = Optional.of(sc.getValue(becZone.getRegion()));
 					} else {
-						scIndex = Optional.of(SiteTool.getSICurve(pps.speciesName[i], becZone.getRegion().equals(Region.COASTAL)));
+						scIndex = Optional.of(SiteTool.getSICurve(workingBank.speciesName[i], becZone.getRegion().equals(Region.COASTAL)));
 					}
 				}
 				
 				if (scIndex.isEmpty()) {
 					if (siteCurveMap.size() > 0) {
-						SiteCurve sc = siteCurveMap.get(pps.speciesName[i]);
+						SiteCurve sc = siteCurveMap.get(workingBank.speciesName[i]);
 						scIndex = Optional.of(sc.getValue(becZone.getRegion()));
 					} else {
-						scIndex = Optional.of(SiteTool.getSICurve(pps.speciesName[i], becZone.getRegion().equals(Region.COASTAL)));
+						scIndex = Optional.of(SiteTool.getSICurve(workingBank.speciesName[i], becZone.getRegion().equals(Region.COASTAL)));
 					}
 				}
 			}
