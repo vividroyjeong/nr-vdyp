@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
-import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;

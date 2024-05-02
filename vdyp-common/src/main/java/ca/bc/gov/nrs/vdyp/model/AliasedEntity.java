@@ -1,6 +1,8 @@
 package ca.bc.gov.nrs.vdyp.model;
 
-public class AliasedEntity {
+import java.util.Objects;
+
+public abstract class AliasedEntity {
 
 	private final String alias;
 	private final String name;
@@ -29,4 +31,17 @@ public class AliasedEntity {
 		return String.format("%s (%s)", getAlias(), getName());
 	}
 
+	@Override
+	public int hashCode() {
+		return alias.hashCode() * 17 + name.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof AliasedEntity that) {
+			return Objects.equals(this.alias, that.alias) && Objects.equals(this.name, that.name);
+		} else {
+			return false;
+		}
+	}
 }

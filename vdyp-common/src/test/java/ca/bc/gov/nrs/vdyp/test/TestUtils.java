@@ -344,7 +344,7 @@ public class TestUtils {
 
 			@Override
 			public String toString(String filename) throws IOException {
-				return klazz.getResource(filename).toString();
+				return klazz.getResource(filename).getPath();
 			}
 
 			@Override

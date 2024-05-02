@@ -154,8 +154,8 @@ public class VriSiteParser implements ControlMapValueReplacer<StreamingParserFac
 				@Override
 				protected Collection<VriSite> convert(List<ValueOrMarker<Optional<VriSite>, EndOfRecord>> children) {
 					return children.stream().map(ValueOrMarker::getValue).map(Optional::get) // Should never be empty as
-																								// we've filtered out
-																								// markers
+							// we've filtered out
+							// markers
 							.flatMap(Optional::stream) // Skip if empty (and unknown layer type)
 							.toList();
 				}

@@ -4,35 +4,34 @@ import java.util.Map;
 import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.model.LayerType;
-import ca.bc.gov.nrs.vdyp.model.SpeciesDistributionSet;
+import ca.bc.gov.nrs.vdyp.model.GenusDistributionSet;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
 public class VdypLayerSpecies {
 
 	// See IPSJF155.doc
 
-	private final String polygonId; // POLYDESC
+	private final VdypPolygonDescription polygonId; // POLYDESC
 	private final LayerType layerType; // LAYERG
-	private final Integer genusIndex; // ISP
+	private final int genusIndex; // ISP
 	private final Optional<String> genus; // SP0
-	private final SpeciesDistributionSet speciesDistributions; // SP64DISTL1
-	private final Float siteIndex; // SI
-	private final Float dominantHeight; // HD
-	private final Float ageTotal; // AGETOT
-	private final Float ageAtBreastHeight; // AGEBH
-	private final Float yearsToBreastHeight; // YTBH
+	private final GenusDistributionSet speciesDistributions; // SP64DISTL1
+	private final float siteIndex; // SI
+	private final float dominantHeight; // HD
+	private final float ageTotal; // AGETOT
+	private final float ageAtBreastHeight; // AGEBH
+	private final float yearsToBreastHeight; // YTBH
 	private final Optional<Boolean> isPrimary; // ISITESP
-	private final Optional<Integer> siteCurveNumber; // SCN
+	private final Integer siteCurveNumber; // SCN
 
 	// Set after construction
 	private VdypPolygonLayer parent;
-	Map<UtilizationClass, VdypSpeciesUtilization> utilizations;
+	Optional<Map<UtilizationClass, VdypSpeciesUtilization>> utilizations;
 
 	public VdypLayerSpecies(
-			String polygonId, LayerType layerType, Integer genusIndex, Optional<String> genus,
-			SpeciesDistributionSet speciesDistributions, Float siteIndex, Float dominantHeight, Float ageTotal,
-			Float ageAtBreastHeight, Float yearsToBreastHeight, Optional<Boolean> isPrimary,
-			Optional<Integer> siteCurveNumber
+			VdypPolygonDescription polygonId, LayerType layerType, int genusIndex, Optional<String> genus,
+			GenusDistributionSet speciesDistributions, float siteIndex, float dominantHeight, float ageTotal,
+			float ageAtBreastHeight, float yearsToBreastHeight, Optional<Boolean> isPrimary, Integer siteCurveNumber
 	) {
 		this.polygonId = polygonId;
 		this.layerType = layerType;
@@ -43,18 +42,17 @@ public class VdypLayerSpecies {
 		this.dominantHeight = dominantHeight;
 
 		// From VDYPGETS.FOR, lines 235 onwards
-		if (ageAtBreastHeight < -8.9) {
+		if (Float.isNaN(ageAtBreastHeight)) {
 			if (ageTotal > 0.0 && yearsToBreastHeight > 0.0) {
 				ageAtBreastHeight = ageTotal - yearsToBreastHeight;
 				if (ageAtBreastHeight < 0.0)
-					ageAtBreastHeight = -9.0f;
+					ageAtBreastHeight = Float.NaN;
 			}
-		} else if (ageTotal < -8.9) {
+		} else if (Float.isNaN(ageTotal)) {
 			if (ageAtBreastHeight > 0.0 && yearsToBreastHeight > 0.0)
 				ageTotal = ageAtBreastHeight + yearsToBreastHeight;
-		} else if (yearsToBreastHeight < -8.9) {
-			if (ageAtBreastHeight > 0.0 && ageTotal > yearsToBreastHeight)
-				yearsToBreastHeight = ageTotal - ageAtBreastHeight;
+		} else if (Float.isNaN(yearsToBreastHeight) && ageAtBreastHeight > 0.0 && ageTotal > ageAtBreastHeight) {
+			yearsToBreastHeight = ageTotal - ageAtBreastHeight;
 		}
 
 		this.ageTotal = ageTotal;
@@ -65,15 +63,24 @@ public class VdypLayerSpecies {
 		this.siteCurveNumber = siteCurveNumber;
 	}
 
-	void setParent(VdypPolygonLayer parent) {
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(polygonId).append(' ').append(layerType).append(' ').append(genusIndex);
+
+		return sb.toString();
+	}
+
+	public void setParent(VdypPolygonLayer parent) {
 		this.parent = parent;
 	}
 
-	void setUtilizations(Map<UtilizationClass, VdypSpeciesUtilization> utilizations) {
+	public void setUtilizations(Optional<Map<UtilizationClass, VdypSpeciesUtilization>> utilizations) {
 		this.utilizations = utilizations;
 	}
 
-	public String getPolygonId() {
+	public VdypPolygonDescription getPolygonId() {
 		return polygonId;
 	}
 
@@ -89,27 +96,27 @@ public class VdypLayerSpecies {
 		return genus;
 	}
 
-	public SpeciesDistributionSet getSpeciesDistributions() {
+	public GenusDistributionSet getSpeciesDistributions() {
 		return speciesDistributions;
 	}
 
-	public Float getSiteIndex() {
+	public float getSiteIndex() {
 		return siteIndex;
 	}
 
-	public Float getDominantHeight() {
+	public float getDominantHeight() {
 		return dominantHeight;
 	}
 
-	public Float getAgeTotal() {
+	public float getAgeTotal() {
 		return ageTotal;
 	}
 
-	public Float getAgeAtBreastHeight() {
+	public float getAgeAtBreastHeight() {
 		return ageAtBreastHeight;
 	}
 
-	public Float getYearsToBreastHeight() {
+	public float getYearsToBreastHeight() {
 		return yearsToBreastHeight;
 	}
 
@@ -117,7 +124,7 @@ public class VdypLayerSpecies {
 		return isPrimary;
 	}
 
-	public Optional<Integer> getSiteCurveNumber() {
+	public Integer getSiteCurveNumber() {
 		return siteCurveNumber;
 	}
 
@@ -125,7 +132,7 @@ public class VdypLayerSpecies {
 		return parent;
 	}
 
-	public Map<UtilizationClass, VdypSpeciesUtilization> getUtilizations() {
+	public Optional<Map<UtilizationClass, VdypSpeciesUtilization>> getUtilizations() {
 		return utilizations;
 	}
 }

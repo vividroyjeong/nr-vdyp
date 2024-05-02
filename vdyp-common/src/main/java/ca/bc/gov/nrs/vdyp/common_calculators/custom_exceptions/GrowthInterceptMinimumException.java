@@ -5,10 +5,11 @@ package ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions;
  * This exception is generally thrown when the growth intercept is below a threshold, this could manifest in something
  * like breast height age is less than 0.5
  */
-public class GrowthInterceptMinimumException extends RuntimeException {
+public class GrowthInterceptMinimumException extends CommonCalculatorException {
 	private static final long serialVersionUID = 6161058579395893538L;
 
 	public GrowthInterceptMinimumException() {
+		super();
 	}
 
 	public GrowthInterceptMinimumException(String message) {
