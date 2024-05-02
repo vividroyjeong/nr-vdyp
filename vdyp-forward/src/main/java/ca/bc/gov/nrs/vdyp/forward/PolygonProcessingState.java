@@ -24,10 +24,9 @@ class PolygonProcessingState {
 	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(PolygonProcessingState.class);
 
-	/** 
-	 * The number of species in the state. Note that all arrays have one more element in them; the
-	 * element at index 0 is unused for the species values and contains the default utilization
-	 * in the Utilization values.
+	/**
+	 * The number of species in the state. Note that all arrays have one more element in them; the element at index 0 is
+	 * unused for the species values and contains the default utilization in the Utilization values.
 	 */
 	private int nSpecies; // BANK1 NSPB
 
@@ -213,14 +212,15 @@ class PolygonProcessingState {
 	/**
 	 * Replace species at index <code>i</code> with that at index <code>j</code>, i < j.
 	 *
-	 * @param toIndex the index of the species to remove, i >= 1
+	 * @param toIndex   the index of the species to remove, i >= 1
 	 * @param fromIndex the index of the species to replace it with, j >= i and j <= nSpecies
 	 */
 	private void move(int toIndex, int fromIndex) {
 		if (toIndex > fromIndex || toIndex < 1 || fromIndex > getNSpecies()) {
 			throw new IllegalArgumentException(
 					MessageFormat.format(
-							"PolygonProcessingState.replace - illegal arguments i = {0}, j = {1}, nSpecies = {2}", toIndex, fromIndex, getNSpecies()
+							"PolygonProcessingState.replace - illegal arguments i = {0}, j = {1}, nSpecies = {2}",
+							toIndex, fromIndex, getNSpecies()
 					)
 			);
 		}

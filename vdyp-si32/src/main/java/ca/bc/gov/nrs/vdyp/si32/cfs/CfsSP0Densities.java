@@ -21,7 +21,7 @@ public class CfsSP0Densities {
 		}
 	}
 
-	private final static float[][] array = {
+	private final static float[][] array = { //
 			{ 295.00F, 229.00F, 564.00F }, //
 			{ 416.00F, 304.00F, 519.00F }, //
 			{ 379.25F, 204.00F, 541.00F }, //
@@ -37,8 +37,7 @@ public class CfsSP0Densities {
 			{ 373.00F, 237.00F, 496.00F }, //
 			{ 420.00F, 204.00F, 693.00F }, //
 			{ 387.00F, 257.00F, 568.00F }, //
-			{ 453.00F, 239.00F, 544.00F }
-	};
+			{ 453.00F, 239.00F, 544.00F } };
 
 	static {
 		if (array.length != SP0Name.size()) {

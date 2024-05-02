@@ -71,12 +71,6 @@ class RootFinderTest {
 
 			RealMatrix jacobian = new Array2DRowRealMatrix(jacFunc.value(x));
 
-			//		0x004F1B78   1.080512e0      -5.529128e-3     -1.078180e-1     -8.984832e-3     -2.384436e-2
-			//		0x004F1B8C   3.801275e-3      6.043534e-1      2.809981e-1      2.211651e-2     -8.970021e-2
-			//		0x004F1BA0  -1.501072e-3     -5.725262e-3      9.703245e-1     -8.760679e-3     -3.791935e-3
-			//		0x004F1BB4   2.603777e-3      9.983147e-3      1.924444e-1      7.162524e-1     -2.040018e-1
-			//		0x004F1BC8   1.723533e-2     -1.313168e-2     -5.943812e-2      4.215959e-2      1.170447e0
-
 			assertThat(
 					jacobian, matrixCloseTo(
 							new double[][] { //

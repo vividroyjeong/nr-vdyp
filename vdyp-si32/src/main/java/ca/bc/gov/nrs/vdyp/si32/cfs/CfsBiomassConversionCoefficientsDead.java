@@ -23,7 +23,7 @@ public class CfsBiomassConversionCoefficientsDead {
 	}
 
 	private static final CfsBiomassConversionCoefficientsDetails[][] array = new CfsBiomassConversionCoefficientsDetails[][] {
-			{
+			{ //
 					new CfsBiomassConversionCoefficientsDetails(
 							true,
 							new float[] { 0.04000000f, 0.04100000f, 0.05300000f, 0.08900000f, 0.13500000f,
@@ -123,9 +123,8 @@ public class CfsBiomassConversionCoefficientsDead {
 							true,
 							new float[] { 0.04000000f, 0.04100000f, 0.05300000f, 0.08900000f, 0.13500000f,
 									108.00000000f, 263.50000000f, 495.50000000f, 934.00000000f }
-					)
-			},
-			{
+					) },
+			{ //
 					new CfsBiomassConversionCoefficientsDetails(
 							true,
 							new float[] { 0.11000000f, 0.06100000f, 0.04900000f, 0.07200000f, 0.10100000f, 79.50000000f,
@@ -225,9 +224,8 @@ public class CfsBiomassConversionCoefficientsDead {
 							true,
 							new float[] { 0.11000000f, 0.06100000f, 0.04900000f, 0.07200000f, 0.10100000f, 79.50000000f,
 									177.50000000f, 301.50000000f, 534.50000000f }
-					)
-			},
-			{
+					) },
+			{ //
 					new CfsBiomassConversionCoefficientsDetails(
 							true,
 							new float[] { 0.15600000f, 0.10800000f, 0.14500000f, 0.11000000f, 0.10400000f, 45.00000000f,
@@ -327,9 +325,8 @@ public class CfsBiomassConversionCoefficientsDead {
 							true,
 							new float[] { 0.15600000f, 0.10800000f, 0.14500000f, 0.11000000f, 0.10400000f, 45.00000000f,
 									126.50000000f, 236.00000000f, 415.00000000f }
-					)
-			},
-			{
+					) },
+			{ //
 					new CfsBiomassConversionCoefficientsDetails(
 							true,
 							new float[] { 0.13100000f, 0.11200000f, 0.09300000f, 0.06300000f, 0.07900000f,
@@ -429,9 +426,8 @@ public class CfsBiomassConversionCoefficientsDead {
 							true,
 							new float[] { 0.13100000f, 0.11200000f, 0.09300000f, 0.06300000f, 0.07900000f,
 									157.00000000f, 345.50000000f, 663.00000000f, 1263.50000000f }
-					)
-			},
-			{
+					) },
+			{ //
 					new CfsBiomassConversionCoefficientsDetails(
 							true,
 							new float[] { 0.08800000f, 0.12600000f, 0.09800000f, 0.08100000f, 0.09200000f, 89.00000000f,
@@ -531,14 +527,13 @@ public class CfsBiomassConversionCoefficientsDead {
 							true,
 							new float[] { 0.08800000f, 0.12600000f, 0.09800000f, 0.08100000f, 0.09200000f, 89.00000000f,
 									181.50000000f, 301.50000000f, 676.00000000f }
-					)
-			}
-	};
+					) } };
 
 	static {
 		new CfsBiomassConversionCoefficientsHelper<CfsBiomassConversionSupportedEcoZone, CfsBiomassConversionSupportedGenera, CfsDeadConversionParams>()
 				.validateCoefficientArray(
-						CfsBiomassConversionCoefficientsDead.class, array, CfsBiomassConversionSupportedEcoZone.class, CfsBiomassConversionSupportedGenera.class, CfsDeadConversionParams.class
+						CfsBiomassConversionCoefficientsDead.class, array, CfsBiomassConversionSupportedEcoZone.class,
+						CfsBiomassConversionSupportedGenera.class, CfsDeadConversionParams.class
 				);
 	}
 }
