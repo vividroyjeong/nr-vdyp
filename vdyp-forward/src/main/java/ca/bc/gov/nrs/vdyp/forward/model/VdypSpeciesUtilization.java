@@ -5,33 +5,33 @@ import java.util.Optional;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
-public class VdypSpeciesUtilization {
+public class VdypSpeciesUtilization extends VdypEntity {
 
 	// See IPSJF155.doc
 
-	private final String polygonId; // POLYDESC
+	private final VdypPolygonDescription polygonId; // POLYDESC
 	private final LayerType layerType; // LAYERG
-	private final Integer genusIndex; // ISP
+	private final int genusIndex; // ISP
 	private final Optional<String> genus; // SP0
-	private final UtilizationClass ucIndex; // J
-	private final Float basalArea; // SP0
-	private final Float liveTreesPerHectare;
-	private final Float loreyHeight;
-	private final Float wholeStemVolume;
-	private final Float closeUtilizationVolume;
-	private final Float cuVolumeMinusDecay;
-	private final Float cuVolumeMinusDecayWastage;
-	private final Float cuVolumeMinusDecayWastageBreakage;
-	private final Float quadraticMeanDiameterAtBH;
+	private final UtilizationClass ucIndex; // J - utilization index
+	private final float basalArea;
+	private final float liveTreesPerHectare;
+	private final float loreyHeight;
+	private final float wholeStemVolume;
+	private final float closeUtilizationVolume;
+	private final float cuVolumeMinusDecay;
+	private final float cuVolumeMinusDecayWastage;
+	private final float cuVolumeMinusDecayWastageBreakage;
+	private final float quadraticMeanDiameterAtBH;
 
 	// Set after construction
 	private VdypLayerSpecies parent;
 
 	public VdypSpeciesUtilization(
-			String polygonId, LayerType layerType, Integer genusIndex, Optional<String> genus, UtilizationClass ucIndex,
-			Float basalArea, Float liveTreesPerHectare, Float loreyHeight, Float wholeStemVolume,
-			Float closeUtilizationVolume, Float cuVolumeMinusDecay, Float cuVolumeMinusDecayWastage,
-			Float cuVolumeMinusDecayWastageBreakage, Float quadraticMeanDiameterAtBH
+			VdypPolygonDescription polygonId, LayerType layerType, Integer genusIndex, Optional<String> genus,
+			UtilizationClass ucIndex, float basalArea, float liveTreesPerHectare, float loreyHeight,
+			float wholeStemVolume, float closeUtilizationVolume, float cuVolumeMinusDecay,
+			float cuVolumeMinusDecayWastage, float cuVolumeMinusDecayWastageBreakage, float quadraticMeanDiameterAtBH
 	) {
 		this.polygonId = polygonId;
 		this.layerType = layerType;
@@ -49,11 +49,21 @@ public class VdypSpeciesUtilization {
 		this.quadraticMeanDiameterAtBH = quadraticMeanDiameterAtBH;
 	}
 
-	void setParent(VdypLayerSpecies parent) {
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(polygonId).append(' ').append(layerType).append(' ').append(genusIndex).append(' ')
+				.append(ucIndex.index);
+
+		return sb.toString();
+	}
+
+	public void setParent(VdypLayerSpecies parent) {
 		this.parent = parent;
 	}
 
-	public String getPolygonId() {
+	public VdypPolygonDescription getPolygonId() {
 		return polygonId;
 	}
 
@@ -73,39 +83,39 @@ public class VdypSpeciesUtilization {
 		return ucIndex;
 	}
 
-	public Float getBasalArea() {
+	public float getBasalArea() {
 		return basalArea;
 	}
 
-	public Float getLiveTreesPerHectare() {
+	public float getLiveTreesPerHectare() {
 		return liveTreesPerHectare;
 	}
 
-	public Float getLoreyHeight() {
+	public float getLoreyHeight() {
 		return loreyHeight;
 	}
 
-	public Float getWholeStemVolume() {
+	public float getWholeStemVolume() {
 		return wholeStemVolume;
 	}
 
-	public Float getCloseUtilizationVolume() {
+	public float getCloseUtilizationVolume() {
 		return closeUtilizationVolume;
 	}
 
-	public Float getCuVolumeMinusDecay() {
+	public float getCuVolumeMinusDecay() {
 		return cuVolumeMinusDecay;
 	}
 
-	public Float getCuVolumeMinusDecayWastage() {
+	public float getCuVolumeMinusDecayWastage() {
 		return cuVolumeMinusDecayWastage;
 	}
 
-	public Float getCuVolumeMinusDecayWastageBreakage() {
+	public float getCuVolumeMinusDecayWastageBreakage() {
 		return cuVolumeMinusDecayWastageBreakage;
 	}
 
-	public Float getQuadraticMeanDiameterAtBH() {
+	public float getQuadraticMeanDiameterAtBH() {
 		return quadraticMeanDiameterAtBH;
 	}
 
