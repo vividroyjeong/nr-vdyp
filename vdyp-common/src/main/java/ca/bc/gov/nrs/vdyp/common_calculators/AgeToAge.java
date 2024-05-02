@@ -20,8 +20,7 @@ public class AgeToAge {
 	public static double ageToAge(
 			SiteIndexEquation cuIndex, double sourceAge, SiteIndexAgeType sourceAgeType, SiteIndexAgeType targetAgeType,
 			double years2BreastHeight
-	)
-			throws AgeTypeErrorException {
+	) throws AgeTypeErrorException {
 
 		double returnValue;
 

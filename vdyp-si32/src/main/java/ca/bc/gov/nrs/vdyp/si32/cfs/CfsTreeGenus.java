@@ -6,28 +6,25 @@ import ca.bc.gov.nrs.vdyp.model.EnumIterator;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
 
 /**
- * Enumerate the different Tree Genus as defined by the Canadian Forest Service for 
- * the purposes of Biomass.
+ * Enumerate the different Tree Genus as defined by the Canadian Forest Service for the purposes of Biomass.
  * <ul>
- * <li><b>UNKNOWN</b> represents an uninitialized value or error state. This value should
- *        not be used as a valid Genus value.</b>
+ * <li><b>UNKNOWN</b> represents an uninitialized value or error state. This value should not be used as a valid Genus
+ * value.</b>
  * <li><b>NotApplicable</b> for records that are not stocked forest land.
  * <li><b>MissingValue</b> no information is available.
  * <li><b>others</b>individual Genus values.
  * </ul>
- * <p><b>Remarks</b>
  * <p>
- *    The values for 'NotApplicable' and 'MissingValue' are 
- *    defined in the CFS source table but should never be used in the context
- *    of VDYP as all CFS species have a Genus mapping. They are included for
- *    completeness of the source definitions. They should never be used as a
- *    valid CFS Genus value.
+ * <b>Remarks</b>
  * <p>
- *    Elements for this table are automatically generated and copy and pasted
- *    from the:
+ * The values for 'NotApplicable' and 'MissingValue' are defined in the CFS source table but should never be used in the
+ * context of VDYP as all CFS species have a Genus mapping. They are included for completeness of the source
+ * definitions. They should never be used as a valid CFS Genus value.
+ * <p>
+ * Elements for this table are automatically generated and copy and pasted from the:
  * <ol>
- * <li>'Internal C Enum Definition' column of the 
- * <li>'SpeciesTable' table found on the 
+ * <li>'Internal C Enum Definition' column of the
+ * <li>'SpeciesTable' table found on the
  * <li>'Lookups' tab in the
  * <li>'BC_Inventory_updates_by_CBMv2bs.xlsx' located in the
  * <li>'Documents/CFS-Biomass' folder.
@@ -97,9 +94,10 @@ public enum CfsTreeGenus implements SI32Enum<CfsTreeGenus> {
 
 	/**
 	 * Returns the enumeration constant with the given index.
+	 *
 	 * @param index the value in question
-	 * @return the enumeration value, unless no enumeration constant has the given 
-	 * 	   <code>index</code> in which case <code>null</code> is returned.
+	 * @return the enumeration value, unless no enumeration constant has the given <code>index</code> in which case
+	 *         <code>null</code> is returned.
 	 */
 	public static CfsTreeGenus forIndex(int index) {
 		for (CfsTreeGenus e : CfsTreeGenus.values()) {

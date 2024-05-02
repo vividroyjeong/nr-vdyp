@@ -10,26 +10,13 @@ import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
 /**
  * Identifies each of the BEC Zones known to the system.
  * <ul>
- * <li> UNKNOWN: Represents an unknown BEC Zone or an error condition.
- * <li> others: Individual BEC Zones recognized.
+ * <li>UNKNOWN: Represents an unknown BEC Zone or an error condition.
+ * <li>others: Individual BEC Zones recognized.
  */
 public enum BecZone implements SI32Enum<BecZone> {
 	UNKNOWN(-1),
 
-	AT(0),
-	BG(1),
-	BWBS(2),
-	CDF(3),
-	CWH(4),
-	ESSF(5),
-	ICH(6),
-	IDF(7),
-	MH(8),
-	MS(9),
-	PP(10),
-	SBPS(11),
-	SBS(12),
-	SWB(13);
+	AT(0), BG(1), BWBS(2), CDF(3), CWH(4), ESSF(5), ICH(6), IDF(7), MH(8), MS(9), PP(10), SBPS(11), SBS(12), SWB(13);
 
 	private static Map<Integer, BecZone> index2EnumMap = null;
 
@@ -78,9 +65,10 @@ public enum BecZone implements SI32Enum<BecZone> {
 
 	/**
 	 * Returns the enumeration constant with the given index.
+	 *
 	 * @param index the value in question
-	 * @return the enumeration value, unless no enumeration constant has the given 
-	 * 	   <code>index</code> in which case <code>null</code> is returned.
+	 * @return the enumeration value, unless no enumeration constant has the given <code>index</code> in which case
+	 *         <code>null</code> is returned.
 	 */
 	public static BecZone forIndex(int index) {
 		return getIndex2EnumMap().get(index);

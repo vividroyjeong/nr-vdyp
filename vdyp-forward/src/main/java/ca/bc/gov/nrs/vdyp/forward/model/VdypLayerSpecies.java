@@ -31,8 +31,7 @@ public class VdypLayerSpecies {
 	public VdypLayerSpecies(
 			VdypPolygonDescription polygonId, LayerType layerType, int genusIndex, Optional<String> genus,
 			GenusDistributionSet speciesDistributions, float siteIndex, float dominantHeight, float ageTotal,
-			float ageAtBreastHeight, float yearsToBreastHeight, Optional<Boolean> isPrimary,
-			Integer siteCurveNumber
+			float ageAtBreastHeight, float yearsToBreastHeight, Optional<Boolean> isPrimary, Integer siteCurveNumber
 	) {
 		this.polygonId = polygonId;
 		this.layerType = layerType;

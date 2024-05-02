@@ -47,7 +47,8 @@ class PolygonProcessingStateTest {
 		parser = new ForwardControlParser();
 		controlMap = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
 		assertThat(
-				controlMap, (Matcher) controlMapHasEntry(
+				controlMap,
+				(Matcher) controlMapHasEntry(
 						ControlKey.SP0_DEF, allOf(instanceOf(List.class), hasItem(instanceOf(GenusDefinition.class)))
 				)
 		);
@@ -195,9 +196,8 @@ class PolygonProcessingStateTest {
 				);
 				assertThat(pps1.cuVolumeMinusDecay[i][uc.index + 1], is(pps2.cuVolumeMinusDecay[j][uc.index + 1]));
 				assertThat(
-						pps1.cuVolumeMinusDecayWastage[i][uc.index + 1], is(
-								pps2.cuVolumeMinusDecayWastage[j][uc.index + 1]
-						)
+						pps1.cuVolumeMinusDecayWastage[i][uc.index + 1],
+						is(pps2.cuVolumeMinusDecayWastage[j][uc.index + 1])
 				);
 				if (uc.index <= 0) {
 					assertThat(pps1.loreyHeight[i][uc.index + 1], is(pps2.loreyHeight[j][uc.index + 1]));

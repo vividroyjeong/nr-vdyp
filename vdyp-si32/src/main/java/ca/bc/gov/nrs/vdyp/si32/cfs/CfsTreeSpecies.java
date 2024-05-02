@@ -8,31 +8,30 @@ import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
 /**
  * Enumeration of the Tree Species as defined by the Canadian Forest Service.
  * <ul>
- * <li>UNKNOWN<p>
- * Indicates an error condition or an uninitialized state. Should not be used 
- * as a place holder for an actual tree species.
- * <li>others<p>
- * </ul>
- * Species names are defined in Appendix 7 of the document 'Model_based_volume_to_biomass.pdf' 
- * found in 'Documents/CFS-Biomass'.
+ * <li>UNKNOWN
  * <p>
- * The list of enumeration constants is automatically generated and copy and pasted into this 
- * enum definition from the:
+ * Indicates an error condition or an uninitialized state. Should not be used as a place holder for an actual tree
+ * species.
+ * <li>others
+ * <p>
+ * </ul>
+ * Species names are defined in Appendix 7 of the document 'Model_based_volume_to_biomass.pdf' found in
+ * 'Documents/CFS-Biomass'.
+ * <p>
+ * The list of enumeration constants is automatically generated and copy and pasted into this enum definition from the:
  * <ol>
- * <li> 'Conversion Param Enum Defn' column of the 
- * <li> 'DeadConversionFactorsTable' found on the 
- * <li> 'Derived C Species Table' tab in the
- * <li> 'BC_Inventory_updates_by_CBMv2bs.xlsx' located in the
- * <li> 'Documents/CFS-Biomass' folder.
+ * <li>'Conversion Param Enum Defn' column of the
+ * <li>'DeadConversionFactorsTable' found on the
+ * <li>'Derived C Species Table' tab in the
+ * <li>'BC_Inventory_updates_by_CBMv2bs.xlsx' located in the
+ * <li>'Documents/CFS-Biomass' folder.
  * </ol>
  */
 public enum CfsTreeSpecies implements SI32Enum<CfsTreeSpecies> {
 	UNKNOWN(-1, -1, "Unknown Species", CfsTreeGenus.UNKNOWN),
 
-	SPRUCE(0, 100, "Spruce", CfsTreeGenus.SPRUCE),
-	SPRUCE_BLACK(1, 101, "Black Spruce", CfsTreeGenus.SPRUCE),
-	SPRUCE_RED(2, 102, "Red Spruce", CfsTreeGenus.SPRUCE),
-	SPRUCE_NORWAY(3, 103, "Norway spruce", CfsTreeGenus.SPRUCE),
+	SPRUCE(0, 100, "Spruce", CfsTreeGenus.SPRUCE), SPRUCE_BLACK(1, 101, "Black Spruce", CfsTreeGenus.SPRUCE),
+	SPRUCE_RED(2, 102, "Red Spruce", CfsTreeGenus.SPRUCE), SPRUCE_NORWAY(3, 103, "Norway spruce", CfsTreeGenus.SPRUCE),
 	SPRUCE_ENGLEMANN(4, 104, "Englemann spruce", CfsTreeGenus.SPRUCE),
 	SPRUCE_WHITE(5, 105, "White spruce", CfsTreeGenus.SPRUCE),
 	SPRUCE_SITKA(6, 106, "Sitka spruce", CfsTreeGenus.SPRUCE),
@@ -41,20 +40,15 @@ public enum CfsTreeSpecies implements SI32Enum<CfsTreeSpecies> {
 	SPRUCE_OTHER(9, 109, "Other spruce", CfsTreeGenus.SPRUCE),
 	/* 10 */
 	SPRUCE_AND_BALSAM_FIR(10, 110, "Spruce and balsam fir", CfsTreeGenus.SPRUCE),
-	PINE(11, 200, "Pine", CfsTreeGenus.PINE),
-	PINE_WESTERN_WHITE(12, 201, "Western white pine", CfsTreeGenus.PINE),
+	PINE(11, 200, "Pine", CfsTreeGenus.PINE), PINE_WESTERN_WHITE(12, 201, "Western white pine", CfsTreeGenus.PINE),
 	PINE_EASTERN_WHITE(13, 202, "Eastern white pine", CfsTreeGenus.PINE),
-	PINE_JACK(14, 203, "Jack pine", CfsTreeGenus.PINE),
-	PINE_LODGEPOLE(15, 204, "Lodgepole pine", CfsTreeGenus.PINE),
-	PINE_SHORE(16, 205, "Shore pine", CfsTreeGenus.PINE),
-	PINE_WHITEBARK(17, 206, "Whitebark pine", CfsTreeGenus.PINE),
+	PINE_JACK(14, 203, "Jack pine", CfsTreeGenus.PINE), PINE_LODGEPOLE(15, 204, "Lodgepole pine", CfsTreeGenus.PINE),
+	PINE_SHORE(16, 205, "Shore pine", CfsTreeGenus.PINE), PINE_WHITEBARK(17, 206, "Whitebark pine", CfsTreeGenus.PINE),
 	PINE_AUSTRIAN(18, 207, "Austrian pine", CfsTreeGenus.PINE),
 	PINE_PONDEROSA(19, 208, "Ponderosa pine", CfsTreeGenus.PINE),
 	/* 20 */
-	PINE_RED(20, 209, "Red pine", CfsTreeGenus.PINE),
-	PINE_PITCH(21, 210, "Pitch pine", CfsTreeGenus.PINE),
-	PINE_SCOTS(22, 211, "Scots pine", CfsTreeGenus.PINE),
-	PINE_MUGHO(23, 212, "Mugho pine", CfsTreeGenus.PINE),
+	PINE_RED(20, 209, "Red pine", CfsTreeGenus.PINE), PINE_PITCH(21, 210, "Pitch pine", CfsTreeGenus.PINE),
+	PINE_SCOTS(22, 211, "Scots pine", CfsTreeGenus.PINE), PINE_MUGHO(23, 212, "Mugho pine", CfsTreeGenus.PINE),
 	PINE_LIMBER(24, 213, "Limber pine", CfsTreeGenus.PINE),
 	PINE_JACK_LODGEPOLE_AND_SHORE(25, 214, "Jack, lodgepole, and shore pine", CfsTreeGenus.PINE),
 	PINE_OTHER(26, 215, "Other pine", CfsTreeGenus.PINE),
@@ -62,8 +56,7 @@ public enum CfsTreeSpecies implements SI32Enum<CfsTreeSpecies> {
 	PINE_WHITEBARK_AND_LIMBER(28, 217, "Whitebark and limber pine", CfsTreeGenus.PINE),
 	FIR(29, 300, "Fir", CfsTreeGenus.FIR),
 	/* 30 */
-	FIR_AMABILIS(30, 301, "Amabilis fir", CfsTreeGenus.FIR),
-	FIR_BALSAM(31, 302, "Balsam fir", CfsTreeGenus.FIR),
+	FIR_AMABILIS(30, 301, "Amabilis fir", CfsTreeGenus.FIR), FIR_BALSAM(31, 302, "Balsam fir", CfsTreeGenus.FIR),
 	FIR_GRAND(32, 303, "Grand fir", CfsTreeGenus.FIR),
 	FIR_SUBALPINE_OR_ALPINE(33, 304, "Subalpinefir (or alpine fir)", CfsTreeGenus.FIR),
 	FIR_BALSAM_AND_ALPINE(34, 305, "Balsam and alpine fir", CfsTreeGenus.FIR),
@@ -79,8 +72,7 @@ public enum CfsTreeSpecies implements SI32Enum<CfsTreeSpecies> {
 	HEMLOCK_WESTERN_AND_MOUNTAIN(43, 404, "Western and mountain hemlock", CfsTreeGenus.HEMLOCK),
 	FIR_DOUGLAS_AND_ROCKY_MOUNTAIN(44, 500, "Douglas-fir and Rocky Mountain Douglas-fir", CfsTreeGenus.DOUGLAS_FIR),
 	TAMARACK_LARCH(45, 600, "Tamarack/Larch", CfsTreeGenus.LARCH),
-	LARCH_EUROPEAN(46, 601, "European larch", CfsTreeGenus.LARCH),
-	TAMARACK(47, 602, "Tamarack", CfsTreeGenus.LARCH),
+	LARCH_EUROPEAN(46, 601, "European larch", CfsTreeGenus.LARCH), TAMARACK(47, 602, "Tamarack", CfsTreeGenus.LARCH),
 	LARCH_WESTERN(48, 603, "Western larch", CfsTreeGenus.LARCH),
 	LARCH_SUBALPINE(49, 604, "Subalpine larch", CfsTreeGenus.LARCH),
 	/* 50 */
@@ -114,14 +106,11 @@ public enum CfsTreeSpecies implements SI32Enum<CfsTreeSpecies> {
 	POPLAR_OTHER(75, 1210, "Other poplar", CfsTreeGenus.POPLAR),
 	POPLAR_BALSAM_LARGETOOTH_EASTERN(
 			76, 1211, "Balsam poplar, largetooth aspen and eastern cottonwood", CfsTreeGenus.POPLAR
-	),
-	POPLAR_BALSAM_BLACKCOTTONWOOD(77, 1212, "Balsam poplar and black cottonwood", CfsTreeGenus.POPLAR),
-	BIRCH(78, 1300, "Birch", CfsTreeGenus.BIRCH),
-	BIRCH_YELLOW(79, 1301, "Yellow birch", CfsTreeGenus.BIRCH),
+	), POPLAR_BALSAM_BLACKCOTTONWOOD(77, 1212, "Balsam poplar and black cottonwood", CfsTreeGenus.POPLAR),
+	BIRCH(78, 1300, "Birch", CfsTreeGenus.BIRCH), BIRCH_YELLOW(79, 1301, "Yellow birch", CfsTreeGenus.BIRCH),
 	/* 80 */
 	BIRCH_CHERRY(80, 1302, "Cherry birch", CfsTreeGenus.BIRCH),
-	BIRCH_WHITE(81, 1303, "White birch", CfsTreeGenus.BIRCH),
-	BIRCH_GRAY(82, 1304, "Gray birch", CfsTreeGenus.BIRCH),
+	BIRCH_WHITE(81, 1303, "White birch", CfsTreeGenus.BIRCH), BIRCH_GRAY(82, 1304, "Gray birch", CfsTreeGenus.BIRCH),
 	BIRCH_ALASKA_PAPER(83, 1305, "Alaska paper birch", CfsTreeGenus.BIRCH),
 	BIRCH_MOUNTAIN_PAPER(84, 1306, "Mountain paper birch", CfsTreeGenus.BIRCH),
 	BIRCH_OTHER(85, 1307, "Other birch", CfsTreeGenus.BIRCH),
@@ -130,12 +119,10 @@ public enum CfsTreeSpecies implements SI32Enum<CfsTreeSpecies> {
 	BIRCH_WHITE_AND_GRAY(88, 1310, "White and gray birch", CfsTreeGenus.BIRCH),
 	MAPLE(89, 1400, "Maple", CfsTreeGenus.MAPLE),
 	/* 90 */
-	MAPLE_SUGAR(90, 1401, "Sugar maple", CfsTreeGenus.MAPLE),
-	MAPLE_BLACK(91, 1402, "Black maple", CfsTreeGenus.MAPLE),
+	MAPLE_SUGAR(90, 1401, "Sugar maple", CfsTreeGenus.MAPLE), MAPLE_BLACK(91, 1402, "Black maple", CfsTreeGenus.MAPLE),
 	MAPLE_BIGLEAF(92, 1403, "Bigleaf maple", CfsTreeGenus.MAPLE),
 	MAPLE_MANITOBA(93, 1404, "Manitoba maple", CfsTreeGenus.MAPLE),
-	MAPLE_RED(94, 1405, "Red maple", CfsTreeGenus.MAPLE),
-	MAPLE_SILVER(95, 1406, "Silver maple", CfsTreeGenus.MAPLE),
+	MAPLE_RED(94, 1405, "Red maple", CfsTreeGenus.MAPLE), MAPLE_SILVER(95, 1406, "Silver maple", CfsTreeGenus.MAPLE),
 	MAPLE_NORWAY(96, 1407, "Norway maple", CfsTreeGenus.MAPLE),
 	MAPLE_SUGAR_AND_BLACK(97, 1408, "Sugar and black maple", CfsTreeGenus.MAPLE),
 	MAPLE_OTHER(98, 1409, "Other maple", CfsTreeGenus.MAPLE),
@@ -145,8 +132,7 @@ public enum CfsTreeSpecies implements SI32Enum<CfsTreeSpecies> {
 	MAPLE_SILVER_AND_RED(101, 1412, "Silver and red maple", CfsTreeGenus.MAPLE),
 	HARDWOOD_OTHER_BROADLEAFOTHER(
 			102, 1500, "Other hardwoods/other broad-leaved species", CfsTreeGenus.OTHER_BROAD_LEAVES
-	),
-	HARDWOOD_UNSPECIFIED(103, 1550, "Unspecified hardwood species", CfsTreeGenus.UNSPECIFIED_BROAD_LEAVES),
+	), HARDWOOD_UNSPECIFIED(103, 1550, "Unspecified hardwood species", CfsTreeGenus.UNSPECIFIED_BROAD_LEAVES),
 	HICKORY(104, 1600, "Hickory", CfsTreeGenus.OTHER_BROAD_LEAVES),
 	HICKORY_BITTERNUT(105, 1601, "Bitternut hickory", CfsTreeGenus.OTHER_BROAD_LEAVES),
 	HICKORY_RED(106, 1602, "Red hickory (Pignut hickory)", CfsTreeGenus.OTHER_BROAD_LEAVES),
@@ -165,8 +151,7 @@ public enum CfsTreeSpecies implements SI32Enum<CfsTreeSpecies> {
 	IRONWOOD_HOP_HORNBEAN(118, 1900, "Ironwood (hop-hornbeam)", CfsTreeGenus.OTHER_BROAD_LEAVES),
 	BLUE_BEECH(119, 1950, "Blue-beech (American hornbeam)", CfsTreeGenus.OTHER_BROAD_LEAVES),
 	/* 120 */
-	BEECH(120, 2000, "Beech", CfsTreeGenus.OTHER_BROAD_LEAVES),
-	OAK(121, 2100, "Oak", CfsTreeGenus.OTHER_BROAD_LEAVES),
+	BEECH(120, 2000, "Beech", CfsTreeGenus.OTHER_BROAD_LEAVES), OAK(121, 2100, "Oak", CfsTreeGenus.OTHER_BROAD_LEAVES),
 	OAK_WHITE(122, 2101, "White oak", CfsTreeGenus.OTHER_BROAD_LEAVES),
 	OAK_SWAMPWHITE(123, 2102, "Swamp white oak", CfsTreeGenus.OTHER_BROAD_LEAVES),
 	OAK_GARRY(124, 2103, "Garry oak", CfsTreeGenus.OTHER_BROAD_LEAVES),
@@ -288,9 +273,10 @@ public enum CfsTreeSpecies implements SI32Enum<CfsTreeSpecies> {
 
 	/**
 	 * Returns the enumeration constant with the given index.
+	 *
 	 * @param index the value in question
-	 * @return the enumeration value, unless no enumeration constant has the given 
-	 * 	   <code>index</code> in which case <code>null</code> is returned.
+	 * @return the enumeration value, unless no enumeration constant has the given <code>index</code> in which case
+	 *         <code>null</code> is returned.
 	 */
 	public static CfsTreeSpecies forIndex(int index) {
 		for (CfsTreeSpecies e : CfsTreeSpecies.values()) {

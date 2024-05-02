@@ -12,8 +12,9 @@ public class GenusDistribution implements Comparable<GenusDistribution> {
 
 	/**
 	 * Construct a GenusDistribution.
-	 * @param index the genus's index.
-	 * @param genus the genus. Must not be null.
+	 *
+	 * @param index      the genus's index.
+	 * @param genus      the genus. Must not be null.
 	 * @param percentage the distribution percentage. Must be non null and in the range 0 .. 100.
 	 */
 	public GenusDistribution(int index, GenusDefinition genus, Float percentage) {

@@ -13,10 +13,10 @@ public class CfsMethods {
 	 * Convert a Canadian Forest Service Tree Class index to a descriptive string.
 	 * <p>
 	 * Names come from the 'Volume_To_Biomass.doc', Table 2.
+	 *
 	 * @param cfsTreeClassIndex the CFS Tree Class number to be converted to a string.
-	 * @return a string corresponding to the named CFS Tree Class constant, or 
-	 *     "Unknown CFS Tree Class" if the given integer doesn't identify a 
-	 *     known CFS Tree Class.
+	 * @return a string corresponding to the named CFS Tree Class constant, or "Unknown CFS Tree Class" if the given
+	 *         integer doesn't identify a known CFS Tree Class.
 	 */
 	public static String cfsTreeClassToString(int cfsTreeClassIndex) {
 		CfsTreeClass cfsTreeCls = CfsTreeClass.forIndex(cfsTreeClassIndex);
@@ -28,25 +28,23 @@ public class CfsMethods {
 	}
 
 	/**
-	 * Convert the supplied CFS Genus enumeration value to a corresppnding
-	 * string value.
+	 * Convert the supplied CFS Genus enumeration value to a corresppnding string value.
 	 * <p>
-	 *    The CFS Tree Genus is defined in 'Appendix 7' in the
-	 *    'Model_based_volume_to_biomass_CFS' document located in
-	 *    'Documents/CFS-Biomass'.
+	 * The CFS Tree Genus is defined in 'Appendix 7' in the 'Model_based_volume_to_biomass_CFS' document located in
+	 * 'Documents/CFS-Biomass'.
 	 * <p>
-	 * Elements for this table are automatically generated and copy and pasted
-	 * from the:
+	 * Elements for this table are automatically generated and copy and pasted from the:
 	 * <ol>
-	 * <li> 'C Enum to String Mapping' column of the 
-	 * <li> 'GenusTable' found on the 
-	 * <li> 'Lookups' tab in the
-	 * <li> 'BC_Inventory_updates_by_CBMv2bs.xlsx' located in the
-	 * <li> 'Documents/CFS-Biomass' folder.
+	 * <li>'C Enum to String Mapping' column of the
+	 * <li>'GenusTable' found on the
+	 * <li>'Lookups' tab in the
+	 * <li>'BC_Inventory_updates_by_CBMv2bs.xlsx' located in the
+	 * <li>'Documents/CFS-Biomass' folder.
 	 * </ol>
+	 *
 	 * @param genus the CFS Tree Genus value to be converted to a string.
-	 * @return the string corresponding to the identified CFS Tree Genus.
-	 *    The string for 'UNKNOWN' if the value is not recognized.
+	 * @return the string corresponding to the identified CFS Tree Genus. The string for 'UNKNOWN' if the value is not
+	 *         recognized.
 	 */
 	public static String cfsGenusToString(CfsTreeGenus genus) {
 		if (genus != null) {
@@ -100,13 +98,13 @@ public class CfsMethods {
 	}
 
 	/**
-	 * Convert the supplied string into the best fit for the CFS Species. The supplied 
-	 * string must case-insensitively match one of the strings found in Appendix 7 of
-	 * 'Model_based_volume_to_biomass_CFS.pdf' found in 'Documents/CFS-Biomass'.
+	 * Convert the supplied string into the best fit for the CFS Species. The supplied string must case-insensitively
+	 * match one of the strings found in Appendix 7 of 'Model_based_volume_to_biomass_CFS.pdf' found in
+	 * 'Documents/CFS-Biomass'.
 	 *
 	 * @param cfsSpeciesName the cfs name of the species.
-	 * @return the CFSTreeSpecies corresponding to the given name. UNKNOWN is 
-	 * returned if the given name doesn't match a known name.
+	 * @return the CFSTreeSpecies corresponding to the given name. UNKNOWN is returned if the given name doesn't match a
+	 *         known name.
 	 *
 	 */
 	public static CfsTreeSpecies stringToCfsSpecies(String cfsSpeciesName) {
@@ -114,14 +112,12 @@ public class CfsMethods {
 	}
 
 	/**
-	 * Determine the CFS Genus for a particular CFS Species. The CFS Species to 
-	 * Genus conversions are defined in Appendix 7 of the document 
-	 * 'Model_based_volume_to_biomass_CFS.pdf' found in the folder
-	 * 'Documents/CFS-Biomass'.
+	 * Determine the CFS Genus for a particular CFS Species. The CFS Species to Genus conversions are defined in
+	 * Appendix 7 of the document 'Model_based_volume_to_biomass_CFS.pdf' found in the folder 'Documents/CFS-Biomass'.
 	 *
 	 * @param cfsSpcs the CFS Species whose genus is to be determined.
-	 * @return The CFS Genus code corresponding to the supplied CFS Species.
-	 *    UNKNOWN if the 'cfsSpcs' code was not recognized.
+	 * @return The CFS Genus code corresponding to the supplied CFS Species. UNKNOWN if the 'cfsSpcs' code was not
+	 *         recognized.
 	 */
 
 	public static CfsTreeGenus cfsSpcsNumToCFSGenus(CfsTreeSpecies cfsSpcs) {

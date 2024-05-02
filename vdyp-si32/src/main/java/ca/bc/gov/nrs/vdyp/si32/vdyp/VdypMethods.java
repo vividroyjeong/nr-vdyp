@@ -39,7 +39,7 @@ public class VdypMethods {
 
 	/**
 	 * Converts a SP64 code name into an index into the Species table.
-	 * 
+	 *
 	 * @param sp64CodeName the code name of the SP64 name in question
 	 * @return the index into the Species table for the corresponding species, and SpeciesTable.UNKNOWN_ENTRY_INDEX if
 	 *         the species was not recognized.
@@ -62,8 +62,8 @@ public class VdypMethods {
 	}
 
 	/**
-	 * Determines if the given species name is valid; that is, if it is either a Commercial 
-	 * or Non-Commercial tree species as defined by MoF..
+	 * Determines if the given species name is valid; that is, if it is either a Commercial or Non-Commercial tree
+	 * species as defined by MoF..
 	 *
 	 * @param spName the species name to test.
 	 * @return a boolean indicating the result of the test.
@@ -102,7 +102,7 @@ public class VdypMethods {
 
 	/**
 	 * Returns the MoF abbreviation for a given species.
-	 * 
+	 *
 	 * @param sp64Name the species in question
 	 * @return the short ("code") name of the species.
 	 */
@@ -116,7 +116,7 @@ public class VdypMethods {
 
 	/**
 	 * Returns the full name of a given species.
-	 * 
+	 *
 	 * @param sp64Name the species in question
 	 * @return the full ("common") name of the species.
 	 */
@@ -130,7 +130,7 @@ public class VdypMethods {
 
 	/**
 	 * Returns the latin name of a given species.
-	 * 
+	 *
 	 * @param sp64Name the species
 	 * @return the latin name of the species.
 	 */
@@ -144,7 +144,7 @@ public class VdypMethods {
 
 	/**
 	 * Returns the genus of a given species.
-	 * 
+	 *
 	 * @param sp64 the species
 	 * @return the latin name of the species.
 	 */
@@ -162,8 +162,8 @@ public class VdypMethods {
 	 * @param spName the name of the species to convert.
 	 * @param region indicates which provincial region to set the site curve for,
 	 *
-	 * @return the equivalent SINDEX species code. "" is returned if the species 
-	 * is null or is not supported by SINDEX and no mapping exists.
+	 * @return the equivalent SINDEX species code. "" is returned if the species is null or is not supported by SINDEX
+	 *         and no mapping exists.
 	 */
 	public static String getSINDEXSpecies(String speciesName, SpeciesRegion region) {
 
@@ -205,10 +205,10 @@ public class VdypMethods {
 
 	/**
 	 * Converts a CFS species name to an equivalent VDYP7 species (genus) name.
-	 * 
+	 *
 	 * @param sp64CodeName the SP64 code name of the species to convert.
-	 * @return the equivalent VDYP7 species code. "" is returned if the 
-	 * species is not supported by VDYP7 and no mapping exists.
+	 * @return the equivalent VDYP7 species code. "" is returned if the species is not supported by VDYP7 and no mapping
+	 *         exists.
 	 */
 	public static String getVDYP7Species(String sp64CodeName) {
 		if (sp64CodeName != null) {
@@ -223,8 +223,7 @@ public class VdypMethods {
 	 * <p>
 	 * SP0 and VDYP7 species names are one and the same.
 	 * <p>
-	 * The returned name is a valid VDYP7 class of species names and would also
-	 * be a valid SP64 species name.
+	 * The returned name is a valid VDYP7 class of species names and would also be a valid SP64 species name.
 	 *
 	 * @param sp0 the species whose name is to be fetched.
 	 * @return the name sought, or "" if the SP0 number is not recognized.
@@ -252,7 +251,7 @@ public class VdypMethods {
 	 * curve assignment has been made, the default curve from SINDEX will be returned.
 	 *
 	 * @param sp64Name the species short ("code") name such as "ABAL"
-	 * @param region the region under consideration
+	 * @param region   the region under consideration
 	 * @return The Site Index curve type to use for this species. -1 if the species or region was not recognized.
 	 */
 	public static SiteIndexEquation getCurrentSICurve(String sp64Name, SpeciesRegion region) {
@@ -284,14 +283,13 @@ public class VdypMethods {
 	/**
 	 * Determines the BC default Site Index curve type to use for the given species and region.
 	 * <p>
-	 * Within this program, there a number of core "Freddie" routines which use this 
-	 * value as an input parameter instead of a species name.
+	 * Within this program, there a number of core "Freddie" routines which use this value as an input parameter instead
+	 * of a species name.
 	 *
 	 * @param sp64Name the species short ("code") name such as "ABAL"
-	 * @param region the region under consideration
+	 * @param region   the region under consideration
 	 *
-	 * @return the BC default Site Index curve type to use for this species. Returns -2 
-	 * for non-commercial species.
+	 * @return the BC default Site Index curve type to use for this species. Returns -2 for non-commercial species.
 	 */
 	public static SiteIndexEquation getDefaultSICurve(String sp64Name, SpeciesRegion region) {
 
@@ -316,9 +314,8 @@ public class VdypMethods {
 	 * Sets the Site Index curve to use for a particular species.
 	 *
 	 * @param sp64CodeName the species short ("code") name such as "ABAL"
-	 * @param region the region under consideration
-	 * @param siCurve the site index curve to use for the specified species. -1.0f
-	 * resets the curve to the default.
+	 * @param region       the region under consideration
+	 * @param siCurve      the site index curve to use for the specified species. -1.0f resets the curve to the default.
 	 *
 	 * @return the previous value.
 	 */
@@ -336,35 +333,32 @@ public class VdypMethods {
 
 	/**
 	 * Determines the number of available SI curves for a particular species.
-	 * 
+	 *
 	 * @param respectSpeciesBoundariesInd
-	 * <ul>
-	 * <li><b>true</b> all remaining parameters are used to filter the particular
-	 *          set of curves to count.
-	 * <li><b>false</b> the count of all curves is returned, regardless of species
-	 *          and provincial location.
-	 * </ul>
-	 * @param sp64Name the short ("code") name of the species.
+	 *                                    <ul>
+	 *                                    <li><b>true</b> all remaining parameters are used to filter the particular set
+	 *                                    of curves to count.
+	 *                                    <li><b>false</b> the count of all curves is returned, regardless of species
+	 *                                    and provincial location.
+	 *                                    </ul>
+	 * @param sp64Name                    the short ("code") name of the species.
 	 * @param mixInteriorCoastalInd
-	 * <ul>
-	 * <li><b>true</b> curves from the interior and the coast are counted in the
-	 *          total count. In this case, the <code>region</code> parameter is ignored.
-	 * <li><b>false</b> only the curves from the particular region of the province
-	 *          specified by the <code>region</code> parameter are counted.
-	 * </ul>
-	 * @param region indicates which provincial region to get the number for. If
-	 * 			<code>mixInteriorCoastalInd</code> is <code>true</code>, this 
-	 *          parameter is ignored.
-	 * @return a count of all of the Site Index curves for a particular species. 0 
-	 * 			is returned if the species is non-commercial or the species is not 
-	 *          recognized. This count is always positive for commercial species. 
-	 *          Always 0 for non-commercial species. When mixing interior and coastal 
-	 *          curves, the count may be the same as when treating these regions 
-	 *          separately.
+	 *                                    <ul>
+	 *                                    <li><b>true</b> curves from the interior and the coast are counted in the
+	 *                                    total count. In this case, the <code>region</code> parameter is ignored.
+	 *                                    <li><b>false</b> only the curves from the particular region of the province
+	 *                                    specified by the <code>region</code> parameter are counted.
+	 *                                    </ul>
+	 * @param region                      indicates which provincial region to get the number for. If
+	 *                                    <code>mixInteriorCoastalInd</code> is <code>true</code>, this parameter is
+	 *                                    ignored.
+	 * @return a count of all of the Site Index curves for a particular species. 0 is returned if the species is
+	 *         non-commercial or the species is not recognized. This count is always positive for commercial species.
+	 *         Always 0 for non-commercial species. When mixing interior and coastal curves, the count may be the same
+	 *         as when treating these regions separately.
 	 */
 	public static int getNumSICurves(
-			boolean respectSpeciesBoundariesInd, String sp64Name,
-			boolean mixInteriorCoastalInd, SpeciesRegion region
+			boolean respectSpeciesBoundariesInd, String sp64Name, boolean mixInteriorCoastalInd, SpeciesRegion region
 	) {
 
 		int numCurves = 0;
@@ -444,8 +438,8 @@ public class VdypMethods {
 	 * Obtains the SINDEX species index most closely associated with a particular site curve.
 	 *
 	 * @param siCurve the Site Index curve to convert into a species name.
-	 * @return species index, for use in other Sindex functions. SI_NO_SPECIES is returned if
-	 * the curve was not recognized.
+	 * @return species index, for use in other Sindex functions. SI_NO_SPECIES is returned if the curve was not
+	 *         recognized.
 	 */
 	public static SiteIndexSpecies getSICurveSpeciesIndex(SiteIndexEquation siCurve) {
 		try {
@@ -460,7 +454,7 @@ public class VdypMethods {
 	 * of the province.
 	 *
 	 * @param sp64CodeName the species name to be looked up.
-	 * @param region indicates which provincial region to get the default CC for.
+	 * @param region       indicates which provincial region to get the default CC for.
 	 *
 	 * @return the default CC associated with the species in that particular region and -1.0 if the species was not
 	 *         recognized or no default CC has been assigned to that species and region.
@@ -482,8 +476,8 @@ public class VdypMethods {
 	 *
 	 * @param sp0Name the VDYP7 Species Name to be converted into a species index.
 	 *
-	 * @return The enumSP0Name corresponding to the supplied species, and UNKNOWN if the species name was not
-	 *         supplied or was not recognized. Note that the returned index is a zero-based index.
+	 * @return The enumSP0Name corresponding to the supplied species, and UNKNOWN if the species name was not supplied
+	 *         or was not recognized. Note that the returned index is a zero-based index.
 	 */
 	public static SP0Name getVDYP7SpeciesIndex(String sp0Name) {
 		SP0Name sp0Index = SP0Name.UNKNOWN;

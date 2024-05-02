@@ -5,16 +5,17 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 
 public class VriPolygon extends BaseVdypPolygon<VriLayer, Optional<Float>, VriSpecies, VriSite> {
 
 	private Optional<String> nonproductiveDescription; // FIP_P3/NPDESC
 	private float yieldFactor; // FIP_P4/YLDFACT
-	public final static String FIZ = " ";
+	public static final String FIZ = " ";
 
 	public VriPolygon(
-			String polygonIdentifier, String fiz, String becIdentifier, Optional<Float> percentAvailable,
+			PolygonIdentifier polygonIdentifier, String fiz, String becIdentifier, Optional<Float> percentAvailable,
 			Optional<PolygonMode> modeFip, Optional<String> nonproductiveDescription, float yieldFactor
 	) {
 		super(polygonIdentifier, percentAvailable, fiz, becIdentifier, modeFip);

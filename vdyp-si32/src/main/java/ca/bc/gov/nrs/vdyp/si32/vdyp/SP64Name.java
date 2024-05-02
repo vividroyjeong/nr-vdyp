@@ -6,11 +6,11 @@ import ca.bc.gov.nrs.vdyp.model.EnumIterator;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
 
 /**
- * An enumeration holding each of the valid SP0 Species known to VDYP7. The index
- * value <b>must</b> match the index of this species in {@code SpeciesTable}.
+ * An enumeration holding each of the valid SP0 Species known to VDYP7. The index value <b>must</b> match the index of
+ * this species in {@code SpeciesTable}.
  * <p>
- * <b>UNKNOWN</b> represents an error condition or an uninitialized state. 
- * This value should not be used as a species constant.
+ * <b>UNKNOWN</b> represents an error condition or an uninitialized state. This value should not be used as a species
+ * constant.
  */
 public enum SP64Name implements SI32Enum<SP64Name> {
 	UNKNOWN(0),
@@ -34,8 +34,7 @@ public enum SP64Name implements SI32Enum<SP64Name> {
 	BG(17), //
 	BI(18), //
 	BL(19), //
-	BM(20),
-	BN(21), //
+	BM(20), BN(21), //
 	BP(22), //
 	BV(23), //
 	C(24), //
@@ -192,8 +191,8 @@ public enum SP64Name implements SI32Enum<SP64Name> {
 	}
 
 	/**
-	 * Return the enumeration value corresponding to the given text. If none
-	 * exists, {@code UNKNOWN} is returned.
+	 * Return the enumeration value corresponding to the given text. If none exists, {@code UNKNOWN} is returned.
+	 *
 	 * @param text the text value == the enumeration text minus the "" prefix.
 	 * @return as described
 	 */
@@ -212,9 +211,10 @@ public enum SP64Name implements SI32Enum<SP64Name> {
 
 	/**
 	 * Returns the enumeration constant with the given index.
+	 *
 	 * @param index the value in question
-	 * @return the enumeration value, unless no enumeration constant has the given 
-	 * 	   <code>index</code> in which case <code>null</code> is returned.
+	 * @return the enumeration value, unless no enumeration constant has the given <code>index</code> in which case
+	 *         <code>null</code> is returned.
 	 */
 	public static SP64Name forIndex(int index) {
 		for (SP64Name e : SP64Name.values()) {

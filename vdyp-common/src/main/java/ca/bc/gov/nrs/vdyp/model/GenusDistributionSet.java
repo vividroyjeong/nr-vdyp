@@ -35,13 +35,12 @@ public class GenusDistributionSet implements Comparable<GenusDistributionSet> {
 		genusDistributionMap = new HashMap<>();
 
 		for (var e : other.genusDistributionMap.entrySet()) {
-			genusDistributionMap
-					.put(
-							e.getKey(), new GenusDistribution(
-									e.getValue().getIndex(),
-									e.getValue().getGenus(), e.getValue().getPercentage()
-							)
-					);
+			genusDistributionMap.put(
+					e.getKey(),
+					new GenusDistribution(
+							e.getValue().getIndex(), e.getValue().getGenus(), e.getValue().getPercentage()
+					)
+			);
 		}
 	}
 
@@ -65,8 +64,7 @@ public class GenusDistributionSet implements Comparable<GenusDistributionSet> {
 		return new GenusDistributionSet(this);
 	}
 
-	public static void validate(int maxIndex, List<GenusDistribution> gdList)
-			throws InvalidGenusDistributionSet {
+	public static void validate(int maxIndex, List<GenusDistribution> gdList) throws InvalidGenusDistributionSet {
 		if (gdList == null || gdList.size() == 0) {
 			throw new InvalidGenusDistributionSet("GenusDistributionSet does not have the required first entry");
 		}
@@ -79,23 +77,20 @@ public class GenusDistributionSet implements Comparable<GenusDistributionSet> {
 		for (GenusDistribution gd : gdList) {
 			if (generaSeen.contains(gd.getGenus())) {
 				throw new InvalidGenusDistributionSet(
-						MessageFormat.format(
-								"Species {0} appears more than once in GenusDistributionSet", gd.getGenus()
-						)
+						MessageFormat
+								.format("Species {0} appears more than once in GenusDistributionSet", gd.getGenus())
 				);
 			}
 			if (indicesSeen.contains(gd.getIndex())) {
 				throw new InvalidGenusDistributionSet(
-						MessageFormat.format(
-								"Index {0} appears more than once in GenusDistributionSet", gd.getIndex()
-						)
+						MessageFormat.format("Index {0} appears more than once in GenusDistributionSet", gd.getIndex())
 				);
 			}
 			if (gd.getIndex() < 0 || gd.getIndex() > maxIndex) {
 				throw new InvalidGenusDistributionSet(
 						MessageFormat.format(
-								"Index {0} is out of range - acceptable values are between 0 and {1}, inclusive", gd
-										.getIndex(), maxIndex
+								"Index {0} is out of range - acceptable values are between 0 and {1}, inclusive",
+								gd.getIndex(), maxIndex
 						)
 				);
 			}

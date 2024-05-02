@@ -45,17 +45,14 @@ public class ForwardDataStreamReader {
 		polygonStream = ((StreamingParserFactory<VdypPolygon>) polygonStreamFactory).get();
 
 		var layerSpeciesStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SPECIES.name());
-		layerSpeciesStream = ((StreamingParserFactory<Collection<VdypLayerSpecies>>) layerSpeciesStreamFactory)
-				.get();
+		layerSpeciesStream = ((StreamingParserFactory<Collection<VdypLayerSpecies>>) layerSpeciesStreamFactory).get();
 
-		var speciesUtilizationStreamFactory = controlMap
-				.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name());
+		var speciesUtilizationStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name());
 		speciesUtilizationStream = ((StreamingParserFactory<Collection<VdypSpeciesUtilization>>) speciesUtilizationStreamFactory)
 				.get();
 	}
 
-	public VdypPolygon readNextPolygon(VdypPolygonDescription polygonDescription)
-			throws ProcessingException {
+	public VdypPolygon readNextPolygon(VdypPolygonDescription polygonDescription) throws ProcessingException {
 
 		// Advance all the streams until the definition for the polygon is found.
 
@@ -102,8 +99,8 @@ public class ForwardDataStreamReader {
 							species.getGenus().orElseThrow(
 									() -> new ProcessingException(
 											MessageFormat.format(
-													"Genus missing for species {} of polygon {}", species
-															.getGenusIndex(), polygon.getDescription()
+													"Genus missing for species {} of polygon {}",
+													species.getGenusIndex(), polygon.getDescription()
 											)
 									)
 							)
@@ -115,8 +112,8 @@ public class ForwardDataStreamReader {
 					} else {
 						throw new IllegalStateException(
 								MessageFormat.format(
-										"Unrecognized layer type {} for species {} of polygon {}", species
-												.getLayerType(), species.getGenusIndex(), polygon.getDescription()
+										"Unrecognized layer type {} for species {} of polygon {}",
+										species.getLayerType(), species.getGenusIndex(), polygon.getDescription()
 								)
 						);
 					}

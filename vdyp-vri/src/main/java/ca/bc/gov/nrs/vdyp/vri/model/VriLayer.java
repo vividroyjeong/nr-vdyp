@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import ca.bc.gov.nrs.vdyp.common.Computed;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 
 public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 
@@ -19,7 +20,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 	private final Optional<Integer> empericalRelationshipParameterIndex; // INXL1/GRPBA1
 
 	public VriLayer(
-			String polygonIdentifier, LayerType layer, float crownClosure, Optional<Float> baseArea,
+			PolygonIdentifier polygonIdentifier, LayerType layer, float crownClosure, Optional<Float> baseArea,
 			Optional<Float> treesPerHectare, float utilization, Optional<String> primaryGenus,
 			Optional<String> secondaryGenus, Optional<Integer> empericalRelationshipParameterIndex
 	) {

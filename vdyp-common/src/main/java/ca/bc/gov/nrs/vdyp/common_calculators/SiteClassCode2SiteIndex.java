@@ -12,8 +12,8 @@ import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies;
  * SiteClassCode2SiteIndex.java - translates site class code to site index (height in metres) for a given species, site
  * class, and FIZ.
  * <p>
- * The translation is intended to be used where total age is small (under 30 years) and where site index
- * based on height may not be reliable.
+ * The translation is intended to be used where total age is small (under 30 years) and where site index based on height
+ * may not be reliable.
  * <p>
  * Primarily used by VDYP and FredTab.
  * <p>
@@ -22,8 +22,9 @@ import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies;
 public class SiteClassCode2SiteIndex {
 	/**
 	 * Convert a species, site class and forest inventory zone to a site index (in m).
-	 * @param spIndex the species' index.
-	 * @param siteClass (one of G, M, P or L)
+	 *
+	 * @param spIndex             the species' index.
+	 * @param siteClass           (one of G, M, P or L)
 	 * @param forestInventoryZone (A through L, with A, B and C coastal and the others interior)
 	 * @return the site index, in metres
 	 * @throws CommonCalculatorException
@@ -307,7 +308,8 @@ public class SiteClassCode2SiteIndex {
 
 		throw new SpeciesErrorException(
 				MessageFormat.format(
-						"classToIndex: not found: spIndex {0}, sitecl {1}, fiz {2}", spIndex, siteClass, forestInventoryZone
+						"classToIndex: not found: spIndex {0}, sitecl {1}, fiz {2}", spIndex, siteClass,
+						forestInventoryZone
 				)
 		);
 	}

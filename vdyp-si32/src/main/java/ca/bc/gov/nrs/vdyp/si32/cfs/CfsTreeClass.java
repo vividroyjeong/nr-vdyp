@@ -6,40 +6,43 @@ import ca.bc.gov.nrs.vdyp.model.EnumIterator;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
 
 /**
- * Provides an enumeration of the different types of Tree Classes as defined by the
- * Canadian Forest Service.
+ * Provides an enumeration of the different types of Tree Classes as defined by the Canadian Forest Service.
  * <ul>
- * <li> UNKNOWN<p>
- *       Represents an error condition or an uninitialized state. This should
- *       never be considered a true tree class.
+ * <li>UNKNOWN
+ * <p>
+ * Represents an error condition or an uninitialized state. This should never be considered a true tree class.
  *
- * <li> Missing<p>
- *       The tree class attribute is missing. This differs from the UNKNOWN
- *       indicator in that this represents a valid business value of Missing
- *       (which may in turn represent an business process error) but remains
- *       a valid value for the attribute.
+ * <li>Missing
+ * <p>
+ * The tree class attribute is missing. This differs from the UNKNOWN indicator in that this represents a valid business
+ * value of Missing (which may in turn represent an business process error) but remains a valid value for the attribute.
  *
- * <li> LiveNoPath<p>
- *       A tree or stand that is living with no pathological indicators.
+ * <li>LiveNoPath
+ * <p>
+ * A tree or stand that is living with no pathological indicators.
  *
- * <li> LiveWithPath<p>
- *       A living tree or stand with some pathological indicators.
+ * <li>LiveWithPath
+ * <p>
+ * A living tree or stand with some pathological indicators.
  *
- * <li> DeadPotential<p>
- *       A dead tree or stand with potential for harvesting.
+ * <li>DeadPotential
+ * <p>
+ * A dead tree or stand with potential for harvesting.
  *
- * <li> DeadUseless<p>
- *       A dead tree or stand with no further potential.
+ * <li>DeadUseless
+ * <p>
+ * A dead tree or stand with no further potential.
  *
- * <li> Veteran<p>
- *       A living tree or stand falling into the Veteran class.
+ * <li>Veteran
+ * <p>
+ * A living tree or stand falling into the Veteran class.
  *
- * <li> NoLongerUsed<p>
- *       No longer used and should be treated as equivalent to:
- *       'LiveWithPath'.
+ * <li>NoLongerUsed
+ * <p>
+ * No longer used and should be treated as equivalent to: 'LiveWithPath'.
  * </ul>
- * The definitions of this table come from Table 2 found in the 'Volume_to_Biomass.doc' file 
- * located in 'Documents/CFS-Biomass'.
+ * The definitions of this table come from Table 2 found in the 'Volume_to_Biomass.doc' file located in
+ * 'Documents/CFS-Biomass'.
  */
 public enum CfsTreeClass implements SI32Enum<CfsTreeClass> {
 	UNKNOWN(-1, "Unknown CFS Tree Class"),
@@ -95,9 +98,10 @@ public enum CfsTreeClass implements SI32Enum<CfsTreeClass> {
 
 	/**
 	 * Returns the enumeration constant with the given index.
+	 *
 	 * @param index the value in question
-	 * @return the enumeration value, unless no enumeration constant has the given 
-	 * 	   <code>index</code> in which case <code>null</code> is returned.
+	 * @return the enumeration value, unless no enumeration constant has the given <code>index</code> in which case
+	 *         <code>null</code> is returned.
 	 */
 	public static CfsTreeClass forIndex(int index) {
 

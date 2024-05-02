@@ -66,10 +66,12 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 		return () -> {
 			var lineParser = new LineParser().strippedString(25, DESCRIPTION).space(1)
 					.value(
-							1, LAYER_TYPE, ValueParser.valueOrMarker(
-									ValueParser.LAYER, ValueParser.optionalSingleton(
-											x -> x == null || x.trim().length() == 0
-													|| x.trim().equals("Z"), EndOfRecord.END_OF_RECORD
+							1, LAYER_TYPE,
+							ValueParser.valueOrMarker(
+									ValueParser.LAYER,
+									ValueParser.optionalSingleton(
+											x -> x == null || x.trim().length() == 0 || x.trim().equals("Z"),
+											EndOfRecord.END_OF_RECORD
 									)
 							)
 					).space(1).value(2, GENUS_INDEX, ValueParser.INTEGER).space(1)
@@ -144,24 +146,18 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 						gdList.add(new GenusDistribution(0, genusDefinitionMap.get(genusNameText0), percentGenus0));
 
 						Utils.ifBothPresent(
-								genusNameText1.filter(
-										t -> genusDefinitionMap.contains(t)
-								), percentGenus1, (s, p) -> gdList
-										.add(new GenusDistribution(1, genusDefinitionMap.get(s), p))
+								genusNameText1.filter(t -> genusDefinitionMap.contains(t)), percentGenus1,
+								(s, p) -> gdList.add(new GenusDistribution(1, genusDefinitionMap.get(s), p))
 						);
 
 						Utils.ifBothPresent(
-								genusNameText2.filter(
-										t -> genusDefinitionMap.contains(t)
-								), percentGenus2, (s, p) -> gdList
-										.add(new GenusDistribution(2, genusDefinitionMap.get(s), p))
+								genusNameText2.filter(t -> genusDefinitionMap.contains(t)), percentGenus2,
+								(s, p) -> gdList.add(new GenusDistribution(2, genusDefinitionMap.get(s), p))
 						);
 
 						Utils.ifBothPresent(
-								genusNameText3.filter(
-										t -> genusDefinitionMap.contains(t)
-								), percentGenus3, (s, p) -> gdList
-										.add(new GenusDistribution(3, genusDefinitionMap.get(s), p))
+								genusNameText3.filter(t -> genusDefinitionMap.contains(t)), percentGenus3,
+								(s, p) -> gdList.add(new GenusDistribution(3, genusDefinitionMap.get(s), p))
 						);
 
 						try {

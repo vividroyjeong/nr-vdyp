@@ -33,7 +33,7 @@ public class VdypSpecies extends BaseVdypSpecies implements VdypUtilizationHolde
 	int breakageGroup;
 
 	public VdypSpecies(
-			String polygonIdentifier, LayerType layer, String genus, float percentGenus, //
+			PolygonIdentifier polygonIdentifier, LayerType layer, String genus, float percentGenus, //
 			int volumeGroup, int decayGroup, int breakageGroup
 	) {
 		super(polygonIdentifier, layer, genus, percentGenus);

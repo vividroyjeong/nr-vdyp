@@ -24,7 +24,7 @@ public enum SP0Name implements SI32Enum<SP0Name> {
 	PA(10), //
 	PL(11), //
 	PW(12), //
-	PY(13), // 
+	PY(13), //
 	S(14), //
 	Y(15);
 
@@ -63,9 +63,9 @@ public enum SP0Name implements SI32Enum<SP0Name> {
 
 	/**
 	 * Returns the enumeration constant corresponding to the given text value.
-	 * @param text the text value in question. Example: "AC". The value is converted to upper-case before
-	 *     the lookup.
-	 * @return the enumeration value, unless <code>text</code> is null or 
+	 *
+	 * @param text the text value in question. Example: "AC". The value is converted to upper-case before the lookup.
+	 * @return the enumeration value, unless <code>text</code> is null or
 	 */
 	public static SP0Name forText(String text) {
 		try {
@@ -77,9 +77,10 @@ public enum SP0Name implements SI32Enum<SP0Name> {
 
 	/**
 	 * Returns the enumeration constant with the given index.
+	 *
 	 * @param index the value in question
-	 * @return the enumeration value, unless no enumeration constant has the given 
-	 * 	   <code>index</code> in which case <code>null</code> is returned.
+	 * @return the enumeration value, unless no enumeration constant has the given <code>index</code> in which case
+	 *         <code>null</code> is returned.
 	 */
 	public static SP0Name forIndex(int index) {
 		for (SP0Name e : SP0Name.values()) {

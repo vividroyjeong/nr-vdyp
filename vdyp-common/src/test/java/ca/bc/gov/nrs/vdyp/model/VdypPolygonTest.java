@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.model;
 
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
@@ -18,13 +19,13 @@ class VdypPolygonTest {
 	@Test
 	void build() throws Exception {
 		var result = VdypPolygon.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.percentAvailable(90f);
 
 			builder.forestInventoryZone("?");
 			builder.biogeoclimaticZone("?");
 		});
-		assertThat(result, hasProperty("polygonIdentifier", is("Test")));
+		assertThat(result, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
 		assertThat(result, hasProperty("percentAvailable", is(90f)));
 		assertThat(result, hasProperty("layers", anEmptyMap()));
 	}
@@ -34,9 +35,8 @@ class VdypPolygonTest {
 		var ex = assertThrows(IllegalStateException.class, () -> VdypPolygon.build(builder -> {
 		}));
 		assertThat(
-				ex, hasProperty(
-						"message", allOf(containsString("polygonIdentifier"), containsString("percentAvailable"))
-				)
+				ex,
+				hasProperty("message", allOf(containsString("polygonIdentifier"), containsString("percentAvailable")))
 		);
 	}
 
@@ -46,7 +46,7 @@ class VdypPolygonTest {
 		EasyMock.expect(mock.getLayerType()).andStubReturn(LayerType.PRIMARY);
 		EasyMock.replay(mock);
 		var result = VdypPolygon.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.percentAvailable(90f);
 
 			builder.forestInventoryZone("?");
@@ -54,7 +54,7 @@ class VdypPolygonTest {
 
 			builder.addLayer(mock);
 		});
-		assertThat(result, hasProperty("polygonIdentifier", is("Test")));
+		assertThat(result, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
 		assertThat(result, hasProperty("percentAvailable", is(90f)));
 		assertThat(result, hasProperty("layers", hasEntry(LayerType.PRIMARY, mock)));
 	}
@@ -62,7 +62,7 @@ class VdypPolygonTest {
 	@Test
 	void buildBuildLayer() throws Exception {
 		var result = VdypPolygon.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.percentAvailable(90f);
 
 			builder.forestInventoryZone("?");
@@ -79,7 +79,7 @@ class VdypPolygonTest {
 				});
 			});
 		});
-		assertThat(result, hasProperty("polygonIdentifier", is("Test")));
+		assertThat(result, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
 		assertThat(result, hasProperty("percentAvailable", is(90f)));
 		assertThat(result, hasProperty("layers", hasEntry(is(LayerType.PRIMARY), any(VdypLayer.class))));
 	}

@@ -14,7 +14,7 @@ import ca.bc.gov.nrs.vdyp.model.EnumIterator;
  */
 public enum SpeciesRegion implements SI32Enum<SpeciesRegion> {
 
-	COAST(0), // 
+	COAST(0), //
 	INTERIOR(1);
 
 	private static Map<Integer, SpeciesRegion> index2EnumMap = null;
@@ -50,9 +50,10 @@ public enum SpeciesRegion implements SI32Enum<SpeciesRegion> {
 
 	/**
 	 * Returns the enumeration constant with the given index.
+	 *
 	 * @param index the value in question
-	 * @return the enumeration value, unless no enumeration constant has the given 
-	 * 	   <code>index</code> in which case <code>null</code> is returned.
+	 * @return the enumeration value, unless no enumeration constant has the given <code>index</code> in which case
+	 *         <code>null</code> is returned.
 	 */
 	public static SpeciesRegion forIndex(int index) {
 		return index2EnumMap.get(index);

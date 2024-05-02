@@ -53,13 +53,11 @@ public class BecZoneMethods {
 		enumToBecZoneMap.put(BecZone.SWB, "SWB");
 	}
 
-	/** 
-	 * Convert the given BEC Zone label to its enumeration value. 
-	 * 
-	 * @param becZone the 2 - 4 character BEC Zone identifier such as "AG". The value
-	 *     need not be in upper-case. 
-	 * @return the index of the given BEC Zone in the enumeration, or 
-	 *     bec_UNKNOWN if it's not recognized.
+	/**
+	 * Convert the given BEC Zone label to its enumeration value.
+	 *
+	 * @param becZone the 2 - 4 character BEC Zone identifier such as "AG". The value need not be in upper-case.
+	 * @return the index of the given BEC Zone in the enumeration, or bec_UNKNOWN if it's not recognized.
 	 */
 	public static BecZone becZoneToIndex(String becZone) {
 
@@ -73,10 +71,10 @@ public class BecZoneMethods {
 		return BecZone.UNKNOWN;
 	}
 
-	/** 
+	/**
 	 * Convert the given BEC Zone enumeration value to its identifier
-	 * 
-	 * @param becZone the value to convert 
+	 *
+	 * @param becZone the value to convert
 	 * @return the BEC Zone identifier or ???? if it's not recognized.
 	 */
 	public static String becZoneToCode(BecZone becZone) {
@@ -140,8 +138,7 @@ public class BecZoneMethods {
 		if (mofBiomassCoeffs.length != SP0Name.size()) {
 			throw new IllegalStateException(
 					MessageFormat.format(
-							"mofBiomassCoeffs does not contain one row for each of the {0} BEC Zones", BecZone
-									.size()
+							"mofBiomassCoeffs does not contain one row for each of the {0} BEC Zones", BecZone.size()
 					)
 			);
 		}
@@ -150,8 +147,8 @@ public class BecZoneMethods {
 			if (mofBiomassCoeffs[i].length != BecZone.size()) {
 				throw new IllegalStateException(
 						MessageFormat.format(
-								"mofBiomassCoeffs {} does not contain one entry for each of the {0} SP0 Zones", i, SP0Name
-										.size()
+								"mofBiomassCoeffs {} does not contain one entry for each of the {0} SP0 Zones", i,
+								SP0Name.size()
 						)
 				);
 			}
@@ -159,10 +156,10 @@ public class BecZoneMethods {
 	}
 
 	/**
-	 * Converts a BEC Zone and a CFS Species code name into an MoF Biomass Coefficient for 
-	 * multiplying corresponding Projected Volumes into an MoF Biomass value.
-	 * 
-	 * @param becZoneName the name of the BEC Zone.
+	 * Converts a BEC Zone and a CFS Species code name into an MoF Biomass Coefficient for multiplying corresponding
+	 * Projected Volumes into an MoF Biomass value.
+	 *
+	 * @param becZoneName  the name of the BEC Zone.
 	 * @param sp64CodeName the code name of the CFS species.
 	 * @return as described. If either parameter doesn't identify an entity of the expected type, -1.0 is returned.
 	 */

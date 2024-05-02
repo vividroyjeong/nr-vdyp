@@ -23,7 +23,6 @@ import org.junit.jupiter.params.provider.EnumSource.Mode;
 
 import ca.bc.gov.nrs.vdyp.application.ApplicationTestUtils;
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
-import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.MockStreamingParser;
@@ -77,16 +76,16 @@ class VriStartTest {
 		ApplicationTestUtils.setControlMap(app, controlMap);
 
 		var polygon = VriPolygon.build(pBuilder -> {
-			pBuilder.polygonIdentifier("Test");
+			pBuilder.polygonIdentifier("Test", 2024);
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(66f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
-				((VriLayer.Builder) lBuilder).empiricalRelationshipParameterIndex(76);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(66f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
+				lBuilder.empiricalRelationshipParameterIndex(76);
 
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B"); // 3
@@ -124,16 +123,16 @@ class VriStartTest {
 		ApplicationTestUtils.setControlMap(app, controlMap);
 
 		var polygon = VriPolygon.build(pBuilder -> {
-			pBuilder.polygonIdentifier("Test");
+			pBuilder.polygonIdentifier("Test", 2024);
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.buildLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
-				((VriLayer.Builder) lBuilder).crownClosure(57.8f);
-				((VriLayer.Builder) lBuilder).baseArea(66f);
-				((VriLayer.Builder) lBuilder).treesPerHectare(850f);
-				((VriLayer.Builder) lBuilder).utilization(7.5f);
-				((VriLayer.Builder) lBuilder).empiricalRelationshipParameterIndex(76);
+				lBuilder.crownClosure(57.8f);
+				lBuilder.baseArea(66f);
+				lBuilder.treesPerHectare(850f);
+				lBuilder.utilization(7.5f);
+				lBuilder.empiricalRelationshipParameterIndex(76);
 
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B"); // 3
@@ -161,7 +160,8 @@ class VriStartTest {
 		Coefficients result = app.estimateBaseAreaYieldCoefficients(species, bec);
 
 		assertThat(
-				result, VdypMatchers.coe(
+				result,
+				VdypMatchers.coe(
 						0, 7.29882717f, 0.934803009f, 7.22950029f, 0.478330702f, 0.00542420009f, 0f, -0.00899999961f
 				)
 		);
@@ -203,7 +203,7 @@ class VriStartTest {
 		Optional<Float> percentForest = Optional.of(90f);
 
 		Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.genus("B");
 			builder.percentGenus(100f);
@@ -211,8 +211,8 @@ class VriStartTest {
 		var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 		var result = app.findDefaultPolygonMode(
-				ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
-						.of(76)
+				ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
+				Optional.of(76)
 		);
 
 		assertThat(result, is(PolygonMode.YOUNG));
@@ -256,7 +256,7 @@ class VriStartTest {
 		Optional<Float> percentForest = Optional.of(90f);
 
 		Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.genus("B");
 			builder.percentGenus(100f);
@@ -264,8 +264,8 @@ class VriStartTest {
 		var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 		var result = app.findDefaultPolygonMode(
-				ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
-						.of(76)
+				ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
+				Optional.of(76)
 		);
 
 		assertThat(result, is(PolygonMode.YOUNG));
@@ -309,7 +309,7 @@ class VriStartTest {
 		Optional<Float> percentForest = Optional.of(90f);
 
 		Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.genus("B");
 			builder.percentGenus(100f);
@@ -317,8 +317,8 @@ class VriStartTest {
 		var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 		var result = app.findDefaultPolygonMode(
-				ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
-						.of(76)
+				ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
+				Optional.of(76)
 		);
 
 		assertThat(result, is(PolygonMode.YOUNG));
@@ -362,7 +362,7 @@ class VriStartTest {
 		Optional<Float> percentForest = Optional.of(90f);
 
 		Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.genus("B");
 			builder.percentGenus(100f);
@@ -370,8 +370,8 @@ class VriStartTest {
 		var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 		var result = app.findDefaultPolygonMode(
-				ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
-						.of(76)
+				ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
+				Optional.of(76)
 		);
 
 		assertThat(result, is(PolygonMode.YOUNG));
@@ -415,7 +415,7 @@ class VriStartTest {
 		Optional<Float> percentForest = Optional.of(95f); // Set this high
 
 		Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.genus("B");
 			builder.percentGenus(100f);
@@ -423,8 +423,8 @@ class VriStartTest {
 		var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 		var result = app.findDefaultPolygonMode(
-				ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
-						.of(76)
+				ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
+				Optional.of(76)
 		);
 
 		assertThat(result, is(PolygonMode.YOUNG));
@@ -468,7 +468,7 @@ class VriStartTest {
 		Optional<Float> percentForest = Optional.of(85f);
 
 		Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.genus("B");
 			builder.percentGenus(100f);
@@ -476,8 +476,8 @@ class VriStartTest {
 		var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 		var result = app.findDefaultPolygonMode(
-				ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
-						.of(76)
+				ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
+				Optional.of(76)
 		);
 
 		assertThat(result, is(PolygonMode.START));
@@ -495,7 +495,7 @@ class VriStartTest {
 		MockFileResolver resolver = dummyInput();
 
 		var poly = VriPolygon.build(pb -> {
-			pb.polygonIdentifier("TestPoly");
+			pb.polygonIdentifier("TestPoly", 2024);
 			pb.biogeoclimaticZone("IDF");
 			pb.yieldFactor(1.0f);
 			pb.mode(mode);
@@ -525,7 +525,7 @@ class VriStartTest {
 		MockFileResolver resolver = dummyInput();
 
 		var poly = VriPolygon.build(pb -> {
-			pb.polygonIdentifier("TestPoly");
+			pb.polygonIdentifier("TestPoly", 2024);
 			pb.biogeoclimaticZone("IDF");
 			pb.yieldFactor(1.0f);
 			pb.mode(mode);
@@ -585,7 +585,7 @@ class VriStartTest {
 		MockFileResolver resolver = dummyInput();
 
 		var poly = VriPolygon.build(pb -> {
-			pb.polygonIdentifier("TestPoly");
+			pb.polygonIdentifier("TestPoly", 2024);
 			pb.biogeoclimaticZone("IDF");
 			pb.yieldFactor(1.0f);
 			pb.mode(PolygonMode.START);
@@ -641,7 +641,7 @@ class VriStartTest {
 		MockFileResolver resolver = dummyInput();
 
 		var poly = VriPolygon.build(pb -> {
-			pb.polygonIdentifier("TestPoly");
+			pb.polygonIdentifier("TestPoly", 2024);
 			pb.biogeoclimaticZone("IDF");
 			pb.yieldFactor(1.0f);
 			pb.mode(PolygonMode.DONT_PROCESS);

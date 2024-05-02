@@ -18,9 +18,8 @@ public class ControlFileWriterTest {
 			writer.writeEntry(1, "Value");
 
 			assertThat(
-					output.toString(ControlFileWriter.CHARSET), equalTo(
-							"001 Value                                             \r\n"
-					)
+					output.toString(ControlFileWriter.CHARSET),
+					equalTo("001 Value                                             \r\n")
 			);
 
 		}
@@ -34,9 +33,8 @@ public class ControlFileWriterTest {
 			writer.writeEntry(1, "Value", "Comment");
 
 			assertThat(
-					output.toString(ControlFileWriter.CHARSET), equalTo(
-							"001 Value                                             Comment\r\n"
-					)
+					output.toString(ControlFileWriter.CHARSET),
+					equalTo("001 Value                                             Comment\r\n")
 			);
 
 		}
@@ -50,7 +48,8 @@ public class ControlFileWriterTest {
 			writer.writeEntry(1, "Long Value.........................................");
 
 			assertThat(
-					output.toString(ControlFileWriter.CHARSET), equalTo(
+					output.toString(ControlFileWriter.CHARSET),
+					equalTo(
 							"001XLong Value.........................................                                                                     \r\n"
 					)
 			);
@@ -66,7 +65,8 @@ public class ControlFileWriterTest {
 			writer.writeEntry(1, "Long Value.........................................", "Comment");
 
 			assertThat(
-					output.toString(ControlFileWriter.CHARSET), equalTo(
+					output.toString(ControlFileWriter.CHARSET),
+					equalTo(
 							"001XLong Value.........................................                                                                     Comment\r\n"
 					)
 			);
@@ -104,7 +104,8 @@ public class ControlFileWriterTest {
 			});
 
 			assertThat(
-					output.toString(ControlFileWriter.CHARSET), equalTo(
+					output.toString(ControlFileWriter.CHARSET),
+					equalTo(
 							"001 Low                                               \r\n200 High                                              \r\n"
 					)
 			);
@@ -119,11 +120,13 @@ public class ControlFileWriterTest {
 
 			writer.writeEntry(1, "");
 			writer.writeEntry(
-					2, "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"
+					2,
+					"012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"
 			);
 			assertThrows(IllegalArgumentException.class, () -> {
 				writer.writeEntry(
-						3, "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789X"
+						3,
+						"012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789X"
 				);
 			});
 			assertThrows(IllegalArgumentException.class, () -> {
@@ -137,7 +140,8 @@ public class ControlFileWriterTest {
 			});
 
 			assertThat(
-					output.toString(ControlFileWriter.CHARSET), equalTo(
+					output.toString(ControlFileWriter.CHARSET),
+					equalTo(
 							"001                                                   \r\n002X012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\r\n"
 					)
 			);
@@ -171,7 +175,8 @@ public class ControlFileWriterTest {
 			});
 
 			assertThat(
-					output.toString(ControlFileWriter.CHARSET), equalTo(
+					output.toString(ControlFileWriter.CHARSET),
+					equalTo(
 							"001 Value                                             \r\n"
 									+ "002 Value                                             Comment\r\n"
 									+ "003 Value                                             ! Comment\r\n" + "    \r\n"

@@ -30,9 +30,8 @@ class UpperCoefficientParserTest {
 		Map<String, Object> controlMap = new HashMap<>();
 
 		List<GenusDefinition> sp0List = Arrays.asList(
-				new GenusDefinition("S1", java.util.Optional.empty(), "Test S1"), new GenusDefinition(
-						"S2", java.util.Optional.empty(), "Test S2"
-				)
+				new GenusDefinition("S1", java.util.Optional.empty(), "Test S1"),
+				new GenusDefinition("S2", java.util.Optional.empty(), "Test S2")
 		);
 
 		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
@@ -52,9 +51,8 @@ class UpperCoefficientParserTest {
 		Map<String, Object> controlMap = new HashMap<>();
 
 		List<GenusDefinition> sp0List = Arrays.asList(
-				new GenusDefinition("S1", java.util.Optional.empty(), "Test S1"), new GenusDefinition(
-						"S2", java.util.Optional.empty(), "Test S2"
-				)
+				new GenusDefinition("S1", java.util.Optional.empty(), "Test S1"),
+				new GenusDefinition("S2", java.util.Optional.empty(), "Test S2")
 		);
 
 		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
@@ -73,9 +71,8 @@ class UpperCoefficientParserTest {
 		Map<String, Object> controlMap = new HashMap<>();
 
 		List<GenusDefinition> sp0List = Arrays.asList(
-				new GenusDefinition("S1", java.util.Optional.empty(), "Test S1"), new GenusDefinition(
-						"S2", java.util.Optional.empty(), "Test S2"
-				)
+				new GenusDefinition("S1", java.util.Optional.empty(), "Test S1"),
+				new GenusDefinition("S2", java.util.Optional.empty(), "Test S2")
 		);
 
 		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);

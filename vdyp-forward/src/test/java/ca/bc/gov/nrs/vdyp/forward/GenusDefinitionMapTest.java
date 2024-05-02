@@ -30,7 +30,8 @@ class GenusDefinitionMapTest {
 		parser = new ForwardControlParser();
 		controlMap = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
 		assertThat(
-				controlMap, (Matcher) controlMapHasEntry(
+				controlMap,
+				(Matcher) controlMapHasEntry(
 						ControlKey.SP0_DEF, allOf(instanceOf(List.class), hasItem(instanceOf(GenusDefinition.class)))
 				)
 		);

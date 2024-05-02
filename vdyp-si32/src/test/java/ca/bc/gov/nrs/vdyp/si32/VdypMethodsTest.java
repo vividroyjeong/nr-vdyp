@@ -96,14 +96,14 @@ class VdypMethodsTest {
 	@Test
 	void test_VDYP_GetCurrentSICurve() {
 		assertThat(
-				VdypMethods.getCurrentSICurve(SP0Name.AC.getText(), SpeciesRegion.INTERIOR), equalTo(
-						SiteIndexEquation.SI_ACB_HUANGAC
-				)
+				VdypMethods.getCurrentSICurve(SP0Name.AC.getText(), SpeciesRegion.INTERIOR),
+				equalTo(SiteIndexEquation.SI_ACB_HUANGAC)
 		);
 		// ensure result from previous call was cached properly.
 		assertThat(
 				VdypMethods.speciesTable.getByCode(SP0Name.AC.getText()).details()
-						.currentSICurve()[SpeciesRegion.INTERIOR.ordinal()], equalTo(SiteIndexEquation.SI_ACB_HUANGAC)
+						.currentSICurve()[SpeciesRegion.INTERIOR.ordinal()],
+				equalTo(SiteIndexEquation.SI_ACB_HUANGAC)
 		);
 		assertThat(
 				VdypMethods.getCurrentSICurve(null, SpeciesRegion.INTERIOR), equalTo(SiteIndexEquation.SI_NO_EQUATION)
@@ -116,9 +116,8 @@ class VdypMethodsTest {
 	@Test
 	void test_VDYP_GetDefaultSICurve() {
 		assertThat(
-				VdypMethods.getDefaultSICurve(SP0Name.AC.getText(), SpeciesRegion.COAST), equalTo(
-						SiteIndexEquation.SI_ACB_HUANGAC
-				)
+				VdypMethods.getDefaultSICurve(SP0Name.AC.getText(), SpeciesRegion.COAST),
+				equalTo(SiteIndexEquation.SI_ACB_HUANGAC)
 		);
 		assertThat(
 				VdypMethods.getDefaultSICurve(null, SpeciesRegion.INTERIOR), equalTo(SiteIndexEquation.SI_NO_EQUATION)

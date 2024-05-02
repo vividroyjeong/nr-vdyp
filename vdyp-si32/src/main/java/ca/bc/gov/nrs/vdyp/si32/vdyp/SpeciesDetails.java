@@ -26,9 +26,9 @@ public record SpeciesDetails(
 		/** The VDYP7 SP0 code name to use with the species. */
 		String sp0Name,
 
-		/** 
-		 * The corresponding CFS Species for the MoF Species.  The source for this
-		 * mapping is found in the document <b>Documents/CFS-Biomass/BCSpcsToCFSSpcs-SAS.txt</b>
+		/**
+		 * The corresponding CFS Species for the MoF Species. The source for this mapping is found in the document
+		 * <b>Documents/CFS-Biomass/BCSpcsToCFSSpcs-SAS.txt</b>
 		 */
 		CfsTreeSpecies cfsSpecies,
 
@@ -56,16 +56,16 @@ public record SpeciesDetails(
 		 */
 		boolean isSoftwood,
 
-		/** 
-		 * Contains the default Crown Closure for a species in each of the {@link SpeciesRegion}
-		 * regions of the province, given by SpeciesRegion.ordinal(). 
+		/**
+		 * Contains the default Crown Closure for a species in each of the {@link SpeciesRegion} regions of the
+		 * province, given by SpeciesRegion.ordinal().
 		 */
 		float[] defaultCrownClosure,
 
-		/** 
-		 * For each {@link SpeciesRegion}, identifies the SINDEX curve number currently assigned to 
-		 * the species. In certain applications, the standard curve number for a species may be modified to
-		 * other experimental or alternative curves rather than the standard curve.
+		/**
+		 * For each {@link SpeciesRegion}, identifies the SINDEX curve number currently assigned to the species. In
+		 * certain applications, the standard curve number for a species may be modified to other experimental or
+		 * alternative curves rather than the standard curve.
 		 */
 		SiteIndexEquation[] currentSICurve
 ) {

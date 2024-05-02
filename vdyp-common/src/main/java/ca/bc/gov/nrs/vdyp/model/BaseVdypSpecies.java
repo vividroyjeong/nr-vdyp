@@ -7,7 +7,7 @@ import java.util.Optional;
 import ca.bc.gov.nrs.vdyp.common.Computed;
 
 public abstract class BaseVdypSpecies {
-	private final String polygonIdentifier; // FIP_P/POLYDESC
+	private final PolygonIdentifier polygonIdentifier; // FIP_P/POLYDESC
 	private final LayerType layerType; // This is also represents the distinction between data stored in
 	// FIPL_1(A) and FIP_V(A). Where VDYP7 stores both and looks at certain values
 	// to determine if a layer is "present". VDYP8 stores them in a map keyed by
@@ -24,7 +24,9 @@ public abstract class BaseVdypSpecies {
 
 	private Map<String, Float> speciesPercent; // Map from
 
-	protected BaseVdypSpecies(String polygonIdentifier, LayerType layerType, String genus, float percentGenus) {
+	protected BaseVdypSpecies(
+			PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, float percentGenus
+	) {
 		this.polygonIdentifier = polygonIdentifier;
 		this.layerType = layerType;
 		this.genus = genus;
@@ -41,7 +43,7 @@ public abstract class BaseVdypSpecies {
 		setSpeciesPercent(toCopy.getSpeciesPercent());
 	}
 
-	public String getPolygonIdentifier() {
+	public PolygonIdentifier getPolygonIdentifier() {
 		return polygonIdentifier;
 	}
 
@@ -81,15 +83,25 @@ public abstract class BaseVdypSpecies {
 	}
 
 	public abstract static class Builder<T extends BaseVdypSpecies> extends ModelClassBuilder<T> {
-		protected Optional<String> polygonIdentifier = Optional.empty();
+		protected Optional<PolygonIdentifier> polygonIdentifier = Optional.empty();
 		protected Optional<LayerType> layerType = Optional.empty();
 		protected Optional<String> genus = Optional.empty();
 		protected Optional<Float> percentGenus = Optional.empty();
 		protected Optional<Float> fractionGenus = Optional.empty();
 		protected Map<String, Float> speciesPercent = new LinkedHashMap<>();
 
-		public Builder<T> polygonIdentifier(String polygonIdentifier) {
+		public Builder<T> polygonIdentifier(PolygonIdentifier polygonIdentifier) {
 			this.polygonIdentifier = Optional.of(polygonIdentifier);
+			return this;
+		}
+
+		public Builder<T> polygonIdentifier(String polygonIdentifier) {
+			this.polygonIdentifier = Optional.of(PolygonIdentifier.split(polygonIdentifier));
+			return this;
+		}
+
+		public Builder<T> polygonIdentifier(String base, int year) {
+			this.polygonIdentifier = Optional.of(new PolygonIdentifier(base, year));
 			return this;
 		}
 
