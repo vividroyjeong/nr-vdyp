@@ -2,7 +2,6 @@ package ca.bc.gov.nrs.vdyp.forward;
 
 import java.text.MessageFormat;
 
-import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 
@@ -16,19 +15,16 @@ class ForwardProcessingState {
 	 */
 	private static final int MAX_RECORDS = 2 * MAX_INSTANCES;
 
-	private final GenusDefinitionMap genusDefinitionMap;
 	private final PolygonProcessingState[] banks;
 	private PolygonProcessingState active;
 
-	public ForwardProcessingState(GenusDefinitionMap genusDefinitionMap) {
-
-		this.genusDefinitionMap = genusDefinitionMap;
+	public ForwardProcessingState() {
 		banks = new PolygonProcessingState[MAX_RECORDS];
 	}
 
 	public void setStartingState(VdypPolygon polygon) {
 		// Move the primary layer of the given polygon to bank zero.
-		banks[0] = new PolygonProcessingState(genusDefinitionMap, polygon.getPrimaryLayer());
+		banks[0] = new PolygonProcessingState(polygon.getPrimaryLayer());
 	}
 
 	public void setActive(LayerType layerType, int instanceNumber) {

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -13,7 +14,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonLayer;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypSpeciesUtilization;
@@ -55,8 +55,12 @@ class PolygonProcessingState {
 	public float quadMeanDiameters[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 DQB
 	public float treesPerHectares[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 TPHB
 	public float wholeStemVolumes[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 VOLWSB
+	
+	// Calculated data - this data is calculated after construction during processing.
+	
+	public Optional<SpeciesRankingDetails> rankingDetails = Optional.empty();
 
-	public PolygonProcessingState(GenusDefinitionMap genusDefinitionMap, VdypPolygonLayer layer) {
+	public PolygonProcessingState(VdypPolygonLayer layer) {
 
 		this.nSpecies = layer.getGenera().size();
 
@@ -116,6 +120,11 @@ class PolygonProcessingState {
 		this.treesPerHectares = copy(s.treesPerHectares);
 		this.wholeStemVolumes = copy(s.wholeStemVolumes);
 		this.yearsToBreastHeight = copy(s.yearsToBreastHeight);
+		
+		if (s.rankingDetails.isPresent()) {
+			this.rankingDetails = Optional.of(new SpeciesRankingDetails(s.rankingDetails.get().primarySpeciesIndex(),
+					s.rankingDetails.get().secondarySpeciesIndex(), s.rankingDetails.get().inventoryTypeGroup()));
+		}
 	}
 
 	public int getNSpecies() {
@@ -156,9 +165,19 @@ class PolygonProcessingState {
 			wholeStemVolumes[index][ucIndex] = su.getValue().getWholeStemVolume();
 		}
 	}
+	
+	public void setSpeciesRankingDetails(SpeciesRankingDetails rankingDetails) {
+		if (this.rankingDetails.isPresent()) {
+			throw new IllegalStateException("SpeciesRankingDetails can be set once only");
+		}
+		this.rankingDetails = Optional.of(rankingDetails);
+	}
+
+	public SpeciesRankingDetails getSpeciesRankingDetails() {
+		return rankingDetails.orElseThrow();
+	}
 
 	public PolygonProcessingState copy() {
-
 		return new PolygonProcessingState(this);
 	}
 

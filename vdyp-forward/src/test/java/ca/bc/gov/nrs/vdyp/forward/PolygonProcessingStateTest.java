@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonDescription;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonLayer;
@@ -37,7 +36,6 @@ class PolygonProcessingStateTest {
 
 	private ForwardControlParser parser;
 	private Map<String, Object> controlMap;
-	private GenusDefinitionMap gdMap;
 
 	private StreamingParser<VdypPolygonDescription> polygonDescriptionStream;
 
@@ -53,12 +51,9 @@ class PolygonProcessingStateTest {
 				)
 		);
 
-		gdMap = new GenusDefinitionMap((List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name()));
-
 		var polygonDescriptionStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_GROWTO.name());
 		polygonDescriptionStream = ((StreamingParserFactory<VdypPolygonDescription>) polygonDescriptionStreamFactory)
 				.get();
-
 	}
 
 	@Test
@@ -74,7 +69,7 @@ class PolygonProcessingStateTest {
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());
 
-		PolygonProcessingState pps = new PolygonProcessingState(gdMap, pLayer);
+		PolygonProcessingState pps = new PolygonProcessingState(pLayer);
 
 		int nSpecies = pLayer.getGenera().size();
 
@@ -138,7 +133,7 @@ class PolygonProcessingStateTest {
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());
 
-		PolygonProcessingState pps = new PolygonProcessingState(gdMap, pLayer);
+		PolygonProcessingState pps = new PolygonProcessingState(pLayer);
 
 		verifyProcessingStateMatchesLayer(pps, pLayer);
 
@@ -159,7 +154,7 @@ class PolygonProcessingStateTest {
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());
 
-		PolygonProcessingState pps = new PolygonProcessingState(gdMap, pLayer);
+		PolygonProcessingState pps = new PolygonProcessingState(pLayer);
 		verifyProcessingStateMatchesLayer(pps, pLayer);
 
 		PolygonProcessingState ppsCopy = new PolygonProcessingState(pps);
@@ -222,7 +217,7 @@ class PolygonProcessingStateTest {
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());
 
-		PolygonProcessingState pps = new PolygonProcessingState(gdMap, pLayer);
+		PolygonProcessingState pps = new PolygonProcessingState(pLayer);
 
 		PolygonProcessingState ppsCopy = new PolygonProcessingState(pps);
 

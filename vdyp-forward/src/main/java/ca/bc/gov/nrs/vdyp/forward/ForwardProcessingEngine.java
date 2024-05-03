@@ -48,7 +48,7 @@ public class ForwardProcessingEngine {
 		becLookup = (BecLookup) controlMap.get(ControlKey.BEC_DEF.name());
 		siteCurveMap = (Map<String, SiteCurve>) controlMap.get(ControlKey.SITE_CURVE_NUMBERS.name());
 
-		fps = new ForwardProcessingState(genusDefinitionMap);
+		fps = new ForwardProcessingState();
 	}
 
 	public GenusDefinitionMap getGenusDefinitionMap() {
@@ -86,6 +86,8 @@ public class ForwardProcessingEngine {
 	private static void setSpecies(PolygonProcessingState bank) {
 
 		setPercentages(bank);
+		
+		setPolygonRankingDetails(bank, CommonData.PRIMARY_SPECIES_TO_COMBINE);
 	}
 
 	public static void setPercentages(PolygonProcessingState bank) {
@@ -170,11 +172,6 @@ public class ForwardProcessingEngine {
 		}
 	}
 
-	public static record SpeciesRankingDetails(
-			int primarySpeciesIndex, Optional<Integer> secondarySpeciesIndex, int inventoryTypeGroup
-	) {
-	}
-
 	// PRIMFIND
 	/**
 	 * Returns a {@code SpeciesRankingDetails} instance giving:
@@ -186,7 +183,7 @@ public class ForwardProcessingEngine {
 	 * @param bank the bank on which to operate
 	 * @return as described
 	 */
-	static SpeciesRankingDetails findPrimarySpecies(PolygonProcessingState bank, Collection<List<String>> speciesToCombine) {
+	static void setPolygonRankingDetails(PolygonProcessingState bank, Collection<List<String>> speciesToCombine) {
 
 		if (bank.getNSpecies() == 0) {
 			throw new IllegalArgumentException("Can not find primary species as there are no species");
@@ -232,12 +229,12 @@ public class ForwardProcessingEngine {
 		try {
 			int inventoryTypeGroup = findInventoryTypeGroup(primaryGenusName, secondaryGenusName, highestPercentage);
 
-			return new SpeciesRankingDetails(
+			bank.setSpeciesRankingDetails(new SpeciesRankingDetails(
 					highestPercentageIndex, secondHighestPercentageIndex != -1
 							? Optional.of(secondHighestPercentageIndex)
 							: Optional.empty(),
 					inventoryTypeGroup
-			);
+			));
 		} catch (ProcessingException e) {
 			// This should never fail because the bank has already been validated and hence the genera
 			// are known to be valid.

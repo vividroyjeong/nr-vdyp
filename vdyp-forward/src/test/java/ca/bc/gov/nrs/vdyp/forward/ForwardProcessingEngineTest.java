@@ -1,13 +1,13 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,14 +20,12 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonDescription;
 import ca.bc.gov.nrs.vdyp.forward.test.VdypForwardTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.CommonData;
-import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 
 class ForwardProcessingEngineTest {
@@ -41,7 +39,6 @@ class ForwardProcessingEngineTest {
 	private static StreamingParser<VdypPolygonDescription> polygonDescriptionStream;
 
 	private static ForwardDataStreamReader forwardDataStreamReader;
-	private static GenusDefinitionMap genusDefinitionMap;
 
 	@SuppressWarnings("unchecked")
 	@BeforeAll
@@ -54,8 +51,6 @@ class ForwardProcessingEngineTest {
 		polygonDescriptionStream = polygonDescriptionStreamFactory.get();
 
 		forwardDataStreamReader = new ForwardDataStreamReader(controlMap);
-		
-		genusDefinitionMap = new GenusDefinitionMap((List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name()));
 	}
 
 	@Test
@@ -86,31 +81,38 @@ class ForwardProcessingEngineTest {
 	@Test 
 	void testFindPrimarySpecies() throws IOException, ResourceParseException, ProcessingException {
 		
-		ForwardProcessingState fps = new ForwardProcessingState(genusDefinitionMap);
+		ForwardProcessingState fps = new ForwardProcessingState();
 
 		var polygonDescription = polygonDescriptionStream.next();
 		var polygon = forwardDataStreamReader.readNextPolygon(polygonDescription);
 		
 		fps.setStartingState(polygon);
 		
-		PolygonProcessingState bank = fps.getBank(LayerType.PRIMARY, 0).copy();
-		
-		ForwardProcessingEngine.setPercentages(bank);
+		{
+			PolygonProcessingState bank = fps.getBank(LayerType.PRIMARY, 0).copy();
+			
+			ForwardProcessingEngine.setPercentages(bank);
+			ForwardProcessingEngine.setPolygonRankingDetails(bank, CommonData.PRIMARY_SPECIES_TO_COMBINE);
+			SpeciesRankingDetails rankingDetails1 = bank.getSpeciesRankingDetails();
+			
+			assertThat(rankingDetails1.primarySpeciesIndex(), is(3));
+			assertThat(rankingDetails1.secondarySpeciesIndex(), is(Optional.of(4)));
+			assertThat(rankingDetails1.inventoryTypeGroup(), is(37));
+		}
+		{
+			PolygonProcessingState bank = fps.getBank(LayerType.PRIMARY, 0).copy();
 
-		ForwardProcessingEngine.SpeciesRankingDetails rankingDetails1 = ForwardProcessingEngine.findPrimarySpecies(bank, CommonData.PRIMARY_SPECIES_TO_COMBINE);
-		
-		assertThat(rankingDetails1.primarySpeciesIndex(), is(3));
-		assertThat(rankingDetails1.secondarySpeciesIndex(), is(Optional.of(4)));
-		assertThat(rankingDetails1.inventoryTypeGroup(), is(37));
+			var speciesToCombine = Arrays.asList(Arrays.asList(bank.speciesNames[3], bank.speciesNames[4]));
 
-		var speciesToCombine = Arrays.asList(Arrays.asList(bank.speciesNames[3], bank.speciesNames[4]));
-
-		ForwardProcessingEngine.SpeciesRankingDetails rankingDetails2 = ForwardProcessingEngine.findPrimarySpecies(bank, speciesToCombine);
-		
-		// The test-specific speciesToCombine will combine 3 & 4 into 3 (leaving 4 at 0.0), promoting 2 to secondary.
-		assertThat(rankingDetails2.primarySpeciesIndex(), is(3));
-		assertThat(rankingDetails2.secondarySpeciesIndex(), is(Optional.of(2)));
-		assertThat(rankingDetails2.inventoryTypeGroup(), is(37));
+			ForwardProcessingEngine.setPercentages(bank);
+			ForwardProcessingEngine.setPolygonRankingDetails(bank, speciesToCombine);
+			SpeciesRankingDetails rankingDetails2 = bank.getSpeciesRankingDetails();
+			
+			// The test-specific speciesToCombine will combine 3 & 4 into 3 (leaving 4 at 0.0), promoting 2 to secondary.
+			assertThat(rankingDetails2.primarySpeciesIndex(), is(3));
+			assertThat(rankingDetails2.secondarySpeciesIndex(), is(Optional.of(2)));
+			assertThat(rankingDetails2.inventoryTypeGroup(), is(37));
+		}
 	}
 	
 	@Test 
