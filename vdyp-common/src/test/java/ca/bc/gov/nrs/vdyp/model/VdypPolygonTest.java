@@ -4,7 +4,6 @@ import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
-import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasEntry;
@@ -13,7 +12,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.easymock.EasyMock;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 class VdypPolygonTest {

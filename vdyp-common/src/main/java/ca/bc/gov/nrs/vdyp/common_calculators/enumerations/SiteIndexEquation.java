@@ -141,7 +141,7 @@ public enum SiteIndexEquation {
 	}
 
 	public static EnumIterator<SiteIndexEquation> getIterator() {
-		return new EnumIterator<SiteIndexEquation>(values(), SI_ACB_HUANG, SI_CWC_NIGH);
+		return new EnumIterator<>(values(), SI_ACB_HUANG, SI_CWC_NIGH);
 	}
 
 	public static SiteIndexEquation getByIndex(int n) {

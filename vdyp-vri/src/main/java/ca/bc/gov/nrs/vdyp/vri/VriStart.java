@@ -23,7 +23,9 @@ import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndex2Height;
-import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexAgeType;
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
@@ -668,8 +670,10 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		var primaryLayer = poly.getLayers().get(LayerType.PRIMARY);
 		var primarySite = primaryLayer.getPrimarySite().orElseThrow();
 		try {
-			short siteCurveNumber = primaryLayer.getPrimarySite().flatMap(BaseVdypSite::getSiteCurveNumber)
-					.map(Integer::shortValue).orElseGet(() -> {
+			SiteIndexEquation siteCurve = primaryLayer.getPrimarySite() //
+					.flatMap(BaseVdypSite::getSiteCurveNumber) //
+					.map(SiteIndexEquation::getByIndex)//
+					.orElseGet(() -> {
 						try {
 							return this.findSiteCurveNumber(
 									bec.getRegion(), primarySite.getSiteSpecies(), primarySite.getSiteGenus()
@@ -728,9 +732,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 						float ageD = primaryBreastHeightAge; // AGED
 
-						float dominantHeightD = (float) SiteIndex2Height.index_to_height(
-								siteCurveNumber, ageD, SiteIndexAgeType.BREAST_HEIGHT.getIndex(), siteIndex, ageD,
-								yeastToBreastHeight
+						float dominantHeightD = (float) SiteIndex2Height.indexToHeight(
+								siteCurve, ageD, SiteIndexAgeType.SI_AT_BREAST, siteIndex, ageD, yeastToBreastHeight
 						); // HDD
 
 						if (increase == 0) {
@@ -801,6 +804,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		} catch (RuntimeStandProcessingException e) {
 			throw e.getCause();
+		} catch (CommonCalculatorException e) {
+			throw new StandProcessingException(e);
 		}
 	}
 
@@ -822,14 +827,14 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	 * @return
 	 * @throws StandProcessingException if no entry for any of the given species IDs is present.
 	 */
-	short findSiteCurveNumber(Region region, String... ids) throws StandProcessingException {
-		var scnMap = Utils.<MatrixMap2<String, Region, Integer>>expectParsedControl(
+	SiteIndexEquation findSiteCurveNumber(Region region, String... ids) throws StandProcessingException {
+		var scnMap = Utils.<MatrixMap2<String, Region, SiteIndexEquation>>expectParsedControl(
 				controlMap, ControlKey.SITE_CURVE_NUMBERS, MatrixMap2.class
 		);
 
 		for (String id : ids) {
 			if (scnMap.hasM(id, region))
-				return scnMap.get(id, region).shortValue();
+				return scnMap.get(id, region);
 		}
 		throw new StandProcessingException(
 				"Could not find Site Curve Number for inst of the following species: " + String.join(", ", ids)

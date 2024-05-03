@@ -117,7 +117,7 @@ class VdypLayerTest {
 
 		var control = EasyMock.createControl();
 
-		BaseVdypLayer toCopy = control.createMock(BaseVdypLayer.class);
+		BaseVdypLayer<?, ?> toCopy = control.createMock(BaseVdypLayer.class);
 
 		EasyMock.expect(toCopy.getPolygonIdentifier()).andStubReturn(new PolygonIdentifier("Test", 2024));
 		EasyMock.expect(toCopy.getLayerType()).andStubReturn(LayerType.PRIMARY);

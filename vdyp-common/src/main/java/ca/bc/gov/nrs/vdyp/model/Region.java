@@ -25,9 +25,6 @@ public enum Region {
 		return Optional.empty();
 	}
 
-	public char getCharacterAlias() {
-		return characterAlias;
-
 	public static Optional<Region> fromIndex(int index) {
 		switch (index) {
 		case 1:

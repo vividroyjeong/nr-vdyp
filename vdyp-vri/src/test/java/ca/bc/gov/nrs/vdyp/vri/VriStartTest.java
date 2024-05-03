@@ -36,6 +36,7 @@ import ca.bc.gov.nrs.vdyp.application.ApplicationTestUtils;
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BasalAreaYieldParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperBoundsParser;
@@ -763,17 +764,17 @@ class VriStartTest {
 
 		app.init(resolver, controlMap);
 
-		assertThat(app.findSiteCurveNumber(Region.COASTAL, "MB"), is((short) 10));
-		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "MB"), is((short) 10));
+		assertThat(app.findSiteCurveNumber(Region.COASTAL, "MB"), is(SiteIndexEquation.getByIndex(10)));
+		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "MB"), is(SiteIndexEquation.getByIndex(10)));
 
-		assertThat(app.findSiteCurveNumber(Region.COASTAL, "B"), is((short) 12));
-		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "B"), is((short) 42));
+		assertThat(app.findSiteCurveNumber(Region.COASTAL, "B"), is(SiteIndexEquation.getByIndex(12)));
+		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "B"), is(SiteIndexEquation.getByIndex(42)));
 
-		assertThat(app.findSiteCurveNumber(Region.COASTAL, "ZZZ", "B"), is((short) 12));
-		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "ZZZ", "B"), is((short) 42));
+		assertThat(app.findSiteCurveNumber(Region.COASTAL, "ZZZ", "B"), is(SiteIndexEquation.getByIndex(12)));
+		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "ZZZ", "B"), is(SiteIndexEquation.getByIndex(42)));
 
-		assertThat(app.findSiteCurveNumber(Region.COASTAL, "YYY", "B"), is((short) 42));
-		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "YYY", "B"), is((short) 06));
+		assertThat(app.findSiteCurveNumber(Region.COASTAL, "YYY", "B"), is(SiteIndexEquation.getByIndex(42)));
+		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "YYY", "B"), is(SiteIndexEquation.getByIndex(06)));
 
 		assertThrows(StandProcessingException.class, () -> app.findSiteCurveNumber(Region.COASTAL, "ZZZ"));
 		assertThrows(StandProcessingException.class, () -> app.findSiteCurveNumber(Region.INTERIOR, "ZZZ"));

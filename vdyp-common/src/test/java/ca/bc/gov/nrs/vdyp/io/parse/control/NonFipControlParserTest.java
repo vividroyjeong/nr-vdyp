@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveAgeMaximumParserTest;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
@@ -172,7 +173,7 @@ class NonFipControlParserTest {
 				result, (Matcher) controlMapHasEntry(
 						ControlKey.SITE_CURVE_NUMBERS, allOf(
 								// Species
-								isA(MatrixMap2.class), mmHasEntry(isA(Integer.class), "MB", Region.COASTAL)
+								isA(MatrixMap2.class), mmHasEntry(isA(SiteIndexEquation.class), "MB", Region.COASTAL)
 						)
 				)
 		);
