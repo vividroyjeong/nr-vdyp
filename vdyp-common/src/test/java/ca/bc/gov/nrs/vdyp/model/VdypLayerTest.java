@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.model;
 
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -18,7 +19,7 @@ class VdypLayerTest {
 	@Test
 	void build() throws Exception {
 		var result = VdypLayer.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 
 			builder.addSite(siteBuilder -> {
@@ -30,7 +31,7 @@ class VdypLayerTest {
 			});
 
 		});
-		assertThat(result, hasProperty("polygonIdentifier", is("Test")));
+		assertThat(result, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
 		assertThat(result, hasProperty("layerType", is(LayerType.PRIMARY)));
 		assertThat(result, hasProperty("ageTotal", present(is(42f))));
 		assertThat(result, hasProperty("yearsToBreastHeight", present(is(2f))));
@@ -49,7 +50,7 @@ class VdypLayerTest {
 	void buildForPolygon() throws Exception {
 
 		var poly = VdypPolygon.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.percentAvailable(50f);
 
 			builder.forestInventoryZone("?");
@@ -68,7 +69,7 @@ class VdypLayerTest {
 
 		});
 
-		assertThat(result, hasProperty("polygonIdentifier", is("Test")));
+		assertThat(result, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
 		assertThat(result, hasProperty("layerType", is(LayerType.PRIMARY)));
 		assertThat(result, hasProperty("ageTotal", present(is(42f))));
 		assertThat(result, hasProperty("yearsToBreastHeight", present(is(2f))));
@@ -85,7 +86,7 @@ class VdypLayerTest {
 		EasyMock.expect(mock.getGenus()).andStubReturn("B");
 		EasyMock.replay(mock);
 		var result = VdypLayer.build(builder -> {
-			builder.polygonIdentifier("Test");
+			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.addSite(siteBuilder -> {
 				siteBuilder.height(10f);

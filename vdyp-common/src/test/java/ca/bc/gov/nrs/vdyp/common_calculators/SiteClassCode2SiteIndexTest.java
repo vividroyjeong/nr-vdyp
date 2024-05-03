@@ -207,8 +207,8 @@ class SiteClassCode2SiteIndexTest {
 		assertEquals(actualResult, (double) 4);
 
 		assertThrows(
-				ForestInventoryZoneException.class, () -> SiteClassCode2SiteIndex
-						.classToIndex(SI_SPEC_HWC, validSiteCl[3], 'X')
+				ForestInventoryZoneException.class,
+				() -> SiteClassCode2SiteIndex.classToIndex(SI_SPEC_HWC, validSiteCl[3], 'X')
 		);
 	}
 

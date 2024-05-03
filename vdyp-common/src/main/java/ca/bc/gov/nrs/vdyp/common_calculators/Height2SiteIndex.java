@@ -28,10 +28,9 @@ public class Height2SiteIndex {
 
 	@SuppressWarnings("java:S3776, java:S6541")
 	public static double heightToIndex(
-			SiteIndexEquation cuIndex, double age, SiteIndexAgeType ageType,
-			double height, SiteIndexEstimationType siEstType
-	)
-			throws CommonCalculatorException {
+			SiteIndexEquation cuIndex, double age, SiteIndexAgeType ageType, double height,
+			SiteIndexEstimationType siEstType
+	) throws CommonCalculatorException {
 		double index;
 		double x1, x2;
 
@@ -252,8 +251,8 @@ public class Height2SiteIndex {
 					// #ifdef SI_AT_GOUDIE
 					logBhAge = Math.log(bhage);
 
-					index = 1.3 + 17.0101 + 0.8784 * (height - 1.3) + 1.8364 * logBhAge
-							- 1.4018 * logBhAge * logBhAge + 0.4374 * llog(height - 1.3) / bhage;
+					index = 1.3 + 17.0101 + 0.8784 * (height - 1.3) + 1.8364 * logBhAge - 1.4018 * logBhAge * logBhAge
+							+ 0.4374 * llog(height - 1.3) / bhage;
 					break;
 				case SI_FDI_VDP_MONT:
 					/* convert to imperial */
@@ -3847,8 +3846,8 @@ public class Height2SiteIndex {
 			} else {
 				/* was age - y2bh */
 				testTop = SiteIndex2Height.indexToHeight(
-						cuIndex, AgeToAge
-								.ageToAge(cuIndex, age, SI_AT_TOTAL, SI_AT_BREAST, y2bh), SI_AT_BREAST, site, y2bh, 0.5
+						cuIndex, AgeToAge.ageToAge(cuIndex, age, SI_AT_TOTAL, SI_AT_BREAST, y2bh), SI_AT_BREAST, site,
+						y2bh, 0.5
 				); // 0.5 may have to change
 			}
 

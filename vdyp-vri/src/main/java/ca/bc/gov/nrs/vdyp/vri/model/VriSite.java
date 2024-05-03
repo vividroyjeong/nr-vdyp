@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 
 public class VriSite extends BaseVdypSite {
 
@@ -13,7 +14,7 @@ public class VriSite extends BaseVdypSite {
 	private final Optional<Float> breastHeightAge; // VRISI/VR_SCN
 
 	public VriSite(
-			String polygonIdentifier, LayerType layer, String siteGenus, Optional<Integer> siteCurveNumber,
+			PolygonIdentifier polygonIdentifier, LayerType layer, String siteGenus, Optional<Integer> siteCurveNumber,
 			Optional<Float> siteIndex, Optional<Float> height, Optional<Float> ageTotal,
 			Optional<Float> yearsToBreastHeight, String siteSpecies, Optional<Float> breastHeightAge
 	) {

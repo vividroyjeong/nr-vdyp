@@ -1,16 +1,15 @@
 package ca.bc.gov.nrs.vdyp.si32.cfs;
 
 /**
- * A two-dimensional array indexed by {@link CfsBiomassConversionSupportedEcoZone} and 
- * then {@link CfsBiomassConversionSupportedGenera} given the biomass conversion coefficients 
- * for that Eco Zone and Genus. Each array element is a record indicating whether it "contains data" - 
- * that is, has meaningful values and, if so, an array of floats indexed by {@link 
- * CfsDeadConversionParams}.
+ * A two-dimensional array indexed by {@link CfsBiomassConversionSupportedEcoZone} and then
+ * {@link CfsBiomassConversionSupportedGenera} given the biomass conversion coefficients for that Eco Zone and Genus.
+ * Each array element is a record indicating whether it "contains data" - that is, has meaningful values and, if so, an
+ * array of floats indexed by {@link CfsDeadConversionParams}.
  * <p>
  * The values are derived from
  * <ul>
- * <li>'C Conversion Factors Initializers' column of the 
- * <li>'DerivedCTable' table found on the 
+ * <li>'C Conversion Factors Initializers' column of the
+ * <li>'DerivedCTable' table found on the
  * <li>'Derived C Species Table' tab in the
  * <li>'BC_Inventory_updates_by_CBMv2bs.xlsx' located in the
  * <li>'Documents/CFS-Biomass' folder.
@@ -18,45 +17,44 @@ package ca.bc.gov.nrs.vdyp.si32.cfs;
  */
 public class CfsBiomassConversionCoefficientsForGenus {
 
-	public static CfsBiomassConversionCoefficientsDetails
-			get(int cfsSupportedEcoZone, int cfsSupportedGeneraIndex) {
+	public static CfsBiomassConversionCoefficientsDetails get(int cfsSupportedEcoZone, int cfsSupportedGeneraIndex) {
 		return array[cfsSupportedEcoZone][cfsSupportedGeneraIndex];
 	}
 
 	private static CfsBiomassConversionCoefficientsDetails[][] array = new CfsBiomassConversionCoefficientsDetails[][] {
 			{
 					// Order of values:
-					// containsData 
+					// containsData
 					// cfsLiveParm_A
-					// cfsLiveParm_B 
-					// cfsLiveParm_a_nonmerch 
-					// cfsLiveParm_b_nonmerch 
-					// cfsLiveParm_k_nonmerch 
-					// cfsLiveParm_cap_nonmerch 
-					// cfsLiveParm_a_sap 
-					// cfsLiveParm_b_sap 
-					// cfsLiveParm_k_sap 
-					// cfsLiveParm_cap_sap 
-					// cfsLiveParm_a1 
-					// cfsLiveParm_a2 
-					// cfsLiveParm_a3 
-					// cfsLiveParm_b1 
-					// cfsLiveParm_b2 
-					// cfsLiveParm_b3 
-					// cfsLiveParm_c1 
-					// cfsLiveParm_c2 
-					// cfsLiveParm_c3 
-					// cfsLiveParm_min_volume 
-					// cfsLiveParm_max_volume 
-					// cfsLiveParm_low_stemwood_prop 
-					// cfsLiveParm_high_stemwood_prop 
-					// cfsLiveParm_low_stembark_prop 
-					// cfsLiveParm_high_stembark_prop 
-					// cfsLiveParm_low_branches_prop 
-					// cfsLiveParm_high_branches_prop 
-					// cfsLiveParm_low_foliage_prop 
-					// cfsLiveParm_high_foliage_prop 
-					
+					// cfsLiveParm_B
+					// cfsLiveParm_a_nonmerch
+					// cfsLiveParm_b_nonmerch
+					// cfsLiveParm_k_nonmerch
+					// cfsLiveParm_cap_nonmerch
+					// cfsLiveParm_a_sap
+					// cfsLiveParm_b_sap
+					// cfsLiveParm_k_sap
+					// cfsLiveParm_cap_sap
+					// cfsLiveParm_a1
+					// cfsLiveParm_a2
+					// cfsLiveParm_a3
+					// cfsLiveParm_b1
+					// cfsLiveParm_b2
+					// cfsLiveParm_b3
+					// cfsLiveParm_c1
+					// cfsLiveParm_c2
+					// cfsLiveParm_c3
+					// cfsLiveParm_min_volume
+					// cfsLiveParm_max_volume
+					// cfsLiveParm_low_stemwood_prop
+					// cfsLiveParm_high_stemwood_prop
+					// cfsLiveParm_low_stembark_prop
+					// cfsLiveParm_high_stembark_prop
+					// cfsLiveParm_low_branches_prop
+					// cfsLiveParm_high_branches_prop
+					// cfsLiveParm_low_foliage_prop
+					// cfsLiveParm_high_foliage_prop
+
 					new CfsBiomassConversionCoefficientsDetails(
 							true,
 							new float[] { 1.22712652f, 0.81452013f, 30.54103246f, -0.85134424f, 0.66976961f,
@@ -216,9 +214,8 @@ public class CfsBiomassConversionCoefficientsForGenus {
 									-0.00021960f, 0.00547460f, -1.78569000f, -0.00055610f, -0.07375640f, -2.02195000f,
 									-0.00103160f, -0.23426020f, 0.24238936f, 997.95058130f, 0.69195659f, 0.80753904f,
 									0.14324682f, 0.13820026f, 0.10266800f, 0.04669479f, 0.06212858f, 0.00756591f }
-					)
-			},
-			{
+					) },
+			{ //
 					new CfsBiomassConversionCoefficientsDetails(
 							true,
 							new float[] { 0.97256578f, 0.86611870f, 45.46295155f, -1.09418571f, 0.85670801f,
@@ -378,9 +375,8 @@ public class CfsBiomassConversionCoefficientsForGenus {
 									-0.00024010f, -0.04763380f, -1.99742900f, -0.00140100f, 0.05348370f, -2.46675200f,
 									-0.00173120f, -0.14754920f, 0.09828630f, 689.20102504f, 0.65622716f, 0.77493823f,
 									0.20285907f, 0.16065650f, 0.09713096f, 0.05681014f, 0.04378281f, 0.00759513f }
-					)
-			},
-			{
+					) },
+			{ //
 					new CfsBiomassConversionCoefficientsDetails(
 							true,
 							new float[] { 0.93907563f, 0.86907074f, 15.23670150f, -0.59440244f, 0.27390132f,
@@ -540,9 +536,8 @@ public class CfsBiomassConversionCoefficientsForGenus {
 									-0.00076190f, -0.00690530f, -2.06819300f, -0.00088180f, 0.04514330f, -2.58355000f,
 									-0.00091270f, -0.13501530f, 0.26796332f, 459.37201005f, 0.71002514f, 0.78266600f,
 									0.15042221f, 0.11331043f, 0.09672609f, 0.08706454f, 0.04282656f, 0.01695903f }
-					)
-			},
-			{
+					) },
+			{ //
 					new CfsBiomassConversionCoefficientsDetails(
 							true,
 							new float[] { 0.64772928f, 0.94162485f, 55.13896265f, -1.51367177f, 1.03313008f,
@@ -702,9 +697,8 @@ public class CfsBiomassConversionCoefficientsForGenus {
 									-0.00048530f, -0.06536840f, -1.55181900f, -0.00055230f, 0.02773460f, -2.10359900f,
 									-0.00139830f, -0.12973620f, 0.92043504f, 1182.79198230f, 0.64023257f, 0.80632503f,
 									0.15539729f, 0.07798616f, 0.14242672f, 0.10817700f, 0.06194342f, 0.00751181f }
-					)
-			},
-			{
+					) },
+			{ //
 					new CfsBiomassConversionCoefficientsDetails(
 							true,
 							new float[] { 0.67009855f, 0.94067057f, 27.88004392f, -1.00060879f, 0.86527095f,
@@ -864,14 +858,13 @@ public class CfsBiomassConversionCoefficientsForGenus {
 									-0.00074650f, 0.00618410f, -1.03329800f, 0.00084690f, -0.19931300f, -1.69923300f,
 									-0.00087010f, -0.25812380f, 0.47830595f, 1182.23962780f, 0.62970420f, 0.74660676f,
 									0.13639799f, 0.06919595f, 0.15971109f, 0.17634912f, 0.07418672f, 0.00784817f }
-					)
-			}
-	};
+					) } };
 
 	static {
 		new CfsBiomassConversionCoefficientsHelper<CfsBiomassConversionSupportedEcoZone, CfsBiomassConversionSupportedGenera, CfsLiveConversionParams>()
 				.validateCoefficientArray(
-						CfsBiomassConversionCoefficientsDead.class, array, CfsBiomassConversionSupportedEcoZone.class, CfsBiomassConversionSupportedGenera.class, CfsLiveConversionParams.class
+						CfsBiomassConversionCoefficientsDead.class, array, CfsBiomassConversionSupportedEcoZone.class,
+						CfsBiomassConversionSupportedGenera.class, CfsLiveConversionParams.class
 				);
 	}
 }

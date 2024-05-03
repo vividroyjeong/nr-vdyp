@@ -67,8 +67,8 @@ class SiteIndex2HeightTest {
 		@Test
 		void testInvalidSiteIndex() throws CommonCalculatorException {
 			assertThrows(
-					LessThan13Exception.class, () -> SiteIndex2Height
-							.indexToHeight(null, 0.0, SI_AT_TOTAL, 1.2, 0.0, 0.0)
+					LessThan13Exception.class,
+					() -> SiteIndex2Height.indexToHeight(null, 0.0, SI_AT_TOTAL, 1.2, 0.0, 0.0)
 			);
 		}
 
@@ -80,8 +80,8 @@ class SiteIndex2HeightTest {
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
 
 			assertThrows(
-					NoAnswerException.class, () -> SiteIndex2Height
-							.indexToHeight(SI_CWC_KURUCZAC, (short) -1, SI_AT_TOTAL, 1.31, 0.0, 0.0)
+					NoAnswerException.class,
+					() -> SiteIndex2Height.indexToHeight(SI_CWC_KURUCZAC, (short) -1, SI_AT_TOTAL, 1.31, 0.0, 0.0)
 			);
 		}
 
@@ -133,8 +133,7 @@ class SiteIndex2HeightTest {
 		@Test
 		void testSI_FDC_KINGBhageLessThanFive() throws CommonCalculatorException {
 			double site_index = 1.31;
-			double actualResult = SiteIndex2Height
-					.indexToHeight(SI_FDC_KING, 1.0, SI_AT_BREAST, site_index, 1.0, 0.0);
+			double actualResult = SiteIndex2Height.indexToHeight(SI_FDC_KING, 1.0, SI_AT_BREAST, site_index, 1.0, 0.0);
 
 			site_index /= 0.3048;
 			double x1 = 2500 / (site_index - 4.5);
@@ -153,8 +152,7 @@ class SiteIndex2HeightTest {
 		void testSI_FDC_KINGBhageGreaterThanFive() throws CommonCalculatorException {
 			double site_index = 1.31;
 
-			double actualResult = SiteIndex2Height
-					.indexToHeight(SI_FDC_KING, 5.0, SI_AT_BREAST, site_index, 1.0, 0.0);
+			double actualResult = SiteIndex2Height.indexToHeight(SI_FDC_KING, 5.0, SI_AT_BREAST, site_index, 1.0, 0.0);
 
 			site_index /= 0.3048;
 			double x1 = 2500 / (site_index - 4.5);
@@ -173,8 +171,7 @@ class SiteIndex2HeightTest {
 		void testSI_HWC_FARRBhageGreaterThanZero() throws CommonCalculatorException {
 			double site_index = 1.31;
 
-			double actualResult = SiteIndex2Height
-					.indexToHeight(SI_HWC_FARR, 5.0, SI_AT_BREAST, site_index, 1.0, 0.0);
+			double actualResult = SiteIndex2Height.indexToHeight(SI_HWC_FARR, 5.0, SI_AT_BREAST, site_index, 1.0, 0.0);
 
 			site_index /= 0.3048;
 			double x2 = 0.3621734 + 1.149181 * Math.log(5) - 0.005617852 * SiteIndexUtilities.ppow(Math.log(5), 3.0)
@@ -207,8 +204,8 @@ class SiteIndex2HeightTest {
 		void testSI_HWC_BARKER() throws CommonCalculatorException {
 			double actualResult = SiteIndex2Height.indexToHeight(SI_HWC_BARKER, 0.0, SI_AT_BREAST, 1.31, 1.0, 0.0);
 			double expectedResult = Math.exp(4.35753) * SiteIndexUtilities.ppow(
-					(-10.45 + 1.30049 * 1.31 - 0.0022 * 1.7161) / Math.exp(4.35753), SiteIndexUtilities
-							.ppow(50.0, 0.756313)
+					(-10.45 + 1.30049 * 1.31 - 0.0022 * 1.7161) / Math.exp(4.35753),
+					SiteIndexUtilities.ppow(50.0, 0.756313)
 			);
 
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
@@ -217,13 +214,12 @@ class SiteIndex2HeightTest {
 		@Test
 		void testSI_HM_MEANSBhageGreaterThanZero() throws CommonCalculatorException {
 			double site_index = 1.31;
-			double actualResult = SiteIndex2Height
-					.indexToHeight(SI_HM_MEANS, 5.0, SI_AT_BREAST, site_index, 1.0, 0.0);
+			double actualResult = SiteIndex2Height.indexToHeight(SI_HM_MEANS, 5.0, SI_AT_BREAST, site_index, 1.0, 0.0);
 
 			site_index = -1.73 + 3.149 * SiteIndexUtilities.ppow(site_index, 0.8279);
 			double expectedResult = 1.37 + (22.87 + 0.9502 * (site_index - 1.37)) * SiteIndexUtilities.ppow(
-					1 - Math.exp(-0.0020647 * SiteIndexUtilities.ppow(site_index - 1.37, 0.5) * 5), 1.3656
-							+ 2.046 / (site_index - 1.37)
+					1 - Math.exp(-0.0020647 * SiteIndexUtilities.ppow(site_index - 1.37, 0.5) * 5),
+					1.3656 + 2.046 / (site_index - 1.37)
 			);
 
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
@@ -246,8 +242,8 @@ class SiteIndex2HeightTest {
 
 			site_index = -1.73 + 3.149 * SiteIndexUtilities.ppow(site_index, 0.8279);
 			double expectedResult = 1.37 + (22.87 + 0.9502 * (site_index - 1.37)) * SiteIndexUtilities.ppow(
-					1 - Math.exp(-0.0020647 * SiteIndexUtilities.ppow(site_index - 1.37, 0.5) * 5), 1.3656
-							+ 2.046 / (site_index - 1.37)
+					1 - Math.exp(-0.0020647 * SiteIndexUtilities.ppow(site_index - 1.37, 0.5) * 5),
+					1.3656 + 2.046 / (site_index - 1.37)
 			);
 
 			assertThat(actualResult, closeTo(expectedResult, ERROR_TOLERANCE));
@@ -265,8 +261,7 @@ class SiteIndex2HeightTest {
 		void testSI_HWC_WILEYBHAGEZero() throws CommonCalculatorException {
 			double site_index = 1.31;
 
-			double actualResult = SiteIndex2Height
-					.indexToHeight(SI_HWC_WILEY, 0.0, SI_AT_BREAST, site_index, 1.0, 0.0);
+			double actualResult = SiteIndex2Height.indexToHeight(SI_HWC_WILEY, 0.0, SI_AT_BREAST, site_index, 1.0, 0.0);
 
 			double expectedResult = 1.37;
 
@@ -277,8 +272,7 @@ class SiteIndex2HeightTest {
 		void testSI_HWC_WILEYBHAGELargeSite() throws CommonCalculatorException {
 			double site_index = 80;
 
-			double actualResult = SiteIndex2Height
-					.indexToHeight(SI_HWC_WILEY, 1.0, SI_AT_BREAST, site_index, 1.0, 0.0);
+			double actualResult = SiteIndex2Height.indexToHeight(SI_HWC_WILEY, 1.0, SI_AT_BREAST, site_index, 1.0, 0.0);
 
 			double x1 = 20 / 1.667 + 0.1;
 			double expectedFunctionResult = SiteIndex2Height
@@ -462,8 +456,8 @@ class SiteIndex2HeightTest {
 		@Test
 		void testDefaultSwitchStatement() throws CommonCalculatorException {
 			assertThrows(
-					CurveErrorException.class, () -> SiteIndex2Height
-							.indexToHeight(null, 5, SI_AT_BREAST, 1.31, 1.5, 0.0)
+					CurveErrorException.class,
+					() -> SiteIndex2Height.indexToHeight(null, 5, SI_AT_BREAST, 1.31, 1.5, 0.0)
 			);
 		}
 

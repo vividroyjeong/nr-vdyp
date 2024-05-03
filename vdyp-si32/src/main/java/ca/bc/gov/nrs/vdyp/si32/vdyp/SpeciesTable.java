@@ -12,11 +12,11 @@ import ca.bc.gov.nrs.vdyp.si32.cfs.CfsTreeSpecies;
 /**
  * Maintains all information for VDYP7 species.
  * <p>
- * These entries MUST be listed alphabetically by sCodeName. It is essential
- * that this array's contents match {@code enumSP64Enum} exactly.
+ * These entries MUST be listed alphabetically by sCodeName. It is essential that this array's contents match
+ * {@code enumSP64Enum} exactly.
  * <p>
- * iCrntCurve is left uninitialized until the first request of a site curve
- * is made or assigned at which time defaults will be populated from SINDEX.
+ * iCrntCurve is left uninitialized until the first request of a site curve is made or assigned at which time defaults
+ * will be populated from SINDEX.
  */
 public class SpeciesTable {
 
@@ -25,11 +25,8 @@ public class SpeciesTable {
 	private static final String YELLOW_CEDAR = "Yellow Cedar";
 	private static final String UNKNOWN_NAME = "<<unknown>>";
 
-	public record SpeciesTableItem(
-			/** The index at which this item resides in the table */
-			int index,
-			SpeciesDetails details
-	) {
+	public record SpeciesTableItem(/** The index at which this item resides in the table */
+	int index, SpeciesDetails details) {
 	}
 
 	public static final int UNKNOWN_ENTRY_INDEX = 0;
@@ -65,8 +62,8 @@ public class SpeciesTable {
 			throw new IllegalStateException(
 					MessageFormat.format(
 							"enumSP64Name's ordinal value for {0}"
-									+ " does not match the index the species will be placed in SpeciesTable {1}", item
-											.codeName(), index
+									+ " does not match the index the species will be placed in SpeciesTable {1}",
+							item.codeName(), index
 					)
 			);
 		}
@@ -79,7 +76,7 @@ public class SpeciesTable {
 
 	/**
 	 * Performs a case-insensitive search for the species with the given sp64 code name.
-	 * 
+	 *
 	 * @param sp64Name the code name of the species to be found.
 	 * @return the {@code structSpeciesTableItem} of that name, or {@code DefaultEntry} if not found.
 	 */
@@ -105,26 +102,26 @@ public class SpeciesTable {
 
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"A", "Aspen/Cottonwood/Poplar", "Populus", "A", "AC", CfsTreeSpecies.UNKNOWN, true,
-						true, false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+						"A", "Aspen/Cottonwood/Poplar", "Populus", "A", "AC", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"ABAL", "Silver Fir", "Abies alba", "B", "B", CfsTreeSpecies.UNKNOWN, true, true,
-						false, getDefaultCrownClosure(57.0f, 42.0f), getDefaultSiteIndexCurves()
+						"ABAL", "Silver Fir", "Abies alba", "B", "B", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(57.0f, 42.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"ABCO", "White Fir", "Abies concolor", "B", "B", CfsTreeSpecies.UNKNOWN, true, true,
-						false, getDefaultCrownClosure(57.0f, 42.0f), getDefaultSiteIndexCurves()
+						"ABCO", "White Fir", "Abies concolor", "B", "B", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(57.0f, 42.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"AC", "Poplar", "Populus balsamifera", "CT", "AC", CfsTreeSpecies.BALSAM_POPLAR, true,
-						true, false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+						"AC", "Poplar", "Populus balsamifera", "CT", "AC", CfsTreeSpecies.BALSAM_POPLAR, true, true,
+						false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -143,28 +140,26 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"AD", "Cottonwood (exotic)", UNKNOWN_NAME, "CT", "AC", CfsTreeSpecies.UNKNOWN, true,
-						true, false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+						"AD", "Cottonwood (exotic)", UNKNOWN_NAME, "CT", "AC", CfsTreeSpecies.UNKNOWN, true, true,
+						false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"AH", "Poplar Cottonwood hybrid", UNKNOWN_NAME, "??", "AC",
-						CfsTreeSpecies.ASPEN_TREMBLING, true, true, false, getDefaultCrownClosure(61.0f, 61.0f),
-						getDefaultSiteIndexCurves()
+						"AH", "Poplar Cottonwood hybrid", UNKNOWN_NAME, "??", "AC", CfsTreeSpecies.ASPEN_TREMBLING,
+						true, true, false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"AT", "Trembling Aspen", "Populus tremuloides", "A", "AT",
-						CfsTreeSpecies.ASPEN_TREMBLING, true, true, false, getDefaultCrownClosure(52.0f, 52.0f),
-						getDefaultSiteIndexCurves()
+						"AT", "Trembling Aspen", "Populus tremuloides", "A", "AT", CfsTreeSpecies.ASPEN_TREMBLING, true,
+						true, false, getDefaultCrownClosure(52.0f, 52.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"AX", "Hybrid Poplars", "Populus ssp.", "CT", "AC", CfsTreeSpecies.UNKNOWN, true,
-						true, false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+						"AX", "Hybrid Poplars", "Populus ssp.", "CT", "AC", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -175,39 +170,38 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"BA", "Amabilis/Pacific Silver Fir", "Abies amabilis", "B", "B",
-						CfsTreeSpecies.FIR_AMABILIS, true, false, true, getDefaultCrownClosure(57.0f, 57.0f),
-						getDefaultSiteIndexCurves()
+						"BA", "Amabilis/Pacific Silver Fir", "Abies amabilis", "B", "B", CfsTreeSpecies.FIR_AMABILIS,
+						true, false, true, getDefaultCrownClosure(57.0f, 57.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"BAC", "Amabilis fir (coast)", UNKNOWN_NAME, "B", "B", CfsTreeSpecies.UNKNOWN, true,
-						false, true, getDefaultCrownClosure(57.0f, 42.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"BAI", "Amabilis fir (interior)", UNKNOWN_NAME, "B", "B", CfsTreeSpecies.UNKNOWN,
-						true, false, true, getDefaultCrownClosure(57.0f, 42.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"BB", "Balsam Fir", "Abies balsamea", "B", "B", CfsTreeSpecies.UNKNOWN, true, false,
+						"BAC", "Amabilis fir (coast)", UNKNOWN_NAME, "B", "B", CfsTreeSpecies.UNKNOWN, true, false,
 						true, getDefaultCrownClosure(57.0f, 42.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"BC", "White Fir", "Abies concolor", "B", "B", CfsTreeSpecies.UNKNOWN, true, false,
+						"BAI", "Amabilis fir (interior)", UNKNOWN_NAME, "B", "B", CfsTreeSpecies.UNKNOWN, true, false,
 						true, getDefaultCrownClosure(57.0f, 42.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"BG", "Grand Fir", "Abies grandis", "B", "B", CfsTreeSpecies.FIR_GRAND, true, false,
-						true, getDefaultCrownClosure(57.0f, 42.0f), getDefaultSiteIndexCurves()
+						"BB", "Balsam Fir", "Abies balsamea", "B", "B", CfsTreeSpecies.UNKNOWN, true, false, true,
+						getDefaultCrownClosure(57.0f, 42.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"BC", "White Fir", "Abies concolor", "B", "B", CfsTreeSpecies.UNKNOWN, true, false, true,
+						getDefaultCrownClosure(57.0f, 42.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"BG", "Grand Fir", "Abies grandis", "B", "B", CfsTreeSpecies.FIR_GRAND, true, false, true,
+						getDefaultCrownClosure(57.0f, 42.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -218,34 +212,32 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"BL", "Alpine Fir", "Abies lasiocarpa", "B", "B",
-						CfsTreeSpecies.FIR_SUBALPINE_OR_ALPINE, true, false, true, getDefaultCrownClosure(42.0f, 42.0f),
-						getDefaultSiteIndexCurves()
+						"BL", "Alpine Fir", "Abies lasiocarpa", "B", "B", CfsTreeSpecies.FIR_SUBALPINE_OR_ALPINE, true,
+						false, true, getDefaultCrownClosure(42.0f, 42.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"BM", "Shasta Red Fir", "Abies magnifica var. shastensis", "B", "B",
-						CfsTreeSpecies.UNKNOWN, true, false, true, getDefaultCrownClosure(57.0f, 42.0f),
-						getDefaultSiteIndexCurves()
+						"BM", "Shasta Red Fir", "Abies magnifica var. shastensis", "B", "B", CfsTreeSpecies.UNKNOWN,
+						true, false, true, getDefaultCrownClosure(57.0f, 42.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"BN", "Noble fir", UNKNOWN_NAME, "B", "B", CfsTreeSpecies.UNKNOWN, true, false,
-						true, getDefaultCrownClosure(57.0f, 42.0f), getDefaultSiteIndexCurves()
+						"BN", "Noble fir", UNKNOWN_NAME, "B", "B", CfsTreeSpecies.UNKNOWN, true, false, true,
+						getDefaultCrownClosure(57.0f, 42.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"BP", "Noble Fir", "Abies procera", "B", "B", CfsTreeSpecies.UNKNOWN, true, false,
-						true, getDefaultCrownClosure(57.0f, 42.0f), getDefaultSiteIndexCurves()
+						"BP", "Noble Fir", "Abies procera", "B", "B", CfsTreeSpecies.UNKNOWN, true, false, true,
+						getDefaultCrownClosure(57.0f, 42.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"BV", "Silver/Paper Birch", UNKNOWN_NAME, "BI", "E", CfsTreeSpecies.UNKNOWN, true,
-						true, false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+						"BV", "Silver/Paper Birch", UNKNOWN_NAME, "BI", "E", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -256,38 +248,38 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"CI", "Incense Cedar", "Calocedrus decurrens", "??", "C", CfsTreeSpecies.UNKNOWN,
-						true, false, true, getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
+						"CI", "Incense Cedar", "Calocedrus decurrens", "??", "C", CfsTreeSpecies.UNKNOWN, true, false,
+						true, getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"COT", "Cottonwood", UNKNOWN_NAME, "CT", "AC", CfsTreeSpecies.UNKNOWN, true, true,
-						false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+						"COT", "Cottonwood", UNKNOWN_NAME, "CT", "AC", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"CP", "Port Orford Cedar", UNKNOWN_NAME, "??", "C", CfsTreeSpecies.UNKNOWN, true,
+						"CP", "Port Orford Cedar", UNKNOWN_NAME, "??", "C", CfsTreeSpecies.UNKNOWN, true, false, true,
+						getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"CT", "Cottonwood", UNKNOWN_NAME, "CT", "AC", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"CW", "Western Red Cedar", "Thuja plicata", "C", "C", CfsTreeSpecies.CEDAR_WESTERN_RED, true,
 						false, true, getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"CT", "Cottonwood", UNKNOWN_NAME, "CT", "AC", CfsTreeSpecies.UNKNOWN, true, true,
-						false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"CW", "Western Red Cedar", "Thuja plicata", "C", "C", CfsTreeSpecies.CEDAR_WESTERN_RED,
-						true, false, true, getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"CY", YELLOW_CEDAR, UNKNOWN_NAME, "C", "Y", CfsTreeSpecies.UNKNOWN, true, false,
-						true, getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
+						"CY", YELLOW_CEDAR, UNKNOWN_NAME, "C", "Y", CfsTreeSpecies.UNKNOWN, true, false, true,
+						getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -298,26 +290,26 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"DF", DOUGLAS_FIR, "Pseudotsuga menziesii", "F", "F", CfsTreeSpecies.UNKNOWN, true,
-						false, true, getDefaultCrownClosure(61.0f, 48.0f), getDefaultSiteIndexCurves()
+						"DF", DOUGLAS_FIR, "Pseudotsuga menziesii", "F", "F", CfsTreeSpecies.UNKNOWN, true, false, true,
+						getDefaultCrownClosure(61.0f, 48.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"DG", "Sitka (green) Alder", UNKNOWN_NAME, "D", "D", CfsTreeSpecies.ALDER_SITKA,
-						true, true, false, getDefaultCrownClosure(72.0f, 72.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"DM", "Mountain Alder", UNKNOWN_NAME, "D", "D", CfsTreeSpecies.ALDER_SITKA, true,
-						true, false, getDefaultCrownClosure(72.0f, 72.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"DR", "Red Alder", "Alnus rubra", "D", "D", CfsTreeSpecies.ALDER_RED, true, true,
+						"DG", "Sitka (green) Alder", UNKNOWN_NAME, "D", "D", CfsTreeSpecies.ALDER_SITKA, true, true,
 						false, getDefaultCrownClosure(72.0f, 72.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"DM", "Mountain Alder", UNKNOWN_NAME, "D", "D", CfsTreeSpecies.ALDER_SITKA, true, true, false,
+						getDefaultCrownClosure(72.0f, 72.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"DR", "Red Alder", "Alnus rubra", "D", "D", CfsTreeSpecies.ALDER_RED, true, true, false,
+						getDefaultCrownClosure(72.0f, 72.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -328,40 +320,38 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"EA", "Common Paper Birch", "Betula neoalaskana", "BI", "E",
-						CfsTreeSpecies.BIRCH_ALASKA_PAPER, true, true, false, getDefaultCrownClosure(61.0f, 61.0f),
-						getDefaultSiteIndexCurves()
+						"EA", "Common Paper Birch", "Betula neoalaskana", "BI", "E", CfsTreeSpecies.BIRCH_ALASKA_PAPER,
+						true, true, false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"EB", "Bog Birch", UNKNOWN_NAME, "BI", "E", CfsTreeSpecies.UNKNOWN, true, true,
-						false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+						"EB", "Bog Birch", UNKNOWN_NAME, "BI", "E", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"EE", "European Birch", "Betula pendula", "BI", "E", CfsTreeSpecies.UNKNOWN, true,
+						"EE", "European Birch", "Betula pendula", "BI", "E", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"EP", "Silver Paper Birch", "Betula papyrifera", "BI", "E", CfsTreeSpecies.BIRCH_WHITE, true,
 						true, false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"EP", "Silver Paper Birch", "Betula papyrifera", "BI", "E",
-						CfsTreeSpecies.BIRCH_WHITE, true, true, false, getDefaultCrownClosure(61.0f, 61.0f),
-						getDefaultSiteIndexCurves()
+						"ES", "Silver Birch (exotic)", "Betula pubescens", "BI", "E", CfsTreeSpecies.UNKNOWN, true,
+						true, false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"ES", "Silver Birch (exotic)", "Betula pubescens", "BI", "E", CfsTreeSpecies.UNKNOWN,
-						true, true, false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"EW", "Water Birch", "Betula occidentalis", "BI", "E", CfsTreeSpecies.BIRCH_WHITE,
-						true, true, false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+						"EW", "Water Birch", "Betula occidentalis", "BI", "E", CfsTreeSpecies.BIRCH_WHITE, true, true,
+						false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -373,8 +363,8 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"F", DOUGLAS_FIR, "Pseudotsuga", "F", "F", CfsTreeSpecies.UNKNOWN, true, false,
-						true, getDefaultCrownClosure(61.0f, 48.0f), getDefaultSiteIndexCurves()
+						"F", DOUGLAS_FIR, "Pseudotsuga", "F", "F", CfsTreeSpecies.UNKNOWN, true, false, true,
+						getDefaultCrownClosure(61.0f, 48.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -406,15 +396,14 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"GP", "Pacific Dogwood", "Cornus nuttallii", "G", "MB",
-						CfsTreeSpecies.DOGWOOD_WESTERNFLOWERING, true, false, false,
-						getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
+						"GP", "Pacific Dogwood", "Cornus nuttallii", "G", "MB", CfsTreeSpecies.DOGWOOD_WESTERNFLOWERING,
+						true, false, false, getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"GR", "Red-Osier Dogwood", UNKNOWN_NAME, "G", "MB", CfsTreeSpecies.UNKNOWN, true,
-						false, false, getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
+						"GR", "Red-Osier Dogwood", UNKNOWN_NAME, "G", "MB", CfsTreeSpecies.UNKNOWN, true, false, false,
+						getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -425,53 +414,50 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"HM", "Mountain Hemlock", "Tsuga mertensiana", "H", "H",
-						CfsTreeSpecies.HEMLOCK_MOUNTAIN, true, false, true, getDefaultCrownClosure(61.0f, 51.0f),
-						getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"HW", "Western Hemlock", "Tsuga heterophylla", "H", "H",
-						CfsTreeSpecies.HEMLOCK_WESTERN, true, false, true, getDefaultCrownClosure(61.0f, 51.0f),
-						getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"HWC", "Western hemlock (coast)", UNKNOWN_NAME, "H", "H", CfsTreeSpecies.UNKNOWN,
-						true, false, true, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"HWI", "Western hemlock (interior)", UNKNOWN_NAME, "H", "H", CfsTreeSpecies.UNKNOWN,
-						true, false, true, getDefaultCrownClosure(51.0f, 51.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"HXM", "Western/Mountain Hemlock cross", UNKNOWN_NAME, "H", "H",
-						CfsTreeSpecies.UNKNOWN, true, false, true, getDefaultCrownClosure(61.0f, 51.0f),
-						getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"IG", "Giant Sequoia", "Sequoiadendron giganteum", "C", "C", CfsTreeSpecies.UNKNOWN,
-						true, false, true, getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"IS", "Coast Redwood", "Sequoia sempervirens", "C", "C", CfsTreeSpecies.UNKNOWN,
-						true, false, true, getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"J", "Juniper", "Juniperus", "J", "C", CfsTreeSpecies.JUNIPER_ROCKY_MOUNTAIN, true,
+						"HM", "Mountain Hemlock", "Tsuga mertensiana", "H", "H", CfsTreeSpecies.HEMLOCK_MOUNTAIN, true,
 						false, true, getDefaultCrownClosure(61.0f, 51.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"HW", "Western Hemlock", "Tsuga heterophylla", "H", "H", CfsTreeSpecies.HEMLOCK_WESTERN, true,
+						false, true, getDefaultCrownClosure(61.0f, 51.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"HWC", "Western hemlock (coast)", UNKNOWN_NAME, "H", "H", CfsTreeSpecies.UNKNOWN, true, false,
+						true, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"HWI", "Western hemlock (interior)", UNKNOWN_NAME, "H", "H", CfsTreeSpecies.UNKNOWN, true,
+						false, true, getDefaultCrownClosure(51.0f, 51.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"HXM", "Western/Mountain Hemlock cross", UNKNOWN_NAME, "H", "H", CfsTreeSpecies.UNKNOWN, true,
+						false, true, getDefaultCrownClosure(61.0f, 51.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"IG", "Giant Sequoia", "Sequoiadendron giganteum", "C", "C", CfsTreeSpecies.UNKNOWN, true,
+						false, true, getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"IS", "Coast Redwood", "Sequoia sempervirens", "C", "C", CfsTreeSpecies.UNKNOWN, true, false,
+						true, getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"J", "Juniper", "Juniperus", "J", "C", CfsTreeSpecies.JUNIPER_ROCKY_MOUNTAIN, true, false, true,
+						getDefaultCrownClosure(61.0f, 51.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -489,8 +475,8 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"KC", "Casara", "Rhamnus Purshiana", "K", "E", CfsTreeSpecies.SPRUCE_WHITE, true,
-						false, false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+						"KC", "Casara", "Rhamnus Purshiana", "K", "E", CfsTreeSpecies.SPRUCE_WHITE, true, false, false,
+						getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -501,26 +487,26 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"LA", "Alpine Larch", "Larix lyallii", "L", "L", CfsTreeSpecies.UNKNOWN, true, true,
-						false, getDefaultCrownClosure(54.0f, 54.0f), getDefaultSiteIndexCurves()
+						"LA", "Alpine Larch", "Larix lyallii", "L", "L", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(54.0f, 54.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"LE", "Eastern Larch", UNKNOWN_NAME, "??", "L", CfsTreeSpecies.UNKNOWN, true, true,
-						false, getDefaultCrownClosure(54.0f, 54.0f), getDefaultSiteIndexCurves()
+						"LE", "Eastern Larch", UNKNOWN_NAME, "??", "L", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(54.0f, 54.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"LT", "Tamarack", "Larix laricina", "L", "L", CfsTreeSpecies.TAMARACK, true, true,
-						false, getDefaultCrownClosure(54.0f, 54.0f), getDefaultSiteIndexCurves()
+						"LT", "Tamarack", "Larix laricina", "L", "L", CfsTreeSpecies.TAMARACK, true, true, false,
+						getDefaultCrownClosure(54.0f, 54.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"LW", "Western Larch", "Larix occidentalis", "L", "L", CfsTreeSpecies.LARCH_WESTERN,
-						true, true, false, getDefaultCrownClosure(54.0f, 54.0f), getDefaultSiteIndexCurves()
+						"LW", "Western Larch", "Larix occidentalis", "L", "L", CfsTreeSpecies.LARCH_WESTERN, true, true,
+						false, getDefaultCrownClosure(54.0f, 54.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -531,81 +517,80 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"MB", "Broadleaf Maple", "Acer macrophyllum", "M", "MB", CfsTreeSpecies.MAPLE_BIGLEAF,
-						true, true, false, getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"ME", "Box elder", "Acer negundo", "??", "E", CfsTreeSpecies.UNKNOWN, true, true,
-						false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"MN", "Norway Maple", "Acer platanoides", "M", "MB", CfsTreeSpecies.UNKNOWN, true,
+						"MB", "Broadleaf Maple", "Acer macrophyllum", "M", "MB", CfsTreeSpecies.MAPLE_BIGLEAF, true,
 						true, false, getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"MR", "Rocky Mountain Maple", UNKNOWN_NAME, "M", "MB", CfsTreeSpecies.MAPLE, true,
-						true, false, getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
+						"ME", "Box elder", "Acer negundo", "??", "E", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"MS", "Sycamore Maple", UNKNOWN_NAME, "M", "MB", CfsTreeSpecies.UNKNOWN, true, true,
-						false, getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
+						"MN", "Norway Maple", "Acer platanoides", "M", "MB", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"MV", "Vine Maple", "Acer macrophyllum", "M", "MB", CfsTreeSpecies.MAPLE, true, true,
-						false, getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
+						"MR", "Rocky Mountain Maple", UNKNOWN_NAME, "M", "MB", CfsTreeSpecies.MAPLE, true, true, false,
+						getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"OA", "Incense cedar", "Calocedrus decurrens", "??", "C", CfsTreeSpecies.UNKNOWN,
-						true, false, true, getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
+						"MS", "Sycamore Maple", UNKNOWN_NAME, "M", "MB", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"OB", "Giant sequoia", "Seqoiadendron giganteum", "??", "C", CfsTreeSpecies.UNKNOWN,
-						true, false, true, getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
+						"MV", "Vine Maple", "Acer macrophyllum", "M", "MB", CfsTreeSpecies.MAPLE, true, true, false,
+						getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"OC", "Coast redwood", "Sequoia sempervirens", "??", "C", CfsTreeSpecies.UNKNOWN,
-						true, false, true, getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
+						"OA", "Incense cedar", "Calocedrus decurrens", "??", "C", CfsTreeSpecies.UNKNOWN, true, false,
+						true, getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"OD", "European mountain Ash", "Sorbus aucuparia", "??", "MB",
-						CfsTreeSpecies.UNKNOWN, true, false, false, getDefaultCrownClosure(71.0f, 71.0f),
-						getDefaultSiteIndexCurves()
+						"OB", "Giant sequoia", "Seqoiadendron giganteum", "??", "C", CfsTreeSpecies.UNKNOWN, true,
+						false, true, getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"OE", "Siberian elm", "Ulmus pumila", "??", "MB", CfsTreeSpecies.UNKNOWN, true,
+						"OC", "Coast redwood", "Sequoia sempervirens", "??", "C", CfsTreeSpecies.UNKNOWN, true, false,
+						true, getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"OD", "European mountain Ash", "Sorbus aucuparia", "??", "MB", CfsTreeSpecies.UNKNOWN, true,
 						false, false, getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"OF", "Common pear", "Pyrus communis", "??", "MB", CfsTreeSpecies.UNKNOWN, true,
-						true, false, getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
+						"OE", "Siberian elm", "Ulmus pumila", "??", "MB", CfsTreeSpecies.UNKNOWN, true, false, false,
+						getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"OG", "Oregon ash", "Fraxinus latifolia", "??", "MB", CfsTreeSpecies.UNKNOWN, true,
-						true, false, getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
+						"OF", "Common pear", "Pyrus communis", "??", "MB", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"OG", "Oregon ash", "Fraxinus latifolia", "??", "MB", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -616,26 +601,26 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"PA", "Whitebark Pine", "Pinus albicaulis", "PL", "PA", CfsTreeSpecies.PINE_WHITEBARK,
-						true, false, true, getDefaultCrownClosure(50.0f, 50.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"PF", "Limber Pine", "Pinus Flexilis", "PL", "PA", CfsTreeSpecies.UNKNOWN, true,
+						"PA", "Whitebark Pine", "Pinus albicaulis", "PL", "PA", CfsTreeSpecies.PINE_WHITEBARK, true,
 						false, true, getDefaultCrownClosure(50.0f, 50.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"PJ", "Jack Pine", "Pinus banksiana", "PL", "PL", CfsTreeSpecies.PINE_JACK, true,
-						false, true, getDefaultCrownClosure(50.0f, 50.0f), getDefaultSiteIndexCurves()
+						"PF", "Limber Pine", "Pinus Flexilis", "PL", "PA", CfsTreeSpecies.UNKNOWN, true, false, true,
+						getDefaultCrownClosure(50.0f, 50.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"PL", "Lodgepole Pine", "Pinus contorta", "PL", "PL", CfsTreeSpecies.PINE_LODGEPOLE,
-						true, false, true, getDefaultCrownClosure(50.0f, 50.0f), getDefaultSiteIndexCurves()
+						"PJ", "Jack Pine", "Pinus banksiana", "PL", "PL", CfsTreeSpecies.PINE_JACK, true, false, true,
+						getDefaultCrownClosure(50.0f, 50.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"PL", "Lodgepole Pine", "Pinus contorta", "PL", "PL", CfsTreeSpecies.PINE_LODGEPOLE, true,
+						false, true, getDefaultCrownClosure(50.0f, 50.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -654,33 +639,32 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"PM", "Monterray Pine", "Pinus radiata", "PL", "PW", CfsTreeSpecies.UNKNOWN, true,
-						false, true, getDefaultCrownClosure(55.0f, 55.0f), getDefaultSiteIndexCurves()
+						"PM", "Monterray Pine", "Pinus radiata", "PL", "PW", CfsTreeSpecies.UNKNOWN, true, false, true,
+						getDefaultCrownClosure(55.0f, 55.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"PR", "Red Pine", "Pinus Resinosa", "PL", "PW", CfsTreeSpecies.UNKNOWN, true, false,
-						true, getDefaultCrownClosure(55.0f, 55.0f), getDefaultSiteIndexCurves()
+						"PR", "Red Pine", "Pinus Resinosa", "PL", "PW", CfsTreeSpecies.UNKNOWN, true, false, true,
+						getDefaultCrownClosure(55.0f, 55.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"PS", "Sugar Pine", "Pinus lambertiana", "PL", "PW", CfsTreeSpecies.UNKNOWN, true,
-						false, true, getDefaultCrownClosure(55.0f, 55.0f), getDefaultSiteIndexCurves()
+						"PS", "Sugar Pine", "Pinus lambertiana", "PL", "PW", CfsTreeSpecies.UNKNOWN, true, false, true,
+						getDefaultCrownClosure(55.0f, 55.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"PV", "Ponderosa pine", "Pinus ponderosa", "PY", "PY", CfsTreeSpecies.UNKNOWN, true,
-						false, true, getDefaultCrownClosure(30.0f, 30.0f), getDefaultSiteIndexCurves()
+						"PV", "Ponderosa pine", "Pinus ponderosa", "PY", "PY", CfsTreeSpecies.UNKNOWN, true, false,
+						true, getDefaultCrownClosure(30.0f, 30.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"PW", "Western White Pine", "Pinus monticola", "PW", "PW",
-						CfsTreeSpecies.PINE_WESTERN_WHITE, true, false, true, getDefaultCrownClosure(55.0f, 55.0f),
-						getDefaultSiteIndexCurves()
+						"PW", "Western White Pine", "Pinus monticola", "PW", "PW", CfsTreeSpecies.PINE_WESTERN_WHITE,
+						true, false, true, getDefaultCrownClosure(55.0f, 55.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -692,8 +676,8 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"PY", "Yellow Pine", "Pinus ponderosa", "PY", "PY", CfsTreeSpecies.PINE_PONDEROSA,
-						true, false, true, getDefaultCrownClosure(30.0f, 30.0f), getDefaultSiteIndexCurves()
+						"PY", "Yellow Pine", "Pinus ponderosa", "PY", "PY", CfsTreeSpecies.PINE_PONDEROSA, true, false,
+						true, getDefaultCrownClosure(30.0f, 30.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -704,14 +688,14 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"QE", "English Oak", "Quercus robur", "Q", "MB", CfsTreeSpecies.UNKNOWN, true, true,
-						false, getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
+						"QE", "English Oak", "Quercus robur", "Q", "MB", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"QG", "Garry Oak", "Quercus Garryana", "Q", "MB", CfsTreeSpecies.UNKNOWN, true, true,
-						false, getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
+						"QG", "Garry Oak", "Quercus Garryana", "Q", "MB", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -722,8 +706,8 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"RA", ARBUTUS, "Arbutus menziesii", "R", "MB", CfsTreeSpecies.ARBUTUS, true, true,
-						false, getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
+						"RA", ARBUTUS, "Arbutus menziesii", "R", "MB", CfsTreeSpecies.ARBUTUS, true, true, false,
+						getDefaultCrownClosure(71.0f, 71.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -734,45 +718,44 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"SA", "Norway Spruce", UNKNOWN_NAME, "??", "S", CfsTreeSpecies.SPRUCE_WHITE, true,
+						"SA", "Norway Spruce", UNKNOWN_NAME, "??", "S", CfsTreeSpecies.SPRUCE_WHITE, true, false, true,
+						getDefaultCrownClosure(50.0f, 46.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"SB", "Black Spruce", "Picea mariana", "S", "S", CfsTreeSpecies.SPRUCE_BLACK, true, false, true,
+						getDefaultCrownClosure(46.0f, 46.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"SE", "Engelmann Spruce", "Picea engelmannii", "S", "S", CfsTreeSpecies.SPRUCE_ENGLEMANN, true,
 						false, true, getDefaultCrownClosure(50.0f, 46.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"SB", "Black Spruce", "Picea mariana", "S", "S", CfsTreeSpecies.SPRUCE_BLACK, true,
-						false, true, getDefaultCrownClosure(46.0f, 46.0f), getDefaultSiteIndexCurves()
+						"SI", "Interior Spruce", UNKNOWN_NAME, "S", "S", CfsTreeSpecies.UNKNOWN, true, false, true,
+						getDefaultCrownClosure(46.0f, 46.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"SE", "Engelmann Spruce", "Picea engelmannii", "S", "S",
-						CfsTreeSpecies.SPRUCE_ENGLEMANN, true, false, true, getDefaultCrownClosure(50.0f, 46.0f),
-						getDefaultSiteIndexCurves()
+						"SN", "Norway Spruce", UNKNOWN_NAME, "S", "S", CfsTreeSpecies.UNKNOWN, true, false, true,
+						getDefaultCrownClosure(50.0f, 46.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"SI", "Interior Spruce", UNKNOWN_NAME, "S", "S", CfsTreeSpecies.UNKNOWN, true,
-						false, true, getDefaultCrownClosure(46.0f, 46.0f), getDefaultSiteIndexCurves()
+						"SS", "Sitka Spruce", "Picea sitchensis", "S", "S", CfsTreeSpecies.SPRUCE_SITKA, true, false,
+						true, getDefaultCrownClosure(50.0f, 50.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"SN", "Norway Spruce", UNKNOWN_NAME, "S", "S", CfsTreeSpecies.UNKNOWN, true, false,
-						true, getDefaultCrownClosure(50.0f, 46.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"SS", "Sitka Spruce", "Picea sitchensis", "S", "S", CfsTreeSpecies.SPRUCE_SITKA, true,
-						false, true, getDefaultCrownClosure(50.0f, 50.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"SW", "White Spruce", "Picea glauca", "S", "S", CfsTreeSpecies.SPRUCE_WHITE, true,
-						false, true, getDefaultCrownClosure(46.0f, 46.0f), getDefaultSiteIndexCurves()
+						"SW", "White Spruce", "Picea glauca", "S", "S", CfsTreeSpecies.SPRUCE_WHITE, true, false, true,
+						getDefaultCrownClosure(46.0f, 46.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -783,14 +766,14 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"SXB", "SXxSB hybrid", UNKNOWN_NAME, "S", "S", CfsTreeSpecies.UNKNOWN, true, false,
-						true, getDefaultCrownClosure(50.0f, 46.0f), getDefaultSiteIndexCurves()
+						"SXB", "SXxSB hybrid", UNKNOWN_NAME, "S", "S", CfsTreeSpecies.UNKNOWN, true, false, true,
+						getDefaultCrownClosure(50.0f, 46.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"SXE", "SSxSE hybrid", UNKNOWN_NAME, "S", "S", CfsTreeSpecies.UNKNOWN, true, false,
-						true, getDefaultCrownClosure(50.0f, 46.0f), getDefaultSiteIndexCurves()
+						"SXE", "SSxSE hybrid", UNKNOWN_NAME, "S", "S", CfsTreeSpecies.UNKNOWN, true, false, true,
+						getDefaultCrownClosure(50.0f, 46.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -802,8 +785,8 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"SXS", "Sitka Spruce Hybrid", "Picea sitchensis x", "S", "S", CfsTreeSpecies.UNKNOWN,
-						true, false, true, getDefaultCrownClosure(50.0f, 46.0f), getDefaultSiteIndexCurves()
+						"SXS", "Sitka Spruce Hybrid", "Picea sitchensis x", "S", "S", CfsTreeSpecies.UNKNOWN, true,
+						false, true, getDefaultCrownClosure(50.0f, 46.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -815,8 +798,8 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"SXX", "SW hybrid", UNKNOWN_NAME, "S", "S", CfsTreeSpecies.UNKNOWN, true, false,
-						true, getDefaultCrownClosure(50.0f, 46.0f), getDefaultSiteIndexCurves()
+						"SXX", "SW hybrid", UNKNOWN_NAME, "S", "S", CfsTreeSpecies.UNKNOWN, true, false, true,
+						getDefaultCrownClosure(50.0f, 46.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -827,9 +810,8 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"TW", "Pacific (western) yew", "Taxus brevifolia", "T", "H",
-						CfsTreeSpecies.YEW_WESTERN, true, true, true, getDefaultCrownClosure(61.0f, 51.0f),
-						getDefaultSiteIndexCurves()
+						"TW", "Pacific (western) yew", "Taxus brevifolia", "T", "H", CfsTreeSpecies.YEW_WESTERN, true,
+						true, true, getDefaultCrownClosure(61.0f, 51.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -846,8 +828,8 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"UP", "Crab apple", "Malus fusca", "U", "E", CfsTreeSpecies.UNKNOWN, true, true,
-						false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+						"UP", "Crab apple", "Malus fusca", "U", "E", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -858,26 +840,26 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"VB", "Bitter Cherry", "Prunus emarginata", "V", "E", CfsTreeSpecies.CHERRY_BITTER,
-						true, true, false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"VP", "Pin Cherry", "Prunus pensylvanica", "V", "E", CfsTreeSpecies.CHERRY_PIN, true,
-						true, false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"VS", "Sweet Cherry", "Prunus avium", "V", "E", CfsTreeSpecies.UNKNOWN, true, true,
+						"VB", "Bitter Cherry", "Prunus emarginata", "V", "E", CfsTreeSpecies.CHERRY_BITTER, true, true,
 						false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"VV", "Choke Cherry", "Prunus virginiana", "V", "E", CfsTreeSpecies.UNKNOWN, true,
-						true, false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+						"VP", "Pin Cherry", "Prunus pensylvanica", "V", "E", CfsTreeSpecies.CHERRY_PIN, true, true,
+						false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"VS", "Sweet Cherry", "Prunus avium", "V", "E", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"VV", "Choke Cherry", "Prunus virginiana", "V", "E", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -888,20 +870,20 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"WA", "Peachleaf Willow", "Salix amygdaloides", "W", "E", CfsTreeSpecies.UNKNOWN,
-						true, true, false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"WB", "Bebb's Willow", "Salix bebbiana", "W", "E", CfsTreeSpecies.WILLOW, true, true,
+						"WA", "Peachleaf Willow", "Salix amygdaloides", "W", "E", CfsTreeSpecies.UNKNOWN, true, true,
 						false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"WD", "Pussy Willow", "Salix discolor", "W", "E", CfsTreeSpecies.UNKNOWN, true, true,
-						false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+						"WB", "Bebb's Willow", "Salix bebbiana", "W", "E", CfsTreeSpecies.WILLOW, true, true, false,
+						getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"WD", "Pussy Willow", "Salix discolor", "W", "E", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
@@ -912,75 +894,74 @@ public class SpeciesTable {
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"WP", "Pacific Willow", "Salix lucida", "W", "E", CfsTreeSpecies.UNKNOWN, true, true,
+						"WP", "Pacific Willow", "Salix lucida", "W", "E", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"WS", "Scouler's Willow", "Salix scouleriana", "W", "E", CfsTreeSpecies.WILLOW, true, true,
 						false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"WS", "Scouler's Willow", "Salix scouleriana", "W", "E", CfsTreeSpecies.WILLOW, true,
-						true, false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+						"WT", "Sitka Willow", "Salix sitchensis", "W", "E", CfsTreeSpecies.UNKNOWN, true, true, false,
+						getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"WT", "Sitka Willow", "Salix sitchensis", "W", "E", CfsTreeSpecies.UNKNOWN, true,
-						true, false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+						"X", "Unknown", UNKNOWN_NAME, "X", "F", CfsTreeSpecies.UNSPECIFIED_SOFTWOOD, true, false, true,
+						getDefaultCrownClosure(61.0f, 48.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"X", "Unknown", UNKNOWN_NAME, "X", "F", CfsTreeSpecies.UNSPECIFIED_SOFTWOOD, true,
-						false, true, getDefaultCrownClosure(61.0f, 48.0f), getDefaultSiteIndexCurves()
+						"XC", "Unknown conifer", UNKNOWN_NAME, "X", "F", CfsTreeSpecies.SPRUCE_WHITE, true, false, true,
+						getDefaultCrownClosure(61.0f, 48.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"XC", "Unknown conifer", UNKNOWN_NAME, "X", "F", CfsTreeSpecies.SPRUCE_WHITE, true,
-						false, true, getDefaultCrownClosure(61.0f, 48.0f), getDefaultSiteIndexCurves()
+						"XH", "Unknown hardwood", UNKNOWN_NAME, "X", "E", CfsTreeSpecies.SPRUCE_WHITE, true, true,
+						false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"XH", "Unknown hardwood", UNKNOWN_NAME, "X", "E", CfsTreeSpecies.SPRUCE_WHITE, true,
-						true, false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
+						"Y", YELLOW_CEDAR, "Chamaecyparis", "C", "Y", CfsTreeSpecies.UNKNOWN, true, false, true,
+						getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"Y", YELLOW_CEDAR, "Chamaecyparis", "C", "Y", CfsTreeSpecies.UNKNOWN, true, false,
+						"YC", YELLOW_CEDAR, "Chamaecyparis nootkatensis", "C", "Y", CfsTreeSpecies.CYPRESS_YELLOW, true,
+						false, true, getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
+				)
+		);
+		addSpeciesToTable(
+				new SpeciesDetails(
+						"YP", "Port Orford", "Chamaecyparis lawsoniana", "C", "Y", CfsTreeSpecies.UNKNOWN, true, false,
 						true, getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"YC", YELLOW_CEDAR, "Chamaecyparis nootkatensis", "C", "Y",
-						CfsTreeSpecies.CYPRESS_YELLOW, true, false, true, getDefaultCrownClosure(60.0f, 51.0f),
-						getDefaultSiteIndexCurves()
+						"Z", "Other Tree", UNKNOWN_NAME, "Z", "E", CfsTreeSpecies.UNKNOWN, true, false, false,
+						getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"YP", "Port Orford", "Chamaecyparis lawsoniana", "C", "Y", CfsTreeSpecies.UNKNOWN,
-						true, false, true, getDefaultCrownClosure(60.0f, 51.0f), getDefaultSiteIndexCurves()
+						"ZC", "Other tree (conifer)", UNKNOWN_NAME, "Z", "F", CfsTreeSpecies.SPRUCE_WHITE, true, false,
+						true, getDefaultCrownClosure(61.0f, 48.0f), getDefaultSiteIndexCurves()
 				)
 		);
 		addSpeciesToTable(
 				new SpeciesDetails(
-						"Z", "Other Tree", UNKNOWN_NAME, "Z", "E", CfsTreeSpecies.UNKNOWN, true, false,
+						"ZH", "Other tree (hardwood)", UNKNOWN_NAME, "Z", "E", CfsTreeSpecies.SPRUCE_WHITE, true, true,
 						false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"ZC", "Other tree (conifer)", UNKNOWN_NAME, "Z", "F", CfsTreeSpecies.SPRUCE_WHITE,
-						true, false, true, getDefaultCrownClosure(61.0f, 48.0f), getDefaultSiteIndexCurves()
-				)
-		);
-		addSpeciesToTable(
-				new SpeciesDetails(
-						"ZH", "Other tree (hardwood)", UNKNOWN_NAME, "Z", "E", CfsTreeSpecies.SPRUCE_WHITE,
-						true, true, false, getDefaultCrownClosure(61.0f, 61.0f), getDefaultSiteIndexCurves()
 				)
 		);
 	}

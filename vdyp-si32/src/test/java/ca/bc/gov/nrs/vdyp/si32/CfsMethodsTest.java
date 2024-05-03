@@ -22,20 +22,15 @@ class CfsMethodsTest {
 	@Test
 	void test_CFS_CFSTreeClassToString() {
 		assertThat(
-				CfsMethods.cfsTreeClassToString(CfsTreeClass.LIVE_NO_PATH.getIndex()), equalTo(
-						CfsTreeClass.LIVE_NO_PATH.getDescription()
-				)
+				CfsMethods.cfsTreeClassToString(CfsTreeClass.LIVE_NO_PATH.getIndex()),
+				equalTo(CfsTreeClass.LIVE_NO_PATH.getDescription())
 		);
 		assertThat(CfsMethods.cfsTreeClassToString(100), equalTo(CfsTreeClass.UNKNOWN.getDescription()));
 	}
 
 	@Test
 	void test_CFS_CFSGenusToString() {
-		assertThat(
-				CfsMethods.cfsGenusToString(CfsTreeGenus.BIRCH), equalTo(
-						CfsTreeGenus.BIRCH.getGenusName()
-				)
-		);
+		assertThat(CfsMethods.cfsGenusToString(CfsTreeGenus.BIRCH), equalTo(CfsTreeGenus.BIRCH.getGenusName()));
 		assertThat(CfsMethods.cfsGenusToString(null), equalTo(CfsTreeGenus.UNKNOWN.getGenusName()));
 	}
 

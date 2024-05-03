@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.common.Computed;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 
 public class FipLayerPrimary extends FipLayer {
 
@@ -13,7 +14,7 @@ public class FipLayerPrimary extends FipLayer {
 	private Optional<String> primaryGenus; // FIPL_1C/JPRIME
 
 	public FipLayerPrimary(
-			String polygonIdentifier, Optional<Integer> inventoryTypeGroup, float crownClosure,
+			PolygonIdentifier polygonIdentifier, Optional<Integer> inventoryTypeGroup, float crownClosure,
 			Optional<Character> stockingClass, Optional<String> primaryGenus
 	) {
 		super(polygonIdentifier, LayerType.PRIMARY, inventoryTypeGroup, crownClosure);
@@ -52,7 +53,7 @@ public class FipLayerPrimary extends FipLayer {
 			builder.ageTotal(8f);
 			builder.yearsToBreastHeight(7f);
 			builder.height(6f);
-	
+
 	@Override
 			builder.siteIndex(5f);
 			builder.crownClosure(0.9f);

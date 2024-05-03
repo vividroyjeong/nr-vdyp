@@ -51,10 +51,12 @@ public class VdypUtilizationParser implements ControlMapValueReplacer<Object, St
 		return () -> {
 			var lineParser = new LineParser().strippedString(25, DESCRIPTION).space(1)
 					.value(
-							1, LAYER_TYPE, ValueParser.valueOrMarker(
-									ValueParser.LAYER, ValueParser.optionalSingleton(
-											x -> x == null || x.trim().length() == 0
-													|| x.trim().equals("Z"), EndOfRecord.END_OF_RECORD
+							1, LAYER_TYPE,
+							ValueParser.valueOrMarker(
+									ValueParser.LAYER,
+									ValueParser.optionalSingleton(
+											x -> x == null || x.trim().length() == 0 || x.trim().equals("Z"),
+											EndOfRecord.END_OF_RECORD
 									)
 							)
 					).value(3, GENUS_INDEX, ValueParser.INTEGER).space(1)

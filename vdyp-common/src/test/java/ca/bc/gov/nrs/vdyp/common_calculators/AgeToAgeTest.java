@@ -50,13 +50,13 @@ class AgeToAgeTest {
 	@Test
 	void testShouldBranchInvalid() {
 		assertThrows(
-				AgeTypeErrorException.class, () -> AgeToAge
-						.ageToAge(SI_ACB_HUANGAC, 0.0, SI_AT_BREAST, SI_AT_BREAST, 0.0)
+				AgeTypeErrorException.class,
+				() -> AgeToAge.ageToAge(SI_ACB_HUANGAC, 0.0, SI_AT_BREAST, SI_AT_BREAST, 0.0)
 		);
 
 		assertThrows(
-				AgeTypeErrorException.class, () -> AgeToAge
-						.ageToAge(SI_ACT_THROWERAC, 0.0, SI_AT_TOTAL, SI_AT_TOTAL, 0.0)
+				AgeTypeErrorException.class,
+				() -> AgeToAge.ageToAge(SI_ACT_THROWERAC, 0.0, SI_AT_TOTAL, SI_AT_TOTAL, 0.0)
 		);
 	}
 
@@ -111,8 +111,7 @@ class AgeToAgeTest {
 	void testUncheckedCasesWithShouldBranch() throws AgeTypeErrorException {
 		double expectedResult = 3.0; // normal calculated test
 		SiteIndexEquation[] cases = { SI_CWI_NIGH, SI_DR_NIGH, SI_EP_NIGH, SI_FDC_BRUCENIGH, SI_FDC_BRUCEAC,
-				SI_FDC_NIGHTA,
-				SI_FDI_THROWERAC, SI_HWI_NIGH, SI_LW_NIGH, SI_PJ_HUANG, SI_PJ_HUANGAC, SI_PLI_NIGHTA2004,
+				SI_FDC_NIGHTA, SI_FDI_THROWERAC, SI_HWI_NIGH, SI_LW_NIGH, SI_PJ_HUANG, SI_PJ_HUANGAC, SI_PLI_NIGHTA2004,
 				SI_PLI_NIGHTA98, SI_PLI_THROWNIGH, SI_PW_CURTISAC, SI_PY_HANNAC, SI_PY_NIGH, SI_SB_NIGH, SI_SE_CHENAC,
 				SI_SE_NIGHTA, SI_SW_GOUDIE_NATAC, SI_SW_GOUDIE_PLAAC, SI_SW_NIGHTA2004, SI_SW_NIGHTA };
 

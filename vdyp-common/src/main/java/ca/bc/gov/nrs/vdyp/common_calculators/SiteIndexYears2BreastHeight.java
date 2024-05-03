@@ -17,12 +17,13 @@ public class SiteIndexYears2BreastHeight {
 
 	/**
 	 * Calculate years-to-breast-height from a curve and site.
-	 * @param cuIndex the index of the site curve
+	 *
+	 * @param cuIndex   the index of the site curve
 	 * @param siteIndex the index of the site, in metres, based on a breast height age 50.
 	 * @return as described. The result has not been rounded.
-	 * @throws LessThan13Exception when the site index is < 1.3.
+	 * @throws LessThan13Exception           when the site index is < 1.3.
 	 * @throws GrowthInterceptTotalException when cuIndex identifies a Growth Intercept curve.
-	 * @throws NoAnswerException when the calculation will not converge.
+	 * @throws NoAnswerException             when the calculation will not converge.
 	 */
 	public static double y2bh(SiteIndexEquation cuIndex, double siteIndex) throws CommonCalculatorException {
 		double y2bh;
@@ -903,7 +904,8 @@ public class SiteIndexYears2BreastHeight {
 
 	/**
 	 * Calculates years-to-breast-height and then converts all results r, x <= r < (x + 1) to x + 0.5.
-	 * @param cuIndex site curve index
+	 *
+	 * @param cuIndex   site curve index
 	 * @param siteIndex site index
 	 * @return as described
 	 * @throws CommonCalculatorException

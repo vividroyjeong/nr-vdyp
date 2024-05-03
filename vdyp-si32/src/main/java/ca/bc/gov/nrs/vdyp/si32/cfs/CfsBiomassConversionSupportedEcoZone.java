@@ -6,26 +6,23 @@ import ca.bc.gov.nrs.vdyp.model.EnumIterator;
 import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
 
 /**
- * Lists indices to Eco Zone conversion factors for the supported CFS Biomass 
- * conversion factors.
+ * Lists indices to Eco Zone conversion factors for the supported CFS Biomass conversion factors.
  * <ul>
- * <li>UNKNOWN: Indicates an uninitialized value or error condition. This should
- *      never be used to indicate a valid Eco Zone Index.
- * <li>other: Indices into the {@link CfsBiomassConversionCoefficients} array corresponding 
- * 		to the identified CFS Eco Zone.
+ * <li>UNKNOWN: Indicates an uninitialized value or error condition. This should never be used to indicate a valid Eco
+ * Zone Index.
+ * <li>other: Indices into the {@link CfsBiomassConversionCoefficients} array corresponding to the identified CFS Eco
+ * Zone.
  * </ul>
- * For the BC implementation of the CFS Conversion Factors, only a subset Eco Zones are supported. 
- * This enumeration lists each of those Eco Zones and their corresponding index into the
- * Cfs*BiomassConversionCoefficients arrays.
+ * For the BC implementation of the CFS Conversion Factors, only a subset Eco Zones are supported. This enumeration
+ * lists each of those Eco Zones and their corresponding index into the Cfs*BiomassConversionCoefficients arrays.
  * <p>
- * The list of enumeration constants is automatically generated and copy and pasted into this 
- * enum definition from the:
+ * The list of enumeration constants is automatically generated and copy and pasted into this enum definition from the:
  * <ol>
- * <li> 'Conversion Param Enum Defn' column of the 
- * <li> 'DeadConversionFactorsTable' found on the 
- * <li> 'Derived C Species Table' tab in the
- * <li> 'BC_Inventory_updates_by_CBMv2bs.xlsx' located in the
- * <li> 'Documents/CFS-Biomass' folder.
+ * <li>'Conversion Param Enum Defn' column of the
+ * <li>'DeadConversionFactorsTable' found on the
+ * <li>'Derived C Species Table' tab in the
+ * <li>'BC_Inventory_updates_by_CBMv2bs.xlsx' located in the
+ * <li>'Documents/CFS-Biomass' folder.
  * </ol>
  */
 public enum CfsBiomassConversionSupportedEcoZone implements SI32Enum<CfsBiomassConversionSupportedEcoZone> {

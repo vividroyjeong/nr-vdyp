@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.vri;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.assertEmpty;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.assertNext;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.hasSpecificEntry;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -85,10 +86,12 @@ class VriLayerParserTest {
 		assertThat(layers, aMapWithSize(1));
 
 		assertThat(
-				layers, hasSpecificEntry(
-						LayerType.PRIMARY, VdypMatchers.builds(
+				layers,
+				hasSpecificEntry(
+						LayerType.PRIMARY,
+						VdypMatchers.builds(
 								allOf(
-										hasProperty("polygonIdentifier", is("082F074/0071         2001")), //
+										hasProperty("polygonIdentifier", isPolyId("082F074/0071", 2001)), //
 										hasProperty("layerType", is(LayerType.PRIMARY)), //
 										hasProperty("crownClosure", is(57.8f)), //
 										hasProperty("baseArea", present(is(66.0f))), //
@@ -134,10 +137,12 @@ class VriLayerParserTest {
 		assertThat(layers, aMapWithSize(1));
 
 		assertThat(
-				layers, hasSpecificEntry(
-						LayerType.VETERAN, VdypMatchers.builds(
+				layers,
+				hasSpecificEntry(
+						LayerType.VETERAN,
+						VdypMatchers.builds(
 								allOf(
-										hasProperty("polygonIdentifier", is("082F074/0071         2001")), //
+										hasProperty("polygonIdentifier", isPolyId("082F074/0071", 2001)), //
 										hasProperty("layerType", is(LayerType.VETERAN)), //
 										hasProperty("crownClosure", is(57.8f)), //
 										hasProperty("baseArea", present(is(66.0f))), //
@@ -185,10 +190,12 @@ class VriLayerParserTest {
 		assertThat(layers, aMapWithSize(2));
 
 		assertThat(
-				layers, hasSpecificEntry(
-						LayerType.PRIMARY, VdypMatchers.builds(
+				layers,
+				hasSpecificEntry(
+						LayerType.PRIMARY,
+						VdypMatchers.builds(
 								allOf(
-										hasProperty("polygonIdentifier", is("082F074/0071         2001")), //
+										hasProperty("polygonIdentifier", isPolyId("082F074/0071", 2001)), //
 										hasProperty("layerType", is(LayerType.PRIMARY)), //
 										hasProperty("crownClosure", is(57.8f)), //
 										hasProperty("baseArea", present(is(66.0f))), //
@@ -199,10 +206,12 @@ class VriLayerParserTest {
 				)
 		);
 		assertThat(
-				layers, hasSpecificEntry(
-						LayerType.VETERAN, VdypMatchers.builds(
+				layers,
+				hasSpecificEntry(
+						LayerType.VETERAN,
+						VdypMatchers.builds(
 								allOf(
-										hasProperty("polygonIdentifier", is("082F074/0071         2001")), //
+										hasProperty("polygonIdentifier", isPolyId("082F074/0071", 2001)), //
 										hasProperty("layerType", is(LayerType.VETERAN)), //
 										hasProperty("crownClosure", is(30.0f)), //
 										hasProperty("baseArea", notPresent()), //

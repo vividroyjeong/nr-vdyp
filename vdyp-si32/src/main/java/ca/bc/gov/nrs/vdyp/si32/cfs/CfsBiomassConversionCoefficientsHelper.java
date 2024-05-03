@@ -22,9 +22,9 @@ public class CfsBiomassConversionCoefficientsHelper<MajorIndexType extends Enum<
 				if (array[i].length != ((int) minorIndexType.getMethod("size").invoke(null))) {
 					throw new IllegalStateException(
 							MessageFormat.format(
-									callingClass.getName()
-											+ " at index {0} does not contain exactly one "
-											+ " entry for each CfsBiomassConversionSupportedSpecies", i
+									callingClass.getName() + " at index {0} does not contain exactly one "
+											+ " entry for each CfsBiomassConversionSupportedSpecies",
+									i
 							)
 					);
 				}
@@ -37,8 +37,8 @@ public class CfsBiomassConversionCoefficientsHelper<MajorIndexType extends Enum<
 						throw new IllegalStateException(
 								MessageFormat.format(
 										callingClass.getName()
-												+ " at index {0} {1} contains {2} elements, but {3} were expected", i, j, array[i][j]
-														.parms().length, CfsLiveConversionParams.size()
+												+ " at index {0} {1} contains {2} elements, but {3} were expected",
+										i, j, array[i][j].parms().length, CfsLiveConversionParams.size()
 								)
 						);
 					}
@@ -48,7 +48,8 @@ public class CfsBiomassConversionCoefficientsHelper<MajorIndexType extends Enum<
 								throw new IllegalStateException(
 										MessageFormat.format(
 												callingClass.getName()
-														+ " at index {0} {1} {2} is recorded as not containing data, but contains -9.0f", i, j, k
+														+ " at index {0} {1} {2} is recorded as not containing data, but contains -9.0f",
+												i, j, k
 										)
 								);
 							}
@@ -59,8 +60,8 @@ public class CfsBiomassConversionCoefficientsHelper<MajorIndexType extends Enum<
 								throw new IllegalStateException(
 										MessageFormat.format(
 												callingClass.getName()
-														+ " at index {0} {1} {2} is recorded as not containing data, but contains {3}", i, j, k, array[i][j]
-																.parms()[k]
+														+ " at index {0} {1} {2} is recorded as not containing data, but contains {3}",
+												i, j, k, array[i][j].parms()[k]
 										)
 								);
 							}

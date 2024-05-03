@@ -17,12 +17,13 @@ public class BaseAreaTreeDensityDiameter {
 
 	// FT_BD
 	/**
-	 * Return an estimate of the number of trees per hectare based on a given base area (a)
-	 * and quadratic mean diameter (q) according to the formula
+	 * Return an estimate of the number of trees per hectare based on a given base area (a) and quadratic mean diameter
+	 * (q) according to the formula
 	 * <p>
 	 * a / π/10⁴ / q^2
 	 * <p>
-	 * @param baseArea the base area 
+	 *
+	 * @param baseArea              the base area
 	 * @param quadraticMeanDiameter the quadratic mean diameter
 	 * @return as described. If baseArea or quadraticMeanDiameter is 0 (or less), 0 is returned.
 	 */
@@ -36,12 +37,13 @@ public class BaseAreaTreeDensityDiameter {
 
 	// FD_BT
 	/**
-	 * Return an estimate of the quadratic mean diameter based on a given number of trees per hectare (t)
-	 * and base area (a) according to the formula
+	 * Return an estimate of the quadratic mean diameter based on a given number of trees per hectare (t) and base area
+	 * (a) according to the formula
 	 * <p>
 	 * (b / t / π/10⁴)^1/2
 	 * <p>
-	 * @param baseArea the base area value
+	 *
+	 * @param baseArea        the base area value
 	 * @param treesPerHectare the trees per hectare value
 	 * @return as described. If baseArea or treesPerHectare is 0 (or less) or more than 1,000,000, 0.0 is returned.
 	 */

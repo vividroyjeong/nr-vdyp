@@ -147,16 +147,18 @@ public class ForwardProcessingEngine {
 
 			throw new ProcessingException(
 					MessageFormat.format(
-							"Polygon {}'s year value {} is < 1900", 101, polygon.getDescription().getName(), polygon
-									.getDescription().getYear()
+							"Polygon {}'s year value {} is < 1900", 101, polygon.getDescription().getName(),
+							polygon.getDescription().getYear()
 					)
 			);
 		}
 
-		// The following is extracted from BANKCHK1, simplified for the parameters METH_CHK = 4,
-		// LayerI = 1, and INSTANCE = 1. So IR = 1, which is the first bank, numbered 0.
+		// The following is extracted from BANKCHK1, simplified for the parameters
+		// METH_CHK = 4, LayerI = 1, and INSTANCE = 1. So IR = 1, which is the first
+		// bank, numbered 0.
 
-		// => all that is done is that species with basal area < MIN_BASAL_AREA are removed.
+		// => all that is done is that species with basal area < MIN_BASAL_AREA are
+		// removed.
 
 		PolygonProcessingState pps = fps.getBank(LayerType.PRIMARY, 0);
 
@@ -165,8 +167,8 @@ public class ForwardProcessingEngine {
 		if (pps.getNSpecies() == 0) {
 			throw new ProcessingException(
 					MessageFormat.format(
-							"Polygon {0} layer 0 has no species with basal area above {1}", polygon.getDescription()
-									.getName(), MIN_BASAL_AREA
+							"Polygon {0} layer 0 has no species with basal area above {1}",
+							polygon.getDescription().getName(), MIN_BASAL_AREA
 					)
 			);
 		}

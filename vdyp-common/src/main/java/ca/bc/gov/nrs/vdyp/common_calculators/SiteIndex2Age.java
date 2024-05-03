@@ -41,9 +41,9 @@ public class SiteIndex2Age {
 	 * @param ageType
 	 * @param siteIndex
 	 * @param yearsToBreastHeight
-	 * 
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws LessThan13Exception           site index or height < 1.3m
 	 * @throws NoAnswerException             iteration could not converge (or projected age > 999)
 	 * @throws CurveEroorException           unknown curve index
@@ -52,8 +52,7 @@ public class SiteIndex2Age {
 	public static double indexToAge(
 			SiteIndexEquation cuIndex, double siteHeight, SiteIndexAgeType ageType, double siteIndex,
 			double yearsToBreastHeight
-	)
-			throws CommonCalculatorException {
+	) throws CommonCalculatorException {
 
 		double x1, x2, x3, x4;
 		double a, b, c;
@@ -527,8 +526,7 @@ public class SiteIndex2Age {
 	public static double iterate(
 			SiteIndexEquation cuIndex, double siteHeight, SiteIndexAgeType ageType, double siteIndex,
 			double yearsToBreastHeight
-	)
-			throws CommonCalculatorException {
+	) throws CommonCalculatorException {
 
 		double si2age;
 		double step;
@@ -541,10 +539,9 @@ public class SiteIndex2Age {
 		err_count = 0;
 
 		/* do a preliminary test to catch some obvious errors */
-		test_ht = SiteIndex2Height
-				.indexToHeight(
-						cuIndex, si2age, SI_AT_TOTAL, siteIndex, yearsToBreastHeight, 0.5 /* may have to change */
-				);
+		test_ht = SiteIndex2Height.indexToHeight(
+				cuIndex, si2age, SI_AT_TOTAL, siteIndex, yearsToBreastHeight, 0.5 /* may have to change */
+		);
 		// This would throw an illegal argument exception and move up the stack
 
 		/* loop until real close, or other end condition */
@@ -559,8 +556,8 @@ public class SiteIndex2Age {
 						// Write to the file
 						fileWriter.write(
 								String.format(
-										"before index_to_height(age=%.2f, age_type=%s, site_index=%.2f, y2bh=%.2f)%n", si2age, ageType
-												.toString(), siteIndex, yearsToBreastHeight
+										"before index_to_height(age=%.2f, age_type=%s, site_index=%.2f, y2bh=%.2f)%n",
+										si2age, ageType.toString(), siteIndex, yearsToBreastHeight
 								)
 						);
 

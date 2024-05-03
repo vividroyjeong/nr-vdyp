@@ -238,7 +238,8 @@ public class Sindxdll {
 	private static final int SI_ERR_NO_ANS = -4;
 	private static final int SI_ERR_SPEC = -10;
 
-	//These are taken from sindex.h (since it was missing everywhere else). These were not defined in the orginal sindxdll.c
+	// These are taken from sindex.h (since it was missing everywhere else). These were not defined in the orginal
+	// sindxdll.c
 
 	public static final int SI_MAX_SPECIES = 135;
 
@@ -592,8 +593,7 @@ public class Sindxdll {
 					/* SI_FDI_HUANG_PLA */
 					"", /* see ACB_HUANG */
 					"", /* see FDI_HUANG_PLA */
-			},
-			{
+			}, {
 					/* SI_FDI_HUANG_NAT */
 					"", /* see ACB_HUANG */
 					"The height-age (site index) curves were developed from stem analysis of 66 "
@@ -633,8 +633,7 @@ public class Sindxdll {
 					/* SI_FDI_VDP_WASH */
 					"", /* see FDI_VDP_MONT */
 					"", /* see FDI_VDP_MONT */
-			},
-			{
+			}, {
 					/* SI_FDI_MONS_DF */
 					"Monserud, Robert A. 1984. Height growth and site index curves for inland "
 							+ "Douglas-fir based on stem analysis data and forest habitat type. For. Sci."
@@ -647,23 +646,19 @@ public class Sindxdll {
 					/* SI_FDI_MONS_GF */
 					"", /* see FDI_MONS_DF */
 					"", /* see FDI_MONS_DF */
-			},
-			{
+			}, {
 					/* SI_FDI_MONS_WRC */
 					"", /* see FDI_MONS_DF */
 					"", /* see FDI_MONS_DF */
-			},
-			{
+			}, {
 					/* SI_FDI_MONS_WH */
 					"", /* see FDI_MONS_DF */
 					"", /* see FDI_MONS_DF */
-			},
-			{
+			}, {
 					/* SI_FDI_MONS_SAF */
 					"", /* see FDI_MONS_DF */
 					"", /* see FDI_MONS_DF */
-			},
-			{
+			}, {
 					/* SI_HWC_NIGHGI */
 					"Nigh, Gordon D. 1996. Growth intercept models for species without distinct "
 							+ "annual branch whorls: western hemlock. Can. J. For. Res. 26: 1407-1415 (1996).",
@@ -787,8 +782,7 @@ public class Sindxdll {
 					/* SI_PLI_HUANG_NAT */
 					"", /* see ACB_HUANG */
 					"", /* see PLI_HUANG_PLA */
-			},
-			{
+			}, {
 					/* SI_PLI_THROWER */
 					"J.S. Thrower and Associates Ltd. 1994. Revised height-age curves for lodgepole "
 							+ "pine and interior spruce in British Columbia. Report to the Res. Br., B.C. "
@@ -826,8 +820,7 @@ public class Sindxdll {
 					/* SI_PLI_GOUDIE_WET */
 					"", /* see PLI_GOUDIE_DRY */
 					"", /* see PLI_GOUDIE_DRY */
-			},
-			{
+			}, {
 					/* SI_PLI_DEMPSTER */
 					"", /* see AT_GOUDIE */
 					"The height-age (site index) curves were developed from stem analysis of 1433 "
@@ -937,8 +930,7 @@ public class Sindxdll {
 					/* SI_SW_HUANG_NAT */
 					"", /* see ACB_HUANG */
 					"", /* see SW_HUANG_PLA */
-			},
-			{
+			}, {
 					/* SI_SW_THROWER */
 					"", /* see PLI_THROWER */
 					"", },
@@ -962,8 +954,7 @@ public class Sindxdll {
 					/* SI_SW_KER_NAT */
 					"", /* see SB_KER */
 					"", /* see SW_KER_PLA */
-			},
-			{
+			}, {
 					/* SI_SW_GOUDIE_PLA */
 					"", /* see PLI_GOUDIE_DRY */
 					"The height-age (site index) curves were developed from stem analysis of 157 "
@@ -974,8 +965,7 @@ public class Sindxdll {
 					/* SI_SW_GOUDIE_NAT */
 					"", /* see PLI_GOUDIE_DRY */
 					"", /* see SW_GOUDIE_PLA */
-			},
-			{
+			}, {
 					/* SI_SW_DEMPSTER */
 					"", /* see AT_GOUDIE */
 					"Notes: The height-age (site index) curves were developed from stem analysis of "
@@ -1090,8 +1080,7 @@ public class Sindxdll {
 					/* SI_CWI_NIGHGI */
 					"", /* see CWI_NIGH */
 					"", /* see CWI_NIGH */
-			},
-			{
+			}, {
 					/* SI_SW_GOUDNIGH */
 					"Nigh, G.D. and B.A. Love. 2000. Juvenile height development in interior "
 							+ "spruce stands of British Columbia. West. J. Appl. For. 15: 117-121."
@@ -1511,27 +1500,25 @@ public class Sindxdll {
 							+ "ranged in site index from 7.2 m to 21.0 m at 50 years breast height age." } };
 
 	private static final SiteIndexEquation[] si_sclist_start = { SI_A_START, SI_ABAL_START, SI_ABCO_START, SI_AC_START,
-			SI_ACB_START,
-			SI_ACT_START, SI_AD_START, SI_AH_START, SI_AT_START, SI_AX_START, SI_B_START, SI_BA_START, SI_BB_START,
-			SI_BC_START, SI_BG_START, SI_BI_START, SI_BL_START, SI_BM_START, SI_BP_START, SI_C_START, SI_CI_START,
-			SI_CP_START, SI_CW_START, SI_CWC_START, SI_CWI_START, SI_CY_START, SI_D_START, SI_DG_START, SI_DM_START,
-			SI_DR_START, SI_E_START, SI_EA_START, SI_EB_START, SI_EE_START, SI_EP_START, SI_ES_START, SI_EW_START,
-			SI_EXP_START, SI_FD_START, SI_FDC_START, SI_FDI_START, SI_G_START, SI_GP_START, SI_GR_START, SI_H_START,
-			SI_HM_START, SI_HW_START, SI_HWC_START, SI_HWI_START, SI_HXM_START, SI_IG_START, SI_IS_START, SI_J_START,
-			SI_JR_START, SI_K_START, SI_KC_START, SI_L_START, SI_LA_START, SI_LE_START, SI_LT_START, SI_LW_START,
-			SI_M_START, SI_MB_START, SI_ME_START, SI_MN_START, SI_MR_START, SI_MS_START, SI_MV_START, SI_OA_START,
-			SI_OB_START, SI_OC_START, SI_OD_START, SI_OE_START, SI_OF_START, SI_OG_START, SI_P_START, SI_PA_START,
-			SI_PF_START, SI_PJ_START, SI_PL_START, SI_PLC_START, SI_PLI_START, SI_PM_START, SI_PR_START, SI_PS_START,
-			SI_PW_START, SI_PXJ_START, SI_PY_START, SI_Q_START, SI_QE_START, SI_QG_START, SI_R_START, SI_RA_START,
-			SI_S_START, SI_SA_START, SI_SB_START, SI_SE_START, SI_SI_START, SI_SN_START, SI_SS_START, SI_SW_START,
-			SI_SX_START, SI_SXB_START, SI_SXE_START, SI_SXL_START, SI_SXS_START, SI_SXW_START, SI_SXX_START, SI_T_START,
-			SI_TW_START, SI_U_START, SI_UA_START, SI_UP_START, SI_V_START, SI_VB_START, SI_VP_START, SI_VS_START,
-			SI_VV_START, SI_W_START, SI_WA_START, SI_WB_START, SI_WD_START, SI_WI_START, SI_WP_START, SI_WS_START,
-			SI_WT_START, SI_X_START, SI_XC_START, SI_XH_START, SI_Y_START, SI_YC_START, SI_YP_START, SI_Z_START,
-			SI_ZC_START, SI_ZH_START };
+			SI_ACB_START, SI_ACT_START, SI_AD_START, SI_AH_START, SI_AT_START, SI_AX_START, SI_B_START, SI_BA_START,
+			SI_BB_START, SI_BC_START, SI_BG_START, SI_BI_START, SI_BL_START, SI_BM_START, SI_BP_START, SI_C_START,
+			SI_CI_START, SI_CP_START, SI_CW_START, SI_CWC_START, SI_CWI_START, SI_CY_START, SI_D_START, SI_DG_START,
+			SI_DM_START, SI_DR_START, SI_E_START, SI_EA_START, SI_EB_START, SI_EE_START, SI_EP_START, SI_ES_START,
+			SI_EW_START, SI_EXP_START, SI_FD_START, SI_FDC_START, SI_FDI_START, SI_G_START, SI_GP_START, SI_GR_START,
+			SI_H_START, SI_HM_START, SI_HW_START, SI_HWC_START, SI_HWI_START, SI_HXM_START, SI_IG_START, SI_IS_START,
+			SI_J_START, SI_JR_START, SI_K_START, SI_KC_START, SI_L_START, SI_LA_START, SI_LE_START, SI_LT_START,
+			SI_LW_START, SI_M_START, SI_MB_START, SI_ME_START, SI_MN_START, SI_MR_START, SI_MS_START, SI_MV_START,
+			SI_OA_START, SI_OB_START, SI_OC_START, SI_OD_START, SI_OE_START, SI_OF_START, SI_OG_START, SI_P_START,
+			SI_PA_START, SI_PF_START, SI_PJ_START, SI_PL_START, SI_PLC_START, SI_PLI_START, SI_PM_START, SI_PR_START,
+			SI_PS_START, SI_PW_START, SI_PXJ_START, SI_PY_START, SI_Q_START, SI_QE_START, SI_QG_START, SI_R_START,
+			SI_RA_START, SI_S_START, SI_SA_START, SI_SB_START, SI_SE_START, SI_SI_START, SI_SN_START, SI_SS_START,
+			SI_SW_START, SI_SX_START, SI_SXB_START, SI_SXE_START, SI_SXL_START, SI_SXS_START, SI_SXW_START,
+			SI_SXX_START, SI_T_START, SI_TW_START, SI_U_START, SI_UA_START, SI_UP_START, SI_V_START, SI_VB_START,
+			SI_VP_START, SI_VS_START, SI_VV_START, SI_W_START, SI_WA_START, SI_WB_START, SI_WD_START, SI_WI_START,
+			SI_WP_START, SI_WS_START, SI_WT_START, SI_X_START, SI_XC_START, SI_XH_START, SI_Y_START, SI_YC_START,
+			SI_YP_START, SI_Z_START, SI_ZC_START, SI_ZH_START };
 
-	private static final SiteIndexEquation[] siCurveDefault = {
-			SI_NO_EQUATION, // A
+	private static final SiteIndexEquation[] siCurveDefault = { SI_NO_EQUATION, // A
 			SI_NO_EQUATION, // ABAL
 			SI_NO_EQUATION, // ABCO
 			SI_NO_EQUATION, // AC
@@ -1668,8 +1655,7 @@ public class Sindxdll {
 			SI_NO_EQUATION, // ZH
 	};
 
-	private static final SiteIndexSpecies[] siCurveIntend = {
-			SI_SPEC_ACB, /* SI_ACB_HUANG */
+	private static final SiteIndexSpecies[] siCurveIntend = { SI_SPEC_ACB, /* SI_ACB_HUANG */
 			SI_SPEC_ACT, /* SI_ACT_THROWER */
 			SI_SPEC_AT, /* SI_AT_HUANG */
 			SI_SPEC_AT, /* SI_AT_CIESZEWSKI */
@@ -2252,7 +2238,7 @@ public class Sindxdll {
 	 * to see if it would return this and thrown the NoAnswerException there instead.
 	 *
 	 * @param spIndex Integer species index
-	 * @param estab    Integer establishment type
+	 * @param estab   Integer establishment type
 	 * @return Integer curve index, for use in other Sindex functions
 	 *
 	 * @throws SpeciesErrorException       when the input parameter is not a valid
@@ -2776,8 +2762,7 @@ public class Sindxdll {
 	public static int HtAgeToSI(
 			SiteIndexEquation curve, double age, SiteIndexAgeType ageType, double height,
 			SiteIndexEstimationType estType, Reference<Double> site
-	)
-			throws CommonCalculatorException {
+	) throws CommonCalculatorException {
 
 		site.set(Height2SiteIndex.heightToIndex(curve, age, ageType, height, estType));
 
@@ -2804,10 +2789,9 @@ public class Sindxdll {
 	 * @throws GrowthInterceptTotalException    when total age and GI curve
 	 */
 	public static int HtSIToAge(
-			SiteIndexEquation curve, double height, SiteIndexAgeType ageType, double siteIndex,
-			double y2bh, Reference<Double> age
-	)
-			throws CommonCalculatorException {
+			SiteIndexEquation curve, double height, SiteIndexAgeType ageType, double siteIndex, double y2bh,
+			Reference<Double> age
+	) throws CommonCalculatorException {
 
 		age.set(SiteIndex2Age.indexToAge(curve, height, ageType, siteIndex, y2bh));
 
@@ -2837,12 +2821,10 @@ public class Sindxdll {
 	 * @throws GrowthInterceptTotalException   when total age and GI curve
 	 * @throws LessThan13Exception             when site index <= 1.3
 	 */
-	public static int
-			AgeSIToHt(
-					SiteIndexEquation curve, double age, SiteIndexAgeType ageType, double siteIndex, double y2bh,
-					Reference<Double> height
-			)
-					throws CommonCalculatorException {
+	public static int AgeSIToHt(
+			SiteIndexEquation curve, double age, SiteIndexAgeType ageType, double siteIndex, double y2bh,
+			Reference<Double> height
+	) throws CommonCalculatorException {
 
 		height.set(SiteIndex2Height.indexToHeight(curve, age, ageType, siteIndex, y2bh, 0.5));
 
@@ -2877,8 +2859,7 @@ public class Sindxdll {
 	 */
 	public static int AgeSIToHtSmooth(
 			SiteIndexEquation curve, double age, SiteIndexAgeType ageType, double siteIndex, double y2bh,
-			double seedling_age, double seedling_ht,
-			Reference<Double> height
+			double seedling_age, double seedling_ht, Reference<Double> height
 	) throws CommonCalculatorException {
 		height.set(
 				SiteIndex2HeightSmoothed
@@ -2936,10 +2917,10 @@ public class Sindxdll {
 	/**
 	 * Site index conversion between species
 	 *
-	 * @param spIndex1 Source species
+	 * @param spIndex1  Source species
 	 * @param siteIndex Floating point source species site index
-	 * @param spIndex2 Target species
-	 * @param result Floating point target species site index. (computed)
+	 * @param spIndex2  Target species
+	 * @param result    Floating point target species site index. (computed)
 	 *
 	 * @return 0, or an exception
 	 *
@@ -2980,9 +2961,9 @@ public class Sindxdll {
 	 * Get site index based on site class.
 	 *
 	 * @param spIndex Integer species index
-	 * @param sitecl   Character site class ('G', 'M', 'P', 'L')
-	 * @param fiz      Character FIZ code (A,B,C)=coast, (D,E,F,G,H,I,J,K,L)=interior
-	 * @param site     Floating point site index. (computed)
+	 * @param sitecl  Character site class ('G', 'M', 'P', 'L')
+	 * @param fiz     Character FIZ code (A,B,C)=coast, (D,E,F,G,H,I,J,K,L)=interior
+	 * @param site    Floating point site index. (computed)
 	 *
 	 * @return 0, or an exception
 	 * @throws SpeciesErrorException        when source species index is not valid, or no conversion
@@ -3194,10 +3175,9 @@ public class Sindxdll {
 	 * @throw AgeTypeErrorException when age type is unknown
 	 */
 	public static int AgeToAge(
-			SiteIndexEquation cu_index, double age1, SiteIndexAgeType age_type1, double y2bh,
-			Reference<Double> result, SiteIndexAgeType age_type2
-	)
-			throws AgeTypeErrorException {
+			SiteIndexEquation cu_index, double age1, SiteIndexAgeType age_type1, double y2bh, Reference<Double> result,
+			SiteIndexAgeType age_type2
+	) throws AgeTypeErrorException {
 
 		result.set(AgeToAge.ageToAge(cu_index, age1, age_type1, age_type2, y2bh));
 		return 0;

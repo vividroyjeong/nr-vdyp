@@ -3,11 +3,11 @@ package ca.bc.gov.nrs.vdyp.model;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-/** 
- * This class supports iterating over (portions of) enumerations. It is most useful
- * for enumerations that contain some values that need to be included but are not
- * formally part of the item set such as "not an element" entries and the like.
- * 
+/**
+ * This class supports iterating over (portions of) enumerations. It is most useful for enumerations that contain some
+ * values that need to be included but are not formally part of the item set such as "not an element" entries and the
+ * like.
+ *
  * @param <T> the enum type
  */
 public class EnumIterator<T extends Enum<T>> implements Iterator<T> {

@@ -30,12 +30,11 @@ public class SiteIndex2HeightSmoothed {
 	 * @param seedlingHeight
 	 * @return
 	 * @throws LessThan13Exception when {@code site_index} is less than 1.3
-	 * @throws NoAnswerException when the iteration will not converge
+	 * @throws NoAnswerException   when the iteration will not converge
 	 */
 	public static double indexToHeightSmoothed(
 			SiteIndexEquation cuIndex, double age, SiteIndexAgeType ageType, double siteIndex,
-			double yearsToBreastHeight,
-			double seedlingAge, double seedlingHeight
+			double yearsToBreastHeight, double seedlingAge, double seedlingHeight
 	) throws CommonCalculatorException {
 
 		double result; // return value

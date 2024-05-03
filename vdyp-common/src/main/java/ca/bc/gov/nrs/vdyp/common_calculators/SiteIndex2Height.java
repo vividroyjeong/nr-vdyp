@@ -29,17 +29,18 @@ public class SiteIndex2Height {
 	 * <li>site index must be based on breast height age 50
 	 * <li>where breast height age is less than 0, a quadratic function is used
 	 * </ul>
-	 * @param cuIndex the index of the site curve
-	 * @param age the current age, of type <code>ageType</code>
-	 * @param ageType one of SI_AT_TOTAL or SI_AT_BREAST
-	 * @param siteIndex the site index
-	 * @param years2BreastHeight if <code>ageType</code> is SI_AT_TOTAL, this value must be supplied and 
-	 * indicates years to breast height
-	 * @param pi proportion of height growth between breast height ages 0 and 1 that occurs below breast height
+	 *
+	 * @param cuIndex            the index of the site curve
+	 * @param age                the current age, of type <code>ageType</code>
+	 * @param ageType            one of SI_AT_TOTAL or SI_AT_BREAST
+	 * @param siteIndex          the site index
+	 * @param years2BreastHeight if <code>ageType</code> is SI_AT_TOTAL, this value must be supplied and indicates years
+	 *                           to breast height
+	 * @param pi                 proportion of height growth between breast height ages 0 and 1 that occurs below breast
+	 *                           height
 	 * @returns as described
-	 * @throws LessThan13Exception site index < 1.3m 
-	 * @throws CurveErrorException when cuIndex does not identify a known curve.
-	 * error codes (returned as height value):
+	 * @throws LessThan13Exception site index < 1.3m
+	 * @throws CurveErrorException when cuIndex does not identify a known curve. error codes (returned as height value):
 	 */
 	public static double indexToHeight(
 			SiteIndexEquation cuIndex, double age, SiteIndexAgeType ageType, double siteIndex,
@@ -159,8 +160,8 @@ public class SiteIndex2Height {
 				siteIndex = -1.73 + 3.149 * ppow(siteIndex, 0.8279);
 
 				height = 1.37 + (22.87 + 0.9502 * (siteIndex - 1.37)) * ppow(
-						1 - Math.exp(-0.0020647 * ppow(siteIndex - 1.37, 0.5) * breastHeightAge), 1.3656
-								+ 2.046 / (siteIndex - 1.37)
+						1 - Math.exp(-0.0020647 * ppow(siteIndex - 1.37, 0.5) * breastHeightAge),
+						1.3656 + 2.046 / (siteIndex - 1.37)
 				);
 			} else
 				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
@@ -171,8 +172,8 @@ public class SiteIndex2Height {
 				siteIndex = -1.73 + 3.149 * ppow(siteIndex, 0.8279);
 
 				height = 1.37 + (22.87 + 0.9502 * (siteIndex - 1.37)) * ppow(
-						1 - Math.exp(-0.0020647 * ppow(siteIndex - 1.37, 0.5) * (breastHeightAge - 0.5)), 1.3656
-								+ 2.046 / (siteIndex - 1.37)
+						1 - Math.exp(-0.0020647 * ppow(siteIndex - 1.37, 0.5) * (breastHeightAge - 0.5)),
+						1.3656 + 2.046 / (siteIndex - 1.37)
 				);
 			} else {
 				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
@@ -391,8 +392,8 @@ public class SiteIndex2Height {
 			if (siteIndex < 19.5) {
 				if (breastHeightAge > 0.5) {
 					/* Goudie */
-					x1 = (1.0 + Math.exp(9.7936 - 1.2866 * llog(siteIndex - 1.3) - 1.4661 * Math.log(49.5))) / (1.0
-							+ Math.exp(
+					x1 = (1.0 + Math.exp(9.7936 - 1.2866 * llog(siteIndex - 1.3) - 1.4661 * Math.log(49.5)))
+							/ (1.0 + Math.exp(
 									9.7936 - 1.2866 * llog(siteIndex - 1.3) - 1.4661 * Math.log(breastHeightAge - 0.5)
 							));
 
@@ -406,8 +407,8 @@ public class SiteIndex2Height {
 					height = (-0.01666 + 0.001722 * siteIndex) * ppow(totalAge, 1.858) * ppow(0.9982, totalAge);
 				} else if (totalAge > years2BreastHeight + 2 - 0.5) {
 					/* use Goudie's breast-height age curve */
-					x1 = (1.0 + Math.exp(9.7936 - 1.2866 * llog(siteIndex - 1.3) - 1.4661 * Math.log(49.5))) / (1.0
-							+ Math.exp(
+					x1 = (1.0 + Math.exp(9.7936 - 1.2866 * llog(siteIndex - 1.3) - 1.4661 * Math.log(49.5)))
+							/ (1.0 + Math.exp(
 									9.7936 - 1.2866 * llog(siteIndex - 1.3) - 1.4661 * Math.log(breastHeightAge - 0.5)
 							));
 
@@ -430,8 +431,8 @@ public class SiteIndex2Height {
 		case SI_PLI_THROWNIGH:
 			if (siteIndex < 18.5) {
 				if (breastHeightAge > 0.5) {
-					x1 = (1.0 + Math.exp(7.6298 - 0.8940 * llog(siteIndex - 1.3) - 1.3563 * Math.log(49.5))) / (1.0
-							+ Math.exp(
+					x1 = (1.0 + Math.exp(7.6298 - 0.8940 * llog(siteIndex - 1.3) - 1.3563 * Math.log(49.5)))
+							/ (1.0 + Math.exp(
 									7.6298 - 0.8940 * llog(siteIndex - 1.3) - 1.3563 * Math.log(breastHeightAge - 0.5)
 							));
 
@@ -445,8 +446,8 @@ public class SiteIndex2Height {
 					height = (-0.03993 + 0.004828 * siteIndex) * ppow(totalAge, 1.902) * ppow(0.9645, totalAge);
 				} else if (totalAge > years2BreastHeight + 2 - 0.5) {
 					/* use Thrower's breast-height age curve */
-					x1 = (1.0 + Math.exp(7.6298 - 0.8940 * llog(siteIndex - 1.3) - 1.3563 * Math.log(49.5))) / (1.0
-							+ Math.exp(
+					x1 = (1.0 + Math.exp(7.6298 - 0.8940 * llog(siteIndex - 1.3) - 1.3563 * Math.log(49.5)))
+							/ (1.0 + Math.exp(
 									7.6298 - 0.8940 * llog(siteIndex - 1.3) - 1.3563 * Math.log(breastHeightAge - 0.5)
 							));
 
@@ -468,10 +469,8 @@ public class SiteIndex2Height {
 			break;
 		case SI_PLI_THROWER:
 			if (breastHeightAge > pi) {
-				x1 = (1.0 + Math.exp(7.6298 - 0.8940 * llog(siteIndex - 1.3) - 1.3563 * Math.log(50 - pi)))
-						/ (1.0 + Math.exp(
-								7.6298 - 0.8940 * llog(siteIndex - 1.3) - 1.3563 * Math.log(breastHeightAge - pi)
-						));
+				x1 = (1.0 + Math.exp(7.6298 - 0.8940 * llog(siteIndex - 1.3) - 1.3563 * Math.log(50 - pi))) / (1.0
+						+ Math.exp(7.6298 - 0.8940 * llog(siteIndex - 1.3) - 1.3563 * Math.log(breastHeightAge - pi)));
 
 				height = 1.3 + (siteIndex - 1.3) * x1;
 			} else {
@@ -2031,8 +2030,7 @@ public class SiteIndex2Height {
 				x3 = -1.334706;
 				x4 = 1.719841;
 
-				x5 = (1.0 + x1 * (siteIndex - 1.3)
-						+ Math.exp(x2 + x3 * Math.log(50 + x4) - Math.log(siteIndex - 1.3)))
+				x5 = (1.0 + x1 * (siteIndex - 1.3) + Math.exp(x2 + x3 * Math.log(50 + x4) - Math.log(siteIndex - 1.3)))
 						/ (1.0 + x1 * (siteIndex - 1.3)
 								+ Math.exp(x2 + x3 * Math.log(breastHeightAge + x4) - Math.log(siteIndex - 1.3)));
 

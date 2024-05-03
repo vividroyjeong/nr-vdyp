@@ -5,7 +5,7 @@ import java.util.Optional;
 
 public abstract class BaseVdypSite {
 
-	private final String polygonIdentifier;
+	private final PolygonIdentifier polygonIdentifier;
 	private final LayerType layerType;
 	private final String siteGenus; // FIPL_1A/SITESP0_L1, VRISIA/SITESP0
 	private final Optional<Integer> siteCurveNumber; // VRISI/VR_SCN
@@ -16,9 +16,9 @@ public abstract class BaseVdypSite {
 	private final Optional<Float> yearsToBreastHeight; // LVCOM3/YTBHLV, L1COM3/YTBHL1, VRISI/VR_YTBH
 
 	protected BaseVdypSite(
-			String polygonIdentifier, LayerType layerType, String siteGenus, Optional<Integer> siteCurveNumber,
-			Optional<Float> siteIndex, Optional<Float> height, Optional<Float> ageTotal,
-			Optional<Float> yearsToBreastHeight
+			PolygonIdentifier polygonIdentifier, LayerType layerType, String siteGenus,
+			Optional<Integer> siteCurveNumber, Optional<Float> siteIndex, Optional<Float> height,
+			Optional<Float> ageTotal, Optional<Float> yearsToBreastHeight
 	) {
 		super();
 		this.polygonIdentifier = polygonIdentifier;
@@ -31,7 +31,7 @@ public abstract class BaseVdypSite {
 		this.yearsToBreastHeight = yearsToBreastHeight;
 	}
 
-	public String getPolygonIdentifier() {
+	public PolygonIdentifier getPolygonIdentifier() {
 		return polygonIdentifier;
 	}
 
@@ -64,7 +64,7 @@ public abstract class BaseVdypSite {
 	}
 
 	public abstract static class Builder<T extends BaseVdypSite> extends ModelClassBuilder<T> {
-		protected Optional<String> polygonIdentifier = Optional.empty();
+		protected Optional<PolygonIdentifier> polygonIdentifier = Optional.empty();
 		protected Optional<LayerType> layerType = Optional.empty();
 		protected Optional<String> siteGenus = Optional.empty();
 
@@ -75,8 +75,18 @@ public abstract class BaseVdypSite {
 		protected Optional<Float> height = Optional.empty();
 		protected Optional<Float> yearsToBreastHeight = Optional.empty();
 
-		public Builder<T> polygonIdentifier(String polygonIdentifier) {
+		public Builder<T> polygonIdentifier(PolygonIdentifier polygonIdentifier) {
 			this.polygonIdentifier = Optional.of(polygonIdentifier);
+			return this;
+		}
+
+		public Builder<T> polygonIdentifier(String polygonIdentifier) {
+			this.polygonIdentifier = Optional.of(PolygonIdentifier.split(polygonIdentifier));
+			return this;
+		}
+
+		public Builder<T> polygonIdentifier(String base, int year) {
+			this.polygonIdentifier = Optional.of(new PolygonIdentifier(base, year));
 			return this;
 		}
 

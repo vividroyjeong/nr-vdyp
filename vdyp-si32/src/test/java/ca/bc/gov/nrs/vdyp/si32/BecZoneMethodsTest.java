@@ -14,14 +14,12 @@ class BecZoneMethodsTest {
 	@Test
 	void test_SiteTool_MoFBiomassCoefficient() {
 		assertThat(
-				BecZoneMethods.mofBiomassCoefficient(BecZone.AT.getText(), SP64Name.A.getText()), equalTo(
-						BecZoneMethods.mofBiomassCoeffs[SP64Name.A.getOffset()][BecZone.AT.getOffset()]
-				)
+				BecZoneMethods.mofBiomassCoefficient(BecZone.AT.getText(), SP64Name.A.getText()),
+				equalTo(BecZoneMethods.mofBiomassCoeffs[SP64Name.A.getOffset()][BecZone.AT.getOffset()])
 		);
 		assertThat(
-				BecZoneMethods.mofBiomassCoefficient("at", "a"), equalTo(
-						BecZoneMethods.mofBiomassCoeffs[SP64Name.A.getOffset()][BecZone.AT.getOffset()]
-				)
+				BecZoneMethods.mofBiomassCoefficient("at", "a"),
+				equalTo(BecZoneMethods.mofBiomassCoeffs[SP64Name.A.getOffset()][BecZone.AT.getOffset()])
 		);
 		assertThat(BecZoneMethods.mofBiomassCoefficient("??", "??"), equalTo(-1.0f));
 		assertThat(BecZoneMethods.mofBiomassCoefficient(SP64Name.A.getText(), "??"), equalTo(-1.0f));

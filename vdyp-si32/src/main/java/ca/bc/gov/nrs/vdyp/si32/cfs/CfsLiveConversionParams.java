@@ -8,21 +8,19 @@ import ca.bc.gov.nrs.vdyp.si32.enumerations.SI32Enum;
 /**
  * Live CFS Biomass definitions.
  * <ul>
- * <li><b>UNKNOWN</b>
- * 	     Indicates an error condition or an uninitialized value. This value
- *       should never be used as an index for a specific conversion parameter.
- * <li><b>others</b>
- *       Indices into the {@link CfsBiomassConversionCoefficientsForSpecies} array for each
- *       of the CFS Biomass conversion parameters/coefficients.
+ * <li><b>UNKNOWN</b> Indicates an error condition or an uninitialized value. This value should never be used as an
+ * index for a specific conversion parameter.
+ * <li><b>others</b> Indices into the {@link CfsBiomassConversionCoefficientsForSpecies} array for each of the CFS
+ * Biomass conversion parameters/coefficients.
  * </ul>
- * The CFS Biomass Conversion process is based on a number of hard coded constants/coefficients 
- * which are used to adjust the conversion by CFS Eco Zone and Species.
+ * The CFS Biomass Conversion process is based on a number of hard coded constants/coefficients which are used to adjust
+ * the conversion by CFS Eco Zone and Species.
  * <ol>
- * <li> 'Conversion Param Enum Defn' column of the 
- * <li> 'DeadConversionFactorsTable' found on the 
- * <li> 'Derived C Species Table' tab in the
- * <li> 'BC_Inventory_updates_by_CBMv2bs.xlsx' located in the
- * <li> 'Documents/CFS-Biomass' folder.
+ * <li>'Conversion Param Enum Defn' column of the
+ * <li>'DeadConversionFactorsTable' found on the
+ * <li>'Derived C Species Table' tab in the
+ * <li>'BC_Inventory_updates_by_CBMv2bs.xlsx' located in the
+ * <li>'Documents/CFS-Biomass' folder.
  * </ol>
  */
 public enum CfsLiveConversionParams implements SI32Enum<CfsLiveConversionParams> {
@@ -106,9 +104,10 @@ public enum CfsLiveConversionParams implements SI32Enum<CfsLiveConversionParams>
 
 	/**
 	 * Returns the enumeration constant with the given index.
+	 *
 	 * @param index the value in question
-	 * @return the enumeration value, unless no enumeration constant has the given 
-	 * 	   <code>index</code> in which case <code>null</code> is returned.
+	 * @return the enumeration value, unless no enumeration constant has the given <code>index</code> in which case
+	 *         <code>null</code> is returned.
 	 */
 	public static CfsLiveConversionParams forIndex(int index) {
 		for (CfsLiveConversionParams e : CfsLiveConversionParams.values()) {

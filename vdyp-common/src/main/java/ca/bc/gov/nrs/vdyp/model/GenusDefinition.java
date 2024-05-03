@@ -17,7 +17,8 @@ public class GenusDefinition extends AliasedEntity implements Comparable<GenusDe
 		if (preference == null) {
 			throw new IllegalArgumentException(
 					MessageFormat.format(
-							"GenusDefinition preference may not be null; provide Optional.empty() instead (alias {0})", alias
+							"GenusDefinition preference may not be null; provide Optional.empty() instead (alias {0})",
+							alias
 					)
 			);
 		}

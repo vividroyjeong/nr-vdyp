@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import ca.bc.gov.nrs.vdyp.common.Computed;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.SingleSiteLayer;
 
 public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> {
@@ -14,7 +15,8 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> {
 	private float crownClosure; // FIPL_1/CC_L1 or FIP:_V/CC_V1
 
 	public FipLayer(
-			String polygonIdentifier, LayerType layer, Optional<Integer> inventoryTypeGroup, float crownClosure
+			PolygonIdentifier polygonIdentifier, LayerType layer, Optional<Integer> inventoryTypeGroup,
+			float crownClosure
 	) {
 		super(polygonIdentifier, layer, inventoryTypeGroup);
 		this.crownClosure = crownClosure;
@@ -57,7 +59,7 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> {
 			builder.ageTotal(8f);
 			builder.yearsToBreastHeight(7f);
 			builder.height(6f);
-	
+
 			builder.siteIndex(5f);
 			builder.crownClosure(0.9f);
 			builder.siteGenus("B");

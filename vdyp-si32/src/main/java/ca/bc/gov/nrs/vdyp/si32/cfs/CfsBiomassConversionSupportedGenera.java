@@ -91,9 +91,10 @@ public enum CfsBiomassConversionSupportedGenera implements SI32Enum<CfsBiomassCo
 
 	/**
 	 * Returns the enumeration constant with the given index.
+	 *
 	 * @param index the value in question
-	 * @return the enumeration value, unless no enumeration constant has the given 
-	 * 	   <code>index</code> in which case <code>null</code> is returned.
+	 * @return the enumeration value, unless no enumeration constant has the given <code>index</code> in which case
+	 *         <code>null</code> is returned.
 	 */
 	public static CfsBiomassConversionSupportedGenera forIndex(int index) {
 		for (CfsBiomassConversionSupportedGenera e : CfsBiomassConversionSupportedGenera.values()) {

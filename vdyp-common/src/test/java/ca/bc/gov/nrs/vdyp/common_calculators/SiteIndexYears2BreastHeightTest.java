@@ -50,9 +50,7 @@ class SiteIndexYears2BreastHeightTest {
 
 		@Test
 		void testSI_FDC_NIGHGI() throws CommonCalculatorException {
-			assertThrows(
-					GrowthInterceptTotalException.class, () -> SiteIndexYears2BreastHeight.y2bh(SI_FDC_NIGHGI, 2)
-			);
+			assertThrows(GrowthInterceptTotalException.class, () -> SiteIndexYears2BreastHeight.y2bh(SI_FDC_NIGHGI, 2));
 		}
 
 		@Test
@@ -240,16 +238,12 @@ class SiteIndexYears2BreastHeightTest {
 
 		@Test
 		void testSI_HWI_NIGHGI() throws CommonCalculatorException {
-			assertThrows(
-					GrowthInterceptTotalException.class, () -> SiteIndexYears2BreastHeight.y2bh(SI_HWI_NIGHGI, 2)
-			);
+			assertThrows(GrowthInterceptTotalException.class, () -> SiteIndexYears2BreastHeight.y2bh(SI_HWI_NIGHGI, 2));
 		}
 
 		@Test
 		void testSI_HWC_NIGHGI() throws CommonCalculatorException {
-			assertThrows(
-					GrowthInterceptTotalException.class, () -> SiteIndexYears2BreastHeight.y2bh(SI_HWC_NIGHGI, 2)
-			);
+			assertThrows(GrowthInterceptTotalException.class, () -> SiteIndexYears2BreastHeight.y2bh(SI_HWC_NIGHGI, 2));
 		}
 
 		@Test
@@ -282,9 +276,7 @@ class SiteIndexYears2BreastHeightTest {
 
 		@Test
 		void testSI_LW_NIGHGI() throws CommonCalculatorException {
-			assertThrows(
-					GrowthInterceptTotalException.class, () -> SiteIndexYears2BreastHeight.y2bh(SI_LW_NIGHGI, 2)
-			);
+			assertThrows(GrowthInterceptTotalException.class, () -> SiteIndexYears2BreastHeight.y2bh(SI_LW_NIGHGI, 2));
 		}
 
 		@Test

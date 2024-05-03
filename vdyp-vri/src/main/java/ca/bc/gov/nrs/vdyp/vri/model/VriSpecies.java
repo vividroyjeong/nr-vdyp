@@ -4,10 +4,11 @@ import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 
 public class VriSpecies extends BaseVdypSpecies {
 
-	public VriSpecies(String polygonIdentifier, LayerType layer, String genus, float percentGenus) {
+	public VriSpecies(PolygonIdentifier polygonIdentifier, LayerType layer, String genus, float percentGenus) {
 		super(polygonIdentifier, layer, genus, percentGenus);
 	}
 

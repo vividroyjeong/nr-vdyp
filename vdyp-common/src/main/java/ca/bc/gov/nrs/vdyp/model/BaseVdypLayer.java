@@ -12,13 +12,15 @@ import java.util.stream.Collectors;
 
 public abstract class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdypSite> {
 
-	private final String polygonIdentifier;
+	private final PolygonIdentifier polygonIdentifier;
 	private final LayerType layerType;
 	private LinkedHashMap<String, S> species = new LinkedHashMap<>();
 	private LinkedHashMap<String, I> sites = new LinkedHashMap<>();
 	private Optional<Integer> inventoryTypeGroup = Optional.empty();
 
-	protected BaseVdypLayer(String polygonIdentifier, LayerType layerType, Optional<Integer> inventoryTypeGroup) {
+	protected BaseVdypLayer(
+			PolygonIdentifier polygonIdentifier, LayerType layerType, Optional<Integer> inventoryTypeGroup
+	) {
 		super();
 		this.polygonIdentifier = polygonIdentifier;
 		this.layerType = layerType;
@@ -26,7 +28,7 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdy
 		this.inventoryTypeGroup = inventoryTypeGroup;
 	}
 
-	public String getPolygonIdentifier() {
+	public PolygonIdentifier getPolygonIdentifier() {
 		return polygonIdentifier;
 	}
 
@@ -72,7 +74,7 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdy
 
 	public abstract static class Builder<T extends BaseVdypLayer<S, I>, S extends BaseVdypSpecies, I extends BaseVdypSite, SB extends BaseVdypSpecies.Builder<S>, IB extends BaseVdypSite.Builder<I>>
 			extends ModelClassBuilder<T> {
-		protected Optional<String> polygonIdentifier = Optional.empty();
+		protected Optional<PolygonIdentifier> polygonIdentifier = Optional.empty();
 		protected Optional<LayerType> layerType = Optional.empty();
 
 		protected Optional<Integer> inventoryTypeGroup = Optional.empty();
@@ -82,8 +84,18 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdy
 		protected List<Consumer<SB>> speciesBuilders = new LinkedList<>();
 		protected List<Consumer<IB>> siteBuilders = new LinkedList<>();
 
-		public Builder<T, S, I, SB, IB> polygonIdentifier(String polygonIdentifier) {
+		public Builder<T, S, I, SB, IB> polygonIdentifier(PolygonIdentifier polygonIdentifier) {
 			this.polygonIdentifier = Optional.of(polygonIdentifier);
+			return this;
+		}
+
+		public Builder<T, S, I, SB, IB> polygonIdentifier(String polygonIdentifier) {
+			this.polygonIdentifier = Optional.of(PolygonIdentifier.split(polygonIdentifier));
+			return this;
+		}
+
+		public Builder<T, S, I, SB, IB> polygonIdentifier(String base, int year) {
+			this.polygonIdentifier = Optional.of(new PolygonIdentifier(base, year));
 			return this;
 		}
 

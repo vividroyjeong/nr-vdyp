@@ -66,9 +66,8 @@ class SiteToolTest {
 		assertThat(SiteTool.lcl_InternalSpeciesIndexToString(null), is("??"));
 		assertThat(SiteTool.lcl_InternalSpeciesIndexToString(CfsBiomassConversionSupportedSpecies.UNKNOWN), is("??"));
 		assertThat(
-				SiteTool.lcl_InternalSpeciesIndexToString(CfsBiomassConversionSupportedSpecies.AC), is(
-						CfsBiomassConversionSupportedSpecies.AC.getText()
-				)
+				SiteTool.lcl_InternalSpeciesIndexToString(CfsBiomassConversionSupportedSpecies.AC),
+				is(CfsBiomassConversionSupportedSpecies.AC.getText())
 		);
 	}
 
@@ -76,14 +75,12 @@ class SiteToolTest {
 	void test_lcl_InternalGenusIndexToString() {
 		assertThat(SiteTool.lcl_InternalGenusIndexToString(null), is("genusInt_INVALID"));
 		assertThat(
-				SiteTool.lcl_InternalGenusIndexToString(CfsBiomassConversionSupportedGenera.INVALID), is(
-						"genusInt_INVALID"
-				)
+				SiteTool.lcl_InternalGenusIndexToString(CfsBiomassConversionSupportedGenera.INVALID),
+				is("genusInt_INVALID")
 		);
 		assertThat(
-				SiteTool.lcl_InternalGenusIndexToString(CfsBiomassConversionSupportedGenera.AC), is(
-						CfsBiomassConversionSupportedSpecies.AC.getText()
-				)
+				SiteTool.lcl_InternalGenusIndexToString(CfsBiomassConversionSupportedGenera.AC),
+				is(CfsBiomassConversionSupportedSpecies.AC.getText())
 		);
 	}
 
@@ -96,19 +93,16 @@ class SiteToolTest {
 		assertThat(SiteTool.lcl_LiveConversionParamToString(null, NameFormat.ENUM_STR), is("cfsLiveParam_UNKNOWN"));
 		assertThat(SiteTool.lcl_LiveConversionParamToString(null, NameFormat.CAT_NAME), is("??"));
 		assertThat(
-				SiteTool.lcl_LiveConversionParamToString(CfsLiveConversionParams.A_NONMERCH, NameFormat.NAME_ONLY), is(
-						"A"
-				)
+				SiteTool.lcl_LiveConversionParamToString(CfsLiveConversionParams.A_NONMERCH, NameFormat.NAME_ONLY),
+				is("A")
 		);
 		assertThat(
-				SiteTool.lcl_LiveConversionParamToString(CfsLiveConversionParams.A_NONMERCH, NameFormat.CAT_ONLY), is(
-						"Non-Merch"
-				)
+				SiteTool.lcl_LiveConversionParamToString(CfsLiveConversionParams.A_NONMERCH, NameFormat.CAT_ONLY),
+				is("Non-Merch")
 		);
 		assertThat(
-				SiteTool.lcl_LiveConversionParamToString(CfsLiveConversionParams.A_NONMERCH, NameFormat.CAT_NAME), is(
-						"Non-Merch A"
-				)
+				SiteTool.lcl_LiveConversionParamToString(CfsLiveConversionParams.A_NONMERCH, NameFormat.CAT_NAME),
+				is("Non-Merch A")
 		);
 	}
 
@@ -125,9 +119,8 @@ class SiteToolTest {
 				SiteTool.lcl_DeadConversionParamToString(CfsDeadConversionParams.PROP1, NameFormat.CAT_ONLY), is("Dead")
 		);
 		assertThat(
-				SiteTool.lcl_DeadConversionParamToString(CfsDeadConversionParams.PROP1, NameFormat.CAT_NAME), is(
-						"Dead P1"
-				)
+				SiteTool.lcl_DeadConversionParamToString(CfsDeadConversionParams.PROP1, NameFormat.CAT_NAME),
+				is("Dead P1")
 		);
 	}
 
@@ -175,85 +168,53 @@ class SiteToolTest {
 	@Test
 	void test_htAgeToSI() throws CommonCalculatorException {
 		assertThrows(
-				LessThan13Exception.class, () -> SiteTool
-						.heightAndAgeToSiteIndex(null, 0, SI_AT_BREAST, 1.0, SI_EST_ITERATE)
+				LessThan13Exception.class,
+				() -> SiteTool.heightAndAgeToSiteIndex(null, 0, SI_AT_BREAST, 1.0, SI_EST_ITERATE)
 		);
 		assertThrows(
-				NoAnswerException.class, () -> SiteTool
-						.heightAndAgeToSiteIndex(null, 0, SI_AT_TOTAL, 0.0, SI_EST_ITERATE)
+				NoAnswerException.class,
+				() -> SiteTool.heightAndAgeToSiteIndex(null, 0, SI_AT_TOTAL, 0.0, SI_EST_ITERATE)
 		);
 		assertThrows(
-				NoAnswerException.class, () -> SiteTool
-						.heightAndAgeToSiteIndex(null, 0, SI_AT_TOTAL, 23.0, SI_EST_ITERATE)
+				NoAnswerException.class,
+				() -> SiteTool.heightAndAgeToSiteIndex(null, 0, SI_AT_TOTAL, 23.0, SI_EST_ITERATE)
+		);
+		assertThat(SiteTool.heightAndAgeToSiteIndex(SI_AT_GOUDIE, 10.0, SI_AT_BREAST, 23.0, SI_EST_DIRECT), is(34.30));
+		assertThat(SiteTool.heightAndAgeToSiteIndex(SI_AT_GOUDIE, 10.0, SI_AT_BREAST, 23.0, SI_EST_ITERATE), is(69.45));
+		assertThat(
+				SiteTool.heightAndAgeToSiteIndex(SI_FDI_THROWER, 10.0, SI_AT_BREAST, 23.0, SI_EST_DIRECT), is(84.31)
 		);
 		assertThat(
-				SiteTool.heightAndAgeToSiteIndex(
-						SI_AT_GOUDIE, 10.0, SI_AT_BREAST, 23.0, SI_EST_DIRECT
-				), is(34.30)
-		);
-		assertThat(
-				SiteTool.heightAndAgeToSiteIndex(
-						SI_AT_GOUDIE, 10.0, SI_AT_BREAST, 23.0, SI_EST_ITERATE
-				), is(69.45)
-		);
-		assertThat(
-				SiteTool.heightAndAgeToSiteIndex(
-						SI_FDI_THROWER, 10.0, SI_AT_BREAST, 23.0, SI_EST_DIRECT
-				), is(84.31)
-		);
-		assertThat(
-				SiteTool.heightAndAgeToSiteIndex(
-						SI_FDI_THROWER, 10.0, SI_AT_BREAST, 23.0, SI_EST_ITERATE
-				), is(87.60)
+				SiteTool.heightAndAgeToSiteIndex(SI_FDI_THROWER, 10.0, SI_AT_BREAST, 23.0, SI_EST_ITERATE), is(87.60)
 		);
 	}
 
 	@Test
 	void test_htSIToAge() throws CommonCalculatorException {
 		assertThrows(
-				LessThan13Exception.class, () -> SiteTool
-						.heightAndSiteIndexToAge(null, 1.0, SI_AT_BREAST, 1.0, 0)
+				LessThan13Exception.class, () -> SiteTool.heightAndSiteIndexToAge(null, 1.0, SI_AT_BREAST, 1.0, 0)
 		);
 		assertThrows(
-				LessThan13Exception.class, () -> SiteTool
-						.heightAndSiteIndexToAge(null, 10.0, SI_AT_BREAST, 1.1, 0.0)
+				LessThan13Exception.class, () -> SiteTool.heightAndSiteIndexToAge(null, 10.0, SI_AT_BREAST, 1.1, 0.0)
 		);
 		assertThat(SiteTool.heightAndSiteIndexToAge(null, 0.0, SI_AT_TOTAL, 1.0, 0), is(0.0));
-		assertThat(
-				round(
-						SiteTool.heightAndSiteIndexToAge(
-								SI_FDI_THROWER, 10.0, SI_AT_BREAST, 47.0, 5.0
-						), 2
-				), is(8.54)
-		);
+		assertThat(round(SiteTool.heightAndSiteIndexToAge(SI_FDI_THROWER, 10.0, SI_AT_BREAST, 47.0, 5.0), 2), is(8.54));
 	}
 
 	@Test
 	void test_ageSIToHt() throws CommonCalculatorException {
-		assertThat(
-				round(
-						SiteTool.ageAndSiteIndexToHeight(
-								SI_FDI_THROWER, 10.0, SI_AT_TOTAL, 30.0, 5.0
-						), 2
-				), is(4.10)
-		);
+		assertThat(round(SiteTool.ageAndSiteIndexToHeight(SI_FDI_THROWER, 10.0, SI_AT_TOTAL, 30.0, 5.0), 2), is(4.10));
 	}
 
 	@Test
 	void test_yearsToBreastHeight() throws CommonCalculatorException {
-		assertThat(
-				SiteTool.yearsToBreastHeight(SI_FDI_THROWER, 30.0), is(7.3)
-		);
+		assertThat(SiteTool.yearsToBreastHeight(SI_FDI_THROWER, 30.0), is(7.3));
 	}
 
 	@Test
 	void test_getSICurveName() {
 		assertThat(SiteTool.getSICurveName(null), is(SiteTool.UNKNOWN_CURVE_RESULT));
-		assertThat(
-				SiteTool.getSICurveName(SI_ACT_THROWER), is(
-						SiteIndexNames.siCurveName[SI_ACT_THROWER.n()]
-				)
-		);
+		assertThat(SiteTool.getSICurveName(SI_ACT_THROWER), is(SiteIndexNames.siCurveName[SI_ACT_THROWER.n()]));
 	}
 
 	@Test
@@ -327,9 +288,8 @@ class SiteToolTest {
 	void test_getSpeciesDefaultCrownClosure() {
 		assertThat(SiteTool.getSpeciesDefaultCrownClosure("ZZZZ", true), is(-1.0f));
 		assertThat(
-				SiteTool.getSpeciesDefaultCrownClosure("ABAL", true), is(
-						speciesTable.getByCode("ABAL").details().defaultCrownClosure()[SpeciesRegion.COAST.ordinal()]
-				)
+				SiteTool.getSpeciesDefaultCrownClosure("ABAL", true),
+				is(speciesTable.getByCode("ABAL").details().defaultCrownClosure()[SpeciesRegion.COAST.ordinal()])
 		);
 	}
 

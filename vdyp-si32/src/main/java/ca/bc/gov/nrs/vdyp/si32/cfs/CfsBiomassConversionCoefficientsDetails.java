@@ -3,10 +3,7 @@ package ca.bc.gov.nrs.vdyp.si32.cfs;
 import java.text.MessageFormat;
 import java.util.Arrays;
 
-public record CfsBiomassConversionCoefficientsDetails(
-		boolean containsData,
-		float[] parms
-) {
+public record CfsBiomassConversionCoefficientsDetails(boolean containsData, float[] parms) {
 	@Override
 	public String toString() {
 		return MessageFormat.format("ContainsData: {0}; parms: {1}", containsData, Arrays.toString(parms));

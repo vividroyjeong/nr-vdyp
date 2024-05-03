@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP extends BaseVdypSpecies, SI extends BaseVdypSite> {
 
-	private String polygonIdentifier; // FIP_P/POLYDESC
+	private PolygonIdentifier polygonIdentifier; // FIP_P/POLYDESC
 	private PA percentAvailable; // FIP_P2/PCTFLAND
 	private Map<LayerType, L> layers = new LinkedHashMap<>();
 	protected String biogeoclimaticZone;
@@ -20,7 +20,8 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 	protected Optional<PolygonMode> mode;
 
 	protected BaseVdypPolygon(
-			String polygonIdentifier, PA percentAvailable, String fiz, String becIdentifier, Optional<PolygonMode> mode
+			PolygonIdentifier polygonIdentifier, PA percentAvailable, String fiz, String becIdentifier,
+			Optional<PolygonMode> mode
 	) {
 		super();
 		this.forestInventoryZone = fiz;
@@ -47,11 +48,11 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 		);
 	}
 
-	public String getPolygonIdentifier() {
+	public PolygonIdentifier getPolygonIdentifier() {
 		return polygonIdentifier;
 	}
 
-	public void setPolygonIdentifier(String polygonIdentifier) {
+	public void setPolygonIdentifier(PolygonIdentifier polygonIdentifier) {
 		this.polygonIdentifier = polygonIdentifier;
 	}
 
@@ -111,7 +112,7 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 			SIB extends BaseVdypSite.Builder<SI>> //
 
 			extends ModelClassBuilder<T> {
-		protected Optional<String> polygonIdentifier = Optional.empty();
+		protected Optional<PolygonIdentifier> polygonIdentifier = Optional.empty();
 		protected Optional<PA> percentAvailable = Optional.empty();
 		protected Optional<String> biogeoclimaticZone = Optional.empty();
 		protected Optional<String> forestInventoryZone = Optional.empty();
@@ -119,8 +120,18 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 
 		protected List<L> layers = new LinkedList<>();
 
-		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> polygonIdentifier(String polygonIdentifier) {
+		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> polygonIdentifier(PolygonIdentifier polygonIdentifier) {
 			this.polygonIdentifier = Optional.of(polygonIdentifier);
+			return this;
+		}
+
+		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> polygonIdentifier(String polygonIdentifier) {
+			this.polygonIdentifier = Optional.of(PolygonIdentifier.split(polygonIdentifier));
+			return this;
+		}
+
+		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> polygonIdentifier(String base, int year) {
+			this.polygonIdentifier = Optional.of(new PolygonIdentifier(base, year));
 			return this;
 		}
 
