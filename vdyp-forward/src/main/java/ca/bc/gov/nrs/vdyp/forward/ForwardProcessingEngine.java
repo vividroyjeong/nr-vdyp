@@ -86,15 +86,14 @@ public class ForwardProcessingEngine {
 	private static void setSpecies(PolygonProcessingState bank) {
 
 		setPercentages(bank);
-		
+
 		setPolygonRankingDetails(bank, CommonData.PRIMARY_SPECIES_TO_COMBINE);
 	}
 
 	public static void setPercentages(PolygonProcessingState bank) {
-		logger.atDebug().addArgument(bank.getNSpecies()).addArgument(bank.basalAreas[0][0])
-				.log(
-						"Calculating percents as a ratio of Species BA over Total BA. # species: {}; Layer total 7.5cm+ basal area: {}"
-				);
+		logger.atDebug().addArgument(bank.getNSpecies()).addArgument(bank.basalAreas[0][0]).log(
+				"Calculating percents as a ratio of Species BA over Total BA. # species: {}; Layer total 7.5cm+ basal area: {}"
+		);
 
 		int ucIndex = UtilizationClass.ALL.ordinal();
 		for (int i = 1; i <= bank.getNSpecies(); i++) {
@@ -182,6 +181,7 @@ public class ForwardProcessingEngine {
 	 * <li>the index in {@code bank} of the secondary species, or Optional.empty() if none, and
 	 * <li>the percentage of forested land occupied by the primary species
 	 * </ul>
+	 *
 	 * @param bank the bank on which to operate
 	 * @return as described
 	 */
@@ -209,7 +209,7 @@ public class ForwardProcessingEngine {
 				secondHighestPercentage = highestPercentage;
 				highestPercentageIndex = i;
 				highestPercentage = percentages[i];
-				
+
 			} else if (percentages[i] > secondHighestPercentage) {
 
 				secondHighestPercentageIndex = i;
@@ -225,18 +225,19 @@ public class ForwardProcessingEngine {
 
 		String primaryGenusName = bank.speciesNames[highestPercentageIndex];
 		Optional<String> secondaryGenusName = secondHighestPercentageIndex != -1
-				? Optional.of(bank.speciesNames[secondHighestPercentageIndex])
-				: Optional.empty();
+				? Optional.of(bank.speciesNames[secondHighestPercentageIndex]) : Optional.empty();
 
 		try {
 			int inventoryTypeGroup = findInventoryTypeGroup(primaryGenusName, secondaryGenusName, highestPercentage);
 
-			bank.setSpeciesRankingDetails(new SpeciesRankingDetails(
-					highestPercentageIndex, secondHighestPercentageIndex != -1
-							? Optional.of(secondHighestPercentageIndex)
-							: Optional.empty(),
-					inventoryTypeGroup
-			));
+			bank.setSpeciesRankingDetails(
+					new SpeciesRankingDetails(
+							highestPercentageIndex,
+							secondHighestPercentageIndex != -1 ? Optional.of(secondHighestPercentageIndex)
+									: Optional.empty(),
+							inventoryTypeGroup
+					)
+			);
 		} catch (ProcessingException e) {
 			// This should never fail because the bank has already been validated and hence the genera
 			// are known to be valid.
@@ -256,7 +257,8 @@ public class ForwardProcessingEngine {
 		if (speciesNames.length != percentages.length) {
 			throw new IllegalArgumentException(
 					MessageFormat.format(
-							"the length of speciesNames ({}) must match that of percentages ({}) but it doesn't", speciesNames.length, percentages.length
+							"the length of speciesNames ({}) must match that of percentages ({}) but it doesn't",
+							speciesNames.length, percentages.length
 					)
 			);
 		}
@@ -288,17 +290,16 @@ public class ForwardProcessingEngine {
 	// ITGFIND
 	/**
 	 * Find Inventory type group (ITG) for the given primary and secondary (if given) genera.
-	 * 
-	 * @param primaryGenus the genus of the primary species
+	 *
+	 * @param primaryGenus           the genus of the primary species
 	 * @param optionalSecondaryGenus the genus of the primary species, which may be empty
-	 * @param primaryPercentage the percentage covered by the primary species
+	 * @param primaryPercentage      the percentage covered by the primary species
 	 * @return as described
 	 * @throws ProcessingException if primaryGenus is not a known genus
 	 */
 	static int findInventoryTypeGroup(
 			String primaryGenus, Optional<String> optionalSecondaryGenus, float primaryPercentage
-	)
-			throws ProcessingException {
+	) throws ProcessingException {
 
 		if (primaryPercentage > 79.999) { // Copied from VDYP7
 

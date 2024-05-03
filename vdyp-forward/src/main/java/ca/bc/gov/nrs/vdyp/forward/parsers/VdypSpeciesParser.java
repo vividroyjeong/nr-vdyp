@@ -131,7 +131,7 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 					var isPrimarySpecies = Utils.<Boolean>optSafe(entry.get(IS_PRIMARY_SPECIES));
 					var siteCurveNumber = Utils.<Integer>optSafe(entry.get(SITE_CURVE_NUMBER))
 							.orElse(VdypEntity.MISSING_INTEGER_VALUE);
-					
+
 					var builder = new ValueOrMarker.Builder<Optional<VdypLayerSpecies>, EndOfRecord>();
 					return layerType.handle(l -> builder.value(l.map(lt -> {
 

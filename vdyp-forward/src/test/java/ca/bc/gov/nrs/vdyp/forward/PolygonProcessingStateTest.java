@@ -46,7 +46,8 @@ class PolygonProcessingStateTest {
 		parser = new ForwardControlParser();
 		controlMap = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
 		assertThat(
-				controlMap, (Matcher) controlMapHasEntry(
+				controlMap,
+				(Matcher) controlMapHasEntry(
 						ControlKey.SP0_DEF, allOf(instanceOf(List.class), hasItem(instanceOf(GenusDefinition.class)))
 				)
 		);
@@ -191,9 +192,8 @@ class PolygonProcessingStateTest {
 				);
 				assertThat(pps1.cuVolumesMinusDecay[i][uc.index + 1], is(pps2.cuVolumesMinusDecay[j][uc.index + 1]));
 				assertThat(
-						pps1.cuVolumesMinusDecayAndWastage[i][uc.index + 1], is(
-								pps2.cuVolumesMinusDecayAndWastage[j][uc.index + 1]
-						)
+						pps1.cuVolumesMinusDecayAndWastage[i][uc.index + 1],
+						is(pps2.cuVolumesMinusDecayAndWastage[j][uc.index + 1])
 				);
 				if (uc.index <= 0) {
 					assertThat(pps1.loreyHeights[i][uc.index + 1], is(pps2.loreyHeights[j][uc.index + 1]));
@@ -225,13 +225,13 @@ class PolygonProcessingStateTest {
 	}
 
 	private void verifyProcessingStateMatchesLayer(PolygonProcessingState pps, VdypPolygonLayer layer) {
-		
+
 		List<Integer> sortedSpIndices = layer.getGenera().keySet().stream().sorted().collect(Collectors.toList());
-		
+
 		for (int i = 0; i < sortedSpIndices.size(); i++) {
 
 			int arrayIndex = i + 1;
-			
+
 			VdypLayerSpecies genus = layer.getGenera().get(sortedSpIndices.get(i));
 			verifyProcessingStateSpeciesMatchesSpecies(pps, arrayIndex, genus);
 

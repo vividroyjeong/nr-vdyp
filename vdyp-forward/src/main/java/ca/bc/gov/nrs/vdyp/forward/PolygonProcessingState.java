@@ -54,9 +54,9 @@ class PolygonProcessingState {
 	public float quadMeanDiameters[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 DQB
 	public float treesPerHectares[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 TPHB
 	public float wholeStemVolumes[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 VOLWSB
-	
+
 	// Calculated data - this data is calculated after construction during processing.
-	
+
 	public Optional<SpeciesRankingDetails> rankingDetails = Optional.empty();
 
 	public PolygonProcessingState(VdypPolygonLayer layer) {
@@ -91,7 +91,8 @@ class PolygonProcessingState {
 			recordUtilizations(0, layer.getDefaultUtilizationMap().get());
 		}
 
-		List<Integer> sortedSpIndices = layer.getGenera().keySet().stream().sorted(Integer::compareTo).collect(Collectors.toList());
+		List<Integer> sortedSpIndices = layer.getGenera().keySet().stream().sorted(Integer::compareTo)
+				.collect(Collectors.toList());
 		for (int i = 0; i < sortedSpIndices.size(); i++) {
 			recordSpecies(i + 1, layer.getGenera().get(sortedSpIndices.get(i)));
 		}
@@ -119,10 +120,14 @@ class PolygonProcessingState {
 		this.treesPerHectares = copy(s.treesPerHectares);
 		this.wholeStemVolumes = copy(s.wholeStemVolumes);
 		this.yearsToBreastHeight = copy(s.yearsToBreastHeight);
-		
+
 		if (s.rankingDetails.isPresent()) {
-			this.rankingDetails = Optional.of(new SpeciesRankingDetails(s.rankingDetails.get().primarySpeciesIndex(),
-					s.rankingDetails.get().secondarySpeciesIndex(), s.rankingDetails.get().inventoryTypeGroup()));
+			this.rankingDetails = Optional.of(
+					new SpeciesRankingDetails(
+							s.rankingDetails.get().primarySpeciesIndex(),
+							s.rankingDetails.get().secondarySpeciesIndex(), s.rankingDetails.get().inventoryTypeGroup()
+					)
+			);
 		}
 	}
 
@@ -164,7 +169,7 @@ class PolygonProcessingState {
 			wholeStemVolumes[index][ucIndex] = su.getValue().getWholeStemVolume();
 		}
 	}
-	
+
 	public void setSpeciesRankingDetails(SpeciesRankingDetails rankingDetails) {
 		if (this.rankingDetails.isPresent()) {
 			throw new IllegalStateException("SpeciesRankingDetails can be set once only");

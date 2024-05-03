@@ -78,23 +78,23 @@ class ForwardProcessingEngineTest {
 		logger.info("{} polygons processed", nPolygonsProcessed);
 	}
 
-	@Test 
+	@Test
 	void testFindPrimarySpecies() throws IOException, ResourceParseException, ProcessingException {
-		
+
 		ForwardProcessingState fps = new ForwardProcessingState();
 
 		var polygonDescription = polygonDescriptionStream.next();
 		var polygon = forwardDataStreamReader.readNextPolygon(polygonDescription);
-		
+
 		fps.setStartingState(polygon);
-		
+
 		{
 			PolygonProcessingState bank = fps.getBank(LayerType.PRIMARY, 0).copy();
-			
+
 			ForwardProcessingEngine.setPercentages(bank);
 			ForwardProcessingEngine.setPolygonRankingDetails(bank, CommonData.PRIMARY_SPECIES_TO_COMBINE);
 			SpeciesRankingDetails rankingDetails1 = bank.getSpeciesRankingDetails();
-			
+
 			assertThat(rankingDetails1.primarySpeciesIndex(), is(3));
 			assertThat(rankingDetails1.secondarySpeciesIndex(), is(Optional.of(4)));
 			assertThat(rankingDetails1.inventoryTypeGroup(), is(37));
@@ -107,15 +107,16 @@ class ForwardProcessingEngineTest {
 			ForwardProcessingEngine.setPercentages(bank);
 			ForwardProcessingEngine.setPolygonRankingDetails(bank, speciesToCombine);
 			SpeciesRankingDetails rankingDetails2 = bank.getSpeciesRankingDetails();
-			
-			// The test-specific speciesToCombine will combine 3 & 4 into 3 (leaving 4 at 0.0), promoting 2 to secondary.
+
+			// The test-specific speciesToCombine will combine 3 & 4 into 3 (leaving 4 at 0.0), promoting 2 to
+			// secondary.
 			assertThat(rankingDetails2.primarySpeciesIndex(), is(3));
 			assertThat(rankingDetails2.secondarySpeciesIndex(), is(Optional.of(2)));
 			assertThat(rankingDetails2.inventoryTypeGroup(), is(37));
 		}
 	}
-	
-	@Test 
+
+	@Test
 	void testCombinePercentages() {
 		
 		String[] speciesNames = new String[] { "AC",  "B",  "C",  "D",  "E",  "F", "PW",  "H", "PY",  "L", "PA", "AT",  "S", "MB",  "Y", "PL" };
@@ -123,12 +124,12 @@ class ForwardProcessingEngineTest {
 
 		List<String> combineGroup;
 		float[] testPercentages;
-		
+
 		combineGroup = List.of("C", "Y");
 		testPercentages = Arrays.copyOf(percentages, percentages.length);
 
 		ForwardProcessingEngine.combinePercentages(speciesNames, combineGroup, testPercentages);
-		
+
 		assertThat(testPercentages[2], is(0f));
 		assertThat(testPercentages[14], is(12.7f));
 
@@ -136,12 +137,12 @@ class ForwardProcessingEngineTest {
 		testPercentages = Arrays.copyOf(percentages, percentages.length);
 
 		ForwardProcessingEngine.combinePercentages(speciesNames, combineGroup, testPercentages);
-		
+
 		assertThat(testPercentages[3], is(6.0f));
 		assertThat(testPercentages[15], is(0.0f));
 	}
 
-	@Test 
+	@Test
 	void testCombinePercentagesOneGenusNotInCombinationList() {
 		
 		String[] speciesNames = new String[] { "AC", "C",  "D",  "E",  "F", "PW",  "H", "PY",  "L", "PA", "AT",  "S", "MB",  "Y", "PL" };
@@ -151,11 +152,11 @@ class ForwardProcessingEngineTest {
 		float[] testPercentages = Arrays.copyOf(percentages, percentages.length);
 
 		ForwardProcessingEngine.combinePercentages(speciesNames, combineGroup, testPercentages);
-		
+
 		assertThat(testPercentages[13], is(9.4f));
 	}
 
-	@Test 
+	@Test
 	void testCombinePercentagesBothGeneraNotInCombinationList() {
 		
 		String[] speciesNames = new String[] { "AC", "D",  "E",  "F", "PW",  "H", "PY",  "L", "PA", "AT",  "S", "MB",  "Y", "PL" };
@@ -165,11 +166,11 @@ class ForwardProcessingEngineTest {
 		float[] testPercentages = Arrays.copyOf(percentages, percentages.length);
 
 		ForwardProcessingEngine.combinePercentages(speciesNames, combineGroup, testPercentages);
-		
+
 		assertThat(testPercentages, is(percentages));
 	}
 
-	@Test 
+	@Test
 	void testCombinePercentagesBadCombinationList() {
 		
 		String[] speciesNames = new String[] { "AC", "D",  "E",  "F", "PW",  "H", "PY",  "L", "PA", "AT",  "S", "MB",  "Y", "PL" };
@@ -185,7 +186,7 @@ class ForwardProcessingEngineTest {
 		}
 	}
 
-	@Test 
+	@Test
 	void testCombinePercentagesBadArrays() {
 		
 		String[] speciesNames = new String[] { "D",  "E",  "F", "PW",  "H", "PY",  "L", "PA", "AT",  "S", "MB",  "Y", "PL" };
@@ -211,8 +212,8 @@ class ForwardProcessingEngineTest {
 		}
 
 		assertThrows(
-				IllegalArgumentException.class, () -> ForwardProcessingEngine
-						.findInventoryTypeGroup("AC", Optional.of("AC"), 0.0f)
+				IllegalArgumentException.class,
+				() -> ForwardProcessingEngine.findInventoryTypeGroup("AC", Optional.of("AC"), 0.0f)
 		);
 
 		assertThat(ForwardProcessingEngine.findInventoryTypeGroup("AC", Optional.empty(), 80.0f), is(36));
@@ -241,8 +242,7 @@ class ForwardProcessingEngineTest {
 
 		for (String primaryGenus : CommonData.ITG_PURE.keySet()) {
 			for (Optional<String> secondaryGenus : CommonData.ITG_PURE.keySet().stream()
-					.filter(k -> !k.equals(primaryGenus))
-					.map(k -> Optional.of(k)).collect(Collectors.toList())) {
+					.filter(k -> !k.equals(primaryGenus)).map(k -> Optional.of(k)).collect(Collectors.toList())) {
 				int itg = ForwardProcessingEngine.findInventoryTypeGroup(primaryGenus, secondaryGenus, 50.0f);
 				assertThat(itg, is(expectedResults[currentAnswerIndex++]));
 			}
