@@ -5,7 +5,6 @@ import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -14,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonDescription;
@@ -23,7 +21,6 @@ import ca.bc.gov.nrs.vdyp.forward.model.VdypSpeciesUtilization;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
-import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
@@ -31,15 +28,12 @@ public class ForwardDataStreamReader {
 
 	private static final Logger logger = LoggerFactory.getLogger(ForwardDataStreamReader.class);
 
-	private final GenusDefinitionMap genusDefinitionMap;
-
 	private final StreamingParser<VdypPolygon> polygonStream;
 	private final StreamingParser<Collection<VdypLayerSpecies>> layerSpeciesStream;
 	private final StreamingParser<Collection<VdypSpeciesUtilization>> speciesUtilizationStream;
 
 	@SuppressWarnings("unchecked")
 	public ForwardDataStreamReader(Map<String, Object> controlMap) throws IOException {
-		genusDefinitionMap = new GenusDefinitionMap((List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name()));
 
 		var polygonStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_POLY.name());
 		polygonStream = ((StreamingParserFactory<VdypPolygon>) polygonStreamFactory).get();
@@ -80,8 +74,8 @@ public class ForwardDataStreamReader {
 				}
 
 				var speciesCollection = layerSpeciesStream.next();
-				var primarySpecies = new HashMap<GenusDefinition, VdypLayerSpecies>();
-				var veteranSpecies = new HashMap<GenusDefinition, VdypLayerSpecies>();
+				var primarySpecies = new HashMap<Integer, VdypLayerSpecies>();
+				var veteranSpecies = new HashMap<Integer, VdypLayerSpecies>();
 				for (var species : speciesCollection) {
 					logger.trace("Saw species {}", species);
 
@@ -98,20 +92,10 @@ public class ForwardDataStreamReader {
 						species.setUtilizations(Optional.empty());
 					}
 
-					GenusDefinition genus = genusDefinitionMap.get(
-							species.getGenus().orElseThrow(
-									() -> new ProcessingException(
-											MessageFormat.format(
-													"Genus missing for species {} of polygon {}", species
-															.getGenusIndex(), polygon.getDescription()
-											)
-									)
-							)
-					);
 					if (LayerType.PRIMARY.equals(species.getLayerType())) {
-						primarySpecies.put(genus, species);
+						primarySpecies.put(species.getGenusIndex(), species);
 					} else if (LayerType.VETERAN.equals(species.getLayerType())) {
-						veteranSpecies.put(genus, species);
+						veteranSpecies.put(species.getGenusIndex(), species);
 					} else {
 						throw new IllegalStateException(
 								MessageFormat.format(

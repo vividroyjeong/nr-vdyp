@@ -112,7 +112,7 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 						layerType = builder.marker(EndOfRecord.END_OF_RECORD);
 					}
 					var genusIndex = (Integer) entry.get(GENUS_INDEX);
-					var genus = (Optional<String>) entry.get(GENUS);
+					var optionalGenus = (Optional<String>) entry.get(GENUS);
 					var genusNameText0 = (String) entry.get(SPECIES_0);
 					var percentGenus0 = (Float) entry.get(PERCENT_SPECIES_0);
 					var genusNameText1 = (Optional<String>) entry.get(SPECIES_1);
@@ -129,7 +129,7 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 					var isPrimarySpecies = Utils.<Boolean>optSafe(entry.get(IS_PRIMARY_SPECIES));
 					var siteCurveNumber = Utils.<Integer>optSafe(entry.get(SITE_CURVE_NUMBER))
 							.orElse(VdypEntity.MISSING_INTEGER_VALUE);
-
+					
 					var builder = new ValueOrMarker.Builder<Optional<VdypLayerSpecies>, EndOfRecord>();
 					return layerType.handle(l -> builder.value(l.map(lt -> {
 
@@ -171,6 +171,8 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 						}
 
 						GenusDistributionSet speciesDistributionSet = new GenusDistributionSet(3, gdList);
+
+						var genus = optionalGenus.orElse(genusDefinitionMap.getByIndex(genusIndex).getAlias());
 
 						return new VdypLayerSpecies(
 								polygonId, lt, genusIndex, genus, speciesDistributionSet, siteIndex, dominantHeight,

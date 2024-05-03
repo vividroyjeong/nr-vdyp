@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,52 +76,52 @@ class PolygonProcessingStateTest {
 
 		PolygonProcessingState pps = new PolygonProcessingState(gdMap, pLayer);
 
-		int nSpecies = gdMap.getNSpecies();
+		int nSpecies = pLayer.getGenera().size();
 
 		assertThat(pps, notNullValue());
-		assertThat(pps.ageBreastHeight.length, is(nSpecies + 1));
-		assertThat(pps.ageTotal.length, is(nSpecies + 1));
-		assertThat(pps.dominantHeight.length, is(nSpecies + 1));
-		assertThat(pps.percentForestedLand.length, is(nSpecies + 1));
-		assertThat(pps.siteIndex.length, is(nSpecies + 1));
-		assertThat(pps.sp64Distribution.length, is(nSpecies + 1));
-		assertThat(pps.speciesIndex.length, is(nSpecies + 1));
-		assertThat(pps.speciesName.length, is(nSpecies + 1));
+		assertThat(pps.agesAtBreastHeight.length, is(nSpecies + 1));
+		assertThat(pps.ageTotals.length, is(nSpecies + 1));
+		assertThat(pps.dominantHeights.length, is(nSpecies + 1));
+		assertThat(pps.percentagesOfForestedLand.length, is(nSpecies + 1));
+		assertThat(pps.siteIndices.length, is(nSpecies + 1));
+		assertThat(pps.sp64Distributions.length, is(nSpecies + 1));
+		assertThat(pps.speciesIndices.length, is(nSpecies + 1));
+		assertThat(pps.speciesNames.length, is(nSpecies + 1));
 		assertThat(pps.yearsToBreastHeight.length, is(nSpecies + 1));
 		assertThat(pps.getNSpecies(), is(nSpecies));
 
-		assertThat(pps.basalArea.length, is(nSpecies + 1));
+		assertThat(pps.basalAreas.length, is(nSpecies + 1));
 		for (int i = 0; i < nSpecies + 1; i++) {
-			assertThat(pps.basalArea[i].length, is(UtilizationClass.values().length));
+			assertThat(pps.basalAreas[i].length, is(UtilizationClass.values().length));
 		}
-		assertThat(pps.closeUtilizationVolume.length, is(nSpecies + 1));
+		assertThat(pps.closeUtilizationVolumes.length, is(nSpecies + 1));
 		for (int i = 0; i < nSpecies + 1; i++) {
-			assertThat(pps.closeUtilizationVolume[i].length, is(UtilizationClass.values().length));
+			assertThat(pps.closeUtilizationVolumes[i].length, is(UtilizationClass.values().length));
 		}
-		assertThat(pps.cuVolumeMinusDecay.length, is(nSpecies + 1));
+		assertThat(pps.cuVolumesMinusDecay.length, is(nSpecies + 1));
 		for (int i = 0; i < nSpecies + 1; i++) {
-			assertThat(pps.cuVolumeMinusDecay[i].length, is(UtilizationClass.values().length));
+			assertThat(pps.cuVolumesMinusDecay[i].length, is(UtilizationClass.values().length));
 		}
-		assertThat(pps.cuVolumeMinusDecayWastage.length, is(nSpecies + 1));
+		assertThat(pps.cuVolumesMinusDecayAndWastage.length, is(nSpecies + 1));
 		for (int i = 0; i < nSpecies + 1; i++) {
-			assertThat(pps.cuVolumeMinusDecayWastage[i].length, is(UtilizationClass.values().length));
+			assertThat(pps.cuVolumesMinusDecayAndWastage[i].length, is(UtilizationClass.values().length));
 		}
 
-		assertThat(pps.loreyHeight.length, is(nSpecies + 1));
+		assertThat(pps.loreyHeights.length, is(nSpecies + 1));
 		for (int i = 0; i < nSpecies + 1; i++) {
-			assertThat(pps.loreyHeight[i].length, is(2));
+			assertThat(pps.loreyHeights[i].length, is(2));
 		}
-		assertThat(pps.quadMeanDiameter.length, is(nSpecies + 1));
+		assertThat(pps.quadMeanDiameters.length, is(nSpecies + 1));
 		for (int i = 0; i < nSpecies + 1; i++) {
-			assertThat(pps.quadMeanDiameter[i].length, is(UtilizationClass.values().length));
+			assertThat(pps.quadMeanDiameters[i].length, is(UtilizationClass.values().length));
 		}
-		assertThat(pps.treesPerHectare.length, is(nSpecies + 1));
+		assertThat(pps.treesPerHectares.length, is(nSpecies + 1));
 		for (int i = 0; i < nSpecies + 1; i++) {
-			assertThat(pps.treesPerHectare[i].length, is(UtilizationClass.values().length));
+			assertThat(pps.treesPerHectares[i].length, is(UtilizationClass.values().length));
 		}
-		assertThat(pps.wholeStemVolume.length, is(nSpecies + 1));
+		assertThat(pps.wholeStemVolumes.length, is(nSpecies + 1));
 		for (int i = 0; i < nSpecies + 1; i++) {
-			assertThat(pps.wholeStemVolume[i].length, is(UtilizationClass.values().length));
+			assertThat(pps.wholeStemVolumes[i].length, is(UtilizationClass.values().length));
 		}
 	}
 
@@ -179,32 +180,32 @@ class PolygonProcessingStateTest {
 	private void
 			verifyProcessingStateIndicesEquals(PolygonProcessingState pps1, int i, PolygonProcessingState pps2, int j) {
 		if (i != j) {
-			assertThat(pps1.ageBreastHeight[i], is(pps2.ageBreastHeight[j]));
-			assertThat(pps1.ageTotal[i], is(pps2.ageTotal[j]));
-			assertThat(pps1.dominantHeight[i], is(pps2.dominantHeight[j]));
-			assertThat(pps1.siteIndex[i], is(pps2.siteIndex[j]));
-			assertThat(pps1.sp64Distribution[i], is(pps2.sp64Distribution[j]));
-			assertThat(pps1.speciesIndex[i], is(pps2.speciesIndex[j]));
-			assertThat(pps1.speciesName[i], is(pps2.speciesName[j]));
+			assertThat(pps1.agesAtBreastHeight[i], is(pps2.agesAtBreastHeight[j]));
+			assertThat(pps1.ageTotals[i], is(pps2.ageTotals[j]));
+			assertThat(pps1.dominantHeights[i], is(pps2.dominantHeights[j]));
+			assertThat(pps1.siteIndices[i], is(pps2.siteIndices[j]));
+			assertThat(pps1.sp64Distributions[i], is(pps2.sp64Distributions[j]));
+			assertThat(pps1.speciesIndices[i], is(pps2.speciesIndices[j]));
+			assertThat(pps1.speciesNames[i], is(pps2.speciesNames[j]));
 			assertThat(pps1.yearsToBreastHeight[i], is(pps2.yearsToBreastHeight[j]));
 
 			for (UtilizationClass uc : UtilizationClass.values()) {
-				assertThat(pps1.basalArea[i][uc.index + 1], is(pps2.basalArea[j][uc.index + 1]));
+				assertThat(pps1.basalAreas[i][uc.index + 1], is(pps2.basalAreas[j][uc.index + 1]));
 				assertThat(
-						pps1.closeUtilizationVolume[i][uc.index + 1], is(pps2.closeUtilizationVolume[j][uc.index + 1])
+						pps1.closeUtilizationVolumes[i][uc.index + 1], is(pps2.closeUtilizationVolumes[j][uc.index + 1])
 				);
-				assertThat(pps1.cuVolumeMinusDecay[i][uc.index + 1], is(pps2.cuVolumeMinusDecay[j][uc.index + 1]));
+				assertThat(pps1.cuVolumesMinusDecay[i][uc.index + 1], is(pps2.cuVolumesMinusDecay[j][uc.index + 1]));
 				assertThat(
-						pps1.cuVolumeMinusDecayWastage[i][uc.index + 1], is(
-								pps2.cuVolumeMinusDecayWastage[j][uc.index + 1]
+						pps1.cuVolumesMinusDecayAndWastage[i][uc.index + 1], is(
+								pps2.cuVolumesMinusDecayAndWastage[j][uc.index + 1]
 						)
 				);
 				if (uc.index <= 0) {
-					assertThat(pps1.loreyHeight[i][uc.index + 1], is(pps2.loreyHeight[j][uc.index + 1]));
+					assertThat(pps1.loreyHeights[i][uc.index + 1], is(pps2.loreyHeights[j][uc.index + 1]));
 				}
-				assertThat(pps1.quadMeanDiameter[i][uc.index + 1], is(pps2.quadMeanDiameter[j][uc.index + 1]));
-				assertThat(pps1.treesPerHectare[i][uc.index + 1], is(pps2.treesPerHectare[j][uc.index + 1]));
-				assertThat(pps1.wholeStemVolume[i][uc.index + 1], is(pps2.wholeStemVolume[j][uc.index + 1]));
+				assertThat(pps1.quadMeanDiameters[i][uc.index + 1], is(pps2.quadMeanDiameters[j][uc.index + 1]));
+				assertThat(pps1.treesPerHectares[i][uc.index + 1], is(pps2.treesPerHectares[j][uc.index + 1]));
+				assertThat(pps1.wholeStemVolumes[i][uc.index + 1], is(pps2.wholeStemVolumes[j][uc.index + 1]));
 			}
 		}
 	}
@@ -229,14 +230,19 @@ class PolygonProcessingStateTest {
 	}
 
 	private void verifyProcessingStateMatchesLayer(PolygonProcessingState pps, VdypPolygonLayer layer) {
-		for (var se : layer.getGenus().entrySet()) {
-			int spIndex = gdMap.getIndex(se.getKey().getAlias());
+		
+		List<Integer> sortedSpIndices = layer.getGenera().keySet().stream().sorted().collect(Collectors.toList());
+		
+		for (int i = 0; i < sortedSpIndices.size(); i++) {
 
-			verifyProcessingStateSpeciesMatchesSpecies(pps, spIndex, se.getKey(), se.getValue());
+			int arrayIndex = i + 1;
+			
+			VdypLayerSpecies genus = layer.getGenera().get(sortedSpIndices.get(i));
+			verifyProcessingStateSpeciesMatchesSpecies(pps, arrayIndex, genus);
 
-			if (se.getValue().getUtilizations().isPresent()) {
+			if (genus.getUtilizations().isPresent()) {
 				verifyProcessingStateSpeciesUtilizationsMatchesUtilizations(
-						pps, spIndex, se.getValue().getUtilizations().get()
+						pps, arrayIndex, genus.getUtilizations().get()
 				);
 			}
 		}
@@ -253,29 +259,29 @@ class PolygonProcessingStateTest {
 		for (UtilizationClass uc : UtilizationClass.values()) {
 			VdypSpeciesUtilization u = map.get(uc);
 
-			assertThat(pps.basalArea[spIndex][uc.index + 1], is(u.getBasalArea()));
-			assertThat(pps.closeUtilizationVolume[spIndex][uc.index + 1], is(u.getCloseUtilizationVolume()));
-			assertThat(pps.cuVolumeMinusDecay[spIndex][uc.index + 1], is(u.getCuVolumeMinusDecay()));
-			assertThat(pps.cuVolumeMinusDecayWastage[spIndex][uc.index + 1], is(u.getCuVolumeMinusDecayWastage()));
+			assertThat(pps.basalAreas[spIndex][uc.index + 1], is(u.getBasalArea()));
+			assertThat(pps.closeUtilizationVolumes[spIndex][uc.index + 1], is(u.getCloseUtilizationVolume()));
+			assertThat(pps.cuVolumesMinusDecay[spIndex][uc.index + 1], is(u.getCuVolumeMinusDecay()));
+			assertThat(pps.cuVolumesMinusDecayAndWastage[spIndex][uc.index + 1], is(u.getCuVolumeMinusDecayWastage()));
 			if (uc.index <= 0) {
-				assertThat(pps.loreyHeight[spIndex][uc.index + 1], is(u.getLoreyHeight()));
+				assertThat(pps.loreyHeights[spIndex][uc.index + 1], is(u.getLoreyHeight()));
 			}
-			assertThat(pps.quadMeanDiameter[spIndex][uc.index + 1], is(u.getQuadraticMeanDiameterAtBH()));
-			assertThat(pps.treesPerHectare[spIndex][uc.index + 1], is(u.getLiveTreesPerHectare()));
-			assertThat(pps.wholeStemVolume[spIndex][uc.index + 1], is(u.getWholeStemVolume()));
+			assertThat(pps.quadMeanDiameters[spIndex][uc.index + 1], is(u.getQuadraticMeanDiameterAtBH()));
+			assertThat(pps.treesPerHectares[spIndex][uc.index + 1], is(u.getLiveTreesPerHectare()));
+			assertThat(pps.wholeStemVolumes[spIndex][uc.index + 1], is(u.getWholeStemVolume()));
 		}
 	}
 
 	private void verifyProcessingStateSpeciesMatchesSpecies(
-			PolygonProcessingState pps, int spIndex, GenusDefinition genus, VdypLayerSpecies species
+			PolygonProcessingState pps, int index, VdypLayerSpecies species
 	) {
-		assertThat(pps.ageBreastHeight[spIndex], is(species.getAgeAtBreastHeight()));
-		assertThat(pps.ageTotal[spIndex], is(species.getAgeTotal()));
-		assertThat(pps.dominantHeight[spIndex], is(species.getDominantHeight()));
-		assertThat(pps.siteIndex[spIndex], is(species.getSiteIndex()));
-		assertThat(pps.sp64Distribution[spIndex], is(species.getSpeciesDistributions()));
-		assertThat(pps.speciesIndex[spIndex], is(species.getGenusIndex()));
-		assertThat(pps.speciesName[spIndex], is(genus.getName()));
-		assertThat(pps.yearsToBreastHeight[spIndex], is(species.getYearsToBreastHeight()));
+		assertThat(pps.agesAtBreastHeight[index], is(species.getAgeAtBreastHeight()));
+		assertThat(pps.ageTotals[index], is(species.getAgeTotal()));
+		assertThat(pps.dominantHeights[index], is(species.getDominantHeight()));
+		assertThat(pps.siteIndices[index], is(species.getSiteIndex()));
+		assertThat(pps.sp64Distributions[index], is(species.getSpeciesDistributions()));
+		assertThat(pps.speciesIndices[index], is(species.getGenusIndex()));
+		assertThat(pps.speciesNames[index], is(species.getGenus()));
+		assertThat(pps.yearsToBreastHeight[index], is(species.getYearsToBreastHeight()));
 	}
 }
