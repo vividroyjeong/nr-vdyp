@@ -38,6 +38,7 @@ import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.CommonData;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.Region;
@@ -606,53 +607,53 @@ class VdypStartApplicationTest {
 			assertItgMixed(app, 5, "F", /*  */ "PL", "PA");
 			assertItgMixed(app, 6, "F", /*  */ "PY");
 			assertItgMixed(app, 7, "F", /*  */ "L", "PW");
-			assertItgMixed(app, 8, "F", /*  */ VdypStartApplication.HARDWOODS);
+			assertItgMixed(app, 8, "F", /*  */ CommonData.HARDWOODS);
 
 			assertItgMixed(app, 10, "C", /* */ "Y");
 			assertItgMixed(app, 11, "C", /* */ "B", "H", "S");
 			assertItgMixed(app, 10, "C", /* */ "PL", "PA", "PY", "L", "PW");
-			assertItgMixed(app, 10, "C", /* */ VdypStartApplication.HARDWOODS);
+			assertItgMixed(app, 10, "C", /* */ CommonData.HARDWOODS);
 
 			assertItgMixed(app, 10, "Y", /* */ "C");
 			assertItgMixed(app, 11, "Y", /* */ "B", "H", "S");
 			assertItgMixed(app, 10, "Y", /* */ "PL", "PA", "PY", "L", "PW");
-			assertItgMixed(app, 10, "Y", /* */ VdypStartApplication.HARDWOODS);
+			assertItgMixed(app, 10, "Y", /* */ CommonData.HARDWOODS);
 
 			assertItgMixed(app, 14, "H", /* */ "C", "Y");
 			assertItgMixed(app, 15, "H", /* */ "B");
 			assertItgMixed(app, 16, "H", /* */ "S");
-			assertItgMixed(app, 17, "H", /* */ VdypStartApplication.HARDWOODS);
+			assertItgMixed(app, 17, "H", /* */ CommonData.HARDWOODS);
 			assertItgMixed(app, 13, "H", /* */ "F", "L", "PA", "PL", "PY");
 
 			assertItgMixed(app, 19, "B", /* */ "C", "Y", "H");
 			assertItgMixed(app, 20, "B", /* */ "S", "PL", "PA", "PY", "L", "PW");
-			assertItgMixed(app, 20, "B", /* */ VdypStartApplication.HARDWOODS);
+			assertItgMixed(app, 20, "B", /* */ CommonData.HARDWOODS);
 
 			assertItgMixed(app, 22, "S", /* */ "F", "L", "PA", "PW", "PY");
 			assertItgMixed(app, 23, "S", /* */ "C", "Y", "H");
 			assertItgMixed(app, 24, "S", /* */ "B");
 			assertItgMixed(app, 25, "S", /* */ "PL");
-			assertItgMixed(app, 26, "S", /* */ VdypStartApplication.HARDWOODS);
+			assertItgMixed(app, 26, "S", /* */ CommonData.HARDWOODS);
 
 			assertItgMixed(app, 27, "PW", /**/ "B", "C", "F", "H", "L", "PA", "PL", "PY", "S", "Y");
-			assertItgMixed(app, 27, "PW", /**/ VdypStartApplication.HARDWOODS);
+			assertItgMixed(app, 27, "PW", /**/ CommonData.HARDWOODS);
 
 			assertItgMixed(app, 28, "PL", /**/ "PA");
 			assertItgMixed(app, 30, "PL", /**/ "B", "C", "H", "S", "Y");
 			assertItgMixed(app, 29, "PL", /**/ "F", "PW", "L", "PY");
-			assertItgMixed(app, 31, "PL", /**/ VdypStartApplication.HARDWOODS);
+			assertItgMixed(app, 31, "PL", /**/ CommonData.HARDWOODS);
 
 			assertItgMixed(app, 28, "PA", /**/ "PL");
 			assertItgMixed(app, 30, "PA", /**/ "B", "C", "H", "S", "Y");
 			assertItgMixed(app, 29, "PA", /**/ "F", "PW", "L", "PY");
-			assertItgMixed(app, 31, "PA", /**/ VdypStartApplication.HARDWOODS);
+			assertItgMixed(app, 31, "PA", /**/ CommonData.HARDWOODS);
 
 			assertItgMixed(app, 32, "PY", /**/ "B", "C", "F", "H", "L", "PA", "PL", "PW", "S", "Y");
-			assertItgMixed(app, 32, "PY", /**/ VdypStartApplication.HARDWOODS);
+			assertItgMixed(app, 32, "PY", /**/ CommonData.HARDWOODS);
 
 			assertItgMixed(app, 33, "L", /* */ "F");
 			assertItgMixed(app, 34, "L", /* */ "B", "C", "H", "PA", "PL", "PW", "PY", "S", "Y");
-			assertItgMixed(app, 34, "L", /* */ VdypStartApplication.HARDWOODS);
+			assertItgMixed(app, 34, "L", /* */ CommonData.HARDWOODS);
 
 			assertItgMixed(app, 35, "AC", /**/ "B", "C", "F", "H", "L", "PA", "PL", "PW", "PY", "S", "Y");
 			assertItgMixed(app, 36, "AC", /**/ "AT", "D", "E", "MB");

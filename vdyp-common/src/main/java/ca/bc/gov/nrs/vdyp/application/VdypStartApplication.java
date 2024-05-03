@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
@@ -35,6 +34,7 @@ import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.CommonData;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
@@ -47,27 +47,6 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	public static final int CONFIG_LOAD_ERROR = 1;
 	public static final int PROCESSING_ERROR = 2;
-
-	static final Map<String, Integer> ITG_PURE = Utils.constMap(map -> {
-		map.put("AC", 36);
-		map.put("AT", 42);
-		map.put("B", 18);
-		map.put("C", 9);
-		map.put("D", 38);
-		map.put("E", 40);
-		map.put("F", 1);
-		map.put("H", 12);
-		map.put("L", 34);
-		map.put("MB", 39);
-		map.put("PA", 28);
-		map.put("PL", 28);
-		map.put("PW", 27);
-		map.put("PY", 32);
-		map.put("S", 21);
-		map.put("Y", 9);
-	});
-
-	static final Set<String> HARDWOODS = Set.of("AC", "AT", "D", "E", "MB");
 
 	protected static void doMain(VdypStartApplication<?, ?, ?, ?> app, final String... args) {
 		var resolver = new FileSystemFileResolver();
@@ -93,12 +72,6 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	static final Comparator<BaseVdypSpecies> PERCENT_GENUS_DESCENDING = Utils
 			.compareUsing(BaseVdypSpecies::getPercentGenus).reversed();
-
-	/**
-	 * When finding primary species these genera should be combined
-	 */
-	protected static final Collection<Collection<String>> PRIMARY_SPECIES_TO_COMBINE = Arrays
-			.asList(Arrays.asList("PL", "PA"), Arrays.asList("C", "Y"));
 
 	protected VdypStartApplication() {
 		super();
@@ -237,7 +210,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		allSpecies.stream().forEach(spec -> combined.put(spec.getGenus(), copySpecies(spec, x -> {
 		})));
 
-		for (var combinationGroup : PRIMARY_SPECIES_TO_COMBINE) {
+		for (var combinationGroup : CommonData.PRIMARY_SPECIES_TO_COMBINE) {
 			var groupSpecies = combinationGroup.stream().map(combined::get).filter(Objects::nonNull).toList();
 			if (groupSpecies.size() < 2) {
 				continue;
@@ -291,7 +264,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		var primary = primarySecondary.get(0);
 
 		if (primary.getPercentGenus() > 79.999) { // Copied from VDYP7
-			return ITG_PURE.get(primary.getGenus());
+			return CommonData.ITG_PURE.get(primary.getGenus());
 		}
 		assert primarySecondary.size() == 2;
 
@@ -342,7 +315,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			case "S":
 				return 16;
 			default:
-				if (HARDWOODS.contains(secondary.getGenus())) {
+				if (CommonData.HARDWOODS.contains(secondary.getGenus())) {
 					return 17;
 				}
 				return 13;
@@ -356,7 +329,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			case "PL":
 				return 25;
 			default:
-				if (HARDWOODS.contains(secondary.getGenus())) {
+				if (CommonData.HARDWOODS.contains(secondary.getGenus())) {
 					return 26;
 				}
 				return 22;
@@ -370,7 +343,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			case "F", "PW", "L", "PY":
 				return 29;
 			default:
-				if (HARDWOODS.contains(secondary.getGenus())) {
+				if (CommonData.HARDWOODS.contains(secondary.getGenus())) {
 					return 31;
 				}
 				return 30;
@@ -385,12 +358,12 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				return 34;
 			}
 		case "AC":
-			if (HARDWOODS.contains(secondary.getGenus())) {
+			if (CommonData.HARDWOODS.contains(secondary.getGenus())) {
 				return 36;
 			}
 			return 35;
 		case "D":
-			if (HARDWOODS.contains(secondary.getGenus())) {
+			if (CommonData.HARDWOODS.contains(secondary.getGenus())) {
 				return 38;
 			}
 			return 37;
@@ -399,7 +372,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		case "E":
 			return 40;
 		case "AT":
-			if (HARDWOODS.contains(secondary.getGenus())) {
+			if (CommonData.HARDWOODS.contains(secondary.getGenus())) {
 				return 42;
 			}
 			return 41;
