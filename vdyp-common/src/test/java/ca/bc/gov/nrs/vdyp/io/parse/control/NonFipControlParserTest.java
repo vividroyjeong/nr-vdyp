@@ -32,9 +32,9 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveAgeMaximumParserTest;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
@@ -42,7 +42,6 @@ import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
-import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 @SuppressWarnings({ "unused", "unchecked", "rawtypes" })
@@ -152,7 +151,7 @@ class NonFipControlParserTest {
 				result, (Matcher) controlMapHasEntry(
 						ControlKey.SITE_CURVE_NUMBERS, allOf(
 								// Species
-								isA(MatrixMap2.class), mmHasEntry(isA(Integer.class), "MB", Region.COASTAL)
+								isA(MatrixMap2.class), mmHasEntry(isA(SiteIndexEquation.class), "MB", Region.COASTAL)
 						)
 				)
 		);

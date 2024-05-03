@@ -9,6 +9,7 @@ import java.util.Map;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.ExpectationDifference;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseValidException;
@@ -42,7 +43,8 @@ import ca.bc.gov.nrs.vdyp.model.Region;
  * @see OptionalControlMapSubResourceParser
  * @author Kevin Smith, Vivid Solutions
  */
-public class SiteCurveParser implements OptionalControlMapSubResourceParser<MatrixMap2<String, Region, Integer>> {
+public class SiteCurveParser
+		implements OptionalControlMapSubResourceParser<MatrixMap2<String, Region, SiteIndexEquation>> {
 	public static final String SPECIES_KEY = "species";
 	public static final String REGION_1_KEY = "region1";
 	public static final String REGION_2_KEY = "region2";
@@ -62,7 +64,7 @@ public class SiteCurveParser implements OptionalControlMapSubResourceParser<Matr
 	}.strippedString(3, SPECIES_KEY).integer(3, REGION_1_KEY).integer(3, REGION_2_KEY);
 
 	@Override
-	public MatrixMap2<String, Region, Integer> parse(InputStream is, Map<String, Object> control)
+	public MatrixMap2<String, Region, SiteIndexEquation> parse(InputStream is, Map<String, Object> control)
 			throws IOException, ResourceParseException {
 		Map<String, int[]> result = new HashMap<>();
 		lineParser.parse(is, result, (value, r, line) -> {
@@ -82,7 +84,8 @@ public class SiteCurveParser implements OptionalControlMapSubResourceParser<Matr
 		}
 
 		return new MatrixMap2Impl<>(
-				result.keySet(), Arrays.asList(Region.values()), (id, region) -> result.get(id)[region.getIndex()]
+				result.keySet(), Arrays.asList(Region.values()),
+				(id, region) -> SiteIndexEquation.getByIndex(result.get(id)[region.getIndex() - 1])
 		);
 	}
 
@@ -92,7 +95,7 @@ public class SiteCurveParser implements OptionalControlMapSubResourceParser<Matr
 	}
 
 	@Override
-	public MatrixMap2<String, Region, Integer> defaultResult() {
+	public MatrixMap2<String, Region, SiteIndexEquation> defaultResult() {
 		return new MatrixMap2Impl<>(Collections.emptySet(), Collections.emptySet(), (x, y) -> null);
 	}
 

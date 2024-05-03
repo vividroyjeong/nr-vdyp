@@ -135,8 +135,8 @@ public class FipSpeciesParser
 				protected Collection<FipSpecies>
 						convert(List<ValueOrMarker<Optional<FipSpecies>, EndOfRecord>> children) {
 					return children.stream().map(ValueOrMarker::getValue).map(Optional::get) // Should never be empty as
-																								// we've filtered out
-																								// markers
+							// we've filtered out
+							// markers
 							.flatMap(Optional::stream) // Skip if empty (and unknown layer type)
 							.toList();
 				}

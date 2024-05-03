@@ -2,8 +2,6 @@ package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.mmHasEntry;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -16,6 +14,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseValidException;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.Region;
@@ -37,8 +36,8 @@ class SiteCurveParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, mmHasEntry(is(1), "S1", Region.COASTAL));
-		assertThat(result, mmHasEntry(is(2), "S1", Region.INTERIOR));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(1)), "S1", Region.COASTAL));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(2)), "S1", Region.INTERIOR));
 	}
 
 	@Test
@@ -55,10 +54,10 @@ class SiteCurveParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, mmHasEntry(is(1), "S1", Region.COASTAL));
-		assertThat(result, mmHasEntry(is(2), "S1", Region.INTERIOR));
-		assertThat(result, mmHasEntry(is(3), "X2", Region.COASTAL));
-		assertThat(result, mmHasEntry(is(4), "X2", Region.INTERIOR));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(1)), "S1", Region.COASTAL));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(2)), "S1", Region.INTERIOR));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(3)), "X2", Region.COASTAL));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(4)), "X2", Region.INTERIOR));
 	}
 
 	@Test
@@ -93,8 +92,8 @@ class SiteCurveParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, mmHasEntry(is(1), "S1", Region.COASTAL));
-		assertThat(result, mmHasEntry(is(2), "S1", Region.INTERIOR));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(1)), "S1", Region.COASTAL));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(2)), "S1", Region.INTERIOR));
 	}
 
 	@Test
@@ -111,8 +110,8 @@ class SiteCurveParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, mmHasEntry(is(1), "S1", Region.COASTAL));
-		assertThat(result, mmHasEntry(is(2), "S1", Region.INTERIOR));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(1)), "S1", Region.COASTAL));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(2)), "S1", Region.INTERIOR));
 	}
 
 	@Test
@@ -129,8 +128,8 @@ class SiteCurveParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, mmHasEntry(is(1), "S1", Region.COASTAL));
-		assertThat(result, mmHasEntry(is(2), "S1", Region.INTERIOR));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(1)), "S1", Region.COASTAL));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(2)), "S1", Region.INTERIOR));
 	}
 
 }

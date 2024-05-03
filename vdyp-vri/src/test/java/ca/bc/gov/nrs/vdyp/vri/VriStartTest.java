@@ -38,6 +38,7 @@ import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BasalAreaYieldParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BaseAreaCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.HLNonprimaryCoefficientParser;
@@ -773,17 +774,17 @@ class VriStartTest {
 
 		app.init(resolver, controlMap);
 
-		assertThat(app.findSiteCurveNumber(Region.COASTAL, "MB"), is((short) 10));
-		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "MB"), is((short) 10));
+		assertThat(app.findSiteCurveNumber(Region.COASTAL, "MB"), is(SiteIndexEquation.getByIndex(10)));
+		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "MB"), is(SiteIndexEquation.getByIndex(10)));
 
-		assertThat(app.findSiteCurveNumber(Region.COASTAL, "B"), is((short) 12));
-		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "B"), is((short) 42));
+		assertThat(app.findSiteCurveNumber(Region.COASTAL, "B"), is(SiteIndexEquation.getByIndex(12)));
+		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "B"), is(SiteIndexEquation.getByIndex(42)));
 
-		assertThat(app.findSiteCurveNumber(Region.COASTAL, "ZZZ", "B"), is((short) 12));
-		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "ZZZ", "B"), is((short) 42));
+		assertThat(app.findSiteCurveNumber(Region.COASTAL, "ZZZ", "B"), is(SiteIndexEquation.getByIndex(12)));
+		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "ZZZ", "B"), is(SiteIndexEquation.getByIndex(42)));
 
-		assertThat(app.findSiteCurveNumber(Region.COASTAL, "YYY", "B"), is((short) 42));
-		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "YYY", "B"), is((short) 06));
+		assertThat(app.findSiteCurveNumber(Region.COASTAL, "YYY", "B"), is(SiteIndexEquation.getByIndex(42)));
+		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "YYY", "B"), is(SiteIndexEquation.getByIndex(06)));
 
 		assertThrows(StandProcessingException.class, () -> app.findSiteCurveNumber(Region.COASTAL, "ZZZ"));
 		assertThrows(StandProcessingException.class, () -> app.findSiteCurveNumber(Region.INTERIOR, "ZZZ"));
@@ -1760,7 +1761,7 @@ class VriStartTest {
 
 		assertThat(resultPrimaryLayer, hasProperty("baseArea", present(closeTo(0.72324f))));
 		assertThat(resultPrimaryLayer, hasProperty("treesPerHectare", present(closeTo(121.6f))));
-		
+
 		assertThat(resultVeteranLayer, hasProperty("baseArea", present(closeTo(0.80981f))));
 
 		for (var nonPrimaryGenus : List.of("B", "C", "H", "S")) {
@@ -1795,8 +1796,7 @@ class VriStartTest {
 	}
 
 	/**
-	 * Matches a species entry with the given genus and a single species entry of
-	 * 100%
+	 * Matches a species entry with the given genus and a single species entry of 100%
 	 *
 	 * @param genus
 	 * @param species

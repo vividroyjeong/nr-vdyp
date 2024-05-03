@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypSpeciesUtilization;
+import ca.bc.gov.nrs.vdyp.forward.parsers.VdypUtilizationParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
@@ -91,7 +92,7 @@ public class VdypForwardUtilizationParserTest {
 				utilizations,
 				hasItem(
 						allOf(
-								hasProperty("polygonId", is("01002 S000001 00     1970")),
+								hasProperty("polygonId", hasProperty("description", is("01002 S000001 00     1970"))),
 								hasProperty("layerType", is(LayerType.PRIMARY)),
 								hasProperty("genus", is(Optional.empty())),
 								hasProperty("ucIndex", is(UtilizationClass.SMALL)),
@@ -147,7 +148,7 @@ public class VdypForwardUtilizationParserTest {
 				utilizations,
 				hasItems(
 						allOf(
-								hasProperty("polygonId", is("01002 S000001 00     1970")),
+								hasProperty("polygonId", hasProperty("description", is("01002 S000001 00     1970"))),
 								hasProperty("layerType", is(LayerType.PRIMARY)),
 								hasProperty("genus", is(Optional.empty())),
 								hasProperty("ucIndex", is(UtilizationClass.SMALL)),
@@ -160,7 +161,7 @@ public class VdypForwardUtilizationParserTest {
 								hasProperty("genusIndex", is(0)), hasProperty("quadraticMeanDiameterAtBH", is(6.1f))
 						),
 						allOf(
-								hasProperty("polygonId", is("01002 S000001 00     1970")),
+								hasProperty("polygonId", hasProperty("description", is("01002 S000001 00     1970"))),
 								hasProperty("layerType", is(LayerType.PRIMARY)),
 								hasProperty("genus", is(Optional.empty())),
 								hasProperty("ucIndex", is(UtilizationClass.SMALL)),

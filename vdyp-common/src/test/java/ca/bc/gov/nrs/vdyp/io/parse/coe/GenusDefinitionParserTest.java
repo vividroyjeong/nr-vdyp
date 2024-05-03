@@ -292,7 +292,7 @@ public class GenusDefinitionParserTest {
 		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 3", "Preference 3", "larger than 2")));
 	}
 
-// TODO Confirm if following methods are still needed after merge
+	// TODO Confirm if following methods are still needed after merge
 	/**
 	 * Add a mock control map entry for SP0 parse results with species "S1" and "S2"
 	 */
