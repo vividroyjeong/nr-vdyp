@@ -75,7 +75,7 @@ public class ForwardProcessingEngine {
 		PolygonProcessingState workingBank = fps.getBank(LayerType.PRIMARY, 0).copy();
 
 		// SCINXSET
-		completeSiteCurveMap(polygon.getBiogeoclimaticZone(), workingBank);
+		completeSiteCurveMap(polygon.getBiogeoclimaticZone(), workingBank, siteCurveMap);
 
 		// VPRIME, method == 1
 		setSpecies(workingBank);
@@ -105,7 +105,7 @@ public class ForwardProcessingEngine {
 		}
 	}
 
-	private void completeSiteCurveMap(BecDefinition becZone, PolygonProcessingState bank) {
+	private static void completeSiteCurveMap(BecDefinition becZone, PolygonProcessingState bank, Map<String, SiteCurve> siteCurveMap) {
 
 		for (int i = 0; i < bank.getNSpecies(); i++) {
 
@@ -136,6 +136,8 @@ public class ForwardProcessingEngine {
 						);
 					}
 				}
+				
+				bank.siteCurveNumbers[i] = scIndex.orElseThrow().n();
 			}
 		}
 	}
