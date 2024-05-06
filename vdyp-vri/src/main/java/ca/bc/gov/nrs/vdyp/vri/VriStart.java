@@ -661,6 +661,9 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		});
 	}
 
+	static record Increase(float dominantHeight, float ageIncrease) {
+	}
+
 	VriPolygon processYoung(VriPolygon poly) throws ProcessingException {
 
 		PolygonIdentifier polygonIdentifier = poly.getPolygonIdentifier();
@@ -692,8 +695,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			float primaryYearsToBreastHeight = primarySite.getYearsToBreastHeight().orElseThrow(); // YTBH_L1
 
 			float primaryBreastHeightAge0 = primaryAgeTotal - primaryYearsToBreastHeight; // AGEBH0
-			float ageIncrease; // AGE_INCR original fortran had some logic to set this, but it will always be
-								// overwritten before being used.
 
 			float siteIndex = primarySite.getSiteIndex().orElseThrow(); // SID
 			float yeastToBreastHeight = primaryYearsToBreastHeight; // YTBHD
@@ -727,77 +728,34 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 			float primaryHeight = primarySite.getHeight().orElseThrow(); // HT_L1
 
-			float dominantHeight;
-
-			foundIncrease: {
-				for (int increase = 0; increase <= moreYears; increase++) {
-					float primaryBreastHeightAge = primaryBreastHeightAge0 + increase; // AGEBH
-
-					if (primaryBreastHeightAge > 1f) {
-
-						float ageD = primaryBreastHeightAge; // AGED
-
-						float dominantHeightD = (float) SiteIndex2Height.indexToHeight(
-								siteCurve, ageD, SiteIndexAgeType.SI_AT_BREAST, siteIndex, ageD, yeastToBreastHeight
-						); // HDD
-
-						if (increase == 0) {
-							dominantHeight0 = dominantHeightD;
-						}
-						dominantHeight = dominantHeightD; // HD
-						if (primaryHeight > 0f && dominantHeight0 > 0f) {
-							dominantHeight = primaryHeight + (dominantHeight - dominantHeight0);
-						}
-
-						// check empirical BA assuming BAV = 0
-
-						float predictedBaseArea = estimateBaseAreaYield(
-								dominantHeight, primaryBreastHeightAge, Optional.empty(), false,
-								primaryLayer.getSpecies().values(), bec,
-								primaryLayer.getEmpericalRelationshipParameterIndex().orElseThrow()
-						); // BAP
-
-						// Calculate the full occupancy BA Hence the BA we will test is the Full
-						// occupanct BA
-
-						predictedBaseArea /= FRACTION_AVAILABLE_N;
-
-						if (dominantHeight >= heightTarget && primaryBreastHeightAge >= ageTarget
-								&& predictedBaseArea >= baseAreaTarget) {
-							ageIncrease = increase;
-							break foundIncrease;
-						}
-					}
-				}
-				throw new StandProcessingException("Unable to increase to target height.");
-			}
-
-			final float ageIncreaseFinal = ageIncrease;
-			final float newPrimaryHeight = dominantHeight;
+			final Increase inc = findIncreaseForYoungMode(
+					bec, primaryLayer, siteCurve, primaryBreastHeightAge0, siteIndex, yeastToBreastHeight,
+					baseAreaTarget, heightTarget, ageTarget, dominantHeight0, moreYears, primaryHeight
+			);
 
 			return VriPolygon.build(pBuilder -> {
 				pBuilder.copy(poly);
-				pBuilder.polygonIdentifier(polygonIdentifier.forYear(year + (int) ageIncreaseFinal));
+				pBuilder.polygonIdentifier(polygonIdentifier.forYear(year + (int) inc.ageIncrease));
 				pBuilder.mode(PolygonMode.BATN);
 				pBuilder.copyLayers(poly, (lBuilder, layer) -> {
 
 					lBuilder.copySites(layer, (iBuilder, site) -> {
 						if (layer.getLayerType() == LayerType.PRIMARY
 								&& primaryLayer.getPrimaryGenus().map(site.getSiteGenus()::equals).orElse(false)) {
-							iBuilder.height(newPrimaryHeight);
+							iBuilder.height(inc.dominantHeight);
 						} else {
 							iBuilder.height(Optional.empty());
 						}
 
-						site.getAgeTotal().map(x -> x + ageIncreaseFinal).ifPresentOrElse(ageTotal -> {
+						site.getAgeTotal().map(x -> x + inc.ageIncrease).ifPresentOrElse(ageTotal -> {
 							iBuilder.ageTotal(ageTotal);
 							iBuilder.breastHeightAge(
 									site.getYearsToBreastHeight()//
 											.map(ytbh -> ageTotal - ytbh)
-											.or(() -> site.getBreastHeightAge().map(bha -> bha + ageIncreaseFinal))
+											.or(() -> site.getBreastHeightAge().map(bha -> bha + inc.ageIncrease))
 							);
 						}, () -> {
-							iBuilder.breastHeightAge(site.getBreastHeightAge().map(bha -> bha + ageIncreaseFinal));
+							iBuilder.breastHeightAge(site.getBreastHeightAge().map(bha -> bha + inc.ageIncrease));
 						});
 
 					});
@@ -812,6 +770,56 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		} catch (CommonCalculatorException e) {
 			throw new StandProcessingException(e);
 		}
+	}
+
+	private Increase findIncreaseForYoungMode(
+			BecDefinition bec, VriLayer primaryLayer, SiteIndexEquation siteCurve, float primaryBreastHeightAge0,
+			float siteIndex, float yeastToBreastHeight, float baseAreaTarget, float heightTarget, float ageTarget,
+			float dominantHeight0, int moreYears, float primaryHeight
+	) throws CommonCalculatorException, StandProcessingException {
+		float dominantHeight;
+		float ageIncrease;
+		for (int increase = 0; increase <= moreYears; increase++) {
+			float primaryBreastHeightAge = primaryBreastHeightAge0 + increase; // AGEBH
+
+			if (primaryBreastHeightAge > 1f) {
+
+				float ageD = primaryBreastHeightAge; // AGED
+
+				float dominantHeightD = (float) SiteIndex2Height.indexToHeight(
+						siteCurve, ageD, SiteIndexAgeType.SI_AT_BREAST, siteIndex, ageD, yeastToBreastHeight
+				); // HDD
+
+				if (increase == 0) {
+					dominantHeight0 = dominantHeightD;
+				}
+				dominantHeight = dominantHeightD; // HD
+				if (primaryHeight > 0f && dominantHeight0 > 0f) {
+					dominantHeight = primaryHeight + (dominantHeight - dominantHeight0);
+				}
+
+				// check empirical BA assuming BAV = 0
+
+				float predictedBaseArea = estimateBaseAreaYield(
+						dominantHeight, primaryBreastHeightAge, Optional.empty(), false,
+						primaryLayer.getSpecies().values(), bec,
+						primaryLayer.getEmpericalRelationshipParameterIndex().orElseThrow()
+				); // BAP
+
+				// Calculate the full occupancy BA Hence the BA we will test is the Full
+				// occupanct BA
+
+				predictedBaseArea /= FRACTION_AVAILABLE_N;
+
+				if (dominantHeight >= heightTarget && primaryBreastHeightAge >= ageTarget
+						&& predictedBaseArea >= baseAreaTarget) {
+					ageIncrease = increase;
+					return new Increase(dominantHeight, ageIncrease);
+				}
+			}
+		}
+		throw new StandProcessingException("Unable to increase to target height.");
+
 	}
 
 	static final <T, B extends ModelClassBuilder<T>> BiConsumer<B, T> noChange() {
