@@ -675,7 +675,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			return 100f;
 		}
 		if (getId() == VdypApplicationIdentifier.VRI_START) {
-			veteran = vetLayer != null;
+			veteran = vetLayer.isPresent();
 		}
 
 		assert primaryLayer != null;
