@@ -663,82 +663,87 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	public float estimatePercentForestLand(P polygon, Optional<L> vetLayer, L primaryLayer) throws ProcessingException {
 		if (polygon.getPercentAvailable().isPresent()) {
 			return polygon.getPercentAvailable().get();
-		} else {
-
-			boolean veteran = vetLayer//
-					.filter(layer -> getLayerHeight(layer).orElse(0f) > 0f) //
-					.filter(layer -> layer.getCrownClosure() > 0f)//
-					.isPresent(); // LAYERV
-
-			if (getId() == VdypApplicationIdentifier.FIP_START
-					&& polygon.getMode().map(mode -> mode == PolygonMode.YOUNG).orElse(false)) {
-				return 100f;
-			}
-			if (getId() == VdypApplicationIdentifier.VRI_START) {
-				veteran = vetLayer != null;
-			}
-
-			assert primaryLayer != null;
-
-			float crownClosure = primaryLayer.getCrownClosure();
-
-			float primaryAgeTotal = getLayerAgeTotal(primaryLayer).orElseThrow();
-			// Assume crown closure linear with age, to 25.
-			if (primaryAgeTotal < 25f) {
-				crownClosure *= 25f / primaryAgeTotal;
-			}
-			// define crown closure as the SUM of two layers
-			if (veteran) {
-				crownClosure += vetLayer.map(InputLayer::getCrownClosure).orElse(0f);
-			}
-
-			crownClosure = clamp(crownClosure, 0, 100);
-
-			/*
-			 * assume that CC occurs at age 25 and that most land goes to 90% occupancy but that occupancy increases
-			 * only 1% /yr with no increases after ages 25. });
-			 */
-
-			// Obtain the percent yield (in comparison with CC = 90%)
-
-			float crownClosureTop = 90f;
-			float breastHeightAge = primaryAgeTotal
-					- getPrimarySite(primaryLayer).flatMap(BaseVdypSite::getYearsToBreastHeight).orElseThrow();
-
-			float yieldFactor = getYieldFactor(polygon);
-
-			var bec = Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap);
-
-			breastHeightAge = max(5.0f, breastHeightAge);
-			// EMP040
-			float baseAreaTop = estimatePrimaryBaseArea(
-					primaryLayer, bec, yieldFactor, breastHeightAge, 0f, crownClosureTop
-			);
-			// EMP040
-			float baseAreaHat = estimatePrimaryBaseArea(
-					primaryLayer, bec, yieldFactor, breastHeightAge, 0f, crownClosure
-			);
-
-			float percentYield;
-			if (baseAreaTop > 0f && baseAreaHat > 0f) {
-				percentYield = min(100f, 100f * baseAreaHat / baseAreaTop);
-			} else {
-				percentYield = 90f;
-			}
-
-			float gainMax;
-			if (primaryAgeTotal > 125f) {
-				gainMax = 0f;
-			} else if (primaryAgeTotal < 25f) {
-				gainMax = max(90f - percentYield, 0);
-			} else {
-				gainMax = max(90f - percentYield, 0);
-				gainMax = min(gainMax, 125 - primaryAgeTotal);
-			}
-
-			return floor(min(percentYield + gainMax, 100f));
-
 		}
+
+		boolean veteran = vetLayer//
+				.filter(layer -> getLayerHeight(layer).orElse(0f) > 0f) //
+				.filter(layer -> layer.getCrownClosure() > 0f)//
+				.isPresent(); // LAYERV
+
+		if (getId() == VdypApplicationIdentifier.FIP_START
+				&& polygon.getMode().map(mode -> mode == PolygonMode.YOUNG).orElse(false)) {
+			return 100f;
+		}
+		if (getId() == VdypApplicationIdentifier.VRI_START) {
+			veteran = vetLayer != null;
+		}
+
+		assert primaryLayer != null;
+
+		float primaryAgeTotal = getLayerAgeTotal(primaryLayer).orElseThrow();
+
+		float crownClosure = crownClosureForPercentForestLand(vetLayer, primaryLayer, veteran, primaryAgeTotal);
+
+		/*
+		 * assume that CC occurs at age 25 and that most land goes to 90% occupancy but that occupancy increases only 1%
+		 * /yr with no increases after ages 25. });
+		 */
+
+		// Obtain the percent yield (in comparison with CC = 90%)
+
+		float crownClosureTop = 90f;
+		float breastHeightAge = primaryAgeTotal
+				- getPrimarySite(primaryLayer).flatMap(BaseVdypSite::getYearsToBreastHeight).orElseThrow();
+
+		float yieldFactor = getYieldFactor(polygon);
+
+		var bec = Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap);
+
+		breastHeightAge = max(5.0f, breastHeightAge);
+		// EMP040
+		float baseAreaTop = estimatePrimaryBaseArea(
+				primaryLayer, bec, yieldFactor, breastHeightAge, 0f, crownClosureTop
+		);
+		// EMP040
+		float baseAreaHat = estimatePrimaryBaseArea(primaryLayer, bec, yieldFactor, breastHeightAge, 0f, crownClosure);
+
+		float percentYield;
+		if (baseAreaTop > 0f && baseAreaHat > 0f) {
+			percentYield = min(100f, 100f * baseAreaHat / baseAreaTop);
+		} else {
+			percentYield = 90f;
+		}
+
+		float gainMax;
+		if (primaryAgeTotal > 125f) {
+			gainMax = 0f;
+		} else if (primaryAgeTotal < 25f) {
+			gainMax = max(90f - percentYield, 0);
+		} else {
+			gainMax = max(90f - percentYield, 0);
+			gainMax = min(gainMax, 125 - primaryAgeTotal);
+		}
+
+		return floor(min(percentYield + gainMax, 100f));
+
+	}
+
+	private float crownClosureForPercentForestLand(
+			Optional<L> vetLayer, L primaryLayer, boolean veteran, float primaryAgeTotal
+	) {
+		float crownClosure = primaryLayer.getCrownClosure();
+
+		// Assume crown closure linear with age, to 25.
+		if (primaryAgeTotal < 25f) {
+			crownClosure *= 25f / primaryAgeTotal;
+		}
+		// define crown closure as the SUM of two layers
+		if (veteran) {
+			crownClosure += vetLayer.map(InputLayer::getCrownClosure).orElse(0f);
+		}
+
+		crownClosure = clamp(crownClosure, 0, 100);
+		return crownClosure;
 	}
 
 	// EMP041
