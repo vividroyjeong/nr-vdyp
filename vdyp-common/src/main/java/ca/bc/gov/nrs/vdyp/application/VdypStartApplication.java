@@ -660,13 +660,12 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	// FIPLAND
 	@SuppressWarnings("java:S3655")
-	public float estimatePercentForestLand(P polygon, Optional<L> fipVetLayer, L primaryLayer)
-			throws ProcessingException {
+	public float estimatePercentForestLand(P polygon, Optional<L> vetLayer, L primaryLayer) throws ProcessingException {
 		if (polygon.getPercentAvailable().isPresent()) {
 			return polygon.getPercentAvailable().get();
 		} else {
 
-			boolean veteran = fipVetLayer//
+			boolean veteran = vetLayer//
 					.filter(layer -> getLayerHeight(layer).orElse(0f) > 0f) //
 					.filter(layer -> layer.getCrownClosure() > 0f)//
 					.isPresent(); // LAYERV
@@ -676,7 +675,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				return 100f;
 			}
 			if (getId() == VdypApplicationIdentifier.VRI_START) {
-				veteran = fipVetLayer != null;
+				veteran = vetLayer != null;
 			}
 
 			assert primaryLayer != null;
@@ -690,7 +689,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			}
 			// define crown closure as the SUM of two layers
 			if (veteran) {
-				crownClosure += fipVetLayer.map(InputLayer::getCrownClosure).orElse(0f);
+				crownClosure += vetLayer.map(InputLayer::getCrownClosure).orElse(0f);
 			}
 
 			crownClosure = clamp(crownClosure, 0, 100);

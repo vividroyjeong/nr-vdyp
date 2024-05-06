@@ -295,7 +295,7 @@ class VdypStartApplicationTest {
 		@Override
 		protected float getYieldFactor(TestPolygon polygon) {
 			// TODO Auto-generated method stub
-			return 0;
+			return 1;
 		}
 
 	}
@@ -1235,6 +1235,52 @@ class VdypStartApplicationTest {
 
 			assertThat(result, closeTo(61.1f)); // Clamp to the COE043/UPPER_BA_BY_CI_S0_P DQ value for this species and
 			// region
+		}
+	}
+
+	@Test
+	void testEstimatePercentForestLand() throws Exception {
+		var controlMap = TestUtils.loadControlMap();
+		try (var app = new TestStartApplication(controlMap, false)) {
+
+			var polygon = TestPolygon.build(pb -> {
+				pb.polygonIdentifier("TestPolygon", 2024);
+				pb.biogeoclimaticZone("IDF");
+				pb.forestInventoryZone("Z");
+				pb.mode(PolygonMode.START);
+
+				pb.percentAvailable(Optional.empty());
+
+				pb.addLayer(lb -> {
+					lb.layerType(LayerType.PRIMARY);
+
+					lb.crownClosure(60f);
+
+					lb.addSite(ib -> {
+						ib.siteGenus("L");
+						ib.ageTotal(60f);
+						ib.height(15f);
+						ib.siteIndex(5f);
+						ib.yearsToBreastHeight(8.5f);
+					});
+
+					lb.addSpecies(sb -> {
+						sb.genus("L");
+						sb.percentGenus(10);
+					});
+					lb.addSpecies(sb -> {
+						sb.genus("PL");
+						sb.percentGenus(90);
+					});
+				});
+			});
+
+			TestLayer primaryLayer = polygon.getLayers().get(LayerType.PRIMARY);
+			Optional<TestLayer> veteranLayer = Optional.empty();
+
+			var result = app.estimatePercentForestLand(polygon, veteranLayer, primaryLayer);
+
+			assertThat(result, closeTo(90f));
 		}
 	}
 
