@@ -29,6 +29,9 @@ import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
@@ -153,6 +156,12 @@ class VdypStartApplicationTest {
 			public Builder crownClosure(float crownClosure) {
 				this.crownClosure = Optional.of(crownClosure);
 				return this;
+			}
+
+			@Override
+			protected void check(Collection<String> errors) {
+				super.check(errors);
+				requirePresent(crownClosure, "crownClosure", errors);
 			}
 
 			@Override
@@ -1281,6 +1290,70 @@ class VdypStartApplicationTest {
 			var result = app.estimatePercentForestLand(polygon, veteranLayer, primaryLayer);
 
 			assertThat(result, closeTo(90f));
+		}
+	}
+
+	@ParameterizedTest
+	@CsvSource(
+			value = { //
+					"'A:100.0', 100.0", //
+					"'A:99.991', 99.991", //
+					"'A:100.009', 100.009", //
+					"'A:75.0 B:25.0', 100.0", //
+					"'A:75.0 B:25.009', 100.009", //
+					"'A:75.0 B:24.991', 99.991" //
+			}
+	)
+	void testGetPercentTotal(String dist, float expected) throws Exception {
+		var controlMap = TestUtils.loadControlMap();
+		try (var app = new TestStartApplication(controlMap, false)) {
+
+			var layer = TestLayer.build(lb -> {
+				lb.polygonIdentifier("TestPolygon", 2024);
+				lb.layerType(LayerType.PRIMARY);
+				lb.crownClosure(90f);
+				for (String s : dist.split(" ")) {
+					var parts = s.split(":");
+					lb.addSpecies(sb -> {
+						sb.genus(parts[0]);
+						sb.percentGenus(Float.valueOf(parts[1]));
+					});
+				}
+			});
+
+			var result = app.getPercentTotal(layer);
+
+			assertThat(result, closeTo(expected));
+		}
+	}
+
+	@ParameterizedTest
+	@ValueSource(
+			strings = { //
+					"A:99.989", //
+					"A:100.011", //
+					"A:75.0 B:25.011", //
+					"A:75.0 B:24.989" //
+			}
+	)
+	void testGetPercentTotalFail(String dist) throws Exception {
+		var controlMap = TestUtils.loadControlMap();
+		try (var app = new TestStartApplication(controlMap, false)) {
+
+			var layer = TestLayer.build(lb -> {
+				lb.polygonIdentifier("TestPolygon", 2024);
+				lb.layerType(LayerType.PRIMARY);
+				lb.crownClosure(90f);
+				for (String s : dist.split(" ")) {
+					var parts = s.split(":");
+					lb.addSpecies(sb -> {
+						sb.genus(parts[0]);
+						sb.percentGenus(Float.valueOf(parts[1]));
+					});
+				}
+			});
+
+			assertThrows(StandProcessingException.class, () -> app.getPercentTotal(layer));
 		}
 	}
 
