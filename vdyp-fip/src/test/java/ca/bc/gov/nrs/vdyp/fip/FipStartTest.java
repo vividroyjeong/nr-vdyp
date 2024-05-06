@@ -2989,7 +2989,7 @@ class FipStartTest {
 	}
 
 	@Test
-	void testEstimateSmallComponents() {
+	void testEstimateSmallComponents() throws ProcessingException {
 		var controlMap = FipTestUtils.loadControlMap();
 		try (var app = new FipStart()) {
 			ApplicationTestUtils.setControlMap(app, controlMap);

@@ -3,7 +3,6 @@ package ca.bc.gov.nrs.vdyp.fip;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.abs;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.clamp;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.exp;
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.floor;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.log;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.pow;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.ratio;
@@ -64,7 +63,6 @@ import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
-import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
@@ -288,9 +286,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		// locally
 		var itg = findItg(primarySpecies);
 
-		BecDefinition bec = lookup.get(fipPolygon.getBiogeoclimaticZone()).orElseThrow(
-				() -> new IllegalStateException("Could not find BEC " + fipPolygon.getBiogeoclimaticZone())
-		);
+		BecDefinition bec = Utils.getBec(fipPolygon.getBiogeoclimaticZone(), controlMap);
 
 		// GRPBA1FD
 		int empiricalRelationshipParameterIndex = findEmpiricalRelationshipParameterIndex(
@@ -860,8 +856,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		var crownClosure = fipLayer.getCrownClosure();
 
 		var becId = fipPolygon.getBiogeoclimaticZone();
-		var bec = BecDefinitionParser.getBecs(controlMap).get(becId)
-				.orElseThrow(() -> new ProcessingException("Could not find BEC " + becId));
+		var bec = Utils.getBec(becId, controlMap);
 		var region = bec.getRegion();
 
 		// Call EMP098 to get Veteran Basal Area, store in LVCOM1/BA array at positions
@@ -2465,16 +2460,16 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 	// compatibility variables
 	/**
 	 * Estimate small components for primary layer
+	 *
+	 * @throws ProcessingException
 	 */
-	public void estimateSmallComponents(FipPolygon fPoly, VdypLayer layer) {
+	public void estimateSmallComponents(FipPolygon fPoly, VdypLayer layer) throws ProcessingException {
 		float loreyHeightSum = 0f;
 		float baseAreaSum = 0f;
 		float treesPerHectareSum = 0f;
 		float volumeSum = 0f;
 
-		Region region = BecDefinitionParser.getBecs(controlMap).get(fPoly.getBiogeoclimaticZone())
-				.orElseThrow(() -> new IllegalStateException("Could not find BEC " + fPoly.getBiogeoclimaticZone()))
-				.getRegion();
+		Region region = Utils.getBec(fPoly.getBiogeoclimaticZone(), controlMap).getRegion();
 
 		for (VdypSpecies spec : layer.getSpecies().values()) {
 			@SuppressWarnings("unused")
