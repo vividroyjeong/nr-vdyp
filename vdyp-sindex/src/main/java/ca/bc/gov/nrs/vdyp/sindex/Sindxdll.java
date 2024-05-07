@@ -2943,12 +2943,9 @@ public class Sindxdll {
 		}
 
 		for (i = 0; i < SI_MAX_CONVERT; i++) {
-			if (SiteIndexNames.siSpeciesConversionParameters[i].sourceSpecies() == spIndex1
-					&& SiteIndexNames.siSpeciesConversionParameters[i].targetSpecies() == spIndex2) {
-				result.set(
-						SiteIndexNames.siSpeciesConversionParameters[i].param1()
-								+ SiteIndexNames.siSpeciesConversionParameters[i].param2() * siteIndex
-				);
+			var params = SiteIndexNames.siSpeciesConversionParameters[i];
+			if (params.sourceSpecies() == spIndex1 && params.targetSpecies() == spIndex2) {
+				result.set(params.param1()	+ params.param2() * siteIndex);
 				return 0;
 			}
 		}

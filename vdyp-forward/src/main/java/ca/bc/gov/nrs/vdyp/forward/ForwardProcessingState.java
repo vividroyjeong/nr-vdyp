@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
 import java.text.MessageFormat;
+import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
@@ -16,23 +17,32 @@ class ForwardProcessingState {
 	private static final int MAX_RECORDS = 2 * MAX_INSTANCES;
 
 	private final PolygonProcessingState[] banks;
-	private PolygonProcessingState active;
+
+	private Optional<VdypPolygon> polygon;
+	private PolygonProcessingState activeBank;
 
 	public ForwardProcessingState() {
+		polygon = Optional.empty();
 		banks = new PolygonProcessingState[MAX_RECORDS];
 	}
 
 	public void setStartingState(VdypPolygon polygon) {
+		this.polygon = Optional.of(polygon);
+		
 		// Move the primary layer of the given polygon to bank zero.
 		banks[0] = new PolygonProcessingState(polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone());
 	}
 
+	public VdypPolygon getPolygon() {
+		return polygon.orElseThrow();
+	}
+
 	public void setActive(LayerType layerType, int instanceNumber) {
-		active = banks[toIndex(layerType, instanceNumber)].copy();
+		activeBank = banks[toIndex(layerType, instanceNumber)].copy();
 	}
 
 	public void storeActive(LayerType layerType, int instanceNumber) {
-		banks[toIndex(layerType, instanceNumber)] = active.copy();
+		banks[toIndex(layerType, instanceNumber)] = activeBank.copy();
 	}
 
 	public void transfer(LayerType layerType, int fromInstanceNumber, int toInstanceNumber) {
@@ -40,7 +50,7 @@ class ForwardProcessingState {
 	}
 
 	public PolygonProcessingState getActive() {
-		return active;
+		return activeBank;
 	}
 
 	public PolygonProcessingState getBank(LayerType layerType, int instanceNumber) {

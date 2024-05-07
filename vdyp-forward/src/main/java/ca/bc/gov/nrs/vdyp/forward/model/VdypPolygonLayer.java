@@ -41,4 +41,9 @@ public class VdypPolygonLayer extends VdypEntity {
 	public Optional<Map<UtilizationClass, VdypSpeciesUtilization>> getDefaultUtilizationMap() {
 		return defaultUtilizationMap;
 	}
+	
+	@Override
+	public String toString() {
+		return layerType.toString();
+	}
 }

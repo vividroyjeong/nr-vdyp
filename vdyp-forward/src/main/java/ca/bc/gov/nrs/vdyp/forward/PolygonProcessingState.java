@@ -27,6 +27,9 @@ class PolygonProcessingState {
 	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(PolygonProcessingState.class);
 
+	private final VdypPolygonLayer layer;
+	private final BecDefinition becZone;
+
 	/**
 	 * The number of species in the state. Note that all arrays have this value plus one elements in 
 	 * them; the element at index 0 is unused for the species values* and contains the default utilization 
@@ -36,8 +39,6 @@ class PolygonProcessingState {
 	 */
 	private int nSpecies; // BANK1 NSPB
 	private int[] indices;
-	
-	private BecDefinition becZone;
 
 	// Species information
 
@@ -69,6 +70,7 @@ class PolygonProcessingState {
 
 	public PolygonProcessingState(VdypPolygonLayer layer, BecDefinition becZone) {
 
+		this.layer = layer;
 		this.becZone = becZone;
 
 		this.nSpecies = layer.getGenera().size();
@@ -112,6 +114,7 @@ class PolygonProcessingState {
 	public PolygonProcessingState(PolygonProcessingState s) {
 
 		this.becZone = s.becZone;
+		this.layer = s.layer;
 		
 		this.nSpecies = s.nSpecies;
 		this.indices = copy(s.indices);
@@ -156,6 +159,10 @@ class PolygonProcessingState {
 	public BecDefinition getBecZone() {
 		return becZone;
 	}
+	
+	public VdypPolygonLayer getLayer() {
+		return layer;
+	}
 
 	private void recordSpecies(int index, VdypLayerSpecies species) {
 
@@ -172,6 +179,8 @@ class PolygonProcessingState {
 
 		if (species.getUtilizations().isPresent()) {
 			recordUtilizations(index, species.getUtilizations().get());
+		} else {
+			recordDefaultUtilizations(index);			
 		}
 	}
 
@@ -192,6 +201,27 @@ class PolygonProcessingState {
 		}
 	}
 
+	private void recordDefaultUtilizations(int index) {
+
+		for (var uc : UtilizationClass.values()) {
+			int ucIndex = uc.ordinal();
+			basalAreas[index][ucIndex] = Float.NaN;
+			closeUtilizationVolumes[index][ucIndex] = Float.NaN;
+			cuVolumesMinusDecay[index][ucIndex] = Float.NaN;
+			cuVolumesMinusDecayAndWastage[index][ucIndex] = Float.NaN;
+			if (ucIndex < 2 /* only uc 0 and 1 have a lorey height */) {
+				loreyHeights[index][ucIndex] = Float.NaN;
+			}
+			quadMeanDiameters[index][ucIndex] = Float.NaN;
+			treesPerHectares[index][ucIndex] = Float.NaN;
+			wholeStemVolumes[index][ucIndex] = Float.NaN;
+		}
+	}
+
+	public PolygonProcessingState copy() {
+		return new PolygonProcessingState(this);
+	}
+
 	public void setSpeciesRankingDetails(SpeciesRankingDetails rankingDetails) {
 		if (this.rankingDetails.isPresent()) {
 			throw new IllegalStateException("SpeciesRankingDetails can be set once only");
@@ -201,10 +231,6 @@ class PolygonProcessingState {
 
 	public SpeciesRankingDetails getSpeciesRankingDetails() {
 		return rankingDetails.orElseThrow();
-	}
-
-	public PolygonProcessingState copy() {
-		return new PolygonProcessingState(this);
 	}
 
 	private GenusDistributionSet[] copy(GenusDistributionSet[] a) {
