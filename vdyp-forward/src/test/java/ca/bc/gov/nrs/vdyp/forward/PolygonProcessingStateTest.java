@@ -70,12 +70,12 @@ class PolygonProcessingStateTest {
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());
 
-		PolygonProcessingState pps = new PolygonProcessingState(pLayer);
+		PolygonProcessingState pps = new PolygonProcessingState(pLayer, polygon.getBiogeoclimaticZone());
 
 		int nSpecies = pLayer.getGenera().size();
 
 		assertThat(pps, notNullValue());
-		assertThat(pps.agesAtBreastHeight.length, is(nSpecies + 1));
+		assertThat(pps.yearsAtBreastHeight.length, is(nSpecies + 1));
 		assertThat(pps.ageTotals.length, is(nSpecies + 1));
 		assertThat(pps.dominantHeights.length, is(nSpecies + 1));
 		assertThat(pps.percentagesOfForestedLand.length, is(nSpecies + 1));
@@ -134,7 +134,7 @@ class PolygonProcessingStateTest {
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());
 
-		PolygonProcessingState pps = new PolygonProcessingState(pLayer);
+		PolygonProcessingState pps = new PolygonProcessingState(pLayer, polygon.getBiogeoclimaticZone());
 
 		verifyProcessingStateMatchesLayer(pps, pLayer);
 
@@ -155,7 +155,7 @@ class PolygonProcessingStateTest {
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());
 
-		PolygonProcessingState pps = new PolygonProcessingState(pLayer);
+		PolygonProcessingState pps = new PolygonProcessingState(pLayer, polygon.getBiogeoclimaticZone());
 		verifyProcessingStateMatchesLayer(pps, pLayer);
 
 		PolygonProcessingState ppsCopy = new PolygonProcessingState(pps);
@@ -176,7 +176,7 @@ class PolygonProcessingStateTest {
 	private void
 			verifyProcessingStateIndicesEquals(PolygonProcessingState pps1, int i, PolygonProcessingState pps2, int j) {
 		if (i != j) {
-			assertThat(pps1.agesAtBreastHeight[i], is(pps2.agesAtBreastHeight[j]));
+			assertThat(pps1.yearsAtBreastHeight[i], is(pps2.yearsAtBreastHeight[j]));
 			assertThat(pps1.ageTotals[i], is(pps2.ageTotals[j]));
 			assertThat(pps1.dominantHeights[i], is(pps2.dominantHeights[j]));
 			assertThat(pps1.siteIndices[i], is(pps2.siteIndices[j]));
@@ -217,7 +217,7 @@ class PolygonProcessingStateTest {
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());
 
-		PolygonProcessingState pps = new PolygonProcessingState(pLayer);
+		PolygonProcessingState pps = new PolygonProcessingState(pLayer, polygon.getBiogeoclimaticZone());
 
 		PolygonProcessingState ppsCopy = new PolygonProcessingState(pps);
 
@@ -270,7 +270,7 @@ class PolygonProcessingStateTest {
 	private void verifyProcessingStateSpeciesMatchesSpecies(
 			PolygonProcessingState pps, int index, VdypLayerSpecies species
 	) {
-		assertThat(pps.agesAtBreastHeight[index], is(species.getAgeAtBreastHeight()));
+		assertThat(pps.yearsAtBreastHeight[index], is(species.getAgeAtBreastHeight()));
 		assertThat(pps.ageTotals[index], is(species.getAgeTotal()));
 		assertThat(pps.dominantHeights[index], is(species.getDominantHeight()));
 		assertThat(pps.siteIndices[index], is(species.getSiteIndex()));

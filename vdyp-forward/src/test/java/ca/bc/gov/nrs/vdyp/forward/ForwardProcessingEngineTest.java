@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +27,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.CommonData;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.SiteCurve;
 
 class ForwardProcessingEngineTest {
 
@@ -41,8 +42,8 @@ class ForwardProcessingEngineTest {
 	private static ForwardDataStreamReader forwardDataStreamReader;
 
 	@SuppressWarnings("unchecked")
-	@BeforeAll
-	static void beforeTest() throws IOException, ResourceParseException {
+	@BeforeEach
+	void beforeTest() throws IOException, ResourceParseException {
 		parser = new ForwardControlParser();
 		controlMap = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
 
@@ -91,8 +92,8 @@ class ForwardProcessingEngineTest {
 		{
 			PolygonProcessingState bank = fps.getBank(LayerType.PRIMARY, 0).copy();
 
-			ForwardProcessingEngine.setPercentages(bank);
-			ForwardProcessingEngine.setPolygonRankingDetails(bank, CommonData.PRIMARY_SPECIES_TO_COMBINE);
+			ForwardProcessingEngine.calculateCoverages(bank);
+			ForwardProcessingEngine.determinePolygonRankings(bank, CommonData.PRIMARY_SPECIES_TO_COMBINE);
 			SpeciesRankingDetails rankingDetails1 = bank.getSpeciesRankingDetails();
 
 			assertThat(rankingDetails1.primarySpeciesIndex(), is(3));
@@ -104,8 +105,8 @@ class ForwardProcessingEngineTest {
 
 			var speciesToCombine = Arrays.asList(Arrays.asList(bank.speciesNames[3], bank.speciesNames[4]));
 
-			ForwardProcessingEngine.setPercentages(bank);
-			ForwardProcessingEngine.setPolygonRankingDetails(bank, speciesToCombine);
+			ForwardProcessingEngine.calculateCoverages(bank);
+			ForwardProcessingEngine.determinePolygonRankings(bank, speciesToCombine);
 			SpeciesRankingDetails rankingDetails2 = bank.getSpeciesRankingDetails();
 
 			// The test-specific speciesToCombine will combine 3 & 4 into 3 (leaving 4 at 0.0), promoting 2 to
@@ -221,21 +222,21 @@ class ForwardProcessingEngineTest {
 		int[] expectedResults = new int[] { 
 					  /*                  Secondary                         */
 				      /* AC  B  C  D  E  F PW  H PY  L PA AT  S MB  Y PL -- */  
-				/* AC */    35,35,36,36,35,35,35,35,35,35,36,35,36,35,35,35,
-				/*  B */ 20,   19,20,20,20,20,19,20,20,20,20,20,20,19,20,20,
-				/*  C */ 10,11,   10,10,10,10,11,10,10,10,10,11,10,10,10,10,
-				/*  D */ 38,37,37,   38,37,37,37,37,37,37,38,37,38,37,37,37,
-				/*  E */ 40,40,40,40,   40,40,40,40,40,40,40,40,40,40,40,40,
-				/*  F */  8, 3, 2, 8, 8,    7, 3, 6, 7, 5, 8, 4, 8, 2, 5, 8,
-				/* PW */ 27,27,27,27,27,27,   27,27,27,27,27,27,27,27,27,27,
-				/*  H */ 13,15,14,13,13,13,13,   13,13,13,13,16,13,14,13,13,
-				/* PY */ 32,32,32,32,32,32,32,32,   32,32,32,32,32,32,32,32,
-				/*  L */ 34,34,34,34,34,33,34,34,34,   34,34,34,34,34,34,34,
-				/* PA */ 31,30,30,31,31,29,29,30,29,29,   31,30,31,30,28,30,
-				/* AT */ 42,41,41,42,42,41,41,41,41,41,41,   41,42,41,41,41,
-				/*  S */ 26,24,23,26,26,22,22,23,22,22,22,26,   26,23,25,22,
-				/* MB */ 39,39,39,39,39,39,39,39,39,39,39,39,39,   39,39,39,
-				/*  Y */ 10,11,10,10,10,10,10,11,10,10,10,10,11,10,   10,10,
+				/* AC */    35,35,36,36,35,35,35,35,35,35,36,35,36,35,35,35, //
+				/*  B */ 20,   19,20,20,20,20,19,20,20,20,20,20,20,19,20,20, //
+				/*  C */ 10,11,   10,10,10,10,11,10,10,10,10,11,10,10,10,10, //
+				/*  D */ 38,37,37,   38,37,37,37,37,37,37,38,37,38,37,37,37, //
+				/*  E */ 40,40,40,40,   40,40,40,40,40,40,40,40,40,40,40,40, //
+				/*  F */  8, 3, 2, 8, 8,    7, 3, 6, 7, 5, 8, 4, 8, 2, 5, 8, //
+				/* PW */ 27,27,27,27,27,27,   27,27,27,27,27,27,27,27,27,27, //
+				/*  H */ 13,15,14,13,13,13,13,   13,13,13,13,16,13,14,13,13, //
+				/* PY */ 32,32,32,32,32,32,32,32,   32,32,32,32,32,32,32,32, //
+				/*  L */ 34,34,34,34,34,33,34,34,34,   34,34,34,34,34,34,34, //
+				/* PA */ 31,30,30,31,31,29,29,30,29,29,   31,30,31,30,28,30, //
+				/* AT */ 42,41,41,42,42,41,41,41,41,41,41,   41,42,41,41,41, //
+				/*  S */ 26,24,23,26,26,22,22,23,22,22,22,26,   26,23,25,22, //
+				/* MB */ 39,39,39,39,39,39,39,39,39,39,39,39,39,   39,39,39, //
+				/*  Y */ 10,11,10,10,10,10,10,11,10,10,10,10,11,10,   10,10, //
 				/* PL */ 31,30,30,31,31,29,29,30,29,29,28,31,30,31,30,   30 };
 
 		int currentAnswerIndex = 0;
@@ -249,5 +250,21 @@ class ForwardProcessingEngineTest {
 			int itg = ForwardProcessingEngine.findInventoryTypeGroup(primaryGenus, Optional.empty(), 50.0f);
 			assertThat(itg, is(expectedResults[currentAnswerIndex++]));
 		}
+	}
+	
+	@Test
+	void testEstimateMissingYearsToBreastHeightValues() throws ProcessingException, IOException, ResourceParseException {
+
+		var polygonDescription = polygonDescriptionStream.next();
+		var polygon = forwardDataStreamReader.readNextPolygon(polygonDescription);
+
+		PolygonProcessingState bank = new PolygonProcessingState(polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone());
+
+		@SuppressWarnings("unchecked")
+		var siteCurveMap = (Map<String, SiteCurve>) controlMap.get(ControlKey.SITE_CURVE_NUMBERS.name());
+
+		ForwardProcessingEngine.executeForwardAlgorithm(bank, siteCurveMap, 3);
+		
+		ForwardProcessingEngine.estimateMissingSiteIndices(bank);
 	}
 }

@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonLayer;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypSpeciesUtilization;
+import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.GenusDistributionSet;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
@@ -26,10 +28,16 @@ class PolygonProcessingState {
 	private static final Logger logger = LoggerFactory.getLogger(PolygonProcessingState.class);
 
 	/**
-	 * The number of species in the state. Note that all arrays have one more element in them; the element at index 0 is
-	 * unused for the species values and contains the default utilization in the Utilization values.
+	 * The number of species in the state. Note that all arrays have this value plus one elements in 
+	 * them; the element at index 0 is unused for the species values* and contains the default utilization 
+	 * in the Utilization values.
+	 * 
+	 * (*) except: siteCurveNumbers[0] is used to store the site curve of the primary species.
 	 */
 	private int nSpecies; // BANK1 NSPB
+	private int[] indices;
+	
+	private BecDefinition becZone;
 
 	// Species information
 
@@ -38,7 +46,7 @@ class PolygonProcessingState {
 	public float siteIndices[/* nSpecies + 1 */]; // BANK3 SIB
 	public float dominantHeights[/* nSpecies + 1 */]; // BANK3 HDB
 	public float ageTotals[/* nSpecies + 1 */]; // BANK3 AGETOTB
-	public float agesAtBreastHeight[/* nSpecies + 1 */]; // BANK3 AGEBHB
+	public float yearsAtBreastHeight[/* nSpecies + 1 */]; // BANK3 AGEBHB
 	public float yearsToBreastHeight[/* nSpecies + 1 */]; // BANK3 YTBHB
 	public int siteCurveNumbers[/* nSpecies + 1 */]; // BANK3 SCNB
 	public int speciesIndices[/* nSpecies + 1 */]; // BANK1 ISPB
@@ -59,9 +67,12 @@ class PolygonProcessingState {
 
 	public Optional<SpeciesRankingDetails> rankingDetails = Optional.empty();
 
-	public PolygonProcessingState(VdypPolygonLayer layer) {
+	public PolygonProcessingState(VdypPolygonLayer layer, BecDefinition becZone) {
+
+		this.becZone = becZone;
 
 		this.nSpecies = layer.getGenera().size();
+		this.indices = IntStream.range(1, nSpecies + 1).toArray();
 
 		// In the following, index 0 is unused
 		speciesNames = new String[getNSpecies() + 1];
@@ -69,7 +80,7 @@ class PolygonProcessingState {
 		siteIndices = new float[getNSpecies() + 1];
 		dominantHeights = new float[getNSpecies() + 1];
 		ageTotals = new float[getNSpecies() + 1];
-		agesAtBreastHeight = new float[getNSpecies() + 1];
+		yearsAtBreastHeight = new float[getNSpecies() + 1];
 		yearsToBreastHeight = new float[getNSpecies() + 1];
 		siteCurveNumbers = new int[getNSpecies() + 1];
 		speciesIndices = new int[getNSpecies() + 1];
@@ -100,9 +111,12 @@ class PolygonProcessingState {
 
 	public PolygonProcessingState(PolygonProcessingState s) {
 
-		this.nSpecies = s.getNSpecies();
+		this.becZone = s.becZone;
+		
+		this.nSpecies = s.nSpecies;
+		this.indices = copy(s.indices);
 
-		this.agesAtBreastHeight = copy(s.agesAtBreastHeight);
+		this.yearsAtBreastHeight = copy(s.yearsAtBreastHeight);
 		this.ageTotals = copy(s.ageTotals);
 		this.basalAreas = copy(s.basalAreas);
 		this.closeUtilizationVolumes = copy(s.closeUtilizationVolumes);
@@ -134,6 +148,14 @@ class PolygonProcessingState {
 	public int getNSpecies() {
 		return nSpecies;
 	}
+	
+	public int[] getIndices() {
+		return indices;
+	}
+
+	public BecDefinition getBecZone() {
+		return becZone;
+	}
 
 	private void recordSpecies(int index, VdypLayerSpecies species) {
 
@@ -142,7 +164,7 @@ class PolygonProcessingState {
 		siteIndices[index] = species.getSiteIndex();
 		dominantHeights[index] = species.getDominantHeight();
 		ageTotals[index] = species.getAgeTotal();
-		agesAtBreastHeight[index] = species.getAgeAtBreastHeight();
+		yearsAtBreastHeight[index] = species.getAgeAtBreastHeight();
 		yearsToBreastHeight[index] = species.getYearsToBreastHeight();
 		siteCurveNumbers[index] = species.getSiteCurveNumber();
 		speciesIndices[index] = species.getGenusIndex();
@@ -257,7 +279,7 @@ class PolygonProcessingState {
 			siteIndices[toIndex] = siteIndices[fromIndex];
 			dominantHeights[toIndex] = dominantHeights[fromIndex];
 			ageTotals[toIndex] = ageTotals[fromIndex];
-			agesAtBreastHeight[toIndex] = agesAtBreastHeight[fromIndex];
+			yearsAtBreastHeight[toIndex] = yearsAtBreastHeight[fromIndex];
 			yearsToBreastHeight[toIndex] = yearsToBreastHeight[fromIndex];
 			siteCurveNumbers[toIndex] = siteCurveNumbers[fromIndex];
 			speciesIndices[toIndex] = speciesIndices[fromIndex];
@@ -297,7 +319,7 @@ class PolygonProcessingState {
 			siteIndices = Arrays.copyOf(siteIndices, nElements);
 			dominantHeights = Arrays.copyOf(dominantHeights, nElements);
 			ageTotals = Arrays.copyOf(ageTotals, nElements);
-			agesAtBreastHeight = Arrays.copyOf(agesAtBreastHeight, nElements);
+			yearsAtBreastHeight = Arrays.copyOf(yearsAtBreastHeight, nElements);
 			yearsToBreastHeight = Arrays.copyOf(yearsToBreastHeight, nElements);
 			siteCurveNumbers = Arrays.copyOf(siteCurveNumbers, nElements);
 			speciesIndices = Arrays.copyOf(speciesIndices, nElements);
