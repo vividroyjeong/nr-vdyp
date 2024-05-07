@@ -1357,6 +1357,25 @@ class VdypStartApplicationTest {
 		}
 	}
 
+	@Test
+	void testGetCoeForSpecies() throws Exception {
+		var controlMap = TestUtils.loadControlMap();
+		try (var app = new TestStartApplication(controlMap, false)) {
+			var species = TestSpecies.build(sb -> {
+				sb.polygonIdentifier("TestPolygon", 2024);
+				sb.layerType(LayerType.PRIMARY);
+				sb.genus("MB");
+
+				sb.percentGenus(90);
+			});
+			var result = app.getCoeForSpecies(species, ControlKey.SMALL_COMP_BA);
+
+			assertThat(result, coe(1, 0.1183f, 0f, 0.03896f, -0.04348f)); // Small Component Base Area coefficients for
+																			// genus MB
+		}
+
+	}
+
 	TestPolygon getTestPolygon(PolygonIdentifier polygonId, Consumer<TestPolygon.Builder> mutator) {
 		return TestPolygon.build(builder -> {
 			builder.polygonIdentifier(polygonId);

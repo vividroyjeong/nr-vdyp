@@ -199,7 +199,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		closeVriWriter();
 	}
 
-	protected Coefficients getCoeForSpecies(VdypSpecies species, ControlKey controlKey) {
+	protected Coefficients getCoeForSpecies(BaseVdypSpecies species, ControlKey controlKey) {
 		var coeMap = Utils.<Map<String, Coefficients>>expectParsedControl(controlMap, controlKey, java.util.Map.class);
 		return coeMap.get(species.getGenus());
 	}
