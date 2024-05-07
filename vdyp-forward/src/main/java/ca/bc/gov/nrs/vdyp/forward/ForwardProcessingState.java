@@ -28,7 +28,7 @@ class ForwardProcessingState {
 
 	public void setStartingState(VdypPolygon polygon) {
 		this.polygon = Optional.of(polygon);
-		
+
 		// Move the primary layer of the given polygon to bank zero.
 		banks[0] = new PolygonProcessingState(polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone());
 	}

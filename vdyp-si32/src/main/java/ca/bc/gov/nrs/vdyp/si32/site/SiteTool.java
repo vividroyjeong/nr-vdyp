@@ -505,35 +505,42 @@ public class SiteTool {
 
 	/**
 	 * Converts <code>siteIndex1</code> from <code>siteCurve1</code> to <code>siteCurve2</code>.
+	 *
 	 * @param siteCurve1 source site curve
 	 * @param siteIndex1 source site index
 	 * @param siteCurve2 target site curve
 	 * @return the calculated site index, as described.
-	 * @throws CurveErrorException when either siteCurve1 or siteCurve2 is not a recognized site curve.
-	 * @throws SpeciesErrorException when either source or target species, as derived siteCurve1 and siteCurve2, respectively, is not valid
-	 * @throws NoAnswerException when there is no conversion defined
+	 * @throws CurveErrorException   when either siteCurve1 or siteCurve2 is not a recognized site curve.
+	 * @throws SpeciesErrorException when either source or target species, as derived siteCurve1 and siteCurve2,
+	 *                               respectively, is not valid
+	 * @throws NoAnswerException     when there is no conversion defined
 	 */
-	public static double convertSiteIndexBetweenCurves(SiteIndexEquation siteCurve1, double siteIndex1,
-			SiteIndexEquation siteCurve2) throws CurveErrorException, SpeciesErrorException, NoAnswerException {
+	public static double
+			convertSiteIndexBetweenCurves(SiteIndexEquation siteCurve1, double siteIndex1, SiteIndexEquation siteCurve2)
+					throws CurveErrorException, SpeciesErrorException, NoAnswerException {
 		if (siteCurve1 == null) {
 			throw new IllegalArgumentException("convertSiteIndexBetweenCurves.siteCurve1");
 		}
 		if (siteCurve2 == null) {
 			throw new IllegalArgumentException("convertSiteIndexBetweenCurves.siteCurve2");
 		}
-		
+
 		SiteIndexSpecies species1 = VdypMethods.getSICurveSpeciesIndex(siteCurve1);
 		SiteIndexSpecies species2 = VdypMethods.getSICurveSpeciesIndex(siteCurve2);
-		
+
 		if (species1 == SiteIndexSpecies.SI_NO_SPECIES || species2 == SiteIndexSpecies.SI_NO_SPECIES) {
-			throw new CurveErrorException(MessageFormat.format("Either or both of {} and {} are not recognized Site Curves", siteCurve1, siteCurve2));
+			throw new CurveErrorException(
+					MessageFormat.format(
+							"Either or both of {} and {} are not recognized Site Curves", siteCurve1, siteCurve2
+					)
+			);
 		}
-		
+
 		Reference<Double> rSiteIndex2 = new Reference<>();
 		Sindxdll.SIToSI(species1, siteIndex1, species2, rSiteIndex2);
 		return rSiteIndex2.get();
 	}
-	
+
 	/**
 	 * Sets the Site Index curve to use for a particular species.
 	 *

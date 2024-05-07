@@ -31,10 +31,9 @@ class PolygonProcessingState {
 	private final BecDefinition becZone;
 
 	/**
-	 * The number of species in the state. Note that all arrays have this value plus one elements in 
-	 * them; the element at index 0 is unused for the species values* and contains the default utilization 
-	 * in the Utilization values.
-	 * 
+	 * The number of species in the state. Note that all arrays have this value plus one elements in them; the element
+	 * at index 0 is unused for the species values* and contains the default utilization in the Utilization values.
+	 *
 	 * (*) except: siteCurveNumbers[0] is used to store the site curve of the primary species.
 	 */
 	private int nSpecies; // BANK1 NSPB
@@ -115,7 +114,7 @@ class PolygonProcessingState {
 
 		this.becZone = s.becZone;
 		this.layer = s.layer;
-		
+
 		this.nSpecies = s.nSpecies;
 		this.indices = copy(s.indices);
 
@@ -151,7 +150,7 @@ class PolygonProcessingState {
 	public int getNSpecies() {
 		return nSpecies;
 	}
-	
+
 	public int[] getIndices() {
 		return indices;
 	}
@@ -159,7 +158,7 @@ class PolygonProcessingState {
 	public BecDefinition getBecZone() {
 		return becZone;
 	}
-	
+
 	public VdypPolygonLayer getLayer() {
 		return layer;
 	}
@@ -180,7 +179,7 @@ class PolygonProcessingState {
 		if (species.getUtilizations().isPresent()) {
 			recordUtilizations(index, species.getUtilizations().get());
 		} else {
-			recordDefaultUtilizations(index);			
+			recordDefaultUtilizations(index);
 		}
 	}
 
