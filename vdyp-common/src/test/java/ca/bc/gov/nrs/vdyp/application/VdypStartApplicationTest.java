@@ -1293,6 +1293,81 @@ class VdypStartApplicationTest {
 		}
 	}
 
+	@Test
+	void testEstimatePercentForestLandWithVeteran() throws Exception {
+		var controlMap = TestUtils.loadControlMap();
+		try (var app = new TestStartApplication(controlMap, false) {
+
+			@Override
+			public VdypApplicationIdentifier getId() {
+				return VdypApplicationIdentifier.FIP_START;
+			}
+
+		}) {
+
+			var polygon = TestPolygon.build(pb -> {
+				pb.polygonIdentifier("TestPolygon", 2024);
+				pb.biogeoclimaticZone("CWH");
+				pb.forestInventoryZone("A");
+				pb.mode(PolygonMode.START);
+
+				pb.percentAvailable(Optional.empty());
+
+				pb.addLayer(lb -> {
+					lb.layerType(LayerType.PRIMARY);
+
+					lb.crownClosure(82.8f);
+
+					lb.addSite(ib -> {
+						ib.siteGenus("H");
+						ib.ageTotal(45f);
+						ib.height(24.3f);
+						ib.siteIndex(28.7f);
+						ib.yearsToBreastHeight(7.1f);
+					});
+
+					lb.addSpecies(sb -> {
+						sb.genus("B");
+						sb.percentGenus(15);
+					});
+					lb.addSpecies(sb -> {
+						sb.genus("D");
+						sb.percentGenus(7);
+					});
+					lb.addSpecies(sb -> {
+						sb.genus("H");
+						sb.percentGenus(77);
+					});
+					lb.addSpecies(sb -> {
+						sb.genus("S");
+						sb.percentGenus(1);
+					});
+				});
+				pb.addLayer(lb -> {
+					lb.layerType(LayerType.VETERAN);
+
+					lb.crownClosure(4f);
+
+					lb.addSite(ib -> {
+						ib.siteGenus("H");
+						ib.ageTotal(105f);
+						ib.height(26.2f);
+						ib.siteIndex(16.7f);
+						ib.yearsToBreastHeight(7.1f);
+					});
+
+				});
+			});
+
+			TestLayer primaryLayer = polygon.getLayers().get(LayerType.PRIMARY);
+			Optional<TestLayer> veteranLayer = Optional.of(polygon.getLayers().get(LayerType.VETERAN));
+
+			var result = app.estimatePercentForestLand(polygon, veteranLayer, primaryLayer);
+
+			assertThat(result, closeTo(98f));
+		}
+	}
+
 	@ParameterizedTest
 	@CsvSource(
 			value = { //
