@@ -74,6 +74,14 @@ public class VriSite extends BaseVdypSite {
 		}
 
 		@Override
+		public Builder copy(VriSite toCopy) {
+			super.copy(toCopy);
+			siteSpecies(toCopy.getSiteSpecies());
+			breastHeightAge(toCopy.getBreastHeightAge());
+			return this;
+		}
+
+		@Override
 		protected VriSite doBuild() {
 			return new VriSite(
 					this.polygonIdentifier.get(), //

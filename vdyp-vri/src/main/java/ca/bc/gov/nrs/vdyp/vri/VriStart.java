@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
@@ -23,11 +22,17 @@ import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
+import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndex2Height;
+import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
+import ca.bc.gov.nrs.vdyp.model.Region;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
@@ -35,6 +40,7 @@ import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
@@ -43,6 +49,9 @@ import ca.bc.gov.nrs.vdyp.vri.model.VriSite;
 import ca.bc.gov.nrs.vdyp.vri.model.VriSpecies;
 
 public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpecies, VriSite> implements Closeable {
+
+	private static final String SPECIAL_PROCESSING_LOG_TEMPLATE = "Doing special processing for mode {}";
+	static final float FRACTION_AVAILABLE_N = 0.85f; // PCTFLAND_N;
 
 	static final Logger log = LoggerFactory.getLogger(VriStart.class);
 
@@ -93,14 +102,14 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					}
 
 					log.atInfo().setMessage("Read {} polygons and wrote {}").addArgument(polygonsRead)
-							.addArgument(polygonsWritten);
+							.addArgument(polygonsWritten).log();
 
 				} catch (StandProcessingException ex) {
 					// TODO include some sort of hook for different forms of user output
 					// TODO Implement single stand mode that propagates the exception
 
 					log.atWarn().setMessage("Polygon {} bypassed").addArgument(polygon.getPolygonIdentifier())
-							.setCause(ex);
+							.setCause(ex).log();
 				}
 
 			}
@@ -296,11 +305,10 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	static final EnumSet<PolygonMode> ACCEPTABLE_MODES = EnumSet.of(PolygonMode.START, PolygonMode.YOUNG);
 
 	Optional<VdypPolygon> processPolygon(int polygonsRead, VriPolygon polygon) throws ProcessingException {
-		VdypPolygon resultPoly;
 		log.atInfo().setMessage("Read polygon {}, preparing to process").addArgument(polygon.getPolygonIdentifier())
 				.log();
 
-		final var mode = polygon.getMode().orElse(PolygonMode.START);
+		var mode = polygon.getMode().orElse(PolygonMode.START);
 
 		if (mode == PolygonMode.DONT_PROCESS) {
 			log.atInfo().setMessage("Skipping polygon with mode {}").addArgument(mode).log();
@@ -309,7 +317,26 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		log.atInfo().setMessage("Checking validity of polygon {}:{}").addArgument(polygonsRead)
 				.addArgument(polygon.getPolygonIdentifier()).log();
-		checkPolygon(polygon);
+
+		mode = checkPolygon(polygon);
+
+		switch (mode) {
+		case YOUNG:
+			log.atTrace().setMessage(SPECIAL_PROCESSING_LOG_TEMPLATE).addArgument(mode).log();
+			polygon = processYoung(polygon);
+			break;
+		case BATC:
+			log.atTrace().setMessage(SPECIAL_PROCESSING_LOG_TEMPLATE).addArgument(mode).log();
+			polygon = processBatc(polygon);
+			break;
+		case BATN:
+			log.atTrace().setMessage(SPECIAL_PROCESSING_LOG_TEMPLATE).addArgument(mode).log();
+			polygon = processBatn(polygon);
+			break;
+		default:
+			log.atTrace().setMessage("No special processing for mode {}").addArgument(mode).log();
+			break;
+		}
 
 		// TODO
 		return Optional.empty();
@@ -317,7 +344,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	}
 
 	// VRI_CHK
-	void checkPolygon(VriPolygon polygon) throws ProcessingException {
+	PolygonMode checkPolygon(VriPolygon polygon) throws ProcessingException {
 
 		BecDefinition bec = Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap);
 
@@ -331,18 +358,19 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			checkLayer(polygon, layer);
 		}
 
-		checkPolygonForMode(polygon, bec);
-
-		VriLayer veteranLayer = polygon.getLayers().get(LayerType.VETERAN);
+		PolygonMode mode = checkPolygonForMode(polygon, bec);
 
 		Map<String, Float> minMap = Utils.expectParsedControl(controlMap, ControlKey.MINIMA, Map.class);
 
 		float veteranMinHeight = minMap.get(VriControlParser.MINIMUM_VETERAN_HEIGHT);
 
+		VriLayer veteranLayer = polygon.getLayers().get(LayerType.VETERAN);
 		if (veteranLayer != null) {
 			Optional<Float> veteranHeight = veteranLayer.getPrimarySite().flatMap(VriSite::getHeight);
 			validateMinimum("Veteran layer primary species height", veteranHeight, veteranMinHeight, true);
 		}
+
+		return mode;
 	}
 
 	private void checkLayer(VriPolygon polygon, VriLayer layer) throws StandProcessingException {
@@ -379,7 +407,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	static final String TREES_PER_HECTARE_PROPERTY_NAME = "Trees per hectare";
 	static final String CROWN_CLOSURE_PROPERTY_NAME = "Crown closure";
 
-	protected void checkPolygonForMode(VriPolygon polygon, BecDefinition bec) throws StandProcessingException {
+	protected PolygonMode checkPolygonForMode(VriPolygon polygon, BecDefinition bec) throws StandProcessingException {
 		VriLayer primaryLayer = polygon.getLayers().get(LayerType.PRIMARY);
 		Optional<VriSite> primarySite = primaryLayer.getPrimaryGenus()
 				.flatMap(id -> Utils.optSafe(primaryLayer.getSites().get(id)));
@@ -409,7 +437,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					primaryLayer.getPrimarySite().flatMap(VriSite::getAgeTotal),
 					primaryLayer.getPrimarySite().flatMap(VriSite::getYearsToBreastHeight), (at, ytbh) -> at - ytbh
 			);
-			log.atDebug().setMessage("Polygon mode {} checks").addArgument(mode);
+			log.atDebug().setMessage("Polygon mode {} checks").addArgument(mode).log();
 			switch (mode) {
 
 			case START:
@@ -447,6 +475,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				// Do Nothing
 				break;
 			}
+			return mode;
 		} catch (RuntimeStandProcessingException e) {
 			throw e.getCause();
 		}
@@ -604,7 +633,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		// TODO expand this
 
-		var vdypPolygon = VdypPolygon.build(builder -> builder.copy(sourcePolygon, x -> x.get()));
+		var vdypPolygon = VdypPolygon.build(builder -> builder.adapt(sourcePolygon, x -> x.get()));
 		vdypPolygon.setLayers(processedLayers);
 		return vdypPolygon;
 	}
@@ -625,5 +654,190 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		return VriSpecies.build(builder -> {
 			builder.copy(toCopy);
 		});
+	}
+
+	VriPolygon processYoung(VriPolygon poly) throws ProcessingException {
+
+		PolygonIdentifier polygonIdentifier = poly.getPolygonIdentifier();
+		int year = polygonIdentifier.getYear();
+
+		if (year < 1900) {
+			throw new StandProcessingException("Year for YOUNG stand should be at least 1900 but was " + year);
+		}
+
+		var bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+
+		var primaryLayer = poly.getLayers().get(LayerType.PRIMARY);
+		var primarySite = primaryLayer.getPrimarySite().orElseThrow();
+		try {
+			SiteIndexEquation siteCurve = primaryLayer.getPrimarySite() //
+					.flatMap(BaseVdypSite::getSiteCurveNumber) //
+					.map(SiteIndexEquation::getByIndex)//
+					.orElseGet(() -> {
+						try {
+							return this.findSiteCurveNumber(
+									bec.getRegion(), primarySite.getSiteSpecies(), primarySite.getSiteGenus()
+							);
+						} catch (StandProcessingException e) {
+							throw new RuntimeStandProcessingException(e);
+						}
+					});
+
+			float primaryAgeTotal = primarySite.getAgeTotal().orElseThrow(); // AGETOT_L1
+			float primaryYearsToBreastHeight = primarySite.getYearsToBreastHeight().orElseThrow(); // YTBH_L1
+
+			float primaryBreastHeightAge0 = primaryAgeTotal - primaryYearsToBreastHeight; // AGEBH0
+			float ageIncrease; // AGE_INCR original fortran had some logic to set this, but it will always be
+								// overwritten before being used.
+
+			float siteIndex = primarySite.getSiteIndex().orElseThrow(); // SID
+			float yeastToBreastHeight = primaryYearsToBreastHeight; // YTBHD
+
+			Map<String, Float> minimaMap = Utils.expectParsedControl(controlMap, ControlKey.MINIMA, Map.class);
+
+			float minimumPredictedBaseArea = minimaMap.get(BaseControlParser.MINIMUM_PREDICTED_BASE_AREA); // VMINBAeqn
+			float minimumHeight = minimaMap.get(BaseControlParser.MINIMUM_HEIGHT); // VMINH
+
+			// Find an increase that puts stand into suitable condition with EMP106
+			// predicting reasonable BA
+
+			float baseAreaTarget = minimumPredictedBaseArea; // BATARGET
+			float heightTarget = minimumHeight; // HTARGET
+			float ageTarget = 5f; // AGETARGET
+
+			// If PCTFLAND is very low, INCREASE the target BA, so as to avoid rounding
+			// problems on output. But Target never increased by more than a factor of 4.
+			// Before Jan 2008, this all started at PCTFLAND < 50.
+
+			float percentAvailable = poly.getPercentAvailable().filter(x -> x >= 0f).orElse(85.0f); // PCT
+
+			if (percentAvailable < 10f) {
+				float factor = Math.min(10f / percentAvailable, 4f);
+				baseAreaTarget *= factor;
+			}
+
+			float dominantHeight0 = 0f; // HD0
+
+			int moreYears = Math.max(80, (int) (130 - primaryAgeTotal));
+
+			float primaryHeight = primarySite.getHeight().orElseThrow(); // HT_L1
+
+			float dominantHeight;
+
+			foundIncrease: {
+				for (int increase = 0; increase <= moreYears; increase++) {
+					float primaryBreastHeightAge = primaryBreastHeightAge0 + increase; // AGEBH
+
+					if (primaryBreastHeightAge > 1f) {
+
+						float ageD = primaryBreastHeightAge; // AGED
+
+						float dominantHeightD = (float) SiteIndex2Height.indexToHeight(
+								siteCurve, ageD, SiteIndexAgeType.SI_AT_BREAST, siteIndex, ageD, yeastToBreastHeight
+						); // HDD
+
+						if (increase == 0) {
+							dominantHeight0 = dominantHeightD;
+						}
+						dominantHeight = dominantHeightD; // HD
+						if (primaryHeight > 0f && dominantHeight0 > 0f) {
+							dominantHeight = primaryHeight + (dominantHeight - dominantHeight0);
+						}
+
+						// check empirical BA assuming BAV = 0
+
+						float predictedBaseArea = estimateBaseAreaYield(
+								dominantHeight, primaryBreastHeightAge, Optional.empty(), false,
+								primaryLayer.getSpecies().values(), bec,
+								primaryLayer.getEmpericalRelationshipParameterIndex().orElseThrow()
+						); // BAP
+
+						// Calculate the full occupancy BA Hence the BA we will test is the Full
+						// occupanct BA
+
+						predictedBaseArea /= FRACTION_AVAILABLE_N;
+
+						if (dominantHeight >= heightTarget && primaryBreastHeightAge >= ageTarget
+								&& predictedBaseArea >= baseAreaTarget) {
+							ageIncrease = increase;
+							break foundIncrease;
+						}
+					}
+				}
+				throw new StandProcessingException("Unable to increase to target height.");
+			}
+
+			final float ageIncreaseFinal = ageIncrease;
+			final float newPrimaryHeight = dominantHeight;
+
+			return VriPolygon.build(pBuilder -> {
+				pBuilder.copy(poly);
+				pBuilder.polygonIdentifier(polygonIdentifier.forYear(year + (int) ageIncreaseFinal));
+				pBuilder.mode(PolygonMode.BATN);
+				pBuilder.copyLayers(poly, (lBuilder, layer) -> {
+
+					lBuilder.copySites(layer, (iBuilder, site) -> {
+						if (layer.getLayerType() == LayerType.PRIMARY
+								&& primaryLayer.getPrimaryGenus().map(site.getSiteGenus()::equals).orElse(false)) {
+							iBuilder.height(newPrimaryHeight);
+						} else {
+							iBuilder.height(Optional.empty());
+						}
+
+						site.getAgeTotal().map(x -> x + ageIncreaseFinal).ifPresentOrElse(ageTotal -> {
+							iBuilder.ageTotal(ageTotal);
+							iBuilder.breastHeightAge(
+									site.getYearsToBreastHeight()//
+											.map(ytbh -> ageTotal - ytbh)
+											.or(() -> site.getBreastHeightAge().map(bha -> bha + ageIncreaseFinal))
+							);
+						}, () -> {
+							iBuilder.breastHeightAge(site.getBreastHeightAge().map(bha -> bha + ageIncreaseFinal));
+						});
+
+					});
+					lBuilder.copySpecies(layer, (sBuilder, species) -> {
+						// No changes, just copy
+					});
+				});
+			});
+
+		} catch (RuntimeStandProcessingException e) {
+			throw e.getCause();
+		} catch (CommonCalculatorException e) {
+			throw new StandProcessingException(e);
+		}
+	}
+
+	VriPolygon processBatc(VriPolygon poly) throws StandProcessingException {
+		// TODO
+		return poly;
+	}
+
+	VriPolygon processBatn(VriPolygon poly) throws StandProcessingException {
+		// TODO
+		return poly;
+	}
+
+	/**
+	 * Returns the siteCurveNumber for the first of the given ids that has one.
+	 *
+	 * @param region
+	 * @param ids
+	 * @return
+	 * @throws StandProcessingException if no entry for any of the given species IDs is present.
+	 */
+	SiteIndexEquation findSiteCurveNumber(Region region, String... ids) throws StandProcessingException {
+		var scnMap = Utils.<MatrixMap2<String, Region, SiteIndexEquation>>expectParsedControl(
+				controlMap, ControlKey.SITE_CURVE_NUMBERS, MatrixMap2.class
+		);
+
+		for (String id : ids) {
+			if (scnMap.hasM(id, region))
+				return scnMap.get(id, region);
+		}
+		throw new StandProcessingException(
+				"Could not find Site Curve Number for inst of the following species: " + String.join(", ", ids)
+		);
 	}
 }

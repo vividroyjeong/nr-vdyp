@@ -150,7 +150,7 @@ public abstract class BaseVdypSite {
 			return yearsToBreastHeight(Optional.of(yearsToBreastHeight));
 		}
 
-		public Builder<T> copy(BaseVdypSite toCopy) {
+		public Builder<T> adapt(BaseVdypSite toCopy) {
 			polygonIdentifier(toCopy.getPolygonIdentifier());
 			layerType(toCopy.getLayerType());
 			ageTotal(toCopy.getAgeTotal());
@@ -160,6 +160,10 @@ public abstract class BaseVdypSite {
 			siteCurveNumber(toCopy.getSiteCurveNumber());
 			siteGenus(toCopy.getSiteGenus());
 			return this;
+		}
+
+		public Builder<T> copy(T toCopy) {
+			return adapt(toCopy);
 		}
 
 		@Override

@@ -7,8 +7,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP extends BaseVdypSpecies, SI extends BaseVdypSite> {
 
@@ -119,6 +121,7 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 		protected Optional<PolygonMode> mode = Optional.empty();
 
 		protected List<L> layers = new LinkedList<>();
+		protected List<Consumer<LB>> layersBuilders = new LinkedList<>();
 
 		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> polygonIdentifier(PolygonIdentifier polygonIdentifier) {
 			this.polygonIdentifier = Optional.of(polygonIdentifier);
@@ -164,27 +167,62 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 			return this;
 		}
 
+		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> addLayer(Consumer<LB> specConfig) {
+			this.layersBuilders.add(specConfig);
+			return this;
+		}
+
 		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> addLayers(Collection<L> layers) {
 			this.layers.addAll(layers);
 			return this;
 		}
 
-		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> buildLayer(Consumer<LB> specConfig) {
+		protected L buildLayer(Consumer<LB> specConfig) {
 			var layerBuilder = getLayerBuilder();
-			layerBuilder.polygonIdentifier(this.polygonIdentifier.get());
 			specConfig.accept(layerBuilder);
-			this.layers.add(layerBuilder.build());
-			return this;
+			layerBuilder.polygonIdentifier(this.polygonIdentifier.get());
+			return layerBuilder.build();
 		}
 
 		protected abstract LB getLayerBuilder();
 
 		public <PA2> Builder<T, L, PA, SP, SI, LB, SPB, SIB>
-				copy(BaseVdypPolygon<?, PA2, ?, ?> toCopy, Function<PA2, PA> paConvert) {
+				adapt(BaseVdypPolygon<?, PA2, ?, ?> toCopy, Function<PA2, PA> paConvert) {
 			polygonIdentifier(toCopy.getPolygonIdentifier());
 			percentAvailable(paConvert.apply(toCopy.getPercentAvailable()));
 			biogeoclimaticZone(toCopy.getBiogeoclimaticZone());
 			forestInventoryZone(toCopy.getForestInventoryZone());
+			return this;
+		}
+
+		public <PA2> Builder<T, L, PA, SP, SI, LB, SPB, SIB> copy(T toCopy) {
+			polygonIdentifier(toCopy.getPolygonIdentifier());
+			percentAvailable(toCopy.getPercentAvailable());
+			biogeoclimaticZone(toCopy.getBiogeoclimaticZone());
+			forestInventoryZone(toCopy.getForestInventoryZone());
+			return this;
+		}
+
+		public <PA2, L2 extends BaseVdypLayer<?, ?>> Builder<T, L, PA, SP, SI, LB, SPB, SIB>
+				adaptLayers(BaseVdypPolygon<L2, PA2, ?, ?> toCopy, BiConsumer<LB, L2> layerConfig) {
+			toCopy.getLayers().values().forEach(layer -> {
+				this.addLayer(lBuilder -> {
+					lBuilder.adapt(layer);
+					lBuilder.polygonIdentifier = Optional.empty();
+					layerConfig.accept(lBuilder, layer);
+				});
+			});
+			return this;
+		}
+
+		public <PA2> Builder<T, L, PA, SP, SI, LB, SPB, SIB> copyLayers(T toCopy, BiConsumer<LB, L> layerConfig) {
+			toCopy.getLayers().values().forEach(layer -> {
+				this.addLayer(lBuilder -> {
+					lBuilder.copy(layer);
+					lBuilder.polygonIdentifier = Optional.empty();
+					layerConfig.accept(lBuilder, layer);
+				});
+			});
 			return this;
 		}
 
@@ -199,11 +237,19 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 		@Override
 		protected void postProcess(T result) {
 			super.postProcess(result);
-
-			// Add species
+			buildChildren();
+			// Add layers
 			for (L layer : layers) {
 				result.getLayers().put(layer.getLayerType(), layer);
 			}
+		}
+
+		/**
+		 * Build any builders for child objects and store the results. This will clear the stored child builders.
+		 */
+		public void buildChildren() {
+			layersBuilders.stream().map(this::buildLayer).collect(Collectors.toCollection(() -> layers));
+			layersBuilders.clear();
 		}
 
 	}

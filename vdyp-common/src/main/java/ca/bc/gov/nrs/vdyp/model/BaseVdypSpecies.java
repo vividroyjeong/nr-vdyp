@@ -135,14 +135,8 @@ public abstract class BaseVdypSpecies {
 			return this;
 		}
 
-		public Builder<T> copy(BaseVdypSpecies toCopy) {
-			polygonIdentifier(toCopy.getPolygonIdentifier());
-			layerType(toCopy.getLayerType());
-			genus(toCopy.getGenus());
-			percentGenus(toCopy.getPercentGenus());
-
-			fractionGenus(toCopy.getFractionGenus());
-			return this;
+		public Builder<T> copy(T toCopy) {
+			return adapt(toCopy);
 		}
 
 		@Override
@@ -158,6 +152,21 @@ public abstract class BaseVdypSpecies {
 			super.postProcess(result);
 			result.setSpeciesPercent(speciesPercent);
 			this.fractionGenus.ifPresent(result::setFractionGenus);
+		}
+
+		public Builder<T> adapt(BaseVdypSpecies toCopy) {
+			polygonIdentifier(toCopy.getPolygonIdentifier());
+			layerType(toCopy.getLayerType());
+			genus(toCopy.getGenus());
+			percentGenus(toCopy.getPercentGenus());
+
+			fractionGenus(toCopy.getFractionGenus());
+
+			for (var entry : toCopy.getSpeciesPercent().entrySet()) {
+				addSpecies(entry.getKey(), entry.getValue());
+			}
+
+			return this;
 		}
 
 	}
