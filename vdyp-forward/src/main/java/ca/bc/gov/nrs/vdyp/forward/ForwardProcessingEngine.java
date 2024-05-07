@@ -3,7 +3,6 @@ package ca.bc.gov.nrs.vdyp.forward;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
@@ -26,11 +26,10 @@ import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.CommonData;
-import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.GenusDistribution;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
-import ca.bc.gov.nrs.vdyp.model.SiteCurve;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.si32.site.SiteTool;
 
@@ -43,7 +42,7 @@ public class ForwardProcessingEngine {
 	// Read-only
 	private final GenusDefinitionMap genusDefinitionMap;
 	private final BecLookup becLookup;
-	private final Map<String, SiteCurve> siteCurveMap;
+	private final MatrixMap2<String, Region, SiteIndexEquation> siteCurveMap;
 
 	private final ForwardProcessingState fps;
 
@@ -56,11 +55,11 @@ public class ForwardProcessingEngine {
 	/* pp */ ForwardProcessingEngine(Map<String, Object> controlMap, ForwardProcessingState fps) {
 
 		// Reference, since read-only
-		this.genusDefinitionMap = new GenusDefinitionMap(
-				(List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name())
+		genusDefinitionMap = new GenusDefinitionMap(
+				Utils.expectParsedControl(controlMap, ControlKey.SP0_DEF, List.class)
 		);
-		this.becLookup = (BecLookup) controlMap.get(ControlKey.BEC_DEF.name());
-		this.siteCurveMap = (Map<String, SiteCurve>) controlMap.get(ControlKey.SITE_CURVE_NUMBERS.name());
+		becLookup = Utils.expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class);
+		siteCurveMap = Utils.expectParsedControl(controlMap, ControlKey.SITE_CURVE_NUMBERS, MatrixMap2.class);
 
 		this.fps = fps;
 	}
@@ -73,8 +72,8 @@ public class ForwardProcessingEngine {
 		return becLookup;
 	}
 
-	public Map<String, SiteCurve> getSiteCurveMap() {
-		return Collections.unmodifiableMap(siteCurveMap);
+	public MatrixMap2<String, Region, SiteIndexEquation> getSiteCurveMap() {
+		return siteCurveMap;
 	}
 
 	public void processPolygon(VdypPolygon polygon) throws ProcessingException {
@@ -94,39 +93,40 @@ public class ForwardProcessingEngine {
 	public enum ExecutionStep {
 		// Must be first
 		None,
-		
-		RemoveSmallSpecies,
-		CalculateMissingSiteCurves,
-		CalculateCoverages,
-		DeterminePolygonRankings,
-		EstimateMissingSiteIndices,
-		EstimateMissingYearsToBreastHeightValues,
-		
+
+		RemoveSmallSpecies, CalculateMissingSiteCurves, CalculateCoverages, DeterminePolygonRankings,
+		EstimateMissingSiteIndices, EstimateMissingYearsToBreastHeightValues,
+
 		// Must be last
 		All;
-		
+
 		public ExecutionStep predecessor() {
 			if (this == None) {
 				throw new IllegalStateException("ExecutionStep.None has no predecessor");
 			}
-			
+
 			return ExecutionStep.values()[ordinal() - 1];
 		}
-		
+
 		public ExecutionStep successor() {
 			if (this == All) {
 				throw new IllegalStateException("ExecutionStep.All has no successor");
 			}
-			
+
 			return ExecutionStep.values()[ordinal() + 1];
 		}
 	}
-	
+
 	static void executeForwardAlgorithm(
-			PolygonProcessingState bank, Map<String, SiteCurve> siteCurveMap, ExecutionStep lastStep
+			PolygonProcessingState bank, MatrixMap2<String, Region, SiteIndexEquation> siteCurveMap,
+			ExecutionStep lastStep
 	) throws ProcessingException {
-		
-		logger.info(MessageFormat.format("Beginning processing of polygon {0} layer {1}", bank.getLayer().getParent(), bank.getLayer()));
+
+		logger.info(
+				MessageFormat.format(
+						"Beginning processing of polygon {0} layer {1}", bank.getLayer().getParent(), bank.getLayer()
+				)
+		);
 
 		// BANKCHK1, simplified for the parameters METH_CHK = 4, LayerI = 1, and INSTANCE = 1
 		if (lastStep.ordinal() >= ExecutionStep.RemoveSmallSpecies.ordinal()) {
@@ -158,10 +158,10 @@ public class ForwardProcessingEngine {
 	}
 
 	/**
-	 * For each species for which a years-to-breast-height value was not supplied, calculate it
-	 * from the given years-at-breast-height and age-total values if given or otherwise 
-	 * estimate it from the site curve and site index values for the species.
-	 * 
+	 * For each species for which a years-to-breast-height value was not supplied, calculate it from the given
+	 * years-at-breast-height and age-total values if given or otherwise estimate it from the site curve and site index
+	 * values for the species.
+	 *
 	 * @param bank the bank in which calculations are performed
 	 */
 	static void estimateMissingYearsToBreastHeightValues(PolygonProcessingState bank) {
@@ -169,8 +169,8 @@ public class ForwardProcessingEngine {
 		int primarySpeciesIndex = bank.getSpeciesRankingDetails().primarySpeciesIndex();
 		float primarySpeciesSiteIndex = bank.siteIndices[primarySpeciesIndex];
 
-		// Determine the default site index by using the site index of the primary species unless 
-		// it hasn't been set in which case pick any. Note that there may still not be a 
+		// Determine the default site index by using the site index of the primary species unless
+		// it hasn't been set in which case pick any. Note that there may still not be a
 		// meaningful value after this for example when the value is not available for the primary
 		// species (see estimateMissingSiteIndices) and it's the only one.
 
@@ -193,7 +193,7 @@ public class ForwardProcessingEngine {
 				continue;
 			}
 
-			// Note: this block will normally never be executed because of the logic in 
+			// Note: this block will normally never be executed because of the logic in
 			// the constructor of VdypLayerSpecies that computes missing values when the
 			// other two measurement values are present.
 			if (!Float.isNaN(bank.yearsAtBreastHeight[i]) && bank.ageTotals[i] > bank.yearsAtBreastHeight[i]) {
@@ -213,17 +213,16 @@ public class ForwardProcessingEngine {
 	}
 
 	/**
-	 * (1) If the site index of the primary species has not been set, calculate it as the average 
-	 * of the site indices of the other species that -do- have one, after converting it between 
-	 * the site curve of the other species and that of the primary species.
+	 * (1) If the site index of the primary species has not been set, calculate it as the average of the site indices of
+	 * the other species that -do- have one, after converting it between the site curve of the other species and that of
+	 * the primary species.
 	 * <p>
-	 * (2) 
-	 * If the site index of the primary species has (now) been set, calculate that of the other 
-	 * species whose site index has not been set from the primary site index after converting it 
-	 * between the site curve of the other species and that of the primary species.
+	 * (2) If the site index of the primary species has (now) been set, calculate that of the other species whose site
+	 * index has not been set from the primary site index after converting it between the site curve of the other
+	 * species and that of the primary species.
 	 *
 	 * @param bank the bank in which the calculations are done.
-	 * @throws ProcessingException 
+	 * @throws ProcessingException
 	 */
 	static void estimateMissingSiteIndices(PolygonProcessingState bank) throws ProcessingException {
 
@@ -256,13 +255,17 @@ public class ForwardProcessingEngine {
 					} catch (NoAnswerException e) {
 						logger.warn(
 								MessageFormat.format(
-										"there is no conversion from curves {0} to {1}. Skipping species {3}", siteCurveI, primarySiteCurve, i
-								));
-					} catch (CurveErrorException | SpeciesErrorException  e) {
+										"there is no conversion from curves {0} to {1}. Skipping species {3}",
+										siteCurveI, primarySiteCurve, i
+								)
+						);
+					} catch (CurveErrorException | SpeciesErrorException e) {
 						throw new ProcessingException(
 								MessageFormat.format(
-										"convertSiteIndexBetweenCurves on {0}, {1} and {2} failed", siteCurveI, siteIndexI, primarySiteCurve
-								), e);
+										"convertSiteIndexBetweenCurves on {0}, {1} and {2} failed", siteCurveI,
+										siteIndexI, primarySiteCurve
+								), e
+						);
 					}
 				}
 			}
@@ -294,13 +297,17 @@ public class ForwardProcessingEngine {
 					} catch (NoAnswerException e) {
 						logger.warn(
 								MessageFormat.format(
-										"there is no conversion between curves {0} and {1}. Skipping species {2}", primarySiteCurve, siteCurveI, i
-								));
-					} catch (CurveErrorException | SpeciesErrorException  e) {
+										"there is no conversion between curves {0} and {1}. Skipping species {2}",
+										primarySiteCurve, siteCurveI, i
+								)
+						);
+					} catch (CurveErrorException | SpeciesErrorException e) {
 						throw new ProcessingException(
 								MessageFormat.format(
-										"convertSiteIndexBetweenCurves on {0}, {1} and {2} failed. Skipping species {3}", primarySiteCurve, primarySpeciesSiteIndex, siteCurveI, i
-								), e);
+										"convertSiteIndexBetweenCurves on {0}, {1} and {2} failed. Skipping species {3}",
+										primarySiteCurve, primarySpeciesSiteIndex, siteCurveI, i
+								), e
+						);
 					}
 				}
 			}
@@ -311,9 +318,9 @@ public class ForwardProcessingEngine {
 	}
 
 	/**
-	 * Calculate the percentage of forested land covered by each species by dividing the basal area 
-	 * of each given species with the basal area of the polygon covered by forest.
-	 * 
+	 * Calculate the percentage of forested land covered by each species by dividing the basal area of each given
+	 * species with the basal area of the polygon covered by forest.
+	 *
 	 * @param bank the bank in which the calculations are performed
 	 */
 	static void calculateCoverages(PolygonProcessingState bank) {
@@ -324,7 +331,8 @@ public class ForwardProcessingEngine {
 
 		int allUcIndex = UtilizationClass.ALL.ordinal();
 		for (int i : bank.getIndices()) {
-			bank.percentagesOfForestedLand[i] = bank.basalAreas[i][allUcIndex] / bank.basalAreas[0][allUcIndex] * 100.0f;
+			bank.percentagesOfForestedLand[i] = bank.basalAreas[i][allUcIndex] / bank.basalAreas[0][allUcIndex]
+					* 100.0f;
 
 			logger.atDebug().addArgument(i).addArgument(bank.speciesIndices[i]).addArgument(bank.speciesNames[i])
 					.addArgument(bank.basalAreas[i][0]).addArgument(bank.percentagesOfForestedLand[i])
@@ -334,13 +342,13 @@ public class ForwardProcessingEngine {
 
 	/**
 	 * Calculate the siteCurve number of all species for which one was not supplied.
-	 * 
-	 * @param bank the bank in which the calculations are done.
-	 * @param becZone the BEC zone definitions.
+	 *
+	 * @param bank         the bank in which the calculations are done.
+	 * @param becZone      the BEC zone definitions.
 	 * @param siteCurveMap the Site Curve definitions.
 	 */
 	static void calculateMissingSiteCurves(
-			PolygonProcessingState bank, Map<String, SiteCurve> siteCurveMap
+			PolygonProcessingState bank, MatrixMap2<String, Region, SiteIndexEquation> siteCurveMap
 	) {
 		BecDefinition becZone = bank.getBecZone();
 
@@ -353,9 +361,9 @@ public class ForwardProcessingEngine {
 				Optional<GenusDistribution> sp0Dist = bank.sp64Distributions[i].getSpeciesDistribution(0);
 
 				if (sp0Dist.isPresent()) {
-					if (siteCurveMap.size() > 0) {
-						SiteCurve sc = siteCurveMap.get(sp0Dist.get().getGenus().getAlias());
-						scIndex = sc == null ? Optional.empty() : Optional.of(sc.getValue(becZone.getRegion()));
+					if (!siteCurveMap.isEmpty()) {
+						scIndex = Utils
+								.optSafe(siteCurveMap.get(sp0Dist.get().getGenus().getAlias(), becZone.getRegion()));
 					} else {
 						SiteIndexEquation siCurve = SiteTool
 								.getSICurve(bank.speciesNames[i], becZone.getRegion().equals(Region.COASTAL));
@@ -364,9 +372,9 @@ public class ForwardProcessingEngine {
 				}
 
 				if (scIndex.isEmpty()) {
-					if (siteCurveMap.size() > 0) {
-						SiteCurve sc = siteCurveMap.get(bank.speciesNames[i]);
-						scIndex = sc == null ? Optional.empty() : Optional.of(sc.getValue(becZone.getRegion()));
+					if (!siteCurveMap.isEmpty()) {
+						scIndex = Utils
+								.optSafe(siteCurveMap.get(sp0Dist.get().getGenus().getAlias(), becZone.getRegion()));
 					} else {
 						SiteIndexEquation siCurve = SiteTool
 								.getSICurve(bank.speciesNames[i], becZone.getRegion().equals(Region.COASTAL));
@@ -381,7 +389,7 @@ public class ForwardProcessingEngine {
 
 	/**
 	 * Validate that the given polygon is in good order for processing.
-	 * 
+	 *
 	 * @param polygon the subject polygon.
 	 * @returns if this method doesn't throw, all is good.
 	 * @throws ProcessingException if the polygon does not pass validation.
@@ -392,8 +400,8 @@ public class ForwardProcessingEngine {
 
 			throw new ProcessingException(
 					MessageFormat.format(
-							"Polygon {}'s year value {} is < 1900", 101, polygon.getDescription().getName(), polygon
-									.getDescription().getYear()
+							"Polygon {}'s year value {} is < 1900", 101, polygon.getDescription().getName(),
+							polygon.getDescription().getYear()
 					)
 			);
 		}
@@ -413,8 +421,8 @@ public class ForwardProcessingEngine {
 		if (bank.getNSpecies() == 0) {
 			throw new ProcessingException(
 					MessageFormat.format(
-							"Polygon {0} layer 0 has no species with basal area above {1}", bank.getLayer().getParent()
-									.getDescription().getName(), MIN_BASAL_AREA
+							"Polygon {0} layer 0 has no species with basal area above {1}",
+							bank.getLayer().getParent().getDescription().getName(), MIN_BASAL_AREA
 					)
 			);
 		}
@@ -472,8 +480,7 @@ public class ForwardProcessingEngine {
 
 		String primaryGenusName = bank.speciesNames[highestPercentageIndex];
 		Optional<String> secondaryGenusName = secondHighestPercentageIndex != -1
-				? Optional.of(bank.speciesNames[secondHighestPercentageIndex])
-				: Optional.empty();
+				? Optional.of(bank.speciesNames[secondHighestPercentageIndex]) : Optional.empty();
 
 		try {
 			int inventoryTypeGroup = findInventoryTypeGroup(primaryGenusName, secondaryGenusName, highestPercentage);
@@ -495,15 +502,14 @@ public class ForwardProcessingEngine {
 	}
 
 	/**
-	 * <code>combinationGroup</code> is a list of precisely two species names. This method determines
-	 * the indices within <code>speciesNames</code> that match the two given names. If two do, say i and j, 
-	 * the <code>percentages</code> is modified as follows. Assuming percentages[i] > percentages[j], 
-	 * percentages[i] is set to percentages[i] + percentages[j] and percentages[j] is set to 0.0. If fewer 
-	 * than two indices match, nothing is done.
-	 *  
-	 * @param speciesNames an array of (possibly null) distinct Strings.
+	 * <code>combinationGroup</code> is a list of precisely two species names. This method determines the indices within
+	 * <code>speciesNames</code> that match the two given names. If two do, say i and j, the <code>percentages</code> is
+	 * modified as follows. Assuming percentages[i] > percentages[j], percentages[i] is set to percentages[i] +
+	 * percentages[j] and percentages[j] is set to 0.0. If fewer than two indices match, nothing is done.
+	 *
+	 * @param speciesNames     an array of (possibly null) distinct Strings.
 	 * @param combinationGroup a pair of (not null) Strings.
-	 * @param percentages an array with one entry for each entry in <code>speciesName</code>.
+	 * @param percentages      an array with one entry for each entry in <code>speciesName</code>.
 	 */
 	static void combinePercentages(String[] speciesNames, List<String> combinationGroup, float[] percentages) {
 
@@ -520,7 +526,8 @@ public class ForwardProcessingEngine {
 		if (speciesNames.length != percentages.length) {
 			throw new IllegalArgumentException(
 					MessageFormat.format(
-							"the length of speciesNames ({}) must match that of percentages ({}) but it doesn't", speciesNames.length, percentages.length
+							"the length of speciesNames ({}) must match that of percentages ({}) but it doesn't",
+							speciesNames.length, percentages.length
 					)
 			);
 		}

@@ -35,7 +35,8 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.CommonData;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
-import ca.bc.gov.nrs.vdyp.model.SiteCurve;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
+import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.si32.site.SiteTool;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -129,9 +130,11 @@ class ForwardProcessingEngineTest {
 
 	@Test
 	void testCombinePercentages() {
-		
-		String[] speciesNames = new String[] { "AC",  "B",  "C",  "D",  "E",  "F", "PW",  "H", "PY",  "L", "PA", "AT",  "S", "MB",  "Y", "PL" };
-		float[] percentages = new float[]    { 1.1f, 2.2f, 3.3f, 4.4f, 5.5f, 6.6f, 7.7f, 8.8f, 9.9f, 9.3f, 8.4f, 7.1f, 6.3f, 8.4f, 9.4f, 1.6f };
+
+		String[] speciesNames = new String[] { "AC", "B", "C", "D", "E", "F", "PW", "H", "PY", "L", "PA", "AT", "S",
+				"MB", "Y", "PL" };
+		float[] percentages = new float[] { 1.1f, 2.2f, 3.3f, 4.4f, 5.5f, 6.6f, 7.7f, 8.8f, 9.9f, 9.3f, 8.4f, 7.1f,
+				6.3f, 8.4f, 9.4f, 1.6f };
 
 		List<String> combineGroup;
 		float[] testPercentages;
@@ -155,9 +158,11 @@ class ForwardProcessingEngineTest {
 
 	@Test
 	void testCombinePercentagesOneGenusNotInCombinationList() {
-		
-		String[] speciesNames = new String[] { "AC", "C",  "D",  "E",  "F", "PW",  "H", "PY",  "L", "PA", "AT",  "S", "MB",  "Y", "PL" };
-		float[] percentages = new float[]    { 1.1f, 3.3f, 4.4f, 5.5f, 6.6f, 7.7f, 8.8f, 9.9f, 9.3f, 8.4f, 7.1f, 6.3f, 8.4f, 9.4f, 1.6f };
+
+		String[] speciesNames = new String[] { "AC", "C", "D", "E", "F", "PW", "H", "PY", "L", "PA", "AT", "S", "MB",
+				"Y", "PL" };
+		float[] percentages = new float[] { 1.1f, 3.3f, 4.4f, 5.5f, 6.6f, 7.7f, 8.8f, 9.9f, 9.3f, 8.4f, 7.1f, 6.3f,
+				8.4f, 9.4f, 1.6f };
 
 		List<String> combineGroup = List.of("B", "Y");
 		float[] testPercentages = Arrays.copyOf(percentages, percentages.length);
@@ -169,9 +174,11 @@ class ForwardProcessingEngineTest {
 
 	@Test
 	void testCombinePercentagesBothGeneraNotInCombinationList() {
-		
-		String[] speciesNames = new String[] { "AC", "D",  "E",  "F", "PW",  "H", "PY",  "L", "PA", "AT",  "S", "MB",  "Y", "PL" };
-		float[] percentages = new float[]    { 1.1f, 4.4f, 5.5f, 6.6f, 7.7f, 8.8f, 9.9f, 9.3f, 8.4f, 7.1f, 6.3f, 8.4f, 9.4f, 1.6f };
+
+		String[] speciesNames = new String[] { "AC", "D", "E", "F", "PW", "H", "PY", "L", "PA", "AT", "S", "MB", "Y",
+				"PL" };
+		float[] percentages = new float[] { 1.1f, 4.4f, 5.5f, 6.6f, 7.7f, 8.8f, 9.9f, 9.3f, 8.4f, 7.1f, 6.3f, 8.4f,
+				9.4f, 1.6f };
 
 		List<String> combineGroup = List.of("B", "C");
 		float[] testPercentages = Arrays.copyOf(percentages, percentages.length);
@@ -183,9 +190,11 @@ class ForwardProcessingEngineTest {
 
 	@Test
 	void testCombinePercentagesBadCombinationList() {
-		
-		String[] speciesNames = new String[] { "AC", "D",  "E",  "F", "PW",  "H", "PY",  "L", "PA", "AT",  "S", "MB",  "Y", "PL" };
-		float[] percentages = new float[]    { 1.1f, 4.4f, 5.5f, 6.6f, 7.7f, 8.8f, 9.9f, 9.3f, 8.4f, 7.1f, 6.3f, 8.4f, 9.4f, 1.6f };
+
+		String[] speciesNames = new String[] { "AC", "D", "E", "F", "PW", "H", "PY", "L", "PA", "AT", "S", "MB", "Y",
+				"PL" };
+		float[] percentages = new float[] { 1.1f, 4.4f, 5.5f, 6.6f, 7.7f, 8.8f, 9.9f, 9.3f, 8.4f, 7.1f, 6.3f, 8.4f,
+				9.4f, 1.6f };
 
 		List<String> combineGroup = List.of("B", "C", "D");
 
@@ -199,9 +208,10 @@ class ForwardProcessingEngineTest {
 
 	@Test
 	void testCombinePercentagesBadArrays() {
-		
-		String[] speciesNames = new String[] { "D",  "E",  "F", "PW",  "H", "PY",  "L", "PA", "AT",  "S", "MB",  "Y", "PL" };
-		float[] percentages = new float[] { 1.1f, 4.4f, 5.5f, 6.6f, 7.7f, 8.8f, 9.9f, 9.3f, 8.4f, 7.1f, 6.3f, 8.4f, 9.4f, 1.6f };
+
+		String[] speciesNames = new String[] { "D", "E", "F", "PW", "H", "PY", "L", "PA", "AT", "S", "MB", "Y", "PL" };
+		float[] percentages = new float[] { 1.1f, 4.4f, 5.5f, 6.6f, 7.7f, 8.8f, 9.9f, 9.3f, 8.4f, 7.1f, 6.3f, 8.4f,
+				9.4f, 1.6f };
 
 		List<String> combineGroup = List.of("B", "C");
 
@@ -261,34 +271,40 @@ class ForwardProcessingEngineTest {
 			assertThat(itg, is(expectedResults[currentAnswerIndex++]));
 		}
 	}
-	
+
 	@Test
-	void testEstimateMissingSiteIndicesStep1() throws ProcessingException, IOException, ResourceParseException, CurveErrorException, SpeciesErrorException, NoAnswerException {
+	void testEstimateMissingSiteIndicesStep1() throws ProcessingException, IOException, ResourceParseException,
+			CurveErrorException, SpeciesErrorException, NoAnswerException {
 
 		controlMap.put(ControlKey.FORWARD_INPUT_VDYP_POLY.name(), "testPolygon.dat");
 		var polygonParser = new VdypPolygonParser();
-		var polygonFileResolver = TestUtils
-				.fileResolver("testPolygon.dat", TestUtils.makeInputStream("01002 S000001 00     1970 CWH  A    99 37  1  1"));
+		var polygonFileResolver = TestUtils.fileResolver(
+				"testPolygon.dat", TestUtils.makeInputStream("01002 S000001 00     1970 CWH  A    99 37  1  1")
+		);
 		polygonParser.modify(controlMap, polygonFileResolver);
 
 		var testPolygonDescription = VdypPolygonDescriptionParser.parse("01002 S000001 00     1970");
-		
+
 		controlMap.put(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SPECIES.name(), "testSpecies.dat");
 		var speciesParser = new VdypSpeciesParser();
-		var speciesFileResolver = TestUtils
-				.fileResolver("testSpecies.dat", TestUtils.makeInputStream(
+		var speciesFileResolver = TestUtils.fileResolver(
+				"testSpecies.dat",
+				TestUtils.makeInputStream(
 						"01002 S000001 00     1970 P  3 B  B  100.0     0.0     0.0     0.0 -9.00 -9.00  -9.0  -9.0  -9.0 0 -9",
 						"01002 S000001 00     1970 P  4 C  C  100.0     0.0     0.0     0.0 13.40 -9.00  -9.0  -9.0  -9.0 0 11",
 						"01002 S000001 00     1970 P  5 D  D  100.0     0.0     0.0     0.0 -9.00 -9.00  -9.0  -9.0  -9.0 0 -9",
 						"01002 S000001 00     1970 P  8 H  H  100.0     0.0     0.0     0.0 -9.00 28.90 265.0 253.9  11.1 1 -9",
 						"01002 S000001 00     1970 P 15 S  S  100.0     0.0     0.0     0.0 -9.00 -9.00  -9.0  -9.0  -9.0 0 -9",
-						"01002 S000001 00     1970"));
+						"01002 S000001 00     1970"
+				)
+		);
 		speciesParser.modify(controlMap, speciesFileResolver);
-		
+
 		controlMap.put(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "testUtilizations.dat");
 		var utilizationsParser = new VdypUtilizationParser();
-		var utilizationsFileResolver = TestUtils
-				.fileResolver("testUtilizations.dat", TestUtils.makeInputStream(
+		var utilizationsFileResolver = TestUtils.fileResolver(
+				"testUtilizations.dat",
+				TestUtils.makeInputStream(
 						"01002 S000001 00     1970 P  0    -1  0.01513     5.24   7.0166   0.0630   0.0000   0.0000   0.0000   0.0000   6.1",
 						"01002 S000001 00     1970 P  0     0 44.93259   595.32  30.9724 620.9775 592.2023 580.1681 577.6229 549.0159  31.0",
 						"01002 S000001 00     1970 P  0     1  0.53100    64.82  -9.0000   2.5979   0.3834   0.3794   0.3788   0.3623  10.2",
@@ -325,83 +341,102 @@ class ForwardProcessingEngineTest {
 						"01002 S000001 00     1970 P 15 S   2  0.07911     4.46  -9.0000   0.6795   0.5440   0.5410   0.5406   0.5189  15.0",
 						"01002 S000001 00     1970 P 15 S   3  0.26095     8.43  -9.0000   2.7391   2.4396   2.4250   2.4229   2.3254  19.9",
 						"01002 S000001 00     1970 P 15 S   4  4.00883    35.49  -9.0000  52.3402  49.8846  49.4689  49.3920  47.3414  37.9",
-						"01002 S000001 00     1970"));
+						"01002 S000001 00     1970"
+				)
+		);
 
 		utilizationsParser.modify(controlMap, utilizationsFileResolver);
 
 		var reader = new ForwardDataStreamReader(controlMap);
-		
+
 		var polygon = reader.readNextPolygon(testPolygonDescription);
-		
-		PolygonProcessingState bank = new PolygonProcessingState(polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone());
+
+		PolygonProcessingState bank = new PolygonProcessingState(
+				polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone()
+		);
 
 		@SuppressWarnings("unchecked")
-		var siteCurveMap = (Map<String, SiteCurve>) controlMap.get(ControlKey.SITE_CURVE_NUMBERS.name());
+		var siteCurveMap = (MatrixMap2<String, Region, SiteIndexEquation>) controlMap
+				.get(ControlKey.SITE_CURVE_NUMBERS.name());
 
 		ForwardProcessingEngine.ExecutionStep lastStep = ForwardProcessingEngine.ExecutionStep.EstimateMissingSiteIndices;
 		ForwardProcessingEngine.executeForwardAlgorithm(bank, siteCurveMap, lastStep);
-		
+
 		var sourceSiteCurve = SiteIndexEquation.SI_CWC_KURUCZ;
 		var sourceSiteIndex = 13.4;
 		var targetSiteCurve = SiteIndexEquation.SI_HWC_WILEYAC;
-		double expectedValue = SiteTool.convertSiteIndexBetweenCurves(sourceSiteCurve, sourceSiteIndex, targetSiteCurve);
-		
-		assertThat(bank.siteIndices[4], is((float)expectedValue));
+		double expectedValue = SiteTool
+				.convertSiteIndexBetweenCurves(sourceSiteCurve, sourceSiteIndex, targetSiteCurve);
+
+		assertThat(bank.siteIndices[4], is((float) expectedValue));
 	}
 
 	@Test
-	void testEstimateMissingSiteIndicesStep2() throws ProcessingException, IOException, ResourceParseException, CurveErrorException, SpeciesErrorException, NoAnswerException {
+	void testEstimateMissingSiteIndicesStep2() throws ProcessingException, IOException, ResourceParseException,
+			CurveErrorException, SpeciesErrorException, NoAnswerException {
 
 		var targetDescription = VdypPolygonDescriptionParser.parse("01004 S000037 00     1957");
 		var polygon = forwardDataStreamReader.readNextPolygon(targetDescription);
-		
-		PolygonProcessingState bank = new PolygonProcessingState(polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone());
+
+		PolygonProcessingState bank = new PolygonProcessingState(
+				polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone()
+		);
 
 		@SuppressWarnings("unchecked")
-		var siteCurveMap = (Map<String, SiteCurve>) controlMap.get(ControlKey.SITE_CURVE_NUMBERS.name());
+		var siteCurveMap = (MatrixMap2<String, Region, SiteIndexEquation>) controlMap
+				.get(ControlKey.SITE_CURVE_NUMBERS.name());
 
 		ForwardProcessingEngine.ExecutionStep lastStep = ForwardProcessingEngine.ExecutionStep.EstimateMissingSiteIndices;
 		ForwardProcessingEngine.executeForwardAlgorithm(bank, siteCurveMap, lastStep);
-		
+
 		var sourceSiteCurve = SiteIndexEquation.SI_CWC_KURUCZ;
 		var sourceSiteIndex = 13.4;
 		var targetSiteCurve = SiteIndexEquation.SI_HWC_WILEYAC;
-		double expectedValue = SiteTool.convertSiteIndexBetweenCurves(sourceSiteCurve, sourceSiteIndex, targetSiteCurve);
-		
-		assertThat(bank.siteIndices[3], is((float)expectedValue));
+		double expectedValue = SiteTool
+				.convertSiteIndexBetweenCurves(sourceSiteCurve, sourceSiteIndex, targetSiteCurve);
+
+		assertThat(bank.siteIndices[3], is((float) expectedValue));
 	}
-	
+
 	@Test
-	void testEstimateMissingYearsToBreastHeightValues() throws ProcessingException, IOException, ResourceParseException {
+	void testEstimateMissingYearsToBreastHeightValues()
+			throws ProcessingException, IOException, ResourceParseException {
 
 		var testPolygonDescription = VdypPolygonDescriptionParser.parse("01002 S000001 00     1970");
-		
+
 		controlMap.put(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SPECIES.name(), "testSpecies.dat");
 		var speciesParser = new VdypSpeciesParser();
-		var speciesFileResolver = TestUtils
-				.fileResolver("testSpecies.dat", TestUtils.makeInputStream(
+		var speciesFileResolver = TestUtils.fileResolver(
+				"testSpecies.dat",
+				TestUtils.makeInputStream(
 						"01002 S000001 00     1970 P  3 B  B  100.0     0.0     0.0     0.0 -9.00 -9.00  15.0  11.0  -9.0 0 -9",
 						"01002 S000001 00     1970 P  4 C  C  100.0     0.0     0.0     0.0 -9.00 -9.00  -9.0  -9.0  -9.0 0 -9",
 						"01002 S000001 00     1970 P  5 D  D  100.0     0.0     0.0     0.0 35.00 35.30  55.0  54.0   1.0 1 13",
 						"01002 S000001 00     1970 P  8 H  H  100.0     0.0     0.0     0.0 -9.00 -9.00  -9.0  -9.0  -9.0 0 -9",
 						"01002 S000001 00     1970 P 15 S  S  100.0     0.0     0.0     0.0 -9.00 -9.00  -9.0  -9.0  -9.0 0 -9",
-						"01002 S000001 00     1970"));
+						"01002 S000001 00     1970"
+				)
+		);
 		speciesParser.modify(controlMap, speciesFileResolver);
 
 		var reader = new ForwardDataStreamReader(controlMap);
-		
+
 		var polygon = reader.readNextPolygon(testPolygonDescription);
 
-		PolygonProcessingState bank = new PolygonProcessingState(polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone());
+		PolygonProcessingState bank = new PolygonProcessingState(
+				polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone()
+		);
 
 		@SuppressWarnings("unchecked")
-		var siteCurveMap = (Map<String, SiteCurve>) controlMap.get(ControlKey.SITE_CURVE_NUMBERS.name());
+		var siteCurveMap = (MatrixMap2<String, Region, SiteIndexEquation>) controlMap
+				.get(ControlKey.SITE_CURVE_NUMBERS.name());
 
-		ForwardProcessingEngine.ExecutionStep lastStep = ForwardProcessingEngine.ExecutionStep.EstimateMissingYearsToBreastHeightValues.predecessor();
+		ForwardProcessingEngine.ExecutionStep lastStep = ForwardProcessingEngine.ExecutionStep.EstimateMissingYearsToBreastHeightValues
+				.predecessor();
 		ForwardProcessingEngine.executeForwardAlgorithm(bank, siteCurveMap, lastStep);
-		
+
 		ForwardProcessingEngine.estimateMissingYearsToBreastHeightValues(bank);
-		
+
 		assertThat(bank.yearsToBreastHeight, is(new float[] { 0.0f, 4.0f, 7.5f, 1.0f, 4.5f, 5.2f }));
 	}
 }
