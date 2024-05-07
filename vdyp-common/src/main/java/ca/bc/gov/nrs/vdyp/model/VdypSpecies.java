@@ -233,6 +233,15 @@ public class VdypSpecies extends BaseVdypSpecies implements VdypUtilizationHolde
 		}
 
 		@Override
+		public Builder copy(VdypSpecies toCopy) {
+			super.copy(toCopy);
+			volumeGroup(toCopy.getVolumeGroup());
+			decayGroup(toCopy.getDecayGroup());
+			breakageGroup(toCopy.getBreakageGroup());
+			return this;
+		}
+
+		@Override
 		protected VdypSpecies doBuild() {
 			return new VdypSpecies(
 					polygonIdentifier.get(), //

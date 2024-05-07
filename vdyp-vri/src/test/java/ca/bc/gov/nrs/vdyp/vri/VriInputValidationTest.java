@@ -62,7 +62,7 @@ class VriInputValidationTest {
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(66.0f);
@@ -127,7 +127,7 @@ class VriInputValidationTest {
 				lBuilder.primaryGenus("H");
 
 			});
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.VETERAN);
 				lBuilder.crownClosure(0f);
 				lBuilder.baseArea(0f);
@@ -156,7 +156,8 @@ class VriInputValidationTest {
 			});
 		});
 
-		app.checkPolygon(poly);
+		PolygonMode result = assertDoesNotThrow(() -> app.checkPolygon(poly));
+		assertThat(result, is(PolygonMode.START));
 
 		app.close();
 	}
@@ -174,7 +175,7 @@ class VriInputValidationTest {
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(66.0f);
@@ -258,7 +259,7 @@ class VriInputValidationTest {
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.VETERAN);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(66.0f);
@@ -362,7 +363,7 @@ class VriInputValidationTest {
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(PolygonMode.YOUNG);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(66.0f);
@@ -453,7 +454,7 @@ class VriInputValidationTest {
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(PolygonMode.YOUNG);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(66.0f);
@@ -545,7 +546,7 @@ class VriInputValidationTest {
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(PolygonMode.YOUNG);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(66.0f);
@@ -611,7 +612,8 @@ class VriInputValidationTest {
 			});
 		});
 
-		assertDoesNotThrow(() -> app.checkPolygon(poly));
+		PolygonMode result = assertDoesNotThrow(() -> app.checkPolygon(poly));
+		assertThat(result, is(PolygonMode.YOUNG));
 
 		app.close();
 	}
@@ -637,7 +639,7 @@ class VriInputValidationTest {
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(PolygonMode.START);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(66.0f);
@@ -703,7 +705,8 @@ class VriInputValidationTest {
 			});
 		});
 
-		assertDoesNotThrow(() -> app.checkPolygon(poly));
+		PolygonMode result = assertDoesNotThrow(() -> app.checkPolygon(poly));
+		assertThat(result, is(PolygonMode.START));
 
 		app.close();
 	}
@@ -729,7 +732,7 @@ class VriInputValidationTest {
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(PolygonMode.START);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(66.0f);
@@ -824,7 +827,7 @@ class VriInputValidationTest {
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(66.0f);
@@ -853,7 +856,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -888,7 +892,7 @@ class VriInputValidationTest {
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(66.0f);
@@ -917,7 +921,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -952,7 +957,7 @@ class VriInputValidationTest {
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(66.0f);
@@ -982,7 +987,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -1017,7 +1023,7 @@ class VriInputValidationTest {
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(66.0f);
@@ -1047,7 +1053,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -1082,7 +1089,7 @@ class VriInputValidationTest {
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(66.0f);
@@ -1115,7 +1122,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -1150,7 +1158,7 @@ class VriInputValidationTest {
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(66.0f);
@@ -1181,7 +1189,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -1225,7 +1234,7 @@ class VriInputValidationTest {
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(66.0f);
@@ -1256,7 +1265,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -1291,7 +1301,7 @@ class VriInputValidationTest {
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(0.0f);
@@ -1322,7 +1332,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -1360,7 +1371,7 @@ class VriInputValidationTest {
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(30.0f);
@@ -1391,7 +1402,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -1426,7 +1438,7 @@ class VriInputValidationTest {
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(0.0f);
 				lBuilder.baseArea(30.0f);
@@ -1457,7 +1469,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -1492,7 +1505,7 @@ class VriInputValidationTest {
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(30.0f);
@@ -1523,7 +1536,8 @@ class VriInputValidationTest {
 		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 
 		if (pass) {
-			assertDoesNotThrow(() -> app.checkPolygon(poly));
+			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
+			assertThat(result, is(mode));
 		} else {
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygonForMode(poly, bec));
 
@@ -1553,7 +1567,7 @@ class VriInputValidationTest {
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(66.0f);
@@ -1618,7 +1632,7 @@ class VriInputValidationTest {
 				lBuilder.primaryGenus("H");
 
 			});
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.VETERAN);
 				lBuilder.crownClosure(0f);
 				lBuilder.baseArea(0f);

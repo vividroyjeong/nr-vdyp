@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +14,9 @@ import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseValidException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.OptionalControlMapSubResourceParser;
-import ca.bc.gov.nrs.vdyp.model.SiteCurve;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
+import ca.bc.gov.nrs.vdyp.model.Region;
 
 /**
  * Parses a Site Curve data file.
@@ -40,10 +43,11 @@ import ca.bc.gov.nrs.vdyp.model.SiteCurve;
  * @see OptionalControlMapSubResourceParser
  * @author Kevin Smith, Vivid Solutions
  */
-public class SiteCurveParser implements OptionalControlMapSubResourceParser<Map<String, SiteCurve>> {
+public class SiteCurveParser
+		implements OptionalControlMapSubResourceParser<MatrixMap2<String, Region, SiteIndexEquation>> {
 	public static final String SPECIES_KEY = "species";
-	public static final String VALUE_1_KEY = "value1";
-	public static final String VALUE_2_KEY = "value2";
+	public static final String REGION_1_KEY = "region1";
+	public static final String REGION_2_KEY = "region2";
 
 	private LineParser lineParser = new LineParser() {
 
@@ -57,20 +61,18 @@ public class SiteCurveParser implements OptionalControlMapSubResourceParser<Map<
 			return line.isBlank() || line.startsWith("# ") || line.startsWith("  ");
 		}
 
-	}.strippedString(3, SPECIES_KEY).integer(3, VALUE_1_KEY).integer(3, VALUE_2_KEY);
+	}.strippedString(3, SPECIES_KEY).integer(3, REGION_1_KEY).integer(3, REGION_2_KEY);
 
 	@Override
-	public Map<String, SiteCurve> parse(InputStream is, Map<String, Object> control)
+	public MatrixMap2<String, Region, SiteIndexEquation> parse(InputStream is, Map<String, Object> control)
 			throws IOException, ResourceParseException {
-		Map<String, SiteCurve> result = new HashMap<>();
+		Map<String, int[]> result = new HashMap<>();
 		lineParser.parse(is, result, (value, r, line) -> {
 			var species = (String) value.get(SPECIES_KEY);
-			var value1 = (int) value.get(VALUE_1_KEY);
-			var value2 = (int) value.get(VALUE_2_KEY);
+			var region1Value = (int) value.get(REGION_1_KEY);
+			var region2Value = (int) value.get(REGION_2_KEY);
 
-			var coastalSiteIndexEquation = SiteIndexEquation.getByIndex(value1);
-			var interiorSiteIndexEquation = SiteIndexEquation.getByIndex(value2);
-			r.put(species, new SiteCurve(coastalSiteIndexEquation, interiorSiteIndexEquation));
+			r.put(species, new int[] { region1Value, region2Value });
 
 			return r;
 		}, control);
@@ -80,7 +82,11 @@ public class SiteCurveParser implements OptionalControlMapSubResourceParser<Map<
 		if (!missing.isEmpty()) {
 			throw new ResourceParseValidException("Missing expected entries for " + String.join(", ", missing));
 		}
-		return result;
+
+		return new MatrixMap2Impl<>(
+				result.keySet(), Arrays.asList(Region.values()),
+				(id, region) -> SiteIndexEquation.getByIndex(result.get(id)[region.getIndex() - 1])
+		);
 	}
 
 	@Override
@@ -89,8 +95,8 @@ public class SiteCurveParser implements OptionalControlMapSubResourceParser<Map<
 	}
 
 	@Override
-	public Map<String, SiteCurve> defaultResult() {
-		return Collections.emptyMap();
+	public MatrixMap2<String, Region, SiteIndexEquation> defaultResult() {
+		return new MatrixMap2Impl<>(Collections.emptySet(), Collections.emptySet(), (x, y) -> null);
 	}
 
 }

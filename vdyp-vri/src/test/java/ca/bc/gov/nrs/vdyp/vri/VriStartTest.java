@@ -1,9 +1,19 @@
 package ca.bc.gov.nrs.vdyp.vri;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.closeTo;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.aMapWithSize;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anything;
+import static org.hamcrest.Matchers.both;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -16,6 +26,7 @@ import java.util.Optional;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -25,6 +36,10 @@ import ca.bc.gov.nrs.vdyp.application.ApplicationTestUtils;
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.BasalAreaYieldParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperBoundsParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.MockStreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
@@ -36,6 +51,7 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
+import ca.bc.gov.nrs.vdyp.test.TestUtils;
 import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
 import ca.bc.gov.nrs.vdyp.vri.model.VriPolygon;
@@ -79,7 +95,7 @@ class VriStartTest {
 			pBuilder.polygonIdentifier("Test", 2024);
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(66f);
@@ -126,7 +142,7 @@ class VriStartTest {
 			pBuilder.polygonIdentifier("Test", 2024);
 			pBuilder.biogeoclimaticZone("IDF");
 			pBuilder.yieldFactor(1.0f);
-			pBuilder.buildLayer(lBuilder -> {
+			pBuilder.addLayer(lBuilder -> {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(66f);
@@ -490,7 +506,12 @@ class VriStartTest {
 	void testProcessPolygonDontSkip(PolygonMode mode) throws Exception {
 		var control = EasyMock.createControl();
 
-		VriStart app = EasyMock.createMockBuilder(VriStart.class).addMockedMethod("checkPolygon").createMock(control);
+		VriStart app = EasyMock.createMockBuilder(VriStart.class) //
+				.addMockedMethod("processYoung") //
+				.addMockedMethod("processBatc") //
+				.addMockedMethod("processBatn") //
+				.addMockedMethod("checkPolygon") //
+				.createMock(control);
 
 		MockFileResolver resolver = dummyInput();
 
@@ -501,8 +522,29 @@ class VriStartTest {
 			pb.mode(mode);
 		});
 
-		app.checkPolygon(poly);
-		EasyMock.expectLastCall().once();
+		var polyYoung = VriPolygon.build(pb -> {
+			pb.polygonIdentifier("TestPolyYoung", 2024);
+			pb.biogeoclimaticZone("IDF");
+			pb.yieldFactor(1.0f);
+			pb.mode(mode);
+		});
+		var polyBatc = VriPolygon.build(pb -> {
+			pb.polygonIdentifier("TestPolyBatc", 2024);
+			pb.biogeoclimaticZone("IDF");
+			pb.yieldFactor(1.0f);
+			pb.mode(mode);
+		});
+		var polyBatn = VriPolygon.build(pb -> {
+			pb.polygonIdentifier("TestPolyBatn", 2024);
+			pb.biogeoclimaticZone("IDF");
+			pb.yieldFactor(1.0f);
+			pb.mode(mode);
+		});
+
+		EasyMock.expect(app.checkPolygon(poly)).andReturn(mode).once();
+		EasyMock.expect(app.processYoung(poly)).andReturn(polyYoung).times(0, 1);
+		EasyMock.expect(app.processBatc(poly)).andReturn(polyBatc).times(0, 1);
+		EasyMock.expect(app.processBatn(poly)).andReturn(polyBatn).times(0, 1);
 
 		control.replay();
 
@@ -583,13 +625,6 @@ class VriStartTest {
 				.createMock(control);
 
 		MockFileResolver resolver = dummyInput();
-
-		var poly = VriPolygon.build(pb -> {
-			pb.polygonIdentifier("TestPoly", 2024);
-			pb.biogeoclimaticZone("IDF");
-			pb.yieldFactor(1.0f);
-			pb.mode(PolygonMode.START);
-		});
 
 		StreamingParser<VriPolygon> polyStream = easyMockInputStreamFactory(
 				controlMap, ControlKey.VRI_INPUT_YIELD_POLY, control
@@ -686,4 +721,666 @@ class VriStartTest {
 		control.verify();
 	}
 
+	@Test
+	void testProcessYoungToOld() throws Exception {
+		var control = EasyMock.createControl();
+
+		VriStart app = new VriStart();
+
+		MockFileResolver resolver = dummyInput();
+
+		var poly = VriPolygon.build(pb -> {
+			pb.polygonIdentifier(TestUtils.polygonId("TestPolygon", 1899));
+			pb.biogeoclimaticZone("IDF");
+			pb.yieldFactor(1.0f);
+			pb.mode(PolygonMode.YOUNG);
+		});
+
+		control.replay();
+
+		app.init(resolver, controlMap);
+
+		var ex = assertThrows(StandProcessingException.class, () -> app.processYoung(poly));
+
+		assertThat(ex, hasProperty("message", is("Year for YOUNG stand should be at least 1900 but was 1899")));
+
+		app.close();
+
+		control.verify();
+	}
+
+	@Test
+	void testFindSiteCurveNumber() throws Exception {
+		var control = EasyMock.createControl();
+
+		VriStart app = new VriStart();
+
+		MockFileResolver resolver = dummyInput();
+
+		TestUtils.populateControlMapGenusReal(controlMap);
+		TestUtils.populateControlMapFromResource(controlMap, new SiteCurveParser(), "SIEQN.PRM");
+
+		control.replay();
+
+		app.init(resolver, controlMap);
+
+		assertThat(app.findSiteCurveNumber(Region.COASTAL, "MB"), is(SiteIndexEquation.getByIndex(10)));
+		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "MB"), is(SiteIndexEquation.getByIndex(10)));
+
+		assertThat(app.findSiteCurveNumber(Region.COASTAL, "B"), is(SiteIndexEquation.getByIndex(12)));
+		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "B"), is(SiteIndexEquation.getByIndex(42)));
+
+		assertThat(app.findSiteCurveNumber(Region.COASTAL, "ZZZ", "B"), is(SiteIndexEquation.getByIndex(12)));
+		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "ZZZ", "B"), is(SiteIndexEquation.getByIndex(42)));
+
+		assertThat(app.findSiteCurveNumber(Region.COASTAL, "YYY", "B"), is(SiteIndexEquation.getByIndex(42)));
+		assertThat(app.findSiteCurveNumber(Region.INTERIOR, "YYY", "B"), is(SiteIndexEquation.getByIndex(06)));
+
+		assertThrows(StandProcessingException.class, () -> app.findSiteCurveNumber(Region.COASTAL, "ZZZ"));
+		assertThrows(StandProcessingException.class, () -> app.findSiteCurveNumber(Region.INTERIOR, "ZZZ"));
+
+		app.close();
+
+		control.verify();
+	}
+
+	@Test
+	void testProcessYoung() throws Exception {
+		var control = EasyMock.createControl();
+
+		VriStart app = EasyMock.createMockBuilder(VriStart.class).createMock(control);
+
+		MockFileResolver resolver = dummyInput();
+
+		TestUtils.populateControlMapGenusReal(controlMap);
+		TestUtils.populateControlMapBecReal(controlMap);
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		}));
+		TestUtils.populateControlMapFromResource(controlMap, new BasalAreaYieldParser(), "YLDBA407.COE");
+		TestUtils.populateControlMapFromResource(controlMap, new UpperBoundsParser(), "PCT_407.coe");
+
+		var poly = VriPolygon.build(pb -> {
+			pb.polygonIdentifier("082F074/0142", 1997);
+			pb.forestInventoryZone(" ");
+			pb.biogeoclimaticZone("IDF");
+			pb.yieldFactor(1.0f);
+			pb.mode(PolygonMode.YOUNG);
+
+			pb.addLayer(lb -> {
+				lb.layerType(LayerType.PRIMARY);
+				lb.baseArea(Optional.empty());
+				lb.treesPerHectare(Optional.empty());
+				lb.primaryGenus("F");
+				lb.inventoryTypeGroup(3);
+				lb.crownClosure(30);
+				lb.utilization(7.5f);
+
+				lb.empiricalRelationshipParameterIndex(61);
+
+				lb.addSpecies(spb -> {
+					spb.genus("B");
+					spb.percentGenus(10);
+					spb.addSpecies("BL", 100);
+				});
+				lb.addSpecies(spb -> {
+					spb.genus("C");
+					spb.percentGenus(20);
+					spb.addSpecies("CW", 100);
+				});
+				lb.addSpecies(spb -> {
+					spb.genus("F");
+					spb.percentGenus(30);
+					spb.addSpecies("FD", 100);
+				});
+				lb.addSpecies(spb -> {
+					spb.genus("H");
+					spb.percentGenus(30);
+					spb.addSpecies("HW", 100);
+				});
+				lb.addSpecies(spb -> {
+					spb.genus("S");
+					spb.percentGenus(10);
+					spb.addSpecies("S", 100);
+				});
+
+				lb.addSite(sib -> {
+					sib.siteGenus("B");
+					sib.siteSpecies("BL");
+				});
+				lb.addSite(sib -> {
+					sib.siteGenus("C");
+					sib.siteCurveNumber(11);
+					sib.siteSpecies("CW");
+				});
+				lb.addSite(sib -> {
+					sib.siteGenus("F");
+					sib.siteSpecies("FD");
+					sib.siteCurveNumber(23);
+					sib.siteIndex(19.7f);
+					sib.height(7.6f);
+					sib.yearsToBreastHeight(9);
+					sib.breastHeightAge(15);
+					sib.ageTotal(24);
+				});
+				lb.addSite(sib -> {
+					sib.siteGenus("H");
+					sib.siteSpecies("HW");
+					sib.siteCurveNumber(37);
+				});
+				lb.addSite(sib -> {
+					sib.siteGenus("S");
+					sib.siteSpecies("S");
+					sib.siteCurveNumber(71);
+				});
+			});
+		});
+
+		control.replay();
+
+		app.init(resolver, controlMap);
+
+		// Run the process
+
+		var result = assertDoesNotThrow(() -> app.processYoung(poly));
+
+		// Assertions
+
+		final var forPolygon = hasProperty("polygonIdentifier", isPolyId("082F074/0142", 1997));
+		final var forPrimeLayer = both(forPolygon).and(hasProperty("layerType", is(LayerType.PRIMARY)));
+
+		assertThat(result, forPolygon);
+		assertThat(result, hasProperty("mode", present(is(PolygonMode.BATN))));
+
+		assertThat(result, hasProperty("layers", allOf(aMapWithSize(1), hasEntry(is(LayerType.PRIMARY), anything()))));
+		var resultPrimaryLayer = result.getLayers().get(LayerType.PRIMARY);
+
+		assertThat(resultPrimaryLayer, forPrimeLayer);
+
+		assertThat(
+				resultPrimaryLayer, hasProperty(
+						"sites", allOf(
+								aMapWithSize(5), //
+								hasSite(
+										is("B"), is("BL"),
+										forPrimeLayer.and(hasProperty("siteCurveNumber", notPresent()))
+								), //
+								hasSite(
+										is("C"), is("CW"),
+										forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(11))))
+								), //
+								hasSite(
+										is("F"), is("FD"),
+										forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(23))))
+								), //
+								hasSite(
+										is("H"), is("HW"),
+										forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(37))))
+								), //
+								hasSite(
+										is("S"), is("S"),
+										forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(71))))
+								)
+						)
+				)
+		);
+
+		assertThat(
+				resultPrimaryLayer, hasProperty(
+						"species", allOf(
+								aMapWithSize(5), //
+								hasSpecies(is("B"), is("BL"), closeTo(10), forPrimeLayer), //
+								hasSpecies(is("C"), is("CW"), closeTo(20), forPrimeLayer), //
+								hasSpecies(is("F"), is("FD"), closeTo(30), forPrimeLayer), //
+								hasSpecies(is("H"), is("HW"), closeTo(30), forPrimeLayer), //
+								hasSpecies(is("S"), is("S"), closeTo(10), forPrimeLayer)
+						)
+				)
+		);
+
+		for (var nonPrimaryGenus : List.of("B", "C", "H", "S")) {
+			var nonPrimarySite = resultPrimaryLayer.getSites().get(nonPrimaryGenus);
+			assertThat(
+					nonPrimarySite, allOf(
+							hasProperty("siteIndex", notPresent()), //
+							hasProperty("height", notPresent()), //
+							hasProperty("ageTotal", notPresent()), //
+							hasProperty("yearsToBreastHeight", notPresent()), //
+							hasProperty("breastHeightAge", notPresent())
+					)
+			);
+		}
+
+		var primarySite = resultPrimaryLayer.getPrimarySite().get();
+
+		assertThat(
+				primarySite, allOf(
+						hasProperty("siteGenus", is("F")), //
+						hasProperty("siteIndex", present(closeTo(19.7f))), //
+						hasProperty("height", present(closeTo(7.6f))), //
+						hasProperty("ageTotal", present(closeTo(24f))), //
+						hasProperty("yearsToBreastHeight", present(closeTo(9f))), //
+						hasProperty("breastHeightAge", present(closeTo(15f)))
+				)
+		);
+
+		app.close();
+
+		control.verify();
+	}
+
+	@Test
+	void testProcessYoungLowPercentAvailable() throws Exception {
+		var control = EasyMock.createControl();
+
+		VriStart app = EasyMock.createMockBuilder(VriStart.class).createMock(control);
+
+		MockFileResolver resolver = dummyInput();
+
+		TestUtils.populateControlMapGenusReal(controlMap);
+		TestUtils.populateControlMapBecReal(controlMap);
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 10f); // Set this high
+		}));
+		TestUtils.populateControlMapFromResource(controlMap, new BasalAreaYieldParser(), "YLDBA407.COE");
+		TestUtils.populateControlMapFromResource(controlMap, new UpperBoundsParser(), "PCT_407.coe");
+
+		// Target BA should be 11.11111111 due to low PCTFLAND
+
+		var poly = VriPolygon.build(pb -> {
+			pb.polygonIdentifier("082F074/0142", 1997);
+			pb.forestInventoryZone(" ");
+			pb.biogeoclimaticZone("IDF");
+			pb.yieldFactor(1.0f);
+			pb.mode(PolygonMode.YOUNG);
+
+			pb.percentAvailable(9); // Set this less than 10
+
+			pb.addLayer(lb -> {
+				lb.layerType(LayerType.PRIMARY);
+				lb.baseArea(Optional.empty());
+				lb.treesPerHectare(Optional.empty());
+				lb.primaryGenus("F");
+				lb.inventoryTypeGroup(3);
+				lb.crownClosure(30);
+				lb.utilization(7.5f);
+
+				lb.empiricalRelationshipParameterIndex(61);
+
+				lb.addSpecies(spb -> {
+					spb.genus("B");
+					spb.percentGenus(10);
+					spb.addSpecies("BL", 100);
+				});
+				lb.addSpecies(spb -> {
+					spb.genus("C");
+					spb.percentGenus(20);
+					spb.addSpecies("CW", 100);
+				});
+				lb.addSpecies(spb -> {
+					spb.genus("F");
+					spb.percentGenus(30);
+					spb.addSpecies("FD", 100);
+				});
+				lb.addSpecies(spb -> {
+					spb.genus("H");
+					spb.percentGenus(30);
+					spb.addSpecies("HW", 100);
+				});
+				lb.addSpecies(spb -> {
+					spb.genus("S");
+					spb.percentGenus(10);
+					spb.addSpecies("S", 100);
+				});
+
+				lb.addSite(sib -> {
+					sib.siteGenus("B");
+					sib.siteSpecies("BL");
+				});
+				lb.addSite(sib -> {
+					sib.siteGenus("C");
+					sib.siteCurveNumber(11);
+					sib.siteSpecies("CW");
+				});
+				lb.addSite(sib -> {
+					sib.siteGenus("F");
+					sib.siteSpecies("FD");
+					sib.siteCurveNumber(23);
+					sib.siteIndex(19.7f);
+					sib.height(7.6f);
+					sib.yearsToBreastHeight(9);
+					sib.breastHeightAge(15);
+					sib.ageTotal(24);
+				});
+				lb.addSite(sib -> {
+					sib.siteGenus("H");
+					sib.siteSpecies("HW");
+					sib.siteCurveNumber(37);
+				});
+				lb.addSite(sib -> {
+					sib.siteGenus("S");
+					sib.siteSpecies("S");
+					sib.siteCurveNumber(71);
+				});
+			});
+		});
+
+		control.replay();
+
+		app.init(resolver, controlMap);
+
+		// Run the process
+
+		var result = assertDoesNotThrow(() -> app.processYoung(poly));
+
+		// Assertions
+
+		final var forPolygon = hasProperty("polygonIdentifier", isPolyId("082F074/0142", 1999));
+		final var forPrimeLayer = both(forPolygon).and(hasProperty("layerType", is(LayerType.PRIMARY)));
+
+		assertThat(result, forPolygon);
+		assertThat(result, hasProperty("mode", present(is(PolygonMode.BATN))));
+
+		assertThat(result, hasProperty("layers", allOf(aMapWithSize(1), hasEntry(is(LayerType.PRIMARY), anything()))));
+		var resultPrimaryLayer = result.getLayers().get(LayerType.PRIMARY);
+
+		assertThat(resultPrimaryLayer, forPrimeLayer);
+
+		assertThat(
+				resultPrimaryLayer, hasProperty(
+						"sites", allOf(
+								aMapWithSize(5), //
+								hasSite(
+										is("B"), is("BL"),
+										forPrimeLayer.and(hasProperty("siteCurveNumber", notPresent()))
+								), //
+								hasSite(
+										is("C"), is("CW"),
+										forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(11))))
+								), //
+								hasSite(
+										is("F"), is("FD"),
+										forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(23))))
+								), //
+								hasSite(
+										is("H"), is("HW"),
+										forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(37))))
+								), //
+								hasSite(
+										is("S"), is("S"),
+										forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(71))))
+								)
+						)
+				)
+		);
+
+		assertThat(
+				resultPrimaryLayer, hasProperty(
+						"species", allOf(
+								aMapWithSize(5), //
+								hasSpecies(is("B"), is("BL"), closeTo(10), forPrimeLayer), //
+								hasSpecies(is("C"), is("CW"), closeTo(20), forPrimeLayer), //
+								hasSpecies(is("F"), is("FD"), closeTo(30), forPrimeLayer), //
+								hasSpecies(is("H"), is("HW"), closeTo(30), forPrimeLayer), //
+								hasSpecies(is("S"), is("S"), closeTo(10), forPrimeLayer)
+						)
+				)
+		);
+
+		for (var nonPrimaryGenus : List.of("B", "C", "H", "S")) {
+			var nonPrimarySite = resultPrimaryLayer.getSites().get(nonPrimaryGenus);
+			assertThat(
+					nonPrimarySite, allOf(
+							hasProperty("siteIndex", notPresent()), //
+							hasProperty("height", notPresent()), //
+							hasProperty("ageTotal", notPresent()), //
+							hasProperty("yearsToBreastHeight", notPresent()), //
+							hasProperty("breastHeightAge", notPresent())
+					)
+			);
+		}
+
+		var primarySite = resultPrimaryLayer.getPrimarySite().get();
+
+		assertThat(
+				primarySite, allOf(
+						hasProperty("siteGenus", is("F")), //
+						hasProperty("siteIndex", present(closeTo(19.7f))), //
+						hasProperty("height", present(closeTo(8.43922043f))), //
+						hasProperty("ageTotal", present(closeTo(26f))), //
+						hasProperty("yearsToBreastHeight", present(closeTo(9f))), //
+						hasProperty("breastHeightAge", present(closeTo(17f)))
+				)
+		);
+
+		app.close();
+
+		control.verify();
+	}
+
+	@Test
+	void testProcessYoungIncreaseYear() throws Exception {
+		var control = EasyMock.createControl();
+
+		VriStart app = EasyMock.createMockBuilder(VriStart.class).createMock(control);
+
+		MockFileResolver resolver = dummyInput();
+
+		TestUtils.populateControlMapGenusReal(controlMap);
+		TestUtils.populateControlMapBecReal(controlMap);
+		controlMap.put(ControlKey.MINIMA.name(), Utils.constMap(map -> {
+			map.put(VriControlParser.MINIMUM_BASE_AREA, 0f);
+			map.put(VriControlParser.MINIMUM_HEIGHT, 6f);
+			map.put(VriControlParser.MINIMUM_PREDICTED_BASE_AREA, 2f);
+		}));
+		TestUtils.populateControlMapFromResource(controlMap, new BasalAreaYieldParser(), "YLDBA407.COE");
+		TestUtils.populateControlMapFromResource(controlMap, new UpperBoundsParser(), "PCT_407.coe");
+
+		var poly = VriPolygon.build(pb -> {
+			pb.polygonIdentifier("082F074/0142", 1997);
+			pb.forestInventoryZone(" ");
+			pb.biogeoclimaticZone("IDF");
+			pb.yieldFactor(1.0f);
+			pb.mode(PolygonMode.YOUNG);
+			pb.percentAvailable(85f);
+
+			pb.addLayer(lb -> {
+				lb.layerType(LayerType.PRIMARY);
+				lb.baseArea(Optional.empty());
+				lb.treesPerHectare(Optional.empty());
+				lb.primaryGenus("F");
+				lb.inventoryTypeGroup(3);
+				lb.crownClosure(30);
+				lb.utilization(7.5f);
+
+				lb.empiricalRelationshipParameterIndex(61);
+				lb.inventoryTypeGroup(3);
+
+				lb.addSpecies(spb -> {
+					spb.genus("B");
+					spb.percentGenus(10);
+					spb.addSpecies("BL", 100);
+				});
+				lb.addSpecies(spb -> {
+					spb.genus("C");
+					spb.percentGenus(20);
+					spb.addSpecies("CW", 100);
+				});
+				lb.addSpecies(spb -> {
+					spb.genus("F");
+					spb.percentGenus(30);
+					spb.addSpecies("FD", 100);
+				});
+				lb.addSpecies(spb -> {
+					spb.genus("H");
+					spb.percentGenus(30);
+					spb.addSpecies("HW", 100);
+				});
+				lb.addSpecies(spb -> {
+					spb.genus("S");
+					spb.percentGenus(10);
+					spb.addSpecies("S", 100);
+				});
+
+				lb.addSite(sib -> {
+					sib.siteGenus("B");
+					sib.siteSpecies("BL");
+				});
+				lb.addSite(sib -> {
+					sib.siteGenus("C");
+					sib.siteCurveNumber(11);
+					sib.siteSpecies("CW");
+				});
+				lb.addSite(sib -> {
+					sib.siteGenus("F");
+					sib.siteSpecies("FD");
+					sib.siteCurveNumber(23);
+					sib.siteIndex(19.7f);
+					sib.height(6f); // Set this low so we have to increment year
+					sib.yearsToBreastHeight(9);
+					sib.breastHeightAge(15);
+					sib.ageTotal(24);
+				});
+				lb.addSite(sib -> {
+					sib.siteGenus("H");
+					sib.siteSpecies("HW");
+					sib.siteCurveNumber(37);
+				});
+				lb.addSite(sib -> {
+					sib.siteGenus("S");
+					sib.siteSpecies("S");
+					sib.siteCurveNumber(71);
+				});
+			});
+		});
+
+		control.replay();
+
+		app.init(resolver, controlMap);
+
+		// Run the process
+
+		var result = assertDoesNotThrow(() -> app.processYoung(poly));
+
+		// Assertions
+
+		final var forPolygon = hasProperty("polygonIdentifier", isPolyId("082F074/0142", 2001));
+		final var forPrimeLayer = both(forPolygon).and(hasProperty("layerType", is(LayerType.PRIMARY)));
+
+		assertThat(result, forPolygon);
+		assertThat(result, hasProperty("mode", present(is(PolygonMode.BATN))));
+
+		assertThat(result, hasProperty("layers", allOf(aMapWithSize(1), hasEntry(is(LayerType.PRIMARY), anything()))));
+		var resultPrimaryLayer = result.getLayers().get(LayerType.PRIMARY);
+
+		assertThat(resultPrimaryLayer, forPrimeLayer);
+
+		assertThat(
+				resultPrimaryLayer, hasProperty(
+						"sites", allOf(
+								aMapWithSize(5), //
+								hasSite(
+										is("B"), is("BL"),
+										forPrimeLayer.and(hasProperty("siteCurveNumber", notPresent()))
+								), //
+								hasSite(
+										is("C"), is("CW"),
+										forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(11))))
+								), //
+								hasSite(
+										is("F"), is("FD"),
+										forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(23))))
+								), //
+								hasSite(
+										is("H"), is("HW"),
+										forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(37))))
+								), //
+								hasSite(
+										is("S"), is("S"),
+										forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(71))))
+								)
+						)
+				)
+		);
+
+		assertThat(
+				resultPrimaryLayer, hasProperty(
+						"species", allOf(
+								aMapWithSize(5), //
+								hasSpecies(is("B"), is("BL"), closeTo(10), forPrimeLayer), //
+								hasSpecies(is("C"), is("CW"), closeTo(20), forPrimeLayer), //
+								hasSpecies(is("F"), is("FD"), closeTo(30), forPrimeLayer), //
+								hasSpecies(is("H"), is("HW"), closeTo(30), forPrimeLayer), //
+								hasSpecies(is("S"), is("S"), closeTo(10), forPrimeLayer)
+						)
+				)
+		);
+
+		for (var nonPrimaryGenus : List.of("B", "C", "H", "S")) {
+			var nonPrimarySite = resultPrimaryLayer.getSites().get(nonPrimaryGenus);
+			assertThat(
+					nonPrimarySite, allOf(
+							hasProperty("siteIndex", notPresent()), //
+							hasProperty("height", notPresent()), //
+							hasProperty("ageTotal", notPresent()), //
+							hasProperty("yearsToBreastHeight", notPresent()), //
+							hasProperty("breastHeightAge", notPresent())
+					)
+			);
+		}
+
+		var primarySite = resultPrimaryLayer.getPrimarySite().get();
+
+		assertThat(
+				primarySite, allOf(
+						hasProperty("siteGenus", is("F")), //
+						hasProperty("siteIndex", present(closeTo(19.7f))), //
+						hasProperty("height", present(closeTo(7.6620512f))), //
+						hasProperty("ageTotal", present(closeTo(28f))), //
+						hasProperty("yearsToBreastHeight", present(closeTo(9f))), //
+						hasProperty("breastHeightAge", present(closeTo(19f)))
+				)
+		);
+
+		app.close();
+
+		control.verify();
+	}
+
+	/**
+	 * Matches a species entry with the given genus and a single species entry of 100%
+	 *
+	 * @param genus
+	 * @param species
+	 * @param percent
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	static Matcher<Map<? extends String, ? extends VriSpecies>> hasSpecies(
+			Matcher<String> genus, Matcher<String> species, Matcher<Float> percent,
+			Matcher<? super VriSpecies> additional
+	) {
+		return hasEntry(
+				genus, //
+				both(hasProperty("genus", genus))
+						.and(hasProperty("speciesPercent", allOf(aMapWithSize(1), hasEntry(species, is(100f)))))
+						.and(hasProperty("percentGenus", percent))//
+						.and((Matcher<? super Object>) additional)
+		);
+	}
+
+	@SuppressWarnings("unchecked")
+	static Matcher<Map<? extends String, ? extends VriSite>>
+			hasSite(Matcher<String> genus, Matcher<String> species, Matcher<? super VriSite> additional) {
+		return hasEntry(
+				genus, //
+				both(hasProperty("siteGenus", genus)) //
+						.and(hasProperty("siteSpecies", species)) //
+						.and((Matcher<? super Object>) additional)
+		);
+	}
 }

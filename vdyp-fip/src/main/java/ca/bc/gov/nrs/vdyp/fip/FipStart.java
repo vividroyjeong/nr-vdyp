@@ -267,7 +267,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 		float percentAvailable = estimatePercentForestLand(fipPolygon, fipVetLayer, fipPrimaryLayer);
 
-		var vdypPolygon = VdypPolygon.build(builder -> builder.copy(fipPolygon, x -> percentAvailable));
+		var vdypPolygon = VdypPolygon.build(builder -> builder.adapt(fipPolygon, x -> percentAvailable));
 		vdypPolygon.setLayers(processedLayers);
 		return vdypPolygon;
 	}
@@ -378,12 +378,12 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		);
 
 		var result = VdypLayer.build(builder -> {
-			builder.copy(fipLayer);
+			builder.adapt(fipLayer);
 			builder.inventoryTypeGroup(itg);
 			builder.empiricalRelationshipParameterIndex(empiricalRelationshipParameterIndex);
 			fipLayer.getSite().ifPresent(site -> {
 				builder.addSite(siteBuilder -> {
-					siteBuilder.copy(site);
+					siteBuilder.adapt(site);
 				});
 			});
 

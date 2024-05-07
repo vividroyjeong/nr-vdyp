@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.forward;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.controlMapHasEntry;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.hasBec;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.mmEmpty;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.mmHasEntry;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -30,6 +31,7 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.forward.test.VdypForwardTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveAgeMaximumParserTest;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -40,7 +42,6 @@ import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
-import ca.bc.gov.nrs.vdyp.model.SiteCurve;
 import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -142,7 +143,7 @@ class VdypForwardControlParserTest {
 				result, (Matcher) controlMapHasEntry(
 						ControlKey.SITE_CURVE_NUMBERS, allOf(
 								// Species
-								isA(Map.class), hasEntry(isA(String.class), isA(SiteCurve.class))
+								isA(MatrixMap2.class), mmHasEntry(isA(SiteIndexEquation.class), "MB", Region.COASTAL)
 						)
 				)
 		);
@@ -152,7 +153,7 @@ class VdypForwardControlParserTest {
 	void testParseE025Empty() throws Exception {
 		var parser = new ForwardControlParser();
 		var result = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
-		assertThat(result, (Matcher) controlMapHasEntry(ControlKey.SITE_CURVE_NUMBERS, Matchers.anEmptyMap()));
+		assertThat(result, (Matcher) controlMapHasEntry(ControlKey.SITE_CURVE_NUMBERS, mmEmpty()));
 	}
 
 	@Test

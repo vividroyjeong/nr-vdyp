@@ -64,6 +64,10 @@ public class VriPolygon extends BaseVdypPolygon<VriLayer, Optional<Float>, VriSp
 			this.percentAvailable = Optional.of(Optional.empty());
 		}
 
+		public Builder percentAvailable(float percentAvailable) {
+			return (Builder) percentAvailable(Optional.of(percentAvailable));
+		}
+
 		public Builder nonproductiveDescription(Optional<String> nonproductiveDescription) {
 			this.nonproductiveDescription = nonproductiveDescription;
 			return this;
@@ -84,6 +88,14 @@ public class VriPolygon extends BaseVdypPolygon<VriLayer, Optional<Float>, VriSp
 			super.check(errors);
 			requirePresent(biogeoclimaticZone, "biogeoclimaticZone", errors);
 			requirePresent(yieldFactor, "yieldFactor", errors);
+		}
+
+		@Override
+		public Builder copy(VriPolygon toCopy) {
+			super.copy(toCopy);
+			yieldFactor(toCopy.getYieldFactor());
+			nonproductiveDescription(toCopy.getNonproductiveDescription());
+			return this;
 		}
 
 		@Override

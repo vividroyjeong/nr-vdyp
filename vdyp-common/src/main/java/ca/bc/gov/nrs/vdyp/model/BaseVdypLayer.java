@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -142,10 +143,65 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdy
 			return this;
 		}
 
-		public Builder<T, S, I, SB, IB> copy(BaseVdypLayer<?, ?> toCopy) {
+		public Builder<T, S, I, SB, IB> adapt(BaseVdypLayer<?, ?> toCopy) {
 			polygonIdentifier(toCopy.getPolygonIdentifier());
 			layerType(toCopy.getLayerType());
 			inventoryTypeGroup(toCopy.getInventoryTypeGroup());
+			return this;
+		}
+
+		public Builder<T, S, I, SB, IB> copy(T toCopy) {
+			adapt(toCopy);
+			return this;
+		}
+
+		public <I2 extends BaseVdypSite> Builder<T, S, I, SB, IB>
+				adaptSites(BaseVdypLayer<?, I2> toCopy, BiConsumer<IB, I2> config) {
+			toCopy.getSites().values().forEach(siteToCopy -> {
+				this.addSite(builder -> {
+					builder.adapt(siteToCopy);
+					builder.polygonIdentifier = Optional.empty();
+					builder.layerType = Optional.empty();
+					config.accept(builder, siteToCopy);
+				});
+			});
+			return this;
+		}
+
+		public Builder<T, S, I, SB, IB> copySites(T toCopy, BiConsumer<IB, I> config) {
+			toCopy.getSites().values().forEach(siteToCopy -> {
+				this.addSite(builder -> {
+					builder.copy(siteToCopy);
+					builder.polygonIdentifier = Optional.empty();
+					builder.layerType = Optional.empty();
+					config.accept(builder, siteToCopy);
+				});
+			});
+			return this;
+		}
+
+		public <S2 extends BaseVdypSpecies> Builder<T, S, I, SB, IB>
+				adaptSpecies(BaseVdypLayer<S2, ?> toCopy, BiConsumer<SB, S2> config) {
+			toCopy.getSpecies().values().forEach(speciesToCopy -> {
+				this.addSpecies(builder -> {
+					builder.adapt(speciesToCopy);
+					builder.polygonIdentifier = Optional.empty();
+					builder.layerType = Optional.empty();
+					config.accept(builder, speciesToCopy);
+				});
+			});
+			return this;
+		}
+
+		public Builder<T, S, I, SB, IB> copySpecies(T toCopy, BiConsumer<SB, S> config) {
+			toCopy.getSpecies().values().forEach(speciesToCopy -> {
+				this.addSpecies(builder -> {
+					builder.copy(speciesToCopy);
+					builder.polygonIdentifier = Optional.empty();
+					builder.layerType = Optional.empty();
+					config.accept(builder, speciesToCopy);
+				});
+			});
 			return this;
 		}
 

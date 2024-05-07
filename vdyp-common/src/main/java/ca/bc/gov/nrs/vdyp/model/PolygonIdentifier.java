@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.model;
 
 import java.util.Objects;
+import java.util.function.IntUnaryOperator;
 
 public class PolygonIdentifier {
 
@@ -63,5 +64,13 @@ public class PolygonIdentifier {
 			return false;
 		PolygonIdentifier other = (PolygonIdentifier) obj;
 		return Objects.equals(base, other.base) && year == other.year;
+	}
+
+	public PolygonIdentifier forYear(int year) {
+		return new PolygonIdentifier(getBase(), year);
+	}
+
+	public PolygonIdentifier forYear(IntUnaryOperator op) {
+		return forYear(op.applyAsInt(getYear()));
 	}
 }

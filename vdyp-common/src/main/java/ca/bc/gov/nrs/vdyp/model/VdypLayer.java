@@ -221,18 +221,18 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 		@Override
 		protected VdypSpecies buildSpecies(Consumer<VdypSpecies.Builder> config) {
 			return VdypSpecies.build(builder -> {
+				config.accept(builder);
 				builder.polygonIdentifier(this.polygonIdentifier.get());
 				builder.layerType(this.layerType.get());
-				config.accept(builder);
 			});
 		}
 
 		@Override
 		protected VdypSite buildSite(Consumer<VdypSite.Builder> config) {
 			return VdypSite.build(builder -> {
+				config.accept(builder);
 				builder.polygonIdentifier(polygonIdentifier.get());
 				builder.layerType(layerType.get());
-				config.accept(builder);
 			});
 		}
 

@@ -1,7 +1,6 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
 import java.text.MessageFormat;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -12,16 +11,16 @@ import org.slf4j.LoggerFactory;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
-import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.GenusDistribution;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
-import ca.bc.gov.nrs.vdyp.model.SiteCurve;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.si32.site.SiteTool;
 
@@ -34,14 +33,16 @@ public class ForwardProcessingEngine {
 	private final ForwardProcessingState fps;
 	private final GenusDefinitionMap genusDefinitionMap;
 	private final BecLookup becLookup;
-	private final Map<String, SiteCurve> siteCurveMap;
+	private final MatrixMap2<String, Region, SiteIndexEquation> siteCurveMap;
 
 	@SuppressWarnings("unchecked")
 	public ForwardProcessingEngine(Map<String, Object> controlMap) {
 
-		genusDefinitionMap = new GenusDefinitionMap((List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name()));
-		becLookup = (BecLookup) controlMap.get(ControlKey.BEC_DEF.name());
-		siteCurveMap = (Map<String, SiteCurve>) controlMap.get(ControlKey.SITE_CURVE_NUMBERS.name());
+		genusDefinitionMap = new GenusDefinitionMap(
+				Utils.expectParsedControl(controlMap, ControlKey.SP0_DEF, List.class)
+		);
+		becLookup = Utils.expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class);
+		siteCurveMap = Utils.expectParsedControl(controlMap, ControlKey.SITE_CURVE_NUMBERS, MatrixMap2.class);
 
 		fps = new ForwardProcessingState(genusDefinitionMap);
 	}
@@ -54,8 +55,8 @@ public class ForwardProcessingEngine {
 		return becLookup;
 	}
 
-	public Map<String, SiteCurve> getSiteCurveMap() {
-		return Collections.unmodifiableMap(siteCurveMap);
+	public MatrixMap2<String, Region, SiteIndexEquation> getSiteCurveMap() {
+		return siteCurveMap;
 	}
 
 	public void processPolygon(VdypPolygon polygon) throws ProcessingException {
@@ -86,9 +87,9 @@ public class ForwardProcessingEngine {
 				Optional<GenusDistribution> sp0Dist = pps.sp64Distribution[i].getSpeciesDistribution(0);
 
 				if (sp0Dist.isPresent()) {
-					if (siteCurveMap.size() > 0) {
-						SiteCurve sc = siteCurveMap.get(sp0Dist.get().getGenus().getAlias());
-						scIndex = Optional.of(sc.getValue(becZone.getRegion()));
+					if (!siteCurveMap.isEmpty()) {
+						scIndex = Utils
+								.optSafe(siteCurveMap.get(sp0Dist.get().getGenus().getAlias(), becZone.getRegion()));
 					} else {
 						scIndex = Optional.of(
 								SiteTool.getSICurve(pps.speciesName[i], becZone.getRegion().equals(Region.COASTAL))
@@ -97,9 +98,8 @@ public class ForwardProcessingEngine {
 				}
 
 				if (scIndex.isEmpty()) {
-					if (siteCurveMap.size() > 0) {
-						SiteCurve sc = siteCurveMap.get(pps.speciesName[i]);
-						scIndex = Optional.of(sc.getValue(becZone.getRegion()));
+					if (!siteCurveMap.isEmpty()) {
+						scIndex = Utils.optSafe(siteCurveMap.get(pps.speciesName[i], becZone.getRegion()));
 					} else {
 						scIndex = Optional.of(
 								SiteTool.getSICurve(pps.speciesName[i], becZone.getRegion().equals(Region.COASTAL))

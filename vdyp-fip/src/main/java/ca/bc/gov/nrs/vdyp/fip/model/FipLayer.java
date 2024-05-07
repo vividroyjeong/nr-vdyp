@@ -120,17 +120,18 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> {
 		@Override
 		protected FipSpecies buildSpecies(Consumer<FipSpecies.Builder> config) {
 			return FipSpecies.build(builder -> {
-				builder.polygonIdentifier(this.polygonIdentifier.get());
 				config.accept(builder);
+				builder.polygonIdentifier(this.polygonIdentifier.get());
+				builder.layerType(layerType.get());
 			});
 		}
 
 		@Override
 		protected FipSite buildSite(Consumer<FipSite.Builder> config) {
 			return FipSite.build(builder -> {
+				config.accept(builder);
 				builder.polygonIdentifier(polygonIdentifier.get());
 				builder.layerType(layerType.get());
-				config.accept(builder);
 			});
 		}
 

@@ -220,19 +220,31 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> {
 		@Override
 		protected VriSpecies buildSpecies(Consumer<VriSpecies.Builder> config) {
 			return VriSpecies.build(builder -> {
-				builder.polygonIdentifier(polygonIdentifier.get());
-				builder.layerType(layerType.get());
 				config.accept(builder);
+				builder.polygonIdentifier(this.polygonIdentifier.get());
+				builder.layerType(layerType.get());
 			});
 		}
 
 		@Override
 		protected VriSite buildSite(Consumer<VriSite.Builder> config) {
 			return VriSite.build(builder -> {
-				builder.polygonIdentifier(polygonIdentifier.get());
-				builder.layerType(layerType.get());
 				config.accept(builder);
+				builder.polygonIdentifier(this.polygonIdentifier.get());
+				builder.layerType(layerType.get());
 			});
+		}
+
+		@Override
+		public Builder copy(VriLayer toCopy) {
+			super.copy(toCopy);
+			this.baseArea(toCopy.getBaseArea());
+			this.crownClosure(toCopy.getCrownClosure());
+			this.utilization(toCopy.getUtilization());
+			this.primaryGenus(toCopy.getPrimaryGenus());
+			this.secondaryGenus(toCopy.getSecondaryGenus());
+			this.empiricalRelationshipParameterIndex(toCopy.getEmpericalRelationshipParameterIndex());
+			return this;
 		}
 
 	}

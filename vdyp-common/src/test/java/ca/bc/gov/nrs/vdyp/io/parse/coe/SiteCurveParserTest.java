@@ -1,7 +1,7 @@
 package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.mmHasEntry;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -36,9 +36,8 @@ class SiteCurveParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, hasKey("S1"));
-		assertThat(result.get("S1").getValue(Region.COASTAL), is(SiteIndexEquation.SI_ACT_THROWER));
-		assertThat(result.get("S1").getValue(Region.INTERIOR), is(SiteIndexEquation.SI_AT_HUANG));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(1)), "S1", Region.COASTAL));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(2)), "S1", Region.INTERIOR));
 	}
 
 	@Test
@@ -55,12 +54,10 @@ class SiteCurveParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, hasKey("S1"));
-		assertThat(result.get("S1").getValue(Region.COASTAL), is(SiteIndexEquation.SI_ACT_THROWER));
-		assertThat(result.get("S1").getValue(Region.INTERIOR), is(SiteIndexEquation.SI_AT_HUANG));
-		assertThat(result, hasKey("X2"));
-		assertThat(result.get("X2").getValue(Region.COASTAL), is(SiteIndexEquation.SI_AT_CIESZEWSKI));
-		assertThat(result.get("X2").getValue(Region.INTERIOR), is(SiteIndexEquation.SI_AT_GOUDIE));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(1)), "S1", Region.COASTAL));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(2)), "S1", Region.INTERIOR));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(3)), "X2", Region.COASTAL));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(4)), "X2", Region.INTERIOR));
 	}
 
 	@Test
@@ -95,9 +92,8 @@ class SiteCurveParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, hasKey("S1"));
-		assertThat(result.get("S1").getValue(Region.COASTAL), is(SiteIndexEquation.SI_ACT_THROWER));
-		assertThat(result.get("S1").getValue(Region.INTERIOR), is(SiteIndexEquation.SI_AT_HUANG));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(1)), "S1", Region.COASTAL));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(2)), "S1", Region.INTERIOR));
 	}
 
 	@Test
@@ -114,9 +110,8 @@ class SiteCurveParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, hasKey("S1"));
-		assertThat(result.get("S1").getValue(Region.COASTAL), is(SiteIndexEquation.SI_ACT_THROWER));
-		assertThat(result.get("S1").getValue(Region.INTERIOR), is(SiteIndexEquation.SI_AT_HUANG));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(1)), "S1", Region.COASTAL));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(2)), "S1", Region.INTERIOR));
 	}
 
 	@Test
@@ -133,9 +128,8 @@ class SiteCurveParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, hasKey("S1"));
-		assertThat(result.get("S1").getValue(Region.COASTAL), is(SiteIndexEquation.SI_ACT_THROWER));
-		assertThat(result.get("S1").getValue(Region.INTERIOR), is(SiteIndexEquation.SI_AT_HUANG));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(1)), "S1", Region.COASTAL));
+		assertThat(result, mmHasEntry(is(SiteIndexEquation.getByIndex(2)), "S1", Region.INTERIOR));
 	}
 
 }
