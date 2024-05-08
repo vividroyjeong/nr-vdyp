@@ -28,6 +28,7 @@ import java.util.function.Consumer;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -433,7 +434,7 @@ class VdypStartApplicationTest {
 
 		return mock;
 	}
-
+	
 	@Test
 	void testFindPrimarySpeciesNoSpecies() throws Exception {
 		var mockControl = EasyMock.createControl();
@@ -958,477 +959,520 @@ class VdypStartApplicationTest {
 
 	}
 
-	@Test
-	void testEstimatePrimaryBaseArea() throws Exception {
-		var controlMap = TestUtils.loadControlMap();
-		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
-		try (TestStartApplication app = new TestStartApplication(controlMap, false)) {
+	@Nested
+	class EstimatePrimaryBaseArea {
 
-			var bec = Utils.getBec("CWH", controlMap);
+		@Test
+		void testSimple() throws Exception {
+			var controlMap = TestUtils.loadControlMap();
+			var polygonId = new PolygonIdentifier("TestPolygon", 2024);
+			try (TestStartApplication app = new TestStartApplication(controlMap, false)) {
 
-			var layer = this.getTestPrimaryLayer(polygonId, l -> {
-				l.crownClosure(82.8000031f);
+				var bec = Utils.getBec("CWH", controlMap);
 
-			}, s -> {
-				s.ageTotal(Optional.of(85f));
-				s.height(Optional.of(38.2999992f));
-				s.siteIndex(Optional.of(28.6000004f));
-				s.yearsToBreastHeight(Optional.of(5.4000001f));
-				s.siteCurveNumber(Optional.of(34));
-				s.siteGenus(Optional.of("H"));
-			});
+				var layer = getTestPrimaryLayer(polygonId, l -> {
+					l.crownClosure(82.8000031f);
 
-			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
-				s.setPercentGenus(33f);
-				s.setFractionGenus(0.330000013f);
-			});
-			var spec2 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
-				s.setPercentGenus(67f);
-				s.setFractionGenus(0.670000017f);
-			});
-
-			Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
-			allSpecies.put(spec1.getGenus(), spec1);
-			allSpecies.put(spec2.getGenus(), spec2);
-
-			layer.setSpecies(allSpecies);
-
-			var result = app.estimatePrimaryBaseArea(layer, bec, 1f, 79.5999985f, 3.13497972f);
-
-			assertThat(result, closeTo(62.6653595f));
-		}
-	}
-
-	@Test
-	void testEstimatePrimaryBaseAreaHeightCloseToA2() throws Exception {
-		controlMap = TestUtils.loadControlMap();
-		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
-		try (TestStartApplication app = new TestStartApplication(controlMap, false)) {
-
-			var bec = Utils.getBec("CWH", controlMap);
-
-			var layer = this.getTestPrimaryLayer(polygonId, l -> {
-				l.crownClosure(82.8000031f);
-			}, s -> {
-				s.ageTotal(Optional.of(85f));
-				s.height(Optional.of(10.1667995f)); // Altered this in the debugger while running VDYP7
-				s.siteIndex(Optional.of(28.6000004f));
-				s.yearsToBreastHeight(Optional.of(5.4000001f));
-				s.siteCurveNumber(Optional.of(34));
-				s.siteGenus(Optional.of("H"));
-			});
-
-			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
-				s.setPercentGenus(33f);
-				s.setFractionGenus(0.330000013f);
-			});
-			var spec2 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
-				s.setPercentGenus(67f);
-				s.setFractionGenus(0.670000017f);
-			});
-
-			Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
-			allSpecies.put(spec1.getGenus(), spec1);
-			allSpecies.put(spec2.getGenus(), spec2);
-
-			layer.setSpecies(allSpecies);
-
-			var result = app.estimatePrimaryBaseArea(layer, bec, 1f, 79.5999985f, 3.13497972f);
-
-			assertThat(result, closeTo(23.1988659f));
-		}
-	}
-
-	@Test
-	void testEstimatePrimaryBaseAreaLowCrownClosure() throws Exception {
-		controlMap = TestUtils.loadControlMap();
-		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
-		try (TestStartApplication app = new TestStartApplication(controlMap, false)) {
-
-			var bec = Utils.getBec("CWH", controlMap);
-
-			var layer = this.getTestPrimaryLayer(polygonId, l -> {
-				l.crownClosure(9f); // Altered this in the debugger while running VDYP7
-			}, s -> {
-				s.ageTotal(Optional.of(85f));
-				s.height(Optional.of(38.2999992f));
-				s.siteIndex(Optional.of(28.6000004f));
-				s.yearsToBreastHeight(Optional.of(5.4000001f));
-				s.siteCurveNumber(Optional.of(34));
-				s.siteGenus(Optional.of("H"));
-			});
-
-			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
-				s.setPercentGenus(33f);
-				s.setFractionGenus(0.330000013f);
-			});
-			var spec2 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
-				s.setPercentGenus(67f);
-				s.setFractionGenus(0.670000017f);
-			});
-
-			Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
-			allSpecies.put(spec1.getGenus(), spec1);
-			allSpecies.put(spec2.getGenus(), spec2);
-
-			layer.setSpecies(allSpecies);
-
-			var result = app.estimatePrimaryBaseArea(layer, bec, 1f, 79.5999985f, 3.13497972f);
-
-			assertThat(result, closeTo(37.6110077f));
-		}
-	}
-
-	@Test
-	void testEstimatePrimaryBaseAreaLowResult() throws Exception {
-		controlMap = TestUtils.loadControlMap();
-		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
-		try (TestStartApplication app = new TestStartApplication(controlMap, false)) {
-
-			var bec = Utils.getBec("CWH", controlMap);
-
-			TestLayer layer = this.getTestPrimaryLayer(polygonId, l -> {
-				l.crownClosure(82.8000031f);
-			}, s -> {
-				s.ageTotal(85f);
-				s.height(7f); // Altered this in the debugger while running VDYP7
-				s.siteIndex(28.6000004f);
-				s.yearsToBreastHeight(5.4000001f);
-				s.siteCurveNumber(34);
-				s.siteGenus("H");
-			});
-
-			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
-				s.setPercentGenus(33f);
-				s.setFractionGenus(0.330000013f);
-			});
-			var spec2 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
-				s.setPercentGenus(67f);
-				s.setFractionGenus(0.670000017f);
-			});
-
-			Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
-			allSpecies.put(spec1.getGenus(), spec1);
-			allSpecies.put(spec2.getGenus(), spec2);
-
-			layer.setSpecies(allSpecies);
-
-			var ex = assertThrows(
-					LowValueException.class, () -> app.estimatePrimaryBaseArea(layer, bec, 1f, 79.5999985f, 3.13497972f)
-			);
-
-			assertThat(ex, hasProperty("value", is(0f)));
-			assertThat(ex, hasProperty("threshold", is(0.05f)));
-		}
-	}
-
-	@Test
-	void testEstimatePrimaryQuadMeanDiameter() throws Exception {
-		var controlMap = TestUtils.loadControlMap();
-		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
-		try (var app = new TestStartApplication(controlMap, false)) {
-
-			var becLookup = BecDefinitionParser.getBecs(controlMap);
-			var bec = becLookup.get("CWH").get();
-
-			var layer = this.getTestPrimaryLayer(polygonId, l -> {
-				l.crownClosure(82.8000031f);
-			}, s -> {
-				s.ageTotal(85f);
-				s.height(38.2999992f);
-				s.siteIndex(28.6000004f);
-				s.yearsToBreastHeight(5.4000001f);
-				s.siteCurveNumber(34);
-				s.siteGenus("H");
-			});
-
-			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
-				s.setPercentGenus(33f);
-				s.setFractionGenus(0.330000013f);
-			});
-			var spec2 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
-				s.setPercentGenus(67f);
-				s.setFractionGenus(0.670000017f);
-			});
-
-			Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
-			allSpecies.put(spec1.getGenus(), spec1);
-			allSpecies.put(spec2.getGenus(), spec2);
-
-			layer.setSpecies(allSpecies);
-
-			var result = app.estimatePrimaryQuadMeanDiameter(layer, bec, 79.5999985f, 3.13497972f);
-
-			assertThat(result, closeTo(32.5390053f));
-		}
-	}
-
-	@Test
-	void testEstimatePrimaryQuadMeanDiameterHeightLessThanA5() throws Exception {
-		var controlMap = TestUtils.loadControlMap();
-		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
-		try (var app = new TestStartApplication(controlMap, false)) {
-
-			var becLookup = BecDefinitionParser.getBecs(controlMap);
-			var bec = becLookup.get("CWH").get();
-
-			var layer = this.getTestPrimaryLayer(polygonId, l -> {
-				l.crownClosure(82.8000031f);
-			}, s -> {
-				s.ageTotal(85f);
-				s.height(4.74730005f);
-				s.siteIndex(28.6000004f);
-				s.yearsToBreastHeight(5.4000001f);
-				s.siteCurveNumber(34);
-				s.siteGenus("H");
-			});
-
-			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
-				s.setPercentGenus(33f);
-				s.setFractionGenus(0.330000013f);
-			});
-			var spec2 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
-				s.setPercentGenus(67f);
-				s.setFractionGenus(0.670000017f);
-			});
-
-			Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
-			allSpecies.put(spec1.getGenus(), spec1);
-			allSpecies.put(spec2.getGenus(), spec2);
-
-			layer.setSpecies(allSpecies);
-
-			var result = app.estimatePrimaryQuadMeanDiameter(layer, bec, 79.5999985f, 3.13497972f);
-
-			assertThat(result, closeTo(7.6f));
-		}
-	}
-
-	@Test
-	void testEstimatePrimaryQuadMeanDiameterResultLargerThanUpperBound() throws Exception {
-		var controlMap = TestUtils.loadControlMap();
-		var polygonId = new PolygonIdentifier("TestPolygon", 2024);
-		try (var app = new TestStartApplication(controlMap, false)) {
-
-			var becLookup = BecDefinitionParser.getBecs(controlMap);
-			var bec = becLookup.get("CWH").get();
-
-			// Tweak the values to produce a very large DQ
-			var layer = this.getTestPrimaryLayer(polygonId, l -> {
-				l.crownClosure(82.8000031f);
-			}, s -> {
-				s.ageTotal(350f);
-				s.height(80f);
-				s.siteIndex(28.6000004f);
-				s.yearsToBreastHeight(5.4000001f);
-				s.siteCurveNumber(34);
-				s.siteGenus("H");
-			});
-
-			var spec1 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
-				s.setPercentGenus(33f);
-				s.setFractionGenus(0.330000013f);
-			});
-			var spec2 = this.getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
-				s.setPercentGenus(67f);
-				s.setFractionGenus(0.670000017f);
-			});
-
-			Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
-			allSpecies.put(spec1.getGenus(), spec1);
-			allSpecies.put(spec2.getGenus(), spec2);
-
-			layer.setSpecies(allSpecies);
-
-			var result = app.estimatePrimaryQuadMeanDiameter(layer, bec, 350f - 5.4000001f, 3.13497972f);
-
-			assertThat(result, closeTo(61.1f)); // Clamp to the COE043/UPPER_BA_BY_CI_S0_P DQ value for this species and
-			// region
-		}
-	}
-
-	@Test
-	void testEstimatePercentForestLand() throws Exception {
-		var controlMap = TestUtils.loadControlMap();
-		try (var app = new TestStartApplication(controlMap, false)) {
-
-			var polygon = TestPolygon.build(pb -> {
-				pb.polygonIdentifier("TestPolygon", 2024);
-				pb.biogeoclimaticZone("IDF");
-				pb.forestInventoryZone("Z");
-				pb.mode(PolygonMode.START);
-
-				pb.percentAvailable(Optional.empty());
-
-				pb.addLayer(lb -> {
-					lb.layerType(LayerType.PRIMARY);
-
-					lb.crownClosure(60f);
-
-					lb.addSite(ib -> {
-						ib.siteGenus("L");
-						ib.ageTotal(60f);
-						ib.height(15f);
-						ib.siteIndex(5f);
-						ib.yearsToBreastHeight(8.5f);
-					});
-
-					lb.addSpecies(sb -> {
-						sb.genus("L");
-						sb.percentGenus(10);
-					});
-					lb.addSpecies(sb -> {
-						sb.genus("PL");
-						sb.percentGenus(90);
-					});
+				}, s -> {
+					s.ageTotal(Optional.of(85f));
+					s.height(Optional.of(38.2999992f));
+					s.siteIndex(Optional.of(28.6000004f));
+					s.yearsToBreastHeight(Optional.of(5.4000001f));
+					s.siteCurveNumber(Optional.of(34));
+					s.siteGenus(Optional.of("H"));
 				});
-			});
 
-			TestLayer primaryLayer = polygon.getLayers().get(LayerType.PRIMARY);
-			Optional<TestLayer> veteranLayer = Optional.empty();
+				var spec1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
+					s.setPercentGenus(33f);
+					s.setFractionGenus(0.330000013f);
+				});
+				var spec2 = getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
+					s.setPercentGenus(67f);
+					s.setFractionGenus(0.670000017f);
+				});
 
-			var result = app.estimatePercentForestLand(polygon, veteranLayer, primaryLayer);
+				Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
+				allSpecies.put(spec1.getGenus(), spec1);
+				allSpecies.put(spec2.getGenus(), spec2);
 
-			assertThat(result, closeTo(90f));
-		}
-	}
+				layer.setSpecies(allSpecies);
 
-	@Test
-	void testEstimatePercentForestLandWithVeteran() throws Exception {
-		var controlMap = TestUtils.loadControlMap();
-		try (var app = new TestStartApplication(controlMap, false) {
+				var result = app.estimatePrimaryBaseArea(layer, bec, 1f, 79.5999985f, 3.13497972f);
 
-			@Override
-			public VdypApplicationIdentifier getId() {
-				return VdypApplicationIdentifier.FIP_START;
+				assertThat(result, closeTo(62.6653595f));
 			}
+		}
 
-		}) {
+		@Test
+		void testHeightCloseToA2() throws Exception {
+			controlMap = TestUtils.loadControlMap();
+			var polygonId = new PolygonIdentifier("TestPolygon", 2024);
+			try (TestStartApplication app = new TestStartApplication(controlMap, false)) {
 
-			var polygon = TestPolygon.build(pb -> {
-				pb.polygonIdentifier("TestPolygon", 2024);
-				pb.biogeoclimaticZone("CWH");
-				pb.forestInventoryZone("A");
-				pb.mode(PolygonMode.START);
+				var bec = Utils.getBec("CWH", controlMap);
 
-				pb.percentAvailable(Optional.empty());
-
-				pb.addLayer(lb -> {
-					lb.layerType(LayerType.PRIMARY);
-
-					lb.crownClosure(82.8f);
-
-					lb.addSite(ib -> {
-						ib.siteGenus("H");
-						ib.ageTotal(45f);
-						ib.height(24.3f);
-						ib.siteIndex(28.7f);
-						ib.yearsToBreastHeight(7.1f);
-					});
-
-					lb.addSpecies(sb -> {
-						sb.genus("B");
-						sb.percentGenus(15);
-					});
-					lb.addSpecies(sb -> {
-						sb.genus("D");
-						sb.percentGenus(7);
-					});
-					lb.addSpecies(sb -> {
-						sb.genus("H");
-						sb.percentGenus(77);
-					});
-					lb.addSpecies(sb -> {
-						sb.genus("S");
-						sb.percentGenus(1);
-					});
+				var layer = getTestPrimaryLayer(polygonId, l -> {
+					l.crownClosure(82.8000031f);
+				}, s -> {
+					s.ageTotal(Optional.of(85f));
+					s.height(Optional.of(10.1667995f)); // Altered this in the debugger while running VDYP7
+					s.siteIndex(Optional.of(28.6000004f));
+					s.yearsToBreastHeight(Optional.of(5.4000001f));
+					s.siteCurveNumber(Optional.of(34));
+					s.siteGenus(Optional.of("H"));
 				});
-				pb.addLayer(lb -> {
-					lb.layerType(LayerType.VETERAN);
 
-					lb.crownClosure(4f);
-
-					lb.addSite(ib -> {
-						ib.siteGenus("H");
-						ib.ageTotal(105f);
-						ib.height(26.2f);
-						ib.siteIndex(16.7f);
-						ib.yearsToBreastHeight(7.1f);
-					});
-
+				var spec1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
+					s.setPercentGenus(33f);
+					s.setFractionGenus(0.330000013f);
 				});
-			});
+				var spec2 = getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
+					s.setPercentGenus(67f);
+					s.setFractionGenus(0.670000017f);
+				});
 
-			TestLayer primaryLayer = polygon.getLayers().get(LayerType.PRIMARY);
-			Optional<TestLayer> veteranLayer = Optional.of(polygon.getLayers().get(LayerType.VETERAN));
+				Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
+				allSpecies.put(spec1.getGenus(), spec1);
+				allSpecies.put(spec2.getGenus(), spec2);
 
-			var result = app.estimatePercentForestLand(polygon, veteranLayer, primaryLayer);
+				layer.setSpecies(allSpecies);
 
-			assertThat(result, closeTo(98f));
+				var result = app.estimatePrimaryBaseArea(layer, bec, 1f, 79.5999985f, 3.13497972f);
+
+				assertThat(result, closeTo(23.1988659f));
+			}
+		}
+
+		@Test
+		void testLowCrownClosure() throws Exception {
+			controlMap = TestUtils.loadControlMap();
+			var polygonId = new PolygonIdentifier("TestPolygon", 2024);
+			try (TestStartApplication app = new TestStartApplication(controlMap, false)) {
+
+				var bec = Utils.getBec("CWH", controlMap);
+
+				var layer = getTestPrimaryLayer(polygonId, l -> {
+					l.crownClosure(9f); // Altered this in the debugger while running VDYP7
+				}, s -> {
+					s.ageTotal(Optional.of(85f));
+					s.height(Optional.of(38.2999992f));
+					s.siteIndex(Optional.of(28.6000004f));
+					s.yearsToBreastHeight(Optional.of(5.4000001f));
+					s.siteCurveNumber(Optional.of(34));
+					s.siteGenus(Optional.of("H"));
+				});
+
+				var spec1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
+					s.setPercentGenus(33f);
+					s.setFractionGenus(0.330000013f);
+				});
+				var spec2 = getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
+					s.setPercentGenus(67f);
+					s.setFractionGenus(0.670000017f);
+				});
+
+				Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
+				allSpecies.put(spec1.getGenus(), spec1);
+				allSpecies.put(spec2.getGenus(), spec2);
+
+				layer.setSpecies(allSpecies);
+
+				var result = app.estimatePrimaryBaseArea(layer, bec, 1f, 79.5999985f, 3.13497972f);
+
+				assertThat(result, closeTo(37.6110077f));
+			}
+		}
+
+		@Test
+		void testLowResult() throws Exception {
+			controlMap = TestUtils.loadControlMap();
+			var polygonId = new PolygonIdentifier("TestPolygon", 2024);
+			try (TestStartApplication app = new TestStartApplication(controlMap, false)) {
+
+				var bec = Utils.getBec("CWH", controlMap);
+
+				TestLayer layer = getTestPrimaryLayer(polygonId, l -> {
+					l.crownClosure(82.8000031f);
+				}, s -> {
+					s.ageTotal(85f);
+					s.height(7f); // Altered this in the debugger while running VDYP7
+					s.siteIndex(28.6000004f);
+					s.yearsToBreastHeight(5.4000001f);
+					s.siteCurveNumber(34);
+					s.siteGenus("H");
+				});
+
+				var spec1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
+					s.setPercentGenus(33f);
+					s.setFractionGenus(0.330000013f);
+				});
+				var spec2 = getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
+					s.setPercentGenus(67f);
+					s.setFractionGenus(0.670000017f);
+				});
+
+				Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
+				allSpecies.put(spec1.getGenus(), spec1);
+				allSpecies.put(spec2.getGenus(), spec2);
+
+				layer.setSpecies(allSpecies);
+
+				var ex = assertThrows(
+						LowValueException.class,
+						() -> app.estimatePrimaryBaseArea(layer, bec, 1f, 79.5999985f, 3.13497972f)
+				);
+
+				assertThat(ex, hasProperty("value", is(0f)));
+				assertThat(ex, hasProperty("threshold", is(0.05f)));
+			}
+		}
+
+	}
+
+	@Nested
+	class EstimatePrimaryQuadMeanDiameter {
+
+		@Test
+		void testSimple() throws Exception {
+			var controlMap = TestUtils.loadControlMap();
+			var polygonId = new PolygonIdentifier("TestPolygon", 2024);
+			try (var app = new TestStartApplication(controlMap, false)) {
+
+				var becLookup = BecDefinitionParser.getBecs(controlMap);
+				var bec = becLookup.get("CWH").get();
+
+				var layer = getTestPrimaryLayer(polygonId, l -> {
+					l.crownClosure(82.8000031f);
+				}, s -> {
+					s.ageTotal(85f);
+					s.height(38.2999992f);
+					s.siteIndex(28.6000004f);
+					s.yearsToBreastHeight(5.4000001f);
+					s.siteCurveNumber(34);
+					s.siteGenus("H");
+				});
+
+				var spec1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
+					s.setPercentGenus(33f);
+					s.setFractionGenus(0.330000013f);
+				});
+				var spec2 = getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
+					s.setPercentGenus(67f);
+					s.setFractionGenus(0.670000017f);
+				});
+
+				Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
+				allSpecies.put(spec1.getGenus(), spec1);
+				allSpecies.put(spec2.getGenus(), spec2);
+
+				layer.setSpecies(allSpecies);
+
+				var result = app.estimatePrimaryQuadMeanDiameter(layer, bec, 79.5999985f, 3.13497972f);
+
+				assertThat(result, closeTo(32.5390053f));
+			}
+		}
+
+		@Test
+		void testHeightLessThanA5() throws Exception {
+			var controlMap = TestUtils.loadControlMap();
+			var polygonId = new PolygonIdentifier("TestPolygon", 2024);
+			try (var app = new TestStartApplication(controlMap, false)) {
+
+				var becLookup = BecDefinitionParser.getBecs(controlMap);
+				var bec = becLookup.get("CWH").get();
+
+				var layer = getTestPrimaryLayer(polygonId, l -> {
+					l.crownClosure(82.8000031f);
+				}, s -> {
+					s.ageTotal(85f);
+					s.height(4.74730005f);
+					s.siteIndex(28.6000004f);
+					s.yearsToBreastHeight(5.4000001f);
+					s.siteCurveNumber(34);
+					s.siteGenus("H");
+				});
+
+				var spec1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
+					s.setPercentGenus(33f);
+					s.setFractionGenus(0.330000013f);
+				});
+				var spec2 = getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
+					s.setPercentGenus(67f);
+					s.setFractionGenus(0.670000017f);
+				});
+
+				Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
+				allSpecies.put(spec1.getGenus(), spec1);
+				allSpecies.put(spec2.getGenus(), spec2);
+
+				layer.setSpecies(allSpecies);
+
+				var result = app.estimatePrimaryQuadMeanDiameter(layer, bec, 79.5999985f, 3.13497972f);
+
+				assertThat(result, closeTo(7.6f));
+			}
+		}
+
+		@Test
+		void testResultLargerThanUpperBound() throws Exception {
+			var controlMap = TestUtils.loadControlMap();
+			var polygonId = new PolygonIdentifier("TestPolygon", 2024);
+			try (var app = new TestStartApplication(controlMap, false)) {
+
+				var becLookup = BecDefinitionParser.getBecs(controlMap);
+				var bec = becLookup.get("CWH").get();
+
+				// Tweak the values to produce a very large DQ
+				var layer = getTestPrimaryLayer(polygonId, l -> {
+					l.crownClosure(82.8000031f);
+				}, s -> {
+					s.ageTotal(350f);
+					s.height(80f);
+					s.siteIndex(28.6000004f);
+					s.yearsToBreastHeight(5.4000001f);
+					s.siteCurveNumber(34);
+					s.siteGenus("H");
+				});
+
+				var spec1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", s -> {
+					s.setPercentGenus(33f);
+					s.setFractionGenus(0.330000013f);
+				});
+				var spec2 = getTestSpecies(polygonId, LayerType.PRIMARY, "H", s -> {
+					s.setPercentGenus(67f);
+					s.setFractionGenus(0.670000017f);
+				});
+
+				Map<String, TestSpecies> allSpecies = new LinkedHashMap<>();
+				allSpecies.put(spec1.getGenus(), spec1);
+				allSpecies.put(spec2.getGenus(), spec2);
+
+				layer.setSpecies(allSpecies);
+
+				var result = app.estimatePrimaryQuadMeanDiameter(layer, bec, 350f - 5.4000001f, 3.13497972f);
+
+				assertThat(result, closeTo(61.1f)); // Clamp to the COE043/UPPER_BA_BY_CI_S0_P DQ value for this species
+													// and
+				// region
+			}
 		}
 	}
 
-	@ParameterizedTest
-	@CsvSource(
-			value = { //
-					"'A:100.0', 100.0", //
-					"'A:99.991', 99.991", //
-					"'A:100.009', 100.009", //
-					"'A:75.0 B:25.0', 100.0", //
-					"'A:75.0 B:25.009', 100.009", //
-					"'A:75.0 B:24.991', 99.991" //
-			}
-	)
-	void testGetPercentTotal(String dist, float expected) throws Exception {
-		var controlMap = TestUtils.loadControlMap();
-		try (var app = new TestStartApplication(controlMap, false)) {
+	@Nested
+	class EstimatePercentForestLand {
 
-			var layer = TestLayer.build(lb -> {
-				lb.polygonIdentifier("TestPolygon", 2024);
-				lb.layerType(LayerType.PRIMARY);
-				lb.crownClosure(90f);
-				for (String s : dist.split(" ")) {
-					var parts = s.split(":");
-					lb.addSpecies(sb -> {
-						sb.genus(parts[0]);
-						sb.percentGenus(Float.valueOf(parts[1]));
+		@Test
+		void testAlreadySet() throws Exception {
+			var controlMap = TestUtils.loadControlMap();
+			try (var app = new TestStartApplication(controlMap, false)) {
+
+				var polygon = TestPolygon.build(pb -> {
+					pb.polygonIdentifier("TestPolygon", 2024);
+					pb.biogeoclimaticZone("IDF");
+					pb.forestInventoryZone("Z");
+					pb.mode(PolygonMode.START);
+
+					pb.percentAvailable(Optional.of(42f));
+
+				});
+
+				TestLayer primaryLayer = polygon.getLayers().get(LayerType.PRIMARY);
+				Optional<TestLayer> veteranLayer = Optional.empty();
+
+				var result = app.estimatePercentForestLand(polygon, veteranLayer, primaryLayer);
+
+				assertThat(result, closeTo(42f));
+			}
+		}
+
+		@Test
+		void testWithoutVeteran() throws Exception {
+			var controlMap = TestUtils.loadControlMap();
+			try (var app = new TestStartApplication(controlMap, false)) {
+
+				var polygon = TestPolygon.build(pb -> {
+					pb.polygonIdentifier("TestPolygon", 2024);
+					pb.biogeoclimaticZone("IDF");
+					pb.forestInventoryZone("Z");
+					pb.mode(PolygonMode.START);
+
+					pb.percentAvailable(Optional.empty());
+
+					pb.addLayer(lb -> {
+						lb.layerType(LayerType.PRIMARY);
+
+						lb.crownClosure(60f);
+
+						lb.addSite(ib -> {
+							ib.siteGenus("L");
+							ib.ageTotal(60f);
+							ib.height(15f);
+							ib.siteIndex(5f);
+							ib.yearsToBreastHeight(8.5f);
+						});
+
+						lb.addSpecies(sb -> {
+							sb.genus("L");
+							sb.percentGenus(10);
+						});
+						lb.addSpecies(sb -> {
+							sb.genus("PL");
+							sb.percentGenus(90);
+						});
 					});
+				});
+
+				TestLayer primaryLayer = polygon.getLayers().get(LayerType.PRIMARY);
+				Optional<TestLayer> veteranLayer = Optional.empty();
+
+				var result = app.estimatePercentForestLand(polygon, veteranLayer, primaryLayer);
+
+				assertThat(result, closeTo(90f));
+			}
+		}
+
+		@Test
+		void testWithVeteran() throws Exception {
+			var controlMap = TestUtils.loadControlMap();
+			try (var app = new TestStartApplication(controlMap, false) {
+
+				@Override
+				public VdypApplicationIdentifier getId() {
+					return VdypApplicationIdentifier.FIP_START;
 				}
-			});
 
-			var result = app.getPercentTotal(layer);
+			}) {
 
-			assertThat(result, closeTo(expected));
+				var polygon = TestPolygon.build(pb -> {
+					pb.polygonIdentifier("TestPolygon", 2024);
+					pb.biogeoclimaticZone("CWH");
+					pb.forestInventoryZone("A");
+					pb.mode(PolygonMode.START);
+
+					pb.percentAvailable(Optional.empty());
+
+					pb.addLayer(lb -> {
+						lb.layerType(LayerType.PRIMARY);
+
+						lb.crownClosure(82.8f);
+
+						lb.addSite(ib -> {
+							ib.siteGenus("H");
+							ib.ageTotal(45f);
+							ib.height(24.3f);
+							ib.siteIndex(28.7f);
+							ib.yearsToBreastHeight(7.1f);
+						});
+
+						lb.addSpecies(sb -> {
+							sb.genus("B");
+							sb.percentGenus(15);
+						});
+						lb.addSpecies(sb -> {
+							sb.genus("D");
+							sb.percentGenus(7);
+						});
+						lb.addSpecies(sb -> {
+							sb.genus("H");
+							sb.percentGenus(77);
+						});
+						lb.addSpecies(sb -> {
+							sb.genus("S");
+							sb.percentGenus(1);
+						});
+					});
+					pb.addLayer(lb -> {
+						lb.layerType(LayerType.VETERAN);
+
+						lb.crownClosure(4f);
+
+						lb.addSite(ib -> {
+							ib.siteGenus("H");
+							ib.ageTotal(105f);
+							ib.height(26.2f);
+							ib.siteIndex(16.7f);
+							ib.yearsToBreastHeight(7.1f);
+						});
+
+					});
+				});
+
+				TestLayer primaryLayer = polygon.getLayers().get(LayerType.PRIMARY);
+				Optional<TestLayer> veteranLayer = Optional.of(polygon.getLayers().get(LayerType.VETERAN));
+
+				var result = app.estimatePercentForestLand(polygon, veteranLayer, primaryLayer);
+
+				assertThat(result, closeTo(98f));
+			}
 		}
 	}
 
-	@ParameterizedTest
-	@ValueSource(
-			strings = { //
-					"A:99.989", //
-					"A:100.011", //
-					"A:75.0 B:25.011", //
-					"A:75.0 B:24.989" //
-			}
-	)
-	void testGetPercentTotalFail(String dist) throws Exception {
-		var controlMap = TestUtils.loadControlMap();
-		try (var app = new TestStartApplication(controlMap, false)) {
+	@Nested
+	class GetPercentTotal {
 
-			var layer = TestLayer.build(lb -> {
-				lb.polygonIdentifier("TestPolygon", 2024);
-				lb.layerType(LayerType.PRIMARY);
-				lb.crownClosure(90f);
-				for (String s : dist.split(" ")) {
-					var parts = s.split(":");
-					lb.addSpecies(sb -> {
-						sb.genus(parts[0]);
-						sb.percentGenus(Float.valueOf(parts[1]));
-					});
+		@ParameterizedTest
+		@CsvSource(
+				value = { //
+						"'A:100.0', 100.0", //
+						"'A:99.991', 99.991", //
+						"'A:100.009', 100.009", //
+						"'A:75.0 B:25.0', 100.0", //
+						"'A:75.0 B:25.009', 100.009", //
+						"'A:75.0 B:24.991', 99.991" //
 				}
-			});
+		)
+		void testPass(String dist, float expected) throws Exception {
+			var controlMap = TestUtils.loadControlMap();
+			try (var app = new TestStartApplication(controlMap, false)) {
 
-			assertThrows(StandProcessingException.class, () -> app.getPercentTotal(layer));
+				var layer = TestLayer.build(lb -> {
+					lb.polygonIdentifier("TestPolygon", 2024);
+					lb.layerType(LayerType.PRIMARY);
+					lb.crownClosure(90f);
+					for (String s : dist.split(" ")) {
+						var parts = s.split(":");
+						lb.addSpecies(sb -> {
+							sb.genus(parts[0]);
+							sb.percentGenus(Float.valueOf(parts[1]));
+						});
+					}
+				});
+
+				var result = app.getPercentTotal(layer);
+
+				assertThat(result, closeTo(expected));
+			}
+		}
+
+		@ParameterizedTest
+		@ValueSource(
+				strings = { //
+						"A:99.989", //
+						"A:100.011", //
+						"A:75.0 B:25.011", //
+						"A:75.0 B:24.989" //
+				}
+		)
+		void testFail(String dist) throws Exception {
+			var controlMap = TestUtils.loadControlMap();
+			try (var app = new TestStartApplication(controlMap, false)) {
+
+				var layer = TestLayer.build(lb -> {
+					lb.polygonIdentifier("TestPolygon", 2024);
+					lb.layerType(LayerType.PRIMARY);
+					lb.crownClosure(90f);
+					for (String s : dist.split(" ")) {
+						var parts = s.split(":");
+						lb.addSpecies(sb -> {
+							sb.genus(parts[0]);
+							sb.percentGenus(Float.valueOf(parts[1]));
+						});
+					}
+				});
+
+				assertThrows(StandProcessingException.class, () -> app.getPercentTotal(layer));
+			}
 		}
 	}
 

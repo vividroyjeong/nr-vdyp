@@ -54,6 +54,7 @@ import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.IndexedFloatBinaryOperator;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayer;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayerPrimary;
@@ -2622,6 +2623,14 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 						a3 * spec.getLoreyHeightByUtilization().getCoe(FipStart.UTIL_ALL);
 
 		return exp(logit) / (1.0f + exp(logit));
+	}
+	
+	@Override
+	protected ValueOrMarker<Float, Boolean> isVeteranForEstimatePercentForestLand(FipPolygon polygon, Optional<FipLayer> vetLayer) {
+		if (polygon.getMode().map(mode -> mode == PolygonMode.YOUNG).orElse(false)) {
+			return FLOAT_OR_BOOL.value(100f);
+		}
+		return super.isVeteranForEstimatePercentForestLand(polygon, vetLayer);
 	}
 
 	/**

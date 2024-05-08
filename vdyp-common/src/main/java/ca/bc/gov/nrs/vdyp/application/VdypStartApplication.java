@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -50,9 +51,7 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
-import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.Region;
-import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 
 public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional<Float>, S, I>, L extends BaseVdypLayer<S, I> & InputLayer, S extends BaseVdypSpecies, I extends BaseVdypSite>
 		extends VdypApplication implements Closeable {
@@ -664,21 +663,18 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		if (polygon.getPercentAvailable().isPresent()) {
 			return polygon.getPercentAvailable().get();
 		}
-
-		boolean veteran = vetLayer//
-				.filter(layer -> getLayerHeight(layer).orElse(0f) > 0f) //
-				.filter(layer -> layer.getCrownClosure() > 0f)//
-				.isPresent(); // LAYERV
-
-		if (getId() == VdypApplicationIdentifier.FIP_START
-				&& polygon.getMode().map(mode -> mode == PolygonMode.YOUNG).orElse(false)) {
-			return 100f;
-		}
-		if (getId() == VdypApplicationIdentifier.VRI_START) {
-			veteran = vetLayer.isPresent();
-		}
-
+		
 		assert primaryLayer != null;
+
+		final boolean veteran;
+		{
+			var resultOrIsVeteran = isVeteranForEstimatePercentForestLand(polygon, vetLayer);
+			if(resultOrIsVeteran.isValue()) {
+				return resultOrIsVeteran.getValue().orElseThrow();
+			}
+			
+			veteran = resultOrIsVeteran.getMarker().orElseThrow();
+		}
 
 		float primaryAgeTotal = getLayerAgeTotal(primaryLayer).orElseThrow();
 
@@ -726,6 +722,17 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 		return floor(min(percentYield + gainMax, 100f));
 
+	}
+	
+	protected static final ValueOrMarker.Builder<Float, Boolean> FLOAT_OR_BOOL = ValueOrMarker.builder(Float.class, Boolean.class);
+
+	protected ValueOrMarker<Float, Boolean> isVeteranForEstimatePercentForestLand(P polygon, Optional<L> vetLayer) {
+		boolean veteran = vetLayer//
+				.filter(layer -> getLayerHeight(layer).orElse(0f) > 0f) //
+				.filter(layer -> layer.getCrownClosure() > 0f)//
+				.isPresent(); // LAYERV
+
+		return FLOAT_OR_BOOL.marker(veteran);
 	}
 
 	private float crownClosureForPercentForestLand(
