@@ -895,9 +895,10 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		// TODO
 		return poly;
 	}
-	
+
 	@Override
-	protected ValueOrMarker<Float, Boolean> isVeteranForEstimatePercentForestLand(VriPolygon polygon, Optional<VriLayer> vetLayer) {
+	protected ValueOrMarker<Float, Boolean>
+			isVeteranForEstimatePercentForestLand(VriPolygon polygon, Optional<VriLayer> vetLayer) {
 		return FLOAT_OR_BOOL.marker(vetLayer.isPresent());
 	}
 

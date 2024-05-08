@@ -2623,9 +2623,10 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 		return exp(logit) / (1.0f + exp(logit));
 	}
-	
+
 	@Override
-	protected ValueOrMarker<Float, Boolean> isVeteranForEstimatePercentForestLand(FipPolygon polygon, Optional<FipLayer> vetLayer) {
+	protected ValueOrMarker<Float, Boolean>
+			isVeteranForEstimatePercentForestLand(FipPolygon polygon, Optional<FipLayer> vetLayer) {
 		if (polygon.getMode().map(mode -> mode == PolygonMode.YOUNG).orElse(false)) {
 			return FLOAT_OR_BOOL.value(100f);
 		}

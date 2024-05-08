@@ -434,7 +434,7 @@ class VdypStartApplicationTest {
 
 		return mock;
 	}
-	
+
 	@Test
 	void testFindPrimarySpeciesNoSpecies() throws Exception {
 		var mockControl = EasyMock.createControl();

@@ -663,16 +663,16 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		if (polygon.getPercentAvailable().isPresent()) {
 			return polygon.getPercentAvailable().get();
 		}
-		
+
 		assert primaryLayer != null;
 
 		final boolean veteran;
 		{
 			var resultOrIsVeteran = isVeteranForEstimatePercentForestLand(polygon, vetLayer);
-			if(resultOrIsVeteran.isValue()) {
+			if (resultOrIsVeteran.isValue()) {
 				return resultOrIsVeteran.getValue().orElseThrow();
 			}
-			
+
 			veteran = resultOrIsVeteran.getMarker().orElseThrow();
 		}
 
@@ -723,8 +723,9 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		return floor(min(percentYield + gainMax, 100f));
 
 	}
-	
-	protected static final ValueOrMarker.Builder<Float, Boolean> FLOAT_OR_BOOL = ValueOrMarker.builder(Float.class, Boolean.class);
+
+	protected static final ValueOrMarker.Builder<Float, Boolean> FLOAT_OR_BOOL = ValueOrMarker
+			.builder(Float.class, Boolean.class);
 
 	protected ValueOrMarker<Float, Boolean> isVeteranForEstimatePercentForestLand(P polygon, Optional<L> vetLayer) {
 		boolean veteran = vetLayer//
