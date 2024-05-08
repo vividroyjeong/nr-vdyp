@@ -276,7 +276,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 	VdypLayer processLayerAsPrimary(FipPolygon fipPolygon, FipLayerPrimary fipLayer, float baseAreaOverstory)
 			throws ProcessingException {
 
-		var lookup = BecDefinitionParser.getBecs(controlMap);
 		// PRIMFIND
 		var primarySpecies = findPrimarySpecies(fipLayer.getSpecies().values());
 
