@@ -21,7 +21,7 @@ def browse(block_name, member_name):
     print('Saw ' + str(len(source_files)) + ' source files')
 
     keywords = ['INTEGER', 'REAL', 'CHARACTER', 'LOGICAL', 'DIMENSION']
-    common_re = re.compile(r'^ *+COMMON.*/' + block_name + r'/', re.IGNORECASE)
+    common_re = re.compile(r'^ *+COMMON.*/\s*' + block_name + r'\s*/', re.IGNORECASE)
     keyword_re = re.compile(r'^ *+([A-Za-z]+)(\*[0-9]|' ')', re.IGNORECASE)
     assignment_re = re.compile(r'[^A-Z0-9_]' + member_name + r'([^A-Z0-9_].*=|=)', re.IGNORECASE)
     usage_re = re.compile(r'[^A-Z0-9_]' + member_name + r'[^A-Z0-9_]', re.IGNORECASE)
