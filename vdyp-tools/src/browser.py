@@ -20,7 +20,9 @@ def browse(block_name, member_name):
 
     print('Saw ' + str(len(source_files)) + ' source files')
 
+    keywords = ['INTEGER', 'REAL', 'CHARACTER', 'LOGICAL', 'DIMENSION']
     common_re = re.compile(r'^ *+COMMON.*/' + block_name + r'/', re.IGNORECASE)
+    keyword_re = re.compile(r'^ *+([A-Za-z]+)(\*[0-9]|' ')', re.IGNORECASE)
     assignment_re = re.compile(r'[^A-Z0-9_]' + member_name + r'([^A-Z0-9_].*=|=)', re.IGNORECASE)
     usage_re = re.compile(r'[^A-Z0-9_]' + member_name + r'[^A-Z0-9_]', re.IGNORECASE)
 
@@ -34,14 +36,16 @@ def browse(block_name, member_name):
                 continue
             if common_re.search(line):
                 block_declarations.append(line)
-            elif line.strip().upper().startswith('DIMENSION'):
-                pass
-            elif assignment_re.search(line):
-                assignments.append(line)
-            elif line.strip().upper().startswith('&'):
-                pass
-            elif usage_re.search(line):
-                usages.append(line)
+            else:
+                m = re.search(keyword_re, line)
+                if m is not None and m.group(1).upper() in keywords:
+                    pass
+                elif assignment_re.search(line):
+                    assignments.append(line)
+                elif line.strip().upper().startswith('&'):
+                    pass
+                elif usage_re.search(line):
+                    usages.append(line)
 
         if len(block_declarations) > 0 and (len(assignments) > 0 or len(usages) > 0):
             print(s.name)
