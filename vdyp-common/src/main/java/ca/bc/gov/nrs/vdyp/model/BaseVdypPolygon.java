@@ -200,6 +200,7 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 			percentAvailable(toCopy.getPercentAvailable());
 			biogeoclimaticZone(toCopy.getBiogeoclimaticZone());
 			forestInventoryZone(toCopy.getForestInventoryZone());
+			mode(toCopy.getMode());
 			return this;
 		}
 

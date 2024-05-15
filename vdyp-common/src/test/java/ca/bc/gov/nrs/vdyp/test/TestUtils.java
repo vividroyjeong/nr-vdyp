@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import java.util.stream.IntStream;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
+import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
@@ -36,7 +38,10 @@ import ca.bc.gov.nrs.vdyp.io.parse.coe.VeteranBAParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.VolumeNetDecayParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
+import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapValueReplacer;
+import ca.bc.gov.nrs.vdyp.io.parse.control.NonFipControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ResourceControlMapModifier;
+import ca.bc.gov.nrs.vdyp.io.parse.control.StartApplicationControlParser;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
@@ -368,9 +373,47 @@ public class TestUtils {
 		}
 	}
 
+	public static Map<String, Object> loadControlMap() {
+		BaseControlParser parser = new TestNonFipControlParser();
+		try {
+			return TestUtils.loadControlMap(parser, TestUtils.class, "VRISTART.CTR");
+		} catch (IOException | ResourceParseException ex) {
+			fail(ex);
+			return null;
+		}
+
+	}
+
 	public static String polygonId(String name, int year) {
 		String result = String.format("%-21s%4d", name, year);
 		assert result.length() == 25;
 		return result;
 	}
+
+	public static StartApplicationControlParser startAppControlParser() {
+		return new TestNonFipControlParser();
+	}
+
+	static private class TestNonFipControlParser extends NonFipControlParser {
+
+		public TestNonFipControlParser() {
+			initialize();
+		}
+
+		@Override
+		protected List<ControlMapValueReplacer<Object, String>> inputFileParsers() {
+			return Collections.emptyList();
+		}
+
+		@Override
+		protected List<ControlKey> outputFileParsers() {
+			return Collections.emptyList();
+		}
+
+		@Override
+		protected VdypApplicationIdentifier getProgramId() {
+			return VdypApplicationIdentifier.VRI_START;
+		}
+	};
+
 }
