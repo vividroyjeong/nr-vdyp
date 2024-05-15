@@ -1,10 +1,23 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
 import java.text.MessageFormat;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
+import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
+import ca.bc.gov.nrs.vdyp.forward.model.VdypGrowthDetails;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
+import ca.bc.gov.nrs.vdyp.model.BecLookup;
+import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
+import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
+import ca.bc.gov.nrs.vdyp.model.Region;
 
 class ForwardProcessingState {
 
@@ -16,33 +29,77 @@ class ForwardProcessingState {
 	 */
 	private static final int MAX_RECORDS = 2 * MAX_INSTANCES;
 
-	private final PolygonProcessingState[] banks;
+	/** The control map defining the context of the execution */
+	private final Map<String, Object> controlMap;
+	/** The genus definition map, extracted from the controlMap at construction time */
+	private final GenusDefinitionMap genusDefinitionMap;
 
+	/** The storage banks */
+	private final Bank[] banks;
+
+	/** Polygon on which the processor is operating */
 	private Optional<VdypPolygon> polygon;
-	private PolygonProcessingState activeBank;
 
-	public ForwardProcessingState() {
+	/** The active state */
+	private PolygonProcessingState processingState;
+	
+	// Polygon-independent COMMON block information
+	
+	// V7COE028
+	private CompVarAdjustments compVarAdjustments; // COE028
+
+	// VTROL
+	private VdypGrowthDetails vdypGrowthDetails; // IVTROL
+	
+	// VDEBUG - NDEBUG
+	// TODO
+
+	public ForwardProcessingState(Map<String, Object> controlMap) {
+		this.controlMap = controlMap;
+
 		polygon = Optional.empty();
-		banks = new PolygonProcessingState[MAX_RECORDS];
+		banks = new Bank[MAX_RECORDS];
+
+		List<GenusDefinition> genusDefinitions = Utils.expectParsedControl(controlMap, ControlKey.SP0_DEF, List.class);
+		genusDefinitionMap = new GenusDefinitionMap(genusDefinitions);
+		compVarAdjustments = Utils.expectParsedControl(controlMap, ControlKey.PARAM_ADJUSTMENTS, CompVarAdjustments.class);
+		vdypGrowthDetails = Utils.expectParsedControl(controlMap, ControlKey.VTROL, VdypGrowthDetails.class);
+	}
+
+	public GenusDefinitionMap getGenusDefinitionMap() {
+		return genusDefinitionMap;
+	}
+	
+	public BecLookup getBecLookup() {
+		return Utils.expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class);
+	}
+	
+	public MatrixMap2<String, Region, SiteIndexEquation> getSiteCurveMap() {
+		return Utils.expectParsedControl(controlMap, ControlKey.SITE_CURVE_NUMBERS, MatrixMap2.class);
+	}
+	
+	public MatrixMap2<String, Region, Coefficients> getHl1Coefficients() {
+		return Utils.expectParsedControl(controlMap, ControlKey.HL_PRIMARY_SP_EQN_P1, MatrixMap2.class);	
 	}
 
 	public void setStartingState(VdypPolygon polygon) {
 		this.polygon = Optional.of(polygon);
 
 		// Move the primary layer of the given polygon to bank zero.
-		banks[0] = new PolygonProcessingState(polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone());
+		banks[0] = new Bank(polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone());
+		setActive(LayerType.PRIMARY, 0);
 	}
 
 	public VdypPolygon getPolygon() {
 		return polygon.orElseThrow();
 	}
 
-	public void setActive(LayerType layerType, int instanceNumber) {
-		activeBank = banks[toIndex(layerType, instanceNumber)].copy();
+	private void setActive(LayerType layerType, int instanceNumber) {
+		processingState = new PolygonProcessingState(banks[toIndex(layerType, instanceNumber)]);
 	}
 
 	public void storeActive(LayerType layerType, int instanceNumber) {
-		banks[toIndex(layerType, instanceNumber)] = activeBank.copy();
+		banks[toIndex(layerType, instanceNumber)] = processingState.wallet.copy();
 	}
 
 	public void transfer(LayerType layerType, int fromInstanceNumber, int toInstanceNumber) {
@@ -50,11 +107,7 @@ class ForwardProcessingState {
 	}
 
 	public PolygonProcessingState getActive() {
-		return activeBank;
-	}
-
-	public PolygonProcessingState getBank(LayerType layerType, int instanceNumber) {
-		return banks[toIndex(layerType, instanceNumber)];
+		return processingState;
 	}
 
 	private static int toIndex(LayerType layerType, int instanceNumber) {

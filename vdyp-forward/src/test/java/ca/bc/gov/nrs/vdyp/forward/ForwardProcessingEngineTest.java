@@ -34,9 +34,6 @@ import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.CommonData;
-import ca.bc.gov.nrs.vdyp.model.LayerType;
-import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
-import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.si32.site.SiteTool;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -68,11 +65,12 @@ class ForwardProcessingEngineTest {
 	@Test
 	void test() throws IOException, ResourceParseException, ProcessingException {
 
+		ForwardProcessingState fps = new ForwardProcessingState(controlMap);
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 
-		assertThat(fpe.getBecLookup(), notNullValue());
-		assertThat(fpe.getGenusDefinitionMap(), notNullValue());
-		assertThat(fpe.getSiteCurveMap(), notNullValue());
+		assertThat(fps.getBecLookup(), notNullValue());
+		assertThat(fps.getGenusDefinitionMap(), notNullValue());
+		assertThat(fps.getSiteCurveMap(), notNullValue());
 
 		// Fetch the next polygon to process.
 		int nPolygonsProcessed = 0;
@@ -93,7 +91,7 @@ class ForwardProcessingEngineTest {
 	@Test
 	void testFindPrimarySpecies() throws IOException, ResourceParseException, ProcessingException {
 
-		ForwardProcessingState fps = new ForwardProcessingState();
+		ForwardProcessingState fps = new ForwardProcessingState(controlMap);
 
 		var polygonDescription = polygonDescriptionStream.next();
 		var polygon = forwardDataStreamReader.readNextPolygon(polygonDescription);
@@ -101,30 +99,28 @@ class ForwardProcessingEngineTest {
 		fps.setStartingState(polygon);
 
 		{
-			PolygonProcessingState bank = fps.getBank(LayerType.PRIMARY, 0).copy();
+			PolygonProcessingState pps = fps.getActive();
 
-			ForwardProcessingEngine.calculateCoverages(bank);
-			ForwardProcessingEngine.determinePolygonRankings(bank, CommonData.PRIMARY_SPECIES_TO_COMBINE);
-			SpeciesRankingDetails rankingDetails1 = bank.getSpeciesRankingDetails();
+			ForwardProcessingEngine.calculateCoverages(pps);
+			ForwardProcessingEngine.determinePolygonRankings(pps, CommonData.PRIMARY_SPECIES_TO_COMBINE);
 
-			assertThat(rankingDetails1.primarySpeciesIndex(), is(3));
-			assertThat(rankingDetails1.secondarySpeciesIndex(), is(Optional.of(4)));
-			assertThat(rankingDetails1.inventoryTypeGroup(), is(37));
+			assertThat(pps.getPrimarySpeciesIndex(), is(3));
+			assertThat(pps.getSecondarySpeciesIndex(), is(Optional.of(4)));
+			assertThat(pps.getInventoryTypeGroup(), is(37));
 		}
 		{
-			PolygonProcessingState bank = fps.getBank(LayerType.PRIMARY, 0).copy();
+			PolygonProcessingState pps = fps.getActive();
 
-			var speciesToCombine = Arrays.asList(Arrays.asList(bank.speciesNames[3], bank.speciesNames[4]));
+			var speciesToCombine = Arrays.asList(Arrays.asList(pps.wallet.speciesNames[3], pps.wallet.speciesNames[4]));
 
-			ForwardProcessingEngine.calculateCoverages(bank);
-			ForwardProcessingEngine.determinePolygonRankings(bank, speciesToCombine);
-			SpeciesRankingDetails rankingDetails2 = bank.getSpeciesRankingDetails();
+			ForwardProcessingEngine.calculateCoverages(pps);
+			ForwardProcessingEngine.determinePolygonRankings(pps, speciesToCombine);
 
 			// The test-specific speciesToCombine will combine 3 & 4 into 3 (leaving 4 at 0.0), promoting 2 to
 			// secondary.
-			assertThat(rankingDetails2.primarySpeciesIndex(), is(3));
-			assertThat(rankingDetails2.secondarySpeciesIndex(), is(Optional.of(2)));
-			assertThat(rankingDetails2.inventoryTypeGroup(), is(37));
+			assertThat(pps.getPrimarySpeciesIndex(), is(3));
+			assertThat(pps.getSecondarySpeciesIndex(), is(Optional.of(2)));
+			assertThat(pps.getInventoryTypeGroup(), is(37));
 		}
 	}
 
@@ -351,24 +347,17 @@ class ForwardProcessingEngineTest {
 
 		var polygon = reader.readNextPolygon(testPolygonDescription);
 
-		PolygonProcessingState bank = new PolygonProcessingState(
-				polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone()
-		);
-
-		@SuppressWarnings("unchecked")
-		var siteCurveMap = (MatrixMap2<String, Region, SiteIndexEquation>) controlMap
-				.get(ControlKey.SITE_CURVE_NUMBERS.name());
-
-		ForwardProcessingEngine.ExecutionStep lastStep = ForwardProcessingEngine.ExecutionStep.EstimateMissingSiteIndices;
-		ForwardProcessingEngine.executeForwardAlgorithm(bank, siteCurveMap, lastStep);
-
+		ForwardProcessingState fps = new ForwardProcessingState(controlMap);
+		ForwardProcessingEngine fpe = new ForwardProcessingEngine(fps);
+		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.EstimateMissingSiteIndices);
+		
 		var sourceSiteCurve = SiteIndexEquation.SI_CWC_KURUCZ;
 		var sourceSiteIndex = 13.4;
 		var targetSiteCurve = SiteIndexEquation.SI_HWC_WILEYAC;
 		double expectedValue = SiteTool
 				.convertSiteIndexBetweenCurves(sourceSiteCurve, sourceSiteIndex, targetSiteCurve);
 
-		assertThat(bank.siteIndices[4], is((float) expectedValue));
+		assertThat(fps.getActive().wallet.siteIndices[4], is((float) expectedValue));
 	}
 
 	@Test
@@ -378,16 +367,9 @@ class ForwardProcessingEngineTest {
 		var targetDescription = VdypPolygonDescriptionParser.parse("01004 S000037 00     1957");
 		var polygon = forwardDataStreamReader.readNextPolygon(targetDescription);
 
-		PolygonProcessingState bank = new PolygonProcessingState(
-				polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone()
-		);
-
-		@SuppressWarnings("unchecked")
-		var siteCurveMap = (MatrixMap2<String, Region, SiteIndexEquation>) controlMap
-				.get(ControlKey.SITE_CURVE_NUMBERS.name());
-
-		ForwardProcessingEngine.ExecutionStep lastStep = ForwardProcessingEngine.ExecutionStep.EstimateMissingSiteIndices;
-		ForwardProcessingEngine.executeForwardAlgorithm(bank, siteCurveMap, lastStep);
+		ForwardProcessingState fps = new ForwardProcessingState(controlMap);
+		ForwardProcessingEngine fpe = new ForwardProcessingEngine(fps);
+		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.EstimateMissingSiteIndices);
 
 		var sourceSiteCurve = SiteIndexEquation.SI_CWC_KURUCZ;
 		var sourceSiteIndex = 13.4;
@@ -395,7 +377,7 @@ class ForwardProcessingEngineTest {
 		double expectedValue = SiteTool
 				.convertSiteIndexBetweenCurves(sourceSiteCurve, sourceSiteIndex, targetSiteCurve);
 
-		assertThat(bank.siteIndices[3], is((float) expectedValue));
+		assertThat(fps.getActive().wallet.siteIndices[3], is((float) expectedValue));
 	}
 
 	@Test
@@ -423,20 +405,10 @@ class ForwardProcessingEngineTest {
 
 		var polygon = reader.readNextPolygon(testPolygonDescription);
 
-		PolygonProcessingState bank = new PolygonProcessingState(
-				polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone()
-		);
+		ForwardProcessingState fps = new ForwardProcessingState(controlMap);
+		ForwardProcessingEngine fpe = new ForwardProcessingEngine(fps);
+		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.EstimateMissingYearsToBreastHeightValues);
 
-		@SuppressWarnings("unchecked")
-		var siteCurveMap = (MatrixMap2<String, Region, SiteIndexEquation>) controlMap
-				.get(ControlKey.SITE_CURVE_NUMBERS.name());
-
-		ForwardProcessingEngine.ExecutionStep lastStep = ForwardProcessingEngine.ExecutionStep.EstimateMissingYearsToBreastHeightValues
-				.predecessor();
-		ForwardProcessingEngine.executeForwardAlgorithm(bank, siteCurveMap, lastStep);
-
-		ForwardProcessingEngine.estimateMissingYearsToBreastHeightValues(bank);
-
-		assertThat(bank.yearsToBreastHeight, is(new float[] { 0.0f, 4.0f, 7.5f, 1.0f, 4.5f, 5.2f }));
+		assertThat(fps.getActive().wallet.yearsToBreastHeight, is(new float[] { 0.0f, 4.0f, 7.5f, 1.0f, 4.5f, 5.2f }));
 	}
 }

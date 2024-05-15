@@ -70,7 +70,7 @@ class PolygonProcessingStateTest {
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());
 
-		PolygonProcessingState pps = new PolygonProcessingState(pLayer, polygon.getBiogeoclimaticZone());
+		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone());
 
 		int nSpecies = pLayer.getGenera().size();
 
@@ -134,11 +134,11 @@ class PolygonProcessingStateTest {
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());
 
-		PolygonProcessingState pps = new PolygonProcessingState(pLayer, polygon.getBiogeoclimaticZone());
+		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone());
 
 		verifyProcessingStateMatchesLayer(pps, pLayer);
 
-		PolygonProcessingState ppsCopy = pps.copy();
+		Bank ppsCopy = pps.copy();
 
 		verifyProcessingStateMatchesLayer(ppsCopy, pLayer);
 	}
@@ -155,10 +155,10 @@ class PolygonProcessingStateTest {
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());
 
-		PolygonProcessingState pps = new PolygonProcessingState(pLayer, polygon.getBiogeoclimaticZone());
+		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone());
 		verifyProcessingStateMatchesLayer(pps, pLayer);
 
-		PolygonProcessingState ppsCopy = new PolygonProcessingState(pps);
+		Bank ppsCopy = new Bank(pps);
 		verifyProcessingStateMatchesLayer(ppsCopy, pLayer);
 
 		Set<Integer> speciesToRemove = new HashSet<>(List.of(2));
@@ -174,7 +174,7 @@ class PolygonProcessingStateTest {
 	}
 
 	private void
-			verifyProcessingStateIndicesEquals(PolygonProcessingState pps1, int i, PolygonProcessingState pps2, int j) {
+			verifyProcessingStateIndicesEquals(Bank pps1, int i, Bank pps2, int j) {
 		if (i != j) {
 			assertThat(pps1.yearsAtBreastHeight[i], is(pps2.yearsAtBreastHeight[j]));
 			assertThat(pps1.ageTotals[i], is(pps2.ageTotals[j]));
@@ -217,14 +217,14 @@ class PolygonProcessingStateTest {
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());
 
-		PolygonProcessingState pps = new PolygonProcessingState(pLayer, polygon.getBiogeoclimaticZone());
+		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone());
 
-		PolygonProcessingState ppsCopy = new PolygonProcessingState(pps);
+		Bank ppsCopy = new Bank(pps);
 
 		verifyProcessingStateMatchesLayer(ppsCopy, pLayer);
 	}
 
-	private void verifyProcessingStateMatchesLayer(PolygonProcessingState pps, VdypPolygonLayer layer) {
+	private void verifyProcessingStateMatchesLayer(Bank pps, VdypPolygonLayer layer) {
 
 		List<Integer> sortedSpIndices = layer.getGenera().keySet().stream().sorted().collect(Collectors.toList());
 
@@ -248,7 +248,7 @@ class PolygonProcessingStateTest {
 	}
 
 	private void verifyProcessingStateSpeciesUtilizationsMatchesUtilizations(
-			PolygonProcessingState pps, int spIndex, Map<UtilizationClass, VdypSpeciesUtilization> map
+			Bank pps, int spIndex, Map<UtilizationClass, VdypSpeciesUtilization> map
 	) {
 
 		for (UtilizationClass uc : UtilizationClass.values()) {
@@ -268,7 +268,7 @@ class PolygonProcessingStateTest {
 	}
 
 	private void verifyProcessingStateSpeciesMatchesSpecies(
-			PolygonProcessingState pps, int index, VdypLayerSpecies species
+			Bank pps, int index, VdypLayerSpecies species
 	) {
 		assertThat(pps.yearsAtBreastHeight[index], is(species.getAgeAtBreastHeight()));
 		assertThat(pps.ageTotals[index], is(species.getAgeTotal()));

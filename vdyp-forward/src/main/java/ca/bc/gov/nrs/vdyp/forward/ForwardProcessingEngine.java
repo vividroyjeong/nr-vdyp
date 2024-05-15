@@ -13,8 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
-import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorException;
@@ -24,10 +22,9 @@ import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
-import ca.bc.gov.nrs.vdyp.model.BecLookup;
+import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.CommonData;
 import ca.bc.gov.nrs.vdyp.model.GenusDistribution;
-import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
@@ -39,55 +36,16 @@ public class ForwardProcessingEngine {
 
 	private static final float MIN_BASAL_AREA = 0.001f;
 
-	// Read-only
-	private final GenusDefinitionMap genusDefinitionMap;
-	private final BecLookup becLookup;
-	private final MatrixMap2<String, Region, SiteIndexEquation> siteCurveMap;
-
 	private final ForwardProcessingState fps;
 
 	public ForwardProcessingEngine(Map<String, Object> controlMap) {
 
-		this(controlMap, new ForwardProcessingState());
+		this(new ForwardProcessingState(controlMap));
 	}
 
-	@SuppressWarnings("unchecked")
-	/* pp */ ForwardProcessingEngine(Map<String, Object> controlMap, ForwardProcessingState fps) {
-
-		// Reference, since read-only
-		genusDefinitionMap = new GenusDefinitionMap(
-				Utils.expectParsedControl(controlMap, ControlKey.SP0_DEF, List.class)
-		);
-		becLookup = Utils.expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class);
-		siteCurveMap = Utils.expectParsedControl(controlMap, ControlKey.SITE_CURVE_NUMBERS, MatrixMap2.class);
+	/* pp */ ForwardProcessingEngine(ForwardProcessingState fps) {
 
 		this.fps = fps;
-	}
-
-	public GenusDefinitionMap getGenusDefinitionMap() {
-		return genusDefinitionMap;
-	}
-
-	public BecLookup getBecLookup() {
-		return becLookup;
-	}
-
-	public MatrixMap2<String, Region, SiteIndexEquation> getSiteCurveMap() {
-		return siteCurveMap;
-	}
-
-	public void processPolygon(VdypPolygon polygon) throws ProcessingException {
-
-		logger.info("Starting processing of polygon {}", polygon.getDescription());
-
-		fps.setStartingState(polygon);
-
-		// All of BANKCHK1 that we need
-		validatePolygon(polygon);
-
-		PolygonProcessingState workingBank = fps.getBank(LayerType.PRIMARY, 0).copy();
-
-		executeForwardAlgorithm(workingBank, siteCurveMap, ExecutionStep.All);
 	}
 
 	public enum ExecutionStep {
@@ -95,7 +53,7 @@ public class ForwardProcessingEngine {
 		None,
 
 		RemoveSmallSpecies, CalculateMissingSiteCurves, CalculateCoverages, DeterminePolygonRankings,
-		EstimateMissingSiteIndices, EstimateMissingYearsToBreastHeightValues,
+		EstimateMissingSiteIndices, EstimateMissingYearsToBreastHeightValues, CalculateHeightAgeSiteIndex,
 
 		// Must be last
 		All;
@@ -117,10 +75,28 @@ public class ForwardProcessingEngine {
 		}
 	}
 
-	static void executeForwardAlgorithm(
-			PolygonProcessingState bank, MatrixMap2<String, Region, SiteIndexEquation> siteCurveMap,
+	public void processPolygon(VdypPolygon polygon) throws ProcessingException {
+
+		processPolygon(polygon, ExecutionStep.All);
+	}
+
+	public void processPolygon(VdypPolygon polygon, ExecutionStep lastStep) throws ProcessingException {
+
+		logger.info("Starting processing of polygon {}", polygon.getDescription());
+
+		fps.setStartingState(polygon);
+
+		// All of BANKCHK1 that we need
+		validatePolygon(polygon);
+
+		executeForwardAlgorithm(ExecutionStep.All);
+	}
+
+	private void executeForwardAlgorithm(
 			ExecutionStep lastStep
 	) throws ProcessingException {
+
+		PolygonProcessingState bank = fps.getActive();
 
 		logger.info(
 				MessageFormat.format(
@@ -135,7 +111,7 @@ public class ForwardProcessingEngine {
 
 		// SCINXSET
 		if (lastStep.ordinal() >= ExecutionStep.CalculateMissingSiteCurves.ordinal()) {
-			calculateMissingSiteCurves(bank, siteCurveMap);
+			calculateMissingSiteCurves(bank, fps.getSiteCurveMap());
 		}
 
 		// VPRIME, method == 1
@@ -155,6 +131,122 @@ public class ForwardProcessingEngine {
 		if (lastStep.ordinal() >= ExecutionStep.EstimateMissingYearsToBreastHeightValues.ordinal()) {
 			estimateMissingYearsToBreastHeightValues(bank);
 		}
+
+		// VHDOM1 METH_H = 2, METH_A = 2, METH_SI = 2
+		if (lastStep.ordinal() >= ExecutionStep.CalculateHeightAgeSiteIndex.ordinal()) {
+			calculateDominantHeightAgeSiteIndex(bank, fps.getHl1Coefficients());
+		}
+	}
+
+	static void calculateDominantHeightAgeSiteIndex(
+			PolygonProcessingState state, MatrixMap2<String, Region, Coefficients> hl1Coefficients
+	) throws ProcessingException {
+
+		// Calculate primary species values
+		int primarySpeciesIndex = state.getPrimarySpeciesIndex();
+
+		// (1) Dominant Height
+		float primarySpeciesDominantHeight = state.wallet.dominantHeights[primarySpeciesIndex];
+		if (Float.isNaN(primarySpeciesDominantHeight)) {
+			float loreyHeight = state.wallet.loreyHeights[primarySpeciesIndex][UtilizationClass.ALL.ordinal()];
+			if (Float.isNaN(loreyHeight)) {
+				throw new ProcessingException(
+						MessageFormat.format(
+								"Neither dominant nor lorey height[All] is available for primary species {}", state.wallet.speciesNames[primarySpeciesIndex]
+						), 2
+				);
+			}
+
+			// Estimate dominant height from the lorey height
+			String primarySpeciesAlias = state.wallet.speciesNames[primarySpeciesIndex];
+			Region primarySpeciesRegion = state.getBecZone().getRegion();
+
+			float a0 = hl1Coefficients.get(primarySpeciesAlias, primarySpeciesRegion).getCoe(1);
+			float a1 = hl1Coefficients.get(primarySpeciesAlias, primarySpeciesRegion).getCoe(2);
+			float a2 = hl1Coefficients.get(primarySpeciesAlias, primarySpeciesRegion).getCoe(3);
+
+			float treesPerHectare = state.wallet.treesPerHectares[primarySpeciesIndex][0];
+			float hMult = a0 - a1 + a1 * (float) Math.exp(a2 * (treesPerHectare - 100.0));
+
+			primarySpeciesDominantHeight = 1.3f + (loreyHeight - 1.3f) / hMult;
+		}
+
+		// (2) Age (total, years at breast height, years to breast height
+		float primarySpeciesTotalAge = state.wallet.ageTotals[primarySpeciesIndex];
+		float primarySpeciesYearsAtBreastHeight = state.wallet.yearsAtBreastHeight[primarySpeciesIndex];
+		float primarySpeciesYearsToBreastHeight = state.wallet.yearsToBreastHeight[primarySpeciesIndex];
+
+		int activeIndex = 0;
+		if (Float.isNaN(primarySpeciesTotalAge)) {
+
+			if (state.getSecondarySpeciesIndex().isPresent()
+					&& !Float.isNaN(state.wallet.ageTotals[state.getSecondarySpeciesIndex().get()])) {
+				activeIndex = state.getSecondarySpeciesIndex().get();
+			} else {
+				for (int i = 1; i <= state.getNSpecies(); i++) {
+					if (!Float.isNaN(state.wallet.ageTotals[i])) {
+						activeIndex = i;
+						break;
+					}
+				}
+			}
+
+			if (Float.isNaN(primarySpeciesTotalAge)) {
+				throw new ProcessingException("Age data unavailable for ALL species", 5);
+			}
+
+			assert (activeIndex != 0);
+			primarySpeciesTotalAge = state.wallet.ageTotals[activeIndex];
+			if (!Float.isNaN(primarySpeciesYearsToBreastHeight)) {
+				primarySpeciesYearsAtBreastHeight = primarySpeciesTotalAge - primarySpeciesYearsToBreastHeight;
+			} else {
+				primarySpeciesYearsAtBreastHeight = state.wallet.yearsAtBreastHeight[activeIndex];
+				primarySpeciesYearsToBreastHeight = state.wallet.yearsToBreastHeight[activeIndex];
+			}
+		}
+
+		// (3) Site Index
+		float primarySpeciesSiteIndex = state.wallet.siteIndices[primarySpeciesIndex];
+		if (Float.isNaN(primarySpeciesSiteIndex)) {
+
+			if (state.getSecondarySpeciesIndex().isPresent()
+					&& !Float.isNaN(state.wallet.siteIndices[state.getSecondarySpeciesIndex().get()])) {
+				activeIndex = state.getSecondarySpeciesIndex().get();
+			} else {
+				if (activeIndex == 0) {
+					activeIndex = 1;
+				}
+				for (int i = 1; i <= state.getNSpecies(); i++) {
+					if (!Float.isNaN(state.wallet.siteIndices[i])) {
+						activeIndex = i;
+						primarySpeciesSiteIndex = state.wallet.siteIndices[activeIndex];
+						break;
+					}
+				}
+
+				if (Float.isNaN(primarySpeciesSiteIndex)) {
+					throw new ProcessingException("Site Index data unavailable for ALL species", 7);
+				}
+			}
+		}
+
+		SiteIndexEquation siteCurve1 = SiteIndexEquation.getByIndex(state.siteCurveNumbers[activeIndex]);
+		SiteIndexEquation siteCurve2 = SiteIndexEquation.getByIndex(state.siteCurveNumbers[0]);
+
+		try {
+			double newSI = SiteTool.convertSiteIndexBetweenCurves(siteCurve1, primarySpeciesSiteIndex, siteCurve2);
+			if (newSI > 1.3) {
+				primarySpeciesSiteIndex = (float) newSI;
+			}
+		} catch (CommonCalculatorException e) {
+			// do nothing. primarySpeciesSiteIndex will not be modified.
+		}
+
+		state.setPrimarySpeciesDetails(
+				new PrimarySpeciesDetails(
+						primarySpeciesDominantHeight, primarySpeciesSiteIndex, primarySpeciesTotalAge,
+						primarySpeciesYearsAtBreastHeight, primarySpeciesYearsToBreastHeight)
+		);
 	}
 
 	/**
@@ -162,12 +254,12 @@ public class ForwardProcessingEngine {
 	 * years-at-breast-height and age-total values if given or otherwise estimate it from the site curve and site index
 	 * values for the species.
 	 *
-	 * @param bank the bank in which calculations are performed
+	 * @param state the bank in which calculations are performed
 	 */
-	static void estimateMissingYearsToBreastHeightValues(PolygonProcessingState bank) {
+	static void estimateMissingYearsToBreastHeightValues(PolygonProcessingState state) {
 
-		int primarySpeciesIndex = bank.getSpeciesRankingDetails().primarySpeciesIndex();
-		float primarySpeciesSiteIndex = bank.siteIndices[primarySpeciesIndex];
+		int primarySpeciesIndex = state.getPrimarySpeciesIndex();
+		float primarySpeciesSiteIndex = state.wallet.siteIndices[primarySpeciesIndex];
 
 		// Determine the default site index by using the site index of the primary species unless
 		// it hasn't been set in which case pick any. Note that there may still not be a
@@ -179,16 +271,16 @@ public class ForwardProcessingEngine {
 		if (Float.isNaN(defaultSiteIndex)) {
 			// Normally, this block will never be executed because the primary species site index
 			// will have been calculated in calculateMissingSiteCurves.
-			for (int i : bank.getIndices()) {
-				if (!Float.isNaN(bank.siteIndices[i])) {
-					defaultSiteIndex = bank.siteIndices[i];
+			for (int i : state.getIndices()) {
+				if (!Float.isNaN(state.wallet.siteIndices[i])) {
+					defaultSiteIndex = state.wallet.siteIndices[i];
 					break;
 				}
 			}
 		}
 
-		for (int i : bank.getIndices()) {
-			if (!Float.isNaN(bank.yearsToBreastHeight[i])) {
+		for (int i : state.getIndices()) {
+			if (!Float.isNaN(state.wallet.yearsToBreastHeight[i])) {
 				// was supplied
 				continue;
 			}
@@ -196,16 +288,18 @@ public class ForwardProcessingEngine {
 			// Note: this block will normally never be executed because of the logic in
 			// the constructor of VdypLayerSpecies that computes missing values when the
 			// other two measurement values are present.
-			if (!Float.isNaN(bank.yearsAtBreastHeight[i]) && bank.ageTotals[i] > bank.yearsAtBreastHeight[i]) {
-				bank.yearsToBreastHeight[i] = bank.ageTotals[i] - bank.yearsAtBreastHeight[i];
+			if (!Float.isNaN(state.wallet.yearsAtBreastHeight[i])
+					&& state.wallet.ageTotals[i] > state.wallet.yearsAtBreastHeight[i]) {
+				state.wallet.yearsToBreastHeight[i] = state.wallet.ageTotals[i] - state.wallet.yearsAtBreastHeight[i];
 				continue;
 			}
 
-			float siteIndex = !Float.isNaN(bank.siteIndices[i]) ? bank.siteIndices[i] : defaultSiteIndex;
+			float siteIndex = !Float.isNaN(state.wallet.siteIndices[i]) ? state.wallet.siteIndices[i]
+					: defaultSiteIndex;
 			try {
-				SiteIndexEquation curve = SiteIndexEquation.getByIndex(bank.siteCurveNumbers[i]);
+				SiteIndexEquation curve = SiteIndexEquation.getByIndex(state.wallet.siteCurveNumbers[i]);
 				double yearsToBreastHeight = SiteTool.yearsToBreastHeight(curve, siteIndex);
-				bank.yearsToBreastHeight[i] = (float) yearsToBreastHeight;
+				state.wallet.yearsToBreastHeight[i] = (float) yearsToBreastHeight;
 			} catch (CommonCalculatorException e) {
 				logger.warn(MessageFormat.format("Unable to determine yearsToBreastHeight of species {0}", i), e);
 			}
@@ -221,31 +315,32 @@ public class ForwardProcessingEngine {
 	 * index has not been set from the primary site index after converting it between the site curve of the other
 	 * species and that of the primary species.
 	 *
-	 * @param bank the bank in which the calculations are done.
+	 * @param state the bank in which the calculations are done.
 	 * @throws ProcessingException
 	 */
-	static void estimateMissingSiteIndices(PolygonProcessingState bank) throws ProcessingException {
+	static void estimateMissingSiteIndices(PolygonProcessingState state) throws ProcessingException {
 
-		int primarySpeciesIndex = bank.getSpeciesRankingDetails().primarySpeciesIndex();
-		SiteIndexEquation primarySiteCurve = SiteIndexEquation.getByIndex(bank.siteCurveNumbers[primarySpeciesIndex]);
+		int primarySpeciesIndex = state.getPrimarySpeciesIndex();
+		SiteIndexEquation primarySiteCurve = SiteIndexEquation
+				.getByIndex(state.wallet.siteCurveNumbers[primarySpeciesIndex]);
 
 		// (1)
 
-		if (Float.isNaN(bank.siteIndices[primarySpeciesIndex])) {
+		if (Float.isNaN(state.wallet.siteIndices[primarySpeciesIndex])) {
 
 			double otherSiteIndicesSum = 0.0f;
 			int nOtherSiteIndices = 0;
 
-			for (int i : bank.getIndices()) {
+			for (int i : state.getIndices()) {
 
 				if (i == primarySpeciesIndex) {
 					continue;
 				}
 
-				float siteIndexI = bank.siteIndices[i];
+				float siteIndexI = state.wallet.siteIndices[i];
 
 				if (!Float.isNaN(siteIndexI)) {
-					SiteIndexEquation siteCurveI = SiteIndexEquation.getByIndex(bank.siteCurveNumbers[i]);
+					SiteIndexEquation siteCurveI = SiteIndexEquation.getByIndex(state.wallet.siteCurveNumbers[i]);
 
 					try {
 						double mappedSiteIndex = SiteTool
@@ -255,15 +350,13 @@ public class ForwardProcessingEngine {
 					} catch (NoAnswerException e) {
 						logger.warn(
 								MessageFormat.format(
-										"there is no conversion from curves {0} to {1}. Skipping species {3}",
-										siteCurveI, primarySiteCurve, i
+										"there is no conversion from curves {0} to {1}. Skipping species {3}", siteCurveI, primarySiteCurve, i
 								)
 						);
 					} catch (CurveErrorException | SpeciesErrorException e) {
 						throw new ProcessingException(
 								MessageFormat.format(
-										"convertSiteIndexBetweenCurves on {0}, {1} and {2} failed", siteCurveI,
-										siteIndexI, primarySiteCurve
+										"convertSiteIndexBetweenCurves on {0}, {1} and {2} failed", siteCurveI, siteIndexI, primarySiteCurve
 								), e
 						);
 					}
@@ -271,41 +364,39 @@ public class ForwardProcessingEngine {
 			}
 
 			if (nOtherSiteIndices > 0) {
-				bank.siteIndices[primarySpeciesIndex] = (float) (otherSiteIndicesSum / nOtherSiteIndices);
+				state.wallet.siteIndices[primarySpeciesIndex] = (float) (otherSiteIndicesSum / nOtherSiteIndices);
 			}
 		}
 
 		// (2)
 
-		float primarySpeciesSiteIndex = bank.siteIndices[primarySpeciesIndex];
+		float primarySpeciesSiteIndex = state.wallet.siteIndices[primarySpeciesIndex];
 		if (!Float.isNaN(primarySpeciesSiteIndex)) {
 
-			for (int i : bank.getIndices()) {
+			for (int i : state.getIndices()) {
 
 				if (i == primarySpeciesIndex) {
 					continue;
 				}
 
-				float siteIndexI = bank.siteIndices[i];
+				float siteIndexI = state.wallet.siteIndices[i];
 				if (Float.isNaN(siteIndexI)) {
-					SiteIndexEquation siteCurveI = SiteIndexEquation.getByIndex(bank.siteCurveNumbers[i]);
+					SiteIndexEquation siteCurveI = SiteIndexEquation.getByIndex(state.wallet.siteCurveNumbers[i]);
 
 					try {
 						double mappedSiteIndex = SiteTool
 								.convertSiteIndexBetweenCurves(primarySiteCurve, primarySpeciesSiteIndex, siteCurveI);
-						bank.siteIndices[i] = (float) mappedSiteIndex;
+						state.wallet.siteIndices[i] = (float) mappedSiteIndex;
 					} catch (NoAnswerException e) {
 						logger.warn(
 								MessageFormat.format(
-										"there is no conversion between curves {0} and {1}. Skipping species {2}",
-										primarySiteCurve, siteCurveI, i
+										"there is no conversion between curves {0} and {1}. Skipping species {2}", primarySiteCurve, siteCurveI, i
 								)
 						);
 					} catch (CurveErrorException | SpeciesErrorException e) {
 						throw new ProcessingException(
 								MessageFormat.format(
-										"convertSiteIndexBetweenCurves on {0}, {1} and {2} failed. Skipping species {3}",
-										primarySiteCurve, primarySpeciesSiteIndex, siteCurveI, i
+										"convertSiteIndexBetweenCurves on {0}, {1} and {2} failed. Skipping species {3}", primarySiteCurve, primarySpeciesSiteIndex, siteCurveI, i
 								), e
 						);
 					}
@@ -314,28 +405,30 @@ public class ForwardProcessingEngine {
 		}
 
 		// Finally, set bank.siteIndices[0] to that of the primary species.
-		bank.siteIndices[0] = primarySpeciesSiteIndex;
+		state.wallet.siteIndices[0] = primarySpeciesSiteIndex;
 	}
 
 	/**
 	 * Calculate the percentage of forested land covered by each species by dividing the basal area of each given
 	 * species with the basal area of the polygon covered by forest.
 	 *
-	 * @param bank the bank in which the calculations are performed
+	 * @param state the bank in which the calculations are performed
 	 */
-	static void calculateCoverages(PolygonProcessingState bank) {
+	static void calculateCoverages(PolygonProcessingState state) {
 
-		logger.atDebug().addArgument(bank.getNSpecies()).addArgument(bank.basalAreas[0][0]).log(
+		logger.atDebug().addArgument(state.getNSpecies()).addArgument(state.wallet.basalAreas[0][0]).log(
 				"Calculating coverages as a ratio of Species BA over Total BA. # species: {}; Layer total 7.5cm+ basal area: {}"
 		);
 
 		int allUcIndex = UtilizationClass.ALL.ordinal();
-		for (int i : bank.getIndices()) {
-			bank.percentagesOfForestedLand[i] = bank.basalAreas[i][allUcIndex] / bank.basalAreas[0][allUcIndex]
+		for (int i : state.getIndices()) {
+			state.wallet.percentagesOfForestedLand[i] = state.wallet.basalAreas[i][allUcIndex]
+					/ state.wallet.basalAreas[0][allUcIndex]
 					* 100.0f;
 
-			logger.atDebug().addArgument(i).addArgument(bank.speciesIndices[i]).addArgument(bank.speciesNames[i])
-					.addArgument(bank.basalAreas[i][0]).addArgument(bank.percentagesOfForestedLand[i])
+			logger.atDebug().addArgument(i).addArgument(state.wallet.speciesIndices[i])
+					.addArgument(state.wallet.speciesNames[i])
+					.addArgument(state.wallet.basalAreas[i][0]).addArgument(state.wallet.percentagesOfForestedLand[i])
 					.log("Species {}: SP0 {}, Name {}, Species 7.5cm+ BA {}, Calculated Percent {}");
 		}
 	}
@@ -343,22 +436,22 @@ public class ForwardProcessingEngine {
 	/**
 	 * Calculate the siteCurve number of all species for which one was not supplied.
 	 *
-	 * @param bank         the bank in which the calculations are done.
+	 * @param state         the bank in which the calculations are done.
 	 * @param becZone      the BEC zone definitions.
 	 * @param siteCurveMap the Site Curve definitions.
 	 */
 	static void calculateMissingSiteCurves(
-			PolygonProcessingState bank, MatrixMap2<String, Region, SiteIndexEquation> siteCurveMap
+			PolygonProcessingState state, MatrixMap2<String, Region, SiteIndexEquation> siteCurveMap
 	) {
-		BecDefinition becZone = bank.getBecZone();
+		BecDefinition becZone = state.getBecZone();
 
-		for (int i : bank.getIndices()) {
+		for (int i : state.getIndices()) {
 
-			if (bank.siteCurveNumbers[i] == VdypEntity.MISSING_INTEGER_VALUE) {
+			if (state.wallet.siteCurveNumbers[i] == VdypEntity.MISSING_INTEGER_VALUE) {
 
 				Optional<SiteIndexEquation> scIndex = Optional.empty();
 
-				Optional<GenusDistribution> sp0Dist = bank.sp64Distributions[i].getSpeciesDistribution(0);
+				Optional<GenusDistribution> sp0Dist = state.wallet.sp64Distributions[i].getSpeciesDistribution(0);
 
 				if (sp0Dist.isPresent()) {
 					if (!siteCurveMap.isEmpty()) {
@@ -366,7 +459,7 @@ public class ForwardProcessingEngine {
 								.optSafe(siteCurveMap.get(sp0Dist.get().getGenus().getAlias(), becZone.getRegion()));
 					} else {
 						SiteIndexEquation siCurve = SiteTool
-								.getSICurve(bank.speciesNames[i], becZone.getRegion().equals(Region.COASTAL));
+								.getSICurve(state.wallet.speciesNames[i], becZone.getRegion().equals(Region.COASTAL));
 						scIndex = siCurve == SiteIndexEquation.SI_NO_EQUATION ? Optional.empty() : Optional.of(siCurve);
 					}
 				}
@@ -377,14 +470,16 @@ public class ForwardProcessingEngine {
 								.optSafe(siteCurveMap.get(sp0Dist.get().getGenus().getAlias(), becZone.getRegion()));
 					} else {
 						SiteIndexEquation siCurve = SiteTool
-								.getSICurve(bank.speciesNames[i], becZone.getRegion().equals(Region.COASTAL));
+								.getSICurve(state.wallet.speciesNames[i], becZone.getRegion().equals(Region.COASTAL));
 						scIndex = siCurve == SiteIndexEquation.SI_NO_EQUATION ? Optional.empty() : Optional.of(siCurve);
 					}
 				}
 
-				bank.siteCurveNumbers[i] = scIndex.orElseThrow().n();
+				state.wallet.siteCurveNumbers[i] = scIndex.orElseThrow().n();
 			}
 		}
+
+		state.setSiteCurveNumbers(state.wallet.siteCurveNumbers);
 	}
 
 	/**
@@ -400,14 +495,14 @@ public class ForwardProcessingEngine {
 
 			throw new ProcessingException(
 					MessageFormat.format(
-							"Polygon {}'s year value {} is < 1900", 101, polygon.getDescription().getName(),
-							polygon.getDescription().getYear()
+							"Polygon {}'s year value {} is < 1900", 101, polygon.getDescription().getName(), polygon
+									.getDescription().getYear()
 					)
 			);
 		}
 	}
 
-	private static void removeSmallSpecies(PolygonProcessingState bank) throws ProcessingException {
+	private static void removeSmallSpecies(PolygonProcessingState state) throws ProcessingException {
 
 		// The following is extracted from BANKCHK1, simplified for the parameters
 		// METH_CHK = 4, LayerI = 1, and INSTANCE = 1. So IR = 1, which is the first
@@ -416,13 +511,13 @@ public class ForwardProcessingEngine {
 		// => all that is done is that species with basal area < MIN_BASAL_AREA are
 		// removed.
 
-		bank.removeSpecies(i -> bank.basalAreas[i][UtilizationClass.ALL.ordinal()] < MIN_BASAL_AREA);
+		state.wallet.removeSpecies(i -> state.wallet.basalAreas[i][UtilizationClass.ALL.ordinal()] < MIN_BASAL_AREA);
 
-		if (bank.getNSpecies() == 0) {
+		if (state.getNSpecies() == 0) {
 			throw new ProcessingException(
 					MessageFormat.format(
-							"Polygon {0} layer 0 has no species with basal area above {1}",
-							bank.getLayer().getParent().getDescription().getName(), MIN_BASAL_AREA
+							"Polygon {0} layer 0 has no species with basal area above {1}", state.getLayer().getParent()
+									.getDescription().getName(), MIN_BASAL_AREA
 					)
 			);
 		}
@@ -437,26 +532,27 @@ public class ForwardProcessingEngine {
 	 * <li>the percentage of forested land occupied by the primary species
 	 * </ul>
 	 *
-	 * @param bank the bank on which to operate
+	 * @param state the bank on which to operate
 	 * @return as described
 	 */
-	static void determinePolygonRankings(PolygonProcessingState bank, Collection<List<String>> speciesToCombine) {
+	static void determinePolygonRankings(PolygonProcessingState state, Collection<List<String>> speciesToCombine) {
 
-		if (bank.getNSpecies() == 0) {
+		if (state.getNSpecies() == 0) {
 			throw new IllegalArgumentException("Can not find primary species as there are no species");
 		}
 
-		float percentages[] = Arrays.copyOf(bank.percentagesOfForestedLand, bank.percentagesOfForestedLand.length);
+		float percentages[] = Arrays
+				.copyOf(state.wallet.percentagesOfForestedLand, state.wallet.percentagesOfForestedLand.length);
 
 		for (var speciesPair : speciesToCombine) {
-			combinePercentages(bank.speciesNames, speciesPair, percentages);
+			combinePercentages(state.wallet.speciesNames, speciesPair, percentages);
 		}
 
 		float highestPercentage = 0.0f;
 		int highestPercentageIndex = -1;
 		float secondHighestPercentage = 0.0f;
 		int secondHighestPercentageIndex = -1;
-		for (int i : bank.getIndices()) {
+		for (int i : state.getIndices()) {
 
 			if (percentages[i] > highestPercentage) {
 
@@ -478,14 +574,15 @@ public class ForwardProcessingEngine {
 			throw new IllegalStateException("There are no species with covering percentage > 0");
 		}
 
-		String primaryGenusName = bank.speciesNames[highestPercentageIndex];
+		String primaryGenusName = state.wallet.speciesNames[highestPercentageIndex];
 		Optional<String> secondaryGenusName = secondHighestPercentageIndex != -1
-				? Optional.of(bank.speciesNames[secondHighestPercentageIndex]) : Optional.empty();
+				? Optional.of(state.wallet.speciesNames[secondHighestPercentageIndex])
+				: Optional.empty();
 
 		try {
 			int inventoryTypeGroup = findInventoryTypeGroup(primaryGenusName, secondaryGenusName, highestPercentage);
 
-			bank.setSpeciesRankingDetails(
+			state.setSpeciesRankingDetails(
 					new SpeciesRankingDetails(
 							highestPercentageIndex,
 							secondHighestPercentageIndex != -1 ? Optional.of(secondHighestPercentageIndex)
@@ -526,8 +623,7 @@ public class ForwardProcessingEngine {
 		if (speciesNames.length != percentages.length) {
 			throw new IllegalArgumentException(
 					MessageFormat.format(
-							"the length of speciesNames ({}) must match that of percentages ({}) but it doesn't",
-							speciesNames.length, percentages.length
+							"the length of speciesNames ({}) must match that of percentages ({}) but it doesn't", speciesNames.length, percentages.length
 					)
 			);
 		}
