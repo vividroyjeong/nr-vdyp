@@ -35,6 +35,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
+import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
@@ -523,7 +524,7 @@ public class VdypMatchers {
 	}
 
 	public static Matcher<Float> closeTo(float expected, float threshold) {
-		float epsilon = Float.max(threshold * expected, Float.MIN_VALUE);
+		float epsilon = Float.max(threshold * FloatMath.abs(expected), Float.MIN_VALUE);
 		return asFloat(Matchers.closeTo(expected, epsilon));
 	}
 

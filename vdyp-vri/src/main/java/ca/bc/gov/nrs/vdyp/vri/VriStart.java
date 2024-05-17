@@ -503,6 +503,23 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		);
 	}
 
+	// UPPERGEN Method 1
+	Coefficients upperBounds(int baseAreaGroup) {
+		var upperBoundsMap = Utils
+				.<Map<Integer, Coefficients>>expectParsedControl(controlMap, ControlKey.BA_DQ_UPPER_BOUNDS, Map.class);
+		return Utils.<Coefficients>optSafe(upperBoundsMap.get(baseAreaGroup)).orElseThrow(
+				() -> new IllegalStateException("Could not find limits for base area group " + baseAreaGroup)
+		);
+	}
+
+	float upperBoundsBaseArea(int baseAreaGroup) {
+		return upperBounds(baseAreaGroup).getCoe(1);
+	}
+
+	float upperBoundsQuadMeanDiameter(int baseAreaGroup) {
+		return upperBounds(baseAreaGroup).getCoe(2);
+	}
+
 	// EMP106
 	float estimateBaseAreaYield(
 			float dominantHeight, float breastHeightAge, Optional<Float> baseAreaOverstory, boolean fullOccupancy,
@@ -510,13 +527,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	) throws StandProcessingException {
 		var coe = estimateBaseAreaYieldCoefficients(species, bec);
 
-		// UPPERGEN Method 1
-		var upperBoundsMap = Utils
-				.<Map<Integer, Coefficients>>expectParsedControl(controlMap, ControlKey.BA_DQ_UPPER_BOUNDS, Map.class);
-		float upperBoundBaseArea = Utils.<Coefficients>optSafe(upperBoundsMap.get(baseAreaGroup))
-				.orElseThrow(
-						() -> new IllegalStateException("Could not limits for find base area group " + baseAreaGroup)
-				).getCoe(1); // Entry 1 is base area
+		float upperBoundBaseArea = upperBoundsBaseArea(baseAreaGroup);
 
 		/*
 		 * The original Fortran had the following comment and a commented out modification to upperBoundsBaseArea
@@ -562,20 +573,68 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	}
 
 	Coefficients estimateBaseAreaYieldCoefficients(Collection<? extends BaseVdypSpecies> species, BecDefinition bec) {
-		var coeMap = Utils.<MatrixMap2<String, String, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.BA_YIELD, MatrixMap2.class
-		);
-
-		var coe = weightedCoefficientSum(
-				7, 0, //
-				species, //
-				BaseVdypSpecies::getFractionGenus, // Weight by fraction
-				spec -> coeMap.get(bec.getDecayBec().getAlias(), spec.getGenus())
-		);
+		var coe = sumCoefficientsWeightedBySpeciesAndDecayBec(species, bec, ControlKey.BA_YIELD, 7);
 
 		// TODO confirm going over 0.5 should drop to 0 as this seems odd.
 		coe.scalarInPlace(5, x -> x > 0.0f ? 0f : x);
 		return coe;
+	}
+
+	Coefficients sumCoefficientsWeightedBySpeciesAndDecayBec(
+			Collection<? extends BaseVdypSpecies> species, BecDefinition bec, ControlKey key, int size
+	) {
+		var coeMap = Utils
+				.<MatrixMap2<String, String, Coefficients>>expectParsedControl(controlMap, key, MatrixMap2.class);
+
+		final String decayBecAlias = bec.getDecayBec().getAlias();
+
+		var coe = weightedCoefficientSum(
+				size, 0, //
+				species, //
+				BaseVdypSpecies::getFractionGenus, // Weight by fraction
+				spec -> coeMap.get(decayBecAlias, spec.getGenus())
+
+		);
+		return coe;
+	}
+
+	// EMP107
+	/**
+	 *
+	 * @param dominantHeight  Dominant height (m)
+	 * @param breastHeightAge breast height age
+	 * @param veteranBaseArea Basal area of overstory (>= 0)
+	 * @param species         Species for the layer
+	 * @param bec             BEC of the polygon
+	 * @param baseAreaGroup   Index of the base area group
+	 * @return DQ of primary layer (w DBH >= 7.5)
+	 * @throws StandProcessingException
+	 */
+	float estimateQuadMeanDiameterYield(
+			float dominantHeight, float breastHeightAge, Optional<Float> veteranBaseArea,
+			Collection<? extends BaseVdypSpecies> species, BecDefinition bec, int baseAreaGroup
+	) throws StandProcessingException {
+		final var coe = sumCoefficientsWeightedBySpeciesAndDecayBec(species, bec, ControlKey.DQ_YIELD, 6);
+
+		// TODO handle NDEBUG(2) case
+		final float ageUse = breastHeightAge;
+
+		final float upperBoundsQuadMeanDiameter = upperBoundsQuadMeanDiameter(baseAreaGroup);
+
+		if (ageUse <= 0f) {
+			throw new StandProcessingException("Primary breast height age must be positive but was " + ageUse);
+		}
+
+		final float trAge = FloatMath.log(ageUse);
+
+		final float c0 = coe.getCoe(0);
+		final float c1 = Math.max(coe.getCoe(1) + coe.getCoe(2) * trAge, 0f);
+		final float c2 = Math.max(coe.getCoe(3) + coe.getCoe(4) * trAge, 0f);
+
+		final float quadMeanDiameter = FloatMath
+				.clamp(c0 + c1 * FloatMath.pow(dominantHeight - 5f, c2), 7.6f, upperBoundsQuadMeanDiameter);
+
+		return quadMeanDiameter;
 	}
 
 	PolygonMode findDefaultPolygonMode(
@@ -892,7 +951,37 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	}
 
 	VriPolygon processBatn(VriPolygon poly) throws ProcessingException {
-		// TODO
+
+		final VriLayer primaryLayer = poly.getLayers().get(LayerType.PRIMARY);
+		final VriSite primarySite = primaryLayer.getPrimarySite()
+				.orElseThrow(() -> new StandProcessingException("Primary layer does not have a primary site"));
+		final Optional<VriLayer> veteranLayer = Utils.optSafe(poly.getLayers().get(LayerType.VETERAN));
+		BecDefinition bec = getBec(poly);
+
+		final float primaryHeight = primarySite.getHeight()
+				.orElseThrow(() -> new StandProcessingException("Primary site does not have a height"));
+		final float primaryBreastHeightAge = primarySite.getBreastHeightAge()
+				.orElseThrow(() -> new StandProcessingException("Primary site does not have a breast height age"));
+		final Optional<Float> veteranBaseArea = veteranLayer.flatMap(VriLayer::getBaseArea);
+
+		final int primaryEmpericalRelationshipParameterIndex = primaryLayer.getEmpericalRelationshipParameterIndex()
+				.orElseThrow(
+						() -> new StandProcessingException(
+								"Primary layer does not have an emperical relationship parameter index"
+						)
+				);
+
+		float primaryBaseArea = estimateBaseAreaYield(
+				primaryHeight, primaryBreastHeightAge, veteranBaseArea, false, primaryLayer.getSpecies().values(), bec,
+				primaryEmpericalRelationshipParameterIndex
+		);
+
+		// EMP107
+		float normativeQuadMeanDiameter = estimateQuadMeanDiameterYield(
+				primaryHeight, primaryBreastHeightAge, veteranBaseArea, primaryLayer.getSpecies().values(), bec,
+				primaryEmpericalRelationshipParameterIndex
+		);
+
 		return poly;
 	}
 
