@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public enum UtilizationClass {
 	SMALL(-1, "<7.5 cm", 0f, 7.5f), //
-	ALL(0, ">7.5 cm", 7.5f, 10000f), //
+	ALL(0, ">=7.5 cm", 7.5f, 10000f), //
 	U75TO125(1, "7.5 - 12.5 cm", 7.5f, 12.5f), //
 	U125TO175(2, "12.5 - 17.5 cm", 12.5f, 17.5f), //
 	U175TO225(3, "17.5 - 22.5 cm", 17.5f, 22.5f), //
