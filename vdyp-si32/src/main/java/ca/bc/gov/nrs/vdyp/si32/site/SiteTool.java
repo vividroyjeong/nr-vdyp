@@ -561,7 +561,8 @@ public class SiteTool {
 	 *
 	 * @param sp64CodeName the species short ("code") name.
 	 * @param isCoastal    <code>true</code> if coastal, <code>false</code> if interior.
-	 * @return the SI Curve number for the species, or -1 if the species was not recognized.
+	 * @return the SiteIndexEquation number for the species, or SiteIndexEquation.SI_NO_EQUATION 
+	 *     if the species was not recognized.
 	 */
 	public static SiteIndexEquation getSICurve(String sp64CodeName, boolean isCoastal) {
 
