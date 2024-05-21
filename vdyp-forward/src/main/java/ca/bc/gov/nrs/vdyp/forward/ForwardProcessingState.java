@@ -43,14 +43,6 @@ class ForwardProcessingState {
 	/** The active state */
 	private PolygonProcessingState processingState;
 	
-	// Polygon-independent COMMON block information
-	
-	// V7COE028
-	private CompVarAdjustments compVarAdjustments; // COE028
-
-	// VTROL
-	private VdypGrowthDetails vdypGrowthDetails; // IVTROL
-	
 	// VDEBUG - NDEBUG
 	// TODO
 
@@ -62,8 +54,6 @@ class ForwardProcessingState {
 
 		List<GenusDefinition> genusDefinitions = Utils.expectParsedControl(controlMap, ControlKey.SP0_DEF, List.class);
 		genusDefinitionMap = new GenusDefinitionMap(genusDefinitions);
-		compVarAdjustments = Utils.expectParsedControl(controlMap, ControlKey.PARAM_ADJUSTMENTS, CompVarAdjustments.class);
-		vdypGrowthDetails = Utils.expectParsedControl(controlMap, ControlKey.VTROL, VdypGrowthDetails.class);
 	}
 
 	public GenusDefinitionMap getGenusDefinitionMap() {
@@ -81,37 +71,45 @@ class ForwardProcessingState {
 	public MatrixMap2<String, Region, Coefficients> getHl1Coefficients() {
 		return Utils.expectParsedControl(controlMap, ControlKey.HL_PRIMARY_SP_EQN_P1, MatrixMap2.class);	
 	}
+	
+	public CompVarAdjustments getCompVarAdjustments() {
+		return Utils.expectParsedControl(controlMap, ControlKey.PARAM_ADJUSTMENTS, CompVarAdjustments.class);
+	}
 
-	public void setStartingState(VdypPolygon polygon) {
+	public VdypGrowthDetails getVdypGrowthDetails() {
+		return Utils.expectParsedControl(controlMap, ControlKey.VTROL, VdypGrowthDetails.class);
+	}
+	
+	public void setPolygon(VdypPolygon polygon) {
 		this.polygon = Optional.of(polygon);
 
 		// Move the primary layer of the given polygon to bank zero.
 		banks[0] = new Bank(polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone());
-		setActive(LayerType.PRIMARY, 0);
+		processingState = new PolygonProcessingState(banks[toIndex(0, LayerType.PRIMARY)]);
 	}
 
 	public VdypPolygon getPolygon() {
 		return polygon.orElseThrow();
 	}
 
-	private void setActive(LayerType layerType, int instanceNumber) {
-		processingState = new PolygonProcessingState(banks[toIndex(layerType, instanceNumber)]);
-	}
-
-	public void storeActive(LayerType layerType, int instanceNumber) {
-		banks[toIndex(layerType, instanceNumber)] = processingState.wallet.copy();
-	}
-
-	public void transfer(LayerType layerType, int fromInstanceNumber, int toInstanceNumber) {
-		banks[toIndex(layerType, toInstanceNumber)] = banks[toIndex(layerType, fromInstanceNumber)].copy();
-	}
-
-	public PolygonProcessingState getActive() {
+	public PolygonProcessingState getProcessingState() {
 		return processingState;
 	}
+	
+	public void storeActive(int instanceNumber, LayerType layerType) {
+		banks[toIndex(instanceNumber, layerType)] = processingState.wallet.copy();
+	}
 
-	private static int toIndex(LayerType layerType, int instanceNumber) {
-		return toLayerIndex(layerType) * MAX_INSTANCES + instanceNumber;
+	public void transfer(int fromInstanceNumber, int toInstanceNumber, LayerType layerType) {
+		banks[toIndex(toInstanceNumber, layerType)] = banks[toIndex(fromInstanceNumber, layerType)].copy();
+	}
+
+	public Bank getBank(int instanceNumber, LayerType layerType) {
+		return banks[toIndex(instanceNumber, layerType)];
+	}
+
+	private static int toIndex(int instanceNumber, LayerType layerType) {
+		return instanceNumber * MAX_INSTANCES + toLayerIndex(layerType);
 	}
 
 	private static int toLayerIndex(LayerType layerType) {

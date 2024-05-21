@@ -59,7 +59,7 @@ class Bank {
 	public float cuVolumesMinusDecayAndWastage[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 VOL_DW_B
 	public float loreyHeights[/* nSpecies + 1, including 0 */][/* uc -1 and 0 only */]; // BANK1 HLB
 	public float quadMeanDiameters[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 DQB
-	public float treesPerHectares[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 TPHB
+	public float treesPerHectare[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 TPHB
 	public float wholeStemVolumes[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 VOLWSB
 	
 	public Bank(VdypPolygonLayer layer, BecDefinition becZone) {
@@ -67,8 +67,8 @@ class Bank {
 		this.layer = layer;
 		this.becZone = becZone;
 
-		this.nSpecies = layer.getGenera().size();
-		this.indices = IntStream.range(1, nSpecies + 1).toArray();
+		nSpecies = layer.getGenera().size();
+		indices = IntStream.range(1, nSpecies + 1).toArray();
 
 		// In the following, index 0 is unused
 		speciesNames = new String[getNSpecies() + 1];
@@ -91,7 +91,7 @@ class Bank {
 		cuVolumesMinusDecayAndWastage = new float[getNSpecies() + 1][nUtilizationClasses];
 		loreyHeights = new float[getNSpecies() + 1][2];
 		quadMeanDiameters = new float[getNSpecies() + 1][nUtilizationClasses];
-		treesPerHectares = new float[getNSpecies() + 1][nUtilizationClasses];
+		treesPerHectare = new float[getNSpecies() + 1][nUtilizationClasses];
 		wholeStemVolumes = new float[getNSpecies() + 1][nUtilizationClasses];
 
 		if (layer.getDefaultUtilizationMap().isPresent()) {
@@ -128,7 +128,7 @@ class Bank {
 		this.sp64Distributions = copy(s.sp64Distributions);
 		this.speciesIndices = copy(s.speciesIndices);
 		this.speciesNames = copy(s.speciesNames);
-		this.treesPerHectares = copy(s.treesPerHectares);
+		this.treesPerHectare = copy(s.treesPerHectare);
 		this.wholeStemVolumes = copy(s.wholeStemVolumes);
 		this.yearsToBreastHeight = copy(s.yearsToBreastHeight);
 	}
@@ -181,7 +181,7 @@ class Bank {
 				loreyHeights[index][ucIndex] = su.getValue().getLoreyHeight();
 			}
 			quadMeanDiameters[index][ucIndex] = su.getValue().getQuadraticMeanDiameterAtBH();
-			treesPerHectares[index][ucIndex] = su.getValue().getLiveTreesPerHectare();
+			treesPerHectare[index][ucIndex] = su.getValue().getLiveTreesPerHectare();
 			wholeStemVolumes[index][ucIndex] = su.getValue().getWholeStemVolume();
 		}
 	}
@@ -198,7 +198,7 @@ class Bank {
 				loreyHeights[index][ucIndex] = Float.NaN;
 			}
 			quadMeanDiameters[index][ucIndex] = Float.NaN;
-			treesPerHectares[index][ucIndex] = Float.NaN;
+			treesPerHectare[index][ucIndex] = Float.NaN;
 			wholeStemVolumes[index][ucIndex] = Float.NaN;
 		}
 	}
@@ -291,27 +291,30 @@ class Bank {
 			cuVolumesMinusDecayAndWastage[toIndex] = cuVolumesMinusDecayAndWastage[fromIndex];
 			loreyHeights[toIndex] = loreyHeights[fromIndex];
 			quadMeanDiameters[toIndex] = quadMeanDiameters[fromIndex];
-			treesPerHectares[toIndex] = treesPerHectares[fromIndex];
+			treesPerHectare[toIndex] = treesPerHectare[fromIndex];
 			wholeStemVolumes[toIndex] = wholeStemVolumes[fromIndex];
 		}
 	}
 
 	private void retainOnly(Set<Integer> speciesToRetainByIndexSet) {
 
-		var speciesToRetainByIndex = new ArrayList<>(speciesToRetainByIndexSet);
-
-		speciesToRetainByIndex.sort(Integer::compareTo);
-
-		int nextAvailableSlot = 1;
-		for (int index : speciesToRetainByIndex) {
-			if (nextAvailableSlot != index) {
-				move(nextAvailableSlot, index);
+		if (speciesToRetainByIndexSet.size() < nSpecies) {
+			
+			var speciesToRetainByIndex = new ArrayList<>(speciesToRetainByIndexSet);
+	
+			speciesToRetainByIndex.sort(Integer::compareTo);
+	
+			int nextAvailableSlot = 1;
+			for (int index : speciesToRetainByIndex) {
+				if (nextAvailableSlot != index) {
+					move(nextAvailableSlot, index);
+				}
+				nextAvailableSlot += 1;
 			}
-			nextAvailableSlot += 1;
-		}
-
-		if (nextAvailableSlot > 1) {
+	
 			nSpecies = speciesToRetainByIndex.size();
+			indices = IntStream.range(1, nSpecies + 1 /* exclusive */).toArray();
+
 			int nElements = nSpecies + 1;
 
 			speciesNames = Arrays.copyOf(speciesNames, nElements);
@@ -331,7 +334,7 @@ class Bank {
 			cuVolumesMinusDecayAndWastage = Arrays.copyOf(cuVolumesMinusDecayAndWastage, nElements);
 			loreyHeights = Arrays.copyOf(loreyHeights, nElements);
 			quadMeanDiameters = Arrays.copyOf(quadMeanDiameters, nElements);
-			treesPerHectares = Arrays.copyOf(treesPerHectares, nElements);
+			treesPerHectare = Arrays.copyOf(treesPerHectare, nElements);
 			wholeStemVolumes = Arrays.copyOf(wholeStemVolumes, nElements);
 		}
 	}

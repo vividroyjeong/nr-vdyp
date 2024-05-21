@@ -38,29 +38,28 @@ class PolygonProcessingState {
 	// INXL1
 	//     ISPP = wallet.speciesIndices[primarySpeciesIndex]
 	//     PCTP = wallet.percentagesOfForestedLand[primarySpeciesIndex]
-	Optional<Integer> secondarySpeciesIndex; // => ISPS (species name) and PCTS (percentage)
-	int inventoryTypeGroup; // ITG
-	int primarySpeciesGroupNumber; // GRPBA1
-	int primarySpeciesStratumNumber; // GRPBA3
+	private Optional<Integer> secondarySpeciesIndex; // => ISPS (species name) and PCTS (percentage)
+	private int inventoryTypeGroup; // ITG
+	private int primarySpeciesGroupNumber; // GRPBA1
+	private int primarySpeciesStratumNumber; // GRPBA3
 	
 	
 	// Site Curve Numbers - encompasses INXSCV
 	private boolean areSiteCurveNumbersSet = false;
 	
 	// INXSC
-	/* pp */ int[] siteCurveNumbers; // INXSCV 
+	private int[] siteCurveNumbers; // INXSCV 
 
 	
 	// Primary Species Details - encompasses L1COM6
 	private boolean arePrimarySpeciesDetailsSet = false;
 	
 	// L1COM6
-	float primarySpeciesDominantHeight; // HD
-	float primarySpeciesSiteIndex; // SI
-	float primarySpeciesTotalAge; // AGETOTP
-	float primarySpeciesAgeAtBreastHeight; // AGEBHP
-	float primarySpeciesAgeToBreastHeight; // YTBHP
-	
+	private float primarySpeciesDominantHeight; // HD
+	private float primarySpeciesSiteIndex; // SI
+	private float primarySpeciesTotalAge; // AGETOTP
+	private float primarySpeciesAgeAtBreastHeight; // AGEBHP
+	private float primarySpeciesAgeToBreastHeight; // YTBHP
 	
 	// FRBASP0 - FR
 	// TODO
@@ -89,34 +88,73 @@ class PolygonProcessingState {
 	}
 
 	public int getPrimarySpeciesIndex() {
+		if (!areRankingDetailsSet) {
+			throw new IllegalStateException("unset primarySpeciesIndex");
+		}
 		return primarySpeciesIndex;
 	}
 
-	public Optional<Integer> getSecondarySpeciesIndex() {
-		return secondarySpeciesIndex;
+	public boolean hasSecondarySpeciesIndex() {
+		return secondarySpeciesIndex.isPresent();
+	}
+
+	public int getSecondarySpeciesIndex() {
+		return secondarySpeciesIndex.orElseThrow(() -> new IllegalStateException("unset secondarySpeciesIndex"));
 	}
 
 	public int getInventoryTypeGroup() {
+		if (!areRankingDetailsSet) {
+			throw new IllegalStateException("unset inventoryTypeGroup");
+		}
 		return inventoryTypeGroup;
 	}
 
+	public int getSiteCurveNumber(int n) {
+		if (!areSiteCurveNumbersSet) {
+			throw new IllegalStateException("unset siteCurveNumbers");
+		}
+		if (n == 0) {
+			// Take this opportunity to initialize siteCurveNumbers[0] from that of the primary species.
+			if (!areRankingDetailsSet) {
+				throw new IllegalStateException("unset rankingDetails");
+			}
+			siteCurveNumbers[0] = siteCurveNumbers[primarySpeciesIndex];
+		}
+		return siteCurveNumbers[n];
+	}
+	
 	public float getPrimarySpeciesDominantHeight() {
+		if (!arePrimarySpeciesDetailsSet) {
+			throw new IllegalStateException("unset primarySpeciesDominantHeight");
+		}
 		return primarySpeciesDominantHeight;
 	}
 
 	public float getPrimarySpeciesSiteIndex() {
+		if (!arePrimarySpeciesDetailsSet) {
+			throw new IllegalStateException("unset primarySpeciesSiteIndex");
+		}
 		return primarySpeciesSiteIndex;
 	}
 
 	public float getPrimarySpeciesTotalAge() {
+		if (!arePrimarySpeciesDetailsSet) {
+			throw new IllegalStateException("unset primarySpeciesTotalAge");
+		}
 		return primarySpeciesTotalAge;
 	}
 
 	public float getPrimarySpeciesAgeAtBreastHeight() {
+		if (!arePrimarySpeciesDetailsSet) {
+			throw new IllegalStateException("unset primarySpeciesAgeAtBreastHeight");
+		}
 		return primarySpeciesAgeAtBreastHeight;
 	}
 
 	public float getPrimarySpeciesAgeToBreastHeight() {
+		if (!arePrimarySpeciesDetailsSet) {
+			throw new IllegalStateException("unset primarySpeciesAgeToBreastHeight");
+		}
 		return primarySpeciesAgeToBreastHeight;
 	}
 
@@ -137,7 +175,7 @@ class PolygonProcessingState {
 			throw new IllegalStateException("SiteCurveNumbers can be set once only");
 		}
 		
-		Arrays.copyOf(siteCurveNumbers, siteCurveNumbers.length);
+		this.siteCurveNumbers = Arrays.copyOf(siteCurveNumbers, siteCurveNumbers.length);
 		
 		areSiteCurveNumbersSet = true;
 	}

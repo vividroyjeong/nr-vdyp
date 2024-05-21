@@ -111,9 +111,9 @@ class PolygonProcessingStateTest {
 		for (int i = 0; i < nSpecies + 1; i++) {
 			assertThat(pps.quadMeanDiameters[i].length, is(UtilizationClass.values().length));
 		}
-		assertThat(pps.treesPerHectares.length, is(nSpecies + 1));
+		assertThat(pps.treesPerHectare.length, is(nSpecies + 1));
 		for (int i = 0; i < nSpecies + 1; i++) {
-			assertThat(pps.treesPerHectares[i].length, is(UtilizationClass.values().length));
+			assertThat(pps.treesPerHectare[i].length, is(UtilizationClass.values().length));
 		}
 		assertThat(pps.wholeStemVolumes.length, is(nSpecies + 1));
 		for (int i = 0; i < nSpecies + 1; i++) {
@@ -199,7 +199,7 @@ class PolygonProcessingStateTest {
 					assertThat(pps1.loreyHeights[i][uc.index + 1], is(pps2.loreyHeights[j][uc.index + 1]));
 				}
 				assertThat(pps1.quadMeanDiameters[i][uc.index + 1], is(pps2.quadMeanDiameters[j][uc.index + 1]));
-				assertThat(pps1.treesPerHectares[i][uc.index + 1], is(pps2.treesPerHectares[j][uc.index + 1]));
+				assertThat(pps1.treesPerHectare[i][uc.index + 1], is(pps2.treesPerHectare[j][uc.index + 1]));
 				assertThat(pps1.wholeStemVolumes[i][uc.index + 1], is(pps2.wholeStemVolumes[j][uc.index + 1]));
 			}
 		}
@@ -262,7 +262,7 @@ class PolygonProcessingStateTest {
 				assertThat(pps.loreyHeights[spIndex][uc.index + 1], is(u.getLoreyHeight()));
 			}
 			assertThat(pps.quadMeanDiameters[spIndex][uc.index + 1], is(u.getQuadraticMeanDiameterAtBH()));
-			assertThat(pps.treesPerHectares[spIndex][uc.index + 1], is(u.getLiveTreesPerHectare()));
+			assertThat(pps.treesPerHectare[spIndex][uc.index + 1], is(u.getLiveTreesPerHectare()));
 			assertThat(pps.wholeStemVolumes[spIndex][uc.index + 1], is(u.getWholeStemVolume()));
 		}
 	}

@@ -25,6 +25,7 @@ import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.CommonData;
 import ca.bc.gov.nrs.vdyp.model.GenusDistribution;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
@@ -50,13 +51,18 @@ public class ForwardProcessingEngine {
 
 	public enum ExecutionStep {
 		// Must be first
-		None,
+		None, //
 
-		RemoveSmallSpecies, CalculateMissingSiteCurves, CalculateCoverages, DeterminePolygonRankings,
-		EstimateMissingSiteIndices, EstimateMissingYearsToBreastHeightValues, CalculateHeightAgeSiteIndex,
+		RemoveSmallSpecies, //
+		CalculateMissingSiteCurves, //
+		CalculateCoverages, //
+		DeterminePolygonRankings, //
+		EstimateMissingSiteIndices, //
+		EstimateMissingYearsToBreastHeightValues, //
+		CalculateDominantHeightAgeSiteIndex, //
 
 		// Must be last
-		All;
+		All; //
 
 		public ExecutionStep predecessor() {
 			if (this == None) {
@@ -84,57 +90,59 @@ public class ForwardProcessingEngine {
 
 		logger.info("Starting processing of polygon {}", polygon.getDescription());
 
-		fps.setStartingState(polygon);
+		fps.setPolygon(polygon);
 
 		// All of BANKCHK1 that we need
 		validatePolygon(polygon);
 
-		executeForwardAlgorithm(ExecutionStep.All);
+		executeForwardAlgorithm(lastStep);
 	}
 
 	private void executeForwardAlgorithm(
 			ExecutionStep lastStep
 	) throws ProcessingException {
 
-		PolygonProcessingState bank = fps.getActive();
+		PolygonProcessingState pps = fps.getProcessingState();
+		Bank bank = fps.getBank(0, LayerType.PRIMARY);
 
 		logger.info(
 				MessageFormat.format(
-						"Beginning processing of polygon {0} layer {1}", bank.getLayer().getParent(), bank.getLayer()
+						"Beginning processing of polygon {0} layer {1}", pps.getLayer().getParent(), pps
+								.getLayer()
 				)
 		);
 
 		// BANKCHK1, simplified for the parameters METH_CHK = 4, LayerI = 1, and INSTANCE = 1
 		if (lastStep.ordinal() >= ExecutionStep.RemoveSmallSpecies.ordinal()) {
-			removeSmallSpecies(bank);
+			removeSmallSpecies(pps);
 		}
 
-		// SCINXSET
+		// SCINXSET - note these are calculated directly from the Primary bank of instance 1
 		if (lastStep.ordinal() >= ExecutionStep.CalculateMissingSiteCurves.ordinal()) {
-			calculateMissingSiteCurves(bank, fps.getSiteCurveMap());
+			calculateMissingSiteCurves(bank, fps.getSiteCurveMap(), fps.getProcessingState());
 		}
 
 		// VPRIME, method == 1
 		if (lastStep.ordinal() >= ExecutionStep.CalculateCoverages.ordinal()) {
-			calculateCoverages(bank);
+			calculateCoverages(pps);
 		}
 
 		if (lastStep.ordinal() >= ExecutionStep.DeterminePolygonRankings.ordinal()) {
-			determinePolygonRankings(bank, CommonData.PRIMARY_SPECIES_TO_COMBINE);
+			determinePolygonRankings(pps, CommonData.PRIMARY_SPECIES_TO_COMBINE);
 		}
 
-		// ADDSITE
+		// SITEADD
 		if (lastStep.ordinal() >= ExecutionStep.EstimateMissingSiteIndices.ordinal()) {
-			estimateMissingSiteIndices(bank);
+			estimateMissingSiteIndices(pps);
 		}
 
 		if (lastStep.ordinal() >= ExecutionStep.EstimateMissingYearsToBreastHeightValues.ordinal()) {
-			estimateMissingYearsToBreastHeightValues(bank);
+			estimateMissingYearsToBreastHeightValues(pps);
 		}
 
 		// VHDOM1 METH_H = 2, METH_A = 2, METH_SI = 2
-		if (lastStep.ordinal() >= ExecutionStep.CalculateHeightAgeSiteIndex.ordinal()) {
-			calculateDominantHeightAgeSiteIndex(bank, fps.getHl1Coefficients());
+		if (lastStep.ordinal() >= ExecutionStep.CalculateDominantHeightAgeSiteIndex.ordinal()) {
+			calculateDominantHeightAgeSiteIndex(pps, fps.getHl1Coefficients());
 		}
 	}
 
@@ -161,11 +169,12 @@ public class ForwardProcessingEngine {
 			String primarySpeciesAlias = state.wallet.speciesNames[primarySpeciesIndex];
 			Region primarySpeciesRegion = state.getBecZone().getRegion();
 
-			float a0 = hl1Coefficients.get(primarySpeciesAlias, primarySpeciesRegion).getCoe(1);
-			float a1 = hl1Coefficients.get(primarySpeciesAlias, primarySpeciesRegion).getCoe(2);
-			float a2 = hl1Coefficients.get(primarySpeciesAlias, primarySpeciesRegion).getCoe(3);
+			var coefficients = hl1Coefficients.get(primarySpeciesAlias, primarySpeciesRegion);
+			float a0 = coefficients.getCoe(1);
+			float a1 = coefficients.getCoe(2);
+			float a2 = coefficients.getCoe(3);
 
-			float treesPerHectare = state.wallet.treesPerHectares[primarySpeciesIndex][0];
+			float treesPerHectare = state.wallet.treesPerHectare[primarySpeciesIndex][UtilizationClass.ALL.ordinal()];
 			float hMult = a0 - a1 + a1 * (float) Math.exp(a2 * (treesPerHectare - 100.0));
 
 			primarySpeciesDominantHeight = 1.3f + (loreyHeight - 1.3f) / hMult;
@@ -176,32 +185,32 @@ public class ForwardProcessingEngine {
 		float primarySpeciesYearsAtBreastHeight = state.wallet.yearsAtBreastHeight[primarySpeciesIndex];
 		float primarySpeciesYearsToBreastHeight = state.wallet.yearsToBreastHeight[primarySpeciesIndex];
 
-		int activeIndex = 0;
+		Optional<Integer> activeIndex = Optional.empty();
+
 		if (Float.isNaN(primarySpeciesTotalAge)) {
 
-			if (state.getSecondarySpeciesIndex().isPresent()
-					&& !Float.isNaN(state.wallet.ageTotals[state.getSecondarySpeciesIndex().get()])) {
-				activeIndex = state.getSecondarySpeciesIndex().get();
+			if (state.hasSecondarySpeciesIndex()
+					&& !Float.isNaN(state.wallet.ageTotals[state.getSecondarySpeciesIndex()])) {
+				activeIndex = Optional.of(state.getSecondarySpeciesIndex());
 			} else {
 				for (int i = 1; i <= state.getNSpecies(); i++) {
 					if (!Float.isNaN(state.wallet.ageTotals[i])) {
-						activeIndex = i;
+						activeIndex = Optional.of(i);
 						break;
 					}
 				}
 			}
 
-			if (Float.isNaN(primarySpeciesTotalAge)) {
-				throw new ProcessingException("Age data unavailable for ALL species", 5);
-			}
+			activeIndex.orElseThrow(() -> new ProcessingException("Age data unavailable for ALL species", 5));
 
-			assert (activeIndex != 0);
-			primarySpeciesTotalAge = state.wallet.ageTotals[activeIndex];
+			primarySpeciesTotalAge = state.wallet.ageTotals[activeIndex.get()];
 			if (!Float.isNaN(primarySpeciesYearsToBreastHeight)) {
 				primarySpeciesYearsAtBreastHeight = primarySpeciesTotalAge - primarySpeciesYearsToBreastHeight;
+			} else if (!Float.isNaN(primarySpeciesYearsAtBreastHeight)) {
+				primarySpeciesYearsToBreastHeight = primarySpeciesTotalAge - primarySpeciesYearsAtBreastHeight;
 			} else {
-				primarySpeciesYearsAtBreastHeight = state.wallet.yearsAtBreastHeight[activeIndex];
-				primarySpeciesYearsToBreastHeight = state.wallet.yearsToBreastHeight[activeIndex];
+				primarySpeciesYearsAtBreastHeight = state.wallet.yearsAtBreastHeight[activeIndex.get()];
+				primarySpeciesYearsToBreastHeight = state.wallet.yearsToBreastHeight[activeIndex.get()];
 			}
 		}
 
@@ -209,32 +218,30 @@ public class ForwardProcessingEngine {
 		float primarySpeciesSiteIndex = state.wallet.siteIndices[primarySpeciesIndex];
 		if (Float.isNaN(primarySpeciesSiteIndex)) {
 
-			if (state.getSecondarySpeciesIndex().isPresent()
-					&& !Float.isNaN(state.wallet.siteIndices[state.getSecondarySpeciesIndex().get()])) {
-				activeIndex = state.getSecondarySpeciesIndex().get();
+			if (state.hasSecondarySpeciesIndex()
+					&& !Float.isNaN(state.wallet.siteIndices[state.getSecondarySpeciesIndex()])) {
+				activeIndex = Optional.of(state.getSecondarySpeciesIndex());
 			} else {
-				if (activeIndex == 0) {
-					activeIndex = 1;
-				}
-				for (int i = 1; i <= state.getNSpecies(); i++) {
-					if (!Float.isNaN(state.wallet.siteIndices[i])) {
-						activeIndex = i;
-						primarySpeciesSiteIndex = state.wallet.siteIndices[activeIndex];
-						break;
+				if (activeIndex.isEmpty() || Float.isNaN(state.wallet.siteIndices[activeIndex.get()])) {
+					for (int i = 1; i <= state.getNSpecies(); i++) {
+						if (!Float.isNaN(state.wallet.siteIndices[i])) {
+							activeIndex = Optional.of(i);
+							break;
+						}
 					}
 				}
-
-				if (Float.isNaN(primarySpeciesSiteIndex)) {
-					throw new ProcessingException("Site Index data unavailable for ALL species", 7);
-				}
 			}
+			primarySpeciesSiteIndex = state.wallet.siteIndices[activeIndex
+					.orElseThrow(() -> new ProcessingException("Site Index data unavailable for ALL species", 7))];
+		} else {
+			activeIndex = Optional.of(primarySpeciesIndex);
 		}
 
-		SiteIndexEquation siteCurve1 = SiteIndexEquation.getByIndex(state.siteCurveNumbers[activeIndex]);
-		SiteIndexEquation siteCurve2 = SiteIndexEquation.getByIndex(state.siteCurveNumbers[0]);
+		SiteIndexEquation siteCurve1 = SiteIndexEquation.getByIndex(state.getSiteCurveNumber(activeIndex.get()));
+		SiteIndexEquation siteCurve2 = SiteIndexEquation.getByIndex(state.getSiteCurveNumber(0));
 
 		try {
-			double newSI = SiteTool.convertSiteIndexBetweenCurves(siteCurve1, primarySpeciesSiteIndex, siteCurve2);
+			double newSI = SiteTool.convertSiteIndexBetweenCurves(siteCurve1, activeIndex.get(), siteCurve2);
 			if (newSI > 1.3) {
 				primarySpeciesSiteIndex = (float) newSI;
 			}
@@ -245,7 +252,8 @@ public class ForwardProcessingEngine {
 		state.setPrimarySpeciesDetails(
 				new PrimarySpeciesDetails(
 						primarySpeciesDominantHeight, primarySpeciesSiteIndex, primarySpeciesTotalAge,
-						primarySpeciesYearsAtBreastHeight, primarySpeciesYearsToBreastHeight)
+						primarySpeciesYearsAtBreastHeight, primarySpeciesYearsToBreastHeight
+				)
 		);
 	}
 
@@ -269,8 +277,6 @@ public class ForwardProcessingEngine {
 		float defaultSiteIndex = primarySpeciesSiteIndex;
 
 		if (Float.isNaN(defaultSiteIndex)) {
-			// Normally, this block will never be executed because the primary species site index
-			// will have been calculated in calculateMissingSiteCurves.
 			for (int i : state.getIndices()) {
 				if (!Float.isNaN(state.wallet.siteIndices[i])) {
 					defaultSiteIndex = state.wallet.siteIndices[i];
@@ -297,7 +303,7 @@ public class ForwardProcessingEngine {
 			float siteIndex = !Float.isNaN(state.wallet.siteIndices[i]) ? state.wallet.siteIndices[i]
 					: defaultSiteIndex;
 			try {
-				SiteIndexEquation curve = SiteIndexEquation.getByIndex(state.wallet.siteCurveNumbers[i]);
+				SiteIndexEquation curve = SiteIndexEquation.getByIndex(state.getSiteCurveNumber(i));
 				double yearsToBreastHeight = SiteTool.yearsToBreastHeight(curve, siteIndex);
 				state.wallet.yearsToBreastHeight[i] = (float) yearsToBreastHeight;
 			} catch (CommonCalculatorException e) {
@@ -322,7 +328,7 @@ public class ForwardProcessingEngine {
 
 		int primarySpeciesIndex = state.getPrimarySpeciesIndex();
 		SiteIndexEquation primarySiteCurve = SiteIndexEquation
-				.getByIndex(state.wallet.siteCurveNumbers[primarySpeciesIndex]);
+				.getByIndex(state.getSiteCurveNumber(primarySpeciesIndex));
 
 		// (1)
 
@@ -340,13 +346,15 @@ public class ForwardProcessingEngine {
 				float siteIndexI = state.wallet.siteIndices[i];
 
 				if (!Float.isNaN(siteIndexI)) {
-					SiteIndexEquation siteCurveI = SiteIndexEquation.getByIndex(state.wallet.siteCurveNumbers[i]);
+					SiteIndexEquation siteCurveI = SiteIndexEquation.getByIndex(state.getSiteCurveNumber(i));
 
 					try {
 						double mappedSiteIndex = SiteTool
 								.convertSiteIndexBetweenCurves(siteCurveI, siteIndexI, primarySiteCurve);
-						otherSiteIndicesSum += mappedSiteIndex;
-						nOtherSiteIndices += 1;
+						if (mappedSiteIndex > 1.3) {
+							otherSiteIndicesSum += mappedSiteIndex;
+							nOtherSiteIndices += 1;
+						}
 					} catch (NoAnswerException e) {
 						logger.warn(
 								MessageFormat.format(
@@ -381,7 +389,7 @@ public class ForwardProcessingEngine {
 
 				float siteIndexI = state.wallet.siteIndices[i];
 				if (Float.isNaN(siteIndexI)) {
-					SiteIndexEquation siteCurveI = SiteIndexEquation.getByIndex(state.wallet.siteCurveNumbers[i]);
+					SiteIndexEquation siteCurveI = SiteIndexEquation.getByIndex(state.getSiteCurveNumber(i));
 
 					try {
 						double mappedSiteIndex = SiteTool
@@ -434,52 +442,57 @@ public class ForwardProcessingEngine {
 	}
 
 	/**
-	 * Calculate the siteCurve number of all species for which one was not supplied.
+	 * Calculate the siteCurve number of all species for which one was not supplied. All calculations
+	 * are done in the given bank, but the resulting site curve vector is stored in the given 
+	 * PolygonProcessingState.
 	 *
-	 * @param state         the bank in which the calculations are done.
-	 * @param becZone      the BEC zone definitions.
+	 * @param bank         the bank in which the calculations are done.
 	 * @param siteCurveMap the Site Curve definitions.
+	 * @param pps		   the PolygonProcessingState to where the calculated curves are also to be  
 	 */
 	static void calculateMissingSiteCurves(
-			PolygonProcessingState state, MatrixMap2<String, Region, SiteIndexEquation> siteCurveMap
+			Bank bank, MatrixMap2<String, Region, SiteIndexEquation> siteCurveMap, PolygonProcessingState pps
 	) {
-		BecDefinition becZone = state.getBecZone();
+		BecDefinition becZone = bank.getBecZone();
 
-		for (int i : state.getIndices()) {
+		for (int i : bank.getIndices()) {
 
-			if (state.wallet.siteCurveNumbers[i] == VdypEntity.MISSING_INTEGER_VALUE) {
+			if (bank.siteCurveNumbers[i] == VdypEntity.MISSING_INTEGER_VALUE) {
 
 				Optional<SiteIndexEquation> scIndex = Optional.empty();
 
-				Optional<GenusDistribution> sp0Dist = state.wallet.sp64Distributions[i].getSpeciesDistribution(0);
+				Optional<GenusDistribution> sp0Dist = bank.sp64Distributions[i].getSpeciesDistribution(0);
 
+				// First alternative is to use the name of the first of the species' sp64Distributions
 				if (sp0Dist.isPresent()) {
 					if (!siteCurveMap.isEmpty()) {
 						scIndex = Utils
 								.optSafe(siteCurveMap.get(sp0Dist.get().getGenus().getAlias(), becZone.getRegion()));
 					} else {
 						SiteIndexEquation siCurve = SiteTool
-								.getSICurve(state.wallet.speciesNames[i], becZone.getRegion().equals(Region.COASTAL));
+								.getSICurve(bank.speciesNames[i], becZone.getRegion().equals(Region.COASTAL));
 						scIndex = siCurve == SiteIndexEquation.SI_NO_EQUATION ? Optional.empty() : Optional.of(siCurve);
 					}
 				}
 
+				// Second alternative is to use the species name as given in the species' "speciesName" field
 				if (scIndex.isEmpty()) {
+					String sp0 = bank.speciesNames[i];
 					if (!siteCurveMap.isEmpty()) {
 						scIndex = Utils
-								.optSafe(siteCurveMap.get(sp0Dist.get().getGenus().getAlias(), becZone.getRegion()));
+								.optSafe(siteCurveMap.get(sp0, becZone.getRegion()));
 					} else {
 						SiteIndexEquation siCurve = SiteTool
-								.getSICurve(state.wallet.speciesNames[i], becZone.getRegion().equals(Region.COASTAL));
+								.getSICurve(sp0, becZone.getRegion().equals(Region.COASTAL));
 						scIndex = siCurve == SiteIndexEquation.SI_NO_EQUATION ? Optional.empty() : Optional.of(siCurve);
 					}
 				}
 
-				state.wallet.siteCurveNumbers[i] = scIndex.orElseThrow().n();
+				bank.siteCurveNumbers[i] = scIndex.orElseThrow().n();
 			}
 		}
 
-		state.setSiteCurveNumbers(state.wallet.siteCurveNumbers);
+		pps.setSiteCurveNumbers(bank.siteCurveNumbers);
 	}
 
 	/**

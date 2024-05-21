@@ -152,7 +152,7 @@ class VdypForwardControlParserTest {
 	@Test
 	void testParseE025Empty() throws Exception {
 		var parser = new ForwardControlParser();
-		var result = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
+		var result = VdypForwardTestUtils.parse(parser, "VDYP-NoSiteCurves.CTR");
 		assertThat(result, (Matcher) controlMapHasEntry(ControlKey.SITE_CURVE_NUMBERS, mmEmpty()));
 	}
 
