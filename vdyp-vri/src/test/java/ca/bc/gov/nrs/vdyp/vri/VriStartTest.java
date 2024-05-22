@@ -9,6 +9,7 @@ import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.both;
+import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
@@ -32,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.EnumSource.Mode;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import ca.bc.gov.nrs.vdyp.application.ApplicationTestUtils;
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
@@ -2088,7 +2090,59 @@ class VriStartTest {
 
 			float result = app.estimateQuadMeanDiameterYield(7.6f, 15f, Optional.empty(), species, bec, 61);
 
-			assertThat(result, closeTo(62.0858421f));
+			assertThat(result, closeTo(10.3879938f));
+		}
+		
+		@ParameterizedTest
+		@ValueSource(floats= {0f, -1f, -Float.MIN_VALUE, -Float.MAX_VALUE, Float.NEGATIVE_INFINITY})
+		void testBreastHeightAgeLow(float breastHeightAge) throws StandProcessingException {
+			Map<String, Object> controlMap = VriTestUtils.loadControlMap();
+			VriStart app = new VriStart();
+			ApplicationTestUtils.setControlMap(app, controlMap);
+
+			var polygon = VriPolygon.build(pBuilder -> {
+				pBuilder.polygonIdentifier("Test", 2024);
+				pBuilder.biogeoclimaticZone("IDF");
+				pBuilder.yieldFactor(1.0f);
+				pBuilder.addLayer(lBuilder -> {
+					lBuilder.layerType(LayerType.PRIMARY);
+					lBuilder.crownClosure(57.8f);
+					lBuilder.utilization(7.5f);
+					lBuilder.empiricalRelationshipParameterIndex(61);
+
+					lBuilder.addSpecies(sBuilder -> {
+						sBuilder.genus("B"); // 3
+						sBuilder.percentGenus(10f);
+					});
+					lBuilder.addSpecies(sBuilder -> {
+						sBuilder.genus("C"); // 4
+						sBuilder.percentGenus(20f);
+					});
+					lBuilder.addSpecies(sBuilder -> {
+						sBuilder.genus("F"); // 4
+						sBuilder.percentGenus(30f);
+					});
+					lBuilder.addSpecies(sBuilder -> {
+						sBuilder.genus("H"); // 8
+						sBuilder.percentGenus(30f);
+					});
+					lBuilder.addSpecies(sBuilder -> {
+						sBuilder.genus("S"); // 15
+						sBuilder.percentGenus(10f);
+					});
+
+					lBuilder.primaryGenus("F");
+				});
+			});
+
+			var species = polygon.getLayers().get(LayerType.PRIMARY).getSpecies().values();
+
+			var bec = Utils.expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class).get("IDF").get();
+
+			var ex = assertThrows(StandProcessingException.class, ()-> app.estimateQuadMeanDiameterYield(7.6f, breastHeightAge, Optional.empty(), species, bec, 61));
+
+			assertThat(ex, hasProperty("message", endsWith(Float.toString(breastHeightAge))));
+
 		}
 
 	}
