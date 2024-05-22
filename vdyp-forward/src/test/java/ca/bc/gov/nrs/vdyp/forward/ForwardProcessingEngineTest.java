@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
+import org.hamcrest.Matchers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -465,6 +466,39 @@ class ForwardProcessingEngineTest {
 		assertThat(fps.getProcessingState().getPrimarySpeciesAgeToBreastHeight(), is(5.0f));
 	}
 
+	@Test
+	void testSetEquationGroups() throws ResourceParseException, IOException, ProcessingException {
+		var testPolygonDescription = VdypPolygonDescriptionParser.parse("01002 S000001 00     1970");
+
+		var reader = new ForwardDataStreamReader(controlMap);
+
+		var polygon = reader.readNextPolygon(testPolygonDescription);
+
+		ForwardProcessingState fps = new ForwardProcessingState(controlMap);
+		fps.setPolygon(polygon);
+		
+		assertThat(fps.getProcessingState().volumeEquationGroups, Matchers.is(new float[] { Float.NaN, 12.0f, 20.0f, 25.0f, 37.0f, 66.0f }));
+		assertThat(fps.getProcessingState().decayEquationGroups, Matchers.is(new float[] { Float.NaN, 7.0f, 14.0f, 19.0f, 31.0f, 54.0f }));
+		assertThat(fps.getProcessingState().breakageEquationGroups, Matchers.is(new float[] { Float.NaN, 5.0f, 6.0f, 12.0f, 17.0f, 28.0f }));
+	}
+
+	@Test
+	void testSetCompatibilityVariables() throws ResourceParseException, IOException, ProcessingException {
+		var testPolygonDescription = VdypPolygonDescriptionParser.parse("01002 S000001 00     1970");
+
+		var reader = new ForwardDataStreamReader(controlMap);
+
+		var polygon = reader.readNextPolygon(testPolygonDescription);
+
+		ForwardProcessingState fps = new ForwardProcessingState(controlMap);
+		ForwardProcessingEngine fpe = new ForwardProcessingEngine(fps);
+		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.SetCompatibilityVariables);
+		
+		assertThat(fps.getProcessingState().volumeEquationGroups, Matchers.is(new float[] { Float.NaN, 12.0f, 20.0f, 25.0f, 37.0f, 66.0f }));
+		assertThat(fps.getProcessingState().decayEquationGroups, Matchers.is(new float[] { Float.NaN, 7.0f, 14.0f, 19.0f, 31.0f, 54.0f }));
+		assertThat(fps.getProcessingState().breakageEquationGroups, Matchers.is(new float[] { Float.NaN, 5.0f, 6.0f, 12.0f, 17.0f, 28.0f }));
+	}
+	 
 	@Test
 	void testCalculateDominantHeightAgeSiteIndexNoSecondary()
 			throws ProcessingException, IOException, ResourceParseException {

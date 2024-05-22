@@ -79,13 +79,13 @@ class ForwardProcessingState {
 	public VdypGrowthDetails getVdypGrowthDetails() {
 		return Utils.expectParsedControl(controlMap, ControlKey.VTROL, VdypGrowthDetails.class);
 	}
-	
+
 	public void setPolygon(VdypPolygon polygon) {
 		this.polygon = Optional.of(polygon);
 
 		// Move the primary layer of the given polygon to bank zero.
 		banks[0] = new Bank(polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone());
-		processingState = new PolygonProcessingState(banks[toIndex(0, LayerType.PRIMARY)]);
+		processingState = new PolygonProcessingState(banks[toIndex(0, LayerType.PRIMARY)], controlMap);
 	}
 
 	public VdypPolygon getPolygon() {

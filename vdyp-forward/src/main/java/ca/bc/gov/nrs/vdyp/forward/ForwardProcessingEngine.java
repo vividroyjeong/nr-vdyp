@@ -24,6 +24,7 @@ import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.CommonData;
+import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
 import ca.bc.gov.nrs.vdyp.model.GenusDistribution;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
@@ -60,6 +61,7 @@ public class ForwardProcessingEngine {
 		EstimateMissingSiteIndices, //
 		EstimateMissingYearsToBreastHeightValues, //
 		CalculateDominantHeightAgeSiteIndex, //
+		SetCompatibilityVariables, //
 
 		// Must be last
 		All; //
@@ -143,6 +145,53 @@ public class ForwardProcessingEngine {
 		// VHDOM1 METH_H = 2, METH_A = 2, METH_SI = 2
 		if (lastStep.ordinal() >= ExecutionStep.CalculateDominantHeightAgeSiteIndex.ordinal()) {
 			calculateDominantHeightAgeSiteIndex(pps, fps.getHl1Coefficients());
+		}
+
+		// CVSET1
+		if (lastStep.ordinal() >= ExecutionStep.SetCompatibilityVariables.ordinal()) {
+			setCompatibilityVariables(pps, fps.getCompVarAdjustments());
+		}
+	}
+
+	private static float[] defaultQuadMeanDiameters = new float[] { Float.NaN, 10.0f, 15.0f, 20.0f, 25.0f };
+	static void setCompatibilityVariables(
+			PolygonProcessingState pps, CompVarAdjustments compVarAdjustments
+	) {
+		float[] adjust0 = new float[4];
+		Arrays.fill(adjust0, 0.0f);
+		
+		float vBaseMin = 0.1f;
+		float bBaseMin = 0.01f;
+		
+		// Note: L1COM2 (Equation Groups) is initialized when the PolygonProcessingState is created.
+		
+		for (int s = 1; s <= pps.getNSpecies(); s++) {
+			int speciesIndex = pps.wallet.speciesIndices[s];
+			
+			float loreyHeight = pps.wallet.loreyHeights[s][0];
+			
+			int nInterestingUtilizationClasses = UtilizationClass.ALL_BUT_SMALL.size();
+			float[] speciesBasalAreas = new float[nInterestingUtilizationClasses];
+			float[] speciesWholeStemVolumes = new float[nInterestingUtilizationClasses];
+			float[] speciesCloseUtilizationVolumes = new float[nInterestingUtilizationClasses];
+			float[] speciesCUMinusDecayVolumes = new float[nInterestingUtilizationClasses];
+			float[] speciesCUMinusDecayWastageVolumes = new float[nInterestingUtilizationClasses];
+			float[] speciesQuadMeanDiameter = new float[nInterestingUtilizationClasses];
+			for (UtilizationClass uc: UtilizationClass.ALL_BUT_SMALL) {
+				
+				int ucIndex = uc.ordinal();
+				
+				speciesBasalAreas[ucIndex] = pps.wallet.basalAreas[s][ucIndex];
+				speciesWholeStemVolumes[ucIndex] = pps.wallet.wholeStemVolumes[s][ucIndex];
+				speciesCloseUtilizationVolumes[ucIndex] = pps.wallet.closeUtilizationVolumes[s][ucIndex];
+				speciesCUMinusDecayVolumes[ucIndex] = pps.wallet.cuVolumesMinusDecay[s][ucIndex];
+				speciesCUMinusDecayWastageVolumes[ucIndex] = pps.wallet.cuVolumesMinusDecayAndWastage[s][ucIndex];
+				
+				speciesQuadMeanDiameter[ucIndex] = pps.wallet.quadMeanDiameters[s][ucIndex];
+				if (ucIndex != 0 && speciesQuadMeanDiameter[ucIndex] <= 0.0f) {
+					speciesQuadMeanDiameter[ucIndex] = defaultQuadMeanDiameters[ucIndex];
+				}
+			}
 		}
 	}
 

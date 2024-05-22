@@ -1,13 +1,17 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonLayer;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 
 class PolygonProcessingState {
 
@@ -18,14 +22,19 @@ class PolygonProcessingState {
 	// when copied to "active" in ForwardProcessingEngine.
 	Bank wallet; 
 	
-	// L1COM2
-	
 	// L1COM3 - just shadows of fields of L1COM5
 	//     AGETOTL1 = wallet.ageTotals[primarySpeciesIndex]
 	//     AGEBHL1 = wallet.yearsAtBreastHeight[primarySpeciesIndex]
 	//     YTBHL1 = wallet.yearsToBreastHeight[primarySpeciesIndex]
 	//     HDL1 = wallet.dominantHeights[primarySpeciesIndex]
 
+	// L1COM2 - equation groups. From the configuration, narrowed to the 
+	// polygon's BEC zone.
+		
+	float[] volumeEquationGroups;
+	float[] decayEquationGroups;
+	float[] breakageEquationGroups;
+	
 	// Calculated data - this data is calculated after construction during processing.
 	
 	
@@ -67,8 +76,32 @@ class PolygonProcessingState {
 	// MNSP - MSPL1, MSPLV
 	// TODO
 	
-	public PolygonProcessingState(Bank bank) {
+	@SuppressWarnings("unchecked")
+	public PolygonProcessingState(Bank bank, Map<String, Object> controlMap) {
 		this.wallet = bank.copy();
+		
+		MatrixMap2<String, String, Integer> volumeEquationGroupMatrix =
+			Utils.expectParsedControl(controlMap, ControlKey.VOLUME_EQN_GROUPS, MatrixMap2.class);		
+		MatrixMap2<String, String, Integer> decayEquationGroupMatrix =
+				Utils.expectParsedControl(controlMap, ControlKey.DECAY_GROUPS, MatrixMap2.class);
+		MatrixMap2<String, String, Integer> breakageEquationGroupMatrix = 
+				Utils.expectParsedControl(controlMap, ControlKey.BREAKAGE_GROUPS, MatrixMap2.class);
+		
+		this.volumeEquationGroups = new float[this.wallet.getNSpecies() + 1];
+		this.decayEquationGroups = new float[this.wallet.getNSpecies() + 1];
+		this.breakageEquationGroups = new float[this.wallet.getNSpecies() + 1];
+
+		this.volumeEquationGroups[0] = Float.NaN;
+		this.decayEquationGroups[0] = Float.NaN;
+		this.breakageEquationGroups[0] = Float.NaN;
+		
+		String becZoneAlias = this.getBecZone().getAlias();
+		for (int i = 1; i < this.wallet.getNSpecies() + 1; i++) {
+			String speciesName = this.wallet.speciesNames[i];
+			this.volumeEquationGroups[i] = volumeEquationGroupMatrix.get(speciesName, becZoneAlias);
+			this.decayEquationGroups[i] = decayEquationGroupMatrix.get(speciesName, becZoneAlias);
+			this.breakageEquationGroups[i] = breakageEquationGroupMatrix.get(speciesName, becZoneAlias);
+		}
 	}
 
 	public int getNSpecies() {
