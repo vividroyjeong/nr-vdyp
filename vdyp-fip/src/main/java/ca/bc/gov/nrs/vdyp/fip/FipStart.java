@@ -3,7 +3,6 @@ package ca.bc.gov.nrs.vdyp.fip;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.abs;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.clamp;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.exp;
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.floor;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.log;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.pow;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.ratio;
@@ -47,6 +46,7 @@ import org.apache.commons.math3.util.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.bc.gov.nrs.vdyp.application.LowValueException;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
@@ -54,6 +54,7 @@ import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.IndexedFloatBinaryOperator;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayer;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayerPrimary;
@@ -63,7 +64,6 @@ import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
-import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
@@ -262,8 +262,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 	VdypPolygon createVdypPolygon(FipPolygon fipPolygon, Map<LayerType, VdypLayer> processedLayers)
 			throws ProcessingException {
-		var fipVetLayer = fipPolygon.getLayers().get(LayerType.VETERAN);
-		var fipPrimaryLayer = (FipLayerPrimary) fipPolygon.getLayers().get(LayerType.PRIMARY);
+		Optional<FipLayer> fipVetLayer = Utils.optSafe(fipPolygon.getLayers().get(LayerType.VETERAN));
+		FipLayerPrimary fipPrimaryLayer = (FipLayerPrimary) fipPolygon.getLayers().get(LayerType.PRIMARY);
 
 		float percentAvailable = estimatePercentForestLand(fipPolygon, fipVetLayer, fipPrimaryLayer);
 
@@ -272,92 +272,10 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		return vdypPolygon;
 	}
 
-	// FIPLAND
-	@SuppressWarnings("java:S3655")
-	float estimatePercentForestLand(FipPolygon fipPolygon, FipLayer fipVetLayer, FipLayerPrimary fipPrimaryLayer)
-			throws ProcessingException {
-		if (fipPolygon.getPercentAvailable().isPresent()) {
-			return fipPolygon.getPercentAvailable().get();
-		} else {
-
-			boolean veteran = fipVetLayer != null && fipVetLayer.getHeight().orElse(0f) > 0f
-					&& fipVetLayer.getCrownClosure() > 0f; // LAYERV
-
-			if (getId() == VdypApplicationIdentifier.FIP_START
-					&& fipPolygon.getMode().map(mode -> mode == PolygonMode.YOUNG).orElse(false)) {
-				return 100f;
-			}
-			if (getId() == VdypApplicationIdentifier.VRI_START) {
-				veteran = fipVetLayer != null;
-			}
-
-			assert fipPrimaryLayer != null;
-
-			float crownClosure = fipPrimaryLayer.getCrownClosure();
-
-			// Assume crown closure linear with age, to 25.
-			if (fipPrimaryLayer.getAgeTotalSafe() < 25f) {
-				crownClosure *= 25f / fipPrimaryLayer.getAgeTotalSafe();
-			}
-			// define crown closure as the SUM of two layers
-			if (veteran) {
-				crownClosure += fipVetLayer.getCrownClosure();
-			}
-			crownClosure = clamp(crownClosure, 0, 100);
-
-			/*
-			 * assume that CC occurs at age 25 and that most land goes to 90% occupancy but that occupancy increases
-			 * only 1% /yr with no increases after ages 25. });
-			 */
-
-			// Obtain the percent yield (in comparison with CC = 90%)
-
-			float crownClosureTop = 90f;
-			float breastHeightAge = fipPrimaryLayer.getAgeTotalSafe() - fipPrimaryLayer.getYearsToBreastHeightSafe();
-
-			float yieldFactor = fipPolygon.getYieldFactor();
-
-			var bec = BecDefinitionParser.getBecs(controlMap).get(fipPolygon.getBiogeoclimaticZone()).orElseThrow(
-					() -> new ProcessingException("Could not find BEC " + fipPolygon.getBiogeoclimaticZone())
-			);
-
-			breastHeightAge = max(5.0f, breastHeightAge);
-			// EMP040
-			float baseAreaTop = estimatePrimaryBaseArea(
-					fipPrimaryLayer, bec, yieldFactor, breastHeightAge, 0f, crownClosureTop
-			);
-			// EMP040
-			float baseAreaHat = estimatePrimaryBaseArea(
-					fipPrimaryLayer, bec, yieldFactor, breastHeightAge, 0f, crownClosure
-			);
-
-			float percentYield;
-			if (baseAreaTop > 0f && baseAreaHat > 0f) {
-				percentYield = min(100f, 100f * baseAreaHat / baseAreaTop);
-			} else {
-				percentYield = 90f;
-			}
-
-			float gainMax;
-			if (fipPrimaryLayer.getAgeTotalSafe() > 125f) {
-				gainMax = 0f;
-			} else if (fipPrimaryLayer.getAgeTotalSafe() < 25f) {
-				gainMax = max(90f - percentYield, 0);
-			} else {
-				gainMax = max(90f - percentYield, 0);
-				gainMax = min(gainMax, 125 - fipPrimaryLayer.getAgeTotalSafe());
-			}
-
-			return floor(min(percentYield + gainMax, 100f));
-
-		}
-	}
-
 	// FIPCALC1
 	VdypLayer processLayerAsPrimary(FipPolygon fipPolygon, FipLayerPrimary fipLayer, float baseAreaOverstory)
 			throws ProcessingException {
 
-		var lookup = BecDefinitionParser.getBecs(controlMap);
 		// PRIMFIND
 		var primarySpecies = findPrimarySpecies(fipLayer.getSpecies().values());
 
@@ -368,9 +286,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		// locally
 		var itg = findItg(primarySpecies);
 
-		BecDefinition bec = lookup.get(fipPolygon.getBiogeoclimaticZone()).orElseThrow(
-				() -> new IllegalStateException("Could not find BEC " + fipPolygon.getBiogeoclimaticZone())
-		);
+		BecDefinition bec = Utils.getBec(fipPolygon.getBiogeoclimaticZone(), controlMap);
 
 		// GRPBA1FD
 		int empiricalRelationshipParameterIndex = findEmpiricalRelationshipParameterIndex(
@@ -940,8 +856,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		var crownClosure = fipLayer.getCrownClosure();
 
 		var becId = fipPolygon.getBiogeoclimaticZone();
-		var bec = BecDefinitionParser.getBecs(controlMap).get(becId)
-				.orElseThrow(() -> new ProcessingException("Could not find BEC " + becId));
+		var bec = Utils.getBec(becId, controlMap);
 		var region = bec.getRegion();
 
 		// Call EMP098 to get Veteran Basal Area, store in LVCOM1/BA array at positions
@@ -1910,8 +1825,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 	 */
 	static final Collection<PropertyDescriptor> NON_VOLUME_UTILIZATION_VECTOR_ACCESSORS;
 
-	private static final float LOW_CROWN_CLOSURE = 10f;
-
 	static {
 		try {
 			var bean = Introspector.getBeanInfo(VdypUtilizationHolder.class);
@@ -2426,109 +2339,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 	}
 
-	// EMP040
-	float estimatePrimaryBaseArea(
-			FipLayer fipLayer, BecDefinition bec, float yieldFactor, float breastHeightAge, float baseAreaOverstory,
-			float crownClosure
-	) throws LowValueException {
-		boolean lowCrownClosure = fipLayer.getCrownClosure() < LOW_CROWN_CLOSURE;
-		crownClosure = lowCrownClosure ? LOW_CROWN_CLOSURE : crownClosure;
-
-		var coeMap = Utils.<MatrixMap2<String, String, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.COE_BA, MatrixMap2.class
-		);
-		var modMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
-				controlMap, ControlKey.BA_MODIFIERS, MatrixMap2.class
-		);
-		var upperBoundMap = Utils.<MatrixMap3<Region, String, Integer, Float>>expectParsedControl(
-				controlMap, ControlKey.UPPER_BA_BY_CI_S0_P, MatrixMap3.class
-		);
-
-		var leadGenus = leadGenus(fipLayer);
-
-		var decayBecAlias = bec.getDecayBec().getAlias();
-		Coefficients coe = weightedCoefficientSum(
-				List.of(0, 1, 2, 3, 4, 5), 9, 0, fipLayer.getSpecies().values(), FipSpecies::getFractionGenus,
-				s -> coeMap.get(decayBecAlias, s.getGenus())
-		);
-
-		var ageToUse = clamp(breastHeightAge, 5f, 350f);
-		var trAge = log(ageToUse);
-
-		/* @formatter:off */
-		//      A00 = exp(A(0)) * ( 1.0 +  A(1) * TR_AGE  )
-		/* @formatter:on */
-		var a00 = exp(coe.getCoe(0)) * (1f + coe.getCoe(1) * trAge);
-
-		/* @formatter:off */
-		//      AP  = exp( A(3)) + exp(A(4)) * TR_AGE
-		/* @formatter:on */
-		var ap = exp(coe.getCoe(3)) + exp(coe.getCoe(4)) * trAge;
-
-		var baseArea = 0f;
-
-		float height = fipLayer.getHeight().orElse(0f);
-		if (height > coe.getCoe(2) - 3f) {
-			/* @formatter:off */
-			//  if (HD .le. A(2) - 3.0) then
-			//      BAP = 0.0
-			//      GO TO 90
-			//  else if (HD .lt. A(2)+3.0) then
-			//      FHD = (HD- (A(2)-3.00) )**2 / 12.0
-			//  else
-			//      FHD = HD-A(2)
-			//  end if
-			/* @formatter:on */
-			var fHeight = height <= coe.getCoe(2) + 3f ? //
-					pow(height - (coe.getCoe(2) - 3), 2) / 12f //
-					: height - coe.getCoe(2);
-
-			/* @formatter:off */
-			//      BAP =  A00 * (CCUSE/100) ** ( A(7) + A(8)*log(HD) )   *
-			//     &      FHD**AP * exp( A(5)*HD  + A(6) * BAV )
-			/* @formatter:on */
-			baseArea = a00 * pow(crownClosure / 100, coe.getCoe(7) + coe.getCoe(8) * log(height)) * pow(fHeight, ap)
-					* exp(coe.getCoe(5) * height + coe.getCoe(6) * baseAreaOverstory);
-
-			baseArea *= modMap.get(leadGenus.getGenus(), bec.getRegion());
-
-			// TODO
-			var NDEBUG_1 = 0;
-			if (NDEBUG_1 <= 0) {
-				// See ISPSJF128
-				var upperBound = upperBoundMap.get(bec.getRegion(), leadGenus.getGenus(), UpperCoefficientParser.BA);
-				baseArea = min(baseArea, upperBound);
-			}
-
-			if (lowCrownClosure) {
-				baseArea *= fipLayer.getCrownClosure() / LOW_CROWN_CLOSURE;
-			}
-
-		}
-
-		baseArea *= yieldFactor;
-
-		// This is to prevent underflow errors in later calculations
-		if (baseArea <= 0.05f) {
-			throw new LowValueException("Estimated base area", baseArea, 0.05f);
-		}
-		return baseArea;
-	}
-
-	// EMP040
-	float estimatePrimaryBaseArea(
-			FipLayer fipLayer, BecDefinition bec, float yieldFactor, float breastHeightAge, float baseAreaOverstory
-	) throws LowValueException {
-		return estimatePrimaryBaseArea(
-				fipLayer, bec, yieldFactor, breastHeightAge, baseAreaOverstory, fipLayer.getCrownClosure()
-		);
-	}
-
-	FipSpecies leadGenus(FipLayer fipLayer) {
-		return fipLayer.getSpecies().values().stream()
-				.sorted(Utils.compareUsing(FipSpecies::getFractionGenus).reversed()).findFirst().orElseThrow();
-	}
-
 	// EMP098
 	float estimateVeteranBaseArea(float height, float crownClosure, String genus, Region region) {
 		var coefficients = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
@@ -2547,70 +2357,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		baseArea = max(baseArea, 0.01f);
 
 		return baseArea;
-	}
-
-	// EMP041
-	float estimatePrimaryQuadMeanDiameter(
-			FipLayerPrimary fipLayer, BecDefinition bec, float breastHeightAge, float baseAreaOverstory
-	) {
-		var coeMap = Utils.<MatrixMap2<String, String, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.COE_DQ, MatrixMap2.class
-		);
-		var modMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
-				controlMap, ControlKey.DQ_MODIFIERS, MatrixMap2.class
-		);
-		var upperBoundMap = Utils.<MatrixMap3<Region, String, Integer, Float>>expectParsedControl(
-				controlMap, ControlKey.UPPER_BA_BY_CI_S0_P, MatrixMap3.class
-		);
-
-		var leadGenus = leadGenus(fipLayer);
-
-		var decayBecAlias = bec.getDecayBec().getAlias();
-		Coefficients coe = weightedCoefficientSum(
-				List.of(0, 1, 2, 3, 4), 8, 0, fipLayer.getSpecies().values(), FipSpecies::getFractionGenus,
-				s -> coeMap.get(decayBecAlias, s.getGenus())
-		);
-
-		var trAge = log(clamp(breastHeightAge, 5f, 350f));
-		var height = fipLayer.getHeight().orElse(0f);
-
-		if (height <= coe.getCoe(5)) {
-			return 7.6f;
-		}
-
-		/* @formatter:off */
-		//    C0 = A(0)
-		//    C1 = EXP(A(1)) + EXP(A(2)) * TR_AGE
-		//    C2 = EXP(A(3)) + EXP(A(4)) * TR_AGE
-		/* @formatter:on */
-		var c0 = coe.get(0);
-		var c1 = exp(coe.getCoe(1)) + exp(coe.getCoe(2)) * trAge;
-		var c2 = exp(coe.getCoe(3)) + exp(coe.getCoe(4)) * trAge;
-
-		/* @formatter:off */
-		//      DQ = C0 + ( C1*(HD - A(5))**C2 )**2 * exp(A(7)*BAV)
-		//     &        * (1.0 - A(6)*CC/100.0)
-		/* @formatter:on */
-
-		var quadMeanDiameter = c0 + pow(c1 * pow(height - coe.getCoe(5), c2), 2)
-				* exp(coe.getCoe(7) * baseAreaOverstory) * (1f - coe.getCoe(6) * fipLayer.getCrownClosure() / 100f);
-
-		/* @formatter:off */
-		//      DQ = DQ * DQMOD200(JLEAD, INDEX_IC)
-		/* @formatter:on */
-		quadMeanDiameter *= modMap.get(leadGenus.getGenus(), bec.getRegion());
-
-		quadMeanDiameter = max(quadMeanDiameter, 7.6f);
-
-		// TODO
-		var NDEBUG_2 = 0;
-		if (NDEBUG_2 <= 0) {
-			// See ISPSJF129
-			var upperBound = upperBoundMap.get(bec.getRegion(), leadGenus.getGenus(), UpperCoefficientParser.DQ);
-			quadMeanDiameter = min(quadMeanDiameter, upperBound);
-		}
-
-		return quadMeanDiameter;
 	}
 
 	/**
@@ -2714,16 +2460,16 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 	// compatibility variables
 	/**
 	 * Estimate small components for primary layer
+	 *
+	 * @throws ProcessingException
 	 */
-	public void estimateSmallComponents(FipPolygon fPoly, VdypLayer layer) {
+	public void estimateSmallComponents(FipPolygon fPoly, VdypLayer layer) throws ProcessingException {
 		float loreyHeightSum = 0f;
 		float baseAreaSum = 0f;
 		float treesPerHectareSum = 0f;
 		float volumeSum = 0f;
 
-		Region region = BecDefinitionParser.getBecs(controlMap).get(fPoly.getBiogeoclimaticZone())
-				.orElseThrow(() -> new IllegalStateException("Could not find BEC " + fPoly.getBiogeoclimaticZone()))
-				.getRegion();
+		Region region = Utils.getBec(fPoly.getBiogeoclimaticZone(), controlMap).getRegion();
 
 		for (VdypSpecies spec : layer.getSpecies().values()) {
 			@SuppressWarnings("unused")
@@ -2878,6 +2624,15 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		return exp(logit) / (1.0f + exp(logit));
 	}
 
+	@Override
+	protected ValueOrMarker<Float, Boolean>
+			isVeteranForEstimatePercentForestLand(FipPolygon polygon, Optional<FipLayer> vetLayer) {
+		if (polygon.getMode().map(mode -> mode == PolygonMode.YOUNG).orElse(false)) {
+			return FLOAT_OR_BOOL.value(100f);
+		}
+		return super.isVeteranForEstimatePercentForestLand(polygon, vetLayer);
+	}
+
 	/**
 	 * Estimate the Jacobian Matrix of a function using forward difference
 	 *
@@ -2971,6 +2726,17 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		return FipSpecies.build(builder -> {
 			builder.copy(toCopy);
 		});
+	}
+
+	@Override
+	protected Optional<FipSite> getPrimarySite(FipLayer layer) {
+		return layer.getSite();
+	}
+
+	@Override
+	protected float getYieldFactor(FipPolygon polygon) {
+		return polygon.getYieldFactor();
+		// TODO Make an InputPolygon interface that has this.
 	}
 
 }

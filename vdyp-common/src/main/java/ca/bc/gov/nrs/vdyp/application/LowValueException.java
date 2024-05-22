@@ -1,6 +1,4 @@
-package ca.bc.gov.nrs.vdyp.fip;
-
-import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
+package ca.bc.gov.nrs.vdyp.application;
 
 /**
  * A given or computer value was lower than expected.

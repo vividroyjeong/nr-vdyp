@@ -10,17 +10,21 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
+import ca.bc.gov.nrs.vdyp.application.RuntimeProcessingException;
 import ca.bc.gov.nrs.vdyp.application.RuntimeStandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndex2Height;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
@@ -38,8 +42,10 @@ import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
+import ca.bc.gov.nrs.vdyp.model.ModelClassBuilder;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
@@ -656,6 +662,9 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		});
 	}
 
+	static record Increase(float dominantHeight, float ageIncrease) {
+	}
+
 	VriPolygon processYoung(VriPolygon poly) throws ProcessingException {
 
 		PolygonIdentifier polygonIdentifier = poly.getPolygonIdentifier();
@@ -687,8 +696,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			float primaryYearsToBreastHeight = primarySite.getYearsToBreastHeight().orElseThrow(); // YTBH_L1
 
 			float primaryBreastHeightAge0 = primaryAgeTotal - primaryYearsToBreastHeight; // AGEBH0
-			float ageIncrease; // AGE_INCR original fortran had some logic to set this, but it will always be
-								// overwritten before being used.
 
 			float siteIndex = primarySite.getSiteIndex().orElseThrow(); // SID
 			float yeastToBreastHeight = primaryYearsToBreastHeight; // YTBHD
@@ -722,77 +729,34 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 			float primaryHeight = primarySite.getHeight().orElseThrow(); // HT_L1
 
-			float dominantHeight;
-
-			foundIncrease: {
-				for (int increase = 0; increase <= moreYears; increase++) {
-					float primaryBreastHeightAge = primaryBreastHeightAge0 + increase; // AGEBH
-
-					if (primaryBreastHeightAge > 1f) {
-
-						float ageD = primaryBreastHeightAge; // AGED
-
-						float dominantHeightD = (float) SiteIndex2Height.indexToHeight(
-								siteCurve, ageD, SiteIndexAgeType.SI_AT_BREAST, siteIndex, ageD, yeastToBreastHeight
-						); // HDD
-
-						if (increase == 0) {
-							dominantHeight0 = dominantHeightD;
-						}
-						dominantHeight = dominantHeightD; // HD
-						if (primaryHeight > 0f && dominantHeight0 > 0f) {
-							dominantHeight = primaryHeight + (dominantHeight - dominantHeight0);
-						}
-
-						// check empirical BA assuming BAV = 0
-
-						float predictedBaseArea = estimateBaseAreaYield(
-								dominantHeight, primaryBreastHeightAge, Optional.empty(), false,
-								primaryLayer.getSpecies().values(), bec,
-								primaryLayer.getEmpericalRelationshipParameterIndex().orElseThrow()
-						); // BAP
-
-						// Calculate the full occupancy BA Hence the BA we will test is the Full
-						// occupanct BA
-
-						predictedBaseArea /= FRACTION_AVAILABLE_N;
-
-						if (dominantHeight >= heightTarget && primaryBreastHeightAge >= ageTarget
-								&& predictedBaseArea >= baseAreaTarget) {
-							ageIncrease = increase;
-							break foundIncrease;
-						}
-					}
-				}
-				throw new StandProcessingException("Unable to increase to target height.");
-			}
-
-			final float ageIncreaseFinal = ageIncrease;
-			final float newPrimaryHeight = dominantHeight;
+			final Increase inc = findIncreaseForYoungMode(
+					bec, primaryLayer, siteCurve, primaryBreastHeightAge0, siteIndex, yeastToBreastHeight,
+					baseAreaTarget, heightTarget, ageTarget, dominantHeight0, moreYears, primaryHeight
+			);
 
 			return VriPolygon.build(pBuilder -> {
 				pBuilder.copy(poly);
-				pBuilder.polygonIdentifier(polygonIdentifier.forYear(year + (int) ageIncreaseFinal));
+				pBuilder.polygonIdentifier(polygonIdentifier.forYear(year + (int) inc.ageIncrease));
 				pBuilder.mode(PolygonMode.BATN);
 				pBuilder.copyLayers(poly, (lBuilder, layer) -> {
 
 					lBuilder.copySites(layer, (iBuilder, site) -> {
 						if (layer.getLayerType() == LayerType.PRIMARY
 								&& primaryLayer.getPrimaryGenus().map(site.getSiteGenus()::equals).orElse(false)) {
-							iBuilder.height(newPrimaryHeight);
+							iBuilder.height(inc.dominantHeight);
 						} else {
 							iBuilder.height(Optional.empty());
 						}
 
-						site.getAgeTotal().map(x -> x + ageIncreaseFinal).ifPresentOrElse(ageTotal -> {
+						site.getAgeTotal().map(x -> x + inc.ageIncrease).ifPresentOrElse(ageTotal -> {
 							iBuilder.ageTotal(ageTotal);
 							iBuilder.breastHeightAge(
 									site.getYearsToBreastHeight()//
 											.map(ytbh -> ageTotal - ytbh)
-											.or(() -> site.getBreastHeightAge().map(bha -> bha + ageIncreaseFinal))
+											.or(() -> site.getBreastHeightAge().map(bha -> bha + inc.ageIncrease))
 							);
 						}, () -> {
-							iBuilder.breastHeightAge(site.getBreastHeightAge().map(bha -> bha + ageIncreaseFinal));
+							iBuilder.breastHeightAge(site.getBreastHeightAge().map(bha -> bha + inc.ageIncrease));
 						});
 
 					});
@@ -809,14 +773,133 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		}
 	}
 
-	VriPolygon processBatc(VriPolygon poly) throws StandProcessingException {
+	private Increase findIncreaseForYoungMode(
+			BecDefinition bec, VriLayer primaryLayer, SiteIndexEquation siteCurve, float primaryBreastHeightAge0,
+			float siteIndex, float yeastToBreastHeight, float baseAreaTarget, float heightTarget, float ageTarget,
+			float dominantHeight0, int moreYears, float primaryHeight
+	) throws CommonCalculatorException, StandProcessingException {
+		float dominantHeight;
+		float ageIncrease;
+		for (int increase = 0; increase <= moreYears; increase++) {
+			float primaryBreastHeightAge = primaryBreastHeightAge0 + increase; // AGEBH
+
+			if (primaryBreastHeightAge > 1f) {
+
+				float ageD = primaryBreastHeightAge; // AGED
+
+				float dominantHeightD = (float) SiteIndex2Height.indexToHeight(
+						siteCurve, ageD, SiteIndexAgeType.SI_AT_BREAST, siteIndex, ageD, yeastToBreastHeight
+				); // HDD
+
+				if (increase == 0) {
+					dominantHeight0 = dominantHeightD;
+				}
+				dominantHeight = dominantHeightD; // HD
+				if (primaryHeight > 0f && dominantHeight0 > 0f) {
+					dominantHeight = primaryHeight + (dominantHeight - dominantHeight0);
+				}
+
+				// check empirical BA assuming BAV = 0
+
+				float predictedBaseArea = estimateBaseAreaYield(
+						dominantHeight, primaryBreastHeightAge, Optional.empty(), false,
+						primaryLayer.getSpecies().values(), bec,
+						primaryLayer.getEmpericalRelationshipParameterIndex().orElseThrow()
+				); // BAP
+
+				// Calculate the full occupancy BA Hence the BA we will test is the Full
+				// occupanct BA
+
+				predictedBaseArea /= FRACTION_AVAILABLE_N;
+
+				if (dominantHeight >= heightTarget && primaryBreastHeightAge >= ageTarget
+						&& predictedBaseArea >= baseAreaTarget) {
+					ageIncrease = increase;
+					return new Increase(dominantHeight, ageIncrease);
+				}
+			}
+		}
+		throw new StandProcessingException("Unable to increase to target height.");
+
+	}
+
+	static final <T, B extends ModelClassBuilder<T>> BiConsumer<B, T> noChange() {
+		return (builder, toCopy) -> {
+			/* Do Nothing */
+		};
+	}
+
+	VriPolygon processBatc(VriPolygon poly) throws ProcessingException {
+
+		VriLayer primaryLayer = getPrimaryLayer(poly);
+		Optional<VriLayer> veteranLayer = getVeteranLayer(poly);
+		BecDefinition bec = getBec(poly);
+
+		try {
+			//
+			final float percentForestLand = poly.getPercentAvailable().orElseGet(() -> {
+				try {
+					return this.estimatePercentForestLand(poly, veteranLayer, primaryLayer);
+				} catch (ProcessingException ex) {
+					throw new RuntimeProcessingException(ex);
+				}
+			}); // PCTFLAND
+
+			final float primaryBreastHeightAge = getLayerBreastHeightAge(primaryLayer).orElseThrow();
+
+			// EMP040
+			final float initialPrimaryBaseArea = this
+					.estimatePrimaryBaseArea(primaryLayer, bec, poly.getYieldFactor(), primaryBreastHeightAge, 0.0f);
+
+			final Optional<Float> veteranBaseArea = veteranLayer.map(InputLayer::getCrownClosure) // BAV
+					.map(ccV -> ccV * initialPrimaryBaseArea / primaryLayer.getCrownClosure());
+
+			final float primaryBaseArea = this.estimatePrimaryBaseArea(
+					primaryLayer, bec, poly.getYieldFactor(), primaryBreastHeightAge, veteranBaseArea.orElse(0.0f) // BAP
+			);
+
+			final float primaryQuadMeanDiameter = this.estimatePrimaryQuadMeanDiameter(
+					primaryLayer, bec, primaryBreastHeightAge, veteranBaseArea.orElse(0f)
+			);
+
+			return VriPolygon.build(pBuilder -> {
+				pBuilder.copy(poly);
+
+				pBuilder.addLayer(lBuilder -> {
+					lBuilder.copy(primaryLayer);
+					lBuilder.baseArea(primaryBaseArea * (percentForestLand / 100));
+					lBuilder.treesPerHectare(
+							BaseAreaTreeDensityDiameter.treesPerHectare(primaryBaseArea, primaryQuadMeanDiameter)
+					);
+					lBuilder.copySites(primaryLayer, noChange());
+					lBuilder.copySpecies(primaryLayer, noChange());
+				});
+				veteranLayer.ifPresent(vLayer -> {
+					pBuilder.addLayer(lBuilder -> {
+						lBuilder.copy(vLayer);
+						lBuilder.baseArea(veteranBaseArea);
+
+						lBuilder.copySites(primaryLayer, noChange());
+						lBuilder.copySpecies(primaryLayer, noChange());
+					});
+				});
+
+			});
+
+		} catch (RuntimeProcessingException ex) {
+			throw ex.getCause();
+		}
+	}
+
+	VriPolygon processBatn(VriPolygon poly) throws ProcessingException {
 		// TODO
 		return poly;
 	}
 
-	VriPolygon processBatn(VriPolygon poly) throws StandProcessingException {
-		// TODO
-		return poly;
+	@Override
+	protected ValueOrMarker<Float, Boolean>
+			isVeteranForEstimatePercentForestLand(VriPolygon polygon, Optional<VriLayer> vetLayer) {
+		return FLOAT_OR_BOOL.marker(vetLayer.isPresent());
 	}
 
 	/**
@@ -839,5 +922,15 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		throw new StandProcessingException(
 				"Could not find Site Curve Number for inst of the following species: " + String.join(", ", ids)
 		);
+	}
+
+	@Override
+	protected Optional<VriSite> getPrimarySite(VriLayer layer) {
+		return layer.getPrimarySite();
+	}
+
+	@Override
+	protected float getYieldFactor(VriPolygon polygon) {
+		return polygon.getYieldFactor();
 	}
 }

@@ -6,11 +6,12 @@ import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.common.Computed;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
+import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.SingleSiteLayer;
 
-public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> {
+public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> implements InputLayer {
 
 	private float crownClosure; // FIPL_1/CC_L1 or FIP:_V/CC_V1
 
@@ -22,6 +23,7 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> {
 		this.crownClosure = crownClosure;
 	}
 
+	@Override
 	public float getCrownClosure() {
 		return crownClosure;
 	}
