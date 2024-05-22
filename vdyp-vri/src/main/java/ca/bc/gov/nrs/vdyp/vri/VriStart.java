@@ -971,7 +971,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 						)
 				);
 
-		float primaryBaseArea = estimateBaseAreaYield(
+		float primaryBaseAreaEstimated = estimateBaseAreaYield(
 				primaryHeight, primaryBreastHeightAge, veteranBaseArea, false, primaryLayer.getSpecies().values(), bec,
 				primaryEmpericalRelationshipParameterIndex
 		);
@@ -982,7 +982,41 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				primaryEmpericalRelationshipParameterIndex
 		);
 
-		return poly;
+		final float normativePercentAvailable = 85f;
+
+		final float primaryBaseAreaFinal = primaryBaseAreaEstimated * (100 / normativePercentAvailable);
+
+		final float primaryTreesPerHectare = BaseAreaTreeDensityDiameter
+				.treesPerHectare(primaryBaseAreaFinal, normativeQuadMeanDiameter);
+
+		if (primaryBaseAreaFinal < 0.5f) {
+			throw new StandProcessingException(
+					"Normative esitimate " + primaryBaseAreaFinal + " of base area was less than 0.5."
+			);
+		}
+
+		return VriPolygon.build(pBuilder -> {
+			pBuilder.copy(poly);
+
+			pBuilder.addLayer(lBuilder -> {
+				lBuilder.copy(primaryLayer);
+				lBuilder.baseArea(primaryBaseAreaFinal);
+				lBuilder.treesPerHectare(primaryTreesPerHectare);
+				lBuilder.copySites(primaryLayer, noChange());
+				lBuilder.copySpecies(primaryLayer, noChange());
+			});
+			veteranLayer.ifPresent(vLayer -> {
+				pBuilder.addLayer(lBuilder -> {
+					lBuilder.copy(vLayer);
+					lBuilder.baseArea(veteranBaseArea);
+
+					lBuilder.copySites(primaryLayer, noChange());
+					lBuilder.copySpecies(primaryLayer, noChange());
+				});
+			});
+
+		});
+
 	}
 
 	@Override

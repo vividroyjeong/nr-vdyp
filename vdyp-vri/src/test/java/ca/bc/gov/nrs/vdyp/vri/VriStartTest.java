@@ -2037,6 +2037,247 @@ class VriStartTest {
 			control.verify();
 		}
 
+		@Test
+		void testWithVeteran() throws Exception {
+			var control = EasyMock.createControl();
+
+			VriStart app = EasyMock.createMockBuilder(VriStart.class).createMock(control);
+
+			MockFileResolver resolver = dummyInput();
+
+			TestUtils.populateControlMapGenusReal(controlMap);
+			TestUtils.populateControlMapBecReal(controlMap);
+
+			TestUtils.populateControlMapFromResource(controlMap, new BaseAreaCoefficientParser(), "REGBA25.coe");
+			TestUtils
+					.populateControlMapFromResource(controlMap, new QuadMeanDiameterCoefficientParser(), "REGDQ26.coe");
+
+			TestUtils.populateControlMapFromResource(controlMap, new HLPrimarySpeciesEqnP1Parser(), "REGYHLP.COE");
+			TestUtils.populateControlMapFromResource(controlMap, new HLPrimarySpeciesEqnP2Parser(), "REGYHLPA.COE");
+			TestUtils.populateControlMapFromResource(controlMap, new HLPrimarySpeciesEqnP3Parser(), "REGYHLPB.DAT");
+			TestUtils.populateControlMapFromResource(controlMap, new HLNonprimaryCoefficientParser(), "REGHL.COE");
+
+			TestUtils.populateControlMapFromResource(controlMap, new UpperCoefficientParser(), "UPPERB02.COE");
+
+			TestUtils.populateControlMapFromResource(controlMap, new BasalAreaYieldParser(), "YLDBA407.COE");
+			TestUtils.populateControlMapFromResource(controlMap, new QuadraticMeanDiameterYieldParser(), "YLDDQ45.COE");
+			TestUtils.populateControlMapFromResource(controlMap, new UpperBoundsParser(), "PCT_407.coe");
+
+			TestUtils.populateControlMapFromResource(
+					controlMap, new ModifierParser(VdypApplicationIdentifier.VRI_START), "mod19813.prm"
+			);
+
+			var poly = VriPolygon.build(pb -> {
+				pb.polygonIdentifier("082F074/0142", 1997);
+				pb.forestInventoryZone(" ");
+				pb.biogeoclimaticZone("IDF");
+				pb.yieldFactor(1.0f);
+				pb.mode(PolygonMode.BATN);
+
+				pb.addLayer(lb -> {
+					lb.layerType(LayerType.PRIMARY);
+					lb.baseArea(Optional.empty());
+					lb.treesPerHectare(Optional.empty());
+					lb.primaryGenus("F");
+					lb.inventoryTypeGroup(3);
+					lb.crownClosure(30);
+					lb.utilization(7.5f);
+
+					lb.empiricalRelationshipParameterIndex(61);
+
+					lb.addSpecies(spb -> {
+						spb.genus("B");
+						spb.percentGenus(10);
+						spb.addSpecies("BL", 100);
+					});
+					lb.addSpecies(spb -> {
+						spb.genus("C");
+						spb.percentGenus(20);
+						spb.addSpecies("CW", 100);
+					});
+					lb.addSpecies(spb -> {
+						spb.genus("F");
+						spb.percentGenus(30);
+						spb.addSpecies("FD", 100);
+					});
+					lb.addSpecies(spb -> {
+						spb.genus("H");
+						spb.percentGenus(30);
+						spb.addSpecies("HW", 100);
+					});
+					lb.addSpecies(spb -> {
+						spb.genus("S");
+						spb.percentGenus(10);
+						spb.addSpecies("S", 100);
+					});
+
+					lb.addSite(sib -> {
+						sib.siteGenus("B");
+						sib.siteSpecies("BL");
+					});
+					lb.addSite(sib -> {
+						sib.siteGenus("C");
+						sib.siteCurveNumber(11);
+						sib.siteSpecies("CW");
+					});
+					lb.addSite(sib -> {
+						sib.siteGenus("F");
+						sib.siteSpecies("FD");
+						sib.siteCurveNumber(23);
+						sib.siteIndex(19.7f);
+						sib.height(7.6f);
+						sib.yearsToBreastHeight(9);
+						sib.breastHeightAge(15);
+						sib.ageTotal(24);
+					});
+					lb.addSite(sib -> {
+						sib.siteGenus("H");
+						sib.siteSpecies("HW");
+						sib.siteCurveNumber(37);
+					});
+					lb.addSite(sib -> {
+						sib.siteGenus("S");
+						sib.siteSpecies("S");
+						sib.siteCurveNumber(71);
+					});
+				});
+				pb.addLayer(lb -> {
+					lb.layerType(LayerType.VETERAN);
+					lb.baseArea(5f);
+					lb.treesPerHectare(Optional.empty());
+					lb.primaryGenus("F");
+					lb.inventoryTypeGroup(3);
+					lb.crownClosure(30);
+					lb.utilization(7.5f);
+
+					lb.empiricalRelationshipParameterIndex(61);
+
+					lb.addSpecies(spb -> {
+						spb.genus("B");
+						spb.percentGenus(10);
+						spb.addSpecies("BL", 100);
+					});
+					lb.addSpecies(spb -> {
+						spb.genus("C");
+						spb.percentGenus(20);
+						spb.addSpecies("CW", 100);
+					});
+					lb.addSpecies(spb -> {
+						spb.genus("F");
+						spb.percentGenus(30);
+						spb.addSpecies("FD", 100);
+					});
+					lb.addSpecies(spb -> {
+						spb.genus("H");
+						spb.percentGenus(30);
+						spb.addSpecies("HW", 100);
+					});
+					lb.addSpecies(spb -> {
+						spb.genus("S");
+						spb.percentGenus(10);
+						spb.addSpecies("S", 100);
+					});
+
+					lb.addSite(sib -> {
+						sib.siteGenus("B");
+						sib.siteSpecies("BL");
+					});
+					lb.addSite(sib -> {
+						sib.siteGenus("C");
+						sib.siteCurveNumber(11);
+						sib.siteSpecies("CW");
+					});
+					lb.addSite(sib -> {
+						sib.siteGenus("F");
+						sib.siteSpecies("FD");
+						sib.siteCurveNumber(23);
+						sib.siteIndex(19.7f);
+						sib.height(7.6f);
+						sib.yearsToBreastHeight(9);
+						sib.breastHeightAge(15);
+						sib.ageTotal(24);
+					});
+					lb.addSite(sib -> {
+						sib.siteGenus("H");
+						sib.siteSpecies("HW");
+						sib.siteCurveNumber(37);
+					});
+					lb.addSite(sib -> {
+						sib.siteGenus("S");
+						sib.siteSpecies("S");
+						sib.siteCurveNumber(71);
+					});
+				});
+			});
+
+			control.replay();
+
+			app.init(resolver, controlMap);
+
+			// Run the process
+
+			var result = assertDoesNotThrow(() -> app.processBatn(poly));
+
+			// Assertions
+
+			final var forPolygon = hasProperty("polygonIdentifier", isPolyId("082F074/0142", 1997));
+			final var forPrimeLayer = both(forPolygon).and(hasProperty("layerType", is(LayerType.PRIMARY)));
+			final var forVeteranLayer = both(forPolygon).and(hasProperty("layerType", is(LayerType.VETERAN)));
+
+			assertThat(result, forPolygon);
+			assertThat(result, hasProperty("mode", present(is(PolygonMode.BATN))));
+
+			assertThat(
+					result,
+					hasProperty(
+							"layers",
+							allOf(
+									aMapWithSize(2), hasEntry(is(LayerType.PRIMARY), anything()),
+									hasEntry(is(LayerType.VETERAN), anything())
+							)
+					)
+			);
+			var resultPrimaryLayer = result.getLayers().get(LayerType.PRIMARY);
+			var resultVeteranLayer = result.getLayers().get(LayerType.VETERAN);
+
+			assertThat(resultPrimaryLayer, forPrimeLayer);
+			assertThat(resultVeteranLayer, forVeteranLayer);
+
+			assertThat(resultPrimaryLayer, hasProperty("baseArea", present(closeTo(6.06380272f))));
+			assertThat(resultPrimaryLayer, hasProperty("treesPerHectare", present(closeTo(715.977112f))));
+
+			assertThat(resultVeteranLayer, hasProperty("baseArea", present(closeTo(5f))));
+
+			for (var nonPrimaryGenus : List.of("B", "C", "H", "S")) {
+				var nonPrimarySite = resultPrimaryLayer.getSites().get(nonPrimaryGenus);
+				assertThat(
+						nonPrimarySite, allOf(
+								hasProperty("siteIndex", notPresent()), //
+								hasProperty("height", notPresent()), //
+								hasProperty("ageTotal", notPresent()), //
+								hasProperty("yearsToBreastHeight", notPresent()), //
+								hasProperty("breastHeightAge", notPresent())
+						)
+				);
+			}
+
+			var primarySite = resultPrimaryLayer.getPrimarySite().get();
+
+			assertThat(
+					primarySite, allOf(
+							hasProperty("siteGenus", is("F")), //
+							hasProperty("siteIndex", present(closeTo(19.7f))), //
+							hasProperty("height", present(closeTo(7.6f))), //
+							hasProperty("ageTotal", present(closeTo(24f))), //
+							hasProperty("yearsToBreastHeight", present(closeTo(9f))), //
+							hasProperty("breastHeightAge", present(closeTo(15f)))
+					)
+			);
+
+			app.close();
+
+			control.verify();
+		}
 	}
 
 	@Nested
@@ -2092,9 +2333,9 @@ class VriStartTest {
 
 			assertThat(result, closeTo(10.3879938f));
 		}
-		
+
 		@ParameterizedTest
-		@ValueSource(floats= {0f, -1f, -Float.MIN_VALUE, -Float.MAX_VALUE, Float.NEGATIVE_INFINITY})
+		@ValueSource(floats = { 0f, -1f, -Float.MIN_VALUE, -Float.MAX_VALUE, Float.NEGATIVE_INFINITY })
 		void testBreastHeightAgeLow(float breastHeightAge) throws StandProcessingException {
 			Map<String, Object> controlMap = VriTestUtils.loadControlMap();
 			VriStart app = new VriStart();
@@ -2139,7 +2380,10 @@ class VriStartTest {
 
 			var bec = Utils.expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class).get("IDF").get();
 
-			var ex = assertThrows(StandProcessingException.class, ()-> app.estimateQuadMeanDiameterYield(7.6f, breastHeightAge, Optional.empty(), species, bec, 61));
+			var ex = assertThrows(
+					StandProcessingException.class,
+					() -> app.estimateQuadMeanDiameterYield(7.6f, breastHeightAge, Optional.empty(), species, bec, 61)
+			);
 
 			assertThat(ex, hasProperty("message", endsWith(Float.toString(breastHeightAge))));
 
