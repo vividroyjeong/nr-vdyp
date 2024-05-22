@@ -35,7 +35,6 @@ public class ForwardProcessingEngine {
 	private final BecLookup becLookup;
 	private final MatrixMap2<String, Region, SiteIndexEquation> siteCurveMap;
 
-	@SuppressWarnings("unchecked")
 	public ForwardProcessingEngine(Map<String, Object> controlMap) {
 
 		genusDefinitionMap = new GenusDefinitionMap(

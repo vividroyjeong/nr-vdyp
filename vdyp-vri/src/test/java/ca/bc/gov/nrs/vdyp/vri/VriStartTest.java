@@ -2286,7 +2286,7 @@ class VriStartTest {
 		@Test
 		void testCompute() throws StandProcessingException {
 
-			Map<String, Object> controlMap = VriTestUtils.loadControlMap();
+			controlMap = VriTestUtils.loadControlMap();
 			VriStart app = new VriStart();
 			ApplicationTestUtils.setControlMap(app, controlMap);
 
@@ -2337,7 +2337,7 @@ class VriStartTest {
 		@ParameterizedTest
 		@ValueSource(floats = { 0f, -1f, -Float.MIN_VALUE, -Float.MAX_VALUE, Float.NEGATIVE_INFINITY })
 		void testBreastHeightAgeLow(float breastHeightAge) throws StandProcessingException {
-			Map<String, Object> controlMap = VriTestUtils.loadControlMap();
+			controlMap = VriTestUtils.loadControlMap();
 			VriStart app = new VriStart();
 			ApplicationTestUtils.setControlMap(app, controlMap);
 

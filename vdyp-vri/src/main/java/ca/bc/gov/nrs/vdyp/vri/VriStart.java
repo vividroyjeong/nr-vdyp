@@ -588,14 +588,13 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		final String decayBecAlias = bec.getDecayBec().getAlias();
 
-		var coe = weightedCoefficientSum(
+		return weightedCoefficientSum(
 				size, 0, //
 				species, //
 				BaseVdypSpecies::getFractionGenus, // Weight by fraction
 				spec -> coeMap.get(decayBecAlias, spec.getGenus())
 
 		);
-		return coe;
 	}
 
 	// EMP107
@@ -631,10 +630,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		final float c1 = Math.max(coe.getCoe(1) + coe.getCoe(2) * trAge, 0f);
 		final float c2 = Math.max(coe.getCoe(3) + coe.getCoe(4) * trAge, 0f);
 
-		final float quadMeanDiameter = FloatMath
-				.clamp(c0 + c1 * FloatMath.pow(dominantHeight - 5f, c2), 7.6f, upperBoundsQuadMeanDiameter);
+		return FloatMath.clamp(c0 + c1 * FloatMath.pow(dominantHeight - 5f, c2), 7.6f, upperBoundsQuadMeanDiameter);
 
-		return quadMeanDiameter;
 	}
 
 	PolygonMode findDefaultPolygonMode(
@@ -657,9 +654,9 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		Map<String, Float> minMap = Utils.expectParsedControl(controlMap, ControlKey.MINIMA, Map.class);
 
-		float minHeight = minMap.get(VriControlParser.MINIMUM_HEIGHT);
-		float minBA = minMap.get(VriControlParser.MINIMUM_BASE_AREA);
-		float minPredictedBA = minMap.get(VriControlParser.MINIMUM_PREDICTED_BASE_AREA);
+		float minHeight = minMap.get(BaseControlParser.MINIMUM_HEIGHT);
+		float minBA = minMap.get(BaseControlParser.MINIMUM_BASE_AREA);
+		float minPredictedBA = minMap.get(BaseControlParser.MINIMUM_PREDICTED_BASE_AREA);
 
 		if (height.map(h -> h < minHeight).orElse(true)) {
 			mode = PolygonMode.YOUNG;
@@ -716,9 +713,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 	@Override
 	protected VriSpecies copySpecies(VriSpecies toCopy, Consumer<Builder<VriSpecies>> config) {
-		return VriSpecies.build(builder -> {
-			builder.copy(toCopy);
-		});
+		return VriSpecies.build(builder -> builder.copy(toCopy));
 	}
 
 	static record Increase(float dominantHeight, float ageIncrease) {
@@ -814,9 +809,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 											.map(ytbh -> ageTotal - ytbh)
 											.or(() -> site.getBreastHeightAge().map(bha -> bha + inc.ageIncrease))
 							);
-						}, () -> {
-							iBuilder.breastHeightAge(site.getBreastHeightAge().map(bha -> bha + inc.ageIncrease));
-						});
+						}, () -> iBuilder.breastHeightAge(site.getBreastHeightAge().map(bha -> bha + inc.ageIncrease)));
 
 					});
 					lBuilder.copySpecies(layer, (sBuilder, species) -> {
@@ -933,15 +926,13 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					lBuilder.copySites(primaryLayer, noChange());
 					lBuilder.copySpecies(primaryLayer, noChange());
 				});
-				veteranLayer.ifPresent(vLayer -> {
-					pBuilder.addLayer(lBuilder -> {
-						lBuilder.copy(vLayer);
-						lBuilder.baseArea(veteranBaseArea);
+				veteranLayer.ifPresent(vLayer -> pBuilder.addLayer(lBuilder -> {
+					lBuilder.copy(vLayer);
+					lBuilder.baseArea(veteranBaseArea);
 
-						lBuilder.copySites(primaryLayer, noChange());
-						lBuilder.copySpecies(primaryLayer, noChange());
-					});
-				});
+					lBuilder.copySites(primaryLayer, noChange());
+					lBuilder.copySpecies(primaryLayer, noChange());
+				}));
 
 			});
 
@@ -1005,15 +996,13 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				lBuilder.copySites(primaryLayer, noChange());
 				lBuilder.copySpecies(primaryLayer, noChange());
 			});
-			veteranLayer.ifPresent(vLayer -> {
-				pBuilder.addLayer(lBuilder -> {
-					lBuilder.copy(vLayer);
-					lBuilder.baseArea(veteranBaseArea);
+			veteranLayer.ifPresent(vLayer -> pBuilder.addLayer(lBuilder -> {
+				lBuilder.copy(vLayer);
+				lBuilder.baseArea(veteranBaseArea);
 
-					lBuilder.copySites(primaryLayer, noChange());
-					lBuilder.copySpecies(primaryLayer, noChange());
-				});
-			});
+				lBuilder.copySites(primaryLayer, noChange());
+				lBuilder.copySpecies(primaryLayer, noChange());
+			}));
 
 		});
 
