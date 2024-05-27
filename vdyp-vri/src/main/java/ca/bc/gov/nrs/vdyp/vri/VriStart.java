@@ -71,6 +71,17 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		}
 	}
 
+	protected static <T extends Number> T requirePositive(Optional<T> opt, String name)
+			throws StandProcessingException {
+		T value = opt.orElseThrow(() -> new StandProcessingException(name + " is not present"));
+
+		if (value.doubleValue() <= 0) {
+			new StandProcessingException(name + " " + value + " is not positive");
+		}
+
+		return value;
+	}
+
 	// VRI_SUB
 	// TODO Fortran takes a vector of flags (FIPPASS) controlling which stages are
 	// implemented. FIPSTART always uses the same vector so far now that's not
@@ -326,27 +337,47 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		mode = checkPolygon(polygon);
 
+		final VriPolygon preProcessedPolygon;
 		switch (mode) {
 		case YOUNG:
 			log.atTrace().setMessage(SPECIAL_PROCESSING_LOG_TEMPLATE).addArgument(mode).log();
-			polygon = processYoung(polygon);
+			preProcessedPolygon = processYoung(polygon);
 			break;
 		case BATC:
 			log.atTrace().setMessage(SPECIAL_PROCESSING_LOG_TEMPLATE).addArgument(mode).log();
-			polygon = processBatc(polygon);
+			preProcessedPolygon = processBatc(polygon);
 			break;
 		case BATN:
 			log.atTrace().setMessage(SPECIAL_PROCESSING_LOG_TEMPLATE).addArgument(mode).log();
-			polygon = processBatn(polygon);
+			preProcessedPolygon = processBatn(polygon);
 			break;
 		default:
 			log.atTrace().setMessage("No special processing for mode {}").addArgument(mode).log();
+			preProcessedPolygon = polygon;
 			break;
 		}
+
+		VdypPolygon.build(pBuilder -> {
+			pBuilder.adapt(preProcessedPolygon, x -> x.get());
+		});
 
 		// TODO
 		return Optional.empty();
 
+	}
+
+	private VdypLayer processPrimaryLayer(VriPolygon polygon) throws StandProcessingException {
+		var primaryLayer = polygon.getLayers().get(LayerType.PRIMARY);
+
+		// BA_L1
+		float primaryBaseArea = requirePositive(primaryLayer.getBaseArea(), "Primary layer base area");
+
+		// TPH_L1
+		float primaryTreesPerHectare = requirePositive(
+				primaryLayer.getTreesPerHectare(), "Primary layer trees per hectare"
+		);
+
+		return null;
 	}
 
 	// VRI_CHK
