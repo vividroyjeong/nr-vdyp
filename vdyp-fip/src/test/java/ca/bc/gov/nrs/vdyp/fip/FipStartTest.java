@@ -1640,13 +1640,17 @@ class FipStartTest {
 		TestUtils.populateControlMapBecReal(controlMap);
 		TestUtils.populateControlMapGenusReal(controlMap);
 		TestUtils.populateControlMapVeteranBq(controlMap);
-		TestUtils.populateControlMapEquationGroups(
-				controlMap, (s, b) -> s.equals("B") && b.equals("BG") ? new int[] { 1, 2, 3 } : new int[] { 0, 0, 0 }
-		);
+		TestUtils.populateControlMapEquationGroups(controlMap, (s, b) -> {
+			if (s.equals("B") && b.equals("BG"))
+				return new int[] { 1, 2, 3 };
+			if (s.equals("B") && b.equals("ESSF"))
+				return new int[] { 4, 5, 6 };
+			return new int[] { 0, 0, 0 };
+		});
 		TestUtils.populateControlMapVeteranDq(controlMap, (s, r) -> new float[] { 0f, 0f, 0f });
 		TestUtils.populateControlMapVeteranVolAdjust(controlMap, s -> new float[] { 0f, 0f, 0f, 0f });
-		TestUtils.populateControlMapWholeStemVolume(controlMap, (wholeStemMap(1)));
-		TestUtils.populateControlMapCloseUtilization(controlMap, closeUtilMap(1));
+		TestUtils.populateControlMapWholeStemVolume(controlMap, wholeStemMap(4));
+		TestUtils.populateControlMapCloseUtilization(controlMap, closeUtilMap(4));
 		TestUtils.populateControlMapNetDecay(controlMap, closeUtilMap(2));
 		FipTestUtils.populateControlMapDecayModifiers(controlMap, (s, r) -> 0f);
 		TestUtils.populateControlMapNetWaste(
@@ -1661,7 +1665,7 @@ class FipStartTest {
 
 			var result = app.processLayerAsVeteran(fipPolygon, fipLayer).getSpecies().get("B");
 
-			assertThat(result, hasProperty("volumeGroup", is(1)));
+			assertThat(result, hasProperty("volumeGroup", is(4))); // Remapped BEC to ESSF
 			assertThat(result, hasProperty("decayGroup", is(2)));
 			assertThat(result, hasProperty("breakageGroup", is(3)));
 		}
