@@ -52,6 +52,7 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.Region;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 
 public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional<Float>, S, I>, L extends BaseVdypLayer<S, I> & InputLayer, S extends BaseVdypSpecies, I extends BaseVdypSite>
 		extends VdypApplication implements Closeable {
@@ -818,6 +819,39 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		}
 
 		return quadMeanDiameter;
+	}
+
+	protected Map<String, Float>
+			applyGroups(BaseVdypPolygon<?, ?, ?, ?> fipPolygon, Map<String, VdypSpecies> vdypSpecies)
+					throws ProcessingException {
+		// Lookup volume group, Decay Group, and Breakage group for each species.
+
+		Map<String, Float> targetPercentages = new HashMap<>(vdypSpecies.size());
+
+		BecDefinition bec = Utils.getBec(fipPolygon.getBiogeoclimaticZone(), controlMap);
+		var volumeGroupMap = getGroupMap(ControlKey.VOLUME_EQN_GROUPS);
+		var decayGroupMap = getGroupMap(ControlKey.DECAY_GROUPS);
+		var breakageGroupMap = getGroupMap(ControlKey.BREAKAGE_GROUPS);
+		for (var vSpec : vdypSpecies.values()) {
+			// VGRPFIND
+			var volumeGroup = volumeGroupMap.get(vSpec.getGenus(), bec.getVolumeBec().getAlias());
+			// DGRPFIND
+			var decayGroup = decayGroupMap.get(vSpec.getGenus(), bec.getDecayBec().getAlias());
+			// BGRPFIND (Breakage uses decay BEC)
+			var breakageGroup = breakageGroupMap.get(vSpec.getGenus(), bec.getDecayBec().getAlias());
+
+			vSpec.setVolumeGroup(volumeGroup);
+			vSpec.setDecayGroup(decayGroup);
+			vSpec.setBreakageGroup(breakageGroup);
+
+			targetPercentages.put(vSpec.getGenus(), vSpec.getPercentGenus());
+		}
+
+		return targetPercentages;
+	}
+
+	protected MatrixMap2<String, String, Integer> getGroupMap(ControlKey key) {
+		return Utils.expectParsedControl(controlMap, key, ca.bc.gov.nrs.vdyp.model.MatrixMap2.class);
 	}
 
 }

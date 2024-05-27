@@ -333,25 +333,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 		var vdypPrimarySpecies = vdypSpecies.get(primarySpecies.get(0).getGenus());
 
-		// Lookup volume group, Decay Group, and Breakage group for each species.
-
-		var volumeGroupMap = getGroupMap(ControlKey.VOLUME_EQN_GROUPS);
-		var decayGroupMap = getGroupMap(ControlKey.DECAY_GROUPS);
-		var breakageGroupMap = getGroupMap(ControlKey.BREAKAGE_GROUPS);
-
-		Map<String, Float> targetPercentages = new HashMap<>(vdypSpecies.size());
-
-		for (var vSpec : vdypSpecies.values()) {
-			var volumeGroup = getGroup(fipPolygon, volumeGroupMap, vSpec.getGenus());
-			var decayGroup = getGroup(fipPolygon, decayGroupMap, vSpec.getGenus());
-			var breakageGroup = getGroup(fipPolygon, breakageGroupMap, vSpec.getGenus());
-
-			vSpec.setVolumeGroup(volumeGroup);
-			vSpec.setDecayGroup(decayGroup);
-			vSpec.setBreakageGroup(breakageGroup);
-
-			targetPercentages.put(vSpec.getGenus(), vSpec.getPercentGenus());
-		}
+		Map<String, Float> targetPercentages = applyGroups(fipPolygon, vdypSpecies);
 
 		var maxPass = fipLayer.getSpecies().size() > 1 ? 2 : 1;
 
@@ -877,20 +859,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				}) //
 				.collect(Collectors.toMap(VdypSpecies::getGenus, Function.identity()));
 
-		// Lookup volume group, Decay Group, and Breakage group for each species.
-
-		var volumeGroupMap = getGroupMap(ControlKey.VOLUME_EQN_GROUPS);
-		var decayGroupMap = getGroupMap(ControlKey.DECAY_GROUPS);
-		var breakageGroupMap = getGroupMap(ControlKey.BREAKAGE_GROUPS);
-		for (var vSpec : vdypSpecies.values()) {
-			var volumeGroup = getGroup(fipPolygon, volumeGroupMap, vSpec.getGenus());
-			var decayGroup = getGroup(fipPolygon, decayGroupMap, vSpec.getGenus());
-			var breakageGroup = getGroup(fipPolygon, breakageGroupMap, vSpec.getGenus());
-
-			vSpec.setVolumeGroup(volumeGroup);
-			vSpec.setDecayGroup(decayGroup);
-			vSpec.setBreakageGroup(breakageGroup);
-		}
+		applyGroups(fipPolygon, vdypSpecies);
 
 		/*
 		 * From VDYP7
@@ -2184,14 +2153,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		}
 		UTIL_CLASSES.forEach(uc -> components.setCoe(uc.index, components.getCoe(uc.index) * k));
 		return k;
-	}
-
-	int getGroup(FipPolygon fipPolygon, MatrixMap2<String, String, Integer> volumeGroupMap, String genus) {
-		return volumeGroupMap.get(genus, fipPolygon.getBiogeoclimaticZone());
-	}
-
-	MatrixMap2<String, String, Integer> getGroupMap(ControlKey key) {
-		return Utils.expectParsedControl(controlMap, key, MatrixMap2.class);
 	}
 
 	// FIP_GET
