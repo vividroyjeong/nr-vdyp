@@ -91,15 +91,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 	private static final Logger log = LoggerFactory.getLogger(FipStart.class);
 
-	public static final int UTIL_ALL = UtilizationClass.ALL.index;
-	public static final int UTIL_LARGEST = UtilizationClass.OVER225.index;
-	public static final int UTIL_SMALL = UtilizationClass.SMALL.index;
-
 	public static final float TOLERANCE = 2.0e-3f;
-
-	static final Collection<UtilizationClass> UTIL_CLASSES = List.of(
-			UtilizationClass.U75TO125, UtilizationClass.U125TO175, UtilizationClass.U175TO225, UtilizationClass.OVER225
-	);
 
 	public static void main(final String... args) throws IOException {
 
@@ -333,7 +325,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 		var vdypPrimarySpecies = vdypSpecies.get(primarySpecies.get(0).getGenus());
 
-		Map<String, Float> targetPercentages = applyGroups(fipPolygon, vdypSpecies);
+		Map<String, Float> targetPercentages = applyGroups(fipPolygon, vdypSpecies.values());
 
 		var maxPass = fipLayer.getSpecies().size() > 1 ? 2 : 1;
 
@@ -349,15 +341,14 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			}
 			// Estimate lorey height for primary species
 			if (iPass == 1 && vdypSpecies.size() == 1) {
-				primaryHeight = primaryHeightFromLeadHeight(
+				primaryHeight = estimators.primaryHeightFromLeadHeight(
 						leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion(), tphTotal
 				);
 			} else if (iPass == 1) {
-				primaryHeight = primaryHeightFromLeadHeightInitial(
-						leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion()
-				);
+				primaryHeight = estimators
+						.primaryHeightFromLeadHeightInitial(leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion());
 			} else {
-				primaryHeight = primaryHeightFromLeadHeight(
+				primaryHeight = estimators.primaryHeightFromLeadHeight(
 						leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion(),
 						vdypPrimarySpecies.getTreesPerHectareByUtilization().getCoe(UTIL_ALL)
 				);
@@ -859,7 +850,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				}) //
 				.collect(Collectors.toMap(VdypSpecies::getGenus, Function.identity()));
 
-		applyGroups(fipPolygon, vdypSpecies);
+		applyGroups(fipPolygon, vdypSpecies.values());
 
 		/*
 		 * From VDYP7
@@ -1725,59 +1716,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		return exp(logit);
 	}
 
-	private float heightMultiplier(String genus, Region region, float treesPerHectarePrimary) {
-		final var coeMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.HL_PRIMARY_SP_EQN_P1, MatrixMap2.class
-		);
-		var coe = coeMap.get(genus, region).reindex(0);
-		return coe.get(0) - coe.getCoe(1) + coe.getCoe(1) * exp(coe.getCoe(2) * (treesPerHectarePrimary - 100f));
-	}
-
-	// EMP050 Meth==1
-	/**
-	 * Return the lorey height of the primary species based on the dominant height of the lead species.
-	 *
-	 * @param leadHeight             dominant height of the lead species
-	 * @param genus                  Primary species
-	 * @param region                 Region of the polygon
-	 * @param treesPerHectarePrimary trees per hectare >7.5 cm of the primary species
-	 * @return
-	 */
-	float primaryHeightFromLeadHeight(float leadHeight, String genus, Region region, float treesPerHectarePrimary) {
-		return 1.3f + (leadHeight - 1.3f) * heightMultiplier(genus, region, treesPerHectarePrimary);
-	}
-
-	// EMP050 Meth==2
-	/**
-	 * Return the dominant height of the lead species based on the lorey height of the primary species.
-	 *
-	 * @param primaryHeight          lorey height of the primary species
-	 * @param genus                  Primary species
-	 * @param region                 Region of the polygon
-	 * @param treesPerHectarePrimary trees per hectare >7.5 cm of the primary species
-	 * @return
-	 */
-	float leadHeightFromPrimaryHeight(float primaryHeight, String genus, Region region, float treesPerHectarePrimary) {
-		return 1.3f + (primaryHeight - 1.3f) / heightMultiplier(genus, region, treesPerHectarePrimary);
-	}
-
-	// EMP051
-	/**
-	 * Return the lorey height of the primary species based on the dominant height of the lead species.
-	 *
-	 * @param leadHeight dominant height of the lead species
-	 * @param genus      Primary species
-	 * @param region     Region of the polygon
-	 * @return
-	 */
-	private float primaryHeightFromLeadHeightInitial(float leadHeight, String genus, Region region) {
-		final var coeMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.HL_PRIMARY_SP_EQN_P2, MatrixMap2.class
-		);
-		var coe = coeMap.get(genus, region);
-		return 1.3f + coe.getCoe(1) * pow(leadHeight - 1.3f, coe.getCoe(2));
-	}
-
 	/**
 	 * Accessor methods for utilization vectors, except for Lorey Height, on Layer and Species objects.
 	 */
@@ -2515,7 +2453,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		float a0 = coe.getCoe(1);
 		float a1 = coe.getCoe(2);
 
-		return 1.3f + (spec.getLoreyHeightByUtilization().getCoe(FipStart.UTIL_ALL) - 1.3f) * exp(
+		return 1.3f + (spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL) - 1.3f) * exp(
 				a0 * (pow(quadMeanDiameterSpecSmall, a1)
 						- pow(spec.getQuadraticMeanDiameterByUtilization().getCoe(UTIL_ALL), a1))
 		);
@@ -2531,7 +2469,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		float a1 = coe.getCoe(2);
 
 		float logit = //
-				a0 + a1 * spec.getLoreyHeightByUtilization().getCoe(FipStart.UTIL_ALL);
+				a0 + a1 * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL);
 
 		return 4.0f + 3.5f * exp(logit) / (1.0f + exp(logit));
 	}
@@ -2556,8 +2494,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		float arg = //
 				(a0 + //
 						a1 * coast + //
-						a2 * spec.getBaseAreaByUtilization().getCoe(FipStart.UTIL_ALL)//
-				) * exp(a3 * spec.getLoreyHeightByUtilization().getCoe(FipStart.UTIL_ALL));
+						a2 * spec.getBaseAreaByUtilization().getCoe(UTIL_ALL)//
+				) * exp(a3 * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL));
 		arg = max(arg, 0f);
 
 		return arg;
@@ -2580,7 +2518,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				a0 + //
 						a1 * coast + //
 						a2 * layer.getBreastHeightAge().orElse(0f) + //
-						a3 * spec.getLoreyHeightByUtilization().getCoe(FipStart.UTIL_ALL);
+						a3 * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL);
 
 		return exp(logit) / (1.0f + exp(logit));
 	}

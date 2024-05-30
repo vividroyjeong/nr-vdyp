@@ -73,13 +73,17 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 	protected static <T extends Number> T requirePositive(Optional<T> opt, String name)
 			throws StandProcessingException {
-		T value = opt.orElseThrow(() -> new StandProcessingException(name + " is not present"));
+		T value = require(opt, name);
 
 		if (value.doubleValue() <= 0) {
-			new StandProcessingException(name + " " + value + " is not positive");
+			throw new StandProcessingException(name + " " + value + " is not positive");
 		}
 
 		return value;
+	}
+
+	protected static <T> T require(Optional<T> opt, String name) throws StandProcessingException {
+		return opt.orElseThrow(() -> new StandProcessingException(name + " is not present"));
 	}
 
 	// VRI_SUB
@@ -357,17 +361,36 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			break;
 		}
 
-		VdypPolygon.build(pBuilder -> {
-			pBuilder.adapt(preProcessedPolygon, x -> x.get());
-		});
+		try {
+			return Optional.of(VdypPolygon.build(pBuilder -> {
+				pBuilder.adapt(preProcessedPolygon, x -> x.orElse(0f));
 
-		// TODO
-		return Optional.empty();
+				pBuilder.addLayer(lBuilder -> {
+					try {
+						processPrimaryLayer(preProcessedPolygon, lBuilder);
+					} catch (ProcessingException e) {
+						throw new RuntimeProcessingException(e);
+					}
+				});
+				if (preProcessedPolygon.getLayers().containsKey(LayerType.VETERAN)) {
+					pBuilder.addLayer(lBuilder -> {
+						try {
+							processVeteranLayer(preProcessedPolygon, lBuilder);
+						} catch (StandProcessingException e) {
+							throw new RuntimeStandProcessingException(e);
+						}
+					});
+				}
 
+			}));
+		} catch (RuntimeProcessingException e) {
+			throw e.getCause();
+		}
 	}
 
-	private VdypLayer processPrimaryLayer(VriPolygon polygon) throws StandProcessingException {
+	private void processPrimaryLayer(VriPolygon polygon, VdypLayer.Builder lBuilder) throws ProcessingException {
 		var primaryLayer = polygon.getLayers().get(LayerType.PRIMARY);
+		var bec = Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap);
 
 		// BA_L1
 		float primaryBaseArea = requirePositive(primaryLayer.getBaseArea(), "Primary layer base area");
@@ -377,7 +400,56 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				primaryLayer.getTreesPerHectare(), "Primary layer trees per hectare"
 		);
 
-		return null;
+		// TODO set TPH, BA, DQ for util class ALL
+
+		lBuilder.adaptSpecies(primaryLayer, (sBuilder, vriSpec) -> {
+			//
+		});
+		lBuilder.adaptSites(primaryLayer, (sBuilder, vriSite) -> {
+			// Nothing
+		});
+
+		lBuilder.buildChildren();
+
+		var species = lBuilder.getSpecies();
+		var sites = lBuilder.getSites();
+
+		// Assign BA by species
+		if (species.size() == 1) {
+			species.get(0).getBaseAreaByUtilization().setCoe(UTIL_ALL, primaryBaseArea);
+		} else {
+			for (var spec : species) {
+				spec.getBaseAreaByUtilization().set(UTIL_ALL, primaryBaseArea * spec.getFractionGenus());
+			}
+		}
+
+		this.applyGroups(polygon, species);
+
+		var primarySite = require(primaryLayer.getPrimarySite(), "Primary site for primary layer");
+
+		var primarySpeciesPercent = require(primaryLayer.getPrimarySpeciesRecord(), "Primary species for primary layer")
+				.getFractionGenus();
+
+		// TPH_L1
+		var primaryLayerDensity = requirePositive(primaryLayer.getTreesPerHectare(), "Primary layer trees per hectare");
+
+		// TPHsp
+		var primarySpeciesDensity = primarySpeciesPercent * primaryLayerDensity;
+
+		// HDL1
+		var leadHeight = requirePositive(primarySite.getHeight(), "Primary layer lead species height");
+
+		// HLPL1
+		var primaryHeight = estimators.primaryHeightFromLeadHeight(
+				leadHeight, primarySite.getSiteGenus(), bec.getRegion(), primarySpeciesDensity
+		);
+
+	}
+
+	private void processVeteranLayer(VriPolygon polygon, VdypLayer.Builder lBuilder) throws StandProcessingException {
+		var veteranLayer = polygon.getLayers().get(LayerType.VETERAN);
+
+		// TODO
 	}
 
 	// VRI_CHK

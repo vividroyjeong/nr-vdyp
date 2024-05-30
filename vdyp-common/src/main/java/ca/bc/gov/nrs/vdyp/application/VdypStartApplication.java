@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
+import ca.bc.gov.nrs.vdyp.common_calculators.Estimators;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -52,6 +53,7 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.Region;
+import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 
 public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional<Float>, S, I>, L extends BaseVdypLayer<S, I> & InputLayer, S extends BaseVdypSpecies, I extends BaseVdypSite>
@@ -106,6 +108,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	protected VriAdjustInputWriter vriWriter;
 
 	protected Map<String, Object> controlMap = new HashMap<>();
+
+	protected Estimators estimators;
 
 	static final Comparator<BaseVdypSpecies> PERCENT_GENUS_DESCENDING = Utils
 			.compareUsing(BaseVdypSpecies::getPercentGenus).reversed();
@@ -177,6 +181,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	void setControlMap(Map<String, Object> controlMap) {
 		this.controlMap = controlMap;
+		this.estimators = new Estimators(controlMap);
 	}
 
 	protected <T> StreamingParser<T> getStreamingParser(ControlKey key) throws ProcessingException {
@@ -730,6 +735,16 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	protected static final ValueOrMarker.Builder<Float, Boolean> FLOAT_OR_BOOL = ValueOrMarker
 			.builder(Float.class, Boolean.class);
 
+	public static final int UTIL_ALL = UtilizationClass.ALL.index;
+
+	public static final int UTIL_LARGEST = UtilizationClass.OVER225.index;
+
+	public static final int UTIL_SMALL = UtilizationClass.SMALL.index;
+
+	protected static final Collection<UtilizationClass> UTIL_CLASSES = List.of(
+			UtilizationClass.U75TO125, UtilizationClass.U125TO175, UtilizationClass.U175TO225, UtilizationClass.OVER225
+	);
+
 	protected ValueOrMarker<Float, Boolean> isVeteranForEstimatePercentForestLand(P polygon, Optional<L> vetLayer) {
 		boolean veteran = vetLayer//
 				.filter(layer -> getLayerHeight(layer).orElse(0f) > 0f) //
@@ -822,7 +837,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	}
 
 	protected Map<String, Float>
-			applyGroups(BaseVdypPolygon<?, ?, ?, ?> fipPolygon, Map<String, VdypSpecies> vdypSpecies)
+			applyGroups(BaseVdypPolygon<?, ?, ?, ?> fipPolygon, Collection<VdypSpecies> vdypSpecies)
 					throws ProcessingException {
 		// Lookup volume group, Decay Group, and Breakage group for each species.
 
@@ -832,7 +847,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		var volumeGroupMap = getGroupMap(ControlKey.VOLUME_EQN_GROUPS);
 		var decayGroupMap = getGroupMap(ControlKey.DECAY_GROUPS);
 		var breakageGroupMap = getGroupMap(ControlKey.BREAKAGE_GROUPS);
-		for (var vSpec : vdypSpecies.values()) {
+		for (var vSpec : vdypSpecies) {
 			// VGRPFIND
 			var volumeGroup = volumeGroupMap.get(vSpec.getGenus(), bec.getVolumeBec().getAlias());
 			// DGRPFIND
