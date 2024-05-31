@@ -617,6 +617,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		for (var entity : entities) {
 			var entityCoe = getCoefficients.apply(entity);
 			double fraction = weight.applyAsDouble(entity);
+			log.atInfo().addArgument(entity).addArgument(fraction).addArgument(entityCoe)
+					.setMessage("For entity {} with fraction {} adding coefficients {}").log();
 			for (int i : weighted) {
 				coeWorking[i - indexFrom] += (entityCoe.getCoe(i)) * fraction;
 			}
