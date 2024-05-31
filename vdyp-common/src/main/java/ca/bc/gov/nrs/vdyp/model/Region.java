@@ -35,7 +35,7 @@ public enum Region {
 			return Optional.empty();
 		}
 	}
-
+	
 	public char getCharacterAlias() {
 		return characterAlias;
 	}

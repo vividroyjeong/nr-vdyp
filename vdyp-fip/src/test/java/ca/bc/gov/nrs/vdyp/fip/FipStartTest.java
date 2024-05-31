@@ -46,6 +46,8 @@ import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.EstimationMethods;
+import ca.bc.gov.nrs.vdyp.common.ReconcilationMethods;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.fip.FipStart.CompatibilityVariableMode;
 import ca.bc.gov.nrs.vdyp.fip.FipStart.VolumeComputeMode;
@@ -63,10 +65,10 @@ import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.MockStreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
-import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
+import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
@@ -1869,9 +1871,9 @@ class FipStartTest {
 			var baseAreaUtil = new Coefficients(new float[] { 0.492921442f, 0f, 0f, 0f, 0.492921442f }, 0);
 			var wholeStemVolumeUtil = new Coefficients(new float[] { 0f, 0f, 0f, 0f, 0f }, 0);
 
-			app.estimateWholeStemVolume(
-					utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, baseAreaUtil,
-					wholeStemVolumeUtil
+			EstimationMethods.estimateWholeStemVolume(
+					utilizationClass, aAdjust, volumeGroup, lorieHeight, null, quadMeanDiameterUtil,
+					baseAreaUtil, wholeStemVolumeUtil
 			);
 
 			assertThat(wholeStemVolumeUtil, coe(0, contains(is(0f), is(0f), is(0f), is(0f), closeTo(6.11904192f))));
@@ -1904,8 +1906,8 @@ class FipStartTest {
 
 			var closeUtilizationUtil = new Coefficients(new float[] { 0f, 0f, 0f, 0f, 0f }, 0);
 
-			app.estimateCloseUtilizationVolume(
-					utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, wholeStemVolumeUtil,
+			EstimationMethods.estimateCloseUtilizationVolume(
+					controlMap, utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, wholeStemVolumeUtil,
 					closeUtilizationUtil
 			);
 
@@ -1944,8 +1946,8 @@ class FipStartTest {
 
 			var closeUtilizationNetOfDecayUtil = new Coefficients(new float[] { 0f, 0f, 0f, 0f, 0f }, 0);
 
-			app.estimateNetDecayVolume(
-					fipSpecies.getGenus(), Region.INTERIOR, utilizationClass, aAdjust, decayGroup, lorieHeight,
+			EstimationMethods.estimateNetDecayVolume(
+					controlMap, fipSpecies.getGenus(), Region.INTERIOR, utilizationClass, aAdjust, decayGroup, lorieHeight,
 					breastHeightAge, quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil
 			);
 
@@ -1993,9 +1995,16 @@ class FipStartTest {
 
 			var closeUtilizationNetOfDecayAndWasteUtil = new Coefficients(new float[] { 0f, 0f, 0f, 0f, 0f }, 0);
 
-			app.estimateNetDecayAndWasteVolume(
-					Region.INTERIOR, utilizationClass, aAdjust, fipSpecies.getGenus(), lorieHeight, breastHeightAge,
-					quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil,
+			final var netDecayCoeMap = Utils.<Map<String, Coefficients>>expectParsedControl(
+					controlMap, ControlKey.VOLUME_NET_DECAY_WASTE, Map.class
+			);
+			final var wasteModifierMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
+					controlMap, ControlKey.WASTE_MODIFIERS, MatrixMap2.class
+			);
+
+			EstimationMethods.estimateNetDecayAndWasteVolume(
+					Region.INTERIOR, utilizationClass, aAdjust, fipSpecies.getGenus(), lorieHeight, breastHeightAge, 
+					netDecayCoeMap, wasteModifierMap, quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil,
 					closeUtilizationNetOfDecayAndWasteUtil
 			);
 
@@ -2039,8 +2048,8 @@ class FipStartTest {
 					new float[] { 0f, 0f, 0f, 0f, 0f }, 0
 			);
 
-			app.estimateNetDecayWasteAndBreakageVolume(
-					utilizationClass, breakageGroup, quadMeanDiameterUtil, closeUtilizationUtil,
+			EstimationMethods.estimateNetDecayWasteAndBreakageVolume(
+					controlMap, utilizationClass, breakageGroup, quadMeanDiameterUtil, closeUtilizationUtil,
 					closeUtilizationNetOfDecayAndWasteUtil, closeUtilizationNetOfDecayWasteAndBreakageUtil
 			);
 
@@ -2070,8 +2079,8 @@ class FipStartTest {
 
 			var closeUtilizationNetOfDecayWasteAndBreakageUtil = Utils.utilizationVector();
 
-			app.estimateNetDecayWasteAndBreakageVolume(
-					utilizationClass, breakageGroup, quadMeanDiameterUtil, closeUtilizationUtil,
+			EstimationMethods.estimateNetDecayWasteAndBreakageVolume(
+					controlMap, utilizationClass, breakageGroup, quadMeanDiameterUtil, closeUtilizationUtil,
 					closeUtilizationNetOfDecayAndWasteUtil, closeUtilizationNetOfDecayWasteAndBreakageUtil
 			);
 
@@ -3143,7 +3152,7 @@ class FipStartTest {
 				builder.breakageGroup(-1);
 			});
 
-			app.estimateQuadMeanDiameterByUtilization(bec, coe, spec1);
+			EstimationMethods.estimateQuadMeanDiameterByUtilization(controlMap, bec, coe, spec1.getGenus());
 
 			assertThat(coe, utilization(0f, 31.6622887f, 10.0594692f, 14.966774f, 19.9454956f, 46.1699982f));
 		} catch (IOException e) {
@@ -3173,7 +3182,7 @@ class FipStartTest {
 				builder.breakageGroup(-1);
 			});
 
-			app.estimateQuadMeanDiameterByUtilization(bec, coe, spec1);
+			EstimationMethods.estimateQuadMeanDiameterByUtilization(controlMap, bec, coe, spec1.getGenus());
 
 			assertThat(coe, utilization(0f, 13.4943399f, 10.2766619f, 14.67033f, 19.4037666f, 25.719244f));
 		} catch (IOException e) {
@@ -3210,7 +3219,7 @@ class FipStartTest {
 				builder.breakageGroup(-1);
 			});
 
-			app.estimateBaseAreaByUtilization(bec, dq, ba, spec1);
+			EstimationMethods.estimateBaseAreaByUtilization(controlMap, bec, dq, ba, spec1.getGenus());
 
 			assertThat(ba, utilization(0f, 0.397305071f, 0.00485289097f, 0.0131751001f, 0.0221586525f, 0.357118428f));
 		} catch (IOException e) {
@@ -3250,7 +3259,7 @@ class FipStartTest {
 			tph.setCoe(3, 14.6700592f);
 			tph.setCoe(4, 4.25086117f);
 
-			app.reconcileComponents(ba, tph, dq);
+			ReconcilationMethods.reconcileComponents(ba, tph, dq);
 
 			assertThat(ba, utilization(0f, 2.20898318f, 0.220842764f, 0.546404183f, 1.44173622f, 0f));
 			assertThat(tph, utilization(0f, 154.454025f, 49.988575f, 44.5250206f, 59.9404259f, 0f));
@@ -3288,7 +3297,7 @@ class FipStartTest {
 			tph.setCoe(3, 0.709191978f);
 			tph.setCoe(4, 2.13305807f);
 
-			app.reconcileComponents(ba, tph, dq);
+			ReconcilationMethods.reconcileComponents(ba, tph, dq);
 
 			assertThat(ba, utilization(0f, 0.397305071f, 0.00485289097f, 0.0131751001f, 0.0221586525f, 0.357118428f));
 			assertThat(tph, utilization(0f, 5.04602766f, 0.733301044f, 0.899351299f, 0.851697803f, 2.56167722f));
@@ -3329,7 +3338,7 @@ class FipStartTest {
 			tph.setCoe(3, 0f);
 			tph.setCoe(4, 0f);
 
-			app.reconcileComponents(ba, tph, dq);
+			ReconcilationMethods.reconcileComponents(ba, tph, dq);
 
 			assertThat(ba, utilization(0f, 2.20898318f, 0f, 2.20898318f, 0f, 0f));
 			assertThat(tph, utilization(0f, 179.71648f, 0f, 179.71648f, 0f, 0f));
@@ -3365,7 +3374,7 @@ class FipStartTest {
 			wsv.setCoe(FipStart.UTIL_ALL, 11.7993851f);
 
 			// app.estimateWholeStemVolumeByUtilizationClass(46, 14.2597857f, dq, ba, wsv);
-			app.estimateWholeStemVolume(UtilizationClass.ALL, 0f, 46, 14.2597857f, dq, ba, wsv);
+			EstimationMethods.estimateWholeStemVolume(UtilizationClass.ALL, 0f, 46, 14.2597857f, null, dq, ba, wsv);
 
 			assertThat(wsv, utilization(0f, 11.7993851f, 3.13278913f, 4.76524019f, 2.63645673f, 1.26489878f));
 		} catch (IOException e) {

@@ -95,6 +95,10 @@ class ForwardProcessingState {
 	public PolygonProcessingState getProcessingState() {
 		return processingState;
 	}
+
+	public Map<String, Object> getControlMap() {
+		return controlMap;
+	}
 	
 	public void storeActive(int instanceNumber, LayerType layerType) {
 		banks[toIndex(instanceNumber, layerType)] = processingState.wallet.copy();
