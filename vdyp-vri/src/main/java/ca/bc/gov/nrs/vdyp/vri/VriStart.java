@@ -49,6 +49,7 @@ import ca.bc.gov.nrs.vdyp.model.ModelClassBuilder;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
 import ca.bc.gov.nrs.vdyp.vri.model.VriPolygon;
 import ca.bc.gov.nrs.vdyp.vri.model.VriSite;
@@ -425,7 +426,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		this.applyGroups(polygon, species);
 
-		var primarySite = require(primaryLayer.getPrimarySite(), "Primary site for primary layer");
+		var primarySiteIn = require(primaryLayer.getPrimarySite(), "Primary site for primary layer");
 
 		var primarySpeciesPercent = require(primaryLayer.getPrimarySpeciesRecord(), "Primary species for primary layer")
 				.getFractionGenus();
@@ -437,13 +438,46 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		var primarySpeciesDensity = primarySpeciesPercent * primaryLayerDensity;
 
 		// HDL1
-		var leadHeight = requirePositive(primarySite.getHeight(), "Primary layer lead species height");
+		var leadHeight = requirePositive(primarySiteIn.getHeight(), "Primary layer lead species height");
 
 		// HLPL1
 		var primaryHeight = estimators.primaryHeightFromLeadHeight(
-				leadHeight, primarySite.getSiteGenus(), bec.getRegion(), primarySpeciesDensity
+				leadHeight, primarySiteIn.getSiteGenus(), bec.getRegion(), primarySpeciesDensity
 		);
 
+		var primarySpeciesOut = species.stream().filter(s->s.getGenus().equals(primaryLayer.getPrimaryGenus())).findAny().get();
+		var primarySiteOut = sites.stream().filter(s->s.getSiteGenus().equals(primaryLayer.getPrimaryGenus())).findAny().get();
+		
+		float loreyHeight = estimateLoreyHeightForVriPrimaryLayer(primaryLayer, bec, species, leadHeight, primaryHeight, primarySpeciesOut);
+	}
+
+	private float estimateLoreyHeightForVriPrimaryLayer(
+			VriLayer primaryLayer, BecDefinition bec, List<VdypSpecies> species, Float leadHeight, float primaryHeight,
+			VdypSpecies primarySpeciesOut
+	) throws ProcessingException {
+		try {
+			for(var spec : species) {
+				var site = primaryLayer.getSites().get(spec.getGenus());
+				
+				if(spec.getGenus().equals(primaryLayer.getPrimaryGenus())) {
+					continue;
+				}
+				
+				// TODO Treat as height not present if  NDEBUG 2 == 1 ||
+				site.getHeight().map(height->{
+					try {
+						return estimators.estimateNonPrimaryLoreyHeight(spec, primarySpeciesOut, bec, leadHeight, primaryHeight);
+					} catch (ProcessingException e) {
+						throw new RuntimeProcessingException(e);
+					}
+				}, ()->{
+					// TODO
+				});
+				
+			}
+		} catch (RuntimeProcessingException e) {
+			throw e.getCause();
+		}
 	}
 
 	private void processVeteranLayer(VriPolygon polygon, VdypLayer.Builder lBuilder) throws StandProcessingException {

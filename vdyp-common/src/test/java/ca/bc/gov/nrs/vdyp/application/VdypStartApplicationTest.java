@@ -34,22 +34,22 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import ca.bc.gov.nrs.vdyp.application.test.TestLayer;
+import ca.bc.gov.nrs.vdyp.application.test.TestPolygon;
+import ca.bc.gov.nrs.vdyp.application.test.TestSite;
+import ca.bc.gov.nrs.vdyp.application.test.TestSpecies;
+import ca.bc.gov.nrs.vdyp.application.test.TestStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
-import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapValueReplacer;
-import ca.bc.gov.nrs.vdyp.io.parse.control.NonFipControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
-import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
-import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
@@ -62,253 +62,6 @@ import ca.bc.gov.nrs.vdyp.test.TestUtils;
 class VdypStartApplicationTest {
 
 	private Map<String, Object> controlMap = new HashMap<>();
-
-	static class TestSpecies extends BaseVdypSpecies {
-
-		protected TestSpecies(
-				PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, float percentGenus
-		) {
-			super(polygonIdentifier, layerType, genus, percentGenus);
-		}
-
-		public static TestSpecies build(Consumer<Builder> config) {
-			var builder = new Builder();
-			config.accept(builder);
-			return builder.build();
-		}
-
-		public static class Builder extends BaseVdypSpecies.Builder<TestSpecies> {
-
-			@Override
-			protected TestSpecies doBuild() {
-				return new TestSpecies(polygonIdentifier.get(), layerType.get(), genus.get(), percentGenus.get());
-			}
-
-		}
-	}
-
-	static class TestSite extends BaseVdypSite {
-
-		protected TestSite(
-				PolygonIdentifier polygonIdentifier, LayerType layerType, String siteGenus,
-				Optional<Integer> siteCurveNumber, Optional<Float> siteIndex, Optional<Float> height,
-				Optional<Float> ageTotal, Optional<Float> yearsToBreastHeight
-		) {
-			super(
-					polygonIdentifier, layerType, siteGenus, siteCurveNumber, siteIndex, height, ageTotal,
-					yearsToBreastHeight
-			);
-		}
-
-		public static TestSite build(Consumer<Builder> config) {
-			var builder = new Builder();
-			config.accept(builder);
-			return builder.build();
-		}
-
-		public static class Builder extends BaseVdypSite.Builder<TestSite> {
-
-			protected Optional<String> siteSpecies = Optional.empty();
-
-			@Override
-			protected TestSite doBuild() {
-				return new TestSite(
-						this.polygonIdentifier.get(), //
-						this.layerType.get(), //
-						this.siteGenus.get(), //
-						this.siteCurveNumber, //
-						this.siteIndex, //
-						this.height, //
-						this.ageTotal, //
-						this.yearsToBreastHeight //
-				);
-			}
-		}
-	}
-
-	static class TestLayer extends BaseVdypLayer<TestSpecies, TestSite> implements InputLayer {
-
-		final float crownClosure;
-
-		protected TestLayer(
-				PolygonIdentifier polygonIdentifier, LayerType layerType, Optional inventoryTypeGroup,
-				float crownClosure
-		) {
-			super(polygonIdentifier, layerType, inventoryTypeGroup);
-			this.crownClosure = crownClosure;
-		}
-
-		@Override
-		public float getCrownClosure() {
-			return crownClosure;
-		}
-
-		public static TestLayer build(Consumer<Builder> config) {
-			var builder = new Builder();
-			config.accept(builder);
-			return builder.build();
-		}
-
-		public static class Builder
-				extends BaseVdypLayer.Builder<TestLayer, TestSpecies, TestSite, TestSpecies.Builder, TestSite.Builder> {
-
-			protected Optional<Float> crownClosure = Optional.empty();
-
-			public Builder crownClosure(float crownClosure) {
-				this.crownClosure = Optional.of(crownClosure);
-				return this;
-			}
-
-			@Override
-			protected void check(Collection<String> errors) {
-				super.check(errors);
-				requirePresent(crownClosure, "crownClosure", errors);
-			}
-
-			@Override
-			protected TestLayer doBuild() {
-
-				return (new TestLayer(
-						polygonIdentifier.get(), //
-						layerType.get(), //
-						inventoryTypeGroup, //
-						crownClosure.get() //
-				));
-			}
-
-			@Override
-			protected TestSpecies buildSpecies(Consumer<TestSpecies.Builder> config) {
-				return TestSpecies.build(sb -> {
-					sb.polygonIdentifier(polygonIdentifier.get());
-					sb.layerType(layerType.get());
-					config.accept(sb);
-				});
-			}
-
-			@Override
-			protected TestSite buildSite(Consumer<TestSite.Builder> config) {
-				return TestSite.build(si -> {
-					si.polygonIdentifier(polygonIdentifier.get());
-					si.layerType(layerType.get());
-					config.accept(si);
-				});
-			}
-		}
-	}
-
-	static class TestPolygon extends BaseVdypPolygon<TestLayer, Optional<Float>, TestSpecies, TestSite> {
-
-		public static TestPolygon build(Consumer<Builder> config) {
-			var builder = new Builder();
-			config.accept(builder);
-			return builder.build();
-		}
-
-		protected TestPolygon(
-				PolygonIdentifier polygonIdentifier, Optional<Float> percentAvailable, String fiz, String becIdentifier,
-				Optional<PolygonMode> mode
-		) {
-			super(polygonIdentifier, percentAvailable, fiz, becIdentifier, mode);
-		}
-
-		public static class Builder extends
-				BaseVdypPolygon.Builder<TestPolygon, TestLayer, Optional<Float>, TestSpecies, TestSite, TestLayer.Builder, TestSpecies.Builder, TestSite.Builder> {
-
-			@Override
-			protected TestLayer.Builder getLayerBuilder() {
-				var builder = new TestLayer.Builder();
-				return builder;
-			}
-
-			@Override
-			protected TestPolygon doBuild() {
-				return (new TestPolygon(
-						polygonIdentifier.get(), //
-						percentAvailable.flatMap(x -> x), //
-						forestInventoryZone.get(), //
-						biogeoclimaticZone.get(), //
-						mode //
-				));
-
-			}
-
-		}
-
-	};
-
-	static class TestStartApplication extends VdypStartApplication<TestPolygon, TestLayer, TestSpecies, TestSite> {
-
-		boolean realInit;
-
-		public TestStartApplication(Map<String, Object> controlMap, boolean realInit) {
-			this.setControlMap(controlMap);
-			this.realInit = realInit;
-		}
-
-		@Override
-		public void init(FileSystemFileResolver resolver, String... controlFilePaths)
-				throws IOException, ResourceParseException {
-			if (realInit) {
-				super.init(resolver, controlFilePaths);
-			}
-		}
-
-		@Override
-		public void init(FileSystemFileResolver resolver, Map<String, Object> controlMap) throws IOException {
-			if (realInit) {
-				super.init(resolver, controlMap);
-			}
-		}
-
-		@Override
-		protected NonFipControlParser getControlFileParser() {
-			return new NonFipControlParser() {
-
-				@Override
-				protected List<ControlMapValueReplacer<Object, String>> inputFileParsers() {
-					return List.of();
-				}
-
-				@Override
-				protected List<ControlKey> outputFileParsers() {
-					return List.of();
-				}
-
-				@Override
-				protected VdypApplicationIdentifier getProgramId() {
-					return VdypApplicationIdentifier.VRI_START;
-				}
-
-			};
-		}
-
-		@Override
-		public void process() throws ProcessingException {
-			// Do Nothing
-		}
-
-		@Override
-		public VdypApplicationIdentifier getId() {
-			return VdypApplicationIdentifier.VRI_START;
-		}
-
-		@Override
-		protected TestSpecies copySpecies(TestSpecies toCopy, Consumer config) {
-			return null;
-		}
-
-		@Override
-		protected Optional<TestSite> getPrimarySite(TestLayer layer) {
-			return Utils.optSafe(layer.getSites().values().iterator().next());
-		}
-
-		@Override
-		protected float getYieldFactor(TestPolygon polygon) {
-			// TODO Auto-generated method stub
-			return 1;
-		}
-
-	}
 
 	@Nested
 	class Init {

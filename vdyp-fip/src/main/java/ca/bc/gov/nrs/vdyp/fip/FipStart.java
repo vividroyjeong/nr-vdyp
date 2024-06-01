@@ -363,7 +363,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				// EMP053
 				vspec.getLoreyHeightByUtilization().setCoe(
 						UTIL_ALL,
-						estimateNonPrimaryLoreyHeight(vspec, vdypPrimarySpecies, bec, leadHeight, primaryHeight)
+						estimators.estimateNonPrimaryLoreyHeight(vspec, vdypPrimarySpecies, bec, leadHeight, primaryHeight)
 				);
 			}
 
@@ -766,35 +766,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				+ coe.getCoe(8) * loreyHeight / quadMeanDiameter;
 
 		return exp(logMeanVolume);
-	}
-
-	// EMP053 Using eqns N1 and N2 from ipsjf124.doc
-	/**
-	 * Estimate the lorey height of a non-primary species of a primary layer.
-	 *
-	 * @param vspec         The species.
-	 * @param vspecPrime    The primary species.
-	 * @param leadHeight    lead height of the layer
-	 * @param primaryHeight height of the primary species
-	 * @throws ProcessingException
-	 */
-	float estimateNonPrimaryLoreyHeight(
-			VdypSpecies vspec, VdypSpecies vspecPrime, BecDefinition bec, float leadHeight, float primaryHeight
-	) throws ProcessingException {
-		var coeMap = Utils.<MatrixMap3<String, String, Region, Optional<NonprimaryHLCoefficients>>>expectParsedControl(
-				controlMap, ControlKey.HL_NONPRIMARY, MatrixMap3.class
-		);
-
-		var coe = coeMap.get(vspec.getGenus(), vspecPrime.getGenus(), bec.getRegion()).orElseThrow(
-				() -> new ProcessingException(
-						String.format(
-								"Could not find Lorey Height Nonprimary Coefficients for %s %s %s", vspec.getGenus(),
-								vspecPrime.getGenus(), bec.getRegion()
-						)
-				)
-		);
-		var heightToUse = coe.getEquationIndex() == 1 ? leadHeight : primaryHeight;
-		return 1.3f + coe.getCoe(1) * pow(heightToUse - 1.3f, coe.getCoe(2));
 	}
 
 	VdypLayer processLayerAsVeteran(FipPolygon fipPolygon, FipLayer fipLayer) throws ProcessingException {
