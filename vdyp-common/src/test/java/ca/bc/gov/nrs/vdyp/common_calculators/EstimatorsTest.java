@@ -17,12 +17,12 @@ import ca.bc.gov.nrs.vdyp.test.TestUtils;
 public class EstimatorsTest {
 
 	Map<String, Object> controlMap;
-	Estimators estimators;
+	EMP estimators;
 
 	@BeforeEach
 	void setup() {
 		controlMap = TestUtils.loadControlMap();
-		estimators = new Estimators(controlMap);
+		estimators = new EMP(controlMap);
 	}
 
 	@Nested

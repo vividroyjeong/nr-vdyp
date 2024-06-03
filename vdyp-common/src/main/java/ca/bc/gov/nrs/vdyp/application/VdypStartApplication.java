@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
-import ca.bc.gov.nrs.vdyp.common_calculators.Estimators;
+import ca.bc.gov.nrs.vdyp.common_calculators.EMP;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -109,7 +109,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	protected Map<String, Object> controlMap = new HashMap<>();
 
-	protected Estimators estimators;
+	protected EMP emp;
 
 	static final Comparator<BaseVdypSpecies> PERCENT_GENUS_DESCENDING = Utils
 			.compareUsing(BaseVdypSpecies::getPercentGenus).reversed();
@@ -181,7 +181,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	protected void setControlMap(Map<String, Object> controlMap) {
 		this.controlMap = controlMap;
-		this.estimators = new Estimators(controlMap);
+		this.emp = new EMP(controlMap);
 	}
 
 	protected <T> StreamingParser<T> getStreamingParser(ControlKey key) throws ProcessingException {

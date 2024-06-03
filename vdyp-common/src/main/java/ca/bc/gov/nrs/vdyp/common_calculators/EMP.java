@@ -9,6 +9,7 @@ import java.util.Optional;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
@@ -20,11 +21,11 @@ import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 /**
  * EMP### functions from VDYP 7
  */
-public class Estimators {
+public class EMP {
 
 	Map<String, Object> controlMap;
 
-	public Estimators(Map<String, Object> controlMap) {
+	public EMP(Map<String, Object> controlMap) {
 		super();
 		this.controlMap = controlMap;
 	}
@@ -84,7 +85,7 @@ public class Estimators {
 		var coe = coeMap.get(genus, region);
 		return 1.3f + coe.getCoe(1) * pow(leadHeight - 1.3f, coe.getCoe(2));
 	}
-	
+
 	// EMP053 Using eqns N1 and N2 from ipsjf124.doc
 	/**
 	 * Estimate the lorey height of a non-primary species of a primary layer.
@@ -96,21 +97,50 @@ public class Estimators {
 	 * @throws ProcessingException
 	 */
 	public float estimateNonPrimaryLoreyHeight(
-			VdypSpecies vspec, VdypSpecies vspecPrime, BecDefinition bec, float leadHeight, float primaryHeight
+			BaseVdypSpecies vspec, BaseVdypSpecies vspecPrime, BecDefinition bec, float leadHeight, float primaryHeight
+	) throws ProcessingException {
+		return estimateNonPrimaryLoreyHeight(vspec.getGenus(), vspecPrime.getGenus(), bec, leadHeight, primaryHeight);
+	}
+
+	// EMP053 Using eqns N1 and N2 from ipsjf124.doc
+	/**
+	 * Estimate the lorey height of a non-primary species of a primary layer.
+	 *
+	 * @param vspec         The species.
+	 * @param vspecPrime    The primary species.
+	 * @param leadHeight    lead height of the layer
+	 * @param primaryHeight height of the primary species
+	 * @throws ProcessingException
+	 */
+	public float estimateNonPrimaryLoreyHeight(
+			String vspec, String vspecPrime, BecDefinition bec, float leadHeight, float primaryHeight
 	) throws ProcessingException {
 		var coeMap = Utils.<MatrixMap3<String, String, Region, Optional<NonprimaryHLCoefficients>>>expectParsedControl(
 				controlMap, ControlKey.HL_NONPRIMARY, MatrixMap3.class
 		);
 
-		var coe = coeMap.get(vspec.getGenus(), vspecPrime.getGenus(), bec.getRegion()).orElseThrow(
+		var coe = coeMap.get(vspec, vspecPrime, bec.getRegion()).orElseThrow(
 				() -> new ProcessingException(
 						String.format(
-								"Could not find Lorey Height Nonprimary Coefficients for %s %s %s", vspec.getGenus(),
-								vspecPrime.getGenus(), bec.getRegion()
+								"Could not find Lorey Height Nonprimary Coefficients for %s %s %s", vspec, vspecPrime,
+								bec.getRegion()
 						)
 				)
 		);
 		var heightToUse = coe.getEquationIndex() == 1 ? leadHeight : primaryHeight;
 		return 1.3f + coe.getCoe(1) * pow(heightToUse - 1.3f, coe.getCoe(2));
 	}
+	
+	public static record Limits (float maxLoreyHeight, float maxQuadMeanDiameter, float minDiameterHeight, float maxDiameterHeight) {};
+	
+	// EMP061
+	public Limits getLimitsForHeightAndDiameter(String genus, Region region) {
+		var coeMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
+				controlMap, ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, MatrixMap2.class
+		);
+
+		var coe = coeMap.get(genus, region);
+		return new Limits(coe.getCoe(1), coe.getCoe(2), coe.getCoe(3), coe.getCoe(4));
+	}
+
 }

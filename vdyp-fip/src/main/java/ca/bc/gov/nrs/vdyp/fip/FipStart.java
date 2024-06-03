@@ -341,14 +341,14 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			}
 			// Estimate lorey height for primary species
 			if (iPass == 1 && vdypSpecies.size() == 1) {
-				primaryHeight = estimators.primaryHeightFromLeadHeight(
+				primaryHeight = emp.primaryHeightFromLeadHeight(
 						leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion(), tphTotal
 				);
 			} else if (iPass == 1) {
-				primaryHeight = estimators
+				primaryHeight = emp
 						.primaryHeightFromLeadHeightInitial(leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion());
 			} else {
-				primaryHeight = estimators.primaryHeightFromLeadHeight(
+				primaryHeight = emp.primaryHeightFromLeadHeight(
 						leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion(),
 						vdypPrimarySpecies.getTreesPerHectareByUtilization().getCoe(UTIL_ALL)
 				);
@@ -363,7 +363,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				// EMP053
 				vspec.getLoreyHeightByUtilization().setCoe(
 						UTIL_ALL,
-						estimators.estimateNonPrimaryLoreyHeight(vspec, vdypPrimarySpecies, bec, leadHeight, primaryHeight)
+						emp.estimateNonPrimaryLoreyHeight(vspec, vdypPrimarySpecies, bec, leadHeight, primaryHeight)
 				);
 			}
 
@@ -417,7 +417,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			// Multiple Species
 			for (var spec : result.getSpecies().values()) {
 
-				Coefficients limitCoe = getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
+				Coefficients limitCoe = emp.getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
 
 				final float maxHeightMultiplier = fipLayer.getPrimaryGenus()
 						.orElseThrow(() -> new IllegalStateException("primaryGenus has not been set"))
@@ -467,7 +467,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				for (var spec : result.getSpecies().values()) {
 
 					// EMP061
-					Coefficients limitCoe = getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
+					Coefficients limitCoe = emp.getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
 
 					var dqMin = limitCoe.getCoe(3) * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL);
 					var dqMax = max(
@@ -704,7 +704,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			treesPerHectare1 = standTreesPerHectare - treesPerHectare2;
 			quadMeanDiameter1 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea1, treesPerHectare1);
 		}
-		var limitCoe = getLimitsForHeightAndDiameter(species, region);
+		var limitCoe = emp.getLimitsForHeightAndDiameter(species, region);
 
 		final var dqMinSp = max(minQuadMeanDiameter, limitCoe.getCoe(3) * loreyHeightSpec);
 		final var dqMaxSp = max(7.6f, min(limitCoe.getCoe(2), limitCoe.getCoe(4) * loreyHeightSpec));
@@ -739,14 +739,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		return quadMeanDiameter1;
 	}
 
-	// EMP061
-	private Coefficients getLimitsForHeightAndDiameter(String genus, Region region) {
-		var coeMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, MatrixMap2.class
-		);
-
-		return coeMap.get(genus, region);
-	}
 
 	// EMP090
 	private float estimateWholeStemVolumePerTree(int volumeGroup, float loreyHeight, float quadMeanDiameter) {

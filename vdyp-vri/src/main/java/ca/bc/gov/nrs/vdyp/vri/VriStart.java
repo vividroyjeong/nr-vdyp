@@ -397,23 +397,83 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		float primaryBaseArea = requirePositive(primaryLayer.getBaseArea(), "Primary layer base area");
 
 		// TPH_L1
-		float primaryTreesPerHectare = requirePositive(
-				primaryLayer.getTreesPerHectare(), "Primary layer trees per hectare"
+		var primaryLayerDensity = requirePositive(primaryLayer.getTreesPerHectare(), "Primary layer trees per hectare");
+
+		var primarySiteIn = require(primaryLayer.getPrimarySite(), "Primary site for primary layer");
+
+		var primarySpeciesPercent = require(primaryLayer.getPrimarySpeciesRecord(), "Primary species for primary layer")
+				.getFractionGenus();
+
+		// TPH_L1
+
+		// TPHsp
+		var primarySpeciesDensity = primarySpeciesPercent * primaryLayerDensity;
+
+		// HDL1 or HT_L1
+		var leadHeight = requirePositive(primarySiteIn.getHeight(), "Primary layer lead species height");
+
+		// HLPL1
+		var primaryHeight = emp.primaryHeightFromLeadHeight(
+				leadHeight, primarySiteIn.getSiteGenus(), bec.getRegion(), primarySpeciesDensity
 		);
+
+		// TODO store this in util class ALL
+		float layerQuadMeanDiameter = BaseAreaTreeDensityDiameter
+				.quadMeanDiameter(primaryBaseArea, primaryLayerDensity);
 
 		// TODO set TPH, BA, DQ for util class ALL
 
+		Map<String, Float> speciesBaseAreas = new HashMap<>();
+
 		lBuilder.adaptSpecies(primaryLayer, (sBuilder, vriSpec) -> {
-			//
+			float factor = primaryLayer.getSpecies().size() == 1 ? 1 : vriSpec.getFractionGenus();
+			speciesBaseAreas.put(vriSpec.getGenus(), factor * primaryBaseArea);
 		});
+
 		lBuilder.adaptSites(primaryLayer, (sBuilder, vriSite) -> {
-			// Nothing
+			var vriSpec = primaryLayer.getSpecies().get(vriSite.getSiteGenus());
+
+			if (vriSite != primarySiteIn) {
+				var NDEBUG2 = 0; // TODO
+
+				float loreyHeight = vriSite.getHeight().filter((x) -> NDEBUG2 == 1).map(height -> {
+					float speciesQuadMeanDiameter = Math.max(7.5f, height / leadHeight * layerQuadMeanDiameter);
+					float speciesDensity = BaseAreaTreeDensityDiameter
+							.treesPerHectare(primaryBaseArea, layerQuadMeanDiameter);
+					float speciesLoreyHeight = emp.primaryHeightFromLeadHeight(
+							vriSite.getHeight().get(), vriSite.getSiteGenus(), bec.getRegion(), speciesDensity
+					);
+
+					return 0f;
+				}).orElseGet(() -> {
+					try {
+						return emp.estimateNonPrimaryLoreyHeight(
+								vriSite.getSiteGenus(), primarySiteIn.getSiteGenus(), bec, leadHeight, primaryHeight
+						);
+					} catch (ProcessingException e) {
+						throw new RuntimeProcessingException(e);
+					}
+				});
+
+				float maxHeight = emp.getLimitsForHeightAndDiameter(vriSpec.getGenus(), bec.getRegion())
+						.maxLoreyHeight();
+				loreyHeight = Math.min(loreyHeight, maxHeight);
+				sBuilder.height(loreyHeight);
+			}
 		});
 
 		lBuilder.buildChildren();
 
 		var species = lBuilder.getSpecies();
 		var sites = lBuilder.getSites();
+		
+		// TODO save to util ALL
+		var layerLoreyHeight = sites.stream().map(BaseVdypSite::getHeight).mapToDouble(Optional::get).sum()/primaryBaseArea;
+
+		var primarySpeciesOut = species.stream().filter(s -> s.getGenus().equals(primaryLayer.getPrimaryGenus()))
+				.findAny().get();
+		var primarySiteOut = sites.stream().filter(s -> s.getSiteGenus().equals(primaryLayer.getPrimaryGenus()))
+				.findAny().get();
 
 		// Assign BA by species
 		if (species.size() == 1) {
@@ -425,59 +485,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		}
 
 		this.applyGroups(polygon, species);
-
-		var primarySiteIn = require(primaryLayer.getPrimarySite(), "Primary site for primary layer");
-
-		var primarySpeciesPercent = require(primaryLayer.getPrimarySpeciesRecord(), "Primary species for primary layer")
-				.getFractionGenus();
-
-		// TPH_L1
-		var primaryLayerDensity = requirePositive(primaryLayer.getTreesPerHectare(), "Primary layer trees per hectare");
-
-		// TPHsp
-		var primarySpeciesDensity = primarySpeciesPercent * primaryLayerDensity;
-
-		// HDL1
-		var leadHeight = requirePositive(primarySiteIn.getHeight(), "Primary layer lead species height");
-
-		// HLPL1
-		var primaryHeight = estimators.primaryHeightFromLeadHeight(
-				leadHeight, primarySiteIn.getSiteGenus(), bec.getRegion(), primarySpeciesDensity
-		);
-
-		var primarySpeciesOut = species.stream().filter(s->s.getGenus().equals(primaryLayer.getPrimaryGenus())).findAny().get();
-		var primarySiteOut = sites.stream().filter(s->s.getSiteGenus().equals(primaryLayer.getPrimaryGenus())).findAny().get();
-		
-		float loreyHeight = estimateLoreyHeightForVriPrimaryLayer(primaryLayer, bec, species, leadHeight, primaryHeight, primarySpeciesOut);
-	}
-
-	private float estimateLoreyHeightForVriPrimaryLayer(
-			VriLayer primaryLayer, BecDefinition bec, List<VdypSpecies> species, Float leadHeight, float primaryHeight,
-			VdypSpecies primarySpeciesOut
-	) throws ProcessingException {
-		try {
-			for(var spec : species) {
-				var site = primaryLayer.getSites().get(spec.getGenus());
-				
-				if(spec.getGenus().equals(primaryLayer.getPrimaryGenus())) {
-					continue;
-				}
-				
-				// TODO Treat as height not present if  NDEBUG 2 == 1 ||
-				site.getHeight().map(height->{
-					try {
-						return estimators.estimateNonPrimaryLoreyHeight(spec, primarySpeciesOut, bec, leadHeight, primaryHeight);
-					} catch (ProcessingException e) {
-						throw new RuntimeProcessingException(e);
-					}
-				}, ()->{
-					// TODO
-				});
-				
-			}
-		} catch (RuntimeProcessingException e) {
-			throw e.getCause();
-		}
 	}
 
 	private void processVeteranLayer(VriPolygon polygon, VdypLayer.Builder lBuilder) throws StandProcessingException {
