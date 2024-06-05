@@ -3,28 +3,16 @@ import sys
 import re
 import commons
 import argparse
+import util
 
-subroutine_declaration_re = re.compile(r'^\s+SUBROUTINE\s+([A-Z0-9_]+)\s*\(')
+subroutine_declaration_re = re.compile(r'^\s+SUBROUTINE\s+([A-Z][A-Z0-9_]*)\s*\(')
 end_subroutine_declaration_re = re.compile(r'^\s+END SUBROUTINE')
 token_re = re.compile(r'CALL\s+([A-Z][A-Z0-9_]*)')
 
 subroutines = {}
 
 
-def collect_symbols():
-    folders = ['C:/source/vdyp/VDYP_Master/Source']
-    source_files = []
-    while len(folders) > 0:
-        current_directory = folders.pop()
-        entities = os.scandir(current_directory)
-        for e in entities:
-            if e.is_dir():
-                folders.append(e)
-            elif e.is_file():
-                if e.name.endswith('.for'):
-                    source_files.append(e)
-
-    print('Saw ' + str(len(source_files)) + ' source files')
+def collect_symbols(source_files):
 
     for s in source_files:
         commons_details = commons.gather_commons_details(s)
@@ -36,7 +24,14 @@ def collect_symbols():
             m = re.search(subroutine_declaration_re, line)
             if m is not None:
                 routine_name = m.group(1)
-                subroutines[m.group(1)] = (s, False, commons.gather_commons_usages(s, commons_details, routine_name))
+                subroutines[routine_name] = {
+                    "name": routine_name,
+                    "file": s,
+                    "has_been_traversed": False,
+                    "commons_usages": commons.gather_commons_usages(s, commons_details, routine_name),
+                    "callees": set()
+                }
+
         sf.close()
 
 
@@ -46,16 +41,17 @@ def generate_call_tree(routines_to_scan):
 
     routine_name = routines_to_scan.pop()
 
-    if subroutines[routine_name][1]:
+    if subroutines[routine_name]["has_been_traversed"]:
         # already scanned
         return
 
-    subroutines[routine_name] = (subroutines[routine_name][0], True, subroutines[routine_name][2], set())
-
     subroutine = subroutines[routine_name]
-    file = subroutine[0]
 
+    subroutine["has_been_traversed"] = True
+
+    file = subroutine["file"]
     sf = open(file)
+
     in_routine = False
     for line in sf.readlines():
         line = line.upper()
@@ -74,18 +70,44 @@ def generate_call_tree(routines_to_scan):
                 while m is not None:
                     token = m.group(1)
                     if token in subroutines:
-                        subroutine[3].add(token)
-                        if not subroutines[token][1]:
+                        subroutine["callees"].add(token)
+                        if not subroutines[token]["has_been_traversed"]:
                             routines_to_scan.append(token)
                     line = line[m.end():]
                     m = re.search(token_re, line)
 
 
-ignored_commons = {'UNITS', 'UNITS3', 'UNITS4'}
+ignored_commons = {'UNITS', 'UNITS3', 'UNITS4', 'LIBCOMMON'}
 
 
-def print_call_tree(name, details, blocks_only, assignments_only, indent):
-    commons_usages = details[2]
+def uses_only_ignored_commons(commons_usages, args):
+    for a in commons_usages["block_assignments"]:
+        if a not in ignored_commons:
+            return False
+    if not args.assignments_only:
+        for u in commons_usages["block_usages"]:
+            if u not in ignored_commons:
+                return False
+
+    return True
+
+
+def has_commons_usages(subroutine, args):
+    for callee in subroutine["callees"]:
+        if has_commons_usages(subroutines[callee], args):
+            return True
+    commons_usages = subroutine["commons_usages"]
+    if uses_only_ignored_commons(commons_usages, args):
+        return False
+    return True
+
+
+def print_call_tree(subroutine, args, indent):
+    name = subroutine["name"]
+    commons_usages = subroutine["commons_usages"]
+
+    if args.exclude_no_commons_usages and not has_commons_usages(subroutine, args):
+        return
 
     assignments = ""
     assignments_per_block = {}
@@ -98,7 +120,7 @@ def print_call_tree(name, details, blocks_only, assignments_only, indent):
             assignments_per_block[c].append(m[len(c) + 1:])
     for c in assignments_per_block.keys():
         assignments += c + '('
-        if not blocks_only:
+        if not args.blocks_only:
             for m in assignments_per_block[c]:
                 assignments += m + ', '
             assignments = assignments[0:len(assignments) - 2]
@@ -106,7 +128,7 @@ def print_call_tree(name, details, blocks_only, assignments_only, indent):
     assignments = ' assignments: ' + assignments[0:len(assignments) - 2] if len(assignments) > 0 else assignments
 
     usages = ""
-    if not assignments_only:
+    if not args.assignments_only:
         usages_per_block = {}
         for c in commons_usages["block_usages"]:
             if c not in ignored_commons:
@@ -117,7 +139,7 @@ def print_call_tree(name, details, blocks_only, assignments_only, indent):
                 usages_per_block[c].append(m[len(c) + 1:])
         for c in usages_per_block.keys():
             usages += c + '('
-            if not blocks_only:
+            if not args.blocks_only:
                 for m in usages_per_block[c]:
                     usages += m + ', '
                 usages = usages[0:len(usages) - 2]
@@ -125,15 +147,16 @@ def print_call_tree(name, details, blocks_only, assignments_only, indent):
         usages = ' usages: ' + usages[0:len(usages) - 2] if len(usages) > 0 else usages
 
     print((' ' * indent if indent > 0 else '') + name + assignments + usages)
-    for callee in details[3]:
-        print_call_tree(callee, subroutines[callee], blocks_only, assignments_only, indent + 4)
+    for callee in subroutine["callees"]:
+        print_call_tree(subroutines[callee], args, indent + 4)
 
 
-def call_tree(routine_name, blocks_only, assignments_only):
+def call_tree(routine_name, args):
 
     routine_name = routine_name.upper()
 
-    collect_symbols()
+    source_files = util.collect_source_files()
+    collect_symbols(source_files)
 
     if routine_name not in subroutines:
         print('Subroutine "' + routine_name + '" not found in the source code')
@@ -146,7 +169,7 @@ def call_tree(routine_name, blocks_only, assignments_only):
     while len(routines_to_scan) > 0:
         generate_call_tree(routines_to_scan)
 
-    print_call_tree(routine_name, subroutines[routine_name], blocks_only, assignments_only, 0)
+    print_call_tree(subroutines[routine_name], args, 0)
 
 
 if __name__ == '__main__':
@@ -155,8 +178,10 @@ if __name__ == '__main__':
                                      ' and, for each method, common block usage')
     parser.add_argument('-b', '--blocks-only', action='store_true', help='display block level information only')
     parser.add_argument('-a', '--assignments-only', action='store_true', help='display assignment information only')
+    parser.add_argument('-x', '--exclude-no-commons-usages', action='store_true'
+                        , help="exclude from call tree subroutines whose call tree doesn't use commons")
     parser.add_argument('subroutine_name', nargs=1)
 
-    args = parser.parse_args(sys.argv[1:])
+    params = parser.parse_args(sys.argv[1:])
 
-    call_tree(args.subroutine_name[0], args.blocks_only, args.assignments_only)
+    call_tree(params.subroutine_name[0], params)

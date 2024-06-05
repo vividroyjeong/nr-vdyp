@@ -3,10 +3,10 @@ import sys
 import re
 
 keywords = ['INTEGER', 'REAL', 'CHARACTER', 'LOGICAL', 'DIMENSION']
-common_re = re.compile(r'^\s*COMMON.*/\s*([A-Z_0-9]+)\s*/(.*)')
+common_re = re.compile(r'^\s*COMMON.*/\s*([A-Z][A-Z0-9_]*)\s*/(.*)')
 keyword_re = re.compile(r"^\s*([A-Z]+)(\*[0-9]+|\s)")
-member_name_re = re.compile(r'(^\s*[A-Z_0-9]+)(\([^)]+\))?\s*(,|$)')
-subroutine_declaration_re = re.compile(r'^\s+SUBROUTINE\s+([A-Z0-9_]+)\s*\(')
+member_name_re = re.compile(r'(^\s*[A-Z][A-Z0-9_]*)(\([^)]+\))?\s*(,|$)')
+subroutine_declaration_re = re.compile(r'^\s+SUBROUTINE\s+([A-Z][A-Z0-9_]*)\s*\(')
 end_subroutine_declaration_re = re.compile(r'^\s+END SUBROUTINE')
 token_re = re.compile(r'([A-Z][A-Z0-9_]*)')
 

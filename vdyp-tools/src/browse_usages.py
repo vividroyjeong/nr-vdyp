@@ -1,30 +1,21 @@
 import os
 import sys
 import re
+import util
+
+keywords = ['INTEGER', 'REAL', 'CHARACTER', 'LOGICAL', 'DIMENSION']
+
 
 def browse_usages(block_name, member_name):
 
-    print('Operating on block ' + block_name + ' and member ' + member_name)
+    print('searching for usages of block ' + block_name + ' and member ' + member_name)
 
-    folders = ['C:/source/vdyp/VDYP_Master/Source']
-    source_files = []
-    while len(folders) > 0:
-        current_directory = folders.pop()
-        entities = os.scandir(current_directory)
-        for e in entities:
-            if e.is_dir():
-                folders.append(e)
-            elif e.is_file():
-                if e.name.endswith('.for'):
-                    source_files.append(e)
+    source_files = util.collect_source_files()
 
-    print('Saw ' + str(len(source_files)) + ' source files')
-
-    keywords = ['INTEGER', 'REAL', 'CHARACTER', 'LOGICAL', 'DIMENSION']
     common_re = re.compile(r'^\s+COMMON.*/\s*' + block_name + r'\s*/')
     keyword_re = re.compile(r'^\s+([A-Z]+)(\*[0-9]+|\s)')
-    assignment_re = re.compile(r'[^A-Z0-9_]' + member_name + r'([^A-Z0-9_].*=|=)')
-    usage_re = re.compile(r'[^A-Z0-9_]' + member_name + r'[^A-Z0-9_]')
+    assignment_re = re.compile(r'[^A-Z0-9_]' + member_name.upper() + r'([^A-Z0-9_].*=|=)')
+    usage_re = re.compile(r'[^A-Z0-9_]' + member_name.upper() + r'[^A-Z0-9_]')
 
     for s in source_files:
         sf = open(s)
@@ -66,7 +57,4 @@ if __name__ == '__main__':
         print('usage: browse_usages <common block name> <member name>')
         sys.exit(0)
 
-    block_name = sys.argv[1]
-    member_name = sys.argv[2]
-
-    browse_usages(block_name, member_name)
+    browse_usages(sys.argv[1], sys.argv[2])
