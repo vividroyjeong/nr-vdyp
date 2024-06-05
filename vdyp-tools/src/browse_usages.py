@@ -2,7 +2,7 @@ import os
 import sys
 import re
 
-def browse(block_name, member_name):
+def browse_usages(block_name, member_name):
 
     print('Operating on block ' + block_name + ' and member ' + member_name)
 
@@ -21,10 +21,10 @@ def browse(block_name, member_name):
     print('Saw ' + str(len(source_files)) + ' source files')
 
     keywords = ['INTEGER', 'REAL', 'CHARACTER', 'LOGICAL', 'DIMENSION']
-    common_re = re.compile(r'^ *+COMMON.*/\s*' + block_name + r'\s*/', re.IGNORECASE)
-    keyword_re = re.compile(r'^ *+([A-Za-z]+)(\*[0-9]|' ')', re.IGNORECASE)
-    assignment_re = re.compile(r'[^A-Z0-9_]' + member_name + r'([^A-Z0-9_].*=|=)', re.IGNORECASE)
-    usage_re = re.compile(r'[^A-Z0-9_]' + member_name + r'[^A-Z0-9_]', re.IGNORECASE)
+    common_re = re.compile(r'^\s+COMMON.*/\s*' + block_name + r'\s*/')
+    keyword_re = re.compile(r'^\s+([A-Z]+)(\*[0-9]+|\s)')
+    assignment_re = re.compile(r'[^A-Z0-9_]' + member_name + r'([^A-Z0-9_].*=|=)')
+    usage_re = re.compile(r'[^A-Z0-9_]' + member_name + r'[^A-Z0-9_]')
 
     for s in source_files:
         sf = open(s)
@@ -32,17 +32,18 @@ def browse(block_name, member_name):
         usages = []
         assignments = []
         for line in sf.readlines():
-            if line[0].upper() == 'C':
+            line = line.upper()
+            if line[0] == 'C' or line[0] == '#':
                 continue
             if common_re.search(line):
                 block_declarations.append(line)
             else:
                 m = re.search(keyword_re, line)
-                if m is not None and m.group(1).upper() in keywords:
+                if m is not None and m.group(1) in keywords:
                     pass
                 elif assignment_re.search(line):
                     assignments.append(line)
-                elif line.strip().upper().startswith('&'):
+                elif line.strip().startswith('&'):
                     pass
                 elif usage_re.search(line):
                     usages.append(line)
@@ -58,9 +59,14 @@ def browse(block_name, member_name):
 
         sf.close()
 
+
 if __name__ == '__main__':
+
+    if len(sys.argv) != 3:
+        print('usage: browse_usages <common block name> <member name>')
+        sys.exit(0)
 
     block_name = sys.argv[1]
     member_name = sys.argv[2]
 
-    browse(block_name, member_name)
+    browse_usages(block_name, member_name)

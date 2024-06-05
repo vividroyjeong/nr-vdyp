@@ -66,15 +66,18 @@ import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
-import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
+import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
@@ -1006,10 +1009,13 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			var adjustDecayWasteUtil = Utils.utilizationVector(); // ADJVDW
 
 			// EMP071
-			EstimationMethods.estimateQuadMeanDiameterByUtilization(controlMap, bec, quadMeanDiameterUtil, spec.getGenus());
+			EstimationMethods
+					.estimateQuadMeanDiameterByUtilization(controlMap, bec, quadMeanDiameterUtil, spec.getGenus());
 
 			// EMP070
-			EstimationMethods.estimateBaseAreaByUtilization(controlMap, bec, quadMeanDiameterUtil, baseAreaUtil, spec.getGenus());
+			EstimationMethods.estimateBaseAreaByUtilization(
+					controlMap, bec, quadMeanDiameterUtil, baseAreaUtil, spec.getGenus()
+			);
 
 			// Calculate tree density components
 			for (var uc : UtilizationClass.UTIL_CLASSES) {
@@ -1079,10 +1085,10 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 				// EMP094
 				EstimationMethods.estimateNetDecayAndWasteVolume(
-						controlMap, bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec.getGenus(), loreyHeightSpec, 
-										vdypLayer.getBreastHeightAge().orElse(
-												0f
-										), quadMeanDiameterUtil, closeVolumeUtil, closeVolumeNetDecayUtil, closeVolumeNetDecayWasteUtil
+						controlMap, bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec
+								.getGenus(), loreyHeightSpec, vdypLayer.getBreastHeightAge().orElse(
+										0f
+								), quadMeanDiameterUtil, closeVolumeUtil, closeVolumeNetDecayUtil, closeVolumeNetDecayWasteUtil
 				);
 
 				if (getId().isStart()) {
@@ -1717,13 +1723,15 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 	 *
 	 * @throws ProcessingException
 	 */
-	public void estimateSmallComponents(FipPolygon fPoly, VdypLayer layer) throws ProcessingException {
+	public <L extends BaseVdypLayer<SP, SI>, SP extends BaseVdypSpecies, SI extends BaseVdypSite> void
+			estimateSmallComponents(BaseVdypPolygon<L, Optional<Float>, SP, SI> polygon, VdypLayer layer)
+					throws ProcessingException {
 		float loreyHeightSum = 0f;
 		float baseAreaSum = 0f;
 		float treesPerHectareSum = 0f;
 		float volumeSum = 0f;
 
-		Region region = Utils.getBec(fPoly.getBiogeoclimaticZone(), controlMap).getRegion();
+		Region region = Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap).getRegion();
 
 		for (VdypSpecies spec : layer.getSpecies().values()) {
 			@SuppressWarnings("unused")
@@ -1736,7 +1744,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			float smallComponentProbability = smallComponentProbability(layer, spec, region); // PROBsp
 
 			// this WHOLE operation on Actual BA's, not 100% occupancy.
-			float fractionAvailable = fPoly.getPercentAvailable().map(p -> p / 100f).orElse(1f);
+			float fractionAvailable = polygon.getPercentAvailable().map(p -> p / 100f).orElse(1f);
 			baseAreaSpec *= fractionAvailable;
 			// EMP081
 			float conditionalExpectedBaseArea = conditionalExpectedBaseArea(spec, baseAreaSpec, region); // BACONDsp

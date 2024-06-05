@@ -1,7 +1,10 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.clamp;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.exp;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.log;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.pow;
+import static java.lang.Math.max;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -17,16 +20,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.EstimationMethods;
 import ca.bc.gov.nrs.vdyp.common.ReconcilationMethods;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.SpeciesErrorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
+import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
+import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonLayer;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.CommonData;
@@ -39,6 +46,8 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3Impl;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.VdypLayer;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.VolumeVariable;
 import ca.bc.gov.nrs.vdyp.si32.site.SiteTool;
 
@@ -146,7 +155,7 @@ public class ForwardProcessingEngine {
 			determinePolygonRankings(pps, CommonData.PRIMARY_SPECIES_TO_COMBINE);
 		}
 
-		// SITEADD
+		// SITEADD (TODO: SITEADDU when NDEBUG 11 > 0)
 		if (lastStep.ordinal() >= ExecutionStep.EstimateMissingSiteIndices.ordinal()) {
 			estimateMissingSiteIndices(pps);
 		}
@@ -351,14 +360,181 @@ public class ForwardProcessingEngine {
 				}
 				cvQuadraticMeanDiameter[s].put(uc, LayerType.PRIMARY, cvValue);
 			}
-			
+
 			// Small components
-			
 
 			cvSmall[s] = new HashMap<Integer, Integer>();
 		}
 
 		pps.setCompatibilityVariableDetails(cvVolume, cvBasalArea, cvQuadraticMeanDiameter, cvSmall);
+	}
+
+	// YSMALL
+	/**
+	 * Estimate small components for primary layer
+	 *
+	 * @throws ProcessingException
+	 */
+	private void estimateSmallComponents(VdypPolygon polygon, VdypPolygonLayer layer)
+					throws ProcessingException {
+		float loreyHeightSum = 0f;
+		float baseAreaSum = 0f;
+		float treesPerHectareSum = 0f;
+		float volumeSum = 0f;
+
+		Region region = polygon.getBiogeoclimaticZone().getRegion();
+
+		for (VdypLayerSpecies spec : layer.getGenera().values()) {
+			@SuppressWarnings("unused")
+			float loreyHeightSpec = spec.getLoreyHeightByUtilization().getCoe(UTILIZATION_ALL_INDEX); // HLsp
+			float baseAreaSpec = spec.getBaseAreaByUtilization().getCoe(UTILIZATION_ALL_INDEX); // BAsp
+			@SuppressWarnings("unused")
+			float quadMeanDiameterSpec = spec.getQuadraticMeanDiameterByUtilization().getCoe(UTILIZATION_ALL_INDEX); // DQsp
+
+			// EMP080
+			float smallComponentProbability = smallComponentProbability(layer, spec, region); // PROBsp
+
+			// this WHOLE operation on Actual BA's, not 100% occupancy.
+			float fractionAvailable = polygon.getPercentAvailable().map(p -> p / 100f).orElse(1f);
+			baseAreaSpec *= fractionAvailable;
+			// EMP081
+			float conditionalExpectedBaseArea = conditionalExpectedBaseArea(spec, baseAreaSpec, region); // BACONDsp
+			conditionalExpectedBaseArea /= fractionAvailable;
+
+			float baseAreaSpecSmall = smallComponentProbability * conditionalExpectedBaseArea;
+
+			// EMP082
+			float quadMeanDiameterSpecSmall = smallComponentQuadMeanDiameter(spec); // DQSMsp
+
+			// EMP085
+			float loreyHeightSpecSmall = smallComponentLoreyHeight(spec, quadMeanDiameterSpecSmall); // HLSMsp
+
+			// EMP086
+			float meanVolumeSmall = meanVolumeSmall(spec, quadMeanDiameterSpecSmall, loreyHeightSpecSmall); // VMEANSMs
+
+			// TODO Apply Compatibility Variables, not needed for FIPSTART
+
+			spec.getLoreyHeightByUtilization().setCoe(UTIL_SMALL, loreyHeightSpecSmall);
+			float treesPerHectareSpecSmall = BaseAreaTreeDensityDiameter
+					.treesPerHectare(baseAreaSpecSmall, quadMeanDiameterSpecSmall); // TPHSMsp
+			spec.getBaseAreaByUtilization().setCoe(UTIL_SMALL, baseAreaSpecSmall);
+			spec.getTreesPerHectareByUtilization().setCoe(UTIL_SMALL, treesPerHectareSpecSmall);
+			spec.getQuadraticMeanDiameterByUtilization().setCoe(UTIL_SMALL, quadMeanDiameterSpecSmall);
+			float wholeStemVolumeSpecSmall = treesPerHectareSpecSmall * meanVolumeSmall; // VOLWS(I,-1)
+			spec.getWholeStemVolumeByUtilization().setCoe(UTIL_SMALL, wholeStemVolumeSpecSmall);
+
+			loreyHeightSum += baseAreaSpecSmall * loreyHeightSpecSmall;
+			baseAreaSum += baseAreaSpecSmall;
+			treesPerHectareSum += treesPerHectareSpecSmall;
+			volumeSum += wholeStemVolumeSpecSmall;
+		}
+
+		if (baseAreaSum > 0f) {
+			layer.getLoreyHeightByUtilization().setCoe(UTIL_SMALL, loreyHeightSum / baseAreaSum);
+		} else {
+			layer.getLoreyHeightByUtilization().setCoe(UTIL_SMALL, 0f);
+		}
+		layer.getBaseAreaByUtilization().setCoe(UTIL_SMALL, baseAreaSum);
+		layer.getTreesPerHectareByUtilization().setCoe(UTIL_SMALL, treesPerHectareSum);
+		layer.getQuadraticMeanDiameterByUtilization()
+				.setCoe(UTIL_SMALL, BaseAreaTreeDensityDiameter.quadMeanDiameter(baseAreaSum, treesPerHectareSum));
+		layer.getWholeStemVolumeByUtilization().setCoe(UTIL_SMALL, volumeSum);
+	}
+
+	// EMP086
+	private float meanVolumeSmall(VdypLayerSpecies spec, float quadMeanDiameterSpecSmall, float loreyHeightSpecSmall) {
+		Coefficients coe = getCoeForSpecies(spec, ControlKey.SMALL_COMP_WS_VOLUME);
+
+		// EQN 1 in IPSJF119.doc
+
+		float a0 = coe.getCoe(1);
+		float a1 = coe.getCoe(2);
+		float a2 = coe.getCoe(3);
+		float a3 = coe.getCoe(4);
+
+		return exp(
+				a0 + a1 * log(quadMeanDiameterSpecSmall) + a2 * log(loreyHeightSpecSmall)
+						+ a3 * quadMeanDiameterSpecSmall
+		);
+	}
+
+	// EMP085
+	private float smallComponentLoreyHeight(VdypLayerSpecies spec, float quadMeanDiameterSpecSmall) {
+		Coefficients coe = getCoeForSpecies(spec, ControlKey.SMALL_COMP_HL);
+
+		// EQN 1 in IPSJF119.doc
+
+		float a0 = coe.getCoe(1);
+		float a1 = coe.getCoe(2);
+
+		return 1.3f + (spec.getLoreyHeightByUtilization().getCoe(VdypLayerSpecies) - 1.3f) * exp(
+				a0 * (pow(quadMeanDiameterSpecSmall, a1)
+						- pow(spec.getQuadraticMeanDiameterByUtilization().getCoe(UTILIZATION_ALL_INDEX), a1))
+		);
+	}
+
+	// EMP082
+	private float smallComponentQuadMeanDiameter(VdypLayerSpecies spec) {
+		Coefficients coe = getCoeForSpecies(spec, ControlKey.SMALL_COMP_DQ);
+
+		// EQN 5 in IPSJF118.doc
+
+		float a0 = coe.getCoe(1);
+		float a1 = coe.getCoe(2);
+
+		float logit = //
+				a0 + a1 * spec.getLoreyHeightByUtilization().getCoe(UTILIZATION_ALL_INDEX);
+
+		return 4.0f + 3.5f * exp(logit) / (1.0f + exp(logit));
+	}
+
+	// EMP081
+	private float conditionalExpectedBaseArea(VdypLayerSpecies spec, float baseAreaSpec, Region region) {
+		Coefficients coe = getCoeForSpecies(spec, ControlKey.SMALL_COMP_BA);
+
+		// EQN 3 in IPSJF118.doc
+
+		float a0 = coe.getCoe(1);
+		float a1 = coe.getCoe(2);
+		float a2 = coe.getCoe(3);
+		float a3 = coe.getCoe(4);
+
+		float coast = region == Region.COASTAL ? 1.0f : 0.0f;
+
+		// FIXME due to a bug in VDYP7 it always treats this as interior. Replicating
+		// that for now.
+		coast = 0f;
+
+		float arg = //
+				(a0 + //
+						a1 * coast + //
+						a2 * spec.getBaseAreaByUtilization().getCoe(UTILIZATION_ALL_INDEX)//
+				) * exp(a3 * spec.getLoreyHeightByUtilization().getCoe(UTILIZATION_ALL_INDEX));
+		arg = max(arg, 0f);
+
+		return arg;
+	}
+
+	// EMP080
+	private float smallComponentProbability(VdypPolygonLayer layer, VdypLayerSpecies spec, Region region) {
+		Coefficients coe = getCoeForSpecies(spec, ControlKey.SMALL_COMP_PROBABILITY);
+
+		// EQN 1 in IPSJF118.doc
+
+		float a0 = coe.getCoe(1);
+		float a1 = coe.getCoe(2);
+		float a2 = coe.getCoe(3);
+		float a3 = coe.getCoe(4);
+
+		float coast = region == Region.COASTAL ? 1.0f : 0.0f;
+
+		float logit = //
+				a0 + //
+						a1 * coast + //
+						a2 * layer.getBreastHeightAge().orElse(0f) + //
+						a3 * spec.getLoreyHeightByUtilization().getCoe(UTILIZATION_ALL_INDEX);
+
+		return exp(logit) / (1.0f + exp(logit));
 	}
 
 	private static float treesPerHectare(float basalArea, float qmd) {
@@ -721,6 +897,9 @@ public class ForwardProcessingEngine {
 	 * Calculate the siteCurve number of all species for which one was not supplied. All calculations
 	 * are done in the given bank, but the resulting site curve vector is stored in the given 
 	 * PolygonProcessingState.
+	 * 
+	 * FORTRAN notes: the original SXINXSET function set both INXSC/INXSCV and BANK3/SCNB, except for 
+	 * index 0 of SCNB.
 	 *
 	 * @param bank         the bank in which the calculations are done.
 	 * @param siteCurveMap the Site Curve definitions.

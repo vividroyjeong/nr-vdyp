@@ -31,18 +31,18 @@ class PolygonProcessingState {
 	// when copied to "active" in ForwardProcessingEngine.
 	Bank wallet;
 
-	// L1COM3 - just shadows of fields of L1COM5
-	//     AGETOTL1 = wallet.ageTotals[primarySpeciesIndex]
-	//     AGEBHL1 = wallet.yearsAtBreastHeight[primarySpeciesIndex]
-	//     YTBHL1 = wallet.yearsToBreastHeight[primarySpeciesIndex]
-	//     HDL1 = wallet.dominantHeights[primarySpeciesIndex]
-
 	// L1COM2 - equation groups. From the configuration, narrowed to the 
 	// polygon's BEC zone.
 
 	int[] volumeEquationGroups;
 	int[] decayEquationGroups;
 	int[] breakageEquationGroups;
+
+	// L1COM3 - just shadows of fields of L1COM5
+	//     AGETOTL1 = wallet.ageTotals[primarySpeciesIndex]
+	//     AGEBHL1 = wallet.yearsAtBreastHeight[primarySpeciesIndex]
+	//     YTBHL1 = wallet.yearsToBreastHeight[primarySpeciesIndex]
+	//     HDL1 = wallet.dominantHeights[primarySpeciesIndex]
 
 	// Cached values from the controlMap
 
