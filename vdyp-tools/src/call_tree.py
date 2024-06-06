@@ -125,7 +125,7 @@ def print_call_tree(subroutine, args, indent):
                 assignments += m + ', '
             assignments = assignments[0:len(assignments) - 2]
         assignments += '), '
-    assignments = ' assignments: ' + assignments[0:len(assignments) - 2] if len(assignments) > 0 else assignments
+    assignments = ' assignments: ' + assignments[0:len(assignments) - 2] if len(assignments) > 0 else ''
 
     usages = ""
     if not args.assignments_only:
@@ -144,9 +144,17 @@ def print_call_tree(subroutine, args, indent):
                     usages += m + ', '
                 usages = usages[0:len(usages) - 2]
             usages += '), '
-        usages = ' usages: ' + usages[0:len(usages) - 2] if len(usages) > 0 else usages
+        usages = ' usages: ' + usages[0:len(usages) - 2] if len(usages) > 0 else ''
 
-    print((' ' * indent if indent > 0 else '') + name + assignments + usages)
+    if len(assignments) > 60 or len(usages) > 60 or len(assignments + usages) > 90:
+        print((' ' * indent if indent > 0 else '') + name)
+        if len(assignments) > 0:
+            print((' ' * (indent + 7)) + assignments)
+        if len(usages) > 0:
+            print((' ' * (indent + 7)) + usages)
+    else:
+        print((' ' * indent if indent > 0 else '') + name + assignments + usages)
+
     for callee in subroutine["callees"]:
         print_call_tree(subroutines[callee], args, indent + 4)
 

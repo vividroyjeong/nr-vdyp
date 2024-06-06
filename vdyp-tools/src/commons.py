@@ -2,9 +2,9 @@ import os
 import sys
 import re
 
-keywords = ['INTEGER', 'REAL', 'CHARACTER', 'LOGICAL', 'DIMENSION']
+declaration_keywords = ['INTEGER', 'REAL', 'CHARACTER', 'LOGICAL', 'DIMENSION']
 common_re = re.compile(r'^\s*COMMON.*/\s*([A-Z][A-Z0-9_]*)\s*/(.*)')
-keyword_re = re.compile(r"^\s*([A-Z]+)(\*[0-9]+|\s)")
+declaration_re = re.compile(r"^\s*([A-Z]+)(\*[0-9]+|\s)")
 member_name_re = re.compile(r'(^\s*[A-Z][A-Z0-9_]*)(\([^)]+\))?\s*(,|$)')
 subroutine_declaration_re = re.compile(r'^\s+SUBROUTINE\s+([A-Z][A-Z0-9_]*)\s*\(')
 end_subroutine_declaration_re = re.compile(r'^\s+END SUBROUTINE')
@@ -84,35 +84,55 @@ def gather_commons_usages(file_name, commons_details, routine_name):
     }
 
     in_routine = routine_name is None
-    for member in commons_details["block_members"]:
-        assignment_re = re.compile(r'[^A-Z0-9_](' + member + ')([^A-Z0-9_][^=]*=|=)')
-        usage_re = re.compile(r'[^A-Z0-9_](' + member + ')[^A-Z0-9_]')
+    in_commons_declaration = False
 
-        sf = open(file_name)
-        for line in sf.readlines():
-            line = line.upper()
-            lstripped_line = line.lstrip()
-            if len(lstripped_line) == 0 or line[0] == 'C' or line[0] == '#':
-                continue
+    sf = open(file_name)
+    for line in sf.readlines():
+        line = line.upper()
+        lstripped_line = line.lstrip()
+        if len(lstripped_line) == 0 or line[0] == 'C' or line[0] == '#':
+            continue
 
-            if not in_routine:
-                m = re.search(subroutine_declaration_re, line)
-                if m is not None and m.group(1) == routine_name:
-                    in_routine = True
+        if not in_routine:
+            m = re.search(subroutine_declaration_re, line)
+            if m is not None and m.group(1) == routine_name:
+                in_routine = True
+        else:
             if in_routine and routine_name is not None:
                 m = re.search(end_subroutine_declaration_re, line)
                 if m is not None:
-                    in_routine = False
-
-            if in_routine and line.find('CALL DBG') == -1:
-                if assignment_re.search(line) is not None:
-                    block_assignments.add(commons_details["member_block"][member])
-                    member_assignments.add(commons_details["member_block"][member] + '.' + member)
-                elif usage_re.search(line) is not None:
-                    block_usages.add(commons_details["member_block"][member])
-                    member_usages.add(commons_details["member_block"][member] + '.' + member)
-                if member in member_usages and member in member_assignments:
                     break
+
+            if common_re.search(line) is not None:
+                in_commons_declaration = True
+            elif in_commons_declaration and lstripped_line.startswith('&'):
+                continue
+            else:
+                m = re.search(declaration_re, line)
+                if m is not None and m.group(1) in declaration_keywords:
+                    continue
+
+                if line.find('CALL DBG') >= 0:
+                    continue
+
+                    # we're in the routine (if one is specified) and this is not a comment line
+                # or a commons block declaration. Tokenize the line and look for assignments
+                # and usages. Also, ignore usages during calls to DBG subroutines.
+                assignment_seen_this_line = False
+
+                m = re.search(token_re, line)
+                while m is not None:
+                    token = m.group(1)
+                    line = line[m.end():]
+                    if token in commons_details["member_block"]:
+                        if not assignment_seen_this_line and line.find('=') >= 0:
+                            block_assignments.add(commons_details["member_block"][token])
+                            member_assignments.add(commons_details["member_block"][token] + '.' + token)
+                            assignment_seen_this_line = True
+                        else:
+                            block_usages.add(commons_details["member_block"][token])
+                            member_usages.add(commons_details["member_block"][token] + '.' + token)
+                    m = re.search(token_re, line)
         sf.close()
 
     return commons_usages
