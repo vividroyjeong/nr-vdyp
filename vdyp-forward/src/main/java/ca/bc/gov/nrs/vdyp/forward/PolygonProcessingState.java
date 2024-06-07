@@ -13,7 +13,6 @@ import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypGrowthDetails;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonLayer;
-import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
@@ -29,6 +28,9 @@ class PolygonProcessingState {
 	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(PolygonProcessingState.class);
 
+	/** The containing ForwardProcessingState */
+	private final ForwardProcessingState fps;
+	
 	/** Polygon on which the processor is operating */
 	private final VdypPolygon polygon;
 
@@ -48,22 +50,6 @@ class PolygonProcessingState {
 	//     AGEBHL1 = wallet.yearsAtBreastHeight[primarySpeciesIndex]
 	//     YTBHL1 = wallet.yearsToBreastHeight[primarySpeciesIndex]
 	//     HDL1 = wallet.dominantHeights[primarySpeciesIndex]
-
-	// Cached values from the controlMap
-
-	private VdypGrowthDetails vdypGrowthDetails;
-	private Map<String, Coefficients> netDecayWasteCoeMap;
-	private MatrixMap2<Integer, Integer, Optional<Coefficients>> netDecayCoeMap;
-	private MatrixMap2<String, Region, Float> wasteModifierMap;
-	private MatrixMap2<String, Region, Float> decayModifierMap;
-	private MatrixMap2<Integer, Integer, Optional<Coefficients>> closeUtilizationCoeMap;
-	private Map<Integer, Coefficients> totalStandWholeStepVolumeCoeMap;
-	private MatrixMap2<Integer, Integer, Optional<Coefficients>> wholeStemUtilizationComponentMap;
-	private Coefficients smallComponentWholeStemVolumeCoefficients;
-	private Coefficients smallComponentLoreyHeightCoefficients;
-	private Coefficients smallComponentQuadMeanDiameterCoefficients;
-	private Coefficients smallComponentBasalAreaCoefficients;
-	private Coefficients smallComponentProbabilityCoefficients;
 	
 	// Calculated data - this data is calculated after construction during processing.
 
@@ -111,8 +97,9 @@ class PolygonProcessingState {
 	// MNSP - MSPL1, MSPLV
 	// TODO
 
-	public PolygonProcessingState(VdypPolygon polygon, Bank bank, Map<String, Object> controlMap) {
+	public PolygonProcessingState(ForwardProcessingState fps, VdypPolygon polygon, Bank bank, Map<String, Object> controlMap) {
 		
+		this.fps = fps;
 		this.polygon = polygon;
 		
 		this.wallet = bank.copy();
@@ -126,45 +113,6 @@ class PolygonProcessingState {
 		var breakageEquationGroupMatrix = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
 				controlMap, ControlKey.BREAKAGE_GROUPS, MatrixMap2.class
 		);
-
-		this.netDecayWasteCoeMap = Utils.<Map<String, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.VOLUME_NET_DECAY_WASTE, Map.class
-		);
-		this.netDecayCoeMap = Utils.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
-				controlMap, ControlKey.VOLUME_NET_DECAY, MatrixMap2.class
-		);
-		this.wasteModifierMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
-				controlMap, ControlKey.WASTE_MODIFIERS, MatrixMap2.class
-		);
-		this.decayModifierMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
-				controlMap, ModifierParser.CONTROL_KEY_MOD301_DECAY, MatrixMap2.class
-		);
-		this.closeUtilizationCoeMap = Utils
-				.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
-						controlMap, ControlKey.CLOSE_UTIL_VOLUME, MatrixMap2.class
-				);
-		this.vdypGrowthDetails = Utils
-				.expectParsedControl(
-						controlMap, ControlKey.VTROL, VdypGrowthDetails.class
-				);
-		this.totalStandWholeStepVolumeCoeMap = Utils
-				.<Map<Integer, Coefficients>>expectParsedControl(
-						controlMap, ControlKey.TOTAL_STAND_WHOLE_STEM_VOL, Map.class
-				);
-		this.wholeStemUtilizationComponentMap = Utils
-				.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
-						controlMap, ControlKey.UTIL_COMP_WS_VOLUME, MatrixMap2.class
-				);
-		this.smallComponentWholeStemVolumeCoefficients = Utils
-				.<Coefficients>expectParsedControl(controlMap, ControlKey.SMALL_COMP_WS_VOLUME, Coefficients.class);
-		this.smallComponentLoreyHeightCoefficients = Utils
-				.<Coefficients>expectParsedControl(controlMap, ControlKey.SMALL_COMP_HL, Coefficients.class);
-		this.smallComponentQuadMeanDiameterCoefficients = Utils
-				.<Coefficients>expectParsedControl(controlMap, ControlKey.SMALL_COMP_DQ, Coefficients.class);
-		this.smallComponentBasalAreaCoefficients = Utils
-				.<Coefficients>expectParsedControl(controlMap, ControlKey.SMALL_COMP_BA, Coefficients.class);
-		this.smallComponentProbabilityCoefficients = Utils
-				.<Coefficients>expectParsedControl(controlMap, ControlKey.SMALL_COMP_PROBABILITY, Coefficients.class);
 
 		this.volumeEquationGroups = new int[this.wallet.getNSpecies() + 1];
 		this.decayEquationGroups = new int[this.wallet.getNSpecies() + 1];
@@ -208,55 +156,59 @@ class PolygonProcessingState {
 	}
 
 	public VdypGrowthDetails getVdypGrowthDetails() {
-		return vdypGrowthDetails;
+		return fps.vdypGrowthDetails;
 	}
 
 	public MatrixMap2<Integer, Integer, Optional<Coefficients>> getNetDecayCoeMap() {
-		return netDecayCoeMap;
+		return fps.netDecayCoeMap;
 	}
 
 	public Map<String, Coefficients> getNetDecayWasteCoeMap() {
-		return netDecayWasteCoeMap;
+		return fps.netDecayWasteCoeMap;
 	}
 
 	public MatrixMap2<String, Region, Float> getWasteModifierMap() {
-		return wasteModifierMap;
+		return fps.wasteModifierMap;
 	}
 
 	public MatrixMap2<String, Region, Float> getDecayModifierMap() {
-		return decayModifierMap;
+		return fps.decayModifierMap;
 	}
 
 	public MatrixMap2<Integer, Integer, Optional<Coefficients>> getCloseUtilizationCoeMap() {
-		return this.closeUtilizationCoeMap;
+		return fps.closeUtilizationCoeMap;
 	}
 
 	public Map<Integer, Coefficients> getTotalStandWholeStepVolumeCoeMap() {
-		return totalStandWholeStepVolumeCoeMap;
+		return fps.totalStandWholeStepVolumeCoeMap;
 	}
 
 	public MatrixMap2<Integer, Integer, Optional<Coefficients>> getWholeStemUtilizationComponentMap() {
-		return wholeStemUtilizationComponentMap;
+		return fps.wholeStemUtilizationComponentMap;
 	}
 
-	public Coefficients getSmallComponentWholeStemVolumeCoefficients() {
-		return smallComponentWholeStemVolumeCoefficients;
+	public MatrixMap3<Integer, String, String, Coefficients> getQuadMeanDiameterUtilizationComponentMap() {
+		return fps.quadMeanDiameterUtilizationComponentMap;
 	}
 
-	public Coefficients getSmallComponentLoreyHeightCoefficients() {
-		return smallComponentLoreyHeightCoefficients;
+	public Map<String, Coefficients> getSmallComponentWholeStemVolumeCoefficients() {
+		return fps.smallComponentWholeStemVolumeCoefficients;
+	}
+
+	public Map<String, Coefficients> getSmallComponentLoreyHeightCoefficients() {
+		return fps.smallComponentLoreyHeightCoefficients;
 	}
 	
-	public Coefficients getSmallComponentQuadMeanDiameterCoefficients() {
-		return smallComponentQuadMeanDiameterCoefficients;
+	public Map<String, Coefficients> getSmallComponentQuadMeanDiameterCoefficients() {
+		return fps.smallComponentQuadMeanDiameterCoefficients;
 	}
 	
-	public Coefficients getSmallComponentBasalAreaCoefficients() {
-		return smallComponentBasalAreaCoefficients;
+	public Map<String, Coefficients> getSmallComponentBasalAreaCoefficients() {
+		return fps.smallComponentBasalAreaCoefficients;
 	}
 	
-	public Coefficients getSmallComponentProbabilityCoefficients() {
-		return smallComponentProbabilityCoefficients;
+	public Map<String, Coefficients> getSmallComponentProbabilityCoefficients() {
+		return fps.smallComponentProbabilityCoefficients;
 	}
 
 	public int getPrimarySpeciesIndex() {

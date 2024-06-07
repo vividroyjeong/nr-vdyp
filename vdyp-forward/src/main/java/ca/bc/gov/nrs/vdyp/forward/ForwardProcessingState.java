@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.forward;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
@@ -10,12 +11,14 @@ import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypGrowthDetails;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.Region;
 
 class ForwardProcessingState {
@@ -30,15 +33,31 @@ class ForwardProcessingState {
 
 	/** The control map defining the context of the execution */
 	private final Map<String, Object> controlMap;
-	/** The genus definition map, extracted from the controlMap at construction time */
-	private final GenusDefinitionMap genusDefinitionMap;
+
+	// Cached values from the controlMap
+
+	final GenusDefinitionMap genusDefinitionMap;
+	final VdypGrowthDetails vdypGrowthDetails;
+	final Map<String, Coefficients> netDecayWasteCoeMap;
+	final MatrixMap2<Integer, Integer, Optional<Coefficients>> netDecayCoeMap;
+	final MatrixMap2<String, Region, Float> wasteModifierMap;
+	final MatrixMap2<String, Region, Float> decayModifierMap;
+	final MatrixMap2<Integer, Integer, Optional<Coefficients>> closeUtilizationCoeMap;
+	final Map<Integer, Coefficients> totalStandWholeStepVolumeCoeMap;
+	final MatrixMap2<Integer, Integer, Optional<Coefficients>> wholeStemUtilizationComponentMap;
+	final MatrixMap3<Integer, String, String, Coefficients> quadMeanDiameterUtilizationComponentMap;
+	final Map<String, Coefficients> smallComponentWholeStemVolumeCoefficients;
+	final Map<String, Coefficients> smallComponentLoreyHeightCoefficients;
+	final Map<String, Coefficients> smallComponentQuadMeanDiameterCoefficients;
+	final Map<String, Coefficients> smallComponentBasalAreaCoefficients;
+	final Map<String, Coefficients> smallComponentProbabilityCoefficients;
 
 	/** The storage banks */
 	private final Bank[] banks;
 
 	/** The active state */
 	private PolygonProcessingState processingState;
-	
+
 	// VDEBUG - NDEBUG
 	// TODO
 
@@ -47,26 +66,71 @@ class ForwardProcessingState {
 
 		banks = new Bank[MAX_RECORDS];
 
-		List<GenusDefinition> genusDefinitions = Utils.expectParsedControl(controlMap, ControlKey.SP0_DEF, List.class);
-		genusDefinitionMap = new GenusDefinitionMap(genusDefinitions);
+		List<GenusDefinition> genusDefinitions = Utils
+				.<List<GenusDefinition>>expectParsedControl(controlMap, ControlKey.SP0_DEF, List.class);
+		this.genusDefinitionMap = new GenusDefinitionMap(genusDefinitions);
+
+		this.netDecayWasteCoeMap = Utils.<Map<String, Coefficients>>expectParsedControl(
+				controlMap, ControlKey.VOLUME_NET_DECAY_WASTE, Map.class
+		);
+		this.netDecayCoeMap = Utils.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
+				controlMap, ControlKey.VOLUME_NET_DECAY, MatrixMap2.class
+		);
+		this.wasteModifierMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
+				controlMap, ControlKey.WASTE_MODIFIERS, MatrixMap2.class
+		);
+		this.decayModifierMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
+				controlMap, ModifierParser.CONTROL_KEY_MOD301_DECAY, MatrixMap2.class
+		);
+		this.closeUtilizationCoeMap = Utils
+				.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
+						controlMap, ControlKey.CLOSE_UTIL_VOLUME, MatrixMap2.class
+				);
+		this.vdypGrowthDetails = Utils
+				.expectParsedControl(
+						controlMap, ControlKey.VTROL, VdypGrowthDetails.class
+				);
+		this.totalStandWholeStepVolumeCoeMap = Utils
+				.<Map<Integer, Coefficients>>expectParsedControl(
+						controlMap, ControlKey.TOTAL_STAND_WHOLE_STEM_VOL, Map.class
+				);
+		this.wholeStemUtilizationComponentMap = Utils
+				.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
+						controlMap, ControlKey.UTIL_COMP_WS_VOLUME, MatrixMap2.class
+				);
+		this.quadMeanDiameterUtilizationComponentMap = Utils.<MatrixMap3<Integer, String, String, Coefficients>>expectParsedControl(
+				controlMap, ControlKey.UTIL_COMP_DQ, MatrixMap3.class
+		);
+		this.smallComponentWholeStemVolumeCoefficients = Utils
+				.<Map<String, Coefficients>>expectParsedControl(controlMap, ControlKey.SMALL_COMP_WS_VOLUME, Map.class);
+		this.smallComponentLoreyHeightCoefficients = Utils
+				.<Map<String, Coefficients>>expectParsedControl(controlMap, ControlKey.SMALL_COMP_HL, Map.class);
+		this.smallComponentQuadMeanDiameterCoefficients = Utils
+				.<Map<String, Coefficients>>expectParsedControl(controlMap, ControlKey.SMALL_COMP_DQ, Map.class);
+		this.smallComponentBasalAreaCoefficients = Utils
+				.<Map<String, Coefficients>>expectParsedControl(controlMap, ControlKey.SMALL_COMP_BA, Map.class);
+		this.smallComponentProbabilityCoefficients = Utils
+				.<Map<String, Coefficients>>expectParsedControl(
+						controlMap, ControlKey.SMALL_COMP_PROBABILITY, Map.class
+				);
 	}
 
 	public GenusDefinitionMap getGenusDefinitionMap() {
 		return genusDefinitionMap;
 	}
-	
+
 	public BecLookup getBecLookup() {
 		return Utils.expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class);
 	}
-	
+
 	public MatrixMap2<String, Region, SiteIndexEquation> getSiteCurveMap() {
 		return Utils.expectParsedControl(controlMap, ControlKey.SITE_CURVE_NUMBERS, MatrixMap2.class);
 	}
-	
+
 	public MatrixMap2<String, Region, Coefficients> getHl1Coefficients() {
-		return Utils.expectParsedControl(controlMap, ControlKey.HL_PRIMARY_SP_EQN_P1, MatrixMap2.class);	
+		return Utils.expectParsedControl(controlMap, ControlKey.HL_PRIMARY_SP_EQN_P1, MatrixMap2.class);
 	}
-	
+
 	public CompVarAdjustments getCompVarAdjustments() {
 		return Utils.expectParsedControl(controlMap, ControlKey.PARAM_ADJUSTMENTS, CompVarAdjustments.class);
 	}
@@ -78,7 +142,7 @@ class ForwardProcessingState {
 	public void setPolygon(VdypPolygon polygon) {
 		// Move the primary layer of the given polygon to bank zero.
 		banks[0] = new Bank(polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone());
-		processingState = new PolygonProcessingState(polygon, banks[toIndex(0, LayerType.PRIMARY)], controlMap);
+		processingState = new PolygonProcessingState(this, polygon, banks[toIndex(0, LayerType.PRIMARY)], controlMap);
 	}
 
 	public PolygonProcessingState getProcessingState() {
@@ -88,7 +152,7 @@ class ForwardProcessingState {
 	public Map<String, Object> getControlMap() {
 		return controlMap;
 	}
-	
+
 	public void storeActive(int instanceNumber, LayerType layerType) {
 		banks[toIndex(instanceNumber, layerType)] = processingState.wallet.copy();
 	}

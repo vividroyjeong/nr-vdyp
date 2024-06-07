@@ -1,6 +1,5 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
-import org.hamcrest.Matchers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -15,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -26,6 +26,7 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorExcepti
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.SpeciesErrorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
+import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonDescription;
 import ca.bc.gov.nrs.vdyp.forward.parsers.VdypPolygonDescriptionParser;
 import ca.bc.gov.nrs.vdyp.forward.parsers.VdypPolygonParser;
@@ -477,9 +478,9 @@ class ForwardProcessingEngineTest {
 		ForwardProcessingState fps = new ForwardProcessingState(controlMap);
 		fps.setPolygon(polygon);
 		
-		assertThat(fps.getProcessingState().volumeEquationGroups, Matchers.is(new float[] { Float.NaN, 12.0f, 20.0f, 25.0f, 37.0f, 66.0f }));
-		assertThat(fps.getProcessingState().decayEquationGroups, Matchers.is(new float[] { Float.NaN, 7.0f, 14.0f, 19.0f, 31.0f, 54.0f }));
-		assertThat(fps.getProcessingState().breakageEquationGroups, Matchers.is(new float[] { Float.NaN, 5.0f, 6.0f, 12.0f, 17.0f, 28.0f }));
+		assertThat(fps.getProcessingState().volumeEquationGroups, Matchers.is(new int[] { VdypEntity.MISSING_INTEGER_VALUE, 12, 20, 25, 37, 66 }));
+		assertThat(fps.getProcessingState().decayEquationGroups, Matchers.is(new int[] { VdypEntity.MISSING_INTEGER_VALUE, 7, 14, 19, 31, 54 }));
+		assertThat(fps.getProcessingState().breakageEquationGroups, Matchers.is(new int[] { VdypEntity.MISSING_INTEGER_VALUE, 5, 6, 12, 17, 28 }));
 	}
 
 	@Test
@@ -494,9 +495,9 @@ class ForwardProcessingEngineTest {
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(fps);
 		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.SetCompatibilityVariables);
 		
-		assertThat(fps.getProcessingState().volumeEquationGroups, Matchers.is(new float[] { Float.NaN, 12.0f, 20.0f, 25.0f, 37.0f, 66.0f }));
-		assertThat(fps.getProcessingState().decayEquationGroups, Matchers.is(new float[] { Float.NaN, 7.0f, 14.0f, 19.0f, 31.0f, 54.0f }));
-		assertThat(fps.getProcessingState().breakageEquationGroups, Matchers.is(new float[] { Float.NaN, 5.0f, 6.0f, 12.0f, 17.0f, 28.0f }));
+		assertThat(fps.getProcessingState().volumeEquationGroups, Matchers.is(new int[] { VdypEntity.MISSING_INTEGER_VALUE, 12, 20, 25, 37, 66 }));
+		assertThat(fps.getProcessingState().decayEquationGroups, Matchers.is(new int[] { VdypEntity.MISSING_INTEGER_VALUE, 7, 14, 19, 31, 54 }));
+		assertThat(fps.getProcessingState().breakageEquationGroups, Matchers.is(new int[] { VdypEntity.MISSING_INTEGER_VALUE, 5, 6, 12, 17, 28 }));
 	}
 	 
 	@Test

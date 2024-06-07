@@ -23,7 +23,6 @@ import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.EstimationMethods;
 import ca.bc.gov.nrs.vdyp.common.ReconcilationMethods;
 import ca.bc.gov.nrs.vdyp.common.Utils;
-import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
@@ -184,6 +183,8 @@ public class ForwardProcessingEngine {
 	) throws ProcessingException {
 		Coefficients aAdjust = new Coefficients(new float[] { 0.0f, 0.0f, 0.0f, 0.0f }, 1);
 
+		int allowCompatibilitySetting = pps.getVdypGrowthDetails().getVtrol(5);
+
 		// Note: L1COM2 (INL1VGRP, INL1DGRP, INL1BGRP) is initialized when 
 		// PolygonProcessingState (volumeEquationGroups, decayEquationGroups
 		// breakageEquationGroups, respectively) is constructed. Copying
@@ -196,8 +197,9 @@ public class ForwardProcessingEngine {
 		var cvSmall = new HashMap[pps.getNSpecies() + 1];
 
 		for (int s = 1; s <= pps.getNSpecies(); s++) {
-			int allowCompatibilitySetting = pps.getVdypGrowthDetails().getVtrol(5);
 
+			String genusName = pps.wallet.speciesNames[s];
+			
 			float spLoreyHeight_All = pps.wallet.loreyHeights[s][0];
 
 			Coefficients basalAreas = Utils.utilizationVector();
@@ -209,13 +211,13 @@ public class ForwardProcessingEngine {
 			Coefficients treesPerHectare = Utils.utilizationVector();
 
 			cvVolume[s] = new MatrixMap3Impl<UtilizationClass, VolumeVariable, LayerType, Float>(
-					UtilizationClass.ALL_BUT_SMALL, VolumeVariable.ALL, LayerType.ALL_USED, null
+					UtilizationClass.ALL_BUT_SMALL, VolumeVariable.ALL, LayerType.ALL_USED, (k1, k2, k3) -> 0f
 			);
 			cvBasalArea[s] = new MatrixMap2Impl<UtilizationClass, LayerType, Float>(
-					UtilizationClass.ALL_BUT_SMALL, LayerType.ALL_USED, null
+					UtilizationClass.ALL_BUT_SMALL, LayerType.ALL_USED, (k1, k2) -> 0f
 			);
 			cvQuadraticMeanDiameter[s] = new MatrixMap2Impl<UtilizationClass, LayerType, Float>(
-					UtilizationClass.ALL_BUT_SMALL, LayerType.ALL_USED, null
+					UtilizationClass.ALL_BUT_SMALL, LayerType.ALL_USED, (k1, k2) -> 0f
 			);
 
 			for (UtilizationClass uc : UtilizationClass.ALL_BUT_SMALL) {
@@ -230,7 +232,7 @@ public class ForwardProcessingEngine {
 				closeUtilizationVolumesNetOfDecayAndWaste
 						.setCoe(uc.index, pps.wallet.cuVolumesMinusDecayAndWastage[s][uc.index]);
 
-				quadMeanDiameters.set(uc.index, pps.wallet.quadMeanDiameters[s][uc.index]);
+				quadMeanDiameters.setCoe(uc.index, pps.wallet.quadMeanDiameters[s][uc.index]);
 				if (uc != UtilizationClass.ALL && quadMeanDiameters.getCoe(uc.index) <= 0.0f) {
 					quadMeanDiameters.setCoe(uc.index, DEFAULT_QUAD_MEAN_DIAMETERS[uc.index]);
 				}
@@ -266,7 +268,7 @@ public class ForwardProcessingEngine {
 						|| allowCompatibilitySetting > 0 && baseVolume > V_BASE_MIN) {
 
 					// EMP094
-					int decayGroup = 0;
+					int decayGroup = pps.decayEquationGroups[s];
 					EstimationMethods.estimateNetDecayVolume(
 							pps.wallet.speciesNames[s], pps.getBecZone()
 									.getRegion(), uc, aAdjust, decayGroup, spLoreyHeight_All, pps.wallet.yearsAtBreastHeight[s], pps
@@ -289,7 +291,7 @@ public class ForwardProcessingEngine {
 						|| allowCompatibilitySetting > 0 && baseVolume > V_BASE_MIN) {
 
 					// EMP092
-					int volumeGroup = 0;
+					int volumeGroup = pps.volumeEquationGroups[s];
 					EstimationMethods.estimateCloseUtilizationVolume(
 							uc, aAdjust, volumeGroup, spLoreyHeight_All, pps
 									.getCloseUtilizationCoeMap(), quadMeanDiameters, wholeStemVolumes, closeUtilizationVolumes
@@ -331,7 +333,7 @@ public class ForwardProcessingEngine {
 				cvVolume[s].put(uc, VolumeVariable.CLOSE_UTIL_VOL, LayerType.PRIMARY, adjustment);
 			}
 
-			EstimationMethods.estimateQuadMeanDiameterByUtilization(pps.getBecZone(), null, quadMeanDiameters, null);
+			EstimationMethods.estimateQuadMeanDiameterByUtilization(pps.getBecZone(), pps.getQuadMeanDiameterUtilizationComponentMap(), quadMeanDiameters, genusName);
 
 			// Calculate trees-per-hectare per utilization
 			treesPerHectare.setCoe(UtilizationClass.ALL.index, pps.wallet.treesPerHectare[s][UTILIZATION_ALL_INDEX]);
@@ -378,7 +380,8 @@ public class ForwardProcessingEngine {
 			throws ProcessingException {
 
 		Region region = pps.getPolygon().getBiogeoclimaticZone().getRegion();
-
+		String speciesName = pps.wallet.speciesNames[speciesIndex];
+		
 		float spLoreyHeight_All = pps.wallet.loreyHeights[speciesIndex][UTILIZATION_ALL_INDEX]; // HLsp
 		float spQuadMeanDiameter_All = pps.wallet.quadMeanDiameters[speciesIndex][UTILIZATION_ALL_INDEX]; // DQsp
 
@@ -387,24 +390,24 @@ public class ForwardProcessingEngine {
 		float spBaseArea_All = pps.wallet.basalAreas[speciesIndex][UTILIZATION_ALL_INDEX] /* * fractionAvailable */; // BAsp
 
 		// EMP080
-		float cvSmallComponentProbability = smallComponentProbability(pps, spLoreyHeight_All, speciesIndex, region); // PROBsp
+		float cvSmallComponentProbability = smallComponentProbability(pps, speciesName, speciesIndex, spLoreyHeight_All, region); // PROBsp
 
 		// EMP081
-		float conditionalExpectedBaseArea = conditionalExpectedBaseArea(pps, spBaseArea_All, spLoreyHeight_All, region); // BACONDsp
+		float conditionalExpectedBaseArea = conditionalExpectedBaseArea(pps, speciesName, spBaseArea_All, spLoreyHeight_All, region); // BACONDsp
 		// TODO (see previous TODO): conditionalExpectedBaseArea /= fractionAvailable;
 
 		float cvBasalArea_Small = cvSmallComponentProbability * conditionalExpectedBaseArea;
 
 		// EMP082
-		float cvQuadMeanDiameter_Small = smallComponentQuadMeanDiameter(pps, spLoreyHeight_All); // DQSMsp
+		float cvQuadMeanDiameter_Small = smallComponentQuadMeanDiameter(pps, speciesName, spLoreyHeight_All); // DQSMsp
 
 		// EMP085
 		float cvLoreyHeight_Small = smallComponentLoreyHeight(
-				pps, spLoreyHeight_All, cvQuadMeanDiameter_Small, spQuadMeanDiameter_All
+				pps, speciesName, spLoreyHeight_All, cvQuadMeanDiameter_Small, spQuadMeanDiameter_All
 		); // HLSMsp
 
 		// EMP086
-		float cvMeanVolume_Small = meanVolumeSmall(pps, cvQuadMeanDiameter_Small, cvLoreyHeight_Small); // VMEANSMs
+		float cvMeanVolume_Small = meanVolumeSmall(pps, speciesName, cvQuadMeanDiameter_Small, cvLoreyHeight_Small); // VMEANSMs
 
 		var cvSmall = new HashMap<SmallUtilizationClassVariable, Float>();
 
@@ -447,8 +450,8 @@ public class ForwardProcessingEngine {
 
 	// EMP080
 	private static float
-			smallComponentProbability(PolygonProcessingState pps, float loreyHeight, int speciesIndex, Region region) {
-		Coefficients coe = pps.getSmallComponentProbabilityCoefficients();
+			smallComponentProbability(PolygonProcessingState pps, String speciesName, int speciesIndex, float loreyHeight, Region region) {
+		Coefficients coe = pps.getSmallComponentProbabilityCoefficients().get(speciesName);
 
 		// EQN 1 in IPSJF118.doc
 
@@ -467,8 +470,8 @@ public class ForwardProcessingEngine {
 
 	// EMP081
 	private static float
-			conditionalExpectedBaseArea(PolygonProcessingState pps, float basalArea, float loreyHeight, Region region) {
-		Coefficients coe = pps.getSmallComponentBasalAreaCoefficients();
+			conditionalExpectedBaseArea(PolygonProcessingState pps, String speciesName, float basalArea, float loreyHeight, Region region) {
+		Coefficients coe = pps.getSmallComponentBasalAreaCoefficients().get(speciesName);
 
 		// EQN 3 in IPSJF118.doc
 
@@ -490,8 +493,8 @@ public class ForwardProcessingEngine {
 	}
 
 	// EMP082
-	private static float smallComponentQuadMeanDiameter(PolygonProcessingState pps, float loreyHeight) {
-		Coefficients coe = pps.getSmallComponentQuadMeanDiameterCoefficients();
+	private static float smallComponentQuadMeanDiameter(PolygonProcessingState pps, String speciesName, float loreyHeight) {
+		Coefficients coe = pps.getSmallComponentQuadMeanDiameterCoefficients().get(speciesName);
 
 		// EQN 5 in IPSJF118.doc
 
@@ -505,10 +508,10 @@ public class ForwardProcessingEngine {
 
 	// EMP085
 	private static float smallComponentLoreyHeight(
-			PolygonProcessingState pps, float speciesLoreyHeight_All, float quadMeanDiameterSpecSmall,
+			PolygonProcessingState pps, String speciesName, float speciesLoreyHeight_All, float quadMeanDiameterSpecSmall,
 			float speciesQuadMeanDiameter_All
 	) {
-		Coefficients coe = pps.getSmallComponentLoreyHeightCoefficients();
+		Coefficients coe = pps.getSmallComponentLoreyHeightCoefficients().get(speciesName);
 
 		// EQN 1 in IPSJF119.doc
 
@@ -524,8 +527,8 @@ public class ForwardProcessingEngine {
 
 	// EMP086
 	private static float
-			meanVolumeSmall(PolygonProcessingState pps, float quadMeanDiameterSpecSmall, float loreyHeightSpecSmall) {
-		Coefficients coe = pps.getSmallComponentWholeStemVolumeCoefficients();
+			meanVolumeSmall(PolygonProcessingState pps, String speciesName, float quadMeanDiameterSpecSmall, float loreyHeightSpecSmall) {
+		Coefficients coe = pps.getSmallComponentWholeStemVolumeCoefficients().get(speciesName);
 
 		// EQN 1 in IPSJF119.doc
 

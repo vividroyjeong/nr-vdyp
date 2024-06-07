@@ -30,7 +30,6 @@ public class EstimationMethods {
 
 	private static final int UTIL_ALL = UtilizationClass.ALL.index;
 	private static final int UTIL_LARGEST = UtilizationClass.OVER225.index;
-	private static final int UTIL_SMALL = UtilizationClass.SMALL.index;
 
 	/**
 	 * EMP092. Updates closeUtilizationVolumeUtil with estimated values.
