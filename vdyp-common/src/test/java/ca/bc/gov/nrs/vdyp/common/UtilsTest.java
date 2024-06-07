@@ -12,77 +12,89 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class UtilsTest {
 
-	@Test
-	void testSingletonOrEmptyForNull() {
-		var result = Utils.singletonOrEmpty(null);
-		assertThat(result, Matchers.empty());
+	@Nested
+	class SingletonOrEmpty {
+		@Test
+		void testForNull() {
+			var result = Utils.singletonOrEmpty(null);
+			assertThat(result, Matchers.empty());
+		}
+
+		@Test
+		void testForNonNull() {
+			var result = Utils.singletonOrEmpty("X");
+			assertThat(result, Matchers.contains("X"));
+		}
 	}
 
-	@Test
-	void testSingletonOrEmptyForNonNull() {
-		var result = Utils.singletonOrEmpty("X");
-		assertThat(result, Matchers.contains("X"));
-	}
+	@Nested
+	class ExpectParsedControl {
 
-	@Test
-	void testExpectParsedControlMissing() {
-		var ex = assertThrows(
-				IllegalStateException.class,
-				() -> Utils.expectParsedControl(Collections.emptyMap(), "NOT_PRESENT", Integer.class)
-		);
-		assertThat(ex, hasProperty("message", stringContainsInOrder("Expected control map to have", "NOT_PRESENT")));
-	}
+		@Test
+		void testMissing() {
+			var ex = assertThrows(
+					IllegalStateException.class,
+					() -> Utils.expectParsedControl(Collections.emptyMap(), "NOT_PRESENT", Integer.class)
+			);
+			assertThat(
+					ex, hasProperty("message", stringContainsInOrder("Expected control map to have", "NOT_PRESENT"))
+			);
+		}
 
-	@Test
-	void testExpectParsedControlWrongType() {
-		var ex = assertThrows(
-				IllegalStateException.class,
-				() -> Utils.expectParsedControl(Collections.singletonMap("WRONG_TYPE", 2d), "WRONG_TYPE", Integer.class)
-		);
-		assertThat(
-				ex,
-				hasProperty(
-						"message",
-						stringContainsInOrder(
-								"Expected control map entry", "WRONG_TYPE", "to be", "Integer", "was", "Double"
-						)
-				)
-		);
-	}
+		@Test
+		void testWrongType() {
+			var ex = assertThrows(
+					IllegalStateException.class,
+					() -> Utils.expectParsedControl(
+							Collections.singletonMap("WRONG_TYPE", 2d), "WRONG_TYPE", Integer.class
+					)
+			);
+			assertThat(
+					ex,
+					hasProperty(
+							"message",
+							stringContainsInOrder(
+									"Expected control map entry", "WRONG_TYPE", "to be", "Integer", "was", "Double"
+							)
+					)
+			);
+		}
 
-	@Test
-	void testExpectParsedControlStillString() {
-		var ex = assertThrows(
-				IllegalStateException.class,
-				() -> Utils.expectParsedControl(
-						Collections.singletonMap("WRONG_TYPE", "UNPARSED"), "WRONG_TYPE", Integer.class
-				)
-		);
-		assertThat(
-				ex,
-				hasProperty(
-						"message",
-						stringContainsInOrder(
-								"Expected control map entry", "WRONG_TYPE", "to be parsed but was still a String"
-						)
-				)
-		);
-	}
+		@Test
+		void testStillString() {
+			var ex = assertThrows(
+					IllegalStateException.class,
+					() -> Utils.expectParsedControl(
+							Collections.singletonMap("WRONG_TYPE", "UNPARSED"), "WRONG_TYPE", Integer.class
+					)
+			);
+			assertThat(
+					ex,
+					hasProperty(
+							"message",
+							stringContainsInOrder(
+									"Expected control map entry", "WRONG_TYPE", "to be parsed but was still a String"
+							)
+					)
+			);
+		}
 
-	@Test
-	void testExpectParsedControlPresent() {
-		var result = Utils.expectParsedControl(Collections.singletonMap("PRESENT", 2), "PRESENT", Integer.class);
-		assertThat(result, is(2));
-	}
+		@Test
+		void testPresent() {
+			var result = Utils.expectParsedControl(Collections.singletonMap("PRESENT", 2), "PRESENT", Integer.class);
+			assertThat(result, is(2));
+		}
 
-	@Test
-	void testExpectParsedControlPresentString() {
-		var result = Utils.expectParsedControl(Collections.singletonMap("PRESENT", "X"), "PRESENT", String.class);
-		assertThat(result, is("X"));
+		@Test
+		void testPresentString() {
+			var result = Utils.expectParsedControl(Collections.singletonMap("PRESENT", "X"), "PRESENT", String.class);
+			assertThat(result, is("X"));
+		}
 	}
 
 	@Test
