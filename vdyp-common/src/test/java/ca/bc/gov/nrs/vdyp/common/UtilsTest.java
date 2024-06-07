@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.common;
 
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasProperty;
@@ -120,4 +121,12 @@ class UtilsTest {
 		assertThrows(UnsupportedOperationException.class, () -> unit.put("ANOTHER", "VALUE"));
 	}
 
+	@Nested
+	class UtilizationVector {
+		@Test
+		void testFromSingleValue() {
+			var unit = Utils.utilizationVector(5f);
+			assertThat(unit, coe(-1, 0f, 5f, 0f, 0f, 0f, 5f));
+		}
+	}
 }
