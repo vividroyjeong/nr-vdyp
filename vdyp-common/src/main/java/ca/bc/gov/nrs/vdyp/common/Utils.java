@@ -202,7 +202,7 @@ public class Utils {
 	}
 
 	public static Coefficients utilizationVector(float singleValue) {
-		return utilizationVector(0f, singleValue, 0f, 0f, singleValue);
+		return utilizationVector(0f, singleValue, 0f, 0f, 0f, singleValue);
 	}
 
 	public static Coefficients utilizationVector() {
