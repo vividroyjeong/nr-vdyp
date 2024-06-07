@@ -11,6 +11,7 @@ import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypGrowthDetails;
+import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonLayer;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
@@ -19,6 +20,7 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.Region;
+import ca.bc.gov.nrs.vdyp.model.SmallUtilizationClassVariable;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.VolumeVariable;
 
@@ -26,6 +28,9 @@ class PolygonProcessingState {
 
 	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(PolygonProcessingState.class);
+
+	/** Polygon on which the processor is operating */
+	private final VdypPolygon polygon;
 
 	// L1COM1, L1COM4 and L1COM5 - these common blocks mirror BANK1, BANK2 and BANK3 and are initialized 
 	// when copied to "active" in ForwardProcessingEngine.
@@ -54,7 +59,12 @@ class PolygonProcessingState {
 	private MatrixMap2<Integer, Integer, Optional<Coefficients>> closeUtilizationCoeMap;
 	private Map<Integer, Coefficients> totalStandWholeStepVolumeCoeMap;
 	private MatrixMap2<Integer, Integer, Optional<Coefficients>> wholeStemUtilizationComponentMap;
-
+	private Coefficients smallComponentWholeStemVolumeCoefficients;
+	private Coefficients smallComponentLoreyHeightCoefficients;
+	private Coefficients smallComponentQuadMeanDiameterCoefficients;
+	private Coefficients smallComponentBasalAreaCoefficients;
+	private Coefficients smallComponentProbabilityCoefficients;
+	
 	// Calculated data - this data is calculated after construction during processing.
 
 	// Ranking Details - encompasses INXXL1 and INXL1
@@ -93,7 +103,7 @@ class PolygonProcessingState {
 	private MatrixMap3<UtilizationClass, VolumeVariable, LayerType, Float>[] cvVolume;
 	private MatrixMap2<UtilizationClass, LayerType, Float>[] cvBasalArea;
 	private MatrixMap2<UtilizationClass, LayerType, Float>[] cvQuadraticMeanDiameter;
-	private Map<VolumeVariable, Float>[] cvSmall;
+	private Map<SmallUtilizationClassVariable, Float>[] cvPrimaryLayerSmall;
 
 	// FRBASP0 - FR
 	// TODO
@@ -101,7 +111,10 @@ class PolygonProcessingState {
 	// MNSP - MSPL1, MSPLV
 	// TODO
 
-	public PolygonProcessingState(Bank bank, Map<String, Object> controlMap) {
+	public PolygonProcessingState(VdypPolygon polygon, Bank bank, Map<String, Object> controlMap) {
+		
+		this.polygon = polygon;
+		
 		this.wallet = bank.copy();
 
 		var volumeEquationGroupMatrix = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
@@ -129,18 +142,29 @@ class PolygonProcessingState {
 		this.closeUtilizationCoeMap = Utils
 				.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
 						controlMap, ControlKey.CLOSE_UTIL_VOLUME, MatrixMap2.class
-		);
+				);
 		this.vdypGrowthDetails = Utils
-				.expectParsedControl(controlMap, ControlKey.VTROL, VdypGrowthDetails.class
-		);
+				.expectParsedControl(
+						controlMap, ControlKey.VTROL, VdypGrowthDetails.class
+				);
 		this.totalStandWholeStepVolumeCoeMap = Utils
 				.<Map<Integer, Coefficients>>expectParsedControl(
 						controlMap, ControlKey.TOTAL_STAND_WHOLE_STEM_VOL, Map.class
-		);
+				);
 		this.wholeStemUtilizationComponentMap = Utils
 				.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
 						controlMap, ControlKey.UTIL_COMP_WS_VOLUME, MatrixMap2.class
 				);
+		this.smallComponentWholeStemVolumeCoefficients = Utils
+				.<Coefficients>expectParsedControl(controlMap, ControlKey.SMALL_COMP_WS_VOLUME, Coefficients.class);
+		this.smallComponentLoreyHeightCoefficients = Utils
+				.<Coefficients>expectParsedControl(controlMap, ControlKey.SMALL_COMP_HL, Coefficients.class);
+		this.smallComponentQuadMeanDiameterCoefficients = Utils
+				.<Coefficients>expectParsedControl(controlMap, ControlKey.SMALL_COMP_DQ, Coefficients.class);
+		this.smallComponentBasalAreaCoefficients = Utils
+				.<Coefficients>expectParsedControl(controlMap, ControlKey.SMALL_COMP_BA, Coefficients.class);
+		this.smallComponentProbabilityCoefficients = Utils
+				.<Coefficients>expectParsedControl(controlMap, ControlKey.SMALL_COMP_PROBABILITY, Coefficients.class);
 
 		this.volumeEquationGroups = new int[this.wallet.getNSpecies() + 1];
 		this.decayEquationGroups = new int[this.wallet.getNSpecies() + 1];
@@ -163,6 +187,10 @@ class PolygonProcessingState {
 		}
 	}
 
+	public VdypPolygon getPolygon() {
+		return polygon;
+	}
+	
 	public int getNSpecies() {
 		return wallet.getNSpecies();
 	}
@@ -206,9 +234,29 @@ class PolygonProcessingState {
 	public Map<Integer, Coefficients> getTotalStandWholeStepVolumeCoeMap() {
 		return totalStandWholeStepVolumeCoeMap;
 	}
-	
+
 	public MatrixMap2<Integer, Integer, Optional<Coefficients>> getWholeStemUtilizationComponentMap() {
 		return wholeStemUtilizationComponentMap;
+	}
+
+	public Coefficients getSmallComponentWholeStemVolumeCoefficients() {
+		return smallComponentWholeStemVolumeCoefficients;
+	}
+
+	public Coefficients getSmallComponentLoreyHeightCoefficients() {
+		return smallComponentLoreyHeightCoefficients;
+	}
+	
+	public Coefficients getSmallComponentQuadMeanDiameterCoefficients() {
+		return smallComponentQuadMeanDiameterCoefficients;
+	}
+	
+	public Coefficients getSmallComponentBasalAreaCoefficients() {
+		return smallComponentBasalAreaCoefficients;
+	}
+	
+	public Coefficients getSmallComponentProbabilityCoefficients() {
+		return smallComponentProbabilityCoefficients;
 	}
 
 	public int getPrimarySpeciesIndex() {
@@ -339,7 +387,7 @@ class PolygonProcessingState {
 			MatrixMap3<UtilizationClass, VolumeVariable, LayerType, Float>[] cvVolume,
 			MatrixMap2<UtilizationClass, LayerType, Float>[] cvBasalArea,
 			MatrixMap2<UtilizationClass, LayerType, Float>[] cvQuadraticMeanDiameter,
-			Map<VolumeVariable, Float>[] cvSmall
+			Map<SmallUtilizationClassVariable, Float>[] cvPrimaryLayerSmall
 	) {
 		if (this.areCompatibilityVariablesSet) {
 			throw new IllegalStateException("CompatibilityVariablesSet can be set once only");
@@ -348,7 +396,7 @@ class PolygonProcessingState {
 		this.cvVolume = cvVolume;
 		this.cvBasalArea = cvBasalArea;
 		this.cvQuadraticMeanDiameter = cvQuadraticMeanDiameter;
-		this.cvSmall = cvSmall;
+		this.cvPrimaryLayerSmall = cvPrimaryLayerSmall;
 
 		this.areCompatibilityVariablesSet = true;
 	}
@@ -378,11 +426,11 @@ class PolygonProcessingState {
 		return cvQuadraticMeanDiameter[speciesIndex].get(uc, layerType);
 	}
 
-	public float getCVSmall(int speciesIndex, VolumeVariable volumeVariable) {
+	public float getCVSmall(int speciesIndex, SmallUtilizationClassVariable variable) {
 		if (!this.areCompatibilityVariablesSet) {
 			throw new IllegalStateException("unset cvBasalAreas");
 		}
 
-		return cvSmall[speciesIndex].get(volumeVariable);
+		return cvPrimaryLayerSmall[speciesIndex].get(variable);
 	}
 }

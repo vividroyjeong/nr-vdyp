@@ -3,7 +3,6 @@ package ca.bc.gov.nrs.vdyp.forward;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
@@ -37,9 +36,6 @@ class ForwardProcessingState {
 	/** The storage banks */
 	private final Bank[] banks;
 
-	/** Polygon on which the processor is operating */
-	private Optional<VdypPolygon> polygon;
-
 	/** The active state */
 	private PolygonProcessingState processingState;
 	
@@ -49,7 +45,6 @@ class ForwardProcessingState {
 	public ForwardProcessingState(Map<String, Object> controlMap) {
 		this.controlMap = controlMap;
 
-		polygon = Optional.empty();
 		banks = new Bank[MAX_RECORDS];
 
 		List<GenusDefinition> genusDefinitions = Utils.expectParsedControl(controlMap, ControlKey.SP0_DEF, List.class);
@@ -81,15 +76,9 @@ class ForwardProcessingState {
 	}
 
 	public void setPolygon(VdypPolygon polygon) {
-		this.polygon = Optional.of(polygon);
-
 		// Move the primary layer of the given polygon to bank zero.
 		banks[0] = new Bank(polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone());
-		processingState = new PolygonProcessingState(banks[toIndex(0, LayerType.PRIMARY)], controlMap);
-	}
-
-	public VdypPolygon getPolygon() {
-		return polygon.orElseThrow();
+		processingState = new PolygonProcessingState(polygon, banks[toIndex(0, LayerType.PRIMARY)], controlMap);
 	}
 
 	public PolygonProcessingState getProcessingState() {
