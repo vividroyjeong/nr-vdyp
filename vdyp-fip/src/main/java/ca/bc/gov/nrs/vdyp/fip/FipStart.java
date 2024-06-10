@@ -75,7 +75,6 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
-import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
@@ -417,12 +416,12 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			// Multiple Species
 			for (var spec : result.getSpecies().values()) {
 
-				Coefficients limitCoe = emp.getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
+				var limits = emp.getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
 
 				final float maxHeightMultiplier = fipLayer.getPrimaryGenus()
 						.orElseThrow(() -> new IllegalStateException("primaryGenus has not been set"))
 						.equals(spec.getGenus()) ? 1.5f : 1.0f;
-				final float heightMax = limitCoe.getCoe(1) * maxHeightMultiplier;
+				final float heightMax = limits.maxLoreyHeight() * maxHeightMultiplier;
 
 				spec.getLoreyHeightByUtilization().scalarInPlace(UTIL_ALL, x -> min(x, heightMax));
 			}
@@ -467,16 +466,16 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				for (var spec : result.getSpecies().values()) {
 
 					// EMP061
-					Coefficients limitCoe = emp.getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
+					var limits = emp.getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
 
-					var dqMin = limitCoe.getCoe(3) * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL);
+					var dqMin = limits.minDiameterHeight() * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL);
 					var dqMax = max(
-							limitCoe.getCoe(2), limitCoe.getCoe(4) * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL)
+							limits.maxQuadMeanDiameter(), limits.maxDiameterHeight() * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL)
 					);
 
 					// EMP060
 					float quadMeanDiameter = clamp(
-							estimateQuadMeanDiameterForSpecies(
+							emp.estimateQuadMeanDiameterForSpecies(
 									spec, result.getSpecies(), bec.getRegion(), quadMeanDiameterTotal, baseAreaTotal,
 									treesPerHectareTotal, loreyHeightTotal
 							), //
@@ -582,162 +581,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		}
 	}
 
-	// EMP060
-	/**
-	 * Estimate DQ for a species (primary or not). Using eqn in jf125.doc.
-	 *
-	 * Enforces mins and maxes from EMP061.
-	 *
-	 * @param spec                  Species of insterest
-	 * @param allSpecies            Collection of all species on the layer
-	 * @param region                BEC Region of the stand
-	 * @param standQuadMeanDiameter Quadratic mean diameter of the stand
-	 * @param standBaseArea         Base area of the stand
-	 * @param standTreesPerHectare  Density opf the stand
-	 * @param standLoreyHeight      Lorey height of the stand
-	 * @return Quadratic mean diameter of the species of interest
-	 * @throws ProcessingException
-	 */
-	float estimateQuadMeanDiameterForSpecies(
-			VdypSpecies spec, // ISP, HLsp, DQsp
-			Map<String, VdypSpecies> allSpecies, // FR
-			Region region, // INDEX_IC
-			float standQuadMeanDiameter, // DQ_TOT
-			float standBaseArea, // BA_TOT
-			float standTreesPerHectare, // TPH_TOT
-			float standLoreyHeight // HL_TOT
-	) throws ProcessingException {
-		String species = spec.getGenus();
-
-		float c = 0.00441786467f;
-
-		float minQuadMeanDiameter = min(7.6f, standQuadMeanDiameter);
-
-		// Quick solution
-		if (spec.getFractionGenus() >= 1f || standQuadMeanDiameter < minQuadMeanDiameter) {
-			return standQuadMeanDiameter;
-		}
-
-		var coeMap = Utils
-				.<Map<String, Coefficients>>expectParsedControl(controlMap, ControlKey.BY_SPECIES_DQ, Map.class);
-		var specAliases = GenusDefinitionParser.getSpeciesAliases(controlMap);
-
-		// TODO we can probably remove these as they seem to only be used for debugging
-		// in VDYP7
-		Map<String, Float> adjust = new HashMap<>(coeMap.size());
-		Map<String, Float> mult = new HashMap<>(coeMap.size());
-
-		var specIt = specAliases.iterator();
-
-		var spec1 = specIt.next();
-
-		float a2 = coeMap.get(spec1).getCoe(2);
-
-		float fractionOther = 1f - spec.getFractionGenus(); // FR_REST
-
-		mult.put(spec1, 1f);
-		float a0 = coeMap.get(spec1).getCoe(0);
-		float a1 = coeMap.get(spec1).getCoe(1);
-
-		while (specIt.hasNext()) {
-			var specIAlias = specIt.next();
-			var specI = allSpecies.get(specIAlias);
-			if (specIAlias.equals(spec.getGenus())) {
-				float multI = 1f;
-				mult.put(specIAlias, multI);
-				a0 += multI * coeMap.get(specIAlias).getCoe(0);
-				a1 += multI * coeMap.get(specIAlias).getCoe(1);
-			} else {
-				if (specI != null && specI.getFractionGenus() > 0f) {
-					float multI = -specI.getFractionGenus() / fractionOther;
-					mult.put(specIAlias, multI);
-					a0 += multI * coeMap.get(specIAlias).getCoe(0);
-					a1 -= multI * coeMap.get(specIAlias).getCoe(1);
-				}
-			}
-		}
-
-		float loreyHeightSpec = spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL);
-		float loreyHeight1 = max(4f, loreyHeightSpec);
-		float loreyHeight2 = (standLoreyHeight - loreyHeightSpec * spec.getFractionGenus()) / fractionOther;
-		float loreyHeightRatio = clamp( (loreyHeight1 - 3f) / (loreyHeight2 - 3f), 0.05f, 20f);
-
-		float r = exp(
-				a0 + a1 * log(loreyHeightRatio) + a2 * log(standQuadMeanDiameter) + adjust.getOrDefault(species, 0f)
-		);
-
-		float baseArea1 = spec.getFractionGenus() * standBaseArea;
-		float baseArea2 = standBaseArea - baseArea1;
-
-		float treesPerHectare1;
-		if (abs(r - 1f) < 0.0005) {
-			treesPerHectare1 = spec.getFractionGenus() * standTreesPerHectare;
-		} else {
-			float aa = (r - 1f) * c;
-			float bb = c * (1f - r) * standTreesPerHectare + baseArea1 + baseArea2 * r;
-			float cc = -baseArea1 * standTreesPerHectare;
-			float term = bb * bb - 4 * aa * cc;
-			if (term <= 0f) {
-				throw new ProcessingException(
-						"Term for trees per hectare calculation when estimating quadratic mean diameter for species "
-								+ species + " was " + term + " but should be positive."
-				);
-			}
-			treesPerHectare1 = (-bb + sqrt(term)) / (2f * aa);
-			if (treesPerHectare1 <= 0f || treesPerHectare1 > standTreesPerHectare) {
-				throw new ProcessingException(
-						"Trees per hectare 1 for species " + species + " was " + treesPerHectare1
-								+ " but should be positive and less than or equal to stand trees per hectare "
-								+ standTreesPerHectare
-				);
-			}
-		}
-
-		float quadMeanDiameter1 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea1, treesPerHectare1);
-		float treesPerHectare2 = standTreesPerHectare - treesPerHectare1;
-		float quadMeanDiameter2 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea2, treesPerHectare2);
-
-		if (quadMeanDiameter2 < minQuadMeanDiameter) {
-			// species 2 is too small. Make target species smaller.
-			quadMeanDiameter2 = minQuadMeanDiameter;
-			treesPerHectare2 = BaseAreaTreeDensityDiameter.treesPerHectare(baseArea2, quadMeanDiameter2);
-			treesPerHectare1 = standTreesPerHectare - treesPerHectare2;
-			quadMeanDiameter1 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea1, treesPerHectare1);
-		}
-		var limitCoe = emp.getLimitsForHeightAndDiameter(species, region);
-
-		final var dqMinSp = max(minQuadMeanDiameter, limitCoe.getCoe(3) * loreyHeightSpec);
-		final var dqMaxSp = max(7.6f, min(limitCoe.getCoe(2), limitCoe.getCoe(4) * loreyHeightSpec));
-		if (quadMeanDiameter1 < dqMinSp) {
-			quadMeanDiameter1 = dqMinSp;
-			treesPerHectare1 = BaseAreaTreeDensityDiameter.treesPerHectare(baseArea1, quadMeanDiameter1);
-			treesPerHectare2 = standTreesPerHectare - treesPerHectare2;
-			quadMeanDiameter2 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea2, treesPerHectare2);
-		}
-		if (quadMeanDiameter1 > dqMaxSp) {
-			// target species is too big. Make target species smaller, DQ2 bigger.
-
-			quadMeanDiameter1 = dqMaxSp;
-			treesPerHectare1 = BaseAreaTreeDensityDiameter.treesPerHectare(baseArea1, quadMeanDiameter1);
-			treesPerHectare2 = standTreesPerHectare - treesPerHectare2;
-
-			if (treesPerHectare2 > 0f && baseArea2 > 0f) {
-				quadMeanDiameter2 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea2, treesPerHectare2);
-			} else {
-				quadMeanDiameter2 = 1000f;
-			}
-
-			// under rare circumstances, let DQ1 exceed DQMAXsp
-			if (quadMeanDiameter2 < minQuadMeanDiameter) {
-				quadMeanDiameter2 = minQuadMeanDiameter;
-				treesPerHectare2 = BaseAreaTreeDensityDiameter.treesPerHectare(baseArea2, quadMeanDiameter2);
-				treesPerHectare1 = standTreesPerHectare - treesPerHectare2;
-				quadMeanDiameter1 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea1, treesPerHectare1);
-			}
-
-		}
-		return quadMeanDiameter1;
-	}
 
 
 	// EMP090

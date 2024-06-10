@@ -423,11 +423,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		// TODO set TPH, BA, DQ for util class ALL
 
-		Map<String, Float> speciesBaseAreas = new HashMap<>();
-
 		lBuilder.adaptSpecies(primaryLayer, (sBuilder, vriSpec) -> {
 			float factor = primaryLayer.getSpecies().size() == 1 ? 1 : vriSpec.getFractionGenus();
-			speciesBaseAreas.put(vriSpec.getGenus(), factor * primaryBaseArea);
 		});
 
 		lBuilder.adaptSites(primaryLayer, (sBuilder, vriSite) -> {
@@ -466,9 +463,10 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		var species = lBuilder.getSpecies();
 		var sites = lBuilder.getSites();
-		
+
 		// TODO save to util ALL
-		var layerLoreyHeight = sites.stream().map(BaseVdypSite::getHeight).mapToDouble(Optional::get).sum()/primaryBaseArea;
+		var layerLoreyHeight = sites.stream().map(BaseVdypSite::getHeight).mapToDouble(Optional::get).sum()
+				/ primaryBaseArea;
 
 		var primarySpeciesOut = species.stream().filter(s -> s.getGenus().equals(primaryLayer.getPrimaryGenus()))
 				.findAny().get();
@@ -485,6 +483,30 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		}
 
 		this.applyGroups(polygon, species);
+	}
+
+	float findRootForQuadMeanDiameter() {
+		return 0; // TODO
+	}
+
+	float quadMeanDiameterFractionalError(
+			float x, Map<String, Float> finalDiameters, Map<String, Float> initial, Map<String, Float> baseArea,
+			Map<String, Float> min, Map<String, Float> max, float totalTreeDensity
+	) {
+		finalDiameters.clear();
+
+		float xToUse = FloatMath.clamp(x, -10, 10);
+
+		double tphSum = initial.entrySet().stream().mapToDouble(spec -> {
+			float speciesFinal = FloatMath.clamp(
+					7.5f + (spec.getValue() - 7.5f) * FloatMath.exp(xToUse),
+					min.get(spec.getKey()), max.get(spec.getKey()))
+			;
+			finalDiameters.put(spec.getKey(), speciesFinal);
+			return BaseAreaTreeDensityDiameter.treesPerHectare(baseArea.get(spec.getKey()), speciesFinal);
+		}).sum();
+		
+		return (float) ((tphSum-totalTreeDensity)/totalTreeDensity);
 	}
 
 	private void processVeteranLayer(VriPolygon polygon, VdypLayer.Builder lBuilder) throws StandProcessingException {
