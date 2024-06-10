@@ -140,7 +140,7 @@ public class EMP {
 		var heightToUse = coe.getEquationIndex() == 1 ? leadHeight : primaryHeight;
 		return 1.3f + coe.getCoe(1) * pow(heightToUse - 1.3f, coe.getCoe(2));
 	}
-	
+
 	// EMP060
 	/**
 	 * Estimate DQ for a species (primary or not). Using eqn in jf125.doc.
@@ -266,7 +266,9 @@ public class EMP {
 		var limits = getLimitsForHeightAndDiameter(species, region);
 
 		final float dqMinSp = max(minQuadMeanDiameter, limits.minDiameterHeight() * loreyHeightSpec);
-		final float dqMaxSp = max(7.6f, min(limits.maxQuadMeanDiameter(), limits.maxDiameterHeight() * loreyHeightSpec));
+		final float dqMaxSp = max(
+				7.6f, min(limits.maxQuadMeanDiameter(), limits.maxDiameterHeight() * loreyHeightSpec)
+		);
 		if (quadMeanDiameter1 < dqMinSp) {
 			quadMeanDiameter1 = dqMinSp;
 			treesPerHectare1 = BaseAreaTreeDensityDiameter.treesPerHectare(baseArea1, quadMeanDiameter1);
@@ -298,9 +300,11 @@ public class EMP {
 		return quadMeanDiameter1;
 	}
 
-	
-	public static record Limits (float maxLoreyHeight, float maxQuadMeanDiameter, float minDiameterHeight, float maxDiameterHeight) {};
-	
+	public static record Limits(
+			float maxLoreyHeight, float maxQuadMeanDiameter, float minDiameterHeight, float maxDiameterHeight
+	) {
+	};
+
 	// EMP061
 	public Limits getLimitsForHeightAndDiameter(String genus, Region region) {
 		var coeMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(

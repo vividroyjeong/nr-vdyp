@@ -8,9 +8,7 @@ import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 
 public class TestSpecies extends BaseVdypSpecies {
 
-	protected TestSpecies(
-			PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, float percentGenus
-	) {
+	protected TestSpecies(PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, float percentGenus) {
 		super(polygonIdentifier, layerType, genus, percentGenus);
 	}
 

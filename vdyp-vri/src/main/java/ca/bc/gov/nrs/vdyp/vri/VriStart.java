@@ -368,6 +368,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 				pBuilder.addLayer(lBuilder -> {
 					try {
+						lBuilder.adapt(preProcessedPolygon.getLayers().get(LayerType.PRIMARY));
 						processPrimaryLayer(preProcessedPolygon, lBuilder);
 					} catch (ProcessingException e) {
 						throw new RuntimeProcessingException(e);
@@ -389,7 +390,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		}
 	}
 
-	private void processPrimaryLayer(VriPolygon polygon, VdypLayer.Builder lBuilder) throws ProcessingException {
+	void processPrimaryLayer(VriPolygon polygon, VdypLayer.Builder lBuilder) throws ProcessingException {
 		var primaryLayer = polygon.getLayers().get(LayerType.PRIMARY);
 		var bec = Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap);
 
@@ -499,14 +500,14 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		double tphSum = initial.entrySet().stream().mapToDouble(spec -> {
 			float speciesFinal = FloatMath.clamp(
-					7.5f + (spec.getValue() - 7.5f) * FloatMath.exp(xToUse),
-					min.get(spec.getKey()), max.get(spec.getKey()))
-			;
+					7.5f + (spec.getValue() - 7.5f) * FloatMath.exp(xToUse), min.get(spec.getKey()),
+					max.get(spec.getKey())
+			);
 			finalDiameters.put(spec.getKey(), speciesFinal);
 			return BaseAreaTreeDensityDiameter.treesPerHectare(baseArea.get(spec.getKey()), speciesFinal);
 		}).sum();
-		
-		return (float) ((tphSum-totalTreeDensity)/totalTreeDensity);
+
+		return (float) ( (tphSum - totalTreeDensity) / totalTreeDensity);
 	}
 
 	private void processVeteranLayer(VriPolygon polygon, VdypLayer.Builder lBuilder) throws StandProcessingException {

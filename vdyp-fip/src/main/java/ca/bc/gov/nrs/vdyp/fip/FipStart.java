@@ -470,7 +470,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 					var dqMin = limits.minDiameterHeight() * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL);
 					var dqMax = max(
-							limits.maxQuadMeanDiameter(), limits.maxDiameterHeight() * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL)
+							limits.maxQuadMeanDiameter(),
+							limits.maxDiameterHeight() * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL)
 					);
 
 					// EMP060
@@ -580,8 +581,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			}
 		}
 	}
-
-
 
 	// EMP090
 	private float estimateWholeStemVolumePerTree(int volumeGroup, float loreyHeight, float quadMeanDiameter) {

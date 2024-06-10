@@ -15,8 +15,7 @@ public class TestLayer extends BaseVdypLayer<TestSpecies, TestSite> implements I
 	final float crownClosure;
 
 	protected TestLayer(
-			PolygonIdentifier polygonIdentifier, LayerType layerType, Optional inventoryTypeGroup,
-			float crownClosure
+			PolygonIdentifier polygonIdentifier, LayerType layerType, Optional inventoryTypeGroup, float crownClosure
 	) {
 		super(polygonIdentifier, layerType, inventoryTypeGroup);
 		this.crownClosure = crownClosure;
