@@ -58,16 +58,11 @@ public class ForwardProcessingEngine {
 	/** π/10⁴ */
 	public static final float PI_40K = (float) (Math.PI / 40_000);
 
-	private final ForwardProcessingState fps;
+	/* pp */ final ForwardProcessingState fps;
 
 	public ForwardProcessingEngine(Map<String, Object> controlMap) {
 
-		this(new ForwardProcessingState(controlMap));
-	}
-
-	/* pp */ ForwardProcessingEngine(ForwardProcessingState fps) {
-
-		this.fps = fps;
+		this.fps = new ForwardProcessingState(controlMap);
 	}
 
 	public enum ExecutionStep {
@@ -124,7 +119,7 @@ public class ForwardProcessingEngine {
 			ExecutionStep lastStep
 	) throws ProcessingException {
 
-		PolygonProcessingState pps = fps.getProcessingState();
+		PolygonProcessingState pps = fps.getPolygonProcessingState();
 		Bank bank = fps.getBank(0, LayerType.PRIMARY);
 
 		logger.info(
@@ -141,7 +136,7 @@ public class ForwardProcessingEngine {
 
 		// SCINXSET - note these are calculated directly from the Primary bank of instance 1
 		if (lastStep.ordinal() >= ExecutionStep.CalculateMissingSiteCurves.ordinal()) {
-			calculateMissingSiteCurves(bank, fps.getSiteCurveMap(), fps.getProcessingState());
+			calculateMissingSiteCurves(bank, fps.getSiteCurveMap(), fps.getPolygonProcessingState());
 		}
 
 		// VPRIME, method == 1
@@ -188,8 +183,11 @@ public class ForwardProcessingEngine {
 		// Note: L1COM2 (INL1VGRP, INL1DGRP, INL1BGRP) is initialized when 
 		// PolygonProcessingState (volumeEquationGroups, decayEquationGroups
 		// breakageEquationGroups, respectively) is constructed. Copying
-		// the values into LCOM1 is not necessary, with the exception that
-		// VolumeEquationGroup 10 is mapped to 11 (VGRPFIND)
+		// the values into LCOM1 is not necessary. Note, however, that 
+		// VolumeEquationGroup 10 is mapped to 11 (VGRPFIND) - this is done
+		// when volumeEquationGroups is built (i.e., when the equivalent to
+		// INL1VGRP is built, rather than when LCOM1 VGRPL is built in the 
+		// original code.)
 
 		var cvVolume = new MatrixMap3[pps.getNSpecies() + 1];
 		var cvBasalArea = new MatrixMap2[pps.getNSpecies() + 1];
@@ -200,7 +198,7 @@ public class ForwardProcessingEngine {
 
 			String genusName = pps.wallet.speciesNames[s];
 			
-			float spLoreyHeight_All = pps.wallet.loreyHeights[s][0];
+			float spLoreyHeight_All = pps.wallet.loreyHeights[s][UtilizationClass.ALL.ordinal()];
 
 			Coefficients basalAreas = Utils.utilizationVector();
 			Coefficients wholeStemVolumes = Utils.utilizationVector();
@@ -211,31 +209,34 @@ public class ForwardProcessingEngine {
 			Coefficients treesPerHectare = Utils.utilizationVector();
 
 			cvVolume[s] = new MatrixMap3Impl<UtilizationClass, VolumeVariable, LayerType, Float>(
-					UtilizationClass.ALL_BUT_SMALL, VolumeVariable.ALL, LayerType.ALL_USED, (k1, k2, k3) -> 0f
+					UtilizationClass.ALL_BUT_SMALL_AND_ALL, VolumeVariable.ALL, LayerType.ALL_USED, (k1, k2, k3) -> 0f
 			);
 			cvBasalArea[s] = new MatrixMap2Impl<UtilizationClass, LayerType, Float>(
-					UtilizationClass.ALL_BUT_SMALL, LayerType.ALL_USED, (k1, k2) -> 0f
+					UtilizationClass.ALL_BUT_SMALL_AND_ALL, LayerType.ALL_USED, (k1, k2) -> 0f
 			);
 			cvQuadraticMeanDiameter[s] = new MatrixMap2Impl<UtilizationClass, LayerType, Float>(
-					UtilizationClass.ALL_BUT_SMALL, LayerType.ALL_USED, (k1, k2) -> 0f
+					UtilizationClass.ALL_BUT_SMALL_AND_ALL, LayerType.ALL_USED, (k1, k2) -> 0f
 			);
 
 			for (UtilizationClass uc : UtilizationClass.ALL_BUT_SMALL) {
 
+				basalAreas.setCoe(uc.index, pps.wallet.basalAreas[s][uc.ordinal()]);
+				wholeStemVolumes.setCoe(uc.index, pps.wallet.wholeStemVolumes[s][uc.ordinal()]);
+				closeUtilizationVolumes.setCoe(uc.index, pps.wallet.closeUtilizationVolumes[s][uc.ordinal()]);
+				closeUtilizationVolumesNetOfDecay.setCoe(uc.index, pps.wallet.cuVolumesMinusDecay[s][uc.ordinal()]);
+				closeUtilizationVolumesNetOfDecayAndWaste
+						.setCoe(uc.index, pps.wallet.cuVolumesMinusDecayAndWastage[s][uc.ordinal()]);
+
+				quadMeanDiameters.setCoe(uc.index, pps.wallet.quadMeanDiameters[s][uc.ordinal()]);
+				if (uc != UtilizationClass.ALL && quadMeanDiameters.getCoe(uc.index) <= 0.0f) {
+					quadMeanDiameters.setCoe(uc.index, DEFAULT_QUAD_MEAN_DIAMETERS[uc.ordinal()]);
+				}
+			}
+
+			for (UtilizationClass uc : UtilizationClass.ALL_BUT_SMALL_AND_ALL) {
+
 				float adjustment;
 				float baseVolume;
-
-				basalAreas.setCoe(uc.index, pps.wallet.basalAreas[s][uc.index]);
-				wholeStemVolumes.setCoe(uc.index, pps.wallet.wholeStemVolumes[s][uc.index]);
-				closeUtilizationVolumes.setCoe(uc.index, pps.wallet.closeUtilizationVolumes[s][uc.index]);
-				closeUtilizationVolumesNetOfDecay.setCoe(uc.index, pps.wallet.cuVolumesMinusDecay[s][uc.index]);
-				closeUtilizationVolumesNetOfDecayAndWaste
-						.setCoe(uc.index, pps.wallet.cuVolumesMinusDecayAndWastage[s][uc.index]);
-
-				quadMeanDiameters.setCoe(uc.index, pps.wallet.quadMeanDiameters[s][uc.index]);
-				if (uc != UtilizationClass.ALL && quadMeanDiameters.getCoe(uc.index) <= 0.0f) {
-					quadMeanDiameters.setCoe(uc.index, DEFAULT_QUAD_MEAN_DIAMETERS[uc.index]);
-				}
 
 				// Volume less decay and waste
 				adjustment = 0.0f;
@@ -246,10 +247,11 @@ public class ForwardProcessingEngine {
 
 					// EMP094
 					EstimationMethods.estimateNetDecayAndWasteVolume(
-							pps.getBecZone()
-									.getRegion(), uc, aAdjust, pps.wallet.speciesNames[s], spLoreyHeight_All, pps.wallet.yearsAtBreastHeight[s], pps
-											.getNetDecayWasteCoeMap(), pps
-													.getWasteModifierMap(), quadMeanDiameters, closeUtilizationVolumes, closeUtilizationVolumesNetOfDecay, closeUtilizationVolumesNetOfDecayAndWaste
+							pps.getBecZone().getRegion(), uc, aAdjust, pps.wallet.speciesNames[s], 
+							spLoreyHeight_All, pps.wallet.yearsAtBreastHeight[s], 
+							pps.getNetDecayWasteCoeMap(), pps.getWasteModifierMap(), 
+							quadMeanDiameters, closeUtilizationVolumes, closeUtilizationVolumesNetOfDecay, 
+							closeUtilizationVolumesNetOfDecayAndWaste
 					);
 
 					float actualVolume = pps.wallet.cuVolumesMinusDecayAndWastage[s][uc.ordinal()];
@@ -270,10 +272,10 @@ public class ForwardProcessingEngine {
 					// EMP094
 					int decayGroup = pps.decayEquationGroups[s];
 					EstimationMethods.estimateNetDecayVolume(
-							pps.wallet.speciesNames[s], pps.getBecZone()
-									.getRegion(), uc, aAdjust, decayGroup, spLoreyHeight_All, pps.wallet.yearsAtBreastHeight[s], pps
-											.getNetDecayCoeMap(), pps
-													.getDecayModifierMap(), quadMeanDiameters, closeUtilizationVolumes, closeUtilizationVolumesNetOfDecay
+							pps.wallet.speciesNames[s], 
+							pps.getBecZone().getRegion(), uc, aAdjust, decayGroup, spLoreyHeight_All, 
+							pps.wallet.yearsAtBreastHeight[s], pps.getNetDecayCoeMap(), pps.getDecayModifierMap(), 
+							quadMeanDiameters, closeUtilizationVolumes, closeUtilizationVolumesNetOfDecay
 					);
 
 					float actualVolume = pps.wallet.cuVolumesMinusDecay[s][uc.ordinal()];
@@ -320,7 +322,7 @@ public class ForwardProcessingEngine {
 							.getWholeStemUtilizationComponentMap(), quadMeanDiameters, basalAreas, wholeStemVolumes
 			);
 
-			for (UtilizationClass uc : UtilizationClass.ALL_BUT_SMALL) {
+			for (UtilizationClass uc : UtilizationClass.ALL_BUT_SMALL_AND_ALL) {
 				float adjustment = 0.0f;
 				float basalArea = pps.wallet.basalAreas[s][uc.ordinal()];
 				if (allowCompatibilitySetting == 0 && basalArea > 0.0f

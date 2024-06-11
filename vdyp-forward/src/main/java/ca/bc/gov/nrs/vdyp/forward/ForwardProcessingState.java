@@ -145,7 +145,7 @@ class ForwardProcessingState {
 		processingState = new PolygonProcessingState(this, polygon, banks[toIndex(0, LayerType.PRIMARY)], controlMap);
 	}
 
-	public PolygonProcessingState getProcessingState() {
+	public PolygonProcessingState getPolygonProcessingState() {
 		return processingState;
 	}
 

@@ -153,8 +153,8 @@ public class EstimationMethods {
 			Region region, UtilizationClass utilizationClass, Coefficients aAdjust,
 			String genus, float loreyHeight, float ageBreastHeight,
 			Map<String, Coefficients> netDecayWasteCoeMap,
-			MatrixMap2<String, Region, Float> wasteModifierMap, Coefficients quadMeanDiameterUtil,
-			Coefficients closeUtilizationUtil,
+			MatrixMap2<String, Region, Float> wasteModifierMap, 
+			Coefficients quadMeanDiameterUtil, Coefficients closeUtilizationUtil,
 			Coefficients closeUtilizationNetOfDecayUtil, Coefficients closeUtilizationNetOfDecayAndWasteUtil
 	) throws ProcessingException {
 		estimateUtilization(
@@ -720,7 +720,7 @@ public class EstimationMethods {
 				continue;
 			}
 	
-			var result = processor.apply(uc, input.getCoe(uc.index));
+			var result = processor.apply(uc, inputValue);
 			output.setCoe(uc.index, result);
 		}
 	}
