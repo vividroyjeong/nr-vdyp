@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.math3.analysis.UnivariateFunction;
+import org.apache.commons.math3.exception.NoBracketingException;
 import org.apache.commons.math3.exception.TooManyEvaluationsException;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -850,7 +851,7 @@ class VriStartTest {
 
 				VriStart app = new VriStart();
 
-				var ex = assertThrows(TooManyEvaluationsException.class, () -> app.findInterval(xInterval, errorFunc));
+				var ex = assertThrows(NoBracketingException.class, () -> app.findInterval(xInterval, errorFunc));
 
 			}
 
@@ -922,7 +923,27 @@ class VriStartTest {
 			@Test
 			void noSolutionThrow() {
 				controlMap = VriTestUtils.loadControlMap();
-				VriStart app = new VriStart();
+
+				VriStart app = new VriStart() {
+
+					@Override
+					float quadMeanDiameterFractionalError(
+							double x, Map<String, Float> finalDiameters, Map<String, Float> initial,
+							Map<String, Float> baseArea, Map<String, Float> min, Map<String, Float> max,
+							float totalTreeDensity
+					) {
+						// Force this to be something with no root. Finding a set of inputs that have no real root or
+						// which the interval fixer can't handle would be better
+
+						var f = Math.exp(x) + 1;
+
+						initial.forEach((k, v) -> finalDiameters.put(k, (float) (v * x)));
+
+						return (float) f;
+					}
+
+				};
+
 				ApplicationTestUtils.setControlMap(app, controlMap);
 
 				Map<String, Float> initialDqs = Utils.constMap(map -> {
@@ -956,23 +977,11 @@ class VriStartTest {
 				});
 
 				float x1 = -0.6f;
-				float x2 = -0.5f;
+				float x2 = 0.5f;
 
 				float tph = 748.402222f;
 
 				var resultPerSpecies = new HashMap<String, Float>();
-
-				float f1 = app.quadMeanDiameterFractionalError(
-						x1, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph
-				);
-				float f2 = app.quadMeanDiameterFractionalError(
-						x2, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph
-				);
-
-				assertThat(
-						"Test invalid unless f(x1) and f(x2) have the same sign", f1 * f2, //
-						Matchers.greaterThan(0.0f)
-				);
 
 				app.setDebugMode(1, 2);
 
@@ -982,13 +991,32 @@ class VriStartTest {
 								x1, x2, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph
 						)
 				);
-
 			}
 
 			@Test
-			void noSolutionBestGuess() throws StandProcessingException {
+			void noSolutionGuess() throws StandProcessingException {
 				controlMap = VriTestUtils.loadControlMap();
-				VriStart app = new VriStart();
+
+				VriStart app = new VriStart() {
+
+					@Override
+					float quadMeanDiameterFractionalError(
+							double x, Map<String, Float> finalDiameters, Map<String, Float> initial,
+							Map<String, Float> baseArea, Map<String, Float> min, Map<String, Float> max,
+							float totalTreeDensity
+					) {
+						// Force this to be something with no root. Finding a set of inputs that have no real root or
+						// which the interval fixer can't handle would be better
+
+						var f = Math.exp(x) + 1;
+
+						initial.forEach((k, v) -> finalDiameters.put(k, (float) (v * x)));
+
+						return (float) f;
+					}
+
+				};
+
 				ApplicationTestUtils.setControlMap(app, controlMap);
 
 				Map<String, Float> initialDqs = Utils.constMap(map -> {
@@ -1022,42 +1050,74 @@ class VriStartTest {
 				});
 
 				float x1 = -0.6f;
-				float x2 = -0.5f;
+				float x2 = 0.5f;
 
 				float tph = 748.402222f;
 
 				var resultPerSpecies = new HashMap<String, Float>();
 
-				float f1 = app.quadMeanDiameterFractionalError(
-						x1, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph
-				);
-				float f2 = app.quadMeanDiameterFractionalError(
-						x2, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph
-				);
-
-				assertThat(
-						"Test invalid unless f(x1) and f(x2) have the same sign", f1 * f2, //
-						Matchers.greaterThan(0.0f)
-				);
-
 				app.setDebugMode(1, 0);
 
-				float result = app.findRootForQuadMeanDiameterFractionalError(
+				var result = app.findRootForQuadMeanDiameterFractionalError(
 						x1, x2, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph
 				);
 
-				assertThat(result, closeTo(0.172141284f));
+				assertThat(result, closeTo(-0.1f));
 
+				// Complete nonsense numbers, but they test if the function is doing the right thing based on the
+				// nonsense function used in the mock
 				assertThat(
 						resultPerSpecies, allOf(
-								hasEntry(is("B"), closeTo(12.9407434f)), //
-								hasEntry(is("C"), closeTo(8.88676834f)), //
-								hasEntry(is("F"), closeTo(12.6130743f)), //
-								hasEntry(is("H"), closeTo(9.35890579f)), //
-								hasEntry(is("S"), closeTo(10.9994669f))
+								hasEntry(is("B"), closeTo(12.0803461f * (-0.1f))), //
+								hasEntry(is("C"), closeTo(8.66746521f * (-0.1f))), //
+								hasEntry(is("F"), closeTo(11.8044939f * (-0.1f))), //
+								hasEntry(is("H"), closeTo(9.06493855f * (-0.1f))), //
+								hasEntry(is("S"), closeTo(10.4460621f * (-0.1f)))
 						)
 				);
 
+			}
+
+		}
+
+		@Nested
+		class BestOf {
+
+			static double func(double x) {
+				return 7 * Math.sin(x / 7) + 2 * Math.sin(x / 2);
+			}
+
+			@ParameterizedTest
+			@CsvSource(
+				{ //
+						"-1, 0, 1, 0", // Increasing middle
+						"-23, -21, -19, -21", // Decreasing middle
+						"4, 10, 20, 20", // Last from above
+						"-9, -5, -1, -1", // Last from below
+						"2, 8, 14, 2", // First from above
+						"22, 30, 34, 22" // First from below
+				}
+			)
+			void testThreePoints(double x1, double x2, double x3, double expect) {
+
+				var result = VriStart.bestOf(BestOf::func, x1, x2, x3);
+
+				assertThat(result, is(expect));
+			}
+
+			@ParameterizedTest
+			@ValueSource(doubles = { 0, -1, 1, -23, -21, -19, -9, -5, 4, 10, 20, 2, 8, 14, 22, 30, 34 })
+			void testOnePoint(double x) {
+
+				var result = VriStart.bestOf(BestOf::func, x);
+
+				assertThat(result, is(x));
+			}
+
+			@Test
+			void noPoints() {
+
+				assertThrows(IllegalArgumentException.class, () -> VriStart.bestOf(BestOf::func));
 			}
 		}
 

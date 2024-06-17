@@ -1222,23 +1222,24 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			Map<String, Float> baseAreas, Map<String, Float> minDq, Map<String, Float> maxDq, float tph
 	) throws StandProcessingException {
 
-		var interval = new Interval(min, max);
-
-		double start = interval.mid();
-
 		// Note, this function has side effects in that it modifies resultPerSpecies. This is intentional, the goal is
 		// to apply adjustment factor x to the values in initialDqs until the combination of their values has minimal
 		// error then use those adjusted values.
-
+		
 		UnivariateFunction errorFunc = x -> this
 				.quadMeanDiameterFractionalError(x, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph);
 		try {
+			var interval = new Interval(min, max);
 
+			// I couldn't identify the method the original Fortran was using, so I just picked one and it worked
+			// We could swap this for another like NewtonRaphsonSolver
 			var solver = new BrentSolver();
 
+			// The Fortran solver library, $ZERO, included an ability to search for a better interval if given one where
+			// the function values at the end points have the same sign.   This replicates that. 
 			interval = findInterval(new Interval(min, max), errorFunc);
 
-			double x = solver.solve(100, errorFunc, interval.start(), interval.end(), start);
+			double x = solver.solve(100, errorFunc, interval.start(), interval.end(), interval.mid());
 
 			return (float) x;
 		} catch (NoBracketingException ex) {
@@ -1265,13 +1266,22 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		}
 	}
 
-	protected static double bestOf(UnivariateFunction func, double... values) {
+	/**
+	 * Returns the x value for which func(x) is closest to 0.
+	 * @param func
+	 * @param values
+	 * @return
+	 */
+	static double bestOf(UnivariateFunction func, double... values) {
+		if(values.length<=0) {
+			throw new IllegalArgumentException("bestOf requires at least one point to compare");
+		}
 		double bestX = values[0];
 		double bestY = func.value(bestX);
 		for (int i = 1; i < values.length; i++) {
 			double newX = values[i];
 			double newY = func.value(newX);
-			if (Math.abs(newY) < Math.abs(bestX)) {
+			if (Math.abs(newY) < Math.abs(bestY)) {
 				bestX = newX;
 				bestY = newY;
 			}
@@ -1314,21 +1324,22 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	 * @param func
 	 * @return an interval for parameters to func
 	 */
-	public Interval findInterval(Interval interval, UnivariateFunction func) {
+	public Interval findInterval(Interval intervalInit, UnivariateFunction func) {
 
+		var interval = intervalInit;
 		// Try 40 times before giving up.
 
 		double currentX = interval.start();
 		double lastX = interval.end();
 		double lastF = func.value(lastX);
-
+		double currentF = func.value(currentX);
 		int i;
 		for (i = 0; i < 40; i++) {
 
-			double currentF = func.value(currentX);
-
 			if (currentF * lastF <= 0) {
-				return new Interval(Math.min(currentX, lastX), Math.max(currentX, lastX));
+				var newInterval = new Interval(Math.min(currentX, lastX), Math.max(currentX, lastX));
+				log.atInfo().setMessage("Looking for root in range {}").addArgument(interval);
+				return newInterval;
 			}
 
 			double tp = currentF / lastF;
@@ -1355,8 +1366,9 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				oppositeX = 1.03125 * currentX + (0.001 * Math.signum(currentX));
 			}
 			currentX += tp * (currentX - oppositeX);
+			currentF = func.value(currentX);
 		}
 
-		throw new TooManyEvaluationsException(i);
+		throw new NoBracketingException(currentX, lastX, currentF, lastF);
 	}
 }
