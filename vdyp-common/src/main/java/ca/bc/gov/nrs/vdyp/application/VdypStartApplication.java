@@ -85,6 +85,17 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		map.put("Y", 9);
 	});
 
+	// TODO Should probably handle this with enums instead for clarity.
+	private int[] debugModes = new int[25];
+
+	protected int getDebugMode(int index) {
+		return debugModes[index];
+	}
+
+	public void setDebugMode(int index, int mode) {
+		debugModes[index] = mode;
+	}
+
 	static final Set<String> HARDWOODS = Set.of("AC", "AT", "D", "E", "MB");
 
 	protected static void doMain(VdypStartApplication<?, ?, ?, ?> app, final String... args) {

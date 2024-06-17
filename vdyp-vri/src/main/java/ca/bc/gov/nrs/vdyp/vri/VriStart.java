@@ -12,8 +12,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
+import org.apache.commons.math3.analysis.UnivariateFunction;
+import org.apache.commons.math3.analysis.solvers.BrentSolver;
+import org.apache.commons.math3.exception.MathIllegalArgumentException;
+import org.apache.commons.math3.exception.NoBracketingException;
+import org.apache.commons.math3.exception.TooManyEvaluationsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
@@ -49,7 +55,6 @@ import ca.bc.gov.nrs.vdyp.model.ModelClassBuilder;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
-import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
 import ca.bc.gov.nrs.vdyp.vri.model.VriPolygon;
 import ca.bc.gov.nrs.vdyp.vri.model.VriSite;
@@ -432,9 +437,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			var vriSpec = primaryLayer.getSpecies().get(vriSite.getSiteGenus());
 
 			if (vriSite != primarySiteIn) {
-				var NDEBUG2 = 0; // TODO
 
-				float loreyHeight = vriSite.getHeight().filter((x) -> NDEBUG2 == 1).map(height -> {
+				float loreyHeight = vriSite.getHeight().filter((x) -> getDebugMode(2) == 1).map(height -> {
 					float speciesQuadMeanDiameter = Math.max(7.5f, height / leadHeight * layerQuadMeanDiameter);
 					float speciesDensity = BaseAreaTreeDensityDiameter
 							.treesPerHectare(primaryBaseArea, layerQuadMeanDiameter);
@@ -491,12 +495,12 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	}
 
 	float quadMeanDiameterFractionalError(
-			float x, Map<String, Float> finalDiameters, Map<String, Float> initial, Map<String, Float> baseArea,
+			double x, Map<String, Float> finalDiameters, Map<String, Float> initial, Map<String, Float> baseArea,
 			Map<String, Float> min, Map<String, Float> max, float totalTreeDensity
 	) {
 		finalDiameters.clear();
 
-		float xToUse = FloatMath.clamp(x, -10, 10);
+		float xToUse = FloatMath.clamp((float) x, -10, 10);
 
 		double tphSum = initial.entrySet().stream().mapToDouble(spec -> {
 			float speciesFinal = FloatMath.clamp(
@@ -713,7 +717,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		float ageToUse = breastHeightAge;
 
-		// TODO NDEBUG(2)
+		// TODO getDebugMode(2)==1
 
 		if (ageToUse <= 0f) {
 			throw new StandProcessingException("Age was not positive");
@@ -782,7 +786,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	) throws StandProcessingException {
 		final var coe = sumCoefficientsWeightedBySpeciesAndDecayBec(species, bec, ControlKey.DQ_YIELD, 6);
 
-		// TODO handle NDEBUG(2) case
+		// TODO handle getDebugMode(2) case
 		final float ageUse = breastHeightAge;
 
 		final float upperBoundsQuadMeanDiameter = upperBoundsQuadMeanDiameter(baseAreaGroup);
@@ -1211,5 +1215,148 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	@Override
 	protected float getYieldFactor(VriPolygon polygon) {
 		return polygon.getYieldFactor();
+	}
+
+	float findRootForQuadMeanDiameterFractionalError(
+			float min, float max, HashMap<String, Float> resultPerSpecies, Map<String, Float> initialDqs,
+			Map<String, Float> baseAreas, Map<String, Float> minDq, Map<String, Float> maxDq, float tph
+	) throws StandProcessingException {
+
+		var interval = new Interval(min, max);
+
+		double start = interval.mid();
+
+		// Note, this function has side effects in that it modifies resultPerSpecies. This is intentional, the goal is
+		// to apply adjustment factor x to the values in initialDqs until the combination of their values has minimal
+		// error then use those adjusted values.
+
+		UnivariateFunction errorFunc = x -> this
+				.quadMeanDiameterFractionalError(x, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph);
+		try {
+
+			var solver = new BrentSolver();
+
+			interval = findInterval(new Interval(min, max), errorFunc);
+
+			double x = solver.solve(100, errorFunc, interval.start(), interval.end(), start);
+
+			return (float) x;
+		} catch (NoBracketingException ex) {
+
+			// Decide if we want to propagate the exception or try to come up with something anyway.
+			handleRootForQuadMeanDiameterFractionalErrorException(ex);
+
+			// Try three values and take the least bad option.
+
+			double x = bestOf(errorFunc, 0, -0.1, 0.1);
+
+			// Invoke the function again to set the species map via
+			errorFunc.value(x);
+
+			return (float) x;
+
+		} catch (TooManyEvaluationsException ex) {
+
+			// Decide if we want to propagate the exception or try to use the last result.
+			handleRootForQuadMeanDiameterFractionalErrorException(ex);
+
+			return 0; // TODO
+
+		}
+	}
+
+	protected static double bestOf(UnivariateFunction func, double... values) {
+		double bestX = values[0];
+		double bestY = func.value(bestX);
+		for (int i = 1; i < values.length; i++) {
+			double newX = values[i];
+			double newY = func.value(newX);
+			if (Math.abs(newY) < Math.abs(bestX)) {
+				bestX = newX;
+				bestY = newY;
+			}
+		}
+		return bestX;
+	}
+
+	private void handleRootForQuadMeanDiameterFractionalErrorException(RuntimeException ex)
+			throws StandProcessingException {
+		// Only do this in VRIStart
+
+		if (getDebugMode(1) == 2) {
+			throw new StandProcessingException("Could not find solution for quadratic mean diameter", ex);
+		}
+
+		log.atWarn().setMessage("Could not find exact solution for quadratic mean diameter.  Using inexact estimate.")
+				.setCause(ex);
+
+	}
+
+	public static record Interval(double start, double end) {
+		double mid() {
+			return (start() + end()) / 2;
+		}
+
+		double size() {
+			return end() - start();
+		}
+
+		Interval evaluate(UnivariateFunction func) {
+			return new Interval(func.value(start()), func.value(end()));
+		}
+
+	}
+
+	/**
+	 * This replicates the behavior of the SZERO root finding library used by VDYP7
+	 *
+	 * @param interval Initial interval of parameters to func
+	 * @param func
+	 * @return an interval for parameters to func
+	 */
+	public Interval findInterval(Interval interval, UnivariateFunction func) {
+
+		// Try 40 times before giving up.
+
+		double currentX = interval.start();
+		double lastX = interval.end();
+		double lastF = func.value(lastX);
+
+		int i;
+		for (i = 0; i < 40; i++) {
+
+			double currentF = func.value(currentX);
+
+			if (currentF * lastF <= 0) {
+				return new Interval(Math.min(currentX, lastX), Math.max(currentX, lastX));
+			}
+
+			double tp = currentF / lastF;
+
+			if (tp >= 1) {
+				double temp = currentX;
+				currentX = lastX;
+				lastX = temp;
+				temp = currentF;
+				currentF = lastF;
+				lastF = temp;
+			}
+
+			if (Math.abs(currentF) >= 8 * Math.abs(lastF - currentF)) {
+				tp = 8;
+			} else {
+				tp = Math.max(0.25 * i, currentF / (lastF - currentF));
+			}
+
+			lastF = currentF;
+			double oppositeX = lastX;
+			lastX = currentX;
+			if (currentX == oppositeX) {
+				oppositeX = 1.03125 * currentX + (0.001 * Math.signum(currentX));
+			}
+			currentX += tp * (currentX - oppositeX);
+		}
+
+		throw new TooManyEvaluationsException(i);
 	}
 }
