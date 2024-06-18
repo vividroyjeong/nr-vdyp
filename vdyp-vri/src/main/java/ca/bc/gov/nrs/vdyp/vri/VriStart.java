@@ -503,15 +503,18 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		float xToUse = FloatMath.clamp((float) x, -10, 10);
 
 		double tphSum = initial.entrySet().stream().mapToDouble(spec -> {
-			float speciesFinal = FloatMath.clamp(
-					7.5f + (spec.getValue() - 7.5f) * FloatMath.exp(xToUse), min.get(spec.getKey()),
-					max.get(spec.getKey())
+			float speciesFinal = quadMeanDiameterSpeciesAdjust(
+					xToUse, spec.getValue(), min.get(spec.getKey()), max.get(spec.getKey())
 			);
 			finalDiameters.put(spec.getKey(), speciesFinal);
 			return BaseAreaTreeDensityDiameter.treesPerHectare(baseArea.get(spec.getKey()), speciesFinal);
 		}).sum();
 
 		return (float) ( (tphSum - totalTreeDensity) / totalTreeDensity);
+	}
+
+	float quadMeanDiameterSpeciesAdjust(float x, float initialDq, float min, float max) {
+		return FloatMath.clamp(7.5f + (initialDq - 7.5f) * FloatMath.exp(x), min, max);
 	}
 
 	private void processVeteranLayer(VriPolygon polygon, VdypLayer.Builder lBuilder) throws StandProcessingException {
@@ -1225,21 +1228,23 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		// Note, this function has side effects in that it modifies resultPerSpecies. This is intentional, the goal is
 		// to apply adjustment factor x to the values in initialDqs until the combination of their values has minimal
 		// error then use those adjusted values.
-		
-		UnivariateFunction errorFunc = x -> this
-				.quadMeanDiameterFractionalError(x, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph);
+
+		// Keeping track of the recent X values tied can be used to make some sort of guess if it doesn't converge.
+		double[] lastXes = new double[2];
+		double[] lastFs = new double[2];
+
+		final double tol = 0.00001;
+
+		UnivariateFunction errorFunc = x -> {
+			lastXes[1] = lastXes[0];
+			lastXes[0] = x;
+			lastFs[1] = lastFs[0];
+			lastFs[0] = this
+					.quadMeanDiameterFractionalError(x, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph);
+			return lastFs[0];
+		};
 		try {
-			var interval = new Interval(min, max);
-
-			// I couldn't identify the method the original Fortran was using, so I just picked one and it worked
-			// We could swap this for another like NewtonRaphsonSolver
-			var solver = new BrentSolver();
-
-			// The Fortran solver library, $ZERO, included an ability to search for a better interval if given one where
-			// the function values at the end points have the same sign.   This replicates that. 
-			interval = findInterval(new Interval(min, max), errorFunc);
-
-			double x = solver.solve(100, errorFunc, interval.start(), interval.end(), interval.mid());
+			double x = doSolve(min, max, errorFunc);
 
 			return (float) x;
 		} catch (NoBracketingException ex) {
@@ -1258,22 +1263,49 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		} catch (TooManyEvaluationsException ex) {
 
-			// Decide if we want to propagate the exception or try to use the last result.
-			handleRootForQuadMeanDiameterFractionalErrorException(ex);
+			if (tol > 0.0 && Math.abs(lastFs[0]) < tol / 2) {
 
-			return 0; // TODO
+				double f = errorFunc.value(lastXes[0]);
+				if (Math.abs(lastFs[0]) < tol) {
+
+					// Decide if we want to propagate the exception or try to use the last result.
+					handleRootForQuadMeanDiameterFractionalErrorException(ex);
+
+					return (float) lastXes[0];
+				}
+			}
+
+			throw new StandProcessingException(
+					"Could not find solution for quadratic mean diameter.  There appears to be a discontinuity.", ex
+			);
 
 		}
 	}
 
+	double doSolve(float min, float max, UnivariateFunction errorFunc) {
+		var interval = new Interval(min, max);
+
+		// I couldn't identify the method the original Fortran was using, so I just picked one and it worked
+		// We could swap this for another like NewtonRaphsonSolver
+		var solver = new BrentSolver();
+
+		// The Fortran solver library, $ZERO, included an ability to search for a better interval if given one where
+		// the function values at the end points have the same sign. This replicates that.
+		interval = findInterval(new Interval(min, max), errorFunc);
+
+		double x = solver.solve(100, errorFunc, interval.start(), interval.end(), interval.mid());
+		return x;
+	}
+
 	/**
 	 * Returns the x value for which func(x) is closest to 0.
+	 *
 	 * @param func
 	 * @param values
 	 * @return
 	 */
 	static double bestOf(UnivariateFunction func, double... values) {
-		if(values.length<=0) {
+		if (values.length <= 0) {
 			throw new IllegalArgumentException("bestOf requires at least one point to compare");
 		}
 		double bestX = values[0];

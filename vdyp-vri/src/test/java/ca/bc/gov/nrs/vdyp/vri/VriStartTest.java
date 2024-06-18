@@ -921,7 +921,7 @@ class VriStartTest {
 			}
 
 			@Test
-			void noSolutionThrow() {
+			void testNoIntervalThrow() {
 				controlMap = VriTestUtils.loadControlMap();
 
 				VriStart app = new VriStart() {
@@ -994,7 +994,7 @@ class VriStartTest {
 			}
 
 			@Test
-			void noSolutionGuess() throws StandProcessingException {
+			void testNoIntervalGuess() throws StandProcessingException {
 				controlMap = VriTestUtils.loadControlMap();
 
 				VriStart app = new VriStart() {
@@ -1076,6 +1076,228 @@ class VriStartTest {
 						)
 				);
 
+			}
+
+			@Test
+			void testTooManyEvaluationsStrictThrow() {
+				controlMap = VriTestUtils.loadControlMap();
+
+				float expectedX = 0.172142f;
+
+				VriStart app = new VriStart() {
+
+					@Override
+					double doSolve(float min, float max, UnivariateFunction errorFunc) {
+						errorFunc.value(0.1);
+						errorFunc.value(expectedX);
+						throw new TooManyEvaluationsException(100);
+					}
+
+				};
+
+				ApplicationTestUtils.setControlMap(app, controlMap);
+
+				Map<String, Float> initialDqs = Utils.constMap(map -> {
+					map.put("B", 12.0803461f);
+					map.put("C", 8.66746521f);
+					map.put("F", 11.8044939f);
+					map.put("H", 9.06493855f);
+					map.put("S", 10.4460621f);
+				});
+				Map<String, Float> baseAreas = Utils.constMap(map -> {
+					map.put("B", 0.634290636f);
+					map.put("C", 1.26858127f);
+					map.put("F", 1.90287197f);
+					map.put("H", 1.90287197f);
+					map.put("S", 0.634290636f);
+
+				});
+				Map<String, Float> minDq = Utils.constMap(map -> {
+					map.put("B", 7.6f);
+					map.put("C", 7.6f);
+					map.put("F", 7.6f);
+					map.put("H", 7.6f);
+					map.put("S", 7.6f);
+				});
+				Map<String, Float> maxDq = Utils.constMap(map -> {
+					map.put("B", 13.8423338f);
+					map.put("C", 16.6669998f);
+					map.put("F", 15.5116472f);
+					map.put("H", 12.5369997f);
+					map.put("S", 12.6630001f);
+				});
+
+				float x1 = -0.6f;
+				float x2 = 0.5f;
+
+				float tph = 748.402222f;
+
+				var resultPerSpecies = new HashMap<String, Float>();
+
+				app.setDebugMode(1, 2);
+
+				assertThrows(
+						StandProcessingException.class,
+						() -> app.findRootForQuadMeanDiameterFractionalError(
+								x1, x2, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph
+						)
+				);
+			}
+
+			@Test
+			void testTooManyEvaluationsGuess() throws StandProcessingException {
+				controlMap = VriTestUtils.loadControlMap();
+
+				float expectedX = 0.172142f;
+
+				VriStart app = new VriStart() {
+
+					@Override
+					double doSolve(float min, float max, UnivariateFunction errorFunc) {
+						errorFunc.value(0.1);
+						errorFunc.value(expectedX);
+						throw new TooManyEvaluationsException(100);
+					}
+
+				};
+
+				ApplicationTestUtils.setControlMap(app, controlMap);
+
+				Map<String, Float> initialDqs = Utils.constMap(map -> {
+					map.put("B", 12.0803461f);
+					map.put("C", 8.66746521f);
+					map.put("F", 11.8044939f);
+					map.put("H", 9.06493855f);
+					map.put("S", 10.4460621f);
+				});
+				Map<String, Float> baseAreas = Utils.constMap(map -> {
+					map.put("B", 0.634290636f);
+					map.put("C", 1.26858127f);
+					map.put("F", 1.90287197f);
+					map.put("H", 1.90287197f);
+					map.put("S", 0.634290636f);
+
+				});
+				Map<String, Float> minDq = Utils.constMap(map -> {
+					map.put("B", 7.6f);
+					map.put("C", 7.6f);
+					map.put("F", 7.6f);
+					map.put("H", 7.6f);
+					map.put("S", 7.6f);
+				});
+				Map<String, Float> maxDq = Utils.constMap(map -> {
+					map.put("B", 13.8423338f);
+					map.put("C", 16.6669998f);
+					map.put("F", 15.5116472f);
+					map.put("H", 12.5369997f);
+					map.put("S", 12.6630001f);
+				});
+
+				float x1 = -0.6f;
+				float x2 = 0.5f;
+
+				float tph = 748.402222f;
+
+				var resultPerSpecies = new HashMap<String, Float>();
+
+				app.setDebugMode(1, 0);
+
+				var result = app.findRootForQuadMeanDiameterFractionalError(
+						x1, x2, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph
+				);
+
+				assertThat(result, closeTo((float) expectedX));
+				assertThat(
+						resultPerSpecies,
+						allOf(
+								appliedX("B", expectedX, app, initialDqs, minDq, maxDq),
+								appliedX("C", expectedX, app, initialDqs, minDq, maxDq),
+								appliedX("F", expectedX, app, initialDqs, minDq, maxDq),
+								appliedX("H", expectedX, app, initialDqs, minDq, maxDq),
+								appliedX("S", expectedX, app, initialDqs, minDq, maxDq)
+						)
+				);
+
+			}
+
+			@Test
+			void testTooManyEvaluationsDiscontinuity() {
+				controlMap = VriTestUtils.loadControlMap();
+
+				float expectedX = -0.2f;
+
+				VriStart app = new VriStart() {
+
+					@Override
+					double doSolve(float min, float max, UnivariateFunction errorFunc) {
+						errorFunc.value(0.1);
+						errorFunc.value(expectedX);
+						throw new TooManyEvaluationsException(100);
+					}
+
+				};
+
+				ApplicationTestUtils.setControlMap(app, controlMap);
+
+				Map<String, Float> initialDqs = Utils.constMap(map -> {
+					map.put("B", 12.0803461f);
+					map.put("C", 8.66746521f);
+					map.put("F", 11.8044939f);
+					map.put("H", 9.06493855f);
+					map.put("S", 10.4460621f);
+				});
+				Map<String, Float> baseAreas = Utils.constMap(map -> {
+					map.put("B", 0.634290636f);
+					map.put("C", 1.26858127f);
+					map.put("F", 1.90287197f);
+					map.put("H", 1.90287197f);
+					map.put("S", 0.634290636f);
+
+				});
+				Map<String, Float> minDq = Utils.constMap(map -> {
+					map.put("B", 7.6f);
+					map.put("C", 7.6f);
+					map.put("F", 7.6f);
+					map.put("H", 7.6f);
+					map.put("S", 7.6f);
+				});
+				Map<String, Float> maxDq = Utils.constMap(map -> {
+					map.put("B", 13.8423338f);
+					map.put("C", 16.6669998f);
+					map.put("F", 15.5116472f);
+					map.put("H", 12.5369997f);
+					map.put("S", 12.6630001f);
+				});
+
+				float x1 = -0.6f;
+				float x2 = 0.5f;
+
+				float tph = 748.402222f;
+
+				var resultPerSpecies = new HashMap<String, Float>();
+
+				app.setDebugMode(1, 0);
+
+				assertThrows(
+						StandProcessingException.class,
+						() -> app.findRootForQuadMeanDiameterFractionalError(
+								x1, x2, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph
+						)
+				);
+			}
+
+			static Matcher<Map<? extends String, ? extends Float>> appliedX(
+					String species, float expectedX, VriStart app, Map<String, Float> initialDqs,
+					Map<String, Float> minDq, Map<String, Float> maxDq
+			) {
+				return hasEntry(
+						is(species),
+						closeTo(
+								app.quadMeanDiameterSpeciesAdjust(
+										expectedX, initialDqs.get(species), minDq.get(species), maxDq.get(species)
+								)
+						)
+				);
 			}
 
 		}
