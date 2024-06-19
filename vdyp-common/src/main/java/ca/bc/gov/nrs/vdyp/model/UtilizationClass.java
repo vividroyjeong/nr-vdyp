@@ -30,7 +30,7 @@ public enum UtilizationClass {
 	public static final Collection<UtilizationClass> ALL_BUT_SMALL = Collections
 			.unmodifiableList(new ArrayList<>(Arrays.asList(ALL, U75TO125, U125TO175, U175TO225, OVER225)));
 
-	public static final Collection<UtilizationClass> ALL_BUT_SMALL_AND_ALL = Collections
+	public static final Collection<UtilizationClass> ALL_BUT_SMALL_ALL = Collections
 			.unmodifiableList(new ArrayList<>(Arrays.asList(U75TO125, U125TO175, U175TO225, OVER225)));
 
 	static {

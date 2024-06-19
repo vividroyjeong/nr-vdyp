@@ -114,7 +114,6 @@ public class ForwardDataStreamReader {
 							LayerType.PRIMARY, polygon, primarySpecies, Optional.ofNullable(defaultSpeciesUtilization)
 					);
 
-					polygon.setPrimaryLayer(primaryLayer);
 					for (VdypLayerSpecies v : primarySpecies.values()) {
 						v.setParent(primaryLayer);
 					}
@@ -131,16 +130,17 @@ public class ForwardDataStreamReader {
 							LayerType.VETERAN, polygon, veteranSpecies, Optional.ofNullable(defaultSpeciesUtilization)
 					);
 
-					polygon.setVeteranLayer(Optional.of(veteranLayer));
 					for (VdypLayerSpecies v : veteranSpecies.values()) {
 						v.setParent(veteranLayer);
 					}
-				} else {
-					polygon.setVeteranLayer(Optional.empty());
 				}
+				
+				polygon.setLayers(primaryLayer, veteranLayer);
 
 				if (polygonDescription.equals(polygon.getDescription())) {
 					thePolygon = Optional.of(polygon);
+					
+					adjustUtilizations(polygon);
 				}
 			}
 		} catch (ResourceParseException | IOException e) {
@@ -154,6 +154,29 @@ public class ForwardDataStreamReader {
 		}
 
 		return thePolygon.get();
+	}
+
+	/** 
+	 * Scale the utilization class values of the primary layer of this polygon to 
+	 * the percent of forested land covered. 
+	 * 
+	 * @param polygon
+	 */
+	private void adjustUtilizations(VdypPolygon polygon) {
+		
+		float percentForestedLand = polygon.getPercentForestLand();
+		assert !Float.isNaN(percentForestedLand);
+		
+		if (percentForestedLand > 0.0f && percentForestedLand < 100.0f) {
+			float scalingFactor = 100.0f / percentForestedLand;
+			
+			polygon.getPrimaryLayer().getGenera().values().stream()
+					.forEach(s -> s.getUtilizations().ifPresent(m -> m.values().stream()
+							.forEach(u -> {
+								u.scale(scalingFactor);
+							})));
+		}
+		
 	}
 
 	private class UtilizationBySpeciesKey {

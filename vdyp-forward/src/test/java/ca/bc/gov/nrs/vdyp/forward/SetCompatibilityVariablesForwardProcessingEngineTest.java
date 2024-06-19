@@ -1,13 +1,12 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 import java.io.IOException;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;

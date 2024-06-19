@@ -9,20 +9,24 @@ public class VdypSpeciesUtilization extends VdypEntity {
 
 	// See IPSJF155.doc
 
-	private final VdypPolygonDescription polygonId; // POLYDESC
+	private VdypPolygonDescription polygonId; // POLYDESC
 	private final LayerType layerType; // LAYERG
 	private final int genusIndex; // ISP
 	private final Optional<String> genus; // SP0
 	private final UtilizationClass ucIndex; // J - utilization index
-	private final float basalArea;
-	private final float liveTreesPerHectare;
-	private final float loreyHeight;
-	private final float wholeStemVolume;
-	private final float closeUtilizationVolume;
-	private final float cuVolumeMinusDecay;
-	private final float cuVolumeMinusDecayWastage;
-	private final float cuVolumeMinusDecayWastageBreakage;
-	private final float quadraticMeanDiameterAtBH;
+	
+	// The following are not final because post construction the values 
+	// may be scaled by the scale method below.
+	
+	private float basalArea;
+	private float liveTreesPerHectare;
+	private float loreyHeight;
+	private float wholeStemVolume;
+	private float closeUtilizationVolume;
+	private float cuVolumeMinusDecay;
+	private float cuVolumeMinusDecayWastage;
+	private float cuVolumeMinusDecayWastageBreakage;
+	private float quadraticMeanDiameterAtBH;
 
 	// Set after construction
 	private VdypLayerSpecies parent;
@@ -121,5 +125,25 @@ public class VdypSpeciesUtilization extends VdypEntity {
 
 	public VdypLayerSpecies getParent() {
 		return parent;
+	}
+
+	/** 
+	 * Implements VDYPGETU lines 224 - 229, in which the utilization
+	 * values are scaled by the % coverage of the primary layer.
+	 * 
+	 * @param scalingFactor
+	 */
+	public void scale(float scalingFactor) {
+		
+		this.basalArea *= scalingFactor;
+		this.liveTreesPerHectare *= scalingFactor;
+		// lorey height is excluded from scaling.
+		// this.loreyHeight *= scalingFactor;
+		this.wholeStemVolume *= scalingFactor;
+		this.closeUtilizationVolume *= scalingFactor;
+		this.cuVolumeMinusDecay *= scalingFactor;
+		this.cuVolumeMinusDecayWastage *= scalingFactor;
+		this.cuVolumeMinusDecayWastageBreakage *= scalingFactor;
+		this.quadraticMeanDiameterAtBH *= scalingFactor;
 	}
 }

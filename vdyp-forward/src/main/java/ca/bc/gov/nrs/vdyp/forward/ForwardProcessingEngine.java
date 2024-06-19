@@ -209,13 +209,13 @@ public class ForwardProcessingEngine {
 			Coefficients treesPerHectare = Utils.utilizationVector();
 
 			cvVolume[s] = new MatrixMap3Impl<UtilizationClass, VolumeVariable, LayerType, Float>(
-					UtilizationClass.ALL_BUT_SMALL_AND_ALL, VolumeVariable.ALL, LayerType.ALL_USED, (k1, k2, k3) -> 0f
+					UtilizationClass.ALL_BUT_SMALL_ALL, VolumeVariable.ALL, LayerType.ALL_USED, (k1, k2, k3) -> 0f
 			);
 			cvBasalArea[s] = new MatrixMap2Impl<UtilizationClass, LayerType, Float>(
-					UtilizationClass.ALL_BUT_SMALL_AND_ALL, LayerType.ALL_USED, (k1, k2) -> 0f
+					UtilizationClass.ALL_BUT_SMALL_ALL, LayerType.ALL_USED, (k1, k2) -> 0f
 			);
 			cvQuadraticMeanDiameter[s] = new MatrixMap2Impl<UtilizationClass, LayerType, Float>(
-					UtilizationClass.ALL_BUT_SMALL_AND_ALL, LayerType.ALL_USED, (k1, k2) -> 0f
+					UtilizationClass.ALL_BUT_SMALL_ALL, LayerType.ALL_USED, (k1, k2) -> 0f
 			);
 
 			for (UtilizationClass uc : UtilizationClass.ALL_BUT_SMALL) {
@@ -233,7 +233,7 @@ public class ForwardProcessingEngine {
 				}
 			}
 
-			for (UtilizationClass uc : UtilizationClass.ALL_BUT_SMALL_AND_ALL) {
+			for (UtilizationClass uc : UtilizationClass.ALL_BUT_SMALL_ALL) {
 
 				float adjustment;
 				float baseVolume;
@@ -269,12 +269,12 @@ public class ForwardProcessingEngine {
 				if (allowCompatibilitySetting == 0 && baseVolume > 0.0f
 						|| allowCompatibilitySetting > 0 && baseVolume > V_BASE_MIN) {
 
-					// EMP094
+					// EMP093
 					int decayGroup = pps.decayEquationGroups[s];
 					EstimationMethods.estimateNetDecayVolume(
 							pps.wallet.speciesNames[s], 
 							pps.getBecZone().getRegion(), uc, aAdjust, decayGroup, spLoreyHeight_All, 
-							pps.wallet.yearsAtBreastHeight[s], pps.getNetDecayCoeMap(), pps.getDecayModifierMap(), 
+							pps.getPrimarySpeciesAgeAtBreastHeight(), pps.getNetDecayCoeMap(), pps.getDecayModifierMap(), 
 							quadMeanDiameters, closeUtilizationVolumes, closeUtilizationVolumesNetOfDecay
 					);
 
@@ -285,7 +285,7 @@ public class ForwardProcessingEngine {
 
 				cvVolume[s].put(uc, VolumeVariable.CLOSE_UTIL_VOL_LESS_DECAY, LayerType.PRIMARY, adjustment);
 
-				// Volume (close utilization)
+				// Volume
 				adjustment = 0.0f;
 				baseVolume = pps.wallet.wholeStemVolumes[s][uc.ordinal()];
 
@@ -322,7 +322,7 @@ public class ForwardProcessingEngine {
 							.getWholeStemUtilizationComponentMap(), quadMeanDiameters, basalAreas, wholeStemVolumes
 			);
 
-			for (UtilizationClass uc : UtilizationClass.ALL_BUT_SMALL_AND_ALL) {
+			for (UtilizationClass uc : UtilizationClass.ALL_BUT_SMALL_ALL) {
 				float adjustment = 0.0f;
 				float basalArea = pps.wallet.basalAreas[s][uc.ordinal()];
 				if (allowCompatibilitySetting == 0 && basalArea > 0.0f
@@ -332,7 +332,7 @@ public class ForwardProcessingEngine {
 					);
 				}
 
-				cvVolume[s].put(uc, VolumeVariable.CLOSE_UTIL_VOL, LayerType.PRIMARY, adjustment);
+				cvVolume[s].put(uc, VolumeVariable.WHOLE_STEM_VOL, LayerType.PRIMARY, adjustment);
 			}
 
 			EstimationMethods.estimateQuadMeanDiameterByUtilization(pps.getBecZone(), pps.getQuadMeanDiameterUtilizationComponentMap(), quadMeanDiameters, genusName);
@@ -584,25 +584,23 @@ public class ForwardProcessingEngine {
 	private static float calculateWholeStemVolume(float actualVolume, float basalArea, float staticVolume) {
 		float result = 0.0f;
 
-		if (basalArea > 0.0f) {
-			float staticRatio = staticVolume / basalArea;
-			float staticLogit;
-			if (staticRatio <= 0.0f) {
-				staticLogit = -2.0f;
-			} else {
-				staticLogit = log(staticRatio);
-			}
-
-			float actualRatio = actualVolume / basalArea;
-			float actualLogit;
-			if (actualRatio <= 0.0f) {
-				actualLogit = -2.0f;
-			} else {
-				actualLogit = log(actualRatio);
-			}
-
-			result = actualLogit - staticLogit;
+		float staticRatio = staticVolume / basalArea;
+		float staticLogit;
+		if (staticRatio <= 0.0f) {
+			staticLogit = -2.0f;
+		} else {
+			staticLogit = log(staticRatio);
 		}
+
+		float actualRatio = actualVolume / basalArea;
+		float actualLogit;
+		if (actualRatio <= 0.0f) {
+			actualLogit = -2.0f;
+		} else {
+			actualLogit = log(actualRatio);
+		}
+
+		result = actualLogit - staticLogit;
 
 		return result;
 	}

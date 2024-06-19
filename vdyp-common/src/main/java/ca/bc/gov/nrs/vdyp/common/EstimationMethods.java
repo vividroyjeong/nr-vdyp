@@ -419,7 +419,8 @@ public class EstimationMethods {
 	) {
 		var coe = totalStandWholeStemVolumeCoeMap.get(volumeGroup).reindex(0);
 
-		var logMeanVolume = coe.getCoe(UtilizationClass.ALL.index) + //
+		var logMeanVolume = //
+				coe.getCoe(UtilizationClass.ALL.index) + //
 				coe.getCoe(1) * log(quadMeanDiameter) + //
 				coe.getCoe(2) * log(loreyHeight) + //
 				coe.getCoe(3) * quadMeanDiameter + //
@@ -505,7 +506,7 @@ public class EstimationMethods {
 			var vbaruc = exp(arg); // volume base area ?? utilization class?
 
 			return ba * vbaruc;
-		}, x -> x < 0f, 0f);
+		}, x -> x <= 0f, 0f);
 
 		if (utilizationClass == UtilizationClass.ALL) {
 			normalizeUtilizationComponents(wholeStemVolumeUtil);
