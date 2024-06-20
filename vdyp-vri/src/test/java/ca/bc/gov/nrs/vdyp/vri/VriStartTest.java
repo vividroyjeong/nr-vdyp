@@ -45,6 +45,7 @@ import org.junit.jupiter.params.provider.EnumSource.Mode;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import ca.bc.gov.nrs.vdyp.application.ApplicationTestUtils;
+import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
@@ -763,6 +764,7 @@ class VriStartTest {
 						)
 				);
 			}
+
 		}
 
 		@Nested
@@ -1343,6 +1345,120 @@ class VriStartTest {
 			}
 		}
 
+		@Nested
+		class InitialMaps {
+			@Test
+			void testCompute() throws ProcessingException {
+
+				controlMap = VriTestUtils.loadControlMap();
+				VriStart app = new VriStart();
+				ApplicationTestUtils.setControlMap(app, controlMap);
+
+				VdypLayer layer = VdypLayer.build((lb) -> {
+					lb.polygonIdentifier("Test", 2024);
+					lb.layerType(LayerType.PRIMARY);
+					lb.addSpecies(sb -> {
+						sb.genus("B");
+						sb.percentGenus(10);
+						sb.volumeGroup(15);
+						sb.decayGroup(11);
+						sb.breakageGroup(4);
+						sb.loreyHeight(8.98269558f);
+						sb.baseArea(0.634290636f);
+					});
+					lb.addSpecies(sb -> {
+						sb.genus("C");
+						sb.percentGenus(20);
+						sb.volumeGroup(23);
+						sb.decayGroup(15);
+						sb.breakageGroup(10);
+						sb.loreyHeight(5.06450224f);
+						sb.baseArea(1.26858127f);
+					});
+					lb.addSpecies(sb -> {
+						sb.genus("F");
+						sb.percentGenus(30);
+						sb.volumeGroup(33);
+						sb.decayGroup(27);
+						sb.breakageGroup(16);
+						sb.loreyHeight(7.1979804f);
+						sb.baseArea(1.90287197f);
+					});
+					lb.addSpecies(sb -> {
+						sb.genus("H");
+						sb.percentGenus(30);
+						sb.volumeGroup(40);
+						sb.decayGroup(33);
+						sb.breakageGroup(19);
+						sb.loreyHeight(6.18095589f);
+						sb.baseArea(1.90287197f);
+					});
+					lb.addSpecies(sb -> {
+						sb.genus("S");
+						sb.percentGenus(10);
+						sb.volumeGroup(69);
+						sb.decayGroup(59);
+						sb.breakageGroup(30);
+						sb.loreyHeight(6.89051533f);
+						sb.baseArea(0.634290636f);
+					});
+				});
+
+				Region region = Region.INTERIOR;
+
+				float quadMeanDiameterTotal = 10.3879938f;
+				float baseAreaTotal = 6.34290648f;
+				float treeDensityTotal = 748.402222f;
+				float loreyHeightTotal = 6.61390257f;
+
+				Map<String, Float> initialDqs = new HashMap<>(5);
+				Map<String, Float> baseAreaPerSpecies = new HashMap<>(5);
+				Map<String, Float> minPerSpecies = new HashMap<>(5);
+				Map<String, Float> maxPerSpecies = new HashMap<>(5);
+
+				app.getDqBySpeciesInitial(
+						layer, region, quadMeanDiameterTotal, baseAreaTotal, treeDensityTotal, loreyHeightTotal,
+						initialDqs, baseAreaPerSpecies, minPerSpecies, maxPerSpecies
+				);
+
+				assertThat(
+						initialDqs, allOf(
+								hasEntry(is("B"), closeTo(12.0803461f)), //
+								hasEntry(is("C"), closeTo(8.66746521f)), //
+								hasEntry(is("F"), closeTo(11.8044939f)), //
+								hasEntry(is("H"), closeTo(9.06493855f)), //
+								hasEntry(is("S"), closeTo(10.4460621f))
+						)
+				);
+				assertThat(
+						baseAreaPerSpecies, allOf(
+								hasEntry(is("B"), closeTo(0.634290636f)), //
+								hasEntry(is("C"), closeTo(1.26858127f)), //
+								hasEntry(is("F"), closeTo(1.90287197f)), //
+								hasEntry(is("H"), closeTo(1.90287197f)), //
+								hasEntry(is("S"), closeTo(0.634290636f))
+						)
+				);
+				assertThat(
+						minPerSpecies, allOf(
+								hasEntry(is("B"), closeTo(7.6f)), //
+								hasEntry(is("C"), closeTo(7.6f)), //
+								hasEntry(is("F"), closeTo(7.6f)), //
+								hasEntry(is("H"), closeTo(7.6f)), //
+								hasEntry(is("S"), closeTo(7.6f))
+						)
+				);
+				assertThat(
+						maxPerSpecies, allOf(
+								hasEntry(is("B"), closeTo(13.8423338f)), //
+								hasEntry(is("C"), closeTo(16.6669998f)), //
+								hasEntry(is("F"), closeTo(15.5116472f)), //
+								hasEntry(is("H"), closeTo(12.5369997f)), //
+								hasEntry(is("S"), closeTo(12.6630001f))
+						)
+				);
+			}
+		}
 	}
 
 	@Nested
