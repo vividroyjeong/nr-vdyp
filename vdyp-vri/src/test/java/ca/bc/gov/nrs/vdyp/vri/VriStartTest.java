@@ -1648,6 +1648,7 @@ class VriStartTest {
 					.addMockedMethod("processBatn") //
 					.addMockedMethod("checkPolygon") //
 					.addMockedMethod("processPrimaryLayer") //
+					.addMockedMethod("getDebugMode") //
 					.createMock(control);
 
 			MockFileResolver resolver = dummyInput();
@@ -1704,6 +1705,8 @@ class VriStartTest {
 			EasyMock.expect(app.processBatn(poly)).andReturn(polyBatn).times(0, 1);
 			app.processPrimaryLayer(EasyMock.anyObject(VriPolygon.class), EasyMock.anyObject(VdypLayer.Builder.class));
 			EasyMock.expectLastCall().once();
+			EasyMock.expect(app.getDebugMode(9)).andStubReturn(0);
+			EasyMock.expect(app.getDebugMode(1)).andStubReturn(0);
 
 			control.replay();
 
@@ -1734,6 +1737,7 @@ class VriStartTest {
 			});
 
 			// expect no calls
+			TestUtils.populateControlMapBecReal(controlMap);
 
 			control.replay();
 
@@ -1773,6 +1777,7 @@ class VriStartTest {
 			StreamingParser<Collection<VriSite>> siteStream = easyMockInputStreamFactory(
 					controlMap, ControlKey.VRI_INPUT_YIELD_HEIGHT_AGE_SI, control
 			);
+			TestUtils.populateControlMapBecReal(controlMap);
 
 			EasyMock.expect(polyStream.hasNext()).andReturn(false);
 
@@ -1829,6 +1834,7 @@ class VriStartTest {
 			StreamingParser<Collection<VriSite>> siteStream = easyMockInputStreamFactory(
 					controlMap, ControlKey.VRI_INPUT_YIELD_HEIGHT_AGE_SI, control
 			);
+			TestUtils.populateControlMapBecReal(controlMap);
 
 			EasyMock.expect(polyStream.hasNext()).andReturn(true);
 			EasyMock.expect(app.getPolygon(polyStream, layerStream, specStream, siteStream)).andReturn(poly);

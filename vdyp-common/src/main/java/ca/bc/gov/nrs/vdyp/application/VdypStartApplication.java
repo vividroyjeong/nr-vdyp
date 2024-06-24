@@ -90,7 +90,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	// TODO Should probably handle this with enums instead for clarity.
 	private int[] debugModes = new int[25];
 
-	protected int getDebugMode(int index) {
+	public int getDebugMode(int index) {
 		return debugModes[index];
 	}
 
@@ -888,7 +888,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	 *
 	 * @throws ProcessingException
 	 */
-	public void estimateSmallComponents(BaseVdypPolygon<?, ?, ?, ?> fPoly, VdypLayer layer) throws ProcessingException {
+	public void estimateSmallComponents(P fPoly, VdypLayer layer) throws ProcessingException {
 		float loreyHeightSum = 0f;
 		float baseAreaSum = 0f;
 		float treesPerHectareSum = 0f;

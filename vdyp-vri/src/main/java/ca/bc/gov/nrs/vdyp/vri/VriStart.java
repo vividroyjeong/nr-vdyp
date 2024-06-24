@@ -334,6 +334,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	Optional<VdypPolygon> processPolygon(int polygonsRead, VriPolygon polygon) throws ProcessingException {
 		log.atInfo().setMessage("Read polygon {}, preparing to process").addArgument(polygon.getPolygonIdentifier())
 				.log();
+		var bec = Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap);
 
 		var mode = polygon.getMode().orElse(PolygonMode.START);
 
@@ -368,7 +369,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		}
 
 		try {
-			return Optional.of(VdypPolygon.build(pBuilder -> {
+			var result = Optional.of(VdypPolygon.build(pBuilder -> {
 				pBuilder.adapt(preProcessedPolygon, x -> x.orElse(0f));
 
 				pBuilder.addLayer(lBuilder -> {
@@ -390,6 +391,16 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				}
 
 			}));
+			result.ifPresent(resultPoly -> {
+				var resultPrimaryLayer = resultPoly.getLayers().get(LayerType.PRIMARY);
+				try {
+					getDqBySpecies(resultPrimaryLayer, bec.getRegion());
+					estimateSmallComponents(polygon, resultPrimaryLayer);
+				} catch (ProcessingException e) {
+					throw new RuntimeProcessingException(e);
+				}
+			});
+			return result;
 		} catch (RuntimeProcessingException e) {
 			throw e.getCause();
 		}
@@ -486,6 +497,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		}
 
 		this.applyGroups(polygon, species);
+
 	}
 
 	// ROOTV01
