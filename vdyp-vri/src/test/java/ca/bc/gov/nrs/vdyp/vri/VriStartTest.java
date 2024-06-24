@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.vri;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.closeTo;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
@@ -1457,6 +1458,176 @@ class VriStartTest {
 								hasEntry(is("S"), closeTo(12.6630001f))
 						)
 				);
+			}
+		}
+
+		@Nested
+		class ApplyResults {
+			@Test
+			void testApply() throws ProcessingException {
+
+				controlMap = VriTestUtils.loadControlMap();
+				VriStart app = new VriStart();
+				ApplicationTestUtils.setControlMap(app, controlMap);
+
+				VdypLayer layer = VdypLayer.build((lb) -> {
+					lb.polygonIdentifier("Test", 2024);
+					lb.layerType(LayerType.PRIMARY);
+					lb.addSpecies(sb -> {
+						sb.genus("B");
+						sb.percentGenus(10);
+						sb.volumeGroup(15);
+						sb.decayGroup(11);
+						sb.breakageGroup(4);
+						sb.loreyHeight(8.98269558f);
+						sb.baseArea(0.634290636f);
+					});
+					lb.addSpecies(sb -> {
+						sb.genus("C");
+						sb.percentGenus(20);
+						sb.volumeGroup(23);
+						sb.decayGroup(15);
+						sb.breakageGroup(10);
+						sb.loreyHeight(5.06450224f);
+						sb.baseArea(1.26858127f);
+					});
+					lb.addSpecies(sb -> {
+						sb.genus("F");
+						sb.percentGenus(30);
+						sb.volumeGroup(33);
+						sb.decayGroup(27);
+						sb.breakageGroup(16);
+						sb.loreyHeight(7.1979804f);
+						sb.baseArea(1.90287197f);
+					});
+					lb.addSpecies(sb -> {
+						sb.genus("H");
+						sb.percentGenus(30);
+						sb.volumeGroup(40);
+						sb.decayGroup(33);
+						sb.breakageGroup(19);
+						sb.loreyHeight(6.18095589f);
+						sb.baseArea(1.90287197f);
+					});
+					lb.addSpecies(sb -> {
+						sb.genus("S");
+						sb.percentGenus(10);
+						sb.volumeGroup(69);
+						sb.decayGroup(59);
+						sb.breakageGroup(30);
+						sb.loreyHeight(6.89051533f);
+						sb.baseArea(0.634290636f);
+					});
+				});
+
+				float baseAreaTotal = 6.34290648f;
+
+				Map<String, Float> baseAreaPerSpecies = Utils.constMap(map -> {
+					map.put("B", 0.634290636f);
+					map.put("C", 1.26858127f);
+					map.put("F", 1.90287197f);
+					map.put("H", 1.90287197f);
+					map.put("S", 0.634290636f);
+				});
+
+				Map<String, Float> diameterPerSpecies = Utils.constMap(map -> {
+					map.put("B", 12.9407434f);
+					map.put("C", 8.88676834f);
+					map.put("F", 12.6130743f);
+					map.put("H", 9.35890579f);
+					map.put("S", 10.9994669f);
+				});
+
+				app.applyDqBySpecies(layer, baseAreaTotal, baseAreaPerSpecies, diameterPerSpecies);
+
+				assertThat(layer.getQuadraticMeanDiameterByUtilization(), coe(-1, 0f, 10.3879948f, 0f, 0f, 0f, 0f));
+				assertThat(layer.getTreesPerHectareByUtilization(), coe(-1, 0f, 748.4021f, 0f, 0f, 0f, 0f));
+
+				var spec = layer.getSpecies().get("C");
+				assertThat(spec.getQuadraticMeanDiameterByUtilization(), coe(-1, 0f, 8.88676834f, 0f, 0f, 0f, 0f));
+				assertThat(spec.getTreesPerHectareByUtilization(), coe(-1, 0f, 204.522324f, 0f, 0f, 0f, 0f));
+
+				// Total is correct and one of the individual species is correct. No need to check the other 4.
+
+			}
+		}
+
+		@Nested
+		class CompleteRun {
+			@Test
+			void testCompute() throws ProcessingException {
+
+				controlMap = VriTestUtils.loadControlMap();
+				VriStart app = new VriStart();
+				ApplicationTestUtils.setControlMap(app, controlMap);
+
+				VdypLayer layer = VdypLayer.build((lb) -> {
+					lb.polygonIdentifier("Test", 2024);
+					lb.layerType(LayerType.PRIMARY);
+					lb.baseArea(6.34290648f);
+					lb.treesPerHectare(748.402222f);
+					lb.quadMeanDiameter(10.3879938f);
+					lb.loreyHeight(6.61390257f);
+					lb.addSpecies(sb -> {
+						sb.genus("B");
+						sb.percentGenus(10);
+						sb.volumeGroup(15);
+						sb.decayGroup(11);
+						sb.breakageGroup(4);
+						sb.loreyHeight(8.98269558f);
+						sb.baseArea(0.634290636f);
+					});
+					lb.addSpecies(sb -> {
+						sb.genus("C");
+						sb.percentGenus(20);
+						sb.volumeGroup(23);
+						sb.decayGroup(15);
+						sb.breakageGroup(10);
+						sb.loreyHeight(5.06450224f);
+						sb.baseArea(1.26858127f);
+					});
+					lb.addSpecies(sb -> {
+						sb.genus("F");
+						sb.percentGenus(30);
+						sb.volumeGroup(33);
+						sb.decayGroup(27);
+						sb.breakageGroup(16);
+						sb.loreyHeight(7.1979804f);
+						sb.baseArea(1.90287197f);
+					});
+					lb.addSpecies(sb -> {
+						sb.genus("H");
+						sb.percentGenus(30);
+						sb.volumeGroup(40);
+						sb.decayGroup(33);
+						sb.breakageGroup(19);
+						sb.loreyHeight(6.18095589f);
+						sb.baseArea(1.90287197f);
+					});
+					lb.addSpecies(sb -> {
+						sb.genus("S");
+						sb.percentGenus(10);
+						sb.volumeGroup(69);
+						sb.decayGroup(59);
+						sb.breakageGroup(30);
+						sb.loreyHeight(6.89051533f);
+						sb.baseArea(0.634290636f);
+					});
+				});
+
+				app.getDqBySpecies(layer, Region.INTERIOR);
+
+				assertThat(
+						layer.getQuadraticMeanDiameterByUtilization(), coe(-1, 0f, 10.3879948f, 0f, 0f, 0f, 10.3879948f)
+				);
+				assertThat(layer.getTreesPerHectareByUtilization(), coe(-1, 0f, 748.4021f, 0f, 0f, 0f, 748.4021f));
+
+				var spec = layer.getSpecies().get("C");
+				assertThat(spec.getQuadraticMeanDiameterByUtilization(), coe(-1, 0f, 8.88676834f, 0f, 0f, 0f, 0f));
+				assertThat(spec.getTreesPerHectareByUtilization(), coe(-1, 0f, 204.522324f, 0f, 0f, 0f, 0f));
+
+				// Total is correct and one of the individual species is correct. No need to check the other 4.
+
 			}
 		}
 	}

@@ -501,10 +501,43 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		Map<String, Float> minPerSpecies = new HashMap<>(layer.getSpecies().size());
 		Map<String, Float> maxPerSpecies = new HashMap<>(layer.getSpecies().size());
 
+		Map<String, Float> resultsPerSpecies = new HashMap<>(layer.getSpecies().size());
+
 		getDqBySpeciesInitial(
 				layer, region, quadMeanDiameterTotal, baseAreaTotal, treeDensityTotal, loreyHeightTotal,
 				initialDqEstimate, baseAreaPerSpecies, minPerSpecies, maxPerSpecies
 		);
+
+		if (this.getDebugMode(9) > 0) {
+			// TODO
+		}
+
+		findRootForQuadMeanDiameterFractionalError(
+				-0.6f, 0.5f, resultsPerSpecies, initialDqEstimate, baseAreaPerSpecies, minPerSpecies, maxPerSpecies,
+				treeDensityTotal
+		);
+
+		applyDqBySpecies(layer, baseAreaTotal, baseAreaPerSpecies, resultsPerSpecies);
+	}
+
+	void applyDqBySpecies(
+			VdypLayer layer, float baseAreaTotal, Map<String, Float> baseAreaPerSpecies,
+			Map<String, Float> resultsPerSpecies
+	) {
+		float quadMeanDiameterTotal;
+		float treeDensityTotal;
+		treeDensityTotal = 0;
+		for (var spec : layer.getSpecies().values()) {
+			float specDq = resultsPerSpecies.get(spec.getGenus());
+			float specBa = baseAreaPerSpecies.get(spec.getGenus());
+			float specTph = treesPerHectare(specBa, specDq);
+			treeDensityTotal += specTph;
+			spec.getQuadraticMeanDiameterByUtilization().setCoe(UTIL_ALL, specDq);
+			spec.getTreesPerHectareByUtilization().setCoe(UTIL_ALL, specTph);
+		}
+		quadMeanDiameterTotal = quadMeanDiameter(baseAreaTotal, treeDensityTotal);
+		layer.getTreesPerHectareByUtilization().setCoe(UTIL_ALL, treeDensityTotal);
+		layer.getQuadraticMeanDiameterByUtilization().setCoe(UTIL_ALL, quadMeanDiameterTotal);
 	}
 
 	void getDqBySpeciesInitial(
@@ -1268,7 +1301,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	}
 
 	float findRootForQuadMeanDiameterFractionalError(
-			float min, float max, HashMap<String, Float> resultPerSpecies, Map<String, Float> initialDqs,
+			float min, float max, Map<String, Float> resultPerSpecies, Map<String, Float> initialDqs,
 			Map<String, Float> baseAreas, Map<String, Float> minDq, Map<String, Float> maxDq, float tph
 	) throws StandProcessingException {
 

@@ -222,11 +222,31 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 		protected Coefficients baseArea = VdypUtilizationHolder.emptyUtilization();
 
 		public void baseArea(float small, float u1, float u2, float u3, float u4) {
-			this.loreyHeight = Utils.utilizationVector(small, u1, u2, u3, u4);
+			this.baseArea = Utils.utilizationVector(small, u1, u2, u3, u4);
 		}
 
 		public void baseArea(float height) {
 			this.baseArea = Utils.utilizationVector(height);
+		}
+
+		protected Coefficients treesPerHectare = VdypUtilizationHolder.emptyUtilization();
+
+		public void treesPerHectare(float small, float u1, float u2, float u3, float u4) {
+			this.treesPerHectare = Utils.utilizationVector(small, u1, u2, u3, u4);
+		}
+
+		public void treesPerHectare(float height) {
+			this.treesPerHectare = Utils.utilizationVector(height);
+		}
+
+		protected Coefficients quadMeanDiameter = VdypUtilizationHolder.emptyUtilization();
+
+		public void quadMeanDiameter(float small, float u1, float u2, float u3, float u4) {
+			this.quadMeanDiameter = Utils.utilizationVector(small, u1, u2, u3, u4);
+		}
+
+		public void quadMeanDiameter(float height) {
+			this.quadMeanDiameter = Utils.utilizationVector(height);
 		}
 
 		@Override
@@ -234,6 +254,8 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 			super.postProcess(layer);
 			layer.setLoreyHeightByUtilization(loreyHeight);
 			layer.setBaseAreaByUtilization(baseArea);
+			layer.setTreesPerHectareByUtilization(treesPerHectare);
+			layer.setQuadraticMeanDiameterByUtilization(quadMeanDiameter);
 		}
 
 		@Override

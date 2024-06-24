@@ -16,6 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,6 +56,8 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.Region;
+import ca.bc.gov.nrs.vdyp.model.VdypLayer;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -1195,6 +1198,222 @@ class VdypStartApplicationTest {
 				});
 
 				assertThrows(StandProcessingException.class, () -> app.getPercentTotal(layer));
+			}
+		}
+	}
+
+	@Nested
+	class SmallComponents {
+		@Test
+		void testEstimate() throws ProcessingException {
+			var controlMap = TestUtils.loadControlMap();
+			try (var app = new TestStartApplication(controlMap, false)) {
+				ApplicationTestUtils.setControlMap(app, controlMap);
+
+				var fPoly = TestPolygon.build(builder -> {
+					builder.polygonIdentifier("Test", 2024);
+					builder.forestInventoryZone("A");
+					builder.biogeoclimaticZone("CWH");
+					builder.percentAvailable(Optional.of(100f));
+					// builder.yieldFactor(1f);
+				});
+				VdypLayer layer = VdypLayer.build(builder -> {
+					builder.polygonIdentifier("Test", 2024);
+					builder.layerType(LayerType.PRIMARY);
+					builder.addSite(siteBuilder -> {
+						siteBuilder.ageTotal(55f);
+						siteBuilder.yearsToBreastHeight(1f);
+						siteBuilder.height(31f);
+						siteBuilder.siteGenus("H");
+					});
+				});
+
+				layer.getLoreyHeightByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 31.3307209f);
+				layer.getBaseAreaByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 44.6249847f);
+				layer.getTreesPerHectareByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 620.484802f);
+				layer.getQuadraticMeanDiameterByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 30.2606697f);
+				layer.getWholeStemVolumeByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 635.659668f);
+
+				var spec1 = VdypSpecies.build(layer, builder -> {
+					builder.genus("B");
+					builder.percentGenus(20f);
+					builder.volumeGroup(-1);
+					builder.decayGroup(-1);
+					builder.breakageGroup(-1);
+				});
+				spec1.getLoreyHeightByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 38.6004372f);
+				spec1.getBaseAreaByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 0.397305071f);
+				spec1.getTreesPerHectareByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 5.04602766f);
+				spec1.getQuadraticMeanDiameterByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 31.6622887f);
+				spec1.getWholeStemVolumeByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 635.659668f);
+				var spec2 = VdypSpecies.build(layer, builder -> {
+					builder.genus("C");
+					builder.percentGenus(20f);
+					builder.volumeGroup(-1);
+					builder.decayGroup(-1);
+					builder.breakageGroup(-1);
+				});
+				spec2.getLoreyHeightByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 22.8001652f);
+				spec2.getBaseAreaByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 5.08774281f);
+				spec2.getTreesPerHectareByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 92.4298019f);
+				spec2.getQuadraticMeanDiameterByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 26.4735165f);
+				spec2.getWholeStemVolumeByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 6.35662031f);
+				var spec3 = VdypSpecies.build(layer, builder -> {
+					builder.genus("D");
+					builder.percentGenus(20f);
+					builder.volumeGroup(-1);
+					builder.decayGroup(-1);
+					builder.breakageGroup(-1);
+				});
+				spec3.getLoreyHeightByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 33.5375252f);
+				spec3.getBaseAreaByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 29.5411568f);
+				spec3.getTreesPerHectareByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 326.800781f);
+				spec3.getQuadraticMeanDiameterByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 33.9255791f);
+				spec3.getWholeStemVolumeByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 44.496151f);
+				var spec4 = VdypSpecies.build(layer, builder -> {
+					builder.genus("H");
+					builder.percentGenus(20f);
+					builder.volumeGroup(-1);
+					builder.decayGroup(-1);
+					builder.breakageGroup(-1);
+				});
+				spec4.getLoreyHeightByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 24.3451157f);
+				spec4.getBaseAreaByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 5.50214148f);
+				spec4.getTreesPerHectareByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 152.482513f);
+				spec4.getQuadraticMeanDiameterByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 21.4343796f);
+				spec4.getWholeStemVolumeByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 470.388489f);
+				var spec5 = VdypSpecies.build(layer, builder -> {
+					builder.genus("S");
+					builder.percentGenus(20f);
+					builder.volumeGroup(-1);
+					builder.decayGroup(-1);
+					builder.breakageGroup(-1);
+				});
+				spec5.getLoreyHeightByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 34.6888771f);
+				spec5.getBaseAreaByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 4.0966382f);
+				spec5.getTreesPerHectareByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 43.7256737f);
+				spec5.getQuadraticMeanDiameterByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 34.5382729f);
+				spec5.getWholeStemVolumeByUtilization().setCoe(VdypStartApplication.UTIL_ALL, 57.2091446f);
+
+				layer.setSpecies(Arrays.asList(spec1, spec2, spec3, spec4, spec5));
+
+				app.estimateSmallComponents(fPoly, layer);
+
+				assertThat(
+						layer.getLoreyHeightByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(7.14446497f)
+				);
+				assertThat(
+						spec1.getLoreyHeightByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(8.39441967f)
+				);
+				assertThat(
+						spec2.getLoreyHeightByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(6.61517191f)
+				);
+				assertThat(
+						spec3.getLoreyHeightByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(10.8831682f)
+				);
+				assertThat(
+						spec4.getLoreyHeightByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(7.93716192f)
+				);
+				assertThat(
+						spec5.getLoreyHeightByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(8.63455391f)
+				);
+
+				assertThat(
+						layer.getBaseAreaByUtilization().getCoe(VdypStartApplication.UTIL_SMALL), closeTo(0.0153773092f)
+				);
+				assertThat(spec1.getBaseAreaByUtilization().getCoe(VdypStartApplication.UTIL_SMALL), closeTo(0f));
+				assertThat(
+						spec2.getBaseAreaByUtilization().getCoe(VdypStartApplication.UTIL_SMALL), closeTo(0.0131671466f)
+				);
+				assertThat(
+						spec3.getBaseAreaByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(0.00163476227f)
+				);
+				assertThat(spec4.getBaseAreaByUtilization().getCoe(VdypStartApplication.UTIL_SMALL), closeTo(0f));
+				assertThat(
+						spec5.getBaseAreaByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(0.000575399841f)
+				);
+
+				assertThat(
+						layer.getTreesPerHectareByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(5.34804487f)
+				);
+				assertThat(
+						spec1.getTreesPerHectareByUtilization().getCoe(VdypStartApplication.UTIL_SMALL), closeTo(0f)
+				);
+				assertThat(
+						spec2.getTreesPerHectareByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(4.67143154f)
+				);
+				assertThat(
+						spec3.getTreesPerHectareByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(0.498754263f)
+				);
+				assertThat(
+						spec4.getTreesPerHectareByUtilization().getCoe(VdypStartApplication.UTIL_SMALL), closeTo(0f)
+				);
+				assertThat(
+						spec5.getTreesPerHectareByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(0.17785944f)
+				);
+
+				assertThat(
+						layer.getQuadraticMeanDiameterByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(6.05059004f)
+				);
+				assertThat(
+						spec1.getQuadraticMeanDiameterByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(6.13586617f)
+				);
+				assertThat(
+						spec2.getQuadraticMeanDiameterByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(5.99067688f)
+				);
+				assertThat(
+						spec3.getQuadraticMeanDiameterByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(6.46009731f)
+				);
+				assertThat(
+						spec4.getQuadraticMeanDiameterByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(6.03505516f)
+				);
+				assertThat(
+						spec5.getQuadraticMeanDiameterByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(6.41802597f)
+				);
+
+				assertThat(
+						layer.getWholeStemVolumeByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(0.0666879341f)
+				);
+				assertThat(
+						spec1.getWholeStemVolumeByUtilization().getCoe(VdypStartApplication.UTIL_SMALL), closeTo(0f)
+				);
+				assertThat(
+						spec2.getWholeStemVolumeByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(0.0556972362f)
+				);
+				assertThat(
+						spec3.getWholeStemVolumeByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(0.0085867513f)
+				);
+				assertThat(
+						spec4.getWholeStemVolumeByUtilization().getCoe(VdypStartApplication.UTIL_SMALL), closeTo(0f)
+				);
+				assertThat(
+						spec5.getWholeStemVolumeByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
+						closeTo(0.00240394124f)
+				);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}
