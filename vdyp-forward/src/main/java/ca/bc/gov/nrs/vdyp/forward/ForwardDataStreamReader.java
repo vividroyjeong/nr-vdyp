@@ -2,9 +2,11 @@ package ca.bc.gov.nrs.vdyp.forward;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -96,8 +98,8 @@ public class ForwardDataStreamReader {
 					} else {
 						throw new IllegalStateException(
 								MessageFormat.format(
-										"Unrecognized layer type {} for species {} of polygon {}",
-										species.getLayerType(), species.getGenusIndex(), polygon.getDescription()
+										"Unrecognized layer type {} for species {} of polygon {}", species
+												.getLayerType(), species.getGenusIndex(), polygon.getDescription()
 								)
 						);
 					}
@@ -134,12 +136,12 @@ public class ForwardDataStreamReader {
 						v.setParent(veteranLayer);
 					}
 				}
-				
+
 				polygon.setLayers(primaryLayer, veteranLayer);
 
 				if (polygonDescription.equals(polygon.getDescription())) {
 					thePolygon = Optional.of(polygon);
-					
+
 					adjustUtilizations(polygon);
 				}
 			}
@@ -157,37 +159,52 @@ public class ForwardDataStreamReader {
 	}
 
 	/** 
-	 * Scale the utilization class values of the primary layer of this polygon to 
-	 * the percent of forested land covered. 
+	 * Both scale the per-hectare values of all the utilizations of the primary
+	 * layer of the given polygon, and for all utilizations of both the primary and
+	 * veteran layer (if present) of the polygon,
+	 * 1. Adjust the basal area to be within bounds of the utilization class, and
+	 * 2. Calculate the quad-mean-diameter value from the basal area and trees per hectare.
 	 * 
 	 * @param polygon
 	 */
-	private void adjustUtilizations(VdypPolygon polygon) {
-		
+	private void adjustUtilizations(VdypPolygon polygon) 
+			throws ProcessingException {
+
 		float percentForestedLand = polygon.getPercentForestLand();
 		assert !Float.isNaN(percentForestedLand);
+		float scalingFactor = 100.0f / percentForestedLand;
+
+		List<VdypSpeciesUtilization> utilizationsToAdjust = new ArrayList<>();
 		
-		if (percentForestedLand > 0.0f && percentForestedLand < 100.0f) {
-			float scalingFactor = 100.0f / percentForestedLand;
-			
-			polygon.getPrimaryLayer().getGenera().values().stream()
-					.forEach(s -> s.getUtilizations().ifPresent(m -> m.values().stream()
-							.forEach(u -> {
-								u.scale(scalingFactor);
-							})));
+		for (VdypPolygonLayer l: polygon.getLayers()) {
+
+			l.getDefaultUtilizationMap().ifPresent(
+				m -> utilizationsToAdjust.addAll(m.values()));
+	
+			l.getGenera().values().stream().forEach(
+				s -> s.getUtilizations().ifPresent(
+					m -> utilizationsToAdjust.addAll(m.values())));
 		}
-		
+
+		for (VdypSpeciesUtilization u: utilizationsToAdjust) {
+	
+			if (percentForestedLand > 0.0f && percentForestedLand < 100.0f) {
+				u.scale(scalingFactor);
+			}
+			
+			u.doPostCreateAdjustments();
+		}
 	}
 
 	private class UtilizationBySpeciesKey {
 		private final LayerType layerType;
 		private final Integer genusIndex;
-
+	
 		public UtilizationBySpeciesKey(LayerType layerType, Integer genusIndex) {
 			this.layerType = layerType;
 			this.genusIndex = genusIndex;
 		}
-
+	
 		@Override
 		public boolean equals(Object other) {
 			if (other instanceof UtilizationBySpeciesKey that) {
@@ -196,7 +213,7 @@ public class ForwardDataStreamReader {
 				return false;
 			}
 		}
-
+	
 		@Override
 		public int hashCode() {
 			return layerType.hashCode() * 17 + genusIndex.hashCode();

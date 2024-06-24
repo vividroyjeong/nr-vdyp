@@ -191,6 +191,10 @@ class PolygonProcessingState {
 		return fps.quadMeanDiameterUtilizationComponentMap;
 	}
 
+	public MatrixMap3<Integer, String, String, Coefficients> getBasalAreaUtilizationComponentMap() {
+		return fps.basalAreaDiameterUtilizationComponentMap;
+	}
+
 	public Map<String, Coefficients> getSmallComponentWholeStemVolumeCoefficients() {
 		return fps.smallComponentWholeStemVolumeCoefficients;
 	}

@@ -6,7 +6,7 @@ import ca.bc.gov.nrs.vdyp.forward.model.VdypGrowthDetails;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 
-public class VdypVtrolParser implements ValueParser<VdypGrowthDetails> {
+public class VdypControlVariableParser implements ValueParser<VdypGrowthDetails> {
 
 	@Override
 	public VdypGrowthDetails parse(String string) throws ValueParseException {
@@ -19,14 +19,15 @@ public class VdypVtrolParser implements ValueParser<VdypGrowthDetails> {
 		}
 
 		var parser = ValueParser.list(ValueParser.INTEGER);
-		List<Integer> vtrol = parser.parse(string);
+		List<Integer> controlVariableValues = parser.parse(string);
 
-		var a = new Integer[vtrol.size()];
-		var details = new VdypGrowthDetails(vtrol.toArray(a));
-
-		if (a.length == 0) {
+		if (controlVariableValues.size() == 0) {
 			throw new ValueParseException(string, "VdypVtrolParser: supplied string \"" + string + "\" is empty");
 		}
+		
+		var a = new Integer[controlVariableValues.size()];
+		
+		var details = new VdypGrowthDetails(controlVariableValues.toArray(a));
 
 		var yearCounter = a[0];
 		if (yearCounter != -1 && (yearCounter < 0 || yearCounter > 400 && yearCounter < 1920)) {

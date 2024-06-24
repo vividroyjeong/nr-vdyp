@@ -640,17 +640,17 @@ public class EstimationMethods {
 	}
 
 	/**
-	 * EMP070.
+	 * EMP070: estimate basal area by utilization class from the given parameters
 	 * 
 	 * @param bec
-	 * @param coeMap
+	 * @param basalAreaUtilCompCoeMap
 	 * @param quadMeanDiameterUtil
 	 * @param baseAreaUtil
 	 * @param genus
 	 * @throws ProcessingException
 	 */
 	public static void estimateBaseAreaByUtilization(
-			BecDefinition bec, MatrixMap3<Integer, String, String, Coefficients> coeMap,
+			BecDefinition bec, MatrixMap3<Integer, String, String, Coefficients> basalAreaUtilCompCoeMap,
 			Coefficients quadMeanDiameterUtil, Coefficients baseAreaUtil, String genus
 	) throws ProcessingException {
 
@@ -658,7 +658,7 @@ public class EstimationMethods {
 		var b = Utils.utilizationVector();
 		b.setCoe(0, baseAreaUtil.getCoe(UTIL_ALL));
 		for (int i = 1; i < UTIL_LARGEST; i++) {
-			var coe = coeMap.get(i, genus, bec.getGrowthBec().getAlias());
+			var coe = basalAreaUtilCompCoeMap.get(i, genus, bec.getGrowthBec().getAlias());
 
 			float a0 = coe.getCoe(1);
 			float a1 = coe.getCoe(2);

@@ -53,7 +53,7 @@ class Bank {
 
 	// Utilization information, per Species
 
-	public float basalAreas[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 BAB
+	public float basalAreas[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 BAB. Units: m^2/hectare
 	public float closeUtilizationVolumes[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 VOLCUB
 	public float cuVolumesMinusDecay[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 VOL_DB
 	public float cuVolumesMinusDecayAndWastage[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 VOL_DW_B

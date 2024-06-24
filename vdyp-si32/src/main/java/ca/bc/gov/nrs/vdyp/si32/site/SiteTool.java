@@ -525,10 +525,10 @@ public class SiteTool {
 			throw new IllegalArgumentException("convertSiteIndexBetweenCurves.siteCurve2");
 		}
 
-		SiteIndexSpecies species1 = VdypMethods.getSICurveSpeciesIndex(siteCurve1);
-		SiteIndexSpecies species2 = VdypMethods.getSICurveSpeciesIndex(siteCurve2);
+		SiteIndexSpecies speciesIndex1 = VdypMethods.getSICurveSpeciesIndex(siteCurve1);
+		SiteIndexSpecies speciesIndex2 = VdypMethods.getSICurveSpeciesIndex(siteCurve2);
 
-		if (species1 == SiteIndexSpecies.SI_NO_SPECIES || species2 == SiteIndexSpecies.SI_NO_SPECIES) {
+		if (speciesIndex1 == SiteIndexSpecies.SI_NO_SPECIES || speciesIndex2 == SiteIndexSpecies.SI_NO_SPECIES) {
 			throw new CurveErrorException(
 					MessageFormat.format(
 							"Either or both of {} and {} are not recognized Site Curves", siteCurve1, siteCurve2
@@ -537,7 +537,7 @@ public class SiteTool {
 		}
 
 		Reference<Double> rSiteIndex2 = new Reference<>();
-		Sindxdll.SIToSI(species1, siteIndex1, species2, rSiteIndex2);
+		Sindxdll.SIToSI(speciesIndex1, siteIndex1, speciesIndex2, rSiteIndex2);
 		return rSiteIndex2.get();
 	}
 

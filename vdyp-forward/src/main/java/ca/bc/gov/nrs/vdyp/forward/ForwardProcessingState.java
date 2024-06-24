@@ -46,6 +46,7 @@ class ForwardProcessingState {
 	final Map<Integer, Coefficients> totalStandWholeStepVolumeCoeMap;
 	final MatrixMap2<Integer, Integer, Optional<Coefficients>> wholeStemUtilizationComponentMap;
 	final MatrixMap3<Integer, String, String, Coefficients> quadMeanDiameterUtilizationComponentMap;
+	final MatrixMap3<Integer, String, String, Coefficients> basalAreaDiameterUtilizationComponentMap;
 	final Map<String, Coefficients> smallComponentWholeStemVolumeCoefficients;
 	final Map<String, Coefficients> smallComponentLoreyHeightCoefficients;
 	final Map<String, Coefficients> smallComponentQuadMeanDiameterCoefficients;
@@ -56,7 +57,7 @@ class ForwardProcessingState {
 	private final Bank[] banks;
 
 	/** The active state */
-	private PolygonProcessingState processingState;
+	private PolygonProcessingState pps;
 
 	// VDEBUG - NDEBUG
 	// TODO
@@ -101,6 +102,9 @@ class ForwardProcessingState {
 		this.quadMeanDiameterUtilizationComponentMap = Utils.<MatrixMap3<Integer, String, String, Coefficients>>expectParsedControl(
 				controlMap, ControlKey.UTIL_COMP_DQ, MatrixMap3.class
 		);
+		this.basalAreaDiameterUtilizationComponentMap = Utils.<MatrixMap3<Integer, String, String, Coefficients>>expectParsedControl(
+				controlMap, ControlKey.UTIL_COMP_BA, MatrixMap3.class
+		);
 		this.smallComponentWholeStemVolumeCoefficients = Utils
 				.<Map<String, Coefficients>>expectParsedControl(controlMap, ControlKey.SMALL_COMP_WS_VOLUME, Map.class);
 		this.smallComponentLoreyHeightCoefficients = Utils
@@ -142,11 +146,11 @@ class ForwardProcessingState {
 	public void setPolygon(VdypPolygon polygon) {
 		// Move the primary layer of the given polygon to bank zero.
 		banks[0] = new Bank(polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone());
-		processingState = new PolygonProcessingState(this, polygon, banks[toIndex(0, LayerType.PRIMARY)], controlMap);
+		pps = new PolygonProcessingState(this, polygon, banks[toIndex(0, LayerType.PRIMARY)], controlMap);
 	}
 
 	public PolygonProcessingState getPolygonProcessingState() {
-		return processingState;
+		return pps;
 	}
 
 	public Map<String, Object> getControlMap() {
@@ -154,7 +158,7 @@ class ForwardProcessingState {
 	}
 
 	public void storeActive(int instanceNumber, LayerType layerType) {
-		banks[toIndex(instanceNumber, layerType)] = processingState.wallet.copy();
+		banks[toIndex(instanceNumber, layerType)] = pps.wallet.copy();
 	}
 
 	public void transfer(int fromInstanceNumber, int toInstanceNumber, LayerType layerType) {
