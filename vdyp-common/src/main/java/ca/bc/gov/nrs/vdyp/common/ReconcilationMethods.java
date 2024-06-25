@@ -44,7 +44,7 @@ public class ReconcilationMethods {
 			baSum += baseAreaUtil.getCoe(uc.index);
 		}
 
-		if (abs(baSum - baseAreaUtil.getCoe(UTIL_ALL)) / baSum > 0.00003) {
+		if (abs(baSum - baseAreaUtil.getCoe(UTIL_ALL)) > 0.00003 * baSum) {
 			throw new ProcessingException("Computed base areas for 7.5+ components do not sum to expected total");
 		}
 
@@ -227,10 +227,10 @@ public class ReconcilationMethods {
 				.sum();
 		float tphSum = (float) UtilizationClass.UTIL_CLASSES.stream()
 				.mapToDouble(uc -> treesPerHectareUtil.getCoe(uc.index)).sum();
-		if (abs(baSum - baseAreaUtil.getCoe(UTIL_ALL)) / baSum > 0.0002) {
+		if (abs(baSum - baseAreaUtil.getCoe(UTIL_ALL)) > 0.0002 * baSum) {
 			throw new ProcessingException("Failed to reconcile Base Area");
 		}
-		if (abs(tphSum - treesPerHectareUtil.getCoe(UTIL_ALL)) / tphSum > 0.0002) {
+		if (abs(tphSum - treesPerHectareUtil.getCoe(UTIL_ALL)) > 0.0002 * tphSum) {
 			throw new ProcessingException("Failed to reconcile Trees per Hectare");
 		}
 	}
