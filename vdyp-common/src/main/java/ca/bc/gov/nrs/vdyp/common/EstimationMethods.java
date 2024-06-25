@@ -153,7 +153,7 @@ public class EstimationMethods {
 			Region region, UtilizationClass utilizationClass, Coefficients aAdjust,
 			String genus, float loreyHeight, float ageBreastHeight,
 			Map<String, Coefficients> netDecayWasteCoeMap,
-			MatrixMap2<String, Region, Float> wasteModifierMap, 
+			MatrixMap2<String, Region, Float> wasteModifierMap,
 			Coefficients quadMeanDiameterUtil, Coefficients closeUtilizationUtil,
 			Coefficients closeUtilizationNetOfDecayUtil, Coefficients closeUtilizationNetOfDecayAndWasteUtil
 	) throws ProcessingException {
@@ -250,7 +250,7 @@ public class EstimationMethods {
 	}
 
 	/**
-     * EMP093. Estimate volume NET OF DECAY by (DBH) utilization classes
+	 * EMP093. Estimate volume NET OF DECAY by (DBH) utilization classes
 	 * 
 	 * @param genus
 	 * @param region
@@ -619,7 +619,8 @@ public class EstimationMethods {
 	}
 
 	/**
-	 * EMP070.
+	 * EMP070. Estimate basal area by utilization class from the given parameters, after getting the 
+	 * estimation coefficients map from the control map.
 	 * 
 	 * @param controlMap
 	 * @param bec
@@ -708,7 +709,7 @@ public class EstimationMethods {
 	) throws ProcessingException {
 		for (var uc : UtilizationClass.UTIL_CLASSES) {
 			var inputValue = input.getCoe(uc.index);
-	
+
 			// it seems like this should be done after checking i against utilizationClass,
 			// which could just be done as part of the processor definition, but this is how
 			// VDYP7 did it.
@@ -716,11 +717,11 @@ public class EstimationMethods {
 				output.setCoe(uc.index, defaultValue);
 				continue;
 			}
-	
+
 			if (utilizationClass != UtilizationClass.ALL && utilizationClass != uc) {
 				continue;
 			}
-	
+
 			var result = processor.apply(uc, inputValue);
 			output.setCoe(uc.index, result);
 		}
