@@ -1872,7 +1872,7 @@ class FipStartTest {
 			var wholeStemVolumeUtil = new Coefficients(new float[] { 0f, 0f, 0f, 0f, 0f }, 0);
 
 			EstimationMethods.estimateWholeStemVolume(
-					utilizationClass, aAdjust, volumeGroup, lorieHeight, null, quadMeanDiameterUtil,
+					controlMap, utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil,
 					baseAreaUtil, wholeStemVolumeUtil
 			);
 
@@ -3374,7 +3374,7 @@ class FipStartTest {
 			wsv.setCoe(FipStart.UTIL_ALL, 11.7993851f);
 
 			// app.estimateWholeStemVolumeByUtilizationClass(46, 14.2597857f, dq, ba, wsv);
-			EstimationMethods.estimateWholeStemVolume(UtilizationClass.ALL, 0f, 46, 14.2597857f, null, dq, ba, wsv);
+			EstimationMethods.estimateWholeStemVolume(controlMap, UtilizationClass.ALL, 0f, 46, 14.2597857f, dq, ba, wsv);
 
 			assertThat(wsv, utilization(0f, 11.7993851f, 3.13278913f, 4.76524019f, 2.63645673f, 1.26489878f));
 		} catch (IOException e) {

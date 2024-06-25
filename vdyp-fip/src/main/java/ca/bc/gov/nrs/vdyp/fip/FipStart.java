@@ -1055,9 +1055,9 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 				// EMP091
 				EstimationMethods.estimateWholeStemVolume(
-						UtilizationClass.ALL, adjustCloseUtil.getCoe(
+						controlMap, UtilizationClass.ALL, adjustCloseUtil.getCoe(
 								4
-						), spec.getVolumeGroup(), loreyHeightSpec, null, quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
+						), spec.getVolumeGroup(), loreyHeightSpec, quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
 				);
 
 				if (compatibilityVariableMode == CompatibilityVariableMode.ALL) {
@@ -1221,8 +1221,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 				// EMP091
 				EstimationMethods.estimateWholeStemVolume(
-						utilizationClass, volumeAdjustCoe.getCoe(1), vdypSpecies
-								.getVolumeGroup(), hlSp, null, quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
+						controlMap, utilizationClass, volumeAdjustCoe.getCoe(1), vdypSpecies
+								.getVolumeGroup(), hlSp, quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
 				);
 
 				adjust.setCoe(4, volumeAdjustCoe.getCoe(2));

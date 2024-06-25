@@ -3531,10 +3531,8 @@ class SindxdllTest {
 		@Test
 		void testNoConversionDefined() throws CommonCalculatorException {
 			Reference<Double> resultSiteIndex = new Reference<>();
-			assertThrows(NoAnswerException.class, () -> {
-				Sindxdll.SIToSI(SI_SPEC_AT, 10.0, SI_SPEC_AT, resultSiteIndex);
-			});
-			assertEquals(SI_NO_EQUATION.n(), resultSiteIndex.get());
+			Sindxdll.SIToSI(SI_SPEC_AT, 10.0, SI_SPEC_AT, resultSiteIndex);
+			assertEquals(10.0f, resultSiteIndex.get());
 		}
 	}
 

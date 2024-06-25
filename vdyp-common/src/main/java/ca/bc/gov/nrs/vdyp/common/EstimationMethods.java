@@ -54,7 +54,7 @@ public class EstimationMethods {
 						controlMap, ControlKey.CLOSE_UTIL_VOLUME, MatrixMap2.class
 				);
 		estimateCloseUtilizationVolume(
-				utilizationClass, aAdjust, volumeGroup, hlSp, closeUtilizationCoeMap, closeUtilizationVolumeUtil, closeUtilizationVolumeUtil, closeUtilizationVolumeUtil
+				utilizationClass, aAdjust, volumeGroup, hlSp, closeUtilizationCoeMap, quadMeanDiameterUtil, wholeStemVolumeUtil, closeUtilizationVolumeUtil
 		);
 	}
 
@@ -245,7 +245,7 @@ public class EstimationMethods {
 				controlMap, ModifierParser.CONTROL_KEY_MOD301_DECAY, MatrixMap2.class
 		);
 		estimateNetDecayVolume(
-				genus, region, utilizationClass, aAdjust, decayGroup, loreyHeight, ageBreastHeight, netDecayCoeMap, decayModifierMap, closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayUtil
+				genus, region, utilizationClass, aAdjust, decayGroup, loreyHeight, ageBreastHeight, netDecayCoeMap, decayModifierMap, quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil
 		);
 	}
 
