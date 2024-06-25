@@ -3,8 +3,10 @@ package ca.bc.gov.nrs.vdyp.common_calculators;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.abs;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.clamp;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.exp;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.exponentRatio;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.log;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.pow;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.safeExponent;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.sqrt;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -13,7 +15,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
+import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
@@ -32,6 +38,7 @@ import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
  * EMP### functions from VDYP 7
  */
 public class EMP {
+	private static final Logger log = LoggerFactory.getLogger(EMP.class);
 
 	Map<String, Object> controlMap;
 
@@ -313,6 +320,91 @@ public class EMP {
 
 		var coe = coeMap.get(genus, region);
 		return new Limits(coe.getCoe(1), coe.getCoe(2), coe.getCoe(3), coe.getCoe(4));
+	}
+
+	/**
+	 * Estimate DQ by utilization class, see ipsjf120.doc
+	 *
+	 * @param bec
+	 * @param quadMeanDiameterUtil
+	 * @param spec
+	 * @throws ProcessingException
+	 */
+	// EMP071
+	public void estimateQuadMeanDiameterByUtilization(
+			BecDefinition bec, Coefficients quadMeanDiameterUtil, VdypSpecies spec
+	) throws ProcessingException {
+		log.atTrace().setMessage("Estimate DQ by utilization class for {} in BEC {}.  DQ for all >7.5 is {}")
+				.addArgument(spec.getGenus()).addArgument(bec.getName())
+				.addArgument(quadMeanDiameterUtil.getCoe(VdypStartApplication.UTIL_ALL));
+
+		float quadMeanDiameter07 = quadMeanDiameterUtil.getCoe(VdypStartApplication.UTIL_ALL);
+
+		for (var uc : VdypStartApplication.UTIL_CLASSES) {
+			log.atDebug().setMessage("For util level {}").addArgument(uc.className);
+			final var coeMap = Utils.<MatrixMap3<Integer, String, String, Coefficients>>expectParsedControl(
+					controlMap, ControlKey.UTIL_COMP_DQ, MatrixMap3.class
+			);
+			var coe = coeMap.get(uc.index, spec.getGenus(), bec.getGrowthBec().getAlias());
+
+			float a0 = coe.getCoe(1);
+			float a1 = coe.getCoe(2);
+			float a2 = coe.getCoe(3);
+
+			log.atDebug().setMessage("a0={}, a1={}, a3={}").addArgument(a0).addArgument(a1).addArgument(a2);
+
+			float logit;
+
+			switch (uc) {
+			case U75TO125:
+				if (quadMeanDiameter07 < 7.5001f) {
+					quadMeanDiameterUtil.setCoe(VdypStartApplication.UTIL_ALL, 7.5f);
+				} else {
+					log.atDebug().setMessage("DQ = 7.5 + a0 * (1 - exp(a1 / a0*(DQ07 - 7.5) ))**a2' )");
+
+					logit = a1 / a0 * (quadMeanDiameter07 - 7.5f);
+
+					quadMeanDiameterUtil
+							.setCoe(uc.index, min(7.5f + a0 * pow(1 - safeExponent(logit), a2), quadMeanDiameter07));
+				}
+				break;
+			case U125TO175, U175TO225:
+				log.atDebug().setMessage(
+						"LOGIT = a0 + a1*(SQ07 / 7.5)**a2,  DQ = (12.5 or 17.5) + 5 * exp(LOGIT) / (1 + exp(LOGIT))"
+				);
+				logit = a0 + a1 * pow(quadMeanDiameter07 / 7.5f, a2);
+
+				quadMeanDiameterUtil.setCoe(uc.index, uc.lowBound + 5f * exponentRatio(logit));
+				break;
+			case OVER225:
+				float a3 = coe.getCoe(4);
+
+				log.atDebug().setMessage(
+						"Coeff A3 {}, LOGIT = a2 + a1*DQ07**a3,  DQ = DQ07 + a0 * (1 - exp(LOGIT) / (1 + exp(LOGIT)) )"
+				);
+
+				logit = a2 + a1 * pow(quadMeanDiameter07, a3);
+
+				quadMeanDiameterUtil
+						.setCoe(uc.index, max(22.5f, quadMeanDiameter07 + a0 * (1f - exponentRatio(logit))));
+				break;
+			case ALL, SMALL:
+				throw new IllegalStateException(
+						"Should not be attempting to process small component or all large components"
+				);
+			default:
+				throw new IllegalStateException("Unknown utilization class " + uc);
+			}
+
+			log.atDebug().setMessage("Util DQ for class {} is {}").addArgument(uc.className)
+					.addArgument(quadMeanDiameterUtil.getCoe(uc.index));
+		}
+
+		log.atTrace().setMessage("Estimated Diameters {}").addArgument(
+				() -> VdypStartApplication.UTIL_CLASSES.stream()
+						.map(uc -> String.format("%s: %d", uc.className, quadMeanDiameterUtil.getCoe(uc.index)))
+		);
+
 	}
 
 }

@@ -754,7 +754,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	public static final int UTIL_SMALL = UtilizationClass.SMALL.index;
 
-	protected static final Collection<UtilizationClass> UTIL_CLASSES = List.of(
+	public static final Collection<UtilizationClass> UTIL_CLASSES = List.of(
 			UtilizationClass.U75TO125, UtilizationClass.U125TO175, UtilizationClass.U175TO225, UtilizationClass.OVER225
 	);
 

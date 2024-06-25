@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.closeTo;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.utilization;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.Region;
@@ -17,7 +19,7 @@ import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
-public class EMPTest {
+class EMPTest {
 
 	Map<String, Object> controlMap;
 	EMP emp;
@@ -173,4 +175,54 @@ public class EMPTest {
 
 	}
 
+	@Nested
+	class EstimateQuadMeanDiameterByUtilization {
+		@Test
+		void testTest1() throws Exception {
+			var controlMap = TestUtils.loadControlMap();
+
+			var coe = Utils.utilizationVector();
+			coe.setCoe(VdypStartApplication.UTIL_ALL, 31.6622887f);
+
+			var bec = Utils.getBec("CWH", controlMap);
+
+			var spec1 = VdypSpecies.build(builder -> {
+				builder.polygonIdentifier("Test", 2024);
+				builder.layerType(LayerType.PRIMARY);
+				builder.genus("B");
+				builder.percentGenus(100f);
+				builder.volumeGroup(-1);
+				builder.decayGroup(-1);
+				builder.breakageGroup(-1);
+			});
+
+			emp.estimateQuadMeanDiameterByUtilization(bec, coe, spec1);
+
+			assertThat(coe, utilization(0f, 31.6622887f, 10.0594692f, 14.966774f, 19.9454956f, 46.1699982f));
+		}
+
+		@Test
+		void testTest2() throws Exception {
+			var controlMap = TestUtils.loadControlMap();
+
+			var coe = Utils.utilizationVector();
+			coe.setCoe(VdypStartApplication.UTIL_ALL, 13.4943399f);
+
+			var bec = Utils.getBec("MH", controlMap);
+
+			var spec1 = VdypSpecies.build(builder -> {
+				builder.polygonIdentifier("Test", 2024);
+				builder.layerType(LayerType.PRIMARY);
+				builder.genus("L");
+				builder.percentGenus(100f);
+				builder.volumeGroup(-1);
+				builder.decayGroup(-1);
+				builder.breakageGroup(-1);
+			});
+
+			emp.estimateQuadMeanDiameterByUtilization(bec, coe, spec1);
+
+			assertThat(coe, utilization(0f, 13.4943399f, 10.2766619f, 14.67033f, 19.4037666f, 25.719244f));
+		}
+	}
 }

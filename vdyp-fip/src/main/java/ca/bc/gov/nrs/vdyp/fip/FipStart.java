@@ -67,6 +67,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
+import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
@@ -797,7 +798,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			var adjustDecayWasteUtil = Utils.utilizationVector(); // ADJVDW
 
 			// EMP071
-			estimateQuadMeanDiameterByUtilization(bec, quadMeanDiameterUtil, spec);
+			emp.estimateQuadMeanDiameterByUtilization(bec, quadMeanDiameterUtil, spec);
 
 			// EMP070
 			estimateBaseAreaByUtilization(bec, quadMeanDiameterUtil, baseAreaUtil, spec);
@@ -1410,7 +1411,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			} else {
 				logit = a0 + a1 * dq;
 			}
-			b.setCoe(i, b.getCoe(i - 1) * exponentRatio(logit));
+			b.setCoe(i, b.getCoe(i - 1) * FloatMath.exponentRatio(logit));
 			if (i == 1 && quadMeanDiameterUtil.getCoe(UTIL_ALL) < 12.5f) {
 				float ba12Max = (1f - pow(
 						(quadMeanDiameterUtil.getCoe(1) - 7.4f) / (quadMeanDiameterUtil.getCoe(UTIL_ALL) - 7.4f), 2f
@@ -1423,102 +1424,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		baseAreaUtil.setCoe(2, b.getCoe(1) - b.getCoe(2));
 		baseAreaUtil.setCoe(3, b.getCoe(2) - b.getCoe(3));
 		baseAreaUtil.setCoe(4, b.getCoe(3));
-	}
-
-	/**
-	 * Estimate DQ by utilization class, see ipsjf120.doc
-	 *
-	 * @param bec
-	 * @param quadMeanDiameterUtil
-	 * @param spec
-	 * @throws ProcessingException
-	 */
-	// EMP071
-	void estimateQuadMeanDiameterByUtilization(BecDefinition bec, Coefficients quadMeanDiameterUtil, VdypSpecies spec)
-			throws ProcessingException {
-		log.atTrace().setMessage("Estimate DQ by utilization class for {} in BEC {}.  DQ for all >7.5 is {}")
-				.addArgument(spec.getGenus()).addArgument(bec.getName())
-				.addArgument(quadMeanDiameterUtil.getCoe(UTIL_ALL));
-
-		float quadMeanDiameter07 = quadMeanDiameterUtil.getCoe(UTIL_ALL);
-
-		for (var uc : UTIL_CLASSES) {
-			log.atDebug().setMessage("For util level {}").addArgument(uc.className);
-			final var coeMap = Utils.<MatrixMap3<Integer, String, String, Coefficients>>expectParsedControl(
-					controlMap, ControlKey.UTIL_COMP_DQ, MatrixMap3.class
-			);
-			var coe = coeMap.get(uc.index, spec.getGenus(), bec.getGrowthBec().getAlias());
-
-			float a0 = coe.getCoe(1);
-			float a1 = coe.getCoe(2);
-			float a2 = coe.getCoe(3);
-
-			log.atDebug().setMessage("a0={}, a1={}, a3={}").addArgument(a0).addArgument(a1).addArgument(a2);
-
-			float logit;
-
-			switch (uc) {
-			case U75TO125:
-				if (quadMeanDiameter07 < 7.5001f) {
-					quadMeanDiameterUtil.setCoe(UTIL_ALL, 7.5f);
-				} else {
-					log.atDebug().setMessage("DQ = 7.5 + a0 * (1 - exp(a1 / a0*(DQ07 - 7.5) ))**a2' )");
-
-					logit = a1 / a0 * (quadMeanDiameter07 - 7.5f);
-
-					quadMeanDiameterUtil
-							.setCoe(uc.index, min(7.5f + a0 * pow(1 - safeExponent(logit), a2), quadMeanDiameter07));
-				}
-				break;
-			case U125TO175, U175TO225:
-				log.atDebug().setMessage(
-						"LOGIT = a0 + a1*(SQ07 / 7.5)**a2,  DQ = (12.5 or 17.5) + 5 * exp(LOGIT) / (1 + exp(LOGIT))"
-				);
-				logit = a0 + a1 * pow(quadMeanDiameter07 / 7.5f, a2);
-
-				quadMeanDiameterUtil.setCoe(uc.index, uc.lowBound + 5f * exponentRatio(logit));
-				break;
-			case OVER225:
-				float a3 = coe.getCoe(4);
-
-				log.atDebug().setMessage(
-						"Coeff A3 {}, LOGIT = a2 + a1*DQ07**a3,  DQ = DQ07 + a0 * (1 - exp(LOGIT) / (1 + exp(LOGIT)) )"
-				);
-
-				logit = a2 + a1 * pow(quadMeanDiameter07, a3);
-
-				quadMeanDiameterUtil
-						.setCoe(uc.index, max(22.5f, quadMeanDiameter07 + a0 * (1f - exponentRatio(logit))));
-				break;
-			case ALL, SMALL:
-				throw new IllegalStateException(
-						"Should not be attempting to process small component or all large components"
-				);
-			default:
-				throw new IllegalStateException("Unknown utilization class " + uc);
-			}
-
-			log.atDebug().setMessage("Util DQ for class {} is {}").addArgument(uc.className)
-					.addArgument(quadMeanDiameterUtil.getCoe(uc.index));
-		}
-
-		log.atTrace().setMessage("Estimated Diameters {}").addArgument(
-				() -> UTIL_CLASSES.stream()
-						.map(uc -> String.format("%s: %d", uc.className, quadMeanDiameterUtil.getCoe(uc.index)))
-		);
-
-	}
-
-	static float exponentRatio(float logit) throws ProcessingException {
-		float exp = safeExponent(logit);
-		return exp / (1f + exp);
-	}
-
-	static float safeExponent(float logit) throws ProcessingException {
-		if (logit > 88f) {
-			throw new ProcessingException("logit " + logit + " exceeds 88");
-		}
-		return exp(logit);
 	}
 
 	/**
