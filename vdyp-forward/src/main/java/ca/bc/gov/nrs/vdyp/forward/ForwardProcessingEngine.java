@@ -70,7 +70,7 @@ public class ForwardProcessingEngine {
 		// Must be first
 		NONE, //
 
-		REMOVE_SMALL_SPECIES, //
+		CHECK_FOR_WORK, //
 		CALCULATE_MISSING_SITE_CURVES, //
 		CALCULATE_COVERAGES, //
 		DETERMINE_POLYGON_RANKINGS, //
@@ -126,8 +126,8 @@ public class ForwardProcessingEngine {
 		logger.info("Beginning processing of polygon {} layer {}", pps.getLayer().getParent(), pps.getLayer());
 
 		// BANKCHK1, simplified for the parameters METH_CHK = 4, LayerI = 1, and INSTANCE = 1
-		if (lastStep.ordinal() >= ExecutionStep.REMOVE_SMALL_SPECIES.ordinal()) {
-			removeSmallSpecies(pps);
+		if (lastStep.ordinal() >= ExecutionStep.CHECK_FOR_WORK.ordinal()) {
+			stopIfNoWork(pps);
 		}
 
 		// SCINXSET - note these are calculated directly from the Primary bank of instance 1
@@ -1016,23 +1016,21 @@ public class ForwardProcessingEngine {
 
 			throw new ProcessingException(
 					MessageFormat.format(
-							"Polygon {}'s year value {} is < 1900", 101, polygon.getDescription().getName(), polygon
+							"Polygon {0}'s year value {1} is < 1900", 101, polygon.getDescription().getName(), polygon
 									.getDescription().getYear()
 					)
 			);
 		}
 	}
 
-	private static void removeSmallSpecies(PolygonProcessingState state) throws ProcessingException {
+	private static void stopIfNoWork(PolygonProcessingState state) throws ProcessingException {
 
 		// The following is extracted from BANKCHK1, simplified for the parameters
 		// METH_CHK = 4, LayerI = 1, and INSTANCE = 1. So IR = 1, which is the first
 		// bank, numbered 0.
 
-		// => all that is done is that species with basal area < MIN_BASAL_AREA are
-		// removed.
-
-		state.wallet.removeSpecies(i -> state.wallet.basalAreas[i][UTILIZATION_ALL_INDEX] < MIN_BASAL_AREA);
+		// => all that is done is that an exception is thrown if there are no species to 
+		// process.
 
 		if (state.getNSpecies() == 0) {
 			throw new ProcessingException(

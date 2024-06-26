@@ -9,11 +9,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,7 +67,7 @@ class PolygonProcessingStateTest {
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());
 
-		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone());
+		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone(), s -> true);
 
 		int nSpecies = pLayer.getGenera().size();
 
@@ -134,7 +131,7 @@ class PolygonProcessingStateTest {
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());
 
-		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone());
+		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone(), s -> true);
 
 		verifyProcessingStateMatchesLayer(pps, pLayer);
 
@@ -144,7 +141,7 @@ class PolygonProcessingStateTest {
 	}
 
 	@Test
-	void testReplace() throws IOException, ResourceParseException, ProcessingException {
+	void testRemoveSmallLayers() throws IOException, ResourceParseException, ProcessingException {
 
 		assertThat(polygonDescriptionStream.hasNext(), is(true));
 		var polygonDescription = polygonDescriptionStream.next();
@@ -155,54 +152,21 @@ class PolygonProcessingStateTest {
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());
 
-		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone());
-		verifyProcessingStateMatchesLayer(pps, pLayer);
+		Bank bank1 = new Bank(pLayer, polygon.getBiogeoclimaticZone(), s -> s.getUtilizations().isPresent() ? 
+				 s.getUtilizations().get().get(UtilizationClass.ALL).getBasalArea() >= 0.5
+				   : true);
+		
+		// the filter should have removed genus B (index 3) since it's ALL basal area is below 0.5
+		assertThat(bank1.getNSpecies(), is(pLayer.getGenera().size() - 1));
+		assertThat(bank1.speciesIndices, is(new int[] { 0, 4, 5, 8, 15 }));
 
-		Bank ppsCopy = new Bank(pps);
-		verifyProcessingStateMatchesLayer(ppsCopy, pLayer);
-
-		Set<Integer> speciesToRemove = new HashSet<>(List.of(2));
-		ppsCopy.removeSpecies(i -> speciesToRemove.contains(i));
-
-		int nSpeciesRemoved = 0;
-		for (int i = 0; i < ppsCopy.getNSpecies(); i++) {
-			if (speciesToRemove.contains(i)) {
-				nSpeciesRemoved += 1;
-			}
-			verifyProcessingStateIndicesEquals(ppsCopy, i, pps, i + nSpeciesRemoved);
-		}
-	}
-
-	private void
-			verifyProcessingStateIndicesEquals(Bank pps1, int i, Bank pps2, int j) {
-		if (i != j) {
-			assertThat(pps1.yearsAtBreastHeight[i], is(pps2.yearsAtBreastHeight[j]));
-			assertThat(pps1.ageTotals[i], is(pps2.ageTotals[j]));
-			assertThat(pps1.dominantHeights[i], is(pps2.dominantHeights[j]));
-			assertThat(pps1.siteIndices[i], is(pps2.siteIndices[j]));
-			assertThat(pps1.sp64Distributions[i], is(pps2.sp64Distributions[j]));
-			assertThat(pps1.speciesIndices[i], is(pps2.speciesIndices[j]));
-			assertThat(pps1.speciesNames[i], is(pps2.speciesNames[j]));
-			assertThat(pps1.yearsToBreastHeight[i], is(pps2.yearsToBreastHeight[j]));
-
-			for (UtilizationClass uc : UtilizationClass.values()) {
-				assertThat(pps1.basalAreas[i][uc.index + 1], is(pps2.basalAreas[j][uc.index + 1]));
-				assertThat(
-						pps1.closeUtilizationVolumes[i][uc.index + 1], is(pps2.closeUtilizationVolumes[j][uc.index + 1])
-				);
-				assertThat(pps1.cuVolumesMinusDecay[i][uc.index + 1], is(pps2.cuVolumesMinusDecay[j][uc.index + 1]));
-				assertThat(
-						pps1.cuVolumesMinusDecayAndWastage[i][uc.index + 1],
-						is(pps2.cuVolumesMinusDecayAndWastage[j][uc.index + 1])
-				);
-				if (uc.index <= 0) {
-					assertThat(pps1.loreyHeights[i][uc.index + 1], is(pps2.loreyHeights[j][uc.index + 1]));
-				}
-				assertThat(pps1.quadMeanDiameters[i][uc.index + 1], is(pps2.quadMeanDiameters[j][uc.index + 1]));
-				assertThat(pps1.treesPerHectare[i][uc.index + 1], is(pps2.treesPerHectare[j][uc.index + 1]));
-				assertThat(pps1.wholeStemVolumes[i][uc.index + 1], is(pps2.wholeStemVolumes[j][uc.index + 1]));
-			}
-		}
+		Bank bank2 = new Bank(pLayer, polygon.getBiogeoclimaticZone(), s -> s.getUtilizations().isPresent() ? 
+				 s.getUtilizations().get().get(UtilizationClass.ALL).getBasalArea() >= 100.0
+				   : true);
+		
+		// the filter should have removed all genera.
+		assertThat(bank2.getNSpecies(), is(0));
+		assertThat(bank2.speciesIndices, is(new int[] { 0 }));
 	}
 
 	@Test
@@ -217,7 +181,7 @@ class PolygonProcessingStateTest {
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());
 
-		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone());
+		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone(), s -> true);
 
 		Bank ppsCopy = new Bank(pps);
 

@@ -434,7 +434,8 @@ public class SiteIndexNames {
 			"Other conifer",
 
 			// SI_SPEC_ZH
-			"Other hardwood", };
+			"Other hardwood"
+	};
 
 	public static String[] siCurveName = {
 			// SI_ACB_HUANG
@@ -870,7 +871,8 @@ public class SiteIndexNames {
 			"Nigh (2015)",
 
 			// SI_CWC_NIGH
-			"Nigh (2016)", };
+			"Nigh (2016)"
+	};
 
 	/**
 	 * Site index conversion between species. Here's how to use the following array: The four elements are: reference
@@ -887,12 +889,12 @@ public class SiteIndexNames {
 	private static final Map<Pair<SiteIndexSpecies, SiteIndexSpecies>, SpeciesConversionParamsDetails> siSpeciesConversionParams = new HashMap<>();
 		
 	public static SpeciesConversionParamsDetails getSpeciesConversionParams(SiteIndexSpecies spIndex1, SiteIndexSpecies spIndex2) {
-		var key = new ImmutablePair<SiteIndexSpecies, SiteIndexSpecies>(spIndex1, spIndex2);
+		var key = new ImmutablePair<>(spIndex1, spIndex2);
 		return siSpeciesConversionParams.get(key);
 	}
 
 	private static void addSpeciesConversionParamsDetails(SpeciesConversionParamsDetails details) {
-		siSpeciesConversionParams.put(new ImmutablePair<SiteIndexSpecies, SiteIndexSpecies>(details.sourceSpecies, details.targetSpecies), details);
+		siSpeciesConversionParams.put(new ImmutablePair<>(details.sourceSpecies, details.targetSpecies), details);
 	}
 	
 	static {
@@ -924,7 +926,7 @@ public class SiteIndexNames {
 		addSpeciesConversionParamsDetails(new SpeciesConversionParamsDetails(SI_SPEC_BL, SI_SPEC_SW, -1.95348837, 1.1627907));
 		addSpeciesConversionParamsDetails(new SpeciesConversionParamsDetails(SI_SPEC_LW, SI_SPEC_PLI, -2, 1.04));
 		addSpeciesConversionParamsDetails(new SpeciesConversionParamsDetails(SI_SPEC_LW, SI_SPEC_FDI, -0.69, 0.983));
-	};
+	}
 
 	/**
 	 * Indicates what equations are available (these are additive):
@@ -1369,8 +1371,7 @@ public class SiteIndexNames {
 			5,
 
 			// SI_CWC_NIGH
-			5,
-
+			5
 	};
 
 	/**
@@ -1810,5 +1811,6 @@ public class SiteIndexNames {
 			1.3,
 
 			// SI_CWC_NIGH
-			1.3 };
+			1.3 
+	};
 }

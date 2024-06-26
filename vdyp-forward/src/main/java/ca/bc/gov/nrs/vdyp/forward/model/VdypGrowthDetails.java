@@ -50,12 +50,12 @@ public class VdypGrowthDetails {
 	private static final int MAX_CONTROL_VARIABLE_VALUES = 10;
 	
 	private enum ControlVariables {
-		GrowTarget,
-		CompatibilityVariableOutput,
-		CompatibilityVariableApplication,
-		OutputFiles,
-		AllowCompatibilityVariableComputations,
-		UpdateDuringGrowth
+		GROW_TARGET,
+		COMPATIBILITY_VARIABLE_OUTPUT,
+		COMPATIBILITY_VARIABLE_APPLICATION,
+		OUTPUT_FILES,
+		ALLOW_COMPATIBILITY_VARIABLE_CALCULATIONS,
+		UPDATE_DURING_GROWTH
 	}
 
 	private Integer firstYear, currentYear, lastYear, yearCounter;
@@ -107,12 +107,12 @@ public class VdypGrowthDetails {
 	}
 
 	public boolean allowCalculation(float value, float limit, BiFunction<Float, Float, Boolean> p) {
-		int cvValue = controlVariables[ControlVariables.AllowCompatibilityVariableComputations.ordinal()];
+		int cvValue = controlVariables[ControlVariables.ALLOW_COMPATIBILITY_VARIABLE_CALCULATIONS.ordinal()];
 		return cvValue == 0 && value > 0 || cvValue == 1 && p.apply(value, limit);
 	}
 
 	public boolean allowCalculation(BooleanSupplier p) {
-		int cvValue = controlVariables[ControlVariables.AllowCompatibilityVariableComputations.ordinal()];
+		int cvValue = controlVariables[ControlVariables.ALLOW_COMPATIBILITY_VARIABLE_CALCULATIONS.ordinal()];
 		return cvValue == 1 && p.getAsBoolean();
 	}
 	

@@ -390,7 +390,7 @@ class EstimationMethodsTest {
 	}
 
 	@Test
-	void testWholeStemVolumePerTreeEstimation() throws ProcessingException {
+	void testWholeStemVolumePerTreeEstimation() {
 		var controlMap = TestUtils.loadControlMap();
 
 		var becLookup = (BecLookup) controlMap.get(ControlKey.BEC_DEF.name());

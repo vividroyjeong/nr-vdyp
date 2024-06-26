@@ -20,6 +20,7 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.Region;
+import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
 class ForwardProcessingState {
 
@@ -143,10 +144,16 @@ class ForwardProcessingState {
 		return Utils.expectParsedControl(controlMap, ControlKey.VTROL, VdypGrowthDetails.class);
 	}
 
+	private static final float MIN_BASAL_AREA = 0.001f;
+
 	public void setPolygon(VdypPolygon polygon) {
 		// Move the primary layer of the given polygon to bank zero.
-		banks[0] = new Bank(polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone());
-		pps = new PolygonProcessingState(this, polygon, banks[toIndex(0, LayerType.PRIMARY)], controlMap);
+		assert toIndex(0, LayerType.PRIMARY) == 0;
+		banks[0] = new Bank(polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone()
+				, s -> s.getUtilizations().isPresent() ? 
+						 s.getUtilizations().get().get(UtilizationClass.ALL).getBasalArea() >= MIN_BASAL_AREA
+					   : true);
+		pps = new PolygonProcessingState(this, polygon, banks[0], controlMap);
 	}
 
 	public PolygonProcessingState getPolygonProcessingState() {
