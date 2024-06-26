@@ -179,22 +179,36 @@ public class VdypSpeciesUtilization extends VdypEntity {
 	 * @throws ProcessingException when calculated values are out of range
 	 */
 	public void doPostCreateAdjustments() throws ProcessingException {
-		// TODO Auto-generated method stub
 
-		// 1. if either basalArea or liveTreesPerHectare is not positive, clear everything.
+		resetOnMissingValues();
+
+		adjustBasalAreaToMatchTreesPerHectare();
+				
+		doCalculateQuadMeanDiameter();
+	}
+	
+	/**
+	 * If either basalArea or liveTreesPerHectare is not positive, clear everything.
+	 */
+	private void resetOnMissingValues() {
 		
 		if (this.basalArea <= 0.0f || this.liveTreesPerHectare <= 0.0f) {
 			this.basalArea = 0.0f;
 			this.liveTreesPerHectare = 0.0f;
-			// do not 0 out the lorey height value.
+			// DO NOT zero-out the lorey height value.
 			this.wholeStemVolume = 0.0f;
 			this.closeUtilizationVolume = 0.0f;
 			this.cuVolumeMinusDecay = 0.0f;
 			this.cuVolumeMinusDecayWastage = 0.0f;
 			this.cuVolumeMinusDecayWastageBreakage = 0.0f;
 		}
+	}
 
-		// 2. Adjust BA to match TPH
+	/**
+	 * Adjust Basal Area to match the Trees-Per-Hectare value.
+	 * @throws ProcessingException 
+	 */
+	private void adjustBasalAreaToMatchTreesPerHectare() throws ProcessingException {
 		
 		if (this.liveTreesPerHectare > 0.0f) {
 			float basalAreaLowerBound = ForwardProcessingEngine
@@ -218,12 +232,20 @@ public class VdypSpeciesUtilization extends VdypEntity {
 			}
 			
 			if (basalAreaError > MAX_ACCEPTABLE_BASAL_AREA_ERROR) {
-				System.out.println(this + ": " + message);
-				// throw new ProcessingException(message);
+				throw new ProcessingException(message);
 			}
 		}
-		
-		// 3. Calculate QuadMeanDiameter - the value supplied in the input is IGNORED REPEAT IGNORED
+	
+	}
+	
+	/**
+	 * Calculate QuadMeanDiameter for the given utilization. 
+	 * 
+	 * The value supplied in the input is IGNORED REPEAT IGNORED
+	 * 
+	 * @throws ProcessingException
+	 */
+	private void doCalculateQuadMeanDiameter() throws ProcessingException {
 
 		if (this.basalArea > 0.0f) {
 			float qmd = ForwardProcessingEngine.calculateQuadMeanDiameter(basalArea, liveTreesPerHectare);

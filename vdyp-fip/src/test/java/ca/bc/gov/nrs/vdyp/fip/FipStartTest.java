@@ -1939,7 +1939,6 @@ class FipStartTest {
 			var utilizationClass = UtilizationClass.OVER225;
 			var aAdjust = new Coefficients(new float[] { 0f, 0f, 0f, 0.000479999988f }, 1);
 			var decayGroup = 7;
-			var lorieHeight = 26.2000008f;
 			var breastHeightAge = 97.9000015f;
 			var quadMeanDiameterUtil = new Coefficients(new float[] { 51.8356705f, 0f, 0f, 0f, 51.8356705f }, 0);
 			var closeUtilizationUtil = new Coefficients(new float[] { 0f, 0f, 0f, 0f, 5.86088896f }, 0);
@@ -1947,8 +1946,8 @@ class FipStartTest {
 			var closeUtilizationNetOfDecayUtil = new Coefficients(new float[] { 0f, 0f, 0f, 0f, 0f }, 0);
 
 			EstimationMethods.estimateNetDecayVolume(
-					controlMap, fipSpecies.getGenus(), Region.INTERIOR, utilizationClass, aAdjust, decayGroup, lorieHeight,
-					breastHeightAge, quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil
+					controlMap, fipSpecies.getGenus(), Region.INTERIOR, utilizationClass, aAdjust, decayGroup, breastHeightAge,
+					quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil
 			);
 
 			assertThat(
@@ -1988,7 +1987,6 @@ class FipStartTest {
 			var utilizationClass = UtilizationClass.OVER225;
 			var aAdjust = new Coefficients(new float[] { 0f, 0f, 0f, -0.00295000011f }, 1);
 			var lorieHeight = 26.2000008f;
-			var breastHeightAge = 97.9000015f;
 			var quadMeanDiameterUtil = new Coefficients(new float[] { 51.8356705f, 0f, 0f, 0f, 51.8356705f }, 0);
 			var closeUtilizationUtil = new Coefficients(new float[] { 0f, 0f, 0f, 0f, 5.86088896f }, 0);
 			var closeUtilizationNetOfDecayUtil = new Coefficients(new float[] { 0f, 0f, 0f, 0f, 5.64048958f }, 0);
@@ -2003,9 +2001,8 @@ class FipStartTest {
 			);
 
 			EstimationMethods.estimateNetDecayAndWasteVolume(
-					Region.INTERIOR, utilizationClass, aAdjust, fipSpecies.getGenus(), lorieHeight, breastHeightAge, 
-					netDecayCoeMap, wasteModifierMap, quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil,
-					closeUtilizationNetOfDecayAndWasteUtil
+					Region.INTERIOR, utilizationClass, aAdjust, fipSpecies.getGenus(), lorieHeight, netDecayCoeMap, 
+					wasteModifierMap, quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
 			);
 
 			assertThat(

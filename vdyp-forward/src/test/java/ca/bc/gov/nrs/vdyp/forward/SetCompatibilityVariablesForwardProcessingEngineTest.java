@@ -28,7 +28,7 @@ class SetCompatibilityVariablesForwardProcessingEngineTest extends AbstractForwa
 		var polygon = reader.readNextPolygon(testPolygonDescription);
 
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.SetCompatibilityVariables);
+		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.SET_COMPATIBILITY_VARIABLES);
 		
 		// These values have been verified against the FORTRAN implementation, allowing for minor
 		// platform-specific differences.

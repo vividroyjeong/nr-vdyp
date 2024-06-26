@@ -226,7 +226,7 @@ class PolygonProcessingStateTest {
 
 	private void verifyProcessingStateMatchesLayer(Bank pps, VdypPolygonLayer layer) {
 
-		List<Integer> sortedSpIndices = layer.getGenera().keySet().stream().sorted().collect(Collectors.toList());
+		List<Integer> sortedSpIndices = layer.getGenera().keySet().stream().sorted().toList();
 
 		for (int i = 0; i < sortedSpIndices.size(); i++) {
 

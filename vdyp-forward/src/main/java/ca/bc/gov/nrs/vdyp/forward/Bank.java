@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
@@ -98,8 +97,7 @@ class Bank {
 			recordUtilizations(0, layer.getDefaultUtilizationMap().get());
 		}
 
-		List<Integer> sortedSpIndices = layer.getGenera().keySet().stream().sorted(Integer::compareTo)
-				.collect(Collectors.toList());
+		List<Integer> sortedSpIndices = layer.getGenera().keySet().stream().sorted(Integer::compareTo).toList();
 		for (int i = 0; i < sortedSpIndices.size(); i++) {
 			recordSpecies(i + 1, layer.getGenera().get(sortedSpIndices.get(i)));
 		}

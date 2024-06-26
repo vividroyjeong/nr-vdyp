@@ -25,6 +25,20 @@ import ca.bc.gov.nrs.vdyp.model.VolumeVariable;
 
 class PolygonProcessingState {
 
+	private static final String COMPATIBILITY_VARIABLES_SET_CAN_BE_SET_ONCE_ONLY = "CompatibilityVariablesSet can be set once only";
+	private static final String PRIMARY_SPECIES_DETAILS_CAN_BE_SET_ONCE_ONLY = "PrimarySpeciesDetails can be set once only";
+	private static final String SITE_CURVE_NUMBERS_CAN_BE_SET_ONCE_ONLY = "SiteCurveNumbers can be set once only";
+	private static final String SPECIES_RANKING_DETAILS_CAN_BE_SET_ONCE_ONLY = "SpeciesRankingDetails can be set once only";
+
+	private static final String UNSET_PRIMARY_SPECIES_AGE_TO_BREAST_HEIGHT = "unset primarySpeciesAgeToBreastHeight";
+	private static final String UNSET_PRIMARY_SPECIES_AGE_AT_BREAST_HEIGHT = "unset primarySpeciesAgeAtBreastHeight";
+	private static final String UNSET_PRIMARY_SPECIES_DOMINANT_HEIGHT = "unset primarySpeciesDominantHeight";
+	private static final String UNSET_CV_VOLUMES = "unset cvVolumes";
+	private static final String UNSET_CV_BASAL_AREAS = "unset cvBasalAreas";
+	private static final String UNSET_RANKING_DETAILS = "unset rankingDetails";
+	private static final String UNSET_SITE_CURVE_NUMBERS = "unset siteCurveNumbers";
+	private static final String UNSET_INVENTORY_TYPE_GROUP = "unset inventoryTypeGroup";
+
 	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(PolygonProcessingState.class);
 
@@ -64,7 +78,9 @@ class PolygonProcessingState {
 	//     PCTP = wallet.percentagesOfForestedLand[primarySpeciesIndex]
 	private Optional<Integer> secondarySpeciesIndex; // => ISPS (species name) and PCTS (percentage)
 	private int inventoryTypeGroup; // ITG
+	@SuppressWarnings("unused")
 	private int primarySpeciesGroupNumber; // GRPBA1
+	@SuppressWarnings("unused")
 	private int primarySpeciesStratumNumber; // GRPBA3
 
 	// Site Curve Numbers - encompasses INXSCV
@@ -232,19 +248,19 @@ class PolygonProcessingState {
 
 	public int getInventoryTypeGroup() {
 		if (!areRankingDetailsSet) {
-			throw new IllegalStateException("unset inventoryTypeGroup");
+			throw new IllegalStateException(UNSET_INVENTORY_TYPE_GROUP);
 		}
 		return inventoryTypeGroup;
 	}
 
 	public int getSiteCurveNumber(int n) {
 		if (!areSiteCurveNumbersSet) {
-			throw new IllegalStateException("unset siteCurveNumbers");
+			throw new IllegalStateException(UNSET_SITE_CURVE_NUMBERS);
 		}
 		if (n == 0) {
 			// Take this opportunity to initialize siteCurveNumbers[0] from that of the primary species.
 			if (!areRankingDetailsSet) {
-				throw new IllegalStateException("unset rankingDetails");
+				throw new IllegalStateException(UNSET_RANKING_DETAILS);
 			}
 			siteCurveNumbers[0] = siteCurveNumbers[primarySpeciesIndex];
 		}
@@ -253,42 +269,42 @@ class PolygonProcessingState {
 
 	public float getPrimarySpeciesDominantHeight() {
 		if (!arePrimarySpeciesDetailsSet) {
-			throw new IllegalStateException("unset primarySpeciesDominantHeight");
+			throw new IllegalStateException(UNSET_PRIMARY_SPECIES_DOMINANT_HEIGHT);
 		}
 		return primarySpeciesDominantHeight;
 	}
 
 	public float getPrimarySpeciesSiteIndex() {
 		if (!arePrimarySpeciesDetailsSet) {
-			throw new IllegalStateException("unset primarySpeciesSiteIndex");
+			throw new IllegalStateException(UNSET_PRIMARY_SPECIES_DOMINANT_HEIGHT);
 		}
 		return primarySpeciesSiteIndex;
 	}
 
 	public float getPrimarySpeciesTotalAge() {
 		if (!arePrimarySpeciesDetailsSet) {
-			throw new IllegalStateException("unset primarySpeciesTotalAge");
+			throw new IllegalStateException(UNSET_PRIMARY_SPECIES_DOMINANT_HEIGHT);
 		}
 		return primarySpeciesTotalAge;
 	}
 
 	public float getPrimarySpeciesAgeAtBreastHeight() {
 		if (!arePrimarySpeciesDetailsSet) {
-			throw new IllegalStateException("unset primarySpeciesAgeAtBreastHeight");
+			throw new IllegalStateException(UNSET_PRIMARY_SPECIES_AGE_AT_BREAST_HEIGHT);
 		}
 		return primarySpeciesAgeAtBreastHeight;
 	}
 
 	public float getPrimarySpeciesAgeToBreastHeight() {
 		if (!arePrimarySpeciesDetailsSet) {
-			throw new IllegalStateException("unset primarySpeciesAgeToBreastHeight");
+			throw new IllegalStateException(UNSET_PRIMARY_SPECIES_AGE_TO_BREAST_HEIGHT);
 		}
 		return primarySpeciesAgeToBreastHeight;
 	}
 
 	public void setSpeciesRankingDetails(SpeciesRankingDetails rankingDetails) {
 		if (this.areRankingDetailsSet) {
-			throw new IllegalStateException("SpeciesRankingDetails can be set once only");
+			throw new IllegalStateException(SPECIES_RANKING_DETAILS_CAN_BE_SET_ONCE_ONLY);
 		}
 
 		this.primarySpeciesIndex = rankingDetails.primarySpeciesIndex();
@@ -300,7 +316,7 @@ class PolygonProcessingState {
 
 	public void setSiteCurveNumbers(int[] siteCurveNumbers) {
 		if (this.areSiteCurveNumbersSet) {
-			throw new IllegalStateException("SiteCurveNumbers can be set once only");
+			throw new IllegalStateException(SITE_CURVE_NUMBERS_CAN_BE_SET_ONCE_ONLY);
 		}
 
 		this.siteCurveNumbers = Arrays.copyOf(siteCurveNumbers, siteCurveNumbers.length);
@@ -310,7 +326,7 @@ class PolygonProcessingState {
 
 	public void setPrimarySpeciesDetails(PrimarySpeciesDetails details) {
 		if (this.arePrimarySpeciesDetailsSet) {
-			throw new IllegalStateException("PrimarySpeciesDetails can be set once only");
+			throw new IllegalStateException(PRIMARY_SPECIES_DETAILS_CAN_BE_SET_ONCE_ONLY);
 		}
 
 		this.primarySpeciesDominantHeight = details.primarySpeciesDominantHeight();
@@ -346,7 +362,7 @@ class PolygonProcessingState {
 			Map<SmallUtilizationClassVariable, Float>[] cvPrimaryLayerSmall
 	) {
 		if (this.areCompatibilityVariablesSet) {
-			throw new IllegalStateException("CompatibilityVariablesSet can be set once only");
+			throw new IllegalStateException(COMPATIBILITY_VARIABLES_SET_CAN_BE_SET_ONCE_ONLY);
 		}
 
 		this.cvVolume = cvVolume;
@@ -360,7 +376,7 @@ class PolygonProcessingState {
 	public float
 			getCVVolume(int speciesIndex, UtilizationClass uc, VolumeVariable volumeVariable, LayerType layerType) {
 		if (!this.areCompatibilityVariablesSet) {
-			throw new IllegalStateException("unset cvVolumes");
+			throw new IllegalStateException(UNSET_CV_VOLUMES);
 		}
 
 		return cvVolume[speciesIndex].get(uc, volumeVariable, layerType);
@@ -368,7 +384,7 @@ class PolygonProcessingState {
 
 	public float getCVBasalArea(int speciesIndex, UtilizationClass uc, LayerType layerType) {
 		if (!this.areCompatibilityVariablesSet) {
-			throw new IllegalStateException("unset cvBasalAreas");
+			throw new IllegalStateException(UNSET_CV_BASAL_AREAS);
 		}
 
 		return cvBasalArea[speciesIndex].get(uc, layerType);
@@ -376,7 +392,7 @@ class PolygonProcessingState {
 
 	public float getCVQuadraticMeanDiameter(int speciesIndex, UtilizationClass uc, LayerType layerType) {
 		if (!this.areCompatibilityVariablesSet) {
-			throw new IllegalStateException("unset cvBasalAreas");
+			throw new IllegalStateException(UNSET_CV_BASAL_AREAS);
 		}
 
 		return cvQuadraticMeanDiameter[speciesIndex].get(uc, layerType);
@@ -384,7 +400,7 @@ class PolygonProcessingState {
 
 	public float getCVSmall(int speciesIndex, SmallUtilizationClassVariable variable) {
 		if (!this.areCompatibilityVariablesSet) {
-			throw new IllegalStateException("unset cvBasalAreas");
+			throw new IllegalStateException(UNSET_CV_BASAL_AREAS);
 		}
 
 		return cvPrimaryLayerSmall[speciesIndex].get(variable);

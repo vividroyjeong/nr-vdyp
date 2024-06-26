@@ -1079,16 +1079,14 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				// EMP093
 				EstimationMethods.estimateNetDecayVolume(
 						controlMap, spec.getGenus(), bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec
-								.getDecayGroup(), loreyHeightSpec, vdypLayer.getBreastHeightAge()
+								.getDecayGroup(), vdypLayer.getBreastHeightAge()
 										.orElse(0f), quadMeanDiameterUtil, closeVolumeUtil, closeVolumeNetDecayUtil
 				);
 
 				// EMP094
 				EstimationMethods.estimateNetDecayAndWasteVolume(
 						controlMap, bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec
-								.getGenus(), loreyHeightSpec, vdypLayer.getBreastHeightAge().orElse(
-										0f
-								), quadMeanDiameterUtil, closeVolumeUtil, closeVolumeNetDecayUtil, closeVolumeNetDecayWasteUtil
+								.getGenus(), loreyHeightSpec, quadMeanDiameterUtil, closeVolumeUtil, closeVolumeNetDecayUtil, closeVolumeNetDecayWasteUtil
 				);
 
 				if (getId().isStart()) {
@@ -1236,7 +1234,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				// EMP093
 				EstimationMethods.estimateNetDecayVolume(
 						controlMap, vdypSpecies.getGenus(), bec.getRegion(), utilizationClass, adjust, vdypSpecies
-								.getDecayGroup(), hlSp, vdypLayer.getBreastHeightAge().orElse(
+								.getDecayGroup(), vdypLayer.getBreastHeightAge().orElse(
 										0f
 								), quadMeanDiameterUtil, closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil
 				);
@@ -1251,10 +1249,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				);
 				EstimationMethods.estimateNetDecayAndWasteVolume(
 						bec.getRegion(), utilizationClass, adjust, vdypSpecies
-								.getGenus(), hlSp, vdypLayer.getBreastHeightAge()
-										.orElse(
-												0f
-										), netDecayCoeMap, wasteModifierMap, quadMeanDiameterUtil, closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
+								.getGenus(), hlSp, netDecayCoeMap, wasteModifierMap, quadMeanDiameterUtil, closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
 				);
 
 				if (getId().isStart()) {

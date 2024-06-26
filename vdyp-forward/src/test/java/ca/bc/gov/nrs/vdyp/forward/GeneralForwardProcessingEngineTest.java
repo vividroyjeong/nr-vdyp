@@ -234,9 +234,10 @@ class GeneralForwardProcessingEngineTest {
 			// expected
 		}
 
+		Optional<String> ac = Optional.of("AC");
 		assertThrows(
 				IllegalArgumentException.class, () -> ForwardProcessingEngine
-						.findInventoryTypeGroup("AC", Optional.of("AC"), 0.0f)
+						.findInventoryTypeGroup("AC", ac, 0.0f)
 		);
 
 		assertThat(ForwardProcessingEngine.findInventoryTypeGroup("AC", Optional.empty(), 80.0f), is(36));
@@ -294,7 +295,7 @@ class GeneralForwardProcessingEngineTest {
 		var polygon = reader.readNextPolygon(testPolygonDescription);
 		
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.CalculateMissingSiteCurves);
+		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.CALCULATE_MISSING_SITE_CURVES);
 
 		// Cannot check 0 since determinePolygonRankings has not been executed.
 		assertThat(fpe.fps.getPolygonProcessingState().getSiteCurveNumber(1), is(12));
@@ -329,7 +330,7 @@ class GeneralForwardProcessingEngineTest {
 		var polygon = reader.readNextPolygon(testPolygonDescription);
 		
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.CalculateMissingSiteCurves);
+		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.CALCULATE_MISSING_SITE_CURVES);
 
 		// Cannot check 0 since determinePolygonRankings has not been executed.
 		assertThat(fpe.fps.getPolygonProcessingState().getSiteCurveNumber(1), is(118));
@@ -369,7 +370,7 @@ class GeneralForwardProcessingEngineTest {
 		var polygon = reader.readNextPolygon(testPolygonDescription);
 
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.EstimateMissingSiteIndices);
+		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.ESTIMATE_MISSING_SITE_INDICES);
 
 		var sourceSiteCurve = SiteIndexEquation.SI_CWC_KURUCZ;
 		var sourceSiteIndex = 13.4;
@@ -388,7 +389,7 @@ class GeneralForwardProcessingEngineTest {
 		var polygon = forwardDataStreamReader.readNextPolygon(targetDescription);
 
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.EstimateMissingSiteIndices);
+		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.ESTIMATE_MISSING_SITE_INDICES);
 
 		var sourceSiteCurve = SiteIndexEquation.SI_CWC_KURUCZ;
 		var sourceSiteIndex = 13.4;
@@ -420,7 +421,7 @@ class GeneralForwardProcessingEngineTest {
 		var polygon = reader.readNextPolygon(testPolygonDescription);
 
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.EstimateMissingYearsToBreastHeightValues);
+		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.ESTIMATE_MISSING_YEARS_TO_BREAST_HEIGHT_VALUES);
 
 		assertThat(
 				fpe.fps.getPolygonProcessingState().wallet.yearsToBreastHeight, is(
@@ -453,7 +454,7 @@ class GeneralForwardProcessingEngineTest {
 		var polygon = reader.readNextPolygon(testPolygonDescription);
 
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.CalculateDominantHeightAgeSiteIndex);
+		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.CALCULATE_DOMINANT_HEIGHT_AGE_SITE_INDEX);
 
 		assertThat(fpe.fps.getPolygonProcessingState().getPrimarySpeciesDominantHeight(), is(35.31195f));
 		assertThat(fpe.fps.getPolygonProcessingState().getPrimarySpeciesSiteIndex(), is(34.0f));
@@ -512,7 +513,7 @@ class GeneralForwardProcessingEngineTest {
 		var polygon = reader.readNextPolygon(testPolygonDescription);
 
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.CalculateDominantHeightAgeSiteIndex);
+		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.CALCULATE_DOMINANT_HEIGHT_AGE_SITE_INDEX);
 
 		assertThat(fpe.fps.getPolygonProcessingState().getPrimarySpeciesDominantHeight(), is(22.950302f));
 		assertThat(fpe.fps.getPolygonProcessingState().getPrimarySpeciesSiteIndex(), is(34.0f));

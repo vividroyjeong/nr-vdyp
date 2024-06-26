@@ -31,6 +31,8 @@ public class EstimationMethods {
 	private static final int UTIL_ALL = UtilizationClass.ALL.index;
 	private static final int UTIL_LARGEST = UtilizationClass.OVER225.index;
 
+	private EstimationMethods() { }
+	
 	/**
 	 * EMP092. Updates closeUtilizationVolumeUtil with estimated values.
 	 * 
@@ -107,7 +109,6 @@ public class EstimationMethods {
 	 * @param aAdjust
 	 * @param genus
 	 * @param loreyHeight
-	 * @param ageBreastHeight
 	 * @param quadMeanDiameterUtil
 	 * @param closeUtilizationUtil
 	 * @param closeUtilizationNetOfDecayUtil
@@ -116,9 +117,8 @@ public class EstimationMethods {
 	 */
 	public static void estimateNetDecayAndWasteVolume(
 			Map<String, Object> controlMap, Region region, UtilizationClass utilizationClass, Coefficients aAdjust,
-			String genus, float loreyHeight, float ageBreastHeight, Coefficients quadMeanDiameterUtil,
-			Coefficients closeUtilizationUtil, Coefficients closeUtilizationNetOfDecayUtil,
-			Coefficients closeUtilizationNetOfDecayAndWasteUtil
+			String genus, float loreyHeight, Coefficients quadMeanDiameterUtil, Coefficients closeUtilizationUtil,
+			Coefficients closeUtilizationNetOfDecayUtil, Coefficients closeUtilizationNetOfDecayAndWasteUtil
 	) throws ProcessingException {
 		final var netDecayWasteCoeMap = Utils.<Map<String, Coefficients>>expectParsedControl(
 				controlMap, ControlKey.VOLUME_NET_DECAY_WASTE, Map.class
@@ -128,7 +128,7 @@ public class EstimationMethods {
 		);
 
 		estimateNetDecayAndWasteVolume(
-				region, utilizationClass, aAdjust, genus, loreyHeight, ageBreastHeight, netDecayWasteCoeMap, wasteModifierMap, quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
+				region, utilizationClass, aAdjust, genus, loreyHeight, netDecayWasteCoeMap, wasteModifierMap, quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
 		);
 	}
 
@@ -140,7 +140,6 @@ public class EstimationMethods {
 	 * @param aAdjust
 	 * @param genus
 	 * @param loreyHeight
-	 * @param ageBreastHeight
 	 * @param netDecayWasteCoeMap
 	 * @param wasteModifierMap
 	 * @param quadMeanDiameterUtil
@@ -151,11 +150,11 @@ public class EstimationMethods {
 	 */
 	public static void estimateNetDecayAndWasteVolume(
 			Region region, UtilizationClass utilizationClass, Coefficients aAdjust,
-			String genus, float loreyHeight, float ageBreastHeight,
-			Map<String, Coefficients> netDecayWasteCoeMap,
+			String genus, float loreyHeight, Map<String, Coefficients> netDecayWasteCoeMap,
 			MatrixMap2<String, Region, Float> wasteModifierMap,
-			Coefficients quadMeanDiameterUtil, Coefficients closeUtilizationUtil,
-			Coefficients closeUtilizationNetOfDecayUtil, Coefficients closeUtilizationNetOfDecayAndWasteUtil
+			Coefficients quadMeanDiameterUtil,
+			Coefficients closeUtilizationUtil, Coefficients closeUtilizationNetOfDecayUtil,
+			Coefficients closeUtilizationNetOfDecayAndWasteUtil
 	) throws ProcessingException {
 		estimateUtilization(
 				closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil, utilizationClass, (
@@ -225,7 +224,6 @@ public class EstimationMethods {
 	 * @param utilizationClass
 	 * @param aAdjust
 	 * @param decayGroup
-	 * @param loreyHeight
 	 * @param ageBreastHeight
 	 * @param quadMeanDiameterUtil
 	 * @param closeUtilizationUtil
@@ -235,8 +233,8 @@ public class EstimationMethods {
 	public static void estimateNetDecayVolume(
 			Map<String, Object> controlMap, String genus, Region region, UtilizationClass utilizationClass,
 			Coefficients aAdjust, int decayGroup,
-			float loreyHeight, float ageBreastHeight, Coefficients quadMeanDiameterUtil,
-			Coefficients closeUtilizationUtil, Coefficients closeUtilizationNetOfDecayUtil
+			float ageBreastHeight, Coefficients quadMeanDiameterUtil, Coefficients closeUtilizationUtil,
+			Coefficients closeUtilizationNetOfDecayUtil
 	) throws ProcessingException {
 		final var netDecayCoeMap = Utils.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
 				controlMap, ControlKey.VOLUME_NET_DECAY, MatrixMap2.class
@@ -245,7 +243,7 @@ public class EstimationMethods {
 				controlMap, ModifierParser.CONTROL_KEY_MOD301_DECAY, MatrixMap2.class
 		);
 		estimateNetDecayVolume(
-				genus, region, utilizationClass, aAdjust, decayGroup, loreyHeight, ageBreastHeight, netDecayCoeMap, decayModifierMap, quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil
+				genus, region, utilizationClass, aAdjust, decayGroup, ageBreastHeight, netDecayCoeMap, decayModifierMap, quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil
 		);
 	}
 
@@ -257,22 +255,21 @@ public class EstimationMethods {
 	 * @param utilizationClass
 	 * @param aAdjust
 	 * @param decayGroup
-	 * @param loreyHeight
 	 * @param ageBreastHeight
 	 * @param netDecayCoeMap
 	 * @param decayModifierMap
 	 * @param quadMeanDiameterUtil
 	 * @param closeUtilizationUtil
 	 * @param closeUtilizationNetOfDecayUtil
+	 * @param loreyHeight
 	 * @throws ProcessingException
 	 */
 	public static void estimateNetDecayVolume(
 			String genus, Region region, UtilizationClass utilizationClass,
-			Coefficients aAdjust, int decayGroup, float loreyHeight, float ageBreastHeight,
-			MatrixMap2<Integer, Integer, Optional<Coefficients>> netDecayCoeMap,
+			Coefficients aAdjust, int decayGroup, float ageBreastHeight, MatrixMap2<Integer, Integer, Optional<Coefficients>> netDecayCoeMap,
 			MatrixMap2<String, Region, Float> decayModifierMap,
-			Coefficients quadMeanDiameterUtil, Coefficients closeUtilizationUtil,
-			Coefficients closeUtilizationNetOfDecayUtil
+			Coefficients quadMeanDiameterUtil,
+			Coefficients closeUtilizationUtil, Coefficients closeUtilizationNetOfDecayUtil
 	) throws ProcessingException {
 		var dqSp = quadMeanDiameterUtil.getCoe(UTIL_ALL);
 

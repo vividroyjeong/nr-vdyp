@@ -35,7 +35,6 @@ import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.CommonData;
-import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
 import ca.bc.gov.nrs.vdyp.model.GenusDistribution;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
@@ -69,22 +68,22 @@ public class ForwardProcessingEngine {
 
 	public enum ExecutionStep {
 		// Must be first
-		None, //
+		NONE, //
 
-		RemoveSmallSpecies, //
-		CalculateMissingSiteCurves, //
-		CalculateCoverages, //
-		DeterminePolygonRankings, //
-		EstimateMissingSiteIndices, //
-		EstimateMissingYearsToBreastHeightValues, //
-		CalculateDominantHeightAgeSiteIndex, //
-		SetCompatibilityVariables, //
+		REMOVE_SMALL_SPECIES, //
+		CALCULATE_MISSING_SITE_CURVES, //
+		CALCULATE_COVERAGES, //
+		DETERMINE_POLYGON_RANKINGS, //
+		ESTIMATE_MISSING_SITE_INDICES, //
+		ESTIMATE_MISSING_YEARS_TO_BREAST_HEIGHT_VALUES, //
+		CALCULATE_DOMINANT_HEIGHT_AGE_SITE_INDEX, //
+		SET_COMPATIBILITY_VARIABLES, //
 
 		// Must be last
-		All; //
+		ALL; //
 
 		public ExecutionStep predecessor() {
-			if (this == None) {
+			if (this == NONE) {
 				throw new IllegalStateException("ExecutionStep.None has no predecessor");
 			}
 
@@ -92,7 +91,7 @@ public class ForwardProcessingEngine {
 		}
 
 		public ExecutionStep successor() {
-			if (this == All) {
+			if (this == ALL) {
 				throw new IllegalStateException("ExecutionStep.All has no successor");
 			}
 
@@ -102,7 +101,7 @@ public class ForwardProcessingEngine {
 
 	public void processPolygon(VdypPolygon polygon) throws ProcessingException {
 
-		processPolygon(polygon, ExecutionStep.All);
+		processPolygon(polygon, ExecutionStep.ALL);
 	}
 
 	public void processPolygon(VdypPolygon polygon, ExecutionStep lastStep) throws ProcessingException {
@@ -124,49 +123,44 @@ public class ForwardProcessingEngine {
 		PolygonProcessingState pps = fps.getPolygonProcessingState();
 		Bank bank = fps.getBank(0, LayerType.PRIMARY);
 
-		logger.info(
-				MessageFormat.format(
-						"Beginning processing of polygon {0} layer {1}", pps.getLayer().getParent(), pps
-								.getLayer()
-				)
-		);
+		logger.info("Beginning processing of polygon {} layer {}", pps.getLayer().getParent(), pps.getLayer());
 
 		// BANKCHK1, simplified for the parameters METH_CHK = 4, LayerI = 1, and INSTANCE = 1
-		if (lastStep.ordinal() >= ExecutionStep.RemoveSmallSpecies.ordinal()) {
+		if (lastStep.ordinal() >= ExecutionStep.REMOVE_SMALL_SPECIES.ordinal()) {
 			removeSmallSpecies(pps);
 		}
 
 		// SCINXSET - note these are calculated directly from the Primary bank of instance 1
-		if (lastStep.ordinal() >= ExecutionStep.CalculateMissingSiteCurves.ordinal()) {
+		if (lastStep.ordinal() >= ExecutionStep.CALCULATE_MISSING_SITE_CURVES.ordinal()) {
 			calculateMissingSiteCurves(bank, fps.getSiteCurveMap(), fps.getPolygonProcessingState());
 		}
 
 		// VPRIME, method == 1
-		if (lastStep.ordinal() >= ExecutionStep.CalculateCoverages.ordinal()) {
+		if (lastStep.ordinal() >= ExecutionStep.CALCULATE_COVERAGES.ordinal()) {
 			calculateCoverages(pps);
 		}
 
-		if (lastStep.ordinal() >= ExecutionStep.DeterminePolygonRankings.ordinal()) {
+		if (lastStep.ordinal() >= ExecutionStep.DETERMINE_POLYGON_RANKINGS.ordinal()) {
 			determinePolygonRankings(pps, CommonData.PRIMARY_SPECIES_TO_COMBINE);
 		}
 
 		// SITEADD (TODO: SITEADDU when NDEBUG 11 > 0)
-		if (lastStep.ordinal() >= ExecutionStep.EstimateMissingSiteIndices.ordinal()) {
+		if (lastStep.ordinal() >= ExecutionStep.ESTIMATE_MISSING_SITE_INDICES.ordinal()) {
 			estimateMissingSiteIndices(pps);
 		}
 
-		if (lastStep.ordinal() >= ExecutionStep.EstimateMissingYearsToBreastHeightValues.ordinal()) {
+		if (lastStep.ordinal() >= ExecutionStep.ESTIMATE_MISSING_YEARS_TO_BREAST_HEIGHT_VALUES.ordinal()) {
 			estimateMissingYearsToBreastHeightValues(pps);
 		}
 
 		// VHDOM1 METH_H = 2, METH_A = 2, METH_SI = 2
-		if (lastStep.ordinal() >= ExecutionStep.CalculateDominantHeightAgeSiteIndex.ordinal()) {
+		if (lastStep.ordinal() >= ExecutionStep.CALCULATE_DOMINANT_HEIGHT_AGE_SITE_INDEX.ordinal()) {
 			calculateDominantHeightAgeSiteIndex(pps, fps.getHl1Coefficients());
 		}
 
 		// CVSET1
-		if (lastStep.ordinal() >= ExecutionStep.SetCompatibilityVariables.ordinal()) {
-			setCompatibilityVariables(pps, fps.getCompVarAdjustments());
+		if (lastStep.ordinal() >= ExecutionStep.SET_COMPATIBILITY_VARIABLES.ordinal()) {
+			setCompatibilityVariables(pps);
 		}
 	}
 
@@ -175,8 +169,7 @@ public class ForwardProcessingEngine {
 	private static float B_BASE_MIN = 0.01f;
 
 	@SuppressWarnings("unchecked")
-	static void setCompatibilityVariables(
-			PolygonProcessingState pps, CompVarAdjustments compVarAdjustments
+	static void setCompatibilityVariables(PolygonProcessingState pps
 	) throws ProcessingException {
 		Coefficients aAdjust = new Coefficients(new float[] { 0.0f, 0.0f, 0.0f, 0.0f }, 1);
 
@@ -249,9 +242,9 @@ public class ForwardProcessingEngine {
 					// EMP094
 					EstimationMethods.estimateNetDecayAndWasteVolume(
 							pps.getBecZone()
-									.getRegion(), uc, aAdjust, pps.wallet.speciesNames[s], spLoreyHeight_All, pps.wallet.yearsAtBreastHeight[s], pps
+									.getRegion(), uc, aAdjust, pps.wallet.speciesNames[s], spLoreyHeight_All, pps
 											.getNetDecayWasteCoeMap(), pps
-													.getWasteModifierMap(), quadMeanDiameters, closeUtilizationVolumes, closeUtilizationVolumesNetOfDecay, closeUtilizationVolumesNetOfDecayAndWaste
+											.getWasteModifierMap(), quadMeanDiameters, closeUtilizationVolumes, closeUtilizationVolumesNetOfDecay, closeUtilizationVolumesNetOfDecayAndWaste
 					);
 
 					float actualVolume = pps.wallet.cuVolumesMinusDecayAndWastage[s][uc.ordinal()];
@@ -272,7 +265,7 @@ public class ForwardProcessingEngine {
 					int decayGroup = pps.decayEquationGroups[s];
 					EstimationMethods.estimateNetDecayVolume(
 							pps.wallet.speciesNames[s], pps.getBecZone()
-									.getRegion(), uc, aAdjust, decayGroup, spLoreyHeight_All, pps
+									.getRegion(), uc, aAdjust, decayGroup, pps
 											.getPrimarySpeciesAgeAtBreastHeight(), pps.getNetDecayCoeMap(), pps
 													.getDecayModifierMap(), quadMeanDiameters, closeUtilizationVolumes, closeUtilizationVolumesNetOfDecay
 					);
@@ -610,7 +603,6 @@ public class ForwardProcessingEngine {
 	}
 
 	private static float calculateCompatibilityVariable(float actualVolume, float baseVolume, float staticVolume) {
-		float result = 0.0f;
 
 		float staticRatio = staticVolume / baseVolume;
 		float staticLogit;
@@ -632,13 +624,12 @@ public class ForwardProcessingEngine {
 			actualLogit = clamp(log(actualRatio / (1.0f - actualRatio)), -7.0f, 7.0f);
 		}
 
-		result = actualLogit - staticLogit;
+		float result = actualLogit - staticLogit;
 
 		return result;
 	}
 
 	private static float calculateWholeStemVolume(float actualVolume, float basalArea, float staticVolume) {
-		float result = 0.0f;
 
 		float staticRatio = staticVolume / basalArea;
 		float staticLogit;
@@ -656,7 +647,7 @@ public class ForwardProcessingEngine {
 			actualLogit = log(actualRatio);
 		}
 
-		result = actualLogit - staticLogit;
+		float result = actualLogit - staticLogit;
 
 		return result;
 	}
@@ -1142,7 +1133,7 @@ public class ForwardProcessingEngine {
 
 		if (combinationGroup.size() != 2) {
 			throw new IllegalArgumentException(
-					MessageFormat.format("combinationGroup must have size 2; it has size", combinationGroup.size())
+					MessageFormat.format("combinationGroup must have size 2; it has size {0}", combinationGroup.size())
 			);
 		}
 

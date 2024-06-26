@@ -177,7 +177,7 @@ class EstimationMethodsTest {
 
 		EstimationMethods.estimateNetDecayVolume(
 				controlMap, genus.getAlias(), becDefinition
-						.getRegion(), UtilizationClass.U175TO225, aAdjust, volumeGroup, 0.0f, 0.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay
+						.getRegion(), UtilizationClass.U175TO225, aAdjust, volumeGroup, 0.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay
 		);
 
 		assertThat(closeUtilizationNetOfDecay, contains(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
@@ -208,7 +208,7 @@ class EstimationMethodsTest {
 
 		EstimationMethods.estimateNetDecayVolume(
 				controlMap, genus.getAlias(), becDefinition
-						.getRegion(), UtilizationClass.U175TO225, aAdjust, decayGroup, 36.7552986f, 54.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay
+						.getRegion(), UtilizationClass.U175TO225, aAdjust, decayGroup, 54.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay
 		);
 
 		// Result of run in FORTRAN VDYP7 with the above parameters.
@@ -235,7 +235,7 @@ class EstimationMethodsTest {
 
 		EstimationMethods.estimateNetDecayAndWasteVolume(
 				controlMap, becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus
-						.getAlias(), 0.0f, 0.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay, closeUtilizationNetOfDecayAndWastage
+						.getAlias(), 0.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay, closeUtilizationNetOfDecayAndWastage
 		);
 
 		assertThat(closeUtilizationNetOfDecay, contains(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
@@ -263,7 +263,7 @@ class EstimationMethodsTest {
 
 		EstimationMethods.estimateNetDecayAndWasteVolume(
 				controlMap, becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus
-						.getAlias(), 36.7552986f, 54.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay, closeUtilizationNetOfDecayAndWastage
+						.getAlias(), 36.7552986f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay, closeUtilizationNetOfDecayAndWastage
 		);
 
 		// Result of run in FORTRAN VDYP7 with the above parameters.

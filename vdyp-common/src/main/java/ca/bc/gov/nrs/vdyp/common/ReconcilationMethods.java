@@ -16,15 +16,16 @@ public class ReconcilationMethods {
 	private static final List<UtilizationClass> MODE_1_RECONCILE_AVAILABILITY_CLASSES = List
 			.of(UtilizationClass.OVER225, UtilizationClass.U175TO225, UtilizationClass.U125TO175);
 
+	private ReconcilationMethods() {}
+	
 	/**
-	 * Implements the three reconciliation modes for layer 1 as described in ipsjf120.doc
+	 * YUC1R. Implements the three reconciliation modes for layer 1 as described in ipsjf120.doc
 	 *
 	 * @param baseAreaUtil
 	 * @param treesPerHectareUtil
 	 * @param quadMeanDiameterUtil
 	 * @throws ProcessingException
 	 */
-	// YUC1R
 	public static void reconcileComponents(
 			Coefficients baseAreaUtil, Coefficients treesPerHectareUtil, Coefficients quadMeanDiameterUtil
 	) throws ProcessingException {
