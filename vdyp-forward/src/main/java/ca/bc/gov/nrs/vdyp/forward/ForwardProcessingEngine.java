@@ -999,7 +999,7 @@ public class ForwardProcessingEngine {
 
 			throw new ProcessingException(
 					MessageFormat.format(
-							"Polygon {0}''s year value {1} is < 1900", 101, polygon.getDescription().getName(),
+							"Polygon {0}''s year value {1} is < 1900", polygon.getDescription().getName(),
 							polygon.getDescription().getYear()
 					)
 			);

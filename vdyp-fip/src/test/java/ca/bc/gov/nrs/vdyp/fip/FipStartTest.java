@@ -1805,6 +1805,8 @@ class FipStartTest {
 											0
 									)
 							);
+				default:
+					throw new IllegalStateException(Integer.valueOf(u).toString());
 				}
 			}
 			return Optional.empty();
@@ -1823,6 +1825,8 @@ class FipStartTest {
 					return Optional.of(new Coefficients(new float[] { -0.796000004f, 0.141299993f, 0.0033499999f }, 1));
 				case 4:
 					return Optional.of(new Coefficients(new float[] { 2.35400009f, 0.00419999985f, 0.0247699991f }, 1));
+				default:
+					throw new IllegalStateException(Integer.valueOf(u).toString());
 				}
 			}
 			return Optional.empty();
@@ -1841,6 +1845,8 @@ class FipStartTest {
 					return Optional.of(new Coefficients(new float[] { 9.40579987f, -0.224209994f, -0.814949989f }, 1));
 				case 4:
 					return Optional.of(new Coefficients(new float[] { 10.7090998f, -0.952880025f, -0.808309972f }, 1));
+				default:
+					throw new IllegalStateException(Integer.valueOf(u).toString());
 				}
 			}
 			return Optional.empty();
@@ -3885,37 +3891,37 @@ class FipStartTest {
 
 			app.adjustForStocking(vdypLayer, fipPrimaryLayer, BecDefinitionParser.getBecs(controlMap).get("IDF").get());
 
-			final var MODIFIED = utilization(0.42f, 4 * 0.42f, 0.42f, 0.42f, 0.42f, 0.42f);
-			final var NEVER_MODIFIED = utilization(1f, 1f, 1f, 1f, 1f, 1f);
+			final var modifiedValue = utilization(0.42f, 4 * 0.42f, 0.42f, 0.42f, 0.42f, 0.42f);
+			final var neverModifiedValue = utilization(1f, 1f, 1f, 1f, 1f, 1f);
 
-			assertThat(vdypLayer, hasProperty("loreyHeightByUtilization", NEVER_MODIFIED));
-			assertThat(vdypLayer, hasProperty("quadraticMeanDiameterByUtilization", NEVER_MODIFIED));
+			assertThat(vdypLayer, hasProperty("loreyHeightByUtilization", neverModifiedValue));
+			assertThat(vdypLayer, hasProperty("quadraticMeanDiameterByUtilization", neverModifiedValue));
 
-			assertThat(vdypLayer, hasProperty("baseAreaByUtilization", MODIFIED));
-			assertThat(vdypLayer, hasProperty("treesPerHectareByUtilization", MODIFIED));
-			assertThat(vdypLayer, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", MODIFIED));
-			assertThat(vdypLayer, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", MODIFIED));
+			assertThat(vdypLayer, hasProperty("baseAreaByUtilization", modifiedValue));
+			assertThat(vdypLayer, hasProperty("treesPerHectareByUtilization", modifiedValue));
+			assertThat(vdypLayer, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiedValue));
+			assertThat(vdypLayer, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiedValue));
 			assertThat(
-					vdypLayer, hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", MODIFIED)
+					vdypLayer, hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiedValue)
 			);
 
-			assertThat(spec1, hasProperty("loreyHeightByUtilization", NEVER_MODIFIED));
-			assertThat(spec1, hasProperty("quadraticMeanDiameterByUtilization", NEVER_MODIFIED));
+			assertThat(spec1, hasProperty("loreyHeightByUtilization", neverModifiedValue));
+			assertThat(spec1, hasProperty("quadraticMeanDiameterByUtilization", neverModifiedValue));
 
-			assertThat(spec1, hasProperty("baseAreaByUtilization", MODIFIED));
-			assertThat(spec1, hasProperty("treesPerHectareByUtilization", MODIFIED));
-			assertThat(spec1, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", MODIFIED));
-			assertThat(spec1, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", MODIFIED));
-			assertThat(spec1, hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", MODIFIED));
+			assertThat(spec1, hasProperty("baseAreaByUtilization", modifiedValue));
+			assertThat(spec1, hasProperty("treesPerHectareByUtilization", modifiedValue));
+			assertThat(spec1, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiedValue));
+			assertThat(spec1, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiedValue));
+			assertThat(spec1, hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiedValue));
 
-			assertThat(spec2, hasProperty("loreyHeightByUtilization", NEVER_MODIFIED));
-			assertThat(spec2, hasProperty("quadraticMeanDiameterByUtilization", NEVER_MODIFIED));
+			assertThat(spec2, hasProperty("loreyHeightByUtilization", neverModifiedValue));
+			assertThat(spec2, hasProperty("quadraticMeanDiameterByUtilization", neverModifiedValue));
 
-			assertThat(spec2, hasProperty("baseAreaByUtilization", MODIFIED));
-			assertThat(spec2, hasProperty("treesPerHectareByUtilization", MODIFIED));
-			assertThat(spec2, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", MODIFIED));
-			assertThat(spec2, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", MODIFIED));
-			assertThat(spec2, hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", MODIFIED));
+			assertThat(spec2, hasProperty("baseAreaByUtilization", modifiedValue));
+			assertThat(spec2, hasProperty("treesPerHectareByUtilization", modifiedValue));
+			assertThat(spec2, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiedValue));
+			assertThat(spec2, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiedValue));
+			assertThat(spec2, hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiedValue));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -4038,50 +4044,50 @@ class FipStartTest {
 
 			app.adjustForStocking(vdypLayer, fipPrimaryLayer, BecDefinitionParser.getBecs(controlMap).get("IDF").get());
 
-			final var MOFIIABLE_NOT_MODIFIED = utilization(1f, 4f, 1f, 1f, 1f, 1f);
-			final var NEVER_MODIFIED = utilization(1f, 1f, 1f, 1f, 1f, 1f);
+			final var modifiableNotModifiedValue = utilization(1f, 4f, 1f, 1f, 1f, 1f);
+			final var neverModifiedValue = utilization(1f, 1f, 1f, 1f, 1f, 1f);
 
-			assertThat(vdypLayer, hasProperty("loreyHeightByUtilization", NEVER_MODIFIED));
-			assertThat(vdypLayer, hasProperty("quadraticMeanDiameterByUtilization", NEVER_MODIFIED));
+			assertThat(vdypLayer, hasProperty("loreyHeightByUtilization", neverModifiedValue));
+			assertThat(vdypLayer, hasProperty("quadraticMeanDiameterByUtilization", neverModifiedValue));
 
-			assertThat(vdypLayer, hasProperty("baseAreaByUtilization", MOFIIABLE_NOT_MODIFIED));
-			assertThat(vdypLayer, hasProperty("treesPerHectareByUtilization", MOFIIABLE_NOT_MODIFIED));
-			assertThat(vdypLayer, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", MOFIIABLE_NOT_MODIFIED));
+			assertThat(vdypLayer, hasProperty("baseAreaByUtilization", modifiableNotModifiedValue));
+			assertThat(vdypLayer, hasProperty("treesPerHectareByUtilization", modifiableNotModifiedValue));
+			assertThat(vdypLayer, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiableNotModifiedValue));
 			assertThat(
 					vdypLayer,
-					hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", MOFIIABLE_NOT_MODIFIED)
+					hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
 			);
 			assertThat(
 					vdypLayer,
-					hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", MOFIIABLE_NOT_MODIFIED)
+					hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiableNotModifiedValue)
 			);
 
-			assertThat(spec1, hasProperty("loreyHeightByUtilization", NEVER_MODIFIED));
-			assertThat(spec1, hasProperty("quadraticMeanDiameterByUtilization", NEVER_MODIFIED));
+			assertThat(spec1, hasProperty("loreyHeightByUtilization", neverModifiedValue));
+			assertThat(spec1, hasProperty("quadraticMeanDiameterByUtilization", neverModifiedValue));
 
-			assertThat(spec1, hasProperty("baseAreaByUtilization", MOFIIABLE_NOT_MODIFIED));
-			assertThat(spec1, hasProperty("treesPerHectareByUtilization", MOFIIABLE_NOT_MODIFIED));
-			assertThat(spec1, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", MOFIIABLE_NOT_MODIFIED));
+			assertThat(spec1, hasProperty("baseAreaByUtilization", modifiableNotModifiedValue));
+			assertThat(spec1, hasProperty("treesPerHectareByUtilization", modifiableNotModifiedValue));
+			assertThat(spec1, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiableNotModifiedValue));
 			assertThat(
-					spec1, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", MOFIIABLE_NOT_MODIFIED)
+					spec1, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
 			);
 			assertThat(
 					spec1,
-					hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", MOFIIABLE_NOT_MODIFIED)
+					hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiableNotModifiedValue)
 			);
 
-			assertThat(spec2, hasProperty("loreyHeightByUtilization", NEVER_MODIFIED));
-			assertThat(spec2, hasProperty("quadraticMeanDiameterByUtilization", NEVER_MODIFIED));
+			assertThat(spec2, hasProperty("loreyHeightByUtilization", neverModifiedValue));
+			assertThat(spec2, hasProperty("quadraticMeanDiameterByUtilization", neverModifiedValue));
 
-			assertThat(spec2, hasProperty("baseAreaByUtilization", MOFIIABLE_NOT_MODIFIED));
-			assertThat(spec2, hasProperty("treesPerHectareByUtilization", MOFIIABLE_NOT_MODIFIED));
-			assertThat(spec2, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", MOFIIABLE_NOT_MODIFIED));
+			assertThat(spec2, hasProperty("baseAreaByUtilization", modifiableNotModifiedValue));
+			assertThat(spec2, hasProperty("treesPerHectareByUtilization", modifiableNotModifiedValue));
+			assertThat(spec2, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiableNotModifiedValue));
 			assertThat(
-					spec2, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", MOFIIABLE_NOT_MODIFIED)
+					spec2, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
 			);
 			assertThat(
 					spec2,
-					hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", MOFIIABLE_NOT_MODIFIED)
+					hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiableNotModifiedValue)
 			);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -4206,57 +4212,57 @@ class FipStartTest {
 
 			app.adjustForStocking(vdypLayer, fipPrimaryLayer, BecDefinitionParser.getBecs(controlMap).get("IDF").get());
 
-			final var MODIFIABLE_NOT_MODIFIED = utilization(1f, 4f, 1f, 1f, 1f, 1f);
-			final var NEVER_MODIFIED = utilization(1f, 1f, 1f, 1f, 1f, 1f);
+			final var modifiableNotModifiedValue = utilization(1f, 4f, 1f, 1f, 1f, 1f);
+			final var neverModifiedValue = utilization(1f, 1f, 1f, 1f, 1f, 1f);
 
-			assertThat(vdypLayer, hasProperty("loreyHeightByUtilization", NEVER_MODIFIED));
-			assertThat(vdypLayer, hasProperty("quadraticMeanDiameterByUtilization", NEVER_MODIFIED));
+			assertThat(vdypLayer, hasProperty("loreyHeightByUtilization", neverModifiedValue));
+			assertThat(vdypLayer, hasProperty("quadraticMeanDiameterByUtilization", neverModifiedValue));
 
-			assertThat(vdypLayer, hasProperty("baseAreaByUtilization", MODIFIABLE_NOT_MODIFIED));
-			assertThat(vdypLayer, hasProperty("treesPerHectareByUtilization", MODIFIABLE_NOT_MODIFIED));
+			assertThat(vdypLayer, hasProperty("baseAreaByUtilization", modifiableNotModifiedValue));
+			assertThat(vdypLayer, hasProperty("treesPerHectareByUtilization", modifiableNotModifiedValue));
 			assertThat(
-					vdypLayer, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", MODIFIABLE_NOT_MODIFIED)
+					vdypLayer, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiableNotModifiedValue)
 			);
 			assertThat(
 					vdypLayer,
-					hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", MODIFIABLE_NOT_MODIFIED)
+					hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
 			);
 			assertThat(
 					vdypLayer,
 					hasProperty(
-							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", MODIFIABLE_NOT_MODIFIED
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiableNotModifiedValue
 					)
 			);
 
-			assertThat(spec1, hasProperty("loreyHeightByUtilization", NEVER_MODIFIED));
-			assertThat(spec1, hasProperty("quadraticMeanDiameterByUtilization", NEVER_MODIFIED));
+			assertThat(spec1, hasProperty("loreyHeightByUtilization", neverModifiedValue));
+			assertThat(spec1, hasProperty("quadraticMeanDiameterByUtilization", neverModifiedValue));
 
-			assertThat(spec1, hasProperty("baseAreaByUtilization", MODIFIABLE_NOT_MODIFIED));
-			assertThat(spec1, hasProperty("treesPerHectareByUtilization", MODIFIABLE_NOT_MODIFIED));
-			assertThat(spec1, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", MODIFIABLE_NOT_MODIFIED));
+			assertThat(spec1, hasProperty("baseAreaByUtilization", modifiableNotModifiedValue));
+			assertThat(spec1, hasProperty("treesPerHectareByUtilization", modifiableNotModifiedValue));
+			assertThat(spec1, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiableNotModifiedValue));
 			assertThat(
-					spec1, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", MODIFIABLE_NOT_MODIFIED)
+					spec1, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
 			);
 			assertThat(
 					spec1,
 					hasProperty(
-							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", MODIFIABLE_NOT_MODIFIED
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiableNotModifiedValue
 					)
 			);
 
-			assertThat(spec2, hasProperty("loreyHeightByUtilization", NEVER_MODIFIED));
-			assertThat(spec2, hasProperty("quadraticMeanDiameterByUtilization", NEVER_MODIFIED));
+			assertThat(spec2, hasProperty("loreyHeightByUtilization", neverModifiedValue));
+			assertThat(spec2, hasProperty("quadraticMeanDiameterByUtilization", neverModifiedValue));
 
-			assertThat(spec2, hasProperty("baseAreaByUtilization", MODIFIABLE_NOT_MODIFIED));
-			assertThat(spec2, hasProperty("treesPerHectareByUtilization", MODIFIABLE_NOT_MODIFIED));
-			assertThat(spec2, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", MODIFIABLE_NOT_MODIFIED));
+			assertThat(spec2, hasProperty("baseAreaByUtilization", modifiableNotModifiedValue));
+			assertThat(spec2, hasProperty("treesPerHectareByUtilization", modifiableNotModifiedValue));
+			assertThat(spec2, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiableNotModifiedValue));
 			assertThat(
-					spec2, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", MODIFIABLE_NOT_MODIFIED)
+					spec2, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
 			);
 			assertThat(
 					spec2,
 					hasProperty(
-							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", MODIFIABLE_NOT_MODIFIED
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiableNotModifiedValue
 					)
 			);
 		} catch (IOException e) {
@@ -4404,7 +4410,7 @@ class FipStartTest {
 	static final <T> Consumer<T> valid() {
 		return x -> {
 		};
-	};
+	}
 
 	static Map<LayerType, FipLayer> layerMap(FipLayer... layers) {
 		Map<LayerType, FipLayer> result = new HashMap<>();
@@ -4424,13 +4430,13 @@ class FipStartTest {
 		});
 		mutator.accept(result);
 		return result;
-	};
+	}
 
 	FipLayerPrimary getTestPrimaryLayer(
 			PolygonIdentifier polygonId, Consumer<FipLayerPrimary.Builder> mutator,
 			Consumer<FipSite.Builder> siteMutator
 	) {
-		var result = FipLayerPrimary.buildPrimary(builder -> {
+		return FipLayerPrimary.buildPrimary(builder -> {
 			builder.polygonIdentifier(polygonId);
 			builder.addSite(siteBuilder -> {
 				siteBuilder.ageTotal(8f);
@@ -4445,9 +4451,7 @@ class FipStartTest {
 			builder.crownClosure(0.9f);
 			mutator.accept(builder);
 		});
-
-		return result;
-	};
+	}
 
 	FipLayer getTestVeteranLayer(
 			PolygonIdentifier polygonId, Consumer<FipLayer.Builder> mutator, Consumer<FipSite.Builder> siteMutator
@@ -4471,11 +4475,11 @@ class FipStartTest {
 		});
 
 		return result;
-	};
+	}
 
 	FipSpecies getTestSpecies(PolygonIdentifier polygonId, LayerType layer, Consumer<FipSpecies> mutator) {
 		return getTestSpecies(polygonId, layer, "B", mutator);
-	};
+	}
 
 	FipSpecies
 			getTestSpecies(PolygonIdentifier polygonId, LayerType layer, String genusId, Consumer<FipSpecies> mutator) {
@@ -4488,7 +4492,7 @@ class FipStartTest {
 		});
 		mutator.accept(result);
 		return result;
-	};
+	}
 
 	@FunctionalInterface
 	private static interface TestConsumer<T> {

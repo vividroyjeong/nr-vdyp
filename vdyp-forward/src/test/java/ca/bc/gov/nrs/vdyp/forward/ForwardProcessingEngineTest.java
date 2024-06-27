@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 
-public class ForwardProcessingEngineTest extends AbstractForwardProcessingEngineTest {
+class ForwardProcessingEngineTest extends AbstractForwardProcessingEngineTest {
 
 	@Test
 	void test() throws IOException, ResourceParseException, ProcessingException {
