@@ -4456,7 +4456,7 @@ class FipStartTest {
 	FipLayer getTestVeteranLayer(
 			PolygonIdentifier polygonId, Consumer<FipLayer.Builder> mutator, Consumer<FipSite.Builder> siteMutator
 	) {
-		var result = FipLayer.build(builder -> {
+		return FipLayer.build(builder -> {
 			builder.polygonIdentifier(polygonId);
 			builder.layerType(LayerType.VETERAN);
 
@@ -4473,8 +4473,6 @@ class FipStartTest {
 			builder.crownClosure(0.9f);
 			mutator.accept(builder);
 		});
-
-		return result;
 	}
 
 	FipSpecies getTestSpecies(PolygonIdentifier polygonId, LayerType layer, Consumer<FipSpecies> mutator) {
