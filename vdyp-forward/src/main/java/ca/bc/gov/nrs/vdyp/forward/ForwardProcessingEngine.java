@@ -160,6 +160,8 @@ public class ForwardProcessingEngine {
 		if (lastStep.ordinal() >= ExecutionStep.SET_COMPATIBILITY_VARIABLES.ordinal()) {
 			setCompatibilityVariables(pps);
 		}
+		
+		fps.storeActive(2, LayerType.PRIMARY);
 	}
 
 	private static final float[] DEFAULT_QUAD_MEAN_DIAMETERS = new float[] { Float.NaN, 10.0f, 15.0f, 20.0f, 25.0f };

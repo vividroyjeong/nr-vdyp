@@ -25,12 +25,15 @@ import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 class ForwardProcessingState {
 
 	/** An "instance" is the processing state of one polygon */
+	private static final int LAYERS_PER_INSTANCE = 2;
+
+	/** An "instance" is the processing state of one polygon */
 	private static final int MAX_INSTANCES = 3;
 
 	/**
 	 * We allocate one record for the Primary Layer and one record for the Veteran Layer of each instance.
 	 */
-	private static final int MAX_RECORDS = 2 * MAX_INSTANCES;
+	private static final int MAX_RECORDS = LAYERS_PER_INSTANCE * MAX_INSTANCES;
 
 	/** The control map defining the context of the execution */
 	private final Map<String, Object> controlMap;
@@ -174,7 +177,7 @@ class ForwardProcessingState {
 	}
 
 	private static int toIndex(int instanceNumber, LayerType layerType) {
-		return instanceNumber * MAX_INSTANCES + toLayerIndex(layerType);
+		return instanceNumber * LAYERS_PER_INSTANCE + toLayerIndex(layerType);
 	}
 
 	private static int toLayerIndex(LayerType layerType) {

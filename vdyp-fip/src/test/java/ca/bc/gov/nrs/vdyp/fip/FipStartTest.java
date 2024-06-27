@@ -1806,7 +1806,7 @@ class FipStartTest {
 									)
 							);
 				default:
-					throw new IllegalStateException(Integer.valueOf(u).toString());
+					;
 				}
 			}
 			return Optional.empty();
@@ -1826,7 +1826,7 @@ class FipStartTest {
 				case 4:
 					return Optional.of(new Coefficients(new float[] { 2.35400009f, 0.00419999985f, 0.0247699991f }, 1));
 				default:
-					throw new IllegalStateException(Integer.valueOf(u).toString());
+					;
 				}
 			}
 			return Optional.empty();
@@ -1846,7 +1846,7 @@ class FipStartTest {
 				case 4:
 					return Optional.of(new Coefficients(new float[] { 10.7090998f, -0.952880025f, -0.808309972f }, 1));
 				default:
-					throw new IllegalStateException(Integer.valueOf(u).toString());
+					;
 				}
 			}
 			return Optional.empty();
