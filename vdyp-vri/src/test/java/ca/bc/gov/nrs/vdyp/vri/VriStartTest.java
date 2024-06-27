@@ -2590,7 +2590,7 @@ class VriStartTest {
 			MockFileResolver resolver = dummyInput();
 
 			var poly = VriPolygon.build(pb -> {
-				pb.polygonIdentifier(TestUtils.polygonId("TestPolygon", 1899));
+				pb.polygonIdentifier("TestPolygon", 1899);
 				pb.biogeoclimaticZone("IDF");
 				pb.yieldFactor(1.0f);
 				pb.mode(PolygonMode.YOUNG);
