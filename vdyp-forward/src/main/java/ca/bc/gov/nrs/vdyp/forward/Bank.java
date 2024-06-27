@@ -1,7 +1,7 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -36,27 +36,27 @@ class Bank {
 
 	// Species information
 
-	public final String speciesNames[/* nSpecies + 1 */]; // BANK2 SP0B
-	public final GenusDistributionSet sp64Distributions[/* nSpecies + 1 */]; // BANK2 SP64DISTB
-	public final float siteIndices[/* nSpecies + 1 */]; // BANK3 SIB
-	public final float dominantHeights[/* nSpecies + 1 */]; // BANK3 HDB
-	public final float ageTotals[/* nSpecies + 1 */]; // BANK3 AGETOTB
-	public final float yearsAtBreastHeight[/* nSpecies + 1 */]; // BANK3 AGEBHB
-	public final float yearsToBreastHeight[/* nSpecies + 1 */]; // BANK3 YTBHB
-	public final int siteCurveNumbers[/* nSpecies + 1 */]; // BANK3 SCNB
-	public final int speciesIndices[/* nSpecies + 1 */]; // BANK1 ISPB
-	public final float percentagesOfForestedLand[/* nSpecies + 1 */]; // BANK1 PCTB
+	public final String[/* nSpecies + 1 */] speciesNames; // BANK2 SP0B
+	public final GenusDistributionSet[/* nSpecies + 1 */] sp64Distributions; // BANK2 SP64DISTB
+	public final float[/* nSpecies + 1 */] siteIndices; // BANK3 SIB
+	public final float[/* nSpecies + 1 */] dominantHeights; // BANK3 HDB
+	public final float[/* nSpecies + 1 */] ageTotals; // BANK3 AGETOTB
+	public final float[/* nSpecies + 1 */] yearsAtBreastHeight; // BANK3 AGEBHB
+	public final float[/* nSpecies + 1 */] yearsToBreastHeight; // BANK3 YTBHB
+	public final int[/* nSpecies + 1 */] siteCurveNumbers; // BANK3 SCNB
+	public final int[/* nSpecies + 1 */] speciesIndices; // BANK1 ISPB
+	public final float[/* nSpecies + 1 */] percentagesOfForestedLand; // BANK1 PCTB
 
 	// Utilization information, per Species
 
-	public final float basalAreas[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 BAB. Units: m^2/hectare
-	public final float closeUtilizationVolumes[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 VOLCUB
-	public final float cuVolumesMinusDecay[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 VOL_DB
-	public final float cuVolumesMinusDecayAndWastage[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 VOL_DW_B
-	public final float loreyHeights[/* nSpecies + 1, including 0 */][/* uc -1 and 0 only */]; // BANK1 HLB
-	public final float quadMeanDiameters[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 DQB
-	public final float treesPerHectare[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 TPHB
-	public final float wholeStemVolumes[/* nSpecies + 1, including 0 */][/* all ucs */]; // BANK1 VOLWSB
+	public final float[/* nSpecies + 1, including 0 */][/* all ucs */] basalAreas; // BANK1 BAB. Units: m^2/hectare
+	public final float[/* nSpecies + 1, including 0 */][/* all ucs */] closeUtilizationVolumes; // BANK1 VOLCUB
+	public final float[/* nSpecies + 1, including 0 */][/* all ucs */] cuVolumesMinusDecay; // BANK1 VOL_DB
+	public final float[/* nSpecies + 1, including 0 */][/* all ucs */] cuVolumesMinusDecayAndWastage; // BANK1 VOL_DW_B
+	public final float[/* nSpecies + 1, including 0 */][/* uc -1 and 0 only */] loreyHeights; // BANK1 HLB
+	public final float[/* nSpecies + 1, including 0 */][/* all ucs */] quadMeanDiameters; // BANK1 DQB
+	public final float[/* nSpecies + 1, including 0 */][/* all ucs */] treesPerHectare; // BANK1 TPHB
+	public final float[/* nSpecies + 1, including 0 */][/* all ucs */] wholeStemVolumes; // BANK1 VOLWSB
 	
 	public Bank(VdypPolygonLayer layer, BecDefinition becZone, Predicate<VdypLayerSpecies> retainCriteria) {
 
@@ -69,11 +69,7 @@ class Bank {
 				speciesToRetain.add(s);
 			}
 		}
-		speciesToRetain.sort(new Comparator<VdypLayerSpecies>() {
-			@Override
-			public int compare(VdypLayerSpecies o1, VdypLayerSpecies o2) {
-				return o1.getGenusIndex().compareTo(o2.getGenusIndex());
-			}});
+		speciesToRetain.sort((o1, o2) -> o1.getGenusIndex().compareTo(o2.getGenusIndex()));
 
 		nSpecies = speciesToRetain.size();
 		indices = IntStream.range(1, nSpecies + 1).toArray();
@@ -215,24 +211,11 @@ class Bank {
 	}
 
 	private GenusDistributionSet[] copy(GenusDistributionSet[] a) {
-		GenusDistributionSet[] t = new GenusDistributionSet[a.length];
-
-		for (int i = 0; i < a.length; i++)
-			if (a[i] != null) {
-				t[i] = a[i].copy();
-			}
-
-		return t;
+		return Arrays.stream(a).map(GenusDistributionSet::copy).toArray(GenusDistributionSet[]::new);
 	}
 
 	private String[] copy(String[] a) {
-		String[] t = new String[a.length];
-
-		for (int i = 0; i < a.length; i++)
-			if (a[i] != null) {
-				t[i] = a[i];
-			}
-		return t;
+		return Arrays.stream(a).toArray(String[]::new);
 	}
 
 	private int[] copy(int[] a) {
@@ -252,14 +235,6 @@ class Bank {
 	}
 
 	private float[][] copy(float[][] a) {
-		float[][] t = new float[a.length][];
-
-		for (int i = 0; i < a.length; i++) {
-			t[i] = new float[a[i].length];
-			for (int j = 0; j < a[i].length; j++)
-				t[i][j] = a[i][j];
-		}
-
-		return t;
+		return Arrays.stream(a).map(float[]::clone).toArray(float[][]::new);
 	}
 }

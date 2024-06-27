@@ -12,17 +12,17 @@ public class VdypControlVariableParser implements ValueParser<VdypGrowthDetails>
 	public VdypGrowthDetails parse(String string) throws ValueParseException {
 
 		if (string == null) {
-			throw new ValueParseException(null, "VdypVtrolParser: supplied string is null");
+			throw new ValueParseException(null, "VdypControlVariableParser: supplied string is null");
 		}
 		if (string.trim().length() == 0) {
-			throw new ValueParseException(string, "VdypVtrolParser: supplied string \"" + string + "\" is empty");
+			throw new ValueParseException(string, "VdypControlVariableParser: supplied string \"" + string + "\" is empty");
 		}
 
 		var parser = ValueParser.list(ValueParser.INTEGER);
 		List<Integer> controlVariableValues = parser.parse(string);
 
-		if (controlVariableValues.size() == 0) {
-			throw new ValueParseException(string, "VdypVtrolParser: supplied string \"" + string + "\" is empty");
+		if (controlVariableValues.isEmpty()) {
+			throw new ValueParseException(string, "VdypControlVariableParser: supplied string \"" + string + "\" is empty");
 		}
 		
 		var a = new Integer[controlVariableValues.size()];
@@ -33,7 +33,7 @@ public class VdypControlVariableParser implements ValueParser<VdypGrowthDetails>
 		if (yearCounter != -1 && (yearCounter < 0 || yearCounter > 400 && yearCounter < 1920)) {
 			throw new ValueParseException(
 					Integer.toString(yearCounter),
-					"VdypVtrolParser: yearCounter value \"" + yearCounter + "\" is out of range"
+					"VdypControlVariableParser: yearCounter value \"" + yearCounter + "\" is out of range"
 			);
 		}
 

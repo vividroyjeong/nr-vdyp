@@ -165,8 +165,8 @@ public class ForwardProcessingEngine {
 	}
 
 	private static final float[] DEFAULT_QUAD_MEAN_DIAMETERS = new float[] { Float.NaN, 10.0f, 15.0f, 20.0f, 25.0f };
-	private static float V_BASE_MIN = 0.1f;
-	private static float B_BASE_MIN = 0.01f;
+	private static final float V_BASE_MIN = 0.1f;
+	private static final float B_BASE_MIN = 0.01f;
 
 	@SuppressWarnings("unchecked")
 	static void setCompatibilityVariables(PolygonProcessingState pps
@@ -624,9 +624,7 @@ public class ForwardProcessingEngine {
 			actualLogit = clamp(log(actualRatio / (1.0f - actualRatio)), -7.0f, 7.0f);
 		}
 
-		float result = actualLogit - staticLogit;
-
-		return result;
+		return actualLogit - staticLogit;
 	}
 
 	private static float calculateWholeStemVolume(float actualVolume, float basalArea, float staticVolume) {
@@ -647,9 +645,7 @@ public class ForwardProcessingEngine {
 			actualLogit = log(actualRatio);
 		}
 
-		float result = actualLogit - staticLogit;
-
-		return result;
+		return actualLogit - staticLogit;
 	}
 
 	static void calculateDominantHeightAgeSiteIndex(
@@ -1016,7 +1012,7 @@ public class ForwardProcessingEngine {
 
 			throw new ProcessingException(
 					MessageFormat.format(
-							"Polygon {0}'s year value {1} is < 1900", 101, polygon.getDescription().getName(), polygon
+							"Polygon {0}''s year value {1} is < 1900", 101, polygon.getDescription().getName(), polygon
 									.getDescription().getYear()
 					)
 			);
@@ -1060,7 +1056,7 @@ public class ForwardProcessingEngine {
 			throw new IllegalArgumentException("Can not find primary species as there are no species");
 		}
 
-		float percentages[] = Arrays
+		float[] percentages = Arrays
 				.copyOf(state.wallet.percentagesOfForestedLand, state.wallet.percentagesOfForestedLand.length);
 
 		for (var speciesPair : speciesToCombine) {

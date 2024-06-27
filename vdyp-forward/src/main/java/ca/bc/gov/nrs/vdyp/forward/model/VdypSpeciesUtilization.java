@@ -168,9 +168,9 @@ public class VdypSpeciesUtilization extends VdypEntity {
 	}
 
 	private static final float MAX_ACCEPTABLE_BASAL_AREA_ERROR = 0.1f;
-	private static float[] CLASS_LOWER_BOUNDS = { 4.0f, 7.5f, 7.5f, 12.5f, 17.5f, 22.5f };
-	private static float[] CLASS_UPPER_BOUNDS = { 7.5f, 2000.0f, 12.5f, 17.5f, 22.5f, 2000.0f };
-	private static float DQ_EPS = 0.005f;
+	private static final float[] CLASS_LOWER_BOUNDS = { 4.0f, 7.5f, 7.5f, 12.5f, 17.5f, 22.5f };
+	private static final float[] CLASS_UPPER_BOUNDS = { 7.5f, 2000.0f, 12.5f, 17.5f, 22.5f, 2000.0f };
+	private static final float DQ_EPS = 0.005f;
 	
 	/** 
 	 * Implements the logic in BANKIN2 (ICHECK == 2) adjusting the utilization 
