@@ -22,10 +22,8 @@ public enum UtilizationClass {
 
 	private Optional<UtilizationClass> next = Optional.empty();
 	private Optional<UtilizationClass> previous = Optional.empty();
-	
-	public static final Collection<UtilizationClass> UTIL_CLASSES = List.of(
-			U75TO125, U125TO175, U175TO225, OVER225
-	);
+
+	public static final Collection<UtilizationClass> UTIL_CLASSES = List.of(U75TO125, U125TO175, U175TO225, OVER225);
 
 	public static final Collection<UtilizationClass> ALL_BUT_SMALL = Collections
 			.unmodifiableList(new ArrayList<>(Arrays.asList(ALL, U75TO125, U125TO175, U175TO225, OVER225)));

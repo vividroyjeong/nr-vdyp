@@ -19,7 +19,7 @@ public class VdypSpeciesUtilization extends VdypEntity {
 	private final Optional<String> genus; // SP0
 	private final UtilizationClass ucIndex; // J - utilization index
 
-	// The following are not final because post construction the values 
+	// The following are not final because post construction the values
 	// may be scaled by the scale method below.
 
 	private float basalArea;
@@ -131,11 +131,10 @@ public class VdypSpeciesUtilization extends VdypEntity {
 		return parent;
 	}
 
-	/** 
-	 * Implements VDYPGETU lines 224 - 229, in which the utilization-
-	 * per-hectare values are scaled by the given factor - the % 
-	 * coverage of the primary layer.
-	 * 
+	/**
+	 * Implements VDYPGETU lines 224 - 229, in which the utilization- per-hectare values are scaled by the given factor
+	 * - the % coverage of the primary layer.
+	 *
 	 * @param scalingFactor
 	 */
 	public void scale(float scalingFactor) {
@@ -171,11 +170,10 @@ public class VdypSpeciesUtilization extends VdypEntity {
 	private static final float[] CLASS_LOWER_BOUNDS = { 4.0f, 7.5f, 7.5f, 12.5f, 17.5f, 22.5f };
 	private static final float[] CLASS_UPPER_BOUNDS = { 7.5f, 2000.0f, 12.5f, 17.5f, 22.5f, 2000.0f };
 	private static final float DQ_EPS = 0.005f;
-	
-	/** 
-	 * Implements the logic in BANKIN2 (ICHECK == 2) adjusting the utilization 
-	 * values according to various rules.
-	 * 
+
+	/**
+	 * Implements the logic in BANKIN2 (ICHECK == 2) adjusting the utilization values according to various rules.
+	 *
 	 * @throws ProcessingException when calculated values are out of range
 	 */
 	public void doPostCreateAdjustments() throws ProcessingException {
@@ -183,15 +181,15 @@ public class VdypSpeciesUtilization extends VdypEntity {
 		resetOnMissingValues();
 
 		adjustBasalAreaToMatchTreesPerHectare();
-				
+
 		doCalculateQuadMeanDiameter();
 	}
-	
+
 	/**
 	 * If either basalArea or liveTreesPerHectare is not positive, clear everything.
 	 */
 	private void resetOnMissingValues() {
-		
+
 		if (this.basalArea <= 0.0f || this.liveTreesPerHectare <= 0.0f) {
 			this.basalArea = 0.0f;
 			this.liveTreesPerHectare = 0.0f;
@@ -206,64 +204,77 @@ public class VdypSpeciesUtilization extends VdypEntity {
 
 	/**
 	 * Adjust Basal Area to match the Trees-Per-Hectare value.
-	 * @throws ProcessingException 
+	 *
+	 * @throws ProcessingException
 	 */
 	private void adjustBasalAreaToMatchTreesPerHectare() throws ProcessingException {
-		
+
 		if (this.liveTreesPerHectare > 0.0f) {
 			float basalAreaLowerBound = ForwardProcessingEngine
 					.calculateBasalArea(CLASS_LOWER_BOUNDS[this.ucIndex.ordinal()] + DQ_EPS, this.liveTreesPerHectare);
 			float basalAreaUpperBound = ForwardProcessingEngine
 					.calculateBasalArea(CLASS_UPPER_BOUNDS[this.ucIndex.ordinal()] - DQ_EPS, this.liveTreesPerHectare);
-			
+
 			float basalAreaError = 0.0f;
 			String message = null;
-			
+
 			if (this.basalArea < basalAreaLowerBound) {
 				basalAreaError = FloatMath.abs(this.basalArea - basalAreaLowerBound);
 				this.basalArea = basalAreaLowerBound;
-				message = MessageFormat.format("{0}: Error 6: basal area {1} is {2} below threshold, exceeding the maximum error {3}"
-						, this, this.basalArea, basalAreaError, MAX_ACCEPTABLE_BASAL_AREA_ERROR);
+				message = MessageFormat.format(
+						"{0}: Error 6: basal area {1} is {2} below threshold, exceeding the maximum error {3}", this,
+						this.basalArea, basalAreaError, MAX_ACCEPTABLE_BASAL_AREA_ERROR
+				);
 			} else if (this.basalArea > basalAreaUpperBound) {
 				basalAreaError = FloatMath.abs(this.basalArea - basalAreaUpperBound);
-				message = MessageFormat.format("{0}: Error 6: basal area {1} is {2} above threshold, exceeding the maximum error {3}"
-						, this, this.basalArea, basalAreaError, MAX_ACCEPTABLE_BASAL_AREA_ERROR);
+				message = MessageFormat.format(
+						"{0}: Error 6: basal area {1} is {2} above threshold, exceeding the maximum error {3}", this,
+						this.basalArea, basalAreaError, MAX_ACCEPTABLE_BASAL_AREA_ERROR
+				);
 				this.basalArea = basalAreaUpperBound;
 			}
-			
+
 			if (basalAreaError > MAX_ACCEPTABLE_BASAL_AREA_ERROR) {
 				throw new ProcessingException(message);
 			}
 		}
-	
+
 	}
-	
+
 	/**
-	 * Calculate QuadMeanDiameter for the given utilization. 
-	 * 
+	 * Calculate QuadMeanDiameter for the given utilization.
+	 *
 	 * The value supplied in the input is IGNORED REPEAT IGNORED
-	 * 
+	 *
 	 * @throws ProcessingException
 	 */
 	private void doCalculateQuadMeanDiameter() throws ProcessingException {
 
 		if (this.basalArea > 0.0f) {
 			float qmd = ForwardProcessingEngine.calculateQuadMeanDiameter(basalArea, liveTreesPerHectare);
-			
+
 			if (qmd < CLASS_LOWER_BOUNDS[this.ucIndex.ordinal()]) {
 				qmd = qmd + DQ_EPS;
 				if (qmd /* is still */ < CLASS_LOWER_BOUNDS[this.ucIndex.ordinal()]) {
-					throw new ProcessingException(MessageFormat.format("{0}: Error 6: calculated quad-mean-diameter value {1} is below lower limit {2}",
-							this, qmd, CLASS_LOWER_BOUNDS[this.ucIndex.ordinal()]));
+					throw new ProcessingException(
+							MessageFormat.format(
+									"{0}: Error 6: calculated quad-mean-diameter value {1} is below lower limit {2}",
+									this, qmd, CLASS_LOWER_BOUNDS[this.ucIndex.ordinal()]
+							)
+					);
 				}
 			} else if (qmd > CLASS_UPPER_BOUNDS[this.ucIndex.ordinal()]) {
 				qmd = qmd - DQ_EPS;
 				if (qmd /* is still */ > CLASS_UPPER_BOUNDS[this.ucIndex.ordinal()]) {
-					throw new ProcessingException(MessageFormat.format("{0}: Error 6: calculated quad-mean-diameter value {1} is above upper limit {2}",
-							this, qmd, CLASS_UPPER_BOUNDS[this.ucIndex.ordinal()]));
+					throw new ProcessingException(
+							MessageFormat.format(
+									"{0}: Error 6: calculated quad-mean-diameter value {1} is above upper limit {2}",
+									this, qmd, CLASS_UPPER_BOUNDS[this.ucIndex.ordinal()]
+							)
+					);
 				}
 			}
-			
+
 			this.quadraticMeanDiameterAtBH = qmd;
 		}
 	}

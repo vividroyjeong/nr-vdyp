@@ -20,7 +20,7 @@ class VdypGrowthDetailParserTest {
 			parser.parse(null);
 			Assertions.fail();
 		} catch (ValueParseException e) {
-			assertThat(e, hasProperty("message", is("VdypVtrolParser: supplied string is null")));
+			assertThat(e, hasProperty("message", is("VdypControlVariableParser: supplied string is null")));
 		}
 	}
 
@@ -31,7 +31,7 @@ class VdypGrowthDetailParserTest {
 			parser.parse("   ");
 			Assertions.fail();
 		} catch (ValueParseException e) {
-			assertThat(e, hasProperty("message", is("VdypVtrolParser: supplied string \"   \" is empty")));
+			assertThat(e, hasProperty("message", is("VdypControlVariableParser: supplied string \"   \" is empty")));
 		}
 	}
 

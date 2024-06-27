@@ -6,7 +6,7 @@ import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.base.SimpleCoefficientParser1;
 
 /**
- * Parser for a Small Component Basal Area data file. Each line contains a Species code and an array of four 
+ * Parser for a Small Component Basal Area data file. Each line contains a Species code and an array of four
  * coefficients (one-based).
  * <ol>
  * <li>(cols 0-2) key - a Species code</li>

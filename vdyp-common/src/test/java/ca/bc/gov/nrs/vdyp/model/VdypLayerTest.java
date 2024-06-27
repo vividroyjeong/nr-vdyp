@@ -275,9 +275,8 @@ class VdypLayerTest {
 		assertThat(resultSpecies, hasProperty("percentGenus", is(100f)));
 		assertThat(resultSpecies, hasProperty("fractionGenus", is(1f)));
 		assertThat(
-				resultSpecies, hasProperty(
-						"speciesPercent", allOf(hasEntry(is("BL"), is(75f)), hasEntry(is("BX"), is(25f)))
-				)
+				resultSpecies,
+				hasProperty("speciesPercent", allOf(hasEntry(is("BL"), is(75f)), hasEntry(is("BX"), is(25f))))
 		);
 
 		control.verify();
@@ -324,9 +323,8 @@ class VdypLayerTest {
 		assertThat(resultSpecies, hasProperty("decayGroup", is(2)));
 		assertThat(resultSpecies, hasProperty("breakageGroup", is(3)));
 		assertThat(
-				resultSpecies, hasProperty(
-						"speciesPercent", allOf(hasEntry(is("BL"), is(75f)), hasEntry(is("BX"), is(25f)))
-				)
+				resultSpecies,
+				hasProperty("speciesPercent", allOf(hasEntry(is("BL"), is(75f)), hasEntry(is("BX"), is(25f))))
 		);
 
 	}

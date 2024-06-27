@@ -16,8 +16,9 @@ public class ReconcilationMethods {
 	private static final List<UtilizationClass> MODE_1_RECONCILE_AVAILABILITY_CLASSES = List
 			.of(UtilizationClass.OVER225, UtilizationClass.U175TO225, UtilizationClass.U125TO175);
 
-	private ReconcilationMethods() {}
-	
+	private ReconcilationMethods() {
+	}
+
 	/**
 	 * YUC1R. Implements the three reconciliation modes for layer 1 as described in ipsjf120.doc
 	 *
@@ -103,7 +104,8 @@ public class ReconcilationMethods {
 		}
 		UtilizationClass.UTIL_CLASSES.forEach(
 				uc -> treesPerHectareUtil.setCoe(
-						uc.index, BaseAreaTreeDensityDiameter
+						uc.index,
+						BaseAreaTreeDensityDiameter
 								.treesPerHectare(baseAreaUtil.getCoe(uc.index), quadMeanDiameterUtil.getCoe(uc.index))
 				)
 		);
@@ -219,7 +221,8 @@ public class ReconcilationMethods {
 		for (var uc : UtilizationClass.UTIL_CLASSES) {
 			quadMeanDiameterUtil.setCoe(uc.index, dqTrial.getCoe(uc.index));
 			treesPerHectareUtil.setCoe(
-					uc.index, BaseAreaTreeDensityDiameter
+					uc.index,
+					BaseAreaTreeDensityDiameter
 							.treesPerHectare(baseAreaUtil.getCoe(uc.index), quadMeanDiameterUtil.getCoe(uc.index))
 			);
 		}
@@ -257,8 +260,7 @@ public class ReconcilationMethods {
 		});
 
 		var ucToUpdate = UtilizationClass.UTIL_CLASSES.stream()
-				.filter(uc -> quadMeanDiameterUtil.getCoe(UTIL_ALL) < uc.highBound)
-				.findFirst().get();
+				.filter(uc -> quadMeanDiameterUtil.getCoe(UTIL_ALL) < uc.highBound).findFirst().get();
 
 		baseAreaUtil.setCoe(ucToUpdate.index, baseAreaUtil.getCoe(UTIL_ALL));
 		treesPerHectareUtil.setCoe(ucToUpdate.index, treesPerHectareUtil.getCoe(UTIL_ALL));

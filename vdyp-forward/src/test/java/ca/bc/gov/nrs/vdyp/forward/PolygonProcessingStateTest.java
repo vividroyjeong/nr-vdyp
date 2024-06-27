@@ -152,18 +152,22 @@ class PolygonProcessingStateTest {
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());
 
-		Bank bank1 = new Bank(pLayer, polygon.getBiogeoclimaticZone(), s -> s.getUtilizations().isPresent() ? 
-				 s.getUtilizations().get().get(UtilizationClass.ALL).getBasalArea() >= 0.5
-				   : true);
-		
+		Bank bank1 = new Bank(
+				pLayer, polygon.getBiogeoclimaticZone(),
+				s -> s.getUtilizations().isPresent()
+						? s.getUtilizations().get().get(UtilizationClass.ALL).getBasalArea() >= 0.5 : true
+		);
+
 		// the filter should have removed genus B (index 3) since it's ALL basal area is below 0.5
 		assertThat(bank1.getNSpecies(), is(pLayer.getGenera().size() - 1));
 		assertThat(bank1.speciesIndices, is(new int[] { 0, 4, 5, 8, 15 }));
 
-		Bank bank2 = new Bank(pLayer, polygon.getBiogeoclimaticZone(), s -> s.getUtilizations().isPresent() ? 
-				 s.getUtilizations().get().get(UtilizationClass.ALL).getBasalArea() >= 100.0
-				   : true);
-		
+		Bank bank2 = new Bank(
+				pLayer, polygon.getBiogeoclimaticZone(),
+				s -> s.getUtilizations().isPresent()
+						? s.getUtilizations().get().get(UtilizationClass.ALL).getBasalArea() >= 100.0 : true
+		);
+
 		// the filter should have removed all genera.
 		assertThat(bank2.getNSpecies(), is(0));
 		assertThat(bank2.speciesIndices, is(new int[] { 0 }));
@@ -231,9 +235,7 @@ class PolygonProcessingStateTest {
 		}
 	}
 
-	private void verifyProcessingStateSpeciesMatchesSpecies(
-			Bank pps, int index, VdypLayerSpecies species
-	) {
+	private void verifyProcessingStateSpeciesMatchesSpecies(Bank pps, int index, VdypLayerSpecies species) {
 		assertThat(pps.yearsAtBreastHeight[index], is(species.getAgeAtBreastHeight()));
 		assertThat(pps.ageTotals[index], is(species.getAgeTotal()));
 		assertThat(pps.dominantHeights[index], is(species.getDominantHeight()));

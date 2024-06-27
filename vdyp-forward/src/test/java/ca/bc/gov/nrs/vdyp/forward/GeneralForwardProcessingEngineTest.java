@@ -236,8 +236,7 @@ class GeneralForwardProcessingEngineTest {
 
 		Optional<String> ac = Optional.of("AC");
 		assertThrows(
-				IllegalArgumentException.class, () -> ForwardProcessingEngine
-						.findInventoryTypeGroup("AC", ac, 0.0f)
+				IllegalArgumentException.class, () -> ForwardProcessingEngine.findInventoryTypeGroup("AC", ac, 0.0f)
 		);
 
 		assertThat(ForwardProcessingEngine.findInventoryTypeGroup("AC", Optional.empty(), 80.0f), is(36));
@@ -275,7 +274,6 @@ class GeneralForwardProcessingEngineTest {
 		}
 	}
 
-
 	@Test
 	void testCalculateMissingSiteCurves() throws IOException, ResourceParseException, ProcessingException {
 
@@ -293,7 +291,7 @@ class GeneralForwardProcessingEngineTest {
 
 		var testPolygonDescription = VdypPolygonDescriptionParser.parse("01002 S000001 00     1970");
 		var polygon = reader.readNextPolygon(testPolygonDescription);
-		
+
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.CALCULATE_MISSING_SITE_CURVES);
 
@@ -306,7 +304,8 @@ class GeneralForwardProcessingEngineTest {
 	}
 
 	@Test
-	void testCalculateMissingSiteCurvesNoSiteCurveData() throws IOException, ResourceParseException, ProcessingException {
+	void testCalculateMissingSiteCurvesNoSiteCurveData()
+			throws IOException, ResourceParseException, ProcessingException {
 
 		buildSpeciesParserForStream(
 				"testSpecies.dat", //
@@ -323,12 +322,12 @@ class GeneralForwardProcessingEngineTest {
 		);
 
 		controlMap.put(ControlKey.SITE_CURVE_NUMBERS.name(), siteCurveMap);
-		
+
 		var reader = new ForwardDataStreamReader(controlMap);
 
 		var testPolygonDescription = VdypPolygonDescriptionParser.parse("01002 S000001 00     1970");
 		var polygon = reader.readNextPolygon(testPolygonDescription);
-		
+
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.CALCULATE_MISSING_SITE_CURVES);
 
@@ -421,18 +420,18 @@ class GeneralForwardProcessingEngineTest {
 		var polygon = reader.readNextPolygon(testPolygonDescription);
 
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.ESTIMATE_MISSING_YEARS_TO_BREAST_HEIGHT_VALUES);
+		fpe.processPolygon(
+				polygon, ForwardProcessingEngine.ExecutionStep.ESTIMATE_MISSING_YEARS_TO_BREAST_HEIGHT_VALUES
+		);
 
 		assertThat(
-				fpe.fps.getPolygonProcessingState().wallet.yearsToBreastHeight, is(
-						new float[] { 0.0f, 4.0f, 4.6f, 1.0f, 5.0f, 5.0f }
-				)
+				fpe.fps.getPolygonProcessingState().wallet.yearsToBreastHeight,
+				is(new float[] { 0.0f, 4.0f, 4.6f, 1.0f, 5.0f, 5.0f })
 		);
 	}
 
 	@Test
-	void testCalculateDominantHeightAgeSiteIndex()
-			throws ProcessingException, IOException, ResourceParseException {
+	void testCalculateDominantHeightAgeSiteIndex() throws ProcessingException, IOException, ResourceParseException {
 
 		var testPolygonDescription = VdypPolygonDescriptionParser.parse("01002 S000001 00     1970");
 
@@ -473,10 +472,19 @@ class GeneralForwardProcessingEngineTest {
 
 		ForwardProcessingState fps = new ForwardProcessingState(controlMap);
 		fps.setPolygon(polygon);
-		
-		assertThat(fps.getPolygonProcessingState().volumeEquationGroups, Matchers.is(new int[] { VdypEntity.MISSING_INTEGER_VALUE, 12, 20, 25, 37, 66 }));
-		assertThat(fps.getPolygonProcessingState().decayEquationGroups, Matchers.is(new int[] { VdypEntity.MISSING_INTEGER_VALUE, 7, 14, 19, 31, 54 }));
-		assertThat(fps.getPolygonProcessingState().breakageEquationGroups, Matchers.is(new int[] { VdypEntity.MISSING_INTEGER_VALUE, 5, 6, 12, 17, 28 }));
+
+		assertThat(
+				fps.getPolygonProcessingState().volumeEquationGroups,
+				Matchers.is(new int[] { VdypEntity.MISSING_INTEGER_VALUE, 12, 20, 25, 37, 66 })
+		);
+		assertThat(
+				fps.getPolygonProcessingState().decayEquationGroups,
+				Matchers.is(new int[] { VdypEntity.MISSING_INTEGER_VALUE, 7, 14, 19, 31, 54 })
+		);
+		assertThat(
+				fps.getPolygonProcessingState().breakageEquationGroups,
+				Matchers.is(new int[] { VdypEntity.MISSING_INTEGER_VALUE, 5, 6, 12, 17, 28 })
+		);
 	}
 
 	@Test
@@ -527,9 +535,7 @@ class GeneralForwardProcessingEngineTest {
 
 		controlMap.put(ControlKey.FORWARD_INPUT_VDYP_POLY.name(), fileName);
 		var polygonParser = new VdypPolygonParser();
-		var polygonFileResolver = TestUtils.fileResolver(
-				fileName, TestUtils.makeInputStream(streamContent)
-		);
+		var polygonFileResolver = TestUtils.fileResolver(fileName, TestUtils.makeInputStream(streamContent));
 
 		polygonParser.modify(controlMap, polygonFileResolver);
 	}
@@ -539,9 +545,7 @@ class GeneralForwardProcessingEngineTest {
 
 		controlMap.put(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SPECIES.name(), fileName);
 		var speciesParser = new VdypSpeciesParser();
-		var speciesFileResolver = TestUtils.fileResolver(
-				fileName, TestUtils.makeInputStream(streamContent)
-		);
+		var speciesFileResolver = TestUtils.fileResolver(fileName, TestUtils.makeInputStream(streamContent));
 
 		speciesParser.modify(controlMap, speciesFileResolver);
 	}
@@ -551,9 +555,7 @@ class GeneralForwardProcessingEngineTest {
 
 		controlMap.put(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), fileName);
 		var utilizationsParser = new VdypUtilizationParser();
-		var utilizationsFileResolver = TestUtils.fileResolver(
-				fileName, TestUtils.makeInputStream(streamContent)
-		);
+		var utilizationsFileResolver = TestUtils.fileResolver(fileName, TestUtils.makeInputStream(streamContent));
 
 		utilizationsParser.modify(controlMap, utilizationsFileResolver);
 	}

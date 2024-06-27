@@ -1872,8 +1872,8 @@ class FipStartTest {
 			var wholeStemVolumeUtil = new Coefficients(new float[] { 0f, 0f, 0f, 0f, 0f }, 0);
 
 			EstimationMethods.estimateWholeStemVolume(
-					controlMap, utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil,
-					baseAreaUtil, wholeStemVolumeUtil
+					controlMap, utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, baseAreaUtil,
+					wholeStemVolumeUtil
 			);
 
 			assertThat(wholeStemVolumeUtil, coe(0, contains(is(0f), is(0f), is(0f), is(0f), closeTo(6.11904192f))));
@@ -1907,8 +1907,8 @@ class FipStartTest {
 			var closeUtilizationUtil = new Coefficients(new float[] { 0f, 0f, 0f, 0f, 0f }, 0);
 
 			EstimationMethods.estimateCloseUtilizationVolume(
-					controlMap, utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, wholeStemVolumeUtil,
-					closeUtilizationUtil
+					controlMap, utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil,
+					wholeStemVolumeUtil, closeUtilizationUtil
 			);
 
 			assertThat(closeUtilizationUtil, coe(0, contains(is(0f), is(0f), is(0f), is(0f), closeTo(5.86088896f))));
@@ -1946,8 +1946,8 @@ class FipStartTest {
 			var closeUtilizationNetOfDecayUtil = new Coefficients(new float[] { 0f, 0f, 0f, 0f, 0f }, 0);
 
 			EstimationMethods.estimateNetDecayVolume(
-					controlMap, fipSpecies.getGenus(), Region.INTERIOR, utilizationClass, aAdjust, decayGroup, breastHeightAge,
-					quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil
+					controlMap, fipSpecies.getGenus(), Region.INTERIOR, utilizationClass, aAdjust, decayGroup,
+					breastHeightAge, quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil
 			);
 
 			assertThat(
@@ -2001,8 +2001,9 @@ class FipStartTest {
 			);
 
 			EstimationMethods.estimateNetDecayAndWasteVolume(
-					Region.INTERIOR, utilizationClass, aAdjust, fipSpecies.getGenus(), lorieHeight, netDecayCoeMap, 
-					wasteModifierMap, quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
+					Region.INTERIOR, utilizationClass, aAdjust, fipSpecies.getGenus(), lorieHeight, netDecayCoeMap,
+					wasteModifierMap, quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil,
+					closeUtilizationNetOfDecayAndWasteUtil
 			);
 
 			assertThat(
@@ -3371,7 +3372,8 @@ class FipStartTest {
 			wsv.setCoe(FipStart.UTIL_ALL, 11.7993851f);
 
 			// app.estimateWholeStemVolumeByUtilizationClass(46, 14.2597857f, dq, ba, wsv);
-			EstimationMethods.estimateWholeStemVolume(controlMap, UtilizationClass.ALL, 0f, 46, 14.2597857f, dq, ba, wsv);
+			EstimationMethods
+					.estimateWholeStemVolume(controlMap, UtilizationClass.ALL, 0f, 46, 14.2597857f, dq, ba, wsv);
 
 			assertThat(wsv, utilization(0f, 11.7993851f, 3.13278913f, 4.76524019f, 2.63645673f, 1.26489878f));
 		} catch (IOException e) {

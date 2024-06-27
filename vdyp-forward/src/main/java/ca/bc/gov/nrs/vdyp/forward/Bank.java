@@ -57,14 +57,14 @@ class Bank {
 	public final float[/* nSpecies + 1, including 0 */][/* all ucs */] quadMeanDiameters; // BANK1 DQB
 	public final float[/* nSpecies + 1, including 0 */][/* all ucs */] treesPerHectare; // BANK1 TPHB
 	public final float[/* nSpecies + 1, including 0 */][/* all ucs */] wholeStemVolumes; // BANK1 VOLWSB
-	
+
 	public Bank(VdypPolygonLayer layer, BecDefinition becZone, Predicate<VdypLayerSpecies> retainCriteria) {
 
 		this.layer = layer;
 		this.becZone = becZone;
 
 		List<VdypLayerSpecies> speciesToRetain = new ArrayList<>();
-		for (VdypLayerSpecies s: layer.getGenera().values()) {
+		for (VdypLayerSpecies s : layer.getGenera().values()) {
 			if (retainCriteria.test(s)) {
 				speciesToRetain.add(s);
 			}
@@ -103,7 +103,7 @@ class Bank {
 		}
 
 		int nextSlot = 1;
-		for (VdypLayerSpecies s: speciesToRetain) {
+		for (VdypLayerSpecies s : speciesToRetain) {
 			recordSpecies(nextSlot++, s);
 		}
 	}
@@ -211,7 +211,7 @@ class Bank {
 	}
 
 	private GenusDistributionSet[] copy(GenusDistributionSet[] a) {
-		return Arrays.stream(a).map(GenusDistributionSet::copy).toArray(GenusDistributionSet[]::new);
+		return Arrays.stream(a).map(g -> g == null ? null : g.copy()).toArray(GenusDistributionSet[]::new);
 	}
 
 	private String[] copy(String[] a) {

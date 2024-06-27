@@ -87,9 +87,8 @@ class EstimationMethodsTest {
 
 		// Result of run in FORTRAN VDYP7 with the above parameters.
 		assertThat(
-				basalAreaByUtilization, contains(
-						0.0f, 0.406989872f, 0.00509467721f, 0.0138180256f, 0.023145527f, 0.36493164f
-				)
+				basalAreaByUtilization,
+				contains(0.0f, 0.406989872f, 0.00509467721f, 0.0138180256f, 0.023145527f, 0.36493164f)
 		);
 	}
 
@@ -116,7 +115,8 @@ class EstimationMethodsTest {
 		float loreyHeight = 30.0f;
 
 		EstimationMethods.estimateCloseUtilizationVolume(
-				controlMap, UtilizationClass.U75TO125, aAdjust, volumeGroup, loreyHeight, quadMeanDiameterByUtilization, wholeStemVolumeByUtilization, closeUtilizationVolume
+				controlMap, UtilizationClass.U75TO125, aAdjust, volumeGroup, loreyHeight, quadMeanDiameterByUtilization,
+				wholeStemVolumeByUtilization, closeUtilizationVolume
 		);
 
 		assertThat(closeUtilizationVolume, contains(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
@@ -147,7 +147,8 @@ class EstimationMethodsTest {
 		float loreyHeight = 36.7552986f;
 
 		EstimationMethods.estimateCloseUtilizationVolume(
-				controlMap, UtilizationClass.U175TO225, aAdjust, volumeGroup, loreyHeight, quadMeanDiameterByUtilization, wholeStemVolumeByUtilization, closeUtilizationVolume
+				controlMap, UtilizationClass.U175TO225, aAdjust, volumeGroup, loreyHeight,
+				quadMeanDiameterByUtilization, wholeStemVolumeByUtilization, closeUtilizationVolume
 		);
 
 		// Result of run in FORTRAN VDYP7 with the above parameters.
@@ -176,8 +177,8 @@ class EstimationMethodsTest {
 		int volumeGroup = volumeEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
 		EstimationMethods.estimateNetDecayVolume(
-				controlMap, genus.getAlias(), becDefinition
-						.getRegion(), UtilizationClass.U175TO225, aAdjust, volumeGroup, 0.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay
+				controlMap, genus.getAlias(), becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust,
+				volumeGroup, 0.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay
 		);
 
 		assertThat(closeUtilizationNetOfDecay, contains(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
@@ -207,8 +208,8 @@ class EstimationMethodsTest {
 		int decayGroup = decayEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
 		EstimationMethods.estimateNetDecayVolume(
-				controlMap, genus.getAlias(), becDefinition
-						.getRegion(), UtilizationClass.U175TO225, aAdjust, decayGroup, 54.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay
+				controlMap, genus.getAlias(), becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust,
+				decayGroup, 54.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay
 		);
 
 		// Result of run in FORTRAN VDYP7 with the above parameters.
@@ -234,8 +235,9 @@ class EstimationMethodsTest {
 		Coefficients closeUtilizationNetOfDecayAndWastage = Utils.utilizationVector(0.0f);
 
 		EstimationMethods.estimateNetDecayAndWasteVolume(
-				controlMap, becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus
-						.getAlias(), 0.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay, closeUtilizationNetOfDecayAndWastage
+				controlMap, becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus.getAlias(), 0.0f,
+				quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay,
+				closeUtilizationNetOfDecayAndWastage
 		);
 
 		assertThat(closeUtilizationNetOfDecay, contains(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
@@ -262,8 +264,9 @@ class EstimationMethodsTest {
 		Coefficients closeUtilizationNetOfDecayAndWastage = Utils.utilizationVector(0.0f);
 
 		EstimationMethods.estimateNetDecayAndWasteVolume(
-				controlMap, becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus
-						.getAlias(), 36.7552986f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay, closeUtilizationNetOfDecayAndWastage
+				controlMap, becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus.getAlias(),
+				36.7552986f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay,
+				closeUtilizationNetOfDecayAndWastage
 		);
 
 		// Result of run in FORTRAN VDYP7 with the above parameters.
@@ -293,7 +296,8 @@ class EstimationMethodsTest {
 		int breakageGroup = breakageEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
 		EstimationMethods.estimateNetDecayWasteAndBreakageVolume(
-				controlMap, UtilizationClass.U175TO225, breakageGroup, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecayAndWastage, closeUtilizationNetOfDecayWastageAndBreakage
+				controlMap, UtilizationClass.U175TO225, breakageGroup, quadMeanDiameterByUtilization, closeUtilization,
+				closeUtilizationNetOfDecayAndWastage, closeUtilizationNetOfDecayWastageAndBreakage
 		);
 
 		assertThat(closeUtilizationNetOfDecayAndWastage, contains(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
@@ -324,7 +328,8 @@ class EstimationMethodsTest {
 		int breakageGroup = breakageEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
 		EstimationMethods.estimateNetDecayWasteAndBreakageVolume(
-				controlMap, UtilizationClass.U175TO225, breakageGroup, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecayAndWastage, closeUtilizationNetOfDecayWastageAndBreakage
+				controlMap, UtilizationClass.U175TO225, breakageGroup, quadMeanDiameterByUtilization, closeUtilization,
+				closeUtilizationNetOfDecayAndWastage, closeUtilizationNetOfDecayWastageAndBreakage
 		);
 
 		// Result of run in FORTRAN VDYP7 with the above parameters.
@@ -378,14 +383,14 @@ class EstimationMethodsTest {
 		int volumeGroup = volumeEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
 		EstimationMethods.estimateWholeStemVolume(
-				controlMap, UtilizationClass.ALL, 0.0f, volumeGroup, 36.7552986f, quadMeanDiameterByUtilization, basalAreaByUtilization, wholeStemVolumeByUtilization
+				controlMap, UtilizationClass.ALL, 0.0f, volumeGroup, 36.7552986f, quadMeanDiameterByUtilization,
+				basalAreaByUtilization, wholeStemVolumeByUtilization
 		);
 
 		// Result of run in FORTRAN VDYP7 with the above parameters.
 		assertThat(
-				wholeStemVolumeByUtilization, contains(
-						0.0f, 6.27250576f, 0.01865777f, 0.07648385f, 0.17615195f, 6.00121212f
-				)
+				wholeStemVolumeByUtilization,
+				contains(0.0f, 6.27250576f, 0.01865777f, 0.07648385f, 0.17615195f, 6.00121212f)
 		);
 	}
 
@@ -405,9 +410,8 @@ class EstimationMethodsTest {
 		);
 		int volumeGroup = volumeEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
-		float result = EstimationMethods.estimateWholeStemVolumePerTree(
-				controlMap, volumeGroup, 36.7552986f, 31.5006275f
-		);
+		float result = EstimationMethods
+				.estimateWholeStemVolumePerTree(controlMap, volumeGroup, 36.7552986f, 31.5006275f);
 
 		// Result of run in FORTRAN VDYP7 with the above parameters.
 		assertThat(result, is(1.2011181f));

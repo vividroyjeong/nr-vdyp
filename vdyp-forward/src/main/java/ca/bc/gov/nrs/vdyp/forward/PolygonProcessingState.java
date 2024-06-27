@@ -44,15 +44,15 @@ class PolygonProcessingState {
 
 	/** The containing ForwardProcessingState */
 	private final ForwardProcessingState fps;
-	
+
 	/** Polygon on which the processor is operating */
 	private final VdypPolygon polygon;
 
-	// L1COM1, L1COM4 and L1COM5 - these common blocks mirror BANK1, BANK2 and BANK3 and are initialized 
+	// L1COM1, L1COM4 and L1COM5 - these common blocks mirror BANK1, BANK2 and BANK3 and are initialized
 	// when copied to "active" in ForwardProcessingEngine.
 	Bank wallet;
 
-	// L1COM2 - equation groups. From the configuration, narrowed to the 
+	// L1COM2 - equation groups. From the configuration, narrowed to the
 	// polygon's BEC zone.
 
 	int[] volumeEquationGroups;
@@ -60,11 +60,11 @@ class PolygonProcessingState {
 	int[] breakageEquationGroups;
 
 	// L1COM3 - just shadows of fields of L1COM5
-	//     AGETOTL1 = wallet.ageTotals[primarySpeciesIndex]
-	//     AGEBHL1 = wallet.yearsAtBreastHeight[primarySpeciesIndex]
-	//     YTBHL1 = wallet.yearsToBreastHeight[primarySpeciesIndex]
-	//     HDL1 = wallet.dominantHeights[primarySpeciesIndex]
-	
+	// AGETOTL1 = wallet.ageTotals[primarySpeciesIndex]
+	// AGEBHL1 = wallet.yearsAtBreastHeight[primarySpeciesIndex]
+	// YTBHL1 = wallet.yearsToBreastHeight[primarySpeciesIndex]
+	// HDL1 = wallet.dominantHeights[primarySpeciesIndex]
+
 	// Calculated data - this data is calculated after construction during processing.
 
 	// Ranking Details - encompasses INXXL1 and INXL1
@@ -74,8 +74,8 @@ class PolygonProcessingState {
 	private int primarySpeciesIndex; // IPOSP
 
 	// INXL1
-	//     ISPP = wallet.speciesIndices[primarySpeciesIndex]
-	//     PCTP = wallet.percentagesOfForestedLand[primarySpeciesIndex]
+	// ISPP = wallet.speciesIndices[primarySpeciesIndex]
+	// PCTP = wallet.percentagesOfForestedLand[primarySpeciesIndex]
 	private Optional<Integer> secondarySpeciesIndex; // => ISPS (species name) and PCTS (percentage)
 	private int inventoryTypeGroup; // ITG
 	@SuppressWarnings("unused")
@@ -87,7 +87,7 @@ class PolygonProcessingState {
 	private boolean areSiteCurveNumbersSet = false;
 
 	// INXSC
-	private int[] siteCurveNumbers; // INXSCV 
+	private int[] siteCurveNumbers; // INXSCV
 
 	// Primary Species Details - encompasses L1COM6
 	private boolean arePrimarySpeciesDetailsSet = false;
@@ -113,11 +113,13 @@ class PolygonProcessingState {
 	// MNSP - MSPL1, MSPLV
 	// TODO
 
-	public PolygonProcessingState(ForwardProcessingState fps, VdypPolygon polygon, Bank bank, Map<String, Object> controlMap) {
-		
+	public PolygonProcessingState(
+			ForwardProcessingState fps, VdypPolygon polygon, Bank bank, Map<String, Object> controlMap
+	) {
+
 		this.fps = fps;
 		this.polygon = polygon;
-		
+
 		this.wallet = bank.copy();
 
 		var volumeEquationGroupMatrix = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
@@ -154,7 +156,7 @@ class PolygonProcessingState {
 	public VdypPolygon getPolygon() {
 		return polygon;
 	}
-	
+
 	public int getNSpecies() {
 		return wallet.getNSpecies();
 	}
@@ -218,15 +220,15 @@ class PolygonProcessingState {
 	public Map<String, Coefficients> getSmallComponentLoreyHeightCoefficients() {
 		return fps.smallComponentLoreyHeightCoefficients;
 	}
-	
+
 	public Map<String, Coefficients> getSmallComponentQuadMeanDiameterCoefficients() {
 		return fps.smallComponentQuadMeanDiameterCoefficients;
 	}
-	
+
 	public Map<String, Coefficients> getSmallComponentBasalAreaCoefficients() {
 		return fps.smallComponentBasalAreaCoefficients;
 	}
-	
+
 	public Map<String, Coefficients> getSmallComponentProbabilityCoefficients() {
 		return fps.smallComponentProbabilityCoefficients;
 	}

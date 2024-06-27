@@ -84,28 +84,25 @@ class ForwardProcessingState {
 		this.decayModifierMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
 				controlMap, ModifierParser.CONTROL_KEY_MOD301_DECAY, MatrixMap2.class
 		);
-		this.closeUtilizationCoeMap = Utils
-				.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
-						controlMap, ControlKey.CLOSE_UTIL_VOLUME, MatrixMap2.class
-				);
-		this.vdypGrowthDetails = Utils
-				.expectParsedControl(
-						controlMap, ControlKey.VTROL, VdypGrowthDetails.class
-				);
-		this.totalStandWholeStepVolumeCoeMap = Utils
-				.<Map<Integer, Coefficients>>expectParsedControl(
-						controlMap, ControlKey.TOTAL_STAND_WHOLE_STEM_VOL, Map.class
-				);
+		this.closeUtilizationCoeMap = Utils.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
+				controlMap, ControlKey.CLOSE_UTIL_VOLUME, MatrixMap2.class
+		);
+		this.vdypGrowthDetails = Utils.expectParsedControl(controlMap, ControlKey.VTROL, VdypGrowthDetails.class);
+		this.totalStandWholeStepVolumeCoeMap = Utils.<Map<Integer, Coefficients>>expectParsedControl(
+				controlMap, ControlKey.TOTAL_STAND_WHOLE_STEM_VOL, Map.class
+		);
 		this.wholeStemUtilizationComponentMap = Utils
 				.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
 						controlMap, ControlKey.UTIL_COMP_WS_VOLUME, MatrixMap2.class
 				);
-		this.quadMeanDiameterUtilizationComponentMap = Utils.<MatrixMap3<Integer, String, String, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.UTIL_COMP_DQ, MatrixMap3.class
-		);
-		this.basalAreaDiameterUtilizationComponentMap = Utils.<MatrixMap3<Integer, String, String, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.UTIL_COMP_BA, MatrixMap3.class
-		);
+		this.quadMeanDiameterUtilizationComponentMap = Utils
+				.<MatrixMap3<Integer, String, String, Coefficients>>expectParsedControl(
+						controlMap, ControlKey.UTIL_COMP_DQ, MatrixMap3.class
+				);
+		this.basalAreaDiameterUtilizationComponentMap = Utils
+				.<MatrixMap3<Integer, String, String, Coefficients>>expectParsedControl(
+						controlMap, ControlKey.UTIL_COMP_BA, MatrixMap3.class
+				);
 		this.smallComponentWholeStemVolumeCoefficients = Utils
 				.<Map<String, Coefficients>>expectParsedControl(controlMap, ControlKey.SMALL_COMP_WS_VOLUME, Map.class);
 		this.smallComponentLoreyHeightCoefficients = Utils
@@ -114,10 +111,9 @@ class ForwardProcessingState {
 				.<Map<String, Coefficients>>expectParsedControl(controlMap, ControlKey.SMALL_COMP_DQ, Map.class);
 		this.smallComponentBasalAreaCoefficients = Utils
 				.<Map<String, Coefficients>>expectParsedControl(controlMap, ControlKey.SMALL_COMP_BA, Map.class);
-		this.smallComponentProbabilityCoefficients = Utils
-				.<Map<String, Coefficients>>expectParsedControl(
-						controlMap, ControlKey.SMALL_COMP_PROBABILITY, Map.class
-				);
+		this.smallComponentProbabilityCoefficients = Utils.<Map<String, Coefficients>>expectParsedControl(
+				controlMap, ControlKey.SMALL_COMP_PROBABILITY, Map.class
+		);
 	}
 
 	public GenusDefinitionMap getGenusDefinitionMap() {
@@ -149,10 +145,11 @@ class ForwardProcessingState {
 	public void setPolygon(VdypPolygon polygon) {
 		// Move the primary layer of the given polygon to bank zero.
 		assert toIndex(0, LayerType.PRIMARY) == 0;
-		banks[0] = new Bank(polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone()
-				, s -> s.getUtilizations().isPresent() ? 
-						 s.getUtilizations().get().get(UtilizationClass.ALL).getBasalArea() >= MIN_BASAL_AREA
-					   : true);
+		banks[0] = new Bank(
+				polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone(),
+				s -> s.getUtilizations().isPresent()
+						? s.getUtilizations().get().get(UtilizationClass.ALL).getBasalArea() >= MIN_BASAL_AREA : true
+		);
 		pps = new PolygonProcessingState(this, polygon, banks[0], controlMap);
 	}
 

@@ -62,8 +62,7 @@ public class MatrixMapImpl<T> implements MatrixMap<T> {
 
 	protected int getIndex(Object... params) {
 		return getIndexSafe(params).orElseThrow(() -> {
-			String keyString = Arrays.stream(params).map(Object::toString)
-					.collect(Collectors.joining(", ", "[", "]"));
+			String keyString = Arrays.stream(params).map(Object::toString).collect(Collectors.joining(", ", "[", "]"));
 			return new IllegalArgumentException("Key " + keyString + " is invalid for this MatrixMap");
 		});
 	}

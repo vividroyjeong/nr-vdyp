@@ -98,8 +98,8 @@ public class ForwardDataStreamReader {
 					} else {
 						throw new IllegalStateException(
 								MessageFormat.format(
-										"Unrecognized layer type {} for species {} of polygon {}", species
-												.getLayerType(), species.getGenusIndex(), polygon.getDescription()
+										"Unrecognized layer type {} for species {} of polygon {}",
+										species.getLayerType(), species.getGenusIndex(), polygon.getDescription()
 								)
 						);
 					}
@@ -167,31 +167,28 @@ public class ForwardDataStreamReader {
 	 * 
 	 * @param polygon
 	 */
-	private void adjustUtilizations(VdypPolygon polygon) 
-			throws ProcessingException {
+	private void adjustUtilizations(VdypPolygon polygon) throws ProcessingException {
 
 		float percentForestedLand = polygon.getPercentForestLand();
 		assert !Float.isNaN(percentForestedLand);
 		float scalingFactor = 100.0f / percentForestedLand;
 
 		List<VdypSpeciesUtilization> utilizationsToAdjust = new ArrayList<>();
-		
-		for (VdypPolygonLayer l: polygon.getLayers()) {
 
-			l.getDefaultUtilizationMap().ifPresent(
-				m -> utilizationsToAdjust.addAll(m.values()));
-	
-			l.getGenera().values().stream().forEach(
-				s -> s.getUtilizations().ifPresent(
-					m -> utilizationsToAdjust.addAll(m.values())));
+		for (VdypPolygonLayer l : polygon.getLayers()) {
+
+			l.getDefaultUtilizationMap().ifPresent(m -> utilizationsToAdjust.addAll(m.values()));
+
+			l.getGenera().values().stream()
+					.forEach(s -> s.getUtilizations().ifPresent(m -> utilizationsToAdjust.addAll(m.values())));
 		}
 
-		for (VdypSpeciesUtilization u: utilizationsToAdjust) {
-	
+		for (VdypSpeciesUtilization u : utilizationsToAdjust) {
+
 			if (percentForestedLand > 0.0f && percentForestedLand < 100.0f) {
 				u.scale(scalingFactor);
 			}
-			
+
 			u.doPostCreateAdjustments();
 		}
 	}
@@ -199,12 +196,12 @@ public class ForwardDataStreamReader {
 	private class UtilizationBySpeciesKey {
 		private final LayerType layerType;
 		private final Integer genusIndex;
-	
+
 		public UtilizationBySpeciesKey(LayerType layerType, Integer genusIndex) {
 			this.layerType = layerType;
 			this.genusIndex = genusIndex;
 		}
-	
+
 		@Override
 		public boolean equals(Object other) {
 			if (other instanceof UtilizationBySpeciesKey that) {
@@ -213,7 +210,7 @@ public class ForwardDataStreamReader {
 				return false;
 			}
 		}
-	
+
 		@Override
 		public int hashCode() {
 			return layerType.hashCode() * 17 + genusIndex.hashCode();

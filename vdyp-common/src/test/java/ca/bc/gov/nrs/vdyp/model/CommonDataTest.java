@@ -12,11 +12,16 @@ class CommonDataTest {
 	@Test
 	void test() {
 		assertThat(CommonData.ITG_PURE, aMapWithSize(16));
-		assertThat(CommonData.ITG_PURE.keySet(), containsInAnyOrder("AC", "AT", "B", "C", "D", "E", "F", "H", "L", "MB", "PA", "PL", "PW", "PY", "S", "Y"));
+		assertThat(
+				CommonData.ITG_PURE.keySet(),
+				containsInAnyOrder(
+						"AC", "AT", "B", "C", "D", "E", "F", "H", "L", "MB", "PA", "PL", "PW", "PY", "S", "Y"
+				)
+		);
 
 		assertThat(CommonData.HARDWOODS, containsInAnyOrder("AC", "AT", "D", "E", "MB"));
-		
-		for (var m: CommonData.PRIMARY_SPECIES_TO_COMBINE) {
+
+		for (var m : CommonData.PRIMARY_SPECIES_TO_COMBINE) {
 			assertThat(m, iterableWithSize(2));
 		}
 	}

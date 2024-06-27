@@ -57,17 +57,17 @@ public class VdypPolygon extends VdypEntity {
 			this.primaryLayer = primaryLayer;
 			this.layers.add(primaryLayer);
 		}
-		
+
 		if (veteranLayer != null) {
 			this.veteranLayer = Optional.of(veteranLayer);
 			this.layers.add(veteranLayer);
 		}
-	} 
+	}
 
 	public Set<VdypPolygonLayer> getLayers() {
 		return Collections.unmodifiableSet(layers);
 	}
-	
+
 	public VdypPolygonDescription getDescription() {
 		return description;
 	}

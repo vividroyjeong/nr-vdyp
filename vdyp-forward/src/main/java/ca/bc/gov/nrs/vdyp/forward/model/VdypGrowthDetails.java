@@ -10,14 +10,14 @@ import java.util.function.BooleanSupplier;
  * <ul>
  * <li>0: NO GROWTH
  * <li>-1: SEQ014 (specifies end yr, each poly)
- * <li>1 to 400: grow i yrs                  
+ * <li>1 to 400: grow i yrs
  * <li>1920 to 2400: grow to yr i (A.D.)
  * </ul>
  * 2nd: Compatibility Variable output
  * <ul>
- * <li>0  None
- * <li>1  First yr only
- * <li>2  All yrs
+ * <li>0 None
+ * <li>1 First yr only
+ * <li>2 All yrs
  * <li>Note: Output can occur ONLY in yrs also selected by 3rd option
  * </ul>
  * 3rd: Compatibility Variable application
@@ -48,18 +48,14 @@ import java.util.function.BooleanSupplier;
 public class VdypGrowthDetails {
 
 	private static final int MAX_CONTROL_VARIABLE_VALUES = 10;
-	
+
 	private enum ControlVariables {
-		GROW_TARGET,
-		COMPATIBILITY_VARIABLE_OUTPUT,
-		COMPATIBILITY_VARIABLE_APPLICATION,
-		OUTPUT_FILES,
-		ALLOW_COMPATIBILITY_VARIABLE_CALCULATIONS,
-		UPDATE_DURING_GROWTH
+		GROW_TARGET, COMPATIBILITY_VARIABLE_OUTPUT, COMPATIBILITY_VARIABLE_APPLICATION, OUTPUT_FILES,
+		ALLOW_COMPATIBILITY_VARIABLE_CALCULATIONS, UPDATE_DURING_GROWTH
 	}
 
 	private Integer firstYear, currentYear, lastYear, yearCounter;
-	
+
 	private final int[] controlVariables = new int[10];
 
 	public VdypGrowthDetails(Integer[] controlVariableValues) {
@@ -115,13 +111,14 @@ public class VdypGrowthDetails {
 		int cvValue = controlVariables[ControlVariables.ALLOW_COMPATIBILITY_VARIABLE_CALCULATIONS.ordinal()];
 		return cvValue == 1 && p.getAsBoolean();
 	}
-	
+
 	int getControlVariable(int elementNumber) {
 
 		int index = elementNumber - 1;
 		if (index < 0 || index > MAX_CONTROL_VARIABLE_VALUES) {
 			throw new IllegalArgumentException(
-					"Element number (" + elementNumber + ") is out of range - must be from 1 to " + MAX_CONTROL_VARIABLE_VALUES
+					"Element number (" + elementNumber + ") is out of range - must be from 1 to "
+							+ MAX_CONTROL_VARIABLE_VALUES
 			);
 		}
 

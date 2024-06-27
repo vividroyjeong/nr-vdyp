@@ -11,8 +11,9 @@ import ca.bc.gov.nrs.vdyp.common.Utils;
 
 public class CommonData {
 
-	private CommonData() {}
-	
+	private CommonData() {
+	}
+
 	public static final Map<String, Integer> ITG_PURE = Utils.constMap(map -> {
 		map.put("AC", 36);
 		map.put("AT", 42);

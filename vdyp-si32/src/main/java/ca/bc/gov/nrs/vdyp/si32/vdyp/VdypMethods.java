@@ -247,13 +247,13 @@ public class VdypMethods {
 	 * <p>
 	 * November 21, 1997 - Added a Coastal/Interior Differentiation for Hemlock.
 	 * <p>
-	 * The curves assigned to specific species may be reassigned through calls to 'VDYP_SetCurrentSICurve'.
-	 * If no such curve assignment has been made, the default curve from SINDEX will be returned.
+	 * The curves assigned to specific species may be reassigned through calls to 'VDYP_SetCurrentSICurve'. If no such
+	 * curve assignment has been made, the default curve from SINDEX will be returned.
 	 *
 	 * @param sp64Name the species short ("code") name such as "ABAL"
 	 * @param region   the region under consideration
-	 * @return The Site Index curve type to use for this species. SI_NO_EQUATION is returned if the species 
-	 * or region was not recognized.
+	 * @return The Site Index curve type to use for this species. SI_NO_EQUATION is returned if the species or region
+	 *         was not recognized.
 	 */
 	public static SiteIndexEquation getCurrentSICurve(String sp64Name, SpeciesRegion region) {
 

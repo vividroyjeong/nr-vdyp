@@ -55,7 +55,7 @@ public class ForwardProcessingEngine {
 	private static final int UTILIZATION_SMALL_INDEX = UtilizationClass.SMALL.ordinal();
 
 	private static final float MIN_BASAL_AREA = 0.001f;
-	
+
 	/** π/4/10⁴ */
 	public static final float PI_40K = (float) (Math.PI / 40_000);
 
@@ -116,9 +116,7 @@ public class ForwardProcessingEngine {
 		executeForwardAlgorithm(lastStep);
 	}
 
-	private void executeForwardAlgorithm(
-			ExecutionStep lastStep
-	) throws ProcessingException {
+	private void executeForwardAlgorithm(ExecutionStep lastStep) throws ProcessingException {
 
 		PolygonProcessingState pps = fps.getPolygonProcessingState();
 		Bank bank = fps.getBank(0, LayerType.PRIMARY);
@@ -169,19 +167,18 @@ public class ForwardProcessingEngine {
 	private static final float B_BASE_MIN = 0.01f;
 
 	@SuppressWarnings("unchecked")
-	static void setCompatibilityVariables(PolygonProcessingState pps
-	) throws ProcessingException {
+	static void setCompatibilityVariables(PolygonProcessingState pps) throws ProcessingException {
 		Coefficients aAdjust = new Coefficients(new float[] { 0.0f, 0.0f, 0.0f, 0.0f }, 1);
 
 		var growthDetails = pps.getVdypGrowthDetails();
 
-		// Note: L1COM2 (INL1VGRP, INL1DGRP, INL1BGRP) is initialized when 
+		// Note: L1COM2 (INL1VGRP, INL1DGRP, INL1BGRP) is initialized when
 		// PolygonProcessingState (volumeEquationGroups, decayEquationGroups
 		// breakageEquationGroups, respectively) is constructed. Copying
-		// the values into LCOM1 is not necessary. Note, however, that 
+		// the values into LCOM1 is not necessary. Note, however, that
 		// VolumeEquationGroup 10 is mapped to 11 (VGRPFIND) - this is done
 		// when volumeEquationGroups is built (i.e., when the equivalent to
-		// INL1VGRP is built, rather than when LCOM1 VGRPL is built in the 
+		// INL1VGRP is built, rather than when LCOM1 VGRPL is built in the
 		// original code.)
 
 		var cvVolume = new MatrixMap3[pps.getNSpecies() + 1];
@@ -241,10 +238,10 @@ public class ForwardProcessingEngine {
 
 					// EMP094
 					EstimationMethods.estimateNetDecayAndWasteVolume(
-							pps.getBecZone()
-									.getRegion(), uc, aAdjust, pps.wallet.speciesNames[s], spLoreyHeight_All, pps
-											.getNetDecayWasteCoeMap(), pps
-											.getWasteModifierMap(), quadMeanDiameters, closeUtilizationVolumes, closeUtilizationVolumesNetOfDecay, closeUtilizationVolumesNetOfDecayAndWaste
+							pps.getBecZone().getRegion(), uc, aAdjust, pps.wallet.speciesNames[s], spLoreyHeight_All,
+							pps.getNetDecayWasteCoeMap(), pps.getWasteModifierMap(), quadMeanDiameters,
+							closeUtilizationVolumes, closeUtilizationVolumesNetOfDecay,
+							closeUtilizationVolumesNetOfDecayAndWaste
 					);
 
 					float actualVolume = pps.wallet.cuVolumesMinusDecayAndWastage[s][uc.ordinal()];
@@ -264,10 +261,10 @@ public class ForwardProcessingEngine {
 					// EMP093
 					int decayGroup = pps.decayEquationGroups[s];
 					EstimationMethods.estimateNetDecayVolume(
-							pps.wallet.speciesNames[s], pps.getBecZone()
-									.getRegion(), uc, aAdjust, decayGroup, pps
-											.getPrimarySpeciesAgeAtBreastHeight(), pps.getNetDecayCoeMap(), pps
-													.getDecayModifierMap(), quadMeanDiameters, closeUtilizationVolumes, closeUtilizationVolumesNetOfDecay
+							pps.wallet.speciesNames[s], pps.getBecZone().getRegion(), uc, aAdjust, decayGroup,
+							pps.getPrimarySpeciesAgeAtBreastHeight(), pps.getNetDecayCoeMap(),
+							pps.getDecayModifierMap(), quadMeanDiameters, closeUtilizationVolumes,
+							closeUtilizationVolumesNetOfDecay
 					);
 
 					float actualVolume = pps.wallet.cuVolumesMinusDecay[s][uc.ordinal()];
@@ -286,8 +283,8 @@ public class ForwardProcessingEngine {
 					// EMP092
 					int volumeGroup = pps.volumeEquationGroups[s];
 					EstimationMethods.estimateCloseUtilizationVolume(
-							uc, aAdjust, volumeGroup, spLoreyHeight_All, pps
-									.getCloseUtilizationCoeMap(), quadMeanDiameters, wholeStemVolumes, closeUtilizationVolumes
+							uc, aAdjust, volumeGroup, spLoreyHeight_All, pps.getCloseUtilizationCoeMap(),
+							quadMeanDiameters, wholeStemVolumes, closeUtilizationVolumes
 					);
 
 					float actualVolume = pps.wallet.closeUtilizationVolumes[s][uc.ordinal()];
@@ -302,15 +299,15 @@ public class ForwardProcessingEngine {
 			float primarySpeciesQMDAll = pps.wallet.quadMeanDiameters[s][UTILIZATION_ALL_INDEX];
 			var wholeStemVolume = pps.wallet.treesPerHectare[s][UTILIZATION_ALL_INDEX]
 					* EstimationMethods.estimateWholeStemVolumePerTree(
-							primarySpeciesVolumeGroup, spLoreyHeight_All, primarySpeciesQMDAll, pps
-									.getTotalStandWholeStepVolumeCoeMap()
+							primarySpeciesVolumeGroup, spLoreyHeight_All, primarySpeciesQMDAll,
+							pps.getTotalStandWholeStepVolumeCoeMap()
 					);
 
 			wholeStemVolumes.setCoe(UTILIZATION_ALL_INDEX, wholeStemVolume);
 
 			EstimationMethods.estimateWholeStemVolume(
-					UtilizationClass.ALL, 0.0f, primarySpeciesVolumeGroup, spLoreyHeight_All, pps
-							.getWholeStemUtilizationComponentMap(), quadMeanDiameters, basalAreas, wholeStemVolumes
+					UtilizationClass.ALL, 0.0f, primarySpeciesVolumeGroup, spLoreyHeight_All,
+					pps.getWholeStemUtilizationComponentMap(), quadMeanDiameters, basalAreas, wholeStemVolumes
 			);
 
 			for (UtilizationClass uc : UtilizationClass.ALL_BUT_SMALL_ALL) {
@@ -330,17 +327,16 @@ public class ForwardProcessingEngine {
 			);
 
 			EstimationMethods.estimateBaseAreaByUtilization(
-					pps.getBecZone(), pps
-							.getBasalAreaUtilizationComponentMap(), quadMeanDiameters, basalAreas, genusName
+					pps.getBecZone(), pps.getBasalAreaUtilizationComponentMap(), quadMeanDiameters, basalAreas,
+					genusName
 			);
 
 			// Calculate trees-per-hectare per utilization
 			treesPerHectare.setCoe(UtilizationClass.ALL.index, pps.wallet.treesPerHectare[s][UTILIZATION_ALL_INDEX]);
 			for (UtilizationClass uc : UtilizationClass.UTIL_CLASSES) {
 				treesPerHectare.setCoe(
-						uc.index, calculateTreesPerHectare(
-								basalAreas.getCoe(uc.index), quadMeanDiameters.getCoe(uc.index)
-						)
+						uc.index,
+						calculateTreesPerHectare(basalAreas.getCoe(uc.index), quadMeanDiameters.getCoe(uc.index))
 				);
 			}
 
@@ -352,7 +348,7 @@ public class ForwardProcessingEngine {
 
 				float originalQmd = pps.wallet.quadMeanDiameters[s][uc.ordinal()];
 				float adjustedQmd = quadMeanDiameters.getCoe(uc.index);
-				
+
 				float qmdCvValue;
 				if (growthDetails.allowCalculation(() -> originalQmd < B_BASE_MIN)) {
 					qmdCvValue = 0.0f;
@@ -361,7 +357,7 @@ public class ForwardProcessingEngine {
 				} else {
 					qmdCvValue = 0.0f;
 				}
-				
+
 				cvQuadraticMeanDiameter[s].put(uc, LayerType.PRIMARY, qmdCvValue);
 			}
 
@@ -375,15 +371,14 @@ public class ForwardProcessingEngine {
 
 	/**
 	 * Estimate small component utilization values for primary layer
-	 * 
-	 * @param allowCompatibilitySetting 
+	 *
+	 * @param allowCompatibilitySetting
 	 *
 	 * @throws ProcessingException
 	 */
-	private static HashMap<SmallUtilizationClassVariable, Float> estimateSmallComponents(
-			PolygonProcessingState pps, int speciesIndex, VdypGrowthDetails growthDetails
-	)
-			throws ProcessingException {
+	private static HashMap<SmallUtilizationClassVariable, Float>
+			estimateSmallComponents(PolygonProcessingState pps, int speciesIndex, VdypGrowthDetails growthDetails)
+					throws ProcessingException {
 
 		Region region = pps.getPolygon().getBiogeoclimaticZone().getRegion();
 		String speciesName = pps.wallet.speciesNames[speciesIndex];
@@ -396,15 +391,13 @@ public class ForwardProcessingEngine {
 		float spBaseArea_All = pps.wallet.basalAreas[speciesIndex][UTILIZATION_ALL_INDEX] /* * fractionAvailable */; // BAsp
 
 		// EMP080
-		float cvSmallComponentProbability = smallComponentProbability(
-				pps, speciesName, spLoreyHeight_All, region
-		); // PROBsp
+		float cvSmallComponentProbability = smallComponentProbability(pps, speciesName, spLoreyHeight_All, region); // PROBsp
 
 		// EMP081
 		float conditionalExpectedBaseArea = conditionalExpectedBaseArea(
 				pps, speciesName, spBaseArea_All, spLoreyHeight_All, region
 		); // BACONDsp
-																																		
+
 		// TODO (see previous TODO): conditionalExpectedBaseArea /= fractionAvailable;
 
 		float cvBasalArea_Small = cvSmallComponentProbability * conditionalExpectedBaseArea;
@@ -424,12 +417,12 @@ public class ForwardProcessingEngine {
 
 		float spInputBasalArea_Small = pps.wallet.basalAreas[speciesIndex][UTILIZATION_SMALL_INDEX];
 		cvSmall.put(SmallUtilizationClassVariable.BASAL_AREA, spInputBasalArea_Small - cvBasalArea_Small);
-		
+
 		if (growthDetails.allowCalculation(spInputBasalArea_Small, B_BASE_MIN, (l, r) -> l > r)) {
 			float spInputQuadMeanDiameter_Small = pps.wallet.quadMeanDiameters[speciesIndex][UTILIZATION_SMALL_INDEX];
 			cvSmall.put(
-					SmallUtilizationClassVariable.QUAD_MEAN_DIAMETER, spInputQuadMeanDiameter_Small
-							- cvQuadMeanDiameter_Small
+					SmallUtilizationClassVariable.QUAD_MEAN_DIAMETER,
+					spInputQuadMeanDiameter_Small - cvQuadMeanDiameter_Small
 			);
 		} else {
 			cvSmall.put(SmallUtilizationClassVariable.QUAD_MEAN_DIAMETER, 0.0f);
@@ -446,7 +439,7 @@ public class ForwardProcessingEngine {
 		float spInputWholeStemVolume_Small = pps.wallet.wholeStemVolumes[speciesIndex][UTILIZATION_SMALL_INDEX];
 		if (spInputWholeStemVolume_Small > 0.0f && cvMeanVolume_Small > 0.0f
 				&& growthDetails.allowCalculation(spInputBasalArea_Small, B_BASE_MIN, (l, r) -> l >= r)) {
-			
+
 			float spInputTreePerHectare_Small = pps.wallet.treesPerHectare[speciesIndex][UTILIZATION_SMALL_INDEX];
 
 			var cvWholeStemVolume = FloatMath
@@ -461,10 +454,9 @@ public class ForwardProcessingEngine {
 	}
 
 	// EMP080
-	private static float
-			smallComponentProbability(
-					PolygonProcessingState pps, String speciesName, float loreyHeight, Region region
-			) {
+	private static float smallComponentProbability(
+			PolygonProcessingState pps, String speciesName, float loreyHeight, Region region
+	) {
 		Coefficients coe = pps.getSmallComponentProbabilityCoefficients().get(speciesName);
 
 		// EQN 1 in IPSJF118.doc
@@ -476,8 +468,7 @@ public class ForwardProcessingEngine {
 
 		a1 = (region == Region.COASTAL) ? a1 : 0.0f;
 
-		float logit = 
-				a0 + // 
+		float logit = a0 + //
 				a1 + //
 				a2 * pps.wallet.yearsAtBreastHeight[pps.getPrimarySpeciesIndex()] + //
 				a3 * loreyHeight;
@@ -486,10 +477,9 @@ public class ForwardProcessingEngine {
 	}
 
 	// EMP081
-	private static float
-			conditionalExpectedBaseArea(
-					PolygonProcessingState pps, String speciesName, float basalArea, float loreyHeight, Region region
-			) {
+	private static float conditionalExpectedBaseArea(
+			PolygonProcessingState pps, String speciesName, float basalArea, float loreyHeight, Region region
+	) {
 		Coefficients coe = pps.getSmallComponentBasalAreaCoefficients().get(speciesName);
 
 		// EQN 3 in IPSJF118.doc
@@ -529,8 +519,7 @@ public class ForwardProcessingEngine {
 	// EMP085
 	private static float smallComponentLoreyHeight(
 			PolygonProcessingState pps, String speciesName, float speciesLoreyHeight_All,
-			float quadMeanDiameterSpecSmall,
-			float speciesQuadMeanDiameter_All
+			float quadMeanDiameterSpecSmall, float speciesQuadMeanDiameter_All
 	) {
 		Coefficients coe = pps.getSmallComponentLoreyHeightCoefficients().get(speciesName);
 
@@ -539,17 +528,14 @@ public class ForwardProcessingEngine {
 		float a0 = coe.getCoe(1);
 		float a1 = coe.getCoe(2);
 
-		return 1.3f + 
-				(speciesLoreyHeight_All - 1.3f) //
+		return 1.3f + (speciesLoreyHeight_All - 1.3f) //
 				* exp(a0 * (pow(quadMeanDiameterSpecSmall, a1) - pow(speciesQuadMeanDiameter_All, a1)));
 	}
 
 	// EMP086
-	private static float
-			meanVolumeSmall(
-					PolygonProcessingState pps, String speciesName, float quadMeanDiameterSpecSmall,
-					float loreyHeightSpecSmall
-			) {
+	private static float meanVolumeSmall(
+			PolygonProcessingState pps, String speciesName, float quadMeanDiameterSpecSmall, float loreyHeightSpecSmall
+	) {
 		Coefficients coe = pps.getSmallComponentWholeStemVolumeCoefficients().get(speciesName);
 
 		// EQN 1 in IPSJF119.doc
@@ -569,10 +555,10 @@ public class ForwardProcessingEngine {
 		if (qmd == 0.0f || Float.isNaN(qmd) || Float.isNaN(basalArea)) {
 			return 0.0f;
 		} else {
-			// basalArea is in m**2/hectare. qmd is diameter in cm. pi/4 converts between 
-			// diameter in cm and area in cm**2 since a = pi * r**2 = pi * (d/2)**2 
+			// basalArea is in m**2/hectare. qmd is diameter in cm. pi/4 converts between
+			// diameter in cm and area in cm**2 since a = pi * r**2 = pi * (d/2)**2
 			// = pi/4 * d**2. Finally, dividing by 10000 converts from cm**2 to m**2.
-			
+
 			return basalArea / PI_40K / (qmd * qmd);
 		}
 	}
@@ -582,9 +568,9 @@ public class ForwardProcessingEngine {
 		if (Float.isNaN(qmd) || Float.isNaN(treesPerHectare)) {
 			return 0.0f;
 		} else {
-			// qmd is diameter in cm (per tree); qmd**2 is in cm**2. Multiplying by pi/4 converts 
+			// qmd is diameter in cm (per tree); qmd**2 is in cm**2. Multiplying by pi/4 converts
 			// to area in cm**2. Dividing by 10000 converts into m**2. Finally, multiplying
-			// by trees-per-hectare takes the per-tree area and converts it into a per-hectare 
+			// by trees-per-hectare takes the per-tree area and converts it into a per-hectare
 			// area - that is, the basal area per hectare.
 
 			return qmd * qmd * PI_40K * treesPerHectare;
@@ -593,8 +579,8 @@ public class ForwardProcessingEngine {
 
 	public static float calculateQuadMeanDiameter(float basalArea, float treesPerHectare) {
 
-		if (   basalArea > 1.0e6 || basalArea == 0.0 || Float.isNaN(basalArea)
-			|| treesPerHectare > 1.0e6 || treesPerHectare == 0.0 || Float.isNaN(treesPerHectare)) {
+		if (basalArea > 1.0e6 || basalArea == 0.0 || Float.isNaN(basalArea) || treesPerHectare > 1.0e6
+				|| treesPerHectare == 0.0 || Float.isNaN(treesPerHectare)) {
 			return 0.0f;
 		} else {
 			// See comments above explaining this calculation
@@ -662,7 +648,8 @@ public class ForwardProcessingEngine {
 			if (Float.isNaN(loreyHeight)) {
 				throw new ProcessingException(
 						MessageFormat.format(
-								"Neither dominant nor lorey height[All] is available for primary species {}", state.wallet.speciesNames[primarySpeciesIndex]
+								"Neither dominant nor lorey height[All] is available for primary species {}",
+								state.wallet.speciesNames[primarySpeciesIndex]
 						), 2
 				);
 			}
@@ -860,13 +847,15 @@ public class ForwardProcessingEngine {
 					} catch (NoAnswerException e) {
 						logger.warn(
 								MessageFormat.format(
-										"there is no conversion from curves {0} to {1}. Skipping species {3}", siteCurveI, primarySiteCurve, i
+										"there is no conversion from curves {0} to {1}. Skipping species {3}",
+										siteCurveI, primarySiteCurve, i
 								)
 						);
 					} catch (CurveErrorException | SpeciesErrorException e) {
 						throw new ProcessingException(
 								MessageFormat.format(
-										"convertSiteIndexBetweenCurves on {0}, {1} and {2} failed", siteCurveI, siteIndexI, primarySiteCurve
+										"convertSiteIndexBetweenCurves on {0}, {1} and {2} failed", siteCurveI,
+										siteIndexI, primarySiteCurve
 								), e
 						);
 					}
@@ -900,13 +889,15 @@ public class ForwardProcessingEngine {
 					} catch (NoAnswerException e) {
 						logger.warn(
 								MessageFormat.format(
-										"there is no conversion between curves {0} and {1}. Skipping species {2}", primarySiteCurve, siteCurveI, i
+										"there is no conversion between curves {0} and {1}. Skipping species {2}",
+										primarySiteCurve, siteCurveI, i
 								)
 						);
 					} catch (CurveErrorException | SpeciesErrorException e) {
 						throw new ProcessingException(
 								MessageFormat.format(
-										"convertSiteIndexBetweenCurves on {0}, {1} and {2} failed. Skipping species {3}", primarySiteCurve, primarySpeciesSiteIndex, siteCurveI, i
+										"convertSiteIndexBetweenCurves on {0}, {1} and {2} failed. Skipping species {3}",
+										primarySiteCurve, primarySpeciesSiteIndex, siteCurveI, i
 								), e
 						);
 					}
@@ -932,27 +923,24 @@ public class ForwardProcessingEngine {
 
 		for (int i : state.getIndices()) {
 			state.wallet.percentagesOfForestedLand[i] = state.wallet.basalAreas[i][UTILIZATION_ALL_INDEX]
-					/ state.wallet.basalAreas[0][UTILIZATION_ALL_INDEX]
-					* 100.0f;
+					/ state.wallet.basalAreas[0][UTILIZATION_ALL_INDEX] * 100.0f;
 
 			logger.atDebug().addArgument(i).addArgument(state.wallet.speciesIndices[i])
-					.addArgument(state.wallet.speciesNames[i])
-					.addArgument(state.wallet.basalAreas[i][0]).addArgument(state.wallet.percentagesOfForestedLand[i])
+					.addArgument(state.wallet.speciesNames[i]).addArgument(state.wallet.basalAreas[i][0])
+					.addArgument(state.wallet.percentagesOfForestedLand[i])
 					.log("Species {}: SP0 {}, Name {}, Species 7.5cm+ BA {}, Calculated Percent {}");
 		}
 	}
 
 	/**
-	 * Calculate the siteCurve number of all species for which one was not supplied. All calculations
-	 * are done in the given bank, but the resulting site curve vector is stored in the given 
-	 * PolygonProcessingState.
-	 * 
-	 * FORTRAN notes: the original SXINXSET function set both INXSC/INXSCV and BANK3/SCNB, except for 
-	 * index 0 of SCNB.
+	 * Calculate the siteCurve number of all species for which one was not supplied. All calculations are done in the
+	 * given bank, but the resulting site curve vector is stored in the given PolygonProcessingState.
+	 *
+	 * FORTRAN notes: the original SXINXSET function set both INXSC/INXSCV and BANK3/SCNB, except for index 0 of SCNB.
 	 *
 	 * @param bank         the bank in which the calculations are done.
 	 * @param siteCurveMap the Site Curve definitions.
-	 * @param pps		   the PolygonProcessingState to where the calculated curves are also to be  
+	 * @param pps          the PolygonProcessingState to where the calculated curves are also to be
 	 */
 	static void calculateMissingSiteCurves(
 			Bank bank, MatrixMap2<String, Region, SiteIndexEquation> siteCurveMap, PolygonProcessingState pps
@@ -983,8 +971,7 @@ public class ForwardProcessingEngine {
 				if (scIndex.isEmpty()) {
 					String sp0 = bank.speciesNames[i];
 					if (!siteCurveMap.isEmpty()) {
-						scIndex = Utils
-								.optSafe(siteCurveMap.get(sp0, becZone.getRegion()));
+						scIndex = Utils.optSafe(siteCurveMap.get(sp0, becZone.getRegion()));
 					} else {
 						SiteIndexEquation siCurve = SiteTool
 								.getSICurve(sp0, becZone.getRegion().equals(Region.COASTAL));
@@ -1012,8 +999,8 @@ public class ForwardProcessingEngine {
 
 			throw new ProcessingException(
 					MessageFormat.format(
-							"Polygon {0}''s year value {1} is < 1900", 101, polygon.getDescription().getName(), polygon
-									.getDescription().getYear()
+							"Polygon {0}''s year value {1} is < 1900", 101, polygon.getDescription().getName(),
+							polygon.getDescription().getYear()
 					)
 			);
 		}
@@ -1025,14 +1012,14 @@ public class ForwardProcessingEngine {
 		// METH_CHK = 4, LayerI = 1, and INSTANCE = 1. So IR = 1, which is the first
 		// bank, numbered 0.
 
-		// => all that is done is that an exception is thrown if there are no species to 
+		// => all that is done is that an exception is thrown if there are no species to
 		// process.
 
 		if (state.getNSpecies() == 0) {
 			throw new ProcessingException(
 					MessageFormat.format(
-							"Polygon {0} layer 0 has no species with basal area above {1}", state.getLayer().getParent()
-									.getDescription().getName(), MIN_BASAL_AREA
+							"Polygon {0} layer 0 has no species with basal area above {1}",
+							state.getLayer().getParent().getDescription().getName(), MIN_BASAL_AREA
 					)
 			);
 		}
@@ -1091,8 +1078,7 @@ public class ForwardProcessingEngine {
 
 		String primaryGenusName = state.wallet.speciesNames[highestPercentageIndex];
 		Optional<String> secondaryGenusName = secondHighestPercentageIndex != -1
-				? Optional.of(state.wallet.speciesNames[secondHighestPercentageIndex])
-				: Optional.empty();
+				? Optional.of(state.wallet.speciesNames[secondHighestPercentageIndex]) : Optional.empty();
 
 		try {
 			int inventoryTypeGroup = findInventoryTypeGroup(primaryGenusName, secondaryGenusName, highestPercentage);
@@ -1138,7 +1124,8 @@ public class ForwardProcessingEngine {
 		if (speciesNames.length != percentages.length) {
 			throw new IllegalArgumentException(
 					MessageFormat.format(
-							"the length of speciesNames ({}) must match that of percentages ({}) but it doesn't", speciesNames.length, percentages.length
+							"the length of speciesNames ({}) must match that of percentages ({}) but it doesn't",
+							speciesNames.length, percentages.length
 					)
 			);
 		}

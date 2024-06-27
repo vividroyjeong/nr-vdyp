@@ -15,18 +15,22 @@ public class VdypControlVariableParser implements ValueParser<VdypGrowthDetails>
 			throw new ValueParseException(null, "VdypControlVariableParser: supplied string is null");
 		}
 		if (string.trim().length() == 0) {
-			throw new ValueParseException(string, "VdypControlVariableParser: supplied string \"" + string + "\" is empty");
+			throw new ValueParseException(
+					string, "VdypControlVariableParser: supplied string \"" + string + "\" is empty"
+			);
 		}
 
 		var parser = ValueParser.list(ValueParser.INTEGER);
 		List<Integer> controlVariableValues = parser.parse(string);
 
 		if (controlVariableValues.isEmpty()) {
-			throw new ValueParseException(string, "VdypControlVariableParser: supplied string \"" + string + "\" is empty");
+			throw new ValueParseException(
+					string, "VdypControlVariableParser: supplied string \"" + string + "\" is empty"
+			);
 		}
-		
+
 		var a = new Integer[controlVariableValues.size()];
-		
+
 		var details = new VdypGrowthDetails(controlVariableValues.toArray(a));
 
 		var yearCounter = a[0];
