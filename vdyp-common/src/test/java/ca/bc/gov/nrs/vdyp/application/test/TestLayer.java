@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import ca.bc.gov.nrs.vdyp.application.test.TestSpecies.Builder;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
 import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
@@ -15,7 +14,8 @@ public class TestLayer extends BaseVdypLayer<TestSpecies, TestSite> implements I
 	final float crownClosure;
 
 	protected TestLayer(
-			PolygonIdentifier polygonIdentifier, LayerType layerType, Optional inventoryTypeGroup, float crownClosure
+			PolygonIdentifier polygonIdentifier, LayerType layerType, Optional<Integer> inventoryTypeGroup,
+			float crownClosure
 	) {
 		super(polygonIdentifier, layerType, inventoryTypeGroup);
 		this.crownClosure = crownClosure;

@@ -1,5 +1,8 @@
 package ca.bc.gov.nrs.vdyp.common_calculators;
 
+import static ca.bc.gov.nrs.vdyp.application.VdypStartApplication.UTIL_ALL;
+import static ca.bc.gov.nrs.vdyp.application.VdypStartApplication.UTIL_CLASSES;
+import static ca.bc.gov.nrs.vdyp.application.VdypStartApplication.UTIL_LARGEST;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.abs;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.clamp;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.exp;
@@ -11,16 +14,11 @@ import static ca.bc.gov.nrs.vdyp.math.FloatMath.safeExponent;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.sqrt;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static ca.bc.gov.nrs.vdyp.application.VdypStartApplication.UTIL_ALL;
-import static ca.bc.gov.nrs.vdyp.application.VdypStartApplication.UTIL_SMALL;
-import static ca.bc.gov.nrs.vdyp.application.VdypStartApplication.UTIL_LARGEST;
-import static ca.bc.gov.nrs.vdyp.application.VdypStartApplication.UTIL_CLASSES;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +38,6 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
-import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 
 /**

@@ -31,7 +31,6 @@ import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
-import ca.bc.gov.nrs.vdyp.common_calculators.EMP;
 import ca.bc.gov.nrs.vdyp.common_calculators.EMP.Limits;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndex2Height;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;

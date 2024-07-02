@@ -15,6 +15,7 @@ import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapValueReplacer;
 import ca.bc.gov.nrs.vdyp.io.parse.control.NonFipControlParser;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder;
 
 public class TestStartApplication extends VdypStartApplication<TestPolygon, TestLayer, TestSpecies, TestSite> {
 
@@ -73,7 +74,7 @@ public class TestStartApplication extends VdypStartApplication<TestPolygon, Test
 	}
 
 	@Override
-	protected TestSpecies copySpecies(TestSpecies toCopy, Consumer config) {
+	protected TestSpecies copySpecies(TestSpecies toCopy, Consumer<Builder<TestSpecies>> config) {
 		return null;
 	}
 

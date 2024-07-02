@@ -29,17 +29,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
-import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.ApplicationTestUtils;
@@ -47,11 +44,7 @@ import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.EstimationMethods;
-import ca.bc.gov.nrs.vdyp.common.ReconcilationMethods;
 import ca.bc.gov.nrs.vdyp.common.Utils;
-import ca.bc.gov.nrs.vdyp.fip.FipStart.CompatibilityVariableMode;
-import ca.bc.gov.nrs.vdyp.fip.FipStart.VolumeComputeMode;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayer;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayerPrimary;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayerPrimary.PrimaryBuilder;
@@ -70,10 +63,8 @@ import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
-import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
-import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
@@ -2921,7 +2912,8 @@ class FipStartTest {
 			assertThat(vdypLayer, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiedValue));
 			assertThat(vdypLayer, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiedValue));
 			assertThat(
-					vdypLayer, hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiedValue)
+					vdypLayer,
+					hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiedValue)
 			);
 
 			assertThat(spec1, hasProperty("loreyHeightByUtilization", neverModifiedValue));
@@ -2931,7 +2923,9 @@ class FipStartTest {
 			assertThat(spec1, hasProperty("treesPerHectareByUtilization", modifiedValue));
 			assertThat(spec1, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiedValue));
 			assertThat(spec1, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiedValue));
-			assertThat(spec1, hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiedValue));
+			assertThat(
+					spec1, hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiedValue)
+			);
 
 			assertThat(spec2, hasProperty("loreyHeightByUtilization", neverModifiedValue));
 			assertThat(spec2, hasProperty("quadraticMeanDiameterByUtilization", neverModifiedValue));
@@ -2940,7 +2934,9 @@ class FipStartTest {
 			assertThat(spec2, hasProperty("treesPerHectareByUtilization", modifiedValue));
 			assertThat(spec2, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiedValue));
 			assertThat(spec2, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiedValue));
-			assertThat(spec2, hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiedValue));
+			assertThat(
+					spec2, hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiedValue)
+			);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -3071,14 +3067,18 @@ class FipStartTest {
 
 			assertThat(vdypLayer, hasProperty("baseAreaByUtilization", modifiableNotModifiedValue));
 			assertThat(vdypLayer, hasProperty("treesPerHectareByUtilization", modifiableNotModifiedValue));
-			assertThat(vdypLayer, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiableNotModifiedValue));
+			assertThat(
+					vdypLayer, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiableNotModifiedValue)
+			);
 			assertThat(
 					vdypLayer,
 					hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
 			);
 			assertThat(
 					vdypLayer,
-					hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiableNotModifiedValue)
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiableNotModifiedValue
+					)
 			);
 
 			assertThat(spec1, hasProperty("loreyHeightByUtilization", neverModifiedValue));
@@ -3088,11 +3088,14 @@ class FipStartTest {
 			assertThat(spec1, hasProperty("treesPerHectareByUtilization", modifiableNotModifiedValue));
 			assertThat(spec1, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiableNotModifiedValue));
 			assertThat(
-					spec1, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
+					spec1,
+					hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
 			);
 			assertThat(
 					spec1,
-					hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiableNotModifiedValue)
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiableNotModifiedValue
+					)
 			);
 
 			assertThat(spec2, hasProperty("loreyHeightByUtilization", neverModifiedValue));
@@ -3102,11 +3105,14 @@ class FipStartTest {
 			assertThat(spec2, hasProperty("treesPerHectareByUtilization", modifiableNotModifiedValue));
 			assertThat(spec2, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiableNotModifiedValue));
 			assertThat(
-					spec2, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
+					spec2,
+					hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
 			);
 			assertThat(
 					spec2,
-					hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiableNotModifiedValue)
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiableNotModifiedValue
+					)
 			);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -3260,7 +3266,8 @@ class FipStartTest {
 			assertThat(spec1, hasProperty("treesPerHectareByUtilization", modifiableNotModifiedValue));
 			assertThat(spec1, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiableNotModifiedValue));
 			assertThat(
-					spec1, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
+					spec1,
+					hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
 			);
 			assertThat(
 					spec1,
@@ -3276,7 +3283,8 @@ class FipStartTest {
 			assertThat(spec2, hasProperty("treesPerHectareByUtilization", modifiableNotModifiedValue));
 			assertThat(spec2, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiableNotModifiedValue));
 			assertThat(
-					spec2, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
+					spec2,
+					hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
 			);
 			assertThat(
 					spec2,
