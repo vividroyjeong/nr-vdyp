@@ -5,9 +5,13 @@ import static ca.bc.gov.nrs.vdyp.math.FloatMath.clamp;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.exp;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.log;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.pow;
+import static ca.bc.gov.nrs.vdyp.math.FloatMath.sqrt;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -24,6 +28,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -46,6 +51,7 @@ import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.IndexedFloatBinaryOperator;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
@@ -55,6 +61,8 @@ import ca.bc.gov.nrs.vdyp.fip.model.FipPolygon;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSite;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
@@ -66,6 +74,8 @@ import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
+import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
@@ -541,8 +551,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		for (var spec : result.getSpecies().values()) {
 			// EMP090
 			var wholeStemVolume = spec.getTreesPerHectareByUtilization().getCoe(UTIL_ALL)
-					* estimateWholeStemVolumePerTree(
-							spec.getVolumeGroup(), spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL),
+					* EstimationMethods.estimateWholeStemVolumePerTree(
+							controlMap, spec.getVolumeGroup(), spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL),
 							spec.getQuadraticMeanDiameterByUtilization().getCoe(UTIL_ALL)
 					);
 			spec.getWholeStemVolumeByUtilization().setCoe(UTIL_ALL, wholeStemVolume);
@@ -574,25 +584,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		}
 	}
 
-	// EMP090
-	private float estimateWholeStemVolumePerTree(int volumeGroup, float loreyHeight, float quadMeanDiameter) {
-		var coeMap = Utils.<Map<Integer, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.TOTAL_STAND_WHOLE_STEM_VOL, Map.class
-		);
-		var coe = coeMap.get(volumeGroup).reindex(0);
-
-		var logMeanVolume = coe.getCoe(UTIL_ALL) + //
-				coe.getCoe(1) * log(quadMeanDiameter) + //
-				coe.getCoe(2) * log(loreyHeight) + //
-				coe.getCoe(3) * quadMeanDiameter + //
-				coe.getCoe(4) / quadMeanDiameter + //
-				coe.getCoe(5) * loreyHeight + //
-				coe.getCoe(6) * quadMeanDiameter * quadMeanDiameter + //
-				coe.getCoe(7) * loreyHeight * quadMeanDiameter //
-				+ coe.getCoe(8) * loreyHeight / quadMeanDiameter;
-
-		return exp(logMeanVolume);
-	}
 
 	VdypLayer processLayerAsVeteran(FipPolygon fipPolygon, FipLayer fipLayer) throws ProcessingException {
 
@@ -752,38 +743,44 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				var adjust = new Coefficients(new float[] { 0f, 0f, 0f, 0f }, 1);
 
 				// EMP091
-				emp.estimateWholeStemVolume(
-						utilizationClass, volumeAdjustCoe.getCoe(1), vdypSpecies.getVolumeGroup(), hlSp,
+				EstimationMethods.estimateWholeStemVolume(
+						controlMap, utilizationClass, volumeAdjustCoe.getCoe(1), vdypSpecies.getVolumeGroup(), hlSp,
 						quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
 				);
 
 				adjust.setCoe(4, volumeAdjustCoe.getCoe(2));
 				// EMP092
-				emp.estimateCloseUtilizationVolume(
-						utilizationClass, adjust, vdypSpecies.getVolumeGroup(), hlSp, quadMeanDiameterUtil,
+				EstimationMethods.estimateCloseUtilizationVolume(
+						controlMap, utilizationClass, adjust, vdypSpecies.getVolumeGroup(), hlSp, quadMeanDiameterUtil,
 						wholeStemVolumeUtil, closeUtilizationVolumeUtil
 				);
 
 				adjust.setCoe(4, volumeAdjustCoe.getCoe(3));
 				// EMP093
-				emp.estimateNetDecayVolume(
-						vdypSpecies.getGenus(), bec.getRegion(), utilizationClass, adjust, vdypSpecies.getDecayGroup(),
-						hlSp, vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil,
+				EstimationMethods.estimateNetDecayVolume(
+						controlMap, vdypSpecies.getGenus(), bec.getRegion(), utilizationClass, adjust,
+						vdypSpecies.getDecayGroup(), vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil,
 						closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil
 				);
 
 				adjust.setCoe(4, volumeAdjustCoe.getCoe(4));
 				// EMP094
-				emp.estimateNetDecayAndWasteVolume(
-						bec.getRegion(), utilizationClass, adjust, vdypSpecies.getGenus(), hlSp,
-						vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil, closeUtilizationVolumeUtil,
+				final var netDecayCoeMap = Utils.<Map<String, Coefficients>>expectParsedControl(
+						controlMap, ControlKey.VOLUME_NET_DECAY_WASTE, Map.class
+				);
+				final var wasteModifierMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
+						controlMap, ControlKey.WASTE_MODIFIERS, MatrixMap2.class
+				);
+				EstimationMethods.estimateNetDecayAndWasteVolume(
+						bec.getRegion(), utilizationClass, adjust, vdypSpecies.getGenus(), hlSp, netDecayCoeMap,
+						wasteModifierMap, quadMeanDiameterUtil, closeUtilizationVolumeUtil,
 						closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
 				);
 
 				if (getId().isStart()) {
 					// EMP095
-					emp.estimateNetDecayWasteAndBreakageVolume(
-							utilizationClass, vdypSpecies.getBreakageGroup(), quadMeanDiameterUtil,
+					EstimationMethods.estimateNetDecayWasteAndBreakageVolume(
+							controlMap, utilizationClass, vdypSpecies.getBreakageGroup(), quadMeanDiameterUtil,
 							closeUtilizationVolumeUtil, closeUtilizationNetOfDecayAndWasteUtil,
 							closeUtilizationNetOfDecayWasteAndBreakageUtil
 					);
