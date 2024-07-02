@@ -94,7 +94,7 @@ notes for code developers and those with detailed knowledge of VDYP7 are in JFme
 */
 public class ForwardDebugSettings {
 
-	public static final int MAX_FILL_INDEX_SETTINGS_INDEX = 20;
+	public static final int MAX_FILL_INDEX_SETTINGS_INDEX = DebugSettings.MAX_DEBUG_SETTINGS;
 	
 	public enum Vars {
 		SPECIES_DYNAMICS_1(1),
