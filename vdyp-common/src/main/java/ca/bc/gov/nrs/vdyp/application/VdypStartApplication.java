@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.EstimationMethods;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
@@ -167,7 +168,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	protected Map<String, Object> controlMap = new HashMap<>();
 
-	public EMP emp;
+	public EstimationMethods estimationMethods;
+	public EMP emp; // TODO remove this
 
 	static final Comparator<BaseVdypSpecies> PERCENT_GENUS_DESCENDING = Utils
 			.compareUsing(BaseVdypSpecies::getPercentGenus).reversed();
@@ -239,6 +241,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	protected void setControlMap(Map<String, Object> controlMap) {
 		this.controlMap = controlMap;
+		this.estimationMethods = new EstimationMethods(controlMap);
 		this.emp = new EMP(controlMap);
 	}
 
@@ -1195,7 +1198,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			} else {
 
 				// EMP091
-				emp.estimateWholeStemVolume(
+				estimationMethods.estimateWholeStemVolume(
 						UtilizationClass.ALL, adjustCloseUtil.getCoe(4), spec.getVolumeGroup(), loreyHeightSpec,
 						quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
 				);
@@ -1211,7 +1214,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				}
 
 				// EMP092
-				emp.estimateCloseUtilizationVolume(
+				estimationMethods.estimateCloseUtilizationVolume(
 						UtilizationClass.ALL, adjustCloseUtil, spec.getVolumeGroup(), loreyHeightSpec,
 						quadMeanDiameterUtil, wholeStemVolumeUtil, closeVolumeUtil
 				);
@@ -1232,7 +1235,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 				if (this.getId().isStart()) {
 					// EMP095
-					emp.estimateNetDecayWasteAndBreakageVolume(
+					estimationMethods.estimateNetDecayWasteAndBreakageVolume(
 							UtilizationClass.ALL, spec.getBreakageGroup(), quadMeanDiameterUtil, closeVolumeUtil,
 							closeVolumeNetDecayWasteUtil, closeVolumeNetDecayWasteBreakUtil
 					);
