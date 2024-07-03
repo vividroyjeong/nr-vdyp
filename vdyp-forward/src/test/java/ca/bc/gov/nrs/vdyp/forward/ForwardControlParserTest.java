@@ -46,7 +46,7 @@ import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
-class VdypForwardControlParserTest {
+class ForwardControlParserTest {
 
 	@Test
 	void testParseBec_9() throws Exception {

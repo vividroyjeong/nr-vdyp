@@ -3,6 +3,8 @@ package ca.bc.gov.nrs.vdyp.forward.model;
 import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
 
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
+
 /**
  * Control Variable values
  * <p>
@@ -45,20 +47,14 @@ import java.util.function.BooleanSupplier;
  * <li>1: Yes (normal)
  * </ul>
  */
-public class VdypGrowthDetails {
+public class ForwardControlVariables {
 
 	private static final int MAX_CONTROL_VARIABLE_VALUES = 10;
-
-	private enum ControlVariables {
-		GROW_TARGET, COMPATIBILITY_VARIABLE_OUTPUT, COMPATIBILITY_VARIABLE_APPLICATION, OUTPUT_FILES,
-		ALLOW_COMPATIBILITY_VARIABLE_CALCULATIONS, UPDATE_DURING_GROWTH
-	}
-
-	private Integer firstYear, currentYear, lastYear, yearCounter;
+	private static final int DEFAULT_CONTROL_VARIABLE_VALUE = 0;
 
 	private final int[] controlVariables = new int[10];
 
-	public VdypGrowthDetails(Integer[] controlVariableValues) {
+	public ForwardControlVariables(Integer[] controlVariableValues) throws ValueParseException {
 		int index = 0;
 
 		if (controlVariableValues != null) {
@@ -67,61 +63,89 @@ public class VdypGrowthDetails {
 		}
 
 		for (; index < MAX_CONTROL_VARIABLE_VALUES; index++)
-			this.controlVariables[index] = 0;
+			this.controlVariables[index] = DEFAULT_CONTROL_VARIABLE_VALUE;
+		
+		validate();
 	}
+	
+	private void validate() throws ValueParseException {
 
-	public Integer getFirstYear() {
-		return firstYear;
-	}
+		// Validate the control variable values.
+		
+		var yearCounter = getControlVariable(ControlVariable.GROW_TARGET_1);
+		if (yearCounter != -1 && (yearCounter < 0 || yearCounter > 400 && yearCounter < 1920 || yearCounter > 2400)) {
+			throw new ValueParseException(
+					Integer.toString(yearCounter),
+					"VdypControlVariableParser: year counter (1) value \"" + yearCounter + "\" is out of range"
+			);
+		}
 
-	public void setFirstYear(Integer firstYear) {
-		this.firstYear = firstYear;
-	}
+		var compatibilityVariableOutputVariableValue = getControlVariable(ControlVariable.COMPAT_VAR_OUTPUT_2);
+		if (compatibilityVariableOutputVariableValue < 0 || compatibilityVariableOutputVariableValue > 2) {
+			throw new ValueParseException(
+					Integer.toString(compatibilityVariableOutputVariableValue),
+					"VdypControlVariableParser: compatibility variable output value \"" + compatibilityVariableOutputVariableValue + "\" is out of range [0-2]"
+			);
+		}
 
-	public Integer getCurrentYear() {
-		return currentYear;
-	}
+		var compatibilityVariableApplicationVariableValue = getControlVariable(ControlVariable.COMPAT_VAR_APPLICATION_3);
+		if (compatibilityVariableApplicationVariableValue < 0 || compatibilityVariableApplicationVariableValue > 2) {
+			throw new ValueParseException(
+					Integer.toString(compatibilityVariableApplicationVariableValue),
+					"VdypControlVariableParser: compatibility variable application value \"" + compatibilityVariableApplicationVariableValue + "\" is out of range [0-2]"
+			);
+		}
 
-	public void setCurrentYear(Integer currentYear) {
-		this.currentYear = currentYear;
-	}
+		var outputFileDirectiveVariableValue = getControlVariable(ControlVariable.OUTPUT_FILES_4);
+		if (outputFileDirectiveVariableValue < 0 || outputFileDirectiveVariableValue > 4) {
+			throw new ValueParseException(
+					Integer.toString(outputFileDirectiveVariableValue),
+					"VdypControlVariableParser: output file directive value \"" + outputFileDirectiveVariableValue + "\" is out of range [0-4]"
+			);
+		}
 
-	public Integer getLastYear() {
-		return lastYear;
-	}
+		var allowCompatibilityVariableCalculationsVariableValue = getControlVariable(ControlVariable.ALLOW_COMPAT_VAR_CALCS_5);
+		if (allowCompatibilityVariableCalculationsVariableValue < 0 || allowCompatibilityVariableCalculationsVariableValue > 1) {
+			throw new ValueParseException(
+					Integer.toString(allowCompatibilityVariableCalculationsVariableValue),
+					"VdypControlVariableParser: compatibility variable calculations allowed value \"" + allowCompatibilityVariableCalculationsVariableValue + "\" is out of range [0-1]"
+			);
+		}
 
-	public void setLastYear(Integer lastYear) {
-		this.lastYear = lastYear;
-	}
-
-	public Integer getYearCounter() {
-		return yearCounter;
-	}
-
-	public void setYearCounter(Integer yearCounter) {
-		this.yearCounter = yearCounter;
+		var updateDuringGrowthVariableValue = getControlVariable(ControlVariable.UPDATE_DURING_GROWTH_6);
+		if (updateDuringGrowthVariableValue < 0 || updateDuringGrowthVariableValue > 1) {
+			throw new ValueParseException(
+					Integer.toString(updateDuringGrowthVariableValue),
+					"VdypControlVariableParser: update site species and ITG during grow value \"" + updateDuringGrowthVariableValue + "\" is out of range [0-1]"
+			);
+		}
 	}
 
 	public boolean allowCalculation(float value, float limit, BiFunction<Float, Float, Boolean> p) {
-		int cvValue = controlVariables[ControlVariables.ALLOW_COMPATIBILITY_VARIABLE_CALCULATIONS.ordinal()];
+		int cvValue = controlVariables[ControlVariable.ALLOW_COMPAT_VAR_CALCS_5.ordinal()];
 		return cvValue == 0 && value > 0 || cvValue == 1 && p.apply(value, limit);
 	}
 
 	public boolean allowCalculation(BooleanSupplier p) {
-		int cvValue = controlVariables[ControlVariables.ALLOW_COMPATIBILITY_VARIABLE_CALCULATIONS.ordinal()];
+		int cvValue = controlVariables[ControlVariable.ALLOW_COMPAT_VAR_CALCS_5.ordinal()];
 		return cvValue == 1 && p.getAsBoolean();
+	}
+
+	public int getControlVariable(ControlVariable controlVariable) {
+
+		assert controlVariable.ordinal() == controlVariable.variableNumber - 1;
+		return controlVariables[controlVariable.ordinal()];
 	}
 
 	int getControlVariable(int elementNumber) {
 
-		int index = elementNumber - 1;
-		if (index < 0 || index > MAX_CONTROL_VARIABLE_VALUES) {
+		if (elementNumber < 1 || elementNumber > MAX_CONTROL_VARIABLE_VALUES) {
 			throw new IllegalArgumentException(
 					"Element number (" + elementNumber + ") is out of range - must be from 1 to "
 							+ MAX_CONTROL_VARIABLE_VALUES
 			);
 		}
 
-		return controlVariables[index];
+		return controlVariables[elementNumber - 1];
 	}
 }
