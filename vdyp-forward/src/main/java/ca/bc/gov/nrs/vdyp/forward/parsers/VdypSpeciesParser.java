@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.forward.parsers;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -11,6 +12,7 @@ import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
 import ca.bc.gov.nrs.vdyp.io.EndOfRecord;
@@ -23,6 +25,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.AbstractStreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.GroupingStreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ControlledValueParser;
+import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.GenusDistribution;
@@ -130,42 +133,57 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 					var isPrimarySpecies = Utils.<Boolean>optSafe(entry.get(IS_PRIMARY_SPECIES));
 					var siteCurveNumber = Utils.<Integer>optSafe(entry.get(SITE_CURVE_NUMBER))
 							.orElse(VdypEntity.MISSING_INTEGER_VALUE);
-
-					var builder = new ValueOrMarker.Builder<Optional<VdypLayerSpecies>, EndOfRecord>();
-					return layerType.handle(l -> builder.value(l.map(lt -> {
-
+					
+					GenusDistributionSet speciesDistributionSet;
+					
+					// Validation 
+					if (layerType.isValue()) {
 						List<GenusDistribution> gdList = new ArrayList<>();
-
+	
 						Utils.ifBothPresent(
 								genusNameText0.filter(t -> genusDefinitionMap.contains(t)), percentGenus0,
 								(s, p) -> gdList.add(new GenusDistribution(0, genusDefinitionMap.get(s), p))
 						);
-
+	
 						Utils.ifBothPresent(
 								genusNameText1.filter(t -> genusDefinitionMap.contains(t)), percentGenus1,
 								(s, p) -> gdList.add(new GenusDistribution(1, genusDefinitionMap.get(s), p))
 						);
-
+	
 						Utils.ifBothPresent(
 								genusNameText2.filter(t -> genusDefinitionMap.contains(t)), percentGenus2,
 								(s, p) -> gdList.add(new GenusDistribution(2, genusDefinitionMap.get(s), p))
 						);
-
+	
 						Utils.ifBothPresent(
 								genusNameText3.filter(t -> genusDefinitionMap.contains(t)), percentGenus3,
 								(s, p) -> gdList.add(new GenusDistribution(3, genusDefinitionMap.get(s), p))
 						);
-
+						
+						speciesDistributionSet = new GenusDistributionSet(3, gdList);
+	
 						try {
 							GenusDistributionSet.validate(3, gdList);
 						} catch (InvalidGenusDistributionSet e) {
-							new ResourceParseException(e);
+							throw new ResourceParseException(e);
 						}
-
-						GenusDistributionSet speciesDistributionSet = new GenusDistributionSet(3, gdList);
+	
+						if (siteCurveNumber != VdypEntity.MISSING_INTEGER_VALUE) {
+							try {
+								SiteIndexEquation.getByIndex(siteCurveNumber);
+							} catch (IllegalArgumentException e) {
+								throw new ResourceParseException(MessageFormat.format("{0} does not identify a known Site Curve", siteCurveNumber));
+							}
+						}
+					} else {
+						speciesDistributionSet = null;
+					}
+					
+					var builder = new ValueOrMarker.Builder<Optional<VdypLayerSpecies>, EndOfRecord>();
+					return layerType.handle(l -> builder.value(l.map(lt -> {
 
 						var genus = optionalGenus.orElse(genusDefinitionMap.getByIndex(genusIndex).getAlias());
-
+						
 						return new VdypLayerSpecies(
 								polygonId, lt, genusIndex, genus, speciesDistributionSet, siteIndex, dominantHeight,
 								totalAge, ageAtBreastHeight, yearsToBreastHeight, isPrimarySpecies, siteCurveNumber

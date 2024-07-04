@@ -1,6 +1,5 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -9,17 +8,20 @@ import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypGrowthDetails;
+import ca.bc.gov.nrs.vdyp.forward.model.ForwardControlVariables;
+import ca.bc.gov.nrs.vdyp.forward.model.ForwardDebugSettings;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
+import ca.bc.gov.nrs.vdyp.model.DebugSettings;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.Region;
+import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
 class ForwardProcessingState {
@@ -28,12 +30,8 @@ class ForwardProcessingState {
 	private static final int LAYERS_PER_INSTANCE = 2;
 
 	/** An "instance" is the processing state of one polygon */
+	@SuppressWarnings("unused")
 	private static final int MAX_INSTANCES = 3;
-
-	/**
-	 * We allocate one record for the Primary Layer and one record for the Veteran Layer of each instance.
-	 */
-	private static final int MAX_RECORDS = LAYERS_PER_INSTANCE * MAX_INSTANCES;
 
 	/** The control map defining the context of the execution */
 	private final Map<String, Object> controlMap;
@@ -41,7 +39,8 @@ class ForwardProcessingState {
 	// Cached values from the controlMap
 
 	final GenusDefinitionMap genusDefinitionMap;
-	final VdypGrowthDetails vdypGrowthDetails;
+	final ForwardControlVariables forwardGrowthDetails;
+	final ForwardDebugSettings debugSettings;
 	final Map<String, Coefficients> netDecayWasteCoeMap;
 	final MatrixMap2<Integer, Integer, Optional<Coefficients>> netDecayCoeMap;
 	final MatrixMap2<String, Region, Float> wasteModifierMap;
@@ -56,20 +55,25 @@ class ForwardProcessingState {
 	final Map<String, Coefficients> smallComponentQuadMeanDiameterCoefficients;
 	final Map<String, Coefficients> smallComponentBasalAreaCoefficients;
 	final Map<String, Coefficients> smallComponentProbabilityCoefficients;
+	final Map<Integer, SiteCurveAgeMaximum> maximumAgeBySiteCurveNumber;
 
 	/** The storage banks */
-	private final Bank[] banks;
+	private final Bank[/* instances */][/* layers of instance */] banks;
 
 	/** The active state */
 	private PolygonProcessingState pps;
 
-	// VDEBUG - NDEBUG
-	// TODO
-
 	public ForwardProcessingState(Map<String, Object> controlMap) {
 		this.controlMap = controlMap;
 
-		banks = new Bank[MAX_RECORDS];
+		banks = new Bank[][] { new Bank[LAYERS_PER_INSTANCE], new Bank[LAYERS_PER_INSTANCE],
+				new Bank[LAYERS_PER_INSTANCE] };
+
+		this.forwardGrowthDetails = Utils
+				.expectParsedControl(controlMap, ControlKey.VTROL, ForwardControlVariables.class);
+		this.debugSettings = new ForwardDebugSettings(
+				Utils.expectParsedControl(controlMap, ControlKey.DEBUG_SWITCHES, DebugSettings.class)
+		);
 
 		List<GenusDefinition> genusDefinitions = Utils
 				.<List<GenusDefinition>>expectParsedControl(controlMap, ControlKey.SP0_DEF, List.class);
@@ -90,7 +94,6 @@ class ForwardProcessingState {
 		this.closeUtilizationCoeMap = Utils.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
 				controlMap, ControlKey.CLOSE_UTIL_VOLUME, MatrixMap2.class
 		);
-		this.vdypGrowthDetails = Utils.expectParsedControl(controlMap, ControlKey.VTROL, VdypGrowthDetails.class);
 		this.totalStandWholeStepVolumeCoeMap = Utils.<Map<Integer, Coefficients>>expectParsedControl(
 				controlMap, ControlKey.TOTAL_STAND_WHOLE_STEM_VOL, Map.class
 		);
@@ -117,6 +120,9 @@ class ForwardProcessingState {
 		this.smallComponentProbabilityCoefficients = Utils.<Map<String, Coefficients>>expectParsedControl(
 				controlMap, ControlKey.SMALL_COMP_PROBABILITY, Map.class
 		);
+		this.maximumAgeBySiteCurveNumber = Utils.<Map<Integer, SiteCurveAgeMaximum>>expectParsedControl(
+				controlMap, ControlKey.SITE_CURVE_AGE_MAX, Map.class
+		);
 	}
 
 	public GenusDefinitionMap getGenusDefinitionMap() {
@@ -139,21 +145,21 @@ class ForwardProcessingState {
 		return Utils.expectParsedControl(controlMap, ControlKey.PARAM_ADJUSTMENTS, CompVarAdjustments.class);
 	}
 
-	public VdypGrowthDetails getVdypGrowthDetails() {
-		return Utils.expectParsedControl(controlMap, ControlKey.VTROL, VdypGrowthDetails.class);
+	public ForwardControlVariables getForwardControlVariables() {
+		return Utils.expectParsedControl(controlMap, ControlKey.VTROL, ForwardControlVariables.class);
 	}
 
 	private static final float MIN_BASAL_AREA = 0.001f;
 
 	public void setPolygon(VdypPolygon polygon) {
 		// Move the primary layer of the given polygon to bank zero.
-		assert toIndex(0, LayerType.PRIMARY) == 0;
-		banks[0] = new Bank(
+		banks[0][0] = new Bank(
 				polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone(),
 				s -> s.getUtilizations().isPresent()
-						? s.getUtilizations().get().get(UtilizationClass.ALL).getBasalArea() >= MIN_BASAL_AREA : true
+						? s.getUtilizations().get().get(UtilizationClass.ALL).getBasalArea() >= MIN_BASAL_AREA
+						: true
 		);
-		pps = new PolygonProcessingState(this, polygon, banks[0], controlMap);
+		pps = new PolygonProcessingState(this, polygon, banks[0][0], controlMap);
 	}
 
 	public PolygonProcessingState getPolygonProcessingState() {
@@ -165,29 +171,14 @@ class ForwardProcessingState {
 	}
 
 	public void storeActive(int instanceNumber, LayerType layerType) {
-		banks[toIndex(instanceNumber, layerType)] = pps.wallet.copy();
+		banks[instanceNumber][layerType.ordinal()] = pps.wallet.copy();
 	}
 
 	public void transfer(int fromInstanceNumber, int toInstanceNumber, LayerType layerType) {
-		banks[toIndex(toInstanceNumber, layerType)] = banks[toIndex(fromInstanceNumber, layerType)].copy();
+		banks[toInstanceNumber][layerType.ordinal()] = banks[fromInstanceNumber][layerType.ordinal()].copy();
 	}
 
 	public Bank getBank(int instanceNumber, LayerType layerType) {
-		return banks[toIndex(instanceNumber, layerType)];
-	}
-
-	private static int toIndex(int instanceNumber, LayerType layerType) {
-		return instanceNumber * LAYERS_PER_INSTANCE + toLayerIndex(layerType);
-	}
-
-	private static int toLayerIndex(LayerType layerType) {
-		switch (layerType) {
-		case PRIMARY:
-			return 0;
-		case VETERAN:
-			return 1;
-		default:
-			throw new IllegalStateException(MessageFormat.format("Unsupported LayerType {0}", layerType));
-		}
+		return banks[instanceNumber][layerType.ordinal()];
 	}
 }

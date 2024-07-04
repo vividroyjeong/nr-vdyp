@@ -50,11 +50,12 @@ class VdypForwardReadPolygonTest {
 
 			while (polygonDescriptionStream.hasNext()) {
 
-				var polygonDescription = polygonDescriptionStream.next();
-
-				var polygon = reader.readNextPolygon(polygonDescription);
-
-				polygons.add(polygon);
+				var polygon = reader.readNextPolygon();
+				if (polygon.isPresent()) {
+					polygons.add(polygon.get());
+				} else {
+					break;
+				}
 			}
 
 			assertThat(polygons, Matchers.hasSize(10));

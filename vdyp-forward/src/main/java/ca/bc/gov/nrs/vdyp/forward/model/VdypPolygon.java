@@ -18,12 +18,13 @@ public class VdypPolygon extends VdypEntity {
 	private final Optional<Integer> inventoryTypeGroup; // ITG
 	private final Optional<Integer> basalAreaGroup; // GRPBA1
 	private final Optional<FipMode> fipMode; // MODE
-
+	
 	// Set after construction
 	private VdypPolygonLayer primaryLayer;
 	private Optional<VdypPolygonLayer> veteranLayer = Optional.empty();
 	private Set<VdypPolygonLayer> layers = new HashSet<>();
-
+	private Optional<Integer> targetYear = Optional.empty();
+	
 	public VdypPolygon(
 			VdypPolygonDescription vdypPolygonDescription, BecDefinition bec, Character fizId, float percentForestLand,
 			Optional<Integer> inventoryTypeGroup, Optional<Integer> basalAreaGroup, Optional<FipMode> fipMode
@@ -66,6 +67,14 @@ public class VdypPolygon extends VdypEntity {
 
 	public Set<VdypPolygonLayer> getLayers() {
 		return Collections.unmodifiableSet(layers);
+	}
+
+	public Optional<Integer> getTargetYear() {
+		return targetYear;
+	}
+
+	public void setTargetYear(int targetYear) {
+		this.targetYear = Optional.of(targetYear);
 	}
 
 	public VdypPolygonDescription getDescription() {

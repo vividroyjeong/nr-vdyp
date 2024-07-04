@@ -2,9 +2,11 @@ package ca.bc.gov.nrs.vdyp.forward;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -12,10 +14,13 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.forward.model.ControlVariable;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonDescription;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
+import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 
 /**
@@ -96,7 +101,6 @@ public class ForwardProcessor {
 	 *
 	 * @throws ProcessingException
 	 */
-	@SuppressWarnings("unchecked")
 	public void process(Set<ForwardPass> vdypPassSet, Map<String, Object> controlMap) throws ProcessingException {
 
 		logger.info("Beginning processing with given configuration");
@@ -119,17 +123,13 @@ public class ForwardProcessor {
 		if (vdypPassSet.contains(ForwardPass.PASS_3)) {
 
 			try {
-				var polygonDescriptionStreamFactory = (StreamingParserFactory<VdypPolygonDescription>) controlMap
-						.get(ControlKey.FORWARD_INPUT_GROWTO.name());
-				var polygonDescriptionStream = polygonDescriptionStreamFactory.get();
-
 				var fpe = new ForwardProcessingEngine(controlMap);
 
 				var forwardDataStreamReader = new ForwardDataStreamReader(controlMap);
 
 				// Fetch the next polygon to process.
 				int nPolygonsProcessed = 0;
-				while (polygonDescriptionStream.hasNext()) {
+				while (true) {
 
 					if (nPolygonsProcessed == maxPoly) {
 						logger.info(
@@ -138,14 +138,19 @@ public class ForwardProcessor {
 						);
 					}
 
-					var polygon = forwardDataStreamReader.readNextPolygon(polygonDescriptionStream.next());
-
+					var polygonHolder = forwardDataStreamReader.readNextPolygon();
+					if (polygonHolder.isEmpty()) {
+						break;
+					}
+					
+					var polygon = polygonHolder.get();
+					
 					fpe.processPolygon(polygon);
 
 					nPolygonsProcessed += 1;
 				}
-
-			} catch (ResourceParseException | IOException e) {
+				
+			} catch (IOException e) {
 				throw new ProcessingException(e);
 			}
 		}

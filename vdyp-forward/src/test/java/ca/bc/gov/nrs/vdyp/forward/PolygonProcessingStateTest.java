@@ -57,12 +57,9 @@ class PolygonProcessingStateTest {
 	@Test
 	void testConstruction() throws IOException, ResourceParseException, ProcessingException {
 
-		assertThat(polygonDescriptionStream.hasNext(), is(true));
-		var polygonDescription = polygonDescriptionStream.next();
-
 		ForwardDataStreamReader reader = new ForwardDataStreamReader(controlMap);
 
-		var polygon = reader.readNextPolygon(polygonDescription);
+		var polygon = reader.readNextPolygon().orElseThrow();
 
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());
@@ -121,12 +118,9 @@ class PolygonProcessingStateTest {
 	@Test
 	void testSetCopy() throws IOException, ResourceParseException, ProcessingException {
 
-		assertThat(polygonDescriptionStream.hasNext(), is(true));
-		var polygonDescription = polygonDescriptionStream.next();
-
 		ForwardDataStreamReader reader = new ForwardDataStreamReader(controlMap);
 
-		var polygon = reader.readNextPolygon(polygonDescription);
+		var polygon = reader.readNextPolygon().orElseThrow();
 
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());
@@ -143,11 +137,9 @@ class PolygonProcessingStateTest {
 	@Test
 	void testRemoveSmallLayers() throws IOException, ResourceParseException, ProcessingException {
 
-		assertThat(polygonDescriptionStream.hasNext(), is(true));
-		var polygonDescription = polygonDescriptionStream.next();
 		ForwardDataStreamReader reader = new ForwardDataStreamReader(controlMap);
 
-		var polygon = reader.readNextPolygon(polygonDescription);
+		var polygon = reader.readNextPolygon().orElseThrow();
 
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());
@@ -176,11 +168,9 @@ class PolygonProcessingStateTest {
 	@Test
 	void testCopyConstructor() throws IOException, ResourceParseException, ProcessingException {
 
-		assertThat(polygonDescriptionStream.hasNext(), is(true));
-		var polygonDescription = polygonDescriptionStream.next();
 		ForwardDataStreamReader reader = new ForwardDataStreamReader(controlMap);
 
-		var polygon = reader.readNextPolygon(polygonDescription);
+		var polygon = reader.readNextPolygon().orElseThrow();
 
 		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
 		assertThat(pLayer, notNullValue());

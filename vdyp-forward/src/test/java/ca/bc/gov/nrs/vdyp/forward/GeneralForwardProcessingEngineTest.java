@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.forward;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -28,7 +29,6 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.SpeciesErrorExcep
 import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonDescription;
-import ca.bc.gov.nrs.vdyp.forward.parsers.VdypPolygonDescriptionParser;
 import ca.bc.gov.nrs.vdyp.forward.parsers.VdypPolygonParser;
 import ca.bc.gov.nrs.vdyp.forward.parsers.VdypSpeciesParser;
 import ca.bc.gov.nrs.vdyp.forward.parsers.VdypUtilizationParser;
@@ -76,27 +76,25 @@ class GeneralForwardProcessingEngineTest {
 		assertThat(fpe.fps.getGenusDefinitionMap(), notNullValue());
 		assertThat(fpe.fps.getSiteCurveMap(), notNullValue());
 
-		// Fetch the next polygon to process.
 		int nPolygonsProcessed = 0;
-		while (polygonDescriptionStream.hasNext()) {
-
-			var polygonDescription = polygonDescriptionStream.next();
-
-			var polygon = forwardDataStreamReader.readNextPolygon(polygonDescription);
-
-			fpe.processPolygon(polygon);
-
-			nPolygonsProcessed += 1;
+		while (true) {
+			var polygon = forwardDataStreamReader.readNextPolygon();
+			
+			if (polygon.isPresent()) {
+				fpe.processPolygon(polygon.get());
+				nPolygonsProcessed += 1;
+			} else {
+				break;
+			}
 		}
 
-		logger.info("{} polygons processed", nPolygonsProcessed);
+		assertEquals(10, nPolygonsProcessed);
 	}
 
 	@Test
 	void testFindPrimarySpecies() throws IOException, ResourceParseException, ProcessingException {
 
-		var polygonDescription = polygonDescriptionStream.next();
-		var polygon = forwardDataStreamReader.readNextPolygon(polygonDescription);
+		var polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 
 		{
 			ForwardProcessingState fps = new ForwardProcessingState(controlMap);
@@ -289,8 +287,7 @@ class GeneralForwardProcessingEngineTest {
 
 		var reader = new ForwardDataStreamReader(controlMap);
 
-		var testPolygonDescription = VdypPolygonDescriptionParser.parse("01002 S000001 00     1970");
-		var polygon = reader.readNextPolygon(testPolygonDescription);
+		var polygon = reader.readNextPolygon().orElseThrow();
 
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.CALCULATE_MISSING_SITE_CURVES);
@@ -325,8 +322,7 @@ class GeneralForwardProcessingEngineTest {
 
 		var reader = new ForwardDataStreamReader(controlMap);
 
-		var testPolygonDescription = VdypPolygonDescriptionParser.parse("01002 S000001 00     1970");
-		var polygon = reader.readNextPolygon(testPolygonDescription);
+		var polygon = reader.readNextPolygon().orElseThrow();
 
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.CALCULATE_MISSING_SITE_CURVES);
@@ -365,8 +361,7 @@ class GeneralForwardProcessingEngineTest {
 
 		var reader = new ForwardDataStreamReader(controlMap);
 
-		var testPolygonDescription = VdypPolygonDescriptionParser.parse("01002 S000001 00     1970");
-		var polygon = reader.readNextPolygon(testPolygonDescription);
+		var polygon = reader.readNextPolygon().orElseThrow();
 
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.ESTIMATE_MISSING_SITE_INDICES);
@@ -384,26 +379,45 @@ class GeneralForwardProcessingEngineTest {
 	void testEstimateMissingSiteIndicesStep2() throws ProcessingException, IOException, ResourceParseException,
 			CurveErrorException, SpeciesErrorException, NoAnswerException {
 
-		var targetDescription = VdypPolygonDescriptionParser.parse("01004 S000037 00     1957");
-		var polygon = forwardDataStreamReader.readNextPolygon(targetDescription);
+		buildPolygonParserForStream("testPolygon.dat", "01002 S000001 00     1970 CWH  A    99 37  1  1");
+
+		buildSpeciesParserForStream(
+				"testSpecies.dat", //
+				"01002 S000001 00     1970 P  3 B  B  100.0     0.0     0.0     0.0 -9.00 -9.00  -9.0  -9.0  -9.0 0 -9", //
+				"01002 S000001 00     1970 P  4 C  C  100.0     0.0     0.0     0.0 -9.00 -9.00  -9.0  -9.0  -9.0 0 -9", //
+				"01002 S000001 00     1970 P  5 D  D  100.0     0.0     0.0     0.0 13.40 28.90 265.0 253.9  11.1 1 12", //
+				"01002 S000001 00     1970 P  8 H  H  100.0     0.0     0.0     0.0 -9.00 -9.00  -9.0  -9.0  -9.0 0 -9", //
+				"01002 S000001 00     1970 P 15 S  S  100.0     0.0     0.0     0.0 -9.00 -9.00  -9.0  -9.0  -9.0 0 -9", //
+				"01002 S000001 00     1970"
+		);
+
+		buildUtilizationParserForStandardStream("testUtilizations.dat");
+
+		var siteCurveMap = new MatrixMap2Impl<String, Region, SiteIndexEquation>(
+				new ArrayList<String>(), new ArrayList<Region>(), (k1, k2) -> SiteIndexEquation.SI_NO_EQUATION
+		);
+
+		controlMap.put(ControlKey.SITE_CURVE_NUMBERS.name(), siteCurveMap);
+
+		var reader = new ForwardDataStreamReader(controlMap);
+
+		var polygon = reader.readNextPolygon().orElseThrow();
 
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.ESTIMATE_MISSING_SITE_INDICES);
 
-		var sourceSiteCurve = SiteIndexEquation.SI_CWC_KURUCZ;
+		var sourceSiteCurve = SiteIndexEquation.SI_CWC_BARKER;
 		var sourceSiteIndex = 13.4;
-		var targetSiteCurve = SiteIndexEquation.SI_CWC_BARKER;
+		var targetSiteCurve = SiteIndexEquation.SI_CWC_NIGH;
 		double expectedValue = SiteTool
 				.convertSiteIndexBetweenCurves(sourceSiteCurve, sourceSiteIndex, targetSiteCurve);
 
-		assertThat(fpe.fps.getPolygonProcessingState().wallet.siteIndices[1], is((float) expectedValue));
+		assertThat(fpe.fps.getPolygonProcessingState().wallet.siteIndices[2], is((float) expectedValue));
 	}
 
 	@Test
 	void testEstimateMissingYearsToBreastHeightValues()
 			throws ProcessingException, IOException, ResourceParseException {
-
-		var testPolygonDescription = VdypPolygonDescriptionParser.parse("01002 S000001 00     1970");
 
 		buildSpeciesParserForStream(
 				"testSpecies.dat", //
@@ -417,7 +431,7 @@ class GeneralForwardProcessingEngineTest {
 
 		var reader = new ForwardDataStreamReader(controlMap);
 
-		var polygon = reader.readNextPolygon(testPolygonDescription);
+		var polygon = reader.readNextPolygon().orElseThrow();
 
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 		fpe.processPolygon(
@@ -432,8 +446,6 @@ class GeneralForwardProcessingEngineTest {
 
 	@Test
 	void testCalculateDominantHeightAgeSiteIndex() throws ProcessingException, IOException, ResourceParseException {
-
-		var testPolygonDescription = VdypPolygonDescriptionParser.parse("01002 S000001 00     1970");
 
 		buildSpeciesParserForStream(
 				"testSpecies.dat", //
@@ -450,7 +462,7 @@ class GeneralForwardProcessingEngineTest {
 
 		var reader = new ForwardDataStreamReader(controlMap);
 
-		var polygon = reader.readNextPolygon(testPolygonDescription);
+		var polygon = reader.readNextPolygon().orElseThrow();
 
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.CALCULATE_DOMINANT_HEIGHT_AGE_SITE_INDEX);
@@ -464,11 +476,9 @@ class GeneralForwardProcessingEngineTest {
 
 	@Test
 	void testSetEquationGroups() throws ResourceParseException, IOException, ProcessingException {
-		var testPolygonDescription = VdypPolygonDescriptionParser.parse("01002 S000001 00     1970");
 
 		var reader = new ForwardDataStreamReader(controlMap);
-
-		var polygon = reader.readNextPolygon(testPolygonDescription);
+		var polygon = reader.readNextPolygon().get();
 
 		ForwardProcessingState fps = new ForwardProcessingState(controlMap);
 		fps.setPolygon(polygon);
@@ -490,8 +500,6 @@ class GeneralForwardProcessingEngineTest {
 	@Test
 	void testCalculateDominantHeightAgeSiteIndexNoSecondary()
 			throws ProcessingException, IOException, ResourceParseException {
-
-		var testPolygonDescription = VdypPolygonDescriptionParser.parse("01002 S000001 00     1970");
 
 		buildSpeciesParserForStream(
 				"testSpecies.dat", //
@@ -518,7 +526,7 @@ class GeneralForwardProcessingEngineTest {
 
 		var reader = new ForwardDataStreamReader(controlMap);
 
-		var polygon = reader.readNextPolygon(testPolygonDescription);
+		var polygon = reader.readNextPolygon().orElseThrow();
 
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.CALCULATE_DOMINANT_HEIGHT_AGE_SITE_INDEX);

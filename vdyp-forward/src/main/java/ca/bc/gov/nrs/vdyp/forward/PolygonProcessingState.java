@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.forward.model.ForwardControlVariables;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypGrowthDetails;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonLayer;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
@@ -173,8 +173,8 @@ class PolygonProcessingState {
 		return wallet.getLayer();
 	}
 
-	public VdypGrowthDetails getVdypGrowthDetails() {
-		return fps.vdypGrowthDetails;
+	public ForwardControlVariables getVdypGrowthDetails() {
+		return fps.forwardGrowthDetails;
 	}
 
 	public MatrixMap2<Integer, Integer, Optional<Coefficients>> getNetDecayCoeMap() {
@@ -255,6 +255,10 @@ class PolygonProcessingState {
 		return inventoryTypeGroup;
 	}
 
+	/** 
+	 * @param n index of species for whom the site curve number is to be returned.
+	 * @return the site curve number of the given species.
+	 */
 	public int getSiteCurveNumber(int n) {
 		if (!areSiteCurveNumbersSet) {
 			throw new IllegalStateException(UNSET_SITE_CURVE_NUMBERS);

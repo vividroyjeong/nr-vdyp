@@ -1,5 +1,17 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
+import static ca.bc.gov.nrs.vdyp.model.SmallUtilizationClassVariable.BASAL_AREA;
+import static ca.bc.gov.nrs.vdyp.model.SmallUtilizationClassVariable.LOREY_HEIGHT;
+import static ca.bc.gov.nrs.vdyp.model.SmallUtilizationClassVariable.QUAD_MEAN_DIAMETER;
+import static ca.bc.gov.nrs.vdyp.model.SmallUtilizationClassVariable.WHOLE_STEM_VOLUME;
+import static ca.bc.gov.nrs.vdyp.model.UtilizationClass.OVER225;
+import static ca.bc.gov.nrs.vdyp.model.UtilizationClass.U125TO175;
+import static ca.bc.gov.nrs.vdyp.model.UtilizationClass.U175TO225;
+import static ca.bc.gov.nrs.vdyp.model.UtilizationClass.U75TO125;
+import static ca.bc.gov.nrs.vdyp.model.VolumeVariable.CLOSE_UTIL_VOL;
+import static ca.bc.gov.nrs.vdyp.model.VolumeVariable.CLOSE_UTIL_VOL_LESS_DECAY;
+import static ca.bc.gov.nrs.vdyp.model.VolumeVariable.CLOSE_UTIL_VOL_LESS_DECAY_LESS_WASTAGE;
+import static ca.bc.gov.nrs.vdyp.model.VolumeVariable.WHOLE_STEM_VOL;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -10,22 +22,16 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
-import ca.bc.gov.nrs.vdyp.forward.parsers.VdypPolygonDescriptionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
-import static ca.bc.gov.nrs.vdyp.model.UtilizationClass.*;
-import static ca.bc.gov.nrs.vdyp.model.VolumeVariable.*;
-import static ca.bc.gov.nrs.vdyp.model.SmallUtilizationClassVariable.*;
 
 class SetCompatibilityVariablesForwardProcessingEngineTest extends AbstractForwardProcessingEngineTest {
 
 	@Test
 	void testSetCompatibilityVariables() throws ResourceParseException, IOException, ProcessingException {
-		var testPolygonDescription = VdypPolygonDescriptionParser.parse("01002 S000001 00     1970");
 
 		var reader = new ForwardDataStreamReader(controlMap);
-
-		var polygon = reader.readNextPolygon(testPolygonDescription);
+		var polygon = reader.readNextPolygon().orElseThrow();
 
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.SET_COMPATIBILITY_VARIABLES);

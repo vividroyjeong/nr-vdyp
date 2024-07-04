@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonDescription;
@@ -33,6 +34,7 @@ public class ForwardDataStreamReader {
 	private final StreamingParser<VdypPolygon> polygonStream;
 	private final StreamingParser<Collection<VdypLayerSpecies>> layerSpeciesStream;
 	private final StreamingParser<Collection<VdypSpeciesUtilization>> speciesUtilizationStream;
+	Optional<StreamingParser<VdypPolygonDescription>> polygonDescriptionStream;
 
 	@SuppressWarnings("unchecked")
 	public ForwardDataStreamReader(Map<String, Object> controlMap) throws IOException {
@@ -46,18 +48,26 @@ public class ForwardDataStreamReader {
 		var speciesUtilizationStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name());
 		speciesUtilizationStream = ((StreamingParserFactory<Collection<VdypSpeciesUtilization>>) speciesUtilizationStreamFactory)
 				.get();
+		
+		polygonDescriptionStream = Optional.empty();
+		if (controlMap.containsKey(ControlKey.FORWARD_INPUT_GROWTO.name())) {
+			var polygonDescriptionStreamFactory = Utils.<StreamingParserFactory<VdypPolygonDescription>>
+					expectParsedControl(controlMap, ControlKey.FORWARD_INPUT_GROWTO, StreamingParserFactory.class);
+			
+			polygonDescriptionStream = Optional.of(polygonDescriptionStreamFactory.get());
+		} else {
+			polygonDescriptionStream = Optional.empty();
+		}
 	}
 
-	public VdypPolygon readNextPolygon(VdypPolygonDescription polygonDescription) throws ProcessingException {
+	public Optional<VdypPolygon> readNextPolygon() throws ProcessingException {
 
 		// Advance all the streams until the definition for the polygon is found.
-
-		logger.debug("Looking for polygon {}", polygonDescription);
 
 		Optional<VdypPolygon> thePolygon = Optional.empty();
 
 		try {
-			while (thePolygon.isEmpty() && polygonStream.hasNext()) {
+			if (polygonStream.hasNext()) {
 				var polygon = polygonStream.next();
 
 				logger.debug("Reading polygon {}", polygon);
@@ -70,6 +80,24 @@ public class ForwardDataStreamReader {
 					var key = new UtilizationBySpeciesKey(utilization.getLayerType(), utilization.getGenusIndex());
 					utilizationsBySpeciesMap.putIfAbsent(key, new EnumMap<>(UtilizationClass.class));
 					utilizationsBySpeciesMap.get(key).put(utilization.getUcIndex(), utilization);
+				}
+				
+				if (polygonDescriptionStream.isPresent()) {
+					var pdStream = polygonDescriptionStream.get();
+					if (!pdStream.hasNext()) {
+						throw new ProcessingException(MessageFormat.format("Grow-to-year file at {0} in the control file does"
+								+ " not contain a record for {1} as expected, but instead the end-of-file was reached"
+								, ControlKey.FORWARD_INPUT_GROWTO.name(), polygon.getDescription().getName()));
+					}
+					var polygonDescription = pdStream.next();
+					if (! polygonDescription.getName().equals(polygon.getDescription().getName())) {
+						throw new ProcessingException(MessageFormat.format("Grow-to-year file at {0} in the control file does"
+								+ " not contain a record for {1} as expected, but instead contains a record for {2}"
+								, ControlKey.FORWARD_INPUT_GROWTO.name(), polygon.getDescription().getName()
+								, polygonDescription.getName()));
+					}
+					
+					polygon.setTargetYear(polygonDescription.getYear());
 				}
 
 				var speciesCollection = layerSpeciesStream.next();
@@ -139,23 +167,14 @@ public class ForwardDataStreamReader {
 
 				polygon.setLayers(primaryLayer, veteranLayer);
 
-				if (polygonDescription.equals(polygon.getDescription())) {
-					thePolygon = Optional.of(polygon);
-
-					adjustUtilizations(polygon);
-				}
+				thePolygon = Optional.of(polygon);
+				adjustUtilizations(polygon);
 			}
 		} catch (ResourceParseException | IOException e) {
 			throw new ProcessingException(e);
 		}
 
-		if (thePolygon.isEmpty()) {
-			throw new ProcessingException(
-					MessageFormat.format("Unable to find the definition of {0}", polygonDescription)
-			);
-		}
-
-		return thePolygon.get();
+		return thePolygon;
 	}
 
 	/** 

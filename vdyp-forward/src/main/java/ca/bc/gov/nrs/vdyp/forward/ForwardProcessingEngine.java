@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
+import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.EstimationMethods;
 import ca.bc.gov.nrs.vdyp.common.ReconcilationMethods;
 import ca.bc.gov.nrs.vdyp.common.Utils;
@@ -27,9 +28,12 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorE
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.SpeciesErrorException;
+import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType;
 import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
+import ca.bc.gov.nrs.vdyp.forward.model.ControlVariable;
+import ca.bc.gov.nrs.vdyp.forward.model.ForwardControlVariables;
+import ca.bc.gov.nrs.vdyp.forward.model.ForwardDebugSettings;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypGrowthDetails;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
@@ -42,6 +46,7 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3Impl;
 import ca.bc.gov.nrs.vdyp.model.Region;
+import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
 import ca.bc.gov.nrs.vdyp.model.SmallUtilizationClassVariable;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.VolumeVariable;
@@ -78,6 +83,7 @@ public class ForwardProcessingEngine {
 		ESTIMATE_MISSING_YEARS_TO_BREAST_HEIGHT_VALUES, //
 		CALCULATE_DOMINANT_HEIGHT_AGE_SITE_INDEX, //
 		SET_COMPATIBILITY_VARIABLES, //
+		GROW, //
 
 		// Must be last
 		ALL; //
@@ -113,10 +119,35 @@ public class ForwardProcessingEngine {
 		// All of BANKCHK1 that we need
 		validatePolygon(polygon);
 
-		executeForwardAlgorithm(lastStep);
+		// Determine the target year of the growth
+		int targetYear;
+
+		int growTargetControlVariableValue = fps.getForwardControlVariables()
+				.getControlVariable(ControlVariable.GROW_TARGET_1);
+		if (growTargetControlVariableValue == -1) {
+			if (polygon.getTargetYear().isEmpty()) {
+				throw new ProcessingException(
+						"Control Variable 1 has the value -1, indicating that the grow-to years are"
+								+ " to be read from a grow-to-year file (at " + ControlKey.FORWARD_INPUT_GROWTO.name()
+								+ " in the"
+								+ " control file), but no such file was specified."
+				);
+			}
+			targetYear = polygon.getTargetYear().get();
+		} else {
+			if (growTargetControlVariableValue <= 400) {
+				targetYear = polygon.getDescription().getYear() + growTargetControlVariableValue;
+			} else {
+				targetYear = growTargetControlVariableValue;
+			}
+		}
+
+		// Run the forward algorithm for this polygon
+
+		executeForwardAlgorithm(lastStep, targetYear);
 	}
 
-	private void executeForwardAlgorithm(ExecutionStep lastStep) throws ProcessingException {
+	private void executeForwardAlgorithm(ExecutionStep lastStep, int untilYear) throws ProcessingException {
 
 		PolygonProcessingState pps = fps.getPolygonProcessingState();
 		Bank bank = fps.getBank(0, LayerType.PRIMARY);
@@ -133,7 +164,7 @@ public class ForwardProcessingEngine {
 			calculateMissingSiteCurves(bank, fps.getSiteCurveMap(), fps.getPolygonProcessingState());
 		}
 
-		// VPRIME, method == 1
+		// VPRIME1, method == 1
 		if (lastStep.ordinal() >= ExecutionStep.CALCULATE_COVERAGES.ordinal()) {
 			calculateCoverages(pps);
 		}
@@ -160,8 +191,282 @@ public class ForwardProcessingEngine {
 		if (lastStep.ordinal() >= ExecutionStep.SET_COMPATIBILITY_VARIABLES.ordinal()) {
 			setCompatibilityVariables(pps);
 		}
-		
-		fps.storeActive(2, LayerType.PRIMARY);
+
+		if (lastStep.ordinal() >= ExecutionStep.GROW.ordinal()) {
+			int veteranLayerInstance = 1;
+
+			int primaryLayerSourceInstance = 2;
+			fps.storeActive(primaryLayerSourceInstance, LayerType.PRIMARY);
+
+			int startingYear = fps.getPolygonProcessingState().getPolygon().getDescription().getYear();
+
+			writeLayers(primaryLayerSourceInstance, veteranLayerInstance, false);
+
+			boolean createNewGroups = fps.debugSettings.getValue(ForwardDebugSettings.Vars.SPECIES_DYNAMICS_1) != 1
+					&& fps.getPolygonProcessingState().getNSpecies() > 1;
+
+			int primaryLayerTargetInstance = 3;
+			int currentYear = startingYear;
+			while (currentYear <= untilYear) {
+
+				grow(primaryLayerSourceInstance, currentYear, primaryLayerTargetInstance, veteranLayerInstance);
+
+				// Store polygon (both primary and veteran layers) to output
+				writeLayers(primaryLayerTargetInstance, veteranLayerInstance, createNewGroups);
+
+				currentYear += 1;
+
+				int newPrimaryLayerSourceInstance = primaryLayerTargetInstance;
+				primaryLayerTargetInstance = primaryLayerSourceInstance;
+				primaryLayerSourceInstance = newPrimaryLayerSourceInstance;
+			}
+		}
+	}
+
+	private void grow(
+			int primaryLayerSourceInstance, int currentYear, int primaryLayerTargetInstance, int veteranLayerInstance
+	)
+			throws ProcessingException {
+
+		PolygonProcessingState pps = fps.getPolygonProcessingState();
+		VdypPolygon polygon = pps.getPolygon();
+
+		logger.info(
+				"Performing grow of {} for year {} from instance {} to instance {}", polygon.getDescription()
+						.getName(), currentYear, primaryLayerSourceInstance, primaryLayerTargetInstance
+		);
+
+		// Call to BANKOUT1 unnecessary; pps.wallet already contains the primary layer
+
+		// If update-during-growth is set, and this is not the starting year, update the
+		// context
+		int startingYear = fps.getPolygonProcessingState().getPolygon().getDescription().getYear();
+		if (currentYear > startingYear
+				&& fps.getForwardControlVariables().getControlVariable(ControlVariable.UPDATE_DURING_GROWTH_6) >= 1) {
+			// VPRIME1, method == 1
+			calculateCoverages(pps);
+
+			// VHDOM1 METH_H = 2, METH_A = 2, METH_SI = 2
+			calculateDominantHeightAgeSiteIndex(pps, fps.getHl1Coefficients());
+		}
+
+		float dominantHeight = pps.getPrimarySpeciesDominantHeight();
+		int siteCurveNumber = pps.getSiteCurveNumber(startingYear);
+		float siteIndex = pps.getPrimarySpeciesSiteIndex();
+		float yearsToBreastHeight = pps.getPrimarySpeciesAgeToBreastHeight();
+
+		SiteCurveAgeMaximum scAgeMaximums = fps.maximumAgeBySiteCurveNumber.get(siteCurveNumber);
+		Region region = fps.getPolygonProcessingState().wallet.getBecZone().getRegion();
+
+		float newDominantHeight = growDominantHeight(
+				scAgeMaximums, region, dominantHeight, siteCurveNumber, siteIndex, yearsToBreastHeight
+		);
+	}
+
+	public static float
+			growDominantHeight(
+					SiteCurveAgeMaximum scAgeMaximums, Region region, float dominantHeight, int siteCurveNumber,
+					float siteIndex, float yearsToBreastHeight
+			) throws ProcessingException {
+
+		if (siteCurveNumber == VdypEntity.MISSING_INTEGER_VALUE) {
+			throw new ProcessingException("No SiteCurveNumber supplied");
+		}
+
+		var siteIndexEquation = SiteIndexEquation.getByIndex(siteCurveNumber);
+
+		if (dominantHeight <= 1.3) {
+			throw new ProcessingException(
+					MessageFormat.format(
+							"(current) DominantHeight {0} is out of range (must be above 1.3)", dominantHeight
+					)
+			);
+		}
+
+		final SiteIndexAgeType ageType = SiteIndexAgeType.SI_AT_TOTAL;
+
+		double siteIndex_d = siteIndex;
+		double dominantHeight_d = dominantHeight;
+		double yearsToBreastHeight_d = yearsToBreastHeight;
+
+		double currentAge;
+		try {
+			currentAge = SiteTool.heightAndSiteIndexToAge(
+					siteIndexEquation, dominantHeight_d, ageType, siteIndex_d, yearsToBreastHeight_d
+			);
+		} catch (CommonCalculatorException e) {
+			throw new ProcessingException(
+					MessageFormat.format(
+							"Encountered exception when calling heightAndSiteIndexToAge({0}, {1}, {2}, {3})", siteIndexEquation, dominantHeight_d, null, siteIndex_d, yearsToBreastHeight_d
+					), e
+			);
+		}
+
+		if (currentAge <= 0.0d) {
+			if (dominantHeight_d > siteIndex_d) {
+				return 0.0f /* no growth */;
+			} else {
+				throw new ProcessingException(
+						MessageFormat.format("currentBreastHeightAge value {0} must be positive", currentAge)
+				);
+			}
+		}
+
+		double nextAge = currentAge + 1.0f;
+
+		// If we are past the total age limit for site curve, assign no growth. If we are almost there, go 
+		// slightly past the limit (by .01 yr). Once there, we should stop growing. The TOTAL age limit was 
+		// stored so we must calculate a BH age limit first...
+
+		float ageLimitInYears = scAgeMaximums.getAgeMaximum(region);
+
+		float breastHeightAgeLimitInYears = 0.0f;
+		if (ageLimitInYears > 0) {
+			breastHeightAgeLimitInYears = ageLimitInYears - yearsToBreastHeight;
+		}
+
+		if (currentAge <= breastHeightAgeLimitInYears || scAgeMaximums.getT1() <= 0.0f) {
+			
+			float yearPart = 1.0f;
+
+			if (scAgeMaximums.getT1() <= 0.0f) {
+				
+				if (breastHeightAgeLimitInYears > 0.0f && nextAge > breastHeightAgeLimitInYears) {
+					if (currentAge > breastHeightAgeLimitInYears) {
+						return 0.0f /* no growth */;
+					}
+
+					yearPart = (float) (breastHeightAgeLimitInYears - currentAge + 0.01);
+					nextAge = currentAge + yearPart;
+				}
+			}
+
+			// The above code to find ages allows errors up to .005 m. At high ages with some 
+			// species this can correspond to a half year. Therefore, AGED1 can not be assumed to 
+			// correspond to HDD1. Find a new HDD1 to at least get the increment correct.
+
+			double currentDominantHeight;
+			try {
+				currentDominantHeight = SiteTool.ageAndSiteIndexToHeight(
+						siteIndexEquation, currentAge, ageType, siteIndex_d, yearsToBreastHeight_d
+				);
+			} catch (CommonCalculatorException e) {
+				throw new ProcessingException(
+						MessageFormat.format(
+								"SiteTool.ageAndSiteIndexToHeight({0}, {1}, {2}, {3}, {4}) threw exception", siteIndexEquation, currentAge, ageType, siteIndex_d, yearsToBreastHeight_d
+						), e
+				);
+			}
+
+			double nextDominantHeight;
+			try {
+				nextDominantHeight = SiteTool.ageAndSiteIndexToHeight(
+						siteIndexEquation, nextAge, ageType, siteIndex_d, yearsToBreastHeight_d
+				);
+			} catch (CommonCalculatorException e) {
+				throw new ProcessingException(
+						MessageFormat.format(
+								"SiteTool.ageAndSiteIndexToHeight({0}, {1}, {2}, {3}, {4}) threw exception", siteIndexEquation, nextAge, ageType, siteIndex_d, yearsToBreastHeight_d
+						), e
+				);
+			}
+
+			if (nextDominantHeight < 0.0) {
+				throw new ProcessingException(
+						MessageFormat.format(
+								"SiteTool.ageAndSiteIndexToHeight({0}, {1}, {2}, {3}, {4}) returned {5}", siteIndexEquation, nextAge, ageType, siteIndex_d, yearsToBreastHeight_d, nextDominantHeight
+						)
+				);
+			}
+
+			if (nextDominantHeight < currentDominantHeight && yearPart == 1.0) {
+				// Rounding error in site routines?
+				if (Math.abs(currentDominantHeight - nextDominantHeight) < 0.01) {
+					return 0.0f /* no growth */;
+				} else {
+					throw new ProcessingException(
+							MessageFormat.format(
+									"New dominant height {0} is less than the current dominant height {1}", nextDominantHeight, currentDominantHeight
+							)
+					);
+				}
+			}
+
+			return (float) (nextDominantHeight - currentDominantHeight);
+
+		} else {
+			// We are in a special extension of the curve. Derive the new curve form and then 
+			// compute the answer.
+
+			float a = FloatMath.log(0.5f) / scAgeMaximums.getT1();
+			double breastHeightAgeLimitInYears_d = breastHeightAgeLimitInYears;
+
+			double currentDominantHeight;
+			try {
+				currentDominantHeight = SiteTool.ageAndSiteIndexToHeight(
+						siteIndexEquation, breastHeightAgeLimitInYears_d, ageType, siteIndex_d, yearsToBreastHeight_d
+				);
+			} catch (CommonCalculatorException e) {
+				throw new ProcessingException(
+						MessageFormat.format(
+								"SiteTool.ageAndSiteIndexToHeight({0}, {1}, {2}, {3}, {4}) threw exception", siteIndexEquation, breastHeightAgeLimitInYears_d, ageType, siteIndex_d, yearsToBreastHeight_d
+						), e
+				);
+			}
+
+			breastHeightAgeLimitInYears_d += 1.0;
+
+			double nextDominantHeight;
+			try {
+				nextDominantHeight = SiteTool.ageAndSiteIndexToHeight(
+						siteIndexEquation, breastHeightAgeLimitInYears_d, ageType, siteIndex_d, yearsToBreastHeight_d
+				);
+			} catch (CommonCalculatorException e) {
+				throw new ProcessingException(
+						MessageFormat.format(
+								"SiteTool.ageAndSiteIndexToHeight({0}, {1}, {2}, {3}, {4}) threw exception", siteIndexEquation, breastHeightAgeLimitInYears_d, ageType, siteIndex_d, yearsToBreastHeight_d
+						), e
+				);
+			}
+
+			float rate = (float) (nextDominantHeight - currentDominantHeight);
+			if (rate < 0.0005f) {
+				rate = 0.0005f;
+			}
+
+			float y = (float) currentDominantHeight;
+			// Model is:
+			//     Y = Y0 - RATE0/A*(1-exp(A* t)) where t = AGE - BHAGELIM
+			// Solve for T:
+			//	   1 - exp(A * T) = (Y0 - Y) * A/RATE0
+			//	   -exp(A * T) = (Y0 - Y) * A/RATE0 - 1
+			//	   exp(A * T) = (Y - Y0) * A/RATE0 + 1
+			//	   A * T = ln(1 + (Y - Y0) * A/RATE0)
+			//	   T = ln(1 + (Y - Y0) * A/RATE0) / A
+			float t;
+			if (dominantHeight > y) {
+				float term = 1.0f + (dominantHeight - y) * a / rate;
+				if (term <= 1.0e-7) {
+					return 0.0f;
+				}
+				t = FloatMath.log(term) / a;
+			} else {
+				t = 0.0f;
+			}
+
+			if (t < scAgeMaximums.getT2()) {
+				return 0.0f;
+			} else {
+				return rate / a * (-FloatMath.exp(a * t) + FloatMath.exp(a * (t + 1.0f)));
+			}
+		}
+	}
+
+	private void writeLayers(int primaryLayerInstance, int veteranLayerInstance, boolean b) {
+
+		logger.info(
+				"Writing primary layer from instance {} and veteran layer from instance {}", primaryLayerInstance, veteranLayerInstance
+		);
 	}
 
 	private static final float[] DEFAULT_QUAD_MEAN_DIAMETERS = new float[] { Float.NaN, 10.0f, 15.0f, 20.0f, 25.0f };
@@ -240,10 +545,10 @@ public class ForwardProcessingEngine {
 
 					// EMP094
 					EstimationMethods.estimateNetDecayAndWasteVolume(
-							pps.getBecZone().getRegion(), uc, aAdjust, pps.wallet.speciesNames[s], spLoreyHeight_All,
-							pps.getNetDecayWasteCoeMap(), pps.getWasteModifierMap(), quadMeanDiameters,
-							closeUtilizationVolumes, closeUtilizationVolumesNetOfDecay,
-							closeUtilizationVolumesNetOfDecayAndWaste
+							pps.getBecZone()
+									.getRegion(), uc, aAdjust, pps.wallet.speciesNames[s], spLoreyHeight_All, pps
+											.getNetDecayWasteCoeMap(), pps
+													.getWasteModifierMap(), quadMeanDiameters, closeUtilizationVolumes, closeUtilizationVolumesNetOfDecay, closeUtilizationVolumesNetOfDecayAndWaste
 					);
 
 					float actualVolume = pps.wallet.cuVolumesMinusDecayAndWastage[s][uc.ordinal()];
@@ -263,10 +568,9 @@ public class ForwardProcessingEngine {
 					// EMP093
 					int decayGroup = pps.decayEquationGroups[s];
 					EstimationMethods.estimateNetDecayVolume(
-							pps.wallet.speciesNames[s], pps.getBecZone().getRegion(), uc, aAdjust, decayGroup,
-							pps.getPrimarySpeciesAgeAtBreastHeight(), pps.getNetDecayCoeMap(),
-							pps.getDecayModifierMap(), quadMeanDiameters, closeUtilizationVolumes,
-							closeUtilizationVolumesNetOfDecay
+							pps.wallet.speciesNames[s], pps.getBecZone().getRegion(), uc, aAdjust, decayGroup, pps
+									.getPrimarySpeciesAgeAtBreastHeight(), pps.getNetDecayCoeMap(), pps
+											.getDecayModifierMap(), quadMeanDiameters, closeUtilizationVolumes, closeUtilizationVolumesNetOfDecay
 					);
 
 					float actualVolume = pps.wallet.cuVolumesMinusDecay[s][uc.ordinal()];
@@ -285,8 +589,8 @@ public class ForwardProcessingEngine {
 					// EMP092
 					int volumeGroup = pps.volumeEquationGroups[s];
 					EstimationMethods.estimateCloseUtilizationVolume(
-							uc, aAdjust, volumeGroup, spLoreyHeight_All, pps.getCloseUtilizationCoeMap(),
-							quadMeanDiameters, wholeStemVolumes, closeUtilizationVolumes
+							uc, aAdjust, volumeGroup, spLoreyHeight_All, pps
+									.getCloseUtilizationCoeMap(), quadMeanDiameters, wholeStemVolumes, closeUtilizationVolumes
 					);
 
 					float actualVolume = pps.wallet.closeUtilizationVolumes[s][uc.ordinal()];
@@ -301,15 +605,15 @@ public class ForwardProcessingEngine {
 			float primarySpeciesQMDAll = pps.wallet.quadMeanDiameters[s][UTILIZATION_ALL_INDEX];
 			var wholeStemVolume = pps.wallet.treesPerHectare[s][UTILIZATION_ALL_INDEX]
 					* EstimationMethods.estimateWholeStemVolumePerTree(
-							primarySpeciesVolumeGroup, spLoreyHeight_All, primarySpeciesQMDAll,
-							pps.getTotalStandWholeStepVolumeCoeMap()
+							primarySpeciesVolumeGroup, spLoreyHeight_All, primarySpeciesQMDAll, pps
+									.getTotalStandWholeStepVolumeCoeMap()
 					);
 
 			wholeStemVolumes.setCoe(UTILIZATION_ALL_INDEX, wholeStemVolume);
 
 			EstimationMethods.estimateWholeStemVolume(
-					UtilizationClass.ALL, 0.0f, primarySpeciesVolumeGroup, spLoreyHeight_All,
-					pps.getWholeStemUtilizationComponentMap(), quadMeanDiameters, basalAreas, wholeStemVolumes
+					UtilizationClass.ALL, 0.0f, primarySpeciesVolumeGroup, spLoreyHeight_All, pps
+							.getWholeStemUtilizationComponentMap(), quadMeanDiameters, basalAreas, wholeStemVolumes
 			);
 
 			for (UtilizationClass uc : UtilizationClass.ALL_BUT_SMALL_ALL) {
@@ -329,16 +633,17 @@ public class ForwardProcessingEngine {
 			);
 
 			EstimationMethods.estimateBaseAreaByUtilization(
-					pps.getBecZone(), pps.getBasalAreaUtilizationComponentMap(), quadMeanDiameters, basalAreas,
-					genusName
+					pps.getBecZone(), pps
+							.getBasalAreaUtilizationComponentMap(), quadMeanDiameters, basalAreas, genusName
 			);
 
 			// Calculate trees-per-hectare per utilization
 			treesPerHectare.setCoe(UtilizationClass.ALL.index, pps.wallet.treesPerHectare[s][UTILIZATION_ALL_INDEX]);
 			for (UtilizationClass uc : UtilizationClass.UTIL_CLASSES) {
 				treesPerHectare.setCoe(
-						uc.index,
-						calculateTreesPerHectare(basalAreas.getCoe(uc.index), quadMeanDiameters.getCoe(uc.index))
+						uc.index, calculateTreesPerHectare(
+								basalAreas.getCoe(uc.index), quadMeanDiameters.getCoe(uc.index)
+						)
 				);
 			}
 
@@ -379,7 +684,7 @@ public class ForwardProcessingEngine {
 	 * @throws ProcessingException
 	 */
 	private static HashMap<SmallUtilizationClassVariable, Float>
-			estimateSmallComponents(PolygonProcessingState pps, int speciesIndex, VdypGrowthDetails growthDetails)
+			estimateSmallComponents(PolygonProcessingState pps, int speciesIndex, ForwardControlVariables growthDetails)
 					throws ProcessingException {
 
 		Region region = pps.getPolygon().getBiogeoclimaticZone().getRegion();
@@ -423,8 +728,8 @@ public class ForwardProcessingEngine {
 		if (growthDetails.allowCalculation(spInputBasalArea_Small, B_BASE_MIN, (l, r) -> l > r)) {
 			float spInputQuadMeanDiameter_Small = pps.wallet.quadMeanDiameters[speciesIndex][UTILIZATION_SMALL_INDEX];
 			cvSmall.put(
-					SmallUtilizationClassVariable.QUAD_MEAN_DIAMETER,
-					spInputQuadMeanDiameter_Small - cvQuadMeanDiameter_Small
+					SmallUtilizationClassVariable.QUAD_MEAN_DIAMETER, spInputQuadMeanDiameter_Small
+							- cvQuadMeanDiameter_Small
 			);
 		} else {
 			cvSmall.put(SmallUtilizationClassVariable.QUAD_MEAN_DIAMETER, 0.0f);
@@ -650,8 +955,7 @@ public class ForwardProcessingEngine {
 			if (Float.isNaN(loreyHeight)) {
 				throw new ProcessingException(
 						MessageFormat.format(
-								"Neither dominant nor lorey height[All] is available for primary species {}",
-								state.wallet.speciesNames[primarySpeciesIndex]
+								"Neither dominant nor lorey height[All] is available for primary species {}", state.wallet.speciesNames[primarySpeciesIndex]
 						), 2
 				);
 			}
@@ -849,15 +1153,13 @@ public class ForwardProcessingEngine {
 					} catch (NoAnswerException e) {
 						logger.warn(
 								MessageFormat.format(
-										"there is no conversion from curves {0} to {1}. Skipping species {3}",
-										siteCurveI, primarySiteCurve, i
+										"there is no conversion from curves {0} to {1}. Skipping species {3}", siteCurveI, primarySiteCurve, i
 								)
 						);
 					} catch (CurveErrorException | SpeciesErrorException e) {
 						throw new ProcessingException(
 								MessageFormat.format(
-										"convertSiteIndexBetweenCurves on {0}, {1} and {2} failed", siteCurveI,
-										siteIndexI, primarySiteCurve
+										"convertSiteIndexBetweenCurves on {0}, {1} and {2} failed", siteCurveI, siteIndexI, primarySiteCurve
 								), e
 						);
 					}
@@ -891,15 +1193,13 @@ public class ForwardProcessingEngine {
 					} catch (NoAnswerException e) {
 						logger.warn(
 								MessageFormat.format(
-										"there is no conversion between curves {0} and {1}. Skipping species {2}",
-										primarySiteCurve, siteCurveI, i
+										"there is no conversion between curves {0} and {1}. Skipping species {2}", primarySiteCurve, siteCurveI, i
 								)
 						);
 					} catch (CurveErrorException | SpeciesErrorException e) {
 						throw new ProcessingException(
 								MessageFormat.format(
-										"convertSiteIndexBetweenCurves on {0}, {1} and {2} failed. Skipping species {3}",
-										primarySiteCurve, primarySpeciesSiteIndex, siteCurveI, i
+										"convertSiteIndexBetweenCurves on {0}, {1} and {2} failed. Skipping species {3}", primarySiteCurve, primarySpeciesSiteIndex, siteCurveI, i
 								), e
 						);
 					}
@@ -1001,8 +1301,8 @@ public class ForwardProcessingEngine {
 
 			throw new ProcessingException(
 					MessageFormat.format(
-							"Polygon {0}''s year value {1} is < 1900", polygon.getDescription().getName(),
-							polygon.getDescription().getYear()
+							"Polygon {0}''s year value {1} is < 1900", polygon.getDescription().getName(), polygon
+									.getDescription().getYear()
 					)
 			);
 		}
@@ -1020,8 +1320,8 @@ public class ForwardProcessingEngine {
 		if (state.getNSpecies() == 0) {
 			throw new ProcessingException(
 					MessageFormat.format(
-							"Polygon {0} layer 0 has no species with basal area above {1}",
-							state.getLayer().getParent().getDescription().getName(), MIN_BASAL_AREA
+							"Polygon {0} layer 0 has no species with basal area above {1}", state.getLayer().getParent()
+									.getDescription().getName(), MIN_BASAL_AREA
 					)
 			);
 		}
@@ -1080,7 +1380,8 @@ public class ForwardProcessingEngine {
 
 		String primaryGenusName = state.wallet.speciesNames[highestPercentageIndex];
 		Optional<String> secondaryGenusName = secondHighestPercentageIndex != -1
-				? Optional.of(state.wallet.speciesNames[secondHighestPercentageIndex]) : Optional.empty();
+				? Optional.of(state.wallet.speciesNames[secondHighestPercentageIndex])
+				: Optional.empty();
 
 		try {
 			int inventoryTypeGroup = findInventoryTypeGroup(primaryGenusName, secondaryGenusName, highestPercentage);
@@ -1126,8 +1427,7 @@ public class ForwardProcessingEngine {
 		if (speciesNames.length != percentages.length) {
 			throw new IllegalArgumentException(
 					MessageFormat.format(
-							"the length of speciesNames ({}) must match that of percentages ({}) but it doesn't",
-							speciesNames.length, percentages.length
+							"the length of speciesNames ({}) must match that of percentages ({}) but it doesn't", speciesNames.length, percentages.length
 					)
 			);
 		}

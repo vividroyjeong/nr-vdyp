@@ -4,19 +4,20 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.forward.parsers.VdypControlVariableParser;
+import ca.bc.gov.nrs.vdyp.forward.parsers.ForwardControlVariableParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
 
-class VdypGrowthDetailParserTest {
+class VdypForwardControlVariablesParserTest {
 
 	@Test
 	void testNullInput() throws Exception {
 		try {
-			var parser = new VdypControlVariableParser();
+			var parser = new ForwardControlVariableParser();
 			parser.parse(null);
 			Assertions.fail();
 		} catch (ValueParseException e) {
@@ -27,7 +28,7 @@ class VdypGrowthDetailParserTest {
 	@Test
 	void testEmptyInput() throws Exception {
 		try {
-			var parser = new VdypControlVariableParser();
+			var parser = new ForwardControlVariableParser();
 			parser.parse("   ");
 			Assertions.fail();
 		} catch (ValueParseException e) {
@@ -38,7 +39,7 @@ class VdypGrowthDetailParserTest {
 	@Test
 	void testInvalidInput() throws Exception {
 		try {
-			var parser = new VdypControlVariableParser();
+			var parser = new ForwardControlVariableParser();
 			parser.parse("a b c");
 			Assertions.fail();
 		} catch (ValueParseException e) {
@@ -48,28 +49,23 @@ class VdypGrowthDetailParserTest {
 
 	@Test
 	void testValidInput() throws Exception {
-		var parser = new VdypControlVariableParser();
-		var details1 = parser.parse("-1");
-		assertThat(details1, hasProperty("yearCounter", is(-1)));
+		var parser = new ForwardControlVariableParser();
 
-		var details2 = parser.parse("1 2 3 4 5 6");
-		assertThat(details2, hasProperty("yearCounter", is(1)));
-		assertThat(1, equalTo(details2.getControlVariable(1)));
-		assertThat(2, equalTo(details2.getControlVariable(2)));
-		assertThat(3, equalTo(details2.getControlVariable(3)));
-		assertThat(4, equalTo(details2.getControlVariable(4)));
-		assertThat(5, equalTo(details2.getControlVariable(5)));
-		assertThat(6, equalTo(details2.getControlVariable(6)));
+		var details = parser.parse("1 1 1 1 1 1");
+		assertThat(1, equalTo(details.getControlVariable(ControlVariable.GROW_TARGET_1)));
+		assertThat(1, equalTo(details.getControlVariable(ControlVariable.COMPAT_VAR_OUTPUT_2)));
+		assertThat(1, equalTo(details.getControlVariable(ControlVariable.COMPAT_VAR_APPLICATION_3)));
+		assertThat(1, equalTo(details.getControlVariable(ControlVariable.OUTPUT_FILES_4)));
+		assertThat(1, equalTo(details.getControlVariable(ControlVariable.ALLOW_COMPAT_VAR_CALCS_5)));
+		assertThat(1, equalTo(details.getControlVariable(ControlVariable.UPDATE_DURING_GROWTH_6)));
 	}
 
 	@Test
 	void testExtraInputIgnored() throws Exception {
-		var parser = new VdypControlVariableParser();
-		var details1 = parser.parse("-1");
-		assertThat(details1, hasProperty("yearCounter", is(-1)));
+		var parser = new ForwardControlVariableParser();
 
-		var details2 = parser.parse("1 2 3 4 5 6 7 8 9 10 11");
-		assertThat(details2, hasProperty("yearCounter", is(1)));
-		assertThat(10, equalTo(details2.getControlVariable(10)));
+		var details = parser.parse("1 1 1 1 1 1 1 1 1 1 1");
+		assertThat(1, equalTo(details.getControlVariable(10)));
+		assertThrows(IllegalArgumentException.class, () -> details.getControlVariable(11));
 	}
 }
