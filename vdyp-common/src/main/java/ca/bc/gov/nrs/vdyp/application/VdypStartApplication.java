@@ -38,10 +38,10 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.EstimationMethods;
+import ca.bc.gov.nrs.vdyp.common.ReconcilationMethods;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
-import ca.bc.gov.nrs.vdyp.common_calculators.EMP;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -169,7 +169,6 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	protected Map<String, Object> controlMap = new HashMap<>();
 
 	public EstimationMethods estimationMethods;
-	public EMP emp; // TODO remove this
 
 	static final Comparator<BaseVdypSpecies> PERCENT_GENUS_DESCENDING = Utils
 			.compareUsing(BaseVdypSpecies::getPercentGenus).reversed();
@@ -242,7 +241,6 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	protected void setControlMap(Map<String, Object> controlMap) {
 		this.controlMap = controlMap;
 		this.estimationMethods = new EstimationMethods(controlMap);
-		this.emp = new EMP(controlMap);
 	}
 
 	protected <T> StreamingParser<T> getStreamingParser(ControlKey key) throws ProcessingException {
@@ -1154,10 +1152,10 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			var adjustDecayWasteUtil = Utils.utilizationVector(); // ADJVDW
 
 			// EMP071
-			emp.estimateQuadMeanDiameterByUtilization(bec, quadMeanDiameterUtil, spec);
+			estimationMethods.estimateQuadMeanDiameterByUtilization(bec, quadMeanDiameterUtil, spec.getGenus());
 
 			// EMP070
-			emp.estimateBaseAreaByUtilization(bec, quadMeanDiameterUtil, baseAreaUtil, spec);
+			estimationMethods.estimateBaseAreaByUtilization(bec, quadMeanDiameterUtil, baseAreaUtil, spec.getGenus());
 
 			// Calculate tree density components
 			for (var uc : VdypStartApplication.UTIL_CLASSES) {
@@ -1171,7 +1169,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			// reconcile components with totals
 
 			// YUC1R
-			reconcileComponents(baseAreaUtil, treesPerHectareUtil, quadMeanDiameterUtil);
+			ReconcilationMethods.reconcileComponents(baseAreaUtil, treesPerHectareUtil, quadMeanDiameterUtil);
 
 			if (compatibilityVariableMode != CompatibilityVariableMode.NONE) {
 				throw new UnsupportedOperationException("TODO");
@@ -1191,7 +1189,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			// Seems this might only be needed when compatibilityVariableMode is not NONE?
 
 			// YUC1R
-			reconcileComponents(baseAreaUtil, treesPerHectareUtil, quadMeanDiameterUtil);
+			ReconcilationMethods.reconcileComponents(baseAreaUtil, treesPerHectareUtil, quadMeanDiameterUtil);
 
 			if (volumeComputeMode == VolumeComputeMode.ZERO) {
 				throw new UnsupportedOperationException("TODO");
@@ -1220,17 +1218,16 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				);
 
 				// EMP093
-				emp.estimateNetDecayVolume(
+				estimationMethods.estimateNetDecayVolume(
 						spec.getGenus(), bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec.getDecayGroup(),
-						loreyHeightSpec, vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil,
-						closeVolumeUtil, closeVolumeNetDecayUtil
+						vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil, closeVolumeUtil,
+						closeVolumeNetDecayUtil
 				);
 
 				// EMP094
-				emp.estimateNetDecayAndWasteVolume(
+				estimationMethods.estimateNetDecayAndWasteVolume(
 						bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec.getGenus(), loreyHeightSpec,
-						vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil, closeVolumeUtil,
-						closeVolumeNetDecayUtil, closeVolumeNetDecayWasteUtil
+						quadMeanDiameterUtil, closeVolumeUtil, closeVolumeNetDecayUtil, closeVolumeNetDecayWasteUtil
 				);
 
 				if (this.getId().isStart()) {
@@ -1242,18 +1239,21 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				}
 			}
 
-			spec.getBaseAreaByUtilization().pairwiseInPlace(baseAreaUtil, EMP.COPY_IF_BAND);
-			spec.getTreesPerHectareByUtilization().pairwiseInPlace(treesPerHectareUtil, EMP.COPY_IF_BAND);
-			spec.getQuadraticMeanDiameterByUtilization().pairwiseInPlace(quadMeanDiameterUtil, EMP.COPY_IF_BAND);
+			spec.getBaseAreaByUtilization().pairwiseInPlace(baseAreaUtil, EstimationMethods.COPY_IF_BAND);
+			spec.getTreesPerHectareByUtilization().pairwiseInPlace(treesPerHectareUtil, EstimationMethods.COPY_IF_BAND);
+			spec.getQuadraticMeanDiameterByUtilization()
+					.pairwiseInPlace(quadMeanDiameterUtil, EstimationMethods.COPY_IF_BAND);
 
-			spec.getWholeStemVolumeByUtilization().pairwiseInPlace(wholeStemVolumeUtil, EMP.COPY_IF_NOT_TOTAL);
-			spec.getCloseUtilizationVolumeByUtilization().pairwiseInPlace(closeVolumeUtil, EMP.COPY_IF_NOT_TOTAL);
+			spec.getWholeStemVolumeByUtilization()
+					.pairwiseInPlace(wholeStemVolumeUtil, EstimationMethods.COPY_IF_NOT_TOTAL);
+			spec.getCloseUtilizationVolumeByUtilization()
+					.pairwiseInPlace(closeVolumeUtil, EstimationMethods.COPY_IF_NOT_TOTAL);
 			spec.getCloseUtilizationVolumeNetOfDecayByUtilization()
-					.pairwiseInPlace(closeVolumeNetDecayUtil, EMP.COPY_IF_NOT_TOTAL);
+					.pairwiseInPlace(closeVolumeNetDecayUtil, EstimationMethods.COPY_IF_NOT_TOTAL);
 			spec.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization()
-					.pairwiseInPlace(closeVolumeNetDecayWasteUtil, EMP.COPY_IF_NOT_TOTAL);
+					.pairwiseInPlace(closeVolumeNetDecayWasteUtil, EstimationMethods.COPY_IF_NOT_TOTAL);
 			spec.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization()
-					.pairwiseInPlace(closeVolumeNetDecayWasteBreakUtil, EMP.COPY_IF_NOT_TOTAL);
+					.pairwiseInPlace(closeVolumeNetDecayWasteBreakUtil, EstimationMethods.COPY_IF_NOT_TOTAL);
 
 		}
 		computeLayerUtilizationComponentsFromSpecies(vdypLayer);
@@ -1308,60 +1308,6 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				vdypLayer.getLoreyHeightByUtilization().scalarInPlace(UTIL_ALL, x -> x / baAll);
 			}
 
-		}
-
-	}
-
-	/**
-	 * Implements the three reconciliation modes for layer 1 as described in ipsjf120.doc
-	 *
-	 * @param baseAreaUtil
-	 * @param treesPerHectareUtil
-	 * @param quadMeanDiameterUtil
-	 * @throws ProcessingException
-	 */
-	// YUC1R
-	public void reconcileComponents(
-			Coefficients baseAreaUtil, Coefficients treesPerHectareUtil, Coefficients quadMeanDiameterUtil
-	) throws ProcessingException {
-		if (baseAreaUtil.getCoe(UTIL_ALL) == 0f) {
-			UTIL_CLASSES.forEach(uc -> {
-				treesPerHectareUtil.setCoe(uc.index, 0f);
-				baseAreaUtil.setCoe(uc.index, 0f);
-			});
-			return;
-		}
-
-		@SuppressWarnings("unused")
-		float tphSum = 0f;
-		float baSum = 0f;
-		for (var uc : UTIL_CLASSES) {
-			tphSum += treesPerHectareUtil.getCoe(uc.index);
-			baSum += baseAreaUtil.getCoe(uc.index);
-		}
-
-		if (abs(baSum - baseAreaUtil.getCoe(UTIL_ALL)) / baSum > 0.00003) {
-			throw new ProcessingException("Computed base areas for 7.5+ components do not sum to expected total");
-		}
-
-		float dq0 = BaseAreaTreeDensityDiameter
-				.quadMeanDiameter(baseAreaUtil.getCoe(UTIL_ALL), treesPerHectareUtil.getCoe(UTIL_ALL));
-
-		if (dq0 < 7.5f) {
-			throw new ProcessingException(
-					"Quadratic mean diameter computed from total base area and trees per hectare is less than 7.5 cm"
-			);
-		}
-
-		float tphSumHigh = (float) UTIL_CLASSES.stream()
-				.mapToDouble(
-						uc -> BaseAreaTreeDensityDiameter.treesPerHectare(baseAreaUtil.getCoe(uc.index), uc.lowBound)
-				).sum();
-
-		if (tphSumHigh < treesPerHectareUtil.getCoe(UTIL_ALL)) {
-			reconcileComponentsMode1(baseAreaUtil, treesPerHectareUtil, quadMeanDiameterUtil, tphSumHigh);
-		} else {
-			reconcileComponentsMode2Check(baseAreaUtil, treesPerHectareUtil, quadMeanDiameterUtil);
 		}
 
 	}
@@ -1422,203 +1368,6 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		} catch (IllegalAccessException | InvocationTargetException ex) {
 			throw new IllegalStateException(ex);
 		}
-	}
-
-	private static final List<UtilizationClass> MODE_1_RECONCILE_AVAILABILITY_CLASSES = List
-			.of(UtilizationClass.OVER225, UtilizationClass.U175TO225, UtilizationClass.U125TO175);
-
-	@SuppressWarnings("java:S3655")
-	void reconcileComponentsMode1(
-			Coefficients baseAreaUtil, Coefficients treesPerHectareUtil, Coefficients quadMeanDiameterUtil,
-			float tphSumHigh
-	) {
-		// MODE 1
-
-		// the high sum of TPH's is too low. Need MODE 1 reconciliation MUST set DQU's
-		// to lowest allowable values AND must move BA from upper classes to lower
-		// classes.
-
-		float tphNeed = treesPerHectareUtil.getCoe(UTIL_ALL) - tphSumHigh;
-
-		UTIL_CLASSES.forEach(uc -> quadMeanDiameterUtil.setCoe(uc.index, uc.lowBound));
-
-		for (var uc : MODE_1_RECONCILE_AVAILABILITY_CLASSES) {
-			float tphAvail = BaseAreaTreeDensityDiameter
-					.treesPerHectare(baseAreaUtil.getCoe(uc.index), uc.previous().get().lowBound)
-					- BaseAreaTreeDensityDiameter.treesPerHectare(baseAreaUtil.getCoe(uc.index), uc.lowBound);
-
-			if (tphAvail < tphNeed) {
-				baseAreaUtil.scalarInPlace(uc.previous().get().index, x -> x + baseAreaUtil.getCoe(uc.index));
-				baseAreaUtil.setCoe(uc.index, 0f);
-				tphNeed -= tphAvail;
-			} else {
-				float baseAreaMove = baseAreaUtil.getCoe(uc.index) * tphNeed / tphAvail;
-				baseAreaUtil.scalarInPlace(uc.previous().get().index, x -> x + baseAreaMove);
-				baseAreaUtil.scalarInPlace(uc.index, x -> x - baseAreaMove);
-				break;
-			}
-		}
-		UTIL_CLASSES.forEach(
-				uc -> treesPerHectareUtil.setCoe(
-						uc.index,
-						BaseAreaTreeDensityDiameter
-								.treesPerHectare(baseAreaUtil.getCoe(uc.index), quadMeanDiameterUtil.getCoe(uc.index))
-				)
-		);
-	}
-
-	void reconcileComponentsMode2Check(
-			Coefficients baseAreaUtil, Coefficients treesPerHectareUtil, Coefficients quadMeanDiameterUtil
-	) throws ProcessingException {
-		// Before entering mode 2, check to see if reconciliation is already adequate
-
-		float tphSum = (float) UTIL_CLASSES.stream().mapToDouble(uc -> treesPerHectareUtil.getCoe(uc.index)).sum();
-
-		if (abs(tphSum - treesPerHectareUtil.getCoe(UTIL_ALL)) / tphSum > 0.00001) {
-			reconcileComponentsMode2(baseAreaUtil, treesPerHectareUtil, quadMeanDiameterUtil);
-			return;
-		}
-		for (var uc : UTIL_CLASSES) {
-			if (baseAreaUtil.getCoe(uc.index) > 0f) {
-				if (treesPerHectareUtil.getCoe(uc.index) <= 0f) {
-					reconcileComponentsMode2(baseAreaUtil, treesPerHectareUtil, quadMeanDiameterUtil);
-					return;
-				}
-				float dWant = BaseAreaTreeDensityDiameter
-						.quadMeanDiameter(baseAreaUtil.getCoe(uc.index), treesPerHectareUtil.getCoe(uc.index));
-				float dqI = quadMeanDiameterUtil.getCoe(uc.index);
-				if (dqI >= uc.lowBound && dqI <= uc.highBound && abs(dWant - dqI) < 0.00001) {
-					return;
-				}
-			}
-		}
-
-	}
-
-	private void reconcileComponentsMode2(
-			Coefficients baseAreaUtil, Coefficients treesPerHectareUtil, Coefficients quadMeanDiameterUtil
-	) throws ProcessingException {
-		int n = 0;
-		float baseAreaFixed = 0f;
-		float treesPerHectareFixed = 0f;
-		var quadMeanDiameterLimit = new boolean[] { false, false, false, false, false };
-		Coefficients dqTrial = Utils.utilizationVector();
-
-		while (true) {
-			n++;
-
-			if (n > 4) {
-				throw new ProcessingException("Mode 2 component reconciliation iterations exceeded 4");
-			}
-
-			float sum = (float) UTIL_CLASSES.stream().mapToDouble(uc -> {
-				float baI = baseAreaUtil.getCoe(uc.index);
-				float dqI = quadMeanDiameterUtil.getCoe(uc.index);
-				if (baI != 0 && !quadMeanDiameterLimit[uc.index]) {
-					return baI / (dqI * dqI);
-				}
-				return 0;
-			}).sum();
-
-			float baAll = baseAreaUtil.getCoe(UTIL_ALL) - baseAreaFixed;
-			float tphAll = treesPerHectareUtil.getCoe(UTIL_ALL) - treesPerHectareFixed;
-
-			if (baAll <= 0f || tphAll <= 0f) {
-				reconcileComponentsMode3(baseAreaUtil, treesPerHectareUtil, quadMeanDiameterUtil);
-				return;
-			}
-
-			float dqAll = BaseAreaTreeDensityDiameter.quadMeanDiameter(baAll, tphAll);
-
-			float k = dqAll * dqAll / baAll * sum;
-			float sqrtK = sqrt(k);
-
-			for (var uc : UTIL_CLASSES) {
-				if (!quadMeanDiameterLimit[uc.index] && baseAreaUtil.getCoe(uc.index) > 0f) {
-					dqTrial.setCoe(uc.index, quadMeanDiameterUtil.getCoe(uc.index) * sqrtK);
-				}
-			}
-
-			UtilizationClass violateClass = null;
-			float violate = 0f;
-			boolean violateLow = false;
-
-			for (var uc : UTIL_CLASSES) {
-				if (baseAreaUtil.getCoe(uc.index) > 0f && dqTrial.getCoe(uc.index) < uc.lowBound) {
-					float vi = 1f - dqTrial.getCoe(uc.index) / uc.lowBound;
-					if (vi > violate) {
-						violate = vi;
-						violateClass = uc;
-						violateLow = true;
-
-					}
-				}
-				if (dqTrial.getCoe(uc.index) > uc.highBound) {
-					float vi = dqTrial.getCoe(uc.index) / uc.highBound - 1f;
-					if (vi > violate) {
-						violate = vi;
-						violateClass = uc;
-						violateLow = false;
-					}
-				}
-			}
-			if (violateClass == null)
-				break;
-			// Move the worst offending DQ to its limit
-			dqTrial.setCoe(violateClass.index, violateLow ? violateClass.lowBound : violateClass.highBound);
-
-			quadMeanDiameterLimit[violateClass.index] = true;
-			baseAreaFixed += baseAreaUtil.getCoe(violateClass.index);
-			treesPerHectareFixed += BaseAreaTreeDensityDiameter
-					.treesPerHectare(baseAreaUtil.getCoe(violateClass.index), dqTrial.getCoe(violateClass.index));
-		}
-
-		// Make BA's agree with DQ's and TPH's
-		for (var uc : UTIL_CLASSES) {
-			quadMeanDiameterUtil.setCoe(uc.index, dqTrial.getCoe(uc.index));
-			treesPerHectareUtil.setCoe(
-					uc.index,
-					BaseAreaTreeDensityDiameter
-							.treesPerHectare(baseAreaUtil.getCoe(uc.index), quadMeanDiameterUtil.getCoe(uc.index))
-			);
-		}
-		// RE VERIFY That sums are correct
-		float baSum = (float) UTIL_CLASSES.stream().mapToDouble(uc -> baseAreaUtil.getCoe(uc.index)).sum();
-		float tphSum = (float) UTIL_CLASSES.stream().mapToDouble(uc -> treesPerHectareUtil.getCoe(uc.index)).sum();
-		if (abs(baSum - baseAreaUtil.getCoe(UTIL_ALL)) / baSum > 0.0002) {
-			throw new ProcessingException("Failed to reconcile Base Area");
-		}
-		if (abs(tphSum - treesPerHectareUtil.getCoe(UTIL_ALL)) / tphSum > 0.0002) {
-			throw new ProcessingException("Failed to reconcile Trees per Hectare");
-		}
-	}
-
-	@SuppressWarnings("java:S3655")
-	void reconcileComponentsMode3(
-			Coefficients baseAreaUtil, Coefficients treesPerHectareUtil, Coefficients quadMeanDiameterUtil
-	) {
-
-		/*
-		 * Reconciliation mode 3 NOT IN THE ORIGINAL DESIGN The primary motivation for this mode is an example where all
-		 * trees were in a signle utilization class and had a DQ of 12.4 cm. BUT the true DQ for the stand was slightly
-		 * over 12.5. In this case the best solution is to simply reassign all trees to the single most appropriate
-		 * class.
-		 *
-		 * Note, "original design" means something pre-VDYP 7. This was added to the Fortran some time before the port
-		 * to Java including the comment above.
-		 */
-		UTIL_CLASSES.forEach(uc -> {
-			baseAreaUtil.setCoe(uc.index, 0f);
-			treesPerHectareUtil.setCoe(uc.index, 0f);
-			quadMeanDiameterUtil.setCoe(uc.index, uc.lowBound + 2.5f);
-		});
-
-		var ucToUpdate = UTIL_CLASSES.stream().filter(uc -> quadMeanDiameterUtil.getCoe(UTIL_ALL) < uc.highBound)
-				.findFirst().get();
-
-		baseAreaUtil.setCoe(ucToUpdate.index, baseAreaUtil.getCoe(UTIL_ALL));
-		treesPerHectareUtil.setCoe(ucToUpdate.index, treesPerHectareUtil.getCoe(UTIL_ALL));
-		quadMeanDiameterUtil.setCoe(ucToUpdate.index, quadMeanDiameterUtil.getCoe(UTIL_ALL));
 	}
 
 }

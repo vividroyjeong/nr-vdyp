@@ -29,9 +29,9 @@ import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.EstimationMethods.Limits;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
-import ca.bc.gov.nrs.vdyp.common_calculators.EMP.Limits;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndex2Height;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType;
@@ -429,7 +429,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		var leadHeight = requirePositive(primarySiteIn.getHeight(), "Primary layer lead species height");
 
 		// HLPL1
-		var primaryHeight = emp.primaryHeightFromLeadHeight(
+		var primaryHeight = estimationMethods.primaryHeightFromLeadHeight(
 				leadHeight, primarySiteIn.getSiteGenus(), bec.getRegion(), primarySpeciesDensity
 		);
 
@@ -450,14 +450,14 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				float loreyHeight = vriSite.getHeight().filter((x) -> getDebugMode(2) == 1).map(height -> {
 					float speciesQuadMeanDiameter = Math.max(7.5f, height / leadHeight * layerQuadMeanDiameter);
 					float speciesDensity = treesPerHectare(primaryBaseArea, layerQuadMeanDiameter);
-					float speciesLoreyHeight = emp.primaryHeightFromLeadHeight(
+					float speciesLoreyHeight = estimationMethods.primaryHeightFromLeadHeight(
 							vriSite.getHeight().get(), vriSite.getSiteGenus(), bec.getRegion(), speciesDensity
 					);
 
 					return 0f;
 				}).orElseGet(() -> {
 					try {
-						return emp.estimateNonPrimaryLoreyHeight(
+						return estimationMethods.estimateNonPrimaryLoreyHeight(
 								vriSite.getSiteGenus(), primarySiteIn.getSiteGenus(), bec, leadHeight, primaryHeight
 						);
 					} catch (ProcessingException e) {
@@ -465,7 +465,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					}
 				});
 
-				float maxHeight = emp.getLimitsForHeightAndDiameter(vriSpec.getGenus(), bec.getRegion())
+				float maxHeight = estimationMethods.getLimitsForHeightAndDiameter(vriSpec.getGenus(), bec.getRegion())
 						.maxLoreyHeight();
 				loreyHeight = Math.min(loreyHeight, maxHeight);
 				sBuilder.height(loreyHeight);
@@ -557,7 +557,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			Map<String, Float> minPerSpecies, Map<String, Float> maxPerSpecies
 	) throws ProcessingException {
 		for (var spec : layer.getSpecies().values()) {
-			float specDq = emp.estimateQuadMeanDiameterForSpecies(
+			float specDq = estimationMethods.estimateQuadMeanDiameterForSpecies(
 					spec, layer.getSpecies(), region, quadMeanDiameterTotal, baseAreaTotal, treeDensityTotal,
 					loreyHeightTotal
 			);
@@ -585,7 +585,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		// TODO for JPROGRAM = 7 implement this differently, see ROOTV01 L91-L99
 
 		// EMP061
-		return emp.getLimitsForHeightAndDiameter(spec.getGenus(), region);
+		return estimationMethods.getLimitsForHeightAndDiameter(spec.getGenus(), region);
 	}
 
 	float quadMeanDiameterFractionalError(

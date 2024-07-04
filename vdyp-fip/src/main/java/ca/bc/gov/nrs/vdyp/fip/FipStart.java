@@ -333,14 +333,14 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			}
 			// Estimate lorey height for primary species
 			if (iPass == 1 && vdypSpecies.size() == 1) {
-				primaryHeight = emp.primaryHeightFromLeadHeight(
+				primaryHeight = estimationMethods.primaryHeightFromLeadHeight(
 						leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion(), tphTotal
 				);
 			} else if (iPass == 1) {
-				primaryHeight = emp
+				primaryHeight = estimationMethods
 						.primaryHeightFromLeadHeightInitial(leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion());
 			} else {
-				primaryHeight = emp.primaryHeightFromLeadHeight(
+				primaryHeight = estimationMethods.primaryHeightFromLeadHeight(
 						leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion(),
 						vdypPrimarySpecies.getTreesPerHectareByUtilization().getCoe(UTIL_ALL)
 				);
@@ -355,7 +355,9 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				// EMP053
 				vspec.getLoreyHeightByUtilization().setCoe(
 						UTIL_ALL,
-						emp.estimateNonPrimaryLoreyHeight(vspec, vdypPrimarySpecies, bec, leadHeight, primaryHeight)
+						estimationMethods.estimateNonPrimaryLoreyHeight(
+								vspec, vdypPrimarySpecies, bec, leadHeight, primaryHeight
+						)
 				);
 			}
 
@@ -409,7 +411,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			// Multiple Species
 			for (var spec : result.getSpecies().values()) {
 
-				var limits = emp.getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
+				var limits = estimationMethods.getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
 
 				final float maxHeightMultiplier = fipLayer.getPrimaryGenus()
 						.orElseThrow(() -> new IllegalStateException("primaryGenus has not been set"))
@@ -459,7 +461,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				for (var spec : result.getSpecies().values()) {
 
 					// EMP061
-					var limits = emp.getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
+					var limits = estimationMethods.getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
 
 					var dqMin = limits.minDiameterHeight() * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL);
 					var dqMax = max(
@@ -469,7 +471,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 					// EMP060
 					float quadMeanDiameter = clamp(
-							emp.estimateQuadMeanDiameterForSpecies(
+							estimationMethods.estimateQuadMeanDiameterForSpecies(
 									spec, result.getSpecies(), bec.getRegion(), quadMeanDiameterTotal, baseAreaTotal,
 									treesPerHectareTotal, loreyHeightTotal
 							), //
