@@ -215,30 +215,35 @@ public class VdypSpeciesUtilization extends VdypEntity {
 			float basalAreaUpperBound = ForwardProcessingEngine
 					.calculateBasalArea(CLASS_UPPER_BOUNDS[this.ucIndex.ordinal()] - DQ_EPS, this.liveTreesPerHectare);
 
-			float basalAreaError = 0.0f;
+			float basalAreaError;
+			float newBasalArea;
 			String message = null;
 
 			if (this.basalArea < basalAreaLowerBound) {
 				basalAreaError = FloatMath.abs(this.basalArea - basalAreaLowerBound);
-				this.basalArea = basalAreaLowerBound;
+				newBasalArea = basalAreaLowerBound;
 				message = MessageFormat.format(
-						"{0}: Error 6: basal area {1} is {2} below threshold, exceeding the maximum error {3}", this,
+						"{0}: Error 6: basal area {1} is {2} below threshold, exceeding the maximum error of {3}.", this,
 						this.basalArea, basalAreaError, MAX_ACCEPTABLE_BASAL_AREA_ERROR
 				);
 			} else if (this.basalArea > basalAreaUpperBound) {
 				basalAreaError = FloatMath.abs(this.basalArea - basalAreaUpperBound);
 				message = MessageFormat.format(
-						"{0}: Error 6: basal area {1} is {2} above threshold, exceeding the maximum error {3}", this,
+						"{0}: Error 6: basal area {1} is {2} above threshold, exceeding the maximum error of {3}.", this,
 						this.basalArea, basalAreaError, MAX_ACCEPTABLE_BASAL_AREA_ERROR
 				);
-				this.basalArea = basalAreaUpperBound;
+				newBasalArea = basalAreaUpperBound;
+			} else {
+				basalAreaError = 0.0f;
+				newBasalArea = this.basalArea;
 			}
 
 			if (basalAreaError > MAX_ACCEPTABLE_BASAL_AREA_ERROR) {
 				throw new ProcessingException(message);
+			} else {
+				this.basalArea = newBasalArea;
 			}
 		}
-
 	}
 
 	/**

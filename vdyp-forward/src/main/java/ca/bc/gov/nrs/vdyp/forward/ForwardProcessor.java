@@ -2,11 +2,9 @@ package ca.bc.gov.nrs.vdyp.forward;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -14,14 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.Utils;
-import ca.bc.gov.nrs.vdyp.forward.model.ControlVariable;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonDescription;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
-import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 
 /**
  *

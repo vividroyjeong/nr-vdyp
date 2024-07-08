@@ -25,7 +25,6 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.AbstractStreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.GroupingStreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ControlledValueParser;
-import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.GenusDistribution;
