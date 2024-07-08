@@ -283,7 +283,7 @@ public class ForwardProcessingEngine {
 			);
 		}
 
-		final SiteIndexAgeType ageType = SiteIndexAgeType.SI_AT_TOTAL;
+		final SiteIndexAgeType ageType = SiteIndexAgeType.SI_AT_BREAST;
 
 		double siteIndex_d = siteIndex;
 		double dominantHeight_d = dominantHeight;
