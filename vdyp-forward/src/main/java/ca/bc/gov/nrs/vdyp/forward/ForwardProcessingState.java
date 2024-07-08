@@ -56,12 +56,22 @@ class ForwardProcessingState {
 	final Map<String, Coefficients> smallComponentBasalAreaCoefficients;
 	final Map<String, Coefficients> smallComponentProbabilityCoefficients;
 	final Map<Integer, SiteCurveAgeMaximum> maximumAgeBySiteCurveNumber;
-
+	final Map<Integer, Coefficients> upperBounds;
+	final MatrixMap2<String, String, Integer> defaultEquationGroup;	
+	final MatrixMap2<Integer, Integer, Optional<Integer>> equationModifierGroup;
+	final MatrixMap2<String, Region, Coefficients> hl1Coefficients;
+	final CompVarAdjustments compVarAdjustments;
+	final ForwardControlVariables forwardControlVariables;
+	
 	/** The storage banks */
 	private final Bank[/* instances */][/* layers of instance */] banks;
 
 	/** The active state */
 	private PolygonProcessingState pps;
+
+	final BecLookup becLookup;
+	final MatrixMap2<String, Region, SiteIndexEquation> siteCurveMap;
+
 
 	public ForwardProcessingState(Map<String, Object> controlMap) {
 		this.controlMap = controlMap;
@@ -123,43 +133,44 @@ class ForwardProcessingState {
 		this.maximumAgeBySiteCurveNumber = Utils.<Map<Integer, SiteCurveAgeMaximum>>expectParsedControl(
 				controlMap, ControlKey.SITE_CURVE_AGE_MAX, Map.class
 		);
-	}
+		this.upperBounds = Utils.<Map<Integer, Coefficients>>expectParsedControl(
+				controlMap, ControlKey.BA_DQ_UPPER_BOUNDS, Map.class);
+		this.defaultEquationGroup = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
+				controlMap, ControlKey.DEFAULT_EQ_NUM, MatrixMap2.class);
+		this.equationModifierGroup = Utils.<MatrixMap2<Integer, Integer, Optional<Integer>>>expectParsedControl(
+				controlMap, ControlKey.EQN_MODIFIERS, MatrixMap2.class);
+		
+		this.becLookup = Utils.expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class);
 
-	public GenusDefinitionMap getGenusDefinitionMap() {
-		return genusDefinitionMap;
-	}
+		this.siteCurveMap = Utils.expectParsedControl(controlMap, ControlKey.SITE_CURVE_NUMBERS, MatrixMap2.class);
 
-	public BecLookup getBecLookup() {
-		return Utils.expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class);
-	}
+		this.hl1Coefficients = Utils.expectParsedControl(controlMap, ControlKey.HL_PRIMARY_SP_EQN_P1, MatrixMap2.class);
+		
+		this.compVarAdjustments = Utils.expectParsedControl(controlMap, ControlKey.PARAM_ADJUSTMENTS, CompVarAdjustments.class);
 
-	public MatrixMap2<String, Region, SiteIndexEquation> getSiteCurveMap() {
-		return Utils.expectParsedControl(controlMap, ControlKey.SITE_CURVE_NUMBERS, MatrixMap2.class);
-	}
-
-	public MatrixMap2<String, Region, Coefficients> getHl1Coefficients() {
-		return Utils.expectParsedControl(controlMap, ControlKey.HL_PRIMARY_SP_EQN_P1, MatrixMap2.class);
-	}
-
-	public CompVarAdjustments getCompVarAdjustments() {
-		return Utils.expectParsedControl(controlMap, ControlKey.PARAM_ADJUSTMENTS, CompVarAdjustments.class);
-	}
-
-	public ForwardControlVariables getForwardControlVariables() {
-		return Utils.expectParsedControl(controlMap, ControlKey.VTROL, ForwardControlVariables.class);
+		this.forwardControlVariables = Utils.expectParsedControl(controlMap, ControlKey.VTROL, ForwardControlVariables.class);
 	}
 
 	private static final float MIN_BASAL_AREA = 0.001f;
 
 	public void setPolygon(VdypPolygon polygon) {
+		
 		// Move the primary layer of the given polygon to bank zero.
-		banks[0][0] = new Bank(
+		Bank primaryBank = banks[0][LayerType.PRIMARY.getIndex()] = new Bank(
 				polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone(),
 				s -> s.getUtilizations().isPresent()
 						? s.getUtilizations().get().get(UtilizationClass.ALL).getBasalArea() >= MIN_BASAL_AREA
 						: true
 		);
-		pps = new PolygonProcessingState(this, polygon, banks[0][0], controlMap);
+		
+		polygon.getVeteranLayer().ifPresent(l ->
+			banks[0][LayerType.VETERAN.getIndex()] = new Bank(
+					l, polygon.getBiogeoclimaticZone(),
+					s -> s.getUtilizations().isPresent()
+							? s.getUtilizations().get().get(UtilizationClass.ALL).getBasalArea() >= MIN_BASAL_AREA
+							: true));
+		
+		pps = new PolygonProcessingState(this, polygon, primaryBank, controlMap);
 	}
 
 	public PolygonProcessingState getPolygonProcessingState() {
@@ -171,14 +182,14 @@ class ForwardProcessingState {
 	}
 
 	public void storeActive(int instanceNumber, LayerType layerType) {
-		banks[instanceNumber][layerType.ordinal()] = pps.wallet.copy();
+		banks[instanceNumber][layerType.getIndex()] = pps.wallet.copy();
 	}
 
 	public void transfer(int fromInstanceNumber, int toInstanceNumber, LayerType layerType) {
-		banks[toInstanceNumber][layerType.ordinal()] = banks[fromInstanceNumber][layerType.ordinal()].copy();
+		banks[toInstanceNumber][layerType.getIndex()] = banks[fromInstanceNumber][layerType.getIndex()].copy();
 	}
 
 	public Bank getBank(int instanceNumber, LayerType layerType) {
-		return banks[instanceNumber][layerType.ordinal()];
+		return banks[instanceNumber][layerType.getIndex()];
 	}
 }

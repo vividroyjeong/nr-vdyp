@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.forward.model.ControlVariable;
 import ca.bc.gov.nrs.vdyp.forward.model.ForwardControlVariables;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
@@ -78,9 +79,7 @@ class PolygonProcessingState {
 	// PCTP = wallet.percentagesOfForestedLand[primarySpeciesIndex]
 	private Optional<Integer> secondarySpeciesIndex; // => ISPS (species name) and PCTS (percentage)
 	private int inventoryTypeGroup; // ITG
-	@SuppressWarnings("unused")
 	private int primarySpeciesGroupNumber; // GRPBA1
-	@SuppressWarnings("unused")
 	private int primarySpeciesStratumNumber; // GRPBA3
 
 	// Site Curve Numbers - encompasses INXSCV
@@ -255,6 +254,122 @@ class PolygonProcessingState {
 		return inventoryTypeGroup;
 	}
 
+	public static String getCompatibilityVariablesSetCanBeSetOnceOnly() {
+		return COMPATIBILITY_VARIABLES_SET_CAN_BE_SET_ONCE_ONLY;
+	}
+
+	public static String getPrimarySpeciesDetailsCanBeSetOnceOnly() {
+		return PRIMARY_SPECIES_DETAILS_CAN_BE_SET_ONCE_ONLY;
+	}
+
+	public static String getSiteCurveNumbersCanBeSetOnceOnly() {
+		return SITE_CURVE_NUMBERS_CAN_BE_SET_ONCE_ONLY;
+	}
+
+	public static String getSpeciesRankingDetailsCanBeSetOnceOnly() {
+		return SPECIES_RANKING_DETAILS_CAN_BE_SET_ONCE_ONLY;
+	}
+
+	public static String getUnsetPrimarySpeciesAgeToBreastHeight() {
+		return UNSET_PRIMARY_SPECIES_AGE_TO_BREAST_HEIGHT;
+	}
+
+	public static String getUnsetPrimarySpeciesAgeAtBreastHeight() {
+		return UNSET_PRIMARY_SPECIES_AGE_AT_BREAST_HEIGHT;
+	}
+
+	public static String getUnsetPrimarySpeciesDominantHeight() {
+		return UNSET_PRIMARY_SPECIES_DOMINANT_HEIGHT;
+	}
+
+	public static String getUnsetCvVolumes() {
+		return UNSET_CV_VOLUMES;
+	}
+
+	public static String getUnsetCvBasalAreas() {
+		return UNSET_CV_BASAL_AREAS;
+	}
+
+	public static String getUnsetRankingDetails() {
+		return UNSET_RANKING_DETAILS;
+	}
+
+	public static String getUnsetSiteCurveNumbers() {
+		return UNSET_SITE_CURVE_NUMBERS;
+	}
+
+	public static String getUnsetInventoryTypeGroup() {
+		return UNSET_INVENTORY_TYPE_GROUP;
+	}
+
+	public static Logger getLogger() {
+		return logger;
+	}
+
+	public ForwardProcessingState getFps() {
+		return fps;
+	}
+
+	public Bank getWallet() {
+		return wallet;
+	}
+
+	public int[] getVolumeEquationGroups() {
+		return volumeEquationGroups;
+	}
+
+	public int[] getDecayEquationGroups() {
+		return decayEquationGroups;
+	}
+
+	public int[] getBreakageEquationGroups() {
+		return breakageEquationGroups;
+	}
+
+	public boolean isAreRankingDetailsSet() {
+		return areRankingDetailsSet;
+	}
+
+	public int getPrimarySpeciesGroupNumber() {
+		return primarySpeciesGroupNumber;
+	}
+
+	public int getPrimarySpeciesStratumNumber() {
+		return primarySpeciesStratumNumber;
+	}
+
+	public boolean isAreSiteCurveNumbersSet() {
+		return areSiteCurveNumbersSet;
+	}
+
+	public int[] getSiteCurveNumbers() {
+		return siteCurveNumbers;
+	}
+
+	public boolean isArePrimarySpeciesDetailsSet() {
+		return arePrimarySpeciesDetailsSet;
+	}
+
+	public boolean isAreCompatibilityVariablesSet() {
+		return areCompatibilityVariablesSet;
+	}
+
+	public MatrixMap3<UtilizationClass, VolumeVariable, LayerType, Float>[] getCvVolume() {
+		return cvVolume;
+	}
+
+	public MatrixMap2<UtilizationClass, LayerType, Float>[] getCvBasalArea() {
+		return cvBasalArea;
+	}
+
+	public MatrixMap2<UtilizationClass, LayerType, Float>[] getCvQuadraticMeanDiameter() {
+		return cvQuadraticMeanDiameter;
+	}
+
+	public Map<SmallUtilizationClassVariable, Float>[] getCvPrimaryLayerSmall() {
+		return cvPrimaryLayerSmall;
+	}
+
 	/** 
 	 * @param n index of species for whom the site curve number is to be returned.
 	 * @return the site curve number of the given species.
@@ -316,6 +431,8 @@ class PolygonProcessingState {
 		this.primarySpeciesIndex = rankingDetails.primarySpeciesIndex();
 		this.secondarySpeciesIndex = rankingDetails.secondarySpeciesIndex();
 		this.inventoryTypeGroup = rankingDetails.inventoryTypeGroup();
+		this.primarySpeciesGroupNumber = rankingDetails.basalAreaGroup1();
+		this.primarySpeciesStratumNumber = rankingDetails.basalAreaGroup3();
 
 		this.areRankingDetailsSet = true;
 	}
@@ -331,7 +448,10 @@ class PolygonProcessingState {
 	}
 
 	public void setPrimarySpeciesDetails(PrimarySpeciesDetails details) {
-		if (this.arePrimarySpeciesDetailsSet) {
+		
+		// Normally, these values may only be set only once. However, during grow(), if the 
+		// control variable UPDATE_DURING_GROWTH_6 has value "1" then updates are allowed.
+		if (this.arePrimarySpeciesDetailsSet && fps.forwardControlVariables.getControlVariable(ControlVariable.UPDATE_DURING_GROWTH_6) != 1) {
 			throw new IllegalStateException(PRIMARY_SPECIES_DETAILS_CAN_BE_SET_ONCE_ONLY);
 		}
 
