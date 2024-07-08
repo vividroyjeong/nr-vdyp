@@ -5,13 +5,9 @@ import static ca.bc.gov.nrs.vdyp.math.FloatMath.clamp;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.exp;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.log;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.pow;
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.sqrt;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -51,8 +47,6 @@ import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.EstimationMethods;
-import ca.bc.gov.nrs.vdyp.common.IndexedFloatBinaryOperator;
-import ca.bc.gov.nrs.vdyp.common.ReconcilationMethods;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
@@ -62,21 +56,16 @@ import ca.bc.gov.nrs.vdyp.fip.model.FipPolygon;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSite;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
-import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
-import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
-import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
-import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.CompatibilityVariableMode;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
-import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
-import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
@@ -85,6 +74,7 @@ import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
+import ca.bc.gov.nrs.vdyp.model.VolumeComputeMode;
 
 public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpecies, FipSite> {
 
@@ -92,10 +82,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			.compareUsing(FipSpecies::getPercentGenus).reversed();
 
 	public static final Logger log = LoggerFactory.getLogger(FipStart.class);
-
-	public static final int UTIL_ALL = UtilizationClass.ALL.index;
-	public static final int UTIL_LARGEST = UtilizationClass.OVER225.index;
-	public static final int UTIL_SMALL = UtilizationClass.SMALL.index;
 
 	public static final float TOLERANCE = 2.0e-3f;
 
@@ -331,25 +317,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 		var vdypPrimarySpecies = vdypSpecies.get(primarySpecies.get(0).getGenus());
 
-		// Lookup volume group, Decay Group, and Breakage group for each species.
-
-		var volumeGroupMap = getGroupMap(ControlKey.VOLUME_EQN_GROUPS);
-		var decayGroupMap = getGroupMap(ControlKey.DECAY_GROUPS);
-		var breakageGroupMap = getGroupMap(ControlKey.BREAKAGE_GROUPS);
-
-		Map<String, Float> targetPercentages = new HashMap<>(vdypSpecies.size());
-
-		for (var vSpec : vdypSpecies.values()) {
-			var volumeGroup = getGroup(fipPolygon, volumeGroupMap, vSpec.getGenus());
-			var decayGroup = getGroup(fipPolygon, decayGroupMap, vSpec.getGenus());
-			var breakageGroup = getGroup(fipPolygon, breakageGroupMap, vSpec.getGenus());
-
-			vSpec.setVolumeGroup(volumeGroup);
-			vSpec.setDecayGroup(decayGroup);
-			vSpec.setBreakageGroup(breakageGroup);
-
-			targetPercentages.put(vSpec.getGenus(), vSpec.getPercentGenus());
-		}
+		Map<String, Float> targetPercentages = applyGroups(fipPolygon, vdypSpecies.values());
 
 		var maxPass = fipLayer.getSpecies().size() > 1 ? 2 : 1;
 
@@ -365,15 +333,14 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			}
 			// Estimate lorey height for primary species
 			if (iPass == 1 && vdypSpecies.size() == 1) {
-				primaryHeight = primaryHeightFromLeadHeight(
+				primaryHeight = estimationMethods.primaryHeightFromLeadHeight(
 						leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion(), tphTotal
 				);
 			} else if (iPass == 1) {
-				primaryHeight = primaryHeightFromLeadHeightInitial(
-						leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion()
-				);
+				primaryHeight = estimationMethods
+						.primaryHeightFromLeadHeightInitial(leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion());
 			} else {
-				primaryHeight = primaryHeightFromLeadHeight(
+				primaryHeight = estimationMethods.primaryHeightFromLeadHeight(
 						leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion(),
 						vdypPrimarySpecies.getTreesPerHectareByUtilization().getCoe(UTIL_ALL)
 				);
@@ -388,7 +355,9 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				// EMP053
 				vspec.getLoreyHeightByUtilization().setCoe(
 						UTIL_ALL,
-						estimateNonPrimaryLoreyHeight(vspec, vdypPrimarySpecies, bec, leadHeight, primaryHeight)
+						estimationMethods.estimateNonPrimaryLoreyHeight(
+								vspec, vdypPrimarySpecies, bec, leadHeight, primaryHeight
+						)
 				);
 			}
 
@@ -442,12 +411,12 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			// Multiple Species
 			for (var spec : result.getSpecies().values()) {
 
-				Coefficients limitCoe = getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
+				var limits = estimationMethods.getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
 
 				final float maxHeightMultiplier = fipLayer.getPrimaryGenus()
 						.orElseThrow(() -> new IllegalStateException("primaryGenus has not been set"))
 						.equals(spec.getGenus()) ? 1.5f : 1.0f;
-				final float heightMax = limitCoe.getCoe(1) * maxHeightMultiplier;
+				final float heightMax = limits.maxLoreyHeight() * maxHeightMultiplier;
 
 				spec.getLoreyHeightByUtilization().scalarInPlace(UTIL_ALL, x -> min(x, heightMax));
 			}
@@ -492,16 +461,17 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				for (var spec : result.getSpecies().values()) {
 
 					// EMP061
-					Coefficients limitCoe = getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
+					var limits = estimationMethods.getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
 
-					var dqMin = limitCoe.getCoe(3) * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL);
+					var dqMin = limits.minDiameterHeight() * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL);
 					var dqMax = max(
-							limitCoe.getCoe(2), limitCoe.getCoe(4) * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL)
+							limits.maxQuadMeanDiameter(),
+							limits.maxDiameterHeight() * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL)
 					);
 
 					// EMP060
 					float quadMeanDiameter = clamp(
-							estimateQuadMeanDiameterForSpecies(
+							estimationMethods.estimateQuadMeanDiameterForSpecies(
 									spec, result.getSpecies(), bec.getRegion(), quadMeanDiameterTotal, baseAreaTotal,
 									treesPerHectareTotal, loreyHeightTotal
 							), //
@@ -607,201 +577,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		}
 	}
 
-	// EMP060
-	/**
-	 * Estimate DQ for a species (primary or not). Using eqn in jf125.doc.
-	 *
-	 * Enforces mins and maxes from EMP061.
-	 *
-	 * @param spec                  Species of insterest
-	 * @param allSpecies            Collection of all species on the layer
-	 * @param region                BEC Region of the stand
-	 * @param standQuadMeanDiameter Quadratic mean diameter of the stand
-	 * @param standBaseArea         Base area of the stand
-	 * @param standTreesPerHectare  Density opf the stand
-	 * @param standLoreyHeight      Lorey height of the stand
-	 * @return Quadratic mean diameter of the species of interest
-	 * @throws ProcessingException
-	 */
-	float estimateQuadMeanDiameterForSpecies(
-			VdypSpecies spec, // ISP, HLsp, DQsp
-			Map<String, VdypSpecies> allSpecies, // FR
-			Region region, // INDEX_IC
-			float standQuadMeanDiameter, // DQ_TOT
-			float standBaseArea, // BA_TOT
-			float standTreesPerHectare, // TPH_TOT
-			float standLoreyHeight // HL_TOT
-	) throws ProcessingException {
-		String species = spec.getGenus();
-
-		float c = 0.00441786467f;
-
-		float minQuadMeanDiameter = min(7.6f, standQuadMeanDiameter);
-
-		// Quick solution
-		if (spec.getFractionGenus() >= 1f || standQuadMeanDiameter < minQuadMeanDiameter) {
-			return standQuadMeanDiameter;
-		}
-
-		var coeMap = Utils
-				.<Map<String, Coefficients>>expectParsedControl(controlMap, ControlKey.BY_SPECIES_DQ, Map.class);
-		var specAliases = GenusDefinitionParser.getSpeciesAliases(controlMap);
-
-		// TODO we can probably remove these as they seem to only be used for debugging
-		// in VDYP7
-		Map<String, Float> adjust = new HashMap<>(coeMap.size());
-		Map<String, Float> mult = new HashMap<>(coeMap.size());
-
-		var specIt = specAliases.iterator();
-
-		var spec1 = specIt.next();
-
-		float a2 = coeMap.get(spec1).getCoe(2);
-
-		float fractionOther = 1f - spec.getFractionGenus(); // FR_REST
-
-		mult.put(spec1, 1f);
-		float a0 = coeMap.get(spec1).getCoe(0);
-		float a1 = coeMap.get(spec1).getCoe(1);
-
-		while (specIt.hasNext()) {
-			var specIAlias = specIt.next();
-			var specI = allSpecies.get(specIAlias);
-			if (specIAlias.equals(spec.getGenus())) {
-				float multI = 1f;
-				mult.put(specIAlias, multI);
-				a0 += multI * coeMap.get(specIAlias).getCoe(0);
-				a1 += multI * coeMap.get(specIAlias).getCoe(1);
-			} else {
-				if (specI != null && specI.getFractionGenus() > 0f) {
-					float multI = -specI.getFractionGenus() / fractionOther;
-					mult.put(specIAlias, multI);
-					a0 += multI * coeMap.get(specIAlias).getCoe(0);
-					a1 -= multI * coeMap.get(specIAlias).getCoe(1);
-				}
-			}
-		}
-
-		float loreyHeightSpec = spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL);
-		float loreyHeight1 = max(4f, loreyHeightSpec);
-		float loreyHeight2 = (standLoreyHeight - loreyHeightSpec * spec.getFractionGenus()) / fractionOther;
-		float loreyHeightRatio = clamp( (loreyHeight1 - 3f) / (loreyHeight2 - 3f), 0.05f, 20f);
-
-		float r = exp(
-				a0 + a1 * log(loreyHeightRatio) + a2 * log(standQuadMeanDiameter) + adjust.getOrDefault(species, 0f)
-		);
-
-		float baseArea1 = spec.getFractionGenus() * standBaseArea;
-		float baseArea2 = standBaseArea - baseArea1;
-
-		float treesPerHectare1;
-		if (abs(r - 1f) < 0.0005) {
-			treesPerHectare1 = spec.getFractionGenus() * standTreesPerHectare;
-		} else {
-			float aa = (r - 1f) * c;
-			float bb = c * (1f - r) * standTreesPerHectare + baseArea1 + baseArea2 * r;
-			float cc = -baseArea1 * standTreesPerHectare;
-			float term = bb * bb - 4 * aa * cc;
-			if (term <= 0f) {
-				throw new ProcessingException(
-						"Term for trees per hectare calculation when estimating quadratic mean diameter for species "
-								+ species + " was " + term + " but should be positive."
-				);
-			}
-			treesPerHectare1 = (-bb + sqrt(term)) / (2f * aa);
-			if (treesPerHectare1 <= 0f || treesPerHectare1 > standTreesPerHectare) {
-				throw new ProcessingException(
-						"Trees per hectare 1 for species " + species + " was " + treesPerHectare1
-								+ " but should be positive and less than or equal to stand trees per hectare "
-								+ standTreesPerHectare
-				);
-			}
-		}
-
-		float quadMeanDiameter1 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea1, treesPerHectare1);
-		float treesPerHectare2 = standTreesPerHectare - treesPerHectare1;
-		float quadMeanDiameter2 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea2, treesPerHectare2);
-
-		if (quadMeanDiameter2 < minQuadMeanDiameter) {
-			// species 2 is too small. Make target species smaller.
-			quadMeanDiameter2 = minQuadMeanDiameter;
-			treesPerHectare2 = BaseAreaTreeDensityDiameter.treesPerHectare(baseArea2, quadMeanDiameter2);
-			treesPerHectare1 = standTreesPerHectare - treesPerHectare2;
-			quadMeanDiameter1 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea1, treesPerHectare1);
-		}
-		var limitCoe = getLimitsForHeightAndDiameter(species, region);
-
-		final var dqMinSp = max(minQuadMeanDiameter, limitCoe.getCoe(3) * loreyHeightSpec);
-		final var dqMaxSp = max(7.6f, min(limitCoe.getCoe(2), limitCoe.getCoe(4) * loreyHeightSpec));
-		if (quadMeanDiameter1 < dqMinSp) {
-			quadMeanDiameter1 = dqMinSp;
-			treesPerHectare1 = BaseAreaTreeDensityDiameter.treesPerHectare(baseArea1, quadMeanDiameter1);
-			treesPerHectare2 = standTreesPerHectare - treesPerHectare2;
-			quadMeanDiameter2 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea2, treesPerHectare2);
-		}
-		if (quadMeanDiameter1 > dqMaxSp) {
-			// target species is too big. Make target species smaller, DQ2 bigger.
-
-			quadMeanDiameter1 = dqMaxSp;
-			treesPerHectare1 = BaseAreaTreeDensityDiameter.treesPerHectare(baseArea1, quadMeanDiameter1);
-			treesPerHectare2 = standTreesPerHectare - treesPerHectare2;
-
-			if (treesPerHectare2 > 0f && baseArea2 > 0f) {
-				quadMeanDiameter2 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea2, treesPerHectare2);
-			} else {
-				quadMeanDiameter2 = 1000f;
-			}
-
-			// under rare circumstances, let DQ1 exceed DQMAXsp
-			if (quadMeanDiameter2 < minQuadMeanDiameter) {
-				quadMeanDiameter2 = minQuadMeanDiameter;
-				treesPerHectare2 = BaseAreaTreeDensityDiameter.treesPerHectare(baseArea2, quadMeanDiameter2);
-				treesPerHectare1 = standTreesPerHectare - treesPerHectare2;
-				quadMeanDiameter1 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea1, treesPerHectare1);
-			}
-
-		}
-		return quadMeanDiameter1;
-	}
-
-	// EMP061
-	private Coefficients getLimitsForHeightAndDiameter(String genus, Region region) {
-		var coeMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, MatrixMap2.class
-		);
-
-		return coeMap.get(genus, region);
-	}
-
-	// EMP053 Using eqns N1 and N2 from ipsjf124.doc
-	/**
-	 * Estimate the lorey height of a non-primary species of a primary layer.
-	 *
-	 * @param vspec         The species.
-	 * @param vspecPrime    The primary species.
-	 * @param leadHeight    lead height of the layer
-	 * @param primaryHeight height of the primary species
-	 * @throws ProcessingException
-	 */
-	float estimateNonPrimaryLoreyHeight(
-			VdypSpecies vspec, VdypSpecies vspecPrime, BecDefinition bec, float leadHeight, float primaryHeight
-	) throws ProcessingException {
-		var coeMap = Utils.<MatrixMap3<String, String, Region, Optional<NonprimaryHLCoefficients>>>expectParsedControl(
-				controlMap, ControlKey.HL_NONPRIMARY, MatrixMap3.class
-		);
-
-		var coe = coeMap.get(vspec.getGenus(), vspecPrime.getGenus(), bec.getRegion()).orElseThrow(
-				() -> new ProcessingException(
-						String.format(
-								"Could not find Lorey Height Nonprimary Coefficients for %s %s %s", vspec.getGenus(),
-								vspecPrime.getGenus(), bec.getRegion()
-						)
-				)
-		);
-		var heightToUse = coe.getEquationIndex() == 1 ? leadHeight : primaryHeight;
-		return 1.3f + coe.getCoe(1) * pow(heightToUse - 1.3f, coe.getCoe(2));
-	}
-
 	VdypLayer processLayerAsVeteran(FipPolygon fipPolygon, FipLayer fipLayer) throws ProcessingException {
 
 		var polygonIdentifier = fipLayer.getPolygonIdentifier();
@@ -855,20 +630,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				}) //
 				.collect(Collectors.toMap(VdypSpecies::getGenus, Function.identity()));
 
-		// Lookup volume group, Decay Group, and Breakage group for each species.
-
-		var volumeGroupMap = getGroupMap(ControlKey.VOLUME_EQN_GROUPS);
-		var decayGroupMap = getGroupMap(ControlKey.DECAY_GROUPS);
-		var breakageGroupMap = getGroupMap(ControlKey.BREAKAGE_GROUPS);
-		for (var vSpec : vdypSpecies.values()) {
-			var volumeGroup = getGroup(fipPolygon, volumeGroupMap, vSpec.getGenus());
-			var decayGroup = getGroup(fipPolygon, decayGroupMap, vSpec.getGenus());
-			var breakageGroup = getGroup(fipPolygon, breakageGroupMap, vSpec.getGenus());
-
-			vSpec.setVolumeGroup(volumeGroup);
-			vSpec.setDecayGroup(decayGroup);
-			vSpec.setBreakageGroup(breakageGroup);
-		}
+		applyGroups(fipPolygon, vdypSpecies.values());
 
 		/*
 		 * From VDYP7
@@ -923,256 +685,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 		return vdypLayer;
 	}
-
-	enum VolumeComputeMode {
-		/**
-		 * set volume components to zero
-		 */
-		ZERO, // 0
-		/**
-		 * compute volumes by utilization component
-		 */
-		BY_UTIL, // 1
-		/**
-		 * As BY_UTIL but also compute Whole Stem Volume for every species
-		 */
-		BY_UTIL_WITH_WHOLE_STEM_BY_SPEC // 2
-	}
-
-	enum CompatibilityVariableMode {
-		/**
-		 * Don't apply compatibility variables
-		 */
-		NONE, // 0
-		/**
-		 * Apply compatibility variables to all but volume
-		 */
-		NO_VOLUME, // 1
-		/**
-		 * Apply compatibility variables to all components
-		 */
-		ALL // 2
-	}
-
-	// YUC1
-	void computeUtilizationComponentsPrimary(
-			BecDefinition bec, VdypLayer vdypLayer, VolumeComputeMode volumeComputeMode,
-			CompatibilityVariableMode compatibilityVariableMode
-	) throws ProcessingException {
-		log.atTrace().setMessage("computeUtilizationComponentsPrimary for {}, stand total age is {}")
-				.addArgument(vdypLayer.getPolygonIdentifier()).addArgument(vdypLayer.getAgeTotal()).log();
-		log.atDebug().setMessage("Primary layer for {} has {} species/genera: {}")
-				.addArgument(vdypLayer::getPolygonIdentifier) //
-				.addArgument(() -> vdypLayer.getSpecies().size()) //
-				.addArgument(() -> vdypLayer.getSpecies().keySet().stream().collect(Collectors.joining(", "))) //
-				.log();
-
-		for (VdypSpecies spec : vdypLayer.getSpecies().values()) {
-			float loreyHeightSpec = spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL);
-			float baseAreaSpec = spec.getBaseAreaByUtilization().getCoe(UTIL_ALL);
-			float quadMeanDiameterSpec = spec.getQuadraticMeanDiameterByUtilization().getCoe(UTIL_ALL);
-			float treesPerHectareSpec = spec.getTreesPerHectareByUtilization().getCoe(UTIL_ALL);
-
-			log.atDebug().setMessage("Working with species {}  LH: {}  DQ: {}  BA: {}  TPH: {}")
-					.addArgument(spec.getClass()).addArgument(loreyHeightSpec).addArgument(quadMeanDiameterSpec)
-					.addArgument(baseAreaSpec).addArgument(treesPerHectareSpec);
-
-			if (volumeComputeMode == VolumeComputeMode.BY_UTIL_WITH_WHOLE_STEM_BY_SPEC) {
-				log.atDebug().log("Estimating tree volume");
-
-				// EMP090
-				throw new UnsupportedOperationException("TODO"); // Not used yet
-
-				// log.atDebug().setMessage("Species WS stand volume {}")
-				// .addArgument(() -> spec.getWholeStemVolumeByUtilization().getCoe(UTIL_ALL));
-
-			}
-			float wholeStemVolumeSpec = spec.getWholeStemVolumeByUtilization().getCoe(UTIL_ALL);
-
-			var baseAreaUtil = Utils.utilizationVector();
-			var quadMeanDiameterUtil = Utils.utilizationVector();
-			var treesPerHectareUtil = Utils.utilizationVector();
-			var wholeStemVolumeUtil = Utils.utilizationVector();
-			var closeVolumeUtil = Utils.utilizationVector();
-			var closeVolumeNetDecayUtil = Utils.utilizationVector();
-			var closeVolumeNetDecayWasteUtil = Utils.utilizationVector();
-			var closeVolumeNetDecayWasteBreakUtil = Utils.utilizationVector();
-
-			baseAreaUtil.setCoe(UTIL_ALL, baseAreaSpec); // BAU
-			quadMeanDiameterUtil.setCoe(UTIL_ALL, quadMeanDiameterSpec); // DQU
-			treesPerHectareUtil.setCoe(UTIL_ALL, treesPerHectareSpec); // TPHU
-			wholeStemVolumeUtil.setCoe(UTIL_ALL, wholeStemVolumeSpec); // WSU
-
-			var adjustCloseUtil = Utils.utilizationVector(); // ADJVCU
-			@SuppressWarnings("unused")
-			var adjustDecayUtil = Utils.utilizationVector(); // ADJVD
-			@SuppressWarnings("unused")
-			var adjustDecayWasteUtil = Utils.utilizationVector(); // ADJVDW
-
-			// EMP071
-			EstimationMethods
-					.estimateQuadMeanDiameterByUtilization(controlMap, bec, quadMeanDiameterUtil, spec.getGenus());
-
-			// EMP070
-			EstimationMethods.estimateBaseAreaByUtilization(
-					controlMap, bec, quadMeanDiameterUtil, baseAreaUtil, spec.getGenus()
-			);
-
-			// Calculate tree density components
-			for (var uc : UtilizationClass.UTIL_CLASSES) {
-				treesPerHectareUtil.setCoe(
-						uc.index,
-						BaseAreaTreeDensityDiameter
-								.treesPerHectare(baseAreaUtil.getCoe(uc.index), quadMeanDiameterUtil.getCoe(uc.index))
-				);
-			}
-
-			// reconcile components with totals
-
-			// YUC1R
-			ReconcilationMethods.reconcileComponents(baseAreaUtil, treesPerHectareUtil, quadMeanDiameterUtil);
-
-			if (compatibilityVariableMode != CompatibilityVariableMode.NONE) {
-				throw new UnsupportedOperationException("TODO");
-			}
-
-			// Recalculate TPH's
-
-			for (var uc : UtilizationClass.UTIL_CLASSES) {
-				treesPerHectareUtil.setCoe(
-						uc.index,
-						BaseAreaTreeDensityDiameter
-								.treesPerHectare(baseAreaUtil.getCoe(uc.index), quadMeanDiameterUtil.getCoe(uc.index))
-				);
-			}
-
-			// Since DQ's may have changed, MUST RECONCILE AGAIN
-			// Seems this might only be needed when compatibilityVariableMode is not NONE?
-
-			// YUC1R
-			ReconcilationMethods.reconcileComponents(baseAreaUtil, treesPerHectareUtil, quadMeanDiameterUtil);
-
-			if (volumeComputeMode == VolumeComputeMode.ZERO) {
-				throw new UnsupportedOperationException("TODO");
-			} else {
-
-				// EMP091
-				EstimationMethods.estimateWholeStemVolume(
-						controlMap, UtilizationClass.ALL, adjustCloseUtil.getCoe(4), spec.getVolumeGroup(),
-						loreyHeightSpec, quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
-				);
-
-				if (compatibilityVariableMode == CompatibilityVariableMode.ALL) {
-					// apply compatibity variables to WS volume
-
-					// Set the adjustment factors for next three volume types
-
-					throw new UnsupportedOperationException("TODO");
-				} else {
-					// Do nothing as the adjustment vectors are already set to 0
-				}
-
-				// EMP092
-				EstimationMethods.estimateCloseUtilizationVolume(
-						controlMap, UtilizationClass.ALL, adjustCloseUtil, spec.getVolumeGroup(), loreyHeightSpec,
-						quadMeanDiameterUtil, wholeStemVolumeUtil, closeVolumeUtil
-				);
-
-				// EMP093
-				EstimationMethods.estimateNetDecayVolume(
-						controlMap, spec.getGenus(), bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil,
-						spec.getDecayGroup(), vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil,
-						closeVolumeUtil, closeVolumeNetDecayUtil
-				);
-
-				// EMP094
-				EstimationMethods.estimateNetDecayAndWasteVolume(
-						controlMap, bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec.getGenus(),
-						loreyHeightSpec, quadMeanDiameterUtil, closeVolumeUtil, closeVolumeNetDecayUtil,
-						closeVolumeNetDecayWasteUtil
-				);
-
-				if (getId().isStart()) {
-					// EMP095
-					EstimationMethods.estimateNetDecayWasteAndBreakageVolume(
-							controlMap, UtilizationClass.ALL, spec.getBreakageGroup(), quadMeanDiameterUtil,
-							closeVolumeUtil, closeVolumeNetDecayWasteUtil, closeVolumeNetDecayWasteBreakUtil
-					);
-				}
-			}
-
-			spec.getBaseAreaByUtilization().pairwiseInPlace(baseAreaUtil, COPY_IF_BAND);
-			spec.getTreesPerHectareByUtilization().pairwiseInPlace(treesPerHectareUtil, COPY_IF_BAND);
-			spec.getQuadraticMeanDiameterByUtilization().pairwiseInPlace(quadMeanDiameterUtil, COPY_IF_BAND);
-
-			spec.getWholeStemVolumeByUtilization().pairwiseInPlace(wholeStemVolumeUtil, COPY_IF_NOT_TOTAL);
-			spec.getCloseUtilizationVolumeByUtilization().pairwiseInPlace(closeVolumeUtil, COPY_IF_NOT_TOTAL);
-			spec.getCloseUtilizationVolumeNetOfDecayByUtilization()
-					.pairwiseInPlace(closeVolumeNetDecayUtil, COPY_IF_NOT_TOTAL);
-			spec.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization()
-					.pairwiseInPlace(closeVolumeNetDecayWasteUtil, COPY_IF_NOT_TOTAL);
-			spec.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization()
-					.pairwiseInPlace(closeVolumeNetDecayWasteBreakUtil, COPY_IF_NOT_TOTAL);
-
-		}
-		computeLayerUtilizationComponentsFromSpecies(vdypLayer);
-
-		for (VdypSpecies spec : vdypLayer.getSpecies().values()) {
-			if (vdypLayer.getBaseAreaByUtilization().getCoe(UTIL_ALL) > 0f) {
-				spec.setFractionGenus(
-						spec.getBaseAreaByUtilization().getCoe(UTIL_ALL)
-								/ vdypLayer.getBaseAreaByUtilization().getCoe(UTIL_ALL)
-				);
-			}
-			log.atDebug().addArgument(spec.getGenus()).addArgument(spec.getFractionGenus())
-					.setMessage("Species {} base area {}%").log();
-		}
-
-		log.atDebug().setMessage("Calculating Stand Lorey Height").log();
-
-		vdypLayer.getLoreyHeightByUtilization().setCoe(UTIL_SMALL, 0f);
-		vdypLayer.getLoreyHeightByUtilization().setCoe(UTIL_ALL, 0f);
-
-		for (VdypSpecies spec : vdypLayer.getSpecies().values()) {
-			log.atDebug() //
-					.addArgument(spec.getGenus()) //
-					.addArgument(() -> spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL))
-					.addArgument(() -> spec.getBaseAreaByUtilization().getCoe(UTIL_ALL))
-					.addArgument(
-							() -> spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL)
-									* spec.getBaseAreaByUtilization().getCoe(UTIL_ALL)
-					)
-					.setMessage(
-							"For species {}, Species LH (7.5cm+): {}, Species BA (7.5cm+): {}, Weighted LH (7.5cm+): {}"
-					).log();
-			vdypLayer.getLoreyHeightByUtilization().scalarInPlace(
-					UTIL_SMALL,
-					x -> x + spec.getLoreyHeightByUtilization().getCoe(UTIL_SMALL)
-							* spec.getBaseAreaByUtilization().getCoe(UTIL_SMALL)
-			);
-			vdypLayer.getLoreyHeightByUtilization().scalarInPlace(
-					UTIL_ALL,
-					x -> x + spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL)
-							* spec.getBaseAreaByUtilization().getCoe(UTIL_ALL)
-			);
-		}
-		{
-			float baSmall = vdypLayer.getBaseAreaByUtilization().getCoe(UTIL_SMALL);
-			float baAll = vdypLayer.getBaseAreaByUtilization().getCoe(UTIL_ALL);
-
-			if (baSmall > 0) {
-				vdypLayer.getLoreyHeightByUtilization().scalarInPlace(UTIL_SMALL, x -> x / baSmall);
-			}
-			if (baAll > 0) {
-				vdypLayer.getLoreyHeightByUtilization().scalarInPlace(UTIL_ALL, x -> x / baAll);
-			}
-
-		}
-
-	}
-
-	private static final IndexedFloatBinaryOperator COPY_IF_BAND = (oldX, newX, i) -> i <= UTIL_ALL ? oldX : newX;
-	private static final IndexedFloatBinaryOperator COPY_IF_NOT_TOTAL = (oldX, newX, i) -> i < UTIL_ALL ? oldX : newX;
 
 	// YUCV
 	private void computeUtilizationComponentsVeteran(VdypLayer vdypLayer, BecDefinition bec)
@@ -1299,159 +811,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		} catch (IllegalAccessException | InvocationTargetException ex) {
 			throw new IllegalStateException(ex);
 		}
-	}
-
-	/**
-	 * Sets the Layer's utilization components based on those of its species.
-	 *
-	 * @param vdypLayer
-	 */
-	private void computeLayerUtilizationComponentsFromSpecies(VdypLayer vdypLayer) {
-		// Layer utilization vectors other than quadratic mean diameter are the pairwise
-		// sums of those of their species
-		sumSpeciesUtilizationVectorsToLayer(vdypLayer);
-
-		{
-			var hlVector = new Coefficients(new float[] { 0f, 0f }, -1);
-			vdypLayer.getSpecies().values().stream().forEach(spec -> {
-				var ba = spec.getBaseAreaByUtilization();
-				hlVector.pairwiseInPlace(spec.getLoreyHeightByUtilization(), (x, y, i) -> x + y * ba.getCoe(i));
-			});
-			var ba = vdypLayer.getBaseAreaByUtilization();
-			hlVector.scalarInPlace((x, i) -> ba.getCoe(i) > 0 ? x / ba.getCoe(i) : x);
-			vdypLayer.setLoreyHeightByUtilization(hlVector);
-		}
-		// Quadratic mean diameter for the layer is computed from the BA and TPH after
-		// they have been found from the species
-		{
-			var utilVector = vdypLayer.getBaseAreaByUtilization().pairwise(
-					vdypLayer.getTreesPerHectareByUtilization(), BaseAreaTreeDensityDiameter::quadMeanDiameter
-			);
-			vdypLayer.setQuadraticMeanDiameterByUtilization(utilVector);
-		}
-	}
-
-	// TODO De-reflectify this when we want to make it work in GralVM
-	private void sumSpeciesUtilizationVectorsToLayer(VdypLayer vdypLayer) throws IllegalStateException {
-		try {
-			for (var accessors : SUMMABLE_UTILIZATION_VECTOR_ACCESSORS) {
-				var utilVector = Utils.utilizationVector();
-				for (var vdypSpecies : vdypLayer.getSpecies().values()) {
-					var speciesVector = (Coefficients) accessors.getReadMethod().invoke(vdypSpecies);
-					utilVector.pairwiseInPlace(speciesVector, (x, y) -> x + y);
-				}
-				accessors.getWriteMethod().invoke(vdypLayer, utilVector);
-			}
-		} catch (IllegalAccessException | InvocationTargetException ex) {
-			throw new IllegalStateException(ex);
-		}
-	}
-
-	// TODO De-reflectify this when we want to make it work in GralVM
-	private void scaleAllSummableUtilization(VdypUtilizationHolder holder, float factor) throws IllegalStateException {
-		try {
-			for (var accessors : SUMMABLE_UTILIZATION_VECTOR_ACCESSORS) {
-				((Coefficients) accessors.getReadMethod().invoke(holder)).scalarInPlace(x -> x * factor);
-			}
-		} catch (IllegalAccessException | InvocationTargetException ex) {
-			throw new IllegalStateException(ex);
-		}
-	}
-
-	private float heightMultiplier(String genus, Region region, float treesPerHectarePrimary) {
-		final var coeMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.HL_PRIMARY_SP_EQN_P1, MatrixMap2.class
-		);
-		var coe = coeMap.get(genus, region).reindex(0);
-		return coe.get(0) - coe.getCoe(1) + coe.getCoe(1) * exp(coe.getCoe(2) * (treesPerHectarePrimary - 100f));
-	}
-
-	// EMP050 Meth==1
-	/**
-	 * Return the lorey height of the primary species based on the dominant height of the lead species.
-	 *
-	 * @param leadHeight             dominant height of the lead species
-	 * @param genus                  Primary species
-	 * @param region                 Region of the polygon
-	 * @param treesPerHectarePrimary trees per hectare >7.5 cm of the primary species
-	 * @return
-	 */
-	float primaryHeightFromLeadHeight(float leadHeight, String genus, Region region, float treesPerHectarePrimary) {
-		return 1.3f + (leadHeight - 1.3f) * heightMultiplier(genus, region, treesPerHectarePrimary);
-	}
-
-	// EMP050 Meth==2
-	/**
-	 * Return the dominant height of the lead species based on the lorey height of the primary species.
-	 *
-	 * @param primaryHeight          lorey height of the primary species
-	 * @param genus                  Primary species
-	 * @param region                 Region of the polygon
-	 * @param treesPerHectarePrimary trees per hectare >7.5 cm of the primary species
-	 * @return
-	 */
-	float leadHeightFromPrimaryHeight(float primaryHeight, String genus, Region region, float treesPerHectarePrimary) {
-		return 1.3f + (primaryHeight - 1.3f) / heightMultiplier(genus, region, treesPerHectarePrimary);
-	}
-
-	// EMP051
-	/**
-	 * Return the lorey height of the primary species based on the dominant height of the lead species.
-	 *
-	 * @param leadHeight dominant height of the lead species
-	 * @param genus      Primary species
-	 * @param region     Region of the polygon
-	 * @return
-	 */
-	private float primaryHeightFromLeadHeightInitial(float leadHeight, String genus, Region region) {
-		final var coeMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.HL_PRIMARY_SP_EQN_P2, MatrixMap2.class
-		);
-		var coe = coeMap.get(genus, region);
-		return 1.3f + coe.getCoe(1) * pow(leadHeight - 1.3f, coe.getCoe(2));
-	}
-
-	/**
-	 * Accessor methods for utilization vectors, except for Lorey Height, on Layer and Species objects.
-	 */
-	static final Collection<PropertyDescriptor> UTILIZATION_VECTOR_ACCESSORS;
-
-	/**
-	 * Accessor methods for utilization vectors, except for Lorey Height and Quadratic Mean Diameter, on Layer and
-	 * Species objects. These are properties where the values for the layer are the sum of those for its species.
-	 */
-	static final Collection<PropertyDescriptor> SUMMABLE_UTILIZATION_VECTOR_ACCESSORS;
-
-	/**
-	 * Accessor methods for utilization vectors, except for Lorey Height,and Volume on Layer and Species objects.
-	 */
-	static final Collection<PropertyDescriptor> NON_VOLUME_UTILIZATION_VECTOR_ACCESSORS;
-
-	static {
-		try {
-			var bean = Introspector.getBeanInfo(VdypUtilizationHolder.class);
-			UTILIZATION_VECTOR_ACCESSORS = Arrays.stream(bean.getPropertyDescriptors()) //
-					.filter(p -> p.getName().endsWith("ByUtilization")) //
-					.filter(p -> !p.getName().startsWith("loreyHeight")) //
-					.filter(p -> p.getPropertyType() == Coefficients.class) //
-					.toList();
-		} catch (IntrospectionException e) {
-			throw new IllegalStateException(e);
-		}
-
-		SUMMABLE_UTILIZATION_VECTOR_ACCESSORS = UTILIZATION_VECTOR_ACCESSORS.stream()
-				.filter(x -> !x.getName().startsWith("quadraticMeanDiameter")).toList();
-
-		NON_VOLUME_UTILIZATION_VECTOR_ACCESSORS = UTILIZATION_VECTOR_ACCESSORS.stream()
-				.filter(x -> !x.getName().contains("Volume")).toList();
-	}
-
-	int getGroup(FipPolygon fipPolygon, MatrixMap2<String, String, Integer> volumeGroupMap, String genus) {
-		return volumeGroupMap.get(genus, fipPolygon.getBiogeoclimaticZone());
-	}
-
-	MatrixMap2<String, String, Integer> getGroupMap(ControlKey key) {
-		return Utils.expectParsedControl(controlMap, key, MatrixMap2.class);
 	}
 
 	// FIP_GET
@@ -1713,177 +1072,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		}
 		y[y.length - 1] = dqFinal;
 		return y;
-	}
-
-	// YSMALL
-	// TODO move to shared location as it's used elsewhere and implement
-	// compatibility variables
-	/**
-	 * Estimate small components for primary layer
-	 *
-	 * @throws ProcessingException
-	 */
-	public <L extends BaseVdypLayer<SP, SI>, SP extends BaseVdypSpecies, SI extends BaseVdypSite> void
-			estimateSmallComponents(BaseVdypPolygon<L, Optional<Float>, SP, SI> polygon, VdypLayer layer)
-					throws ProcessingException {
-		float loreyHeightSum = 0f;
-		float baseAreaSum = 0f;
-		float treesPerHectareSum = 0f;
-		float volumeSum = 0f;
-
-		Region region = Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap).getRegion();
-
-		for (VdypSpecies spec : layer.getSpecies().values()) {
-			@SuppressWarnings("unused")
-			float loreyHeightSpec = spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL); // HLsp
-			float baseAreaSpec = spec.getBaseAreaByUtilization().getCoe(UTIL_ALL); // BAsp
-			@SuppressWarnings("unused")
-			float quadMeanDiameterSpec = spec.getQuadraticMeanDiameterByUtilization().getCoe(UTIL_ALL); // DQsp
-
-			// EMP080
-			float smallComponentProbability = smallComponentProbability(layer, spec, region); // PROBsp
-
-			// this WHOLE operation on Actual BA's, not 100% occupancy.
-			float fractionAvailable = polygon.getPercentAvailable().map(p -> p / 100f).orElse(1f);
-			baseAreaSpec *= fractionAvailable;
-			// EMP081
-			float conditionalExpectedBaseArea = conditionalExpectedBaseArea(spec, baseAreaSpec, region); // BACONDsp
-			conditionalExpectedBaseArea /= fractionAvailable;
-
-			float baseAreaSpecSmall = smallComponentProbability * conditionalExpectedBaseArea;
-
-			// EMP082
-			float quadMeanDiameterSpecSmall = smallComponentQuadMeanDiameter(spec); // DQSMsp
-
-			// EMP085
-			float loreyHeightSpecSmall = smallComponentLoreyHeight(spec, quadMeanDiameterSpecSmall); // HLSMsp
-
-			// EMP086
-			float meanVolumeSmall = meanVolumeSmall(spec, quadMeanDiameterSpecSmall, loreyHeightSpecSmall); // VMEANSMs
-
-			// TODO Apply Compatibility Variables, not needed for FIPSTART
-
-			spec.getLoreyHeightByUtilization().setCoe(UTIL_SMALL, loreyHeightSpecSmall);
-			float treesPerHectareSpecSmall = BaseAreaTreeDensityDiameter
-					.treesPerHectare(baseAreaSpecSmall, quadMeanDiameterSpecSmall); // TPHSMsp
-			spec.getBaseAreaByUtilization().setCoe(UTIL_SMALL, baseAreaSpecSmall);
-			spec.getTreesPerHectareByUtilization().setCoe(UTIL_SMALL, treesPerHectareSpecSmall);
-			spec.getQuadraticMeanDiameterByUtilization().setCoe(UTIL_SMALL, quadMeanDiameterSpecSmall);
-			float wholeStemVolumeSpecSmall = treesPerHectareSpecSmall * meanVolumeSmall; // VOLWS(I,-1)
-			spec.getWholeStemVolumeByUtilization().setCoe(UTIL_SMALL, wholeStemVolumeSpecSmall);
-
-			loreyHeightSum += baseAreaSpecSmall * loreyHeightSpecSmall;
-			baseAreaSum += baseAreaSpecSmall;
-			treesPerHectareSum += treesPerHectareSpecSmall;
-			volumeSum += wholeStemVolumeSpecSmall;
-		}
-
-		if (baseAreaSum > 0f) {
-			layer.getLoreyHeightByUtilization().setCoe(UTIL_SMALL, loreyHeightSum / baseAreaSum);
-		} else {
-			layer.getLoreyHeightByUtilization().setCoe(UTIL_SMALL, 0f);
-		}
-		layer.getBaseAreaByUtilization().setCoe(UTIL_SMALL, baseAreaSum);
-		layer.getTreesPerHectareByUtilization().setCoe(UTIL_SMALL, treesPerHectareSum);
-		layer.getQuadraticMeanDiameterByUtilization()
-				.setCoe(UTIL_SMALL, BaseAreaTreeDensityDiameter.quadMeanDiameter(baseAreaSum, treesPerHectareSum));
-		layer.getWholeStemVolumeByUtilization().setCoe(UTIL_SMALL, volumeSum);
-	}
-
-	// EMP086
-	private float meanVolumeSmall(VdypSpecies spec, float quadMeanDiameterSpecSmall, float loreyHeightSpecSmall) {
-		Coefficients coe = getCoeForSpecies(spec, ControlKey.SMALL_COMP_WS_VOLUME);
-
-		// EQN 1 in IPSJF119.doc
-
-		float a0 = coe.getCoe(1);
-		float a1 = coe.getCoe(2);
-		float a2 = coe.getCoe(3);
-		float a3 = coe.getCoe(4);
-
-		return exp(
-				a0 + a1 * log(quadMeanDiameterSpecSmall) + a2 * log(loreyHeightSpecSmall)
-						+ a3 * quadMeanDiameterSpecSmall
-		);
-	}
-
-	// EMP085
-	private float smallComponentLoreyHeight(VdypSpecies spec, float quadMeanDiameterSpecSmall) {
-		Coefficients coe = getCoeForSpecies(spec, ControlKey.SMALL_COMP_HL);
-
-		// EQN 1 in IPSJF119.doc
-
-		float a0 = coe.getCoe(1);
-		float a1 = coe.getCoe(2);
-
-		return 1.3f + (spec.getLoreyHeightByUtilization().getCoe(FipStart.UTIL_ALL) - 1.3f) * exp(
-				a0 * (pow(quadMeanDiameterSpecSmall, a1)
-						- pow(spec.getQuadraticMeanDiameterByUtilization().getCoe(UTIL_ALL), a1))
-		);
-	}
-
-	// EMP082
-	private float smallComponentQuadMeanDiameter(VdypSpecies spec) {
-		Coefficients coe = getCoeForSpecies(spec, ControlKey.SMALL_COMP_DQ);
-
-		// EQN 5 in IPSJF118.doc
-
-		float a0 = coe.getCoe(1);
-		float a1 = coe.getCoe(2);
-
-		float logit = //
-				a0 + a1 * spec.getLoreyHeightByUtilization().getCoe(FipStart.UTIL_ALL);
-
-		return 4.0f + 3.5f * exp(logit) / (1.0f + exp(logit));
-	}
-
-	// EMP081
-	private float conditionalExpectedBaseArea(VdypSpecies spec, float baseAreaSpec, Region region) {
-		Coefficients coe = getCoeForSpecies(spec, ControlKey.SMALL_COMP_BA);
-
-		// EQN 3 in IPSJF118.doc
-
-		float a0 = coe.getCoe(1);
-		float a1 = coe.getCoe(2);
-		float a2 = coe.getCoe(3);
-		float a3 = coe.getCoe(4);
-
-		float coast = region == Region.COASTAL ? 1.0f : 0.0f;
-
-		// FIXME due to a bug in VDYP7 it always treats this as interior. Replicating
-		// that for now.
-		coast = 0f;
-
-		float arg = //
-				(a0 + //
-						a1 * coast + //
-						a2 * spec.getBaseAreaByUtilization().getCoe(FipStart.UTIL_ALL)//
-				) * exp(a3 * spec.getLoreyHeightByUtilization().getCoe(FipStart.UTIL_ALL));
-		arg = max(arg, 0f);
-
-		return arg;
-	}
-
-	// EMP080
-	private float smallComponentProbability(VdypLayer layer, VdypSpecies spec, Region region) {
-		Coefficients coe = getCoeForSpecies(spec, ControlKey.SMALL_COMP_PROBABILITY);
-
-		// EQN 1 in IPSJF118.doc
-
-		float a0 = coe.getCoe(1);
-		float a1 = coe.getCoe(2);
-		float a2 = coe.getCoe(3);
-		float a3 = coe.getCoe(4);
-
-		float coast = region == Region.COASTAL ? 1.0f : 0.0f;
-
-		float logit = //
-				a0 + //
-						a1 * coast + //
-						a2 * layer.getBreastHeightAge().orElse(0f) + //
-						a3 * spec.getLoreyHeightByUtilization().getCoe(FipStart.UTIL_ALL);
-
-		return exp(logit) / (1.0f + exp(logit));
 	}
 
 	@Override

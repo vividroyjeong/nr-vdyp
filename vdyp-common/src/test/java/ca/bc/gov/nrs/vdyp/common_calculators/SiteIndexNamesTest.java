@@ -15,7 +15,7 @@ class SiteIndexNamesTest {
 	@Test
 	void testTypicalUsage() {
 		SpeciesConversionParamsDetails details = SiteIndexNames.getSpeciesConversionParams(SI_SPEC_HWC, SI_SPEC_FDC);
-		
+
 		assertThat(details.param1(), is(0.48053393));
 		assertThat(details.param2(), is(1.11234705));
 	}
@@ -23,7 +23,7 @@ class SiteIndexNamesTest {
 	@Test
 	void testNoEntry() {
 		SpeciesConversionParamsDetails details = SiteIndexNames.getSpeciesConversionParams(SI_SPEC_HWC, SI_SPEC_HWC);
-		
+
 		assertThat(details, nullValue());
 	}
 }

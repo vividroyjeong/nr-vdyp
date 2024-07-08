@@ -177,13 +177,12 @@ public class ForwardDataStreamReader {
 		return thePolygon;
 	}
 
-	/** 
-	 * Both scale the per-hectare values of all the utilizations of the primary
-	 * layer of the given polygon, and for all utilizations of both the primary and
-	 * veteran layer (if present) of the polygon,
-	 * 1. Adjust the basal area to be within bounds of the utilization class, and
-	 * 2. Calculate the quad-mean-diameter value from the basal area and trees per hectare.
-	 * 
+	/**
+	 * Both scale the per-hectare values of all the utilizations of the primary layer of the given polygon, and for all
+	 * utilizations of both the primary and veteran layer (if present) of the polygon, 1. Adjust the basal area to be
+	 * within bounds of the utilization class, and 2. Calculate the quad-mean-diameter value from the basal area and
+	 * trees per hectare.
+	 *
 	 * @param polygon
 	 */
 	private void adjustUtilizations(VdypPolygon polygon) throws ProcessingException {

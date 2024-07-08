@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 
 class ReconcilationMethodsTest {
 
@@ -19,46 +20,115 @@ class ReconcilationMethodsTest {
 		ReconcilationMethods.reconcileComponents(
 				basalAreaByUtilization, treesPerHectareByUtilization, quadMeanDiameterByUtilization
 		);
-		assertThat(treesPerHectareByUtilization, contains(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
-		assertThat(quadMeanDiameterByUtilization, contains(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
+		assertThat(treesPerHectareByUtilization, VdypMatchers.utilization(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
+		assertThat(quadMeanDiameterByUtilization, VdypMatchers.utilization(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
 	}
 
 	@Test
-	void testReconcilationMode2() throws ProcessingException {
-		Coefficients basalAreaByUtilization = Utils
-				.utilizationVector(0.0f, 0.406989872f, 0.00509467721f, 0.0138180256f, 0.0231454968f, 0.364931673f);
-		Coefficients quadMeanDiameterByUtilization = Utils
-				.utilizationVector(0.0f, 31.5006275f, 10.0594692f, 14.9665585f, 19.9451237f, 46.0375214f);
-		Coefficients treesPerHectareByUtilization = Utils
-				.utilizationVector(0.0f, 5.22222185f, 0.64102751f, 0.785438597f, 0.740803719f, 2.19228911f);
+	void testReconcileComponentsMode1() throws ProcessingException {
 
-		ReconcilationMethods.reconcileComponents(
-				basalAreaByUtilization, treesPerHectareByUtilization, quadMeanDiameterByUtilization
-		);
+		var dq = Utils.utilizationVector();
+		var ba = Utils.utilizationVector();
+		var tph = Utils.utilizationVector();
 
-		// Results verified against FORTRAN VDYP7 run.
-		assertThat(
-				treesPerHectareByUtilization, contains(0.0f, 5.222222f, 0.7678731f, 0.94086f, 0.8873928f, 2.626096f)
-		);
-		assertThat(
-				quadMeanDiameterByUtilization, contains(0.0f, 31.500628f, 9.191125f, 13.674629f, 18.22344f, 42.063515f)
-		);
+		// '082E004 615 1988' with component BA re-ordered from smallest to largest to
+		// force mode 1.
+
+		dq.setCoe(0, 13.4943399f);
+		dq.setCoe(1, 10.2766619f);
+		dq.setCoe(2, 14.67033f);
+		dq.setCoe(3, 19.4037666f);
+		dq.setCoe(4, 25.719244f);
+
+		ba.setCoe(0, 2.20898318f);
+		ba.setCoe(1, 0.220842764f);
+		ba.setCoe(2, 0.433804274f);
+		ba.setCoe(3, 0.691931725f);
+		ba.setCoe(4, 0.862404406f);
+
+		tph.setCoe(0, 154.454025f);
+		tph.setCoe(1, 83.4198151f);
+		tph.setCoe(2, 51.0201035f);
+		tph.setCoe(3, 14.6700592f);
+		tph.setCoe(4, 4.25086117f);
+
+		ReconcilationMethods.reconcileComponents(ba, tph, dq);
+
+		assertThat(ba, VdypMatchers.utilization(0f, 2.20898318f, 0.220842764f, 0.546404183f, 1.44173622f, 0f));
+		assertThat(tph, VdypMatchers.utilization(0f, 154.454025f, 49.988575f, 44.5250206f, 59.9404259f, 0f));
+		assertThat(dq, VdypMatchers.utilization(0f, 13.4943399f, 7.5f, 12.5f, 17.5f, 22.5f));
 	}
 
 	@Test
-	void testReconcilationMode1() throws ProcessingException {
-		Coefficients basalAreaByUtilization = Utils
-				.utilizationVector(0.0f, 0.406989872f, 0.00509467721f, 0.0138180256f, 0.0231454968f, 0.364931673f);
-		Coefficients quadMeanDiameterByUtilization = Utils
-				.utilizationVector(0.0f, 31.5006275f, 10.0594692f, 14.9665585f, 19.9451237f, 46.0375214f);
-		Coefficients treesPerHectareByUtilization = Utils
-				.utilizationVector(0.0f, 14.0f, 0.64102751f, 0.785438597f, 0.740803719f, 2.19228911f);
+	void testReconcileComponentsMode2() throws ProcessingException {
 
-		ReconcilationMethods.reconcileComponents(
-				basalAreaByUtilization, treesPerHectareByUtilization, quadMeanDiameterByUtilization
+		var dq = Utils.utilizationVector();
+		var ba = Utils.utilizationVector();
+		var tph = Utils.utilizationVector();
+		dq.setCoe(0, 31.6622887f);
+		dq.setCoe(1, 10.0594692f);
+		dq.setCoe(2, 14.966774f);
+		dq.setCoe(3, 19.9454956f);
+		dq.setCoe(4, 46.1699982f);
+
+		ba.setCoe(0, 0.397305071f);
+		ba.setCoe(1, 0.00485289097f);
+		ba.setCoe(2, 0.0131751001f);
+		ba.setCoe(3, 0.0221586525f);
+		ba.setCoe(4, 0.357118428f);
+
+		tph.setCoe(0, 5.04602766f);
+		tph.setCoe(1, 0.61060524f);
+		tph.setCoe(2, 0.748872101f);
+		tph.setCoe(3, 0.709191978f);
+		tph.setCoe(4, 2.13305807f);
+
+		ReconcilationMethods.reconcileComponents(ba, tph, dq);
+
+		assertThat(
+				ba,
+				VdypMatchers.utilization(0f, 0.397305071f, 0.00485289097f, 0.0131751001f, 0.0221586525f, 0.357118428f)
 		);
+		assertThat(
+				tph, VdypMatchers.utilization(0f, 5.04602766f, 0.733301044f, 0.899351299f, 0.851697803f, 2.56167722f)
+		);
+		assertThat(dq, VdypMatchers.utilization(0f, 31.6622887f, 9.17939758f, 13.6573782f, 18.2005272f, 42.1307297f));
 
-		assertThat(treesPerHectareByUtilization, contains(0.0f, 14.0f, 1.1531991f, 1.1259941f, 4.9625316f, 6.7582755f));
-		assertThat(quadMeanDiameterByUtilization, contains(0.0f, 31.500628f, 7.5f, 12.5f, 17.5f, 22.5f));
 	}
+
+	@Test
+	void testReconcileComponentsMode3() throws ProcessingException {
+
+		var dq = Utils.utilizationVector();
+		var ba = Utils.utilizationVector();
+		var tph = Utils.utilizationVector();
+
+		// Set of inputs that cause mode 2 to fail over into mode 3
+
+		dq.setCoe(0, 12.51f);
+		dq.setCoe(1, 12.4f);
+		dq.setCoe(2, 0f);
+		dq.setCoe(3, 0f);
+		dq.setCoe(4, 0f);
+
+		ba.setCoe(0, 2.20898318f);
+		ba.setCoe(1, 2.20898318f);
+		ba.setCoe(2, 0f);
+		ba.setCoe(3, 0f);
+		ba.setCoe(4, 0f);
+
+		tph.setCoe(0, 179.71648f);
+		tph.setCoe(1, 182.91916f);
+		tph.setCoe(2, 0f);
+		tph.setCoe(3, 0f);
+		tph.setCoe(4, 0f);
+
+		ReconcilationMethods.reconcileComponents(ba, tph, dq);
+
+		assertThat(ba, VdypMatchers.utilization(0f, 2.20898318f, 0f, 2.20898318f, 0f, 0f));
+		assertThat(tph, VdypMatchers.utilization(0f, 179.71648f, 0f, 179.71648f, 0f, 0f));
+		assertThat(dq, VdypMatchers.utilization(0f, 12.51f, 10, 12.51f, 20f, 25f));
+
+	}
+
 }
