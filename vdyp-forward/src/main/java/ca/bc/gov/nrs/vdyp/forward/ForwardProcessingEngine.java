@@ -278,8 +278,8 @@ public class ForwardProcessingEngine {
 
 		float[] speciesProportionByBasalArea = new float[pps.getNSpecies() + 1];
 		for (int i = 1; i <= pps.getNSpecies(); i++) {
-			speciesProportionByBasalArea[i] = primaryBank.basalAreas[i][UC_ALL_INDEX]
-					/ primaryBank.basalAreas[0][UC_ALL_INDEX];
+			speciesProportionByBasalArea[i] = pps.wallet.basalAreas[i][UC_ALL_INDEX]
+					/ pps.wallet.basalAreas[0][UC_ALL_INDEX];
 		}
 
 		float growthInBasalArea = growBasalArea(
@@ -287,6 +287,19 @@ public class ForwardProcessingEngine {
 		);
 	}
 
+	private static final float EMPIRICAL_OCCUPANCY = 0.85f;
+	
+	/**
+	 * EMP111A - Basal area growth for the primary layer.
+	 * 
+	 * @param fps current processing state
+	 * @param yearsAtBreastHeight at the start of the year
+	 * @param dominantHeight primary species dominant height at start of year
+	 * @param primaryLayerBasalArea at the start of the year
+	 * @param veteranLayerBasalArea at the start of the year
+	 * @param growthInDominantHeight during the year
+	 * @return the growth in the basal area for the year
+	 */
 	private float growBasalArea(
 			ForwardProcessingState fps, float yearsAtBreastHeight, float dominantHeight, float primaryLayerBasalArea,
 			float veteranLayerBasalArea, float growthInDominantHeight
@@ -295,11 +308,13 @@ public class ForwardProcessingEngine {
 		var baUpperBound = growBasalAreaUpperBound(fps);
 		var dqUpperBound = growQuadraticMeanDiameterUpperBound(fps);
 
+		baUpperBound = baUpperBound / EMPIRICAL_OCCUPANCY;
+		var baLimit = Math.max(baUpperBound, primaryLayerBasalArea);
 		return 0;
 	}
 
 	/**
-	 * UPPERGEN( 1, BATOP98, DQTOP98) for basal area
+	 * UPPERGEN(1, BATOP98, DQTOP98) for basal area
 	 */
 	private float growBasalAreaUpperBound(ForwardProcessingState fps) {
 		var primarySpeciesGroupNumber = fps.getPolygonProcessingState().getPrimarySpeciesGroupNumber();
@@ -307,7 +322,7 @@ public class ForwardProcessingEngine {
 	}
 	
 	/**
-	 * UPPERGEN( 1, BATOP98, DQTOP98) for quad-mean-diameter
+	 * UPPERGEN(1, BATOP98, DQTOP98) for quad-mean-diameter
 	 */
 	private float growQuadraticMeanDiameterUpperBound(ForwardProcessingState fps) {
 		var primarySpeciesGroupNumber = fps.getPolygonProcessingState().getPrimarySpeciesGroupNumber();
