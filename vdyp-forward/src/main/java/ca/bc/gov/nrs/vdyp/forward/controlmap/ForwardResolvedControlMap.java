@@ -10,11 +10,15 @@ import ca.bc.gov.nrs.vdyp.model.Region;
 
 public interface ForwardResolvedControlMap extends ResolvedControlMap {
 	
-	ForwardDebugSettings getDebugSettings();
-
-	ForwardControlVariables getForwardControlVariables();
-	
+	/** 9 */
 	BecLookup getBecLookup();
 	
+	/** 25 */
 	MatrixMap2<String, Region, SiteIndexEquation> getSiteCurveMap();
+	
+	/** 101 */
+	ForwardControlVariables getForwardControlVariables();
+	
+	/** 199 */
+	ForwardDebugSettings getDebugSettings();
 }

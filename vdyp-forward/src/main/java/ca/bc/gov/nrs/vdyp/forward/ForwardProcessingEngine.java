@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
+import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Estimators;
 import ca.bc.gov.nrs.vdyp.common.ReconcilationMethods;
@@ -196,6 +197,7 @@ public class ForwardProcessingEngine {
 			setCompatibilityVariables(pps);
 		}
 
+		// VGROW1
 		if (lastStep.ordinal() >= ExecutionStep.GROW.ordinal()) {
 			int veteranLayerInstance = 0;
 
@@ -273,11 +275,11 @@ public class ForwardProcessingEngine {
 
 		// Calculate change in basal area
 
-		final float veteranLayerBasalArea;
+		final Optional<Float> veteranLayerBasalArea;
 		if (veteranBank.isPresent())
-			veteranLayerBasalArea = veteranBank.get().basalAreas[0][UC_ALL_INDEX];
+			veteranLayerBasalArea = Optional.of(veteranBank.get().basalAreas[0][UC_ALL_INDEX]);
 		else {
-			veteranLayerBasalArea = 0.0f;
+			veteranLayerBasalArea = Optional.empty();
 		}
 
 		float[] speciesProportionByBasalArea = new float[pps.getNSpecies() + 1];
@@ -287,34 +289,42 @@ public class ForwardProcessingEngine {
 		}
 
 		float growthInBasalArea = growBasalArea(
-				fps, yearsAtBreastHeight, dominantHeight, primaryBank.basalAreas[0][UC_ALL_INDEX], veteranLayerBasalArea, growthInDominantHeight
+				speciesProportionByBasalArea, yearsAtBreastHeight, dominantHeight, primaryBank.basalAreas[0][UC_ALL_INDEX], veteranLayerBasalArea, growthInDominantHeight
 		);
 	}
 
-	private static final float EMPIRICAL_OCCUPANCY = 0.85f;
-
 	/**
 	 * EMP111A - Basal area growth for the primary layer.
-	 * 
-	 * @param fps current processing state
+	 * @param speciesProportionByBasalArea the proportion by basal area of each of the polygon's species
 	 * @param yearsAtBreastHeight at the start of the year
 	 * @param dominantHeight primary species dominant height at start of year
 	 * @param primaryLayerBasalArea at the start of the year
 	 * @param veteranLayerBasalArea at the start of the year
 	 * @param growthInDominantHeight during the year
+	 * 
 	 * @return the growth in the basal area for the year
+	 * @throws StandProcessingException 
 	 */
 	private float growBasalArea(
-			ForwardProcessingState fps, float yearsAtBreastHeight, float dominantHeight, float primaryLayerBasalArea,
-			float veteranLayerBasalArea, float growthInDominantHeight
-	) {
+			float[] speciesProportionByBasalArea, float yearsAtBreastHeight, float dominantHeight, float primaryLayerBasalArea, 
+			Optional<Float> veteranLayerBasalArea, float growthInDominantHeight
+	) throws StandProcessingException {
+		
 		// UPPERGEN( 1, BATOP98, DQTOP98)
 		var baUpperBound = growBasalAreaUpperBound();
 		var dqUpperBound = growQuadraticMeanDiameterUpperBound();
 
-		baUpperBound = baUpperBound / EMPIRICAL_OCCUPANCY;
+		baUpperBound = baUpperBound / Estimators.EMPIRICAL_OCCUPANCY;
 		var baLimit = Math.max(baUpperBound, primaryLayerBasalArea);
-		return 0;
+		
+		var baYield = fps.fcm
+		
+		boolean isFullOccupancy = true;
+		int primarySpeciesGroupNumber = fps.getPolygonProcessingState().getPrimarySpeciesGroupNumber();
+		float basalAreaYield = estimators.estimateBaseAreaYield(null, dominantHeight, yearsAtBreastHeight, veteranLayerBasalArea, 
+				isFullOccupancy, fps.getPolygonProcessingState().getBecZone(), primarySpeciesGroupNumber);
+
+		return basalAreaYield;
 	}
 
 	/**
@@ -866,8 +876,7 @@ public class ForwardProcessingEngine {
 	}
 
 	// EMP082
-	private float
-			smallComponentQuadMeanDiameter(String speciesName, float loreyHeight) {
+	private float smallComponentQuadMeanDiameter(String speciesName, float loreyHeight) {
 		Coefficients coe = fps.fcm.getSmallComponentQuadMeanDiameterCoefficients().get(speciesName);
 
 		// EQN 5 in IPSJF118.doc

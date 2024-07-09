@@ -37,10 +37,10 @@ public class Estimators {
 
 	public static final Logger log = LoggerFactory.getLogger(Estimators.class);
 
+	public static final float EMPIRICAL_OCCUPANCY = 0.85f;
+
 	private static final int UTIL_ALL = UtilizationClass.ALL.index;
 	private static final int UTIL_LARGEST = UtilizationClass.OVER225.index;
-
-	private static final float EMPIRICAL_OCCUPANCY = 0.85f;
 
 	/**
 	 * Returns the new value if the index is that of a utilization class that represents a size band, otherwise the old
