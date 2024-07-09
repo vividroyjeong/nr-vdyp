@@ -62,17 +62,17 @@ class GrowDominantHeightTest {
 	@Test
 	void testNormalCurve() throws ProcessingException {
 		
-		ForwardProcessingState fps = new ForwardProcessingState(controlMap);
+		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 		
 		// Select the first polygon - 01002 S000001 00(1970)
-		fps.setPolygon(forwardDataStreamReader.readNextPolygon().orElseThrow());
+		fpe.fps.setPolygon(forwardDataStreamReader.readNextPolygon().orElseThrow());
 
 		float hd = 35.2999992f;
 		int sc = 13;
 		float si = 35;
 		float ytbh = 1.0f;
 		
-		float gdh = ForwardProcessingEngine.growDominantHeight(fps, hd, sc, si, ytbh);
+		float gdh = fpe.growDominantHeight(hd, sc, si, ytbh);
 		
 		assertThat(gdh, is(0.173380271f));
 	}
@@ -80,21 +80,22 @@ class GrowDominantHeightTest {
 	@Test
 	void testCurveExtension1() throws ProcessingException {
 		
+		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
+
 		// Select polygon 01003AS000001 00(1953) - triggers curve extension code
 		VdypPolygon polygon;
 		do {
 			polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 		} while (! polygon.getDescription().getName().equals("01003AS000001 00"));
 		
-		ForwardProcessingState fps = new ForwardProcessingState(controlMap);
-		fps.setPolygon(polygon);
+		fpe.fps.setPolygon(polygon);
 
 		float hd = 29.5f;
 		int sc = 11;
 		float si = 14.8000002f;
 		float ytbh = 10.8000002f;
 		
-		float gdh = ForwardProcessingEngine.growDominantHeight(fps, hd, sc, si, ytbh);
+		float gdh = fpe.growDominantHeight(hd, sc, si, ytbh);
 		
 		assertThat(gdh, is(0.0f));
 	}
@@ -102,21 +103,22 @@ class GrowDominantHeightTest {
 	@Test
 	void testCurveExtension2() throws ProcessingException {
 		
+		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
+
 		// Select polygon 01003AS000001 00(1953) - triggers curve extension code
 		VdypPolygon polygon;
 		do {
 			polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 		} while (! polygon.getDescription().getName().equals("01003AS000001 00"));
 		
-		ForwardProcessingState fps = new ForwardProcessingState(controlMap);
-		fps.setPolygon(polygon);
+		fpe.fps.setPolygon(polygon);
 		
 		float hd = 26.5f;
 		int sc = 11;
 		float si = 14.8000002f;
 		float ytbh = 5.8000002f;
 		
-		float gdh = ForwardProcessingEngine.growDominantHeight(fps, hd, sc, si, ytbh);
+		float gdh = fpe.growDominantHeight(hd, sc, si, ytbh);
 		
 		assertThat(gdh, is(0.045883115f));
 	}

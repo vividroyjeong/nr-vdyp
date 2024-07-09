@@ -18,9 +18,9 @@ class ForwardProcessingEngineTest extends AbstractForwardProcessingEngineTest {
 
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 
-		assertThat(fpe.fps.becLookup, notNullValue());
-		assertThat(fpe.fps.genusDefinitionMap, notNullValue());
-		assertThat(fpe.fps.siteCurveMap, notNullValue());
+		assertThat(fpe.fps.fcm.getBecLookup(), notNullValue());
+		assertThat(fpe.fps.fcm.getGenusDefinitionMap(), notNullValue());
+		assertThat(fpe.fps.fcm.getSiteCurveMap(), notNullValue());
 
 		// Fetch the next polygon to process.
 		int nPolygonsProcessed = 0;

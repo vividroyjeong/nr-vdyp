@@ -46,7 +46,6 @@ import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.EstimationMethods;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
@@ -333,14 +332,14 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			}
 			// Estimate lorey height for primary species
 			if (iPass == 1 && vdypSpecies.size() == 1) {
-				primaryHeight = estimationMethods.primaryHeightFromLeadHeight(
+				primaryHeight = estimators.primaryHeightFromLeadHeight(
 						leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion(), tphTotal
 				);
 			} else if (iPass == 1) {
-				primaryHeight = estimationMethods
+				primaryHeight = estimators
 						.primaryHeightFromLeadHeightInitial(leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion());
 			} else {
-				primaryHeight = estimationMethods.primaryHeightFromLeadHeight(
+				primaryHeight = estimators.primaryHeightFromLeadHeight(
 						leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion(),
 						vdypPrimarySpecies.getTreesPerHectareByUtilization().getCoe(UTIL_ALL)
 				);
@@ -355,8 +354,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				// EMP053
 				vspec.getLoreyHeightByUtilization().setCoe(
 						UTIL_ALL,
-						estimationMethods.estimateNonPrimaryLoreyHeight(
-								vspec, vdypPrimarySpecies, bec, leadHeight, primaryHeight
+						estimators.estimateNonPrimaryLoreyHeight(
+								vspec.getGenus(), vdypPrimarySpecies.getGenus(), bec, leadHeight, primaryHeight
 						)
 				);
 			}
@@ -411,7 +410,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			// Multiple Species
 			for (var spec : result.getSpecies().values()) {
 
-				var limits = estimationMethods.getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
+				var limits = estimators.getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
 
 				final float maxHeightMultiplier = fipLayer.getPrimaryGenus()
 						.orElseThrow(() -> new IllegalStateException("primaryGenus has not been set"))
@@ -461,7 +460,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				for (var spec : result.getSpecies().values()) {
 
 					// EMP061
-					var limits = estimationMethods.getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
+					var limits = estimators.getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
 
 					var dqMin = limits.minDiameterHeight() * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL);
 					var dqMax = max(
@@ -471,7 +470,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 					// EMP060
 					float quadMeanDiameter = clamp(
-							estimationMethods.estimateQuadMeanDiameterForSpecies(
+							estimators.estimateQuadMeanDiameterForSpecies(
 									spec, result.getSpecies(), bec.getRegion(), quadMeanDiameterTotal, baseAreaTotal,
 									treesPerHectareTotal, loreyHeightTotal
 							), //
@@ -544,8 +543,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		for (var spec : result.getSpecies().values()) {
 			// EMP090
 			var wholeStemVolume = spec.getTreesPerHectareByUtilization().getCoe(UTIL_ALL)
-					* EstimationMethods.estimateWholeStemVolumePerTree(
-							controlMap, spec.getVolumeGroup(), spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL),
+					* estimators.estimateWholeStemVolumePerTree(
+							spec.getVolumeGroup(), spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL),
 							spec.getQuadraticMeanDiameterByUtilization().getCoe(UTIL_ALL)
 					);
 			spec.getWholeStemVolumeByUtilization().setCoe(UTIL_ALL, wholeStemVolume);
@@ -735,44 +734,37 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				var adjust = new Coefficients(new float[] { 0f, 0f, 0f, 0f }, 1);
 
 				// EMP091
-				EstimationMethods.estimateWholeStemVolume(
-						controlMap, utilizationClass, volumeAdjustCoe.getCoe(1), vdypSpecies.getVolumeGroup(), hlSp,
+				estimators.estimateWholeStemVolume(
+						utilizationClass, volumeAdjustCoe.getCoe(1), vdypSpecies.getVolumeGroup(), hlSp,
 						quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
 				);
 
 				adjust.setCoe(4, volumeAdjustCoe.getCoe(2));
 				// EMP092
-				EstimationMethods.estimateCloseUtilizationVolume(
-						controlMap, utilizationClass, adjust, vdypSpecies.getVolumeGroup(), hlSp, quadMeanDiameterUtil,
+				estimators.estimateCloseUtilizationVolume(
+						utilizationClass, adjust, vdypSpecies.getVolumeGroup(), hlSp, quadMeanDiameterUtil,
 						wholeStemVolumeUtil, closeUtilizationVolumeUtil
 				);
 
 				adjust.setCoe(4, volumeAdjustCoe.getCoe(3));
 				// EMP093
-				EstimationMethods.estimateNetDecayVolume(
-						controlMap, vdypSpecies.getGenus(), bec.getRegion(), utilizationClass, adjust,
+				estimators.estimateNetDecayVolume(
+						vdypSpecies.getGenus(), bec.getRegion(), utilizationClass, adjust,
 						vdypSpecies.getDecayGroup(), vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil,
 						closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil
 				);
 
 				adjust.setCoe(4, volumeAdjustCoe.getCoe(4));
 				// EMP094
-				final var netDecayCoeMap = Utils.<Map<String, Coefficients>>expectParsedControl(
-						controlMap, ControlKey.VOLUME_NET_DECAY_WASTE, Map.class
-				);
-				final var wasteModifierMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
-						controlMap, ControlKey.WASTE_MODIFIERS, MatrixMap2.class
-				);
-				EstimationMethods.estimateNetDecayAndWasteVolume(
-						bec.getRegion(), utilizationClass, adjust, vdypSpecies.getGenus(), hlSp, netDecayCoeMap,
-						wasteModifierMap, quadMeanDiameterUtil, closeUtilizationVolumeUtil,
-						closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
-				);
+				estimators.estimateNetDecayAndWasteVolume(
+						bec.getRegion(), utilizationClass, adjust, vdypSpecies.getGenus(), hlSp,
+						quadMeanDiameterUtil, closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil, 
+						closeUtilizationNetOfDecayAndWasteUtil);
 
 				if (getId().isStart()) {
 					// EMP095
-					EstimationMethods.estimateNetDecayWasteAndBreakageVolume(
-							controlMap, utilizationClass, vdypSpecies.getBreakageGroup(), quadMeanDiameterUtil,
+					estimators.estimateNetDecayWasteAndBreakageVolume(
+							utilizationClass, vdypSpecies.getBreakageGroup(), quadMeanDiameterUtil,
 							closeUtilizationVolumeUtil, closeUtilizationNetOfDecayAndWasteUtil,
 							closeUtilizationNetOfDecayWasteAndBreakageUtil
 					);

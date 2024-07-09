@@ -1,16 +1,12 @@
 package ca.bc.gov.nrs.vdyp.common;
 
 import static ca.bc.gov.nrs.vdyp.test.TestUtils.closeUtilMap;
-import static ca.bc.gov.nrs.vdyp.test.TestUtils.polygonId;
-import static ca.bc.gov.nrs.vdyp.test.TestUtils.valid;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.closeTo;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.utilization;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
+import ca.bc.gov.nrs.vdyp.controlmap.CachingResolvedControlMapImpl;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
@@ -37,12 +34,12 @@ class EstimationMethodsTest {
 
 	Map<String, Object> controlMap;
 	BecLookup becLookup;
-	EstimationMethods emp;
+	Estimators estimators;
 
 	@BeforeEach
 	void setup() {
 		controlMap = TestUtils.loadControlMap();
-		emp = new EstimationMethods(controlMap);
+		estimators = new Estimators(new CachingResolvedControlMapImpl(controlMap));
 		becLookup = (BecLookup) controlMap.get(ControlKey.BEC_DEF.name());
 	}
 
@@ -59,8 +56,8 @@ class EstimationMethodsTest {
 			Coefficients quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
 			Coefficients basalAreaByUtilization = Utils.utilizationVector(0.0f);
 
-			EstimationMethods.estimateBaseAreaByUtilization(
-					controlMap, becDefinition, quadMeanDiameterByUtilization, basalAreaByUtilization, genus.getAlias()
+			estimators.estimateBaseAreaByUtilization(
+					becDefinition, quadMeanDiameterByUtilization, basalAreaByUtilization, genus.getAlias()
 			);
 
 			for (var c : basalAreaByUtilization) {
@@ -79,8 +76,8 @@ class EstimationMethodsTest {
 			Coefficients quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
 			Coefficients basalAreaByUtilization = Utils.utilizationVector(10.0f);
 
-			EstimationMethods.estimateBaseAreaByUtilization(
-					controlMap, becDefinition, quadMeanDiameterByUtilization, basalAreaByUtilization, genus.getAlias()
+			estimators.estimateBaseAreaByUtilization(
+					becDefinition, quadMeanDiameterByUtilization, basalAreaByUtilization, genus.getAlias()
 			);
 
 			assertThat(basalAreaByUtilization.getCoe(UtilizationClass.SMALL.index), is(0.0f));
@@ -103,8 +100,8 @@ class EstimationMethodsTest {
 			Coefficients quadMeanDiameterByUtilization = Utils.utilizationVector(31.5006275f);
 			Coefficients basalAreaByUtilization = Utils.utilizationVector(0.406989872f);
 
-			EstimationMethods.estimateBaseAreaByUtilization(
-					controlMap, becDefinition, quadMeanDiameterByUtilization, basalAreaByUtilization, genus.getAlias()
+			estimators.estimateBaseAreaByUtilization(
+					 becDefinition, quadMeanDiameterByUtilization, basalAreaByUtilization, genus.getAlias()
 			);
 
 			// Result of run in FORTRAN VDYP7 with the above parameters.
@@ -128,7 +125,7 @@ class EstimationMethodsTest {
 
 			var bec = Utils.getBec("CWH", controlMap);
 
-			emp.estimateBaseAreaByUtilization(bec, dq, ba, "B");
+			estimators.estimateBaseAreaByUtilization(bec, dq, ba, "B");
 
 			assertThat(
 					ba,
@@ -163,8 +160,8 @@ class EstimationMethodsTest {
 			Coefficients closeUtilizationVolume = Utils.utilizationVector(0.0f);
 			float loreyHeight = 30.0f;
 
-			EstimationMethods.estimateCloseUtilizationVolume(
-					controlMap, UtilizationClass.U75TO125, aAdjust, volumeGroup, loreyHeight,
+			estimators.estimateCloseUtilizationVolume(
+					UtilizationClass.U75TO125, aAdjust, volumeGroup, loreyHeight,
 					quadMeanDiameterByUtilization, wholeStemVolumeByUtilization, closeUtilizationVolume
 			);
 
@@ -193,8 +190,8 @@ class EstimationMethodsTest {
 			Coefficients closeUtilizationVolume = Utils.utilizationVector(0.0f);
 			float loreyHeight = 36.7552986f;
 
-			EstimationMethods.estimateCloseUtilizationVolume(
-					controlMap, UtilizationClass.U175TO225, aAdjust, volumeGroup, loreyHeight,
+			estimators.estimateCloseUtilizationVolume(
+					UtilizationClass.U175TO225, aAdjust, volumeGroup, loreyHeight,
 					quadMeanDiameterByUtilization, wholeStemVolumeByUtilization, closeUtilizationVolume
 			);
 
@@ -215,7 +212,7 @@ class EstimationMethodsTest {
 
 			var closeUtilizationUtil = Utils.utilizationVector(0f, 0f, 0f, 0f, 0f);
 
-			emp.estimateCloseUtilizationVolume(
+			estimators.estimateCloseUtilizationVolume(
 					utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, wholeStemVolumeUtil,
 					closeUtilizationUtil
 			);
@@ -246,8 +243,8 @@ class EstimationMethodsTest {
 			);
 			int volumeGroup = volumeEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
-			EstimationMethods.estimateNetDecayVolume(
-					controlMap, genus.getAlias(), becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust,
+			estimators.estimateNetDecayVolume(
+					genus.getAlias(), becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust,
 					volumeGroup, 0.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay
 			);
 
@@ -275,8 +272,8 @@ class EstimationMethodsTest {
 			);
 			int decayGroup = decayEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
-			EstimationMethods.estimateNetDecayVolume(
-					controlMap, genus.getAlias(), becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust,
+			estimators.estimateNetDecayVolume(
+					genus.getAlias(), becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust,
 					decayGroup, 54.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay
 			);
 
@@ -302,8 +299,8 @@ class EstimationMethodsTest {
 			Coefficients closeUtilizationNetOfDecay = Utils.utilizationVector(0.0f);
 			Coefficients closeUtilizationNetOfDecayAndWastage = Utils.utilizationVector(0.0f);
 
-			EstimationMethods.estimateNetDecayAndWasteVolume(
-					controlMap, becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus.getAlias(), 0.0f,
+			estimators.estimateNetDecayAndWasteVolume(
+					becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus.getAlias(), 0.0f,
 					quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay,
 					closeUtilizationNetOfDecayAndWastage
 			);
@@ -329,8 +326,8 @@ class EstimationMethodsTest {
 					.utilizationVector(0.0f, 5.90565634f, 0.000909090857f, 0.0502020158f, 0.152929291f, 5.70161581f);
 			Coefficients closeUtilizationNetOfDecayAndWastage = Utils.utilizationVector(0.0f);
 
-			EstimationMethods.estimateNetDecayAndWasteVolume(
-					controlMap, becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus.getAlias(),
+			estimators.estimateNetDecayAndWasteVolume(
+					becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus.getAlias(),
 					36.7552986f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay,
 					closeUtilizationNetOfDecayAndWastage
 			);
@@ -362,8 +359,8 @@ class EstimationMethodsTest {
 			);
 			int breakageGroup = breakageEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
-			EstimationMethods.estimateNetDecayWasteAndBreakageVolume(
-					controlMap, UtilizationClass.U175TO225, breakageGroup, quadMeanDiameterByUtilization,
+			estimators.estimateNetDecayWasteAndBreakageVolume(
+					UtilizationClass.U175TO225, breakageGroup, quadMeanDiameterByUtilization,
 					closeUtilization, closeUtilizationNetOfDecayAndWastage, closeUtilizationNetOfDecayWastageAndBreakage
 			);
 
@@ -392,8 +389,8 @@ class EstimationMethodsTest {
 			);
 			int breakageGroup = breakageEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
-			EstimationMethods.estimateNetDecayWasteAndBreakageVolume(
-					controlMap, UtilizationClass.U175TO225, breakageGroup, quadMeanDiameterByUtilization,
+			estimators.estimateNetDecayWasteAndBreakageVolume(
+					UtilizationClass.U175TO225, breakageGroup, quadMeanDiameterByUtilization,
 					closeUtilization, closeUtilizationNetOfDecayAndWastage, closeUtilizationNetOfDecayWastageAndBreakage
 			);
 
@@ -417,7 +414,7 @@ class EstimationMethodsTest {
 
 			var bec = Utils.getBec("CWH", controlMap);
 
-			emp.estimateQuadMeanDiameterByUtilization(bec, coe, "B");
+			estimators.estimateQuadMeanDiameterByUtilization(bec, coe, "B");
 
 			assertThat(coe, utilization(0f, 31.6622887f, 10.0594692f, 14.966774f, 19.9454956f, 46.1699982f));
 		}
@@ -431,7 +428,7 @@ class EstimationMethodsTest {
 
 			var bec = Utils.getBec("MH", controlMap);
 
-			emp.estimateQuadMeanDiameterByUtilization(bec, coe, "L");
+			estimators.estimateQuadMeanDiameterByUtilization(bec, coe, "L");
 
 			assertThat(coe, utilization(0f, 13.4943399f, 10.2766619f, 14.67033f, 19.4037666f, 25.719244f));
 		}
@@ -511,7 +508,7 @@ class EstimationMethodsTest {
 		specs.put(spec4.getGenus(), spec4);
 		specs.put(spec5.getGenus(), spec5);
 
-		float dq = emp.estimateQuadMeanDiameterForSpecies(
+		float dq = estimators.estimateQuadMeanDiameterForSpecies(
 				spec1, specs, Region.COASTAL, 30.2601795f, 44.6249847f, 620.504883f, 31.6603775f
 		);
 
@@ -543,8 +540,8 @@ class EstimationMethodsTest {
 			);
 			int volumeGroup = volumeEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
-			EstimationMethods.estimateWholeStemVolume(
-					controlMap, UtilizationClass.ALL, 0.0f, volumeGroup, 36.7552986f, quadMeanDiameterByUtilization,
+			estimators.estimateWholeStemVolume(
+					UtilizationClass.ALL, 0.0f, volumeGroup, 36.7552986f, quadMeanDiameterByUtilization,
 					basalAreaByUtilization, wholeStemVolumeByUtilization
 			);
 
@@ -565,15 +562,13 @@ class EstimationMethodsTest {
 			var baseAreaUtil = Utils.utilizationVector(0.492921442f, 0f, 0f, 0f, 0.492921442f);
 			var wholeStemVolumeUtil = Utils.utilizationVector();
 
-			emp.estimateWholeStemVolume(
+			estimators.estimateWholeStemVolume(
 					utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, baseAreaUtil,
 					wholeStemVolumeUtil
 			);
 
 			assertThat(wholeStemVolumeUtil, utilization(0f, 0f, 0f, 0f, 0f, 6.11904192f));
-
 		}
-
 	}
 
 	@Test
@@ -590,8 +585,8 @@ class EstimationMethodsTest {
 		);
 		int volumeGroup = volumeEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
-		float result = EstimationMethods
-				.estimateWholeStemVolumePerTree(controlMap, volumeGroup, 36.7552986f, 31.5006275f);
+		float result = estimators
+				.estimateWholeStemVolumePerTree(volumeGroup, 36.7552986f, 31.5006275f);
 
 		// Result of run in FORTRAN VDYP7 with the above parameters.
 		assertThat(result, is(1.2011181f));
@@ -624,7 +619,7 @@ class EstimationMethodsTest {
 				builder.breakageGroup(-1);
 			});
 
-			var result = emp.estimateNonPrimaryLoreyHeight(spec, specPrime, bec, 24.2999992f, 20.5984688f);
+			var result = estimators.estimateNonPrimaryLoreyHeight(spec.getGenus(), specPrime.getGenus(), bec, 24.2999992f, 20.5984688f);
 
 			assertThat(result, closeTo(21.5356998f));
 
@@ -654,7 +649,7 @@ class EstimationMethodsTest {
 				builder.breakageGroup(-1);
 			});
 
-			var result = emp.estimateNonPrimaryLoreyHeight(spec, specPrime, bec, 35.2999992f, 33.6889763f);
+			var result = estimators.estimateNonPrimaryLoreyHeight(spec.getGenus(), specPrime.getGenus(), bec, 35.2999992f, 33.6889763f);
 
 			assertThat(result, closeTo(38.7456512f));
 

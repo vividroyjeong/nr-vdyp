@@ -768,93 +768,88 @@ class VriStartTest {
 		@Nested
 		class ExpandIntervalOfRootFinder {
 			@Test
-			void testNoChange() throws StandProcessingException {
+			void testNoChange() throws StandProcessingException, IOException {
 
 				UnivariateFunction errorFunc = x -> x;
 
 				var xInterval = new VriStart.Interval(-1, 1);
 
-				VriStart app = new VriStart();
-
-				var result = app.findInterval(xInterval, errorFunc);
-
-				assertThat(result, equalTo(xInterval));
-
+				try (var app = new VriStart()) {
+					var result = app.findInterval(xInterval, errorFunc);
+	
+					assertThat(result, equalTo(xInterval));
+				}
 			}
 
 			@Test
-			void testSimpleChange() throws StandProcessingException {
+			void testSimpleChange() throws StandProcessingException, IOException {
 
 				UnivariateFunction errorFunc = x -> x;
 
 				var xInterval = new VriStart.Interval(-2, -1);
 
-				VriStart app = new VriStart();
-
-				var result = app.findInterval(xInterval, errorFunc);
-
-				var evaluated = result.evaluate(errorFunc);
-				assertTrue(
-						evaluated.start() * evaluated.end() <= 0,
-						() -> "F(" + result + ") should have mixed signs but was " + evaluated
-				);
-
+				try (VriStart app = new VriStart()) {
+	
+					var result = app.findInterval(xInterval, errorFunc);
+	
+					var evaluated = result.evaluate(errorFunc);
+					assertTrue(
+							evaluated.start() * evaluated.end() <= 0,
+							() -> "F(" + result + ") should have mixed signs but was " + evaluated
+					);
+				}
 			}
 
 			@ParameterizedTest
 			@CsvSource({ "1, 1", "-1, 1", "1, -1", "-1, -1" })
-			void testDifficultChange(float a, float b) throws StandProcessingException {
+			void testDifficultChange(float a, float b) throws StandProcessingException, IOException {
 
 				UnivariateFunction errorFunc = x -> a * (Math.exp(b * x) - 0.000001);
 
 				var xInterval = new VriStart.Interval(-1, 1);
 
-				VriStart app = new VriStart();
-
-				var result = app.findInterval(xInterval, errorFunc);
-
-				var evaluated = result.evaluate(errorFunc);
-				assertTrue(
-						evaluated.start() * evaluated.end() <= 0,
-						() -> "F(" + result + ") should have mixed signs but was " + evaluated
-				);
-
+				try (VriStart app = new VriStart()) {
+					var result = app.findInterval(xInterval, errorFunc);
+	
+					var evaluated = result.evaluate(errorFunc);
+					assertTrue(
+							evaluated.start() * evaluated.end() <= 0,
+							() -> "F(" + result + ") should have mixed signs but was " + evaluated
+					);
+				}
 			}
 
 			@ParameterizedTest
 			@ValueSource(floats = { 1, -1, 20, -20 })
-			void testTwoRoots(float a) throws StandProcessingException {
+			void testTwoRoots(float a) throws StandProcessingException, IOException {
 
 				UnivariateFunction errorFunc = x -> a * (x * x - 0.5);
 
 				var xInterval = new VriStart.Interval(-1, 1);
 
-				VriStart app = new VriStart();
-
-				var result = app.findInterval(xInterval, errorFunc);
-
-				var evaluated = result.evaluate(errorFunc);
-				assertTrue(
-						evaluated.start() * evaluated.end() <= 0,
-						() -> "F(" + result + ") should have mixed signs but was " + evaluated
-				);
-
+				try (VriStart app = new VriStart()) {
+					var result = app.findInterval(xInterval, errorFunc);
+	
+					var evaluated = result.evaluate(errorFunc);
+					assertTrue(
+							evaluated.start() * evaluated.end() <= 0,
+							() -> "F(" + result + ") should have mixed signs but was " + evaluated
+					);
+				}
 			}
 
 			@ParameterizedTest
 			@CsvSource({ "1, 1", "-1, 1", "1, -1", "-1, -1" })
-			void testImpossible(float a, float b) throws StandProcessingException {
+			void testImpossible(float a, float b) throws StandProcessingException, IOException {
 
 				UnivariateFunction errorFunc = x -> a * (Math.exp(b * x) + 1);
 
 				var xInterval = new VriStart.Interval(-1, 1);
 
-				VriStart app = new VriStart();
-
-				var ex = assertThrows(NoBracketingException.class, () -> app.findInterval(xInterval, errorFunc));
-
+				try (VriStart app = new VriStart()) {
+					assertThrows(NoBracketingException.class, () -> app.findInterval(xInterval, errorFunc));
+				}
 			}
-
 		}
 
 		@Nested
@@ -1639,79 +1634,78 @@ class VriStartTest {
 
 			var control = EasyMock.createControl();
 
-			VriStart app = EasyMock.createMockBuilder(VriStart.class) //
+			try (VriStart app = EasyMock.createMockBuilder(VriStart.class) //
 					.addMockedMethod("processYoung") //
 					.addMockedMethod("processBatc") //
 					.addMockedMethod("processBatn") //
 					.addMockedMethod("checkPolygon") //
 					.addMockedMethod("processPrimaryLayer") //
 					.addMockedMethod("getDebugMode") //
-					.createMock(control);
-
-			MockFileResolver resolver = dummyInput();
-
-			var poly = VriPolygon.build(pb -> {
-				pb.polygonIdentifier("TestPoly", 2024);
-				pb.biogeoclimaticZone("IDF");
-				pb.yieldFactor(1.0f);
-				pb.mode(mode);
-				pb.addLayer(lb -> {
-					lb.layerType(LayerType.PRIMARY);
-					lb.crownClosure(80f);
-					lb.utilization(0.6f);
+					.createMock(control)) {
+	
+				MockFileResolver resolver = dummyInput();
+	
+				var poly = VriPolygon.build(pb -> {
+					pb.polygonIdentifier("TestPoly", 2024);
+					pb.biogeoclimaticZone("IDF");
+					pb.yieldFactor(1.0f);
+					pb.mode(mode);
+					pb.addLayer(lb -> {
+						lb.layerType(LayerType.PRIMARY);
+						lb.crownClosure(80f);
+						lb.utilization(0.6f);
+					});
 				});
-			});
-
-			var polyYoung = VriPolygon.build(pb -> {
-				pb.polygonIdentifier("TestPolyYoung", 2024);
-				pb.biogeoclimaticZone("IDF");
-				pb.yieldFactor(1.0f);
-				pb.mode(mode);
-				pb.addLayer(lb -> {
-					lb.layerType(LayerType.PRIMARY);
-					lb.crownClosure(80f);
-					lb.utilization(0.6f);
+	
+				var polyYoung = VriPolygon.build(pb -> {
+					pb.polygonIdentifier("TestPolyYoung", 2024);
+					pb.biogeoclimaticZone("IDF");
+					pb.yieldFactor(1.0f);
+					pb.mode(mode);
+					pb.addLayer(lb -> {
+						lb.layerType(LayerType.PRIMARY);
+						lb.crownClosure(80f);
+						lb.utilization(0.6f);
+					});
 				});
-			});
-			var polyBatc = VriPolygon.build(pb -> {
-				pb.polygonIdentifier("TestPolyBatc", 2024);
-				pb.biogeoclimaticZone("IDF");
-				pb.yieldFactor(1.0f);
-				pb.mode(mode);
-				pb.addLayer(lb -> {
-					lb.layerType(LayerType.PRIMARY);
-					lb.crownClosure(80f);
-					lb.utilization(0.6f);
+				var polyBatc = VriPolygon.build(pb -> {
+					pb.polygonIdentifier("TestPolyBatc", 2024);
+					pb.biogeoclimaticZone("IDF");
+					pb.yieldFactor(1.0f);
+					pb.mode(mode);
+					pb.addLayer(lb -> {
+						lb.layerType(LayerType.PRIMARY);
+						lb.crownClosure(80f);
+						lb.utilization(0.6f);
+					});
 				});
-			});
-			var polyBatn = VriPolygon.build(pb -> {
-				pb.polygonIdentifier("TestPolyBatn", 2024);
-				pb.biogeoclimaticZone("IDF");
-				pb.yieldFactor(1.0f);
-				pb.mode(mode);
-				pb.addLayer(lb -> {
-					lb.layerType(LayerType.PRIMARY);
-					lb.crownClosure(80f);
-					lb.utilization(0.6f);
+				var polyBatn = VriPolygon.build(pb -> {
+					pb.polygonIdentifier("TestPolyBatn", 2024);
+					pb.biogeoclimaticZone("IDF");
+					pb.yieldFactor(1.0f);
+					pb.mode(mode);
+					pb.addLayer(lb -> {
+						lb.layerType(LayerType.PRIMARY);
+						lb.crownClosure(80f);
+						lb.utilization(0.6f);
+					});
 				});
-			});
-
-			EasyMock.expect(app.checkPolygon(poly)).andReturn(mode).once();
-			EasyMock.expect(app.processYoung(poly)).andReturn(polyYoung).times(0, 1);
-			EasyMock.expect(app.processBatc(poly)).andReturn(polyBatc).times(0, 1);
-			EasyMock.expect(app.processBatn(poly)).andReturn(polyBatn).times(0, 1);
-			app.processPrimaryLayer(EasyMock.anyObject(VriPolygon.class), EasyMock.anyObject(VdypLayer.Builder.class));
-			EasyMock.expectLastCall().once();
-			EasyMock.expect(app.getDebugMode(9)).andStubReturn(0);
-			EasyMock.expect(app.getDebugMode(1)).andStubReturn(0);
-
-			control.replay();
-
-			app.init(resolver, controlMap);
-
-			var result = app.processPolygon(0, poly);
-
-			app.close();
+	
+				EasyMock.expect(app.checkPolygon(poly)).andReturn(mode).once();
+				EasyMock.expect(app.processYoung(poly)).andReturn(polyYoung).times(0, 1);
+				EasyMock.expect(app.processBatc(poly)).andReturn(polyBatc).times(0, 1);
+				EasyMock.expect(app.processBatn(poly)).andReturn(polyBatn).times(0, 1);
+				app.processPrimaryLayer(EasyMock.anyObject(VriPolygon.class), EasyMock.anyObject(VdypLayer.Builder.class));
+				EasyMock.expectLastCall().once();
+				EasyMock.expect(app.getDebugMode(9)).andStubReturn(0);
+				EasyMock.expect(app.getDebugMode(1)).andStubReturn(0);
+	
+				control.replay();
+	
+				app.init(resolver, controlMap);
+	
+				app.processPolygon(0, poly);
+			}
 
 			control.verify();
 		}
@@ -1859,6 +1853,7 @@ class VriStartTest {
 			control.verify();
 		}
 
+		@SuppressWarnings("unused")
 		@Test
 		void testStandExceptionProcessingPrimaryLayer() throws Exception {
 
@@ -1932,7 +1927,7 @@ class VriStartTest {
 
 			app.init(resolver, controlMap);
 
-			var ex = assertThrows(StandProcessingException.class, () -> app.processPolygon(0, poly));
+			assertThrows(StandProcessingException.class, () -> app.processPolygon(0, poly));
 
 			app.close();
 

@@ -1,12 +1,10 @@
 package ca.bc.gov.nrs.vdyp.application;
 
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.abs;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.clamp;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.exp;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.floor;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.log;
 import static ca.bc.gov.nrs.vdyp.math.FloatMath.pow;
-import static ca.bc.gov.nrs.vdyp.math.FloatMath.sqrt;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -37,11 +35,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.EstimationMethods;
+import ca.bc.gov.nrs.vdyp.common.Estimators;
 import ca.bc.gov.nrs.vdyp.common.ReconcilationMethods;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
+import ca.bc.gov.nrs.vdyp.controlmap.ResolvedControlMapImpl;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -168,7 +167,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	protected Map<String, Object> controlMap = new HashMap<>();
 
-	public EstimationMethods estimationMethods;
+	protected Estimators estimators;
 
 	static final Comparator<BaseVdypSpecies> PERCENT_GENUS_DESCENDING = Utils
 			.compareUsing(BaseVdypSpecies::getPercentGenus).reversed();
@@ -240,7 +239,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	protected void setControlMap(Map<String, Object> controlMap) {
 		this.controlMap = controlMap;
-		this.estimationMethods = new EstimationMethods(controlMap);
+		this.estimators = new Estimators(new ResolvedControlMapImpl(controlMap));
 	}
 
 	protected <T> StreamingParser<T> getStreamingParser(ControlKey key) throws ProcessingException {
@@ -1152,10 +1151,10 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			var adjustDecayWasteUtil = Utils.utilizationVector(); // ADJVDW
 
 			// EMP071
-			estimationMethods.estimateQuadMeanDiameterByUtilization(bec, quadMeanDiameterUtil, spec.getGenus());
+			estimators.estimateQuadMeanDiameterByUtilization(bec, quadMeanDiameterUtil, spec.getGenus());
 
 			// EMP070
-			estimationMethods.estimateBaseAreaByUtilization(bec, quadMeanDiameterUtil, baseAreaUtil, spec.getGenus());
+			estimators.estimateBaseAreaByUtilization(bec, quadMeanDiameterUtil, baseAreaUtil, spec.getGenus());
 
 			// Calculate tree density components
 			for (var uc : VdypStartApplication.UTIL_CLASSES) {
@@ -1196,7 +1195,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			} else {
 
 				// EMP091
-				estimationMethods.estimateWholeStemVolume(
+				estimators.estimateWholeStemVolume(
 						UtilizationClass.ALL, adjustCloseUtil.getCoe(4), spec.getVolumeGroup(), loreyHeightSpec,
 						quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
 				);
@@ -1212,48 +1211,48 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				}
 
 				// EMP092
-				estimationMethods.estimateCloseUtilizationVolume(
+				estimators.estimateCloseUtilizationVolume(
 						UtilizationClass.ALL, adjustCloseUtil, spec.getVolumeGroup(), loreyHeightSpec,
 						quadMeanDiameterUtil, wholeStemVolumeUtil, closeVolumeUtil
 				);
 
 				// EMP093
-				estimationMethods.estimateNetDecayVolume(
+				estimators.estimateNetDecayVolume(
 						spec.getGenus(), bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec.getDecayGroup(),
 						vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil, closeVolumeUtil,
 						closeVolumeNetDecayUtil
 				);
 
 				// EMP094
-				estimationMethods.estimateNetDecayAndWasteVolume(
+				estimators.estimateNetDecayAndWasteVolume(
 						bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec.getGenus(), loreyHeightSpec,
 						quadMeanDiameterUtil, closeVolumeUtil, closeVolumeNetDecayUtil, closeVolumeNetDecayWasteUtil
 				);
 
 				if (this.getId().isStart()) {
 					// EMP095
-					estimationMethods.estimateNetDecayWasteAndBreakageVolume(
+					estimators.estimateNetDecayWasteAndBreakageVolume(
 							UtilizationClass.ALL, spec.getBreakageGroup(), quadMeanDiameterUtil, closeVolumeUtil,
 							closeVolumeNetDecayWasteUtil, closeVolumeNetDecayWasteBreakUtil
 					);
 				}
 			}
 
-			spec.getBaseAreaByUtilization().pairwiseInPlace(baseAreaUtil, EstimationMethods.COPY_IF_BAND);
-			spec.getTreesPerHectareByUtilization().pairwiseInPlace(treesPerHectareUtil, EstimationMethods.COPY_IF_BAND);
+			spec.getBaseAreaByUtilization().pairwiseInPlace(baseAreaUtil, Estimators.COPY_IF_BAND);
+			spec.getTreesPerHectareByUtilization().pairwiseInPlace(treesPerHectareUtil, Estimators.COPY_IF_BAND);
 			spec.getQuadraticMeanDiameterByUtilization()
-					.pairwiseInPlace(quadMeanDiameterUtil, EstimationMethods.COPY_IF_BAND);
+					.pairwiseInPlace(quadMeanDiameterUtil, Estimators.COPY_IF_BAND);
 
 			spec.getWholeStemVolumeByUtilization()
-					.pairwiseInPlace(wholeStemVolumeUtil, EstimationMethods.COPY_IF_NOT_TOTAL);
+					.pairwiseInPlace(wholeStemVolumeUtil, Estimators.COPY_IF_NOT_TOTAL);
 			spec.getCloseUtilizationVolumeByUtilization()
-					.pairwiseInPlace(closeVolumeUtil, EstimationMethods.COPY_IF_NOT_TOTAL);
+					.pairwiseInPlace(closeVolumeUtil, Estimators.COPY_IF_NOT_TOTAL);
 			spec.getCloseUtilizationVolumeNetOfDecayByUtilization()
-					.pairwiseInPlace(closeVolumeNetDecayUtil, EstimationMethods.COPY_IF_NOT_TOTAL);
+					.pairwiseInPlace(closeVolumeNetDecayUtil, Estimators.COPY_IF_NOT_TOTAL);
 			spec.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization()
-					.pairwiseInPlace(closeVolumeNetDecayWasteUtil, EstimationMethods.COPY_IF_NOT_TOTAL);
+					.pairwiseInPlace(closeVolumeNetDecayWasteUtil, Estimators.COPY_IF_NOT_TOTAL);
 			spec.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization()
-					.pairwiseInPlace(closeVolumeNetDecayWasteBreakUtil, EstimationMethods.COPY_IF_NOT_TOTAL);
+					.pairwiseInPlace(closeVolumeNetDecayWasteBreakUtil, Estimators.COPY_IF_NOT_TOTAL);
 
 		}
 		computeLayerUtilizationComponentsFromSpecies(vdypLayer);

@@ -19,13 +19,10 @@ import org.junit.jupiter.api.Test;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonDescription;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonLayer;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypSpeciesUtilization;
 import ca.bc.gov.nrs.vdyp.forward.test.VdypForwardTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
-import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
@@ -33,8 +30,6 @@ class PolygonProcessingStateTest {
 
 	private ForwardControlParser parser;
 	private Map<String, Object> controlMap;
-
-	private StreamingParser<VdypPolygonDescription> polygonDescriptionStream;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@BeforeEach
@@ -48,10 +43,6 @@ class PolygonProcessingStateTest {
 						ControlKey.SP0_DEF, allOf(instanceOf(List.class), hasItem(instanceOf(GenusDefinition.class)))
 				)
 		);
-
-		var polygonDescriptionStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_GROWTO.name());
-		polygonDescriptionStream = ((StreamingParserFactory<VdypPolygonDescription>) polygonDescriptionStreamFactory)
-				.get();
 	}
 
 	@Test

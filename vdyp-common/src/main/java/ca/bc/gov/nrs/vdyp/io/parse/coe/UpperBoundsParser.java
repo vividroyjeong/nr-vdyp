@@ -46,8 +46,8 @@ public class UpperBoundsParser implements ControlMapSubResourceParser<Map<Intege
 	public static final String MAX_BA_KEY = "maxBaKey";
 	public static final String MAX_DQ_KEY = "maxDqKey";
 	
-	public static final int BA_INDEX = 0;
-	public static final int DQ_INDEX = 1;
+	public static final int BA_INDEX = 1;
+	public static final int DQ_INDEX = 2;
 
 	private static final Pattern ZEROES = Pattern.compile("0{0,3}");
 

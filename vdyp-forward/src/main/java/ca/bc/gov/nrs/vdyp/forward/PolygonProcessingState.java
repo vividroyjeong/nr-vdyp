@@ -8,18 +8,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.forward.model.ControlVariable;
-import ca.bc.gov.nrs.vdyp.forward.model.ForwardControlVariables;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonLayer;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
-import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
-import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.SmallUtilizationClassVariable;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.VolumeVariable;
@@ -113,7 +109,7 @@ class PolygonProcessingState {
 	// TODO
 
 	public PolygonProcessingState(
-			ForwardProcessingState fps, VdypPolygon polygon, Bank bank, Map<String, Object> controlMap
+			ForwardProcessingState fps, VdypPolygon polygon, Bank bank
 	) {
 
 		this.fps = fps;
@@ -121,14 +117,14 @@ class PolygonProcessingState {
 
 		this.wallet = bank.copy();
 
-		var volumeEquationGroupMatrix = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
-				controlMap, ControlKey.VOLUME_EQN_GROUPS, MatrixMap2.class
+		var volumeEquationGroupMatrix = this.fps.fcm.<MatrixMap2<String, String, Integer>>get(
+				ControlKey.VOLUME_EQN_GROUPS, MatrixMap2.class
 		);
-		var decayEquationGroupMatrix = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
-				controlMap, ControlKey.DECAY_GROUPS, MatrixMap2.class
+		var decayEquationGroupMatrix = this.fps.fcm.<MatrixMap2<String, String, Integer>>get(
+				ControlKey.DECAY_GROUPS, MatrixMap2.class
 		);
-		var breakageEquationGroupMatrix = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
-				controlMap, ControlKey.BREAKAGE_GROUPS, MatrixMap2.class
+		var breakageEquationGroupMatrix = this.fps.fcm.<MatrixMap2<String, String, Integer>>get(
+				ControlKey.BREAKAGE_GROUPS, MatrixMap2.class
 		);
 
 		this.volumeEquationGroups = new int[this.wallet.getNSpecies() + 1];
@@ -172,65 +168,6 @@ class PolygonProcessingState {
 		return wallet.getLayer();
 	}
 
-	public ForwardControlVariables getVdypGrowthDetails() {
-		return fps.forwardGrowthDetails;
-	}
-
-	public MatrixMap2<Integer, Integer, Optional<Coefficients>> getNetDecayCoeMap() {
-		return fps.netDecayCoeMap;
-	}
-
-	public Map<String, Coefficients> getNetDecayWasteCoeMap() {
-		return fps.netDecayWasteCoeMap;
-	}
-
-	public MatrixMap2<String, Region, Float> getWasteModifierMap() {
-		return fps.wasteModifierMap;
-	}
-
-	public MatrixMap2<String, Region, Float> getDecayModifierMap() {
-		return fps.decayModifierMap;
-	}
-
-	public MatrixMap2<Integer, Integer, Optional<Coefficients>> getCloseUtilizationCoeMap() {
-		return fps.closeUtilizationCoeMap;
-	}
-
-	public Map<Integer, Coefficients> getTotalStandWholeStepVolumeCoeMap() {
-		return fps.totalStandWholeStepVolumeCoeMap;
-	}
-
-	public MatrixMap2<Integer, Integer, Optional<Coefficients>> getWholeStemUtilizationComponentMap() {
-		return fps.wholeStemUtilizationComponentMap;
-	}
-
-	public MatrixMap3<Integer, String, String, Coefficients> getQuadMeanDiameterUtilizationComponentMap() {
-		return fps.quadMeanDiameterUtilizationComponentMap;
-	}
-
-	public MatrixMap3<Integer, String, String, Coefficients> getBasalAreaUtilizationComponentMap() {
-		return fps.basalAreaDiameterUtilizationComponentMap;
-	}
-
-	public Map<String, Coefficients> getSmallComponentWholeStemVolumeCoefficients() {
-		return fps.smallComponentWholeStemVolumeCoefficients;
-	}
-
-	public Map<String, Coefficients> getSmallComponentLoreyHeightCoefficients() {
-		return fps.smallComponentLoreyHeightCoefficients;
-	}
-
-	public Map<String, Coefficients> getSmallComponentQuadMeanDiameterCoefficients() {
-		return fps.smallComponentQuadMeanDiameterCoefficients;
-	}
-
-	public Map<String, Coefficients> getSmallComponentBasalAreaCoefficients() {
-		return fps.smallComponentBasalAreaCoefficients;
-	}
-
-	public Map<String, Coefficients> getSmallComponentProbabilityCoefficients() {
-		return fps.smallComponentProbabilityCoefficients;
-	}
 
 	public int getPrimarySpeciesIndex() {
 		if (!areRankingDetailsSet) {
@@ -451,7 +388,7 @@ class PolygonProcessingState {
 		
 		// Normally, these values may only be set only once. However, during grow(), if the 
 		// control variable UPDATE_DURING_GROWTH_6 has value "1" then updates are allowed.
-		if (this.arePrimarySpeciesDetailsSet && fps.forwardControlVariables.getControlVariable(ControlVariable.UPDATE_DURING_GROWTH_6) != 1) {
+		if (this.arePrimarySpeciesDetailsSet && fps.fcm.getForwardControlVariables().getControlVariable(ControlVariable.UPDATE_DURING_GROWTH_6) != 1) {
 			throw new IllegalStateException(PRIMARY_SPECIES_DETAILS_CAN_BE_SET_ONCE_ONLY);
 		}
 
