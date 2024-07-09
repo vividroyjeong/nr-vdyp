@@ -37,8 +37,6 @@ public class CachingResolvedControlMapImpl extends ResolvedControlMapImpl implem
 	final MatrixMap2<String, String, Integer> defaultEquationGroup;
 	final MatrixMap2<Integer, Integer, Optional<Integer>> equationModifierGroup;
 	final MatrixMap2<String, Region, Coefficients> hl1Coefficients;
-	final CompVarAdjustments compVarAdjustments;
-
 	public CachingResolvedControlMapImpl(Map<String, Object> controlMap) {
 
 		super(controlMap);
@@ -63,7 +61,6 @@ public class CachingResolvedControlMapImpl extends ResolvedControlMapImpl implem
 		this.maximumAgeBySiteCurveNumber = this.get(ControlKey.SITE_CURVE_AGE_MAX, Map.class);
 		this.defaultEquationGroup = this.get(ControlKey.DEFAULT_EQ_NUM, MatrixMap2.class);
 		this.hl1Coefficients = this.get(ControlKey.HL_PRIMARY_SP_EQN_P1, MatrixMap2.class);
-		this.compVarAdjustments = this.get(ControlKey.PARAM_ADJUSTMENTS, CompVarAdjustments.class);
 		this.upperBounds = this.get(ControlKey.BA_DQ_UPPER_BOUNDS, Map.class);
 		this.equationModifierGroup = this.get(ControlKey.EQN_MODIFIERS, MatrixMap2.class);
 	}
@@ -166,10 +163,5 @@ public class CachingResolvedControlMapImpl extends ResolvedControlMapImpl implem
 	@Override
 	public MatrixMap2<String, Region, Coefficients> getHl1Coefficients() {
 		return hl1Coefficients;
-	}
-
-	@Override
-	public CompVarAdjustments getCompVarAdjustments() {
-		return compVarAdjustments;
 	}
 }

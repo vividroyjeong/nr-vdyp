@@ -9,6 +9,7 @@ import ca.bc.gov.nrs.vdyp.controlmap.CachingResolvedControlMapImpl;
 import ca.bc.gov.nrs.vdyp.forward.model.ForwardControlVariables;
 import ca.bc.gov.nrs.vdyp.forward.model.ForwardDebugSettings;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
+import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
 import ca.bc.gov.nrs.vdyp.model.DebugSettings;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
@@ -19,6 +20,7 @@ public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl
 	final ForwardControlVariables forwardControlVariables;
 	final BecLookup becLookup;
 	final MatrixMap2<String, Region, SiteIndexEquation> siteCurveMap;
+	final CompVarAdjustments compVarAdjustments;
 	
 	public ForwardResolvedControlMapImpl(Map<String, Object> controlMap) {
 
@@ -28,6 +30,7 @@ public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl
 		this.forwardControlVariables = get(ControlKey.VTROL, ForwardControlVariables.class);
 		this.becLookup = Utils.expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class);
 		this.siteCurveMap = Utils.expectParsedControl(controlMap, ControlKey.SITE_CURVE_NUMBERS, MatrixMap2.class);
+		this.compVarAdjustments = this.get(ControlKey.PARAM_ADJUSTMENTS, CompVarAdjustments.class);
 	}
 	
 	@Override
@@ -48,5 +51,10 @@ public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl
 	@Override
 	public MatrixMap2<String, Region, SiteIndexEquation> getSiteCurveMap() {
 		return siteCurveMap;
+	}
+
+	@Override
+	public CompVarAdjustments getCompVarAdjustments() {
+		return compVarAdjustments;
 	}
 }
