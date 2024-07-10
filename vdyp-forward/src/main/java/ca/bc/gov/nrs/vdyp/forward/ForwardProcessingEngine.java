@@ -295,7 +295,7 @@ public class ForwardProcessingEngine {
 
 	/**
 	 * EMP111A - Basal area growth for the primary layer.
-	 * @param speciesProportionByBasalArea the proportion by basal area of each of the polygon's species
+	 * @param speciesProportionsByBasalArea the proportion by basal area of each of the polygon's species
 	 * @param yearsAtBreastHeight at the start of the year
 	 * @param dominantHeight primary species dominant height at start of year
 	 * @param primaryLayerBasalArea at the start of the year
@@ -306,7 +306,7 @@ public class ForwardProcessingEngine {
 	 * @throws StandProcessingException 
 	 */
 	private float growBasalArea(
-			float[] speciesProportionByBasalArea, float yearsAtBreastHeight, float dominantHeight, float primaryLayerBasalArea, 
+			float[] speciesProportionsByBasalArea, float yearsAtBreastHeight, float dominantHeight, float primaryLayerBasalArea, 
 			Optional<Float> veteranLayerBasalArea, float growthInDominantHeight
 	) throws StandProcessingException {
 		
@@ -317,14 +317,74 @@ public class ForwardProcessingEngine {
 		baUpperBound = baUpperBound / Estimators.EMPIRICAL_OCCUPANCY;
 		var baLimit = Math.max(baUpperBound, primaryLayerBasalArea);
 		
-		var baYield = fps.fcm
+		var baYieldCoefficients = fps.fcm.getBasalAreaYieldCoefficients();
+		var becZoneAlias = fps.getPolygonProcessingState().getBecZone().getAlias();
+		Coefficients estimateBaseAreaYieldCoefficients = Coefficients.empty(7, 0);
+		for (int i = 0; i < 7; i++) {
+			float sum = 0.0f;
+			for (String speciesAlias: fps.getPolygonProcessingState().wallet.speciesNames) {
+				sum += baYieldCoefficients.get(becZoneAlias, speciesAlias).getCoe(i);
+			}
+			estimateBaseAreaYieldCoefficients.setCoe(i, sum);
+		}
+		if (estimateBaseAreaYieldCoefficients.getCoe(5) > 0.0f) {
+			estimateBaseAreaYieldCoefficients.setCoe(5, 0.0f);
+		}
 		
 		boolean isFullOccupancy = true;
 		int primarySpeciesGroupNumber = fps.getPolygonProcessingState().getPrimarySpeciesGroupNumber();
-		float basalAreaYield = estimators.estimateBaseAreaYield(null, dominantHeight, yearsAtBreastHeight, veteranLayerBasalArea, 
+		float basalAreaYieldAtStart = estimators.estimateBaseAreaYield(estimateBaseAreaYieldCoefficients, dominantHeight, yearsAtBreastHeight, veteranLayerBasalArea, 
 				isFullOccupancy, fps.getPolygonProcessingState().getBecZone(), primarySpeciesGroupNumber);
 
-		return basalAreaYield;
+		float dominantHeightEnd = dominantHeight + growthInDominantHeight;
+		float yearsAtBreastHeightEnd = yearsAtBreastHeight + 1.0f;
+		
+		float basalAreaYieldAtEnd = estimators.estimateBaseAreaYield(estimateBaseAreaYieldCoefficients, dominantHeightEnd, yearsAtBreastHeightEnd, 
+				veteranLayerBasalArea, isFullOccupancy, fps.getPolygonProcessingState().getBecZone(), primarySpeciesGroupNumber);
+
+		var basalAreaGrowthFiatDetails = fps.fcm.getBasalAreaGrowthFiatDetails();
+		var growthFaitDetails = basalAreaGrowthFiatDetails.get(fps.getPolygonProcessingState().getBecZone().getRegion());
+		var convergenceCoefficient = growthFaitDetails.getCoefficient(0);
+		int nAges = growthFaitDetails.getNAgesSupplied();
+		if (yearsAtBreastHeight > growthFaitDetails.getAge(0) && nAges > 1) {
+			if (yearsAtBreastHeight >= growthFaitDetails.getAge(nAges - 1)) {
+				convergenceCoefficient = growthFaitDetails.getAge(nAges - 1);
+			} else {
+				// Must interpolate (between pair1 & pair2)
+				int pair1, pair2;
+				if (yearsAtBreastHeight < growthFaitDetails.getAge(0)) {
+					pair1 = 0;
+				} else if (yearsAtBreastHeight < growthFaitDetails.getAge(1)) {
+					pair1 = 1;
+				} else {
+					pair1 = 2;
+				}
+				pair2 = pair1 + 1;
+				
+				convergenceCoefficient = growthFaitDetails.getCoefficient(pair1)
+						+   (growthFaitDetails.getCoefficient(pair2) - growthFaitDetails.getCoefficient(pair1))
+						  * (yearsAtBreastHeight - growthFaitDetails.getAge(pair1)) 
+						  / (growthFaitDetails.getAge(pair2) - growthFaitDetails.getAge(pair1));
+			}
+		}
+		
+		var grow = basalAreaYieldAtEnd - basalAreaYieldAtStart;
+		var adjust = -convergenceCoefficient * (primaryLayerBasalArea - basalAreaYieldAtStart);
+		grow += adjust;
+		
+		// Special check at young ages. 
+		if (yearsAtBreastHeight < 40.0f && primaryLayerBasalArea > 5.0f * basalAreaYieldAtStart) {
+			// This stand started MUCH faster than base yield model. We'll let it keep going like 
+			// this for a while.
+			grow = Math.min(basalAreaYieldAtStart / yearsAtBreastHeight, Math.min(0.5f, grow));
+		}
+		
+		if (fps.fcm.getDebugSettings().getValue(ForwardDebugSettings.Vars.BASAL_AREA_GROWTH_MODEL_3) >= 1) {
+			var growFiat = grow;
+			// ...
+		}
+		
+		return basalAreaYieldAtEnd;
 	}
 
 	/**

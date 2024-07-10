@@ -6,9 +6,10 @@ import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
+import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
-import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
@@ -17,6 +18,7 @@ import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
 
 public class CachingResolvedControlMapImpl extends ResolvedControlMapImpl implements ResolvedControlMap {
 
+	final BecLookup becLookup;
 	final GenusDefinitionMap genusDefinitionMap;
 	final Map<String, Coefficients> netDecayWasteCoeMap;
 	final MatrixMap2<Integer, Integer, Optional<Coefficients>> netDecayCoeMap;
@@ -41,6 +43,8 @@ public class CachingResolvedControlMapImpl extends ResolvedControlMapImpl implem
 
 		super(controlMap);
 
+		this.becLookup = Utils.expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class);
+
 		List<GenusDefinition> genusDefinitions = this.get(ControlKey.SP0_DEF, List.class);
 		this.genusDefinitionMap = new GenusDefinitionMap(genusDefinitions);
 
@@ -63,6 +67,11 @@ public class CachingResolvedControlMapImpl extends ResolvedControlMapImpl implem
 		this.hl1Coefficients = this.get(ControlKey.HL_PRIMARY_SP_EQN_P1, MatrixMap2.class);
 		this.upperBounds = this.get(ControlKey.BA_DQ_UPPER_BOUNDS, Map.class);
 		this.equationModifierGroup = this.get(ControlKey.EQN_MODIFIERS, MatrixMap2.class);
+	}
+
+	@Override
+	public BecLookup getBecLookup() {
+		return becLookup;
 	}
 
 	@Override

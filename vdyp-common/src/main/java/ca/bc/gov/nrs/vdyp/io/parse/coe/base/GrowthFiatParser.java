@@ -56,7 +56,7 @@ public abstract class GrowthFiatParser implements ControlMapSubResourceParser<Ma
 
 			GrowthFiatDetails details = new GrowthFiatDetails(regionId, coefficients);
 
-			if (details.getNAges() == 0) {
+			if (details.getNAgesSupplied() == 0) {
 				throw new ValueParseException("0", "Region Id " + regionId + " contains no age ranges");
 			}
 

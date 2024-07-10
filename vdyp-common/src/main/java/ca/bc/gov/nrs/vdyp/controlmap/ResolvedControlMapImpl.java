@@ -9,8 +9,8 @@ import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
+import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
-import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
@@ -47,9 +47,13 @@ public class ResolvedControlMapImpl implements ResolvedControlMap {
 	}
 
 	@Override
+	public BecLookup getBecLookup() {
+		return this.get(ControlKey.BEC_DEF, BecLookup.class);		
+	}
+
+	@Override
 	public Map<String, Coefficients> getNetDecayWasteCoeMap() {
 		return this.get(ControlKey.VOLUME_NET_DECAY_WASTE, Map.class);		
-
 	}
 
 	@Override
@@ -140,10 +144,5 @@ public class ResolvedControlMapImpl implements ResolvedControlMap {
 	@Override
 	public MatrixMap2<String, Region, Coefficients> getHl1Coefficients() {
 		return this.get(ControlKey.HL_PRIMARY_SP_EQN_P1, MatrixMap2.class);
-	}
-
-	@Override
-	public CompVarAdjustments getCompVarAdjustments() {
-		return this.get(ControlKey.PARAM_ADJUSTMENTS, CompVarAdjustments.class);
 	}
 }

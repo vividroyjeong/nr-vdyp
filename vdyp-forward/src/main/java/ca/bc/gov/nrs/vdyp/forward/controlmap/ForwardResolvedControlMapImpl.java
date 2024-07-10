@@ -8,9 +8,10 @@ import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.controlmap.CachingResolvedControlMapImpl;
 import ca.bc.gov.nrs.vdyp.forward.model.ForwardControlVariables;
 import ca.bc.gov.nrs.vdyp.forward.model.ForwardDebugSettings;
-import ca.bc.gov.nrs.vdyp.model.BecLookup;
+import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
 import ca.bc.gov.nrs.vdyp.model.DebugSettings;
+import ca.bc.gov.nrs.vdyp.model.GrowthFiatDetails;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
 
@@ -18,19 +19,21 @@ public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl
 	
 	final ForwardDebugSettings debugSettings;
 	final ForwardControlVariables forwardControlVariables;
-	final BecLookup becLookup;
 	final MatrixMap2<String, Region, SiteIndexEquation> siteCurveMap;
 	final CompVarAdjustments compVarAdjustments;
-	
+	final MatrixMap2<String, String, Coefficients> basalAreaYieldCoefficients;
+	final Map<Region, GrowthFiatDetails> basalAreaGrowthFiatDetails;
+
 	public ForwardResolvedControlMapImpl(Map<String, Object> controlMap) {
 
 		super(controlMap);
 		
 		this.debugSettings = new ForwardDebugSettings(get(ControlKey.DEBUG_SWITCHES, DebugSettings.class));
 		this.forwardControlVariables = get(ControlKey.VTROL, ForwardControlVariables.class);
-		this.becLookup = Utils.expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class);
 		this.siteCurveMap = Utils.expectParsedControl(controlMap, ControlKey.SITE_CURVE_NUMBERS, MatrixMap2.class);
 		this.compVarAdjustments = this.get(ControlKey.PARAM_ADJUSTMENTS, CompVarAdjustments.class);
+		this.basalAreaYieldCoefficients = this.get(ControlKey.BA_YIELD, MatrixMap2.class);
+		this.basalAreaGrowthFiatDetails = this.get(ControlKey.BA_GROWTH_FIAT, Map.class);
 	}
 	
 	@Override
@@ -44,11 +47,6 @@ public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl
 	}
 
 	@Override
-	public BecLookup getBecLookup() {
-		return becLookup;
-	}
-
-	@Override
 	public MatrixMap2<String, Region, SiteIndexEquation> getSiteCurveMap() {
 		return siteCurveMap;
 	}
@@ -56,5 +54,15 @@ public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl
 	@Override
 	public CompVarAdjustments getCompVarAdjustments() {
 		return compVarAdjustments;
+	}
+	
+	@Override
+	public MatrixMap2<String, String, Coefficients> getBasalAreaYieldCoefficients() {
+		return basalAreaYieldCoefficients;
+	}
+
+	@Override
+	public Map<Region, GrowthFiatDetails> getBasalAreaGrowthFiatDetails() {
+		return basalAreaGrowthFiatDetails;
 	}
 }
