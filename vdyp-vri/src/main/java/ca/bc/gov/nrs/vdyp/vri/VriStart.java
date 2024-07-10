@@ -48,6 +48,7 @@ import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.CompatibilityVariableMode;
 import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
@@ -56,6 +57,7 @@ import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
+import ca.bc.gov.nrs.vdyp.model.VolumeComputeMode;
 import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
 import ca.bc.gov.nrs.vdyp.vri.model.VriPolygon;
 import ca.bc.gov.nrs.vdyp.vri.model.VriSite;
@@ -395,6 +397,11 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				try {
 					getDqBySpecies(resultPrimaryLayer, bec.getRegion());
 					estimateSmallComponents(polygon, resultPrimaryLayer);
+
+					computeUtilizationComponentsPrimary(
+							bec, resultPrimaryLayer, VolumeComputeMode.BY_UTIL, CompatibilityVariableMode.NONE
+					);
+
 				} catch (ProcessingException e) {
 					throw new RuntimeProcessingException(e);
 				}
@@ -433,19 +440,18 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				leadHeight, primarySiteIn.getSiteGenus(), bec.getRegion(), primarySpeciesDensity
 		);
 
-		// TODO store this in util class ALL
 		float layerQuadMeanDiameter = quadMeanDiameter(primaryBaseArea, primaryLayerDensity);
-
-		// TODO set TPH, BA, DQ for util class ALL
+		lBuilder.quadMeanDiameter(layerQuadMeanDiameter);
+		lBuilder.baseArea(primaryBaseArea);
+		lBuilder.treesPerHectare(primaryLayerDensity);
 
 		lBuilder.adaptSpecies(primaryLayer, (sBuilder, vriSpec) -> {
+			var vriSite = primaryLayer.getSites().get(vriSpec.getGenus());
 			float factor = primaryLayer.getSpecies().size() == 1 ? 1 : vriSpec.getFractionGenus();
-		});
 
-		lBuilder.adaptSites(primaryLayer, (sBuilder, vriSite) -> {
-			var vriSpec = primaryLayer.getSpecies().get(vriSite.getSiteGenus());
-
-			if (vriSite != primarySiteIn) {
+			if (vriSite == primarySiteIn) {
+				sBuilder.loreyHeight(vriSite.getHeight().get());
+			} else {
 
 				float loreyHeight = vriSite.getHeight().filter((x) -> getDebugMode(2) == 1).map(height -> {
 					float speciesQuadMeanDiameter = Math.max(7.5f, height / leadHeight * layerQuadMeanDiameter);
@@ -468,8 +474,16 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				float maxHeight = estimationMethods.getLimitsForHeightAndDiameter(vriSpec.getGenus(), bec.getRegion())
 						.maxLoreyHeight();
 				loreyHeight = Math.min(loreyHeight, maxHeight);
-				sBuilder.height(loreyHeight);
+				sBuilder.loreyHeight(loreyHeight);
 			}
+			this.applyGroups(bec, vriSpec.getGenus(), sBuilder);
+		});
+
+		// Only use the primary site
+		var primarySite = primaryLayer.getPrimarySite().get();
+
+		lBuilder.adaptSite(primarySite, (sBuilder, vriSite) -> {
+			sBuilder.height(vriSite.getHeight().get());
 		});
 
 		lBuilder.buildChildren();
@@ -477,23 +491,21 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		var species = lBuilder.getSpecies();
 		var sites = lBuilder.getSites();
 
-		// TODO save to util ALL
-		var layerLoreyHeight = sites.stream().map(BaseVdypSite::getHeight).mapToDouble(Optional::get).sum()
-				/ primaryBaseArea;
-
-		var primarySpeciesOut = species.stream().filter(s -> s.getGenus().equals(primaryLayer.getPrimaryGenus()))
-				.findAny().get();
-		var primarySiteOut = sites.stream().filter(s -> s.getSiteGenus().equals(primaryLayer.getPrimaryGenus()))
-				.findAny().get();
-
+		float sumBaseAreaLoreyHeight = 0;
 		// Assign BA by species
 		if (species.size() == 1) {
 			species.get(0).getBaseAreaByUtilization().setCoe(UTIL_ALL, primaryBaseArea);
+			sumBaseAreaLoreyHeight = primaryBaseArea;
 		} else {
 			for (var spec : species) {
-				spec.getBaseAreaByUtilization().set(UTIL_ALL, primaryBaseArea * spec.getFractionGenus());
+				float specBaseArea = primaryBaseArea * spec.getFractionGenus();
+				float specHeight = spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL);
+				spec.getBaseAreaByUtilization().setCoe(UTIL_ALL, specBaseArea);
+				sumBaseAreaLoreyHeight += specBaseArea * specHeight;
 			}
 		}
+
+		lBuilder.loreyHeight(sumBaseAreaLoreyHeight / primaryBaseArea);
 
 		this.applyGroups(polygon, species);
 

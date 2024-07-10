@@ -193,6 +193,10 @@ public class Utils {
 		return new Coefficients(new float[] { small, all }, -1);
 	}
 
+	public static Coefficients heightVector() {
+		return heightVector(0, 0);
+	}
+
 	public static Coefficients utilizationVector(float small, float all, float u1, float u2, float u3, float u4) {
 		return new Coefficients(new float[] { small, all, u1, u2, u3, u4 }, -1);
 	}

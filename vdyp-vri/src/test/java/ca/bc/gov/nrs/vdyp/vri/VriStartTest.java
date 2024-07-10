@@ -1939,6 +1939,115 @@ class VriStartTest {
 			control.verify();
 		}
 
+		@Test
+		void testProcessPrimary() throws Exception {
+
+			controlMap = TestUtils.loadControlMap();
+
+			var control = EasyMock.createControl();
+
+			VriStart app = EasyMock.createMockBuilder(VriStart.class) //
+					.addMockedMethod("getDebugMode") //
+					.createMock(control);
+
+			MockFileResolver resolver = dummyInput();
+
+			var poly = VriPolygon.build(pb -> {
+				pb.polygonIdentifier("TestPoly", 2024);
+				pb.biogeoclimaticZone("IDF");
+				pb.yieldFactor(1.0f);
+				pb.mode(PolygonMode.BATN);
+				pb.forestInventoryZone("");
+				pb.percentAvailable(85);
+				pb.addLayer(lb -> {
+					lb.layerType(LayerType.PRIMARY);
+					lb.crownClosure(30f);
+					lb.utilization(7.5f);
+
+					lb.inventoryTypeGroup(3);
+					lb.empiricalRelationshipParameterIndex(61);
+
+					lb.primaryGenus("F");
+					// 1
+					lb.addSpecies(sb -> {
+						sb.genus("B");
+						sb.percentGenus(10);
+						sb.addSpecies("BL", 100);
+					});
+					lb.addSite(sb -> {
+						sb.siteGenus("B");
+						sb.siteSpecies("BL");
+					});
+
+					// 2
+					lb.addSpecies(sb -> {
+						sb.genus("C");
+						sb.percentGenus(20);
+						sb.addSpecies("CW", 100);
+					});
+					lb.addSite(sb -> {
+						sb.siteGenus("C");
+						sb.siteCurveNumber(11);
+						sb.siteSpecies("CW");
+					});
+
+					// 3
+					lb.addSpecies(sb -> {
+						sb.genus("F");
+						sb.percentGenus(30);
+						sb.addSpecies("FD", 100);
+					});
+					lb.addSite(sb -> {
+						sb.siteGenus("F");
+						sb.siteCurveNumber(23);
+						sb.ageTotal(24);
+						sb.height(7.6f);
+						sb.siteIndex(19.7f);
+						sb.yearsToBreastHeight(9);
+						sb.breastHeightAge(15);
+						sb.siteSpecies("FD");
+					});
+
+					// 4
+					lb.addSpecies(sb -> {
+						sb.genus("H");
+						sb.percentGenus(30);
+						sb.addSpecies("HW", 100);
+					});
+					lb.addSite(sb -> {
+						sb.siteGenus("H");
+						sb.siteCurveNumber(37);
+						sb.siteSpecies("HW");
+					});
+
+					// 5
+					lb.addSpecies(sb -> {
+						sb.genus("S");
+						sb.percentGenus(10);
+						sb.addSpecies("S", 100);
+					});
+					lb.addSite(sb -> {
+						sb.siteGenus("S");
+						sb.siteCurveNumber(71);
+						sb.siteSpecies("S");
+					});
+				});
+			});
+
+			EasyMock.expect(app.getDebugMode(9)).andStubReturn(0);
+			EasyMock.expect(app.getDebugMode(1)).andStubReturn(0);
+
+			control.replay();
+
+			app.init(resolver, controlMap);
+
+			var result = app.processPolygon(0, poly);
+
+			app.close();
+
+			control.verify();
+		}
+
 	}
 
 	<T> void mockInputStreamFactory(

@@ -158,12 +158,17 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies, I extends BaseVdy
 		public <I2 extends BaseVdypSite> Builder<T, S, I, SB, IB>
 				adaptSites(BaseVdypLayer<?, I2> toCopy, BiConsumer<IB, I2> config) {
 			toCopy.getSites().values().forEach(siteToCopy -> {
-				this.addSite(builder -> {
-					builder.adapt(siteToCopy);
-					builder.polygonIdentifier = Optional.empty();
-					builder.layerType = Optional.empty();
-					config.accept(builder, siteToCopy);
-				});
+				this.adaptSite(siteToCopy, config);
+			});
+			return this;
+		}
+
+		public <I2 extends BaseVdypSite> Builder<T, S, I, SB, IB> adaptSite(I2 toCopy, BiConsumer<IB, I2> config) {
+			this.addSite(builder -> {
+				builder.adapt(toCopy);
+				builder.polygonIdentifier = Optional.empty();
+				builder.layerType = Optional.empty();
+				config.accept(builder, toCopy);
 			});
 			return this;
 		}

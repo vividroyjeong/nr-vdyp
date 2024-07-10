@@ -286,5 +286,10 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 			});
 		}
 
+		public void baseAreaByUtilization(Coefficients utilizationVector) {
+			// TODO Auto-generated method stub
+
+		}
+
 	}
 }

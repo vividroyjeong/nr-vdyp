@@ -924,6 +924,26 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		return targetPercentages;
 	}
 
+	protected void applyGroups(BecDefinition bec, String genus, VdypSpecies.Builder builder) {
+		// Lookup volume group, Decay Group, and Breakage group for each species.
+
+		var volumeGroupMap = getGroupMap(ControlKey.VOLUME_EQN_GROUPS);
+		var decayGroupMap = getGroupMap(ControlKey.DECAY_GROUPS);
+		var breakageGroupMap = getGroupMap(ControlKey.BREAKAGE_GROUPS);
+
+		// VGRPFIND
+		var volumeGroup = volumeGroupMap.get(genus, bec.getVolumeBec().getAlias());
+		// DGRPFIND
+		var decayGroup = decayGroupMap.get(genus, bec.getDecayBec().getAlias());
+		// BGRPFIND (Breakage uses decay BEC)
+		var breakageGroup = breakageGroupMap.get(genus, bec.getDecayBec().getAlias());
+
+		builder.volumeGroup(volumeGroup);
+		builder.decayGroup(decayGroup);
+		builder.breakageGroup(breakageGroup);
+
+	}
+
 	protected MatrixMap2<String, String, Integer> getGroupMap(ControlKey key) {
 		return Utils.expectParsedControl(controlMap, key, ca.bc.gov.nrs.vdyp.model.MatrixMap2.class);
 	}
