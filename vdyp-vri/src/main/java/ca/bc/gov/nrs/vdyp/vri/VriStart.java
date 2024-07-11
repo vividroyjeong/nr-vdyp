@@ -780,7 +780,9 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	) throws StandProcessingException {
 		var coe = estimateBaseAreaYieldCoefficients(species, bec);
 
-		return estimators.estimateBaseAreaYield(coe, dominantHeight, breastHeightAge, baseAreaOverstory, fullOccupancy, bec, baseAreaGroup);
+		// TODO - switch to use the configured value.
+		int debugSetting2Value = 0;
+		return estimators.estimateBaseAreaYield(coe, debugSetting2Value, dominantHeight, breastHeightAge, baseAreaOverstory, fullOccupancy, bec, baseAreaGroup);
 	}
 
 	Coefficients estimateBaseAreaYieldCoefficients(Collection<? extends BaseVdypSpecies> species, BecDefinition bec) {

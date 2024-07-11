@@ -815,6 +815,7 @@ public class Estimators {
 	 * EMP106
 	 * 
 	 * @param estimateBaseAreaYieldCoefficients
+	 * @param debugSetting2Value
 	 * @param dominantHeight
 	 * @param breastHeightAge
 	 * @param baseAreaOverstory
@@ -825,9 +826,9 @@ public class Estimators {
 	 * @throws StandProcessingException
 	 */
 	public float estimateBaseAreaYield(
-			Coefficients estimateBaseAreaYieldCoefficients, float dominantHeight, float breastHeightAge,
-			Optional<Float> baseAreaOverstory, boolean fullOccupancy,
-			BecDefinition bec, int baseAreaGroup
+			Coefficients estimateBaseAreaYieldCoefficients, int debugSetting2Value, float dominantHeight, 
+			float breastHeightAge, Optional<Float> baseAreaOverstory, boolean fullOccupancy, BecDefinition bec, 
+			int baseAreaGroup
 	) throws StandProcessingException {
 		float upperBoundBaseArea = upperBoundsBaseArea(baseAreaGroup);
 
@@ -848,7 +849,10 @@ public class Estimators {
 
 		float ageToUse = breastHeightAge;
 
-		// TODO getDebugMode(2)==1
+		if (debugSetting2Value > 0) {
+			// Cap ageToUse to at most 100 * debugSetting2Value
+			ageToUse = Math.min(ageToUse, debugSetting2Value * 100.0f);
+		}
 
 		if (ageToUse <= 0f) {
 			throw new StandProcessingException("Age was not positive");

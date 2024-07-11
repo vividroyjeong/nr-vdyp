@@ -10,6 +10,7 @@ import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
 import ca.bc.gov.nrs.vdyp.model.GrowthFiatDetails;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.Region;
 
 public interface ForwardResolvedControlMap extends ResolvedControlMap {
@@ -20,6 +21,9 @@ public interface ForwardResolvedControlMap extends ResolvedControlMap {
 	/** 28 - PARAM_ADJUSTMENTS */
 	CompVarAdjustments getCompVarAdjustments();
 	
+	/** 43 - UPPER_BA_BY_CI_S0_P */
+	MatrixMap3<Region, String, Integer, Float> getUpperBoundsCoefficients();
+	
 	/** 101 - VTROL */
 	ForwardControlVariables getForwardControlVariables();
 	
@@ -28,6 +32,9 @@ public interface ForwardResolvedControlMap extends ResolvedControlMap {
 	
 	/** 111 - BA_GROWTH_FIAT */
 	Map<Region, GrowthFiatDetails> getBasalAreaGrowthFiatDetails();
+	
+	/** 121 - BA_GROWTH_EMPIRICAL */
+	MatrixMap2<String, String, Coefficients> getBasalAreaGrowthEmpiricalCoefficients();
 	
 	/** 199 - DEBUG_SWITCHES */
 	ForwardDebugSettings getDebugSettings();

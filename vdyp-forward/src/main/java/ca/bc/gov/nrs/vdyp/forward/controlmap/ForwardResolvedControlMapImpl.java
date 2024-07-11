@@ -13,6 +13,7 @@ import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
 import ca.bc.gov.nrs.vdyp.model.DebugSettings;
 import ca.bc.gov.nrs.vdyp.model.GrowthFiatDetails;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
+import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.Region;
 
 public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl implements ForwardResolvedControlMap {
@@ -23,7 +24,9 @@ public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl
 	final CompVarAdjustments compVarAdjustments;
 	final MatrixMap2<String, String, Coefficients> basalAreaYieldCoefficients;
 	final Map<Region, GrowthFiatDetails> basalAreaGrowthFiatDetails;
-
+	final MatrixMap2<String, String, Coefficients> basalAreaGrowthEmpiricalCoefficients;
+	final MatrixMap3<Region, String, Integer, Float> upperBoundCoefficients;
+	
 	public ForwardResolvedControlMapImpl(Map<String, Object> controlMap) {
 
 		super(controlMap);
@@ -34,6 +37,8 @@ public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl
 		this.compVarAdjustments = this.get(ControlKey.PARAM_ADJUSTMENTS, CompVarAdjustments.class);
 		this.basalAreaYieldCoefficients = this.get(ControlKey.BA_YIELD, MatrixMap2.class);
 		this.basalAreaGrowthFiatDetails = this.get(ControlKey.BA_GROWTH_FIAT, Map.class);
+		this.basalAreaGrowthEmpiricalCoefficients = this.get(ControlKey.BA_GROWTH_EMPIRICAL, MatrixMap2.class);
+		this.upperBoundCoefficients = this.get(ControlKey.UPPER_BA_BY_CI_S0_P, MatrixMap3.class);
 	}
 	
 	@Override
@@ -64,5 +69,15 @@ public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl
 	@Override
 	public Map<Region, GrowthFiatDetails> getBasalAreaGrowthFiatDetails() {
 		return basalAreaGrowthFiatDetails;
+	}
+
+	@Override
+	public MatrixMap2<String, String, Coefficients> getBasalAreaGrowthEmpiricalCoefficients() {
+		return basalAreaGrowthEmpiricalCoefficients;
+	}
+
+	@Override
+	public MatrixMap3<Region, String, Integer, Float> getUpperBoundsCoefficients() {
+		return upperBoundCoefficients;
 	}
 }
