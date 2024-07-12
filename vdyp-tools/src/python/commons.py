@@ -1,6 +1,7 @@
 import os
 import sys
 import re
+import util
 
 declaration_keywords = ['INTEGER', 'REAL', 'CHARACTER', 'LOGICAL', 'DIMENSION']
 common_re = re.compile(r'^\s*COMMON.*/\s*([A-Z][A-Z0-9_]*)\s*/(.*)')
@@ -17,7 +18,7 @@ def find_file(file_name):
     if not file_name.endswith('.for'):
         file_name = file_name + '.for'
 
-    folders = ['C:/source/vdyp/VDYP_Master/Source']
+    folders = [utils.get_source_folder()]
     source_file = None
     while source_file is None and len(folders) > 0:
         current_directory = folders.pop()

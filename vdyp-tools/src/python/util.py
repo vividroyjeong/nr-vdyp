@@ -2,7 +2,7 @@ import os
 
 
 def collect_source_files():
-    folders = ['C:/source/vdyp/VDYP_Master/Source']
+    folders = [get_source_folder()]
     source_files = []
     while len(folders) > 0:
         current_directory = folders.pop()
@@ -17,3 +17,7 @@ def collect_source_files():
     print('Saw ' + str(len(source_files)) + ' source files')
 
     return source_files
+
+
+def get_source_folder():
+    return os.environ['VDYP_MASTER_SOURCE_FOLDER'] or 'C:/source/vdyp/VDYP_Master/Source'

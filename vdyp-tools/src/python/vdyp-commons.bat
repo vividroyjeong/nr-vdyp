@@ -1,0 +1,1 @@
+%VDYP_TOOLS_PYTHON_HOME%\python.exe %VDYP_TOOLS_PYTHON%\commons.py %~1

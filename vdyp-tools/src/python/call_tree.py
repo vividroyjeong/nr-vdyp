@@ -7,7 +7,7 @@ import util
 
 subroutine_declaration_re = re.compile(r'^\s+SUBROUTINE\s+([A-Z][A-Z0-9_]*)\s*\(')
 end_subroutine_declaration_re = re.compile(r'^\s+END SUBROUTINE')
-token_re = re.compile(r'CALL\s+([A-Z][A-Z0-9_]*)')
+call_site_re = re.compile(r'CALL\s+([A-Z][A-Z0-9_]*)')
 
 subroutines = {}
 
@@ -29,7 +29,7 @@ def collect_symbols(source_files):
                     "file": s,
                     "has_been_traversed": False,
                     "commons_usages": commons.gather_commons_usages(s, commons_details, routine_name),
-                    "callees": set()
+                    "callees": []
                 }
 
         sf.close()
@@ -66,15 +66,15 @@ def generate_call_tree(routines_to_scan):
                 in_routine = False
             elif in_routine:
                 # tokenize the line, looking for nested calls
-                m = re.search(token_re, line)
+                m = re.search(call_site_re, line)
                 while m is not None:
                     token = m.group(1)
-                    if token in subroutines:
-                        subroutine["callees"].add(token)
+                    if token in subroutines and token not in subroutine["callees"]:
+                        subroutine["callees"].append(token)
                         if not subroutines[token]["has_been_traversed"]:
                             routines_to_scan.append(token)
                     line = line[m.end():]
-                    m = re.search(token_re, line)
+                    m = re.search(call_site_re, line)
 
 
 ignored_commons = {'UNITS', 'UNITS3', 'UNITS4', 'LIBCOMMON'}
