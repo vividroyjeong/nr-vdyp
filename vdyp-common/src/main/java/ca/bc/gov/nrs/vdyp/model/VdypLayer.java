@@ -141,14 +141,6 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 		this.closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization;
 	}
 
-	public Optional<String> getDominantSpecies() {
-		return dominantSpecies;
-	}
-
-	public void setDominantSpecies(Optional<String> dominantSpecies) {
-		this.dominantSpecies = dominantSpecies;
-	}
-
 	public Optional<Integer> getEmpiricalRelationshipParameterIndex() {
 		return empericalRelationshipParameterIndex;
 	}

@@ -1,6 +1,13 @@
 package ca.bc.gov.nrs.vdyp.test;
 
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.aMapWithSize;
+import static org.hamcrest.Matchers.both;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -44,13 +51,20 @@ import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapValueReplacer;
 import ca.bc.gov.nrs.vdyp.io.parse.control.NonFipControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ResourceControlMapModifier;
 import ca.bc.gov.nrs.vdyp.io.parse.control.StartApplicationControlParser;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.Region;
+import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.VdypLayer;
+import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
+import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 
 public class TestUtils {
 
@@ -518,6 +532,56 @@ public class TestUtils {
 			}
 			return Optional.empty();
 		};
+	}
+
+	/**
+	 * Assert that a polygon has a layer of the given type.
+	 * @param polygon the polygon
+	 * @param type the type of layer
+	 * @param number the total number of layers the polygon should have
+	 * @return the layer
+	 */
+	public static <P extends BaseVdypPolygon<L, ?, ?, ?>, L extends BaseVdypLayer<?, ?>> L assertLayer(P polygon, LayerType type) {
+		assertThat(polygon, hasProperty("layers", hasKey(type)));
+		
+		var resultLayer = polygon.getLayers().get(type);
+		
+		assertThat(resultLayer, hasProperty("polygonIdentifier", equalTo(polygon.getPolygonIdentifier())));
+		assertThat(resultLayer, hasProperty("layerType", is(type)));
+		
+		return resultLayer;
+	};
+	
+	/**
+	 * Assert that a polygon only has a primary layer.
+	 * @param polygon the polygon
+	 * @param polygon
+	 * @return the primary layer
+	 */
+	public static <P extends BaseVdypPolygon<L, ?, ?, ?>, L extends BaseVdypLayer<?, ?>> L assertOnlyPrimaryLayer(P polygon) {
+		assertThat(polygon, hasProperty("layers", aMapWithSize(1)));
+		return assertLayer(polygon, LayerType.PRIMARY);
+	};
+	
+	/**
+	 * Assert that a polygon has a primary layer, allowing for other layers.
+	 * @param polygon the polygon
+	 * @param polygon
+	 * @return the primary layer
+	 */
+	public static <P extends BaseVdypPolygon<L, ?, ?, ?>, L extends BaseVdypLayer<?, ?>> L assertHasPrimaryLayer(P polygon) {
+		return assertLayer(polygon, LayerType.PRIMARY);
+	};
+	
+	/**
+	 * Assert that a polygon has a veteran layer as well as a primary.
+	 * @param polygon the polygon
+	 * @param polygon
+	 * @return the veteran layer
+	 */
+	public static <P extends BaseVdypPolygon<L, ?, ?, ?>, L extends BaseVdypLayer<?, ?>> L assertHasVeteranLayer(P polygon) {
+		assertThat(polygon, hasProperty("layers", aMapWithSize(2)));
+		return assertLayer(polygon, LayerType.VETERAN);
 	};
 
 }

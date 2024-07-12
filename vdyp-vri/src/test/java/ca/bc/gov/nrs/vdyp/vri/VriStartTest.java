@@ -1,14 +1,18 @@
 package ca.bc.gov.nrs.vdyp.vri;
 
+import static ca.bc.gov.nrs.vdyp.test.TestUtils.assertOnlyPrimaryLayer;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.closeTo;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.utilization;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.utilizationHeight;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anything;
+import static org.hamcrest.Matchers.blankString;
 import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
@@ -590,6 +594,57 @@ class VriStartTest {
 								hasEntry(is("S"), closeTo(10.9634094f))
 						)
 				);
+			}
+			@Test
+			void testComputeGraph() throws StandProcessingException {
+
+				controlMap = VriTestUtils.loadControlMap();
+				VriStart app = new VriStart();
+				ApplicationTestUtils.setControlMap(app, controlMap);
+
+				Map<String, Float> initialDqs = Utils.constMap(map -> {
+					map.put("B", 12.0803461f);
+					map.put("C", 8.66746521f);
+					map.put("F", 11.8044939f);
+					map.put("H", 9.06493855f);
+					map.put("S", 10.4460621f);
+				});
+				Map<String, Float> baseAreas = Utils.constMap(map -> {
+					map.put("B", 0.634290636f);
+					map.put("C", 1.26858127f);
+					map.put("F", 1.90287197f);
+					map.put("H", 1.90287197f);
+					map.put("S", 0.634290636f);
+
+				});
+				Map<String, Float> minDq = Utils.constMap(map -> {
+					map.put("B", 7.6f);
+					map.put("C", 7.6f);
+					map.put("F", 7.6f);
+					map.put("H", 7.6f);
+					map.put("S", 7.6f);
+				});
+				Map<String, Float> maxDq = Utils.constMap(map -> {
+					map.put("B", 13.8423338f);
+					map.put("C", 16.6669998f);
+					map.put("F", 15.5116472f);
+					map.put("H", 12.5369997f);
+					map.put("S", 12.6630001f);
+				});
+
+				float tph = 748.402222f;
+
+				var resultPerSpecies = new HashMap<String, Float>();
+
+				
+				for(float x=-3.9f; x<=2; x+=0.01) {
+				
+					float result = app
+						.quadMeanDiameterFractionalError(x, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph);
+					
+					System.out.println(String.format("%f\t%f", x, result));
+
+				}
 			}
 
 			@Test
@@ -1944,11 +1999,8 @@ class VriStartTest {
 
 			controlMap = TestUtils.loadControlMap();
 
-			var control = EasyMock.createControl();
 
-			VriStart app = EasyMock.createMockBuilder(VriStart.class) //
-					.addMockedMethod("getDebugMode") //
-					.createMock(control);
+			VriStart app = new VriStart();
 
 			MockFileResolver resolver = dummyInput();
 
@@ -2034,18 +2086,37 @@ class VriStartTest {
 				});
 			});
 
-			EasyMock.expect(app.getDebugMode(9)).andStubReturn(0);
-			EasyMock.expect(app.getDebugMode(1)).andStubReturn(0);
-
-			control.replay();
-
 			app.init(resolver, controlMap);
 
-			var result = app.processPolygon(0, poly);
+			var result = app.processPolygon(0, poly).get();
+
+			assertThat(result, hasProperty("polygonIdentifier", isPolyId("TestPoly", 2024)));
+			assertThat(result, hasProperty("biogeoclimaticZone", is("IDF")));
+			assertThat(result, hasProperty("forestInventoryZone", blankString()));
+			assertThat(result, hasProperty("mode", present(is(PolygonMode.BATN))));
+			assertThat(result, hasProperty("percentAvailable", is(85f)));
+
+			
+			var resultLayer = assertOnlyPrimaryLayer(result);
+			
+			assertThat(resultLayer, hasProperty("ageTotal", present(closeTo(24))));
+			assertThat(resultLayer, hasProperty("breastHeightAge", present(closeTo(15))));
+			assertThat(resultLayer, hasProperty("yearsToBreastHeight", present(closeTo(9))));
+			
+			assertThat(resultLayer, hasProperty("siteGenus", present(is("F"))));
+			
+			assertThat(resultLayer, hasProperty("height", present(closeTo(7.6f))));
+			assertThat(resultLayer, hasProperty("inventoryTypeGroup", present(is(3))));
+			// TODO assertThat(resultLayer, hasProperty("empiricalRelationshipParameterIndex", present(is(61))));
+			
+			assertThat(resultLayer, hasProperty("loreyHeightByUtilization", utilizationHeight(4.14067888f, 6.61390257f)));
+			assertThat(resultLayer, hasProperty("baseAreaByUtilization", utilization(0.0679966733f, 6.34290648f, 4.24561071f, 1.01540196f, 0.571661115f, 0.510232806f)));
+			// TODO Check Value 			assertThat(resultLayer, hasProperty("quadraticMeanDiameterByUtilization", utilization(0, 0, 0, 0, 0, 0)));
+			// TODO Check Value 			assertThat(resultLayer, hasProperty("treesPerHectareByUtilization", utilization(0, 0, 0, 0, 0, 0)));
+			
+			// TODO Check Value 			assertThat(resultLayer, hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", utilization(0, 0, 0, 0, 0, 0)));
 
 			app.close();
-
-			control.verify();
 		}
 
 	}
