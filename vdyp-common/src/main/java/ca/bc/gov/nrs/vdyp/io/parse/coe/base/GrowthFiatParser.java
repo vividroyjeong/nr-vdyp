@@ -54,7 +54,12 @@ public abstract class GrowthFiatParser implements ControlMapSubResourceParser<Ma
 			@SuppressWarnings("unchecked")
 			var coefficients = (List<Float>) value.get(COEFFICIENTS_KEY);
 
-			GrowthFiatDetails details = new GrowthFiatDetails(regionId, coefficients);
+			GrowthFiatDetails details;
+			try {
+				details = new GrowthFiatDetails(regionId, coefficients);
+			} catch (ResourceParseException e) {
+				throw new ValueParseException(String.valueOf(regionId), "Error constructing GrowthFiatDetails instance", e);
+			}
 
 			if (details.getNAgesSupplied() == 0) {
 				throw new ValueParseException("0", "Region Id " + regionId + " contains no age ranges");

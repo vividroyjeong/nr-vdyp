@@ -10,6 +10,7 @@ import static ca.bc.gov.nrs.vdyp.math.FloatMath.sqrt;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -830,7 +831,7 @@ public class Estimators {
 			float breastHeightAge, Optional<Float> baseAreaOverstory, boolean fullOccupancy, BecDefinition bec, 
 			int baseAreaGroup
 	) throws StandProcessingException {
-		float upperBoundBaseArea = upperBoundsBaseArea(baseAreaGroup);
+		float upperBoundBasalArea = upperBoundsBaseArea(baseAreaGroup);
 
 		/*
 		 * The original Fortran had the following comment and a commented out modification to upperBoundsBaseArea
@@ -855,7 +856,7 @@ public class Estimators {
 		}
 
 		if (ageToUse <= 0f) {
-			throw new StandProcessingException("Age was not positive");
+			throw new StandProcessingException(MessageFormat.format("Age ({0}) was not positive", ageToUse));
 		}
 
 		float trAge = FloatMath.log(ageToUse);
@@ -876,7 +877,7 @@ public class Estimators {
 							estimateBaseAreaYieldCoefficients.getCoe(5) * dominantHeight
 									+ estimateBaseAreaYieldCoefficients.getCoe(6) * baseAreaOverstory.orElse(0f)
 					);
-			bap = Math.min(bap, upperBoundBaseArea);
+			bap = Math.min(bap, upperBoundBasalArea);
 		}
 
 		if (fullOccupancy)

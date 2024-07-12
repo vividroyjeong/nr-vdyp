@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.model;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -13,21 +14,21 @@ class DebugSettingsTest {
 	void testNullArray() {
 		DebugSettings ds = new DebugSettings(null);
 		assertThat(ds.settings, Matchers.notNullValue());
-		assertThat(ds.settings, Matchers.arrayWithSize(0));
+		assertTrue(ds.settings.length == DebugSettings.MAX_DEBUG_SETTINGS);
 	}
 
 	@Test
 	void testEmptyArray() {
 		DebugSettings ds = new DebugSettings(new Integer[0]);
 		assertThat(ds.settings, Matchers.notNullValue());
-		assertThat(ds.settings, Matchers.arrayWithSize(0));
+		assertTrue(ds.settings.length == DebugSettings.MAX_DEBUG_SETTINGS);
 	}
 
 	@Test
 	void testSizeOneArray() {
 		DebugSettings ds = new DebugSettings(new Integer[] { 43 });
 		assertThat(ds.settings, Matchers.notNullValue());
-		assertThat(ds.settings, Matchers.arrayWithSize(1));
+		assertTrue(ds.settings.length == DebugSettings.MAX_DEBUG_SETTINGS);
 		assertThat(ds.settings[0], is(43));
 	}
 

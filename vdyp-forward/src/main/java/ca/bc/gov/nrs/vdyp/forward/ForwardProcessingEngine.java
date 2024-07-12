@@ -68,12 +68,10 @@ public class ForwardProcessingEngine {
 	public static final float PI_40K = (float) (Math.PI / 40_000);
 
 	/* pp */ final ForwardProcessingState fps;
-	/* pp */ final Estimators estimators;
 
 	public ForwardProcessingEngine(Map<String, Object> controlMap) {
 
 		this.fps = new ForwardProcessingState(controlMap);
-		this.estimators = new Estimators(fps.fcm);
 	}
 
 	public enum ExecutionStep {
@@ -230,6 +228,18 @@ public class ForwardProcessingEngine {
 		}
 	}
 
+	/**
+	 * VGROW1 - "grow" the primary layer, located in <code>primaryLayerSourceInstance</code>, starting at the 
+	 * given year, and write the results to <code>primaryLayerTargetInstance</code>. The veteran layer instance
+	 * is supplied but at this point is ignored.
+	 * 
+	 * @param primaryLayerSourceInstance
+	 * @param currentYear
+	 * @param primaryLayerTargetInstance
+	 * @param veteranLayerInstance
+	 * 
+	 * @throws ProcessingException
+	 */
 	private void grow(
 			int primaryLayerSourceInstance, int currentYear, int primaryLayerTargetInstance, int veteranLayerInstance
 	)
@@ -282,15 +292,23 @@ public class ForwardProcessingEngine {
 			veteranLayerBasalArea = Optional.empty();
 		}
 
-		float[] speciesProportionByBasalArea = new float[pps.getNSpecies() + 1];
+		float growthInBasalArea = growBasalArea(
+				primarySpeciesYearsAtBreastHeight, fps.fcm.getDebugSettings(), dominantHeight, primaryBank.basalAreas[0][UC_ALL_INDEX], veteranLayerBasalArea, growthInDominantHeight
+		);
+	}
+	
+	private float[] getSpeciesProportionsByBasalArea() {
+		
+		PolygonProcessingState pps = fps.getPolygonProcessingState();
+		
+		float[] speciesProportionsByBasalArea = new float[pps.getNSpecies() + 1];
+		
 		for (int i = 1; i <= pps.getNSpecies(); i++) {
-			speciesProportionByBasalArea[i] = pps.wallet.basalAreas[i][UC_ALL_INDEX]
+			speciesProportionsByBasalArea[i] = pps.wallet.basalAreas[i][UC_ALL_INDEX]
 					/ pps.wallet.basalAreas[0][UC_ALL_INDEX];
 		}
-
-		float growthInBasalArea = growBasalArea(
-				speciesProportionByBasalArea, primarySpeciesYearsAtBreastHeight, dominantHeight, primaryBank.basalAreas[0][UC_ALL_INDEX], veteranLayerBasalArea, growthInDominantHeight
-		);
+		
+		return speciesProportionsByBasalArea;
 	}
 
 	/**
@@ -306,69 +324,51 @@ public class ForwardProcessingEngine {
 	 * @return the growth in the basal area for the year
 	 * @throws StandProcessingException in the event of an error
 	 */
-	private float growBasalArea(
-			float[] speciesProportionsByBasalArea, float yearsAtBreastHeight, float dominantHeight,
+	float growBasalArea(
+			float yearsAtBreastHeight, ForwardDebugSettings debugSettings, float dominantHeight,
 			float primaryLayerBasalArea, Optional<Float> veteranLayerBasalArea, float growthInDominantHeight
 	) throws StandProcessingException {
 
+		float[] speciesProportionsByBasalArea = getSpeciesProportionsByBasalArea();
+		
 		var baYieldCoefficients = fps.fcm.getBasalAreaYieldCoefficients();
 		var becZoneAlias = fps.getPolygonProcessingState().getBecZone().getAlias();
-		Coefficients estimateBaseAreaYieldCoefficients = Coefficients.empty(7, 0);
+		Coefficients estimateBasalAreaYieldCoefficients = Coefficients.empty(7, 0);
 		for (int i = 0; i < 7; i++) {
 			float sum = 0.0f;
-			for (int speciesIndex = 1; speciesIndex <= fps.getPolygonProcessingState().wallet.getNSpecies(); speciesIndex++) {
+			for (int speciesIndex = 1; speciesIndex <= fps.getPolygonProcessingState().wallet
+					.getNSpecies(); speciesIndex++) {
 				String speciesAlias = fps.getPolygonProcessingState().wallet.speciesNames[speciesIndex];
-				sum += baYieldCoefficients.get(becZoneAlias, speciesAlias).getCoe(i) * speciesProportionsByBasalArea[speciesIndex];
+				sum += baYieldCoefficients.get(becZoneAlias, speciesAlias).getCoe(i)
+						* speciesProportionsByBasalArea[speciesIndex];
 			}
-			estimateBaseAreaYieldCoefficients.setCoe(i, sum);
+			estimateBasalAreaYieldCoefficients.setCoe(i, sum);
 		}
-		if (estimateBaseAreaYieldCoefficients.getCoe(5) > 0.0f) {
-			estimateBaseAreaYieldCoefficients.setCoe(5, 0.0f);
+		if (estimateBasalAreaYieldCoefficients.getCoe(5) > 0.0f) {
+			estimateBasalAreaYieldCoefficients.setCoe(5, 0.0f);
 		}
 
 		boolean isFullOccupancy = true;
 		int primarySpeciesGroupNumber = fps.getPolygonProcessingState().getPrimarySpeciesGroupNumber();
-		int debugSetting2Value = fps.fcm.getDebugSettings().getValue(ForwardDebugSettings.Vars.MAX_BREAST_HEIGHT_AGE_2);
+		int debugSetting2Value = debugSettings.getValue(ForwardDebugSettings.Vars.MAX_BREAST_HEIGHT_AGE_2);
 
-		float basalAreaYieldAtStart = estimators.estimateBaseAreaYield(
-				estimateBaseAreaYieldCoefficients, debugSetting2Value, dominantHeight, yearsAtBreastHeight, veteranLayerBasalArea, 
+		float basalAreaYieldAtStart = fps.estimators.estimateBaseAreaYield(
+				estimateBasalAreaYieldCoefficients, debugSetting2Value, dominantHeight, yearsAtBreastHeight, veteranLayerBasalArea, 
 				isFullOccupancy, fps.getPolygonProcessingState().getBecZone(), primarySpeciesGroupNumber
 		);
 
 		float dominantHeightEnd = dominantHeight + growthInDominantHeight;
 		float yearsAtBreastHeightEnd = yearsAtBreastHeight + 1.0f;
 
-		float basalAreaYieldAtEnd = estimators.estimateBaseAreaYield(
-				estimateBaseAreaYieldCoefficients, debugSetting2Value, dominantHeightEnd, yearsAtBreastHeightEnd, veteranLayerBasalArea, 
+		float basalAreaYieldAtEnd = fps.estimators.estimateBaseAreaYield(
+				estimateBasalAreaYieldCoefficients, debugSetting2Value, dominantHeightEnd, yearsAtBreastHeightEnd, veteranLayerBasalArea, 
 				isFullOccupancy, fps.getPolygonProcessingState().getBecZone(), primarySpeciesGroupNumber
 		);
 
 		var growthFaitDetails = fps.fcm.getBasalAreaGrowthFiatDetails()
 				.get(fps.getPolygonProcessingState().getBecZone().getRegion());
-		
-		var convergenceCoefficient = growthFaitDetails.getCoefficient(0);
-		int nAges = growthFaitDetails.getNAgesSupplied();
-		if (yearsAtBreastHeight > growthFaitDetails.getAge(0) && nAges > 1) {
-			if (yearsAtBreastHeight >= growthFaitDetails.getAge(nAges - 1)) {
-				convergenceCoefficient = growthFaitDetails.getAge(nAges - 1);
-			} else {
-				// Must interpolate (between pair1 & pair2)
-				int pair1, pair2;
-				if (yearsAtBreastHeight < growthFaitDetails.getAge(1)) {
-					pair1 = 0;
-				} else if (yearsAtBreastHeight < growthFaitDetails.getAge(2)) {
-					pair1 = 1;
-				} else {
-					pair1 = 2;
-				}
-				pair2 = pair1 + 1;
 
-				convergenceCoefficient = growthFaitDetails.getCoefficient(pair1)
-						+ (growthFaitDetails.getCoefficient(pair2) - growthFaitDetails.getCoefficient(pair1))
-								* (yearsAtBreastHeight - growthFaitDetails.getAge(pair1))
-								/ (growthFaitDetails.getAge(pair2) - growthFaitDetails.getAge(pair1));
-			}
-		}
+		var convergenceCoefficient = growthFaitDetails.calculateCoefficient(yearsAtBreastHeight);
 
 		float baGrowth = basalAreaYieldAtEnd - basalAreaYieldAtStart;
 		var adjust = -convergenceCoefficient * (primaryLayerBasalArea - basalAreaYieldAtStart);
@@ -381,17 +381,17 @@ public class ForwardProcessingEngine {
 			baGrowth = Math.min(basalAreaYieldAtStart / yearsAtBreastHeight, Math.min(0.5f, baGrowth));
 		}
 
-		int debugSetting3Value = fps.fcm.getDebugSettings().getValue(ForwardDebugSettings.Vars.BASAL_AREA_GROWTH_MODEL_3);
-		
+		int debugSetting3Value = debugSettings.getValue(ForwardDebugSettings.Vars.BASAL_AREA_GROWTH_MODEL_3);
+
 		if (debugSetting3Value >= 1) {
 			float baGrowthFiatModel = baGrowth;
-			
+
 			float baGrowthEmpiricalModel = calculateBasalAreaGrowthEmpirical(
 					speciesProportionsByBasalArea, primaryLayerBasalArea, yearsAtBreastHeight, dominantHeight, basalAreaYieldAtStart, basalAreaYieldAtEnd
 			);
-			
+
 			baGrowth = baGrowthEmpiricalModel;
-		
+
 			if (debugSetting3Value == 2) {
 				float c = 1.0f;
 				if (yearsAtBreastHeight >= growthFaitDetails.getMixedCoefficient(1)) {
@@ -416,13 +416,13 @@ public class ForwardProcessingEngine {
 		if (primaryLayerBasalArea + baGrowth > baLimit) {
 			baGrowth = Math.max(baLimit - primaryLayerBasalArea, 0.0f);
 		}
-		
+
 		// Undocumented check to prevent negative growth that causes BA to go to less than 
 		// 1.0. It is doubtful that this condition will ever occur...
 		if (baGrowth < 0.0f && primaryLayerBasalArea + baGrowth < 1.0f) {
 			baGrowth = -primaryLayerBasalArea + 1.0f;
 		}
-		
+
 		return baGrowth;
 	}
 
@@ -438,20 +438,22 @@ public class ForwardProcessingEngine {
 	 * 
 	 * @return the change in primary layer basal area from start to start + 1 year
 	 */
-	private float calculateBasalAreaGrowthEmpirical(float[] speciesProportionsByBasalArea, float primaryLayerBasalArea, float yearsAtBreastHeight, 
-				float dominantHeight, float basalAreaYieldAtStart, float basalAreaYieldAtEnd) {
-		
+	private float calculateBasalAreaGrowthEmpirical(
+			float[] speciesProportionsByBasalArea, float primaryLayerBasalArea, float yearsAtBreastHeight,
+			float dominantHeight, float basalAreaYieldAtStart, float basalAreaYieldAtEnd
+	) {
+
 		yearsAtBreastHeight = Math.max(yearsAtBreastHeight, 1.0f);
 		if (yearsAtBreastHeight > 999.0f) {
 			yearsAtBreastHeight = 999.0f;
 		}
-		
+
 		var basalAreaGrowthEmpiricalCoefficients = fps.fcm.getBasalAreaGrowthEmpiricalCoefficients();
-		
+
 		String becZoneAlias = fps.getPolygonProcessingState().getBecZone().getAlias();
 		String firstSpecies = fps.fcm.getGenusDefinitionMap().getByIndex(1).getAlias();
 		var firstSpeciesBaGrowthCoe = basalAreaGrowthEmpiricalCoefficients.get(becZoneAlias, firstSpecies);
-		
+
 		float b0 = firstSpeciesBaGrowthCoe.get(0);
 		float b1 = firstSpeciesBaGrowthCoe.get(1);
 		float b2 = firstSpeciesBaGrowthCoe.get(2);
@@ -460,29 +462,29 @@ public class ForwardProcessingEngine {
 		float b5 = 0.0f;
 		float b6 = firstSpeciesBaGrowthCoe.get(6);
 		float b7 = firstSpeciesBaGrowthCoe.get(7);
-		
+
 		for (int i = 1; i <= fps.getPolygonProcessingState().wallet.getNSpecies(); i++) {
 			String speciesAlias = fps.getPolygonProcessingState().wallet.speciesNames[i];
 			var baGrowthCoe = basalAreaGrowthEmpiricalCoefficients.get(becZoneAlias, speciesAlias);
 			b4 += speciesProportionsByBasalArea[i] * baGrowthCoe.getCoe(4);
 			b5 += speciesProportionsByBasalArea[i] * baGrowthCoe.getCoe(5);
 		}
-		
+
 		b4 = Math.max(b4, 0.0f);
 		b5 = Math.min(b5, 0.0f);
-		
+
 		float term1;
 		if (dominantHeight > b0) {
 			term1 = 1.0f - FloatMath.exp(b1 * (dominantHeight - b0));
 		} else {
 			term1 = 0.0f;
 		}
-		
+
 		float fLogIt = -0.05f * (yearsAtBreastHeight - 350.0f);
 		float term2a = FloatMath.exp(fLogIt) / (1.0f + FloatMath.exp(fLogIt));
 		float term2 = b2 * FloatMath.pow(dominantHeight / 20.0f, b3) * term2a;
 		float term3 = b4 * FloatMath.exp(b5 * yearsAtBreastHeight);
-		
+
 		float term4;
 		float basalAreaYieldDelta = basalAreaYieldAtEnd - basalAreaYieldAtStart;
 		if (basalAreaYieldDelta > 0.0) {
@@ -490,15 +492,15 @@ public class ForwardProcessingEngine {
 		} else {
 			term4 = 0.0f;
 		}
-		
+
 		float basalAreaDelta = term1 * (term2 + term3) + term4;
-		
+
 		// An undocumented check to prevent negative growth that causes BA to go to 
 		// less than 1.0. It is doubtful that this condition will ever occur.
 		if (basalAreaDelta < 0.0 && primaryLayerBasalArea + basalAreaDelta < 1.0f) {
 			basalAreaDelta = -primaryLayerBasalArea + 1.0f;
 		}
-		
+
 		return basalAreaDelta;
 	}
 
@@ -506,16 +508,18 @@ public class ForwardProcessingEngine {
 	 * UPPERGEN(1, BATOP98, DQTOP98) for basal area
 	 */
 	private float growBasalAreaUpperBound() {
-		
-		int debugSetting4Value = fps.fcm.getDebugSettings().getValue(ForwardDebugSettings.Vars.PER_SPECIES_AND_REGION_MAX_BREAST_HEIGHT_4);
+
+		int debugSetting4Value = fps.fcm.getDebugSettings()
+				.getValue(ForwardDebugSettings.Vars.PER_SPECIES_AND_REGION_MAX_BREAST_HEIGHT_4);
 		if (debugSetting4Value > 0) {
 			var upperBoundsCoefficients = fps.fcm.getUpperBoundsCoefficients();
 			Region region = fps.getPolygonProcessingState().getBecZone().getRegion();
 			int primarySpeciesIndex = fps.getPolygonProcessingState().getPrimarySpeciesIndex();
-			return upperBoundsCoefficients.get(region, fps.getPolygonProcessingState().wallet.speciesNames[primarySpeciesIndex], 1);
+			return upperBoundsCoefficients
+					.get(region, fps.getPolygonProcessingState().wallet.speciesNames[primarySpeciesIndex], 1);
 		} else {
 			var primarySpeciesGroupNumber = fps.getPolygonProcessingState().getPrimarySpeciesGroupNumber();
-			return fps.fcm.getUpperBounds().get(primarySpeciesGroupNumber).getCoe(UpperBoundsParser.BA_INDEX);			
+			return fps.fcm.getUpperBounds().get(primarySpeciesGroupNumber).getCoe(UpperBoundsParser.BA_INDEX);
 		}
 	}
 
@@ -524,19 +528,21 @@ public class ForwardProcessingEngine {
 	 */
 	private float growQuadraticMeanDiameterUpperBound() {
 
-		int debugSetting4Value = fps.fcm.getDebugSettings().getValue(ForwardDebugSettings.Vars.PER_SPECIES_AND_REGION_MAX_BREAST_HEIGHT_4);
+		int debugSetting4Value = fps.fcm.getDebugSettings()
+				.getValue(ForwardDebugSettings.Vars.PER_SPECIES_AND_REGION_MAX_BREAST_HEIGHT_4);
 		if (debugSetting4Value > 0) {
 			var upperBoundsCoefficients = fps.fcm.getUpperBoundsCoefficients();
 			Region region = fps.getPolygonProcessingState().getBecZone().getRegion();
 			int primarySpeciesIndex = fps.getPolygonProcessingState().getPrimarySpeciesIndex();
-			return upperBoundsCoefficients.get(region, fps.getPolygonProcessingState().wallet.speciesNames[primarySpeciesIndex], 2);
+			return upperBoundsCoefficients
+					.get(region, fps.getPolygonProcessingState().wallet.speciesNames[primarySpeciesIndex], 2);
 		} else {
 			var primarySpeciesGroupNumber = fps.getPolygonProcessingState().getPrimarySpeciesGroupNumber();
 			return fps.fcm.getUpperBounds().get(primarySpeciesGroupNumber).getCoe(UpperBoundsParser.DQ_INDEX);
 		}
 	}
 
-	public float growDominantHeight(
+	float growDominantHeight(
 			float dominantHeight, int siteCurveNumber, float siteIndex,
 			float yearsToBreastHeight
 	) throws ProcessingException {
@@ -807,7 +813,7 @@ public class ForwardProcessingEngine {
 				if (growthDetails.allowCalculation(baseVolume, V_BASE_MIN, (l, r) -> l > r)) {
 
 					// EMP094
-					estimators.estimateNetDecayAndWasteVolume(
+					fps.estimators.estimateNetDecayAndWasteVolume(
 							pps.getBecZone()
 									.getRegion(), uc, aAdjust, pps.wallet.speciesNames[s], spLoreyHeight_All, quadMeanDiameters, closeUtilizationVolumes, closeUtilizationVolumesNetOfDecay, closeUtilizationVolumesNetOfDecayAndWaste
 					);
@@ -828,7 +834,7 @@ public class ForwardProcessingEngine {
 
 					// EMP093
 					int decayGroup = pps.decayEquationGroups[s];
-					estimators.estimateNetDecayVolume(
+					fps.estimators.estimateNetDecayVolume(
 							pps.wallet.speciesNames[s], pps.getBecZone().getRegion(), uc, aAdjust, decayGroup, pps
 									.getPrimarySpeciesAgeAtBreastHeight(), quadMeanDiameters, closeUtilizationVolumes, closeUtilizationVolumesNetOfDecay
 					);
@@ -848,7 +854,7 @@ public class ForwardProcessingEngine {
 
 					// EMP092
 					int volumeGroup = pps.volumeEquationGroups[s];
-					estimators.estimateCloseUtilizationVolume(
+					fps.estimators.estimateCloseUtilizationVolume(
 							uc, aAdjust, volumeGroup, spLoreyHeight_All, quadMeanDiameters, wholeStemVolumes, closeUtilizationVolumes
 					);
 
@@ -863,13 +869,13 @@ public class ForwardProcessingEngine {
 			int primarySpeciesVolumeGroup = pps.volumeEquationGroups[s];
 			float primarySpeciesQMDAll = pps.wallet.quadMeanDiameters[s][UC_ALL_INDEX];
 			var wholeStemVolume = pps.wallet.treesPerHectare[s][UC_ALL_INDEX]
-					* estimators.estimateWholeStemVolumePerTree(
+					* fps.estimators.estimateWholeStemVolumePerTree(
 							primarySpeciesVolumeGroup, spLoreyHeight_All, primarySpeciesQMDAll
 					);
 
 			wholeStemVolumes.setCoe(UC_ALL_INDEX, wholeStemVolume);
 
-			estimators.estimateWholeStemVolume(
+			fps.estimators.estimateWholeStemVolume(
 					UtilizationClass.ALL, 0.0f, primarySpeciesVolumeGroup, spLoreyHeight_All, quadMeanDiameters, basalAreas, wholeStemVolumes
 			);
 
@@ -885,11 +891,11 @@ public class ForwardProcessingEngine {
 				cvVolume[s].put(uc, VolumeVariable.WHOLE_STEM_VOL, LayerType.PRIMARY, adjustment);
 			}
 
-			estimators.estimateQuadMeanDiameterByUtilization(
+			fps.estimators.estimateQuadMeanDiameterByUtilization(
 					pps.getBecZone(), quadMeanDiameters, genusName
 			);
 
-			estimators.estimateBaseAreaByUtilization(
+			fps.estimators.estimateBaseAreaByUtilization(
 					pps.getBecZone(), quadMeanDiameters, basalAreas, genusName
 			);
 

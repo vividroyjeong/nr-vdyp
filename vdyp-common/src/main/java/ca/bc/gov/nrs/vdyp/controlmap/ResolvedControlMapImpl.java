@@ -42,7 +42,7 @@ public class ResolvedControlMapImpl implements ResolvedControlMap {
 
 	@Override
 	public GenusDefinitionMap getGenusDefinitionMap() {
-		List<GenusDefinition> genusDefinitions = this.get(ControlKey.SP0_DEF, List.class);
+		List<GenusDefinition> genusDefinitions = this.<List<GenusDefinition>>get(ControlKey.SP0_DEF, List.class);
 		return new GenusDefinitionMap(genusDefinitions);
 	}
 

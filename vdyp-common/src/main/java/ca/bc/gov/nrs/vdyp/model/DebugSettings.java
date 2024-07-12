@@ -26,39 +26,64 @@ import java.util.Arrays;
 public class DebugSettings {
 
 	public static final int MAX_DEBUG_SETTINGS = 25;
-	protected static final int DEFAULT_DEBUG_SETTING = 0;
+	private static final int DEFAULT_DEBUG_SETTING = 0;
 	
-	protected final Integer[] settings;
+	final int[] settings;
 	
+	/**
+	 * Create a DebugSettings instance from the given values. If <code>settings</code> is null, this
+	 * is equivalent to calling DebugSettings(new Integer[0]). If an entry in <code>settings</code> 
+	 * is null, the default value (0) is assigned to that variable. If more than 
+	 * <code>MAX_DEBUG_SETTINGS</code> are supplied, those in excess are ignored.
+	 */
 	public DebugSettings(Integer[] settings) {
-		this.settings = settings == null ? new Integer[0] : Arrays.copyOf(settings, settings.length);
+				
+		if (settings == null) {
+			settings = new Integer[0];
+		}
 		
-		if (this.settings.length > MAX_DEBUG_SETTINGS) {
-			throw new IllegalArgumentException("Debug settings array has length " + this.settings.length 
+		if (settings.length > MAX_DEBUG_SETTINGS) {
+			throw new IllegalArgumentException("Debug settings array has length " + settings.length 
 					+ ", which exceeds the maximum length of " + MAX_DEBUG_SETTINGS);
 		}
 		
-		for (int i = 0; i < this.settings.length; i++) {
-			if (this.settings[i] == null) {
+		this.settings = new int[MAX_DEBUG_SETTINGS];
+		
+		for (int i = 0; i < MAX_DEBUG_SETTINGS; i++) {
+			if (i < settings.length && settings[i] != null) {
+				this.settings[i] = settings[i];
+			} else {
 				this.settings[i] = DEFAULT_DEBUG_SETTING;
 			}
 		}
 	}
 	
+	/**
+	 * Create a DebugSettings instance with all settings set to zero.
+	 */
 	public DebugSettings() {
 		this(new Integer[0]);
 	}
 	
+	/**
+	 * Return the value of the debug variable with setting number <code>settingNumber</code>. This is a
+	 * <b>one-based</b> value.
+	 * @param settingNumber the number of the debug variable whose value is to be returned.
+	 * @return as described.
+	 */
 	public int getValue(int settingNumber) {
 		if (settingNumber < 1 || settingNumber > MAX_DEBUG_SETTINGS) {
 			throw new IllegalArgumentException("Debug setting number " + settingNumber + " is out of range -"
 					+ " must be between 1 and " + MAX_DEBUG_SETTINGS);
 		}
 		
-		if (settingNumber > settings.length) {
-			return DEFAULT_DEBUG_SETTING;
-		}
-		
 		return settings[settingNumber - 1];
+	}
+
+	/**
+	 * @return a copy of the values array, useful when the debug settings need to be modified.
+	 */
+	public int[] getValues() {
+		return Arrays.copyOf(settings, settings.length);
 	}
 }

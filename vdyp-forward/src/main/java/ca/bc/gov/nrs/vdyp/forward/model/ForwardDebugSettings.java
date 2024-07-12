@@ -112,7 +112,7 @@ public class ForwardDebugSettings {
 		}
 	}
 
-	private final DebugSettings debugSettings;
+	private DebugSettings debugSettings;
 
 	public ForwardDebugSettings(DebugSettings debugSettings) {
 		this.debugSettings = debugSettings;
@@ -120,6 +120,27 @@ public class ForwardDebugSettings {
 
 	public int getValue(Vars v) {
 		return debugSettings.getValue(v.settingNumber);
+	}
+	
+	/**
+	 * For testing purposes sometimes it's useful to change the value of a debug setting.
+	 * It is not expected that this method would be used for any other purpose.
+	 * 
+	 * @param v the variable to change
+	 * @param value the new value the variable is to have
+	 */
+	public void setValue(Vars v, int value) {
+		
+		int[] currentSettings = debugSettings.getValues();
+		Integer[] updatedSettings = new Integer[currentSettings.length];
+		for (int i = 0; i < currentSettings.length; i++) {
+			if (i == v.settingNumber - 1) {
+				updatedSettings[i] = value;
+			} else {
+				updatedSettings[i] = currentSettings[i];
+			}
+		}
+		debugSettings = new DebugSettings(updatedSettings);
 	}
 
 	public Integer[] getFillInValues() {

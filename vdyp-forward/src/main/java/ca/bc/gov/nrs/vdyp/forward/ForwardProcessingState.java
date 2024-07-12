@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.vdyp.forward;
 
 import java.util.Map;
 
+import ca.bc.gov.nrs.vdyp.common.Estimators;
 import ca.bc.gov.nrs.vdyp.forward.controlmap.ForwardResolvedControlMap;
 import ca.bc.gov.nrs.vdyp.forward.controlmap.ForwardResolvedControlMapImpl;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
@@ -19,7 +20,10 @@ class ForwardProcessingState {
 
 	/** The control map defining the context of the execution */
 	final ForwardResolvedControlMap fcm;
-	
+
+	/** The estimators instance used by this engine */
+	final Estimators estimators;
+
 	/** The storage banks */
 	private final Bank[/* instances */][/* layers of instance */] banks;
 
@@ -31,6 +35,7 @@ class ForwardProcessingState {
 				new Bank[LAYERS_PER_INSTANCE] };
 
 		this.fcm = new ForwardResolvedControlMapImpl(controlMap);
+		this.estimators = new Estimators(this.fcm);
 	}
 
 	private static final float MIN_BASAL_AREA = 0.001f;
