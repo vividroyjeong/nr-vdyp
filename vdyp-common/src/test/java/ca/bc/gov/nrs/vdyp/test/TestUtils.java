@@ -53,6 +53,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.control.ResourceControlMapModifier;
 import ca.bc.gov.nrs.vdyp.io.parse.control.StartApplicationControlParser;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
@@ -591,5 +592,40 @@ public class TestUtils {
 		assertThat(polygon, hasProperty("layers", aMapWithSize(2)));
 		return assertLayer(polygon, LayerType.VETERAN);
 	};
+	
 
+	/**
+	 * Assert that a layer has a species of the given genus ID.
+	 * @param layer
+	 * @param id
+	 * @return The species
+	 */
+	public static <L extends BaseVdypLayer<S, ?>, S extends BaseVdypSpecies> S
+			assertHasSpecies(L layer, String id) {
+		
+		assertThat(layer, hasProperty("species", hasKey(id)));
+
+		var resultSpecies = layer.getSpecies().get(id);
+		assertThat(resultSpecies, hasProperty("polygonIdentifier", equalTo(layer.getPolygonIdentifier())));
+		assertThat(resultSpecies, hasProperty("layerType", is(layer.getLayerType())));
+		assertThat(resultSpecies, hasProperty("genus", is(id)));
+
+		return resultSpecies;
+	};
+	
+	/**
+	 * Assert that a layer has a species of the given genera IDs.
+	 * @param layer
+	 * @param ids
+	 * @return the first species specified
+	 */
+	public static <L extends BaseVdypLayer<S, ?>, S extends BaseVdypSpecies> S assertHasSpecies(L layer, String... ids) {
+		assertThat(layer, hasProperty("species", aMapWithSize(ids.length)));
+
+		for(var id : ids) {
+			assertHasSpecies(layer, id);
+		}
+		
+		return layer.getSpecies().get(ids[0]);
+	}
 }

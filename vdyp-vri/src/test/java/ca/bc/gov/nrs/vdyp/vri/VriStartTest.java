@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -77,6 +78,7 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
@@ -2140,6 +2142,45 @@ class VriStartTest {
 					hasProperty(
 							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
 							utilization(0, 4.73118162f, 0.0503439531f, 1.59589052f, 1.62338901f, 1.46155834f)
+					)
+			);
+			assertThat(
+					resultLayer.getSpecies(),
+					allOf(aMapWithSize(5), hasKey("B"), hasKey("C"), hasKey("F"), hasKey("H"), hasKey("S"))
+			);
+
+			VdypSpecies resultSpecB = TestUtils.assertHasSpecies(resultLayer, "B", "C", "F", "H", "S");
+			
+			
+			assertThat(
+					resultSpecB,
+					hasProperty(
+							"baseAreaByUtilization",
+							utilization(
+									0.0116237309f, 0.634290636f, 0.239887208f, 0.196762085f, 0.102481194f, 0.095160149f
+							)
+					)
+			);
+			assertThat(
+					resultSpecB,
+					hasProperty(
+							"quadraticMeanDiameterByUtilization",
+							utilization(5.61674118f, 12.9407434f, 9.93954372f, 14.3500404f, 19.1790199f, 27.5482502f)
+					)
+			);
+			assertThat(
+					resultSpecB,
+					hasProperty(
+							"treesPerHectareByUtilization",
+							utilization(4.69123125f, 48.2258606f, 30.9160728f, 12.1659298f, 3.54732919f, 1.59653044f)
+					)
+			);
+
+			assertThat(
+					resultSpecB,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+							utilization(0, 1.20897281f, 0.0223761573f, 0.441060275f, 0.441060275f, 0.386988521f)
 					)
 			);
 
