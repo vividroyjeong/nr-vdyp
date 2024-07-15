@@ -1069,7 +1069,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		float arg = //
 				(a0 + //
 						a1 * coast + //
-						a2 * spec.getBaseAreaByUtilization().getCoe(UTIL_ALL)//
+						a2 * baseAreaSpec//
 				) * exp(a3 * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL));
 		arg = max(arg, 0f);
 

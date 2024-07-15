@@ -536,50 +536,58 @@ public class TestUtils {
 
 	/**
 	 * Assert that a polygon has a layer of the given type.
+	 *
 	 * @param polygon the polygon
-	 * @param type the type of layer
-	 * @param number the total number of layers the polygon should have
+	 * @param type    the type of layer
+	 * @param number  the total number of layers the polygon should have
 	 * @return the layer
 	 */
-	public static <P extends BaseVdypPolygon<L, ?, ?, ?>, L extends BaseVdypLayer<?, ?>> L assertLayer(P polygon, LayerType type) {
+	public static <P extends BaseVdypPolygon<L, ?, ?, ?>, L extends BaseVdypLayer<?, ?>> L
+			assertLayer(P polygon, LayerType type) {
 		assertThat(polygon, hasProperty("layers", hasKey(type)));
-		
+
 		var resultLayer = polygon.getLayers().get(type);
-		
+
 		assertThat(resultLayer, hasProperty("polygonIdentifier", equalTo(polygon.getPolygonIdentifier())));
 		assertThat(resultLayer, hasProperty("layerType", is(type)));
-		
+
 		return resultLayer;
 	};
-	
+
 	/**
 	 * Assert that a polygon only has a primary layer.
+	 *
 	 * @param polygon the polygon
 	 * @param polygon
 	 * @return the primary layer
 	 */
-	public static <P extends BaseVdypPolygon<L, ?, ?, ?>, L extends BaseVdypLayer<?, ?>> L assertOnlyPrimaryLayer(P polygon) {
+	public static <P extends BaseVdypPolygon<L, ?, ?, ?>, L extends BaseVdypLayer<?, ?>> L
+			assertOnlyPrimaryLayer(P polygon) {
 		assertThat(polygon, hasProperty("layers", aMapWithSize(1)));
 		return assertLayer(polygon, LayerType.PRIMARY);
 	};
-	
+
 	/**
 	 * Assert that a polygon has a primary layer, allowing for other layers.
+	 *
 	 * @param polygon the polygon
 	 * @param polygon
 	 * @return the primary layer
 	 */
-	public static <P extends BaseVdypPolygon<L, ?, ?, ?>, L extends BaseVdypLayer<?, ?>> L assertHasPrimaryLayer(P polygon) {
+	public static <P extends BaseVdypPolygon<L, ?, ?, ?>, L extends BaseVdypLayer<?, ?>> L
+			assertHasPrimaryLayer(P polygon) {
 		return assertLayer(polygon, LayerType.PRIMARY);
 	};
-	
+
 	/**
 	 * Assert that a polygon has a veteran layer as well as a primary.
+	 *
 	 * @param polygon the polygon
 	 * @param polygon
 	 * @return the veteran layer
 	 */
-	public static <P extends BaseVdypPolygon<L, ?, ?, ?>, L extends BaseVdypLayer<?, ?>> L assertHasVeteranLayer(P polygon) {
+	public static <P extends BaseVdypPolygon<L, ?, ?, ?>, L extends BaseVdypLayer<?, ?>> L
+			assertHasVeteranLayer(P polygon) {
 		assertThat(polygon, hasProperty("layers", aMapWithSize(2)));
 		return assertLayer(polygon, LayerType.VETERAN);
 	};

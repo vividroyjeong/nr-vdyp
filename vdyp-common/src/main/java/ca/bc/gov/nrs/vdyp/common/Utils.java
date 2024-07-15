@@ -352,10 +352,8 @@ public class Utils {
 			}
 		}
 	}
-	
-	
-	// The following methods replicate the structure of the arrays used by VDYP7 to aid in debugging
 
+	// The following methods replicate the structure of the arrays used by VDYP7 to aid in debugging
 
 	public static float[] utilizationArray(
 			VdypLayer layer, Function<VdypUtilizationHolder, Coefficients> accessor, UtilizationClass uc
@@ -378,19 +376,22 @@ public class Utils {
 	public static float[][] utilizationArray(VdypLayer layer, Function<VdypUtilizationHolder, Coefficients> accessor) {
 		return utilizationArrayLimited(layer, accessor, UtilizationClass.OVER225);
 	}
-	
-	private static float[][] utilizationArrayLimited(VdypLayer layer, Function<VdypUtilizationHolder, Coefficients> accessor, UtilizationClass maxUc) {
-		var result = new float[maxUc.index+2][layer.getSpecies().size() + 1];
+
+	private static float[][] utilizationArrayLimited(
+			VdypLayer layer, Function<VdypUtilizationHolder, Coefficients> accessor, UtilizationClass maxUc
+	) {
+		var result = new float[maxUc.index + 2][layer.getSpecies().size() + 1];
 
 		int i = 0;
 
 		for (var uc : UtilizationClass.values()) {
 			utilizationArray(result[i++], layer, accessor, uc);
-			if(uc==maxUc) break;
+			if (uc == maxUc)
+				break;
 		}
 		return result;
 	}
-	
+
 	public static float[][] hlArray(VdypLayer layer) {
 		return utilizationArrayLimited(layer, VdypUtilizationHolder::getLoreyHeightByUtilization, UtilizationClass.ALL);
 	}
@@ -406,19 +407,17 @@ public class Utils {
 	public static float[][] tphArray(VdypLayer layer) {
 		return utilizationArray(layer, VdypUtilizationHolder::getTreesPerHectareByUtilization);
 	}
-	
-	public static float[] specValueArray(
-			VdypLayer layer, Function<VdypSpecies, Object> accessor
-	) {
+
+	public static float[] specValueArray(VdypLayer layer, Function<VdypSpecies, Object> accessor) {
 		var result = new float[layer.getSpecies().size()];
 		int i = 0;
 
 		for (var spec : layer.getSpecies().values()) {
-			result[i++]=Utils.optSafe(accessor.apply(spec)).map(Float.class::cast).orElse(-9f);
+			result[i++] = Utils.optSafe(accessor.apply(spec)).map(Float.class::cast).orElse(-9f);
 		}
 		return result;
 	}
-	
+
 	public static float[] specFraction(VdypLayer layer) {
 		return specValueArray(layer, VdypSpecies::getFractionGenus);
 	}

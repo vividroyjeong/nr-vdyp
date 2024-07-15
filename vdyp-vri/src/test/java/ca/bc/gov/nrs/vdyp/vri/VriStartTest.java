@@ -595,6 +595,7 @@ class VriStartTest {
 						)
 				);
 			}
+
 			@Test
 			void testComputeGraph() throws StandProcessingException {
 
@@ -636,12 +637,12 @@ class VriStartTest {
 
 				var resultPerSpecies = new HashMap<String, Float>();
 
-				
-				for(float x=-3.9f; x<=2; x+=0.01) {
-				
-					float result = app
-						.quadMeanDiameterFractionalError(x, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph);
-					
+				for (float x = -3.9f; x <= 2; x += 0.01) {
+
+					float result = app.quadMeanDiameterFractionalError(
+							x, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph
+					);
+
 					System.out.println(String.format("%f\t%f", x, result));
 
 				}
@@ -1999,7 +2000,6 @@ class VriStartTest {
 
 			controlMap = TestUtils.loadControlMap();
 
-
 			VriStart app = new VriStart();
 
 			MockFileResolver resolver = dummyInput();
@@ -2096,25 +2096,53 @@ class VriStartTest {
 			assertThat(result, hasProperty("mode", present(is(PolygonMode.BATN))));
 			assertThat(result, hasProperty("percentAvailable", is(85f)));
 
-			
 			var resultLayer = assertOnlyPrimaryLayer(result);
-			
+
 			assertThat(resultLayer, hasProperty("ageTotal", present(closeTo(24))));
 			assertThat(resultLayer, hasProperty("breastHeightAge", present(closeTo(15))));
 			assertThat(resultLayer, hasProperty("yearsToBreastHeight", present(closeTo(9))));
-			
+
 			assertThat(resultLayer, hasProperty("siteGenus", present(is("F"))));
-			
+
 			assertThat(resultLayer, hasProperty("height", present(closeTo(7.6f))));
 			assertThat(resultLayer, hasProperty("inventoryTypeGroup", present(is(3))));
 			// TODO assertThat(resultLayer, hasProperty("empiricalRelationshipParameterIndex", present(is(61))));
+
+			assertThat(
+					resultLayer, hasProperty("loreyHeightByUtilization", utilizationHeight(4.14067888f, 6.61390257f))
+			);
+			assertThat(
+					resultLayer,
+					hasProperty(
+							"baseAreaByUtilization",
+							utilization(
+									0.0679966733f, 6.34290648f, 4.24561071f, 1.01540196f, 0.571661115f, 0.510232806f
+							)
+					)
+			);
+			assertThat(
+					resultLayer,
+					hasProperty(
+							"quadraticMeanDiameterByUtilization",
+							utilization(5.58983135f, 10.3879948f, 9.11466217f, 13.9179964f, 18.6690178f, 25.3685265f)
+					)
+			);
+			assertThat(
+					resultLayer,
+					hasProperty(
+							"treesPerHectareByUtilization",
+							utilization(27.707695f, 748.4021f, 650.682556f, 66.7413025f, 20.8836231f, 10.094574f)
+					)
+			);
 			
-			assertThat(resultLayer, hasProperty("loreyHeightByUtilization", utilizationHeight(4.14067888f, 6.61390257f)));
-			assertThat(resultLayer, hasProperty("baseAreaByUtilization", utilization(0.0679966733f, 6.34290648f, 4.24561071f, 1.01540196f, 0.571661115f, 0.510232806f)));
-			// TODO Check Value 			assertThat(resultLayer, hasProperty("quadraticMeanDiameterByUtilization", utilization(0, 0, 0, 0, 0, 0)));
-			// TODO Check Value 			assertThat(resultLayer, hasProperty("treesPerHectareByUtilization", utilization(0, 0, 0, 0, 0, 0)));
-			
-			// TODO Check Value 			assertThat(resultLayer, hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", utilization(0, 0, 0, 0, 0, 0)));
+			//TODO fix this
+			assertThat(
+					resultLayer,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+							utilization(0, 4.73118162f, 0.0503439531f, 1.59589052f, 1.62338901f, 1.46155834f)
+					)
+			);
 
 			app.close();
 		}

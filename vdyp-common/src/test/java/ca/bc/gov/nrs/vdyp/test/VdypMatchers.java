@@ -633,8 +633,7 @@ public class VdypMatchers {
 		return utilization(0f, all, 0f, 0f, 0f, all);
 	}
 
-	public static Matcher<Coefficients>
-			utilizationHeight(float small, float all) {
+	public static Matcher<Coefficients> utilizationHeight(float small, float all) {
 		return new TypeSafeDiagnosingMatcher<Coefficients>() {
 
 			boolean matchesComponent(Description description, float expected, float result) {
@@ -645,9 +644,7 @@ public class VdypMatchers {
 
 			@Override
 			public void describeTo(Description description) {
-				String utilizationRep = String.format(
-						"[Small: %f, All: %f]", small, all
-				);
+				String utilizationRep = String.format("[Small: %f, All: %f]", small, all);
 				description.appendText("A lorey height vector ").appendValue(utilizationRep);
 			}
 

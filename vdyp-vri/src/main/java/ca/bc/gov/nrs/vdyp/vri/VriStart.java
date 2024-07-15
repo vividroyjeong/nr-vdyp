@@ -398,14 +398,9 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			result.ifPresent(resultPoly -> {
 				var resultPrimaryLayer = resultPoly.getLayers().get(LayerType.PRIMARY);
 
-				var hl = Utils.hlArray(resultPrimaryLayer);
-				var dq = Utils.dqArray(resultPrimaryLayer);
-				var ba = Utils.baArray(resultPrimaryLayer);
-				var tph = Utils.tphArray(resultPrimaryLayer);
-				var fr = Utils.specFraction(resultPrimaryLayer);
-				
 				try {
 					getDqBySpecies(resultPrimaryLayer, bec.getRegion());
+
 					estimateSmallComponents(polygon, resultPrimaryLayer);
 
 					computeUtilizationComponentsPrimary(
@@ -555,7 +550,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		);
 
 		resultsPerSpecies.putAll(initialDqEstimate);
-		
+
 		if (this.getDebugMode(9) > 0) {
 			// TODO
 		}
