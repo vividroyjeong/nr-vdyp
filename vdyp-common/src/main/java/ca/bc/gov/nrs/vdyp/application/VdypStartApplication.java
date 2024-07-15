@@ -1142,12 +1142,12 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			if (volumeComputeMode == VolumeComputeMode.BY_UTIL_WITH_WHOLE_STEM_BY_SPEC) {
 				log.atDebug().log("Estimating tree volume");
 
-				// EMP090
-				throw new UnsupportedOperationException("TODO"); // Not used yet
+				var volumeGroup = spec.getVolumeGroup();
+				var meanVolume = this.estimationMethods
+						.estimateWholeStemVolumePerTree(volumeGroup, loreyHeightSpec, quadMeanDiameterSpec);
+				var specWholeStemVolume = treesPerHectareSpec * meanVolume;
 
-				// log.atDebug().setMessage("Species WS stand volume {}")
-				// .addArgument(() -> spec.getWholeStemVolumeByUtilization().getCoe(UTIL_ALL));
-
+				spec.getWholeStemVolumeByUtilization().setCoe(UTIL_ALL, specWholeStemVolume);
 			}
 			float wholeStemVolumeSpec = spec.getWholeStemVolumeByUtilization().getCoe(VdypStartApplication.UTIL_ALL);
 

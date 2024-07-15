@@ -2134,8 +2134,7 @@ class VriStartTest {
 							utilization(27.707695f, 748.4021f, 650.682556f, 66.7413025f, 20.8836231f, 10.094574f)
 					)
 			);
-			
-			//TODO fix this
+
 			assertThat(
 					resultLayer,
 					hasProperty(
