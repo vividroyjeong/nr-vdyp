@@ -2106,7 +2106,7 @@ class VriStartTest {
 
 			assertThat(resultLayer, hasProperty("height", present(closeTo(7.6f))));
 			assertThat(resultLayer, hasProperty("inventoryTypeGroup", present(is(3))));
-			// TODO assertThat(resultLayer, hasProperty("empiricalRelationshipParameterIndex", present(is(61))));
+			assertThat(resultLayer, hasProperty("empiricalRelationshipParameterIndex", present(is(61))));
 
 			assertThat(
 					resultLayer, hasProperty("loreyHeightByUtilization", utilizationHeight(4.14067888f, 6.61390257f))

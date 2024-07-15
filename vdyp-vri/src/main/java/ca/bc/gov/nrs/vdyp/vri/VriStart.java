@@ -451,6 +451,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		lBuilder.quadMeanDiameter(layerQuadMeanDiameter);
 		lBuilder.baseArea(primaryBaseArea);
 		lBuilder.treesPerHectare(primaryLayerDensity);
+		lBuilder.empiricalRelationshipParameterIndex(primaryLayer.getEmpericalRelationshipParameterIndex());
 
 		lBuilder.adaptSpecies(primaryLayer, (sBuilder, vriSpec) -> {
 			var vriSite = primaryLayer.getSites().get(vriSpec.getGenus());
