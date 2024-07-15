@@ -30,11 +30,23 @@ public interface ForwardResolvedControlMap extends ResolvedControlMap {
 	/** 106 - BA_YIELD */
 	MatrixMap2<String, String, Coefficients> getBasalAreaYieldCoefficients();
 	
+	/** 107 - DQ_YIELD */
+	MatrixMap2<String, String, Coefficients> getQuadMeanDiameterYieldCoefficients();
+	
 	/** 111 - BA_GROWTH_FIAT */
 	Map<Region, GrowthFiatDetails> getBasalAreaGrowthFiatDetails();
-	
+
+	/** 117 - DQ_GROWTH_FIAT */
+	Map<Region, GrowthFiatDetails> getQuadMeanDiameterGrowthFiatDetails();
+
 	/** 121 - BA_GROWTH_EMPIRICAL */
 	MatrixMap2<String, String, Coefficients> getBasalAreaGrowthEmpiricalCoefficients();
+	
+	/** 122 - DQ_GROWTH_EMPIRICAL */
+	Map<Integer, Coefficients> getQuadMeanDiameterGrowthEmpiricalCoefficients();
+	
+	/** 123 - DQ_GROWTH_EMPIRICAL_LIMITS */
+	Map<Integer, Coefficients> getQuadMeanDiameterGrowthEmpiricalLimits();
 	
 	/** 199 - DEBUG_SWITCHES */
 	ForwardDebugSettings getDebugSettings();

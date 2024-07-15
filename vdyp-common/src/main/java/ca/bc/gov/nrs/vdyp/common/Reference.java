@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.sindex;
+package ca.bc.gov.nrs.vdyp.common;
 
 import java.util.Optional;
 

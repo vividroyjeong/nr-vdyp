@@ -26,6 +26,10 @@ public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl
 	final Map<Region, GrowthFiatDetails> basalAreaGrowthFiatDetails;
 	final MatrixMap2<String, String, Coefficients> basalAreaGrowthEmpiricalCoefficients;
 	final MatrixMap3<Region, String, Integer, Float> upperBoundCoefficients;
+	final MatrixMap2<String, String, Coefficients> quadMeanDiameterYieldCoefficients;
+	final Map<Region, GrowthFiatDetails> quadMeanDiameterGrowthFiatDetails;
+	final Map<Integer, Coefficients> quadMeanDiameterGrowthEmpiricalCoefficients;
+	final Map<Integer, Coefficients> quadMeanDiameterGrowthEmpiricalLimits;
 	
 	public ForwardResolvedControlMapImpl(Map<String, Object> controlMap) {
 
@@ -39,6 +43,10 @@ public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl
 		this.basalAreaGrowthFiatDetails = this.get(ControlKey.BA_GROWTH_FIAT, Map.class);
 		this.basalAreaGrowthEmpiricalCoefficients = this.get(ControlKey.BA_GROWTH_EMPIRICAL, MatrixMap2.class);
 		this.upperBoundCoefficients = this.get(ControlKey.UPPER_BA_BY_CI_S0_P, MatrixMap3.class);
+		this.quadMeanDiameterYieldCoefficients = this.get(ControlKey.DQ_YIELD, MatrixMap2.class);
+		this.quadMeanDiameterGrowthFiatDetails = this.get(ControlKey.DQ_GROWTH_FIAT, Map.class);
+		this.quadMeanDiameterGrowthEmpiricalCoefficients = this.get(ControlKey.DQ_GROWTH_EMPIRICAL, Map.class);
+		this.quadMeanDiameterGrowthEmpiricalLimits = this.get(ControlKey.DQ_GROWTH_EMPIRICAL_LIMITS, Map.class);
 	}
 	
 	@Override
@@ -65,6 +73,11 @@ public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl
 	public MatrixMap2<String, String, Coefficients> getBasalAreaYieldCoefficients() {
 		return basalAreaYieldCoefficients;
 	}
+	
+	@Override
+	public MatrixMap2<String, String, Coefficients> getQuadMeanDiameterYieldCoefficients() {
+		return quadMeanDiameterYieldCoefficients;
+	}
 
 	@Override
 	public Map<Region, GrowthFiatDetails> getBasalAreaGrowthFiatDetails() {
@@ -79,5 +92,20 @@ public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl
 	@Override
 	public MatrixMap3<Region, String, Integer, Float> getUpperBoundsCoefficients() {
 		return upperBoundCoefficients;
+	}
+	
+	@Override
+	public Map<Region, GrowthFiatDetails> getQuadMeanDiameterGrowthFiatDetails() {
+		return quadMeanDiameterGrowthFiatDetails;
+	}
+
+	@Override
+	public Map<Integer, Coefficients> getQuadMeanDiameterGrowthEmpiricalCoefficients() {
+		return quadMeanDiameterGrowthEmpiricalCoefficients;
+	}
+	
+	@Override
+	public Map<Integer, Coefficients> getQuadMeanDiameterGrowthEmpiricalLimits() {
+		return quadMeanDiameterGrowthEmpiricalLimits;
 	}
 }

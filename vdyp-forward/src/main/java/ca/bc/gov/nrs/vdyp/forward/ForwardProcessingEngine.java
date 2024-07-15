@@ -25,6 +25,7 @@ import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Estimators;
 import ca.bc.gov.nrs.vdyp.common.ReconcilationMethods;
+import ca.bc.gov.nrs.vdyp.common.Reference;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorException;
@@ -292,22 +293,223 @@ public class ForwardProcessingEngine {
 			veteranLayerBasalArea = Optional.empty();
 		}
 
+		float basalAreaAtStartOfPeriod = primaryBank.basalAreas[0][UC_ALL_INDEX];
 		float growthInBasalArea = growBasalArea(
-				primarySpeciesYearsAtBreastHeight, fps.fcm.getDebugSettings(), dominantHeight, primaryBank.basalAreas[0][UC_ALL_INDEX], veteranLayerBasalArea, growthInDominantHeight
+				primarySpeciesYearsAtBreastHeight, fps.fcm
+						.getDebugSettings(), dominantHeight, basalAreaAtStartOfPeriod, veteranLayerBasalArea, growthInDominantHeight
+		);
+
+		float qmdAtStartOfGrowthPeriod = primaryBank.quadMeanDiameters[0][UC_ALL_INDEX];
+		float primaryLayerBasalArea = primaryBank.basalAreas[0][UC_ALL_INDEX];
+		Reference<Boolean> dqGrowthLimitApplied = new Reference<>();
+		float growthInQuadMeanDiameter = growQuadMeanDiameter(
+				yearsToBreastHeight, primaryLayerBasalArea, dominantHeight, qmdAtStartOfGrowthPeriod, veteranLayerBasalArea, 
+				veteranLayerBasalArea, growthInDominantHeight, dqGrowthLimitApplied
 		);
 	}
+
+	/**
+	 * EMP117 - Quad Mean Diameter growth for the primary layer.
+	 * 
+	 * @param yearsAtBreastHeight
+	 * @param dominantHeight
+	 * @param dqAtStart
+	 * @param veteranBasalAreaStart
+	 * @param veteranBasalAreaEnd
+	 * @param hdGrowth
+	 * @return 
+	 * 
+	 * @throws StandProcessingException
+	 */
+	float growQuadMeanDiameter(
+			float yearsAtBreastHeight, float primaryLayerBasalArea, float dominantHeight, float dqAtStart,
+			Optional<Float> veteranBasalAreaStart, Optional<Float> veteranBasalAreaEnd, float hdGrowth,
+			Reference<Boolean> dqGrowthLimitApplied
+	)
+			throws StandProcessingException {
+
+		float[] speciesProportionsByBasalArea = getSpeciesProportionsByBasalArea();
+
+		var dqYieldCoefficients = fps.fcm.getQuadMeanDiameterYieldCoefficients();
+		var decayBecZoneAlias = fps.getPolygonProcessingState().getBecZone().getDecayBec().getAlias();
+		Coefficients coefficientsWeightedBySpeciesAndDecayBec = Coefficients.empty(6, 0);
+		for (int i = 0; i < 6; i++) {
+			float sum = 0.0f;
+			for (int speciesIndex = 1; speciesIndex <= fps.getPolygonProcessingState().wallet
+					.getNSpecies(); speciesIndex++) {
+				String speciesAlias = fps.getPolygonProcessingState().wallet.speciesNames[speciesIndex];
+				sum += dqYieldCoefficients.get(decayBecZoneAlias, speciesAlias).getCoe(i)
+						* speciesProportionsByBasalArea[speciesIndex];
+			}
+			coefficientsWeightedBySpeciesAndDecayBec.setCoe(i, sum);
+		}
+
+		float dqYieldAtStart = fps.estimators.estimateQuadMeanDiameterYield(
+				coefficientsWeightedBySpeciesAndDecayBec, dominantHeight, yearsAtBreastHeight, veteranBasalAreaStart, fps
+						.getPolygonProcessingState()
+						.getBecZone(), fps.getPolygonProcessingState().getPrimarySpeciesGroupNumber()
+		);
+
+		float dominantHeightAtEnd = dominantHeight + hdGrowth;
+		float yearsAtBreastHeightAtEnd = yearsAtBreastHeight + 1.0f;
+
+		float dqYieldAtEnd = fps.estimators.estimateQuadMeanDiameterYield(
+				coefficientsWeightedBySpeciesAndDecayBec, dominantHeightAtEnd, yearsAtBreastHeightAtEnd, veteranBasalAreaEnd, fps
+						.getPolygonProcessingState()
+						.getBecZone(), fps.getPolygonProcessingState().getPrimarySpeciesGroupNumber()
+		);
+
+		float dqYieldGrowth = dqYieldAtEnd - dqYieldAtStart;
+
+		int debugSetting6Value = fps.fcm.getDebugSettings().getValue(ForwardDebugSettings.Vars.DQ_GROWTH_MODEL_6);
+
+		var growthFaitDetails = fps.fcm.getQuadMeanDiameterGrowthFiatDetails()
+				.get(fps.getPolygonProcessingState().getBecZone().getRegion());
+
+		Optional<Float> dqGrowthFiat = Optional.empty();
+		if (debugSetting6Value != 1) {
+			var convergenceCoefficient = growthFaitDetails.calculateCoefficient(yearsAtBreastHeight);
+
+			float adjust = -convergenceCoefficient * (dqAtStart - dqYieldAtStart);
+			dqGrowthFiat = Optional.of(dqYieldGrowth + adjust);
+		}
+
+		Optional<Float> dqGrowthEmpirical = Optional.empty();
+		if (debugSetting6Value != 0) {
+			dqGrowthEmpirical = Optional.of(
+					calculateQuadMeanDiameterGrowthEmpirical(
+							yearsAtBreastHeight, dominantHeight, primaryLayerBasalArea, dqAtStart, hdGrowth, dqYieldAtStart, dqYieldAtEnd
+					)
+			);
+		}
+		
+		float dqGrowth;
+		
+		switch (debugSetting6Value) {
+			case 0:
+				dqGrowth = dqGrowthFiat.orElseThrow();
+				break;
+				
+			case 1:
+				dqGrowth = dqGrowthEmpirical.orElseThrow();
+				break;
+				
+			case 2: {
+				float c = 1.0f;
+				if (yearsAtBreastHeight >= growthFaitDetails.getMixedCoefficient(1)) {
+					c = 0.0f;
+				} else if (yearsAtBreastHeight > growthFaitDetails.getMixedCoefficient(0)) {
+					float t1 = yearsAtBreastHeight - growthFaitDetails.getMixedCoefficient(0);
+					float t2 = growthFaitDetails.getMixedCoefficient(1) - growthFaitDetails.getMixedCoefficient(0);
+					float t3 = growthFaitDetails.getMixedCoefficient(2);
+					c = 1.0f - FloatMath.pow(t1 / t2, t3);
+				}
+				dqGrowth = c * dqGrowthEmpirical.orElseThrow() + (1.0f - c) * dqGrowthFiat.orElseThrow();
+				break;
+			}
+			
+			default:
+				throw new IllegalStateException("debugSetting6Value of " + debugSetting6Value + " is not supported");
+		}
 	
+		float dqUpperBound = growQuadraticMeanDiameterUpperBound();
+		float dqLimit = Math.max(dqUpperBound, dqAtStart);
+
+		if (dqAtStart + dqGrowth < 7.6f) {
+			dqGrowth = 7.6f - dqAtStart;
+		}
+		
+		if (dqAtStart + dqGrowth > dqLimit - 0.001f) {
+			dqGrowthLimitApplied.set(true);
+			dqGrowth = Math.max(dqLimit - dqAtStart, 0.0f);
+		} else {
+			dqGrowthLimitApplied.set(false);
+		}
+		
+		// TODO: Must note if limited by maximum!!!
+		
+		return dqGrowth;
+	}
+
+	/**
+	 * EMP122. Calculate quad mean diameter growth using the empirical model.
+	 * 
+	 * @param yearsAtBreastHeight primary species years at breast height or more
+	 * @param dominantHeight primary species dominant height
+	 * @param primaryLayerBasalArea basal area of primary layer
+	 * @param dqAtStart quad mean diameter at start of growth period
+	 * @param hdGrowth growth in dominant height
+	 * @param dqYieldAtStart quad mean diameter yield at start of growth period
+	 * @param dqYieldAtEnd quad mean diameter yield at end of growth period
+	 * 
+	 * @return the change in primary layer basal area from start to start + 1 year
+	 */
+	private float calculateQuadMeanDiameterGrowthEmpirical(
+			float yearsAtBreastHeight, float dominantHeight,
+			float primaryLayerBasalArea, float dqAtStart, float hdGrowth, float dqYieldAtStart,
+			float dqYieldAtEnd
+	) {
+		// Compute the growth in quadratic mean diameter 
+
+		var dqGrowthEmpiricalCoefficients = fps.fcm.getQuadMeanDiameterGrowthEmpiricalCoefficients();
+
+		Integer stratumNumber = fps.getPolygonProcessingState().getPrimarySpeciesStratumNumber();
+		var firstSpeciesDqGrowthCoe = dqGrowthEmpiricalCoefficients.get(stratumNumber);
+
+		float a0 = firstSpeciesDqGrowthCoe.get(0);
+		float a1 = firstSpeciesDqGrowthCoe.get(1);
+		float a2 = firstSpeciesDqGrowthCoe.get(2);
+		float a3 = firstSpeciesDqGrowthCoe.get(3);
+		float a4 = firstSpeciesDqGrowthCoe.get(4);
+		float a5 = firstSpeciesDqGrowthCoe.get(5);
+		float a6 = firstSpeciesDqGrowthCoe.get(6);
+
+		yearsAtBreastHeight = Math.max(yearsAtBreastHeight, 1.0f);
+		float dqYieldGrowth = dqYieldAtEnd - dqYieldAtStart;
+
+		float dqDelta = FloatMath.exp(
+				a0 + a2 * FloatMath.log(yearsAtBreastHeight) + a3 * dqAtStart
+						+ a4 * dominantHeight + a5 * primaryLayerBasalArea + a6 * hdGrowth)
+				+ a1 * dqYieldGrowth;
+
+		dqDelta = Math.max(dqDelta, 0.0f);
+
+		// Compute min/max growth in quadratic mean diameter 
+
+		Map<Integer, Coefficients> quadMeanDiameterGrowthEmpiricalLimits = fps.fcm
+				.getQuadMeanDiameterGrowthEmpiricalLimits();
+		float[] l = new float[8];
+		for (int i = 0; i < 8; i++) {
+			l[i] = quadMeanDiameterGrowthEmpiricalLimits.get(stratumNumber).getCoe(i);
+		}
+
+		float x = dqAtStart - 7.5f;
+		float xsq = x * x;
+
+		var dqGrowthMin = Math.max(l[0] + l[1] * x + l[2] * xsq / 100.0f, l[6]);
+		var dqGrowthMax = Math.min(l[3] + l[4] * x + l[5] * xsq / 100.0f, l[7]);
+
+		dqGrowthMax = Math.max(dqGrowthMax, dqGrowthMin);
+
+		// Apply the just-computed limits to the previously computed value.
+
+		dqDelta = Math.max(dqDelta, dqGrowthMin);
+		dqDelta = Math.min(dqDelta, dqGrowthMax);
+
+		return dqDelta;
+	}
+
 	private float[] getSpeciesProportionsByBasalArea() {
-		
+
 		PolygonProcessingState pps = fps.getPolygonProcessingState();
-		
+
 		float[] speciesProportionsByBasalArea = new float[pps.getNSpecies() + 1];
-		
+
 		for (int i = 1; i <= pps.getNSpecies(); i++) {
 			speciesProportionsByBasalArea[i] = pps.wallet.basalAreas[i][UC_ALL_INDEX]
 					/ pps.wallet.basalAreas[0][UC_ALL_INDEX];
 		}
-		
+
 		return speciesProportionsByBasalArea;
 	}
 
@@ -330,7 +532,7 @@ public class ForwardProcessingEngine {
 	) throws StandProcessingException {
 
 		float[] speciesProportionsByBasalArea = getSpeciesProportionsByBasalArea();
-		
+
 		var baYieldCoefficients = fps.fcm.getBasalAreaYieldCoefficients();
 		var becZoneAlias = fps.getPolygonProcessingState().getBecZone().getAlias();
 		Coefficients estimateBasalAreaYieldCoefficients = Coefficients.empty(7, 0);
@@ -353,16 +555,16 @@ public class ForwardProcessingEngine {
 		int debugSetting2Value = debugSettings.getValue(ForwardDebugSettings.Vars.MAX_BREAST_HEIGHT_AGE_2);
 
 		float basalAreaYieldAtStart = fps.estimators.estimateBaseAreaYield(
-				estimateBasalAreaYieldCoefficients, debugSetting2Value, dominantHeight, yearsAtBreastHeight, veteranLayerBasalArea, 
-				isFullOccupancy, fps.getPolygonProcessingState().getBecZone(), primarySpeciesGroupNumber
+				estimateBasalAreaYieldCoefficients, debugSetting2Value, dominantHeight, yearsAtBreastHeight, veteranLayerBasalArea, isFullOccupancy, fps
+						.getPolygonProcessingState().getBecZone(), primarySpeciesGroupNumber
 		);
 
 		float dominantHeightEnd = dominantHeight + growthInDominantHeight;
 		float yearsAtBreastHeightEnd = yearsAtBreastHeight + 1.0f;
 
 		float basalAreaYieldAtEnd = fps.estimators.estimateBaseAreaYield(
-				estimateBasalAreaYieldCoefficients, debugSetting2Value, dominantHeightEnd, yearsAtBreastHeightEnd, veteranLayerBasalArea, 
-				isFullOccupancy, fps.getPolygonProcessingState().getBecZone(), primarySpeciesGroupNumber
+				estimateBasalAreaYieldCoefficients, debugSetting2Value, dominantHeightEnd, yearsAtBreastHeightEnd, veteranLayerBasalArea, isFullOccupancy, fps
+						.getPolygonProcessingState().getBecZone(), primarySpeciesGroupNumber
 		);
 
 		var growthFaitDetails = fps.fcm.getBasalAreaGrowthFiatDetails()

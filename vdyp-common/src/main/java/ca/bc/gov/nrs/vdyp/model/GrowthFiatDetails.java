@@ -66,7 +66,7 @@ public class GrowthFiatDetails {
 		}
 
 		coefficients = new Float[N_AGES];
-		coefficients[0] = numbers.get(0);
+		coefficients[0] = numbers.get(1);
 		for (int i = 1; i < N_AGES; i++) {
 			coefficients[i] = numbers.get(i * 2 + 1);
 			if (i >= nAgesSupplied && coefficients[i] != 0.0f) {
