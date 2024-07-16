@@ -592,17 +592,16 @@ public class TestUtils {
 		assertThat(polygon, hasProperty("layers", aMapWithSize(2)));
 		return assertLayer(polygon, LayerType.VETERAN);
 	};
-	
 
 	/**
 	 * Assert that a layer has a species of the given genus ID.
+	 *
 	 * @param layer
 	 * @param id
 	 * @return The species
 	 */
-	public static <L extends BaseVdypLayer<S, ?>, S extends BaseVdypSpecies> S
-			assertHasSpecies(L layer, String id) {
-		
+	public static <L extends BaseVdypLayer<S, ?>, S extends BaseVdypSpecies> S assertHasSpecies(L layer, String id) {
+
 		assertThat(layer, hasProperty("species", hasKey(id)));
 
 		var resultSpecies = layer.getSpecies().get(id);
@@ -612,20 +611,22 @@ public class TestUtils {
 
 		return resultSpecies;
 	};
-	
+
 	/**
 	 * Assert that a layer has a species of the given genera IDs.
+	 *
 	 * @param layer
 	 * @param ids
 	 * @return the first species specified
 	 */
-	public static <L extends BaseVdypLayer<S, ?>, S extends BaseVdypSpecies> S assertHasSpecies(L layer, String... ids) {
+	public static <L extends BaseVdypLayer<S, ?>, S extends BaseVdypSpecies> S
+			assertHasSpecies(L layer, String... ids) {
 		assertThat(layer, hasProperty("species", aMapWithSize(ids.length)));
 
-		for(var id : ids) {
+		for (var id : ids) {
 			assertHasSpecies(layer, id);
 		}
-		
+
 		return layer.getSpecies().get(ids[0]);
 	}
 }

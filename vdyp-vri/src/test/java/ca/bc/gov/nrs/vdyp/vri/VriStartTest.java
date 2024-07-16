@@ -2150,8 +2150,7 @@ class VriStartTest {
 			);
 
 			VdypSpecies resultSpecB = TestUtils.assertHasSpecies(resultLayer, "B", "C", "F", "H", "S");
-			
-			
+
 			assertThat(
 					resultSpecB,
 					hasProperty(
@@ -2176,11 +2175,45 @@ class VriStartTest {
 					)
 			);
 
+			var wsv = Utils.wsvArray(resultLayer);
+			var cuv = Utils.cuvArray(resultLayer);
+			var cuvd = Utils.cuvdArray(resultLayer);
+			var cuvdw = Utils.cuvdwArray(resultLayer);
+			var cuvdwb = Utils.cuvdwbArray(resultLayer);
+
+			assertThat(
+					resultSpecB,
+					hasProperty(
+							"wholeStemVolumeByUtilization",
+							utilization(0.0244281366f, 2.41518188f, 0.747900844f, 0.752810001f, 0.4540295f, 0.46044156f)
+					)
+			);
+			assertThat(
+					resultSpecB,
+					hasProperty(
+							"closeUtilizationVolumeByUtilization",
+							utilization(0, 1.28733742f, 0.0235678982f, 0.464995325f, 0.378819793f, 0.41995436f)
+					)
+			);
+			assertThat(
+					resultSpecB,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayByUtilization",
+							utilization(0, 1.24826729f, 0.0230324566f, 0.454239398f, 0.369579285f, 0.401416153f)
+					)
+			);
+			assertThat(
+					resultSpecB,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization",
+							utilization(0, 1.23482728f, 0.0228475146f, 0.450360179f, 0.366144955f, 0.395474672f)
+					)
+			);
 			assertThat(
 					resultSpecB,
 					hasProperty(
 							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
-							utilization(0, 1.20897281f, 0.0223761573f, 0.441060275f, 0.441060275f, 0.386988521f)
+							utilization(0, 1.20897281f, 0.0223761573f, 0.441060275f, 0.358547896f, 0.386988521f)
 					)
 			);
 

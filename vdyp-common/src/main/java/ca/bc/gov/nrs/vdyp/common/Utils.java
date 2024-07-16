@@ -408,6 +408,28 @@ public class Utils {
 		return utilizationArray(layer, VdypUtilizationHolder::getTreesPerHectareByUtilization);
 	}
 
+	public static float[][] wsvArray(VdypLayer layer) {
+		return utilizationArray(layer, VdypUtilizationHolder::getWholeStemVolumeByUtilization);
+	}
+
+	public static float[][] cuvArray(VdypLayer layer) {
+		return utilizationArray(layer, VdypUtilizationHolder::getCloseUtilizationVolumeByUtilization);
+	}
+
+	public static float[][] cuvdArray(VdypLayer layer) {
+		return utilizationArray(layer, VdypUtilizationHolder::getCloseUtilizationVolumeNetOfDecayByUtilization);
+	}
+
+	public static float[][] cuvdwArray(VdypLayer layer) {
+		return utilizationArray(layer, VdypUtilizationHolder::getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization);
+	}
+
+	public static float[][] cuvdwbArray(VdypLayer layer) {
+		return utilizationArray(
+				layer, VdypUtilizationHolder::getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization
+		);
+	}
+
 	public static float[] specValueArray(VdypLayer layer, Function<VdypSpecies, Object> accessor) {
 		var result = new float[layer.getSpecies().size()];
 		int i = 0;
