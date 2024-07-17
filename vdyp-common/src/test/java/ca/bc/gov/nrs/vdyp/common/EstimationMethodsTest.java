@@ -1,16 +1,12 @@
 package ca.bc.gov.nrs.vdyp.common;
 
 import static ca.bc.gov.nrs.vdyp.test.TestUtils.closeUtilMap;
-import static ca.bc.gov.nrs.vdyp.test.TestUtils.polygonId;
-import static ca.bc.gov.nrs.vdyp.test.TestUtils.valid;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.closeTo;
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.utilization;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

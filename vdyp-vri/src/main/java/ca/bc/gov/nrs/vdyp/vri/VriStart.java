@@ -43,7 +43,6 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.Region;
-import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder;
@@ -59,7 +58,6 @@ import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
-import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 import ca.bc.gov.nrs.vdyp.model.VolumeComputeMode;
 import ca.bc.gov.nrs.vdyp.vri.model.VriLayer;
 import ca.bc.gov.nrs.vdyp.vri.model.VriPolygon;
@@ -499,7 +497,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		lBuilder.buildChildren();
 
 		var species = lBuilder.getSpecies();
-		var sites = lBuilder.getSites();
 
 		float sumBaseAreaLoreyHeight = 0;
 		// Assign BA by species
@@ -656,8 +653,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	PolygonMode checkPolygon(VriPolygon polygon) throws ProcessingException {
 
 		BecDefinition bec = Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap);
-
-		var primaryLayer = requireLayer(polygon, LayerType.PRIMARY);
 
 		// At this point the Fortran implementation nulled the BA and TPH of Primary
 		// layers if the BA and TPH were present and resulted in a DQ <7.5
@@ -1391,7 +1386,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 			if (tol > 0.0 && Math.abs(lastFs[0]) < tol / 2) {
 
-				double f = errorFunc.value(lastXes[0]);
 				if (Math.abs(lastFs[0]) < tol) {
 
 					// Decide if we want to propagate the exception or try to use the last result.

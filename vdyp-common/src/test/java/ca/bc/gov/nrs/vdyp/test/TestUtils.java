@@ -1,9 +1,7 @@
 package ca.bc.gov.nrs.vdyp.test;
 
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
-import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasProperty;
@@ -62,10 +60,6 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.Region;
-import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
-import ca.bc.gov.nrs.vdyp.model.VdypLayer;
-import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
-import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 
 public class TestUtils {
 

@@ -63,7 +63,6 @@ import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.VolumeComputeMode;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
-import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 class VdypStartApplicationTest {
@@ -146,7 +145,7 @@ class VdypStartApplicationTest {
 		}
 
 		@Test
-		void testEntryMissing() throws IOException, ResourceParseException, ProcessingException {
+		void testEntryMissing() throws IOException, ResourceParseException {
 
 			MockFileResolver resolver = dummyIo();
 
@@ -164,7 +163,7 @@ class VdypStartApplicationTest {
 		}
 
 		@Test
-		void testErrorOpeningFile() throws IOException, ResourceParseException, ProcessingException {
+		void testErrorOpeningFile() throws IOException, ResourceParseException {
 			var mockControl = EasyMock.createControl();
 
 			StreamingParserFactory streamingParserFactory = mockControl.createMock(StreamingParserFactory.class);
@@ -694,7 +693,7 @@ class VdypStartApplicationTest {
 
 		@Test
 		void testSimple() throws Exception {
-			var controlMap = TestUtils.loadControlMap();
+			controlMap = TestUtils.loadControlMap();
 			var polygonId = new PolygonIdentifier("TestPolygon", 2024);
 			try (TestStartApplication app = new TestStartApplication(controlMap, false)) {
 
@@ -864,7 +863,7 @@ class VdypStartApplicationTest {
 
 		@Test
 		void testSimple() throws Exception {
-			var controlMap = TestUtils.loadControlMap();
+			controlMap = TestUtils.loadControlMap();
 			var polygonId = new PolygonIdentifier("TestPolygon", 2024);
 			try (var app = new TestStartApplication(controlMap, false)) {
 
@@ -905,7 +904,7 @@ class VdypStartApplicationTest {
 
 		@Test
 		void testHeightLessThanA5() throws Exception {
-			var controlMap = TestUtils.loadControlMap();
+			controlMap = TestUtils.loadControlMap();
 			var polygonId = new PolygonIdentifier("TestPolygon", 2024);
 			try (var app = new TestStartApplication(controlMap, false)) {
 
@@ -946,7 +945,7 @@ class VdypStartApplicationTest {
 
 		@Test
 		void testResultLargerThanUpperBound() throws Exception {
-			var controlMap = TestUtils.loadControlMap();
+			controlMap = TestUtils.loadControlMap();
 			var polygonId = new PolygonIdentifier("TestPolygon", 2024);
 			try (var app = new TestStartApplication(controlMap, false)) {
 
@@ -994,7 +993,7 @@ class VdypStartApplicationTest {
 
 		@Test
 		void testAlreadySet() throws Exception {
-			var controlMap = TestUtils.loadControlMap();
+			controlMap = TestUtils.loadControlMap();
 			try (var app = new TestStartApplication(controlMap, false)) {
 
 				var polygon = TestPolygon.build(pb -> {
@@ -1018,7 +1017,7 @@ class VdypStartApplicationTest {
 
 		@Test
 		void testWithoutVeteran() throws Exception {
-			var controlMap = TestUtils.loadControlMap();
+			controlMap = TestUtils.loadControlMap();
 			try (var app = new TestStartApplication(controlMap, false)) {
 
 				var polygon = TestPolygon.build(pb -> {
@@ -1064,7 +1063,7 @@ class VdypStartApplicationTest {
 
 		@Test
 		void testWithVeteran() throws Exception {
-			var controlMap = TestUtils.loadControlMap();
+			controlMap = TestUtils.loadControlMap();
 			try (var app = new TestStartApplication(controlMap, false) {
 
 				@Override
@@ -1153,7 +1152,7 @@ class VdypStartApplicationTest {
 				}
 		)
 		void testPass(String dist, float expected) throws Exception {
-			var controlMap = TestUtils.loadControlMap();
+			controlMap = TestUtils.loadControlMap();
 			try (var app = new TestStartApplication(controlMap, false)) {
 
 				var layer = TestLayer.build(lb -> {
@@ -1185,7 +1184,7 @@ class VdypStartApplicationTest {
 				}
 		)
 		void testFail(String dist) throws Exception {
-			var controlMap = TestUtils.loadControlMap();
+			controlMap = TestUtils.loadControlMap();
 			try (var app = new TestStartApplication(controlMap, false)) {
 
 				var layer = TestLayer.build(lb -> {
@@ -1209,8 +1208,8 @@ class VdypStartApplicationTest {
 	@Nested
 	class SmallComponents {
 		@Test
-		void testEstimate() throws ProcessingException {
-			var controlMap = TestUtils.loadControlMap();
+		void testEstimate() throws ProcessingException, IOException {
+			controlMap = TestUtils.loadControlMap();
 			try (var app = new TestStartApplication(controlMap, false)) {
 				ApplicationTestUtils.setControlMap(app, controlMap);
 
@@ -1219,7 +1218,6 @@ class VdypStartApplicationTest {
 					builder.forestInventoryZone("A");
 					builder.biogeoclimaticZone("CWH");
 					builder.percentAvailable(Optional.of(100f));
-					// builder.yieldFactor(1f);
 				});
 				VdypLayer layer = VdypLayer.build(builder -> {
 					builder.polygonIdentifier("Test", 2024);
@@ -1415,9 +1413,6 @@ class VdypStartApplicationTest {
 						spec5.getWholeStemVolumeByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
 						closeTo(0.00240394124f)
 				);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		}
 	}
@@ -1455,7 +1450,7 @@ class VdypStartApplicationTest {
 
 		@Test
 		void testGetCoeForSpecies() throws Exception {
-			var controlMap = TestUtils.loadControlMap();
+			controlMap = TestUtils.loadControlMap();
 			try (var app = new TestStartApplication(controlMap, false)) {
 				var species = TestSpecies.build(sb -> {
 					sb.polygonIdentifier("TestPolygon", 2024);
@@ -1512,8 +1507,8 @@ class VdypStartApplicationTest {
 	}
 
 	@Test
-	void testComputeUtilizationComponentsPrimaryByUtilNoCV() throws ProcessingException {
-		var controlMap = TestUtils.loadControlMap();
+	void testComputeUtilizationComponentsPrimaryByUtilNoCV() throws ProcessingException, IOException {
+		controlMap = TestUtils.loadControlMap();
 		try (var app = new TestStartApplication(controlMap, false)) {
 
 			var bec = BecDefinitionParser.getBecs(controlMap).get("IDF").get();
@@ -1703,9 +1698,6 @@ class VdypStartApplicationTest {
 					layer.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(),
 					utilization(0f, 65.4214401f, 2.34636664f, 35.7128258f, 21.2591972f, 6.10304976f)
 			);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 

@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -826,7 +827,7 @@ class VriStartTest {
 		@Nested
 		class ExpandIntervalOfRootFinder {
 			@Test
-			void testNoChange() throws StandProcessingException {
+			void testNoChange() throws StandProcessingException, IOException {
 
 				UnivariateFunction errorFunc = x -> x;
 
@@ -836,12 +837,14 @@ class VriStartTest {
 
 				var result = app.findInterval(xInterval, errorFunc);
 
+				app.close();
+
 				assertThat(result, equalTo(xInterval));
 
 			}
 
 			@Test
-			void testSimpleChange() throws StandProcessingException {
+			void testSimpleChange() throws StandProcessingException, IOException {
 
 				UnivariateFunction errorFunc = x -> x;
 
@@ -850,6 +853,8 @@ class VriStartTest {
 				VriStart app = new VriStart();
 
 				var result = app.findInterval(xInterval, errorFunc);
+
+				app.close();
 
 				var evaluated = result.evaluate(errorFunc);
 				assertTrue(
@@ -861,13 +866,15 @@ class VriStartTest {
 
 			@ParameterizedTest
 			@CsvSource({ "1, 1", "-1, 1", "1, -1", "-1, -1" })
-			void testDifficultChange(float a, float b) throws StandProcessingException {
+			void testDifficultChange(float a, float b) throws StandProcessingException, IOException {
 
 				UnivariateFunction errorFunc = x -> a * (Math.exp(b * x) - 0.000001);
 
 				var xInterval = new VriStart.Interval(-1, 1);
 
 				VriStart app = new VriStart();
+
+				app.close();
 
 				var result = app.findInterval(xInterval, errorFunc);
 
@@ -881,13 +888,15 @@ class VriStartTest {
 
 			@ParameterizedTest
 			@ValueSource(floats = { 1, -1, 20, -20 })
-			void testTwoRoots(float a) throws StandProcessingException {
+			void testTwoRoots(float a) throws StandProcessingException, IOException {
 
 				UnivariateFunction errorFunc = x -> a * (x * x - 0.5);
 
 				var xInterval = new VriStart.Interval(-1, 1);
 
 				VriStart app = new VriStart();
+
+				app.close();
 
 				var result = app.findInterval(xInterval, errorFunc);
 
@@ -901,7 +910,7 @@ class VriStartTest {
 
 			@ParameterizedTest
 			@CsvSource({ "1, 1", "-1, 1", "1, -1", "-1, -1" })
-			void testImpossible(float a, float b) throws StandProcessingException {
+			void testImpossible(float a, float b) throws StandProcessingException, IOException {
 
 				UnivariateFunction errorFunc = x -> a * (Math.exp(b * x) + 1);
 
@@ -909,7 +918,9 @@ class VriStartTest {
 
 				VriStart app = new VriStart();
 
-				var ex = assertThrows(NoBracketingException.class, () -> app.findInterval(xInterval, errorFunc));
+				app.close();
+
+				assertThrows(NoBracketingException.class, () -> app.findInterval(xInterval, errorFunc));
 
 			}
 
@@ -1769,6 +1780,8 @@ class VriStartTest {
 
 			var result = app.processPolygon(0, poly);
 
+			assertThat(result, notNullValue());
+
 			app.close();
 
 			control.verify();
@@ -1948,40 +1961,6 @@ class VriStartTest {
 				});
 			});
 
-			var polyYoung = VriPolygon.build(pb -> {
-				pb.polygonIdentifier("TestPolyYoung", 2024);
-				pb.biogeoclimaticZone("IDF");
-				pb.yieldFactor(1.0f);
-				pb.mode(mode);
-				pb.addLayer(lb -> {
-					lb.layerType(LayerType.PRIMARY);
-					lb.crownClosure(80f);
-					lb.utilization(0.6f);
-				});
-			});
-			var polyBatc = VriPolygon.build(pb -> {
-				pb.polygonIdentifier("TestPolyBatc", 2024);
-				pb.biogeoclimaticZone("IDF");
-				pb.yieldFactor(1.0f);
-				pb.mode(mode);
-				pb.addLayer(lb -> {
-					lb.layerType(LayerType.PRIMARY);
-					lb.crownClosure(80f);
-					lb.utilization(0.6f);
-				});
-			});
-			var polyBatn = VriPolygon.build(pb -> {
-				pb.polygonIdentifier("TestPolyBatn", 2024);
-				pb.biogeoclimaticZone("IDF");
-				pb.yieldFactor(1.0f);
-				pb.mode(mode);
-				pb.addLayer(lb -> {
-					lb.layerType(LayerType.PRIMARY);
-					lb.crownClosure(80f);
-					lb.utilization(0.6f);
-				});
-			});
-
 			EasyMock.expect(app.checkPolygon(poly)).andReturn(mode).once();
 			app.processPrimaryLayer(EasyMock.same(poly), EasyMock.anyObject(VdypLayer.Builder.class));
 			EasyMock.expectLastCall().andThrow(new StandProcessingException("Test Exception")).once();
@@ -1990,7 +1969,7 @@ class VriStartTest {
 
 			app.init(resolver, controlMap);
 
-			var ex = assertThrows(StandProcessingException.class, () -> app.processPolygon(0, poly));
+			assertThrows(StandProcessingException.class, () -> app.processPolygon(0, poly));
 
 			app.close();
 
@@ -2174,12 +2153,6 @@ class VriStartTest {
 							utilization(4.69123125f, 48.2258606f, 30.9160728f, 12.1659298f, 3.54732919f, 1.59653044f)
 					)
 			);
-
-			var wsv = Utils.wsvArray(resultLayer);
-			var cuv = Utils.cuvArray(resultLayer);
-			var cuvd = Utils.cuvdArray(resultLayer);
-			var cuvdw = Utils.cuvdwArray(resultLayer);
-			var cuvdwb = Utils.cuvdwbArray(resultLayer);
 
 			assertThat(
 					resultSpecB,
