@@ -640,7 +640,7 @@ class VriStartTest {
 
 				var resultPerSpecies = new HashMap<String, Float>();
 
-				for (float x = -3.9f; x <= 2; x += 0.01) {
+				for (float x = -3.9f; x <= 2f; x += 0.01f) {
 
 					float result = app.quadMeanDiameterFractionalError(
 							x, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph
