@@ -2,20 +2,19 @@
 				 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>vdyp-sindex</artifactId>
+  <artifactId>vdyp-si32</artifactId>
   
   
-  <name>Variable Density Yield Project - Sindex</name>
+  <name>Variable Density Yield Project - SI32</name>
   <url>http://maven.apache.org</url>
 
   <parent>
     <groupId>ca.bc.gov.nrs.vdyp</groupId>
-    <artifactId>vdyp-parent</artifactId>
+    <artifactId>vdyp-lib</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
-
-  	<build>
+  <build>
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -38,6 +37,17 @@
 			<groupId>ca.bc.gov.nrs.vdyp</groupId>
 			<artifactId>vdyp-common</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>ca.bc.gov.nrs.vdyp</groupId>
+			<artifactId>vdyp-sindex</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-lang3</artifactId>
 		</dependency>
 
 		<dependency>
