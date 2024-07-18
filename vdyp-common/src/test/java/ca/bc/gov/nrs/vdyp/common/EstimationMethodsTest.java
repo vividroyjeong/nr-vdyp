@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
+import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
@@ -434,84 +435,187 @@ class EstimationMethodsTest {
 
 	}
 
-	@Test
-	void testEstimateQuadMeanDiameterForSpecies() throws Exception {
+	@Nested
+	class EstimateQuadMeanDiameterForSpecies {
+		@Test
+		void testSimple() throws Exception {
 
-		var layer = VdypLayer.build(builder -> {
-			builder.polygonIdentifier("Test", 2024);
-			builder.layerType(LayerType.PRIMARY);
-			builder.addSite(siteBuilder -> {
-				siteBuilder.ageTotal(55f);
-				siteBuilder.yearsToBreastHeight(1f);
-				siteBuilder.height(32.2999992f);
-				siteBuilder.siteGenus("H");
+			var layer = VdypLayer.build(builder -> {
+				builder.polygonIdentifier("Test", 2024);
+				builder.layerType(LayerType.PRIMARY);
+				builder.addSite(siteBuilder -> {
+					siteBuilder.ageTotal(55f);
+					siteBuilder.yearsToBreastHeight(1f);
+					siteBuilder.height(32.2999992f);
+					siteBuilder.siteGenus("H");
+				});
 			});
-		});
 
-		// sp 3, 4, 5, 8, 15
-		// sp B, C, D, H, S
-		var spec1 = VdypSpecies.build(layer, builder -> {
-			builder.genus("B");
-			builder.volumeGroup(12);
-			builder.decayGroup(7);
-			builder.breakageGroup(5);
-			builder.percentGenus(1f);
-		});
-		spec1.getLoreyHeightByUtilization().setCoe(0, 38.7456512f);
-		spec1.setFractionGenus(0.00817133673f);
+			// sp 3, 4, 5, 8, 15
+			// sp B, C, D, H, S
+			var spec1 = VdypSpecies.build(layer, builder -> {
+				builder.genus("B");
+				builder.volumeGroup(12);
+				builder.decayGroup(7);
+				builder.breakageGroup(5);
+				builder.percentGenus(1f);
+			});
+			spec1.getLoreyHeightByUtilization().setCoe(0, 38.7456512f);
+			spec1.setFractionGenus(0.00817133673f);
 
-		var spec2 = VdypSpecies.build(layer, builder -> {
-			builder.genus("C");
-			builder.volumeGroup(20);
-			builder.decayGroup(14);
-			builder.breakageGroup(6);
-			builder.percentGenus(7f);
-		});
-		spec2.getLoreyHeightByUtilization().setCoe(0, 22.8001652f);
-		spec2.setFractionGenus(0.0972022042f);
+			var spec2 = VdypSpecies.build(layer, builder -> {
+				builder.genus("C");
+				builder.volumeGroup(20);
+				builder.decayGroup(14);
+				builder.breakageGroup(6);
+				builder.percentGenus(7f);
+			});
+			spec2.getLoreyHeightByUtilization().setCoe(0, 22.8001652f);
+			spec2.setFractionGenus(0.0972022042f);
 
-		var spec3 = VdypSpecies.build(layer, builder -> {
-			builder.genus("D");
-			builder.volumeGroup(25);
-			builder.decayGroup(19);
-			builder.breakageGroup(12);
-			builder.percentGenus(74f);
-		});
-		spec3.getLoreyHeightByUtilization().setCoe(0, 33.6889763f);
-		spec3.setFractionGenus(0.695440531f);
+			var spec3 = VdypSpecies.build(layer, builder -> {
+				builder.genus("D");
+				builder.volumeGroup(25);
+				builder.decayGroup(19);
+				builder.breakageGroup(12);
+				builder.percentGenus(74f);
+			});
+			spec3.getLoreyHeightByUtilization().setCoe(0, 33.6889763f);
+			spec3.setFractionGenus(0.695440531f);
 
-		var spec4 = VdypSpecies.build(layer, builder -> {
-			builder.genus("H");
-			builder.volumeGroup(37);
-			builder.decayGroup(31);
-			builder.breakageGroup(17);
-			builder.percentGenus(9f);
-		});
-		spec4.getLoreyHeightByUtilization().setCoe(0, 24.3451157f);
-		spec4.setFractionGenus(0.117043354f);
+			var spec4 = VdypSpecies.build(layer, builder -> {
+				builder.genus("H");
+				builder.volumeGroup(37);
+				builder.decayGroup(31);
+				builder.breakageGroup(17);
+				builder.percentGenus(9f);
+			});
+			spec4.getLoreyHeightByUtilization().setCoe(0, 24.3451157f);
+			spec4.setFractionGenus(0.117043354f);
 
-		var spec5 = VdypSpecies.build(layer, builder -> {
-			builder.genus("S");
-			builder.volumeGroup(66);
-			builder.decayGroup(54);
-			builder.breakageGroup(28);
-			builder.percentGenus(9f);
-		});
-		spec5.getLoreyHeightByUtilization().setCoe(0, 34.6888771f);
-		spec5.setFractionGenus(0.082142584f);
+			var spec5 = VdypSpecies.build(layer, builder -> {
+				builder.genus("S");
+				builder.volumeGroup(66);
+				builder.decayGroup(54);
+				builder.breakageGroup(28);
+				builder.percentGenus(9f);
+			});
+			spec5.getLoreyHeightByUtilization().setCoe(0, 34.6888771f);
+			spec5.setFractionGenus(0.082142584f);
 
-		Map<String, VdypSpecies> specs = new HashMap<>();
-		specs.put(spec1.getGenus(), spec1);
-		specs.put(spec2.getGenus(), spec2);
-		specs.put(spec3.getGenus(), spec3);
-		specs.put(spec4.getGenus(), spec4);
-		specs.put(spec5.getGenus(), spec5);
+			Map<String, VdypSpecies> specs = new HashMap<>();
+			specs.put(spec1.getGenus(), spec1);
+			specs.put(spec2.getGenus(), spec2);
+			specs.put(spec3.getGenus(), spec3);
+			specs.put(spec4.getGenus(), spec4);
+			specs.put(spec5.getGenus(), spec5);
 
-		float dq = emp.estimateQuadMeanDiameterForSpecies(
-				spec1, specs, Region.COASTAL, 30.2601795f, 44.6249847f, 620.504883f, 31.6603775f
-		);
+			float dq = emp.estimateQuadMeanDiameterForSpecies(
+					spec1, specs, Region.COASTAL, 30.2601795f, 44.6249847f, 620.504883f, 31.6603775f
+			);
 
-		assertThat(dq, closeTo(31.7022133f));
+			assertThat(dq, closeTo(31.7022133f));
+
+		}
+
+		@Test
+		void testClampSimple() throws Exception {
+			var limits = new EstimationMethods.Limits(48.3f, 68.7f, 0.729f, 1.718f);
+			float standTreesPerHectare = 620.5049f;
+			float minQuadMeanDiameter = 7.6f;
+			float loreyHeightSpec = 38.74565f;
+			float baseArea1 = 0.36464578f;
+			float baseArea2 = 44.260338f;
+			float quadMeanDiameter1 = 31.697449f;
+			float treesPerHectare2 = 615.8839f;
+			float quadMeanDiameter2 = 30.249138f;
+
+			float dq = emp.estimateQuadMeanDiameterClampResult(
+					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
+					quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+			);
+
+			assertThat(dq, is(quadMeanDiameter1));
+
+		}
+
+		@Test
+		void testClampToLow2() throws Exception {
+			var limits = new EstimationMethods.Limits(48.3f, 68.7f, 0.729f, 1.718f);
+			float standTreesPerHectare = 620.5049f;
+			float minQuadMeanDiameter = 7.6f;
+			float loreyHeightSpec = 38.74565f;
+
+			float baseArea1 = 44.36464578f;
+			float baseArea2 = 0.1f;
+
+			float quadMeanDiameter2 = 7.3f; // Less than minQuadMeanDiameter 7.6
+
+			float treesPerHectare2 = BaseAreaTreeDensityDiameter.treesPerHectare(baseArea2, quadMeanDiameter2);
+			float treesPerHectare1 = standTreesPerHectare - treesPerHectare2;
+
+			float quadMeanDiameter1 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea1, treesPerHectare1);
+
+			float dq = emp.estimateQuadMeanDiameterClampResult(
+					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
+					quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+			);
+
+			assertThat(dq, closeTo(30.722431f));
+
+		}
+
+		@Test
+		void testClampToLow1() throws Exception {
+			var limits = new EstimationMethods.Limits(48.3f, 68.7f, 0.729f, 1.718f);
+			float standTreesPerHectare = 620.5049f;
+			float minQuadMeanDiameter = 7.6f;
+			float loreyHeightSpec = 38.74565f;
+
+			float baseArea1 = 30f;
+			float baseArea2 = 10f;
+
+			float quadMeanDiameter1 = 26f; // Less than computed min of 28.245578
+
+			float treesPerHectare1 = BaseAreaTreeDensityDiameter.treesPerHectare(baseArea1, quadMeanDiameter1);
+			float treesPerHectare2 = standTreesPerHectare - treesPerHectare1;
+
+			float quadMeanDiameter2 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea2, treesPerHectare2);
+
+			float dq = emp.estimateQuadMeanDiameterClampResult(
+					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
+					quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+			);
+
+			assertThat(dq, closeTo(28.245578f));
+
+		}
+
+		@Test
+		void testClampToHigh1() throws Exception {
+			var limits = new EstimationMethods.Limits(48.3f, 68.7f, 0.729f, 1.718f);
+			float standTreesPerHectare = 620.5049f;
+			float minQuadMeanDiameter = 7.6f;
+			float loreyHeightSpec = 38.74565f;
+
+			float baseArea1 = 30f;
+			float baseArea2 = 10f;
+
+			float quadMeanDiameter1 = 70f; // More than than computed max of 66.565033
+
+			float treesPerHectare1 = BaseAreaTreeDensityDiameter.treesPerHectare(baseArea1, quadMeanDiameter1);
+			float treesPerHectare2 = standTreesPerHectare - treesPerHectare1;
+
+			float quadMeanDiameter2 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea2, treesPerHectare2);
+
+			float dq = emp.estimateQuadMeanDiameterClampResult(
+					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
+					quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+			);
+
+			assertThat(dq, closeTo(66.565033f));
+
+		}
 
 	}
 

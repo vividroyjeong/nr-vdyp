@@ -317,7 +317,20 @@ public class EstimationMethods {
 		float quadMeanDiameter1 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea1, treesPerHectare1);
 		float treesPerHectare2 = standTreesPerHectare - treesPerHectare1;
 		float quadMeanDiameter2 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea2, treesPerHectare2);
+		var limits = getLimitsForHeightAndDiameter(species, region);
 
+		quadMeanDiameter1 = estimateQuadMeanDiameterClampResult(
+				limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
+				quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+		);
+		return quadMeanDiameter1;
+	}
+
+	float estimateQuadMeanDiameterClampResult(
+			Limits limits, float standTreesPerHectare, float minQuadMeanDiameter, float loreyHeightSpec,
+			float baseArea1, float baseArea2, float quadMeanDiameter1, float treesPerHectare2, float quadMeanDiameter2
+	) {
+		float treesPerHectare1;
 		if (quadMeanDiameter2 < minQuadMeanDiameter) {
 			// species 2 is too small. Make target species smaller.
 			quadMeanDiameter2 = minQuadMeanDiameter;
@@ -325,7 +338,6 @@ public class EstimationMethods {
 			treesPerHectare1 = standTreesPerHectare - treesPerHectare2;
 			quadMeanDiameter1 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea1, treesPerHectare1);
 		}
-		var limits = getLimitsForHeightAndDiameter(species, region);
 
 		final float dqMinSp = max(minQuadMeanDiameter, limits.minDiameterHeight() * loreyHeightSpec);
 		final float dqMaxSp = max(
