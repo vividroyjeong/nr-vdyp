@@ -59,6 +59,7 @@ import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
+import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.VolumeComputeMode;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
@@ -1413,6 +1414,64 @@ class VdypStartApplicationTest {
 						spec5.getWholeStemVolumeByUtilization().getCoe(VdypStartApplication.UTIL_SMALL),
 						closeTo(0.00240394124f)
 				);
+			}
+		}
+	}
+
+	@Nested
+	class ApplyGroups {
+
+		@Test
+		void testApplyToBuilder() throws Exception {
+			controlMap = TestUtils.loadControlMap();
+			var bec = Utils.getBec("IDF", controlMap);
+
+			try (var app = new TestStartApplication(controlMap, false)) {
+
+				var result = VdypSpecies.build(sb -> {
+					sb.polygonIdentifier("Test", 2024);
+					sb.layerType(LayerType.PRIMARY);
+					sb.genus("B");
+					sb.percentGenus(100);
+					app.applyGroups(bec, "B", sb);
+				});
+
+				assertThat(result, hasProperty("volumeGroup", is(15)));
+				assertThat(result, hasProperty("decayGroup", is(11)));
+				assertThat(result, hasProperty("breakageGroup", is(4)));
+			}
+		}
+
+		@Test
+		void testApplyToObject() throws Exception {
+			controlMap = TestUtils.loadControlMap();
+			var bec = Utils.getBec("IDF", controlMap);
+
+			try (var app = new TestStartApplication(controlMap, false)) {
+				var poly = VdypPolygon.build(pb -> {
+					pb.polygonIdentifier("Test", 2024);
+					pb.percentAvailable(90f);
+					pb.biogeoclimaticZone("IDF");
+					pb.forestInventoryZone("");
+					pb.addLayer(lb -> {
+						lb.layerType(LayerType.PRIMARY);
+						lb.addSpecies(sb -> {
+							sb.genus("B");
+							sb.percentGenus(100);
+
+							sb.volumeGroup(0);
+							sb.decayGroup(0);
+							sb.breakageGroup(0);
+						});
+					});
+				});
+				var spec = poly.getLayers().get(LayerType.PRIMARY).getSpecies().get("B");
+
+				app.applyGroups(poly, poly.getLayers().get(LayerType.PRIMARY).getSpecies().values());
+
+				assertThat(spec, hasProperty("volumeGroup", is(15)));
+				assertThat(spec, hasProperty("decayGroup", is(11)));
+				assertThat(spec, hasProperty("breakageGroup", is(4)));
 			}
 		}
 	}
