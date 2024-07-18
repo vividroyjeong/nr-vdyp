@@ -6,6 +6,7 @@ import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeTyp
 import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_TOTAL;
 import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEstimationType.*;
 
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMaximumException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMinimumException;
@@ -129,14 +130,12 @@ public class Height2SiteIndex {
 					index = ppow( (index + 1.73) / 3.149, 1.2079);
 					break;
 				case SI_FDI_MILNER:
-					/* convert to imperial */
-					height /= 0.3048;
-
-					index = 57.3 + (7.06 + 0.02275 * bhage - 1.858 * Math.log(bhage) + 5.496 / (bhage * bhage))
-							* (height - 4.5 - 114.6 * Math.pow(1 - Math.exp(-0.01462 * bhage), 1.179));
-
-					/* convert back to metric */
-					index *= 0.3048;
+					index = Utils.computeInFeet(
+							height,
+							heightFt -> 57.3
+									+ (7.06 + 0.02275 * bhage - 1.858 * Math.log(bhage) + 5.496 / (bhage * bhage))
+											* (heightFt - 4.5 - 114.6 * Math.pow(1 - Math.exp(-0.01462 * bhage), 1.179))
+					);
 					break;
 				case SI_FDI_THROWER:
 					index = 0.39 + 0.3104 * height + 33.3828 * height / bhage;
@@ -156,14 +155,12 @@ public class Height2SiteIndex {
 				// #undef LW_MILNER Removed since never used again?
 				// #define LW_MILNER 1 Removed since never used again?
 				case SI_LW_MILNER:
-					/* convert to imperial */
-					height /= 0.3048;
-
-					index = 69.0 + (-0.8019 + 17.06 / bhage + 0.4268 * Math.log(bhage) - 0.00009635 * bhage * bhage)
-							* (height - 4.5 - 127.8 * Math.pow(1 - Math.exp(-0.01655 * bhage), 1.196));
-
-					/* convert back to metric */
-					index *= 0.3048;
+					index = Utils.computeInFeet(
+							height,
+							heightFt -> 69.0
+									+ (-0.8019 + 17.06 / bhage + 0.4268 * Math.log(bhage) - 0.00009635 * bhage * bhage)
+											* (heightFt - 4.5 - 127.8 * Math.pow(1 - Math.exp(-0.01655 * bhage), 1.196))
+					);
 					break;
 				case SI_PLI_DEMPSTER:
 					logBhAge = Math.log(bhage);
@@ -174,37 +171,29 @@ public class Height2SiteIndex {
 							+ 8.2281 * ht13 / bhage - 0.2569 * ht13 * llog(ht13);
 					break;
 				case SI_PLI_MILNER:
-					/* convert to imperial */
-					height /= 0.3048;
-
-					index = 59.6 + (1.055 - 0.006344 * bhage + 14.82 / bhage - 5.212 / (bhage * bhage))
-							* (height - 4.5 - 96.93 * Math.pow(1 - Math.exp(-0.01955 * bhage), 1.216));
-
-					/* convert back to metric */
-					index *= 0.3048;
+					index = Utils.computeInFeet(
+							height,
+							heightFt -> 59.6 + (1.055 - 0.006344 * bhage + 14.82 / bhage - 5.212 / (bhage * bhage))
+									* (heightFt - 4.5 - 96.93 * Math.pow(1 - Math.exp(-0.01955 * bhage), 1.216))
+					);
 					break;
 				case SI_PY_MILNER:
-					/* convert to imperial */
-					height /= 0.3048;
-
-					index = 59.6 + (4.787 + 0.012544 * bhage - 1.141 * Math.log(bhage) + 11.44 / (bhage * bhage))
-							* (height - 4.5 - 121.4 * Math.pow(1 - Math.exp(-0.01756 * bhage), 1.483));
-
-					/* convert back to metric */
-					index *= 0.3048;
+					index = Utils.computeInFeet(
+							height,
+							heightFt -> 59.6
+									+ (4.787 + 0.012544 * bhage - 1.141 * Math.log(bhage) + 11.44 / (bhage * bhage))
+											* (heightFt - 4.5 - 121.4 * Math.pow(1 - Math.exp(-0.01756 * bhage), 1.483))
+					);
 					break;
 				case SI_PW_CURTIS:
-					/* convert to imperial */
-					height /= 0.3048;
-
 					x1 = Math.log(bhage) - Math.log(50.0);
 					x2 = x1 * x1;
 
-					index = Math.exp(-2.608801 * x1 - 0.715601 * x2)
-							* Math.pow(height, 1.0 + 0.408404 * x1 + 0.138199 * x2);
-
-					/* convert back to metric */
-					index *= 0.3048;
+					index = Utils.computeInFeet(
+							height,
+							heightFt -> Math.exp(-2.608801 * x1 - 0.715601 * x2)
+									* Math.pow(heightFt, 1.0 + 0.408404 * x1 + 0.138199 * x2)
+					);
 					break;
 				case SI_SW_HU_GARCIA: {
 					double q;
@@ -255,99 +244,42 @@ public class Height2SiteIndex {
 							+ 0.4374 * llog(height - 1.3) / bhage;
 					break;
 				case SI_FDI_VDP_MONT:
-					/* convert to imperial */
-					height /= 0.3048;
-
-					index = 4.5 + 111.832 + 0.721 * (height - 4.5) - 28.2175 * Math.log(bhage)
-							- 731.551 / (bhage * bhage) + 13.164 * (height - 4.5) / bhage;
-
-					/* convert back to metric */
-					index *= 0.3048;
+					index = Utils.computeInFeet(
+							height,
+							heightFt -> 4.5 + 111.832 + 0.721 * (heightFt - 4.5) - 28.2175 * Math.log(bhage)
+									- 731.551 / (bhage * bhage) + 13.164 * (heightFt - 4.5) / bhage
+					);
 					break;
 				case SI_FDI_VDP_WASH:
-					/* convert to imperial */
-					height /= 0.3048;
-
-					index = 4.5 + 146.274 + 0.809 * (height - 4.5) - 37.218 * Math.log(bhage)
-							- 1064.4055 / (bhage * bhage) + 9.511 * (height - 4.5) / bhage;
-
-					/* convert back to metric */
-					index *= 0.3048;
+					index = Utils.computeInFeet(
+							height,
+							heightFt -> 4.5 + 146.274 + 0.809 * (heightFt - 4.5) - 37.218 * Math.log(bhage)
+									- 1064.4055 / (bhage * bhage) + 9.511 * (heightFt - 4.5) / bhage
+					);
 					break;
 				case SI_FDI_MONS_DF:
-					/* convert to imperial */
-					height /= 0.3048;
-
 					x1 = 0.4948;
 					x2 = 25.315;
 
 					logBhAge = Math.log(bhage);
 
-					index = 4.5 + 38.787 - 2.805 * logBhAge * logBhAge + 0.0216 * bhage * logBhAge + x1 * height
-							+ x2 * height / bhage;
-
-					/* convert back to metric */
-					index *= 0.3048;
+					index = Utils.computeInFeet(
+							height,
+							heightFt -> 4.5 + 38.787 - 2.805 * logBhAge * logBhAge + 0.0216 * bhage * logBhAge
+									+ x1 * heightFt + x2 * heightFt / bhage
+					);
 					break;
-				case SI_FDI_MONS_GF:
-					/* convert to imperial */
-					height /= 0.3048;
-
+				case SI_FDI_MONS_GF, SI_FDI_MONS_WRC:
 					x1 = 0.4305;
 					x2 = 28.415;
 
-					logBhAge = Math.log(bhage);
-
-					index = 4.5 + 38.787 - 2.805 * logBhAge * logBhAge + 0.0216 * bhage * logBhAge + x1 * height
-							+ x2 * height / bhage;
-
-					/* convert back to metric */
-					index *= 0.3048;
+					index = siFdiMons(bhage, height, x1, x2);
 					break;
-				case SI_FDI_MONS_WRC:
-					/* convert to imperial */
-					height /= 0.3048;
-
-					x1 = 0.4305;
-					x2 = 28.415;
-
-					logBhAge = Math.log(bhage);
-
-					index = 4.5 + 38.787 - 2.805 * logBhAge * logBhAge + 0.0216 * bhage * logBhAge + x1 * height
-							+ x2 * height / bhage;
-
-					/* convert back to metric */
-					index *= 0.3048;
-					break;
-				case SI_FDI_MONS_WH:
-					/* convert to imperial */
-					height /= 0.3048;
-
+				case SI_FDI_MONS_WH, SI_FDI_MONS_SAF:
 					x1 = 0.3964;
 					x2 = 30.008;
 
-					logBhAge = Math.log(bhage);
-
-					index = 4.5 + 38.787 - 2.805 * logBhAge * logBhAge + 0.0216 * bhage * logBhAge + x1 * height
-							+ x2 * height / bhage;
-
-					/* convert back to metric */
-					index *= 0.3048;
-					break;
-				case SI_FDI_MONS_SAF:
-					/* convert to imperial */
-					height /= 0.3048;
-
-					x1 = 0.3964;
-					x2 = 30.008;
-
-					logBhAge = Math.log(bhage);
-
-					index = 4.5 + 38.787 - 2.805 * logBhAge * logBhAge + 0.0216 * bhage * logBhAge + x1 * height
-							+ x2 * height / bhage;
-
-					/* convert back to metric */
-					index *= 0.3048;
+					index = siFdiMons(bhage, height, x1, x2);
 					break;
 				case SI_FDI_NIGHGI:
 					switch ((int) bhage) {
@@ -3817,6 +3749,19 @@ public class Height2SiteIndex {
 			} else
 				index = siteIterate(cuIndex, bhage, SI_AT_BREAST, height);
 		}
+		return index;
+	}
+
+	private static double siFdiMons(double bhage, double height, double x1, double x2) {
+		double index;
+		double logBhAge;
+		logBhAge = Math.log(bhage);
+
+		index = Utils.computeInFeet(
+				height,
+				heightFt -> 4.5 + 38.787 - 2.805 * logBhAge * logBhAge + 0.0216 * bhage * logBhAge + x1 * heightFt
+						+ x2 * heightFt / bhage
+		);
 		return index;
 	}
 
