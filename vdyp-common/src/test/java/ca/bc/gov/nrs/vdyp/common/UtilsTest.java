@@ -2,6 +2,8 @@ package ca.bc.gov.nrs.vdyp.common;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayContaining;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
@@ -15,6 +17,9 @@ import java.util.List;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 
 class UtilsTest {
 
@@ -127,6 +132,49 @@ class UtilsTest {
 		void testFromSingleValue() {
 			var unit = Utils.utilizationVector(5f);
 			assertThat(unit, coe(-1, 0f, 5f, 0f, 0f, 0f, 5f));
+		}
+	}
+
+	@Nested
+	class UtilizationVectorAsArray {
+		@Test
+		void testFromSingleValue() {
+			var layer = VdypLayer.build(lb -> {
+				lb.polygonIdentifier("Test", 2024);
+				lb.layerType(LayerType.PRIMARY);
+
+				lb.baseArea(0.7f, 0.9f, 1.1f, 1.3f, 1.5f);
+
+				lb.addSpecies(sb -> {
+					sb.genus("B");
+					sb.baseArea(0.1f, 0.2f, 0.3f, 0.4f, 0.5f);
+					sb.percentGenus(40);
+					sb.volumeGroup(42);
+					sb.decayGroup(42);
+					sb.breakageGroup(42);
+				});
+				lb.addSpecies(sb -> {
+					sb.genus("C");
+					sb.baseArea(0.6f, 0.7f, 0.8f, 0.9f, 1f);
+					sb.percentGenus(60);
+					sb.volumeGroup(42);
+					sb.decayGroup(42);
+					sb.breakageGroup(42);
+				});
+			});
+			var unit = Utils.baArray(layer);
+			assertThat(
+					unit, equalTo(
+							new float[][] { //
+									{ 0.7f, 0.1f, 0.6f }, //
+									{ 4.8f, 1.4f, 3.4f }, //
+									{ 0.9f, 0.2f, 0.7f }, //
+									{ 1.1f, 0.3f, 0.8f }, //
+									{ 1.3f, 0.4f, 0.9f }, //
+									{ 1.5f, 0.5f, 1.0f } //
+							}
+					)
+			);
 		}
 	}
 }
