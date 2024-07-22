@@ -446,7 +446,9 @@ public class Utils {
 	public static final double METRES_PER_FOOT = 0.3048f;
 
 	/**
-	 * Converts the given value from metres to feet, does the given operation, and converts the result from feet to metres.
+	 * Converts the given value from metres to feet, does the given operation, and converts the result from feet to
+	 * metres.
+	 *
 	 * @param value
 	 * @param operation
 	 * @return

@@ -6,6 +6,9 @@ import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeTyp
 import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_TOTAL;
 import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEstimationType.*;
 
+import java.util.function.DoubleBinaryOperator;
+import java.util.function.DoubleUnaryOperator;
+
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMaximumException;
@@ -273,13 +276,13 @@ public class Height2SiteIndex {
 					x1 = 0.4305;
 					x2 = 28.415;
 
-					index = siFdiMons(bhage, height, x1, x2);
+					index = findSiteIndex1(bhage, height, x1, x2);
 					break;
 				case SI_FDI_MONS_WH, SI_FDI_MONS_SAF:
 					x1 = 0.3964;
 					x2 = 30.008;
 
-					index = siFdiMons(bhage, height, x1, x2);
+					index = findSiteIndex1(bhage, height, x1, x2);
 					break;
 				case SI_FDI_NIGHGI:
 					switch ((int) bhage) {
@@ -488,14 +491,7 @@ public class Height2SiteIndex {
 						x2 = 0;
 						break;
 					}
-					if (x1 == 0) {
-						throw new GrowthInterceptMaximumException(
-								"Variable height growth intercept formulation, bhage > range: " + x1
-						);
-					} else {
-						index = (height - 1.3) * 100 / (bhage - 0.5);
-						index = 1.3 + x1 * ppow(index, x2);
-					}
+					index = findSiteIndex2(bhage, height, x1, x2);
 					break;
 				case SI_PLI_NIGHGI97:
 					switch ((int) bhage) {
@@ -704,14 +700,7 @@ public class Height2SiteIndex {
 						x2 = 0;
 						break;
 					}
-					if (x1 == 0) {
-						throw new GrowthInterceptMaximumException(
-								"Variable height growth intercept formulation, bhage > range: " + x1
-						);
-					} else {
-						index = (height - 1.3) * 100 / (bhage - 0.5);
-						index = 1.3 + x1 * ppow(index, x2);
-					}
+					index = findSiteIndex2(bhage, height, x1, x2);
 					break;
 				/*
 				 * This section has been commented out since I cannot find the constant anywhere and this was surronded
@@ -866,14 +855,7 @@ public class Height2SiteIndex {
 						x2 = 0;
 						break;
 					}
-					if (x1 == 0) {
-						throw new GrowthInterceptMaximumException(
-								"Variable height growth intercept formulation, bhage > range: " + x1
-						);
-					} else {
-						index = (height - 1.3) * 100 / (bhage - 0.5);
-						index = x1 + x2 * index;
-					}
+					index = findSiteIndexCommon(bhage, height, x1, 100, index2 -> x1 + x2 * index2);
 					break;
 				case SI_SW_NIGHGI99:
 					switch ((int) bhage) {
@@ -1082,14 +1064,7 @@ public class Height2SiteIndex {
 						x2 = 0;
 						break;
 					}
-					if (x1 == 0) {
-						throw new GrowthInterceptMaximumException(
-								"Variable height growth intercept formulation, bhage > range: " + x1
-						);
-					} else {
-						index = (height - 1.3) * 100 / (bhage - 0.5);
-						index = 1.3 + x1 * ppow(index, x2);
-					}
+					index = findSiteIndex2(bhage, height, x1, x2);
 					break;
 				case SI_SW_NIGHGI2004:
 					switch ((int) bhage) {
@@ -1298,14 +1273,7 @@ public class Height2SiteIndex {
 						x2 = 0;
 						break;
 					}
-					if (x1 == 0) {
-						throw new GrowthInterceptMaximumException(
-								"Variable height growth intercept formulation, bhage > range: " + x1
-						);
-					} else {
-						index = (height - 1.3) * 100 / (bhage - 0.5);
-						index = 1.3 + x1 * ppow(index, x2);
-					}
+					index = findSiteIndex2(bhage, height, x1, x2);
 					break;
 				case SI_HWC_NIGHGI99:
 					switch ((int) bhage) {
@@ -1514,14 +1482,7 @@ public class Height2SiteIndex {
 						x2 = 0;
 						break;
 					}
-					if (x1 == 0) {
-						throw new GrowthInterceptMaximumException(
-								"Variable height growth intercept formulation, bhage > range: " + x1
-						);
-					} else {
-						index = (height - 1.3) * 100 / (bhage - 0.5);
-						index = 1.3 + x1 * ppow(index, x2);
-					}
+					index = findSiteIndex2(bhage, height, x1, x2);
 					break;
 				case SI_HWC_NIGHGI:
 					switch ((int) bhage) {
@@ -1651,14 +1612,7 @@ public class Height2SiteIndex {
 						break;
 
 					}
-					if (x1 == 0) {
-						throw new GrowthInterceptMaximumException(
-								"Variable height growth intercept formulation, bhage > range: " + x1
-						);
-					} else {
-						index = (height - 1.3) * 100 / (bhage - 0.5);
-						index = x1 * ppow(index, x2);
-					}
+					index = findeSiteIndex3(bhage, height, x1, x2);
 					break;
 				case SI_HWI_NIGHGI:
 					switch ((int) bhage) {
@@ -1868,14 +1822,7 @@ public class Height2SiteIndex {
 						break;
 
 					}
-					if (x1 == 0) {
-						throw new GrowthInterceptMaximumException(
-								"Variable height growth intercept formulation, bhage > range: " + x1
-						);
-					} else {
-						index = (height - 1.3) * 100 / (bhage - 0.5);
-						index = 1.3 + x1 * ppow(index, x2);
-					}
+					index = findSiteIndex2(bhage, height, x1, x2);
 					break;
 				case SI_FDC_NIGHGI:
 					switch ((int) bhage) {
@@ -2084,14 +2031,7 @@ public class Height2SiteIndex {
 						x2 = 0;
 						break;
 					}
-					if (x1 == 0) {
-						throw new GrowthInterceptMaximumException(
-								"Variable height growth intercept formulation, bhage > range: " + x1
-						);
-					} else {
-						index = (height - 1.3) * 100 / (bhage - 0.5);
-						index = 1.3 + x1 * ppow(index, x2);
-					}
+					index = findSiteIndex2(bhage, height, x1, x2);
 					break;
 				case SI_SE_NIGHGI:
 					switch ((int) bhage) {
@@ -2300,14 +2240,7 @@ public class Height2SiteIndex {
 						x2 = 0;
 						break;
 					}
-					if (x1 == 0) {
-						throw new GrowthInterceptMaximumException(
-								"Variable height growth intercept formulation, bhage > range: " + x1
-						);
-					} else {
-						index = (height - 1.3) / (bhage - 0.5);
-						index = 1.3 + x1 * ppow(index, x2);
-					}
+					index = findSiteIndexCommon(bhage, height, x1, 1, index1 -> 1.3 + x1 * ppow(index1, x2));
 					break;
 				case SI_SS_NIGHGI:
 					switch ((int) bhage) {
@@ -2437,14 +2370,7 @@ public class Height2SiteIndex {
 						break;
 
 					}
-					if (x1 == 0) {
-						throw new GrowthInterceptMaximumException(
-								"Variable height growth intercept formulation, bhage > range: " + x1
-						);
-					} else {
-						index = (height - 1.3) * 100 / (bhage - 0.5);
-						index = x1 * ppow(index, x2);
-					}
+					index = findeSiteIndex3(bhage, height, x1, x2);
 					break;
 				case SI_SS_NIGHGI99:
 					switch ((int) bhage) {
@@ -2653,14 +2579,7 @@ public class Height2SiteIndex {
 						x2 = 0;
 						break;
 					}
-					if (x1 == 0) {
-						throw new GrowthInterceptMaximumException(
-								"Variable height growth intercept formulation, bhage > range: " + x1
-						);
-					} else {
-						index = (height - 1.3) * 100 / (bhage - 0.5);
-						index = 1.3 + x1 * ppow(index, x2);
-					}
+					index = findSiteIndex2(bhage, height, x1, x2);
 					break;
 				case SI_CWI_NIGHGI:
 					switch ((int) bhage) {
@@ -2869,14 +2788,7 @@ public class Height2SiteIndex {
 						x2 = 0;
 						break;
 					}
-					if (x1 == 0) {
-						throw new GrowthInterceptMaximumException(
-								"Variable height growth intercept formulation, bhage > range: " + x1
-						);
-					} else {
-						index = (height - 1.3) * 100 / (bhage - 0.5);
-						index = 1.3 + x1 * ppow(index, x2);
-					}
+					index = findSiteIndex2(bhage, height, x1, x2);
 					break;
 				case SI_LW_NIGHGI:
 					switch ((int) bhage) {
@@ -3085,14 +2997,7 @@ public class Height2SiteIndex {
 						x2 = 0;
 						break;
 					}
-					if (x1 == 0) {
-						throw new GrowthInterceptMaximumException(
-								"Variable height growth intercept formulation, bhage > range: " + x1
-						);
-					} else {
-						index = (height - 1.3) * 100 / (bhage - 0.5);
-						index = 1.3 + x1 * ppow(index, x2);
-					}
+					index = findSiteIndex2(bhage, height, x1, x2);
 					break;
 				case SI_PY_NIGHGI:
 					switch ((int) bhage) {
@@ -3301,14 +3206,7 @@ public class Height2SiteIndex {
 						x2 = 0;
 						break;
 					}
-					if (x1 == 0)
-						throw new GrowthInterceptMaximumException(
-								"Variable height growth intercept formulation, bhage > range: " + x1
-						);
-					else {
-						index = (height - 1.3) * 100 / (bhage - 0.5);
-						index = 1.3 + x1 * ppow(index, x2);
-					}
+					index = findSiteIndex2(bhage, height, x1, x2);
 					break;
 				case SI_BA_NIGHGI:
 					switch ((int) bhage) {
@@ -3517,14 +3415,7 @@ public class Height2SiteIndex {
 						x2 = 0;
 						break;
 					}
-					if (x1 == 0) {
-						throw new GrowthInterceptMaximumException(
-								"Variable height growth intercept formulation, bhage > range: " + x1
-						);
-					} else {
-						index = (height - 1.3) * 100 / (bhage - 0.5);
-						index = 1.3 + x1 * ppow(index, x2);
-					}
+					index = findSiteIndex2(bhage, height, x1, x2);
 					break;
 				case SI_BL_THROWERGI:
 					switch ((int) bhage) {
@@ -3733,14 +3624,7 @@ public class Height2SiteIndex {
 						x2 = 0;
 						break;
 					}
-					if (x1 == 0) {
-						throw new GrowthInterceptMaximumException(
-								"Variable height growth intercept formulation, bhage > range: " + x1
-						);
-					} else {
-						index = (height - 1.3) * 100 / (bhage - 0.5);
-						index = 1.3 + x1 * ppow(index, x2);
-					}
+					index = findSiteIndex2(bhage, height, x1, x2);
 					break;
 				default:
 					index = siteIterate(cuIndex, bhage, SI_AT_BREAST, height);
@@ -3752,7 +3636,22 @@ public class Height2SiteIndex {
 		return index;
 	}
 
-	private static double siFdiMons(double bhage, double height, double x1, double x2) {
+	private static double findSiteIndexCommon(
+			double bhage, double height, double x1, double heightAgeFactor, DoubleUnaryOperator modifyIndex
+	) throws GrowthInterceptMaximumException {
+		double index;
+		if (x1 == 0) {
+			throw new GrowthInterceptMaximumException(
+					"Variable height growth intercept formulation, bhage > range: " + x1
+			);
+		} else {
+			index = (height - 1.3) * heightAgeFactor / (bhage - 0.5);
+			index = modifyIndex.applyAsDouble(index);
+		}
+		return index;
+	}
+
+	private static double findSiteIndex1(double bhage, double height, double x1, double x2) {
 		double index;
 		double logBhAge;
 		logBhAge = Math.log(bhage);
@@ -3763,6 +3662,17 @@ public class Height2SiteIndex {
 						+ x2 * heightFt / bhage
 		);
 		return index;
+	}
+
+	private static double findSiteIndex2(double bhage, double height, double x1, double x2)
+			throws GrowthInterceptMaximumException {
+
+		return findSiteIndexCommon(bhage, height, x1, 100, index -> 1.3 + x1 * ppow(index, x2));
+	}
+
+	private static double findeSiteIndex3(double bhage, double height, double x1, double x2)
+			throws GrowthInterceptMaximumException {
+		return findSiteIndexCommon(bhage, height, x1, 100, index -> x1 * ppow(index, x2));
 	}
 
 	public static double siteIterate(SiteIndexEquation cuIndex, double age, SiteIndexAgeType ageType, double height)
