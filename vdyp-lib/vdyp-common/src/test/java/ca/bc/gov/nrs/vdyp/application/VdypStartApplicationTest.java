@@ -199,9 +199,8 @@ class VdypStartApplicationTest {
 	protected VdypStartApplication getTestUnit(IMocksControl control) throws IOException {
 
 		VdypStartApplication mock = EasyMock.createMockBuilder(VdypStartApplication.class)//
-				.addMockedMethods("getControlFileParser", "process", "getId", "copySpecies")//
+				.addMockedMethods("getControlFileParser", "process", "getId", "copySpecies", "getDebugMode")//
 				.createMock(control);
-
 		return mock;
 	}
 
@@ -440,6 +439,7 @@ class VdypStartApplicationTest {
 				EasyMock.expect(app.copySpecies(EasyMock.same(spec1), EasyMock.capture(copyCapture))).andReturn(spec1);
 				EasyMock.expect(app.copySpecies(EasyMock.same(spec2), EasyMock.capture(copyCapture))).andReturn(spec2);
 				EasyMock.expect(app.copySpecies(EasyMock.same(spec3), EasyMock.capture(copyCapture))).andReturn(spec3);
+				EasyMock.expect(app.getDebugMode(22)).andStubReturn(0);
 				mockControl.replay();
 
 				var allSpecies = List.of(spec1, spec2, spec3);
