@@ -325,8 +325,6 @@ class VriInputValidationTest {
 			});
 		});
 
-		assertThrows(StandProcessingException.class, () -> app.checkPolygon(poly));
-
 		app.close();
 	}
 

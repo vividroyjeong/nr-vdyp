@@ -632,4 +632,38 @@ public class VdypMatchers {
 	public static Matcher<Coefficients> utilizationAllAndBiggest(float all) {
 		return utilization(0f, all, 0f, 0f, 0f, all);
 	}
+
+	public static Matcher<Coefficients> utilizationHeight(float small, float all) {
+		return new TypeSafeDiagnosingMatcher<Coefficients>() {
+
+			boolean matchesComponent(Description description, float expected, float result) {
+				boolean matches = closeTo(expected).matches(result);
+				description.appendText(String.format(matches ? "%f" : "[[%f]]", result));
+				return matches;
+			}
+
+			@Override
+			public void describeTo(Description description) {
+				String utilizationRep = String.format("[Small: %f, All: %f]", small, all);
+				description.appendText("A lorey height vector ").appendValue(utilizationRep);
+			}
+
+			@Override
+			protected boolean matchesSafely(Coefficients item, Description mismatchDescription) {
+				if (item.size() != 2 || item.getIndexFrom() != -1) {
+					mismatchDescription.appendText("Was not a lorey height vector");
+					return false;
+				}
+				boolean matches = true;
+				mismatchDescription.appendText("Was [Small: ");
+				matches &= matchesComponent(mismatchDescription, small, item.getCoe(UtilizationClass.SMALL.index));
+				mismatchDescription.appendText(", All: ");
+				matches &= matchesComponent(mismatchDescription, all, item.getCoe(UtilizationClass.ALL.index));
+				mismatchDescription.appendText("]");
+				return matches;
+			}
+
+		};
+	}
+
 }

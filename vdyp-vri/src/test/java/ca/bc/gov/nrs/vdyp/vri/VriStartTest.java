@@ -1,20 +1,26 @@
 package ca.bc.gov.nrs.vdyp.vri;
 
+import static ca.bc.gov.nrs.vdyp.test.TestUtils.assertOnlyPrimaryLayer;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.closeTo;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.utilization;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.utilizationHeight;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anything;
+import static org.hamcrest.Matchers.blankString;
 import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -73,6 +79,7 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.test.MockFileResolver;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
@@ -593,6 +600,58 @@ class VriStartTest {
 			}
 
 			@Test
+			void testComputeGraph() throws StandProcessingException {
+
+				controlMap = VriTestUtils.loadControlMap();
+				VriStart app = new VriStart();
+				ApplicationTestUtils.setControlMap(app, controlMap);
+
+				Map<String, Float> initialDqs = Utils.constMap(map -> {
+					map.put("B", 12.0803461f);
+					map.put("C", 8.66746521f);
+					map.put("F", 11.8044939f);
+					map.put("H", 9.06493855f);
+					map.put("S", 10.4460621f);
+				});
+				Map<String, Float> baseAreas = Utils.constMap(map -> {
+					map.put("B", 0.634290636f);
+					map.put("C", 1.26858127f);
+					map.put("F", 1.90287197f);
+					map.put("H", 1.90287197f);
+					map.put("S", 0.634290636f);
+
+				});
+				Map<String, Float> minDq = Utils.constMap(map -> {
+					map.put("B", 7.6f);
+					map.put("C", 7.6f);
+					map.put("F", 7.6f);
+					map.put("H", 7.6f);
+					map.put("S", 7.6f);
+				});
+				Map<String, Float> maxDq = Utils.constMap(map -> {
+					map.put("B", 13.8423338f);
+					map.put("C", 16.6669998f);
+					map.put("F", 15.5116472f);
+					map.put("H", 12.5369997f);
+					map.put("S", 12.6630001f);
+				});
+
+				float tph = 748.402222f;
+
+				var resultPerSpecies = new HashMap<String, Float>();
+
+				for (float x = -3.9f; x <= 2f; x += 0.01f) {
+
+					float result = app.quadMeanDiameterFractionalError(
+							x, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph
+					);
+
+					System.out.println(String.format("%f\t%f", x, result));
+
+				}
+			}
+
+			@Test
 			void testComputeXClamppedHigh() throws StandProcessingException {
 
 				controlMap = VriTestUtils.loadControlMap();
@@ -774,11 +833,14 @@ class VriStartTest {
 
 				var xInterval = new VriStart.Interval(-1, 1);
 
-				try (var app = new VriStart()) {
-					var result = app.findInterval(xInterval, errorFunc);
-	
-					assertThat(result, equalTo(xInterval));
-				}
+				VriStart app = new VriStart();
+
+				var result = app.findInterval(xInterval, errorFunc);
+
+				app.close();
+
+				assertThat(result, equalTo(xInterval));
+
 			}
 
 			@Test
@@ -788,16 +850,18 @@ class VriStartTest {
 
 				var xInterval = new VriStart.Interval(-2, -1);
 
-				try (VriStart app = new VriStart()) {
-	
-					var result = app.findInterval(xInterval, errorFunc);
-	
-					var evaluated = result.evaluate(errorFunc);
-					assertTrue(
-							evaluated.start() * evaluated.end() <= 0,
-							() -> "F(" + result + ") should have mixed signs but was " + evaluated
-					);
-				}
+				VriStart app = new VriStart();
+
+				var result = app.findInterval(xInterval, errorFunc);
+
+				app.close();
+
+				var evaluated = result.evaluate(errorFunc);
+				assertTrue(
+						evaluated.start() * evaluated.end() <= 0,
+						() -> "F(" + result + ") should have mixed signs but was " + evaluated
+				);
+
 			}
 
 			@ParameterizedTest
@@ -808,15 +872,18 @@ class VriStartTest {
 
 				var xInterval = new VriStart.Interval(-1, 1);
 
-				try (VriStart app = new VriStart()) {
-					var result = app.findInterval(xInterval, errorFunc);
-	
-					var evaluated = result.evaluate(errorFunc);
-					assertTrue(
-							evaluated.start() * evaluated.end() <= 0,
-							() -> "F(" + result + ") should have mixed signs but was " + evaluated
-					);
-				}
+				VriStart app = new VriStart();
+
+				app.close();
+
+				var result = app.findInterval(xInterval, errorFunc);
+
+				var evaluated = result.evaluate(errorFunc);
+				assertTrue(
+						evaluated.start() * evaluated.end() <= 0,
+						() -> "F(" + result + ") should have mixed signs but was " + evaluated
+				);
+
 			}
 
 			@ParameterizedTest
@@ -827,15 +894,18 @@ class VriStartTest {
 
 				var xInterval = new VriStart.Interval(-1, 1);
 
-				try (VriStart app = new VriStart()) {
-					var result = app.findInterval(xInterval, errorFunc);
-	
-					var evaluated = result.evaluate(errorFunc);
-					assertTrue(
-							evaluated.start() * evaluated.end() <= 0,
-							() -> "F(" + result + ") should have mixed signs but was " + evaluated
-					);
-				}
+				VriStart app = new VriStart();
+
+				app.close();
+
+				var result = app.findInterval(xInterval, errorFunc);
+
+				var evaluated = result.evaluate(errorFunc);
+				assertTrue(
+						evaluated.start() * evaluated.end() <= 0,
+						() -> "F(" + result + ") should have mixed signs but was " + evaluated
+				);
+
 			}
 
 			@ParameterizedTest
@@ -846,10 +916,14 @@ class VriStartTest {
 
 				var xInterval = new VriStart.Interval(-1, 1);
 
-				try (VriStart app = new VriStart()) {
-					assertThrows(NoBracketingException.class, () -> app.findInterval(xInterval, errorFunc));
-				}
+				VriStart app = new VriStart();
+
+				app.close();
+
+				assertThrows(NoBracketingException.class, () -> app.findInterval(xInterval, errorFunc));
+
 			}
+
 		}
 
 		@Nested
@@ -1634,78 +1708,81 @@ class VriStartTest {
 
 			var control = EasyMock.createControl();
 
-			try (VriStart app = EasyMock.createMockBuilder(VriStart.class) //
+			VriStart app = EasyMock.createMockBuilder(VriStart.class) //
 					.addMockedMethod("processYoung") //
 					.addMockedMethod("processBatc") //
 					.addMockedMethod("processBatn") //
 					.addMockedMethod("checkPolygon") //
 					.addMockedMethod("processPrimaryLayer") //
 					.addMockedMethod("getDebugMode") //
-					.createMock(control)) {
-	
-				MockFileResolver resolver = dummyInput();
-	
-				var poly = VriPolygon.build(pb -> {
-					pb.polygonIdentifier("TestPoly", 2024);
-					pb.biogeoclimaticZone("IDF");
-					pb.yieldFactor(1.0f);
-					pb.mode(mode);
-					pb.addLayer(lb -> {
-						lb.layerType(LayerType.PRIMARY);
-						lb.crownClosure(80f);
-						lb.utilization(0.6f);
-					});
+					.createMock(control);
+
+			MockFileResolver resolver = dummyInput();
+
+			var poly = VriPolygon.build(pb -> {
+				pb.polygonIdentifier("TestPoly", 2024);
+				pb.biogeoclimaticZone("IDF");
+				pb.yieldFactor(1.0f);
+				pb.mode(mode);
+				pb.addLayer(lb -> {
+					lb.layerType(LayerType.PRIMARY);
+					lb.crownClosure(80f);
+					lb.utilization(0.6f);
 				});
-	
-				var polyYoung = VriPolygon.build(pb -> {
-					pb.polygonIdentifier("TestPolyYoung", 2024);
-					pb.biogeoclimaticZone("IDF");
-					pb.yieldFactor(1.0f);
-					pb.mode(mode);
-					pb.addLayer(lb -> {
-						lb.layerType(LayerType.PRIMARY);
-						lb.crownClosure(80f);
-						lb.utilization(0.6f);
-					});
+			});
+
+			var polyYoung = VriPolygon.build(pb -> {
+				pb.polygonIdentifier("TestPolyYoung", 2024);
+				pb.biogeoclimaticZone("IDF");
+				pb.yieldFactor(1.0f);
+				pb.mode(mode);
+				pb.addLayer(lb -> {
+					lb.layerType(LayerType.PRIMARY);
+					lb.crownClosure(80f);
+					lb.utilization(0.6f);
 				});
-				var polyBatc = VriPolygon.build(pb -> {
-					pb.polygonIdentifier("TestPolyBatc", 2024);
-					pb.biogeoclimaticZone("IDF");
-					pb.yieldFactor(1.0f);
-					pb.mode(mode);
-					pb.addLayer(lb -> {
-						lb.layerType(LayerType.PRIMARY);
-						lb.crownClosure(80f);
-						lb.utilization(0.6f);
-					});
+			});
+			var polyBatc = VriPolygon.build(pb -> {
+				pb.polygonIdentifier("TestPolyBatc", 2024);
+				pb.biogeoclimaticZone("IDF");
+				pb.yieldFactor(1.0f);
+				pb.mode(mode);
+				pb.addLayer(lb -> {
+					lb.layerType(LayerType.PRIMARY);
+					lb.crownClosure(80f);
+					lb.utilization(0.6f);
 				});
-				var polyBatn = VriPolygon.build(pb -> {
-					pb.polygonIdentifier("TestPolyBatn", 2024);
-					pb.biogeoclimaticZone("IDF");
-					pb.yieldFactor(1.0f);
-					pb.mode(mode);
-					pb.addLayer(lb -> {
-						lb.layerType(LayerType.PRIMARY);
-						lb.crownClosure(80f);
-						lb.utilization(0.6f);
-					});
+			});
+			var polyBatn = VriPolygon.build(pb -> {
+				pb.polygonIdentifier("TestPolyBatn", 2024);
+				pb.biogeoclimaticZone("IDF");
+				pb.yieldFactor(1.0f);
+				pb.mode(mode);
+				pb.addLayer(lb -> {
+					lb.layerType(LayerType.PRIMARY);
+					lb.crownClosure(80f);
+					lb.utilization(0.6f);
 				});
-	
-				EasyMock.expect(app.checkPolygon(poly)).andReturn(mode).once();
-				EasyMock.expect(app.processYoung(poly)).andReturn(polyYoung).times(0, 1);
-				EasyMock.expect(app.processBatc(poly)).andReturn(polyBatc).times(0, 1);
-				EasyMock.expect(app.processBatn(poly)).andReturn(polyBatn).times(0, 1);
-				app.processPrimaryLayer(EasyMock.anyObject(VriPolygon.class), EasyMock.anyObject(VdypLayer.Builder.class));
-				EasyMock.expectLastCall().once();
-				EasyMock.expect(app.getDebugMode(9)).andStubReturn(0);
-				EasyMock.expect(app.getDebugMode(1)).andStubReturn(0);
-	
-				control.replay();
-	
-				app.init(resolver, controlMap);
-	
-				app.processPolygon(0, poly);
-			}
+			});
+
+			EasyMock.expect(app.checkPolygon(poly)).andReturn(mode).once();
+			EasyMock.expect(app.processYoung(poly)).andReturn(polyYoung).times(0, 1);
+			EasyMock.expect(app.processBatc(poly)).andReturn(polyBatc).times(0, 1);
+			EasyMock.expect(app.processBatn(poly)).andReturn(polyBatn).times(0, 1);
+			app.processPrimaryLayer(EasyMock.anyObject(VriPolygon.class), EasyMock.anyObject(VdypLayer.Builder.class));
+			EasyMock.expectLastCall().once();
+			EasyMock.expect(app.getDebugMode(9)).andStubReturn(0);
+			EasyMock.expect(app.getDebugMode(1)).andStubReturn(0);
+
+			control.replay();
+
+			app.init(resolver, controlMap);
+
+			var result = app.processPolygon(0, poly);
+
+			assertThat(result, notNullValue());
+
+			app.close();
 
 			control.verify();
 		}
@@ -1853,7 +1930,6 @@ class VriStartTest {
 			control.verify();
 		}
 
-		@SuppressWarnings("unused")
 		@Test
 		void testStandExceptionProcessingPrimaryLayer() throws Exception {
 
@@ -1885,40 +1961,6 @@ class VriStartTest {
 				});
 			});
 
-			var polyYoung = VriPolygon.build(pb -> {
-				pb.polygonIdentifier("TestPolyYoung", 2024);
-				pb.biogeoclimaticZone("IDF");
-				pb.yieldFactor(1.0f);
-				pb.mode(mode);
-				pb.addLayer(lb -> {
-					lb.layerType(LayerType.PRIMARY);
-					lb.crownClosure(80f);
-					lb.utilization(0.6f);
-				});
-			});
-			var polyBatc = VriPolygon.build(pb -> {
-				pb.polygonIdentifier("TestPolyBatc", 2024);
-				pb.biogeoclimaticZone("IDF");
-				pb.yieldFactor(1.0f);
-				pb.mode(mode);
-				pb.addLayer(lb -> {
-					lb.layerType(LayerType.PRIMARY);
-					lb.crownClosure(80f);
-					lb.utilization(0.6f);
-				});
-			});
-			var polyBatn = VriPolygon.build(pb -> {
-				pb.polygonIdentifier("TestPolyBatn", 2024);
-				pb.biogeoclimaticZone("IDF");
-				pb.yieldFactor(1.0f);
-				pb.mode(mode);
-				pb.addLayer(lb -> {
-					lb.layerType(LayerType.PRIMARY);
-					lb.crownClosure(80f);
-					lb.utilization(0.6f);
-				});
-			});
-
 			EasyMock.expect(app.checkPolygon(poly)).andReturn(mode).once();
 			app.processPrimaryLayer(EasyMock.same(poly), EasyMock.anyObject(VdypLayer.Builder.class));
 			EasyMock.expectLastCall().andThrow(new StandProcessingException("Test Exception")).once();
@@ -1932,6 +1974,223 @@ class VriStartTest {
 			app.close();
 
 			control.verify();
+		}
+
+		@Test
+		void testProcessPrimary() throws Exception {
+
+			controlMap = TestUtils.loadControlMap();
+
+			VriStart app = new VriStart();
+
+			MockFileResolver resolver = dummyInput();
+
+			var poly = VriPolygon.build(pb -> {
+				pb.polygonIdentifier("TestPoly", 2024);
+				pb.biogeoclimaticZone("IDF");
+				pb.yieldFactor(1.0f);
+				pb.mode(PolygonMode.BATN);
+				pb.forestInventoryZone("");
+				pb.percentAvailable(85);
+				pb.addLayer(lb -> {
+					lb.layerType(LayerType.PRIMARY);
+					lb.crownClosure(30f);
+					lb.utilization(7.5f);
+
+					lb.inventoryTypeGroup(3);
+					lb.empiricalRelationshipParameterIndex(61);
+
+					lb.primaryGenus("F");
+					// 1
+					lb.addSpecies(sb -> {
+						sb.genus("B");
+						sb.percentGenus(10);
+						sb.addSpecies("BL", 100);
+					});
+					lb.addSite(sb -> {
+						sb.siteGenus("B");
+						sb.siteSpecies("BL");
+					});
+
+					// 2
+					lb.addSpecies(sb -> {
+						sb.genus("C");
+						sb.percentGenus(20);
+						sb.addSpecies("CW", 100);
+					});
+					lb.addSite(sb -> {
+						sb.siteGenus("C");
+						sb.siteCurveNumber(11);
+						sb.siteSpecies("CW");
+					});
+
+					// 3
+					lb.addSpecies(sb -> {
+						sb.genus("F");
+						sb.percentGenus(30);
+						sb.addSpecies("FD", 100);
+					});
+					lb.addSite(sb -> {
+						sb.siteGenus("F");
+						sb.siteCurveNumber(23);
+						sb.ageTotal(24);
+						sb.height(7.6f);
+						sb.siteIndex(19.7f);
+						sb.yearsToBreastHeight(9);
+						sb.breastHeightAge(15);
+						sb.siteSpecies("FD");
+					});
+
+					// 4
+					lb.addSpecies(sb -> {
+						sb.genus("H");
+						sb.percentGenus(30);
+						sb.addSpecies("HW", 100);
+					});
+					lb.addSite(sb -> {
+						sb.siteGenus("H");
+						sb.siteCurveNumber(37);
+						sb.siteSpecies("HW");
+					});
+
+					// 5
+					lb.addSpecies(sb -> {
+						sb.genus("S");
+						sb.percentGenus(10);
+						sb.addSpecies("S", 100);
+					});
+					lb.addSite(sb -> {
+						sb.siteGenus("S");
+						sb.siteCurveNumber(71);
+						sb.siteSpecies("S");
+					});
+				});
+			});
+
+			app.init(resolver, controlMap);
+
+			var result = app.processPolygon(0, poly).get();
+
+			assertThat(result, hasProperty("polygonIdentifier", isPolyId("TestPoly", 2024)));
+			assertThat(result, hasProperty("biogeoclimaticZone", is("IDF")));
+			assertThat(result, hasProperty("forestInventoryZone", blankString()));
+			assertThat(result, hasProperty("mode", present(is(PolygonMode.BATN))));
+			assertThat(result, hasProperty("percentAvailable", is(85f)));
+
+			var resultLayer = assertOnlyPrimaryLayer(result);
+
+			assertThat(resultLayer, hasProperty("ageTotal", present(closeTo(24))));
+			assertThat(resultLayer, hasProperty("breastHeightAge", present(closeTo(15))));
+			assertThat(resultLayer, hasProperty("yearsToBreastHeight", present(closeTo(9))));
+
+			assertThat(resultLayer, hasProperty("siteGenus", present(is("F"))));
+
+			assertThat(resultLayer, hasProperty("height", present(closeTo(7.6f))));
+			assertThat(resultLayer, hasProperty("inventoryTypeGroup", present(is(3))));
+			assertThat(resultLayer, hasProperty("empiricalRelationshipParameterIndex", present(is(61))));
+
+			assertThat(
+					resultLayer, hasProperty("loreyHeightByUtilization", utilizationHeight(4.14067888f, 6.61390257f))
+			);
+			assertThat(
+					resultLayer,
+					hasProperty(
+							"baseAreaByUtilization",
+							utilization(
+									0.0679966733f, 6.34290648f, 4.24561071f, 1.01540196f, 0.571661115f, 0.510232806f
+							)
+					)
+			);
+			assertThat(
+					resultLayer,
+					hasProperty(
+							"quadraticMeanDiameterByUtilization",
+							utilization(5.58983135f, 10.3879948f, 9.11466217f, 13.9179964f, 18.6690178f, 25.3685265f)
+					)
+			);
+			assertThat(
+					resultLayer,
+					hasProperty(
+							"treesPerHectareByUtilization",
+							utilization(27.707695f, 748.4021f, 650.682556f, 66.7413025f, 20.8836231f, 10.094574f)
+					)
+			);
+
+			assertThat(
+					resultLayer,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+							utilization(0, 4.73118162f, 0.0503439531f, 1.59589052f, 1.62338901f, 1.46155834f)
+					)
+			);
+			assertThat(
+					resultLayer.getSpecies(),
+					allOf(aMapWithSize(5), hasKey("B"), hasKey("C"), hasKey("F"), hasKey("H"), hasKey("S"))
+			);
+
+			VdypSpecies resultSpecB = TestUtils.assertHasSpecies(resultLayer, "B", "C", "F", "H", "S");
+
+			assertThat(
+					resultSpecB,
+					hasProperty(
+							"baseAreaByUtilization",
+							utilization(
+									0.0116237309f, 0.634290636f, 0.239887208f, 0.196762085f, 0.102481194f, 0.095160149f
+							)
+					)
+			);
+			assertThat(
+					resultSpecB,
+					hasProperty(
+							"quadraticMeanDiameterByUtilization",
+							utilization(5.61674118f, 12.9407434f, 9.93954372f, 14.3500404f, 19.1790199f, 27.5482502f)
+					)
+			);
+			assertThat(
+					resultSpecB,
+					hasProperty(
+							"treesPerHectareByUtilization",
+							utilization(4.69123125f, 48.2258606f, 30.9160728f, 12.1659298f, 3.54732919f, 1.59653044f)
+					)
+			);
+
+			assertThat(
+					resultSpecB,
+					hasProperty(
+							"wholeStemVolumeByUtilization",
+							utilization(0.0244281366f, 2.41518188f, 0.747900844f, 0.752810001f, 0.4540295f, 0.46044156f)
+					)
+			);
+			assertThat(
+					resultSpecB,
+					hasProperty(
+							"closeUtilizationVolumeByUtilization",
+							utilization(0, 1.28733742f, 0.0235678982f, 0.464995325f, 0.378819793f, 0.41995436f)
+					)
+			);
+			assertThat(
+					resultSpecB,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayByUtilization",
+							utilization(0, 1.24826729f, 0.0230324566f, 0.454239398f, 0.369579285f, 0.401416153f)
+					)
+			);
+			assertThat(
+					resultSpecB,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization",
+							utilization(0, 1.23482728f, 0.0228475146f, 0.450360179f, 0.366144955f, 0.395474672f)
+					)
+			);
+			assertThat(
+					resultSpecB,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+							utilization(0, 1.20897281f, 0.0223761573f, 0.441060275f, 0.358547896f, 0.386988521f)
+					)
+			);
+
+			app.close();
 		}
 
 	}

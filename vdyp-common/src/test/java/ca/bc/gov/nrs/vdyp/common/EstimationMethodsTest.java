@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
-import ca.bc.gov.nrs.vdyp.controlmap.CachingResolvedControlMapImpl;
+import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
@@ -34,12 +34,12 @@ class EstimationMethodsTest {
 
 	Map<String, Object> controlMap;
 	BecLookup becLookup;
-	Estimators estimators;
+	EstimationMethods emp;
 
 	@BeforeEach
 	void setup() {
 		controlMap = TestUtils.loadControlMap();
-		estimators = new Estimators(new CachingResolvedControlMapImpl(controlMap));
+		emp = new EstimationMethods(controlMap);
 		becLookup = (BecLookup) controlMap.get(ControlKey.BEC_DEF.name());
 	}
 
@@ -56,8 +56,8 @@ class EstimationMethodsTest {
 			Coefficients quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
 			Coefficients basalAreaByUtilization = Utils.utilizationVector(0.0f);
 
-			estimators.estimateBaseAreaByUtilization(
-					becDefinition, quadMeanDiameterByUtilization, basalAreaByUtilization, genus.getAlias()
+			EstimationMethods.estimateBaseAreaByUtilization(
+					controlMap, becDefinition, quadMeanDiameterByUtilization, basalAreaByUtilization, genus.getAlias()
 			);
 
 			for (var c : basalAreaByUtilization) {
@@ -76,8 +76,8 @@ class EstimationMethodsTest {
 			Coefficients quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
 			Coefficients basalAreaByUtilization = Utils.utilizationVector(10.0f);
 
-			estimators.estimateBaseAreaByUtilization(
-					becDefinition, quadMeanDiameterByUtilization, basalAreaByUtilization, genus.getAlias()
+			EstimationMethods.estimateBaseAreaByUtilization(
+					controlMap, becDefinition, quadMeanDiameterByUtilization, basalAreaByUtilization, genus.getAlias()
 			);
 
 			assertThat(basalAreaByUtilization.getCoe(UtilizationClass.SMALL.index), is(0.0f));
@@ -100,8 +100,8 @@ class EstimationMethodsTest {
 			Coefficients quadMeanDiameterByUtilization = Utils.utilizationVector(31.5006275f);
 			Coefficients basalAreaByUtilization = Utils.utilizationVector(0.406989872f);
 
-			estimators.estimateBaseAreaByUtilization(
-					 becDefinition, quadMeanDiameterByUtilization, basalAreaByUtilization, genus.getAlias()
+			EstimationMethods.estimateBaseAreaByUtilization(
+					controlMap, becDefinition, quadMeanDiameterByUtilization, basalAreaByUtilization, genus.getAlias()
 			);
 
 			// Result of run in FORTRAN VDYP7 with the above parameters.
@@ -125,7 +125,7 @@ class EstimationMethodsTest {
 
 			var bec = Utils.getBec("CWH", controlMap);
 
-			estimators.estimateBaseAreaByUtilization(bec, dq, ba, "B");
+			emp.estimateBaseAreaByUtilization(bec, dq, ba, "B");
 
 			assertThat(
 					ba,
@@ -160,8 +160,8 @@ class EstimationMethodsTest {
 			Coefficients closeUtilizationVolume = Utils.utilizationVector(0.0f);
 			float loreyHeight = 30.0f;
 
-			estimators.estimateCloseUtilizationVolume(
-					UtilizationClass.U75TO125, aAdjust, volumeGroup, loreyHeight,
+			EstimationMethods.estimateCloseUtilizationVolume(
+					controlMap, UtilizationClass.U75TO125, aAdjust, volumeGroup, loreyHeight,
 					quadMeanDiameterByUtilization, wholeStemVolumeByUtilization, closeUtilizationVolume
 			);
 
@@ -190,8 +190,8 @@ class EstimationMethodsTest {
 			Coefficients closeUtilizationVolume = Utils.utilizationVector(0.0f);
 			float loreyHeight = 36.7552986f;
 
-			estimators.estimateCloseUtilizationVolume(
-					UtilizationClass.U175TO225, aAdjust, volumeGroup, loreyHeight,
+			EstimationMethods.estimateCloseUtilizationVolume(
+					controlMap, UtilizationClass.U175TO225, aAdjust, volumeGroup, loreyHeight,
 					quadMeanDiameterByUtilization, wholeStemVolumeByUtilization, closeUtilizationVolume
 			);
 
@@ -212,7 +212,7 @@ class EstimationMethodsTest {
 
 			var closeUtilizationUtil = Utils.utilizationVector(0f, 0f, 0f, 0f, 0f);
 
-			estimators.estimateCloseUtilizationVolume(
+			emp.estimateCloseUtilizationVolume(
 					utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, wholeStemVolumeUtil,
 					closeUtilizationUtil
 			);
@@ -243,8 +243,8 @@ class EstimationMethodsTest {
 			);
 			int volumeGroup = volumeEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
-			estimators.estimateNetDecayVolume(
-					genus.getAlias(), becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust,
+			EstimationMethods.estimateNetDecayVolume(
+					controlMap, genus.getAlias(), becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust,
 					volumeGroup, 0.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay
 			);
 
@@ -272,8 +272,8 @@ class EstimationMethodsTest {
 			);
 			int decayGroup = decayEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
-			estimators.estimateNetDecayVolume(
-					genus.getAlias(), becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust,
+			EstimationMethods.estimateNetDecayVolume(
+					controlMap, genus.getAlias(), becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust,
 					decayGroup, 54.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay
 			);
 
@@ -299,8 +299,8 @@ class EstimationMethodsTest {
 			Coefficients closeUtilizationNetOfDecay = Utils.utilizationVector(0.0f);
 			Coefficients closeUtilizationNetOfDecayAndWastage = Utils.utilizationVector(0.0f);
 
-			estimators.estimateNetDecayAndWasteVolume(
-					becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus.getAlias(), 0.0f,
+			EstimationMethods.estimateNetDecayAndWasteVolume(
+					controlMap, becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus.getAlias(), 0.0f,
 					quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay,
 					closeUtilizationNetOfDecayAndWastage
 			);
@@ -326,8 +326,8 @@ class EstimationMethodsTest {
 					.utilizationVector(0.0f, 5.90565634f, 0.000909090857f, 0.0502020158f, 0.152929291f, 5.70161581f);
 			Coefficients closeUtilizationNetOfDecayAndWastage = Utils.utilizationVector(0.0f);
 
-			estimators.estimateNetDecayAndWasteVolume(
-					becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus.getAlias(),
+			EstimationMethods.estimateNetDecayAndWasteVolume(
+					controlMap, becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus.getAlias(),
 					36.7552986f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay,
 					closeUtilizationNetOfDecayAndWastage
 			);
@@ -359,8 +359,8 @@ class EstimationMethodsTest {
 			);
 			int breakageGroup = breakageEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
-			estimators.estimateNetDecayWasteAndBreakageVolume(
-					UtilizationClass.U175TO225, breakageGroup, quadMeanDiameterByUtilization,
+			EstimationMethods.estimateNetDecayWasteAndBreakageVolume(
+					controlMap, UtilizationClass.U175TO225, breakageGroup, quadMeanDiameterByUtilization,
 					closeUtilization, closeUtilizationNetOfDecayAndWastage, closeUtilizationNetOfDecayWastageAndBreakage
 			);
 
@@ -389,8 +389,8 @@ class EstimationMethodsTest {
 			);
 			int breakageGroup = breakageEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
-			estimators.estimateNetDecayWasteAndBreakageVolume(
-					UtilizationClass.U175TO225, breakageGroup, quadMeanDiameterByUtilization,
+			EstimationMethods.estimateNetDecayWasteAndBreakageVolume(
+					controlMap, UtilizationClass.U175TO225, breakageGroup, quadMeanDiameterByUtilization,
 					closeUtilization, closeUtilizationNetOfDecayAndWastage, closeUtilizationNetOfDecayWastageAndBreakage
 			);
 
@@ -414,7 +414,7 @@ class EstimationMethodsTest {
 
 			var bec = Utils.getBec("CWH", controlMap);
 
-			estimators.estimateQuadMeanDiameterByUtilization(bec, coe, "B");
+			emp.estimateQuadMeanDiameterByUtilization(bec, coe, "B");
 
 			assertThat(coe, utilization(0f, 31.6622887f, 10.0594692f, 14.966774f, 19.9454956f, 46.1699982f));
 		}
@@ -428,91 +428,194 @@ class EstimationMethodsTest {
 
 			var bec = Utils.getBec("MH", controlMap);
 
-			estimators.estimateQuadMeanDiameterByUtilization(bec, coe, "L");
+			emp.estimateQuadMeanDiameterByUtilization(bec, coe, "L");
 
 			assertThat(coe, utilization(0f, 13.4943399f, 10.2766619f, 14.67033f, 19.4037666f, 25.719244f));
 		}
 
 	}
 
-	@Test
-	void testEstimateQuadMeanDiameterForSpecies() throws Exception {
+	@Nested
+	class EstimateQuadMeanDiameterForSpecies {
+		@Test
+		void testSimple() throws Exception {
 
-		var layer = VdypLayer.build(builder -> {
-			builder.polygonIdentifier("Test", 2024);
-			builder.layerType(LayerType.PRIMARY);
-			builder.addSite(siteBuilder -> {
-				siteBuilder.ageTotal(55f);
-				siteBuilder.yearsToBreastHeight(1f);
-				siteBuilder.height(32.2999992f);
-				siteBuilder.siteGenus("H");
+			var layer = VdypLayer.build(builder -> {
+				builder.polygonIdentifier("Test", 2024);
+				builder.layerType(LayerType.PRIMARY);
+				builder.addSite(siteBuilder -> {
+					siteBuilder.ageTotal(55f);
+					siteBuilder.yearsToBreastHeight(1f);
+					siteBuilder.height(32.2999992f);
+					siteBuilder.siteGenus("H");
+				});
 			});
-		});
 
-		// sp 3, 4, 5, 8, 15
-		// sp B, C, D, H, S
-		var spec1 = VdypSpecies.build(layer, builder -> {
-			builder.genus("B");
-			builder.volumeGroup(12);
-			builder.decayGroup(7);
-			builder.breakageGroup(5);
-			builder.percentGenus(1f);
-		});
-		spec1.getLoreyHeightByUtilization().setCoe(0, 38.7456512f);
-		spec1.setFractionGenus(0.00817133673f);
+			// sp 3, 4, 5, 8, 15
+			// sp B, C, D, H, S
+			var spec1 = VdypSpecies.build(layer, builder -> {
+				builder.genus("B");
+				builder.volumeGroup(12);
+				builder.decayGroup(7);
+				builder.breakageGroup(5);
+				builder.percentGenus(1f);
+			});
+			spec1.getLoreyHeightByUtilization().setCoe(0, 38.7456512f);
+			spec1.setFractionGenus(0.00817133673f);
 
-		var spec2 = VdypSpecies.build(layer, builder -> {
-			builder.genus("C");
-			builder.volumeGroup(20);
-			builder.decayGroup(14);
-			builder.breakageGroup(6);
-			builder.percentGenus(7f);
-		});
-		spec2.getLoreyHeightByUtilization().setCoe(0, 22.8001652f);
-		spec2.setFractionGenus(0.0972022042f);
+			var spec2 = VdypSpecies.build(layer, builder -> {
+				builder.genus("C");
+				builder.volumeGroup(20);
+				builder.decayGroup(14);
+				builder.breakageGroup(6);
+				builder.percentGenus(7f);
+			});
+			spec2.getLoreyHeightByUtilization().setCoe(0, 22.8001652f);
+			spec2.setFractionGenus(0.0972022042f);
 
-		var spec3 = VdypSpecies.build(layer, builder -> {
-			builder.genus("D");
-			builder.volumeGroup(25);
-			builder.decayGroup(19);
-			builder.breakageGroup(12);
-			builder.percentGenus(74f);
-		});
-		spec3.getLoreyHeightByUtilization().setCoe(0, 33.6889763f);
-		spec3.setFractionGenus(0.695440531f);
+			var spec3 = VdypSpecies.build(layer, builder -> {
+				builder.genus("D");
+				builder.volumeGroup(25);
+				builder.decayGroup(19);
+				builder.breakageGroup(12);
+				builder.percentGenus(74f);
+			});
+			spec3.getLoreyHeightByUtilization().setCoe(0, 33.6889763f);
+			spec3.setFractionGenus(0.695440531f);
 
-		var spec4 = VdypSpecies.build(layer, builder -> {
-			builder.genus("H");
-			builder.volumeGroup(37);
-			builder.decayGroup(31);
-			builder.breakageGroup(17);
-			builder.percentGenus(9f);
-		});
-		spec4.getLoreyHeightByUtilization().setCoe(0, 24.3451157f);
-		spec4.setFractionGenus(0.117043354f);
+			var spec4 = VdypSpecies.build(layer, builder -> {
+				builder.genus("H");
+				builder.volumeGroup(37);
+				builder.decayGroup(31);
+				builder.breakageGroup(17);
+				builder.percentGenus(9f);
+			});
+			spec4.getLoreyHeightByUtilization().setCoe(0, 24.3451157f);
+			spec4.setFractionGenus(0.117043354f);
 
-		var spec5 = VdypSpecies.build(layer, builder -> {
-			builder.genus("S");
-			builder.volumeGroup(66);
-			builder.decayGroup(54);
-			builder.breakageGroup(28);
-			builder.percentGenus(9f);
-		});
-		spec5.getLoreyHeightByUtilization().setCoe(0, 34.6888771f);
-		spec5.setFractionGenus(0.082142584f);
+			var spec5 = VdypSpecies.build(layer, builder -> {
+				builder.genus("S");
+				builder.volumeGroup(66);
+				builder.decayGroup(54);
+				builder.breakageGroup(28);
+				builder.percentGenus(9f);
+			});
+			spec5.getLoreyHeightByUtilization().setCoe(0, 34.6888771f);
+			spec5.setFractionGenus(0.082142584f);
 
-		Map<String, VdypSpecies> specs = new HashMap<>();
-		specs.put(spec1.getGenus(), spec1);
-		specs.put(spec2.getGenus(), spec2);
-		specs.put(spec3.getGenus(), spec3);
-		specs.put(spec4.getGenus(), spec4);
-		specs.put(spec5.getGenus(), spec5);
+			Map<String, VdypSpecies> specs = new HashMap<>();
+			specs.put(spec1.getGenus(), spec1);
+			specs.put(spec2.getGenus(), spec2);
+			specs.put(spec3.getGenus(), spec3);
+			specs.put(spec4.getGenus(), spec4);
+			specs.put(spec5.getGenus(), spec5);
 
-		float dq = estimators.estimateQuadMeanDiameterForSpecies(
-				spec1, specs, Region.COASTAL, 30.2601795f, 44.6249847f, 620.504883f, 31.6603775f
-		);
+			float dq = emp.estimateQuadMeanDiameterForSpecies(
+					spec1, specs, Region.COASTAL, 30.2601795f, 44.6249847f, 620.504883f, 31.6603775f
+			);
 
-		assertThat(dq, closeTo(31.7022133f));
+			assertThat(dq, closeTo(31.7022133f));
+
+		}
+
+		@Test
+		void testClampSimple() throws Exception {
+			var limits = new EstimationMethods.Limits(48.3f, 68.7f, 0.729f, 1.718f);
+			float standTreesPerHectare = 620.5049f;
+			float minQuadMeanDiameter = 7.6f;
+			float loreyHeightSpec = 38.74565f;
+			float baseArea1 = 0.36464578f;
+			float baseArea2 = 44.260338f;
+			float quadMeanDiameter1 = 31.697449f;
+			float treesPerHectare2 = 615.8839f;
+			float quadMeanDiameter2 = 30.249138f;
+
+			float dq = emp.estimateQuadMeanDiameterClampResult(
+					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
+					quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+			);
+
+			assertThat(dq, is(quadMeanDiameter1));
+
+		}
+
+		@Test
+		void testClampToLow2() throws Exception {
+			var limits = new EstimationMethods.Limits(48.3f, 68.7f, 0.729f, 1.718f);
+			float standTreesPerHectare = 620.5049f;
+			float minQuadMeanDiameter = 7.6f;
+			float loreyHeightSpec = 38.74565f;
+
+			float baseArea1 = 44.36464578f;
+			float baseArea2 = 0.1f;
+
+			float quadMeanDiameter2 = 7.3f; // Less than minQuadMeanDiameter 7.6
+
+			float treesPerHectare2 = BaseAreaTreeDensityDiameter.treesPerHectare(baseArea2, quadMeanDiameter2);
+			float treesPerHectare1 = standTreesPerHectare - treesPerHectare2;
+
+			float quadMeanDiameter1 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea1, treesPerHectare1);
+
+			float dq = emp.estimateQuadMeanDiameterClampResult(
+					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
+					quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+			);
+
+			assertThat(dq, closeTo(30.722431f));
+
+		}
+
+		@Test
+		void testClampToLow1() throws Exception {
+			var limits = new EstimationMethods.Limits(48.3f, 68.7f, 0.729f, 1.718f);
+			float standTreesPerHectare = 620.5049f;
+			float minQuadMeanDiameter = 7.6f;
+			float loreyHeightSpec = 38.74565f;
+
+			float baseArea1 = 30f;
+			float baseArea2 = 10f;
+
+			float quadMeanDiameter1 = 26f; // Less than computed min of 28.245578
+
+			float treesPerHectare1 = BaseAreaTreeDensityDiameter.treesPerHectare(baseArea1, quadMeanDiameter1);
+			float treesPerHectare2 = standTreesPerHectare - treesPerHectare1;
+
+			float quadMeanDiameter2 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea2, treesPerHectare2);
+
+			float dq = emp.estimateQuadMeanDiameterClampResult(
+					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
+					quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+			);
+
+			assertThat(dq, closeTo(28.245578f));
+
+		}
+
+		@Test
+		void testClampToHigh1() throws Exception {
+			var limits = new EstimationMethods.Limits(48.3f, 68.7f, 0.729f, 1.718f);
+			float standTreesPerHectare = 620.5049f;
+			float minQuadMeanDiameter = 7.6f;
+			float loreyHeightSpec = 38.74565f;
+
+			float baseArea1 = 30f;
+			float baseArea2 = 10f;
+
+			float quadMeanDiameter1 = 70f; // More than than computed max of 66.565033
+
+			float treesPerHectare1 = BaseAreaTreeDensityDiameter.treesPerHectare(baseArea1, quadMeanDiameter1);
+			float treesPerHectare2 = standTreesPerHectare - treesPerHectare1;
+
+			float quadMeanDiameter2 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea2, treesPerHectare2);
+
+			float dq = emp.estimateQuadMeanDiameterClampResult(
+					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
+					quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+			);
+
+			assertThat(dq, closeTo(66.565033f));
+
+		}
 
 	}
 
@@ -540,8 +643,8 @@ class EstimationMethodsTest {
 			);
 			int volumeGroup = volumeEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
-			estimators.estimateWholeStemVolume(
-					UtilizationClass.ALL, 0.0f, volumeGroup, 36.7552986f, quadMeanDiameterByUtilization,
+			EstimationMethods.estimateWholeStemVolume(
+					controlMap, UtilizationClass.ALL, 0.0f, volumeGroup, 36.7552986f, quadMeanDiameterByUtilization,
 					basalAreaByUtilization, wholeStemVolumeByUtilization
 			);
 
@@ -562,13 +665,15 @@ class EstimationMethodsTest {
 			var baseAreaUtil = Utils.utilizationVector(0.492921442f, 0f, 0f, 0f, 0.492921442f);
 			var wholeStemVolumeUtil = Utils.utilizationVector();
 
-			estimators.estimateWholeStemVolume(
+			emp.estimateWholeStemVolume(
 					utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, baseAreaUtil,
 					wholeStemVolumeUtil
 			);
 
 			assertThat(wholeStemVolumeUtil, utilization(0f, 0f, 0f, 0f, 0f, 6.11904192f));
+
 		}
+
 	}
 
 	@Test
@@ -585,8 +690,8 @@ class EstimationMethodsTest {
 		);
 		int volumeGroup = volumeEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
-		float result = estimators
-				.estimateWholeStemVolumePerTree(volumeGroup, 36.7552986f, 31.5006275f);
+		float result = EstimationMethods
+				.estimateWholeStemVolumePerTree(controlMap, volumeGroup, 36.7552986f, 31.5006275f);
 
 		// Result of run in FORTRAN VDYP7 with the above parameters.
 		assertThat(result, is(1.2011181f));
@@ -619,7 +724,7 @@ class EstimationMethodsTest {
 				builder.breakageGroup(-1);
 			});
 
-			var result = estimators.estimateNonPrimaryLoreyHeight(spec.getGenus(), specPrime.getGenus(), bec, 24.2999992f, 20.5984688f);
+			var result = emp.estimateNonPrimaryLoreyHeight(spec, specPrime, bec, 24.2999992f, 20.5984688f);
 
 			assertThat(result, closeTo(21.5356998f));
 
@@ -649,11 +754,30 @@ class EstimationMethodsTest {
 				builder.breakageGroup(-1);
 			});
 
-			var result = estimators.estimateNonPrimaryLoreyHeight(spec.getGenus(), specPrime.getGenus(), bec, 35.2999992f, 33.6889763f);
+			var result = emp.estimateNonPrimaryLoreyHeight(spec, specPrime, bec, 35.2999992f, 33.6889763f);
 
 			assertThat(result, closeTo(38.7456512f));
 
 		}
+	}
+
+	@Nested
+	class PrimaryLeadHeightConversion {
+
+		@Test
+		void testPrimaryHeightFromLeadHeight() throws Exception {
+			float result = emp.primaryHeightFromLeadHeight(20.0f, "B", Region.COASTAL, 40.260403f);
+
+			assertThat(result, closeTo(19.870464f));
+		}
+
+		@Test
+		void testLeadHeightFromPrimaryHeight() throws Exception {
+			float result = emp.leadHeightFromPrimaryHeight(19.870464f, "B", Region.COASTAL, 40.260403f);
+
+			assertThat(result, closeTo(20));
+		}
+
 	}
 
 }

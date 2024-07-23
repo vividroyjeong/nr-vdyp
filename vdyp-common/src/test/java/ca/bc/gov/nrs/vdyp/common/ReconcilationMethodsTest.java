@@ -1,7 +1,6 @@
 package ca.bc.gov.nrs.vdyp.common;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;

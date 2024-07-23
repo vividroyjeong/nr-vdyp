@@ -923,6 +923,26 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		return targetPercentages;
 	}
 
+	protected void applyGroups(BecDefinition bec, String genus, VdypSpecies.Builder builder) {
+		// Lookup volume group, Decay Group, and Breakage group for each species.
+
+		var volumeGroupMap = getGroupMap(ControlKey.VOLUME_EQN_GROUPS);
+		var decayGroupMap = getGroupMap(ControlKey.DECAY_GROUPS);
+		var breakageGroupMap = getGroupMap(ControlKey.BREAKAGE_GROUPS);
+
+		// VGRPFIND
+		var volumeGroup = volumeGroupMap.get(genus, bec.getVolumeBec().getAlias());
+		// DGRPFIND
+		var decayGroup = decayGroupMap.get(genus, bec.getDecayBec().getAlias());
+		// BGRPFIND (Breakage uses decay BEC)
+		var breakageGroup = breakageGroupMap.get(genus, bec.getDecayBec().getAlias());
+
+		builder.volumeGroup(volumeGroup);
+		builder.decayGroup(decayGroup);
+		builder.breakageGroup(breakageGroup);
+
+	}
+
 	protected MatrixMap2<String, String, Integer> getGroupMap(ControlKey key) {
 		return Utils.expectParsedControl(controlMap, key, ca.bc.gov.nrs.vdyp.model.MatrixMap2.class);
 	}
@@ -1048,7 +1068,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		float arg = //
 				(a0 + //
 						a1 * coast + //
-						a2 * spec.getBaseAreaByUtilization().getCoe(UTIL_ALL)//
+						a2 * baseAreaSpec//
 				) * exp(a3 * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL));
 		arg = max(arg, 0f);
 
@@ -1121,12 +1141,12 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			if (volumeComputeMode == VolumeComputeMode.BY_UTIL_WITH_WHOLE_STEM_BY_SPEC) {
 				log.atDebug().log("Estimating tree volume");
 
-				// EMP090
-				throw new UnsupportedOperationException("TODO"); // Not used yet
+				var volumeGroup = spec.getVolumeGroup();
+				var meanVolume = this.estimationMethods
+						.estimateWholeStemVolumePerTree(volumeGroup, loreyHeightSpec, quadMeanDiameterSpec);
+				var specWholeStemVolume = treesPerHectareSpec * meanVolume;
 
-				// log.atDebug().setMessage("Species WS stand volume {}")
-				// .addArgument(() -> spec.getWholeStemVolumeByUtilization().getCoe(UTIL_ALL));
-
+				spec.getWholeStemVolumeByUtilization().setCoe(UTIL_ALL, specWholeStemVolume);
 			}
 			float wholeStemVolumeSpec = spec.getWholeStemVolumeByUtilization().getCoe(VdypStartApplication.UTIL_ALL);
 

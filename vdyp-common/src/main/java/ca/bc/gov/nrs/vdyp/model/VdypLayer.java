@@ -141,14 +141,6 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 		this.closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization;
 	}
 
-	public Optional<String> getDominantSpecies() {
-		return dominantSpecies;
-	}
-
-	public void setDominantSpecies(Optional<String> dominantSpecies) {
-		this.dominantSpecies = dominantSpecies;
-	}
-
 	public Optional<Integer> getEmpiricalRelationshipParameterIndex() {
 		return empericalRelationshipParameterIndex;
 	}
@@ -284,6 +276,11 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 				builder.polygonIdentifier(polygonIdentifier.get());
 				builder.layerType(layerType.get());
 			});
+		}
+
+		public void baseAreaByUtilization(Coefficients utilizationVector) {
+			// TODO Auto-generated method stub
+
 		}
 
 	}

@@ -23,6 +23,10 @@ import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.VdypLayer;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
+import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 
 public class Utils {
 
@@ -193,6 +197,10 @@ public class Utils {
 		return new Coefficients(new float[] { small, all }, -1);
 	}
 
+	public static Coefficients heightVector() {
+		return heightVector(0, 0);
+	}
+
 	public static Coefficients utilizationVector(float small, float all, float u1, float u2, float u3, float u4) {
 		return new Coefficients(new float[] { small, all, u1, u2, u3, u4 }, -1);
 	}
@@ -342,4 +350,96 @@ public class Utils {
 			}
 		}
 	}
+
+	// The following methods replicate the structure of the arrays used by VDYP7 to aid in debugging
+
+	public static float[] utilizationArray(
+			VdypLayer layer, Function<VdypUtilizationHolder, Coefficients> accessor, UtilizationClass uc
+	) {
+		var result = new float[layer.getSpecies().size() + 1];
+		utilizationArray(result, layer, accessor, uc);
+		return result;
+	}
+
+	private static void utilizationArray(
+			float[] result, VdypLayer layer, Function<VdypUtilizationHolder, Coefficients> accessor, UtilizationClass uc
+	) {
+		int i = 0;
+		result[i++] = accessor.apply(layer).getCoe(uc.index);
+		for (var spec : layer.getSpecies().values()) {
+			result[i++] = accessor.apply(spec).getCoe(uc.index);
+		}
+	}
+
+	public static float[][] utilizationArray(VdypLayer layer, Function<VdypUtilizationHolder, Coefficients> accessor) {
+		return utilizationArrayLimited(layer, accessor, UtilizationClass.OVER225);
+	}
+
+	private static float[][] utilizationArrayLimited(
+			VdypLayer layer, Function<VdypUtilizationHolder, Coefficients> accessor, UtilizationClass maxUc
+	) {
+		var result = new float[maxUc.index + 2][layer.getSpecies().size() + 1];
+
+		int i = 0;
+
+		for (var uc : UtilizationClass.values()) {
+			utilizationArray(result[i++], layer, accessor, uc);
+			if (uc == maxUc)
+				break;
+		}
+		return result;
+	}
+
+	public static float[][] hlArray(VdypLayer layer) {
+		return utilizationArrayLimited(layer, VdypUtilizationHolder::getLoreyHeightByUtilization, UtilizationClass.ALL);
+	}
+
+	public static float[][] dqArray(VdypLayer layer) {
+		return utilizationArray(layer, VdypUtilizationHolder::getQuadraticMeanDiameterByUtilization);
+	}
+
+	public static float[][] baArray(VdypLayer layer) {
+		return utilizationArray(layer, VdypUtilizationHolder::getBaseAreaByUtilization);
+	}
+
+	public static float[][] tphArray(VdypLayer layer) {
+		return utilizationArray(layer, VdypUtilizationHolder::getTreesPerHectareByUtilization);
+	}
+
+	public static float[][] wsvArray(VdypLayer layer) {
+		return utilizationArray(layer, VdypUtilizationHolder::getWholeStemVolumeByUtilization);
+	}
+
+	public static float[][] cuvArray(VdypLayer layer) {
+		return utilizationArray(layer, VdypUtilizationHolder::getCloseUtilizationVolumeByUtilization);
+	}
+
+	public static float[][] cuvdArray(VdypLayer layer) {
+		return utilizationArray(layer, VdypUtilizationHolder::getCloseUtilizationVolumeNetOfDecayByUtilization);
+	}
+
+	public static float[][] cuvdwArray(VdypLayer layer) {
+		return utilizationArray(layer, VdypUtilizationHolder::getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization);
+	}
+
+	public static float[][] cuvdwbArray(VdypLayer layer) {
+		return utilizationArray(
+				layer, VdypUtilizationHolder::getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization
+		);
+	}
+
+	public static float[] specValueArray(VdypLayer layer, Function<VdypSpecies, Object> accessor) {
+		var result = new float[layer.getSpecies().size()];
+		int i = 0;
+
+		for (var spec : layer.getSpecies().values()) {
+			result[i++] = Utils.optSafe(accessor.apply(spec)).map(Float.class::cast).orElse(-9f);
+		}
+		return result;
+	}
+
+	public static float[] specFraction(VdypLayer layer) {
+		return specValueArray(layer, VdypSpecies::getFractionGenus);
+	}
+
 }
