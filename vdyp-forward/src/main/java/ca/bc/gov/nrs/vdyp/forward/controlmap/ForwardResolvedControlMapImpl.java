@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.forward.controlmap;
 
 import java.util.Map;
+import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
@@ -14,6 +15,8 @@ import ca.bc.gov.nrs.vdyp.model.DebugSettings;
 import ca.bc.gov.nrs.vdyp.model.GrowthFiatDetails;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
+import ca.bc.gov.nrs.vdyp.model.ModelCoefficients;
+import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
 import ca.bc.gov.nrs.vdyp.model.Region;
 
 public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl implements ForwardResolvedControlMap {
@@ -30,7 +33,14 @@ public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl
 	final Map<Region, GrowthFiatDetails> quadMeanDiameterGrowthFiatDetails;
 	final Map<Integer, Coefficients> quadMeanDiameterGrowthEmpiricalCoefficients;
 	final Map<Integer, Coefficients> quadMeanDiameterGrowthEmpiricalLimits;
-	
+	final MatrixMap2<String, Region, Coefficients> loreyHeightPrimarySpeciesEquationP1Coefficients;
+	final MatrixMap3<String, String, Region, Optional<NonprimaryHLCoefficients>> loreyHeightNonPrimaryCoefficients;
+	final Map<Integer, ModelCoefficients> primarySpeciesBasalAreaGrowthCoefficients;
+	final MatrixMap2<String, Integer, Optional<Coefficients>> nonPrimarySpeciesBasalAreaGrowthCoefficients;
+	final Map<Integer, ModelCoefficients> primaryQuadMeanDiameterGrowthCoefficients;
+	final MatrixMap2<String, Integer, Optional<Coefficients>> nonPrimaryQuadMeanDiameterGrowthCoefficients;
+	final MatrixMap2<String, Region, Coefficients> componentSizeCoefficients;
+
 	public ForwardResolvedControlMapImpl(Map<String, Object> controlMap) {
 
 		super(controlMap);
@@ -47,6 +57,13 @@ public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl
 		this.quadMeanDiameterGrowthFiatDetails = this.get(ControlKey.DQ_GROWTH_FIAT, Map.class);
 		this.quadMeanDiameterGrowthEmpiricalCoefficients = this.get(ControlKey.DQ_GROWTH_EMPIRICAL, Map.class);
 		this.quadMeanDiameterGrowthEmpiricalLimits = this.get(ControlKey.DQ_GROWTH_EMPIRICAL_LIMITS, Map.class);
+		this.loreyHeightPrimarySpeciesEquationP1Coefficients = this.get(ControlKey.HL_PRIMARY_SP_EQN_P1, MatrixMap2.class);
+		this.loreyHeightNonPrimaryCoefficients = this.get(ControlKey.HL_NONPRIMARY, MatrixMap3.class);
+		this.primarySpeciesBasalAreaGrowthCoefficients = this.get(ControlKey.PRIMARY_SP_BA_GROWTH, Map.class);
+		this.nonPrimarySpeciesBasalAreaGrowthCoefficients = this.get(ControlKey.NON_PRIMARY_SP_BA_GROWTH, MatrixMap2.class);
+		this.primaryQuadMeanDiameterGrowthCoefficients = this.get(ControlKey.PRIMARY_SP_DQ_GROWTH, Map.class);
+		this.nonPrimaryQuadMeanDiameterGrowthCoefficients = this.get(ControlKey.NON_PRIMARY_SP_DQ_GROWTH, MatrixMap2.class);
+		this.componentSizeCoefficients = this.get(ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, MatrixMap2.class);
 	}
 	
 	@Override
@@ -107,5 +124,40 @@ public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl
 	@Override
 	public Map<Integer, Coefficients> getQuadMeanDiameterGrowthEmpiricalLimits() {
 		return quadMeanDiameterGrowthEmpiricalLimits;
+	}
+
+	@Override
+	public MatrixMap2<String, Region, Coefficients> getLoreyHeightPrimarySpeciesEquationP1Coefficients() {
+		return loreyHeightPrimarySpeciesEquationP1Coefficients;
+	}
+	
+	@Override
+	public MatrixMap3<String, String, Region, Optional<NonprimaryHLCoefficients>> getLoreyHeightNonPrimaryCoefficients() {
+		return loreyHeightNonPrimaryCoefficients;
+	}
+
+	@Override
+	public Map<Integer, ModelCoefficients> getPrimarySpeciesBasalAreaGrowthCoefficients() {
+		return primarySpeciesBasalAreaGrowthCoefficients;
+	}
+
+	@Override
+	public MatrixMap2<String, Integer, Optional<Coefficients>> getNonPrimarySpeciesBasalAreaGrowthCoefficients() {
+		return nonPrimarySpeciesBasalAreaGrowthCoefficients;
+	}
+
+	@Override
+	public Map<Integer, ModelCoefficients> getPrimarySpeciesQuadMeanDiameterGrowthCoefficients() {
+		return primaryQuadMeanDiameterGrowthCoefficients;
+	}
+
+	@Override
+	public MatrixMap2<String, Integer, Optional<Coefficients>> getNonPrimarySpeciesQuadMeanDiameterGrowthCoefficients() {
+		return nonPrimaryQuadMeanDiameterGrowthCoefficients;
+	}
+
+	@Override
+	public MatrixMap2<String, Region, Coefficients> getComponentSizeCoefficients() {
+		return this.componentSizeCoefficients;
 	}
 }

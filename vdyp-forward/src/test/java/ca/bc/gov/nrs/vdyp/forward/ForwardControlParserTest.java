@@ -43,6 +43,8 @@ import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
+import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.UtilizationClassVariable;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -201,7 +203,7 @@ class ForwardControlParserTest {
 
 		CompVarAdjustments m = (CompVarAdjustments) result.get(ControlKey.PARAM_ADJUSTMENTS.name());
 
-		assertThat(m.getParam(CompVarAdjustments.SMALL_BA), is(1.0f));
+		assertThat(m.getValue(UtilizationClass.SMALL, UtilizationClassVariable.BASAL_AREA), is(1.0f));
 	}
 
 	@Test

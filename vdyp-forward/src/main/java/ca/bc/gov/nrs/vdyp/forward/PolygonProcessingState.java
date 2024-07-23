@@ -16,8 +16,8 @@ import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
-import ca.bc.gov.nrs.vdyp.model.SmallUtilizationClassVariable;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.UtilizationClassVariable;
 import ca.bc.gov.nrs.vdyp.model.VolumeVariable;
 
 class PolygonProcessingState {
@@ -36,7 +36,6 @@ class PolygonProcessingState {
 	private static final String UNSET_SITE_CURVE_NUMBERS = "unset siteCurveNumbers";
 	private static final String UNSET_INVENTORY_TYPE_GROUP = "unset inventoryTypeGroup";
 
-	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(PolygonProcessingState.class);
 
 	/** The containing ForwardProcessingState */
@@ -100,7 +99,7 @@ class PolygonProcessingState {
 	private MatrixMap3<UtilizationClass, VolumeVariable, LayerType, Float>[] cvVolume;
 	private MatrixMap2<UtilizationClass, LayerType, Float>[] cvBasalArea;
 	private MatrixMap2<UtilizationClass, LayerType, Float>[] cvQuadraticMeanDiameter;
-	private Map<SmallUtilizationClassVariable, Float>[] cvPrimaryLayerSmall;
+	private Map<UtilizationClassVariable, Float>[] cvPrimaryLayerSmall;
 
 	// FRBASP0 - FR
 	// TODO
@@ -174,6 +173,13 @@ class PolygonProcessingState {
 			throw new IllegalStateException("unset primarySpeciesIndex");
 		}
 		return primarySpeciesIndex;
+	}
+	
+	public String getPrimarySpeciesAlias() {
+		if (!areRankingDetailsSet) {
+			throw new IllegalStateException("unset primarySpeciesIndex");
+		}
+		return wallet.speciesNames[primarySpeciesIndex];
 	}
 
 	public boolean hasSecondarySpeciesIndex() {
@@ -275,22 +281,9 @@ class PolygonProcessingState {
 		return primarySpeciesStratumNumber;
 	}
 
-	public boolean isAreSiteCurveNumbersSet() {
-		return areSiteCurveNumbersSet;
-	}
-
 	public int[] getSiteCurveNumbers() {
 		return siteCurveNumbers;
 	}
-
-	public boolean isArePrimarySpeciesDetailsSet() {
-		return arePrimarySpeciesDetailsSet;
-	}
-
-	public boolean isAreCompatibilityVariablesSet() {
-		return areCompatibilityVariablesSet;
-	}
-
 	public MatrixMap3<UtilizationClass, VolumeVariable, LayerType, Float>[] getCvVolume() {
 		return cvVolume;
 	}
@@ -303,7 +296,7 @@ class PolygonProcessingState {
 		return cvQuadraticMeanDiameter;
 	}
 
-	public Map<SmallUtilizationClassVariable, Float>[] getCvPrimaryLayerSmall() {
+	public Map<UtilizationClassVariable, Float>[] getCvPrimaryLayerSmall() {
 		return cvPrimaryLayerSmall;
 	}
 
@@ -417,12 +410,22 @@ class PolygonProcessingState {
 
 		this.arePrimarySpeciesDetailsSet = true;
 	}
+	
+	public void updatePrimarySpeciesDetailsAfterGrowth(float newPrimarySpeciesDominantHeight) {
+		
+		this.primarySpeciesDominantHeight = newPrimarySpeciesDominantHeight;
+		this.primarySpeciesTotalAge += 1;
+		this.primarySpeciesAgeAtBreastHeight += 1;
+		
+		// primarySpeciesSiteIndex - does this change?
+		// primarySpeciesAgeToBreastHeight of course doesn't change.
+	}
 
 	public void setCompatibilityVariableDetails(
 			MatrixMap3<UtilizationClass, VolumeVariable, LayerType, Float>[] cvVolume,
 			MatrixMap2<UtilizationClass, LayerType, Float>[] cvBasalArea,
 			MatrixMap2<UtilizationClass, LayerType, Float>[] cvQuadraticMeanDiameter,
-			Map<SmallUtilizationClassVariable, Float>[] cvPrimaryLayerSmall
+			Map<UtilizationClassVariable, Float>[] cvPrimaryLayerSmall
 	) {
 		if (this.areCompatibilityVariablesSet) {
 			throw new IllegalStateException(COMPATIBILITY_VARIABLES_SET_CAN_BE_SET_ONCE_ONLY);
@@ -434,6 +437,31 @@ class PolygonProcessingState {
 		this.cvPrimaryLayerSmall = cvPrimaryLayerSmall;
 
 		this.areCompatibilityVariablesSet = true;
+	}
+
+	/**
+	 * CVADJ1 - adjust the values of the compatibility variables after one year of growth.
+	 */
+	public void updateCompatibilityVariableAfterGrowth() {
+		
+		var compVarAdjustments = fps.fcm.getCompVarAdjustments();
+		
+		for (int i: getIndices()) {
+			for (UtilizationClassVariable sucv: UtilizationClassVariable.values()) {
+				cvPrimaryLayerSmall[i].put(sucv, cvPrimaryLayerSmall[i].get(sucv) * compVarAdjustments.getValue(UtilizationClass.SMALL, sucv));
+			}
+			for (UtilizationClass uc: UtilizationClass.UTIL_CLASSES) {
+				cvBasalArea[i].put(uc, LayerType.PRIMARY, cvBasalArea[i].get(uc, LayerType.PRIMARY) 
+						* compVarAdjustments.getValue(uc, UtilizationClassVariable.BASAL_AREA));
+				cvQuadraticMeanDiameter[i].put(uc, LayerType.PRIMARY, cvQuadraticMeanDiameter[i].get(uc, LayerType.PRIMARY)
+						* compVarAdjustments.getValue(uc, UtilizationClassVariable.QUAD_MEAN_DIAMETER));
+				
+				for (VolumeVariable vv: VolumeVariable.ALL) {
+					cvVolume[i].put(uc, vv, LayerType.PRIMARY, cvVolume[i].get(uc, vv, LayerType.PRIMARY)
+							* compVarAdjustments.getVolumeValue(uc, vv));
+				}
+			}
+		}
 	}
 
 	public float
@@ -461,7 +489,7 @@ class PolygonProcessingState {
 		return cvQuadraticMeanDiameter[speciesIndex].get(uc, layerType);
 	}
 
-	public float getCVSmall(int speciesIndex, SmallUtilizationClassVariable variable) {
+	public float getCVSmall(int speciesIndex, UtilizationClassVariable variable) {
 		if (!this.areCompatibilityVariablesSet) {
 			throw new IllegalStateException(UNSET_CV_BASAL_AREAS);
 		}
