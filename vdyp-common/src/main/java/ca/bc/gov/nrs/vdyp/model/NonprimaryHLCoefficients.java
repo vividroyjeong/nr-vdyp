@@ -20,4 +20,9 @@ public class NonprimaryHLCoefficients extends Coefficients {
 		return equationIndex;
 	}
 
+	private static final NonprimaryHLCoefficients DEFAULT_VALUE = new NonprimaryHLCoefficients(new float[] { 1.0f, 1.0f }, 2);
+	
+	public static final NonprimaryHLCoefficients getDefault() { 
+		return DEFAULT_VALUE;
+	}
 }
