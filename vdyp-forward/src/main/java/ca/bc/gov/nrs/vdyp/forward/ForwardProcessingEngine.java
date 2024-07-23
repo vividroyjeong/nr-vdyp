@@ -160,7 +160,7 @@ public class ForwardProcessingEngine {
 		if (lastStep.ordinal() >= ExecutionStep.SET_COMPATIBILITY_VARIABLES.ordinal()) {
 			setCompatibilityVariables(pps);
 		}
-		
+
 		fps.storeActive(2, LayerType.PRIMARY);
 	}
 

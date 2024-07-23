@@ -1,6 +1,11 @@
 package ca.bc.gov.nrs.vdyp.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.aMapWithSize;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -19,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -33,6 +39,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BreakageParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.CloseUtilVolumeParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.UtilComponentWSVolumeParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.VeteranBAParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.VolumeNetDecayParser;
@@ -42,11 +49,16 @@ import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapValueReplacer;
 import ca.bc.gov.nrs.vdyp.io.parse.control.NonFipControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ResourceControlMapModifier;
 import ca.bc.gov.nrs.vdyp.io.parse.control.StartApplicationControlParser;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.Region;
 
 public class TestUtils {
@@ -278,7 +290,7 @@ public class TestUtils {
 	}
 
 	public static void
-			populateControlMapNetBreakage(HashMap<String, Object> controlMap, Function<Integer, Coefficients> mapper) {
+			populateControlMapNetBreakage(Map<String, Object> controlMap, Function<Integer, Coefficients> mapper) {
 		var groupIndicies = groupIndices(BreakageParser.MAX_GROUPS);
 
 		populateControlMap1(controlMap, ControlKey.BREAKAGE.name(), groupIndicies, mapper);
@@ -301,6 +313,34 @@ public class TestUtils {
 		var result = keys1.stream().collect(Collectors.toMap(k -> k, mapper));
 
 		controlMap.put(key, result);
+	}
+
+	/**
+	 * Fill in the decay modifiers in a control map with mock data for testing.
+	 *
+	 * @param controlMap
+	 * @param mapper
+	 */
+	public static void
+			populateControlMapDecayModifiers(Map<String, Object> controlMap, BiFunction<String, Region, Float> mapper) {
+		var spec = Arrays.asList(TestUtils.getSpeciesAliases());
+		var regions = Arrays.asList(Region.values());
+		TestUtils
+				.populateControlMap2(controlMap, ModifierParser.CONTROL_KEY_MOD301_DECAY.name(), spec, regions, mapper);
+	}
+
+	/**
+	 * Fill in the waste modifiers in a control map with mock data for testing.
+	 *
+	 * @param controlMap
+	 * @param mapper
+	 */
+	public static void
+			populateControlMapWasteModifiers(Map<String, Object> controlMap, BiFunction<String, Region, Float> mapper) {
+		var spec = Arrays.asList(TestUtils.getSpeciesAliases());
+		var regions = Arrays.asList(Region.values());
+		TestUtils
+				.populateControlMap2(controlMap, ModifierParser.CONTROL_KEY_MOD301_WASTE.name(), spec, regions, mapper);
 	}
 
 	static final Collection<Integer> UTIL_CLASSES = IntStream.rangeClosed(-1, 4).mapToObj(x -> x).toList();
@@ -384,10 +424,8 @@ public class TestUtils {
 
 	}
 
-	public static String polygonId(String name, int year) {
-		String result = String.format("%-21s%4d", name, year);
-		assert result.length() == 25;
-		return result;
+	public static PolygonIdentifier polygonId(String name, int year) {
+		return new PolygonIdentifier(name, year);
 	}
 
 	public static StartApplicationControlParser startAppControlParser() {
@@ -414,6 +452,175 @@ public class TestUtils {
 		protected VdypApplicationIdentifier getProgramId() {
 			return VdypApplicationIdentifier.VRI_START;
 		}
+	}
+
+	/**
+	 * Do nothing to mutate valid test data
+	 */
+	public static final <T> Consumer<T> valid() {
+		return x -> {
+		};
+	}
+
+	public static BiFunction<Integer, Integer, Optional<Coefficients>> wholeStemMap(int group) {
+		return (u, g) -> {
+			if (g == group) {
+				switch (u) {
+				case 1:
+					return Optional.of(
+							new Coefficients(new float[] { -1.20775998f, 0.670000017f, 1.43023002f, -0.886789978f }, 0)
+					);
+				case 2:
+					return Optional.of(
+							new Coefficients(new float[] { -1.58211005f, 0.677200019f, 1.36449003f, -0.781769991f }, 0)
+					);
+				case 3:
+					return Optional.of(
+							new Coefficients(new float[] { -1.61995006f, 0.651030004f, 1.17782998f, -0.607379973f }, 0)
+					);
+				case 4:
+					return Optional
+							.of(
+									new Coefficients(
+											new float[] { -0.172529995f, 0.932619989f, -0.0697899982f,
+													-0.00362000009f },
+											0
+									)
+							);
+				}
+			}
+			return Optional.empty();
+		};
+	}
+
+	public static BiFunction<Integer, Integer, Optional<Coefficients>> closeUtilMap(int group) {
+		return (u, g) -> {
+			if (g == group) {
+				switch (u) {
+				case 1:
+					return Optional.of(new Coefficients(new float[] { -10.6339998f, 0.835500002f, 0f }, 1));
+				case 2:
+					return Optional.of(new Coefficients(new float[] { -4.44999981f, 0.373400003f, 0f }, 1));
+				case 3:
+					return Optional.of(new Coefficients(new float[] { -0.796000004f, 0.141299993f, 0.0033499999f }, 1));
+				case 4:
+					return Optional.of(new Coefficients(new float[] { 2.35400009f, 0.00419999985f, 0.0247699991f }, 1));
+				}
+			}
+			return Optional.empty();
+		};
+	}
+
+	public static BiFunction<Integer, Integer, Optional<Coefficients>> netDecayMap(int group) {
+		return (u, g) -> {
+			if (g == group) {
+				switch (u) {
+				case 1:
+					return Optional.of(new Coefficients(new float[] { 9.84819984f, -0.224209994f, -0.814949989f }, 1));
+				case 2:
+					return Optional.of(new Coefficients(new float[] { 9.61330032f, -0.224209994f, -0.814949989f }, 1));
+				case 3:
+					return Optional.of(new Coefficients(new float[] { 9.40579987f, -0.224209994f, -0.814949989f }, 1));
+				case 4:
+					return Optional.of(new Coefficients(new float[] { 10.7090998f, -0.952880025f, -0.808309972f }, 1));
+				}
+			}
+			return Optional.empty();
+		};
+	}
+
+	/**
+	 * Assert that a polygon has a layer of the given type.
+	 *
+	 * @param polygon the polygon
+	 * @param type    the type of layer
+	 * @param number  the total number of layers the polygon should have
+	 * @return the layer
+	 */
+	public static <P extends BaseVdypPolygon<L, ?, ?, ?>, L extends BaseVdypLayer<?, ?>> L
+			assertLayer(P polygon, LayerType type) {
+		assertThat(polygon, hasProperty("layers", hasKey(type)));
+
+		var resultLayer = polygon.getLayers().get(type);
+
+		assertThat(resultLayer, hasProperty("polygonIdentifier", equalTo(polygon.getPolygonIdentifier())));
+		assertThat(resultLayer, hasProperty("layerType", is(type)));
+
+		return resultLayer;
 	};
 
+	/**
+	 * Assert that a polygon only has a primary layer.
+	 *
+	 * @param polygon the polygon
+	 * @param polygon
+	 * @return the primary layer
+	 */
+	public static <P extends BaseVdypPolygon<L, ?, ?, ?>, L extends BaseVdypLayer<?, ?>> L
+			assertOnlyPrimaryLayer(P polygon) {
+		assertThat(polygon, hasProperty("layers", aMapWithSize(1)));
+		return assertLayer(polygon, LayerType.PRIMARY);
+	};
+
+	/**
+	 * Assert that a polygon has a primary layer, allowing for other layers.
+	 *
+	 * @param polygon the polygon
+	 * @param polygon
+	 * @return the primary layer
+	 */
+	public static <P extends BaseVdypPolygon<L, ?, ?, ?>, L extends BaseVdypLayer<?, ?>> L
+			assertHasPrimaryLayer(P polygon) {
+		return assertLayer(polygon, LayerType.PRIMARY);
+	};
+
+	/**
+	 * Assert that a polygon has a veteran layer as well as a primary.
+	 *
+	 * @param polygon the polygon
+	 * @param polygon
+	 * @return the veteran layer
+	 */
+	public static <P extends BaseVdypPolygon<L, ?, ?, ?>, L extends BaseVdypLayer<?, ?>> L
+			assertHasVeteranLayer(P polygon) {
+		assertThat(polygon, hasProperty("layers", aMapWithSize(2)));
+		return assertLayer(polygon, LayerType.VETERAN);
+	};
+
+	/**
+	 * Assert that a layer has a species of the given genus ID.
+	 *
+	 * @param layer
+	 * @param id
+	 * @return The species
+	 */
+	public static <L extends BaseVdypLayer<S, ?>, S extends BaseVdypSpecies> S assertHasSpecies(L layer, String id) {
+
+		assertThat(layer, hasProperty("species", hasKey(id)));
+
+		var resultSpecies = layer.getSpecies().get(id);
+		assertThat(resultSpecies, hasProperty("polygonIdentifier", equalTo(layer.getPolygonIdentifier())));
+		assertThat(resultSpecies, hasProperty("layerType", is(layer.getLayerType())));
+		assertThat(resultSpecies, hasProperty("genus", is(id)));
+
+		return resultSpecies;
+	};
+
+	/**
+	 * Assert that a layer has a species of the given genera IDs.
+	 *
+	 * @param layer
+	 * @param ids
+	 * @return the first species specified
+	 */
+	public static <L extends BaseVdypLayer<S, ?>, S extends BaseVdypSpecies> S
+			assertHasSpecies(L layer, String... ids) {
+		assertThat(layer, hasProperty("species", aMapWithSize(ids.length)));
+
+		for (var id : ids) {
+			assertHasSpecies(layer, id);
+		}
+
+		return layer.getSpecies().get(ids[0]);
+	}
 }
