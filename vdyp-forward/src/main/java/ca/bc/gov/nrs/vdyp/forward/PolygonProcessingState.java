@@ -442,7 +442,7 @@ class PolygonProcessingState {
 	/**
 	 * CVADJ1 - adjust the values of the compatibility variables after one year of growth.
 	 */
-	public void updateCompatibilityVariableAfterGrowth() {
+	public void updateCompatibilityVariablesAfterGrowth() {
 		
 		var compVarAdjustments = fps.fcm.getCompVarAdjustments();
 		

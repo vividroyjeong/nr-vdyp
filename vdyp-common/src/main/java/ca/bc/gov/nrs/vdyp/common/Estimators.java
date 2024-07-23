@@ -813,14 +813,14 @@ public class Estimators {
 	}
 
 	/**
-	 * EMP106
+	 * EMP106 - estimate primary <b>layer</b> basal area yield
 	 * 
 	 * @param estimateBaseAreaYieldCoefficients
 	 * @param debugSetting2Value
 	 * @param dominantHeight
 	 * @param breastHeightAge
 	 * @param baseAreaOverstory
-	 * @param fullOccupancy
+	 * @param isFullOccupancy
 	 * @param bec
 	 * @param baseAreaGroup
 	 * @return
@@ -828,7 +828,7 @@ public class Estimators {
 	 */
 	public float estimateBaseAreaYield(
 			Coefficients estimateBaseAreaYieldCoefficients, int debugSetting2Value, float dominantHeight, 
-			float breastHeightAge, Optional<Float> baseAreaOverstory, boolean fullOccupancy, BecDefinition bec, 
+			float breastHeightAge, Optional<Float> baseAreaOverstory, boolean isFullOccupancy, BecDefinition bec, 
 			int baseAreaGroup
 	) throws StandProcessingException {
 		float upperBoundBasalArea = upperBoundsBaseArea(baseAreaGroup);
@@ -880,7 +880,7 @@ public class Estimators {
 			bap = Math.min(bap, upperBoundBasalArea);
 		}
 
-		if (fullOccupancy)
+		if (isFullOccupancy)
 			bap /= EMPIRICAL_OCCUPANCY;
 
 		return bap;

@@ -96,13 +96,45 @@ public class ForwardDebugSettings {
 	public static final int MAX_FILL_INDEX_SETTINGS_INDEX = DebugSettings.MAX_DEBUG_SETTINGS;
 	
 	public enum Vars {
+		/**
+		 * <li>Value 0: Full species dynamics. Not recommended.
+		 * <li>Value 1: No species dynamics. Species percents in TPH and BA are constant.
+		 * <li>Value 2: Limited dynamics. Percents by BA are constant, but TPH %’s vary.
+		 */
 		SPECIES_DYNAMICS_1(1),
+		/**
+		 * <li>Value 0: No upper age for application of BA and DQ yield equations.
+		 * <li>Value n: Maximum BH age for application of BA and DQ yields is 100 * n (years).
+		 */
 		MAX_BREAST_HEIGHT_AGE_2(2),
+		/**
+		 * <li>Value 0: BA growth comes from fiat model (approach to yield eqn’s).
+		 * <li>Value 1: BA growth from empirical model (older ages suspect).
+		 * <li>Value 2: Mixed fiat & empirical model. (See SEQ111 and IPSJF162).	
+		 */
 		BASAL_AREA_GROWTH_MODEL_3(3),
+		/**
+		 * <li>Value 0: Will default to (2). Controls upper bounds in some models.
+		 * <li>Value 1: Limits from SEQ108 on control file, categorized by GRPBA1.
+		 * <li>Value 2: Limits from SEQ043 on control file, Coast Interior & Leading species. 
+		 */
 		PER_SPECIES_AND_REGION_MAX_BREAST_HEIGHT_4(4),
+		/** Messaging Level */
 		MESSAGING_LEVEL_5(5),
+		/**
+		 * <li>Value 0: DQ growth comes from fiat model (approach to yield eqn’s).
+		 * <li>Value 1: DQ growth from empirical model (older ages suspect).
+		 * <li>Value 2: Mixed fiat & empirical model. (See SEQ117 and IPSJF178).	
+		 */
 		DQ_GROWTH_MODEL_6(6),
+		/**
+		 * <li>Value 0: Normal changes in Lorey height (HL), all species.
+		 * <li>Value 1: Force change to zero for nonprimary species if change in HD is zero.
+		 * <li>Value 2: Force change to zero for all species if change in HD is zero.
+         *              (option 2 precludes changes in primary sp HL due solely to change in TPH).
+		 */
 		LOREY_HEIGHT_CHANGE_STRATEGY_8(8),
+		/** Limit BA if DQ has been limited */
 		DO_LIMIT_BA_WHEN_DQ_LIMITED_9(9);
 
 		public final int settingNumber;
