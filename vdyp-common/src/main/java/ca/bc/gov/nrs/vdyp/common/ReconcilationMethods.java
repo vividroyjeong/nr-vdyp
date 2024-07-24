@@ -7,12 +7,11 @@ import java.util.List;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
-import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.UtilizationVector;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
 public class ReconcilationMethods {
 
-	private static final int UTIL_ALL = UtilizationClass.ALL.index;
 	private static final List<UtilizationClass> MODE_1_RECONCILE_AVAILABILITY_CLASSES = List
 			.of(UtilizationClass.OVER225, UtilizationClass.U175TO225, UtilizationClass.U125TO175);
 
@@ -28,9 +27,10 @@ public class ReconcilationMethods {
 	 * @throws ProcessingException
 	 */
 	public static void reconcileComponents(
-			Coefficients baseAreaUtil, Coefficients treesPerHectareUtil, Coefficients quadMeanDiameterUtil
+			UtilizationVector baseAreaUtil, UtilizationVector treesPerHectareUtil,
+			UtilizationVector quadMeanDiameterUtil
 	) throws ProcessingException {
-		if (baseAreaUtil.getCoe(UTIL_ALL) == 0f) {
+		if (baseAreaUtil.getAll() == 0f) {
 			UtilizationClass.UTIL_CLASSES.forEach(uc -> {
 				treesPerHectareUtil.setCoe(uc.index, 0f);
 				baseAreaUtil.setCoe(uc.index, 0f);
@@ -46,12 +46,11 @@ public class ReconcilationMethods {
 			baSum += baseAreaUtil.getCoe(uc.index);
 		}
 
-		if (abs(baSum - baseAreaUtil.getCoe(UTIL_ALL)) > 0.00003 * baSum) {
+		if (abs(baSum - baseAreaUtil.getAll()) > 0.00003 * baSum) {
 			throw new ProcessingException("Computed base areas for 7.5+ components do not sum to expected total");
 		}
 
-		float dq0 = BaseAreaTreeDensityDiameter
-				.quadMeanDiameter(baseAreaUtil.getCoe(UTIL_ALL), treesPerHectareUtil.getCoe(UTIL_ALL));
+		float dq0 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseAreaUtil.getAll(), treesPerHectareUtil.getAll());
 
 		if (dq0 < 7.5f) {
 			throw new ProcessingException(
@@ -64,7 +63,7 @@ public class ReconcilationMethods {
 						uc -> BaseAreaTreeDensityDiameter.treesPerHectare(baseAreaUtil.getCoe(uc.index), uc.lowBound)
 				).sum();
 
-		if (tphSumHigh < treesPerHectareUtil.getCoe(UTIL_ALL)) {
+		if (tphSumHigh < treesPerHectareUtil.getAll()) {
 			reconcileComponentsMode1(baseAreaUtil, treesPerHectareUtil, quadMeanDiameterUtil, tphSumHigh);
 		} else {
 			reconcileComponentsMode2Check(baseAreaUtil, treesPerHectareUtil, quadMeanDiameterUtil);
@@ -73,8 +72,8 @@ public class ReconcilationMethods {
 
 	@SuppressWarnings("java:S3655")
 	public static void reconcileComponentsMode1(
-			Coefficients baseAreaUtil, Coefficients treesPerHectareUtil, Coefficients quadMeanDiameterUtil,
-			float tphSumHigh
+			UtilizationVector baseAreaUtil, UtilizationVector treesPerHectareUtil,
+			UtilizationVector quadMeanDiameterUtil, float tphSumHigh
 	) {
 		// MODE 1
 
@@ -82,7 +81,7 @@ public class ReconcilationMethods {
 		// to lowest allowable values AND must move BA from upper classes to lower
 		// classes.
 
-		float tphNeed = treesPerHectareUtil.getCoe(UTIL_ALL) - tphSumHigh;
+		float tphNeed = treesPerHectareUtil.getAll() - tphSumHigh;
 
 		UtilizationClass.UTIL_CLASSES.forEach(uc -> quadMeanDiameterUtil.setCoe(uc.index, uc.lowBound));
 
@@ -112,14 +111,15 @@ public class ReconcilationMethods {
 	}
 
 	public static void reconcileComponentsMode2Check(
-			Coefficients baseAreaUtil, Coefficients treesPerHectareUtil, Coefficients quadMeanDiameterUtil
+			UtilizationVector baseAreaUtil, UtilizationVector treesPerHectareUtil,
+			UtilizationVector quadMeanDiameterUtil
 	) throws ProcessingException {
 		// Before entering mode 2, check to see if reconciliation is already adequate
 
 		float tphSum = (float) UtilizationClass.UTIL_CLASSES.stream()
 				.mapToDouble(uc -> treesPerHectareUtil.getCoe(uc.index)).sum();
 
-		if (abs(tphSum - treesPerHectareUtil.getCoe(UTIL_ALL)) / tphSum > 0.00001) {
+		if (abs(tphSum - treesPerHectareUtil.getAll()) / tphSum > 0.00001) {
 			reconcileComponentsMode2(baseAreaUtil, treesPerHectareUtil, quadMeanDiameterUtil);
 			return;
 		}
@@ -140,13 +140,14 @@ public class ReconcilationMethods {
 	}
 
 	public static void reconcileComponentsMode2(
-			Coefficients baseAreaUtil, Coefficients treesPerHectareUtil, Coefficients quadMeanDiameterUtil
+			UtilizationVector baseAreaUtil, UtilizationVector treesPerHectareUtil,
+			UtilizationVector quadMeanDiameterUtil
 	) throws ProcessingException {
 		int n = 0;
 		float baseAreaFixed = 0f;
 		float treesPerHectareFixed = 0f;
 		var quadMeanDiameterLimit = new boolean[] { false, false, false, false, false };
-		Coefficients dqTrial = Utils.utilizationVector();
+		UtilizationVector dqTrial = Utils.utilizationVector();
 
 		while (true) {
 			n++;
@@ -164,8 +165,8 @@ public class ReconcilationMethods {
 				return 0;
 			}).sum();
 
-			float baAll = baseAreaUtil.getCoe(UTIL_ALL) - baseAreaFixed;
-			float tphAll = treesPerHectareUtil.getCoe(UTIL_ALL) - treesPerHectareFixed;
+			float baAll = baseAreaUtil.getAll() - baseAreaFixed;
+			float tphAll = treesPerHectareUtil.getAll() - treesPerHectareFixed;
 
 			if (baAll <= 0f || tphAll <= 0f) {
 				reconcileComponentsMode3(baseAreaUtil, treesPerHectareUtil, quadMeanDiameterUtil);
@@ -231,17 +232,18 @@ public class ReconcilationMethods {
 				.sum();
 		float tphSum = (float) UtilizationClass.UTIL_CLASSES.stream()
 				.mapToDouble(uc -> treesPerHectareUtil.getCoe(uc.index)).sum();
-		if (abs(baSum - baseAreaUtil.getCoe(UTIL_ALL)) > 0.0002 * baSum) {
+		if (abs(baSum - baseAreaUtil.getAll()) > 0.0002 * baSum) {
 			throw new ProcessingException("Failed to reconcile Base Area");
 		}
-		if (abs(tphSum - treesPerHectareUtil.getCoe(UTIL_ALL)) > 0.0002 * tphSum) {
+		if (abs(tphSum - treesPerHectareUtil.getAll()) > 0.0002 * tphSum) {
 			throw new ProcessingException("Failed to reconcile Trees per Hectare");
 		}
 	}
 
 	@SuppressWarnings("java:S3655")
 	public static void reconcileComponentsMode3(
-			Coefficients baseAreaUtil, Coefficients treesPerHectareUtil, Coefficients quadMeanDiameterUtil
+			UtilizationVector baseAreaUtil, UtilizationVector treesPerHectareUtil,
+			UtilizationVector quadMeanDiameterUtil
 	) {
 
 		/*
@@ -260,10 +262,10 @@ public class ReconcilationMethods {
 		});
 
 		var ucToUpdate = UtilizationClass.UTIL_CLASSES.stream()
-				.filter(uc -> quadMeanDiameterUtil.getCoe(UTIL_ALL) < uc.highBound).findFirst().get();
+				.filter(uc -> quadMeanDiameterUtil.getAll() < uc.highBound).findFirst().get();
 
-		baseAreaUtil.setCoe(ucToUpdate.index, baseAreaUtil.getCoe(UTIL_ALL));
-		treesPerHectareUtil.setCoe(ucToUpdate.index, treesPerHectareUtil.getCoe(UTIL_ALL));
-		quadMeanDiameterUtil.setCoe(ucToUpdate.index, quadMeanDiameterUtil.getCoe(UTIL_ALL));
+		baseAreaUtil.setCoe(ucToUpdate.index, baseAreaUtil.getAll());
+		treesPerHectareUtil.setCoe(ucToUpdate.index, treesPerHectareUtil.getAll());
+		quadMeanDiameterUtil.setCoe(ucToUpdate.index, quadMeanDiameterUtil.getAll());
 	}
 }
