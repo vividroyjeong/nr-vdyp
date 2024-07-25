@@ -87,17 +87,16 @@ public abstract class BecZoneBySpeciesCoefficientParser
 				var spec = specIt.next();
 				
 				Float coe = specCoefficients.get(coefficientIndex);
-
-				Coefficients coefficients = r.get(becZoneId, spec);
-				if (indicator == 1 && coefficientIndex > 0) {
-					coefficients.setCoe(index, coe + first);
-				} else {
-					coefficients.setCoe(index, coe);
-				}
-				
 				if (coefficientIndex == 0) {
 					first = coe;
 				}
+
+				Coefficients coefficients = r.get(becZoneId, spec);
+				if (indicator == 0 || coefficientIndex == 0) {
+					coefficients.setCoe(index, first);
+				} else {
+					coefficients.setCoe(index, first + coe);
+				}				
 
 				coefficientIndex += 1;
 			}

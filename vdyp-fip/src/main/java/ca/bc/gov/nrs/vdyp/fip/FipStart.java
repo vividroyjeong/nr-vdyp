@@ -415,7 +415,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				final float maxHeightMultiplier = fipLayer.getPrimaryGenus()
 						.orElseThrow(() -> new IllegalStateException("primaryGenus has not been set"))
 						.equals(spec.getGenus()) ? 1.5f : 1.0f;
-				final float heightMax = limits.maxLoreyHeight() * maxHeightMultiplier;
+				final float heightMax = limits.loreyHeightMaximum() * maxHeightMultiplier;
 
 				spec.getLoreyHeightByUtilization().scalarInPlace(UTIL_ALL, x -> min(x, heightMax));
 			}
@@ -462,10 +462,10 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 					// EMP061
 					var limits = estimators.getLimitsForHeightAndDiameter(spec.getGenus(), bec.getRegion());
 
-					var dqMin = limits.minDiameterHeight() * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL);
+					var dqMin = limits.minQuadMeanDiameterLoreyHeightRatio() * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL);
 					var dqMax = max(
-							limits.maxQuadMeanDiameter(),
-							limits.maxDiameterHeight() * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL)
+							limits.quadMeanDiameterMaximum(),
+							limits.maxQuadMeanDiameterLoreyHeightRatio() * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL)
 					);
 
 					// EMP060

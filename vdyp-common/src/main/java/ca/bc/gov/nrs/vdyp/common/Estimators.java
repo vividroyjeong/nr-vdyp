@@ -27,6 +27,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.ComponentSizeLimits;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
@@ -268,7 +269,7 @@ public class Estimators {
 	}
 
 	float estimateQuadMeanDiameterClampResult(
-			Limits limits, float standTreesPerHectare, float minQuadMeanDiameter, float loreyHeightSpec,
+			ComponentSizeLimits limits, float standTreesPerHectare, float minQuadMeanDiameter, float loreyHeightSpec,
 			float baseArea1, float baseArea2, float quadMeanDiameter1, float treesPerHectare2, float quadMeanDiameter2
 	) {
 		float treesPerHectare1;
@@ -280,9 +281,9 @@ public class Estimators {
 			quadMeanDiameter1 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea1, treesPerHectare1);
 		}
 
-		final float dqMinSp = max(minQuadMeanDiameter, limits.minDiameterHeight() * loreyHeightSpec);
+		final float dqMinSp = max(minQuadMeanDiameter, limits.minQuadMeanDiameterLoreyHeightRatio() * loreyHeightSpec);
 		final float dqMaxSp = max(
-				7.6f, min(limits.maxQuadMeanDiameter(), limits.maxDiameterHeight() * loreyHeightSpec)
+				7.6f, min(limits.quadMeanDiameterMaximum(), limits.maxQuadMeanDiameterLoreyHeightRatio() * loreyHeightSpec)
 		);
 		if (quadMeanDiameter1 < dqMinSp) {
 			quadMeanDiameter1 = dqMinSp;
@@ -315,19 +316,13 @@ public class Estimators {
 		return quadMeanDiameter1;
 	}
 
-	public static record Limits(
-			float maxLoreyHeight, float maxQuadMeanDiameter, float minDiameterHeight, float maxDiameterHeight
-	) {
-	};
-
 	// EMP061
-	public Limits getLimitsForHeightAndDiameter(String genus, Region region) {
-		var coeMap = controlMap.<MatrixMap2<String, Region, Coefficients>>get(
+	public ComponentSizeLimits getLimitsForHeightAndDiameter(String genus, Region region) {
+		var cslMap = controlMap.<MatrixMap2<String, Region, ComponentSizeLimits>>get(
 				ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, MatrixMap2.class
 		);
 
-		var coe = coeMap.get(genus, region);
-		return new Limits(coe.getCoe(1), coe.getCoe(2), coe.getCoe(3), coe.getCoe(4));
+		return cslMap.get(genus, region);
 	}
 
 	/**

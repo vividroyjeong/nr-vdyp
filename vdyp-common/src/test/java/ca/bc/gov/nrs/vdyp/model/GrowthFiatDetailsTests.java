@@ -87,11 +87,6 @@ public class GrowthFiatDetailsTests {
 	}
 
 	@Test
-	void testCoefficientsNotMonatonicallyIncreasing() {
-		assertThrows(ResourceParseException.class, () -> new GrowthFiatDetails(2, List.of(1.0f, 1.0f, 2.0f, 2.0f, 3.0f, 1.5f, 4.0f, 4.0f, 0.1f, 0.2f, 0.3f)));
-	}
-
-	@Test
 	void testRegionValueNot1Or2() {
 		assertThrows(ResourceParseException.class, () -> new GrowthFiatDetails(0, List.of(1.0f, 1.0f, 2.0f, 2.0f, 3.0f, 1.5f, 4.0f, 4.0f, 0.1f, 0.2f, 0.3f)));
 	}

@@ -1142,7 +1142,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				log.atDebug().log("Estimating tree volume");
 
 				var volumeGroup = spec.getVolumeGroup();
-				var meanVolume = this.estimationMethods
+				var meanVolume = this.estimators
 						.estimateWholeStemVolumePerTree(volumeGroup, loreyHeightSpec, quadMeanDiameterSpec);
 				var specWholeStemVolume = treesPerHectareSpec * meanVolume;
 

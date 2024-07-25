@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,14 +29,15 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveAgeMaximumParserTest;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
+import ca.bc.gov.nrs.vdyp.model.ComponentSizeLimits;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
@@ -325,9 +325,14 @@ class NonFipControlParserTest {
 				result,
 				(Matcher) controlMapHasEntry(
 						ControlKey.SPECIES_COMPONENT_SIZE_LIMIT,
-						allOf(mmHasEntry(coe(1, contains(49.4f, 153.3f, 0.726f, 3.647f)), "AC", Region.COASTAL))
-				)
-		);
+						mmHasEntry(isA(ComponentSizeLimits.class), "AC", Region.COASTAL))
+				);
+		var cslMap = Utils.<MatrixMap2<String, Region, ComponentSizeLimits>>expectParsedControl(result, ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, MatrixMap2.class);
+		var csl = cslMap.get("AC", Region.COASTAL);
+		assertThat(csl.loreyHeightMaximum(), is(49.4f));
+		assertThat(csl.quadMeanDiameterMaximum(), is(153.3f));
+		assertThat(csl.maxQuadMeanDiameterLoreyHeightRatio(), is(3.647f));
+		assertThat(csl.minQuadMeanDiameterLoreyHeightRatio(), is(0.726f));
 	}
 
 	@Test
@@ -623,7 +628,7 @@ class NonFipControlParserTest {
 		}
 	}
 
-	Map<String, ?> parse(BaseControlParser parser, Class<?> klazz, String resourceName)
+	Map<String, Object> parse(BaseControlParser parser, Class<?> klazz, String resourceName)
 			throws IOException, ResourceParseException {
 		try (var is = klazz.getResourceAsStream(resourceName)) {
 

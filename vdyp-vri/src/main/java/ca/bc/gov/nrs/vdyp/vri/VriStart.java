@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.vri;
 
-import static ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter.*;
+import static ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter.quadMeanDiameter;
+import static ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter.treesPerHectare;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import org.apache.commons.math3.exception.NoBracketingException;
 import org.apache.commons.math3.exception.TooManyEvaluationsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.application.RuntimeProcessingException;
 import ca.bc.gov.nrs.vdyp.application.RuntimeStandProcessingException;
@@ -30,7 +32,6 @@ import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.EstimationMethods.Limits;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndex2Height;
@@ -41,8 +42,6 @@ import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
-import ca.bc.gov.nrs.vdyp.model.PolygonMode;
-import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder;
@@ -50,11 +49,14 @@ import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.CompatibilityVariableMode;
+import ca.bc.gov.nrs.vdyp.model.ComponentSizeLimits;
 import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.ModelClassBuilder;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
+import ca.bc.gov.nrs.vdyp.model.PolygonMode;
+import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
@@ -440,8 +442,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		var leadHeight = requirePositive(primarySiteIn.getHeight(), "Primary layer lead species height");
 
 		// HLPL1
+		var primaryHeight = estimators.primaryHeightFromLeadHeight(
 		// EMP050 Method 1
-		var primaryHeight = estimationMethods.primaryHeightFromLeadHeight(
 				leadHeight, primarySiteIn.getSiteGenus(), bec.getRegion(), primarySpeciesDensity
 		);
 
@@ -463,14 +465,14 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					float speciesQuadMeanDiameter = Math.max(7.5f, height / leadHeight * layerQuadMeanDiameter);
 					float speciesDensity = treesPerHectare(primaryBaseArea, speciesQuadMeanDiameter);
 					// EMP050 Method 1
-					float speciesLoreyHeight = estimationMethods.primaryHeightFromLeadHeight(
+					float speciesLoreyHeight = estimators.primaryHeightFromLeadHeight(
 							vriSite.getHeight().get(), vriSite.getSiteGenus(), bec.getRegion(), speciesDensity
 					);
 					return speciesLoreyHeight;
 				}).orElseGet(() -> {
 					try {
 						// EMP053
-						float speciesLoreyHeight = estimationMethods.estimateNonPrimaryLoreyHeight(
+						float speciesLoreyHeight = estimators.estimateNonPrimaryLoreyHeight(
 								vriSite.getSiteGenus(), primarySiteIn.getSiteGenus(), bec, leadHeight, primaryHeight
 						);
 						return speciesLoreyHeight;
@@ -479,8 +481,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					}
 				});
 
-				float maxHeight = estimationMethods.getLimitsForHeightAndDiameter(vriSpec.getGenus(), bec.getRegion())
-						.maxLoreyHeight();
+				float maxHeight = estimators.getLimitsForHeightAndDiameter(vriSpec.getGenus(), bec.getRegion())
+						.loreyHeightMaximum();
 				loreyHeight = Math.min(loreyHeight, maxHeight);
 				sBuilder.loreyHeight(loreyHeight);
 			}
@@ -589,7 +591,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	) throws ProcessingException {
 		for (var spec : layer.getSpecies().values()) {
 			// EMP060
-			float specDq = estimationMethods.estimateQuadMeanDiameterForSpecies(
+			float specDq = estimators.estimateQuadMeanDiameterForSpecies(
 					spec, layer.getSpecies(), region, quadMeanDiameterTotal, baseAreaTotal, treeDensityTotal,
 					loreyHeightTotal
 			);
@@ -597,9 +599,9 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			var limits = getLimitsForSpecies(spec, region);
 
 			float min = Math
-					.max(7.6f, limits.minDiameterHeight() * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL));
+					.max(7.6f, limits.minQuadMeanDiameterLoreyHeightRatio() * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL));
 			float loreyHeightToUse = Math.max(spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL), 7.0f);
-			float max = Math.min(limits.maxQuadMeanDiameter(), limits.maxDiameterHeight() * loreyHeightToUse);
+			float max = Math.min(limits.quadMeanDiameterMaximum(), limits.maxQuadMeanDiameterLoreyHeightRatio() * loreyHeightToUse);
 			max = Math.max(7.75f, max);
 
 			minPerSpecies.put(spec.getGenus(), min);
@@ -613,11 +615,11 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		}
 	}
 
-	protected Limits getLimitsForSpecies(VdypSpecies spec, Region region) {
+	protected ComponentSizeLimits getLimitsForSpecies(VdypSpecies spec, Region region) {
 		// TODO for JPROGRAM = 7 implement this differently, see ROOTV01 L91-L99
 
 		// EMP061
-		return estimationMethods.getLimitsForHeightAndDiameter(spec.getGenus(), region);
+		return estimators.getLimitsForHeightAndDiameter(spec.getGenus(), region);
 	}
 
 	float quadMeanDiameterFractionalError(
