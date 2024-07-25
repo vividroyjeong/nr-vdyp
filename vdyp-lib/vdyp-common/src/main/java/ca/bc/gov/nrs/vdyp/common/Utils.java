@@ -25,6 +25,7 @@ import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.UtilizationVector;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
@@ -194,27 +195,27 @@ public class Utils {
 		return Collections.unmodifiableMap(map);
 	}
 
-	public static Coefficients heightVector(float small, float all) {
-		return new Coefficients(new float[] { small, all }, -1);
+	public static UtilizationVector heightVector(float small, float all) {
+		return new UtilizationVector(small, all);
 	}
 
-	public static Coefficients heightVector() {
+	public static UtilizationVector heightVector() {
 		return heightVector(0, 0);
 	}
 
-	public static Coefficients utilizationVector(float small, float all, float u1, float u2, float u3, float u4) {
-		return new Coefficients(new float[] { small, all, u1, u2, u3, u4 }, -1);
+	public static UtilizationVector utilizationVector(float small, float all, float u1, float u2, float u3, float u4) {
+		return new UtilizationVector(small, all, u1, u2, u3, u4);
 	}
 
-	public static Coefficients utilizationVector(float small, float u1, float u2, float u3, float u4) {
+	public static UtilizationVector utilizationVector(float small, float u1, float u2, float u3, float u4) {
 		return utilizationVector(small, u1 + u2 + u3 + u4, u1, u2, u3, u4);
 	}
 
-	public static Coefficients utilizationVector(float singleValue) {
+	public static UtilizationVector utilizationVector(float singleValue) {
 		return utilizationVector(0f, singleValue, 0f, 0f, 0f, singleValue);
 	}
 
-	public static Coefficients utilizationVector() {
+	public static UtilizationVector utilizationVector() {
 		return utilizationVector(0f);
 	}
 

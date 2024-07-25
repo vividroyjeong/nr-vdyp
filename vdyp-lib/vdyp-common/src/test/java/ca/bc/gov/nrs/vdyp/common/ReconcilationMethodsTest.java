@@ -4,16 +4,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
-import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.UtilizationVector;
 import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 
 class ReconcilationMethodsTest {
 
 	@Test
 	void testReconcilationWhenBasalAreaAllIsZero() throws ProcessingException {
-		Coefficients basalAreaByUtilization = Utils.utilizationVector(0.0f);
-		Coefficients quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
-		Coefficients treesPerHectareByUtilization = Utils.utilizationVector(0.0f);
+		UtilizationVector basalAreaByUtilization = Utils.utilizationVector(0.0f);
+		UtilizationVector quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
+		UtilizationVector treesPerHectareByUtilization = Utils.utilizationVector(0.0f);
 
 		ReconcilationMethods.reconcileComponents(
 				basalAreaByUtilization, treesPerHectareByUtilization, quadMeanDiameterByUtilization

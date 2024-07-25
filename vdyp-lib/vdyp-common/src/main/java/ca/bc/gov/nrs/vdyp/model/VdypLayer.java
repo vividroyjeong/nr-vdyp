@@ -8,24 +8,24 @@ import ca.bc.gov.nrs.vdyp.common.Utils;
 
 public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements VdypUtilizationHolder {
 
-	private Coefficients baseAreaByUtilization = //
+	private UtilizationVector baseAreaByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/BA species 0
-	private Coefficients loreyHeightByUtilization = //
+	private UtilizationVector loreyHeightByUtilization = //
 			VdypUtilizationHolder.emptyLoreyHeightUtilization(); // LVCOM/HL species 0
-	private Coefficients quadraticMeanDiameterByUtilization = //
+	private UtilizationVector quadraticMeanDiameterByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/DQ species 0
-	private Coefficients treesPerHectareByUtilization = //
+	private UtilizationVector treesPerHectareByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/TPH species 0
 
-	private Coefficients wholeStemVolumeByUtilization = //
+	private UtilizationVector wholeStemVolumeByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOLWS species 0
-	private Coefficients closeUtilizationVolumeByUtilization = //
+	private UtilizationVector closeUtilizationVolumeByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOLCU species/ 0
-	private Coefficients closeUtilizationVolumeNetOfDecayByUtilization = //
+	private UtilizationVector closeUtilizationVolumeNetOfDecayByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOL_D species 0
-	private Coefficients closeUtilizationVolumeNetOfDecayAndWasteByUtilization = //
+	private UtilizationVector closeUtilizationVolumeNetOfDecayAndWasteByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOL_DW species 0
-	private Coefficients closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = //
+	private UtilizationVector closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOL_DWB species 0
 
 	private Optional<String> dominantSpecies;
@@ -46,97 +46,97 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 	}
 
 	@Override
-	public Coefficients getBaseAreaByUtilization() {
+	public UtilizationVector getBaseAreaByUtilization() {
 		return baseAreaByUtilization;
 	}
 
 	@Override
-	public void setBaseAreaByUtilization(Coefficients baseAreaByUtilization) {
+	public void setBaseAreaByUtilization(UtilizationVector baseAreaByUtilization) {
 		this.baseAreaByUtilization = baseAreaByUtilization;
 	}
 
 	@Override
-	public Coefficients getLoreyHeightByUtilization() {
+	public UtilizationVector getLoreyHeightByUtilization() {
 		return loreyHeightByUtilization;
 	}
 
 	@Override
-	public void setLoreyHeightByUtilization(Coefficients loreyHeightByUtilization) {
+	public void setLoreyHeightByUtilization(UtilizationVector loreyHeightByUtilization) {
 		this.loreyHeightByUtilization = loreyHeightByUtilization;
 	}
 
 	@Override
-	public Coefficients getQuadraticMeanDiameterByUtilization() {
+	public UtilizationVector getQuadraticMeanDiameterByUtilization() {
 		return quadraticMeanDiameterByUtilization;
 	}
 
 	@Override
-	public void setQuadraticMeanDiameterByUtilization(Coefficients quadraticMeanDiameterByUtilization) {
+	public void setQuadraticMeanDiameterByUtilization(UtilizationVector quadraticMeanDiameterByUtilization) {
 		this.quadraticMeanDiameterByUtilization = quadraticMeanDiameterByUtilization;
 	}
 
 	@Override
-	public Coefficients getTreesPerHectareByUtilization() {
+	public UtilizationVector getTreesPerHectareByUtilization() {
 		return treesPerHectareByUtilization;
 	}
 
 	@Override
-	public void setTreesPerHectareByUtilization(Coefficients treesPerHectareByUtilization) {
+	public void setTreesPerHectareByUtilization(UtilizationVector treesPerHectareByUtilization) {
 		this.treesPerHectareByUtilization = treesPerHectareByUtilization;
 	}
 
 	@Override
-	public Coefficients getWholeStemVolumeByUtilization() {
+	public UtilizationVector getWholeStemVolumeByUtilization() {
 		return wholeStemVolumeByUtilization;
 	}
 
 	@Override
-	public void setWholeStemVolumeByUtilization(Coefficients wholeStemVolumeByUtilization) {
+	public void setWholeStemVolumeByUtilization(UtilizationVector wholeStemVolumeByUtilization) {
 		this.wholeStemVolumeByUtilization = wholeStemVolumeByUtilization;
 	}
 
 	@Override
-	public Coefficients getCloseUtilizationVolumeByUtilization() {
+	public UtilizationVector getCloseUtilizationVolumeByUtilization() {
 		return closeUtilizationVolumeByUtilization;
 	}
 
 	@Override
-	public void setCloseUtilizationVolumeByUtilization(Coefficients closeUtilizationVolumeByUtilization) {
+	public void setCloseUtilizationVolumeByUtilization(UtilizationVector closeUtilizationVolumeByUtilization) {
 		this.closeUtilizationVolumeByUtilization = closeUtilizationVolumeByUtilization;
 	}
 
 	@Override
-	public Coefficients getCloseUtilizationVolumeNetOfDecayByUtilization() {
+	public UtilizationVector getCloseUtilizationVolumeNetOfDecayByUtilization() {
 		return closeUtilizationVolumeNetOfDecayByUtilization;
 	}
 
 	@Override
 	public void setCloseUtilizationVolumeNetOfDecayByUtilization(
-			Coefficients closeUtilizationNetVolumeOfDecayByUtilization
+			UtilizationVector closeUtilizationNetVolumeOfDecayByUtilization
 	) {
 		this.closeUtilizationVolumeNetOfDecayByUtilization = closeUtilizationNetVolumeOfDecayByUtilization;
 	}
 
 	@Override
-	public Coefficients getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization() {
+	public UtilizationVector getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization() {
 		return closeUtilizationVolumeNetOfDecayAndWasteByUtilization;
 	}
 
 	@Override
 	public void setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(
-			Coefficients closeUtilizationVolumeNetOfDecayAndWasteByUtilization
+			UtilizationVector closeUtilizationVolumeNetOfDecayAndWasteByUtilization
 	) {
 		this.closeUtilizationVolumeNetOfDecayAndWasteByUtilization = closeUtilizationVolumeNetOfDecayAndWasteByUtilization;
 	}
 
 	@Override
-	public Coefficients getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization() {
+	public UtilizationVector getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization() {
 		return closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization;
 	}
 
 	@Override
 	public void setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
-			Coefficients closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization
+			UtilizationVector closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization
 	) {
 		this.closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization;
 	}
@@ -201,7 +201,7 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 			this.empiricalRelationshipParameterIndex(Optional.of(empiricalRelationshipParameterIndex));
 		}
 
-		Coefficients loreyHeight = VdypUtilizationHolder.emptyLoreyHeightUtilization();
+		UtilizationVector loreyHeight = VdypUtilizationHolder.emptyLoreyHeightUtilization();
 
 		public void loreyHeight(float height) {
 			this.loreyHeight = Utils.heightVector(0, height);
@@ -211,7 +211,7 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 			this.loreyHeight = Utils.heightVector(small, height);
 		}
 
-		protected Coefficients baseArea = VdypUtilizationHolder.emptyUtilization();
+		protected UtilizationVector baseArea = VdypUtilizationHolder.emptyUtilization();
 
 		public void baseArea(float small, float u1, float u2, float u3, float u4) {
 			this.baseArea = Utils.utilizationVector(small, u1, u2, u3, u4);
@@ -221,7 +221,7 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 			this.baseArea = Utils.utilizationVector(height);
 		}
 
-		protected Coefficients treesPerHectare = VdypUtilizationHolder.emptyUtilization();
+		protected UtilizationVector treesPerHectare = VdypUtilizationHolder.emptyUtilization();
 
 		public void treesPerHectare(float small, float u1, float u2, float u3, float u4) {
 			this.treesPerHectare = Utils.utilizationVector(small, u1, u2, u3, u4);
@@ -231,7 +231,7 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 			this.treesPerHectare = Utils.utilizationVector(height);
 		}
 
-		protected Coefficients quadMeanDiameter = VdypUtilizationHolder.emptyUtilization();
+		protected UtilizationVector quadMeanDiameter = VdypUtilizationHolder.emptyUtilization();
 
 		public void quadMeanDiameter(float small, float u1, float u2, float u3, float u4) {
 			this.quadMeanDiameter = Utils.utilizationVector(small, u1, u2, u3, u4);
@@ -278,7 +278,7 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 			});
 		}
 
-		public void baseAreaByUtilization(Coefficients utilizationVector) {
+		public void baseAreaByUtilization(UtilizationVector utilizationVector) {
 			// TODO Auto-generated method stub
 
 		}

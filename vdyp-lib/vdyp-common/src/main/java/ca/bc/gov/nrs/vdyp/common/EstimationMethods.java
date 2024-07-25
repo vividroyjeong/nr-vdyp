@@ -30,25 +30,28 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.UtilizationVector;
+import ca.bc.gov.nrs.vdyp.model.UtilizationVector.BinaryOperatorWithClass;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 
 public class EstimationMethods {
 
 	public static final Logger log = LoggerFactory.getLogger(EstimationMethods.class);
 
-	private static final int UTIL_ALL = UtilizationClass.ALL.index;
-	private static final int UTIL_LARGEST = UtilizationClass.OVER225.index;
-
 	/**
 	 * Returns the new value if the index is that of a utilization class that represents a size band, otherwise the old
 	 * value
 	 */
-	public static final IndexedFloatBinaryOperator COPY_IF_BAND = (oldX, newX, i) -> i <= UTIL_ALL ? oldX : newX;
+	public static final BinaryOperatorWithClass COPY_IF_BAND = (
+			oldX, newX, uc
+	) -> UtilizationClass.UTIL_CLASSES.contains(uc) ? newX : oldX;
 
 	/**
-	 * Returns the new value if the index is that of a utilization class is not the total, otherwise the old value
+	 * Returns the new value if the index is that of a utilization class is not the small band, otherwise the old value
 	 */
-	public static final IndexedFloatBinaryOperator COPY_IF_NOT_TOTAL = (oldX, newX, i) -> i < UTIL_ALL ? oldX : newX;
+	public static final BinaryOperatorWithClass COPY_IF_NOT_SMALL = (
+			oldX, newX, uc
+	) -> UtilizationClass.ALL_BUT_SMALL.contains(uc) ? newX : oldX;
 
 	Map<String, Object> controlMap;
 
@@ -400,7 +403,7 @@ public class EstimationMethods {
 	 * @throws ProcessingException
 	 */
 	public void estimateBaseAreaByUtilization(
-			BecDefinition bec, Coefficients quadMeanDiameterUtil, Coefficients baseAreaUtil, String genus
+			BecDefinition bec, UtilizationVector quadMeanDiameterUtil, UtilizationVector baseAreaUtil, String genus
 	) throws ProcessingException {
 
 		estimateBaseAreaByUtilization(controlMap, bec, quadMeanDiameterUtil, baseAreaUtil, genus);
@@ -418,8 +421,8 @@ public class EstimationMethods {
 	 * @throws ProcessingException
 	 */
 	public static void estimateBaseAreaByUtilization(
-			Map<String, Object> controlMap, BecDefinition bec, Coefficients quadMeanDiameterUtil,
-			Coefficients baseAreaUtil, String genus
+			Map<String, Object> controlMap, BecDefinition bec, UtilizationVector quadMeanDiameterUtil,
+			UtilizationVector baseAreaUtil, String genus
 	) throws ProcessingException {
 		final var coeMap = Utils.<MatrixMap3<Integer, String, String, Coefficients>>expectParsedControl(
 				controlMap, ControlKey.UTIL_COMP_BA, MatrixMap3.class
@@ -440,34 +443,35 @@ public class EstimationMethods {
 	 */
 	public static void estimateBaseAreaByUtilization(
 			BecDefinition bec, MatrixMap3<Integer, String, String, Coefficients> basalAreaUtilCompCoeMap,
-			Coefficients quadMeanDiameterUtil, Coefficients baseAreaUtil, String genus
+			UtilizationVector quadMeanDiameterUtil, UtilizationVector baseAreaUtil, String genus
 	) throws ProcessingException {
 
-		float dq = quadMeanDiameterUtil.getCoe(UTIL_ALL);
+		float dq = quadMeanDiameterUtil.getAll();
 		var b = Utils.utilizationVector();
-		b.setCoe(0, baseAreaUtil.getCoe(UTIL_ALL));
-		for (int i = 1; i < UTIL_LARGEST; i++) {
-			var coe = basalAreaUtilCompCoeMap.get(i, genus, bec.getGrowthBec().getAlias());
+		b.setCoe(0, baseAreaUtil.getAll());
+
+		for (UtilizationClass uc : UtilizationClass.ALL_BANDS_BUT_LARGEST) {
+			var coe = basalAreaUtilCompCoeMap.get(uc.index, genus, bec.getGrowthBec().getAlias());
 
 			float a0 = coe.getCoe(1);
 			float a1 = coe.getCoe(2);
 
 			float logit;
-			if (i == 1) {
+			if (uc == UtilizationClass.U75TO125) {
 				logit = a0 + a1 * pow(dq, 0.25f);
 			} else {
 				logit = a0 + a1 * dq;
 			}
-			b.setCoe(i, b.getCoe(i - 1) * exponentRatio(logit));
-			if (i == 1 && quadMeanDiameterUtil.getCoe(UTIL_ALL) < 12.5f) {
-				float ba12Max = (1f - pow(
-						(quadMeanDiameterUtil.getCoe(1) - 7.4f) / (quadMeanDiameterUtil.getCoe(UTIL_ALL) - 7.4f), 2f
-				)) * b.getCoe(0);
+			b.set(uc, b.get(uc.previous().get()) * exponentRatio(logit));
+			if (uc == UtilizationClass.U75TO125 && quadMeanDiameterUtil.getAll() < 12.5f) {
+				float ba12Max = (1f
+						- pow( (quadMeanDiameterUtil.getCoe(1) - 7.4f) / (quadMeanDiameterUtil.getAll() - 7.4f), 2f))
+						* b.getCoe(0);
 				b.scalarInPlace(1, x -> min(x, ba12Max));
 			}
 		}
 
-		baseAreaUtil.setCoe(1, baseAreaUtil.getCoe(UTIL_ALL) - b.getCoe(1));
+		baseAreaUtil.setCoe(1, baseAreaUtil.getAll() - b.getCoe(1));
 		baseAreaUtil.setCoe(2, b.getCoe(1) - b.getCoe(2));
 		baseAreaUtil.setCoe(3, b.getCoe(2) - b.getCoe(3));
 		baseAreaUtil.setCoe(4, b.getCoe(3));
@@ -481,9 +485,9 @@ public class EstimationMethods {
 	 * @param genus
 	 * @throws ProcessingException
 	 */
-	public void
-			estimateQuadMeanDiameterByUtilization(BecDefinition bec, Coefficients quadMeanDiameterUtil, String genus)
-					throws ProcessingException {
+	public void estimateQuadMeanDiameterByUtilization(
+			BecDefinition bec, UtilizationVector quadMeanDiameterUtil, String genus
+	) throws ProcessingException {
 
 		estimateQuadMeanDiameterByUtilization(controlMap, bec, quadMeanDiameterUtil, genus);
 	}
@@ -498,7 +502,7 @@ public class EstimationMethods {
 	 * @throws ProcessingException
 	 */
 	public static void estimateQuadMeanDiameterByUtilization(
-			Map<String, Object> controlMap, BecDefinition bec, Coefficients quadMeanDiameterUtil, String genus
+			Map<String, Object> controlMap, BecDefinition bec, UtilizationVector quadMeanDiameterUtil, String genus
 	) throws ProcessingException {
 
 		final var coeMap = Utils.<MatrixMap3<Integer, String, String, Coefficients>>expectParsedControl(
@@ -519,12 +523,12 @@ public class EstimationMethods {
 	 */
 	public static void estimateQuadMeanDiameterByUtilization(
 			BecDefinition bec, MatrixMap3<Integer, String, String, Coefficients> coeMap,
-			Coefficients quadMeanDiameterUtil, String genus
+			UtilizationVector quadMeanDiameterUtil, String genus
 	) throws ProcessingException {
 		log.atTrace().setMessage("Estimate DQ by utilization class for {} in BEC {}.  DQ for all >7.5 is {}")
-				.addArgument(genus).addArgument(bec.getName()).addArgument(quadMeanDiameterUtil.getCoe(UTIL_ALL));
+				.addArgument(genus).addArgument(bec.getName()).addArgument(quadMeanDiameterUtil.getAll());
 
-		float quadMeanDiameter07 = quadMeanDiameterUtil.getCoe(UTIL_ALL);
+		float quadMeanDiameter07 = quadMeanDiameterUtil.getAll();
 
 		for (var uc : UtilizationClass.UTIL_CLASSES) {
 			log.atDebug().setMessage("For util level {}").addArgument(uc.className);
@@ -541,7 +545,7 @@ public class EstimationMethods {
 			switch (uc) {
 			case U75TO125:
 				if (quadMeanDiameter07 < 7.5001f) {
-					quadMeanDiameterUtil.setCoe(UTIL_ALL, 7.5f);
+					quadMeanDiameterUtil.setAll(7.5f);
 				} else {
 					log.atDebug().setMessage("DQ = 7.5 + a0 * (1 - exp(a1 / a0*(DQ07 - 7.5) ))**a2' )");
 
@@ -671,7 +675,8 @@ public class EstimationMethods {
 	 */
 	public void estimateWholeStemVolume(
 			UtilizationClass utilizationClass, float adjustCloseUtil, int volumeGroup, Float hlSp,
-			Coefficients quadMeanDiameterUtil, Coefficients baseAreaUtil, Coefficients wholeStemVolumeUtil
+			UtilizationVector quadMeanDiameterUtil, UtilizationVector baseAreaUtil,
+			UtilizationVector wholeStemVolumeUtil
 	) throws ProcessingException {
 
 		estimateWholeStemVolume(
@@ -696,7 +701,8 @@ public class EstimationMethods {
 	 */
 	public static void estimateWholeStemVolume(
 			Map<String, Object> controlMap, UtilizationClass utilizationClass, float adjustCloseUtil, int volumeGroup,
-			Float hlSp, Coefficients quadMeanDiameterUtil, Coefficients baseAreaUtil, Coefficients wholeStemVolumeUtil
+			Float hlSp, UtilizationVector quadMeanDiameterUtil, UtilizationVector baseAreaUtil,
+			UtilizationVector wholeStemVolumeUtil
 	) throws ProcessingException {
 		final var wholeStemUtilizationComponentMap = Utils
 				.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
@@ -725,9 +731,10 @@ public class EstimationMethods {
 	public static void estimateWholeStemVolume(
 			UtilizationClass utilizationClass, float adjustCloseUtil, int volumeGroup, Float hlSp,
 			MatrixMap2<Integer, Integer, Optional<Coefficients>> wholeStemUtilizationComponentMap,
-			Coefficients quadMeanDiameterUtil, Coefficients baseAreaUtil, Coefficients wholeStemVolumeUtil
+			UtilizationVector quadMeanDiameterUtil, UtilizationVector baseAreaUtil,
+			UtilizationVector wholeStemVolumeUtil
 	) throws ProcessingException {
-		var dqSp = quadMeanDiameterUtil.getCoe(UTIL_ALL);
+		var dqSp = quadMeanDiameterUtil.getAll();
 
 		estimateUtilization(baseAreaUtil, wholeStemVolumeUtil, utilizationClass, (uc, ba) -> {
 			Coefficients wholeStemCoe = wholeStemUtilizationComponentMap.get(uc.index, volumeGroup).orElseThrow(
@@ -774,7 +781,8 @@ public class EstimationMethods {
 	 */
 	public void estimateCloseUtilizationVolume(
 			UtilizationClass utilizationClass, Coefficients aAdjust, int volumeGroup, float hlSp,
-			Coefficients quadMeanDiameterUtil, Coefficients wholeStemVolumeUtil, Coefficients closeUtilizationVolumeUtil
+			UtilizationVector quadMeanDiameterUtil, UtilizationVector wholeStemVolumeUtil,
+			UtilizationVector closeUtilizationVolumeUtil
 	) throws ProcessingException {
 		estimateCloseUtilizationVolume(
 				controlMap, utilizationClass, aAdjust, volumeGroup, hlSp, quadMeanDiameterUtil, wholeStemVolumeUtil,
@@ -797,8 +805,8 @@ public class EstimationMethods {
 	 */
 	public static void estimateCloseUtilizationVolume(
 			Map<String, Object> controlMap, UtilizationClass utilizationClass, Coefficients aAdjust, int volumeGroup,
-			float hlSp, Coefficients quadMeanDiameterUtil, Coefficients wholeStemVolumeUtil,
-			Coefficients closeUtilizationVolumeUtil
+			float hlSp, UtilizationVector quadMeanDiameterUtil, UtilizationVector wholeStemVolumeUtil,
+			UtilizationVector closeUtilizationVolumeUtil
 	) throws ProcessingException {
 		final var closeUtilizationCoeMap = Utils
 				.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
@@ -826,7 +834,8 @@ public class EstimationMethods {
 	public static void estimateCloseUtilizationVolume(
 			UtilizationClass utilizationClass, Coefficients aAdjust, int volumeGroup, float hlSp,
 			MatrixMap2<Integer, Integer, Optional<Coefficients>> closeUtilizationCoeMap,
-			Coefficients quadMeanDiameterUtil, Coefficients wholeStemVolumeUtil, Coefficients closeUtilizationVolumeUtil
+			UtilizationVector quadMeanDiameterUtil, UtilizationVector wholeStemVolumeUtil,
+			UtilizationVector closeUtilizationVolumeUtil
 	) throws ProcessingException {
 		estimateUtilization(wholeStemVolumeUtil, closeUtilizationVolumeUtil, utilizationClass, (uc, ws) -> {
 			Coefficients closeUtilCoe = closeUtilizationCoeMap.get(uc.index, volumeGroup).orElseThrow(
@@ -866,8 +875,8 @@ public class EstimationMethods {
 	 */
 	public void estimateNetDecayVolume(
 			String genus, Region region, UtilizationClass utilizationClass, Coefficients aAdjust, int decayGroup,
-			float ageBreastHeight, Coefficients quadMeanDiameterUtil, Coefficients closeUtilizationUtil,
-			Coefficients closeUtilizationNetOfDecayUtil
+			float ageBreastHeight, UtilizationVector quadMeanDiameterUtil, UtilizationVector closeUtilizationUtil,
+			UtilizationVector closeUtilizationNetOfDecayUtil
 	) throws ProcessingException {
 
 		estimateNetDecayVolume(
@@ -893,8 +902,8 @@ public class EstimationMethods {
 	 */
 	public static void estimateNetDecayVolume(
 			Map<String, Object> controlMap, String genus, Region region, UtilizationClass utilizationClass,
-			Coefficients aAdjust, int decayGroup, float ageBreastHeight, Coefficients quadMeanDiameterUtil,
-			Coefficients closeUtilizationUtil, Coefficients closeUtilizationNetOfDecayUtil
+			Coefficients aAdjust, int decayGroup, float ageBreastHeight, UtilizationVector quadMeanDiameterUtil,
+			UtilizationVector closeUtilizationUtil, UtilizationVector closeUtilizationNetOfDecayUtil
 	) throws ProcessingException {
 		final var netDecayCoeMap = Utils.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
 				controlMap, ControlKey.VOLUME_NET_DECAY, MatrixMap2.class
@@ -928,10 +937,10 @@ public class EstimationMethods {
 	public static void estimateNetDecayVolume(
 			String genus, Region region, UtilizationClass utilizationClass, Coefficients aAdjust, int decayGroup,
 			float ageBreastHeight, MatrixMap2<Integer, Integer, Optional<Coefficients>> netDecayCoeMap,
-			MatrixMap2<String, Region, Float> decayModifierMap, Coefficients quadMeanDiameterUtil,
-			Coefficients closeUtilizationUtil, Coefficients closeUtilizationNetOfDecayUtil
+			MatrixMap2<String, Region, Float> decayModifierMap, UtilizationVector quadMeanDiameterUtil,
+			UtilizationVector closeUtilizationUtil, UtilizationVector closeUtilizationNetOfDecayUtil
 	) throws ProcessingException {
-		var dqSp = quadMeanDiameterUtil.getCoe(UTIL_ALL);
+		var dqSp = quadMeanDiameterUtil.getAll();
 
 		final var ageTr = (float) Math.log(Math.max(20.0, ageBreastHeight));
 
@@ -978,8 +987,8 @@ public class EstimationMethods {
 	 */
 	public void estimateNetDecayAndWasteVolume(
 			Region region, UtilizationClass utilizationClass, Coefficients aAdjust, String genus, float loreyHeight,
-			Coefficients quadMeanDiameterUtil, Coefficients closeUtilizationUtil,
-			Coefficients closeUtilizationNetOfDecayUtil, Coefficients closeUtilizationNetOfDecayAndWasteUtil
+			UtilizationVector quadMeanDiameterUtil, UtilizationVector closeUtilizationUtil,
+			UtilizationVector closeUtilizationNetOfDecayUtil, UtilizationVector closeUtilizationNetOfDecayAndWasteUtil
 	) throws ProcessingException {
 
 		estimateNetDecayAndWasteVolume(
@@ -1005,8 +1014,9 @@ public class EstimationMethods {
 	 */
 	public static void estimateNetDecayAndWasteVolume(
 			Map<String, Object> controlMap, Region region, UtilizationClass utilizationClass, Coefficients aAdjust,
-			String genus, float loreyHeight, Coefficients quadMeanDiameterUtil, Coefficients closeUtilizationUtil,
-			Coefficients closeUtilizationNetOfDecayUtil, Coefficients closeUtilizationNetOfDecayAndWasteUtil
+			String genus, float loreyHeight, UtilizationVector quadMeanDiameterUtil,
+			UtilizationVector closeUtilizationUtil, UtilizationVector closeUtilizationNetOfDecayUtil,
+			UtilizationVector closeUtilizationNetOfDecayAndWasteUtil
 	) throws ProcessingException {
 		final var netDecayWasteCoeMap = Utils.<Map<String, Coefficients>>expectParsedControl(
 				controlMap, ControlKey.VOLUME_NET_DECAY_WASTE, Map.class
@@ -1041,8 +1051,8 @@ public class EstimationMethods {
 	public static void estimateNetDecayAndWasteVolume(
 			Region region, UtilizationClass utilizationClass, Coefficients aAdjust, String genus, float loreyHeight,
 			Map<String, Coefficients> netDecayWasteCoeMap, MatrixMap2<String, Region, Float> wasteModifierMap,
-			Coefficients quadMeanDiameterUtil, Coefficients closeUtilizationUtil,
-			Coefficients closeUtilizationNetOfDecayUtil, Coefficients closeUtilizationNetOfDecayAndWasteUtil
+			UtilizationVector quadMeanDiameterUtil, UtilizationVector closeUtilizationUtil,
+			UtilizationVector closeUtilizationNetOfDecayUtil, UtilizationVector closeUtilizationNetOfDecayAndWasteUtil
 	) throws ProcessingException {
 		estimateUtilization(
 				closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil, utilizationClass,
@@ -1115,9 +1125,9 @@ public class EstimationMethods {
 	 * @throws ProcessingException
 	 */
 	public void estimateNetDecayWasteAndBreakageVolume(
-			UtilizationClass utilizationClass, int breakageGroup, Coefficients quadMeanDiameterUtil,
-			Coefficients closeUtilizationUtil, Coefficients closeUtilizationNetOfDecayAndWasteUtil,
-			Coefficients closeUtilizationNetOfDecayWasteAndBreakageUtil
+			UtilizationClass utilizationClass, int breakageGroup, UtilizationVector quadMeanDiameterUtil,
+			UtilizationVector closeUtilizationUtil, UtilizationVector closeUtilizationNetOfDecayAndWasteUtil,
+			UtilizationVector closeUtilizationNetOfDecayWasteAndBreakageUtil
 	) throws ProcessingException {
 
 		estimateNetDecayWasteAndBreakageVolume(
@@ -1140,9 +1150,9 @@ public class EstimationMethods {
 	 */
 	public static void estimateNetDecayWasteAndBreakageVolume(
 			Map<String, Object> controlMap, UtilizationClass utilizationClass, int breakageGroup,
-			Coefficients quadMeanDiameterUtil, Coefficients closeUtilizationUtil,
-			Coefficients closeUtilizationNetOfDecayAndWasteUtil,
-			Coefficients closeUtilizationNetOfDecayWasteAndBreakageUtil
+			UtilizationVector quadMeanDiameterUtil, UtilizationVector closeUtilizationUtil,
+			UtilizationVector closeUtilizationNetOfDecayAndWasteUtil,
+			UtilizationVector closeUtilizationNetOfDecayWasteAndBreakageUtil
 	) throws ProcessingException {
 		final var netBreakageCoeMap = Utils
 				.<Map<Integer, Coefficients>>expectParsedControl(controlMap, ControlKey.BREAKAGE, Map.class);
@@ -1167,9 +1177,9 @@ public class EstimationMethods {
 	 */
 	public static void estimateNetDecayWasteAndBreakageVolume(
 			UtilizationClass utilizationClass, int breakageGroup, Map<Integer, Coefficients> netBreakageCoeMap,
-			Coefficients quadMeanDiameterUtil, Coefficients closeUtilizationUtil,
-			Coefficients closeUtilizationNetOfDecayAndWasteUtil,
-			Coefficients closeUtilizationNetOfDecayWasteAndBreakageUtil
+			UtilizationVector quadMeanDiameterUtil, UtilizationVector closeUtilizationUtil,
+			UtilizationVector closeUtilizationNetOfDecayAndWasteUtil,
+			UtilizationVector closeUtilizationNetOfDecayWasteAndBreakageUtil
 	) throws ProcessingException {
 		final var coefficients = netBreakageCoeMap.get(breakageGroup);
 		if (coefficients == null) {
@@ -1210,7 +1220,8 @@ public class EstimationMethods {
 	 *
 	 * @param input            source utilization
 	 * @param output           result utilization
-	 * @param utilizationClass the utilization class for which to do the computation, UTIL_ALL for all of them.
+	 * @param utilizationClass the utilization class for which to do the computation, UtilizationClass.ALL for all of
+	 *                         them.
 	 * @param processor        Given a utilization class, and the source utilization for that class, return the result
 	 *                         utilization
 	 * @param skip             a utilization class will be skipped and the result set to the default value if this is
@@ -1219,8 +1230,8 @@ public class EstimationMethods {
 	 * @throws ProcessingException
 	 */
 	private static void estimateUtilization(
-			Coefficients input, Coefficients output, UtilizationClass utilizationClass, UtilizationProcessor processor,
-			Predicate<Float> skip, float defaultValue
+			UtilizationVector input, UtilizationVector output, UtilizationClass utilizationClass,
+			UtilizationProcessor processor, Predicate<Float> skip, float defaultValue
 	) throws ProcessingException {
 		for (var uc : UtilizationClass.UTIL_CLASSES) {
 			var inputValue = input.getCoe(uc.index);
@@ -1247,13 +1258,15 @@ public class EstimationMethods {
 	 *
 	 * @param input            source utilization
 	 * @param output           result utilization
-	 * @param utilizationClass the utilization class for which to do the computation, UTIL_ALL for all of them.
+	 * @param utilizationClass the utilization class for which to do the computation, UtilizationClass.ALL for all of
+	 *                         them.
 	 * @param processor        Given a utilization class, and the source utilization for that class, return the result
 	 *                         utilization
 	 * @throws ProcessingException
 	 */
 	private static void estimateUtilization(
-			Coefficients input, Coefficients output, UtilizationClass utilizationClass, UtilizationProcessor processor
+			UtilizationVector input, UtilizationVector output, UtilizationClass utilizationClass,
+			UtilizationProcessor processor
 	) throws ProcessingException {
 		estimateUtilization(input, output, utilizationClass, processor, x -> false, 0f);
 	}
@@ -1271,13 +1284,13 @@ public class EstimationMethods {
 	}
 
 	/**
-	 * Normalizes the utilization components 1-4 so they sum to the value of component UTIL_ALL
+	 * Normalizes the utilization components 1-4 so they sum to the value of component UtilizationClass.ALL
 	 *
 	 * @throws ProcessingException if the sum is not positive
 	 */
-	private static float normalizeUtilizationComponents(Coefficients components) throws ProcessingException {
+	private static float normalizeUtilizationComponents(UtilizationVector components) throws ProcessingException {
 		var sum = sumUtilizationComponents(components);
-		var k = components.getCoe(UTIL_ALL) / sum;
+		var k = components.getAll() / sum;
 		if (sum <= 0f) {
 			throw new ProcessingException("Total volume " + sum + " was not positive.");
 		}
@@ -1288,15 +1301,15 @@ public class EstimationMethods {
 	/**
 	 * Sums the individual utilization components (1-4)
 	 */
-	private static float sumUtilizationComponents(Coefficients components) {
+	private static float sumUtilizationComponents(UtilizationVector components) {
 		return (float) UtilizationClass.UTIL_CLASSES.stream().mapToInt(x -> x.index).mapToDouble(components::getCoe)
 				.sum();
 	}
 
 	/**
-	 * Sums the individual utilization components (1-4) and stores the results in coefficient UTIL_ALL
+	 * Sums the individual utilization components (1-4) and stores the results in coefficient UtilizationClass.ALL
 	 */
-	private static float storeSumUtilizationComponents(Coefficients components) {
+	private static float storeSumUtilizationComponents(UtilizationVector components) {
 		var sum = sumUtilizationComponents(components);
 		components.setCoe(UtilizationClass.ALL.index, sum);
 		return sum;
