@@ -8,7 +8,7 @@ import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
 public class VdypPolygonLayer extends VdypEntity {
 
-	// See IPSJF155.doc
+	// See IPSJF155.doc, appendix II
 
 	private final LayerType layerType; // LAYERG
 

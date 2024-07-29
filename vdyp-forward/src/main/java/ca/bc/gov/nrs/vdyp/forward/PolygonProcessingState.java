@@ -46,8 +46,13 @@ class PolygonProcessingState {
 
 	// L1COM1, L1COM4 and L1COM5 - these common blocks mirror BANK1, BANK2 and BANK3 and are initialized
 	// when copied to "active" in ForwardProcessingEngine.
-	Bank wallet;
-
+	
+	/** 
+	 * State of the polygon at the start of processing; read-write during preparation for grow 
+	 * and read-only after that.
+	 */
+	private Bank start;
+	
 	// L1COM2 - equation groups. From the configuration, narrowed to the
 	// polygon's BEC zone.
 
@@ -114,7 +119,7 @@ class PolygonProcessingState {
 		this.fps = fps;
 		this.polygon = polygon;
 
-		this.wallet = bank.copy();
+		this.start = bank.copy();
 
 		var volumeEquationGroupMatrix = this.fps.fcm.<MatrixMap2<String, String, Integer>>get(
 				ControlKey.VOLUME_EQN_GROUPS, MatrixMap2.class
@@ -126,17 +131,17 @@ class PolygonProcessingState {
 				ControlKey.BREAKAGE_GROUPS, MatrixMap2.class
 		);
 
-		this.volumeEquationGroups = new int[this.wallet.getNSpecies() + 1];
-		this.decayEquationGroups = new int[this.wallet.getNSpecies() + 1];
-		this.breakageEquationGroups = new int[this.wallet.getNSpecies() + 1];
+		this.volumeEquationGroups = new int[this.start.getNSpecies() + 1];
+		this.decayEquationGroups = new int[this.start.getNSpecies() + 1];
+		this.breakageEquationGroups = new int[this.start.getNSpecies() + 1];
 
 		this.volumeEquationGroups[0] = VdypEntity.MISSING_INTEGER_VALUE;
 		this.decayEquationGroups[0] = VdypEntity.MISSING_INTEGER_VALUE;
 		this.breakageEquationGroups[0] = VdypEntity.MISSING_INTEGER_VALUE;
 
 		String becZoneAlias = this.getBecZone().getAlias();
-		for (int i = 1; i < this.wallet.getNSpecies() + 1; i++) {
-			String speciesName = this.wallet.speciesNames[i];
+		for (int i = 1; i < this.start.getNSpecies() + 1; i++) {
+			String speciesName = this.start.speciesNames[i];
 			this.volumeEquationGroups[i] = volumeEquationGroupMatrix.get(speciesName, becZoneAlias);
 			// From VGRPFIND, volumeEquationGroup 10 is mapped to 11.
 			if (this.volumeEquationGroups[i] == 10) {
@@ -152,19 +157,19 @@ class PolygonProcessingState {
 	}
 
 	public int getNSpecies() {
-		return wallet.getNSpecies();
+		return start.getNSpecies();
 	}
 
 	public int[] getIndices() {
-		return wallet.getIndices();
+		return start.getIndices();
 	}
 
 	public BecDefinition getBecZone() {
-		return wallet.getBecZone();
+		return start.getBecZone();
 	}
 
 	public VdypPolygonLayer getLayer() {
-		return wallet.getLayer();
+		return start.getLayer();
 	}
 
 
@@ -179,7 +184,7 @@ class PolygonProcessingState {
 		if (!areRankingDetailsSet) {
 			throw new IllegalStateException("unset primarySpeciesIndex");
 		}
-		return wallet.speciesNames[primarySpeciesIndex];
+		return start.speciesNames[primarySpeciesIndex];
 	}
 
 	public boolean hasSecondarySpeciesIndex() {
@@ -253,8 +258,8 @@ class PolygonProcessingState {
 		return fps;
 	}
 
-	public Bank getWallet() {
-		return wallet;
+	public Bank getStartBank() {
+		return start;
 	}
 
 	public int[] getVolumeEquationGroups() {
@@ -391,21 +396,21 @@ class PolygonProcessingState {
 		this.primarySpeciesAgeAtBreastHeight = details.primarySpeciesAgeAtBreastHeight();
 		this.primarySpeciesAgeToBreastHeight = details.primarySpeciesAgeToBreastHeight();
 
-		// Store these values into the wallet - VHDOM1 lines 182 - 186
-		if (wallet.dominantHeights[primarySpeciesIndex] <= 0.0) {
-			wallet.dominantHeights[primarySpeciesIndex] = this.primarySpeciesDominantHeight;
+		// Store these values into start - VHDOM1 lines 182 - 186
+		if (start.dominantHeights[primarySpeciesIndex] <= 0.0) {
+			start.dominantHeights[primarySpeciesIndex] = this.primarySpeciesDominantHeight;
 		}
-		if (wallet.siteIndices[primarySpeciesIndex] <= 0.0) {
-			wallet.siteIndices[primarySpeciesIndex] = this.primarySpeciesSiteIndex;
+		if (start.siteIndices[primarySpeciesIndex] <= 0.0) {
+			start.siteIndices[primarySpeciesIndex] = this.primarySpeciesSiteIndex;
 		}
-		if (wallet.ageTotals[primarySpeciesIndex] <= 0.0) {
-			wallet.ageTotals[primarySpeciesIndex] = this.primarySpeciesTotalAge;
+		if (start.ageTotals[primarySpeciesIndex] <= 0.0) {
+			start.ageTotals[primarySpeciesIndex] = this.primarySpeciesTotalAge;
 		}
-		if (wallet.yearsAtBreastHeight[primarySpeciesIndex] <= 0.0) {
-			wallet.yearsAtBreastHeight[primarySpeciesIndex] = this.primarySpeciesAgeAtBreastHeight;
+		if (start.yearsAtBreastHeight[primarySpeciesIndex] <= 0.0) {
+			start.yearsAtBreastHeight[primarySpeciesIndex] = this.primarySpeciesAgeAtBreastHeight;
 		}
-		if (wallet.yearsAtBreastHeight[primarySpeciesIndex] <= 0.0) {
-			wallet.yearsAtBreastHeight[primarySpeciesIndex] = this.primarySpeciesAgeToBreastHeight;
+		if (start.yearsAtBreastHeight[primarySpeciesIndex] <= 0.0) {
+			start.yearsAtBreastHeight[primarySpeciesIndex] = this.primarySpeciesAgeToBreastHeight;
 		}
 
 		this.arePrimarySpeciesDetailsSet = true;

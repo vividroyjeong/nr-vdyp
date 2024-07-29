@@ -86,7 +86,7 @@ class GeneralForwardProcessingEngineTest extends AbstractForwardProcessingEngine
 			fpe.fps.setPolygon(polygon);
 			PolygonProcessingState pps = fpe.fps.getPolygonProcessingState();
 
-			var speciesToCombine = Arrays.asList(Arrays.asList(pps.wallet.speciesNames[3], pps.wallet.speciesNames[4]));
+			var speciesToCombine = Arrays.asList(Arrays.asList(pps.getStartBank().speciesNames[3], pps.getStartBank().speciesNames[4]));
 
 			fpe.calculateCoverages();
 			fpe.determinePolygonRankings(speciesToCombine);
@@ -381,7 +381,7 @@ class GeneralForwardProcessingEngineTest extends AbstractForwardProcessingEngine
 		double expectedValue = SiteTool
 				.convertSiteIndexBetweenCurves(sourceSiteCurve, sourceSiteIndex, targetSiteCurve);
 
-		assertThat(fpe.fps.getPolygonProcessingState().wallet.siteIndices[4], is((float) expectedValue));
+		assertThat(fpe.fps.getPolygonProcessingState().getStartBank().siteIndices[4], is((float) expectedValue));
 	}
 
 	@Test
@@ -421,7 +421,7 @@ class GeneralForwardProcessingEngineTest extends AbstractForwardProcessingEngine
 		double expectedValue = SiteTool
 				.convertSiteIndexBetweenCurves(sourceSiteCurve, sourceSiteIndex, targetSiteCurve);
 
-		assertThat(fpe.fps.getPolygonProcessingState().wallet.siteIndices[2], is((float) expectedValue));
+		assertThat(fpe.fps.getPolygonProcessingState().getStartBank().siteIndices[2], is((float) expectedValue));
 	}
 
 	@Test
@@ -448,7 +448,7 @@ class GeneralForwardProcessingEngineTest extends AbstractForwardProcessingEngine
 		);
 
 		assertThat(
-				fpe.fps.getPolygonProcessingState().wallet.yearsToBreastHeight,
+				fpe.fps.getPolygonProcessingState().getStartBank().yearsToBreastHeight,
 				is(new float[] { 0.0f, 4.0f, 4.6f, 1.0f, 5.0f, 5.0f })
 		);
 	}

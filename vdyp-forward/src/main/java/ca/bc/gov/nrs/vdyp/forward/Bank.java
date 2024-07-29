@@ -62,41 +62,45 @@ class Bank {
 
 		this.layer = layer;
 		this.becZone = becZone;
+		
+		this.indices = IntStream.range(1, nSpecies + 1).toArray();
 
 		List<VdypLayerSpecies> speciesToRetain = new ArrayList<>();
+
 		for (VdypLayerSpecies s : layer.getGenera().values()) {
 			if (retainCriteria.test(s)) {
 				speciesToRetain.add(s);
 			}
 		}
+				
 		speciesToRetain.sort((o1, o2) -> o1.getGenusIndex().compareTo(o2.getGenusIndex()));
 
-		nSpecies = speciesToRetain.size();
-		indices = IntStream.range(1, nSpecies + 1).toArray();
+		this.nSpecies = speciesToRetain.size();
+		this.indices = IntStream.range(1, nSpecies + 1).toArray();
 
 		// In the following, index 0 is unused
-		speciesNames = new String[getNSpecies() + 1];
-		sp64Distributions = new GenusDistributionSet[getNSpecies() + 1];
-		siteIndices = new float[getNSpecies() + 1];
-		dominantHeights = new float[getNSpecies() + 1];
-		ageTotals = new float[getNSpecies() + 1];
-		yearsAtBreastHeight = new float[getNSpecies() + 1];
-		yearsToBreastHeight = new float[getNSpecies() + 1];
-		siteCurveNumbers = new int[getNSpecies() + 1];
-		speciesIndices = new int[getNSpecies() + 1];
-		percentagesOfForestedLand = new float[getNSpecies() + 1];
+		speciesNames = new String[nSpecies + 1];
+		sp64Distributions = new GenusDistributionSet[nSpecies + 1];
+		siteIndices = new float[nSpecies + 1];
+		dominantHeights = new float[nSpecies + 1];
+		ageTotals = new float[nSpecies + 1];
+		yearsAtBreastHeight = new float[nSpecies + 1];
+		yearsToBreastHeight = new float[nSpecies + 1];
+		siteCurveNumbers = new int[nSpecies + 1];
+		speciesIndices = new int[nSpecies + 1];
+		percentagesOfForestedLand = new float[nSpecies + 1];
 
 		int nUtilizationClasses = UtilizationClass.values().length;
 
 		// In the following, index 0 is used for the default species utilization
-		basalAreas = new float[getNSpecies() + 1][nUtilizationClasses];
-		closeUtilizationVolumes = new float[getNSpecies() + 1][nUtilizationClasses];
-		cuVolumesMinusDecay = new float[getNSpecies() + 1][nUtilizationClasses];
-		cuVolumesMinusDecayAndWastage = new float[getNSpecies() + 1][nUtilizationClasses];
-		loreyHeights = new float[getNSpecies() + 1][2];
-		quadMeanDiameters = new float[getNSpecies() + 1][nUtilizationClasses];
-		treesPerHectare = new float[getNSpecies() + 1][nUtilizationClasses];
-		wholeStemVolumes = new float[getNSpecies() + 1][nUtilizationClasses];
+		basalAreas = new float[nSpecies + 1][nUtilizationClasses];
+		closeUtilizationVolumes = new float[nSpecies + 1][nUtilizationClasses];
+		cuVolumesMinusDecay = new float[nSpecies + 1][nUtilizationClasses];
+		cuVolumesMinusDecayAndWastage = new float[nSpecies + 1][nUtilizationClasses];
+		loreyHeights = new float[nSpecies + 1][2];
+		quadMeanDiameters = new float[nSpecies + 1][nUtilizationClasses];
+		treesPerHectare = new float[nSpecies + 1][nUtilizationClasses];
+		wholeStemVolumes = new float[nSpecies + 1][nUtilizationClasses];
 
 		if (layer.getDefaultUtilizationMap().isPresent()) {
 			recordUtilizations(0, layer.getDefaultUtilizationMap().get());
@@ -108,32 +112,75 @@ class Bank {
 		}
 	}
 
-	public Bank(Bank s) {
+	enum CopyMode { CopyAll, CopyStructure };
+	
+	public Bank(Bank s, CopyMode copyMode) {
 
 		this.becZone = s.becZone;
 		this.layer = s.layer;
 
 		this.nSpecies = s.nSpecies;
 		this.indices = copy(s.indices);
+		this.speciesNames = copy(s.speciesNames);
+		this.speciesIndices = copy(s.speciesIndices);
 
-		this.yearsAtBreastHeight = copy(s.yearsAtBreastHeight);
-		this.ageTotals = copy(s.ageTotals);
-		this.basalAreas = copy(s.basalAreas);
-		this.closeUtilizationVolumes = copy(s.closeUtilizationVolumes);
-		this.cuVolumesMinusDecay = copy(s.cuVolumesMinusDecay);
-		this.cuVolumesMinusDecayAndWastage = copy(s.cuVolumesMinusDecayAndWastage);
-		this.dominantHeights = copy(s.dominantHeights);
-		this.loreyHeights = copy(s.loreyHeights);
-		this.percentagesOfForestedLand = copy(s.percentagesOfForestedLand);
-		this.quadMeanDiameters = copy(s.quadMeanDiameters);
-		this.siteIndices = copy(s.siteIndices);
 		this.siteCurveNumbers = copy(s.siteCurveNumbers);
 		this.sp64Distributions = copy(s.sp64Distributions);
-		this.speciesIndices = copy(s.speciesIndices);
-		this.speciesNames = copy(s.speciesNames);
-		this.treesPerHectare = copy(s.treesPerHectare);
-		this.wholeStemVolumes = copy(s.wholeStemVolumes);
-		this.yearsToBreastHeight = copy(s.yearsToBreastHeight);
+
+		if (copyMode == CopyMode.CopyAll) {
+			this.ageTotals = copy(s.ageTotals);
+			this.dominantHeights = copy(s.dominantHeights);
+			this.percentagesOfForestedLand = copy(s.percentagesOfForestedLand);
+			this.siteIndices = copy(s.siteIndices);
+			this.yearsAtBreastHeight = copy(s.yearsAtBreastHeight);
+			this.yearsToBreastHeight = copy(s.yearsToBreastHeight);
+			
+			this.basalAreas = copy(s.basalAreas);
+			this.closeUtilizationVolumes = copy(s.closeUtilizationVolumes);
+			this.cuVolumesMinusDecay = copy(s.cuVolumesMinusDecay);
+			this.cuVolumesMinusDecayAndWastage = copy(s.cuVolumesMinusDecayAndWastage);
+			this.loreyHeights = copy(s.loreyHeights);
+			this.quadMeanDiameters = copy(s.quadMeanDiameters);
+			this.treesPerHectare = copy(s.treesPerHectare);
+			this.wholeStemVolumes = copy(s.wholeStemVolumes);
+		} else {
+			this.ageTotals = buildShell(nSpecies);
+			this.dominantHeights = buildShell(nSpecies);
+			this.percentagesOfForestedLand = buildShell(nSpecies);
+			this.siteIndices = buildShell(nSpecies);
+			this.yearsAtBreastHeight = buildShell(nSpecies);
+			this.yearsToBreastHeight = buildShell(nSpecies);
+			
+			int nUtilizationClasses = UtilizationClass.values().length;
+			this.basalAreas = buildShell(nSpecies, nUtilizationClasses);
+			this.closeUtilizationVolumes = buildShell(nSpecies, nUtilizationClasses);
+			this.cuVolumesMinusDecay = buildShell(nSpecies, nUtilizationClasses);
+			this.cuVolumesMinusDecayAndWastage = buildShell(nSpecies, nUtilizationClasses);
+			this.loreyHeights = buildShell(nSpecies, nUtilizationClasses);
+			this.quadMeanDiameters = buildShell(nSpecies, nUtilizationClasses);
+			this.treesPerHectare = buildShell(nSpecies, nUtilizationClasses);
+			this.wholeStemVolumes = buildShell(nSpecies, nUtilizationClasses);
+		}
+	}
+	
+	private float[] buildShell(int n) {
+		
+		float[] result = new float[nSpecies + 1];
+		Arrays.fill(result, Float.NaN);
+		return result;
+	}
+
+	private float[][] buildShell(int n, int m) {
+		
+		float[][] result = new float[nSpecies + 1][];
+		
+		for (int i = 0; i < n; i++) {
+			float[] row = new float[m];
+			Arrays.fill(row, Float.NaN);
+			result[i] = row;
+		}
+		
+		return result;
 	}
 
 	public int getNSpecies() {
@@ -207,7 +254,7 @@ class Bank {
 	}
 
 	public Bank copy() {
-		return new Bank(this);
+		return new Bank(this, CopyMode.CopyAll);
 	}
 
 	private GenusDistributionSet[] copy(GenusDistributionSet[] a) {

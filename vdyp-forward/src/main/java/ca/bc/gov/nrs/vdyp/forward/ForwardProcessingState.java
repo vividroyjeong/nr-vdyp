@@ -64,8 +64,8 @@ class ForwardProcessingState {
 		return pps;
 	}
 
-	public void storeActive(int instanceNumber, LayerType layerType) {
-		banks[instanceNumber][layerType.getIndex()] = pps.wallet.copy();
+	public void storeActive(Bank end, int instanceNumber, LayerType layerType) {
+		banks[instanceNumber][layerType.getIndex()] = end.copy();
 	}
 
 	public void transfer(int fromInstanceNumber, int toInstanceNumber, LayerType layerType) {

@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.forward.Bank.CopyMode;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonLayer;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypSpeciesUtilization;
@@ -168,7 +169,7 @@ class PolygonProcessingStateTest {
 
 		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone(), s -> true);
 
-		Bank ppsCopy = new Bank(pps);
+		Bank ppsCopy = new Bank(pps, CopyMode.CopyAll);
 
 		verifyProcessingStateMatchesLayer(ppsCopy, pLayer);
 	}

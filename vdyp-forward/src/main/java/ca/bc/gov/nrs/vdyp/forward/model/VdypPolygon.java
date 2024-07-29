@@ -6,10 +6,11 @@ import java.util.Optional;
 import java.util.Set;
 
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
+import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 
 public class VdypPolygon extends VdypEntity {
 
-	// See IPSJF155.doc
+	// See IPSJF155.doc, appendix II
 
 	private final VdypPolygonDescription description; // POLYDESC
 	private final BecDefinition biogeoclimaticZone; // BEC
@@ -17,7 +18,7 @@ public class VdypPolygon extends VdypEntity {
 	private final float percentForestLand; // PCTFLAND
 	private final Optional<Integer> inventoryTypeGroup; // ITG
 	private final Optional<Integer> basalAreaGroup; // GRPBA1
-	private final Optional<FipMode> fipMode; // MODE
+	private final Optional<PolygonMode> polygonMode; // MODE
 	
 	// Set after construction
 	private VdypPolygonLayer primaryLayer;
@@ -27,7 +28,7 @@ public class VdypPolygon extends VdypEntity {
 	
 	public VdypPolygon(
 			VdypPolygonDescription vdypPolygonDescription, BecDefinition bec, Character fizId, float percentForestLand,
-			Optional<Integer> inventoryTypeGroup, Optional<Integer> basalAreaGroup, Optional<FipMode> fipMode
+			Optional<Integer> inventoryTypeGroup, Optional<Integer> basalAreaGroup, Optional<PolygonMode> polygonMode
 	) {
 		this.description = vdypPolygonDescription;
 		this.biogeoclimaticZone = bec;
@@ -41,7 +42,7 @@ public class VdypPolygon extends VdypEntity {
 
 		this.inventoryTypeGroup = inventoryTypeGroup;
 		this.basalAreaGroup = basalAreaGroup;
-		this.fipMode = fipMode;
+		this.polygonMode = polygonMode;
 	}
 
 	@Override
@@ -109,8 +110,8 @@ public class VdypPolygon extends VdypEntity {
 		return basalAreaGroup;
 	}
 
-	public Optional<FipMode> getFipMode() {
-		return fipMode;
+	public Optional<PolygonMode> getFipMode() {
+		return polygonMode;
 	}
 
 	public VdypPolygonLayer getPrimaryLayer() {
