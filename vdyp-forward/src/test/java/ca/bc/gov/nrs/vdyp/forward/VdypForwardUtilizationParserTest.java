@@ -19,12 +19,12 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypSpeciesUtilization;
 import ca.bc.gov.nrs.vdyp.forward.parsers.VdypUtilizationParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.VdypUtilization;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 public class VdypForwardUtilizationParserTest {
@@ -48,7 +48,7 @@ public class VdypForwardUtilizationParserTest {
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
 		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<VdypSpeciesUtilization>) parserFactory).get();
+		var stream = ((StreamingParserFactory<VdypUtilization>) parserFactory).get();
 
 		assertThat(stream, instanceOf(StreamingParser.class));
 
@@ -80,7 +80,7 @@ public class VdypForwardUtilizationParserTest {
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
 		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<Collection<VdypSpeciesUtilization>>) parserFactory).get();
+		var stream = ((StreamingParserFactory<Collection<VdypUtilization>>) parserFactory).get();
 
 		assertThat(stream, instanceOf(StreamingParser.class));
 
@@ -137,7 +137,7 @@ public class VdypForwardUtilizationParserTest {
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
 		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<Collection<VdypSpeciesUtilization>>) parserFactory).get();
+		var stream = ((StreamingParserFactory<Collection<VdypUtilization>>) parserFactory).get();
 
 		assertThat(stream, instanceOf(StreamingParser.class));
 

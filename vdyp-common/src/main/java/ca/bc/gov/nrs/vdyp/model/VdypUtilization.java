@@ -1,16 +1,13 @@
-package ca.bc.gov.nrs.vdyp.forward.model;
+package ca.bc.gov.nrs.vdyp.model;
 
 import java.text.MessageFormat;
 import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
-import ca.bc.gov.nrs.vdyp.forward.ForwardProcessingEngine;
+import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
-import ca.bc.gov.nrs.vdyp.model.LayerType;
-import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
-import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
-public class VdypSpeciesUtilization extends VdypEntity {
+public class VdypUtilization implements VdypEntity {
 
 	// See IPSJF155.doc
 
@@ -34,9 +31,9 @@ public class VdypSpeciesUtilization extends VdypEntity {
 	private float quadraticMeanDiameterAtBH;
 
 	// Set after construction
-	private VdypLayerSpecies parent;
+	private VdypSpecies parent;
 
-	public VdypSpeciesUtilization(
+	public VdypUtilization(
 			PolygonIdentifier polygonId, LayerType layerType, Integer genusIndex, Optional<String> genus,
 			UtilizationClass ucIndex, float basalArea, float liveTreesPerHectare, float loreyHeight,
 			float wholeStemVolume, float closeUtilizationVolume, float cuVolumeMinusDecay,
@@ -68,7 +65,7 @@ public class VdypSpeciesUtilization extends VdypEntity {
 		return sb.toString();
 	}
 
-	public void setParent(VdypLayerSpecies parent) {
+	public void setParent(VdypSpecies parent) {
 		this.parent = parent;
 	}
 
@@ -128,7 +125,7 @@ public class VdypSpeciesUtilization extends VdypEntity {
 		return quadraticMeanDiameterAtBH;
 	}
 
-	public VdypLayerSpecies getParent() {
+	public VdypSpecies getParent() {
 		return parent;
 	}
 
@@ -211,10 +208,10 @@ public class VdypSpeciesUtilization extends VdypEntity {
 	private void adjustBasalAreaToMatchTreesPerHectare() throws ProcessingException {
 
 		if (this.liveTreesPerHectare > 0.0f) {
-			float basalAreaLowerBound = ForwardProcessingEngine
-					.calculateBasalArea(CLASS_LOWER_BOUNDS[this.ucIndex.ordinal()] + DQ_EPS, this.liveTreesPerHectare);
-			float basalAreaUpperBound = ForwardProcessingEngine
-					.calculateBasalArea(CLASS_UPPER_BOUNDS[this.ucIndex.ordinal()] - DQ_EPS, this.liveTreesPerHectare);
+			float basalAreaLowerBound = BaseAreaTreeDensityDiameter
+					.basalArea(CLASS_LOWER_BOUNDS[this.ucIndex.ordinal()] + DQ_EPS, this.liveTreesPerHectare);
+			float basalAreaUpperBound = BaseAreaTreeDensityDiameter
+					.basalArea(CLASS_UPPER_BOUNDS[this.ucIndex.ordinal()] - DQ_EPS, this.liveTreesPerHectare);
 
 			float basalAreaError;
 			float newBasalArea;
@@ -257,7 +254,7 @@ public class VdypSpeciesUtilization extends VdypEntity {
 	private void doCalculateQuadMeanDiameter() throws ProcessingException {
 
 		if (this.basalArea > 0.0f) {
-			float qmd = ForwardProcessingEngine.calculateQuadMeanDiameter(basalArea, liveTreesPerHectare);
+			float qmd = BaseAreaTreeDensityDiameter.quadMeanDiameter(basalArea, liveTreesPerHectare);
 
 			if (qmd < CLASS_LOWER_BOUNDS[this.ucIndex.ordinal()]) {
 				qmd = qmd + DQ_EPS;

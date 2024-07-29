@@ -27,12 +27,12 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.forward.test.VdypForwardTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
+import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 
 class GrowDominantHeightTest {
 
@@ -86,7 +86,7 @@ class GrowDominantHeightTest {
 		VdypPolygon polygon;
 		do {
 			polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
-		} while (! polygon.getDescription().getName().equals("01003AS000001 00"));
+		} while (! polygon.getPolygonIdentifier().getName().equals("01003AS000001 00"));
 		
 		fpe.fps.setPolygon(polygon);
 
@@ -109,7 +109,7 @@ class GrowDominantHeightTest {
 		VdypPolygon polygon;
 		do {
 			polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
-		} while (! polygon.getDescription().getName().equals("01003AS000001 00"));
+		} while (! polygon.getPolygonIdentifier().getName().equals("01003AS000001 00"));
 		
 		fpe.fps.setPolygon(polygon);
 		

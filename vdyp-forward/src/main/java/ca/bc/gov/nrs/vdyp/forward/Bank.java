@@ -10,19 +10,19 @@ import java.util.stream.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonLayer;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypSpeciesUtilization;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.GenusDistributionSet;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.VdypLayer;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
+import ca.bc.gov.nrs.vdyp.model.VdypUtilization;
 
 class Bank {
 
 	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(Bank.class);
 
-	private final VdypPolygonLayer layer;
+	private final VdypLayer layer;
 	private final BecDefinition becZone;
 
 	/**
@@ -58,16 +58,16 @@ class Bank {
 	public final float[/* nSpecies + 1, including 0 */][/* all ucs */] treesPerHectare; // BANK1 TPHB
 	public final float[/* nSpecies + 1, including 0 */][/* all ucs */] wholeStemVolumes; // BANK1 VOLWSB
 
-	public Bank(VdypPolygonLayer layer, BecDefinition becZone, Predicate<VdypLayerSpecies> retainCriteria) {
+	public Bank(VdypLayer layer, BecDefinition becZone, Predicate<VdypSpecies> retainCriteria) {
 
 		this.layer = layer;
 		this.becZone = becZone;
 		
 		this.indices = IntStream.range(1, nSpecies + 1).toArray();
 
-		List<VdypLayerSpecies> speciesToRetain = new ArrayList<>();
+		List<VdypSpecies> speciesToRetain = new ArrayList<>();
 
-		for (VdypLayerSpecies s : layer.getGenera().values()) {
+		for (VdypSpecies s : layer.getSpecies().values()) {
 			if (retainCriteria.test(s)) {
 				speciesToRetain.add(s);
 			}
@@ -107,7 +107,7 @@ class Bank {
 		}
 
 		int nextSlot = 1;
-		for (VdypLayerSpecies s : speciesToRetain) {
+		for (VdypSpecies s : speciesToRetain) {
 			recordSpecies(nextSlot++, s);
 		}
 	}
@@ -195,14 +195,14 @@ class Bank {
 		return becZone;
 	}
 
-	public VdypPolygonLayer getLayer() {
+	public VdypLayer getLayer() {
 		return layer;
 	}
 
-	private void recordSpecies(int index, VdypLayerSpecies species) {
+	private void recordSpecies(int index, VdypSpecies species) {
 
 		speciesNames[index] = species.getGenus();
-		sp64Distributions[index] = species.getSpeciesDistributions();
+		sp64Distributions[index] = species.getSpeciesPercent();
 		siteIndices[index] = species.getSiteIndex();
 		dominantHeights[index] = species.getDominantHeight();
 		ageTotals[index] = species.getAgeTotal();
@@ -219,7 +219,7 @@ class Bank {
 		}
 	}
 
-	private void recordUtilizations(int index, Map<UtilizationClass, VdypSpeciesUtilization> suMap) {
+	private void recordUtilizations(int index, Map<UtilizationClass, VdypUtilization> suMap) {
 
 		for (var su : suMap.entrySet()) {
 			int ucIndex = su.getKey().ordinal();

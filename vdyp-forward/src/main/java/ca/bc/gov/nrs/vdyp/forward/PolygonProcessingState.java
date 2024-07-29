@@ -9,15 +9,15 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.forward.model.ControlVariable;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonLayer;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClassVariable;
+import ca.bc.gov.nrs.vdyp.model.VdypEntity;
+import ca.bc.gov.nrs.vdyp.model.VdypLayer;
+import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VolumeVariable;
 
 class PolygonProcessingState {
@@ -168,7 +168,7 @@ class PolygonProcessingState {
 		return start.getBecZone();
 	}
 
-	public VdypPolygonLayer getLayer() {
+	public VdypLayer getLayer() {
 		return start.getLayer();
 	}
 

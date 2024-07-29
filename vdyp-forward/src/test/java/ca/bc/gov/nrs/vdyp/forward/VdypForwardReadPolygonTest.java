@@ -21,12 +21,12 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 @SuppressWarnings({ "unchecked" })
@@ -62,9 +62,9 @@ class VdypForwardReadPolygonTest {
 
 			var polygon = polygons.get(0);
 
-			assertThat(polygon.getDescription().toStringCompact(), is("01002 S000001 00(1970)"));
+			assertThat(polygon.getPolygonIdentifier().toStringCompact(), is("01002 S000001 00(1970)"));
 
-			var primaryLayer = polygon.getPrimaryLayer();
+			var primaryLayer = polygon.getLayers().get(LayerType.PRIMARY);
 			{
 				assertThat(primaryLayer, hasProperty("layerType", is(LayerType.PRIMARY)));
 				assertThat(primaryLayer, hasProperty("defaultUtilizationMap"));
@@ -98,10 +98,8 @@ class VdypForwardReadPolygonTest {
 				}
 			}
 
-			var optionalVeteranLayer = polygon.getVeteranLayer();
-			if (optionalVeteranLayer.isPresent()) {
-
-				var veteranLayer = optionalVeteranLayer.get();
+			var veteranLayer = polygon.getLayers().get(LayerType.VETERAN);
+			if (veteranLayer != null) {
 
 				if (veteranLayer.getDefaultUtilizationMap().isPresent()) {
 					var utilizationMap = veteranLayer.getDefaultUtilizationMap().get();

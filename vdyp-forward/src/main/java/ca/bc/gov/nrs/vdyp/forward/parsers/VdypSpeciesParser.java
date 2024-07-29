@@ -13,8 +13,6 @@ import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
 import ca.bc.gov.nrs.vdyp.io.EndOfRecord;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.InvalidGenusDistributionSet;
@@ -31,6 +29,8 @@ import ca.bc.gov.nrs.vdyp.model.GenusDistribution;
 import ca.bc.gov.nrs.vdyp.model.GenusDistributionSet;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
+import ca.bc.gov.nrs.vdyp.model.VdypEntity;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 
 public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String> {
 
@@ -62,7 +62,7 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 	}
 
 	@Override
-	public StreamingParserFactory<Collection<VdypLayerSpecies>>
+	public StreamingParserFactory<Collection<VdypSpecies>>
 			map(String fileName, FileResolver fileResolver, Map<String, Object> control)
 					throws IOException, ResourceParseException {
 		return () -> {
@@ -101,12 +101,12 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 					(List<GenusDefinition>) control.get(ControlKey.SP0_DEF.name())
 			);
 
-			var delegateStream = new AbstractStreamingParser<ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord>>(
+			var delegateStream = new AbstractStreamingParser<ValueOrMarker<Optional<VdypSpecies>, EndOfRecord>>(
 					is, lineParser, control
 			) {
 				@SuppressWarnings("unchecked")
 				@Override
-				protected ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord> convert(Map<String, Object> entry)
+				protected ValueOrMarker<Optional<VdypSpecies>, EndOfRecord> convert(Map<String, Object> entry)
 						throws ResourceParseException {
 
 					var polygonId = PolygonIdentifier.split((String) entry.get(DESCRIPTION));
@@ -179,12 +179,12 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 						speciesDistributionSet = null;
 					}
 					
-					var builder = new ValueOrMarker.Builder<Optional<VdypLayerSpecies>, EndOfRecord>();
+					var builder = new ValueOrMarker.Builder<Optional<VdypSpecies>, EndOfRecord>();
 					return layerType.handle(l -> builder.value(l.map(lt -> {
 
 						var genus = optionalGenus.orElse(genusDefinitionMap.getByIndex(genusIndex).getAlias());
 						
-						return new VdypLayerSpecies(
+						return new VdypSpecies(
 								polygonId, lt, genusIndex, genus, speciesDistributionSet, siteIndex, dominantHeight,
 								totalAge, ageAtBreastHeight, yearsToBreastHeight, isPrimarySpecies, siteCurveNumber
 						);
@@ -192,22 +192,22 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 				}
 			};
 
-			return new GroupingStreamingParser<Collection<VdypLayerSpecies>, ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord>>(
+			return new GroupingStreamingParser<Collection<VdypSpecies>, ValueOrMarker<Optional<VdypSpecies>, EndOfRecord>>(
 					delegateStream
 			) {
 				@Override
-				protected boolean skip(ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord> nextChild) {
+				protected boolean skip(ValueOrMarker<Optional<VdypSpecies>, EndOfRecord> nextChild) {
 					return nextChild.getValue().map(Optional::isEmpty).orElse(false);
 				}
 
 				@Override
-				protected boolean stop(ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord> nextChild) {
+				protected boolean stop(ValueOrMarker<Optional<VdypSpecies>, EndOfRecord> nextChild) {
 					return nextChild.isMarker();
 				}
 
 				@Override
-				protected Collection<VdypLayerSpecies>
-						convert(List<ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord>> children) {
+				protected Collection<VdypSpecies>
+						convert(List<ValueOrMarker<Optional<VdypSpecies>, EndOfRecord>> children) {
 					// Skip if empty (and unknown layer type)
 					return children.stream().map(ValueOrMarker::getValue).map(Optional::get).flatMap(Optional::stream)
 							.toList();

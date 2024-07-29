@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypSpeciesUtilization;
 import ca.bc.gov.nrs.vdyp.io.EndOfRecord;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
@@ -22,6 +21,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.VdypUtilization;
 
 public class VdypUtilizationParser implements ControlMapValueReplacer<Object, String> {
 
@@ -46,7 +46,7 @@ public class VdypUtilizationParser implements ControlMapValueReplacer<Object, St
 	}
 
 	@Override
-	public StreamingParserFactory<Collection<VdypSpeciesUtilization>>
+	public StreamingParserFactory<Collection<VdypUtilization>>
 			map(String fileName, FileResolver fileResolver, Map<String, Object> control)
 					throws IOException, ResourceParseException {
 		return () -> {
@@ -75,12 +75,12 @@ public class VdypUtilizationParser implements ControlMapValueReplacer<Object, St
 
 			var is = fileResolver.resolveForInput(fileName);
 
-			var delegateStream = new AbstractStreamingParser<ValueOrMarker<Optional<VdypSpeciesUtilization>, EndOfRecord>>(
+			var delegateStream = new AbstractStreamingParser<ValueOrMarker<Optional<VdypUtilization>, EndOfRecord>>(
 					is, lineParser, control
 			) {
 				@SuppressWarnings("unchecked")
 				@Override
-				protected ValueOrMarker<Optional<VdypSpeciesUtilization>, EndOfRecord>
+				protected ValueOrMarker<Optional<VdypUtilization>, EndOfRecord>
 						convert(Map<String, Object> entry) throws ResourceParseException {
 
 					var polygonId = PolygonIdentifier.split((String) entry.get(DESCRIPTION));
@@ -102,10 +102,10 @@ public class VdypUtilizationParser implements ControlMapValueReplacer<Object, St
 					var cuVolumeLessDecayWastageBreakage = (Float) (entry.get(CU_VOLUME_LESS_DECAY_WASTAGE_BREAKAGE));
 					var quadraticMeanDBH = (Float) (entry.get(QUADRATIC_MEAN_DIAMETER_BREAST_HEIGHT));
 
-					var builder = new ValueOrMarker.Builder<Optional<VdypSpeciesUtilization>, EndOfRecord>();
+					var builder = new ValueOrMarker.Builder<Optional<VdypUtilization>, EndOfRecord>();
 					return layerType.handle(l -> {
 						return builder.value(l.map(lt -> {
-							return new VdypSpeciesUtilization(
+							return new VdypUtilization(
 									polygonId, lt, genusIndex, genus, utilizationClass, basalArea, liveTreesPerHectare,
 									loreyHeight, wholeStemVolume, closeUtilVolume, cuVolumeLessDecay,
 									cuVolumeLessDecayWastage, cuVolumeLessDecayWastageBreakage, quadraticMeanDBH
@@ -115,23 +115,23 @@ public class VdypUtilizationParser implements ControlMapValueReplacer<Object, St
 				}
 			};
 
-			return new GroupingStreamingParser<Collection<VdypSpeciesUtilization>, ValueOrMarker<Optional<VdypSpeciesUtilization>, EndOfRecord>>(
+			return new GroupingStreamingParser<Collection<VdypUtilization>, ValueOrMarker<Optional<VdypUtilization>, EndOfRecord>>(
 					delegateStream
 			) {
 
 				@Override
-				protected boolean skip(ValueOrMarker<Optional<VdypSpeciesUtilization>, EndOfRecord> nextChild) {
+				protected boolean skip(ValueOrMarker<Optional<VdypUtilization>, EndOfRecord> nextChild) {
 					return nextChild.getValue().map(Optional::isEmpty).orElse(false);
 				}
 
 				@Override
-				protected boolean stop(ValueOrMarker<Optional<VdypSpeciesUtilization>, EndOfRecord> nextChild) {
+				protected boolean stop(ValueOrMarker<Optional<VdypUtilization>, EndOfRecord> nextChild) {
 					return nextChild.isMarker();
 				}
 
 				@Override
-				protected Collection<VdypSpeciesUtilization>
-						convert(List<ValueOrMarker<Optional<VdypSpeciesUtilization>, EndOfRecord>> children) {
+				protected Collection<VdypUtilization>
+						convert(List<ValueOrMarker<Optional<VdypUtilization>, EndOfRecord>> children) {
 					// Skip if empty (and unknown layer type)
 					return children.stream().map(ValueOrMarker::getValue).map(Optional::get).flatMap(Optional::stream)
 							.toList();

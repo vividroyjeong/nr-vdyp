@@ -19,13 +19,14 @@ import org.junit.jupiter.api.Test;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.forward.Bank.CopyMode;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonLayer;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypSpeciesUtilization;
 import ca.bc.gov.nrs.vdyp.forward.test.VdypForwardTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.VdypLayer;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
+import ca.bc.gov.nrs.vdyp.model.VdypUtilization;
 
 class PolygonProcessingStateTest {
 
@@ -53,7 +54,7 @@ class PolygonProcessingStateTest {
 
 		var polygon = reader.readNextPolygon().orElseThrow();
 
-		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
+		VdypLayer pLayer = polygon.getLayers().get(LayerType.PRIMARY);
 		assertThat(pLayer, notNullValue());
 
 		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone(), s -> true);
@@ -114,7 +115,7 @@ class PolygonProcessingStateTest {
 
 		var polygon = reader.readNextPolygon().orElseThrow();
 
-		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
+		VdypLayer pLayer = polygon.getLayers().get(LayerType.PRIMARY);
 		assertThat(pLayer, notNullValue());
 
 		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone(), s -> true);
@@ -133,7 +134,7 @@ class PolygonProcessingStateTest {
 
 		var polygon = reader.readNextPolygon().orElseThrow();
 
-		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
+		VdypLayer pLayer = polygon.getLayers().get(LayerType.PRIMARY);
 		assertThat(pLayer, notNullValue());
 
 		Bank bank1 = new Bank(
@@ -164,7 +165,7 @@ class PolygonProcessingStateTest {
 
 		var polygon = reader.readNextPolygon().orElseThrow();
 
-		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
+		VdypLayer pLayer = polygon.getLayers().get(LayerType.PRIMARY);
 		assertThat(pLayer, notNullValue());
 
 		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone(), s -> true);
@@ -174,7 +175,7 @@ class PolygonProcessingStateTest {
 		verifyProcessingStateMatchesLayer(ppsCopy, pLayer);
 	}
 
-	private void verifyProcessingStateMatchesLayer(Bank pps, VdypPolygonLayer layer) {
+	private void verifyProcessingStateMatchesLayer(Bank pps, VdypLayer layer) {
 
 		List<Integer> sortedSpIndices = layer.getGenera().keySet().stream().sorted().toList();
 
@@ -182,7 +183,7 @@ class PolygonProcessingStateTest {
 
 			int arrayIndex = i + 1;
 
-			VdypLayerSpecies genus = layer.getGenera().get(sortedSpIndices.get(i));
+			VdypSpecies genus = layer.getGenera().get(sortedSpIndices.get(i));
 			verifyProcessingStateSpeciesMatchesSpecies(pps, arrayIndex, genus);
 
 			if (genus.getUtilizations().isPresent()) {
@@ -198,11 +199,11 @@ class PolygonProcessingStateTest {
 	}
 
 	private void verifyProcessingStateSpeciesUtilizationsMatchesUtilizations(
-			Bank pps, int spIndex, Map<UtilizationClass, VdypSpeciesUtilization> map
+			Bank pps, int spIndex, Map<UtilizationClass, VdypUtilization> map
 	) {
 
 		for (UtilizationClass uc : UtilizationClass.values()) {
-			VdypSpeciesUtilization u = map.get(uc);
+			VdypUtilization u = map.get(uc);
 
 			assertThat(pps.basalAreas[spIndex][uc.index + 1], is(u.getBasalArea()));
 			assertThat(pps.closeUtilizationVolumes[spIndex][uc.index + 1], is(u.getCloseUtilizationVolume()));
@@ -217,7 +218,7 @@ class PolygonProcessingStateTest {
 		}
 	}
 
-	private void verifyProcessingStateSpeciesMatchesSpecies(Bank pps, int index, VdypLayerSpecies species) {
+	private void verifyProcessingStateSpeciesMatchesSpecies(Bank pps, int index, VdypSpecies species) {
 		assertThat(pps.yearsAtBreastHeight[index], is(species.getAgeAtBreastHeight()));
 		assertThat(pps.ageTotals[index], is(species.getAgeTotal()));
 		assertThat(pps.dominantHeights[index], is(species.getDominantHeight()));

@@ -20,12 +20,12 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
 import ca.bc.gov.nrs.vdyp.forward.parsers.VdypSpeciesParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.VdypEntity;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 class VdypForwardSpeciesParserTest {
@@ -49,7 +49,7 @@ class VdypForwardSpeciesParserTest {
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
 		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<VdypLayerSpecies>) parserFactory).get();
+		var stream = ((StreamingParserFactory<VdypSpecies>) parserFactory).get();
 
 		assertThat(stream, instanceOf(StreamingParser.class));
 
@@ -81,7 +81,7 @@ class VdypForwardSpeciesParserTest {
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
 		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<Collection<VdypLayerSpecies>>) parserFactory).get();
+		var stream = ((StreamingParserFactory<Collection<VdypSpecies>>) parserFactory).get();
 
 		assertThat(stream, instanceOf(StreamingParser.class));
 
@@ -150,7 +150,7 @@ class VdypForwardSpeciesParserTest {
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
 		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<Collection<VdypLayerSpecies>>) parserFactory).get();
+		var stream = ((StreamingParserFactory<Collection<VdypSpecies>>) parserFactory).get();
 
 		assertThat(stream, instanceOf(StreamingParser.class));
 
@@ -190,7 +190,7 @@ class VdypForwardSpeciesParserTest {
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
 		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<Collection<VdypLayerSpecies>>) parserFactory).get();
+		var stream = ((StreamingParserFactory<Collection<VdypSpecies>>) parserFactory).get();
 
 		assertThat(stream, instanceOf(StreamingParser.class));
 
@@ -309,7 +309,7 @@ class VdypForwardSpeciesParserTest {
 		assertThat(parserFactory, instanceOf(StreamingParserFactory.class));
 
 		@SuppressWarnings("unchecked")
-		var stream = ((StreamingParserFactory<Collection<VdypLayerSpecies>>) parserFactory).get();
+		var stream = ((StreamingParserFactory<Collection<VdypSpecies>>) parserFactory).get();
 
 		assertThat(stream, instanceOf(StreamingParser.class));
 

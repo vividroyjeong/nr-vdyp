@@ -5,9 +5,9 @@ import java.util.Map;
 import ca.bc.gov.nrs.vdyp.common.Estimators;
 import ca.bc.gov.nrs.vdyp.forward.controlmap.ForwardResolvedControlMap;
 import ca.bc.gov.nrs.vdyp.forward.controlmap.ForwardResolvedControlMapImpl;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 
 class ForwardProcessingState {
 
@@ -44,13 +44,13 @@ class ForwardProcessingState {
 		
 		// Move the primary layer of the given polygon to bank zero.
 		Bank primaryBank = banks[0][LayerType.PRIMARY.getIndex()] = new Bank(
-				polygon.getPrimaryLayer(), polygon.getBiogeoclimaticZone(),
+				polygon.getLayers().get(LayerType.PRIMARY), polygon.getBiogeoclimaticZone(),
 				s -> s.getUtilizations().isPresent()
 						? s.getUtilizations().get().get(UtilizationClass.ALL).getBasalArea() >= MIN_BASAL_AREA
 						: true
 		);
 		
-		polygon.getVeteranLayer().ifPresent(l ->
+		polygon.getLayers().get(LayerType.VETERAN).ifPresent(l ->
 			banks[0][LayerType.VETERAN.getIndex()] = new Bank(
 					l, polygon.getBiogeoclimaticZone(),
 					s -> s.getUtilizations().isPresent()

@@ -16,24 +16,24 @@ import org.slf4j.LoggerFactory;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonLayer;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypSpeciesUtilization;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.VdypLayer;
+import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
+import ca.bc.gov.nrs.vdyp.model.VdypUtilization;
 
 public class ForwardDataStreamReader {
 
 	private static final Logger logger = LoggerFactory.getLogger(ForwardDataStreamReader.class);
 
 	private final StreamingParser<VdypPolygon> polygonStream;
-	private final StreamingParser<Collection<VdypLayerSpecies>> layerSpeciesStream;
-	private final StreamingParser<Collection<VdypSpeciesUtilization>> speciesUtilizationStream;
+	private final StreamingParser<Collection<VdypSpecies>> layerSpeciesStream;
+	private final StreamingParser<Collection<VdypUtilization>> speciesUtilizationStream;
 	Optional<StreamingParser<PolygonIdentifier>> polygonDescriptionStream;
 
 	@SuppressWarnings("unchecked")
@@ -43,10 +43,10 @@ public class ForwardDataStreamReader {
 		polygonStream = ((StreamingParserFactory<VdypPolygon>) polygonStreamFactory).get();
 
 		var layerSpeciesStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SPECIES.name());
-		layerSpeciesStream = ((StreamingParserFactory<Collection<VdypLayerSpecies>>) layerSpeciesStreamFactory).get();
+		layerSpeciesStream = ((StreamingParserFactory<Collection<VdypSpecies>>) layerSpeciesStreamFactory).get();
 
 		var speciesUtilizationStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name());
-		speciesUtilizationStream = ((StreamingParserFactory<Collection<VdypSpeciesUtilization>>) speciesUtilizationStreamFactory)
+		speciesUtilizationStream = ((StreamingParserFactory<Collection<VdypUtilization>>) speciesUtilizationStreamFactory)
 				.get();
 		
 		polygonDescriptionStream = Optional.empty();
@@ -73,7 +73,7 @@ public class ForwardDataStreamReader {
 				logger.debug("Reading polygon {}", polygon);
 
 				var utilizationCollection = speciesUtilizationStream.next();
-				var utilizationsBySpeciesMap = new HashMap<UtilizationBySpeciesKey, Map<UtilizationClass, VdypSpeciesUtilization>>();
+				var utilizationsBySpeciesMap = new HashMap<UtilizationBySpeciesKey, Map<UtilizationClass, VdypUtilization>>();
 				for (var utilization : utilizationCollection) {
 					logger.trace("Saw utilization {}", utilization);
 
@@ -87,13 +87,13 @@ public class ForwardDataStreamReader {
 					if (!pdStream.hasNext()) {
 						throw new ProcessingException(MessageFormat.format("Grow-to-year file at {0} in the control file does"
 								+ " not contain a record for {1} as expected, but instead the end-of-file was reached"
-								, ControlKey.FORWARD_INPUT_GROWTO.name(), polygon.getDescription().getName()));
+								, ControlKey.FORWARD_INPUT_GROWTO.name(), polygon.getPolygonIdentifier().getName()));
 					}
 					var polygonDescription = pdStream.next();
-					if (! polygonDescription.getName().equals(polygon.getDescription().getName())) {
+					if (! polygonDescription.getName().equals(polygon.getPolygonIdentifier().getName())) {
 						throw new ProcessingException(MessageFormat.format("Grow-to-year file at {0} in the control file does"
 								+ " not contain a record for {1} as expected, but instead contains a record for {2}"
-								, ControlKey.FORWARD_INPUT_GROWTO.name(), polygon.getDescription().getName()
+								, ControlKey.FORWARD_INPUT_GROWTO.name(), polygon.getPolygonIdentifier().getName()
 								, polygonDescription.getName()));
 					}
 					
@@ -101,8 +101,8 @@ public class ForwardDataStreamReader {
 				}
 
 				var speciesCollection = layerSpeciesStream.next();
-				var primarySpecies = new HashMap<Integer, VdypLayerSpecies>();
-				var veteranSpecies = new HashMap<Integer, VdypLayerSpecies>();
+				var primarySpecies = new HashMap<Integer, VdypSpecies>();
+				var veteranSpecies = new HashMap<Integer, VdypSpecies>();
 				for (var species : speciesCollection) {
 					logger.trace("Saw species {}", species);
 
@@ -112,7 +112,7 @@ public class ForwardDataStreamReader {
 					if (speciesUtilizations != null) {
 						species.setUtilizations(Optional.of(speciesUtilizations));
 
-						for (VdypSpeciesUtilization u : speciesUtilizations.values()) {
+						for (VdypUtilization u : speciesUtilizations.values()) {
 							u.setParent(species);
 						}
 					} else {
@@ -127,40 +127,40 @@ public class ForwardDataStreamReader {
 						throw new IllegalStateException(
 								MessageFormat.format(
 										"Unrecognized layer type {} for species {} of polygon {}",
-										species.getLayerType(), species.getGenusIndex(), polygon.getDescription()
+										species.getLayerType(), species.getGenusIndex(), polygon.getPolygonIdentifier()
 								)
 						);
 					}
 				}
 
-				VdypPolygonLayer primaryLayer = null;
+				VdypLayer primaryLayer = null;
 				if (primarySpecies.size() > 0) {
 
 					var key = new UtilizationBySpeciesKey(LayerType.PRIMARY, 0);
-					Map<UtilizationClass, VdypSpeciesUtilization> defaultSpeciesUtilization = utilizationsBySpeciesMap
+					Map<UtilizationClass, VdypUtilization> defaultSpeciesUtilization = utilizationsBySpeciesMap
 							.get(key);
 
-					primaryLayer = new VdypPolygonLayer(
+					primaryLayer = new VdypLayer(
 							LayerType.PRIMARY, polygon, primarySpecies, Optional.ofNullable(defaultSpeciesUtilization)
 					);
 
-					for (VdypLayerSpecies v : primarySpecies.values()) {
+					for (VdypSpecies v : primarySpecies.values()) {
 						v.setParent(primaryLayer);
 					}
 				}
 
-				VdypPolygonLayer veteranLayer = null;
+				VdypLayer veteranLayer = null;
 				if (veteranSpecies.size() > 0) {
 
 					var key = new UtilizationBySpeciesKey(LayerType.VETERAN, 0);
-					Map<UtilizationClass, VdypSpeciesUtilization> defaultSpeciesUtilization = utilizationsBySpeciesMap
+					Map<UtilizationClass, VdypUtilization> defaultSpeciesUtilization = utilizationsBySpeciesMap
 							.get(key);
 
-					veteranLayer = new VdypPolygonLayer(
+					veteranLayer = new VdypLayer(
 							LayerType.VETERAN, polygon, veteranSpecies, Optional.ofNullable(defaultSpeciesUtilization)
 					);
 
-					for (VdypLayerSpecies v : veteranSpecies.values()) {
+					for (VdypSpecies v : veteranSpecies.values()) {
 						v.setParent(veteranLayer);
 					}
 				}
@@ -187,13 +187,13 @@ public class ForwardDataStreamReader {
 	 */
 	private void adjustUtilizations(VdypPolygon polygon) throws ProcessingException {
 
-		float percentForestedLand = polygon.getPercentForestLand();
+		float percentForestedLand = polygon.getPercentAvailable();
 		assert !Float.isNaN(percentForestedLand);
 		float scalingFactor = 100.0f / percentForestedLand;
 
-		List<VdypSpeciesUtilization> utilizationsToAdjust = new ArrayList<>();
+		List<VdypUtilization> utilizationsToAdjust = new ArrayList<>();
 
-		for (VdypPolygonLayer l : polygon.getLayers()) {
+		for (VdypLayer l : polygon.getLayers().values()) {
 
 			l.getDefaultUtilizationMap().ifPresent(m -> utilizationsToAdjust.addAll(m.values()));
 
@@ -201,7 +201,7 @@ public class ForwardDataStreamReader {
 					.forEach(s -> s.getUtilizations().ifPresent(m -> utilizationsToAdjust.addAll(m.values())));
 		}
 
-		for (VdypSpeciesUtilization u : utilizationsToAdjust) {
+		for (VdypUtilization u : utilizationsToAdjust) {
 
 			if (percentForestedLand > 0.0f && percentForestedLand < 100.0f) {
 				u.scale(scalingFactor);

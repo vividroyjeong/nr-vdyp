@@ -27,6 +27,7 @@ import ca.bc.gov.nrs.vdyp.common.Estimators;
 import ca.bc.gov.nrs.vdyp.common.ReconcilationMethods;
 import ca.bc.gov.nrs.vdyp.common.Reference;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.NoAnswerException;
@@ -37,8 +38,6 @@ import ca.bc.gov.nrs.vdyp.forward.Bank.CopyMode;
 import ca.bc.gov.nrs.vdyp.forward.model.ControlVariable;
 import ca.bc.gov.nrs.vdyp.forward.model.ForwardControlVariables;
 import ca.bc.gov.nrs.vdyp.forward.model.ForwardDebugSettings;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperBoundsParser;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
@@ -57,6 +56,8 @@ import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClassVariable;
+import ca.bc.gov.nrs.vdyp.model.VdypEntity;
+import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VolumeVariable;
 import ca.bc.gov.nrs.vdyp.si32.site.SiteTool;
 
@@ -141,7 +142,7 @@ public class ForwardProcessingEngine {
 	 */
 	public void processPolygon(VdypPolygon polygon, ExecutionStep lastStepInclusive) throws ProcessingException {
 
-		logger.info("Starting processing of polygon {}", polygon.getDescription());
+		logger.info("Starting processing of polygon {}", polygon.getPolygonIdentifier());
 
 		fps.setPolygon(polygon);
 
@@ -164,7 +165,7 @@ public class ForwardProcessingEngine {
 			targetYear = polygon.getTargetYear().get();
 		} else {
 			if (growTargetControlVariableValue <= 400) {
-				targetYear = polygon.getDescription().getYear() + growTargetControlVariableValue;
+				targetYear = polygon.getPolygonIdentifier().getYear() + growTargetControlVariableValue;
 			} else {
 				targetYear = growTargetControlVariableValue;
 			}
@@ -224,7 +225,7 @@ public class ForwardProcessingEngine {
 		if (lastStepInclusive.ordinal() >= ExecutionStep.GROW.ordinal()) {
 			int veteranLayerInstance = 0;
 
-			int startingYear = fps.getPolygonProcessingState().getPolygon().getDescription().getYear();
+			int startingYear = fps.getPolygonProcessingState().getPolygon().getPolygonIdentifier().getYear();
 			Bank startBank = pps.getStartBank();
 
 			int primaryLayerSourceInstance = 2;
@@ -275,14 +276,14 @@ public class ForwardProcessingEngine {
 		PolygonProcessingState pps = fps.getPolygonProcessingState();
 		VdypPolygon polygon = pps.getPolygon();
 
-		logger.info("Performing grow of {} for year {}", polygon.getDescription().getName(), currentYear);
+		logger.info("Performing grow of {} for year {}", polygon.getPolygonIdentifier().getName(), currentYear);
 
 		Bank end = new Bank(start, CopyMode.CopyStructure);
 
 		Optional<Bank> veteranBank = Optional.ofNullable(fps.getBank(veteranLayerInstance, LayerType.VETERAN));
 
 		// If update-during-growth is set, and this is not the starting year, update the context
-		int startingYear = polygon.getDescription().getYear();
+		int startingYear = polygon.getPolygonIdentifier().getYear();
 		if (currentYear > startingYear
 				&& fps.fcm.getForwardControlVariables()
 						.getControlVariable(ControlVariable.UPDATE_DURING_GROWTH_6) >= 1) {
@@ -343,7 +344,7 @@ public class ForwardProcessingEngine {
 		float dhEnd = dhStart + dhDelta;
 		float dqEnd = dqStart + dqDelta;
 		float baEnd = baStart + baDelta;
-		float tphEnd = calculateTreesPerHectare(baEnd, dqEnd);
+		float tphEnd = BaseAreaTreeDensityDiameter.treesPerHectare(baEnd, dqEnd);
 		float tphMultiplier = tphEnd / tphStart;
 
 		// Begin storing computed results - dq, ba and tph for the layer
@@ -416,7 +417,7 @@ public class ForwardProcessingEngine {
 
 		// Calculate quad-mean-diameter over all species, uc UC_ALL_INDEX
 
-		end.quadMeanDiameters[0][UC_ALL_INDEX] = calculateQuadMeanDiameter(
+		end.quadMeanDiameters[0][UC_ALL_INDEX] = BaseAreaTreeDensityDiameter.quadMeanDiameter(
 				end.basalAreas[0][UC_ALL_INDEX], end.treesPerHectare[0][UC_ALL_INDEX]
 		);
 
@@ -429,7 +430,6 @@ public class ForwardProcessingEngine {
 		// and Lorey height. Proceed to per-species estimates.
 
 		// Calculate basal area percentages per species, uc UC_ALL_INDEX
-		
 		for (int i : start.getIndices()) {
 			end.percentagesOfForestedLand[i] = 100.0f * end.basalAreas[i][UC_ALL_INDEX]
 					/ end.basalAreas[0][UC_ALL_INDEX];
@@ -492,10 +492,10 @@ public class ForwardProcessingEngine {
 				float spBaEnd = spBaStart * (1.0f + baChangeRate);
 				float spTphStart = start.treesPerHectare[i][UC_ALL_INDEX];
 				float spTphEnd = spTphStart * tphChangeRate;
-				float spDqEnd = calculateQuadMeanDiameter(spBaEnd, spTphEnd);
+				float spDqEnd = BaseAreaTreeDensityDiameter.quadMeanDiameter(spBaEnd, spTphEnd);
 				if (spDqEnd < 7.51f) {
 					spDqEnd = 7.51f;
-					spTphEnd = calculateTreesPerHectare(spBaEnd, spDqEnd);
+					spTphEnd = BaseAreaTreeDensityDiameter.treesPerHectare(spBaEnd, spDqEnd);
 				}
 
 				end.basalAreas[i][UC_ALL_INDEX] = spBaEnd;
@@ -696,7 +696,7 @@ public class ForwardProcessingEngine {
 				float tph = 0.0f;
 				for (int i : start.speciesIndices) {
 					if (spBaEnd[i] > 0.0f) {
-						spTphNew[i] = calculateTreesPerHectare(spBaEnd[i], spDqNew[i]);
+						spTphNew[i] = BaseAreaTreeDensityDiameter.treesPerHectare(spBaEnd[i], spDqNew[i]);
 					} else {
 						spTphNew[i] = 0.0f;
 					}
@@ -707,8 +707,8 @@ public class ForwardProcessingEngine {
 					break;
 				}
 
-				float dqNewBar = calculateQuadMeanDiameter(baStart + baDelta, tph);
-				float dqStartEstimate = calculateQuadMeanDiameter(baStart, tphStart);
+				float dqNewBar = BaseAreaTreeDensityDiameter.quadMeanDiameter(baStart + baDelta, tph);
+				float dqStartEstimate = BaseAreaTreeDensityDiameter.quadMeanDiameter(baStart, tphStart);
 				float dqWant = dqStartEstimate + dqDelta;
 
 				var score = FloatMath.abs(dqWant - dqNewBar);
@@ -738,7 +738,7 @@ public class ForwardProcessingEngine {
 				end.basalAreas[i][UC_ALL_INDEX] = spBaEnd[i];
 				end.treesPerHectare[i][UC_ALL_INDEX] = spTphNew[i];
 				if (spBaEnd[i] > 0.0f) {
-					end.quadMeanDiameters[i][UC_ALL_INDEX] = calculateQuadMeanDiameter(spBaEnd[i], spTphNew[i]);
+					end.quadMeanDiameters[i][UC_ALL_INDEX] = BaseAreaTreeDensityDiameter.quadMeanDiameter(spBaEnd[i], spTphNew[i]);
 				}
 			}
 		}
@@ -1005,7 +1005,7 @@ public class ForwardProcessingEngine {
 			float smallProbability = smallComponentProbability(speciesName, spLhAll, region);
 
 			// This whole operation is on Actual BA's, not 100% occupancy.
-			float fractionAvailable = pps.getPolygon().getPercentForestLand() / 100.0f;
+			float fractionAvailable = pps.getPolygon().getPercentAvailable() / 100.0f;
 
 			if (fractionAvailable > 0.0f) {
 				spBaAll *= fractionAvailable;
@@ -1052,7 +1052,7 @@ public class ForwardProcessingEngine {
 				}
 			}
 
-			float spTphSmall = calculateTreesPerHectare(spBaSmall, spDqSmall);
+			float spTphSmall = BaseAreaTreeDensityDiameter.treesPerHectare(spBaSmall, spDqSmall);
 			float spWsVolumeSmall = spTphSmall * meanVolumeSmall;
 
 			end.loreyHeights[speciesIndex][UC_SMALL_INDEX] = spLhSmall;
@@ -1077,7 +1077,7 @@ public class ForwardProcessingEngine {
 		}
 		end.basalAreas[0][UC_SMALL_INDEX] = baSum;
 		end.treesPerHectare[0][UC_SMALL_INDEX] = tphSum;
-		end.quadMeanDiameters[0][UC_SMALL_INDEX] = calculateQuadMeanDiameter(baSum, tphSum);
+		end.quadMeanDiameters[0][UC_SMALL_INDEX] = BaseAreaTreeDensityDiameter.quadMeanDiameter(baSum, tphSum);
 		end.wholeStemVolumes[0][UC_SMALL_INDEX] = wsVolumeSum;
 		end.closeUtilizationVolumes[0][UC_SMALL_INDEX] = 0.0f;
 		end.cuVolumesMinusDecay[0][UC_SMALL_INDEX] = 0.0f;
@@ -2019,7 +2019,7 @@ public class ForwardProcessingEngine {
 			treesPerHectare.setCoe(UtilizationClass.ALL.index, start.treesPerHectare[s][UC_ALL_INDEX]);
 			for (UtilizationClass uc : UtilizationClass.UTIL_CLASSES) {
 				treesPerHectare.setCoe(
-						uc.index, calculateTreesPerHectare(
+						uc.index, BaseAreaTreeDensityDiameter.treesPerHectare(
 								basalAreas.getCoe(uc.index), quadMeanDiameters.getCoe(uc.index)
 						)
 				);
@@ -2239,43 +2239,6 @@ public class ForwardProcessingEngine {
 				a0 + a1 * log(quadMeanDiameterSpecSmall) + a2 * log(loreyHeightSpecSmall)
 						+ a3 * quadMeanDiameterSpecSmall
 		);
-	}
-
-	public static float calculateTreesPerHectare(float basalArea, float qmd) {
-		if (qmd == 0.0f || Float.isNaN(qmd) || Float.isNaN(basalArea)) {
-			return 0.0f;
-		} else {
-			// basalArea is in m**2/hectare. qmd is diameter in cm. pi/4 converts between
-			// diameter in cm and area in cm**2 since a = pi * r**2 = pi * (d/2)**2
-			// = pi/4 * d**2. Finally, dividing by 10000 converts from cm**2 to m**2.
-
-			return basalArea / PI_40K / (qmd * qmd);
-		}
-	}
-
-	public static float calculateBasalArea(float qmd, float treesPerHectare) {
-
-		if (Float.isNaN(qmd) || Float.isNaN(treesPerHectare)) {
-			return 0.0f;
-		} else {
-			// qmd is diameter in cm (per tree); qmd**2 is in cm**2. Multiplying by pi/4 converts
-			// to area in cm**2. Dividing by 10000 converts into m**2. Finally, multiplying
-			// by trees-per-hectare takes the per-tree area and converts it into a per-hectare
-			// area - that is, the basal area per hectare.
-
-			return qmd * qmd * PI_40K * treesPerHectare;
-		}
-	}
-
-	public static float calculateQuadMeanDiameter(float basalArea, float treesPerHectare) {
-
-		if (basalArea > 1.0e6 || basalArea == 0.0 || Float.isNaN(basalArea) || treesPerHectare > 1.0e6
-				|| treesPerHectare == 0.0 || Float.isNaN(treesPerHectare)) {
-			return 0.0f;
-		} else {
-			// See comments above explaining this calculation
-			return FloatMath.sqrt(basalArea / treesPerHectare / PI_40K);
-		}
 	}
 
 	private static float calculateCompatibilityVariable(float actualVolume, float baseVolume, float staticVolume) {
@@ -2695,12 +2658,12 @@ public class ForwardProcessingEngine {
 	 */
 	private static void validatePolygon(VdypPolygon polygon) throws ProcessingException {
 
-		if (polygon.getDescription().getYear() < 1900) {
+		if (polygon.getPolygonIdentifier().getYear() < 1900) {
 
 			throw new ProcessingException(
 					MessageFormat.format(
-							"Polygon {0}''s year value {1} is < 1900", polygon.getDescription().getName(), polygon
-									.getDescription().getYear()
+							"Polygon {0}''s year value {1} is < 1900", polygon.getPolygonIdentifier().getName(), polygon
+									.getPolygonIdentifier().getYear()
 					)
 			);
 		}
