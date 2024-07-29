@@ -6,13 +6,14 @@ import java.util.Optional;
 import java.util.Set;
 
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 
 public class VdypPolygon extends VdypEntity {
 
 	// See IPSJF155.doc, appendix II
 
-	private final VdypPolygonDescription description; // POLYDESC
+	private final PolygonIdentifier description; // POLYDESC
 	private final BecDefinition biogeoclimaticZone; // BEC
 	private final Character forestInventoryZone; // FIZ
 	private final float percentForestLand; // PCTFLAND
@@ -27,7 +28,7 @@ public class VdypPolygon extends VdypEntity {
 	private Optional<Integer> targetYear = Optional.empty();
 	
 	public VdypPolygon(
-			VdypPolygonDescription vdypPolygonDescription, BecDefinition bec, Character fizId, float percentForestLand,
+			PolygonIdentifier vdypPolygonDescription, BecDefinition bec, Character fizId, float percentForestLand,
 			Optional<Integer> inventoryTypeGroup, Optional<Integer> basalAreaGroup, Optional<PolygonMode> polygonMode
 	) {
 		this.description = vdypPolygonDescription;
@@ -47,11 +48,7 @@ public class VdypPolygon extends VdypEntity {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(description.getName()).append('(').append(description.getYear()).append(')');
-
-		return sb.toString();
+		return description.toString();
 	}
 
 	public void setLayers(VdypPolygonLayer primaryLayer, VdypPolygonLayer veteranLayer) {
@@ -78,7 +75,7 @@ public class VdypPolygon extends VdypEntity {
 		this.targetYear = Optional.of(targetYear);
 	}
 
-	public VdypPolygonDescription getDescription() {
+	public PolygonIdentifier getDescription() {
 		return description;
 	}
 
@@ -110,7 +107,7 @@ public class VdypPolygon extends VdypEntity {
 		return basalAreaGroup;
 	}
 
-	public Optional<PolygonMode> getFipMode() {
+	public Optional<PolygonMode> getPolygonMode() {
 		return polygonMode;
 	}
 

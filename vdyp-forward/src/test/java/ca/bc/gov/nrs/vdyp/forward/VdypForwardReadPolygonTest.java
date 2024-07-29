@@ -22,10 +22,10 @@ import org.junit.jupiter.api.Test;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonDescription;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -40,7 +40,7 @@ class VdypForwardReadPolygonTest {
 
 		try {
 			var polygonDescriptionStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_GROWTO.name());
-			var polygonDescriptionStream = ((StreamingParserFactory<VdypPolygonDescription>) polygonDescriptionStreamFactory)
+			var polygonDescriptionStream = ((StreamingParserFactory<PolygonIdentifier>) polygonDescriptionStreamFactory)
 					.get();
 
 			ForwardDataStreamReader reader = new ForwardDataStreamReader(controlMap);
@@ -62,7 +62,7 @@ class VdypForwardReadPolygonTest {
 
 			var polygon = polygons.get(0);
 
-			assertThat(polygon.getDescription().toString(), is("01002 S000001 00(1970)"));
+			assertThat(polygon.getDescription().toStringCompact(), is("01002 S000001 00(1970)"));
 
 			var primaryLayer = polygon.getPrimaryLayer();
 			{

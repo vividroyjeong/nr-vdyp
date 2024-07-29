@@ -7,13 +7,14 @@ import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.forward.ForwardProcessingEngine;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
 public class VdypSpeciesUtilization extends VdypEntity {
 
 	// See IPSJF155.doc
 
-	private VdypPolygonDescription polygonId; // POLYDESC
+	private PolygonIdentifier polygonId; // POLYDESC
 	private final LayerType layerType; // LAYERG
 	private final int genusIndex; // ISP
 	private final Optional<String> genus; // SP0
@@ -36,7 +37,7 @@ public class VdypSpeciesUtilization extends VdypEntity {
 	private VdypLayerSpecies parent;
 
 	public VdypSpeciesUtilization(
-			VdypPolygonDescription polygonId, LayerType layerType, Integer genusIndex, Optional<String> genus,
+			PolygonIdentifier polygonId, LayerType layerType, Integer genusIndex, Optional<String> genus,
 			UtilizationClass ucIndex, float basalArea, float liveTreesPerHectare, float loreyHeight,
 			float wholeStemVolume, float closeUtilizationVolume, float cuVolumeMinusDecay,
 			float cuVolumeMinusDecayWastage, float cuVolumeMinusDecayWastageBreakage, float quadraticMeanDiameterAtBH
@@ -71,7 +72,7 @@ public class VdypSpeciesUtilization extends VdypEntity {
 		this.parent = parent;
 	}
 
-	public VdypPolygonDescription getPolygonId() {
+	public PolygonIdentifier getPolygonId() {
 		return polygonId;
 	}
 

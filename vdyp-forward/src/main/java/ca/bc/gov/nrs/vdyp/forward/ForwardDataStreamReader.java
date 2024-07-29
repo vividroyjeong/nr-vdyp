@@ -18,13 +18,13 @@ import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonDescription;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonLayer;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypSpeciesUtilization;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
 public class ForwardDataStreamReader {
@@ -34,7 +34,7 @@ public class ForwardDataStreamReader {
 	private final StreamingParser<VdypPolygon> polygonStream;
 	private final StreamingParser<Collection<VdypLayerSpecies>> layerSpeciesStream;
 	private final StreamingParser<Collection<VdypSpeciesUtilization>> speciesUtilizationStream;
-	Optional<StreamingParser<VdypPolygonDescription>> polygonDescriptionStream;
+	Optional<StreamingParser<PolygonIdentifier>> polygonDescriptionStream;
 
 	@SuppressWarnings("unchecked")
 	public ForwardDataStreamReader(Map<String, Object> controlMap) throws IOException {
@@ -51,7 +51,7 @@ public class ForwardDataStreamReader {
 		
 		polygonDescriptionStream = Optional.empty();
 		if (controlMap.containsKey(ControlKey.FORWARD_INPUT_GROWTO.name())) {
-			var polygonDescriptionStreamFactory = Utils.<StreamingParserFactory<VdypPolygonDescription>>
+			var polygonDescriptionStreamFactory = Utils.<StreamingParserFactory<PolygonIdentifier>>
 					expectParsedControl(controlMap, ControlKey.FORWARD_INPUT_GROWTO, StreamingParserFactory.class);
 			
 			polygonDescriptionStream = Optional.of(polygonDescriptionStreamFactory.get());

@@ -22,6 +22,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.value.ControlledValueParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 
 public class VdypPolygonParser implements ControlMapValueReplacer<Object, String> {
@@ -85,7 +86,7 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 						);
 					}
 
-					var description = VdypPolygonDescriptionParser.parse(descriptionText);
+					var description = PolygonIdentifier.split(descriptionText);
 
 					if (percentForestLand <= 0.0) {
 						// VDYPGETP.for lines 146 - 154

@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonDescription;
 import ca.bc.gov.nrs.vdyp.forward.parsers.VdypPolygonParser;
 import ca.bc.gov.nrs.vdyp.forward.parsers.VdypSpeciesParser;
 import ca.bc.gov.nrs.vdyp.forward.parsers.VdypUtilizationParser;
@@ -16,6 +15,7 @@ import ca.bc.gov.nrs.vdyp.forward.test.VdypForwardTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 abstract class AbstractForwardProcessingEngineTest {
@@ -26,8 +26,8 @@ abstract class AbstractForwardProcessingEngineTest {
 	protected static ForwardControlParser parser;
 	protected static Map<String, Object> controlMap;
 
-	protected static StreamingParserFactory<VdypPolygonDescription> polygonDescriptionStreamFactory;
-	protected static StreamingParser<VdypPolygonDescription> polygonDescriptionStream;
+	protected static StreamingParserFactory<PolygonIdentifier> polygonDescriptionStreamFactory;
+	protected static StreamingParser<PolygonIdentifier> polygonDescriptionStream;
 
 	protected static ForwardDataStreamReader forwardDataStreamReader;
 
@@ -37,7 +37,7 @@ abstract class AbstractForwardProcessingEngineTest {
 		parser = new ForwardControlParser();
 		controlMap = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
 
-		polygonDescriptionStreamFactory = (StreamingParserFactory<VdypPolygonDescription>) controlMap
+		polygonDescriptionStreamFactory = (StreamingParserFactory<PolygonIdentifier>) controlMap
 				.get(ControlKey.FORWARD_INPUT_GROWTO.name());
 		polygonDescriptionStream = polygonDescriptionStreamFactory.get();
 

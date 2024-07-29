@@ -5,13 +5,14 @@ import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.model.GenusDistributionSet;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
 public class VdypLayerSpecies {
 
 	// See IPSJF155.doc
 
-	private final VdypPolygonDescription polygonId; // POLYDESC
+	private final PolygonIdentifier polygonId; // POLYDESC
 	private final LayerType layerType; // LAYERG
 	private final int genusIndex; // ISP
 	private final String genus; // SP0
@@ -29,7 +30,7 @@ public class VdypLayerSpecies {
 	Optional<Map<UtilizationClass, VdypSpeciesUtilization>> utilizations;
 
 	public VdypLayerSpecies(
-			VdypPolygonDescription polygonId, LayerType layerType, int genusIndex, String genus,
+			PolygonIdentifier polygonId, LayerType layerType, int genusIndex, String genus,
 			GenusDistributionSet speciesDistributions, float siteIndex, float dominantHeight, float ageTotal,
 			float ageAtBreastHeight, float yearsToBreastHeight, Optional<Boolean> isPrimary, Integer siteCurveNumber
 	) {
@@ -80,7 +81,7 @@ public class VdypLayerSpecies {
 		this.utilizations = utilizations;
 	}
 
-	public VdypPolygonDescription getPolygonId() {
+	public PolygonIdentifier getPolygonId() {
 		return polygonId;
 	}
 

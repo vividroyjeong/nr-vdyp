@@ -20,6 +20,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ControlledValueParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
 public class VdypUtilizationParser implements ControlMapValueReplacer<Object, String> {
@@ -82,7 +83,7 @@ public class VdypUtilizationParser implements ControlMapValueReplacer<Object, St
 				protected ValueOrMarker<Optional<VdypSpeciesUtilization>, EndOfRecord>
 						convert(Map<String, Object> entry) throws ResourceParseException {
 
-					var polygonId = VdypPolygonDescriptionParser.parse((String) entry.get(DESCRIPTION));
+					var polygonId = PolygonIdentifier.split((String) entry.get(DESCRIPTION));
 					var layerType = (ValueOrMarker<Optional<LayerType>, EndOfRecord>) entry.get(LAYER_TYPE);
 					if (layerType == null) {
 						var builder = new ValueOrMarker.Builder<Optional<LayerType>, EndOfRecord>();

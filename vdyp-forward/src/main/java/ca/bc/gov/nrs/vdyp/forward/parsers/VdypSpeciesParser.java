@@ -30,6 +30,7 @@ import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.GenusDistribution;
 import ca.bc.gov.nrs.vdyp.model.GenusDistributionSet;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 
 public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String> {
 
@@ -108,7 +109,7 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 				protected ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord> convert(Map<String, Object> entry)
 						throws ResourceParseException {
 
-					var polygonId = VdypPolygonDescriptionParser.parse((String) entry.get(DESCRIPTION));
+					var polygonId = PolygonIdentifier.split((String) entry.get(DESCRIPTION));
 					var layerType = (ValueOrMarker<Optional<LayerType>, EndOfRecord>) entry.get(LAYER_TYPE);
 					if (layerType == null) {
 						var builder = new ValueOrMarker.Builder<Optional<LayerType>, EndOfRecord>();
