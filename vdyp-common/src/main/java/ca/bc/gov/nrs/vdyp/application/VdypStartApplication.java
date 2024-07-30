@@ -1258,15 +1258,15 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 					.pairwiseInPlace(quadMeanDiameterUtil, Estimators.COPY_IF_BAND);
 
 			spec.getWholeStemVolumeByUtilization()
-					.pairwiseInPlace(wholeStemVolumeUtil, EstimationMethods.COPY_IF_NOT_SMALL);
+					.pairwiseInPlace(wholeStemVolumeUtil, Estimators.COPY_IF_NOT_SMALL);
 			spec.getCloseUtilizationVolumeByUtilization()
-					.pairwiseInPlace(closeVolumeUtil, EstimationMethods.COPY_IF_NOT_SMALL);
+					.pairwiseInPlace(closeVolumeUtil, Estimators.COPY_IF_NOT_SMALL);
 			spec.getCloseUtilizationVolumeNetOfDecayByUtilization()
-					.pairwiseInPlace(closeVolumeNetDecayUtil, EstimationMethods.COPY_IF_NOT_SMALL);
+					.pairwiseInPlace(closeVolumeNetDecayUtil, Estimators.COPY_IF_NOT_SMALL);
 			spec.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization()
-					.pairwiseInPlace(closeVolumeNetDecayWasteUtil, EstimationMethods.COPY_IF_NOT_SMALL);
+					.pairwiseInPlace(closeVolumeNetDecayWasteUtil, Estimators.COPY_IF_NOT_SMALL);
 			spec.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization()
-					.pairwiseInPlace(closeVolumeNetDecayWasteBreakUtil, EstimationMethods.COPY_IF_NOT_SMALL);
+					.pairwiseInPlace(closeVolumeNetDecayWasteBreakUtil, Estimators.COPY_IF_NOT_SMALL);
 
 		}
 		computeLayerUtilizationComponentsFromSpecies(vdypLayer);

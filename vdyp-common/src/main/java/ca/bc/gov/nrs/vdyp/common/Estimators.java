@@ -20,11 +20,12 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
-import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
+import ca.bc.gov.nrs.vdyp.controlmap.ResolvedControlMap;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.ComponentSizeLimits;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
@@ -34,9 +35,9 @@ import ca.bc.gov.nrs.vdyp.model.UtilizationVector;
 import ca.bc.gov.nrs.vdyp.model.UtilizationVector.BinaryOperatorWithClass;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 
-public class EstimationMethods {
+public class Estimators {
 
-	public static final Logger log = LoggerFactory.getLogger(EstimationMethods.class);
+	public static final Logger log = LoggerFactory.getLogger(Estimators.class);
 
 	/**
 	 * Returns the new value if the index is that of a utilization class that represents a size band, otherwise the old
@@ -53,18 +54,17 @@ public class EstimationMethods {
 			oldX, newX, uc
 	) -> UtilizationClass.ALL_BUT_SMALL.contains(uc) ? newX : oldX;
 
-	Map<String, Object> controlMap;
+	ResolvedControlMap controlMap;
 
-	public EstimationMethods(Map<String, Object> controlMap) {
-		this.controlMap = controlMap;
+	public Estimators(ResolvedControlMap resolvedControlMap) {
+		this.controlMap = resolvedControlMap;
 	}
 
-	private static float heightMultiplier(
-			Map<String, Object> controlMap, String genus, Region region, float treesPerHectarePrimary
+	private float heightMultiplier(
+			String genus, Region region, float treesPerHectarePrimary
 	) {
-		final var coeMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.HL_PRIMARY_SP_EQN_P1, MatrixMap2.class
-		);
+		final var coeMap = controlMap
+				.<MatrixMap2<String, Region, Coefficients>>get(ControlKey.HL_PRIMARY_SP_EQN_P1, MatrixMap2.class);
 		var coe = coeMap.get(genus, region).reindex(0);
 		return coe.get(0) - coe.getCoe(1) + coe.getCoe(1) * exp(coe.getCoe(2) * (treesPerHectarePrimary - 100f));
 	}
@@ -80,23 +80,8 @@ public class EstimationMethods {
 	 */
 	public float
 			primaryHeightFromLeadHeight(float leadHeight, String genus, Region region, float treesPerHectarePrimary) {
-		return primaryHeightFromLeadHeight(controlMap, leadHeight, genus, region, treesPerHectarePrimary);
-	}
 
-	/**
-	 * EMP050 Method 1: Return the lorey height of the primary species based on the dominant height of the lead species.
-	 *
-	 * @param controlMap             Control map containing coefficients
-	 * @param leadHeight             dominant height of the lead species
-	 * @param genus                  Primary species
-	 * @param region                 Region of the polygon
-	 * @param treesPerHectarePrimary trees per hectare >7.5 cm of the primary species
-	 * @return
-	 */
-	public static float primaryHeightFromLeadHeight(
-			Map<String, Object> controlMap, float leadHeight, String genus, Region region, float treesPerHectarePrimary
-	) {
-		return 1.3f + (leadHeight - 1.3f) * heightMultiplier(controlMap, genus, region, treesPerHectarePrimary);
+		return 1.3f + (leadHeight - 1.3f) * heightMultiplier(genus, region, treesPerHectarePrimary);
 	}
 
 	/**
@@ -110,34 +95,7 @@ public class EstimationMethods {
 	public float leadHeightFromPrimaryHeight(
 			float primaryHeight, String genus, Region region, float treesPerHectarePrimary
 	) {
-		return leadHeightFromPrimaryHeight(controlMap, primaryHeight, genus, region, treesPerHectarePrimary);
-	}
-
-	/**
-	 * EMP050 Method 2: Return the dominant height of the lead species based on the lorey height of the primary species.
-	 *
-	 * @param controlMap             Control map containing coefficients
-	 * @param primaryHeight          lorey height of the primary species
-	 * @param genus                  Primary species
-	 * @param region                 Region of the polygon
-	 * @param treesPerHectarePrimary trees per hectare >7.5 cm of the primary species
-	 */
-	public static float leadHeightFromPrimaryHeight(
-			Map<String, Object> controlMap, float primaryHeight, String genus, Region region,
-			float treesPerHectarePrimary
-	) {
-		return 1.3f + (primaryHeight - 1.3f) / heightMultiplier(controlMap, genus, region, treesPerHectarePrimary);
-	}
-
-	/**
-	 * EMP051 Return the lorey height of the primary species based on the dominant height of the lead species.
-	 *
-	 * @param leadHeight dominant height of the lead species
-	 * @param genus      Primary species
-	 * @param region     Region of the polygon
-	 */
-	public float primaryHeightFromLeadHeightInitial(float leadHeight, String genus, Region region) {
-		return primaryHeightFromLeadHeightInitial(controlMap, leadHeight, genus, region);
+		return 1.3f + (primaryHeight - 1.3f) / heightMultiplier(genus, region, treesPerHectarePrimary);
 	}
 
 	/**
@@ -149,11 +107,10 @@ public class EstimationMethods {
 	 * @param region     Region of the polygon
 	 */
 	public float primaryHeightFromLeadHeightInitial(
-			Map<String, Object> controlMap, float leadHeight, String genus, Region region
+			float leadHeight, String genus, Region region
 	) {
-		final var coeMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.HL_PRIMARY_SP_EQN_P2, MatrixMap2.class
-		);
+		final var coeMap = controlMap
+				.<MatrixMap2<String, Region, Coefficients>>get(ControlKey.HL_PRIMARY_SP_EQN_P2, MatrixMap2.class);
 		var coe = coeMap.get(genus, region);
 		return 1.3f + coe.getCoe(1) * pow(leadHeight - 1.3f, coe.getCoe(2));
 	}
@@ -190,15 +147,15 @@ public class EstimationMethods {
 	public float estimateNonPrimaryLoreyHeight(
 			String vspec, String vspecPrime, BecDefinition bec, float leadHeight, float primaryHeight
 	) throws ProcessingException {
-		var coeMap = Utils.<MatrixMap3<String, String, Region, Optional<NonprimaryHLCoefficients>>>expectParsedControl(
-				controlMap, ControlKey.HL_NONPRIMARY, MatrixMap3.class
+		var coeMap = controlMap.<MatrixMap3<String, String, Region, Optional<NonprimaryHLCoefficients>>>get(
+				ControlKey.HL_NONPRIMARY, MatrixMap3.class
 		);
 
 		var coe = coeMap.get(vspec, vspecPrime, bec.getRegion()).orElseThrow(
 				() -> new ProcessingException(
 						String.format(
-								"Could not find Lorey Height Nonprimary Coefficients for %s %s %s", vspec, vspecPrime,
-								bec.getRegion()
+								"Could not find Lorey Height Nonprimary Coefficients for %s %s %s", vspec, vspecPrime, bec
+										.getRegion()
 						)
 				)
 		);
@@ -242,9 +199,8 @@ public class EstimationMethods {
 			return standQuadMeanDiameter;
 		}
 
-		var coeMap = Utils
-				.<Map<String, Coefficients>>expectParsedControl(controlMap, ControlKey.BY_SPECIES_DQ, Map.class);
-		var specAliases = GenusDefinitionParser.getSpeciesAliases(controlMap);
+		var coeMap = controlMap.<Map<String, Coefficients>>get(ControlKey.BY_SPECIES_DQ, Map.class);
+		var specAliases = controlMap.getGenusDefinitionMap().getAliases();
 
 		// TODO we can probably remove these as they seem to only be used for debugging
 		// in VDYP7
@@ -323,14 +279,13 @@ public class EstimationMethods {
 		var limits = getLimitsForHeightAndDiameter(species, region);
 
 		quadMeanDiameter1 = estimateQuadMeanDiameterClampResult(
-				limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
-				quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+				limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2, quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
 		);
 		return quadMeanDiameter1;
 	}
 
 	float estimateQuadMeanDiameterClampResult(
-			Limits limits, float standTreesPerHectare, float minQuadMeanDiameter, float loreyHeightSpec,
+			ComponentSizeLimits limits, float standTreesPerHectare, float minQuadMeanDiameter, float loreyHeightSpec,
 			float baseArea1, float baseArea2, float quadMeanDiameter1, float treesPerHectare2, float quadMeanDiameter2
 	) {
 		float treesPerHectare1;
@@ -342,9 +297,9 @@ public class EstimationMethods {
 			quadMeanDiameter1 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea1, treesPerHectare1);
 		}
 
-		final float dqMinSp = max(minQuadMeanDiameter, limits.minDiameterHeight() * loreyHeightSpec);
+		final float dqMinSp = max(minQuadMeanDiameter, limits.minQuadMeanDiameterLoreyHeightRatio() * loreyHeightSpec);
 		final float dqMaxSp = max(
-				7.6f, min(limits.maxQuadMeanDiameter(), limits.maxDiameterHeight() * loreyHeightSpec)
+				7.6f, min(limits.quadMeanDiameterMaximum(), limits.maxQuadMeanDiameterLoreyHeightRatio() * loreyHeightSpec)
 		);
 		if (quadMeanDiameter1 < dqMinSp) {
 			quadMeanDiameter1 = dqMinSp;
@@ -377,19 +332,14 @@ public class EstimationMethods {
 		return quadMeanDiameter1;
 	}
 
-	public static record Limits(
-			float maxLoreyHeight, float maxQuadMeanDiameter, float minDiameterHeight, float maxDiameterHeight
-	) {
-	};
-
 	// EMP061
-	public Limits getLimitsForHeightAndDiameter(String genus, Region region) {
-		var coeMap = Utils.<MatrixMap2<String, Region, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, MatrixMap2.class
+	public ComponentSizeLimits getLimitsForHeightAndDiameter(String genus, Region region) {
+		var coeMap = controlMap.<MatrixMap2<String, Region, Coefficients>>get(
+				ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, MatrixMap2.class
 		);
 
 		var coe = coeMap.get(genus, region);
-		return new Limits(coe.getCoe(1), coe.getCoe(2), coe.getCoe(3), coe.getCoe(4));
+		return new ComponentSizeLimits(coe.getCoe(1), coe.getCoe(2), coe.getCoe(3), coe.getCoe(4));
 	}
 
 	/**
@@ -406,26 +356,8 @@ public class EstimationMethods {
 			BecDefinition bec, UtilizationVector quadMeanDiameterUtil, UtilizationVector baseAreaUtil, String genus
 	) throws ProcessingException {
 
-		estimateBaseAreaByUtilization(controlMap, bec, quadMeanDiameterUtil, baseAreaUtil, genus);
-	}
-
-	/**
-	 * EMP070. Estimate basal area by utilization class from the given parameters, after getting the estimation
-	 * coefficients map from the control map.
-	 *
-	 * @param controlMap
-	 * @param bec
-	 * @param quadMeanDiameterUtil
-	 * @param baseAreaUtil
-	 * @param genus
-	 * @throws ProcessingException
-	 */
-	public static void estimateBaseAreaByUtilization(
-			Map<String, Object> controlMap, BecDefinition bec, UtilizationVector quadMeanDiameterUtil,
-			UtilizationVector baseAreaUtil, String genus
-	) throws ProcessingException {
-		final var coeMap = Utils.<MatrixMap3<Integer, String, String, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.UTIL_COMP_BA, MatrixMap3.class
+		final var coeMap = controlMap.<MatrixMap3<Integer, String, String, Coefficients>>get(
+				ControlKey.UTIL_COMP_BA, MatrixMap3.class
 		);
 
 		estimateBaseAreaByUtilization(bec, coeMap, quadMeanDiameterUtil, baseAreaUtil, genus);
@@ -489,24 +421,8 @@ public class EstimationMethods {
 			BecDefinition bec, UtilizationVector quadMeanDiameterUtil, String genus
 	) throws ProcessingException {
 
-		estimateQuadMeanDiameterByUtilization(controlMap, bec, quadMeanDiameterUtil, genus);
-	}
-
-	/**
-	 * EMP071. Estimate DQ by utilization class, see ipsjf120.doc.
-	 *
-	 * @param controlMap
-	 * @param bec
-	 * @param quadMeanDiameterUtil
-	 * @param genus
-	 * @throws ProcessingException
-	 */
-	public static void estimateQuadMeanDiameterByUtilization(
-			Map<String, Object> controlMap, BecDefinition bec, UtilizationVector quadMeanDiameterUtil, String genus
-	) throws ProcessingException {
-
-		final var coeMap = Utils.<MatrixMap3<Integer, String, String, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.UTIL_COMP_DQ, MatrixMap3.class
+		final var coeMap = controlMap.<MatrixMap3<Integer, String, String, Coefficients>>get(
+				ControlKey.UTIL_COMP_DQ, MatrixMap3.class
 		);
 
 		estimateQuadMeanDiameterByUtilization(bec, coeMap, quadMeanDiameterUtil, genus);
@@ -605,25 +521,8 @@ public class EstimationMethods {
 	 */
 	public float estimateWholeStemVolumePerTree(int volumeGroup, float loreyHeight, float quadMeanDiameter) {
 
-		return estimateWholeStemVolumePerTree(controlMap, volumeGroup, loreyHeight, quadMeanDiameter);
-	}
-
-	/**
-	 * EMP090. Return an estimate of the volume, per tree, of the whole stem, based on the given lorey height and quad
-	 * mean diameter.
-	 *
-	 * @param controlMap       the control map from which the total stand whole stem volume equation coefficients are
-	 *                         retrieved
-	 * @param volumeGroup      the species' volume group
-	 * @param loreyHeight      the species' lorey height
-	 * @param quadMeanDiameter the species' quadratic mean diameter
-	 * @return as described
-	 */
-	public static float estimateWholeStemVolumePerTree(
-			Map<String, Object> controlMap, int volumeGroup, float loreyHeight, float quadMeanDiameter
-	) {
-		var coeMap = Utils.<Map<Integer, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.TOTAL_STAND_WHOLE_STEM_VOL, Map.class
+		var coeMap = controlMap.<Map<Integer, Coefficients>>get(
+				ControlKey.TOTAL_STAND_WHOLE_STEM_VOL, Map.class
 		);
 
 		return estimateWholeStemVolumePerTree(volumeGroup, loreyHeight, quadMeanDiameter, coeMap);
@@ -679,39 +578,13 @@ public class EstimationMethods {
 			UtilizationVector wholeStemVolumeUtil
 	) throws ProcessingException {
 
-		estimateWholeStemVolume(
-				controlMap, utilizationClass, adjustCloseUtil, volumeGroup, hlSp, quadMeanDiameterUtil, baseAreaUtil,
-				wholeStemVolumeUtil
-		);
-	}
-
-	/**
-	 * EMP091. Updates wholeStemVolumeUtil with estimated values, getting wholeStemUtilizationComponentMap from the
-	 * given controlMap.
-	 *
-	 * @param controlMap
-	 * @param utilizationClass
-	 * @param adjustCloseUtil
-	 * @param volumeGroup
-	 * @param hlSp
-	 * @param quadMeanDiameterUtil
-	 * @param baseAreaUtil
-	 * @param wholeStemVolumeUtil
-	 * @throws ProcessingException
-	 */
-	public static void estimateWholeStemVolume(
-			Map<String, Object> controlMap, UtilizationClass utilizationClass, float adjustCloseUtil, int volumeGroup,
-			Float hlSp, UtilizationVector quadMeanDiameterUtil, UtilizationVector baseAreaUtil,
-			UtilizationVector wholeStemVolumeUtil
-	) throws ProcessingException {
-		final var wholeStemUtilizationComponentMap = Utils
-				.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
-						controlMap, ControlKey.UTIL_COMP_WS_VOLUME, MatrixMap2.class
+		final var wholeStemUtilizationComponentMap = controlMap
+				.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>get(
+						ControlKey.UTIL_COMP_WS_VOLUME, MatrixMap2.class
 				);
 
 		estimateWholeStemVolume(
-				utilizationClass, adjustCloseUtil, volumeGroup, hlSp, wholeStemUtilizationComponentMap,
-				quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
+				utilizationClass, adjustCloseUtil, volumeGroup, hlSp, wholeStemUtilizationComponentMap, quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
 		);
 	}
 
@@ -784,37 +657,13 @@ public class EstimationMethods {
 			UtilizationVector quadMeanDiameterUtil, UtilizationVector wholeStemVolumeUtil,
 			UtilizationVector closeUtilizationVolumeUtil
 	) throws ProcessingException {
-		estimateCloseUtilizationVolume(
-				controlMap, utilizationClass, aAdjust, volumeGroup, hlSp, quadMeanDiameterUtil, wholeStemVolumeUtil,
-				closeUtilizationVolumeUtil
-		);
-	}
 
-	/**
-	 * EMP092. Updates closeUtilizationVolumeUtil with estimated values.
-	 *
-	 * @param controlMap
-	 * @param utilizationClass
-	 * @param aAdjust
-	 * @param volumeGroup
-	 * @param hlSp
-	 * @param quadMeanDiameterUtil
-	 * @param wholeStemVolumeUtil
-	 * @param closeUtilizationVolumeUtil
-	 * @throws ProcessingException
-	 */
-	public static void estimateCloseUtilizationVolume(
-			Map<String, Object> controlMap, UtilizationClass utilizationClass, Coefficients aAdjust, int volumeGroup,
-			float hlSp, UtilizationVector quadMeanDiameterUtil, UtilizationVector wholeStemVolumeUtil,
-			UtilizationVector closeUtilizationVolumeUtil
-	) throws ProcessingException {
-		final var closeUtilizationCoeMap = Utils
-				.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
-						controlMap, ControlKey.CLOSE_UTIL_VOLUME, MatrixMap2.class
+		final var closeUtilizationCoeMap = controlMap
+				.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>get(
+						ControlKey.CLOSE_UTIL_VOLUME, MatrixMap2.class
 				);
 		estimateCloseUtilizationVolume(
-				utilizationClass, aAdjust, volumeGroup, hlSp, closeUtilizationCoeMap, quadMeanDiameterUtil,
-				wholeStemVolumeUtil, closeUtilizationVolumeUtil
+				utilizationClass, aAdjust, volumeGroup, hlSp, closeUtilizationCoeMap, quadMeanDiameterUtil, wholeStemVolumeUtil, closeUtilizationVolumeUtil
 		);
 	}
 
@@ -879,41 +728,14 @@ public class EstimationMethods {
 			UtilizationVector closeUtilizationNetOfDecayUtil
 	) throws ProcessingException {
 
-		estimateNetDecayVolume(
-				controlMap, genus, region, utilizationClass, aAdjust, decayGroup, ageBreastHeight, quadMeanDiameterUtil,
-				closeUtilizationUtil, closeUtilizationNetOfDecayUtil
+		final var netDecayCoeMap = controlMap.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>get(
+				ControlKey.VOLUME_NET_DECAY, MatrixMap2.class
 		);
-	}
-
-	/**
-	 * EMP093. Estimate volume NET OF DECAY by (DBH) utilization classes
-	 *
-	 * @param controlMap
-	 * @param genus
-	 * @param region
-	 * @param utilizationClass
-	 * @param aAdjust
-	 * @param decayGroup
-	 * @param ageBreastHeight
-	 * @param quadMeanDiameterUtil
-	 * @param closeUtilizationUtil
-	 * @param closeUtilizationNetOfDecayUtil
-	 * @throws ProcessingException
-	 */
-	public static void estimateNetDecayVolume(
-			Map<String, Object> controlMap, String genus, Region region, UtilizationClass utilizationClass,
-			Coefficients aAdjust, int decayGroup, float ageBreastHeight, UtilizationVector quadMeanDiameterUtil,
-			UtilizationVector closeUtilizationUtil, UtilizationVector closeUtilizationNetOfDecayUtil
-	) throws ProcessingException {
-		final var netDecayCoeMap = Utils.<MatrixMap2<Integer, Integer, Optional<Coefficients>>>expectParsedControl(
-				controlMap, ControlKey.VOLUME_NET_DECAY, MatrixMap2.class
-		);
-		final var decayModifierMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
-				controlMap, ModifierParser.CONTROL_KEY_MOD301_DECAY, MatrixMap2.class
+		final var decayModifierMap = controlMap.<MatrixMap2<String, Region, Float>>get(
+				ModifierParser.CONTROL_KEY_MOD301_DECAY, MatrixMap2.class
 		);
 		estimateNetDecayVolume(
-				genus, region, utilizationClass, aAdjust, decayGroup, ageBreastHeight, netDecayCoeMap, decayModifierMap,
-				quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil
+				genus, region, utilizationClass, aAdjust, decayGroup, ageBreastHeight, netDecayCoeMap, decayModifierMap, quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil
 		);
 	}
 
@@ -991,44 +813,15 @@ public class EstimationMethods {
 			UtilizationVector closeUtilizationNetOfDecayUtil, UtilizationVector closeUtilizationNetOfDecayAndWasteUtil
 	) throws ProcessingException {
 
-		estimateNetDecayAndWasteVolume(
-				controlMap, region, utilizationClass, aAdjust, genus, loreyHeight, quadMeanDiameterUtil,
-				closeUtilizationUtil, closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
+		final var netDecayWasteCoeMap = controlMap.<Map<String, Coefficients>>get(
+				ControlKey.VOLUME_NET_DECAY_WASTE, Map.class
 		);
-	}
-
-	/**
-	 * EMP094. Estimate utilization net of decay and waste
-	 *
-	 * @param controlMap
-	 * @param region
-	 * @param utilizationClass
-	 * @param aAdjust
-	 * @param genus
-	 * @param loreyHeight
-	 * @param quadMeanDiameterUtil
-	 * @param closeUtilizationUtil
-	 * @param closeUtilizationNetOfDecayUtil
-	 * @param closeUtilizationNetOfDecayAndWasteUtil
-	 * @throws ProcessingException
-	 */
-	public static void estimateNetDecayAndWasteVolume(
-			Map<String, Object> controlMap, Region region, UtilizationClass utilizationClass, Coefficients aAdjust,
-			String genus, float loreyHeight, UtilizationVector quadMeanDiameterUtil,
-			UtilizationVector closeUtilizationUtil, UtilizationVector closeUtilizationNetOfDecayUtil,
-			UtilizationVector closeUtilizationNetOfDecayAndWasteUtil
-	) throws ProcessingException {
-		final var netDecayWasteCoeMap = Utils.<Map<String, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.VOLUME_NET_DECAY_WASTE, Map.class
-		);
-		final var wasteModifierMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
-				controlMap, ControlKey.WASTE_MODIFIERS, MatrixMap2.class
+		final var wasteModifierMap = controlMap.<MatrixMap2<String, Region, Float>>get(
+				ControlKey.WASTE_MODIFIERS, MatrixMap2.class
 		);
 
 		estimateNetDecayAndWasteVolume(
-				region, utilizationClass, aAdjust, genus, loreyHeight, netDecayWasteCoeMap, wasteModifierMap,
-				quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil,
-				closeUtilizationNetOfDecayAndWasteUtil
+				region, utilizationClass, aAdjust, genus, loreyHeight, netDecayWasteCoeMap, wasteModifierMap, quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
 		);
 	}
 
@@ -1055,8 +848,9 @@ public class EstimationMethods {
 			UtilizationVector closeUtilizationNetOfDecayUtil, UtilizationVector closeUtilizationNetOfDecayAndWasteUtil
 	) throws ProcessingException {
 		estimateUtilization(
-				closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil, utilizationClass,
-				(i, netDecay) -> {
+				closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil, utilizationClass, (
+						i, netDecay
+				) -> {
 					if (Float.isNaN(netDecay) || netDecay <= 0f) {
 						return 0f;
 					}
@@ -1130,36 +924,11 @@ public class EstimationMethods {
 			UtilizationVector closeUtilizationNetOfDecayWasteAndBreakageUtil
 	) throws ProcessingException {
 
-		estimateNetDecayWasteAndBreakageVolume(
-				controlMap, utilizationClass, breakageGroup, quadMeanDiameterUtil, closeUtilizationUtil,
-				closeUtilizationNetOfDecayAndWasteUtil, closeUtilizationNetOfDecayWasteAndBreakageUtil
-		);
-	}
-
-	/**
-	 * EMP095. Estimate utilization net of decay, waste, and breakage
-	 *
-	 * @param controlMap
-	 * @param utilizationClass
-	 * @param breakageGroup
-	 * @param quadMeanDiameterUtil
-	 * @param closeUtilizationUtil
-	 * @param closeUtilizationNetOfDecayAndWasteUtil
-	 * @param closeUtilizationNetOfDecayWasteAndBreakageUtil
-	 * @throws ProcessingException
-	 */
-	public static void estimateNetDecayWasteAndBreakageVolume(
-			Map<String, Object> controlMap, UtilizationClass utilizationClass, int breakageGroup,
-			UtilizationVector quadMeanDiameterUtil, UtilizationVector closeUtilizationUtil,
-			UtilizationVector closeUtilizationNetOfDecayAndWasteUtil,
-			UtilizationVector closeUtilizationNetOfDecayWasteAndBreakageUtil
-	) throws ProcessingException {
-		final var netBreakageCoeMap = Utils
-				.<Map<Integer, Coefficients>>expectParsedControl(controlMap, ControlKey.BREAKAGE, Map.class);
+		final var netBreakageCoeMap = controlMap
+				.<Map<Integer, Coefficients>>get(ControlKey.BREAKAGE, Map.class);
 
 		estimateNetDecayWasteAndBreakageVolume(
-				utilizationClass, breakageGroup, netBreakageCoeMap, quadMeanDiameterUtil, closeUtilizationUtil,
-				closeUtilizationNetOfDecayAndWasteUtil, closeUtilizationNetOfDecayWasteAndBreakageUtil
+				utilizationClass, breakageGroup, netBreakageCoeMap, quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayAndWasteUtil, closeUtilizationNetOfDecayWasteAndBreakageUtil
 		);
 	}
 
@@ -1192,8 +961,9 @@ public class EstimationMethods {
 		final var a4 = coefficients.getCoe(4);
 
 		estimateUtilization(
-				closeUtilizationNetOfDecayAndWasteUtil, closeUtilizationNetOfDecayWasteAndBreakageUtil,
-				utilizationClass, (uc, netWaste) -> {
+				closeUtilizationNetOfDecayAndWasteUtil, closeUtilizationNetOfDecayWasteAndBreakageUtil, utilizationClass, (
+						uc, netWaste
+				) -> {
 
 					if (netWaste <= 0f) {
 						return 0f;

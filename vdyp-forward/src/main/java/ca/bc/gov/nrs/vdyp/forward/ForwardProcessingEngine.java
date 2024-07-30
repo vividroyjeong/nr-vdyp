@@ -56,6 +56,7 @@ import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClassVariable;
+import ca.bc.gov.nrs.vdyp.model.UtilizationVector;
 import ca.bc.gov.nrs.vdyp.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VolumeVariable;
@@ -1884,13 +1885,13 @@ public class ForwardProcessingEngine {
 
 			float spLoreyHeight_All = start.loreyHeights[s][UtilizationClass.ALL.ordinal()];
 
-			Coefficients basalAreas = Utils.utilizationVector();
-			Coefficients wholeStemVolumes = Utils.utilizationVector();
-			Coefficients closeUtilizationVolumes = Utils.utilizationVector();
-			Coefficients closeUtilizationVolumesNetOfDecay = Utils.utilizationVector();
-			Coefficients closeUtilizationVolumesNetOfDecayAndWaste = Utils.utilizationVector();
-			Coefficients quadMeanDiameters = Utils.utilizationVector();
-			Coefficients treesPerHectare = Utils.utilizationVector();
+			UtilizationVector basalAreas = Utils.utilizationVector();
+			UtilizationVector wholeStemVolumes = Utils.utilizationVector();
+			UtilizationVector closeUtilizationVolumes = Utils.utilizationVector();
+			UtilizationVector closeUtilizationVolumesNetOfDecay = Utils.utilizationVector();
+			UtilizationVector closeUtilizationVolumesNetOfDecayAndWaste = Utils.utilizationVector();
+			UtilizationVector quadMeanDiameters = Utils.utilizationVector();
+			UtilizationVector treesPerHectare = Utils.utilizationVector();
 
 			cvVolume[s] = new MatrixMap3Impl<UtilizationClass, VolumeVariable, LayerType, Float>(
 					UtilizationClass.UTIL_CLASSES, VolumeVariable.ALL, LayerType.ALL_USED, (k1, k2, k3) -> 0f
