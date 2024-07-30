@@ -1,6 +1,5 @@
 package ca.bc.gov.nrs.vdyp.fip;
 
-import static ca.bc.gov.nrs.vdyp.fip.FipStart.UTIL_ALL;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 
@@ -131,7 +130,7 @@ class RootFinderTest {
 			builder.decayGroup(-1);
 			builder.breakageGroup(-1);
 		});
-		spec3.getLoreyHeightByUtilization().setCoe(UTIL_ALL, 38.7456512f);
+		spec3.getLoreyHeightByUtilization().setAll(38.7456512f);
 
 		var spec4 = VdypSpecies.build(layer, builder -> {
 			builder.genus(GenusDefinitionParser.getSpeciesByIndex(4, control).getAlias());
@@ -140,7 +139,7 @@ class RootFinderTest {
 			builder.decayGroup(-1);
 			builder.breakageGroup(-1);
 		});
-		spec4.getLoreyHeightByUtilization().setCoe(UTIL_ALL, 22.8001652f);
+		spec4.getLoreyHeightByUtilization().setAll(22.8001652f);
 
 		var spec5 = VdypSpecies.build(layer, builder -> {
 			builder.genus(GenusDefinitionParser.getSpeciesByIndex(5, control).getAlias());
@@ -149,7 +148,7 @@ class RootFinderTest {
 			builder.decayGroup(-1);
 			builder.breakageGroup(-1);
 		});
-		spec5.getLoreyHeightByUtilization().setCoe(UTIL_ALL, 33.6889763f);
+		spec5.getLoreyHeightByUtilization().setAll(33.6889763f);
 
 		var spec8 = VdypSpecies.build(layer, builder -> {
 			builder.genus(GenusDefinitionParser.getSpeciesByIndex(8, control).getAlias());
@@ -158,7 +157,7 @@ class RootFinderTest {
 			builder.decayGroup(-1);
 			builder.breakageGroup(-1);
 		});
-		spec8.getLoreyHeightByUtilization().setCoe(UTIL_ALL, 24.3451157f);
+		spec8.getLoreyHeightByUtilization().setAll(24.3451157f);
 
 		var spec15 = VdypSpecies.build(layer, builder -> {
 			builder.genus(GenusDefinitionParser.getSpeciesByIndex(15, control).getAlias());
@@ -167,11 +166,11 @@ class RootFinderTest {
 			builder.decayGroup(-1);
 			builder.breakageGroup(-1);
 		});
-		spec15.getLoreyHeightByUtilization().setCoe(UTIL_ALL, 34.6888771f);
+		spec15.getLoreyHeightByUtilization().setAll(34.6888771f);
 
-		layer.getBaseAreaByUtilization().setCoe(UTIL_ALL, 44.6249847f);
-		layer.getTreesPerHectareByUtilization().setCoe(UTIL_ALL, 620.504883f);
-		layer.getQuadraticMeanDiameterByUtilization().setCoe(UTIL_ALL, 30.2601795f);
+		layer.getBaseAreaByUtilization().setAll(44.6249847f);
+		layer.getTreesPerHectareByUtilization().setAll(620.504883f);
+		layer.getQuadraticMeanDiameterByUtilization().setAll(30.2601795f);
 
 		spec3.setVolumeGroup(12);
 		spec4.setVolumeGroup(20);

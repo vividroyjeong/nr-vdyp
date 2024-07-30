@@ -501,13 +501,13 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		float sumBaseAreaLoreyHeight = 0;
 		// Assign BA by species
 		if (species.size() == 1) {
-			species.get(0).getBaseAreaByUtilization().setCoe(UTIL_ALL, primaryBaseArea);
+			species.get(0).getBaseAreaByUtilization().setAll(primaryBaseArea);
 			sumBaseAreaLoreyHeight = primaryBaseArea;
 		} else {
 			for (var spec : species) {
 				float specBaseArea = primaryBaseArea * spec.getFractionGenus();
-				float specHeight = spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL);
-				spec.getBaseAreaByUtilization().setCoe(UTIL_ALL, specBaseArea);
+				float specHeight = spec.getLoreyHeightByUtilization().getAll();
+				spec.getBaseAreaByUtilization().setAll(specBaseArea);
 				sumBaseAreaLoreyHeight += specBaseArea * specHeight;
 			}
 		}
@@ -522,13 +522,13 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	void getDqBySpecies(VdypLayer layer, Region region) throws ProcessingException {
 
 		// DQ_TOT
-		float quadMeanDiameterTotal = layer.getQuadraticMeanDiameterByUtilization().getCoe(UTIL_ALL);
+		float quadMeanDiameterTotal = layer.getQuadraticMeanDiameterByUtilization().getAll();
 		// BA_TOT
-		float baseAreaTotal = layer.getBaseAreaByUtilization().getCoe(UTIL_ALL);
+		float baseAreaTotal = layer.getBaseAreaByUtilization().getAll();
 		// TPH_TOT
 		float treeDensityTotal = treesPerHectare(baseAreaTotal, quadMeanDiameterTotal);
 
-		float loreyHeightTotal = layer.getLoreyHeightByUtilization().getCoe(UTIL_ALL);
+		float loreyHeightTotal = layer.getLoreyHeightByUtilization().getAll();
 
 		// DQV
 		Map<String, Float> initialDqEstimate = new LinkedHashMap<>(layer.getSpecies().size());
@@ -574,12 +574,12 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			float specBa = baseAreaPerSpecies.get(spec.getGenus());
 			float specTph = treesPerHectare(specBa, specDq);
 			treeDensityTotal += specTph;
-			spec.getQuadraticMeanDiameterByUtilization().setCoe(UTIL_ALL, specDq);
-			spec.getTreesPerHectareByUtilization().setCoe(UTIL_ALL, specTph);
+			spec.getQuadraticMeanDiameterByUtilization().setAll(specDq);
+			spec.getTreesPerHectareByUtilization().setAll(specTph);
 		}
 		quadMeanDiameterTotal = quadMeanDiameter(baseAreaTotal, treeDensityTotal);
-		layer.getTreesPerHectareByUtilization().setCoe(UTIL_ALL, treeDensityTotal);
-		layer.getQuadraticMeanDiameterByUtilization().setCoe(UTIL_ALL, quadMeanDiameterTotal);
+		layer.getTreesPerHectareByUtilization().setAll(treeDensityTotal);
+		layer.getQuadraticMeanDiameterByUtilization().setAll(quadMeanDiameterTotal);
 	}
 
 	void getDqBySpeciesInitial(
@@ -596,9 +596,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 			var limits = getLimitsForSpecies(spec, region);
 
-			float min = Math
-					.max(7.6f, limits.minDiameterHeight() * spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL));
-			float loreyHeightToUse = Math.max(spec.getLoreyHeightByUtilization().getCoe(UTIL_ALL), 7.0f);
+			float min = Math.max(7.6f, limits.minDiameterHeight() * spec.getLoreyHeightByUtilization().getAll());
+			float loreyHeightToUse = Math.max(spec.getLoreyHeightByUtilization().getAll(), 7.0f);
 			float max = Math.min(limits.maxQuadMeanDiameter(), limits.maxDiameterHeight() * loreyHeightToUse);
 			max = Math.max(7.75f, max);
 
@@ -609,7 +608,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 			initialDqEstimate.put(spec.getGenus(), specDq);
 
-			baseAreaPerSpecies.put(spec.getGenus(), spec.getBaseAreaByUtilization().getCoe(UTIL_ALL));
+			baseAreaPerSpecies.put(spec.getGenus(), spec.getBaseAreaByUtilization().getAll());
 		}
 	}
 

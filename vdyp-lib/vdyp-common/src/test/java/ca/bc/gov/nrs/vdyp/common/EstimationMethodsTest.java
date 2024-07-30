@@ -25,6 +25,7 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.UtilizationVector;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
@@ -53,8 +54,8 @@ class EstimationMethodsTest {
 			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
 			var genus = genera.get(0);
 
-			Coefficients quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
-			Coefficients basalAreaByUtilization = Utils.utilizationVector(0.0f);
+			UtilizationVector quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
+			UtilizationVector basalAreaByUtilization = Utils.utilizationVector(0.0f);
 
 			EstimationMethods.estimateBaseAreaByUtilization(
 					controlMap, becDefinition, quadMeanDiameterByUtilization, basalAreaByUtilization, genus.getAlias()
@@ -73,8 +74,8 @@ class EstimationMethodsTest {
 			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
 			var genus = genera.get(0);
 
-			Coefficients quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
-			Coefficients basalAreaByUtilization = Utils.utilizationVector(10.0f);
+			UtilizationVector quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
+			UtilizationVector basalAreaByUtilization = Utils.utilizationVector(10.0f);
 
 			EstimationMethods.estimateBaseAreaByUtilization(
 					controlMap, becDefinition, quadMeanDiameterByUtilization, basalAreaByUtilization, genus.getAlias()
@@ -97,8 +98,8 @@ class EstimationMethodsTest {
 			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
 			var genus = genera.get(2);
 
-			Coefficients quadMeanDiameterByUtilization = Utils.utilizationVector(31.5006275f);
-			Coefficients basalAreaByUtilization = Utils.utilizationVector(0.406989872f);
+			UtilizationVector quadMeanDiameterByUtilization = Utils.utilizationVector(31.5006275f);
+			UtilizationVector basalAreaByUtilization = Utils.utilizationVector(0.406989872f);
 
 			EstimationMethods.estimateBaseAreaByUtilization(
 					controlMap, becDefinition, quadMeanDiameterByUtilization, basalAreaByUtilization, genus.getAlias()
@@ -155,9 +156,9 @@ class EstimationMethodsTest {
 			int volumeGroup = volumeEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
 			Coefficients aAdjust = Utils.utilizationVector(0.0f);
-			Coefficients quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
-			Coefficients wholeStemVolumeByUtilization = Utils.utilizationVector(0.0f);
-			Coefficients closeUtilizationVolume = Utils.utilizationVector(0.0f);
+			UtilizationVector quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
+			UtilizationVector wholeStemVolumeByUtilization = Utils.utilizationVector(0.0f);
+			UtilizationVector closeUtilizationVolume = Utils.utilizationVector(0.0f);
 			float loreyHeight = 30.0f;
 
 			EstimationMethods.estimateCloseUtilizationVolume(
@@ -183,11 +184,11 @@ class EstimationMethodsTest {
 			int volumeGroup = volumeEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
 			Coefficients aAdjust = Utils.utilizationVector(0.0f);
-			Coefficients quadMeanDiameterByUtilization = Utils
+			UtilizationVector quadMeanDiameterByUtilization = Utils
 					.utilizationVector(0.0f, 31.5006275f, 9.17065048f, 13.6603403f, 18.1786556f, 42.0707741f);
-			Coefficients wholeStemVolumeByUtilization = Utils
+			UtilizationVector wholeStemVolumeByUtilization = Utils
 					.utilizationVector(0.0f, 0.0186868683f, 0.0764646456f, 0.176565647f, 6.00080776f);
-			Coefficients closeUtilizationVolume = Utils.utilizationVector(0.0f);
+			UtilizationVector closeUtilizationVolume = Utils.utilizationVector(0.0f);
 			float loreyHeight = 36.7552986f;
 
 			EstimationMethods.estimateCloseUtilizationVolume(
@@ -234,9 +235,9 @@ class EstimationMethodsTest {
 			var genus = genera.get(2);
 
 			Coefficients aAdjust = Utils.utilizationVector(0.0f);
-			Coefficients quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
-			Coefficients closeUtilization = Utils.utilizationVector(0.0f);
-			Coefficients closeUtilizationNetOfDecay = Utils.utilizationVector(0.0f);
+			UtilizationVector quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
+			UtilizationVector closeUtilization = Utils.utilizationVector(0.0f);
+			UtilizationVector closeUtilizationNetOfDecay = Utils.utilizationVector(0.0f);
 
 			var volumeEquationGroupMatrix = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
 					controlMap, ControlKey.VOLUME_EQN_GROUPS, MatrixMap2.class
@@ -261,11 +262,11 @@ class EstimationMethodsTest {
 			var genus = genera.get(2);
 
 			Coefficients aAdjust = Utils.utilizationVector(0.0f);
-			Coefficients quadMeanDiameterByUtilization = Utils
+			UtilizationVector quadMeanDiameterByUtilization = Utils
 					.utilizationVector(0.0f, 31.5006275f, 9.17065048f, 13.6603403f, 18.1786556f, 42.0707741f);
-			Coefficients closeUtilization = Utils
+			UtilizationVector closeUtilization = Utils
 					.utilizationVector(0.0f, 6.01939344f, 0.000909090857f, 0.0503030308f, 0.153636351f, 5.81454515f);
-			Coefficients closeUtilizationNetOfDecay = Utils.utilizationVector(0.0f);
+			UtilizationVector closeUtilizationNetOfDecay = Utils.utilizationVector(0.0f);
 
 			var decayEquationGroupMatrix = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
 					controlMap, ControlKey.DECAY_GROUPS, MatrixMap2.class
@@ -294,10 +295,10 @@ class EstimationMethodsTest {
 			var genus = genera.get(2);
 
 			Coefficients aAdjust = Utils.utilizationVector(0.0f);
-			Coefficients quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
-			Coefficients closeUtilization = Utils.utilizationVector(0.0f);
-			Coefficients closeUtilizationNetOfDecay = Utils.utilizationVector(0.0f);
-			Coefficients closeUtilizationNetOfDecayAndWastage = Utils.utilizationVector(0.0f);
+			UtilizationVector quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
+			UtilizationVector closeUtilization = Utils.utilizationVector(0.0f);
+			UtilizationVector closeUtilizationNetOfDecay = Utils.utilizationVector(0.0f);
+			UtilizationVector closeUtilizationNetOfDecayAndWastage = Utils.utilizationVector(0.0f);
 
 			EstimationMethods.estimateNetDecayAndWasteVolume(
 					controlMap, becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus.getAlias(), 0.0f,
@@ -318,13 +319,13 @@ class EstimationMethodsTest {
 			var genus = genera.get(2);
 
 			Coefficients aAdjust = Utils.utilizationVector(0.0f);
-			Coefficients quadMeanDiameterByUtilization = Utils
+			UtilizationVector quadMeanDiameterByUtilization = Utils
 					.utilizationVector(0.0f, 31.5006275f, 9.17065048f, 13.6603403f, 18.1786556f, 42.0707741f);
-			Coefficients closeUtilization = Utils
+			UtilizationVector closeUtilization = Utils
 					.utilizationVector(0.0f, 6.01939344f, 0.000909090857f, 0.0503030308f, 0.153636351f, 5.81454515f);
-			Coefficients closeUtilizationNetOfDecay = Utils
+			UtilizationVector closeUtilizationNetOfDecay = Utils
 					.utilizationVector(0.0f, 5.90565634f, 0.000909090857f, 0.0502020158f, 0.152929291f, 5.70161581f);
-			Coefficients closeUtilizationNetOfDecayAndWastage = Utils.utilizationVector(0.0f);
+			UtilizationVector closeUtilizationNetOfDecayAndWastage = Utils.utilizationVector(0.0f);
 
 			EstimationMethods.estimateNetDecayAndWasteVolume(
 					controlMap, becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus.getAlias(),
@@ -349,10 +350,10 @@ class EstimationMethodsTest {
 			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
 			var genus = genera.get(2);
 
-			Coefficients quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
-			Coefficients closeUtilization = Utils.utilizationVector(0.0f);
-			Coefficients closeUtilizationNetOfDecayAndWastage = Utils.utilizationVector(0.0f);
-			Coefficients closeUtilizationNetOfDecayWastageAndBreakage = Utils.utilizationVector(0.0f);
+			UtilizationVector quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
+			UtilizationVector closeUtilization = Utils.utilizationVector(0.0f);
+			UtilizationVector closeUtilizationNetOfDecayAndWastage = Utils.utilizationVector(0.0f);
+			UtilizationVector closeUtilizationNetOfDecayWastageAndBreakage = Utils.utilizationVector(0.0f);
 
 			var breakageEquationGroupMatrix = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
 					controlMap, ControlKey.BREAKAGE_GROUPS, MatrixMap2.class
@@ -376,13 +377,13 @@ class EstimationMethodsTest {
 			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
 			var genus = genera.get(2);
 
-			Coefficients quadMeanDiameterByUtilization = Utils
+			UtilizationVector quadMeanDiameterByUtilization = Utils
 					.utilizationVector(0.0f, 31.5006275f, 9.17065048f, 13.6603403f, 18.1786556f, 42.0707741f);
-			Coefficients closeUtilization = Utils
+			UtilizationVector closeUtilization = Utils
 					.utilizationVector(0.0f, 6.01939344f, 0.000909090857f, 0.0503030308f, 0.153636351f, 5.81454515f);
-			Coefficients closeUtilizationNetOfDecayAndWastage = Utils
+			UtilizationVector closeUtilizationNetOfDecayAndWastage = Utils
 					.utilizationVector(0.0f, 0.0f, 0.0f, 0.0f, 0.15271991f, 0.0f);
-			Coefficients closeUtilizationNetOfDecayWastageAndBreakage = Utils.utilizationVector(0.0f);
+			UtilizationVector closeUtilizationNetOfDecayWastageAndBreakage = Utils.utilizationVector(0.0f);
 
 			var breakageEquationGroupMatrix = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
 					controlMap, ControlKey.BREAKAGE_GROUPS, MatrixMap2.class
@@ -410,7 +411,7 @@ class EstimationMethodsTest {
 			var controlMap = TestUtils.loadControlMap();
 
 			var coe = Utils.utilizationVector();
-			coe.setCoe(VdypStartApplication.UTIL_ALL, 31.6622887f);
+			coe.setAll(31.6622887f);
 
 			var bec = Utils.getBec("CWH", controlMap);
 
@@ -424,7 +425,7 @@ class EstimationMethodsTest {
 			var controlMap = TestUtils.loadControlMap();
 
 			var coe = Utils.utilizationVector();
-			coe.setCoe(VdypStartApplication.UTIL_ALL, 13.4943399f);
+			coe.setAll(13.4943399f);
 
 			var bec = Utils.getBec("MH", controlMap);
 
@@ -631,11 +632,11 @@ class EstimationMethodsTest {
 			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
 			var genus = genera.get(2);
 
-			Coefficients quadMeanDiameterByUtilization = Utils
+			UtilizationVector quadMeanDiameterByUtilization = Utils
 					.utilizationVector(0.0f, 31.5006275f, 9.17065048f, 13.6603403f, 18.1786556f, 42.0707741f);
-			Coefficients basalAreaByUtilization = Utils
+			UtilizationVector basalAreaByUtilization = Utils
 					.utilizationVector(0.0f, 0.406989872f, 0.00507070683f, 0.0137676764f, 0.0230707061f, 0.365080774f);
-			Coefficients wholeStemVolumeByUtilization = Utils
+			UtilizationVector wholeStemVolumeByUtilization = Utils
 					.utilizationVector(0.0f, 6.27250576f, 0.0f, 0.0f, 0.0f, 0.0f);
 
 			var volumeEquationGroupMatrix = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
