@@ -10,7 +10,7 @@
 
   <parent>
     <groupId>ca.bc.gov.nrs.vdyp</groupId>
-    <artifactId>vdyp-parent</artifactId>
+    <artifactId>vdyp-lib</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 

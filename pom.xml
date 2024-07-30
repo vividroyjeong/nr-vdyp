@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>ca.bc.gov.nrs.vdyp</groupId>
-	<artifactId>vdyp-parent</artifactId>
+	<artifactId>vdyp-root</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>Variable Density Yield Project Parent</name>
+	<name>Variable Density Yield Project - Parent</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -28,13 +28,8 @@
 	</properties>
 
 	<modules>
-		<module>vdyp-common</module>
-		<module>vdyp-fip</module>
-		<module>vdyp-vri</module>
+		<module>vdyp-lib</module>
 		<module>vdyp-buildtools</module>
-		<module>vdyp-sindex</module>
-		<module>vdyp-si32</module>
-		<module>vdyp-forward</module>
 	</modules>
 
 	<dependencyManagement>

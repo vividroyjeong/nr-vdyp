@@ -15,6 +15,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -339,12 +340,19 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			// There's only one
 			result.addAll(combined.values());
 		} else {
-			var NDEBUG_22 = false;
-			if (NDEBUG_22) {
-				// TODO
-				throw new UnsupportedOperationException();
-			} else {
+			switch (this.getDebugMode(22)) {
+			case 0:
 				combined.values().stream().sorted(PERCENT_GENUS_DESCENDING).limit(2).forEach(result::add);
+				break;
+			case 1:
+				// TODO
+				throw new UnsupportedOperationException(
+						MessageFormat.format("Debug flag 22 value of {0} is not supported", this.getDebugMode(22))
+				);
+			default:
+				throw new IllegalStateException(
+						MessageFormat.format("Debug flag 22 value of {0} is unknown", this.getDebugMode(22))
+				);
 			}
 		}
 

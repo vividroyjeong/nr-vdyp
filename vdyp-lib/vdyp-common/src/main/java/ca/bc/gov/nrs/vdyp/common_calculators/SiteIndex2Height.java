@@ -6,6 +6,10 @@ import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeTyp
 import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType.SI_AT_TOTAL;
 import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEstimationType.SI_EST_DIRECT;
 
+import java.util.function.DoubleBinaryOperator;
+import java.util.function.DoubleUnaryOperator;
+
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CurveErrorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.GrowthInterceptMinimumException;
@@ -202,122 +206,25 @@ public class SiteIndex2Height {
 		 */
 
 		case SI_HWC_WILEY:
-			if (breastHeightAge > 0.0) {
-				if (siteIndex > 60 + 1.667 * breastHeightAge) {
-					// function starts going nuts at high sites and low ages
-					// evaluate at a safe age, and interpolate
-					x1 = (siteIndex - 60) / 1.667 + 0.1;
-					x2 = indexToHeight(cuIndex, x1, SI_AT_BREAST, siteIndex, years2BreastHeight, pi);
-					height = 1.37 + (x2 - 1.37) * breastHeightAge / x1;
-					break;
-				}
-
-				// convert to imperial
-				siteIndex /= 0.3048;
-
-				x1 = 2500 / (siteIndex - 4.5);
-
-				x2 = -1.7307 + 0.1394 * x1;
-				x3 = -0.0616 + 0.0137 * x1;
-				x4 = 0.00192428 + 0.00007024 * x1;
-
-				height = 4.5 + breastHeightAge * breastHeightAge
-						/ (x2 + x3 * breastHeightAge + x4 * breastHeightAge * breastHeightAge);
-
-				if (breastHeightAge < 5) {
-					height += (0.3 * breastHeightAge);
-				} else if (breastHeightAge < 10) {
-					height += (3.0 - 0.3 * breastHeightAge);
-				}
-
-				// convert back to metric
-				height *= 0.3048;
-			} else {
-				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
-			}
+			height = wiley(totalAge, breastHeightAge, years2BreastHeight, siteIndex, cuIndex, pi, (h, bha) -> h);
 			break;
 		case SI_HWC_WILEY_BC:
-			if (breastHeightAge > 0.0) {
-				if (siteIndex > 60 + 1.667 * breastHeightAge) {
-					// function starts going nuts at high sites and low ages
-					// evaluate at a safe age, and interpolate
-					x1 = (siteIndex - 60) / 1.667 + 0.1;
-					x2 = indexToHeight(cuIndex, x1, SI_AT_BREAST, siteIndex, years2BreastHeight, pi);
-					height = 1.37 + (x2 - 1.37) * breastHeightAge / x1;
-					break;
+			height = wiley(totalAge, breastHeightAge, years2BreastHeight, siteIndex, cuIndex, pi, (h, bha) -> {
+				double offset = -1.34105 + 0.0009 * bha * h;
+				if (offset > 0.0) {
+					h -= offset;
 				}
-
-				// convert to imperial
-				siteIndex /= 0.3048;
-
-				x1 = 2500 / (siteIndex - 4.5);
-
-				x2 = -1.7307 + 0.1394 * x1;
-				x3 = -0.0616 + 0.0137 * x1;
-				x4 = 0.00192428 + 0.00007024 * x1;
-
-				height = 4.5 + breastHeightAge * breastHeightAge
-						/ (x2 + x3 * breastHeightAge + x4 * breastHeightAge * breastHeightAge);
-
-				if (breastHeightAge < 5) {
-					height += (0.3 * breastHeightAge);
-				} else if (breastHeightAge < 10) {
-					height += (3.0 - 0.3 * breastHeightAge);
-				}
-
-				// convert back to metric
-				height *= 0.3048;
-
-				if (cuIndex == SiteIndexEquation.SI_HWC_WILEY_BC) {
-					x1 = -1.34105 + 0.0009 * breastHeightAge * height;
-					if (x1 > 0.0) {
-						height -= x1;
-					}
-				}
-			} else {
-				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
-			}
+				return h;
+			});
 			break;
-
 		case SI_HWC_WILEY_MB:
-			if (breastHeightAge > 0.0) {
-				if (siteIndex > 60 + 1.667 * breastHeightAge) {
-					// function starts going nuts at high sites and low ages
-					// evaluate at a safe age, and interpolate
-					x1 = (siteIndex - 60) / 1.667 + 0.1;
-					x2 = indexToHeight(cuIndex, x1, SI_AT_BREAST, siteIndex, years2BreastHeight, pi);
-					height = 1.37 + (x2 - 1.37) * breastHeightAge / x1;
-					break;
+			height = wiley(totalAge, breastHeightAge, years2BreastHeight, siteIndex, cuIndex, pi, (h, bha) -> {
+				double offset = 0.0972129 + 0.000419315 * bha * h;
+				if (offset > 0.0) {
+					h -= offset;
 				}
-
-				// convert to imperial
-				siteIndex /= 0.3048;
-
-				x1 = 2500 / (siteIndex - 4.5);
-
-				x2 = -1.7307 + 0.1394 * x1;
-				x3 = -0.0616 + 0.0137 * x1;
-				x4 = 0.00192428 + 0.00007024 * x1;
-
-				height = 4.5 + breastHeightAge * breastHeightAge
-						/ (x2 + x3 * breastHeightAge + x4 * breastHeightAge * breastHeightAge);
-
-				if (breastHeightAge < 5) {
-					height += (0.3 * breastHeightAge);
-				} else if (breastHeightAge < 10) {
-					height += (3.0 - 0.3 * breastHeightAge);
-				}
-
-				// convert back to metric
-				height *= 0.3048;
-
-				if (cuIndex == SiteIndexEquation.SI_HWC_WILEY_MB) {
-					x1 = 0.0972129 + 0.000419315 * breastHeightAge * height;
-					height -= x1;
-				}
-			} else {
-				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
-			}
+				return h;
+			});
 			break;
 		case SI_HWC_WILEYAC:
 			if (breastHeightAge >= pi) {
@@ -2154,46 +2061,49 @@ public class SiteIndex2Height {
 	}
 
 	public static double huGarciaQ(double siteIndex, double bhage) {
-		double h, q, step, diff, lastdiff;
-
-		q = 0.02;
-		step = 0.01;
-		lastdiff = 0;
-		diff = 0;
-
-		do {
-			h = huGarciaH(q, bhage);
-			lastdiff = diff;
-			diff = siteIndex - h;
-			if (diff > 0.0000001) {
-				if (lastdiff < 0) {
-					step = step / 2.0;
-				}
-				q += step;
-			} else if (diff < -0.0000001) {
-				if (lastdiff > 0) {
-					step = step / 2.0;
-				}
-				q -= step;
-				if (q <= 0) {
-					q = 0.0000001;
-				}
-			} else {
-				break;
-			}
-			if (step < 0.0000001) {
-				break;
-			}
-		} while (true);
-
-		return q;
+		return Height2SiteIndex.huGarciaQ(siteIndex, bhage);
 	}
 
 	public static double huGarciaH(double q, double bhage) {
-		double a, height;
+		return Height2SiteIndex.huGarciaH(q, bhage);
+	}
 
-		a = 283.9 * Math.pow(q, 0.5137);
-		height = a * Math.pow(1 - (1 - Math.pow(1.3 / a, 0.5829)) * Math.exp(-q * (bhage - 0.5)), 1.71556);
+	private static double wiley(
+			double totalAge, double breastHeightAge, double years2BreastHeight, double siteIndex,
+			SiteIndexEquation cuIndex, double pi, DoubleBinaryOperator adjustMetric
+	) throws CommonCalculatorException {
+		double height;
+		if (breastHeightAge > 0.0) {
+			if (siteIndex > 60 + 1.667 * breastHeightAge) {
+				// function starts going nuts at high sites and low ages
+				// evaluate at a safe age, and interpolate
+				double x1 = (siteIndex - 60) / 1.667 + 0.1;
+				double x2 = indexToHeight(cuIndex, x1, SI_AT_BREAST, siteIndex, years2BreastHeight, pi);
+				height = 1.37 + (x2 - 1.37) * breastHeightAge / x1;
+				return height;
+			}
+
+			height = Utils.computeInFeet(siteIndex, siteIndexFt -> {
+				double x1 = 2500 / (siteIndex - 4.5);
+
+				double x2 = -1.7307 + 0.1394 * x1;
+				double x3 = -0.0616 + 0.0137 * x1;
+				double x4 = 0.00192428 + 0.00007024 * x1;
+
+				double heightFt = 4.5 + breastHeightAge * breastHeightAge
+						/ (x2 + x3 * breastHeightAge + x4 * breastHeightAge * breastHeightAge);
+
+				if (breastHeightAge < 5) {
+					heightFt += (0.3 * breastHeightAge);
+				} else if (breastHeightAge < 10) {
+					heightFt += (3.0 - 0.3 * breastHeightAge);
+				}
+				return heightFt;
+			});
+			height = adjustMetric.applyAsDouble(height, breastHeightAge);
+		} else {
+			height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
+		}
 		return height;
 	}
 }
