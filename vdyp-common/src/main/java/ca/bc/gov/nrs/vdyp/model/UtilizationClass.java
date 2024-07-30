@@ -30,6 +30,12 @@ public enum UtilizationClass {
 	public static final Collection<UtilizationClass> ALL_CLASSES = Collections
 			.unmodifiableList(List.of(SMALL, U75TO125, U125TO175, U175TO225, OVER225));
 
+	public static final Collection<UtilizationClass> ALL_BUT_LARGEST = Collections
+			.unmodifiableList(new ArrayList<>(Arrays.asList(SMALL, ALL, U75TO125, U125TO175, U175TO225)));
+
+	public static final Collection<UtilizationClass> ALL_BANDS_BUT_LARGEST = Collections
+			.unmodifiableList(new ArrayList<>(Arrays.asList(U75TO125, U125TO175, U175TO225)));
+
 	static {
 		for (int i = 1; i < UtilizationClass.values().length; i++) {
 			UtilizationClass.values()[i].previous = Optional.of(UtilizationClass.values()[i - 1]);

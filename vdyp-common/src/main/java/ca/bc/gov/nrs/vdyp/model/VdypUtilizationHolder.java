@@ -14,101 +14,103 @@ public interface VdypUtilizationHolder {
 	 * Close utilization volume net of decay, waste and breakage for utilization index -1 through 0
 	 */
 	void setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
-			Coefficients closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization
+			UtilizationVector closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization
 	);
 
 	/**
 	 * Close utilization volume net of decay, waste and breakage for utilization index -1 through 0
 	 */
-	Coefficients getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization();
+	UtilizationVector getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization();
 
 	/**
 	 * Close utilization volume net of decay and waste for utilization index -1 through 0
 	 */
 	void setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(
-			Coefficients closeUtilizationVolumeNetOfDecayAndWasteByUtilization
+			UtilizationVector closeUtilizationVolumeNetOfDecayAndWasteByUtilization
 	);
 
 	/**
 	 * Close utilization volume net of decay and waste for utilization index -1 through 0
 	 */
-	Coefficients getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization();
+	UtilizationVector getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization();
 
 	/**
 	 * Close utilization volume net of decay for utilization index -1 through 0
 	 */
-	void setCloseUtilizationVolumeNetOfDecayByUtilization(Coefficients closeUtilizationNetVolumeOfDecayByUtilization);
+	void setCloseUtilizationVolumeNetOfDecayByUtilization(
+			UtilizationVector closeUtilizationNetVolumeOfDecayByUtilization
+	);
 
 	/**
 	 * Close utilization volume net of decay for utilization index -1 through 0
 	 */
-	Coefficients getCloseUtilizationVolumeNetOfDecayByUtilization();
+	UtilizationVector getCloseUtilizationVolumeNetOfDecayByUtilization();
 
 	/**
 	 * Close utilization volume for utilization index -1 through 0
 	 */
-	void setCloseUtilizationVolumeByUtilization(Coefficients closeUtilizationVolumeByUtilization);
+	void setCloseUtilizationVolumeByUtilization(UtilizationVector closeUtilizationVolumeByUtilization);
 
 	/**
 	 * Close utilization volume for utilization index -1 through 0
 	 */
-	Coefficients getCloseUtilizationVolumeByUtilization();
+	UtilizationVector getCloseUtilizationVolumeByUtilization();
 
 	/**
 	 * Whole stem volume for utilization index -1 through 0
 	 */
-	void setWholeStemVolumeByUtilization(Coefficients wholeStemVolumeByUtilization);
+	void setWholeStemVolumeByUtilization(UtilizationVector wholeStemVolumeByUtilization);
 
 	/**
 	 * Whole stem volume for utilization index -1 through 0
 	 */
-	Coefficients getWholeStemVolumeByUtilization();
+	UtilizationVector getWholeStemVolumeByUtilization();
 
 	/**
 	 * Trees per hectare for utilization index -1 through 0
 	 */
-	void setTreesPerHectareByUtilization(Coefficients treesPerHectareByUtilization);
+	void setTreesPerHectareByUtilization(UtilizationVector treesPerHectareByUtilization);
 
 	/**
 	 * Trees per hectare for utilization index -1 through 0
 	 */
-	Coefficients getTreesPerHectareByUtilization();
+	UtilizationVector getTreesPerHectareByUtilization();
 
 	/**
 	 * Quadratic mean of diameter for utilization index -1 through 0
 	 */
-	void setQuadraticMeanDiameterByUtilization(Coefficients quadraticMeanDiameterByUtilization);
+	void setQuadraticMeanDiameterByUtilization(UtilizationVector quadraticMeanDiameterByUtilization);
 
 	/**
 	 * Quadratic mean of diameter for utilization index -1 through 0
 	 */
-	Coefficients getQuadraticMeanDiameterByUtilization();
+	UtilizationVector getQuadraticMeanDiameterByUtilization();
 
 	/**
 	 * Lorey height for utilization index -1 through 0
 	 */
-	void setLoreyHeightByUtilization(Coefficients loreyHeightByUtilization);
+	void setLoreyHeightByUtilization(UtilizationVector loreyHeightByUtilization);
 
 	/**
 	 * Lorey height for utilization index -1 through 0
 	 */
-	Coefficients getLoreyHeightByUtilization();
+	UtilizationVector getLoreyHeightByUtilization();
 
 	/**
 	 * Base area for utilization index -1 through 4
 	 */
-	void setBaseAreaByUtilization(Coefficients baseAreaByUtilization);
+	void setBaseAreaByUtilization(UtilizationVector baseAreaByUtilization);
 
 	/**
 	 * Base area for utilization index -1 through 4
 	 */
-	Coefficients getBaseAreaByUtilization();
+	UtilizationVector getBaseAreaByUtilization();
 
-	static Coefficients emptyUtilization() {
-		return new Coefficients(Arrays.asList(0f, 0f, 0f, 0f, 0f, 0f), -1);
+	static UtilizationVector emptyUtilization() {
+		return new UtilizationVector(0f, 0f, 0f, 0f, 0f, 0f);
 	}
 
-	static Coefficients emptyLoreyHeightUtilization() {
-		return new Coefficients(Arrays.asList(0f, 0f), -1);
+	static UtilizationVector emptyLoreyHeightUtilization() {
+		return new UtilizationVector(0f, 0f);
 	}
 }
