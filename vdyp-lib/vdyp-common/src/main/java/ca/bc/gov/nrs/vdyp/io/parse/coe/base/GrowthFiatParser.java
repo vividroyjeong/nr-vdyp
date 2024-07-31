@@ -58,7 +58,9 @@ public abstract class GrowthFiatParser implements ControlMapSubResourceParser<Ma
 			try {
 				details = new GrowthFiatDetails(regionId, coefficients);
 			} catch (ResourceParseException e) {
-				throw new ValueParseException(String.valueOf(regionId), "Error constructing GrowthFiatDetails instance", e);
+				throw new ValueParseException(
+						String.valueOf(regionId), "Error constructing GrowthFiatDetails instance", e
+				);
 			}
 
 			if (details.getNAgesSupplied() == 0) {

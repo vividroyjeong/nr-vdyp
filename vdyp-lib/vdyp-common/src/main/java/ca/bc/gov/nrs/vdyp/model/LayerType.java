@@ -32,7 +32,7 @@ public enum LayerType {
 	public String getAlias() {
 		return alias;
 	}
-	
+
 	public int getIndex() {
 		if (index == null) {
 			throw new UnsupportedOperationException("LayerType " + this.getAlias() + " is not supported");

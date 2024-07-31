@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.Estimators;
+import ca.bc.gov.nrs.vdyp.common.EstimationMethods;
 import ca.bc.gov.nrs.vdyp.common.ReconcilationMethods;
 import ca.bc.gov.nrs.vdyp.common.Reference;
 import ca.bc.gov.nrs.vdyp.common.Utils;
@@ -182,7 +182,10 @@ public class ForwardProcessingEngine {
 		PolygonProcessingState pps = fps.getPolygonProcessingState();
 		Bank bank = fps.getBank(0, LayerType.PRIMARY);
 
-		logger.info("Beginning processing of polygon {} layer {}", pps.getLayer().getParent(), pps.getLayer());
+		logger.info(
+				"Beginning processing of polygon {} layer {}", pps.getLayer().getPolygonIdentifier()
+						.toStringCompact(), pps.getLayer()
+		);
 
 		// BANKCHK1, simplified for the parameters METH_CHK = 4, LayerI = 1, and INSTANCE = 1
 		if (lastStepInclusive.ordinal() >= ExecutionStep.CHECK_FOR_WORK.ordinal()) {
@@ -349,7 +352,7 @@ public class ForwardProcessingEngine {
 		float tphMultiplier = tphEnd / tphStart;
 
 		// Begin storing computed results - dq, ba and tph for the layer
-		
+
 		end.quadMeanDiameters[0][UC_ALL_INDEX] = dqEnd;
 		end.basalAreas[0][UC_ALL_INDEX] = baEnd;
 		end.treesPerHectare[0][UC_ALL_INDEX] = tphEnd;
@@ -384,7 +387,9 @@ public class ForwardProcessingEngine {
 			start.loreyHeights[0][UC_ALL_INDEX] = sum1 / sum2;
 
 			// Now do the actual updates of DQ by species
-			wasSolutionFound = growUsingPartialSpeciesDynamics(end, dqDelta, baDelta, baStart, dqStart, tphStart, currentLoreyHeights);
+			wasSolutionFound = growUsingPartialSpeciesDynamics(
+					end, dqDelta, baDelta, baStart, dqStart, tphStart, currentLoreyHeights
+			);
 
 			// Restore the Lorey Heights back to the values at the beginning of the period.
 			// They will be updated below using the new estimate of TPH-primary species.
@@ -423,7 +428,7 @@ public class ForwardProcessingEngine {
 		);
 
 		// Calculate Lorey heights over all species, uc UC_ALL_INDEX
-		
+
 		float pspTphEnd = end.treesPerHectare[pps.getPrimarySpeciesIndex()][UC_ALL_INDEX];
 		growLoreyHeights(end, dhStart, dhEnd, pspTphStart, pspTphEnd, pspLhStart);
 
@@ -469,7 +474,7 @@ public class ForwardProcessingEngine {
 		computeUtilizationComponentsPrimary();
 
 		calculateSmallComponentYields(end);
-		
+
 		return end;
 	}
 
@@ -520,19 +525,19 @@ public class ForwardProcessingEngine {
 	 * 
 	 * @return true if and only if a solution was found.
 	 */
-	private boolean growUsingPartialSpeciesDynamics(Bank end, float dqDelta, float baDelta, float baStart, 
-			float dqStart, float tphStart, float[] currentLoreyHeights) {
+	private boolean growUsingPartialSpeciesDynamics(
+			Bank end, float dqDelta, float baDelta, float baStart,
+			float dqStart, float tphStart, float[] currentLoreyHeights
+	) {
 
 		boolean wasSuccessful = true;
 
-		PolygonProcessingState pps = fps.getPolygonProcessingState();		
+		PolygonProcessingState pps = fps.getPolygonProcessingState();
 
 		if (dqDelta == 0 || baDelta == 0 || pps.getNSpecies() == 1) {
 			return false /* no solution available */;
 		}
-		
-		
-		
+
 		return wasSuccessful;
 	}
 
@@ -739,7 +744,8 @@ public class ForwardProcessingEngine {
 				end.basalAreas[i][UC_ALL_INDEX] = spBaEnd[i];
 				end.treesPerHectare[i][UC_ALL_INDEX] = spTphNew[i];
 				if (spBaEnd[i] > 0.0f) {
-					end.quadMeanDiameters[i][UC_ALL_INDEX] = BaseAreaTreeDensityDiameter.quadMeanDiameter(spBaEnd[i], spTphNew[i]);
+					end.quadMeanDiameters[i][UC_ALL_INDEX] = BaseAreaTreeDensityDiameter
+							.quadMeanDiameter(spBaEnd[i], spTphNew[i]);
 				}
 			}
 		}
@@ -892,8 +898,7 @@ public class ForwardProcessingEngine {
 			throw new ProcessingException(
 					MessageFormat.format(
 							"No nonPrimarySpeciesBasalAreaGrowthCoefficients exist for stratum {0}"
-									+ "; call growBasalAreaForNonPrimarySpecies({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})", 
-							pspStratumNumber, speciesName, baStart, baDelta, lhStart, spBaStart, spDqStart, spLhStart
+									+ "; call growBasalAreaForNonPrimarySpecies({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})", pspStratumNumber, speciesName, baStart, baDelta, lhStart, spBaStart, spDqStart, spLhStart
 					)
 			);
 		}
@@ -999,7 +1004,7 @@ public class ForwardProcessingEngine {
 			float spBaAll = end.basalAreas[speciesIndex][UC_ALL_INDEX];
 			float spDqAll = end.quadMeanDiameters[speciesIndex][UC_ALL_INDEX];
 
-			Region region = pps.getPolygon().getBiogeoclimaticZone().getRegion();
+			Region region = pps.getBecZone().getRegion();
 			String speciesName = start.speciesNames[speciesIndex];
 
 			// EMP080
@@ -1095,8 +1100,10 @@ public class ForwardProcessingEngine {
 	 * @param pspTphEnd primary species trees-per-hectare at end
 	 * @param pspLhStart primary species Lorey height at end
 	 */
-	private void growLoreyHeights(Bank end, float dhStart, float dhEnd, float pspTphStart, float pspTphEnd, float pspLhStart) {
-		
+	private void growLoreyHeights(
+			Bank end, float dhStart, float dhEnd, float pspTphStart, float pspTphEnd, float pspLhStart
+	) {
+
 		PolygonProcessingState pps = fps.getPolygonProcessingState();
 		Bank start = pps.getStartBank();
 
@@ -1177,7 +1184,7 @@ public class ForwardProcessingEngine {
 	) {
 		PolygonProcessingState pps = fps.getPolygonProcessingState();
 		Bank start = pps.getStartBank();
-		
+
 		float spLh;
 
 		int primarySpeciesIndex = pps.getPrimarySpeciesIndex();
@@ -1342,7 +1349,8 @@ public class ForwardProcessingEngine {
 	 * 
 	 * @return the change in primary layer basal area from start to start + 1 year
 	 */
-	private float calculateQuadMeanDiameterGrowthEmpirical(float pspYabhStart, float dhStart,
+	private float calculateQuadMeanDiameterGrowthEmpirical(
+			float pspYabhStart, float dhStart,
 			float baStart, float dqStart, float hdGrowth, float dqYieldStart, float dqYieldEnd
 	) {
 		// Compute the growth in quadratic mean diameter 
@@ -1383,8 +1391,10 @@ public class ForwardProcessingEngine {
 		float x = dqStart - 7.5f;
 		float xsq = x * x;
 
-		var dqGrowthMin = Math.max(dqDeltaLimits[0] + dqDeltaLimits[1] * x + dqDeltaLimits[2] * xsq / 100.0f, dqDeltaLimits[6]);
-		var dqGrowthMax = Math.min(dqDeltaLimits[3] + dqDeltaLimits[4] * x + dqDeltaLimits[5] * xsq / 100.0f, dqDeltaLimits[7]);
+		var dqGrowthMin = Math
+				.max(dqDeltaLimits[0] + dqDeltaLimits[1] * x + dqDeltaLimits[2] * xsq / 100.0f, dqDeltaLimits[6]);
+		var dqGrowthMax = Math
+				.min(dqDeltaLimits[3] + dqDeltaLimits[4] * x + dqDeltaLimits[5] * xsq / 100.0f, dqDeltaLimits[7]);
 
 		dqGrowthMax = Math.max(dqGrowthMax, dqGrowthMin);
 
@@ -1397,7 +1407,7 @@ public class ForwardProcessingEngine {
 
 		PolygonProcessingState pps = fps.getPolygonProcessingState();
 		Bank start = pps.getStartBank();
-		
+
 		float[] speciesProportionsByBasalArea = new float[pps.getNSpecies() + 1];
 
 		for (int i = 1; i <= pps.getNSpecies(); i++) {
@@ -1427,7 +1437,7 @@ public class ForwardProcessingEngine {
 
 		PolygonProcessingState pps = fps.getPolygonProcessingState();
 		Bank start = pps.getStartBank();
-		
+
 		float[] speciesProportionsByBasalArea = getSpeciesProportionsByBasalArea();
 
 		var baYieldCoefficients = fps.fcm.getBasalAreaYieldCoefficients();
@@ -1451,8 +1461,8 @@ public class ForwardProcessingEngine {
 		int debugSetting2Value = debugSettings.getValue(ForwardDebugSettings.Vars.MAX_BREAST_HEIGHT_AGE_2);
 
 		float baYieldStart = fps.estimators.estimateBaseAreaYield(
-				estimateBasalAreaYieldCoefficients, debugSetting2Value, pspDhStart, pspYabhStart, veteranLayerBa, isFullOccupancy, fps
-						.getPolygonProcessingState().getBecZone(), pspGroupNumber
+				estimateBasalAreaYieldCoefficients, debugSetting2Value, pspDhStart, pspYabhStart, veteranLayerBa, 
+				isFullOccupancy, fps.getPolygonProcessingState().getBecZone(), pspGroupNumber
 		);
 
 		float pspDhEnd = pspDhStart + dhDelta;
@@ -1507,7 +1517,7 @@ public class ForwardProcessingEngine {
 		// UPPERGEN( 1, BATOP98, DQTOP98)
 		var baUpperBound = growBasalAreaUpperBound();
 
-		baUpperBound = baUpperBound / Estimators.EMPIRICAL_OCCUPANCY;
+		baUpperBound = baUpperBound / EstimationMethods.EMPIRICAL_OCCUPANCY;
 		var baLimit = Math.max(baUpperBound, baStart);
 
 		// Enforce upper limit on growth
@@ -1608,7 +1618,7 @@ public class ForwardProcessingEngine {
 	private float growBasalAreaUpperBound() {
 
 		PolygonProcessingState pps = fps.getPolygonProcessingState();
-		
+
 		int debugSetting4Value = fps.fcm.getDebugSettings()
 				.getValue(ForwardDebugSettings.Vars.PER_SPECIES_AND_REGION_MAX_BREAST_HEIGHT_4);
 		if (debugSetting4Value > 0) {
@@ -1633,7 +1643,7 @@ public class ForwardProcessingEngine {
 		int debugSetting4Value = fps.fcm.getDebugSettings()
 				.getValue(ForwardDebugSettings.Vars.PER_SPECIES_AND_REGION_MAX_BREAST_HEIGHT_4);
 		if (debugSetting4Value > 0) {
-			
+
 			var upperBoundsCoefficients = fps.fcm.getUpperBoundsCoefficients();
 			Region region = pps.getBecZone().getRegion();
 			int primarySpeciesIndex = pps.getPrimarySpeciesIndex();
@@ -1858,13 +1868,13 @@ public class ForwardProcessingEngine {
 
 	@SuppressWarnings("unchecked")
 	void setCompatibilityVariables() throws ProcessingException {
-		
+
 		Coefficients aAdjust = new Coefficients(new float[] { 0.0f, 0.0f, 0.0f, 0.0f }, 1);
 
 		var growthDetails = fps.fcm.getForwardControlVariables();
 		var pps = fps.getPolygonProcessingState();
 		Bank start = pps.getStartBank();
-		
+
 		// Note: L1COM2 (INL1VGRP, INL1DGRP, INL1BGRP) is initialized when
 		// PolygonProcessingState (volumeEquationGroups, decayEquationGroups
 		// breakageEquationGroups, respectively) is constructed. Copying
@@ -2070,7 +2080,7 @@ public class ForwardProcessingEngine {
 		var pps = fps.getPolygonProcessingState();
 		Bank start = pps.getStartBank();
 
-		Region region = pps.getPolygon().getBiogeoclimaticZone().getRegion();
+		Region region = pps.getBecZone().getRegion();
 		String speciesName = start.speciesNames[speciesIndex];
 
 		float spLoreyHeight_All = start.loreyHeights[speciesIndex][UC_ALL_INDEX]; // HLsp
@@ -2300,7 +2310,7 @@ public class ForwardProcessingEngine {
 	) throws ProcessingException {
 
 		Bank startBank = pps.getStartBank();
-		
+
 		// Calculate primary species values
 		int primarySpeciesIndex = pps.getPrimarySpeciesIndex();
 
@@ -2418,7 +2428,7 @@ public class ForwardProcessingEngine {
 	static void estimateMissingYearsToBreastHeightValues(PolygonProcessingState pps) {
 
 		Bank start = pps.getStartBank();
-		
+
 		int primarySpeciesIndex = pps.getPrimarySpeciesIndex();
 		float primarySpeciesSiteIndex = start.siteIndices[primarySpeciesIndex];
 
@@ -2480,7 +2490,7 @@ public class ForwardProcessingEngine {
 	static void estimateMissingSiteIndices(PolygonProcessingState pps) throws ProcessingException {
 
 		Bank start = pps.getStartBank();
-		
+
 		int primarySpeciesIndex = pps.getPrimarySpeciesIndex();
 		SiteIndexEquation primarySiteCurve = SiteIndexEquation.getByIndex(pps.getSiteCurveNumber(primarySpeciesIndex));
 
@@ -2580,7 +2590,7 @@ public class ForwardProcessingEngine {
 
 		PolygonProcessingState pps = this.fps.getPolygonProcessingState();
 		Bank start = pps.getStartBank();
-		
+
 		logger.atDebug().addArgument(pps.getNSpecies()).addArgument(start.basalAreas[0][0]).log(
 				"Calculating coverages as a ratio of Species BA over Total BA. # species: {}; Layer total 7.5cm+ basal area: {}"
 		);
@@ -2682,8 +2692,8 @@ public class ForwardProcessingEngine {
 		if (state.getNSpecies() == 0) {
 			throw new ProcessingException(
 					MessageFormat.format(
-							"Polygon {0} layer 0 has no species with basal area above {1}", state.getLayer().getParent()
-									.getDescription().getName(), MIN_BASAL_AREA
+							"Polygon {0} layer 0 has no species with basal area above {1}", state.getLayer()
+									.getPolygonIdentifier().toStringCompact(), MIN_BASAL_AREA
 					)
 			);
 		}
@@ -2710,7 +2720,7 @@ public class ForwardProcessingEngine {
 
 		PolygonProcessingState pps = fps.getPolygonProcessingState();
 		Bank start = pps.getStartBank();
-		
+
 		if (pps.getNSpecies() == 0) {
 			throw new IllegalArgumentException("Can not find primary species as there are no species");
 		}

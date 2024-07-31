@@ -3,7 +3,6 @@ package ca.bc.gov.nrs.vdyp.forward;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
@@ -15,7 +14,7 @@ import ca.bc.gov.nrs.vdyp.model.GenusDistributionSet;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
-import ca.bc.gov.nrs.vdyp.model.VdypUtilization;
+import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 
 class Bank {
 
@@ -102,9 +101,7 @@ class Bank {
 		treesPerHectare = new float[nSpecies + 1][nUtilizationClasses];
 		wholeStemVolumes = new float[nSpecies + 1][nUtilizationClasses];
 
-		if (layer.getDefaultUtilizationMap().isPresent()) {
-			recordUtilizations(0, layer.getDefaultUtilizationMap().get());
-		}
+		recordUtilizations(0, layer);
 
 		int nextSlot = 1;
 		for (VdypSpecies s : speciesToRetain) {
@@ -212,27 +209,23 @@ class Bank {
 		speciesIndices[index] = species.getGenusIndex();
 		// percentForestedLand is output-only and so not assigned here.
 
-		if (species.getUtilizations().isPresent()) {
-			recordUtilizations(index, species.getUtilizations().get());
-		} else {
-			recordDefaultUtilizations(index);
-		}
+		recordUtilizations(index, species);
 	}
 
-	private void recordUtilizations(int index, Map<UtilizationClass, VdypUtilization> suMap) {
+	private void recordUtilizations(int index, VdypUtilizationHolder uh) {
 
-		for (var su : suMap.entrySet()) {
-			int ucIndex = su.getKey().ordinal();
-			basalAreas[index][ucIndex] = su.getValue().getBasalArea();
-			closeUtilizationVolumes[index][ucIndex] = su.getValue().getCloseUtilizationVolume();
-			cuVolumesMinusDecay[index][ucIndex] = su.getValue().getCuVolumeMinusDecay();
-			cuVolumesMinusDecayAndWastage[index][ucIndex] = su.getValue().getCuVolumeMinusDecayWastage();
+		for (UtilizationClass uc: UtilizationClass.values()) {
+			int ucIndex = uc.ordinal();
+			basalAreas[index][ucIndex] = uh.getBaseAreaByUtilization().get(uc);
+			closeUtilizationVolumes[index][ucIndex] = uh.getCloseUtilizationVolumeByUtilization().get(uc);
+			cuVolumesMinusDecay[index][ucIndex] = uh.getCloseUtilizationVolumeNetOfDecayByUtilization().get(uc);
+			cuVolumesMinusDecayAndWastage[index][ucIndex] = uh.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization().get(uc);
 			if (ucIndex < 2 /* only uc 0 and 1 have a lorey height */) {
-				loreyHeights[index][ucIndex] = su.getValue().getLoreyHeight();
+				loreyHeights[index][ucIndex] = uh.getLoreyHeightByUtilization().get(uc);
 			}
-			quadMeanDiameters[index][ucIndex] = su.getValue().getQuadraticMeanDiameterAtBH();
-			treesPerHectare[index][ucIndex] = su.getValue().getLiveTreesPerHectare();
-			wholeStemVolumes[index][ucIndex] = su.getValue().getWholeStemVolume();
+			quadMeanDiameters[index][ucIndex] = uh.getQuadraticMeanDiameterByUtilization().get(uc);
+			treesPerHectare[index][ucIndex] = uh.getTreesPerHectareByUtilization().get(uc);
+			wholeStemVolumes[index][ucIndex] = uh.getWholeStemVolumeByUtilization().get(uc);
 		}
 	}
 

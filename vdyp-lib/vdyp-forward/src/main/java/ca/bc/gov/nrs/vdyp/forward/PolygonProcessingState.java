@@ -118,7 +118,6 @@ class PolygonProcessingState {
 
 		this.fps = fps;
 		this.polygon = polygon;
-
 		this.start = bank.copy();
 
 		var volumeEquationGroupMatrix = this.fps.fcm.<MatrixMap2<String, String, Integer>>get(

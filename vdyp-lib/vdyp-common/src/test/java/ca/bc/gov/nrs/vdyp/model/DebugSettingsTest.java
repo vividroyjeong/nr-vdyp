@@ -34,7 +34,10 @@ class DebugSettingsTest {
 
 	@Test
 	void testTooLargeArray() {
-		assertThrows(IllegalArgumentException.class, () -> new DebugSettings(new Integer[DebugSettings.MAX_DEBUG_SETTINGS + 1]));
+		assertThrows(
+				IllegalArgumentException.class,
+				() -> new DebugSettings(new Integer[DebugSettings.MAX_DEBUG_SETTINGS + 1])
+		);
 	}
 
 	@Test

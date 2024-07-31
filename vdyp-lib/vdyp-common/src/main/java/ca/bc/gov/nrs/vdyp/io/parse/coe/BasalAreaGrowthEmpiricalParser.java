@@ -27,10 +27,9 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
  * </ol>
  * All lines are parsed. A BEC Zone Alias value, trimmed, of "" results in the line being skipped.
  * <p>
- * The result of the parse is a map from BEC Zone Alias and Species to a (zero-based) eight-element coefficient
- * array. If, for a given line "indicator" is zero, only the first coefficient is recorded (for species 0) and 
- * all others are set to zero. If "indicator" is one, all coefficients on the line are assigned to their respective 
- * species.
+ * The result of the parse is a map from BEC Zone Alias and Species to a (zero-based) eight-element coefficient array.
+ * If, for a given line "indicator" is zero, only the first coefficient is recorded (for species 0) and all others are
+ * set to zero. If "indicator" is one, all coefficients on the line are assigned to their respective species.
  * <p>
  * Control index: 121
  * <p>
@@ -39,7 +38,8 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
  * @author Michael Junkin, Vivid Solutions
  * @see BecZoneBySpeciesCoefficientParser
  */
-public class BasalAreaGrowthEmpiricalParser implements ControlMapSubResourceParser<MatrixMap2<String, String, Coefficients>> {
+public class BasalAreaGrowthEmpiricalParser
+		implements ControlMapSubResourceParser<MatrixMap2<String, String, Coefficients>> {
 
 	private static final int NUM_SPECIES = 16;
 	private static final int NUM_COEFFICIENTS = 8;
@@ -58,11 +58,14 @@ public class BasalAreaGrowthEmpiricalParser implements ControlMapSubResourcePars
 			}
 
 		} //
-			.value(4, BEC_ZONE_ID_KEY, ControlledValueParser.BEC) //
-			.space(2) //
-			.value(1, INDEX_KEY, ValueParser.range(ValueParser.INTEGER, 0, true, NUM_COEFFICIENTS, false, "Index value")) //
-			.value(2, INDICATOR_KEY, ValueParser.range(ValueParser.INTEGER, 0, true, 1, true, "Indicator value")) //
-			.multiValue(NUM_SPECIES, 8, COEFFICIENTS_KEY, ValueParser.FLOAT);
+				.value(4, BEC_ZONE_ID_KEY, ControlledValueParser.BEC) //
+				.space(2) //
+				.value(
+						1, INDEX_KEY,
+						ValueParser.range(ValueParser.INTEGER, 0, true, NUM_COEFFICIENTS, false, "Index value")
+				) //
+				.value(2, INDICATOR_KEY, ValueParser.range(ValueParser.INTEGER, 0, true, 1, true, "Indicator value")) //
+				.multiValue(NUM_SPECIES, 8, COEFFICIENTS_KEY, ValueParser.FLOAT);
 	}
 
 	private LineParser lineParser;
@@ -107,7 +110,7 @@ public class BasalAreaGrowthEmpiricalParser implements ControlMapSubResourcePars
 
 		return result;
 	}
-	
+
 	@Override
 	public ControlKey getControlKey() {
 		return ControlKey.BA_GROWTH_EMPIRICAL;

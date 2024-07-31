@@ -35,9 +35,7 @@ public class DqGrowthFiatParserTest {
 				.get(ControlKey.DQ_GROWTH_FIAT.name());
 
 		assertThat(m, Matchers.aMapWithSize(2));
-		assertThat(
-				m.get(Region.COASTAL).getNAgesSupplied(), Matchers.is(3)
-		);
+		assertThat(m.get(Region.COASTAL).getNAgesSupplied(), Matchers.is(3));
 		assertThat(
 				m.get(Region.COASTAL),
 				Matchers.allOf(

@@ -35,7 +35,9 @@ class ComponentSizeParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, mmHasEntry(is(new ComponentSizeLimits(49.4f, 153.3f, 0.726f, 3.647f)), "S1", Region.COASTAL));
+		assertThat(
+				result, mmHasEntry(is(new ComponentSizeLimits(49.4f, 153.3f, 0.726f, 3.647f)), "S1", Region.COASTAL)
+		);
 	}
 
 	@Test

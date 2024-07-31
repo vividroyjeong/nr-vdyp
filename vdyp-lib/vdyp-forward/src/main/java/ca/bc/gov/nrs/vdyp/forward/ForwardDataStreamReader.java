@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.UtilizationOperations;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
@@ -22,10 +23,12 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.UtilizationVector;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.VdypUtilization;
+import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 
 public class ForwardDataStreamReader {
 
@@ -101,8 +104,8 @@ public class ForwardDataStreamReader {
 				}
 
 				var speciesCollection = layerSpeciesStream.next();
-				var primarySpecies = new HashMap<Integer, VdypSpecies>();
-				var veteranSpecies = new HashMap<Integer, VdypSpecies>();
+				var primarySpecies = new HashMap<String, VdypSpecies>();
+				var veteranSpecies = new HashMap<String, VdypSpecies>();
 				for (var species : speciesCollection) {
 					logger.trace("Saw species {}", species);
 
@@ -110,13 +113,33 @@ public class ForwardDataStreamReader {
 					var speciesUtilizations = utilizationsBySpeciesMap.get(key);
 
 					if (speciesUtilizations != null) {
-						species.setUtilizations(Optional.of(speciesUtilizations));
+						
+						UtilizationVector basalAreaUtilizations = new UtilizationVector();
+						UtilizationVector liveTreesPerHectareUtilizations = new UtilizationVector();
+						UtilizationVector loreyHeightUtilizations = new UtilizationVector();
+						UtilizationVector wholeStemVolumeUtilizations = new UtilizationVector();
+						UtilizationVector closeUtilizationVolumeUtilizations = new UtilizationVector();
+						UtilizationVector cuVolumeMinusDecayUtilizations = new UtilizationVector();
+						UtilizationVector cuVolumeMinusDecayWastageUtilizations = new UtilizationVector();
+						UtilizationVector cuVolumeMinusDecayWastageBreakageUtilizations = new UtilizationVector();
+						UtilizationVector quadraticMeanDiameterAtBHUtilizations = new UtilizationVector();
+						
+						for (var e: speciesUtilizations.entrySet()) {
+							var uc = e.getKey();
+							var ucUtilizations = e.getValue();
 
-						for (VdypUtilization u : speciesUtilizations.values()) {
-							u.setParent(species);
+							basalAreaUtilizations.set(uc, ucUtilizations.getBasalArea());
+							liveTreesPerHectareUtilizations.set(uc, ucUtilizations.getLiveTreesPerHectare());
+							if (uc == UtilizationClass.SMALL || uc == UtilizationClass.ALL) {
+								loreyHeightUtilizations.set(uc, ucUtilizations.getLoreyHeight());
+							}
+							wholeStemVolumeUtilizations.set(uc, ucUtilizations.getWholeStemVolume());
+							closeUtilizationVolumeUtilizations.set(uc, ucUtilizations.getCloseUtilizationVolume());
+							cuVolumeMinusDecayUtilizations.set(uc, ucUtilizations.getCuVolumeMinusDecay());
+							cuVolumeMinusDecayWastageUtilizations.set(uc, ucUtilizations.getCuVolumeMinusDecayWastage());
+							cuVolumeMinusDecayWastageBreakageUtilizations.set(uc, ucUtilizations.getCuVolumeMinusDecayWastageBreakage());
+							quadraticMeanDiameterAtBHUtilizations.set(uc, ucUtilizations.getQuadraticMeanDiameterAtBH());
 						}
-					} else {
-						species.setUtilizations(Optional.empty());
 					}
 
 					if (LayerType.PRIMARY.equals(species.getLayerType())) {
@@ -133,6 +156,8 @@ public class ForwardDataStreamReader {
 					}
 				}
 
+				Map<LayerType, VdypLayer> layerMap = new HashMap<>();
+				
 				VdypLayer primaryLayer = null;
 				if (primarySpecies.size() > 0) {
 
@@ -143,10 +168,8 @@ public class ForwardDataStreamReader {
 					primaryLayer = new VdypLayer(
 							LayerType.PRIMARY, polygon, primarySpecies, Optional.ofNullable(defaultSpeciesUtilization)
 					);
-
-					for (VdypSpecies v : primarySpecies.values()) {
-						v.setParent(primaryLayer);
-					}
+					
+					layerMap.put(LayerType.PRIMARY, primaryLayer);
 				}
 
 				VdypLayer veteranLayer = null;
@@ -159,16 +182,14 @@ public class ForwardDataStreamReader {
 					veteranLayer = new VdypLayer(
 							LayerType.VETERAN, polygon, veteranSpecies, Optional.ofNullable(defaultSpeciesUtilization)
 					);
-
-					for (VdypSpecies v : veteranSpecies.values()) {
-						v.setParent(veteranLayer);
-					}
+					
+					layerMap.put(LayerType.VETERAN, veteranLayer);
 				}
 
-				polygon.setLayers(primaryLayer, veteranLayer);
+				polygon.setLayers(layerMap);
 
 				thePolygon = Optional.of(polygon);
-				adjustUtilizations(polygon);
+				UtilizationOperations.doPostCreateAdjustments(polygon);
 			}
 		} catch (ResourceParseException | IOException e) {
 			throw new ProcessingException(e);
@@ -177,53 +198,19 @@ public class ForwardDataStreamReader {
 		return thePolygon;
 	}
 
-	/**
-	 * Both scale the per-hectare values of all the utilizations of the primary layer of the given polygon, and for all
-	 * utilizations of both the primary and veteran layer (if present) of the polygon, 1. Adjust the basal area to be
-	 * within bounds of the utilization class, and 2. Calculate the quad-mean-diameter value from the basal area and
-	 * trees per hectare.
-	 *
-	 * @param polygon
-	 */
-	private void adjustUtilizations(VdypPolygon polygon) throws ProcessingException {
-
-		float percentForestedLand = polygon.getPercentAvailable();
-		assert !Float.isNaN(percentForestedLand);
-		float scalingFactor = 100.0f / percentForestedLand;
-
-		List<VdypUtilization> utilizationsToAdjust = new ArrayList<>();
-
-		for (VdypLayer l : polygon.getLayers().values()) {
-
-			l.getDefaultUtilizationMap().ifPresent(m -> utilizationsToAdjust.addAll(m.values()));
-
-			l.getGenera().values().stream()
-					.forEach(s -> s.getUtilizations().ifPresent(m -> utilizationsToAdjust.addAll(m.values())));
-		}
-
-		for (VdypUtilization u : utilizationsToAdjust) {
-
-			if (percentForestedLand > 0.0f && percentForestedLand < 100.0f) {
-				u.scale(scalingFactor);
-			}
-
-			u.doPostCreateAdjustments();
-		}
-	}
-
 	private class UtilizationBySpeciesKey {
 		private final LayerType layerType;
-		private final Integer genusIndex;
+		private final Integer speciesIndex;
 
-		public UtilizationBySpeciesKey(LayerType layerType, Integer genusIndex) {
+		public UtilizationBySpeciesKey(LayerType layerType, Integer speciesIndex) {
 			this.layerType = layerType;
-			this.genusIndex = genusIndex;
+			this.speciesIndex = speciesIndex;
 		}
 
 		@Override
 		public boolean equals(Object other) {
 			if (other instanceof UtilizationBySpeciesKey that) {
-				return layerType.equals(that.layerType) && genusIndex.equals(that.genusIndex);
+				return layerType.equals(that.layerType) && speciesIndex.equals(that.speciesIndex);
 			} else {
 				return false;
 			}
@@ -231,7 +218,7 @@ public class ForwardDataStreamReader {
 
 		@Override
 		public int hashCode() {
-			return layerType.hashCode() * 17 + genusIndex.hashCode();
+			return layerType.hashCode() * 17 + speciesIndex.hashCode();
 		}
 	}
 }

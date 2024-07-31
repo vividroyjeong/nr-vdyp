@@ -39,6 +39,7 @@ public class CachingResolvedControlMapImpl extends ResolvedControlMapImpl implem
 	final MatrixMap2<String, String, Integer> defaultEquationGroup;
 	final MatrixMap2<Integer, Integer, Optional<Integer>> equationModifierGroup;
 	final MatrixMap2<String, Region, Coefficients> hl1Coefficients;
+
 	public CachingResolvedControlMapImpl(Map<String, Object> controlMap) {
 
 		super(controlMap);
@@ -48,7 +49,7 @@ public class CachingResolvedControlMapImpl extends ResolvedControlMapImpl implem
 		List<GenusDefinition> genusDefinitions = this.get(ControlKey.SP0_DEF, List.class);
 		this.genusDefinitionMap = new GenusDefinitionMap(genusDefinitions);
 
-		this.netDecayWasteCoeMap = this.get(ControlKey.VOLUME_NET_DECAY_WASTE, Map.class);		
+		this.netDecayWasteCoeMap = this.get(ControlKey.VOLUME_NET_DECAY_WASTE, Map.class);
 		this.netDecayCoeMap = this.get(ControlKey.VOLUME_NET_DECAY, MatrixMap2.class);
 		this.wasteModifierMap = this.get(ControlKey.WASTE_MODIFIERS, MatrixMap2.class);
 		this.decayModifierMap = this.get(ModifierParser.CONTROL_KEY_MOD301_DECAY, MatrixMap2.class);

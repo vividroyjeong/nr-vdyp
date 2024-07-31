@@ -34,7 +34,7 @@ public class GenusDefinitionMap {
 	public boolean contains(String alias) {
 		return genusByAliasMap.get(alias) != null;
 	}
-	
+
 	public List<String> getAliases() {
 		return genusByAliasMap.values().stream().map(GenusDefinition::getAlias).toList();
 	}

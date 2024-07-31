@@ -277,11 +277,5 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 				builder.layerType(layerType.get());
 			});
 		}
-
-		public void baseAreaByUtilization(UtilizationVector utilizationVector) {
-			// TODO Auto-generated method stub
-
-		}
-
 	}
 }

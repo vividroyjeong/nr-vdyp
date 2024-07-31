@@ -33,9 +33,7 @@ class BasalAreaGrowthFiatParserTest {
 				.get(ControlKey.BA_GROWTH_FIAT.name());
 
 		assertThat(m, Matchers.aMapWithSize(2));
-		assertThat(
-				m.get(Region.COASTAL).getNAgesSupplied(), Matchers.is(3)
-		);
+		assertThat(m.get(Region.COASTAL).getNAgesSupplied(), Matchers.is(3));
 		assertThat(
 				m.get(Region.COASTAL),
 				Matchers.allOf(

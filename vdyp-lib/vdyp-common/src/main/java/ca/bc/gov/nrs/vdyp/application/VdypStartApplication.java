@@ -36,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.Estimators;
+import ca.bc.gov.nrs.vdyp.common.EstimationMethods;
 import ca.bc.gov.nrs.vdyp.common.ReconcilationMethods;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
@@ -169,7 +169,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	protected Map<String, Object> controlMap = new HashMap<>();
 
-	protected Estimators estimators;
+	protected EstimationMethods estimators;
 
 	static final Comparator<BaseVdypSpecies> PERCENT_GENUS_DESCENDING = Utils
 			.compareUsing(BaseVdypSpecies::getPercentGenus).reversed();
@@ -241,7 +241,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	protected void setControlMap(Map<String, Object> controlMap) {
 		this.controlMap = controlMap;
-		this.estimators = new Estimators(new ResolvedControlMapImpl(controlMap));
+		this.estimators = new EstimationMethods(new ResolvedControlMapImpl(controlMap));
 	}
 
 	protected <T> StreamingParser<T> getStreamingParser(ControlKey key) throws ProcessingException {
@@ -1260,21 +1260,19 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				}
 			}
 
-			spec.getBaseAreaByUtilization().pairwiseInPlace(baseAreaUtil, Estimators.COPY_IF_BAND);
-			spec.getTreesPerHectareByUtilization().pairwiseInPlace(treesPerHectareUtil, Estimators.COPY_IF_BAND);
-			spec.getQuadraticMeanDiameterByUtilization()
-					.pairwiseInPlace(quadMeanDiameterUtil, Estimators.COPY_IF_BAND);
+			spec.getBaseAreaByUtilization().pairwiseInPlace(baseAreaUtil, EstimationMethods.COPY_IF_BAND);
+			spec.getTreesPerHectareByUtilization().pairwiseInPlace(treesPerHectareUtil, EstimationMethods.COPY_IF_BAND);
+			spec.getQuadraticMeanDiameterByUtilization().pairwiseInPlace(quadMeanDiameterUtil, EstimationMethods.COPY_IF_BAND);
 
-			spec.getWholeStemVolumeByUtilization()
-					.pairwiseInPlace(wholeStemVolumeUtil, Estimators.COPY_IF_NOT_SMALL);
+			spec.getWholeStemVolumeByUtilization().pairwiseInPlace(wholeStemVolumeUtil, EstimationMethods.COPY_IF_NOT_SMALL);
 			spec.getCloseUtilizationVolumeByUtilization()
-					.pairwiseInPlace(closeVolumeUtil, Estimators.COPY_IF_NOT_SMALL);
+					.pairwiseInPlace(closeVolumeUtil, EstimationMethods.COPY_IF_NOT_SMALL);
 			spec.getCloseUtilizationVolumeNetOfDecayByUtilization()
-					.pairwiseInPlace(closeVolumeNetDecayUtil, Estimators.COPY_IF_NOT_SMALL);
+					.pairwiseInPlace(closeVolumeNetDecayUtil, EstimationMethods.COPY_IF_NOT_SMALL);
 			spec.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization()
-					.pairwiseInPlace(closeVolumeNetDecayWasteUtil, Estimators.COPY_IF_NOT_SMALL);
+					.pairwiseInPlace(closeVolumeNetDecayWasteUtil, EstimationMethods.COPY_IF_NOT_SMALL);
 			spec.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization()
-					.pairwiseInPlace(closeVolumeNetDecayWasteBreakUtil, Estimators.COPY_IF_NOT_SMALL);
+					.pairwiseInPlace(closeVolumeNetDecayWasteBreakUtil, EstimationMethods.COPY_IF_NOT_SMALL);
 
 		}
 		computeLayerUtilizationComponentsFromSpecies(vdypLayer);

@@ -18,25 +18,25 @@ import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
 
 public class ResolvedControlMapImpl implements ResolvedControlMap {
-	
+
 	private final Map<String, Object> controlMap;
-	
+
 	private final Map<ControlKey, Object> entityCache = new HashMap<>();
-		
+
 	public ResolvedControlMapImpl(Map<String, Object> controlMap) {
 		this.controlMap = controlMap;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public <U> U get(ControlKey key, Class<? super U> clazz) {
-		
+
 		U entity = (U) entityCache.get(key);
 		if (entity == null) {
 			entity = (U) Utils.expectParsedControl(controlMap, key.name(), clazz);
 			entityCache.put(key, entity);
 		}
-		
+
 		return entity;
 	}
 
@@ -48,12 +48,12 @@ public class ResolvedControlMapImpl implements ResolvedControlMap {
 
 	@Override
 	public BecLookup getBecLookup() {
-		return this.get(ControlKey.BEC_DEF, BecLookup.class);		
+		return this.get(ControlKey.BEC_DEF, BecLookup.class);
 	}
 
 	@Override
 	public Map<String, Coefficients> getNetDecayWasteCoeMap() {
-		return this.get(ControlKey.VOLUME_NET_DECAY_WASTE, Map.class);		
+		return this.get(ControlKey.VOLUME_NET_DECAY_WASTE, Map.class);
 	}
 
 	@Override

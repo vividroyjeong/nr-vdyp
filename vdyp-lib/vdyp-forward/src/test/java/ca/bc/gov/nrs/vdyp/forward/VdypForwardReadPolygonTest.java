@@ -68,64 +68,42 @@ class VdypForwardReadPolygonTest {
 			{
 				assertThat(primaryLayer, hasProperty("layerType", is(LayerType.PRIMARY)));
 				assertThat(primaryLayer, hasProperty("defaultUtilizationMap"));
-				assertThat(primaryLayer.getParent(), is(polygon));
+				assertThat(primaryLayer.getPolygonIdentifier().getName(), is(polygon.getPolygonIdentifier().getName()));
+				assertThat(primaryLayer.getPolygonIdentifier().getYear(), is(polygon.getPolygonIdentifier().getYear()));
 
-				if (primaryLayer.getDefaultUtilizationMap().isPresent()) {
-					var utilizationMap = primaryLayer.getDefaultUtilizationMap().get();
+				assertThat(UtilizationClass.values().length, is(primaryLayer.getBaseAreaByUtilization().size()));
 
-					assertThat(utilizationMap.size(), greaterThan(0));
-					assertThat(utilizationMap.size(), lessThanOrEqualTo(UtilizationClass.values().length));
-					for (UtilizationClass uc : UtilizationClass.values()) {
-						assertThat(utilizationMap.get(uc), hasProperty("genusIndex", is(0)));
-					}
-				}
+				var speciesMap = primaryLayer.getSpecies();
+				assertThat(speciesMap.size(), is(5));
 
-				var genusMap = primaryLayer.getGenera();
-				assertThat(genusMap.size(), is(5));
+				var species = speciesMap.values().iterator().next();
 
-				var genus = genusMap.values().iterator().next();
+				assertThat(species, hasProperty("layerType", is(primaryLayer.getLayerType())));
+				assertThat(species, hasProperty("polygonIdentifier", is(polygon.getPolygonIdentifier())));
+				assertThat(species, hasProperty("utilizations"));
 
-				assertThat(genus, hasProperty("parent", is(primaryLayer)));
-				assertThat(genus, hasProperty("utilizations"));
-
-				var genusUtilizationMap = genus.getUtilizations();
-
-				if (genusUtilizationMap.isPresent()) {
-					for (var u : genusUtilizationMap.get().values()) {
-						assertThat(u, hasProperty("genusIndex", is(genus.getGenusIndex())));
-						assertThat(u, hasProperty("parent", is(genus)));
-					}
+				for (var u : UtilizationClass.values()) {
+					assertThat(u, hasProperty("genusIndex", is(species.getGenusIndex())));
+					assertThat(u, hasProperty("polygonIdentifier", is("01002 S000001 00   (1970)")));
 				}
 			}
 
 			var veteranLayer = polygon.getLayers().get(LayerType.VETERAN);
 			if (veteranLayer != null) {
 
-				if (veteranLayer.getDefaultUtilizationMap().isPresent()) {
-					var utilizationMap = veteranLayer.getDefaultUtilizationMap().get();
-
-					assertThat(utilizationMap.size(), greaterThan(0));
-					assertThat(utilizationMap.size(), lessThanOrEqualTo(UtilizationClass.values().length));
-					for (UtilizationClass uc : UtilizationClass.values()) {
-						assertThat(utilizationMap.get(uc), hasProperty("genusIndex", is(0)));
-					}
+				assertThat(primaryLayer.getBaseAreaByUtilization().size(), is(UtilizationClass.values().length));
+				assertThat(primaryLayer.getLoreyHeightByUtilization().size(), is(2));
+				for (UtilizationClass uc : UtilizationClass.values()) {
+					assertThat(primaryLayer.getBaseAreaByUtilization(), hasProperty("genusIndex", is(0)));
 				}
 
-				var genusMap = veteranLayer.getGenera();
-				assertThat(genusMap.size(), is(5));
+				var speciesMap = veteranLayer.getSpecies();
+				assertThat(speciesMap.size(), is(5));
 
-				var genus = genusMap.values().iterator().next();
+				var genus = speciesMap.values().iterator().next();
 
 				assertThat(genus, hasProperty("parent", is(veteranLayer)));
 				assertThat(genus, hasProperty("utilizations"));
-
-				var genusUtilizationMap = genus.getUtilizations();
-				if (genusUtilizationMap.isPresent()) {
-					for (var u : genusUtilizationMap.get().values()) {
-						assertThat(u, hasProperty("genusIndex", is(genus.getGenusIndex())));
-						assertThat(u, hasProperty("parent", is(genus)));
-					}
-				}
 			}
 		} catch (ResourceParseException | IOException e) {
 			throw new ProcessingException(e);

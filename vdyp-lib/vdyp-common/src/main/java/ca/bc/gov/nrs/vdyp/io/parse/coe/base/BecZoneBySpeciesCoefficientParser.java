@@ -23,9 +23,9 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
  * Zone Alias and then sp0 Alias, one per index.
  *
  * Indices range from 0 to a parameterized value (7, for example).
- * 
- * If, for a given input line, indicator is "one", coe i, i = 1 - 15, is set to coe 0 plus coe i. 
- * Otherwise (indicator is "zero"), coe i is set to the ith coe supplied in the input file.
+ *
+ * If, for a given input line, indicator is "one", coe i, i = 1 - 15, is set to coe 0 plus coe i. Otherwise (indicator
+ * is "zero"), coe i is set to the ith coe supplied in the input file.
  *
  * @author Michael Junkin, Vivid Solutions
  * @see ControlMapSubResourceParser
@@ -52,11 +52,14 @@ public abstract class BecZoneBySpeciesCoefficientParser
 			}
 
 		} //
-			.value(4, BEC_ZONE_ID_KEY, ControlledValueParser.BEC) //
-			.space(2) //
-			.value(1, INDEX_KEY, ValueParser.range(ValueParser.INTEGER, 0, true, nCoefficients, false, "Index value")) //
-			.value(2, INDICATOR_KEY, ValueParser.range(ValueParser.INTEGER, 0, true, 1, true, "Indicator value")) //
-			.multiValue(NUM_SPECIES, 8, COEFFICIENTS_KEY, ValueParser.FLOAT);
+				.value(4, BEC_ZONE_ID_KEY, ControlledValueParser.BEC) //
+				.space(2) //
+				.value(
+						1, INDEX_KEY,
+						ValueParser.range(ValueParser.INTEGER, 0, true, nCoefficients, false, "Index value")
+				) //
+				.value(2, INDICATOR_KEY, ValueParser.range(ValueParser.INTEGER, 0, true, 1, true, "Indicator value")) //
+				.multiValue(NUM_SPECIES, 8, COEFFICIENTS_KEY, ValueParser.FLOAT);
 	}
 
 	private LineParser lineParser;
@@ -80,12 +83,12 @@ public abstract class BecZoneBySpeciesCoefficientParser
 			var specCoefficients = (List<Float>) value.get(COEFFICIENTS_KEY);
 
 			var specIt = sp0Aliases.iterator();
-			
+
 			Float first = null;
 			int coefficientIndex = 0;
 			while (specIt.hasNext()) {
 				var spec = specIt.next();
-				
+
 				Float coe = specCoefficients.get(coefficientIndex);
 				if (coefficientIndex == 0) {
 					first = coe;
@@ -96,7 +99,7 @@ public abstract class BecZoneBySpeciesCoefficientParser
 					coefficients.setCoe(index, first);
 				} else {
 					coefficients.setCoe(index, first + coe);
-				}				
+				}
 
 				coefficientIndex += 1;
 			}

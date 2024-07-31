@@ -17,7 +17,9 @@ public class GrowthFiatDetailsTests {
 	@Test
 	void test0Ages() {
 		try {
-			GrowthFiatDetails details = new GrowthFiatDetails(1, List.of(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.2f, 0.3f));
+			GrowthFiatDetails details = new GrowthFiatDetails(
+					1, List.of(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1f, 0.2f, 0.3f)
+			);
 			Assertions.assertTrue(details.getNAgesSupplied() == 0);
 			assertThat(details.getAges(), arrayContaining(0.0f, 0.0f, 0.0f, 0.0f));
 			assertThat(details.getCoefficients(), arrayContaining(0.0f, 0.0f, 0.0f, 0.0f));
@@ -30,7 +32,9 @@ public class GrowthFiatDetailsTests {
 	@Test
 	void test4Ages() {
 		try {
-			GrowthFiatDetails details = new GrowthFiatDetails(1, List.of(1.0f, 1.0f, 2.0f, 2.0f, 3.0f, 3.0f, 4.0f, 4.0f, 0.1f, 0.2f, 0.3f));
+			GrowthFiatDetails details = new GrowthFiatDetails(
+					1, List.of(1.0f, 1.0f, 2.0f, 2.0f, 3.0f, 3.0f, 4.0f, 4.0f, 0.1f, 0.2f, 0.3f)
+			);
 			Assertions.assertTrue(details.getNAgesSupplied() == 4);
 			assertThat(details.getAges(), arrayContaining(1.0f, 2.0f, 3.0f, 4.0f));
 			assertThat(details.getCoefficients(), arrayContaining(1.0f, 2.0f, 3.0f, 4.0f));
@@ -43,7 +47,9 @@ public class GrowthFiatDetailsTests {
 	@Test
 	void test3Ages() {
 		try {
-			GrowthFiatDetails details = new GrowthFiatDetails(1, List.of(1.0f, 1.0f, 2.0f, 2.0f, 3.0f, 3.0f, 0.0f, 0.0f, 0.1f, 0.2f, 0.3f));
+			GrowthFiatDetails details = new GrowthFiatDetails(
+					1, List.of(1.0f, 1.0f, 2.0f, 2.0f, 3.0f, 3.0f, 0.0f, 0.0f, 0.1f, 0.2f, 0.3f)
+			);
 			Assertions.assertTrue(details.getNAgesSupplied() == 3);
 			assertThat(details.getAges(), arrayContaining(1.0f, 2.0f, 3.0f, 0.0f));
 			assertThat(details.getCoefficients(), arrayContaining(1.0f, 2.0f, 3.0f, 0.0f));
@@ -53,11 +59,12 @@ public class GrowthFiatDetailsTests {
 		}
 	}
 
-
 	@Test
 	void testInterpolation() {
 		try {
-			GrowthFiatDetails details = new GrowthFiatDetails(1, List.of(1.0f, 1.0f, 2.0f, 2.0f, 3.0f, 3.0f, 0.0f, 0.0f, 0.1f, 0.2f, 0.3f));
+			GrowthFiatDetails details = new GrowthFiatDetails(
+					1, List.of(1.0f, 1.0f, 2.0f, 2.0f, 3.0f, 3.0f, 0.0f, 0.0f, 0.1f, 0.2f, 0.3f)
+			);
 			Assertions.assertTrue(details.getNAgesSupplied() == 3);
 			assertThat(details.calculateCoefficient(0.5f), is(1.0f));
 			assertThat(details.calculateCoefficient(1.0f), is(1.0f));
@@ -73,21 +80,41 @@ public class GrowthFiatDetailsTests {
 
 	@Test
 	void testAgeListNotEndedProperly() {
-		assertThrows(ResourceParseException.class, () -> new GrowthFiatDetails(1, List.of(1.0f, 1.0f, 2.0f, 2.0f, 0.0f, 0.0f, 4.0f, 4.0f, 0.1f, 0.2f, 0.3f)));
+		assertThrows(
+				ResourceParseException.class,
+				() -> new GrowthFiatDetails(
+						1, List.of(1.0f, 1.0f, 2.0f, 2.0f, 0.0f, 0.0f, 4.0f, 4.0f, 0.1f, 0.2f, 0.3f)
+				)
+		);
 	}
 
 	@Test
 	void testBadCoefficient() {
-		assertThrows(ResourceParseException.class, () -> new GrowthFiatDetails(1, List.of(1.0f, 1.0f, 2.0f, 2.0f, 0.0f, 0.0f, 0.0f, 4.0f, 0.1f, 0.2f, 0.3f)));
+		assertThrows(
+				ResourceParseException.class,
+				() -> new GrowthFiatDetails(
+						1, List.of(1.0f, 1.0f, 2.0f, 2.0f, 0.0f, 0.0f, 0.0f, 4.0f, 0.1f, 0.2f, 0.3f)
+				)
+		);
 	}
 
 	@Test
 	void testAgesNotMonatonicallyIncreasing() {
-		assertThrows(ResourceParseException.class, () -> new GrowthFiatDetails(1, List.of(1.0f, 1.0f, 2.0f, 2.0f, 3.0f, 3.0f, 2.5f, 4.0f, 0.1f, 0.2f, 0.3f)));
+		assertThrows(
+				ResourceParseException.class,
+				() -> new GrowthFiatDetails(
+						1, List.of(1.0f, 1.0f, 2.0f, 2.0f, 3.0f, 3.0f, 2.5f, 4.0f, 0.1f, 0.2f, 0.3f)
+				)
+		);
 	}
 
 	@Test
 	void testRegionValueNot1Or2() {
-		assertThrows(ResourceParseException.class, () -> new GrowthFiatDetails(0, List.of(1.0f, 1.0f, 2.0f, 2.0f, 3.0f, 1.5f, 4.0f, 4.0f, 0.1f, 0.2f, 0.3f)));
+		assertThrows(
+				ResourceParseException.class,
+				() -> new GrowthFiatDetails(
+						0, List.of(1.0f, 1.0f, 2.0f, 2.0f, 3.0f, 1.5f, 4.0f, 4.0f, 0.1f, 0.2f, 0.3f)
+				)
+		);
 	}
 }

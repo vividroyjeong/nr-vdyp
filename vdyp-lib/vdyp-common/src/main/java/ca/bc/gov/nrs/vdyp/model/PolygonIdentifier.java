@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.function.IntUnaryOperator;
 
 public class PolygonIdentifier {
-	
+
 	public static final int ID_LENGTH = 25;
 	public static final int YEAR_LENGTH = 4;
 	public static final int BASE_LENGTH = ID_LENGTH - YEAR_LENGTH;
@@ -37,6 +37,7 @@ public class PolygonIdentifier {
 
 	/**
 	 * Return the <code>base</code> (a.k.a. <code>name</code>) of the Polygon. These terms are synonomous.
+	 *
 	 * @return as described
 	 */
 	public String getBase() {
@@ -45,6 +46,7 @@ public class PolygonIdentifier {
 
 	/**
 	 * Return the <code>name</code> (a.k.a. <code>base</code>) of the Polygon. These terms are synonomous.
+	 *
 	 * @return as described
 	 */
 	public String getName() {

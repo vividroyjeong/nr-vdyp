@@ -325,9 +325,12 @@ class NonFipControlParserTest {
 				result,
 				(Matcher) controlMapHasEntry(
 						ControlKey.SPECIES_COMPONENT_SIZE_LIMIT,
-						mmHasEntry(isA(ComponentSizeLimits.class), "AC", Region.COASTAL))
-				);
-		var cslMap = Utils.<MatrixMap2<String, Region, ComponentSizeLimits>>expectParsedControl(result, ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, MatrixMap2.class);
+						mmHasEntry(isA(ComponentSizeLimits.class), "AC", Region.COASTAL)
+				)
+		);
+		var cslMap = Utils.<MatrixMap2<String, Region, ComponentSizeLimits>>expectParsedControl(
+				result, ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, MatrixMap2.class
+		);
 		var csl = cslMap.get("AC", Region.COASTAL);
 		assertThat(csl.loreyHeightMaximum(), is(49.4f));
 		assertThat(csl.quadMeanDiameterMaximum(), is(153.3f));

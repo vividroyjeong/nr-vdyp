@@ -36,13 +36,13 @@ class EstimatorsTest {
 
 	Map<String, Object> controlMap;
 	BecLookup becLookup;
-	Estimators emp;
+	EstimationMethods emp;
 
 	@BeforeEach
 	void setup() {
 		controlMap = TestUtils.loadControlMap();
 		var resolvedControlMap = new ResolvedControlMapImpl(controlMap);
-		emp = new Estimators(resolvedControlMap);
+		emp = new EstimationMethods(resolvedControlMap);
 		becLookup = (BecLookup) controlMap.get(ControlKey.BEC_DEF.name());
 	}
 
@@ -164,8 +164,8 @@ class EstimatorsTest {
 			float loreyHeight = 30.0f;
 
 			emp.estimateCloseUtilizationVolume(
-					UtilizationClass.U75TO125, aAdjust, volumeGroup, loreyHeight,
-					quadMeanDiameterByUtilization, wholeStemVolumeByUtilization, closeUtilizationVolume
+					UtilizationClass.U75TO125, aAdjust, volumeGroup, loreyHeight, quadMeanDiameterByUtilization,
+					wholeStemVolumeByUtilization, closeUtilizationVolume
 			);
 
 			assertThat(closeUtilizationVolume, contains(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
@@ -194,8 +194,8 @@ class EstimatorsTest {
 			float loreyHeight = 36.7552986f;
 
 			emp.estimateCloseUtilizationVolume(
-					UtilizationClass.U175TO225, aAdjust, volumeGroup, loreyHeight,
-					quadMeanDiameterByUtilization, wholeStemVolumeByUtilization, closeUtilizationVolume
+					UtilizationClass.U175TO225, aAdjust, volumeGroup, loreyHeight, quadMeanDiameterByUtilization,
+					wholeStemVolumeByUtilization, closeUtilizationVolume
 			);
 
 			// Result of run in FORTRAN VDYP7 with the above parameters.
@@ -247,8 +247,8 @@ class EstimatorsTest {
 			int volumeGroup = volumeEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
 			emp.estimateNetDecayVolume(
-					genus.getAlias(), becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust,
-					volumeGroup, 0.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay
+					genus.getAlias(), becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, volumeGroup, 0.0f,
+					quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay
 			);
 
 			assertThat(closeUtilizationNetOfDecay, contains(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
@@ -276,8 +276,8 @@ class EstimatorsTest {
 			int decayGroup = decayEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
 			emp.estimateNetDecayVolume(
-					genus.getAlias(), becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust,
-					decayGroup, 54.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay
+					genus.getAlias(), becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, decayGroup, 54.0f,
+					quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay
 			);
 
 			// Result of run in FORTRAN VDYP7 with the above parameters.
@@ -330,8 +330,8 @@ class EstimatorsTest {
 			UtilizationVector closeUtilizationNetOfDecayAndWastage = Utils.utilizationVector(0.0f);
 
 			emp.estimateNetDecayAndWasteVolume(
-					becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus.getAlias(),
-					36.7552986f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay,
+					becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus.getAlias(), 36.7552986f,
+					quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay,
 					closeUtilizationNetOfDecayAndWastage
 			);
 
@@ -363,8 +363,8 @@ class EstimatorsTest {
 			int breakageGroup = breakageEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
 			emp.estimateNetDecayWasteAndBreakageVolume(
-					UtilizationClass.U175TO225, breakageGroup, quadMeanDiameterByUtilization,
-					closeUtilization, closeUtilizationNetOfDecayAndWastage, closeUtilizationNetOfDecayWastageAndBreakage
+					UtilizationClass.U175TO225, breakageGroup, quadMeanDiameterByUtilization, closeUtilization,
+					closeUtilizationNetOfDecayAndWastage, closeUtilizationNetOfDecayWastageAndBreakage
 			);
 
 			assertThat(closeUtilizationNetOfDecayAndWastage, contains(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
@@ -393,8 +393,8 @@ class EstimatorsTest {
 			int breakageGroup = breakageEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
 			emp.estimateNetDecayWasteAndBreakageVolume(
-					UtilizationClass.U175TO225, breakageGroup, quadMeanDiameterByUtilization,
-					closeUtilization, closeUtilizationNetOfDecayAndWastage, closeUtilizationNetOfDecayWastageAndBreakage
+					UtilizationClass.U175TO225, breakageGroup, quadMeanDiameterByUtilization, closeUtilization,
+					closeUtilizationNetOfDecayAndWastage, closeUtilizationNetOfDecayWastageAndBreakage
 			);
 
 			// Result of run in FORTRAN VDYP7 with the above parameters.
@@ -693,8 +693,7 @@ class EstimatorsTest {
 		);
 		int volumeGroup = volumeEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
-		float result = emp
-				.estimateWholeStemVolumePerTree(volumeGroup, 36.7552986f, 31.5006275f);
+		float result = emp.estimateWholeStemVolumePerTree(volumeGroup, 36.7552986f, 31.5006275f);
 
 		// Result of run in FORTRAN VDYP7 with the above parameters.
 		assertThat(result, is(1.2011181f));
@@ -727,7 +726,9 @@ class EstimatorsTest {
 				builder.breakageGroup(-1);
 			});
 
-			var result = emp.estimateNonPrimaryLoreyHeight(spec.getGenus(), specPrime.getGenus(), bec, 24.2999992f, 20.5984688f);
+			var result = emp.estimateNonPrimaryLoreyHeight(
+					spec.getGenus(), specPrime.getGenus(), bec, 24.2999992f, 20.5984688f
+			);
 
 			assertThat(result, closeTo(21.5356998f));
 
@@ -757,7 +758,9 @@ class EstimatorsTest {
 				builder.breakageGroup(-1);
 			});
 
-			var result = emp.estimateNonPrimaryLoreyHeight(spec.getGenus(), specPrime.getGenus(), bec, 35.2999992f, 33.6889763f);
+			var result = emp.estimateNonPrimaryLoreyHeight(
+					spec.getGenus(), specPrime.getGenus(), bec, 35.2999992f, 33.6889763f
+			);
 
 			assertThat(result, closeTo(38.7456512f));
 

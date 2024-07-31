@@ -16,13 +16,13 @@ public class BaseAreaTreeDensityDiameter {
 	public static final float PI_40K = (float) (Math.PI / 40_000);
 
 	/**
-	 * FT_BD - return an estimate of the number of trees per hectare based on a given base area (a) and quadratic mean diameter
-	 * (q) according to the formula
+	 * FT_BD - return an estimate of the number of trees per hectare based on a given base area (a) and quadratic mean
+	 * diameter (q) according to the formula
 	 * <p>
 	 * a / PI_40K / q**2
 	 * <p>
 	 *
-	 * @param baseArea the base area (m**2 / hectare)
+	 * @param baseArea              the base area (m**2 / hectare)
 	 * @param quadraticMeanDiameter the quadratic mean diameter (cm / tree)
 	 * @return as described. If baseArea or quadraticMeanDiameter is not positive, 0 is returned.
 	 */
@@ -35,15 +35,16 @@ public class BaseAreaTreeDensityDiameter {
 	}
 
 	/**
-	 * FD_BT - return an estimate of the quadratic mean diameter based on a given number of trees per hectare (t) and base area
-	 * (a) according to the formula
+	 * FD_BT - return an estimate of the quadratic mean diameter based on a given number of trees per hectare (t) and
+	 * base area (a) according to the formula
 	 * <p>
 	 * (b / t / PI_40K)**1/2
 	 * <p>
 	 *
 	 * @param baseArea        the base area value
 	 * @param treesPerHectare the trees per hectare value
-	 * @return as described. If baseArea or treesPerHectare is Nan, not positive or more than 1,000,000, 0.0 is returned.
+	 * @return as described. If baseArea or treesPerHectare is Nan, not positive or more than 1,000,000, 0.0 is
+	 *         returned.
 	 */
 	public static float quadMeanDiameter(float baseArea, float treesPerHectare) {
 		if (baseArea > 1e6f || treesPerHectare > 1e6f || Float.isNaN(baseArea) || Float.isNaN(treesPerHectare)) {
@@ -54,16 +55,17 @@ public class BaseAreaTreeDensityDiameter {
 		return 0f;
 
 	}
-	
+
 	/**
 	 * FB_DT - return an estimate of the basal area based on a given quad-mean-diameter value (q) and a
 	 * trees-per-hectare value according to the formula
 	 * <p>
 	 * q**2 * PI_40K * t
 	 * <p>
+	 *
 	 * @param quadraticMeanDiameter the quadratic mean diameter (cm / tree)
-	 * @param treesPerHectare the trees per hectare value
-	 * @return as described. If either parameter is NaN, 0f is returned. 
+	 * @param treesPerHectare       the trees per hectare value
+	 * @return as described. If either parameter is NaN, 0f is returned.
 	 */
 	public static float basalArea(float quadraticMeanDiameter, float treesPerHectare) {
 

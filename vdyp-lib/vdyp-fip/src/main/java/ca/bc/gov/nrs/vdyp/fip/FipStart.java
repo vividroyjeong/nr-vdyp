@@ -46,7 +46,7 @@ import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.Estimators;
+import ca.bc.gov.nrs.vdyp.common.EstimationMethods;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
@@ -758,7 +758,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				final var wasteModifierMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
 						controlMap, ControlKey.WASTE_MODIFIERS, MatrixMap2.class
 				);
-				Estimators.estimateNetDecayAndWasteVolume(
+				EstimationMethods.estimateNetDecayAndWasteVolume(
 						bec.getRegion(), utilizationClass, adjust, vdypSpecies.getGenus(), hlSp, netDecayCoeMap,
 						wasteModifierMap, quadMeanDiameterUtil, closeUtilizationVolumeUtil,
 						closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil

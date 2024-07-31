@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.forward.Bank.CopyMode;
 import ca.bc.gov.nrs.vdyp.forward.test.VdypForwardTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -27,6 +28,7 @@ import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.VdypUtilization;
+import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 
 class PolygonProcessingStateTest {
 
@@ -57,9 +59,9 @@ class PolygonProcessingStateTest {
 		VdypLayer pLayer = polygon.getLayers().get(LayerType.PRIMARY);
 		assertThat(pLayer, notNullValue());
 
-		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone(), s -> true);
+		Bank pps = new Bank(pLayer, Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap), s -> true);
 
-		int nSpecies = pLayer.getGenera().size();
+		int nSpecies = pLayer.getSpecies().size();
 
 		assertThat(pps, notNullValue());
 		assertThat(pps.yearsAtBreastHeight.length, is(nSpecies + 1));
@@ -118,7 +120,7 @@ class PolygonProcessingStateTest {
 		VdypLayer pLayer = polygon.getLayers().get(LayerType.PRIMARY);
 		assertThat(pLayer, notNullValue());
 
-		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone(), s -> true);
+		Bank pps = new Bank(pLayer, Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap), s -> true);
 
 		verifyProcessingStateMatchesLayer(pps, pLayer);
 
@@ -138,19 +140,17 @@ class PolygonProcessingStateTest {
 		assertThat(pLayer, notNullValue());
 
 		Bank bank1 = new Bank(
-				pLayer, polygon.getBiogeoclimaticZone(),
-				s -> s.getUtilizations().isPresent()
-						? s.getUtilizations().get().get(UtilizationClass.ALL).getBasalArea() >= 0.5 : true
+				pLayer, Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap),
+				s -> s.getBaseAreaByUtilization().get(UtilizationClass.ALL) >= 0.5
 		);
 
 		// the filter should have removed genus B (index 3) since it's ALL basal area is below 0.5
-		assertThat(bank1.getNSpecies(), is(pLayer.getGenera().size() - 1));
+		assertThat(bank1.getNSpecies(), is(pLayer.getSpecies().size() - 1));
 		assertThat(bank1.speciesIndices, is(new int[] { 0, 4, 5, 8, 15 }));
 
 		Bank bank2 = new Bank(
-				pLayer, polygon.getBiogeoclimaticZone(),
-				s -> s.getUtilizations().isPresent()
-						? s.getUtilizations().get().get(UtilizationClass.ALL).getBasalArea() >= 100.0 : true
+				pLayer, Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap),
+				s -> s.getBaseAreaByUtilization().get(UtilizationClass.ALL) >= 100.0
 		);
 
 		// the filter should have removed all genera.
@@ -168,7 +168,7 @@ class PolygonProcessingStateTest {
 		VdypLayer pLayer = polygon.getLayers().get(LayerType.PRIMARY);
 		assertThat(pLayer, notNullValue());
 
-		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone(), s -> true);
+		Bank pps = new Bank(pLayer, Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap), s -> true);
 
 		Bank ppsCopy = new Bank(pps, CopyMode.CopyAll);
 
@@ -177,44 +177,34 @@ class PolygonProcessingStateTest {
 
 	private void verifyProcessingStateMatchesLayer(Bank pps, VdypLayer layer) {
 
-		List<Integer> sortedSpIndices = layer.getGenera().keySet().stream().sorted().toList();
+		List<String> sortedSpIndices = layer.getSpecies().keySet().stream().sorted().toList();
 
 		for (int i = 0; i < sortedSpIndices.size(); i++) {
 
 			int arrayIndex = i + 1;
 
-			VdypSpecies genus = layer.getGenera().get(sortedSpIndices.get(i));
-			verifyProcessingStateSpeciesMatchesSpecies(pps, arrayIndex, genus);
-
-			if (genus.getUtilizations().isPresent()) {
-				verifyProcessingStateSpeciesUtilizationsMatchesUtilizations(
-						pps, arrayIndex, genus.getUtilizations().get()
-				);
-			}
+			VdypSpecies species = layer.getSpecies().get(sortedSpIndices.get(i));
+			verifyProcessingStateSpeciesMatchesSpecies(pps, arrayIndex, species);
 		}
 
-		if (layer.getDefaultUtilizationMap().isPresent()) {
-			verifyProcessingStateSpeciesUtilizationsMatchesUtilizations(pps, 0, layer.getDefaultUtilizationMap().get());
-		}
+		verifyProcessingStateSpeciesUtilizationsMatchesUtilizations(pps, 0, layer);
 	}
 
 	private void verifyProcessingStateSpeciesUtilizationsMatchesUtilizations(
-			Bank pps, int spIndex, Map<UtilizationClass, VdypUtilization> map
+			Bank pps, int spIndex, VdypUtilizationHolder uh
 	) {
 
 		for (UtilizationClass uc : UtilizationClass.values()) {
-			VdypUtilization u = map.get(uc);
-
-			assertThat(pps.basalAreas[spIndex][uc.index + 1], is(u.getBasalArea()));
-			assertThat(pps.closeUtilizationVolumes[spIndex][uc.index + 1], is(u.getCloseUtilizationVolume()));
-			assertThat(pps.cuVolumesMinusDecay[spIndex][uc.index + 1], is(u.getCuVolumeMinusDecay()));
-			assertThat(pps.cuVolumesMinusDecayAndWastage[spIndex][uc.index + 1], is(u.getCuVolumeMinusDecayWastage()));
+			assertThat(pps.basalAreas[spIndex][uc.index + 1], is(uh.getBaseAreaByUtilization().get(uc)));
+			assertThat(pps.closeUtilizationVolumes[spIndex][uc.index + 1], is(uh.getCloseUtilizationVolumeByUtilization().get(uc)));
+			assertThat(pps.cuVolumesMinusDecay[spIndex][uc.index + 1], is(uh.getCloseUtilizationVolumeNetOfDecayByUtilization().get(uc)));
+			assertThat(pps.cuVolumesMinusDecayAndWastage[spIndex][uc.index + 1], is(uh.getCloseUtilizationVolumeNetOfDecayByUtilization().get(uc)));
 			if (uc.index <= 0) {
-				assertThat(pps.loreyHeights[spIndex][uc.index + 1], is(u.getLoreyHeight()));
+				assertThat(pps.loreyHeights[spIndex][uc.index + 1], is(uh.getLoreyHeightByUtilization().get(uc)));
 			}
-			assertThat(pps.quadMeanDiameters[spIndex][uc.index + 1], is(u.getQuadraticMeanDiameterAtBH()));
-			assertThat(pps.treesPerHectare[spIndex][uc.index + 1], is(u.getLiveTreesPerHectare()));
-			assertThat(pps.wholeStemVolumes[spIndex][uc.index + 1], is(u.getWholeStemVolume()));
+			assertThat(pps.quadMeanDiameters[spIndex][uc.index + 1], is(uh.getQuadraticMeanDiameterByUtilization().get(uc)));
+			assertThat(pps.treesPerHectare[spIndex][uc.index + 1], is(uh.getTreesPerHectareByUtilization().get(uc)));
+			assertThat(pps.wholeStemVolumes[spIndex][uc.index + 1], is(uh.getWholeStemVolumeByUtilization().get(uc)));
 		}
 	}
 
@@ -227,5 +217,9 @@ class PolygonProcessingStateTest {
 		assertThat(pps.speciesIndices[index], is(species.getGenusIndex()));
 		assertThat(pps.speciesNames[index], is(species.getGenus()));
 		assertThat(pps.yearsToBreastHeight[index], is(species.getYearsToBreastHeight()));
+		
+		verifyProcessingStateSpeciesUtilizationsMatchesUtilizations(
+				pps, index, species
+		);
 	}
 }
