@@ -172,6 +172,7 @@ public abstract class BaseVdypSite {
 			requirePresent(layerType, "layerType", errors);
 			requirePresent(siteGenus, "siteGenus", errors);
 		}
+	
 
 	}
 

@@ -240,6 +240,16 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 		public void quadMeanDiameter(float height) {
 			this.quadMeanDiameter = Utils.utilizationVector(height);
 		}
+		
+		protected UtilizationVector wholeStemVolume = VdypUtilizationHolder.emptyUtilization();
+
+		public void wholeStemVolume(float small, float u1, float u2, float u3, float u4) {
+			this.wholeStemVolume = Utils.utilizationVector(small, u1, u2, u3, u4);
+		}
+
+		public void wholeStemVolume(float volume) {
+			this.wholeStemVolume = Utils.utilizationVector(volume);
+		}
 
 		@Override
 		protected void postProcess(VdypLayer layer) {
@@ -248,6 +258,7 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 			layer.setBaseAreaByUtilization(baseArea);
 			layer.setTreesPerHectareByUtilization(treesPerHectare);
 			layer.setQuadraticMeanDiameterByUtilization(quadMeanDiameter);
+			layer.setWholeStemVolumeByUtilization(wholeStemVolume);
 		}
 
 		@Override
@@ -266,15 +277,6 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 				config.accept(builder);
 				builder.polygonIdentifier(this.polygonIdentifier.get());
 				builder.layerType(this.layerType.get());
-			});
-		}
-
-		@Override
-		protected VdypSite buildSite(Consumer<VdypSite.Builder> config) {
-			return VdypSite.build(builder -> {
-				config.accept(builder);
-				builder.polygonIdentifier(polygonIdentifier.get());
-				builder.layerType(layerType.get());
 			});
 		}
 

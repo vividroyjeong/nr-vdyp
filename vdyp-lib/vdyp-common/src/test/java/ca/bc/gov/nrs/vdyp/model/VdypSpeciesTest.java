@@ -58,14 +58,6 @@ class VdypSpeciesTest {
 		var layer = VdypLayer.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
-
-			builder.addSite(siteBuilder -> {
-				siteBuilder.siteGenus("B");
-				siteBuilder.siteCurveNumber(0);
-				siteBuilder.ageTotal(42f);
-				siteBuilder.yearsToBreastHeight(2f);
-				siteBuilder.height(10f);
-			});
 		});
 
 		var result = VdypSpecies.build(layer, builder -> {
@@ -75,6 +67,12 @@ class VdypSpeciesTest {
 			builder.volumeGroup(1);
 			builder.decayGroup(2);
 			builder.breakageGroup(3);
+			builder.addSite(siteBuilder -> {
+				siteBuilder.siteCurveNumber(0);
+				siteBuilder.ageTotal(42f);
+				siteBuilder.yearsToBreastHeight(2f);
+				siteBuilder.height(10f);
+			});
 		});
 
 		assertThat(result, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
