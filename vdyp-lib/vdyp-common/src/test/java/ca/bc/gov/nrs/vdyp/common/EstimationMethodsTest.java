@@ -446,12 +446,6 @@ class EstimatorsTest {
 			var layer = VdypLayer.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.addSite(siteBuilder -> {
-					siteBuilder.ageTotal(55f);
-					siteBuilder.yearsToBreastHeight(1f);
-					siteBuilder.height(32.2999992f);
-					siteBuilder.siteGenus("H");
-				});
 			});
 
 			// sp 3, 4, 5, 8, 15
@@ -492,6 +486,11 @@ class EstimatorsTest {
 				builder.decayGroup(31);
 				builder.breakageGroup(17);
 				builder.percentGenus(9f);
+				builder.addSite(siteBuilder -> {
+					siteBuilder.ageTotal(55f);
+					siteBuilder.yearsToBreastHeight(1f);
+					siteBuilder.height(32.2999992f);
+				});
 			});
 			spec4.getLoreyHeightByUtilization().setCoe(0, 24.3451157f);
 			spec4.setFractionGenus(0.117043354f);

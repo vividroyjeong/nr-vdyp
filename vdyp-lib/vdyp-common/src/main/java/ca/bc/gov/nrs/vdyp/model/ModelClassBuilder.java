@@ -39,6 +39,7 @@ public abstract class ModelClassBuilder<T> {
 	 */
 	public T build() {
 		Collection<String> errors = new LinkedList<>();
+		preProcess();
 		check(errors);
 		if (!errors.isEmpty()) {
 			throw new IllegalStateException(String.join(", ", errors));
@@ -46,6 +47,13 @@ public abstract class ModelClassBuilder<T> {
 		var result = doBuild();
 		postProcess(result);
 		return result;
+	}
+
+	/**
+	 * Additional steps before building
+	 */
+	protected void preProcess() {
+		// Do Nothing
 	}
 
 	/**

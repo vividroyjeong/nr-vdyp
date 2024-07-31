@@ -101,13 +101,20 @@ class VriAdjustInputWriterTest {
 				builder.polygonIdentifier("082E004    615       1988");
 				builder.layerType(LayerType.PRIMARY);
 
-				builder.addSite(siteBuilder -> {
-					siteBuilder.height(15f);
-					siteBuilder.siteIndex(14.7f);
-					siteBuilder.ageTotal(60f);
-					siteBuilder.yearsToBreastHeight(8.5f);
-					siteBuilder.siteGenus("PL");
-					siteBuilder.siteCurveNumber(0);
+				builder.addSpecies(specBuilder -> {
+					specBuilder.genus("PL");
+					specBuilder.percentGenus(100);
+					specBuilder.volumeGroup(1);
+					specBuilder.decayGroup(2);
+					specBuilder.breakageGroup(3);
+
+					specBuilder.addSite(siteBuilder -> {
+						siteBuilder.height(15f);
+						siteBuilder.siteIndex(14.7f);
+						siteBuilder.ageTotal(60f);
+						siteBuilder.yearsToBreastHeight(8.5f);
+						siteBuilder.siteCurveNumber(0);
+					});
 				});
 			});
 
@@ -131,13 +138,20 @@ class VriAdjustInputWriterTest {
 				builder.polygonIdentifier("082E004    615       1988");
 				builder.layerType(LayerType.PRIMARY);
 
-				builder.addSite(siteBuilder -> {
-					siteBuilder.height(15f);
-					siteBuilder.siteIndex(14.7f);
-					siteBuilder.ageTotal(60f);
-					siteBuilder.yearsToBreastHeight(8.5f);
-					siteBuilder.siteGenus("PL");
-					siteBuilder.siteCurveNumber(0);
+				builder.addSpecies(specBuilder -> {
+					specBuilder.genus("PL");
+					specBuilder.percentGenus(100);
+					specBuilder.volumeGroup(1);
+					specBuilder.decayGroup(2);
+					specBuilder.breakageGroup(3);
+
+					specBuilder.addSite(siteBuilder -> {
+						siteBuilder.height(15f);
+						siteBuilder.siteIndex(14.7f);
+						siteBuilder.ageTotal(60f);
+						siteBuilder.yearsToBreastHeight(8.5f);
+						siteBuilder.siteCurveNumber(0);
+					});
 				});
 			});
 
@@ -170,14 +184,22 @@ class VriAdjustInputWriterTest {
 				builder.polygonIdentifier("082E004    615       1988");
 				builder.layerType(LayerType.PRIMARY);
 
-				builder.addSite(siteBuilder -> {
-					siteBuilder.height(15f);
-					siteBuilder.siteIndex(14.7f);
-					siteBuilder.ageTotal(60f);
-					siteBuilder.yearsToBreastHeight(8.5f);
-					siteBuilder.siteGenus("PL");
-					siteBuilder.siteCurveNumber(0);
+				builder.addSpecies(specBuilder -> {
+					specBuilder.genus("PL");
+					specBuilder.percentGenus(100);
+					specBuilder.volumeGroup(1);
+					specBuilder.decayGroup(2);
+					specBuilder.breakageGroup(3);
+
+					specBuilder.addSite(siteBuilder -> {
+						siteBuilder.height(15f);
+						siteBuilder.siteIndex(14.7f);
+						siteBuilder.ageTotal(60f);
+						siteBuilder.yearsToBreastHeight(8.5f);
+						siteBuilder.siteCurveNumber(0);
+					});
 				});
+
 			});
 
 			@SuppressWarnings("unused")
@@ -247,13 +269,20 @@ class VriAdjustInputWriterTest {
 				builder.polygonIdentifier("082E004    615       1988");
 				builder.layerType(LayerType.PRIMARY);
 
-				builder.addSite(siteBuilder -> {
-					siteBuilder.height(15f);
-					siteBuilder.siteIndex(14.7f);
-					siteBuilder.ageTotal(60f);
-					siteBuilder.yearsToBreastHeight(8.5f);
-					siteBuilder.siteGenus("PL");
-					siteBuilder.siteCurveNumber(0);
+				builder.addSpecies(specBuilder -> {
+					specBuilder.genus("PL");
+					specBuilder.percentGenus(100);
+					specBuilder.volumeGroup(1);
+					specBuilder.decayGroup(2);
+					specBuilder.breakageGroup(3);
+
+					specBuilder.addSite(siteBuilder -> {
+						siteBuilder.height(15f);
+						siteBuilder.siteIndex(14.7f);
+						siteBuilder.ageTotal(60f);
+						siteBuilder.yearsToBreastHeight(8.5f);
+						siteBuilder.siteCurveNumber(0);
+					});
 				});
 			});
 
@@ -334,13 +363,20 @@ class VriAdjustInputWriterTest {
 			var layer = VdypLayer.build(polygon, builder -> {
 				builder.layerType(LayerType.PRIMARY);
 
-				builder.addSite(siteBuilder -> {
-					siteBuilder.height(15f);
-					siteBuilder.siteIndex(14.7f);
-					siteBuilder.ageTotal(60f);
-					siteBuilder.yearsToBreastHeight(8.5f);
-					siteBuilder.siteGenus("PL");
-					siteBuilder.siteCurveNumber(0);
+				builder.addSpecies(specBuilder -> {
+					specBuilder.genus("PL");
+					specBuilder.percentGenus(100);
+					specBuilder.volumeGroup(1);
+					specBuilder.decayGroup(2);
+					specBuilder.breakageGroup(3);
+
+					specBuilder.addSite(siteBuilder -> {
+						siteBuilder.height(15f);
+						siteBuilder.siteIndex(14.7f);
+						siteBuilder.ageTotal(60f);
+						siteBuilder.yearsToBreastHeight(8.5f);
+						siteBuilder.siteCurveNumber(0);
+					});
 				});
 			});
 
