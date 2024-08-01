@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.model;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -196,6 +197,15 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies<I>, I extends Base
 			super.postProcess(result);
 			buildChildren();
 			result.setSpecies(species);
+		}
+
+		@Override
+		protected String getBuilderId() {
+			return MessageFormat.format(
+					"Layer {0} {1}", //
+					polygonIdentifier.map(Object::toString).orElse("N/A"), //
+					layerType.map(Object::toString).orElse("N/A") //
+			);
 		}
 
 	}
