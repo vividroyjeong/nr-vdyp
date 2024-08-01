@@ -10,18 +10,25 @@ import static ca.bc.gov.nrs.vdyp.math.FloatMath.sqrt;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
+import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.controlmap.ResolvedControlMap;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
+import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
@@ -33,6 +40,7 @@ import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.UtilizationVector;
 import ca.bc.gov.nrs.vdyp.model.UtilizationVector.BinaryOperatorWithClass;
+import ca.bc.gov.nrs.vdyp.model.VdypSite;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 
 public class EstimationMethods {
@@ -78,9 +86,8 @@ public class EstimationMethods {
 	 * @param treesPerHectarePrimary trees per hectare >7.5 cm of the primary species
 	 * @return
 	 */
-	public float
-			primaryHeightFromLeadHeight(float leadHeight, String genus, Region region, float treesPerHectarePrimary) {
-
+	public float primaryHeightFromLeadHeight(float leadHeight, String genus, Region region, float treesPerHectarePrimary
+	) {
 		return 1.3f + (leadHeight - 1.3f) * heightMultiplier(genus, region, treesPerHectarePrimary);
 	}
 
@@ -126,7 +133,8 @@ public class EstimationMethods {
 	 * @throws ProcessingException
 	 */
 	public float estimateNonPrimaryLoreyHeight(
-			BaseVdypSpecies vspec, BaseVdypSpecies vspecPrime, BecDefinition bec, float leadHeight, float primaryHeight
+			BaseVdypSpecies<VdypSite> vspec, BaseVdypSpecies<VdypSite> vspecPrime, BecDefinition bec, 
+			float leadHeight, float primaryHeight
 	) throws ProcessingException {
 		return estimateNonPrimaryLoreyHeight(vspec.getGenus(), vspecPrime.getGenus(), bec, leadHeight, primaryHeight);
 	}
@@ -522,6 +530,235 @@ public class EstimationMethods {
 		var coeMap = controlMap.<Map<Integer, Coefficients>>get(ControlKey.TOTAL_STAND_WHOLE_STEM_VOL, Map.class);
 
 		return estimateWholeStemVolumePerTree(volumeGroup, loreyHeight, quadMeanDiameter, coeMap);
+	}
+
+	/**
+	 * EMP106 - estimate basal area yield for the primary layer (from IPSJF160.doc)
+	 * 
+	 * @param coefficients estimate basal area yield coefficients
+	 * @param controlVariable2Setting the value of control variable 2
+	 * @param dominantHeight dominant height (m)
+	 * @param breastHeightAge breast height age (years)
+	 * @param veteranBaseArea basal area of overstory (>= 0)
+	 * @param basalAreaGroup index of the basal area group
+	 * @param fullOccupancy if true, the empirically fitted curve is increased to become 
+	 *                      a full occupancy curve. If false, BAP is for mean conditions.
+	 * @return
+	 * @throws StandProcessingException
+	 */
+	public float estimateBaseAreaYield(
+			Coefficients estimateBasalAreaYieldCoefficients, int controlVariable2Setting, float dominantHeight, 
+			float breastHeightAge, Optional<Float> veteranBasalArea, boolean fullOccupancy, int baseAreaGroup
+	) throws StandProcessingException {
+		float upperBoundBaseArea = upperBoundsBaseArea(baseAreaGroup);
+
+		// The original Fortran had the following comment and a commented out modification to upperBoundsBaseArea
+		// (BATOP98):
+
+		/*
+		 * And one POSSIBLY one last vestige of grouping by ITG.
+		 * 
+		 * That limit applies to full occupancy and Empirical occupancy. They were derived as the 98th percentile 
+		 * of Empirical stocking, though adjusted PSPs were included. If the ouput of this routine is bumped up 
+		 * from empirical to full, MIGHT adjust this limit DOWN here, so that at end, it is correct. Tentatively 
+		 * decide NOT to do this:
+		 */
+
+// 		if (fullOccupancy) {
+//     		upperBoundsBaseArea *= EMPOC;
+// 		}
+		
+		float ageToUse = breastHeightAge;
+
+		if (controlVariable2Setting > 0) {
+			ageToUse = Math.min(ageToUse, controlVariable2Setting * 100);
+		}
+
+		if (ageToUse <= 0f) {
+			throw new StandProcessingException("Age was not positive");
+		}
+
+		float trAge = FloatMath.log(ageToUse);
+
+		float a0 = estimateBasalAreaYieldCoefficients.getCoe(0);
+		float a1 = estimateBasalAreaYieldCoefficients.getCoe(0);
+		float a2 = estimateBasalAreaYieldCoefficients.getCoe(0);
+		float a3 = estimateBasalAreaYieldCoefficients.getCoe(0);
+		float a4 = estimateBasalAreaYieldCoefficients.getCoe(0);
+		float a5 = estimateBasalAreaYieldCoefficients.getCoe(0);
+		float a6 = estimateBasalAreaYieldCoefficients.getCoe(0);
+		
+		float a00 = Math.max(a0 + a1 * trAge, 0);
+		float ap = Math.max(a3 + a4 * trAge, 0);
+
+		float bap;
+		if (dominantHeight <= a2) {
+			bap = 0;
+		} else {
+			bap = a00 * FloatMath.pow(dominantHeight - a2, ap)
+					* FloatMath.exp(a5 * dominantHeight + a6 * veteranBasalArea.orElse(0f));
+			bap = Math.min(bap, upperBoundBaseArea);
+		}
+
+		if (fullOccupancy) {
+			bap /= EMPIRICAL_OCCUPANCY;
+		}
+		
+		return bap;
+	}
+
+	/**
+	 * EMP107 - estimate DQ yield for the primary layer (from IPSJF161.doc)
+	 * 
+	 * @param coefficients coefficients weighted by species and decay bec zone
+	 * @param controlVariable2Setting the value of control variable 2
+	 * @param dominantHeight dominant height (m)
+	 * @param breastHeightAge breast height age (years)
+	 * @param veteranBaseArea basal area of overstory (>= 0)
+	 * @param basalAreaGroup index of the basal area group
+	 * 
+	 * @return quad-mean-diameter of primary layer (with DBH >= 7.5)
+	 * 
+	 * @throws StandProcessingException in the event of a processing error
+	 */
+	public float estimateQuadMeanDiameterYield(
+			Coefficients coefficients, int controlVariable2Setting, float dominantHeight, 
+			float breastHeightAge, Optional<Float> veteranBaseArea, int basalAreaGroup
+	) throws StandProcessingException {
+
+		if (dominantHeight <= 5) {
+			return 7.6f;
+		}
+		
+		final float upperBoundsQuadMeanDiameter = upperBoundsQuadMeanDiameter(basalAreaGroup);
+
+		final float ageUse = breastHeightAge;
+
+		if (ageUse <= 0f) {
+			throw new StandProcessingException("Primary breast height age must be positive but was " + ageUse);
+		}
+
+		final float trAge = FloatMath.log(ageUse);
+
+		final float c0 = coefficients.getCoe(0);
+		final float c1 = Math.max(coefficients.getCoe(1) + coefficients.getCoe(2) * trAge, 0f);
+		final float c2 = Math.max(coefficients.getCoe(3) + coefficients.getCoe(4) * trAge, 0f);
+
+		float dq = c0 + c1 * FloatMath.pow(dominantHeight - 5f, c2);
+		
+		return FloatMath.clamp(dq, 7.6f, upperBoundsQuadMeanDiameter);
+	}
+
+	/**
+	 * @param basalAreaGroup the basal area group in question
+	 * @return the quad-mean-diameter upper bound for the given basal area group 
+	 */
+	float upperBoundsQuadMeanDiameter(int basalAreaGroup) {
+		return upperBounds(basalAreaGroup).getCoe(2);
+	}
+
+	/**
+	 * @param basalAreaGroup the basal area group in question
+	 * @return the basal area upper bound for the given basal area group 
+	 */
+	float upperBoundsBaseArea(int basalAreaGroup) {
+		return upperBounds(basalAreaGroup).getCoe(1);
+	}
+
+	/**
+	 * UPPERGEN Method 1 - return the upper bounds of basal area and quad-mean-diameter for a given 
+	 * basal area group as a list of (two) floats.
+	 * @param basalAreaGroup the basal area group in question
+	 * @return as described
+	 */
+	Coefficients upperBounds(int basalAreaGroup) {
+		var upperBoundsMap = controlMap.<Map<Integer, Coefficients>>get(ControlKey.BA_DQ_UPPER_BOUNDS, Map.class);
+		return Utils.<Coefficients>optSafe(upperBoundsMap.get(basalAreaGroup)).orElseThrow(
+				() -> new IllegalStateException("Could not find limits for basal area group " + basalAreaGroup)
+		);
+	}
+
+	Coefficients sumCoefficientsWeightedBySpeciesAndDecayBec(
+			Collection<? extends BaseVdypSpecies<VdypSite>> species, BecDefinition bec, ControlKey key, int size
+	) {
+		var coeMap = controlMap.<MatrixMap2<String, String, Coefficients>>get(key, MatrixMap2.class);
+
+		final String decayBecAlias = bec.getDecayBec().getAlias();
+
+		return weightedCoefficientSum(
+				size, 0, //
+				species, //
+				BaseVdypSpecies::getFractionGenus, // Weight by fraction
+				spec -> coeMap.get(decayBecAlias, spec.getGenus())
+		);
+	}
+
+	/**
+	 * Create a coefficients object where its values are either a weighted sum of those for each of the given entities,
+	 * or the value from one arbitrarily chose entity.
+	 *
+	 * @param <T>             The type of entity
+	 * @param size            Size of the resulting coefficients object
+	 * @param indexFrom       index from of the resulting coefficients object
+	 * @param entities        the entities to do weighted sums over
+	 * @param weight          the weight for a given entity
+	 * @param getCoefficients the coefficients for a given entity
+	 */
+	public static <T> Coefficients weightedCoefficientSum(
+			int size, int indexFrom, Collection<T> entities, ToDoubleFunction<T> weight,
+			Function<T, Coefficients> getCoefficients
+	) {
+		var weighted = IntStream.range(indexFrom, size + indexFrom).boxed().toList();
+		return weightedCoefficientSum(weighted, size, indexFrom, entities, weight, getCoefficients);
+	}
+
+	/**
+	 * Create a coefficients object where its values are either a weighted sum of those for each of the given entities,
+	 * or the value from one arbitrarily chose entity.
+	 *
+	 * @param <T>             The type of entity
+	 * @param weighted        the indicies of the coefficients that should be weighted sums, those that are not included
+	 *                        are assumed to be constant across all entities and one is choses arbitrarily.
+	 * @param size            Size of the resulting coefficients object
+	 * @param indexFrom       index from of the resulting coefficients object
+	 * @param entities        the entities to do weighted sums over
+	 * @param weight          the weight for a given entity
+	 * @param getCoefficients the coefficients for a given entity
+	 */
+	public static <T> Coefficients weightedCoefficientSum(
+			Collection<Integer> weighted, int size, int indexFrom, Collection<T> entities, ToDoubleFunction<T> weight,
+			Function<T, Coefficients> getCoefficients
+	) {
+		Coefficients coe = Coefficients.empty(size, indexFrom);
+
+		// Do the summation in double precision
+		var coeWorking = new double[size];
+		Arrays.fill(coeWorking, 0.0);
+
+		for (var entity : entities) {
+			var entityCoe = getCoefficients.apply(entity);
+			double fraction = weight.applyAsDouble(entity);
+			log.atInfo().addArgument(entity).addArgument(fraction).addArgument(entityCoe)
+					.setMessage("For entity {} with fraction {} adding coefficients {}").log();
+			for (int i : weighted) {
+				coeWorking[i - indexFrom] += (entityCoe.getCoe(i)) * fraction;
+			}
+		}
+		// Reduce back to float once done
+		for (int i : weighted) {
+			coe.setCoe(i, (float) coeWorking[i - indexFrom]);
+		}
+
+		// Pick one entity to fill in the fixed coefficients
+		// Choice is arbitrary, they should all be the same
+		var anyCoe = getCoefficients.apply(entities.iterator().next());
+
+		for (int i = indexFrom; i < size + indexFrom; i++) {
+			if (weighted.contains(i))
+				continue;
+			coe.setCoe(i, anyCoe.getCoe(i));
+		}
+		return coe;
 	}
 
 	/**

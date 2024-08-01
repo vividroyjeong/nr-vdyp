@@ -1253,8 +1253,11 @@ public class ForwardProcessingEngine {
 			coefficientsWeightedBySpeciesAndDecayBec.setCoe(i, sum);
 		}
 
+		int controlVariable2Value = fps.fcm.get(ControlKey.VTROL, ForwardControlVariables.class)
+				.getControlVariable(ControlVariable.COMPAT_VAR_OUTPUT_2);
+
 		float dqYieldStart = fps.estimators.estimateQuadMeanDiameterYield(
-				coefficientsWeightedBySpeciesAndDecayBec, dhStart, pspYabhStart, veteranBaStart, becZone, pps
+				coefficientsWeightedBySpeciesAndDecayBec, controlVariable2Value, dhStart, pspYabhStart, veteranBaStart, pps
 						.getPrimarySpeciesGroupNumber()
 		);
 
@@ -1262,7 +1265,7 @@ public class ForwardProcessingEngine {
 		float pspYabhEnd = pspYabhStart + 1.0f;
 
 		float dqYieldEnd = fps.estimators.estimateQuadMeanDiameterYield(
-				coefficientsWeightedBySpeciesAndDecayBec, dhEnd, pspYabhEnd, veteranBaEnd, becZone, pps
+				coefficientsWeightedBySpeciesAndDecayBec, controlVariable2Value, dhEnd, pspYabhEnd, veteranBaEnd, pps
 						.getPrimarySpeciesGroupNumber()
 		);
 
@@ -1458,19 +1461,18 @@ public class ForwardProcessingEngine {
 
 		boolean isFullOccupancy = true;
 		int pspGroupNumber = fps.getPolygonProcessingState().getPrimarySpeciesGroupNumber();
-		int debugSetting2Value = debugSettings.getValue(ForwardDebugSettings.Vars.MAX_BREAST_HEIGHT_AGE_2);
+		int controlVariable2Value = fps.fcm.get(ControlKey.VTROL, ForwardControlVariables.class)
+				.getControlVariable(ControlVariable.COMPAT_VAR_OUTPUT_2);
 
 		float baYieldStart = fps.estimators.estimateBaseAreaYield(
-				estimateBasalAreaYieldCoefficients, debugSetting2Value, pspDhStart, pspYabhStart, veteranLayerBa, 
-				isFullOccupancy, fps.getPolygonProcessingState().getBecZone(), pspGroupNumber
+				estimateBasalAreaYieldCoefficients, controlVariable2Value, pspDhStart, pspYabhStart, veteranLayerBa, isFullOccupancy, pspGroupNumber
 		);
 
 		float pspDhEnd = pspDhStart + dhDelta;
 		float pspYabhEnd = pspYabhStart + 1.0f;
 
 		float baYieldEnd = fps.estimators.estimateBaseAreaYield(
-				estimateBasalAreaYieldCoefficients, debugSetting2Value, pspDhEnd, pspYabhEnd, veteranLayerBa, isFullOccupancy, fps
-						.getPolygonProcessingState().getBecZone(), pspGroupNumber
+				estimateBasalAreaYieldCoefficients, controlVariable2Value, pspDhEnd, pspYabhEnd, veteranLayerBa, isFullOccupancy, pspGroupNumber
 		);
 
 		var growthFaitDetails = fps.fcm.getBasalAreaGrowthFiatDetails()
