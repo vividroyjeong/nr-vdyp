@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,10 +10,13 @@ import java.util.stream.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.GenusDistributionSet;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
+import ca.bc.gov.nrs.vdyp.model.VdypSite;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 
@@ -198,14 +202,22 @@ class Bank {
 
 	private void recordSpecies(int index, VdypSpecies species) {
 
+		VdypSite site = species.getSite().orElseThrow(() -> new ProcessingException(MessageFormat.format(
+				"Species {0} of Polygon {1} must contain a Site definition but does not.", 
+				species.getGenus(), species.getPolygonIdentifier().toStringCompact())));
+		
 		speciesNames[index] = species.getGenus();
-		sp64Distributions[index] = species.getSpeciesPercent();
-		siteIndices[index] = species.getSiteIndex();
-		dominantHeights[index] = species.getDominantHeight();
-		ageTotals[index] = species.getAgeTotal();
-		yearsAtBreastHeight[index] = species.getAgeAtBreastHeight();
-		yearsToBreastHeight[index] = species.getYearsToBreastHeight();
-		siteCurveNumbers[index] = species.getSiteCurveNumber();
+		sp64Distributions[index] = new GenusDistributionSet(species.getSpeciesPercent());
+		siteIndices[index] = site.getSiteIndex().orElse(VdypEntity.MISSING_FLOAT_VALUE);
+		dominantHeights[index] = site.getHeight().orElse(VdypEntity.MISSING_FLOAT_VALUE);
+		ageTotals[index] = site.getAgeTotal().orElse(VdypEntity.MISSING_FLOAT_VALUE);
+		yearsToBreastHeight[index] = site.getYearsToBreastHeight().orElse(VdypEntity.MISSING_FLOAT_VALUE);
+		if (ageTotals[index] != VdypEntity.MISSING_FLOAT_VALUE && yearsToBreastHeight[index] != VdypEntity.MISSING_FLOAT_VALUE) {
+			ageTotals[index] = ageTotals[index] - yearsToBreastHeight[index];
+		} else {
+			ageTotals[index] = VdypEntity.MISSING_FLOAT_VALUE;
+		}
+		siteCurveNumbers[index] = site.getSiteCurveNumber().orElse(VdypEntity.MISSING_INTEGER_VALUE);
 		speciesIndices[index] = species.getGenusIndex();
 		// percentForestedLand is output-only and so not assigned here.
 

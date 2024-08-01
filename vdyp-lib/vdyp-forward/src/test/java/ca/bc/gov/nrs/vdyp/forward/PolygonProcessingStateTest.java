@@ -25,9 +25,10 @@ import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
+import ca.bc.gov.nrs.vdyp.model.VdypSite;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
-import ca.bc.gov.nrs.vdyp.model.VdypUtilization;
 import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 
 class PolygonProcessingStateTest {
@@ -209,14 +210,15 @@ class PolygonProcessingStateTest {
 	}
 
 	private void verifyProcessingStateSpeciesMatchesSpecies(Bank pps, int index, VdypSpecies species) {
-		assertThat(pps.yearsAtBreastHeight[index], is(species.getAgeAtBreastHeight()));
-		assertThat(pps.ageTotals[index], is(species.getAgeTotal()));
-		assertThat(pps.dominantHeights[index], is(species.getDominantHeight()));
-		assertThat(pps.siteIndices[index], is(species.getSiteIndex()));
+		VdypSite site = species.getSite().get();
+		
+		assertThat(pps.ageTotals[index], is(site.getAgeTotal().orElse(VdypEntity.MISSING_FLOAT_VALUE)));
+		assertThat(pps.dominantHeights[index], is(site.getHeight().orElse(VdypEntity.MISSING_FLOAT_VALUE)));
+		assertThat(pps.siteIndices[index], is(site.getSiteIndex().orElse(VdypEntity.MISSING_FLOAT_VALUE)));
 		assertThat(pps.sp64Distributions[index], is(species.getSpeciesDistributions()));
 		assertThat(pps.speciesIndices[index], is(species.getGenusIndex()));
 		assertThat(pps.speciesNames[index], is(species.getGenus()));
-		assertThat(pps.yearsToBreastHeight[index], is(species.getYearsToBreastHeight()));
+		assertThat(pps.yearsToBreastHeight[index], is(site.getYearsToBreastHeight().orElse(VdypEntity.MISSING_FLOAT_VALUE)));
 		
 		verifyProcessingStateSpeciesUtilizationsMatchesUtilizations(
 				pps, index, species
