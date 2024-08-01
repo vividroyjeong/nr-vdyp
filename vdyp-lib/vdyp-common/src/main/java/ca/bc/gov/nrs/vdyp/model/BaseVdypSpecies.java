@@ -215,6 +215,12 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 			return this;
 		}
 
+		public <S2 extends BaseVdypSpecies<I2>, I2 extends BaseVdypSite> Builder<T, I, IB>
+				adaptSiteFrom(S2 specToCopy, BiConsumer<IB, I2> config) {
+			specToCopy.getSite().ifPresent(toCopy -> this.adaptSite(toCopy, config));
+			return this;
+		}
+
 		public Builder<T, I, IB> copySite(I toCopy, BiConsumer<IB, I> config) {
 			this.addSite(builder -> {
 				builder.copy(toCopy);
@@ -223,6 +229,11 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 				builder.layerType = Optional.empty();
 				config.accept(builder, toCopy);
 			});
+			return this;
+		}
+
+		public Builder<T, I, IB> copySiteFrom(T specToCopy, BiConsumer<IB, I> config) {
+			specToCopy.getSite().ifPresent(toCopy -> this.copySite(toCopy, config));
 			return this;
 		}
 
