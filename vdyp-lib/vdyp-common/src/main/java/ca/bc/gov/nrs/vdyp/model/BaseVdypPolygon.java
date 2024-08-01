@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.model;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
@@ -252,6 +253,14 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 		public void buildChildren() {
 			layersBuilders.stream().map(this::buildLayer).collect(Collectors.toCollection(() -> layers));
 			layersBuilders.clear();
+		}
+
+		@Override
+		protected String getBuilderId() {
+			return MessageFormat.format(
+					"Polygon {0}", //
+					polygonIdentifier.map(Object::toString).orElse("N/A") //
+			);
 		}
 
 	}

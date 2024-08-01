@@ -28,8 +28,6 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 	private UtilizationVector closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOL_DWB species 0
 
-	private Optional<String> dominantSpecies;
-
 	private Optional<Integer> empericalRelationshipParameterIndex = Optional.empty(); // INXL1/GRPBA1
 
 	public VdypLayer(
@@ -240,7 +238,7 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 		public void quadMeanDiameter(float height) {
 			this.quadMeanDiameter = Utils.utilizationVector(height);
 		}
-		
+
 		protected UtilizationVector wholeStemVolume = VdypUtilizationHolder.emptyUtilization();
 
 		public void wholeStemVolume(float small, float u1, float u2, float u3, float u4) {
@@ -280,13 +278,10 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 			});
 		}
 
-		@Override
-		protected VdypSite buildSite(Consumer<VdypSite.Builder> config) {
-			return VdypSite.build(builder -> {
-				config.accept(builder);
-				builder.polygonIdentifier(polygonIdentifier.get());
-				builder.layerType(layerType.get());
-			});
+		public void baseAreaByUtilization(UtilizationVector utilizationVector) {
+			// TODO Auto-generated method stub
+
 		}
+
 	}
 }

@@ -141,9 +141,10 @@ class VriAdjustInputWriterTest {
 				builder.addSpecies(specBuilder -> {
 					specBuilder.genus("PL");
 					specBuilder.percentGenus(100);
-					specBuilder.volumeGroup(1);
-					specBuilder.decayGroup(2);
-					specBuilder.breakageGroup(3);
+					specBuilder.volumeGroup(0);
+					specBuilder.decayGroup(0);
+					specBuilder.breakageGroup(0);
+					specBuilder.addSpecies("PL", 100);
 
 					specBuilder.addSite(siteBuilder -> {
 						siteBuilder.height(15f);
@@ -155,17 +156,7 @@ class VriAdjustInputWriterTest {
 				});
 			});
 
-			var species = VdypSpecies.build(layer, builder -> {
-				builder.genus("PL");
-				builder.addSpecies("PL", 100f);
-
-				builder.percentGenus(100f);
-				builder.volumeGroup(0);
-				builder.decayGroup(0);
-				builder.breakageGroup(0);
-			});
-
-			unit.writeSpecies(layer, species);
+			unit.writeSpecies(layer, layer.getSpecies().get("PL"));
 		}
 		specStream.assertContent(
 				is(
@@ -366,9 +357,10 @@ class VriAdjustInputWriterTest {
 				builder.addSpecies(specBuilder -> {
 					specBuilder.genus("PL");
 					specBuilder.percentGenus(100);
-					specBuilder.volumeGroup(1);
-					specBuilder.decayGroup(2);
-					specBuilder.breakageGroup(3);
+					specBuilder.volumeGroup(0);
+					specBuilder.decayGroup(0);
+					specBuilder.breakageGroup(0);
+					specBuilder.addSpecies("PL", 100);
 
 					specBuilder.addSite(siteBuilder -> {
 						siteBuilder.height(15f);
@@ -380,15 +372,7 @@ class VriAdjustInputWriterTest {
 				});
 			});
 
-			var species = VdypSpecies.build(layer, builder -> {
-				builder.genus("PL");
-				builder.addSpecies("PL", 100f);
-
-				builder.percentGenus(100f);
-				builder.volumeGroup(0);
-				builder.decayGroup(0);
-				builder.breakageGroup(0);
-			});
+			var species = layer.getSpecies().get("PL");
 
 			// fixme add to builder
 			layer.setEmpericalRelationshipParameterIndex(Optional.of(119));

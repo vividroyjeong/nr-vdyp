@@ -41,7 +41,6 @@ import ca.bc.gov.nrs.vdyp.common.ReconcilationMethods;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
-import ca.bc.gov.nrs.vdyp.controlmap.ResolvedControlMapImpl;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -169,7 +168,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	protected Map<String, Object> controlMap = new HashMap<>();
 
-	protected EstimationMethods estimators;
+	public EstimationMethods estimationMethods;
 
 	static final Comparator<BaseVdypSpecies<?>> PERCENT_GENUS_DESCENDING = Utils
 			.compareUsing(BaseVdypSpecies<?>::getPercentGenus).reversed();
@@ -241,7 +240,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	protected void setControlMap(Map<String, Object> controlMap) {
 		this.controlMap = controlMap;
-		this.estimators = new EstimationMethods(new ResolvedControlMapImpl(controlMap));
+		this.estimationMethods = new EstimationMethods(controlMap);
 	}
 
 	protected <T> StreamingParser<T> getStreamingParser(ControlKey key) throws ProcessingException {
@@ -634,7 +633,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	public S leadGenus(L fipLayer) {
 		return fipLayer.getSpecies().values().stream()
-				.sorted(Utils.compareUsing(BaseVdypSpecies<? extends BaseVdypSite>::getFractionGenus).reversed()).findFirst().orElseThrow();
+				.sorted(Utils.compareUsing(BaseVdypSpecies<?>::getFractionGenus).reversed()).findFirst().orElseThrow();
 	}
 
 	protected L getPrimaryLayer(P poly) throws StandProcessingException {
@@ -1145,7 +1144,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				log.atDebug().log("Estimating tree volume");
 
 				var volumeGroup = spec.getVolumeGroup();
-				var meanVolume = this.estimators
+				var meanVolume = this.estimationMethods
 						.estimateWholeStemVolumePerTree(volumeGroup, loreyHeightSpec, quadMeanDiameterSpec);
 				var specWholeStemVolume = treesPerHectareSpec * meanVolume;
 
@@ -1174,10 +1173,10 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			var adjustDecayWasteUtil = Utils.utilizationVector(); // ADJVDW
 
 			// EMP071
-			estimators.estimateQuadMeanDiameterByUtilization(bec, quadMeanDiameterUtil, spec.getGenus());
+			estimationMethods.estimateQuadMeanDiameterByUtilization(bec, quadMeanDiameterUtil, spec.getGenus());
 
 			// EMP070
-			estimators.estimateBaseAreaByUtilization(bec, quadMeanDiameterUtil, baseAreaUtil, spec.getGenus());
+			estimationMethods.estimateBaseAreaByUtilization(bec, quadMeanDiameterUtil, baseAreaUtil, spec.getGenus());
 
 			// Calculate tree density components
 			for (var uc : VdypStartApplication.UTIL_CLASSES) {
@@ -1218,7 +1217,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			} else {
 
 				// EMP091
-				estimators.estimateWholeStemVolume(
+				estimationMethods.estimateWholeStemVolume(
 						UtilizationClass.ALL, adjustCloseUtil.getCoe(4), spec.getVolumeGroup(), loreyHeightSpec,
 						quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
 				);
@@ -1234,27 +1233,27 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				}
 
 				// EMP092
-				estimators.estimateCloseUtilizationVolume(
+				estimationMethods.estimateCloseUtilizationVolume(
 						UtilizationClass.ALL, adjustCloseUtil, spec.getVolumeGroup(), loreyHeightSpec,
 						quadMeanDiameterUtil, wholeStemVolumeUtil, closeVolumeUtil
 				);
 
 				// EMP093
-				estimators.estimateNetDecayVolume(
+				estimationMethods.estimateNetDecayVolume(
 						spec.getGenus(), bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec.getDecayGroup(),
 						vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil, closeVolumeUtil,
 						closeVolumeNetDecayUtil
 				);
 
 				// EMP094
-				estimators.estimateNetDecayAndWasteVolume(
+				estimationMethods.estimateNetDecayAndWasteVolume(
 						bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec.getGenus(), loreyHeightSpec,
 						quadMeanDiameterUtil, closeVolumeUtil, closeVolumeNetDecayUtil, closeVolumeNetDecayWasteUtil
 				);
 
 				if (this.getId().isStart()) {
 					// EMP095
-					estimators.estimateNetDecayWasteAndBreakageVolume(
+					estimationMethods.estimateNetDecayWasteAndBreakageVolume(
 							UtilizationClass.ALL, spec.getBreakageGroup(), quadMeanDiameterUtil, closeVolumeUtil,
 							closeVolumeNetDecayWasteUtil, closeVolumeNetDecayWasteBreakUtil
 					);
@@ -1263,9 +1262,11 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 			spec.getBaseAreaByUtilization().pairwiseInPlace(baseAreaUtil, EstimationMethods.COPY_IF_BAND);
 			spec.getTreesPerHectareByUtilization().pairwiseInPlace(treesPerHectareUtil, EstimationMethods.COPY_IF_BAND);
-			spec.getQuadraticMeanDiameterByUtilization().pairwiseInPlace(quadMeanDiameterUtil, EstimationMethods.COPY_IF_BAND);
+			spec.getQuadraticMeanDiameterByUtilization()
+					.pairwiseInPlace(quadMeanDiameterUtil, EstimationMethods.COPY_IF_BAND);
 
-			spec.getWholeStemVolumeByUtilization().pairwiseInPlace(wholeStemVolumeUtil, EstimationMethods.COPY_IF_NOT_SMALL);
+			spec.getWholeStemVolumeByUtilization()
+					.pairwiseInPlace(wholeStemVolumeUtil, EstimationMethods.COPY_IF_NOT_SMALL);
 			spec.getCloseUtilizationVolumeByUtilization()
 					.pairwiseInPlace(closeVolumeUtil, EstimationMethods.COPY_IF_NOT_SMALL);
 			spec.getCloseUtilizationVolumeNetOfDecayByUtilization()

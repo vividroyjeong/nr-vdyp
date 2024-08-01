@@ -261,6 +261,16 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 			this.wholeStemVolume = Utils.utilizationVector(volume);
 		}
 
+		protected UtilizationVector wholeStemVolume = VdypUtilizationHolder.emptyUtilization();
+
+		public void wholeStemVolume(float small, float u1, float u2, float u3, float u4) {
+			this.wholeStemVolume = Utils.utilizationVector(small, u1, u2, u3, u4);
+		}
+
+		public void wholeStemVolume(float volume) {
+			this.wholeStemVolume = Utils.utilizationVector(volume);
+		}
+
 		@Override
 		protected void check(Collection<String> errors) {
 			super.check(errors);
@@ -296,13 +306,12 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 					layerType.get(), //
 					genus.get(), //
 					percentGenus.get(), //
-					site,
-					volumeGroup.get(), //
+					site, volumeGroup.get(), //
 					decayGroup.get(), //
 					breakageGroup.get() //
 			);
 		}
-		
+
 		@Override
 		protected VdypSite buildSite(Consumer<VdypSite.Builder> config) {
 			return VdypSite.build(builder -> {
@@ -312,7 +321,7 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 				builder.siteGenus(genus);
 			});
 		}
-		
+
 		public Builder volumeGroup(int i) {
 			this.volumeGroup = Optional.of(i);
 			return this;

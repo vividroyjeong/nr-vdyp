@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.model;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -151,7 +152,7 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 			addSite(Optional.of(site));
 			return this;
 		}
-		
+
 		public Builder<T, I, IB> addSite(Optional<I> site) {
 			this.site = site;
 			this.siteBuilder = Optional.empty();
@@ -172,11 +173,21 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 			result.setSpeciesPercent(speciesPercent);
 			this.fractionGenus.ifPresent(result::setFractionGenus);
 		}
-		
+
 		@Override
 		protected void preProcess() {
 			super.preProcess();
-			site = siteBuilder.map(this::buildSite).or(()->site);
+			site = siteBuilder.map(this::buildSite).or(() -> site);
+		}
+
+		@Override
+		protected String getBuilderId() {
+			return MessageFormat.format(
+					"Species {0} {1} {2}", //
+					polygonIdentifier.map(Object::toString).orElse("N/A"), //
+					layerType.map(Object::toString).orElse("N/A"), //
+					genus.map(Object::toString).orElse("N/A")//
+			);
 		}
 
 		public Builder<T, I, IB> adapt(BaseVdypSpecies<?> toCopy) {
@@ -204,6 +215,12 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 			return this;
 		}
 
+		public <S2 extends BaseVdypSpecies<I2>, I2 extends BaseVdypSite> Builder<T, I, IB>
+				adaptSiteFrom(S2 specToCopy, BiConsumer<IB, I2> config) {
+			specToCopy.getSite().ifPresent(toCopy -> this.adaptSite(toCopy, config));
+			return this;
+		}
+
 		public Builder<T, I, IB> copySite(I toCopy, BiConsumer<IB, I> config) {
 			this.addSite(builder -> {
 				builder.copy(toCopy);
@@ -212,6 +229,11 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 				builder.layerType = Optional.empty();
 				config.accept(builder, toCopy);
 			});
+			return this;
+		}
+
+		public Builder<T, I, IB> copySiteFrom(T specToCopy, BiConsumer<IB, I> config) {
+			specToCopy.getSite().ifPresent(toCopy -> this.copySite(toCopy, config));
 			return this;
 		}
 

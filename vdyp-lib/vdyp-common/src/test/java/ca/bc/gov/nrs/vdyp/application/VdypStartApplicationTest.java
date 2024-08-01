@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -1209,7 +1208,7 @@ class VdypStartApplicationTest {
 						sb.volumeGroup(-1);
 						sb.decayGroup(-1);
 						sb.breakageGroup(-1);
-						
+
 						sb.loreyHeight(38.6004372f);
 						sb.baseArea(0.397305071f);
 						sb.treesPerHectare(5.04602766f);
@@ -1277,12 +1276,9 @@ class VdypStartApplicationTest {
 					lb.quadMeanDiameter(30.2606697f);
 					lb.wholeStemVolume(635.659668f);
 				});
-				
-				var site = layer.getSite();
-
 
 				app.estimateSmallComponents(fPoly, layer);
-				
+
 				var spec1 = layer.getSpecies().get("B");
 				var spec2 = layer.getSpecies().get("C");
 				var spec3 = layer.getSpecies().get("D");
@@ -1318,7 +1314,7 @@ class VdypStartApplicationTest {
 				assertThat(spec3.getWholeStemVolumeByUtilization().getSmall(), closeTo(0.0085867513f));
 				assertThat(spec4.getWholeStemVolumeByUtilization().getSmall(), closeTo(0f));
 				assertThat(spec5.getWholeStemVolumeByUtilization().getSmall(), closeTo(0.00240394124f));
-				
+
 				assertThat(layer.getLoreyHeightByUtilization().getSmall(), closeTo(7.14446497f));
 				assertThat(layer.getBaseAreaByUtilization().getSmall(), closeTo(0.0153773092f));
 				assertThat(layer.getTreesPerHectareByUtilization().getSmall(), closeTo(5.34804487f));

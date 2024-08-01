@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.model;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -52,7 +53,7 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies<I>, I extends Base
 
 	public LinkedHashMap<String, I> getSites() {
 		var result = new LinkedHashMap<String, I>(species.size());
-		species.forEach((key,spec)->spec.getSite().ifPresent(site->result.put(key, site)) );
+		species.forEach((key, spec) -> spec.getSite().ifPresent(site -> result.put(key, site)));
 		return result;
 	}
 
@@ -196,6 +197,15 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies<I>, I extends Base
 			super.postProcess(result);
 			buildChildren();
 			result.setSpecies(species);
+		}
+
+		@Override
+		protected String getBuilderId() {
+			return MessageFormat.format(
+					"Layer {0} {1}", //
+					polygonIdentifier.map(Object::toString).orElse("N/A"), //
+					layerType.map(Object::toString).orElse("N/A") //
+			);
 		}
 
 	}
