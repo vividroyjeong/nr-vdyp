@@ -163,32 +163,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				.orElseThrow(() -> new StandProcessingException("Unknown BEC " + polygon.getBiogeoclimaticZone()));
 
 		log.trace("Getting species for polygon {}", polygon.getPolygonIdentifier());
-		Collection<VriSpecies> species;
-		try {
-			species = speciesStream.next();
-		} catch (NoSuchElementException ex) {
-			throw validationError("Species file has fewer records than polygon file.", ex);
-		}
-
-		Map<LayerType, VriLayer.Builder> layersBuilders = layerStream.next();
-
-		for (var spec : species) {
-			var layerBuilder = layersBuilders.get(spec.getLayerType());
-			// Validate that species belong to the correct polygon
-			if (!spec.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
-				throw validationError(
-						"Record in species file contains species for polygon %s when expecting one for %s.",
-						spec.getPolygonIdentifier(), polygon.getPolygonIdentifier()
-				);
-			}
-			if (Objects.isNull(layerBuilder)) {
-				throw validationError(
-						"Species entry references layer %s of polygon %s but it is not present.", spec.getLayerType(),
-						polygon.getPolygonIdentifier()
-				);
-			}
-			layerBuilder.addSpecies(spec);
-		}
 
 		log.trace("Getting sites for polygon {}", polygon.getPolygonIdentifier());
 		Collection<VriSite> sites;
@@ -198,22 +172,47 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			throw validationError("Sites file has fewer records than polygon file.", ex);
 		}
 
-		for (var site : sites) {
-			var layerBuilder = layersBuilders.get(site.getLayerType());
+		Collection<VriSpecies> species;
+		try {
+			species = speciesStream.next();
+		} catch (NoSuchElementException ex) {
+			throw validationError("Species file has fewer records than polygon file.", ex);
+		}
+
+		Map<LayerType, VriLayer.Builder> layersBuilders = layerStream.next();
+
+		for (final var spec : species) {
+			var layerBuilder = layersBuilders.get(spec.getLayerType());
+
+			var foundSite = sites.stream().filter(site -> site.getSiteGenus().equals(spec.getGenus())).findFirst();
+			final var specWithSite = VriSpecies.build(builder -> {
+				builder.copy(spec);
+				builder.addSite(foundSite);
+			});
+			foundSite.ifPresent(sites::remove);
+
 			// Validate that species belong to the correct polygon
-			if (!site.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
+			if (!specWithSite.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
 				throw validationError(
-						"Record in site file contains site for polygon %s when expecting one for %s.",
-						site.getPolygonIdentifier(), polygon.getPolygonIdentifier()
+						"Record in species file contains species for polygon %s when expecting one for %s.",
+						specWithSite.getPolygonIdentifier(), polygon.getPolygonIdentifier()
 				);
 			}
 			if (Objects.isNull(layerBuilder)) {
 				throw validationError(
-						"Site entry references layer %s of polygon %s but it is not present.", site.getLayerType(),
-						polygon.getPolygonIdentifier()
+						"Species entry references layer %s of polygon %s but it is not present.",
+						specWithSite.getLayerType(), polygon.getPolygonIdentifier()
 				);
 			}
-			layerBuilder.addSite(site);
+			layerBuilder.addSpecies(specWithSite);
+		}
+		if (!sites.isEmpty()) {
+			var specNames = sites.stream().map(site -> site.getSiteGenus()).collect(Collectors.joining(", "));
+			var layerType = sites.iterator().next().getLayerType();
+			throw validationError(
+					"Site entries reference species %s of layer %s of polygon %s but they are not present.", specNames,
+					layerType, polygon.getPolygonIdentifier()
+			);
 		}
 
 		Map<LayerType, VriLayer> layers = getLayersForPolygon(polygon, bec, layersBuilders);
@@ -457,6 +456,11 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 			if (vriSite == primarySiteIn) {
 				sBuilder.loreyHeight(primaryHeight);
+
+				// Only use the primary site
+				sBuilder.adaptSite(vriSite, (iBuilder, vriSite2) -> {
+					iBuilder.height(vriSite2.getHeight().get());
+				});
 			} else {
 
 				float loreyHeight = vriSite.getHeight().filter((x) -> getDebugMode(2) == 1).map(height -> {
@@ -485,13 +489,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				sBuilder.loreyHeight(loreyHeight);
 			}
 			this.applyGroups(bec, vriSpec.getGenus(), sBuilder);
-		});
-
-		// Only use the primary site
-		var primarySite = primaryLayer.getPrimarySite().get();
-
-		lBuilder.adaptSite(primarySite, (sBuilder, vriSite) -> {
-			sBuilder.height(vriSite.getHeight().get());
 		});
 
 		lBuilder.buildChildren();
@@ -1009,7 +1006,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	}
 
 	@Override
-	protected VriSpecies copySpecies(VriSpecies toCopy, Consumer<Builder<VriSpecies>> config) {
+	protected VriSpecies copySpecies(VriSpecies toCopy, Consumer<Builder<VriSpecies, VriSite, ?>> config) {
 		return VriSpecies.build(builder -> builder.copy(toCopy));
 	}
 
@@ -1091,26 +1088,27 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				pBuilder.mode(PolygonMode.BATN);
 				pBuilder.copyLayers(poly, (lBuilder, layer) -> {
 
-					lBuilder.copySites(layer, (iBuilder, site) -> {
-						if (layer.getLayerType() == LayerType.PRIMARY
-								&& primaryLayer.getPrimaryGenus().map(site.getSiteGenus()::equals).orElse(false)) {
-							iBuilder.height(inc.dominantHeight);
-						} else {
-							iBuilder.height(Optional.empty());
-						}
-
-						site.getAgeTotal().map(x -> x + inc.ageIncrease).ifPresentOrElse(ageTotal -> {
-							iBuilder.ageTotal(ageTotal);
-							iBuilder.breastHeightAge(
-									site.getYearsToBreastHeight()//
-											.map(ytbh -> ageTotal - ytbh)
-											.or(() -> site.getBreastHeightAge().map(bha -> bha + inc.ageIncrease))
-							);
-						}, () -> iBuilder.breastHeightAge(site.getBreastHeightAge().map(bha -> bha + inc.ageIncrease)));
-
-					});
 					lBuilder.copySpecies(layer, (sBuilder, species) -> {
-						// No changes, just copy
+						sBuilder.copySiteFrom(species, (iBuilder, site) -> {
+							if (layer.getLayerType() == LayerType.PRIMARY
+									&& primaryLayer.getPrimaryGenus().map(site.getSiteGenus()::equals).orElse(false)) {
+								iBuilder.height(inc.dominantHeight);
+							} else {
+								iBuilder.height(Optional.empty());
+							}
+
+							site.getAgeTotal().map(x -> x + inc.ageIncrease).ifPresentOrElse(ageTotal -> {
+								iBuilder.ageTotal(ageTotal);
+								iBuilder.breastHeightAge(
+										site.getYearsToBreastHeight()//
+												.map(ytbh -> ageTotal - ytbh)
+												.or(() -> site.getBreastHeightAge().map(bha -> bha + inc.ageIncrease))
+								);
+							}, () -> iBuilder
+									.breastHeightAge(site.getBreastHeightAge().map(bha -> bha + inc.ageIncrease))
+							);
+
+						});
 					});
 				});
 			});
@@ -1178,6 +1176,12 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		};
 	}
 
+	static final BiConsumer<VriSpecies.Builder, VriSpecies> noChangeSpecies() {
+		return (builder, toCopy) -> {
+			toCopy.getSite().ifPresent(site -> builder.copySite(site, noChange()));
+		};
+	}
+
 	VriPolygon processBatc(VriPolygon poly) throws ProcessingException {
 
 		VriLayer primaryLayer = getPrimaryLayer(poly);
@@ -1218,15 +1222,13 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					lBuilder.copy(primaryLayer);
 					lBuilder.baseArea(primaryBaseArea * (percentForestLand / 100));
 					lBuilder.treesPerHectare(treesPerHectare(primaryBaseArea, primaryQuadMeanDiameter));
-					lBuilder.copySites(primaryLayer, noChange());
-					lBuilder.copySpecies(primaryLayer, noChange());
+					lBuilder.copySpecies(primaryLayer, noChangeSpecies());
 				});
 				veteranLayer.ifPresent(vLayer -> pBuilder.addLayer(lBuilder -> {
 					lBuilder.copy(vLayer);
 					lBuilder.baseArea(veteranBaseArea);
 
-					lBuilder.copySites(primaryLayer, noChange());
-					lBuilder.copySpecies(primaryLayer, noChange());
+					lBuilder.copySpecies(primaryLayer, noChangeSpecies());
 				}));
 
 			});
@@ -1287,15 +1289,13 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				lBuilder.copy(primaryLayer);
 				lBuilder.baseArea(primaryBaseAreaFinal);
 				lBuilder.treesPerHectare(primaryTreesPerHectare);
-				lBuilder.copySites(primaryLayer, noChange());
-				lBuilder.copySpecies(primaryLayer, noChange());
+				lBuilder.copySpecies(primaryLayer, noChangeSpecies());
 			});
 			veteranLayer.ifPresent(vLayer -> pBuilder.addLayer(lBuilder -> {
 				lBuilder.copy(vLayer);
 				lBuilder.baseArea(veteranBaseArea);
 
-				lBuilder.copySites(primaryLayer, noChange());
-				lBuilder.copySpecies(primaryLayer, noChange());
+				lBuilder.copySpecies(primaryLayer, noChangeSpecies());
 			}));
 
 		});

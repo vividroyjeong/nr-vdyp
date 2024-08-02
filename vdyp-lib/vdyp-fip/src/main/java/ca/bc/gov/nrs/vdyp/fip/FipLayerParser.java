@@ -109,7 +109,6 @@ public class FipLayerParser
 									siteBuilder.siteGenus(siteSp0.get());
 									siteBuilder.siteCurveNumber(siteCurveNumber);
 									siteBuilder.siteSpecies(siteSp64.get());
-
 								});
 
 								flBuilder.crownClosure(crownClosure);
