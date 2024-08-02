@@ -29,6 +29,7 @@ import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.controlmap.ResolvedControlMap;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
@@ -40,7 +41,6 @@ import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.UtilizationVector;
 import ca.bc.gov.nrs.vdyp.model.UtilizationVector.BinaryOperatorWithClass;
-import ca.bc.gov.nrs.vdyp.model.VdypSite;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 
 public class EstimationMethods {
@@ -133,7 +133,7 @@ public class EstimationMethods {
 	 * @throws ProcessingException
 	 */
 	public float estimateNonPrimaryLoreyHeight(
-			BaseVdypSpecies<VdypSite> vspec, BaseVdypSpecies<VdypSite> vspecPrime, BecDefinition bec, 
+			BaseVdypSpecies<? extends BaseVdypSite> vspec, BaseVdypSpecies<? extends BaseVdypSite> vspecPrime, BecDefinition bec, 
 			float leadHeight, float primaryHeight
 	) throws ProcessingException {
 		return estimateNonPrimaryLoreyHeight(vspec.getGenus(), vspecPrime.getGenus(), bec, leadHeight, primaryHeight);
@@ -565,7 +565,7 @@ public class EstimationMethods {
 		 */
 
 // 		if (fullOccupancy) {
-//     		upperBoundsBaseArea *= EMPOC;
+//     		upperBoundsBaseArea *= EMPIRICAL_OCCUPANCY;
 // 		}
 		
 		float ageToUse = breastHeightAge;
@@ -679,7 +679,7 @@ public class EstimationMethods {
 	}
 
 	Coefficients sumCoefficientsWeightedBySpeciesAndDecayBec(
-			Collection<? extends BaseVdypSpecies<VdypSite>> species, BecDefinition bec, ControlKey key, int size
+			Collection<? extends BaseVdypSpecies<? extends BaseVdypSite>> species, BecDefinition bec, ControlKey key, int size
 	) {
 		var coeMap = controlMap.<MatrixMap2<String, String, Coefficients>>get(key, MatrixMap2.class);
 

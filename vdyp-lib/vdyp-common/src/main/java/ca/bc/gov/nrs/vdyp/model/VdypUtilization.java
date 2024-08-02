@@ -1,11 +1,6 @@
 package ca.bc.gov.nrs.vdyp.model;
 
-import java.text.MessageFormat;
 import java.util.Optional;
-
-import ca.bc.gov.nrs.vdyp.application.ProcessingException;
-import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
-import ca.bc.gov.nrs.vdyp.math.FloatMath;
 
 public class VdypUtilization implements VdypEntity {
 

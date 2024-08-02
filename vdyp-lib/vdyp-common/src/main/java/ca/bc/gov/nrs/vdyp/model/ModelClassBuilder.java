@@ -62,13 +62,6 @@ public abstract class ModelClassBuilder<T> {
 	}
 
 	/**
-	 * Additional steps before building
-	 */
-	protected void preProcess() {
-		// Do Nothing
-	}
-
-	/**
 	 * Run the constructor, assuming all required properties are present
 	 */
 	protected abstract T doBuild();

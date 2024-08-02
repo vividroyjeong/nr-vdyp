@@ -261,16 +261,6 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 			this.wholeStemVolume = Utils.utilizationVector(volume);
 		}
 
-		protected UtilizationVector wholeStemVolume = VdypUtilizationHolder.emptyUtilization();
-
-		public void wholeStemVolume(float small, float u1, float u2, float u3, float u4) {
-			this.wholeStemVolume = Utils.utilizationVector(small, u1, u2, u3, u4);
-		}
-
-		public void wholeStemVolume(float volume) {
-			this.wholeStemVolume = Utils.utilizationVector(volume);
-		}
-
 		@Override
 		protected void check(Collection<String> errors) {
 			super.check(errors);
