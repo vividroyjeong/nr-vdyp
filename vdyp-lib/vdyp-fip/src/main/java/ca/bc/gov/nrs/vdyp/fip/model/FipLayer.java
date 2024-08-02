@@ -128,14 +128,5 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> implements In
 			});
 		}
 
-		@Override
-		protected FipSite buildSite(Consumer<FipSite.Builder> config) {
-			return FipSite.build(builder -> {
-				config.accept(builder);
-				builder.polygonIdentifier(polygonIdentifier.get());
-				builder.layerType(layerType.get());
-			});
-		}
-
 	}
 }
