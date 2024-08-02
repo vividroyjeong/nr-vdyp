@@ -1989,12 +1989,7 @@ class FipStartTest {
 			var layer = VdypLayer.build(builder -> {
 				builder.polygonIdentifier(polygonId);
 				builder.layerType(LayerType.PRIMARY);
-				builder.addSite(siteBuilder -> {
-					siteBuilder.ageTotal(285f);
-					siteBuilder.yearsToBreastHeight(11.3999996f);
-					siteBuilder.height(24.3999996f);
-					siteBuilder.siteGenus("Y");
-				});
+
 			});
 			layer.getBaseAreaByUtilization().setCoe(0, 76.5122147f);
 			layer.getTreesPerHectareByUtilization().setCoe(0, 845.805969f);
@@ -2006,6 +2001,11 @@ class FipStartTest {
 				builder.volumeGroup(-1);
 				builder.decayGroup(-1);
 				builder.breakageGroup(-1);
+				builder.addSite(siteBuilder -> {
+					siteBuilder.ageTotal(285f);
+					siteBuilder.yearsToBreastHeight(11.3999996f);
+					siteBuilder.height(24.3999996f);
+				});
 			});
 			spec.setVolumeGroup(74);
 			spec.setDecayGroup(63);
@@ -2073,12 +2073,6 @@ class FipStartTest {
 			var layer = VdypLayer.build(builder -> {
 				builder.polygonIdentifier(polygonId);
 				builder.layerType(LayerType.PRIMARY);
-				builder.addSite(siteBuilder -> {
-					siteBuilder.ageTotal(55f);
-					siteBuilder.yearsToBreastHeight(1f);
-					siteBuilder.height(35.2999992f);
-					siteBuilder.siteGenus("B");
-				});
 			});
 			layer.getBaseAreaByUtilization().setCoe(0, 44.6249847f);
 			layer.getTreesPerHectareByUtilization().setCoe(0, 620.504883f);
@@ -2099,6 +2093,11 @@ class FipStartTest {
 				builder.volumeGroup(12);
 				builder.decayGroup(7);
 				builder.breakageGroup(5);
+				builder.addSite(siteBuilder -> {
+					siteBuilder.ageTotal(55f);
+					siteBuilder.yearsToBreastHeight(1f);
+					siteBuilder.height(35.2999992f);
+				});
 			});
 			spec1.getLoreyHeightByUtilization().setCoe(0, 38.7456512f);
 			var spec2 = VdypSpecies.build(layer, builder -> {
@@ -2352,12 +2351,6 @@ class FipStartTest {
 			var layer = VdypLayer.build(builder -> {
 				builder.polygonIdentifier(polygonId);
 				builder.layerType(LayerType.PRIMARY);
-				builder.addSite(siteBuilder -> {
-					siteBuilder.ageTotal(45f);
-					siteBuilder.yearsToBreastHeight(5.4000001f);
-					siteBuilder.height(24.2999992f);
-					siteBuilder.siteGenus("H");
-				});
 			});
 
 			layer.getBaseAreaByUtilization().setCoe(0, 44.9531403f);
@@ -2395,6 +2388,11 @@ class FipStartTest {
 				builder.volumeGroup(37);
 				builder.decayGroup(54);
 				builder.breakageGroup(28);
+				builder.addSite(siteBuilder -> {
+					siteBuilder.ageTotal(45f);
+					siteBuilder.yearsToBreastHeight(5.4000001f);
+					siteBuilder.height(24.2999992f);
+				});
 			});
 			spec3.getLoreyHeightByUtilization().setCoe(0, 20.5984688f);
 			var spec4 = VdypSpecies.build(layer, builder -> {
@@ -2615,14 +2613,6 @@ class FipStartTest {
 			var fipPrimaryLayer = FipLayerPrimary.buildPrimary(fipPolygon, builder -> {
 
 				builder.crownClosure(60f);
-				builder.addSite(siteBuilder -> {
-					siteBuilder.ageTotal(60f);
-					siteBuilder.yearsToBreastHeight(8.5f);
-					siteBuilder.height(15f);
-					siteBuilder.siteGenus("L");
-					siteBuilder.siteSpecies("L");
-					siteBuilder.siteIndex(5f);
-				});
 
 			});
 
@@ -2630,17 +2620,23 @@ class FipStartTest {
 			processedLayers.put(LayerType.PRIMARY, VdypLayer.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.addSite(siteBuilder -> {
-					siteBuilder.ageTotal(60f);
-					siteBuilder.yearsToBreastHeight(8.5f);
-					siteBuilder.height(15f);
-					siteBuilder.siteGenus("H");
-				});
+				/*
+				 * builder.addSite(siteBuilder -> { siteBuilder.ageTotal(60f); siteBuilder.yearsToBreastHeight(8.5f);
+				 * siteBuilder.height(15f); siteBuilder.siteGenus("H"); });
+				 */
 			}));
 
 			FipSpecies.build(fipPrimaryLayer, builder -> {
 				builder.genus("L");
 				builder.percentGenus(10f);
+				builder.addSite(siteBuilder -> {
+					siteBuilder.ageTotal(60f);
+					siteBuilder.yearsToBreastHeight(8.5f);
+					siteBuilder.height(15f);
+					siteBuilder.siteSpecies("L");
+					siteBuilder.siteIndex(5f);
+				});
+
 			});
 			FipSpecies.build(fipPrimaryLayer, builder -> {
 				builder.genus("PL");
@@ -2664,55 +2660,51 @@ class FipStartTest {
 		try (var app = new FipStart()) {
 			ApplicationTestUtils.setControlMap(app, controlMap);
 
-			var fipPolygon = FipPolygon.build(builder -> {
-				builder.polygonIdentifier("Test", 2024);
-				builder.forestInventoryZone("D");
-				builder.biogeoclimaticZone("IDF");
-				builder.mode(PolygonMode.START);
-				builder.yieldFactor(1f);
+			var fipPolygon = FipPolygon.build(pb -> {
+				pb.polygonIdentifier("Test", 2024);
+				pb.forestInventoryZone("D");
+				pb.biogeoclimaticZone("IDF");
+				pb.mode(PolygonMode.START);
+				pb.yieldFactor(1f);
 
-				builder.percentAvailable(42f);
+				pb.percentAvailable(42f);
 			});
 
 			// var fipVeteranLayer = new FipLayer("Test", LayerType.VETERAN);
-			var fipPrimaryLayer = FipLayerPrimary.buildPrimary(fipPolygon, builder -> {
-				builder.crownClosure(60f);
+			var fipPrimaryLayer = FipLayerPrimary.buildPrimary(fipPolygon, lb -> {
+				lb.crownClosure(60f);
 
-				builder.addSite(siteBuilder -> {
-					siteBuilder.ageTotal(60f);
-					siteBuilder.yearsToBreastHeight(8.5f);
-					siteBuilder.height(15f);
+				lb.addSpecies(sb -> {
+					sb.genus("L");
+					sb.percentGenus(10f);
 
-					siteBuilder.siteIndex(5f);
-					siteBuilder.siteGenus("L");
-					siteBuilder.siteSpecies("L");
+					sb.addSite(siteBuilder -> {
+						siteBuilder.ageTotal(60f);
+						siteBuilder.yearsToBreastHeight(8.5f);
+						siteBuilder.height(15f);
+
+						siteBuilder.siteIndex(5f);
+						siteBuilder.siteSpecies("L");
+					});
+
 				});
+
+				lb.addSpecies(sb -> {
+					sb.genus("PL");
+					sb.percentGenus(90f);
+				});
+
 			});
 
 			var processedLayers = new HashMap<LayerType, VdypLayer>();
 			processedLayers.put(LayerType.PRIMARY, VdypLayer.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.addSite(siteBuilder -> {
-					siteBuilder.ageTotal(60f);
-					siteBuilder.yearsToBreastHeight(8.5f);
-					siteBuilder.height(15f);
-					siteBuilder.siteGenus("L");
-				});
+				/*
+				 * builder.addSite(siteBuilder -> { siteBuilder.ageTotal(60f); siteBuilder.yearsToBreastHeight(8.5f);
+				 * siteBuilder.height(15f); siteBuilder.siteGenus("L"); });
+				 */
 			}));
-
-			FipSpecies.build(fipPrimaryLayer, builder -> {
-				builder.polygonIdentifier("Test", 2024);
-				builder.layerType(LayerType.PRIMARY);
-				builder.genus("L");
-				builder.percentGenus(10f);
-			});
-			FipSpecies.build(fipPrimaryLayer, builder -> {
-				builder.polygonIdentifier("Test", 2024);
-				builder.layerType(LayerType.PRIMARY);
-				builder.genus("PL");
-				builder.percentGenus(90f);
-			});
 
 			var vdypPolygon = app.createVdypPolygon(fipPolygon, processedLayers);
 
@@ -2731,49 +2723,49 @@ class FipStartTest {
 		try (var app = new FipStart()) {
 			ApplicationTestUtils.setControlMap(app, controlMap);
 
-			var fipPolygon = FipPolygon.build(builder -> {
-				builder.polygonIdentifier("Test", 2024);
-				builder.forestInventoryZone("D");
-				builder.biogeoclimaticZone("IDF");
-				builder.mode(PolygonMode.YOUNG);
-				builder.yieldFactor(1f);
+			var fipPolygon = FipPolygon.build(pb -> {
+				pb.polygonIdentifier("Test", 2024);
+				pb.forestInventoryZone("D");
+				pb.biogeoclimaticZone("IDF");
+				pb.mode(PolygonMode.YOUNG);
+				pb.yieldFactor(1f);
 			});
 
 			// var fipVeteranLayer = new FipLayer("Test", LayerType.VETERAN);
-			var fipPrimaryLayer = FipLayerPrimary.buildPrimary(fipPolygon, builder -> {
-				builder.crownClosure(60f);
+			var fipPrimaryLayer = FipLayerPrimary.buildPrimary(fipPolygon, lb -> {
+				lb.crownClosure(60f);
 
-				builder.addSite(siteBuilder -> {
-					siteBuilder.ageTotal(60f);
-					siteBuilder.yearsToBreastHeight(8.5f);
-					siteBuilder.height(15f);
+				lb.addSpecies(sb -> {
+					sb.genus("L");
+					sb.percentGenus(10f);
+					sb.addSite(ib-> {
+						ib.ageTotal(60f);
+						ib.yearsToBreastHeight(8.5f);
+						ib.height(15f);
 
-					siteBuilder.siteIndex(5f);
-					siteBuilder.siteGenus("L");
-					siteBuilder.siteSpecies("L");
+						ib.siteIndex(5f);
+						ib.siteSpecies("L");
+					});
 				});
+				
+				lb.addSpecies(sb -> {
+					sb.genus("PL");
+					sb.percentGenus(90f);
+				});
+
 			});
 
 			var processedLayers = new HashMap<LayerType, VdypLayer>();
-			processedLayers.put(LayerType.PRIMARY, VdypLayer.build(builder -> {
-				builder.polygonIdentifier("Test", 2024);
-				builder.layerType(LayerType.PRIMARY);
-				builder.addSite(siteBuilder -> {
+			processedLayers.put(LayerType.PRIMARY, VdypLayer.build(lb -> {
+				lb.polygonIdentifier("Test", 2024);
+				lb.layerType(LayerType.PRIMARY);
+				/*lb.addSite(siteBuilder -> {
 					siteBuilder.ageTotal(60f);
 					siteBuilder.yearsToBreastHeight(8.5f);
 					siteBuilder.height(15f);
 					siteBuilder.siteGenus("L");
-				});
+				});*/
 			}));
-
-			FipSpecies.build(fipPrimaryLayer, builder -> {
-				builder.genus("L");
-				builder.percentGenus(10f);
-			});
-			FipSpecies.build(fipPrimaryLayer, builder -> {
-				builder.genus("PL");
-				builder.percentGenus(90f);
-			});
 
 			var vdypPolygon = app.createVdypPolygon(fipPolygon, processedLayers);
 
