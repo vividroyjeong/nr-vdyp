@@ -86,7 +86,8 @@ public class EstimationMethods {
 	 * @param treesPerHectarePrimary trees per hectare >7.5 cm of the primary species
 	 * @return
 	 */
-	public float primaryHeightFromLeadHeight(float leadHeight, String genus, Region region, float treesPerHectarePrimary
+	public float primaryHeightFromLeadHeight(
+			float leadHeight, String genus, Region region, float treesPerHectarePrimary
 	) {
 		return 1.3f + (leadHeight - 1.3f) * heightMultiplier(genus, region, treesPerHectarePrimary);
 	}
@@ -133,7 +134,8 @@ public class EstimationMethods {
 	 * @throws ProcessingException
 	 */
 	public float estimateNonPrimaryLoreyHeight(
-			BaseVdypSpecies<? extends BaseVdypSite> vspec, BaseVdypSpecies<? extends BaseVdypSite> vspecPrime, BecDefinition bec, 
+			BaseVdypSpecies<? extends BaseVdypSite> vspec, BaseVdypSpecies<? extends BaseVdypSite> vspecPrime,
+			BecDefinition bec,
 			float leadHeight, float primaryHeight
 	) throws ProcessingException {
 		return estimateNonPrimaryLoreyHeight(vspec.getGenus(), vspecPrime.getGenus(), bec, leadHeight, primaryHeight);
@@ -160,8 +162,8 @@ public class EstimationMethods {
 		var coe = coeMap.get(vspec, vspecPrime, bec.getRegion()).orElseThrow(
 				() -> new ProcessingException(
 						String.format(
-								"Could not find Lorey Height Nonprimary Coefficients for %s %s %s", vspec, vspecPrime,
-								bec.getRegion()
+								"Could not find Lorey Height Nonprimary Coefficients for %s %s %s", vspec, vspecPrime, bec
+										.getRegion()
 						)
 				)
 		);
@@ -194,70 +196,105 @@ public class EstimationMethods {
 			float standTreesPerHectare, // TPH_TOT
 			float standLoreyHeight // HL_TOT
 	) throws ProcessingException {
-		String species = spec.getGenus();
+
+		Map<String, Float> basalAreaFractionPerSpecies = new HashMap<>();
+		allSpecies.values().stream().forEach(s -> basalAreaFractionPerSpecies.put(s.getGenus(), s.getFractionGenus()));
+
+		return estimateQuadMeanDiameterForSpecies(
+				spec.getGenus(), spec.getLoreyHeightByUtilization().get(
+						UtilizationClass.ALL
+				), spec.getQuadraticMeanDiameterByUtilization().get(
+						UtilizationClass.ALL
+				), basalAreaFractionPerSpecies, region, standQuadMeanDiameter, standBaseArea, standTreesPerHectare, standLoreyHeight
+		);
+
+	}
+
+	// EMP060
+	/**
+	 * Estimate DQ for a species (primary or not). Using eqn in jf125.doc.
+	 *
+	 * Enforces mins and maxes from EMP061.
+	 *
+	 * @param spAlias               The alias of the species
+	 * @param spLoreyHeight			The lorey height (all utilizations) of the species 
+	 * @param spQuadMeanDiameter    The quad-mean-diameter (all utilizations) of the species
+	 * @param basalAreaFractionPerSpecies Basal area fractions of the per species in the stand
+	 * @param region                BEC Region of the stand
+	 * @param standQuadMeanDiameter Quadratic mean diameter of the stand
+	 * @param standBaseArea         Base area of the stand
+	 * @param standTreesPerHectare  Density opf the stand
+	 * @param standLoreyHeight      Lorey height of the stand
+	 * @return Quadratic mean diameter of the species of interest
+	 * @throws ProcessingException
+	 */
+	public float estimateQuadMeanDiameterForSpecies(
+			String spAlias,
+			float spLoreyHeight, // HLsp
+			float spQuadMeanDiameter, // DQsp
+			Map<String, Float> basalAreaFractionPerSpecies, // FR
+			Region region, // INDEX_IC
+			float standQuadMeanDiameter, // DQ_TOT
+			float standBaseArea, // BA_TOT
+			float standTreesPerHectare, // TPH_TOT
+			float standLoreyHeight // HL_TOT
+	) throws ProcessingException {
 
 		float c = 0.00441786467f;
 
 		float minQuadMeanDiameter = min(7.6f, standQuadMeanDiameter);
 
+		Float spFraction = basalAreaFractionPerSpecies.get(spAlias);
+
 		// Quick solution
-		if (spec.getFractionGenus() >= 1f || standQuadMeanDiameter < minQuadMeanDiameter) {
+		if (spFraction >= 1f || standQuadMeanDiameter < minQuadMeanDiameter) {
 			return standQuadMeanDiameter;
 		}
 
 		var coeMap = controlMap.<Map<String, Coefficients>>get(ControlKey.BY_SPECIES_DQ, Map.class);
 		var specAliases = controlMap.getGenusDefinitionMap().getAliases();
 
-		// TODO we can probably remove these as they seem to only be used for debugging
-		// in VDYP7
-		Map<String, Float> adjust = new HashMap<>(coeMap.size());
-		Map<String, Float> mult = new HashMap<>(coeMap.size());
-
 		var specIt = specAliases.iterator();
-
 		var spec1 = specIt.next();
 
 		float a2 = coeMap.get(spec1).getCoe(2);
 
-		float fractionOther = 1f - spec.getFractionGenus(); // FR_REST
+		float fractionOther = 1f - spFraction; // FR_REST
 
-		mult.put(spec1, 1f);
 		float a0 = coeMap.get(spec1).getCoe(0);
 		float a1 = coeMap.get(spec1).getCoe(1);
 
 		while (specIt.hasNext()) {
 			var specIAlias = specIt.next();
-			var specI = allSpecies.get(specIAlias);
-			if (specIAlias.equals(spec.getGenus())) {
+			if (spAlias.equals(specIAlias)) {
 				float multI = 1f;
-				mult.put(specIAlias, multI);
 				a0 += multI * coeMap.get(specIAlias).getCoe(0);
 				a1 += multI * coeMap.get(specIAlias).getCoe(1);
 			} else {
-				if (specI != null && specI.getFractionGenus() > 0f) {
-					float multI = -specI.getFractionGenus() / fractionOther;
-					mult.put(specIAlias, multI);
+				float spIFraction = basalAreaFractionPerSpecies.get(specIAlias);
+				if (spIFraction > 0f) {
+					float multI = -spIFraction / fractionOther;
 					a0 += multI * coeMap.get(specIAlias).getCoe(0);
 					a1 -= multI * coeMap.get(specIAlias).getCoe(1);
 				}
 			}
 		}
 
-		float loreyHeightSpec = spec.getLoreyHeightByUtilization().getCoe(UtilizationClass.ALL.index);
+		float loreyHeightSpec = spLoreyHeight;
 		float loreyHeight1 = max(4f, loreyHeightSpec);
-		float loreyHeight2 = (standLoreyHeight - loreyHeightSpec * spec.getFractionGenus()) / fractionOther;
+		float loreyHeight2 = (standLoreyHeight - loreyHeightSpec * spFraction) / fractionOther;
 		float loreyHeightRatio = clamp( (loreyHeight1 - 3f) / (loreyHeight2 - 3f), 0.05f, 20f);
 
 		float r = exp(
-				a0 + a1 * log(loreyHeightRatio) + a2 * log(standQuadMeanDiameter) + adjust.getOrDefault(species, 0f)
+				a0 + a1 * log(loreyHeightRatio) + a2 * log(standQuadMeanDiameter)
 		);
 
-		float baseArea1 = spec.getFractionGenus() * standBaseArea;
+		float baseArea1 = spFraction * standBaseArea;
 		float baseArea2 = standBaseArea - baseArea1;
 
 		float treesPerHectare1;
 		if (abs(r - 1f) < 0.0005) {
-			treesPerHectare1 = spec.getFractionGenus() * standTreesPerHectare;
+			treesPerHectare1 = spFraction * standTreesPerHectare;
 		} else {
 			float aa = (r - 1f) * c;
 			float bb = c * (1f - r) * standTreesPerHectare + baseArea1 + baseArea2 * r;
@@ -266,13 +303,13 @@ public class EstimationMethods {
 			if (term <= 0f) {
 				throw new ProcessingException(
 						"Term for trees per hectare calculation when estimating quadratic mean diameter for species "
-								+ species + " was " + term + " but should be positive."
+								+ spAlias + " was " + term + " but should be positive."
 				);
 			}
 			treesPerHectare1 = (-bb + sqrt(term)) / (2f * aa);
 			if (treesPerHectare1 <= 0f || treesPerHectare1 > standTreesPerHectare) {
 				throw new ProcessingException(
-						"Trees per hectare 1 for species " + species + " was " + treesPerHectare1
+						"Trees per hectare 1 for species " + spAlias + " was " + treesPerHectare1
 								+ " but should be positive and less than or equal to stand trees per hectare "
 								+ standTreesPerHectare
 				);
@@ -282,11 +319,10 @@ public class EstimationMethods {
 		float quadMeanDiameter1 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea1, treesPerHectare1);
 		float treesPerHectare2 = standTreesPerHectare - treesPerHectare1;
 		float quadMeanDiameter2 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea2, treesPerHectare2);
-		var limits = getLimitsForHeightAndDiameter(species, region);
+		var limits = getLimitsForHeightAndDiameter(spAlias, region);
 
 		quadMeanDiameter1 = estimateQuadMeanDiameterClampResult(
-				limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
-				quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+				limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2, quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
 		);
 		return quadMeanDiameter1;
 	}
@@ -306,8 +342,9 @@ public class EstimationMethods {
 
 		final float dqMinSp = max(minQuadMeanDiameter, limits.minQuadMeanDiameterLoreyHeightRatio() * loreyHeightSpec);
 		final float dqMaxSp = max(
-				7.6f,
-				min(limits.quadMeanDiameterMaximum(), limits.maxQuadMeanDiameterLoreyHeightRatio() * loreyHeightSpec)
+				7.6f, min(
+						limits.quadMeanDiameterMaximum(), limits.maxQuadMeanDiameterLoreyHeightRatio() * loreyHeightSpec
+				)
 		);
 		if (quadMeanDiameter1 < dqMinSp) {
 			quadMeanDiameter1 = dqMinSp;
@@ -547,7 +584,7 @@ public class EstimationMethods {
 	 * @throws StandProcessingException
 	 */
 	public float estimateBaseAreaYield(
-			Coefficients estimateBasalAreaYieldCoefficients, int controlVariable2Setting, float dominantHeight, 
+			Coefficients estimateBasalAreaYieldCoefficients, int controlVariable2Setting, float dominantHeight,
 			float breastHeightAge, Optional<Float> veteranBasalArea, boolean fullOccupancy, int baseAreaGroup
 	) throws StandProcessingException {
 		float upperBoundBaseArea = upperBoundsBaseArea(baseAreaGroup);
@@ -564,10 +601,10 @@ public class EstimationMethods {
 		 * decide NOT to do this:
 		 */
 
-// 		if (fullOccupancy) {
-//     		upperBoundsBaseArea *= EMPIRICAL_OCCUPANCY;
-// 		}
-		
+		// 		if (fullOccupancy) {
+		//     		upperBoundsBaseArea *= EMPIRICAL_OCCUPANCY;
+		// 		}
+
 		float ageToUse = breastHeightAge;
 
 		if (controlVariable2Setting > 0) {
@@ -587,7 +624,7 @@ public class EstimationMethods {
 		float a4 = estimateBasalAreaYieldCoefficients.getCoe(0);
 		float a5 = estimateBasalAreaYieldCoefficients.getCoe(0);
 		float a6 = estimateBasalAreaYieldCoefficients.getCoe(0);
-		
+
 		float a00 = Math.max(a0 + a1 * trAge, 0);
 		float ap = Math.max(a3 + a4 * trAge, 0);
 
@@ -603,7 +640,7 @@ public class EstimationMethods {
 		if (fullOccupancy) {
 			bap /= EMPIRICAL_OCCUPANCY;
 		}
-		
+
 		return bap;
 	}
 
@@ -622,14 +659,14 @@ public class EstimationMethods {
 	 * @throws StandProcessingException in the event of a processing error
 	 */
 	public float estimateQuadMeanDiameterYield(
-			Coefficients coefficients, int controlVariable2Setting, float dominantHeight, 
+			Coefficients coefficients, int controlVariable2Setting, float dominantHeight,
 			float breastHeightAge, Optional<Float> veteranBaseArea, int basalAreaGroup
 	) throws StandProcessingException {
 
 		if (dominantHeight <= 5) {
 			return 7.6f;
 		}
-		
+
 		final float upperBoundsQuadMeanDiameter = upperBoundsQuadMeanDiameter(basalAreaGroup);
 
 		final float ageUse = breastHeightAge;
@@ -645,7 +682,7 @@ public class EstimationMethods {
 		final float c2 = Math.max(coefficients.getCoe(3) + coefficients.getCoe(4) * trAge, 0f);
 
 		float dq = c0 + c1 * FloatMath.pow(dominantHeight - 5f, c2);
-		
+
 		return FloatMath.clamp(dq, 7.6f, upperBoundsQuadMeanDiameter);
 	}
 
@@ -679,7 +716,8 @@ public class EstimationMethods {
 	}
 
 	Coefficients sumCoefficientsWeightedBySpeciesAndDecayBec(
-			Collection<? extends BaseVdypSpecies<? extends BaseVdypSite>> species, BecDefinition bec, ControlKey key, int size
+			Collection<? extends BaseVdypSpecies<? extends BaseVdypSite>> species, BecDefinition bec, ControlKey key,
+			int size
 	) {
 		var coeMap = controlMap.<MatrixMap2<String, String, Coefficients>>get(key, MatrixMap2.class);
 
@@ -817,8 +855,7 @@ public class EstimationMethods {
 				);
 
 		estimateWholeStemVolume(
-				utilizationClass, adjustCloseUtil, volumeGroup, hlSp, wholeStemUtilizationComponentMap,
-				quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
+				utilizationClass, adjustCloseUtil, volumeGroup, hlSp, wholeStemUtilizationComponentMap, quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
 		);
 	}
 
@@ -896,8 +933,7 @@ public class EstimationMethods {
 				ControlKey.CLOSE_UTIL_VOLUME, MatrixMap2.class
 		);
 		estimateCloseUtilizationVolume(
-				utilizationClass, aAdjust, volumeGroup, hlSp, closeUtilizationCoeMap, quadMeanDiameterUtil,
-				wholeStemVolumeUtil, closeUtilizationVolumeUtil
+				utilizationClass, aAdjust, volumeGroup, hlSp, closeUtilizationCoeMap, quadMeanDiameterUtil, wholeStemVolumeUtil, closeUtilizationVolumeUtil
 		);
 	}
 
@@ -968,8 +1004,7 @@ public class EstimationMethods {
 		final var decayModifierMap = controlMap
 				.<MatrixMap2<String, Region, Float>>get(ModifierParser.CONTROL_KEY_MOD301_DECAY, MatrixMap2.class);
 		estimateNetDecayVolume(
-				genus, region, utilizationClass, aAdjust, decayGroup, ageBreastHeight, netDecayCoeMap, decayModifierMap,
-				quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil
+				genus, region, utilizationClass, aAdjust, decayGroup, ageBreastHeight, netDecayCoeMap, decayModifierMap, quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil
 		);
 	}
 
@@ -1053,9 +1088,7 @@ public class EstimationMethods {
 				.<MatrixMap2<String, Region, Float>>get(ControlKey.WASTE_MODIFIERS, MatrixMap2.class);
 
 		estimateNetDecayAndWasteVolume(
-				region, utilizationClass, aAdjust, genus, loreyHeight, netDecayWasteCoeMap, wasteModifierMap,
-				quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil,
-				closeUtilizationNetOfDecayAndWasteUtil
+				region, utilizationClass, aAdjust, genus, loreyHeight, netDecayWasteCoeMap, wasteModifierMap, quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
 		);
 	}
 
@@ -1082,8 +1115,9 @@ public class EstimationMethods {
 			UtilizationVector closeUtilizationNetOfDecayUtil, UtilizationVector closeUtilizationNetOfDecayAndWasteUtil
 	) throws ProcessingException {
 		estimateUtilization(
-				closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil, utilizationClass,
-				(i, netDecay) -> {
+				closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil, utilizationClass, (
+						i, netDecay
+				) -> {
 					if (Float.isNaN(netDecay) || netDecay <= 0f) {
 						return 0f;
 					}
@@ -1160,8 +1194,7 @@ public class EstimationMethods {
 		final var netBreakageCoeMap = controlMap.<Map<Integer, Coefficients>>get(ControlKey.BREAKAGE, Map.class);
 
 		estimateNetDecayWasteAndBreakageVolume(
-				utilizationClass, breakageGroup, netBreakageCoeMap, quadMeanDiameterUtil, closeUtilizationUtil,
-				closeUtilizationNetOfDecayAndWasteUtil, closeUtilizationNetOfDecayWasteAndBreakageUtil
+				utilizationClass, breakageGroup, netBreakageCoeMap, quadMeanDiameterUtil, closeUtilizationUtil, closeUtilizationNetOfDecayAndWasteUtil, closeUtilizationNetOfDecayWasteAndBreakageUtil
 		);
 	}
 
@@ -1194,8 +1227,9 @@ public class EstimationMethods {
 		final var a4 = coefficients.getCoe(4);
 
 		estimateUtilization(
-				closeUtilizationNetOfDecayAndWasteUtil, closeUtilizationNetOfDecayWasteAndBreakageUtil,
-				utilizationClass, (uc, netWaste) -> {
+				closeUtilizationNetOfDecayAndWasteUtil, closeUtilizationNetOfDecayWasteAndBreakageUtil, utilizationClass, (
+						uc, netWaste
+				) -> {
 
 					if (netWaste <= 0f) {
 						return 0f;

@@ -66,17 +66,8 @@ class Bank {
 		this.layer = layer;
 		this.becZone = becZone;
 		
-		this.indices = IntStream.range(1, nSpecies + 1).toArray();
-
-		List<VdypSpecies> speciesToRetain = new ArrayList<>();
-
-		for (VdypSpecies s : layer.getSpecies().values()) {
-			if (retainCriteria.test(s)) {
-				speciesToRetain.add(s);
-			}
-		}
-				
-		speciesToRetain.sort((o1, o2) -> o1.getGenusIndex().compareTo(o2.getGenusIndex()));
+		List<VdypSpecies> speciesToRetain = layer.getSpecies().values().stream().filter(s -> retainCriteria.test(s))
+				.sorted((s1, s2) -> s1.getGenusIndex().compareTo(s2.getGenusIndex())).toList();
 
 		this.nSpecies = speciesToRetain.size();
 		this.indices = IntStream.range(1, nSpecies + 1).toArray();
@@ -105,11 +96,11 @@ class Bank {
 		treesPerHectare = new float[nSpecies + 1][nUtilizationClasses];
 		wholeStemVolumes = new float[nSpecies + 1][nUtilizationClasses];
 
-		recordUtilizations(0, layer);
+		transferUtilizationsIntoBank(0, layer);
 
 		int nextSlot = 1;
 		for (VdypSpecies s : speciesToRetain) {
-			recordSpecies(nextSlot++, s);
+			transferSpeciesIntoBank(nextSlot++, s);
 		}
 	}
 
@@ -188,19 +179,27 @@ class Bank {
 		return nSpecies;
 	}
 
-	public int[] getIndices() {
+	int[] getIndices() {
 		return indices;
 	}
 
-	public BecDefinition getBecZone() {
+	BecDefinition getBecZone() {
 		return becZone;
 	}
-
-	public VdypLayer getLayer() {
+	
+	/**
+	 * This method copies the Bank contents out to the VdypLayer instance used to create it
+	 * and returns that. It is a relatively expensive operation and should not be called 
+	 * without due consideration.
+	 * 
+	 * @return as described
+	 */
+	VdypLayer getUpdatedLayer() {
+		transferLayerFromBank();
 		return layer;
 	}
 
-	private void recordSpecies(int index, VdypSpecies species) {
+	private void transferSpeciesIntoBank(int index, VdypSpecies species) {
 
 		VdypSite site = species.getSite().orElseThrow(() -> new ProcessingException(MessageFormat.format(
 				"Species {0} of Polygon {1} must contain a Site definition but does not.", 
@@ -213,18 +212,18 @@ class Bank {
 		ageTotals[index] = site.getAgeTotal().orElse(VdypEntity.MISSING_FLOAT_VALUE);
 		yearsToBreastHeight[index] = site.getYearsToBreastHeight().orElse(VdypEntity.MISSING_FLOAT_VALUE);
 		if (ageTotals[index] != VdypEntity.MISSING_FLOAT_VALUE && yearsToBreastHeight[index] != VdypEntity.MISSING_FLOAT_VALUE) {
-			ageTotals[index] = ageTotals[index] - yearsToBreastHeight[index];
+			yearsAtBreastHeight[index] = ageTotals[index] - yearsToBreastHeight[index];
 		} else {
-			ageTotals[index] = VdypEntity.MISSING_FLOAT_VALUE;
+			yearsAtBreastHeight[index] = VdypEntity.MISSING_FLOAT_VALUE;
 		}
 		siteCurveNumbers[index] = site.getSiteCurveNumber().orElse(VdypEntity.MISSING_INTEGER_VALUE);
 		speciesIndices[index] = species.getGenusIndex();
 		// percentForestedLand is output-only and so not assigned here.
 
-		recordUtilizations(index, species);
+		transferUtilizationsIntoBank(index, species);
 	}
 
-	private void recordUtilizations(int index, VdypUtilizationHolder uh) {
+	private void transferUtilizationsIntoBank(int index, VdypUtilizationHolder uh) {
 
 		for (UtilizationClass uc: UtilizationClass.values()) {
 			int ucIndex = uc.ordinal();
@@ -241,7 +240,7 @@ class Bank {
 		}
 	}
 
-	private void recordDefaultUtilizations(int index) {
+	private void transferDefaultUtilizationsIntoBank(int index) {
 
 		for (var uc : UtilizationClass.values()) {
 			int ucIndex = uc.ordinal();
@@ -258,10 +257,55 @@ class Bank {
 		}
 	}
 
+	private void transferLayerFromBank() {
+
+		transferUtilizationsFromBank(0, layer);
+		
+		for (int i: indices) {
+			transferSpeciesFromBank(i, layer.getSpecies().get(speciesNames[i]));
+		}
+	}
+
+	private void transferSpeciesFromBank(int index, VdypSpecies species) {
+
+		VdypSite site = species.getSite().get();
+		
+		VdypSite updatedSite = new VdypSite.Builder()
+				.adapt(site)
+				.siteIndex(siteIndices[index])
+				.ageTotal(ageTotals[index])
+				.height(dominantHeights[index])
+				.yearsToBreastHeight(yearsToBreastHeight[index])
+				.build();
+		
+		VdypSpecies speciesBuilder = new VdypSpecies.Builder()
+				.addSite(updatedSite)
+				.adapt(species).build();
+
+		transferUtilizationsIntoBank(index, species);
+	}
+
+	private void transferUtilizationsFromBank(int index, VdypUtilizationHolder uh) {
+
+		for (UtilizationClass uc: UtilizationClass.values()) {
+			int ucIndex = uc.ordinal();
+			uh.getBaseAreaByUtilization().set(uc, basalAreas[index][ucIndex]);
+			uh.getCloseUtilizationVolumeByUtilization().set(uc, closeUtilizationVolumes[index][ucIndex]);
+			uh.getCloseUtilizationVolumeNetOfDecayByUtilization().set(uc, cuVolumesMinusDecay[index][ucIndex]);
+			uh.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization().set(uc, cuVolumesMinusDecayAndWastage[index][ucIndex]);
+			if (ucIndex < 2 /* only uc 0 and 1 have a lorey height */) {
+				uh.getLoreyHeightByUtilization().set(uc, loreyHeights[index][ucIndex]);
+			}
+			uh.getQuadraticMeanDiameterByUtilization().set(uc, quadMeanDiameters[index][ucIndex]);
+			uh.getTreesPerHectareByUtilization().set(uc, treesPerHectare[index][ucIndex]);
+			uh.getWholeStemVolumeByUtilization().set(uc, wholeStemVolumes[index][ucIndex]);
+		}
+	}
+
 	public Bank copy() {
 		return new Bank(this, CopyMode.CopyAll);
 	}
-
+	
 	private GenusDistributionSet[] copy(GenusDistributionSet[] a) {
 		return Arrays.stream(a).map(g -> g == null ? null : g.copy()).toArray(GenusDistributionSet[]::new);
 	}

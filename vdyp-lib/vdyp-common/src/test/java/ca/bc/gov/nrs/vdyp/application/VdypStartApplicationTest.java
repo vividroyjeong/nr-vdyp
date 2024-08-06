@@ -41,8 +41,11 @@ import ca.bc.gov.nrs.vdyp.application.test.TestPolygon;
 import ca.bc.gov.nrs.vdyp.application.test.TestSite;
 import ca.bc.gov.nrs.vdyp.application.test.TestSpecies;
 import ca.bc.gov.nrs.vdyp.application.test.TestStartApplication;
+import ca.bc.gov.nrs.vdyp.common.ComputationMethods;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.EstimationMethods;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.controlmap.ResolvedControlMapImpl;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
@@ -1542,7 +1545,9 @@ class VdypStartApplicationTest {
 
 			layer.setSpecies(Arrays.asList(spec1, spec2));
 
-			app.computeUtilizationComponentsPrimary(
+			EstimationMethods estimationMethods = new EstimationMethods(new ResolvedControlMapImpl(controlMap));
+			ComputationMethods computationMethods = new ComputationMethods(estimationMethods, null);
+			computationMethods.computeUtilizationComponentsPrimary(
 					bec, layer, VolumeComputeMode.BY_UTIL, CompatibilityVariableMode.NONE
 			);
 

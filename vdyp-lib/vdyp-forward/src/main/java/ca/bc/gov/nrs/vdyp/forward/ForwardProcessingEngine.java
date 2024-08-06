@@ -58,7 +58,9 @@ import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClassVariable;
 import ca.bc.gov.nrs.vdyp.model.UtilizationVector;
 import ca.bc.gov.nrs.vdyp.model.VdypEntity;
+import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.VolumeVariable;
 import ca.bc.gov.nrs.vdyp.si32.site.SiteTool;
 
@@ -180,11 +182,21 @@ public class ForwardProcessingEngine {
 	private void executeForwardAlgorithm(ExecutionStep lastStepInclusive, int untilYear) throws ProcessingException {
 
 		PolygonProcessingState pps = fps.getPolygonProcessingState();
-		Bank bank = fps.getBank(0, LayerType.PRIMARY);
+		Bank primaryBank = fps.getBank(0, LayerType.PRIMARY);
+
+		Optional<VdypLayer> veteranLayer;
+		Optional<Bank> veteranBank;
+		if (pps.getPolygon().getLayers().containsKey(LayerType.VETERAN)){
+			veteranLayer = Optional.of(pps.getPolygon().getLayers().get(LayerType.VETERAN));
+			veteranBank = Optional.of(fps.getBank(0, LayerType.VETERAN));
+		} else {
+			veteranLayer = Optional.empty();
+			veteranBank = Optional.empty();
+		}
 
 		logger.info(
-				"Beginning processing of polygon {} layer {}", pps.getLayer().getPolygonIdentifier()
-						.toStringCompact(), pps.getLayer()
+				"Beginning processing of polygon {} Primary layer {}", pps.getPolygon().getPolygonIdentifier()
+						.toStringCompact()
 		);
 
 		// BANKCHK1, simplified for the parameters METH_CHK = 4, LayerI = 1, and INSTANCE = 1
@@ -194,7 +206,7 @@ public class ForwardProcessingEngine {
 
 		// SCINXSET - note these are calculated directly from the Primary bank of instance 1
 		if (lastStepInclusive.ordinal() >= ExecutionStep.CALCULATE_MISSING_SITE_CURVES.ordinal()) {
-			calculateMissingSiteCurves(bank, fps.fcm.getSiteCurveMap(), fps.getPolygonProcessingState());
+			calculateMissingSiteCurves(primaryBank, fps.fcm.getSiteCurveMap(), fps.getPolygonProcessingState());
 		}
 
 		// VPRIME1, method == 1
@@ -227,15 +239,13 @@ public class ForwardProcessingEngine {
 
 		// VGROW1
 		if (lastStepInclusive.ordinal() >= ExecutionStep.GROW.ordinal()) {
-			int veteranLayerInstance = 0;
-
 			int startingYear = fps.getPolygonProcessingState().getPolygon().getPolygonIdentifier().getYear();
-			Bank startBank = pps.getStartBank();
 
-			int primaryLayerSourceInstance = 2;
-			fps.storeActive(pps.getStartBank(), primaryLayerSourceInstance, LayerType.PRIMARY);
-
-			writeLayers(startBank, veteranLayerInstance, false);
+			VdypPolygon vdypPolygon = pps.getPolygon();
+			
+			VdypLayer primaryLayer = vdypPolygon.getLayers().get(LayerType.PRIMARY);
+			
+			writeLayers(primaryLayer, veteranLayer, false);
 
 			boolean createNewGroups = fps.fcm.getDebugSettings()
 					.getValue(ForwardDebugSettings.Vars.SPECIES_DYNAMICS_1) != 1
@@ -245,18 +255,12 @@ public class ForwardProcessingEngine {
 			int currentYear = startingYear;
 			while (currentYear <= untilYear) {
 
-				Bank endBank = grow(startBank, currentYear, veteranLayerInstance);
+				primaryLayer = grow(primaryBank, currentYear, veteranBank);
 
 				// Store polygon (both primary and veteran layers) to output
-				writeLayers(endBank, veteranLayerInstance, createNewGroups);
+				writeLayers(primaryLayer, veteranLayer, createNewGroups);
 
 				currentYear += 1;
-
-				int newPrimaryLayerSourceInstance = primaryLayerTargetInstance;
-				primaryLayerTargetInstance = primaryLayerSourceInstance;
-				primaryLayerSourceInstance = newPrimaryLayerSourceInstance;
-
-				startBank = endBank;
 			}
 		}
 	}
@@ -274,7 +278,7 @@ public class ForwardProcessingEngine {
 	 * 
 	 * @throws ProcessingException
 	 */
-	private Bank grow(Bank start, int currentYear, int veteranLayerInstance)
+	private Bank grow(Bank start, int currentYear, Optional<Bank> veteranBank)
 			throws ProcessingException {
 
 		PolygonProcessingState pps = fps.getPolygonProcessingState();
@@ -283,8 +287,6 @@ public class ForwardProcessingEngine {
 		logger.info("Performing grow of {} for year {}", polygon.getPolygonIdentifier().getName(), currentYear);
 
 		Bank end = new Bank(start, CopyMode.CopyStructure);
-
-		Optional<Bank> veteranBank = Optional.ofNullable(fps.getBank(veteranLayerInstance, LayerType.VETERAN));
 
 		// If update-during-growth is set, and this is not the starting year, update the context
 		int startingYear = polygon.getPolygonIdentifier().getYear();
@@ -471,7 +473,8 @@ public class ForwardProcessingEngine {
 
 		pps.updateCompatibilityVariablesAfterGrowth();
 
-		computeUtilizationComponentsPrimary();
+		VdypLayer primaryLayer = pps.getStartBank().getUpdatedLayer();
+		pps.getFps().computers.computeUtilizationComponentsPrimary(pps.getBecZone(), primaryLayer, null, null);
 
 		calculateSmallComponentYields(end);
 
@@ -524,20 +527,69 @@ public class ForwardProcessingEngine {
 	 * (indices 1 - # species) | overall (index 0) the start of the growth period 
 	 * 
 	 * @return true if and only if a solution was found.
+	 * @throws ProcessingException 
 	 */
 	private boolean growUsingPartialSpeciesDynamics(
 			Bank end, float dqDelta, float baDelta, float baStart,
 			float dqStart, float tphStart, float[] currentLoreyHeights
-	) {
-
+	) throws ProcessingException {
 		boolean wasSuccessful = true;
 
 		PolygonProcessingState pps = fps.getPolygonProcessingState();
+		Bank start = pps.getStartBank();		
 
 		if (dqDelta == 0 || baDelta == 0 || pps.getNSpecies() == 1) {
 			return false /* no solution available */;
 		}
+		
+		float[] dqs1 = new float[pps.getNSpecies() + 1];
+		float[] dqs2 = new float[pps.getNSpecies() + 1];
 
+		float[] baNew = new float[pps.getNSpecies() + 1];
+		baNew[0] = baStart + baDelta;
+		for (int i : pps.getIndices()) {
+			baNew[i] = start.basalAreas[i][0] * baNew[0] / start.basalAreas[0][0];
+		}
+		
+		float[] dqNew = new float[pps.getNSpecies() + 1];
+		dqNew[0] = dqStart + dqDelta;
+
+		float[] tphNew = new float[pps.getNSpecies() + 1];
+		tphNew[0] = tphStart + BaseAreaTreeDensityDiameter.treesPerHectare(baNew[0], dqNew[0]);
+
+		Map<String, Float> basalAreaPercentagesPerSpecies = new HashMap<>();
+		for (String spAlias : fps.fcm.getGenusDefinitionMap().getAliases()) {
+			basalAreaPercentagesPerSpecies.put(spAlias, 0.0f);
+		}
+		for (int i : pps.getIndices()) {
+			basalAreaPercentagesPerSpecies.put(start.speciesNames[i], start.percentagesOfForestedLand[i]);
+		}
+		
+		for (int i : pps.getIndices()) {
+
+			dqs1[i] = fps.estimators.estimateQuadMeanDiameterForSpecies(
+					start.speciesNames[i],
+					start.basalAreas[i][0],
+					start.quadMeanDiameters[i][0],
+					basalAreaPercentagesPerSpecies,
+					pps.getBecZone().getRegion(),
+					dqStart,
+					baStart,
+					tphStart,
+					currentLoreyHeights[0]);
+			
+			dqs2[i] = fps.estimators.estimateQuadMeanDiameterForSpecies(
+					start.speciesNames[i],
+					baNew[0],
+					dqNew[0],
+					basalAreaPercentagesPerSpecies,
+					pps.getBecZone().getRegion(),
+					dqStart,
+					baStart,
+					tphStart,
+					start.loreyHeights[i][0]);
+		}
+		
 		return wasSuccessful;
 	}
 
@@ -974,13 +1026,6 @@ public class ForwardProcessingEngine {
 		}
 
 		return baDelta;
-	}
-
-	/**
-	 * YUC1
-	 */
-	private void computeUtilizationComponentsPrimary() {
-		// TODO Auto-generated method stub
 	}
 
 	/**
@@ -1857,10 +1902,11 @@ public class ForwardProcessingEngine {
 		}
 	}
 
-	private void writeLayers(Bank endBank, int veteranLayerInstance, boolean b) {
+	private void writeLayers(VdypLayer primaryLayer, Optional<VdypLayer> veteranLayer, boolean doCreateNewGroups) {
 
 		logger.info(
-				"Writing primary layer, and veteran layer from instance {}", endBank, veteranLayerInstance
+				"Writing primary layer {}{}", primaryLayer.getPolygonIdentifier(), 
+						veteranLayer.isPresent() ? veteranLayer.get().getPolygonIdentifier() : ""
 		);
 	}
 
@@ -2682,7 +2728,7 @@ public class ForwardProcessingEngine {
 		}
 	}
 
-	private static void stopIfNoWork(PolygonProcessingState state) throws ProcessingException {
+	private static void stopIfNoWork(PolygonProcessingState pps) throws ProcessingException {
 
 		// The following is extracted from BANKCHK1, simplified for the parameters
 		// METH_CHK = 4, LayerI = 1, and INSTANCE = 1. So IR = 1, which is the first
@@ -2691,10 +2737,10 @@ public class ForwardProcessingEngine {
 		// => all that is done is that an exception is thrown if there are no species to
 		// process.
 
-		if (state.getNSpecies() == 0) {
+		if (pps.getNSpecies() == 0) {
 			throw new ProcessingException(
 					MessageFormat.format(
-							"Polygon {0} layer 0 has no species with basal area above {1}", state.getLayer()
+							"Polygon {0} layer 0 has no species with basal area above {1}", pps.getPolygon()
 									.getPolygonIdentifier().toStringCompact(), MIN_BASAL_AREA
 					)
 			);

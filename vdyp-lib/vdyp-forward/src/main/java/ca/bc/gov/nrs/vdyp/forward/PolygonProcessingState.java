@@ -16,7 +16,6 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClassVariable;
 import ca.bc.gov.nrs.vdyp.model.VdypEntity;
-import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VolumeVariable;
 
@@ -166,11 +165,6 @@ class PolygonProcessingState {
 	public BecDefinition getBecZone() {
 		return start.getBecZone();
 	}
-
-	public VdypLayer getLayer() {
-		return start.getLayer();
-	}
-
 
 	public int getPrimarySpeciesIndex() {
 		if (!areRankingDetailsSet) {
