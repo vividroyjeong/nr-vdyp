@@ -20,7 +20,6 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.math3.util.Pair;
 
-import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
@@ -294,10 +293,19 @@ public class Utils {
 		return Optional.empty();
 	}
 
-	public static BecDefinition getBec(String biogeoclimaticZone, Map<String, Object> controlMap)
-			throws ProcessingException {
-		return expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class).get(biogeoclimaticZone)
-				.orElseThrow(() -> new ProcessingException("Reference to unexpected BEC " + biogeoclimaticZone));
+	/**
+	 * Returns the BecDefinition of the given bec zone alias, throwing an IllegalArgumentException
+	 * if the alias does not identify a known Bec Zone, or <code>controlMap</code> does not contain
+	 * {@code ControlKey.BEC_DEF}.
+	 * @param becZoneAlias
+	 * @param controlMap
+	 * @return as described
+	 * @throws IllegalArgumentException as described
+	 */
+	public static BecDefinition getBec(String becZoneAlias, Map<String, Object> controlMap)
+			throws IllegalArgumentException {
+		return expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class).get(becZoneAlias)
+				.orElseThrow(() -> new IllegalArgumentException("Reference to unexpected BEC " + becZoneAlias));
 	}
 
 	/**

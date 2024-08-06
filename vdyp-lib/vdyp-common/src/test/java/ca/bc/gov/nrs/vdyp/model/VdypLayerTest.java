@@ -13,13 +13,16 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.easymock.EasyMock;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 class VdypLayerTest {
 
@@ -62,12 +65,15 @@ class VdypLayerTest {
 	@Test
 	void buildForPolygon() throws Exception {
 
+		Map<String, Object> controlMap = new HashMap<>();
+		TestUtils.populateControlMapBecReal(controlMap);
+				
 		var poly = VdypPolygon.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.percentAvailable(50f);
 
 			builder.forestInventoryZone("?");
-			builder.biogeoclimaticZone("?");
+			builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 		});
 
 		var result = VdypLayer.build(poly, builder -> {

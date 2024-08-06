@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -12,6 +13,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapValueReplacer;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.AbstractStreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
+import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.vri.model.VriPolygon;
 
@@ -51,9 +53,9 @@ public class VriPolygonParser implements ControlMapValueReplacer<StreamingParser
 
 				@SuppressWarnings("unchecked")
 				@Override
-				protected VriPolygon convert(Map<String, Object> entry) {
+				protected VriPolygon convert(Map<String, Object> entry) throws ResourceParseException {
 					var polygonId = (String) entry.get(POLYGON_IDENTIFIER);
-					var becId = (String) entry.get(BIOGEOGRAPHIC_ZONE);
+					var becAlias = (String) entry.get(BIOGEOGRAPHIC_ZONE);
 					var percentForestLand = ((Optional<Float>) entry.get(PERCENT_FOREST_LAND)).filter(x -> x > 0.0f);
 					var fipMode = ((Optional<Integer>) entry.get(FIP_MODE)).flatMap(PolygonMode::getByCode);
 					var nonproductiveDesc = (Optional<String>) entry.get(NONPRODUCTIVE_DESCRIPTION);
@@ -62,9 +64,17 @@ public class VriPolygonParser implements ControlMapValueReplacer<StreamingParser
 							() -> fipMode
 									.flatMap(mode -> mode == PolygonMode.BATC ? Optional.of(85f) : Optional.empty())
 					);
+					
+					BecDefinition bec;
+					try {
+						bec = Utils.getBec(becAlias, control);
+					} catch (IllegalArgumentException e) {
+						throw new ResourceParseException(e);
+					}
+
 					return VriPolygon.build(builder -> {
 						builder.polygonIdentifier(polygonId);
-						builder.biogeoclimaticZone(becId);
+						builder.biogeoclimaticZone(bec);
 						builder.percentAvailable(percentForestLandWithDefault);
 						builder.mode(fipMode);
 						builder.nonproductiveDescription(nonproductiveDesc);

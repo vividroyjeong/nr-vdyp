@@ -633,7 +633,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	public S leadGenus(L fipLayer) {
 		return fipLayer.getSpecies().values().stream()
-				.sorted(Utils.compareUsing(BaseVdypSpecies<?>::getFractionGenus).reversed()).findFirst().orElseThrow();
+				.sorted(Utils.compareUsing(BaseVdypSpecies<? extends BaseVdypSite>::getFractionGenus).reversed()).findFirst().orElseThrow();
 	}
 
 	protected L getPrimaryLayer(P poly) throws StandProcessingException {
@@ -646,10 +646,6 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	protected Optional<L> getVeteranLayer(P poly) throws StandProcessingException {
 		return Utils.optSafe(poly.getLayers().get(LayerType.VETERAN));
-	}
-
-	protected BecDefinition getBec(P poly) throws ProcessingException {
-		return Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
 	}
 
 	protected static <E extends Throwable> void throwIfPresent(Optional<E> opt) throws E {
@@ -767,7 +763,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 		float yieldFactor = getYieldFactor(polygon);
 
-		var bec = Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap);
+		var bec = polygon.getBiogeoclimaticZone();
 
 		breastHeightAge = max(5.0f, breastHeightAge);
 		// EMP040
@@ -903,7 +899,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 		Map<String, Float> targetPercentages = new HashMap<>(vdypSpecies.size());
 
-		BecDefinition bec = Utils.getBec(fipPolygon.getBiogeoclimaticZone(), controlMap);
+		BecDefinition bec = fipPolygon.getBiogeoclimaticZone();
 		var volumeGroupMap = getGroupMap(ControlKey.VOLUME_EQN_GROUPS);
 		var decayGroupMap = getGroupMap(ControlKey.DECAY_GROUPS);
 		var breakageGroupMap = getGroupMap(ControlKey.BREAKAGE_GROUPS);
@@ -961,7 +957,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		float treesPerHectareSum = 0f;
 		float volumeSum = 0f;
 
-		Region region = Utils.getBec(fPoly.getBiogeoclimaticZone(), controlMap).getRegion();
+		Region region = fPoly.getBiogeoclimaticZone().getRegion();
 
 		for (VdypSpecies spec : layer.getSpecies().values()) {
 			@SuppressWarnings("unused")

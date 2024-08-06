@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
+import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 
@@ -14,7 +15,7 @@ public class FipPolygon extends BaseVdypPolygon<FipLayer, Optional<Float>, FipSp
 	private float yieldFactor; // FIP_P4/YLDFACT
 
 	public FipPolygon(
-			PolygonIdentifier polygonIdentifier, String fiz, String becIdentifier, Optional<Float> percentAvailable,
+			PolygonIdentifier polygonIdentifier, String fiz, BecDefinition becIdentifier, Optional<Float> percentAvailable,
 			Optional<PolygonMode> modeFip, Optional<String> nonproductiveDescription, float yieldFactor
 	) {
 		super(polygonIdentifier, percentAvailable, fiz, becIdentifier, modeFip);

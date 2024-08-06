@@ -59,7 +59,7 @@ class VriInputValidationTest {
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
-			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.addLayer(lBuilder -> {
@@ -164,7 +164,7 @@ class VriInputValidationTest {
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
-			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.addLayer(lBuilder -> {
@@ -242,7 +242,7 @@ class VriInputValidationTest {
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
-			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.addLayer(lBuilder -> {
@@ -337,7 +337,7 @@ class VriInputValidationTest {
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
-			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(PolygonMode.YOUNG);
@@ -422,7 +422,7 @@ class VriInputValidationTest {
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
-			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(PolygonMode.YOUNG);
@@ -508,7 +508,7 @@ class VriInputValidationTest {
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
-			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(PolygonMode.YOUNG);
@@ -595,7 +595,7 @@ class VriInputValidationTest {
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
-			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(PolygonMode.START);
@@ -682,7 +682,7 @@ class VriInputValidationTest {
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
-			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(PolygonMode.START);
@@ -771,7 +771,7 @@ class VriInputValidationTest {
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
-			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
@@ -798,7 +798,7 @@ class VriInputValidationTest {
 				lBuilder.primaryGenus("B");
 			});
 		});
-		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+		BecDefinition bec = poly.getBiogeoclimaticZone();
 
 		if (pass) {
 			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
@@ -833,7 +833,7 @@ class VriInputValidationTest {
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
-			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
@@ -860,7 +860,7 @@ class VriInputValidationTest {
 				lBuilder.primaryGenus("B");
 			});
 		});
-		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+		BecDefinition bec = poly.getBiogeoclimaticZone();
 
 		if (pass) {
 			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
@@ -895,7 +895,7 @@ class VriInputValidationTest {
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
-			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
@@ -925,7 +925,7 @@ class VriInputValidationTest {
 				lBuilder.primaryGenus("B");
 			});
 		});
-		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+		BecDefinition bec = poly.getBiogeoclimaticZone();
 
 		if (pass) {
 			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
@@ -960,7 +960,7 @@ class VriInputValidationTest {
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
-			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
@@ -988,7 +988,7 @@ class VriInputValidationTest {
 				lBuilder.primaryGenus("B");
 			});
 		});
-		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+		BecDefinition bec = poly.getBiogeoclimaticZone();
 
 		if (pass) {
 			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
@@ -1023,7 +1023,7 @@ class VriInputValidationTest {
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
-			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
@@ -1054,7 +1054,7 @@ class VriInputValidationTest {
 				lBuilder.primaryGenus("B");
 			});
 		});
-		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+		BecDefinition bec = poly.getBiogeoclimaticZone();
 
 		if (pass) {
 			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
@@ -1089,7 +1089,7 @@ class VriInputValidationTest {
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
-			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
@@ -1118,7 +1118,7 @@ class VriInputValidationTest {
 				lBuilder.primaryGenus("B");
 			});
 		});
-		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+		BecDefinition bec = poly.getBiogeoclimaticZone();
 
 		if (pass) {
 			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
@@ -1162,7 +1162,7 @@ class VriInputValidationTest {
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
-			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
@@ -1191,7 +1191,7 @@ class VriInputValidationTest {
 				lBuilder.primaryGenus("B");
 			});
 		});
-		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+		BecDefinition bec = poly.getBiogeoclimaticZone();
 
 		if (pass) {
 			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
@@ -1226,7 +1226,7 @@ class VriInputValidationTest {
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
-			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
@@ -1255,7 +1255,7 @@ class VriInputValidationTest {
 				lBuilder.primaryGenus("B");
 			});
 		});
-		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+		BecDefinition bec = poly.getBiogeoclimaticZone();
 
 		if (pass) {
 			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
@@ -1293,7 +1293,7 @@ class VriInputValidationTest {
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
-			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
@@ -1322,7 +1322,7 @@ class VriInputValidationTest {
 				lBuilder.primaryGenus("B");
 			});
 		});
-		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+		BecDefinition bec = poly.getBiogeoclimaticZone();
 
 		if (pass) {
 			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
@@ -1357,7 +1357,7 @@ class VriInputValidationTest {
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
-			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
@@ -1386,7 +1386,7 @@ class VriInputValidationTest {
 				lBuilder.primaryGenus("B");
 			});
 		});
-		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+		BecDefinition bec = poly.getBiogeoclimaticZone();
 
 		if (pass) {
 			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
@@ -1421,7 +1421,7 @@ class VriInputValidationTest {
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
-			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.mode(mode);
@@ -1450,7 +1450,7 @@ class VriInputValidationTest {
 				lBuilder.primaryGenus("B");
 			});
 		});
-		BecDefinition bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+		BecDefinition bec = poly.getBiogeoclimaticZone();
 
 		if (pass) {
 			var result = assertDoesNotThrow(() -> app.checkPolygonForMode(poly, bec));
@@ -1481,7 +1481,7 @@ class VriInputValidationTest {
 
 		var poly = VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
-			pBuilder.biogeoclimaticZone("IDF");
+			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");
 			pBuilder.yieldFactor(1.0f);
 			pBuilder.addLayer(lBuilder -> {

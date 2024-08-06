@@ -107,7 +107,7 @@ class ParsersTogetherTest {
 		polyStream.addValue(VriPolygon.build(polyBuilder -> {
 			polyBuilder.polygonIdentifier(polygonId);
 			polyBuilder.percentAvailable(Optional.of(100.0f));
-			polyBuilder.biogeoclimaticZone("IDF");
+			polyBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			polyBuilder.yieldFactor(0.9f);
 		}));
 
@@ -176,7 +176,7 @@ class ParsersTogetherTest {
 		polyStream.addValue(VriPolygon.build(polyBuilder -> {
 			polyBuilder.polygonIdentifier(polygonId);
 			polyBuilder.percentAvailable(Optional.of(100.0f));
-			polyBuilder.biogeoclimaticZone("IDF");
+			polyBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			polyBuilder.yieldFactor(0.9f);
 		}));
 
@@ -245,7 +245,7 @@ class ParsersTogetherTest {
 		polyStream.addValue(VriPolygon.build(polyBuilder -> {
 			polyBuilder.polygonIdentifier(polygonId);
 			polyBuilder.percentAvailable(Optional.of(75.0f));
-			polyBuilder.biogeoclimaticZone("IDF");
+			polyBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			polyBuilder.yieldFactor(0.9f);
 		}));
 
@@ -332,7 +332,7 @@ class ParsersTogetherTest {
 		polyStream.addValue(VriPolygon.build(polyBuilder -> {
 			polyBuilder.polygonIdentifier(polygonId);
 			polyBuilder.percentAvailable(Optional.of(100.0f));
-			polyBuilder.biogeoclimaticZone("IDF");
+			polyBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			polyBuilder.yieldFactor(0.9f);
 		}));
 
@@ -397,7 +397,7 @@ class ParsersTogetherTest {
 		polyStream.addValue(VriPolygon.build(polyBuilder -> {
 			polyBuilder.polygonIdentifier(polygonId);
 			polyBuilder.percentAvailable(Optional.of(100.0f));
-			polyBuilder.biogeoclimaticZone("IDF");
+			polyBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			polyBuilder.yieldFactor(0.9f);
 		}));
 
@@ -488,7 +488,7 @@ class ParsersTogetherTest {
 		polyStream.addValue(VriPolygon.build(polyBuilder -> {
 			polyBuilder.polygonIdentifier(polygonId);
 			polyBuilder.percentAvailable(Optional.of(100.0f));
-			polyBuilder.biogeoclimaticZone("IDF");
+			polyBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			polyBuilder.yieldFactor(0.9f);
 		}));
 
@@ -579,7 +579,7 @@ class ParsersTogetherTest {
 		polyStream.addValue(VriPolygon.build(polyBuilder -> {
 			polyBuilder.polygonIdentifier(polygonId);
 			polyBuilder.percentAvailable(Optional.of(75.0f));
-			polyBuilder.biogeoclimaticZone("IDF");
+			polyBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			polyBuilder.yieldFactor(0.9f);
 		}));
 
@@ -661,7 +661,7 @@ class ParsersTogetherTest {
 		polyStream.addValue(VriPolygon.build(polyBuilder -> {
 			polyBuilder.polygonIdentifier(polygonId);
 			polyBuilder.percentAvailable(Optional.of(75.0f));
-			polyBuilder.biogeoclimaticZone("IDF");
+			polyBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			polyBuilder.yieldFactor(0.9f);
 		}));
 

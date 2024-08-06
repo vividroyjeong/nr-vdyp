@@ -36,6 +36,7 @@ class VriAdjustInputWriterTest {
 	@BeforeEach
 	void initStreams() {
 		controlMap = new HashMap<String, Object>();
+		TestUtils.populateControlMapBecReal(controlMap);
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		polyStream = new TestUtils.MockOutputStream("polygons");
@@ -93,7 +94,7 @@ class VriAdjustInputWriterTest {
 
 				builder.polygonIdentifier("082E004    615       1988");
 				builder.percentAvailable(90f);
-				builder.biogeoclimaticZone("IDF");
+				builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				builder.forestInventoryZone("D");
 				builder.mode(PolygonMode.START);
 			});
@@ -340,13 +341,13 @@ class VriAdjustInputWriterTest {
 
 	@Test
 	void testWritePolygonWithChildren() throws IOException {
-		try (var unit = new VriAdjustInputWriter(controlMap, fileResolver);) {
+		try (var unit = new VriAdjustInputWriter(controlMap, fileResolver)) {
 
 			VdypPolygon polygon = VdypPolygon.build(builder -> {
 
 				builder.polygonIdentifier("082E004    615       1988");
 				builder.percentAvailable(90f);
-				builder.biogeoclimaticZone("IDF");
+				builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				builder.forestInventoryZone("D");
 				builder.mode(PolygonMode.START);
 			});

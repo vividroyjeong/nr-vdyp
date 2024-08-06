@@ -7,10 +7,10 @@ import java.util.function.Function;
 public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float, VdypSpecies, VdypSite> {
 
 	public VdypPolygon(
-			PolygonIdentifier polygonIdentifier, Float percentAvailable, String fiz, String becIdentifier,
+			PolygonIdentifier polygonIdentifier, Float percentAvailable, String fiz, BecDefinition bec,
 			Optional<PolygonMode> modeFip
 	) {
-		super(polygonIdentifier, percentAvailable, fiz, becIdentifier, modeFip);
+		super(polygonIdentifier, percentAvailable, fiz, bec, modeFip);
 	}
 
 	/**

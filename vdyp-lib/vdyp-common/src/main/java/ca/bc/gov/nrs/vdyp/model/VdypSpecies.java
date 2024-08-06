@@ -296,7 +296,8 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 					layerType.get(), //
 					genus.get(), //
 					percentGenus.get(), //
-					site, volumeGroup.get(), //
+					site, //
+					volumeGroup.get(), //
 					decayGroup.get(), //
 					breakageGroup.get() //
 			);

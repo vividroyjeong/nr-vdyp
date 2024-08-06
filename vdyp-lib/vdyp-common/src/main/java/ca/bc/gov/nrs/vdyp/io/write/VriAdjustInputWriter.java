@@ -118,7 +118,7 @@ public class VriAdjustInputWriter implements Closeable {
 				POLY_FORMAT, //
 
 				polygon.getPolygonIdentifier(), //
-				polygon.getBiogeoclimaticZone(), //
+				polygon.getBiogeoclimaticZone().getAlias(), //
 				polygon.getForestInventoryZone(), //
 
 				polygon.getPercentAvailable().intValue(), //

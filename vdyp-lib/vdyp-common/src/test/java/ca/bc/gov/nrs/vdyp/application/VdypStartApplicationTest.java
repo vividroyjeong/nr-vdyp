@@ -976,7 +976,7 @@ class VdypStartApplicationTest {
 
 				var polygon = TestPolygon.build(pb -> {
 					pb.polygonIdentifier("TestPolygon", 2024);
-					pb.biogeoclimaticZone("IDF");
+					pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 					pb.forestInventoryZone("Z");
 					pb.mode(PolygonMode.START);
 
@@ -1000,7 +1000,7 @@ class VdypStartApplicationTest {
 
 				var polygon = TestPolygon.build(pb -> {
 					pb.polygonIdentifier("TestPolygon", 2024);
-					pb.biogeoclimaticZone("IDF");
+					pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 					pb.forestInventoryZone("Z");
 					pb.mode(PolygonMode.START);
 
@@ -1052,7 +1052,7 @@ class VdypStartApplicationTest {
 
 				var polygon = TestPolygon.build(pb -> {
 					pb.polygonIdentifier("TestPolygon", 2024);
-					pb.biogeoclimaticZone("CWH");
+					pb.biogeoclimaticZone(Utils.getBec("CWH", controlMap));
 					pb.forestInventoryZone("A");
 					pb.mode(PolygonMode.START);
 
@@ -1195,7 +1195,7 @@ class VdypStartApplicationTest {
 				var fPoly = TestPolygon.build(builder -> {
 					builder.polygonIdentifier("Test", 2024);
 					builder.forestInventoryZone("A");
-					builder.biogeoclimaticZone("CWH");
+					builder.biogeoclimaticZone(Utils.getBec("CWH", controlMap));
 					builder.percentAvailable(Optional.of(100f));
 				});
 
@@ -1357,7 +1357,7 @@ class VdypStartApplicationTest {
 				var poly = VdypPolygon.build(pb -> {
 					pb.polygonIdentifier("Test", 2024);
 					pb.percentAvailable(90f);
-					pb.biogeoclimaticZone("IDF");
+					pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 					pb.forestInventoryZone("");
 					pb.addLayer(lb -> {
 						lb.layerType(LayerType.PRIMARY);
@@ -1662,7 +1662,7 @@ class VdypStartApplicationTest {
 		return TestPolygon.build(builder -> {
 			builder.polygonIdentifier(polygonId);
 			builder.forestInventoryZone("0");
-			builder.biogeoclimaticZone("BG");
+			builder.biogeoclimaticZone(Utils.getBec("BG", controlMap));
 			builder.mode(PolygonMode.START);
 			mutator.accept(builder);
 		});

@@ -11,19 +11,28 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.easymock.EasyMock;
 import org.junit.jupiter.api.Test;
+
+import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 class VdypPolygonTest {
 
 	@Test
 	void build() throws Exception {
+		Map<String, Object> controlMap = new HashMap<>();
+		TestUtils.populateControlMapBecReal(controlMap);
+
 		var result = VdypPolygon.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.percentAvailable(90f);
 
 			builder.forestInventoryZone("?");
-			builder.biogeoclimaticZone("?");
+			builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 		});
 		assertThat(result, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
 		assertThat(result, hasProperty("percentAvailable", is(90f)));
@@ -42,6 +51,9 @@ class VdypPolygonTest {
 
 	@Test
 	void buildAddLayer() throws Exception {
+		Map<String, Object> controlMap = new HashMap<>();
+		TestUtils.populateControlMapBecReal(controlMap);
+
 		VdypLayer mock = EasyMock.mock(VdypLayer.class);
 		EasyMock.expect(mock.getLayerType()).andStubReturn(LayerType.PRIMARY);
 		EasyMock.replay(mock);
@@ -50,7 +62,7 @@ class VdypPolygonTest {
 			builder.percentAvailable(90f);
 
 			builder.forestInventoryZone("?");
-			builder.biogeoclimaticZone("?");
+			builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 
 			builder.addLayer(mock);
 		});
@@ -61,12 +73,15 @@ class VdypPolygonTest {
 
 	@Test
 	void buildAddLayerSubBuild() throws Exception {
+		Map<String, Object> controlMap = new HashMap<>();
+		TestUtils.populateControlMapBecReal(controlMap);
+
 		var result = VdypPolygon.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.percentAvailable(90f);
 
 			builder.forestInventoryZone("?");
-			builder.biogeoclimaticZone("?");
+			builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 
 			builder.addLayer(layerBuilder -> {
 				layerBuilder.layerType(LayerType.PRIMARY);
@@ -83,12 +98,15 @@ class VdypPolygonTest {
 
 	@Test
 	void copyWithoutLayers() throws Exception {
+		
+		var controlMap = TestUtils.loadControlMap();
+		
 		var toCopy = VdypPolygon.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.percentAvailable(90f);
 
 			builder.forestInventoryZone("Z");
-			builder.biogeoclimaticZone("IDF");
+			builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 
 			builder.addLayer(layerBuilder -> {
 				layerBuilder.layerType(LayerType.PRIMARY);
@@ -107,12 +125,15 @@ class VdypPolygonTest {
 
 	@Test
 	void copyWithLayers() throws Exception {
+		
+		var controlMap = TestUtils.loadControlMap();
+		
 		var toCopy = VdypPolygon.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.percentAvailable(90f);
 
 			builder.forestInventoryZone("Z");
-			builder.biogeoclimaticZone("IDF");
+			builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 
 			builder.addLayer(layerBuilder -> {
 				layerBuilder.layerType(LayerType.PRIMARY);

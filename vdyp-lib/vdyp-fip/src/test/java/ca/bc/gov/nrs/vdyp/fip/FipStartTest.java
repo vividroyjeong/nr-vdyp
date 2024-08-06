@@ -648,10 +648,12 @@ class FipStartTest {
 	@Test
 	void testProcessVeteranUtilization() throws Exception {
 
+		var controlMap = FipTestUtils.loadControlMap();
+
 		var polygonId = polygonId("Test Polygon", 2023);
 
 		var fipPolygon = getTestPolygon(polygonId, x -> {
-			x.setBiogeoclimaticZone("CWH");
+			x.setBiogeoclimaticZone(Utils.getBec("CWH", controlMap));
 			x.setForestInventoryZone("A");
 			x.setYieldFactor(1f);
 		});
@@ -677,8 +679,6 @@ class FipStartTest {
 		});
 		fipPolygon.setLayers(Collections.singletonMap(LayerType.VETERAN, fipLayer));
 		fipLayer.setSpecies(List.of(fipSpecies1, fipSpecies2, fipSpecies3));
-
-		var controlMap = FipTestUtils.loadControlMap();
 
 		VdypLayer result;
 		try (var app = new FipStart();) {
@@ -1083,10 +1083,12 @@ class FipStartTest {
 	@Test
 	void testProcessPrimary() throws Exception {
 
+		var controlMap = FipTestUtils.loadControlMap();
+
 		var polygonId = polygonId("Test Polygon", 2023);
 
 		var fipPolygon = getTestPolygon(polygonId, x -> {
-			x.setBiogeoclimaticZone("CWH");
+			x.setBiogeoclimaticZone(Utils.getBec("CWH", controlMap));
 			x.setForestInventoryZone("A");
 		});
 		var fipLayer = getTestPrimaryLayer(polygonId, layerBuilder -> {
@@ -1118,8 +1120,6 @@ class FipStartTest {
 		});
 		fipPolygon.setLayers(List.of(fipLayer));
 		fipLayer.setSpecies(List.of(fipSpecies1, fipSpecies2, fipSpecies3, fipSpecies4, fipSpecies5));
-
-		var controlMap = FipTestUtils.loadControlMap();
 
 		try (var app = new FipStart()) {
 			ApplicationTestUtils.setControlMap(app, controlMap);
@@ -1475,10 +1475,12 @@ class FipStartTest {
 	@Test
 	void testProcessPrimaryWithOverstory() throws Exception {
 
+		var controlMap = FipTestUtils.loadControlMap();
+
 		var polygonId = polygonId("01002 S000002 00", 1970);
 
 		var fipPolygon = getTestPolygon(polygonId, x -> {
-			x.setBiogeoclimaticZone("CWH");
+			x.setBiogeoclimaticZone(Utils.getBec("CWH", controlMap));
 			x.setForestInventoryZone("A");
 		});
 		var fipLayer = getTestPrimaryLayer(polygonId, x -> {
@@ -1508,8 +1510,6 @@ class FipStartTest {
 		});
 		fipPolygon.setLayers(List.of(fipLayer));
 		fipLayer.setSpecies(List.of(fipSpecies1, fipSpecies2, fipSpecies3, fipSpecies4));
-
-		var controlMap = FipTestUtils.loadControlMap();
 
 		try (var app = new FipStart()) {
 			ApplicationTestUtils.setControlMap(app, controlMap);
@@ -1847,10 +1847,12 @@ class FipStartTest {
 	@Test
 	void testProcessAsVeteranLayer() throws Exception {
 
+		var controlMap = FipTestUtils.loadControlMap();
+
 		var polygonId = PolygonIdentifier.split("01002 S000002 00     1970");
 
 		var fipPolygon = getTestPolygon(polygonId, x -> {
-			x.setBiogeoclimaticZone("CWH");
+			x.setBiogeoclimaticZone(Utils.getBec("CWH", controlMap));
 			x.setForestInventoryZone("A");
 			x.setYieldFactor(1f);
 		});
@@ -1886,8 +1888,6 @@ class FipStartTest {
 		speciesMap.put("H", fipSpecies2);
 		speciesMap.put("S", fipSpecies3);
 		fipLayer.setSpecies(speciesMap);
-
-		var controlMap = FipTestUtils.loadControlMap();
 
 		try (var app = new FipStart()) {
 			ApplicationTestUtils.setControlMap(app, controlMap);
@@ -2604,7 +2604,7 @@ class FipStartTest {
 			var fipPolygon = FipPolygon.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.forestInventoryZone("D");
-				builder.biogeoclimaticZone("IDF");
+				builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				builder.mode(PolygonMode.START);
 				builder.yieldFactor(1f);
 			});
@@ -2663,7 +2663,7 @@ class FipStartTest {
 			var fipPolygon = FipPolygon.build(pb -> {
 				pb.polygonIdentifier("Test", 2024);
 				pb.forestInventoryZone("D");
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.mode(PolygonMode.START);
 				pb.yieldFactor(1f);
 
@@ -2726,7 +2726,7 @@ class FipStartTest {
 			var fipPolygon = FipPolygon.build(pb -> {
 				pb.polygonIdentifier("Test", 2024);
 				pb.forestInventoryZone("D");
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.mode(PolygonMode.YOUNG);
 				pb.yieldFactor(1f);
 			});
@@ -3292,7 +3292,7 @@ class FipStartTest {
 
 		var poly = FipPolygon.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
-			builder.biogeoclimaticZone("CWH");
+			builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			builder.yieldFactor(1f);
 			builder.forestInventoryZone("0");
 			builder.mode(PolygonMode.START);
@@ -3427,10 +3427,14 @@ class FipStartTest {
 	}
 
 	FipPolygon getTestPolygon(PolygonIdentifier polygonId, Consumer<FipPolygon> mutator) {
+		
+		Map<String, Object> controlMap = new HashMap<>();		
+		TestUtils.populateControlMapBecReal(controlMap);
+		
 		var result = FipPolygon.build(builder -> {
 			builder.polygonIdentifier(polygonId);
 			builder.forestInventoryZone("0");
-			builder.biogeoclimaticZone("BG");
+			builder.biogeoclimaticZone(Utils.getBec("BG", controlMap));
 			builder.mode(PolygonMode.START);
 			builder.yieldFactor(1.0f);
 		});

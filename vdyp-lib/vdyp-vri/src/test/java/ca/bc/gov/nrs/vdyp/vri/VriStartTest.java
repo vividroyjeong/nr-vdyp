@@ -125,7 +125,7 @@ class VriStartTest {
 
 			var polygon = VriPolygon.build(pBuilder -> {
 				pBuilder.polygonIdentifier("Test", 2024);
-				pBuilder.biogeoclimaticZone("IDF");
+				pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pBuilder.yieldFactor(1.0f);
 				pBuilder.addLayer(lBuilder -> {
 					lBuilder.layerType(LayerType.PRIMARY);
@@ -172,7 +172,7 @@ class VriStartTest {
 
 			var polygon = VriPolygon.build(pBuilder -> {
 				pBuilder.polygonIdentifier("Test", 2024);
-				pBuilder.biogeoclimaticZone("IDF");
+				pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pBuilder.yieldFactor(1.0f);
 				pBuilder.addLayer(lBuilder -> {
 					lBuilder.layerType(LayerType.PRIMARY);
@@ -1721,7 +1721,7 @@ class VriStartTest {
 
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPoly", 2024);
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(mode);
 				pb.addLayer(lb -> {
@@ -1733,7 +1733,7 @@ class VriStartTest {
 
 			var polyYoung = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPolyYoung", 2024);
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(mode);
 				pb.addLayer(lb -> {
@@ -1744,7 +1744,7 @@ class VriStartTest {
 			});
 			var polyBatc = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPolyBatc", 2024);
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(mode);
 				pb.addLayer(lb -> {
@@ -1755,7 +1755,7 @@ class VriStartTest {
 			});
 			var polyBatn = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPolyBatn", 2024);
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(mode);
 				pb.addLayer(lb -> {
@@ -1799,7 +1799,7 @@ class VriStartTest {
 
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPoly", 2024);
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(mode);
 			});
@@ -1885,7 +1885,7 @@ class VriStartTest {
 
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPoly", 2024);
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(PolygonMode.DONT_PROCESS);
 			});
@@ -1951,7 +1951,7 @@ class VriStartTest {
 
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPoly", 2024);
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(mode);
 				pb.addLayer(lb -> {
@@ -1987,7 +1987,7 @@ class VriStartTest {
 
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPoly", 2024);
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(PolygonMode.BATN);
 				pb.forestInventoryZone("");
@@ -2275,7 +2275,7 @@ class VriStartTest {
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("082F074/0142", 1997);
 				pb.forestInventoryZone(" ");
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(PolygonMode.YOUNG);
 
@@ -2461,7 +2461,7 @@ class VriStartTest {
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("082F074/0142", 1997);
 				pb.forestInventoryZone(" ");
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(PolygonMode.YOUNG);
 
@@ -2647,7 +2647,7 @@ class VriStartTest {
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("082F074/0142", 1997);
 				pb.forestInventoryZone(" ");
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(PolygonMode.YOUNG);
 				pb.percentAvailable(85f);
@@ -2822,7 +2822,7 @@ class VriStartTest {
 
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPolygon", 1899);
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(PolygonMode.YOUNG);
 			});
@@ -2873,7 +2873,7 @@ class VriStartTest {
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("082F074/0142", 1997);
 				pb.forestInventoryZone(" ");
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(PolygonMode.BATC);
 
@@ -3068,7 +3068,7 @@ class VriStartTest {
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("082F074/0142", 1997);
 				pb.forestInventoryZone(" ");
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(PolygonMode.BATC);
 
@@ -3304,7 +3304,7 @@ class VriStartTest {
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("082F074/0142", 1997);
 				pb.forestInventoryZone(" ");
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(PolygonMode.BATN);
 
@@ -3503,7 +3503,7 @@ class VriStartTest {
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("082F074/0142", 1997);
 				pb.forestInventoryZone(" ");
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(PolygonMode.BATN);
 
@@ -3715,7 +3715,7 @@ class VriStartTest {
 
 			var polygon = VriPolygon.build(pBuilder -> {
 				pBuilder.polygonIdentifier("Test", 2024);
-				pBuilder.biogeoclimaticZone("IDF");
+				pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pBuilder.yieldFactor(1.0f);
 				pBuilder.addLayer(lBuilder -> {
 					lBuilder.layerType(LayerType.PRIMARY);
@@ -3766,7 +3766,7 @@ class VriStartTest {
 
 			var polygon = VriPolygon.build(pBuilder -> {
 				pBuilder.polygonIdentifier("Test", 2024);
-				pBuilder.biogeoclimaticZone("IDF");
+				pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pBuilder.yieldFactor(1.0f);
 				pBuilder.addLayer(lBuilder -> {
 					lBuilder.layerType(LayerType.PRIMARY);
