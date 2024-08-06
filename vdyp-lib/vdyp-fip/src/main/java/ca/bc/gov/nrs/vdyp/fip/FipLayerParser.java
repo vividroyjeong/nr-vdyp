@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayer;
 import ca.bc.gov.nrs.vdyp.fip.model.FipLayerPrimary;
+import ca.bc.gov.nrs.vdyp.fip.model.FipSite;
 import ca.bc.gov.nrs.vdyp.io.EndOfRecord;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
@@ -101,7 +103,7 @@ public class FipLayerParser
 							FipLayerPrimary fipLayerPrimary = FipLayerPrimary.buildPrimary(flBuilder -> {
 								flBuilder.polygonIdentifier(polygonId);
 
-								flBuilder.addSite(siteBuilder -> {
+								flBuilder.addSiteWithoutSpecies(siteBuilder -> {
 									siteBuilder.ageTotal(ageTotal);
 									siteBuilder.yearsToBreastHeight(yearsToBreastHeight);
 									siteBuilder.height(height);
@@ -121,7 +123,7 @@ public class FipLayerParser
 							FipLayer fipLayerVeteran = FipLayer.build(flBuilder -> {
 								flBuilder.polygonIdentifier(polygonId);
 								flBuilder.layerType(LayerType.VETERAN);
-								flBuilder.addSite(siteBuilder -> {
+								flBuilder.addSiteWithoutSpecies(siteBuilder -> {
 									siteBuilder.ageTotal(ageTotal);
 									siteBuilder.yearsToBreastHeight(yearsToBreastHeight);
 									siteBuilder.height(height);

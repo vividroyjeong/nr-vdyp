@@ -282,12 +282,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			builder.adapt(fipLayer);
 			builder.inventoryTypeGroup(itg);
 			builder.empiricalRelationshipParameterIndex(empiricalRelationshipParameterIndex);
-			fipLayer.getSite().ifPresent(site -> {
-				builder.addSite(siteBuilder -> {
-					siteBuilder.adapt(site);
-				});
-			});
-
 		});
 
 		// EMP040
@@ -313,7 +307,11 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		// LVCOM4/SP64DISTL1=FIPSA/VDISTRV
 		// LVCOM1/PCLT1=FIPS/PCTVOLV
 		var vdypSpecies = fipLayer.getSpecies().values().stream() //
-				.map(VdypSpecies::new) //
+				.map(fipSpec -> VdypSpecies.build(sb -> {
+					sb.adapt(fipSpec);
+					sb.adaptSiteFrom(fipSpec, (ib, fipSite) -> {
+					});
+				})) //
 				.collect(Collectors.toMap(VdypSpecies::getGenus, Function.identity()));
 
 		var vdypPrimarySpecies = vdypSpecies.get(primarySpecies.get(0).getGenus());
@@ -621,7 +619,11 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		// LVCOM1/HL=FIPL_V/HT_LV
 		var vdypSpecies = fipLayer.getSpecies().values().stream() //
 				.map(fipSpec -> {
-					var vs = new VdypSpecies(fipSpec);
+					var vs = VdypSpecies.build(sb -> {
+						sb.adapt(fipSpec);
+						sb.adaptSiteFrom(fipSpec, (ib, fipSite) -> {
+						});
+					});
 					vs.setLoreyHeightByUtilization(new UtilizationVector(0f, height));
 					return vs;
 				}) //
@@ -662,14 +664,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		var vdypLayer = VdypLayer.build(builder -> {
 			builder.polygonIdentifier(polygonIdentifier);
 			builder.layerType(layer);
-
-			builder.addSite(siteBuilder -> {
-				siteBuilder.ageTotal(ageTotal);
-				siteBuilder.yearsToBreastHeight(yearsToBreastHeight);
-				siteBuilder.height(height);
-				siteBuilder.siteGenus(fipLayer.getSiteGenus());
-				siteBuilder.siteIndex(fipLayer.getSiteIndex());
-			});
 
 			builder.addSpecies(vdypSpecies.values());
 		});
@@ -1167,7 +1161,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 	}
 
 	@Override
-	protected FipSpecies copySpecies(FipSpecies toCopy, Consumer<BaseVdypSpecies.Builder<FipSpecies>> config) {
+	protected FipSpecies
+			copySpecies(FipSpecies toCopy, Consumer<BaseVdypSpecies.Builder<FipSpecies, FipSite, ?>> config) {
 		return FipSpecies.build(builder -> {
 			builder.copy(toCopy);
 		});
