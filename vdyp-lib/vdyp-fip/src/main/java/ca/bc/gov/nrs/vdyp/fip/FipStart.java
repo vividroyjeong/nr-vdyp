@@ -309,13 +309,16 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		var vdypSpecies = fipLayer.getSpecies().values().stream() //
 				.map(fipSpec -> VdypSpecies.build(sb -> {
 					sb.adapt(fipSpec);
-					sb.adaptSiteFrom(fipSpec, (ib, fipSite)->{});
+					applyGroups(bec,fipSpec.getGenus(), sb);
+					sb.adaptSiteFrom(fipSpec, (ib, fipSite) -> {
+					});
 				})) //
 				.collect(Collectors.toMap(VdypSpecies::getGenus, Function.identity()));
 
 		var vdypPrimarySpecies = vdypSpecies.get(primarySpecies.get(0).getGenus());
 
-		Map<String, Float> targetPercentages = applyGroups(fipPolygon, vdypSpecies.values());
+		Map<String, Float> targetPercentages = getTargetPercentages(vdypSpecies.values());
+
 
 		var maxPass = fipLayer.getSpecies().size() > 1 ? 2 : 1;
 
@@ -620,14 +623,14 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				.map(fipSpec -> {
 					var vs = VdypSpecies.build(sb -> {
 						sb.adapt(fipSpec);
-						sb.adaptSiteFrom(fipSpec, (ib, fipSite)->{});
+						applyGroups(bec,fipSpec.getGenus(), sb);
+						sb.adaptSiteFrom(fipSpec, (ib, fipSite) -> {
+						});
 					});
 					vs.setLoreyHeightByUtilization(new UtilizationVector(0f, height));
 					return vs;
 				}) //
 				.collect(Collectors.toMap(VdypSpecies::getGenus, Function.identity()));
-
-		applyGroups(fipPolygon, vdypSpecies.values());
 
 		/*
 		 * From VDYP7

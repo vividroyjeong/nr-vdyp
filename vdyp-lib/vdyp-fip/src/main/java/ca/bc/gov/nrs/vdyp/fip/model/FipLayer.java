@@ -16,7 +16,7 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> implements In
 
 	private float crownClosure; // FIPL_1/CC_L1 or FIP:_V/CC_V1
 
-	private Optional<FipSite> siteWithoutSpecies;
+	private Optional<FipSite> siteWithoutSpecies = Optional.empty();
 
 	public FipLayer(
 			PolygonIdentifier polygonIdentifier, LayerType layer, Optional<Integer> inventoryTypeGroup,
@@ -67,10 +67,10 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> implements In
 
 			var spec = this.getSpecies().get(site.getSiteGenus());
 			if (spec != null) {
-				FipSpecies.build(sb -> {
+				this.getSpecies().put(site.getSiteGenus(), FipSpecies.build(sb -> {
 					sb.copy(spec);
 					sb.addSite(siteWithoutSpecies);
-				});
+				}));
 				siteWithoutSpecies = Optional.empty();
 			}
 
@@ -100,7 +100,7 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> implements In
 			builder.ageTotal(8f);
 			builder.yearsToBreastHeight(7f);
 			builder.height(6f);
-	
+
 			builder.siteIndex(5f);
 			builder.crownClosure(0.9f);
 			builder.siteGenus("B");
@@ -136,8 +136,8 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> implements In
 			return this;
 		}
 
-		protected Optional<FipSite> siteWithoutSpecies;
-		protected Optional<Consumer<FipSite.Builder>> siteWithoutSpeciesBuilder;
+		protected Optional<FipSite> siteWithoutSpecies = Optional.empty();
+		protected Optional<Consumer<FipSite.Builder>> siteWithoutSpeciesBuilder = Optional.empty();
 
 		public Builder addSiteWithoutSpecies(Optional<FipSite> siteWithoutSpecies) {
 			this.siteWithoutSpecies = siteWithoutSpecies;
@@ -149,7 +149,7 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> implements In
 		}
 
 		public Builder addSiteWithoutSpecies(Consumer<FipSite.Builder> config) {
-			this.siteWithoutSpeciesBuilder = Optional.empty();
+			this.siteWithoutSpeciesBuilder = Optional.of(config);
 			return this;
 		}
 
@@ -188,11 +188,12 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> implements In
 		@Override
 		protected void preProcess() {
 			super.preProcess();
-			siteWithoutSpeciesBuilder.map(config -> FipSite.build(builder -> {
-				config.accept(builder);
-				builder.polygonIdentifier(this.polygonIdentifier.get());
-				builder.layerType(layerType.get());
-			}));
+			this.siteWithoutSpecies = siteWithoutSpecies
+					.or(() -> siteWithoutSpeciesBuilder.map(config -> FipSite.build(builder -> {
+						config.accept(builder);
+						builder.polygonIdentifier(this.polygonIdentifier.get());
+						builder.layerType(layerType.get());
+					})));
 		}
 
 	}
