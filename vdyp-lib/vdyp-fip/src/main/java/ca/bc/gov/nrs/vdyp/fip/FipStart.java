@@ -309,7 +309,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		var vdypSpecies = fipLayer.getSpecies().values().stream() //
 				.map(fipSpec -> VdypSpecies.build(sb -> {
 					sb.adapt(fipSpec);
-					sb.adaptSiteFrom(fipSpec, (ib, fipSite)->{});
+					sb.adaptSiteFrom(fipSpec, (ib, fipSite) -> {
+					});
 				})) //
 				.collect(Collectors.toMap(VdypSpecies::getGenus, Function.identity()));
 
@@ -620,7 +621,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				.map(fipSpec -> {
 					var vs = VdypSpecies.build(sb -> {
 						sb.adapt(fipSpec);
-						sb.adaptSiteFrom(fipSpec, (ib, fipSite)->{});
+						sb.adaptSiteFrom(fipSpec, (ib, fipSite) -> {
+						});
 					});
 					vs.setLoreyHeightByUtilization(new UtilizationVector(0f, height));
 					return vs;
