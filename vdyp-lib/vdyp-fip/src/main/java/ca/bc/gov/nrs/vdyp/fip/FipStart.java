@@ -284,16 +284,17 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			builder.empiricalRelationshipParameterIndex(empiricalRelationshipParameterIndex);
 		});
 
+		var breastHeightAge = fipLayer.getSite()
+				.flatMap(x -> Utils.mapBoth(x.getAgeTotal(), x.getYearsToBreastHeight(), (at, ytbh) -> at - ytbh))
+				.orElse(0f);
 		// EMP040
 		var baseArea = estimatePrimaryBaseArea(
-				fipLayer, bec, fipPolygon.getYieldFactor(), result.getBreastHeightAge().orElse(0f), baseAreaOverstory
+				fipLayer, bec, fipPolygon.getYieldFactor(), breastHeightAge, baseAreaOverstory
 		); // BA_TOT
 
 		result.getBaseAreaByUtilization().setAll(baseArea);
 
-		var quadMeanDiameter = estimatePrimaryQuadMeanDiameter(
-				fipLayer, bec, result.getBreastHeightAge().orElse(0f), baseAreaOverstory
-		);
+		var quadMeanDiameter = estimatePrimaryQuadMeanDiameter(fipLayer, bec, breastHeightAge, baseAreaOverstory);
 
 		result.getQuadraticMeanDiameterByUtilization().setAll(quadMeanDiameter);
 
@@ -309,7 +310,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		var vdypSpecies = fipLayer.getSpecies().values().stream() //
 				.map(fipSpec -> VdypSpecies.build(sb -> {
 					sb.adapt(fipSpec);
-					applyGroups(bec,fipSpec.getGenus(), sb);
+					applyGroups(bec, fipSpec.getGenus(), sb);
 					sb.adaptSiteFrom(fipSpec, (ib, fipSite) -> {
 					});
 				})) //
@@ -318,7 +319,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		var vdypPrimarySpecies = vdypSpecies.get(primarySpecies.get(0).getGenus());
 
 		Map<String, Float> targetPercentages = getTargetPercentages(vdypSpecies.values());
-
 
 		var maxPass = fipLayer.getSpecies().size() > 1 ? 2 : 1;
 
@@ -352,9 +352,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		}
 		// Estimate lorey height for primary species
 		if (iPass == 1 && vdypSpecies.size() == 1) {
-			primaryHeight = estimationMethods.primaryHeightFromLeadHeight(
-					leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion(), tphTotal
-			);
+			primaryHeight = estimationMethods
+					.primaryHeightFromLeadHeight(leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion(), tphTotal);
 		} else if (iPass == 1) {
 			primaryHeight = estimationMethods
 					.primaryHeightFromLeadHeightInitial(leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion());
@@ -373,9 +372,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 			// EMP053
 			vspec.getLoreyHeightByUtilization().setAll(
-					estimationMethods.estimateNonPrimaryLoreyHeight(
-							vspec, vdypPrimarySpecies, bec, leadHeight, primaryHeight
-					)
+					estimationMethods
+							.estimateNonPrimaryLoreyHeight(vspec, vdypPrimarySpecies, bec, leadHeight, primaryHeight)
 			);
 		}
 	}
@@ -601,7 +599,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				.getGenus();
 
 		// ageTotal copy, LVCOM3/AGETOTLV copied from FIPL_V/AGETOT_LV
-		var ageTotal = fipLayer.getAgeTotal().orElse(0f);
+		var ageTotal = fipLayer.getAgeTotal();
 
 		// yearsToBreastHeight copy, minimum 6.0, LVCOM3/YTBHLV copied from
 		// FIPL_V/YTBH_L
@@ -630,8 +628,10 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				.map(fipSpec -> {
 					var vs = VdypSpecies.build(sb -> {
 						sb.adapt(fipSpec);
-						applyGroups(bec,fipSpec.getGenus(), sb);
+						applyGroups(bec, fipSpec.getGenus(), sb);
 						sb.adaptSiteFrom(fipSpec, (ib, fipSite) -> {
+							ib.ageTotal(ageTotal);
+							ib.yearsToBreastHeight(yearsToBreastHeight);
 						});
 					});
 					vs.setLoreyHeightByUtilization(new UtilizationVector(0f, height));
