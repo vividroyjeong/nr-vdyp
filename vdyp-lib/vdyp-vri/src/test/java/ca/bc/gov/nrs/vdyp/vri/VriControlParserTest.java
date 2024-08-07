@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.hamcrest.Matcher;
@@ -30,6 +29,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveAgeMaximumParserTest;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -41,7 +41,6 @@ import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
-import ca.bc.gov.nrs.vdyp.model.StockingClassFactor;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 @SuppressWarnings({ "unused", "unchecked", "rawtypes" })
@@ -72,7 +71,7 @@ class VriControlParserTest {
 		assertThat(
 				result,
 				(Matcher) controlMapHasEntry(
-						ControlKey.SP0_DEF, allOf(instanceOf(List.class), hasItem(instanceOf(GenusDefinition.class)))
+						ControlKey.SP0_DEF, instanceOf(GenusDefinitionMap.class)
 				)
 		);
 	}

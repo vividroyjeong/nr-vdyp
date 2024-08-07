@@ -73,6 +73,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B");
+					sBuilder.genusIndex(3);
 					sBuilder.percentGenus(3f);
 					sBuilder.addSpecies("BL", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -82,6 +83,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("C");
+					sBuilder.genusIndex(4);
 					sBuilder.percentGenus(30f);
 					sBuilder.addSpecies("CW", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -96,6 +98,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("H");
+					sBuilder.genusIndex(8);
 					sBuilder.percentGenus(48.9f);
 					sBuilder.addSpecies("HW", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -110,6 +113,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("S");
+					sBuilder.genusIndex(15);
 					sBuilder.percentGenus(18.1f);
 					sBuilder.addSpecies("SE", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -131,6 +135,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("H");
+					sBuilder.genusIndex(8);
 					sBuilder.percentGenus(100f);
 					sBuilder.addSpecies("HW", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -177,6 +182,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B");
+					sBuilder.genusIndex(3);
 					sBuilder.percentGenus(3f);
 					sBuilder.addSpecies("BL", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -186,6 +192,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("C");
+					sBuilder.genusIndex(4);
 					sBuilder.percentGenus(30f);
 					sBuilder.addSpecies("CW", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -200,6 +207,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("H");
+					sBuilder.genusIndex(8);
 					sBuilder.percentGenus(48.7f);
 					sBuilder.addSpecies("HW", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -214,6 +222,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("S");
+					sBuilder.genusIndex(15);
 					sBuilder.percentGenus(18.1f);
 					sBuilder.addSpecies("SE", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -255,6 +264,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B");
+					sBuilder.genusIndex(3);
 					sBuilder.percentGenus(3f);
 					sBuilder.addSpecies("BL", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -264,6 +274,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("C");
+					sBuilder.genusIndex(4);
 					sBuilder.percentGenus(30f);
 					sBuilder.addSpecies("CW", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -278,6 +289,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("H");
+					sBuilder.genusIndex(8);
 					sBuilder.percentGenus(48.7f);
 					sBuilder.addSpecies("HW", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -292,6 +304,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("S");
+					sBuilder.genusIndex(15);
 					sBuilder.percentGenus(18.1f);
 					sBuilder.addSpecies("SE", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -351,6 +364,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B");
+					sBuilder.genusIndex(3);
 					sBuilder.percentGenus(3f);
 					sBuilder.addSpecies("BL", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -360,6 +374,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("C");
+					sBuilder.genusIndex(4);
 					sBuilder.percentGenus(30f);
 					sBuilder.addSpecies("CW", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -374,6 +389,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("H");
+					sBuilder.genusIndex(8);
 					sBuilder.percentGenus(48.9f);
 					sBuilder.addSpecies("HW", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -388,6 +404,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("S");
+					sBuilder.genusIndex(15);
 					sBuilder.percentGenus(18.1f);
 					sBuilder.addSpecies("SE", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -436,6 +453,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B");
+					sBuilder.genusIndex(3);
 					sBuilder.percentGenus(3f);
 					sBuilder.addSpecies("BL", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -445,6 +463,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("C");
+					sBuilder.genusIndex(4);
 					sBuilder.percentGenus(30f);
 					sBuilder.addSpecies("CW", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -459,6 +478,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("H");
+					sBuilder.genusIndex(8);
 					sBuilder.percentGenus(48.9f);
 					sBuilder.addSpecies("HW", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -473,6 +493,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("S");
+					sBuilder.genusIndex(15);
 					sBuilder.percentGenus(18.1f);
 					sBuilder.addSpecies("SE", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -523,6 +544,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B");
+					sBuilder.genusIndex(3);
 					sBuilder.percentGenus(3f);
 					sBuilder.addSpecies("BL", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -532,6 +554,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("C");
+					sBuilder.genusIndex(4);
 					sBuilder.percentGenus(30f);
 					sBuilder.addSpecies("CW", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -546,6 +569,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("H");
+					sBuilder.genusIndex(8);
 					sBuilder.percentGenus(48.9f);
 					sBuilder.addSpecies("HW", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -560,6 +584,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("S");
+					sBuilder.genusIndex(15);
 					sBuilder.percentGenus(18.1f);
 					sBuilder.addSpecies("SE", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -610,6 +635,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B");
+					sBuilder.genusIndex(3);
 					sBuilder.percentGenus(3f);
 					sBuilder.addSpecies("BL", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -619,6 +645,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("C");
+					sBuilder.genusIndex(4);
 					sBuilder.percentGenus(30f);
 					sBuilder.addSpecies("CW", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -633,6 +660,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("H");
+					sBuilder.genusIndex(8);
 					sBuilder.percentGenus(48.9f);
 					sBuilder.addSpecies("HW", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -647,6 +675,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("S");
+					sBuilder.genusIndex(15);
 					sBuilder.percentGenus(18.1f);
 					sBuilder.addSpecies("SE", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -696,6 +725,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B");
+					sBuilder.genusIndex(3);
 					sBuilder.percentGenus(3f);
 					sBuilder.addSpecies("BL", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -705,6 +735,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("C");
+					sBuilder.genusIndex(4);
 					sBuilder.percentGenus(30f);
 					sBuilder.addSpecies("CW", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -719,6 +750,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("H");
+					sBuilder.genusIndex(8);
 					sBuilder.percentGenus(48.9f);
 					sBuilder.addSpecies("HW", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -733,6 +765,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("S");
+					sBuilder.genusIndex(15);
 					sBuilder.percentGenus(18.1f);
 					sBuilder.addSpecies("SE", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -785,6 +818,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B");
+					sBuilder.genusIndex(3);
 					sBuilder.percentGenus(100f);
 					sBuilder.addSpecies("BL", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -847,6 +881,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B");
+					sBuilder.genusIndex(3);
 					sBuilder.percentGenus(100f);
 					sBuilder.addSpecies("BL", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -911,6 +946,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B");
+					sBuilder.genusIndex(3);
 					sBuilder.percentGenus(100f);
 					sBuilder.addSpecies("BL", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -974,6 +1010,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B");
+					sBuilder.genusIndex(3);
 					sBuilder.percentGenus(100f);
 					sBuilder.addSpecies("BL", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -1037,6 +1074,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B");
+					sBuilder.genusIndex(3);
 					sBuilder.percentGenus(100f);
 					sBuilder.addSpecies("BL", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -1103,6 +1141,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B");
+					sBuilder.genusIndex(3);
 					sBuilder.percentGenus(100f);
 					sBuilder.addSpecies("BL", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -1176,6 +1215,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B");
+					sBuilder.genusIndex(3);
 					sBuilder.percentGenus(100f);
 					sBuilder.addSpecies("BL", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -1240,6 +1280,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B");
+					sBuilder.genusIndex(3);
 					sBuilder.percentGenus(100f);
 					sBuilder.addSpecies("BL", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -1307,6 +1348,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B");
+					sBuilder.genusIndex(3);
 					sBuilder.percentGenus(100f);
 					sBuilder.addSpecies("BL", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -1371,6 +1413,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B");
+					sBuilder.genusIndex(3);
 					sBuilder.percentGenus(100f);
 					sBuilder.addSpecies("BL", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -1435,6 +1478,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B");
+					sBuilder.genusIndex(3);
 					sBuilder.percentGenus(100f);
 					sBuilder.addSpecies("BL", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -1495,6 +1539,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("B");
+					sBuilder.genusIndex(3);
 					sBuilder.percentGenus(3f);
 					sBuilder.addSpecies("BL", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -1504,6 +1549,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("C");
+					sBuilder.genusIndex(4);
 					sBuilder.percentGenus(30f);
 					sBuilder.addSpecies("CW", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -1518,6 +1564,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("H");
+					sBuilder.genusIndex(8);
 					sBuilder.percentGenus(48.9f);
 					sBuilder.addSpecies("HW", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -1532,6 +1579,7 @@ class VriInputValidationTest {
 				});
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("S");
+					sBuilder.genusIndex(15);
 					sBuilder.percentGenus(18.1f);
 					sBuilder.addSpecies("SE", 100);
 					sBuilder.addSite(iBuilder -> {
@@ -1555,6 +1603,7 @@ class VriInputValidationTest {
 				// Species
 				lBuilder.addSpecies(sBuilder -> {
 					sBuilder.genus("H");
+					sBuilder.genusIndex(8);
 					sBuilder.percentGenus(100f);
 					sBuilder.addSpecies("HW", 100);
 					sBuilder.addSite(iBuilder -> {

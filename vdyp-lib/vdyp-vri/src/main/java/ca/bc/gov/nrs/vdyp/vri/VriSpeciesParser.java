@@ -96,14 +96,17 @@ public class VriSpeciesParser
 					var polygonId = (String) entry.get(VriPolygonParser.POLYGON_IDENTIFIER);
 					var species = (ValueOrMarker<Optional<LayerType>, EndOfRecord>) entry.get(VriLayerParser.LAYER);
 					String genus;
+					int genusIndex;
 					if (species.isValue()) {
 						genus = ((Optional<String>) entry.get(GENUS)).orElseThrow(
 								() -> new ResourceParseValidException(
 										"Genus identifier can not be empty except in end of record entries"
 								)
 						);
+						genusIndex = Utils.getGenusIndex(genus, control);
 					} else {
 						genus = null;
+						genusIndex = 0;
 					}
 					var percentGenus = (Float) entry.get(PERCENT_GENUS);
 					var species1 = (Optional<String>) entry.get(SPECIES_1);
@@ -127,6 +130,7 @@ public class VriSpeciesParser
 								specBuilder.polygonIdentifier(polygonId);
 								specBuilder.layerType(layerType);
 								specBuilder.genus(genus);
+								specBuilder.genusIndex(genusIndex);
 								specBuilder.percentGenus(percentGenus);
 								specBuilder.addSpecies(speciesPercent);
 							});

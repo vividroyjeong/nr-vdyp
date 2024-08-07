@@ -34,18 +34,15 @@ class GenusDefinitionMapTest {
 		parser = new ForwardControlParser();
 		controlMap = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
 		assertThat(
-				controlMap,
-				(Matcher) controlMapHasEntry(
+				controlMap, (Matcher) controlMapHasEntry(
 						ControlKey.SP0_DEF, allOf(instanceOf(List.class), hasItem(instanceOf(GenusDefinition.class)))
 				)
 		);
-
 	}
 
 	@Test
 	void test() {
-		@SuppressWarnings("unchecked")
-		var gdMap = new GenusDefinitionMap((GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name()));
+		var gdMap = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
 
 		assertThat(gdMap.contains("AC"), is(true));
 		assertThat(gdMap.getByAlias("AC"), hasProperty("alias", is("AC")));

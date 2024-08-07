@@ -81,6 +81,7 @@ class ParsersTogetherTest {
 				ControlKey.EQN_MODIFIERS.name(),
 				new EquationModifierParser().parse(TestUtils.class, "coe/GMODBA1.DAT", controlMap)
 		);
+		TestUtils.populateControlMapBecReal(controlMap);
 	}
 
 	@AfterEach
@@ -124,6 +125,7 @@ class ParsersTogetherTest {
 			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
 			specBuilder.genus("B");
+			specBuilder.genusIndex(3);
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
@@ -272,6 +274,7 @@ class ParsersTogetherTest {
 			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
 			specBuilder.genus("B");
+			specBuilder.genusIndex(3);
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
@@ -349,6 +352,7 @@ class ParsersTogetherTest {
 			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
 			specBuilder.genus("B");
+			specBuilder.genusIndex(3);
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
@@ -425,11 +429,13 @@ class ParsersTogetherTest {
 			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
 			specBuilder.genus("B");
+			specBuilder.genusIndex(3);
 			specBuilder.percentGenus(80f);
 		}), VriSpecies.build(specBuilder -> {
 			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
 			specBuilder.genus("S");
+			specBuilder.genusIndex(15);
 			specBuilder.percentGenus(20f);
 		})));
 		siteStream.addValue(List.of(VriSite.build(siteBuilder -> {
@@ -505,11 +511,13 @@ class ParsersTogetherTest {
 			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
 			specBuilder.genus("B");
+			specBuilder.genusIndex(3);
 			specBuilder.percentGenus(80f);
 		}), VriSpecies.build(specBuilder -> {
 			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
 			specBuilder.genus("S");
+			specBuilder.genusIndex(15);
 			specBuilder.percentGenus(20f);
 		})));
 		siteStream.addValue(List.of(VriSite.build(siteBuilder -> {
@@ -606,6 +614,7 @@ class ParsersTogetherTest {
 			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
 			specBuilder.genus("B");
+			specBuilder.genusIndex(3);
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
@@ -688,6 +697,7 @@ class ParsersTogetherTest {
 			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
 			specBuilder.genus("B");
+			specBuilder.genusIndex(3);
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
