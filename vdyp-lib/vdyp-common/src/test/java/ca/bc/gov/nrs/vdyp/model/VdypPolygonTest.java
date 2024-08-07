@@ -1,6 +1,8 @@
 package ca.bc.gov.nrs.vdyp.model;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
@@ -13,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.easymock.EasyMock;
 import org.junit.jupiter.api.Test;
@@ -33,10 +36,12 @@ class VdypPolygonTest {
 
 			builder.forestInventoryZone("?");
 			builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
+			builder.targetYear(Optional.of(2024));
 		});
 		assertThat(result, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
 		assertThat(result, hasProperty("percentAvailable", is(90f)));
 		assertThat(result, hasProperty("layers", anEmptyMap()));
+		assertThat(result.getTargetYear(), present(is(2024)));
 	}
 
 	@Test
@@ -69,6 +74,7 @@ class VdypPolygonTest {
 		assertThat(result, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
 		assertThat(result, hasProperty("percentAvailable", is(90f)));
 		assertThat(result, hasProperty("layers", hasEntry(LayerType.PRIMARY, mock)));
+		assertThat(result, hasProperty("targetYear", notPresent()));
 	}
 
 	@Test
@@ -119,7 +125,7 @@ class VdypPolygonTest {
 		assertThat(result, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
 		assertThat(result, hasProperty("percentAvailable", is(90f)));
 		assertThat(result, hasProperty("forestInventoryZone", is("Z")));
-		assertThat(result, hasProperty("biogeoclimaticZone", is("IDF")));
+		assertThat(result, hasProperty("biogeoclimaticZone", hasProperty("alias", is("IDF"))));
 		assertThat(result, hasProperty("layers", anEmptyMap()));
 	}
 
@@ -149,7 +155,7 @@ class VdypPolygonTest {
 		assertThat(result, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
 		assertThat(result, hasProperty("percentAvailable", is(90f)));
 		assertThat(result, hasProperty("forestInventoryZone", is("Z")));
-		assertThat(result, hasProperty("biogeoclimaticZone", is("IDF")));
+		assertThat(result, hasProperty("biogeoclimaticZone", hasProperty("alias", is("IDF"))));
 		assertThat(result, hasProperty("layers", hasEntry(is(LayerType.PRIMARY), anything())));
 		var resultLayer = result.getLayers().get(LayerType.PRIMARY);
 

@@ -6,11 +6,22 @@ import java.util.function.Function;
 
 public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float, VdypSpecies, VdypSite> {
 
+	private final Optional<Integer> targetYear;
+	
 	public VdypPolygon(
 			PolygonIdentifier polygonIdentifier, Float percentAvailable, String fiz, BecDefinition bec,
 			Optional<PolygonMode> modeFip
 	) {
+		this(polygonIdentifier, percentAvailable, fiz, bec, modeFip, Optional.empty());
+	}
+
+	public VdypPolygon(
+			PolygonIdentifier polygonIdentifier, Float percentAvailable, String fiz, BecDefinition bec,
+			Optional<PolygonMode> modeFip, Optional<Integer> targetYear
+	) {
 		super(polygonIdentifier, percentAvailable, fiz, bec, modeFip);
+		
+		this.targetYear = targetYear;
 	}
 
 	/**
@@ -25,6 +36,15 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float, VdypSpecies, 
 			O toCopy, Function<U, Float> convertPercentAvailable
 	) {
 		super(toCopy, convertPercentAvailable);
+		if (toCopy instanceof VdypPolygon vdypPolygonToCopy) {
+			this.targetYear = vdypPolygonToCopy.getTargetYear();
+		} else {
+			this.targetYear = Optional.empty();
+		}
+	}
+	
+	public Optional<Integer> getTargetYear() {
+		return targetYear;
 	}
 
 	/**
@@ -50,11 +70,13 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float, VdypSpecies, 
 	public static class Builder extends
 			BaseVdypPolygon.Builder<VdypPolygon, VdypLayer, Float, VdypSpecies, VdypSite, VdypLayer.Builder, VdypSpecies.Builder, VdypSite.Builder> {
 
+		protected Optional<Integer> targetYear = Optional.empty();
+		
 		@Override
 		protected VdypPolygon doBuild() {
 			return new VdypPolygon(
 					polygonIdentifier.get(), percentAvailable.get(), forestInventoryZone.get(),
-					biogeoclimaticZone.get(), mode
+					biogeoclimaticZone.get(), mode, targetYear
 			);
 		}
 
@@ -63,5 +85,8 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float, VdypSpecies, 
 			return new VdypLayer.Builder();
 		}
 
+		public void targetYear(Optional<Integer> targetYear) {
+			this.targetYear = targetYear;
+		}
 	}
 }
