@@ -423,10 +423,10 @@ class FipStartTest {
 
 			var polygon = getTestPolygon(polygonId, TestUtils.valid());
 			var layer = this.getTestPrimaryLayer(polygonId, TestUtils.valid(), TestUtils.valid());
-			var spec1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", x -> {
+			var spec1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", 3, x -> {
 				x.setPercentGenus(75f);
 			});
-			var spec2 = getTestSpecies(polygonId, LayerType.PRIMARY, "C", x -> {
+			var spec2 = getTestSpecies(polygonId, LayerType.PRIMARY, "C", 4, x -> {
 				x.setPercentGenus(25f);
 			});
 			layer.setSpecies(List.of(spec1, spec2));
@@ -447,10 +447,10 @@ class FipStartTest {
 
 			var polygon = getTestPolygon(polygonId, TestUtils.valid());
 			var layer = this.getTestPrimaryLayer(polygonId, TestUtils.valid(), TestUtils.valid());
-			var spec1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", x -> {
+			var spec1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", 3, x -> {
 				x.setPercentGenus(75f - 1f);
 			});
-			var spec2 = getTestSpecies(polygonId, LayerType.PRIMARY, "C", x -> {
+			var spec2 = getTestSpecies(polygonId, LayerType.PRIMARY, "C", 4, x -> {
 				x.setPercentGenus(25f);
 			});
 			layer.setSpecies(List.of(spec1, spec2));
@@ -482,10 +482,10 @@ class FipStartTest {
 
 			var polygon = getTestPolygon(polygonId, TestUtils.valid());
 			var layer = this.getTestPrimaryLayer(polygonId, TestUtils.valid(), TestUtils.valid());
-			var spec1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", x -> {
+			var spec1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", 3, x -> {
 				x.setPercentGenus(75f + 1f);
 			});
-			var spec2 = getTestSpecies(polygonId, LayerType.PRIMARY, "C", x -> {
+			var spec2 = getTestSpecies(polygonId, LayerType.PRIMARY, "C", 4, x -> {
 				x.setPercentGenus(25f);
 			});
 			layer.setSpecies(List.of(spec1, spec2));
@@ -514,9 +514,9 @@ class FipStartTest {
 
 		final var speciesList = Arrays.asList(
 				//
-				getTestSpecies(polygonId, layer, "B", x -> {
+				getTestSpecies(polygonId, layer, "B", 3, x -> {
 					x.setPercentGenus(75f);
-				}), getTestSpecies(polygonId, layer, "C", x -> {
+				}), getTestSpecies(polygonId, layer, "C", 4, x -> {
 					x.setPercentGenus(25f);
 				})
 		);
@@ -549,9 +549,9 @@ class FipStartTest {
 
 		final var speciesList = Arrays.asList(
 				//
-				getTestSpecies(polygonId, layer, "B", x -> {
+				getTestSpecies(polygonId, layer, "B", 3, x -> {
 					x.setPercentGenus(75 + 0.009f);
-				}), getTestSpecies(polygonId, layer, "C", x -> {
+				}), getTestSpecies(polygonId, layer, "C", 4, x -> {
 					x.setPercentGenus(25f);
 				})
 		);
@@ -673,13 +673,13 @@ class FipStartTest {
 			siteBuilder.siteSpecies("H");
 			siteBuilder.siteGenus("H");
 		});
-		var fipSpecies1 = getTestSpecies(polygonId, LayerType.VETERAN, "B", x -> {
+		var fipSpecies1 = getTestSpecies(polygonId, LayerType.VETERAN, "B", 3, x -> {
 			x.setPercentGenus(22f);
 		});
-		var fipSpecies2 = getTestSpecies(polygonId, LayerType.VETERAN, "H", x -> {
+		var fipSpecies2 = getTestSpecies(polygonId, LayerType.VETERAN, "H", 8, x -> {
 			x.setPercentGenus(60f);
 		});
-		var fipSpecies3 = getTestSpecies(polygonId, LayerType.VETERAN, "S", x -> {
+		var fipSpecies3 = getTestSpecies(polygonId, LayerType.VETERAN, "S", 15, x -> {
 			x.setPercentGenus(18f);
 		});
 		fipPolygon.setLayers(Collections.singletonMap(LayerType.VETERAN, fipLayer));
@@ -1108,19 +1108,19 @@ class FipStartTest {
 			siteBuilder.siteGenus("D");
 			siteBuilder.siteSpecies("D");
 		});
-		var fipSpecies1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", x -> {
+		var fipSpecies1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", 3, x -> {
 			x.setPercentGenus(1f);
 		});
-		var fipSpecies2 = getTestSpecies(polygonId, LayerType.PRIMARY, "C", x -> {
+		var fipSpecies2 = getTestSpecies(polygonId, LayerType.PRIMARY, "C", 4, x -> {
 			x.setPercentGenus(7f);
 		});
-		var fipSpecies3 = getTestSpecies(polygonId, LayerType.PRIMARY, "D", x -> {
+		var fipSpecies3 = getTestSpecies(polygonId, LayerType.PRIMARY, "D", 5, x -> {
 			x.setPercentGenus(74f);
 		});
-		var fipSpecies4 = getTestSpecies(polygonId, LayerType.PRIMARY, "H", x -> {
+		var fipSpecies4 = getTestSpecies(polygonId, LayerType.PRIMARY, "H", 8, x -> {
 			x.setPercentGenus(9f);
 		});
-		var fipSpecies5 = getTestSpecies(polygonId, LayerType.PRIMARY, "S", x -> {
+		var fipSpecies5 = getTestSpecies(polygonId, LayerType.PRIMARY, "S", 15, x -> {
 			x.setPercentGenus(9f);
 		});
 		fipPolygon.setLayers(List.of(fipLayer));
@@ -1501,16 +1501,16 @@ class FipStartTest {
 			x.yearsToBreastHeight(5.4f);
 			x.siteCurveNumber(34);
 		});
-		var fipSpecies1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", x -> {
+		var fipSpecies1 = getTestSpecies(polygonId, LayerType.PRIMARY, "B", 3, x -> {
 			x.setPercentGenus(15f);
 		});
-		var fipSpecies2 = getTestSpecies(polygonId, LayerType.PRIMARY, "D", x -> {
+		var fipSpecies2 = getTestSpecies(polygonId, LayerType.PRIMARY, "D", 4, x -> {
 			x.setPercentGenus(7f);
 		});
-		var fipSpecies3 = getTestSpecies(polygonId, LayerType.PRIMARY, "H", x -> {
+		var fipSpecies3 = getTestSpecies(polygonId, LayerType.PRIMARY, "H", 8, x -> {
 			x.setPercentGenus(77f);
 		});
-		var fipSpecies4 = getTestSpecies(polygonId, LayerType.PRIMARY, "S", x -> {
+		var fipSpecies4 = getTestSpecies(polygonId, LayerType.PRIMARY, "S", 15, x -> {
 			x.setPercentGenus(1f);
 		});
 		fipPolygon.setLayers(List.of(fipLayer));
@@ -1647,6 +1647,7 @@ class FipStartTest {
 
 				lb.addSpecies(sb -> {
 					sb.genus("B");
+					sb.genusIndex(3);
 					sb.percentGenus(1);
 
 					sb.volumeGroup(12);
@@ -1657,6 +1658,7 @@ class FipStartTest {
 				});
 				lb.addSpecies(sb -> {
 					sb.genus("C");
+					sb.genusIndex(4);
 					sb.percentGenus(7);
 
 					sb.volumeGroup(20);
@@ -1667,6 +1669,7 @@ class FipStartTest {
 				});
 				lb.addSpecies(sb -> {
 					sb.genus("S");
+					sb.genusIndex(15);
 					sb.percentGenus(9);
 
 					sb.volumeGroup(66);
@@ -1677,6 +1680,7 @@ class FipStartTest {
 				});
 				lb.addSpecies(sb -> {
 					sb.genus("D");
+					sb.genusIndex(5);
 					sb.percentGenus(74);
 
 					sb.volumeGroup(25);
@@ -1687,6 +1691,7 @@ class FipStartTest {
 				});
 				lb.addSpecies(sb -> {
 					sb.genus("H");
+					sb.genusIndex(8);
 					sb.percentGenus(9);
 
 					sb.volumeGroup(37);
@@ -1747,6 +1752,7 @@ class FipStartTest {
 
 				lb.addSpecies(sb -> {
 					sb.genus("B");
+					sb.genusIndex(3);
 					sb.percentGenus(0.8918811f);
 
 					sb.volumeGroup(12);
@@ -1763,6 +1769,7 @@ class FipStartTest {
 				});
 				lb.addSpecies(sb -> {
 					sb.genus("C");
+					sb.genusIndex(4);
 					sb.percentGenus(11.449178f);
 
 					sb.volumeGroup(20);
@@ -1779,6 +1786,7 @@ class FipStartTest {
 				});
 				lb.addSpecies(sb -> {
 					sb.genus("S");
+					sb.genusIndex(15);
 					sb.percentGenus(9.215943f);
 
 					sb.volumeGroup(66);
@@ -1795,6 +1803,7 @@ class FipStartTest {
 				});
 				lb.addSpecies(sb -> {
 					sb.genus("D");
+					sb.genusIndex(5);
 					sb.percentGenus(66.05741f);
 
 					sb.volumeGroup(25);
@@ -1811,6 +1820,7 @@ class FipStartTest {
 				});
 				lb.addSpecies(sb -> {
 					sb.genus("H");
+					sb.genusIndex(8);
 					sb.percentGenus(12.385582f);
 
 					sb.volumeGroup(37);
@@ -1999,14 +2009,14 @@ class FipStartTest {
 		var fipLayer = getTestVeteranLayer(polygonId, TestUtils.valid(), x -> {
 			x.height(10f);
 		});
-		var fipSpecies1 = getTestSpecies(polygonId, LayerType.VETERAN, "B", x -> {
+		var fipSpecies1 = getTestSpecies(polygonId, LayerType.VETERAN, "B", 3, x -> {
 			var map = new LinkedHashMap<String, Float>();
 			map.put("S1", 75f);
 			map.put("S2", 25f);
 			x.setSpeciesPercent(map);
 			x.setPercentGenus(60f);
 		});
-		var fipSpecies2 = getTestSpecies(polygonId, LayerType.VETERAN, "C", x -> {
+		var fipSpecies2 = getTestSpecies(polygonId, LayerType.VETERAN, "C", 4, x -> {
 			var map = new LinkedHashMap<String, Float>();
 			map.put("S3", 75f);
 			map.put("S4", 25f);
@@ -2123,17 +2133,17 @@ class FipStartTest {
 			x.siteSpecies("H");
 			x.yearsToBreastHeight(7.1f);
 		});
-		var fipSpecies1 = getTestSpecies(polygonId, LayerType.VETERAN, "B", x -> {
+		var fipSpecies1 = getTestSpecies(polygonId, LayerType.VETERAN, "B", 3, x -> {
 			var map = new LinkedHashMap<String, Float>();
 			x.setSpeciesPercent(map);
 			x.setPercentGenus(22f);
 		});
-		var fipSpecies2 = getTestSpecies(polygonId, LayerType.VETERAN, "H", x -> {
+		var fipSpecies2 = getTestSpecies(polygonId, LayerType.VETERAN, "H", 8, x -> {
 			var map = new LinkedHashMap<String, Float>();
 			x.setSpeciesPercent(map);
 			x.setPercentGenus(60f);
 		});
-		var fipSpecies3 = getTestSpecies(polygonId, LayerType.VETERAN, "S", x -> {
+		var fipSpecies3 = getTestSpecies(polygonId, LayerType.VETERAN, "S", 15, x -> {
 			var map = new LinkedHashMap<String, Float>();
 			x.setSpeciesPercent(map);
 			x.setPercentGenus(18f);
@@ -2253,6 +2263,7 @@ class FipStartTest {
 
 			var spec = VdypSpecies.build(layer, builder -> {
 				builder.genus("Y");
+				builder.genusIndex(16);
 				builder.percentGenus(100f);
 				builder.volumeGroup(-1);
 				builder.decayGroup(-1);
@@ -2345,6 +2356,7 @@ class FipStartTest {
 			// sp B, C, D, H, S
 			var spec1 = VdypSpecies.build(layer, builder -> {
 				builder.genus("B");
+				builder.genusIndex(3);
 				builder.percentGenus(1f);
 				builder.volumeGroup(12);
 				builder.decayGroup(7);
@@ -2358,6 +2370,7 @@ class FipStartTest {
 			spec1.getLoreyHeightByUtilization().setCoe(0, 38.7456512f);
 			var spec2 = VdypSpecies.build(layer, builder -> {
 				builder.genus("C");
+				builder.genusIndex(4);
 				builder.percentGenus(7f);
 				builder.volumeGroup(20);
 				builder.decayGroup(14);
@@ -2367,6 +2380,7 @@ class FipStartTest {
 			spec2.getLoreyHeightByUtilization().setCoe(0, 22.8001652f);
 			var spec3 = VdypSpecies.build(layer, builder -> {
 				builder.genus("D");
+				builder.genusIndex(5);
 				builder.percentGenus(74f);
 				builder.volumeGroup(25);
 				builder.decayGroup(19);
@@ -2375,6 +2389,7 @@ class FipStartTest {
 			spec3.getLoreyHeightByUtilization().setCoe(0, 33.6889763f);
 			var spec4 = VdypSpecies.build(layer, builder -> {
 				builder.genus("H");
+				builder.genusIndex(8);
 				builder.percentGenus(9f);
 				builder.volumeGroup(37);
 				builder.decayGroup(31);
@@ -2383,6 +2398,7 @@ class FipStartTest {
 			spec4.getLoreyHeightByUtilization().setCoe(0, 24.3451157f);
 			var spec5 = VdypSpecies.build(layer, builder -> {
 				builder.genus("S");
+				builder.genusIndex(15);
 				builder.percentGenus(9f);
 				builder.volumeGroup(66);
 				builder.decayGroup(54);
@@ -2624,6 +2640,7 @@ class FipStartTest {
 			// sp B, C, D, H, S
 			var spec1 = VdypSpecies.build(layer, builder -> {
 				builder.genus("B");
+				builder.genusIndex(3);
 				builder.percentGenus(15f);
 				builder.volumeGroup(12);
 				builder.decayGroup(7);
@@ -2632,6 +2649,7 @@ class FipStartTest {
 			spec1.getLoreyHeightByUtilization().setCoe(0, 21.5356998f);
 			var spec2 = VdypSpecies.build(layer, builder -> {
 				builder.genus("D");
+				builder.genusIndex(4);
 				builder.percentGenus(7f);
 				builder.volumeGroup(25);
 				builder.decayGroup(19);
@@ -2640,6 +2658,7 @@ class FipStartTest {
 			spec2.getLoreyHeightByUtilization().setCoe(0, 22.4329224f);
 			var spec3 = VdypSpecies.build(layer, builder -> {
 				builder.genus("H");
+				builder.genusIndex(8);
 				builder.percentGenus(77f);
 				builder.volumeGroup(37);
 				builder.decayGroup(54);
@@ -2653,6 +2672,7 @@ class FipStartTest {
 			spec3.getLoreyHeightByUtilization().setCoe(0, 20.5984688f);
 			var spec4 = VdypSpecies.build(layer, builder -> {
 				builder.genus("S");
+				builder.genusIndex(15);
 				builder.percentGenus(1f);
 				builder.volumeGroup(66);
 				builder.decayGroup(54);
@@ -2884,6 +2904,7 @@ class FipStartTest {
 
 			FipSpecies.build(fipPrimaryLayer, builder -> {
 				builder.genus("L");
+				builder.genusIndex(9);
 				builder.percentGenus(10f);
 				builder.addSite(siteBuilder -> {
 					siteBuilder.ageTotal(60f);
@@ -2896,6 +2917,7 @@ class FipStartTest {
 			});
 			FipSpecies.build(fipPrimaryLayer, builder -> {
 				builder.genus("PL");
+				builder.genusIndex(12);
 				builder.percentGenus(90f);
 			});
 
@@ -2932,6 +2954,7 @@ class FipStartTest {
 
 				lb.addSpecies(sb -> {
 					sb.genus("L");
+					sb.genusIndex(9);
 					sb.percentGenus(10f);
 
 					sb.addSite(siteBuilder -> {
@@ -2947,6 +2970,7 @@ class FipStartTest {
 
 				lb.addSpecies(sb -> {
 					sb.genus("PL");
+					sb.genusIndex(12);
 					sb.percentGenus(90f);
 				});
 
@@ -2993,6 +3017,7 @@ class FipStartTest {
 
 				lb.addSpecies(sb -> {
 					sb.genus("L");
+					sb.genusIndex(9);
 					sb.percentGenus(10f);
 					sb.addSite(ib -> {
 						ib.ageTotal(60f);
@@ -3006,6 +3031,7 @@ class FipStartTest {
 
 				lb.addSpecies(sb -> {
 					sb.genus("PL");
+					sb.genusIndex(12);
 					sb.percentGenus(90f);
 				});
 
@@ -3052,6 +3078,7 @@ class FipStartTest {
 
 				lb.addSpecies(sb -> {
 					sb.genus("L");
+					sb.genusIndex(9);
 					sb.percentGenus(50f);
 					sb.addSite(ib -> {
 						ib.ageTotal(60f);
@@ -3064,6 +3091,7 @@ class FipStartTest {
 				});
 				lb.addSpecies(sb -> {
 					sb.genus("PL");
+					sb.genusIndex(12);
 					sb.percentGenus(50f);
 				});
 
@@ -3076,6 +3104,7 @@ class FipStartTest {
 
 				lb.addSpecies(sb -> {
 					sb.genus("L");
+					sb.genusIndex(9);
 					sb.percentGenus(50f);
 					sb.volumeGroup(-1);
 					sb.decayGroup(-1);
@@ -3091,6 +3120,7 @@ class FipStartTest {
 
 				lb.addSpecies(sb -> {
 					sb.genus("PL");
+					sb.genusIndex(12);
 					sb.percentGenus(50f);
 					sb.volumeGroup(-1);
 					sb.decayGroup(-1);
@@ -3205,6 +3235,7 @@ class FipStartTest {
 
 				lb.addSpecies(sb -> {
 					sb.genus("L");
+					sb.genusIndex(9);
 					sb.percentGenus(50f);
 					sb.addSite(ib -> {
 						ib.ageTotal(60f);
@@ -3217,6 +3248,7 @@ class FipStartTest {
 				});
 				lb.addSpecies(sb -> {
 					sb.genus("PL");
+					sb.genusIndex(12);
 					sb.percentGenus(50f);
 				});
 
@@ -3230,6 +3262,7 @@ class FipStartTest {
 
 				lb.addSpecies(sb -> {
 					sb.genus("L");
+					sb.genusIndex(9);
 					sb.percentGenus(50f);
 					sb.volumeGroup(-1);
 					sb.decayGroup(-1);
@@ -3245,6 +3278,7 @@ class FipStartTest {
 
 				lb.addSpecies(sb -> {
 					sb.genus("PL");
+					sb.genusIndex(12);
 					sb.percentGenus(50f);
 					sb.volumeGroup(-1);
 					sb.decayGroup(-1);
@@ -3377,6 +3411,7 @@ class FipStartTest {
 
 				lb.addSpecies(sb -> {
 					sb.genus("L");
+					sb.genusIndex(9);
 					sb.percentGenus(50f);
 					sb.addSite(ib -> {
 						ib.ageTotal(60f);
@@ -3389,6 +3424,7 @@ class FipStartTest {
 				});
 				lb.addSpecies(sb -> {
 					sb.genus("PL");
+					sb.genusIndex(12);
 					sb.percentGenus(50f);
 				});
 			});
@@ -3401,6 +3437,7 @@ class FipStartTest {
 
 				lb.addSpecies(sb -> {
 					sb.genus("L");
+					sb.genusIndex(9);
 					sb.percentGenus(50f);
 					sb.volumeGroup(-1);
 					sb.decayGroup(-1);
@@ -3416,6 +3453,7 @@ class FipStartTest {
 
 				lb.addSpecies(sb -> {
 					sb.genus("PL");
+					sb.genusIndex(12);
 					sb.percentGenus(50f);
 					sb.volumeGroup(-1);
 					sb.decayGroup(-1);
@@ -3440,6 +3478,7 @@ class FipStartTest {
 
 			var spec1 = VdypSpecies.build(vdypLayer, builder -> {
 				builder.genus("L");
+				builder.genusIndex(9);
 				builder.percentGenus(50f);
 				builder.volumeGroup(-1);
 				builder.decayGroup(-1);
@@ -3460,6 +3499,7 @@ class FipStartTest {
 
 			var spec2 = VdypSpecies.build(vdypLayer, builder -> {
 				builder.genus("PL");
+				builder.genusIndex(12);
 				builder.percentGenus(50f);
 				builder.volumeGroup(-1);
 				builder.decayGroup(-1);
@@ -3559,6 +3599,7 @@ class FipStartTest {
 
 			lb.addSpecies(sb -> {
 				sb.genus("B");
+				sb.genusIndex(3);
 				sb.percentGenus(100);
 
 				sb.addSite(ib -> {
@@ -3739,15 +3780,16 @@ class FipStartTest {
 	}
 
 	FipSpecies getTestSpecies(PolygonIdentifier polygonId, LayerType layer, Consumer<FipSpecies> mutator) {
-		return getTestSpecies(polygonId, layer, "B", mutator);
+		return getTestSpecies(polygonId, layer, "B", 3, mutator);
 	}
 
 	FipSpecies
-			getTestSpecies(PolygonIdentifier polygonId, LayerType layer, String genusId, Consumer<FipSpecies> mutator) {
+			getTestSpecies(PolygonIdentifier polygonId, LayerType layer, String genusId, int genusIndex, Consumer<FipSpecies> mutator) {
 		var result = FipSpecies.build(builder -> {
 			builder.polygonIdentifier(polygonId);
 			builder.layerType(layer);
 			builder.genus(genusId);
+			builder.genusIndex(genusIndex);
 			builder.percentGenus(100.0f);
 			builder.addSpecies(genusId, 100f);
 		});

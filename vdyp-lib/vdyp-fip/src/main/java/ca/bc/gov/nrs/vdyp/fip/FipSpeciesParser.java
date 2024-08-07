@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
 import ca.bc.gov.nrs.vdyp.io.EndOfRecord;
@@ -77,14 +78,17 @@ public class FipSpeciesParser
 					var polygonId = (String) entry.get(FipPolygonParser.POLYGON_IDENTIFIER);
 					var layer = (ValueOrMarker<Optional<LayerType>, EndOfRecord>) entry.get(FipLayerParser.LAYER);
 					String genus;
+					int genusIndex;
 					if (layer.isValue()) {
 						genus = ((Optional<String>) entry.get(GENUS)).orElseThrow(
 								() -> new ResourceParseValidException(
 										"Genus identifier can not be empty except in end of record entries"
 								)
 						);
+						genusIndex = Utils.getGenusIndex(genus, control);
 					} else {
 						genus = null;
+						genusIndex = 0;
 					}
 					var percentGenus = (Float) entry.get(PERCENT_GENUS);
 					var species1 = (Optional<String>) entry.get(SPECIES_1);
@@ -108,6 +112,7 @@ public class FipSpeciesParser
 								specBuilder.polygonIdentifier(polygonId);
 								specBuilder.layerType(layerType);
 								specBuilder.genus(genus);
+								specBuilder.genusIndex(genusIndex);
 								specBuilder.percentGenus(percentGenus);
 								specBuilder.addSpecies(speciesPercent);
 							});
