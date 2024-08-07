@@ -10,10 +10,10 @@ import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 public class FipSpecies extends BaseVdypSpecies<FipSite> {
 
 	public FipSpecies(
-			PolygonIdentifier polygonIdentifier, LayerType layer, String genus, float percentGenus,
+			PolygonIdentifier polygonIdentifier, LayerType layer, String genus, int genusIndex, float percentGenus,
 			Optional<FipSite> site
 	) {
-		super(polygonIdentifier, layer, genus, percentGenus, site);
+		super(polygonIdentifier, layer, genus, genusIndex, percentGenus, site);
 	}
 
 	/**
@@ -24,6 +24,7 @@ public class FipSpecies extends BaseVdypSpecies<FipSite> {
 			builder.polygonIdentifier(polygonId);
 			builder.layerType(LayerType.VETERAN);
 			builder.genus("B");
+			builder.genusIndex(3);
 			builder.percentGenus(6f);
 	 * })
 	 * </pre>
@@ -64,6 +65,7 @@ public class FipSpecies extends BaseVdypSpecies<FipSite> {
 					this.polygonIdentifier.get(), //
 					this.layerType.get(), //
 					this.genus.get(), //
+					this.genusIndex.get(), //
 					this.percentGenus.get(), this.site
 			);
 		}

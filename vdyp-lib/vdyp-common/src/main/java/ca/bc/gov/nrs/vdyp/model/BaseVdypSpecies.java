@@ -12,12 +12,17 @@ import ca.bc.gov.nrs.vdyp.common.Computed;
 
 public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 	private final PolygonIdentifier polygonIdentifier; // FIP_P/POLYDESC
-	private final LayerType layerType; // This is also represents the distinction between data stored in
+	
+	// This is also represents the distinction between data stored in
 	// FIPL_1(A) and FIP_V(A). Where VDYP7 stores both and looks at certain values
 	// to determine if a layer is "present". VDYP8 stores them in a map keyed by
-	// this value
+	// this value.
+	private final LayerType layerType; 
 
 	private final String genus; // FIPSA/SP0V
+	
+	/** the species index within species definition file (e.g. SPODEF_v0.dat) */
+	private final int genusIndex; // BANK1/ISPB, L1COM1/ISPL1, etc.
 
 	private float percentGenus; // FIPS/PCTVOLV L1COM1/PCTL1
 
@@ -30,13 +35,14 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 	private Optional<I> site;
 
 	protected BaseVdypSpecies(
-			PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, float percentGenus, Optional<I> site
+			PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, int genusIndex, float percentGenus, Optional<I> site
 	) {
 		this.polygonIdentifier = polygonIdentifier;
 		this.layerType = layerType;
 		this.genus = genus;
 		this.setPercentGenus(percentGenus);
 		this.site = site;
+		this.genusIndex = genusIndex;
 	}
 
 	public PolygonIdentifier getPolygonIdentifier() {
@@ -78,6 +84,10 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		return genus;
 	}
 
+	public int getGenusIndex() {
+		return genusIndex;
+	}
+	
 	public Optional<I> getSite() {
 		return site;
 	}
@@ -87,6 +97,7 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		protected Optional<PolygonIdentifier> polygonIdentifier = Optional.empty();
 		protected Optional<LayerType> layerType = Optional.empty();
 		protected Optional<String> genus = Optional.empty();
+		protected Optional<Integer> genusIndex = Optional.empty();
 		protected Optional<Float> percentGenus = Optional.empty();
 		protected Optional<Float> fractionGenus = Optional.empty();
 		protected Map<String, Float> speciesPercent = new LinkedHashMap<>();
@@ -115,6 +126,11 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 
 		public Builder<T, I, IB> genus(String genus) {
 			this.genus = Optional.of(genus);
+			return this;
+		}
+
+		public Builder<T, I, IB> genusIndex(int genusIndex) {
+			this.genusIndex = Optional.of(genusIndex);
 			return this;
 		}
 
@@ -164,6 +180,7 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 			requirePresent(polygonIdentifier, "polygonIdentifier", errors);
 			requirePresent(layerType, "layerType", errors);
 			requirePresent(genus, "genus", errors);
+			requirePresent(genusIndex, "genusIndex", errors);
 			requirePresent(percentGenus, "percentGenus", errors);
 		}
 
@@ -194,6 +211,7 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 			polygonIdentifier(toCopy.getPolygonIdentifier());
 			layerType(toCopy.getLayerType());
 			genus(toCopy.getGenus());
+			genusIndex(toCopy.getGenusIndex());
 			percentGenus(toCopy.getPercentGenus());
 
 			fractionGenus(toCopy.getFractionGenus());

@@ -20,6 +20,7 @@ class VdypSpeciesTest {
 			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.genus("B");
+			builder.genusIndex(3);
 			builder.percentGenus(50f);
 			builder.volumeGroup(1);
 			builder.decayGroup(2);
@@ -63,6 +64,7 @@ class VdypSpeciesTest {
 		var result = VdypSpecies.build(layer, builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.genus("B");
+			builder.genusIndex(3);
 			builder.percentGenus(50f);
 			builder.volumeGroup(1);
 			builder.decayGroup(2);
@@ -93,6 +95,7 @@ class VdypSpeciesTest {
 			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.genus("B");
+			builder.genusIndex(3);
 			builder.percentGenus(50f);
 			builder.volumeGroup(1);
 			builder.decayGroup(2);

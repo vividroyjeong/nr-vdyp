@@ -138,22 +138,22 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 
 						Utils.ifBothPresent(
 								genusNameText0.filter(t -> genusDefinitionMap.contains(t)), percentGenus0,
-								(s, p) -> gdList.add(new GenusDistribution(0, genusDefinitionMap.get(s), p))
+								(s, p) -> gdList.add(new GenusDistribution(0, genusDefinitionMap.getByAlias(s), p))
 						);
 
 						Utils.ifBothPresent(
 								genusNameText1.filter(t -> genusDefinitionMap.contains(t)), percentGenus1,
-								(s, p) -> gdList.add(new GenusDistribution(1, genusDefinitionMap.get(s), p))
+								(s, p) -> gdList.add(new GenusDistribution(1, genusDefinitionMap.getByAlias(s), p))
 						);
 
 						Utils.ifBothPresent(
 								genusNameText2.filter(t -> genusDefinitionMap.contains(t)), percentGenus2,
-								(s, p) -> gdList.add(new GenusDistribution(2, genusDefinitionMap.get(s), p))
+								(s, p) -> gdList.add(new GenusDistribution(2, genusDefinitionMap.getByAlias(s), p))
 						);
 
 						Utils.ifBothPresent(
 								genusNameText3.filter(t -> genusDefinitionMap.contains(t)), percentGenus3,
-								(s, p) -> gdList.add(new GenusDistribution(3, genusDefinitionMap.get(s), p))
+								(s, p) -> gdList.add(new GenusDistribution(3, genusDefinitionMap.getByAlias(s), p))
 						);
 
 						try {

@@ -23,6 +23,7 @@ import org.apache.commons.math3.util.Pair;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.UtilizationVector;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
@@ -244,7 +245,6 @@ public class Utils {
 				public Pair<T, U> next() {
 					return new Pair<>(iterator1.next(), iterator2.next());
 				}
-
 			};
 		};
 	}
@@ -263,9 +263,8 @@ public class Utils {
 	}
 
 	/**
-	 * @return true iff <code>string</code> is null or {@code java.lang.String.isBlank()} would return true.
-	 *
 	 * @param string the String against which the check is being made
+	 * @return true iff <code>string</code> is null or {@code java.lang.String.isBlank()} would return true.
 	 */
 	public static boolean nullOrBlank(@Nullable String string) {
 		return string == null || string.isBlank();
@@ -308,13 +307,30 @@ public class Utils {
 				.orElseThrow(() -> new IllegalArgumentException("Reference to unexpected BEC " + becZoneAlias));
 	}
 
+	/** 
+	 * Returns the index of the genus with the given alias.
+	 * 
+	 * @param genusAlias
+	 * @return as described
+	 */
+	public static int getGenusIndex(String genusAlias, Map<String, Object> controlMap)
+			throws IllegalArgumentException {
+		
+		GenusDefinition gd = (GenusDefinition)expectParsedControl(controlMap, ControlKey.SP0_DEF, GenusDefinitionMap.class).getByAlias(genusAlias);
+		if (gd == null) {
+			throw new IllegalArgumentException("Reference to unexpected species " + genusAlias);
+		}
+		
+		return gd.getIndex();
+	}
+
 	/**
 	 * Returns the value of the optional if it's present, otherwise the string "N/A"
 	 *
 	 * @param <T>
 	 * @param value
 	 * @param stringify
-	 * @return
+	 * @return as described
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static Object optNa(Optional<?> value) {
@@ -322,24 +338,24 @@ public class Utils {
 	}
 
 	/**
-	 * If the value is present, returns the default string representation otherwise returns "N/A"
+	 * If the Optional value is present, return its default string representation and otherwise 
+	 * return "N/A".
 	 *
-	 * @param <T>
 	 * @param value
-	 * @param stringify
-	 * @return
+	 * @return as described
 	 */
 	public static String optPretty(Optional<?> value) {
 		return optPretty(value, Object::toString);
 	}
 
 	/**
-	 * If the value is present, returns the result of the stringify function otherwise returns "N/A"
+	 * If the Optional value (of type T) is present, return the result of the given stringify function and 
+	 * otherwise return "N/A".
 	 *
 	 * @param <T>
 	 * @param value
 	 * @param stringify
-	 * @return
+	 * @return as described
 	 */
 	public static <T> String optPretty(Optional<T> value, Function<T, String> stringify) {
 		return (String) optNa(value.map(stringify));

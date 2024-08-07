@@ -34,6 +34,7 @@ class VdypLayerTest {
 
 			builder.addSpecies(specBuilder -> {
 				specBuilder.genus("PL");
+				specBuilder.genusIndex(12);
 				specBuilder.percentGenus(100);
 				specBuilder.volumeGroup(-1);
 				specBuilder.decayGroup(-1);
@@ -80,6 +81,7 @@ class VdypLayerTest {
 			builder.layerType(LayerType.PRIMARY);
 			builder.addSpecies(specBuilder -> {
 				specBuilder.genus("PL");
+				specBuilder.genusIndex(12);
 				specBuilder.percentGenus(100);
 				specBuilder.volumeGroup(-1);
 				specBuilder.decayGroup(-1);
@@ -115,6 +117,7 @@ class VdypLayerTest {
 			builder.layerType(LayerType.PRIMARY);
 			builder.addSpecies(specBuilder -> {
 				specBuilder.genus("PL");
+				specBuilder.genusIndex(12);
 				specBuilder.percentGenus(100);
 				specBuilder.volumeGroup(-1);
 				specBuilder.decayGroup(-1);
@@ -129,6 +132,7 @@ class VdypLayerTest {
 
 			builder.addSpecies(specBuilder -> {
 				specBuilder.genus("B");
+				specBuilder.genusIndex(3);
 				specBuilder.percentGenus(90f);
 				specBuilder.volumeGroup(10);
 				specBuilder.decayGroup(10);
@@ -181,6 +185,7 @@ class VdypLayerTest {
 		EasyMock.expect(toCopy.getSpecies())
 				.andStubReturn(new LinkedHashMap<>(Collections.singletonMap("B", speciesToCopy)));
 		EasyMock.expect(speciesToCopy.getGenus()).andStubReturn("B");
+		EasyMock.expect(speciesToCopy.getGenusIndex()).andStubReturn(3);
 		EasyMock.expect(speciesToCopy.getPercentGenus()).andStubReturn(100f);
 		EasyMock.expect(speciesToCopy.getFractionGenus()).andStubReturn(1f);
 		EasyMock.expect(speciesToCopy.getSpeciesPercent()).andStubReturn(Utils.constMap(map -> {
@@ -225,6 +230,7 @@ class VdypLayerTest {
 
 			builder.addSpecies(speciesBuilder -> {
 				speciesBuilder.genus("B");
+				speciesBuilder.genusIndex(3);
 				speciesBuilder.percentGenus(100f);
 				speciesBuilder.fractionGenus(1f);
 				speciesBuilder.volumeGroup(1);

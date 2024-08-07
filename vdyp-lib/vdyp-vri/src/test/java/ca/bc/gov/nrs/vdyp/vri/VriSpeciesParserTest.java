@@ -324,7 +324,7 @@ class VriSpeciesParserTest {
 	}
 
 	@Test
-	void testParseMutipleSpecies() throws Exception {
+	void testParseMultipleSpecies() throws Exception {
 
 		var parser = new VriSpeciesParser();
 
@@ -359,7 +359,9 @@ class VriSpeciesParserTest {
 				containsInAnyOrder(
 						allOf(
 								hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)), //
-								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")), //
+								hasProperty("layerType", is(LayerType.PRIMARY)), //
+								hasProperty("genus", is("B")), //
+								hasProperty("genusIndex", is(3)), //
 								hasProperty("percentGenus", is(100.0f)), //
 								hasProperty(
 										"speciesPercent", //

@@ -34,6 +34,7 @@ import org.hamcrest.Matchers;
 
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BreakageParser;
@@ -198,11 +199,12 @@ public class TestUtils {
 
 		List<GenusDefinition> sp0List = new ArrayList<>();
 
+		int speciesNumber = 1;
 		for (var alias : aliases) {
-			sp0List.add(new GenusDefinition(alias, java.util.Optional.empty(), "Test " + alias));
+			sp0List.add(new GenusDefinition(alias, speciesNumber++, "Test " + alias));
 		}
 
-		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), new GenusDefinitionMap(sp0List));
 	}
 
 	/**

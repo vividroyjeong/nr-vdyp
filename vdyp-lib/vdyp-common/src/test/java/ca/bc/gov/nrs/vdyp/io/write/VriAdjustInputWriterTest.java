@@ -104,6 +104,7 @@ class VriAdjustInputWriterTest {
 
 				builder.addSpecies(specBuilder -> {
 					specBuilder.genus("PL");
+					specBuilder.genusIndex(Utils.getGenusIndex("PL", controlMap));
 					specBuilder.percentGenus(100);
 					specBuilder.volumeGroup(1);
 					specBuilder.decayGroup(2);
@@ -141,6 +142,7 @@ class VriAdjustInputWriterTest {
 
 				builder.addSpecies(specBuilder -> {
 					specBuilder.genus("PL");
+					specBuilder.genusIndex(Utils.getGenusIndex("PL", controlMap));
 					specBuilder.percentGenus(100);
 					specBuilder.volumeGroup(0);
 					specBuilder.decayGroup(0);
@@ -178,6 +180,7 @@ class VriAdjustInputWriterTest {
 
 				builder.addSpecies(specBuilder -> {
 					specBuilder.genus("PL");
+					specBuilder.genusIndex(Utils.getGenusIndex("PL", controlMap));
 					specBuilder.percentGenus(100);
 					specBuilder.volumeGroup(1);
 					specBuilder.decayGroup(2);
@@ -197,6 +200,7 @@ class VriAdjustInputWriterTest {
 			@SuppressWarnings("unused")
 			var species = VdypSpecies.build(layer, builder -> {
 				builder.genus("PL");
+				builder.genusIndex(Utils.getGenusIndex("PL", controlMap));
 				builder.addSpecies("PL", 100f);
 
 				builder.percentGenus(100f);
@@ -263,6 +267,7 @@ class VriAdjustInputWriterTest {
 
 				builder.addSpecies(specBuilder -> {
 					specBuilder.genus("PL");
+					specBuilder.genusIndex(Utils.getGenusIndex("PL", controlMap));
 					specBuilder.percentGenus(100);
 					specBuilder.volumeGroup(1);
 					specBuilder.decayGroup(2);
@@ -280,6 +285,7 @@ class VriAdjustInputWriterTest {
 
 			var species = VdypSpecies.build(layer, builder -> {
 				builder.genus("PL");
+				builder.genusIndex(Utils.getGenusIndex("PL", controlMap));
 				builder.addSpecies("PL", 100f);
 
 				builder.percentGenus(100f);
@@ -312,13 +318,8 @@ class VriAdjustInputWriterTest {
 					Utils.utilizationVector(0f, 65.4214f, 2.3464f, 35.7128f, 21.2592f, 6.1030f)
 			);
 
-			species.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f)); // Should be
-																											// ignored
-																											// and
-																											// computed
-																											// from
-																											// BA and
-																											// TPH
+			// Should be ignored and computed from BA and TPH
+			species.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f)); 
 
 			unit.writeUtilization(layer, species);
 		}
@@ -357,6 +358,7 @@ class VriAdjustInputWriterTest {
 
 				builder.addSpecies(specBuilder -> {
 					specBuilder.genus("PL");
+					specBuilder.genusIndex(Utils.getGenusIndex("PL", controlMap));
 					specBuilder.percentGenus(100);
 					specBuilder.volumeGroup(0);
 					specBuilder.decayGroup(0);
@@ -403,13 +405,8 @@ class VriAdjustInputWriterTest {
 					Utils.utilizationVector(0f, 65.4214f, 2.3464f, 35.7128f, 21.2592f, 6.1030f)
 			);
 
-			layer.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f)); // Should be
-																											// ignored
-																											// and
-																											// computed
-																											// from
-																											// BA and
-																											// TPH
+			// Should be ignored and computed from BA and TPH.
+			layer.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f)); 
 
 			species.setBaseAreaByUtilization(
 					Utils.utilizationVector(0.02865f, 19.97867f, 6.79731f, 8.54690f, 3.63577f, 0f)

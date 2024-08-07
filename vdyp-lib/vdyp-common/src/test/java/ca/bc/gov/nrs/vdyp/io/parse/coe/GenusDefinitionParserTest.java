@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseLineException;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseValidException;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
@@ -33,7 +34,8 @@ public class GenusDefinitionParserTest {
 		var result = parser.parse(TestUtils.class, "coe/SP0DEF_v0.dat", Collections.emptyMap());
 
 		assertThat(
-				result, contains(
+				result.getGenera(),
+				contains(
 						allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("AC")), //
@@ -75,7 +77,8 @@ public class GenusDefinitionParserTest {
 								Matchers.hasProperty("name", equalTo("Hemlock"))
 						),
 						allOf(
-								Matchers.instanceOf(GenusDefinition.class), Matchers.hasProperty("alias", equalTo("L")),
+								Matchers.instanceOf(GenusDefinition.class), //
+								Matchers.hasProperty("alias", equalTo("L")), //
 								Matchers.hasProperty("name", equalTo("Larch"))
 						),
 						allOf(
@@ -122,7 +125,7 @@ public class GenusDefinitionParserTest {
 	void testOrderByPreference() throws Exception {
 		var parser = new GenusDefinitionParser(2);
 
-		List<GenusDefinition> result;
+		GenusDefinitionMap result;
 		try (
 				var is = new ByteArrayInputStream(
 						"AT Aspen                            02\r\nAC Cottonwood                       01".getBytes()
@@ -131,7 +134,7 @@ public class GenusDefinitionParserTest {
 			result = parser.parse(is, Collections.emptyMap());
 		}
 		assertThat(
-				result, contains(
+				result.getGenera(), contains(
 						allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("AC")), //
@@ -150,7 +153,7 @@ public class GenusDefinitionParserTest {
 	void testOrderByLinesBlank() throws Exception {
 		var parser = new GenusDefinitionParser(2);
 
-		List<GenusDefinition> result;
+		GenusDefinitionMap result;
 		try (
 				var is = new ByteArrayInputStream(
 						"AT Aspen                              \r\nAC Cottonwood                         ".getBytes()
@@ -159,7 +162,7 @@ public class GenusDefinitionParserTest {
 			result = parser.parse(is, Collections.emptyMap());
 		}
 		assertThat(
-				result, contains(
+				result.getGenera(), contains(
 						allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("AT")), //
@@ -178,7 +181,7 @@ public class GenusDefinitionParserTest {
 	void testOrderByLinesZero() throws Exception {
 		var parser = new GenusDefinitionParser(2);
 
-		List<GenusDefinition> result;
+		GenusDefinitionMap result;
 		try (
 				var is = new ByteArrayInputStream(
 						"AT Aspen                            00\r\nAC Cottonwood                       00".getBytes()
@@ -187,7 +190,7 @@ public class GenusDefinitionParserTest {
 			result = parser.parse(is, Collections.emptyMap());
 		}
 		assertThat(
-				result, contains(
+				result.getGenera(), contains(
 						allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("AT")), //
@@ -212,12 +215,11 @@ public class GenusDefinitionParserTest {
 						"AT Aspen                            00\r\nAC Cottonwood                       03".getBytes()
 				);
 		) {
-
 			ex1 = Assertions
 					.assertThrows(ResourceParseLineException.class, () -> parser.parse(is, Collections.emptyMap()));
 		}
 		assertThat(ex1, hasProperty("line", is(2)));
-		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 2", "Preference 3", "larger than 2")));
+		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 2", "must be between 1 and 2", "value 3")));
 	}
 
 	@Test
@@ -235,7 +237,7 @@ public class GenusDefinitionParserTest {
 					.assertThrows(ResourceParseLineException.class, () -> parser.parse(is, Collections.emptyMap()));
 		}
 		assertThat(ex1, hasProperty("line", is(2)));
-		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 2", "Preference -1", "less than 0")));
+		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 2", "between 1 and 2", "value -1")));
 	}
 
 	@Test
@@ -253,7 +255,7 @@ public class GenusDefinitionParserTest {
 					.assertThrows(ResourceParseLineException.class, () -> parser.parse(is, Collections.emptyMap()));
 		}
 		assertThat(ex1, hasProperty("line", is(2)));
-		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 2", "Preference 1", "set to AT")));
+		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 2", "Genera ordering 1", "for genera AT")));
 	}
 
 	@Test
@@ -289,7 +291,7 @@ public class GenusDefinitionParserTest {
 			ex1 = Assertions
 					.assertThrows(ResourceParseLineException.class, () -> parser.parse(is, Collections.emptyMap()));
 		}
-		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 3", "Preference 3", "larger than 2")));
+		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 3", "between 1 and 2", "value 3")));
 	}
 
 	// TODO Confirm if following methods are still needed after merge
@@ -321,8 +323,9 @@ public class GenusDefinitionParserTest {
 
 		List<GenusDefinition> sp0List = new ArrayList<>();
 
+		int index = 1;
 		for (var alias : aliases) {
-			sp0List.add(new GenusDefinition(alias, java.util.Optional.empty(), "Test " + alias));
+			sp0List.add(new GenusDefinition(alias, index, "Test " + alias));
 		}
 
 		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);

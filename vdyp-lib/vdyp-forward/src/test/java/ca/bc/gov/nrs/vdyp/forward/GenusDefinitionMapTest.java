@@ -45,12 +45,12 @@ class GenusDefinitionMapTest {
 	@Test
 	void test() {
 		@SuppressWarnings("unchecked")
-		var gdMap = new GenusDefinitionMap((List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name()));
+		var gdMap = new GenusDefinitionMap((GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name()));
 
 		assertThat(gdMap.contains("AC"), is(true));
-		assertThat(gdMap.get("AC"), hasProperty("alias", is("AC")));
+		assertThat(gdMap.getByAlias("AC"), hasProperty("alias", is("AC")));
 		assertThat(gdMap.getByIndex(3), hasProperty("alias", is("B")));
-		assertThat(gdMap.getIndex("B"), is(3));
-		assertThat(gdMap.getNSpecies(), is(16));
+		assertThat(gdMap.getIndexByAlias("B"), is(3));
+		assertThat(gdMap.getNGenera(), is(16));
 	}
 }

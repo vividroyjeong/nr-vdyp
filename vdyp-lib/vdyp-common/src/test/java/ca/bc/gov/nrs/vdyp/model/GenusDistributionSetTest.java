@@ -22,8 +22,8 @@ class GenusDistributionSetTest {
 
 	@BeforeAll
 	static void beforeAll() {
-		a = new GenusDefinition("A", Optional.empty(), "Genus A");
-		b = new GenusDefinition("B", Optional.of(2), "Genus B");
+		a = new GenusDefinition("A", 1, "Genus A");
+		b = new GenusDefinition("B", 2, "Genus B");
 	}
 
 	@Test

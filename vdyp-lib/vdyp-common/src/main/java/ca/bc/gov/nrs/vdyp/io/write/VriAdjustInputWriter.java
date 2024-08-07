@@ -15,10 +15,9 @@ import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
-import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
@@ -143,7 +142,6 @@ public class VriAdjustInputWriter implements Closeable {
 				Stream.generate(() -> new AbstractMap.SimpleEntry<String, Float>("", 0f))
 		).limit(4).toList();
 		// 082E004 615 1988 P 9 L LW 100.0 0.0 0.0 0.0 -9.00 -9.00 -9.0 -9.0 -9.0 0 -9
-		var specIndex = GenusDefinitionParser.getIndex(spec.getGenus(), controlMap);
 		boolean isSiteSpec = layer.getSiteGenus().map(spec.getGenus()::equals).orElse(false);
 		writeFormat(
 				speciesFile, //
@@ -152,7 +150,7 @@ public class VriAdjustInputWriter implements Closeable {
 				spec.getPolygonIdentifier(), //
 				spec.getLayerType().getAlias(), //
 
-				specIndex.orElse(0), //
+				spec.getGenusIndex(), //
 				spec.getGenus(), //
 
 				specDistributionEntries.get(0).getKey(), //
@@ -187,11 +185,11 @@ public class VriAdjustInputWriter implements Closeable {
 	// V7W_AIU Internalized loop over utilization classes
 	void writeUtilization(VdypLayer layer, VdypUtilizationHolder utils) throws IOException {
 		Optional<String> specId = Optional.empty();
+		Optional<Integer> specIndex = Optional.empty();
 		if (utils instanceof VdypSpecies spec) {
 			specId = Optional.of(spec.getGenus());
+			specIndex = Optional.of(spec.getGenusIndex());
 		}
-
-		Optional<Integer> specIndex = specId.flatMap(id -> GenusDefinitionParser.getIndex(id, controlMap));
 
 		for (var uc : UtilizationClass.values()) {
 			Optional<Float> height = Optional.empty();

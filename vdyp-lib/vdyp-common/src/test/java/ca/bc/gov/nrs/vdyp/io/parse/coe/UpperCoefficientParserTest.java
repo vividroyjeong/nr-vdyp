@@ -13,6 +13,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseLineException;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.Region;
@@ -30,11 +31,11 @@ class UpperCoefficientParserTest {
 		Map<String, Object> controlMap = new HashMap<>();
 
 		List<GenusDefinition> sp0List = Arrays.asList(
-				new GenusDefinition("S1", java.util.Optional.empty(), "Test S1"),
-				new GenusDefinition("S2", java.util.Optional.empty(), "Test S2")
+				new GenusDefinition("S1", 1, "Test S1"),
+				new GenusDefinition("S2", 2, "Test S2")
 		);
 
-		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), new GenusDefinitionMap(sp0List));
 
 		var result = parser.parse(is, controlMap);
 
@@ -51,11 +52,11 @@ class UpperCoefficientParserTest {
 		Map<String, Object> controlMap = new HashMap<>();
 
 		List<GenusDefinition> sp0List = Arrays.asList(
-				new GenusDefinition("S1", java.util.Optional.empty(), "Test S1"),
-				new GenusDefinition("S2", java.util.Optional.empty(), "Test S2")
+				new GenusDefinition("S1", 1, "Test S1"),
+				new GenusDefinition("S2", 2, "Test S2")
 		);
 
-		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), new GenusDefinitionMap(sp0List));
 
 		assertThrows(ResourceParseLineException.class, () -> parser.parse(is, controlMap));
 
@@ -71,11 +72,11 @@ class UpperCoefficientParserTest {
 		Map<String, Object> controlMap = new HashMap<>();
 
 		List<GenusDefinition> sp0List = Arrays.asList(
-				new GenusDefinition("S1", java.util.Optional.empty(), "Test S1"),
-				new GenusDefinition("S2", java.util.Optional.empty(), "Test S2")
+				new GenusDefinition("S1", 1, "Test S1"),
+				new GenusDefinition("S2", 2, "Test S2")
 		);
 
-		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), new GenusDefinitionMap(sp0List));
 
 		assertThrows(ResourceParseLineException.class, () -> parser.parse(is, controlMap));
 

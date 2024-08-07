@@ -116,7 +116,6 @@ class VriStartTest {
 
 	@Nested
 	class EstimateBaseAreaYield {
-		@SuppressWarnings("resource")
 		@Test
 		void testCompute() throws StandProcessingException {
 			Map<String, Object> controlMap = VriTestUtils.loadControlMap();
@@ -163,7 +162,6 @@ class VriStartTest {
 			assertThat(result, closeTo(62.0858421f));
 		}
 
-		@SuppressWarnings("resource")
 		@Test
 		void testGetCoefficients() throws StandProcessingException {
 			Map<String, Object> controlMap = VriTestUtils.loadControlMap();
@@ -184,6 +182,7 @@ class VriStartTest {
 
 					lBuilder.addSpecies(sBuilder -> {
 						sBuilder.genus("B"); // 3
+						sBuilder.genusIndex(Utils.getGenusIndex("B", controlMap));
 						sBuilder.percentGenus(2.99999993f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
