@@ -324,42 +324,9 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 		result.setSpecies(vdypSpecies);
 
-		float primaryHeight;
 		float leadHeight = fipLayer.getHeight().orElse(0f);
 		for (var iPass = 1; iPass <= maxPass; iPass++) {
-			if (iPass == 2) {
-				for (var vSpec : vdypSpecies.values()) {
-					vSpec.setPercentGenus(targetPercentages.get(vSpec.getGenus()));
-				}
-			}
-			// Estimate lorey height for primary species
-			if (iPass == 1 && vdypSpecies.size() == 1) {
-				primaryHeight = estimationMethods.primaryHeightFromLeadHeight(
-						leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion(), tphTotal
-				);
-			} else if (iPass == 1) {
-				primaryHeight = estimationMethods
-						.primaryHeightFromLeadHeightInitial(leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion());
-			} else {
-				primaryHeight = estimationMethods.primaryHeightFromLeadHeight(
-						leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion(),
-						vdypPrimarySpecies.getTreesPerHectareByUtilization().getAll()
-				);
-			}
-			vdypPrimarySpecies.getLoreyHeightByUtilization().setAll(primaryHeight);
-
-			// Estimate lorey height for non-primary species
-			for (var vspec : vdypSpecies.values()) {
-				if (vspec == vdypPrimarySpecies)
-					continue;
-
-				// EMP053
-				vspec.getLoreyHeightByUtilization().setAll(
-						estimationMethods.estimateNonPrimaryLoreyHeight(
-								vspec, vdypPrimarySpecies, bec, leadHeight, primaryHeight
-						)
-				);
-			}
+			findPrimaryHeightPass(bec, tphTotal, vdypSpecies, vdypPrimarySpecies, targetPercentages, leadHeight, iPass);
 
 			// ROOTF01
 			findRootsForDiameterAndBaseArea(result, fipLayer, bec, iPass + 1);
@@ -371,6 +338,46 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		computeUtilizationComponentsPrimary(bec, result, VolumeComputeMode.BY_UTIL, CompatibilityVariableMode.NONE);
 
 		return result;
+	}
+
+	void findPrimaryHeightPass(
+			BecDefinition bec, float tphTotal, Map<String, VdypSpecies> vdypSpecies, VdypSpecies vdypPrimarySpecies,
+			Map<String, Float> targetPercentages, float leadHeight, int iPass
+	) throws ProcessingException {
+		float primaryHeight;
+		if (iPass == 2) {
+			for (var vSpec : vdypSpecies.values()) {
+				vSpec.setPercentGenus(targetPercentages.get(vSpec.getGenus()));
+			}
+		}
+		// Estimate lorey height for primary species
+		if (iPass == 1 && vdypSpecies.size() == 1) {
+			primaryHeight = estimationMethods.primaryHeightFromLeadHeight(
+					leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion(), tphTotal
+			);
+		} else if (iPass == 1) {
+			primaryHeight = estimationMethods
+					.primaryHeightFromLeadHeightInitial(leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion());
+		} else {
+			primaryHeight = estimationMethods.primaryHeightFromLeadHeight(
+					leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion(),
+					vdypPrimarySpecies.getTreesPerHectareByUtilization().getAll()
+			);
+		}
+		vdypPrimarySpecies.getLoreyHeightByUtilization().setAll(primaryHeight);
+
+		// Estimate lorey height for non-primary species
+		for (var vspec : vdypSpecies.values()) {
+			if (vspec == vdypPrimarySpecies)
+				continue;
+
+			// EMP053
+			vspec.getLoreyHeightByUtilization().setAll(
+					estimationMethods.estimateNonPrimaryLoreyHeight(
+							vspec, vdypPrimarySpecies, bec, leadHeight, primaryHeight
+					)
+			);
+		}
 	}
 
 	public static <T> List<T> utilizationArray(VdypLayer layer, Function<VdypUtilizationHolder, T> accessor) {
