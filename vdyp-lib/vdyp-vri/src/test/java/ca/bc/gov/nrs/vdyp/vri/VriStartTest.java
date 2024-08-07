@@ -1825,15 +1825,15 @@ class VriStartTest {
 
 			MockFileResolver resolver = dummyInput();
 
+			// expect no calls
+			TestUtils.populateControlMapBecReal(controlMap);
+
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPoly", 2024);
 				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(mode);
 			});
-
-			// expect no calls
-			TestUtils.populateControlMapBecReal(controlMap);
 
 			control.replay();
 
@@ -2868,6 +2868,8 @@ class VriStartTest {
 
 			MockFileResolver resolver = dummyInput();
 
+			TestUtils.populateControlMapBecReal(controlMap);
+			
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPolygon", 1899);
 				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));

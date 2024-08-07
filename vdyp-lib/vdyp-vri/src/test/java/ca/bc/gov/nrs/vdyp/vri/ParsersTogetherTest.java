@@ -195,6 +195,7 @@ class ParsersTogetherTest {
 			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
 			specBuilder.genus("B");
+			specBuilder.genusIndex(3);
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
