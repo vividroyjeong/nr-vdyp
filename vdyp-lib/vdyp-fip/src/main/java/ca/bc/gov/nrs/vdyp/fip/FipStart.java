@@ -897,9 +897,13 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		// consider changing it.
 
 		if (primaryLayer.getAgeTotal().orElse(0f) - primaryLayer.getYearsToBreastHeight().orElse(0f) < 0.5f) {
+			var ageTotal = primaryLayer.getAgeTotal().map(Object::toString).orElse("N/A (0)");
+			var ytbh = primaryLayer.getYearsToBreastHeight().map(Object::toString).orElse("N/A (0)");
 			throw validationError(
-					"Polygon %s has %s layer where total age is less than YTBH.", polygon.getPolygonIdentifier(),
-					LayerType.PRIMARY
+					"Polygon %s has %s layer where total age (%s) is less than YTBH (%s).", polygon.getPolygonIdentifier(),
+					LayerType.PRIMARY,
+					ageTotal,
+					ytbh
 			);
 		}
 

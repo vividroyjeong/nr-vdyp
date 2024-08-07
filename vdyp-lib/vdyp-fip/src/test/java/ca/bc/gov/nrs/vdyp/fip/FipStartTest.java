@@ -287,7 +287,7 @@ class FipStartTest {
 							"message",
 							is(
 									"Polygon " + polygonId + " has " + LayerType.PRIMARY
-											+ " layer where total age is less than YTBH."
+											+ " layer where total age (7.0) is less than YTBH (8.0)."
 							)
 					)
 			);
@@ -3574,10 +3574,7 @@ class FipStartTest {
 		});
 
 		@SuppressWarnings("unused")
-		var spec = FipSpecies.build(layer, builder -> {
-			builder.genus("B");
-			builder.percentGenus(100f);
-		});
+		var spec = layer.getSpecies().get("B");
 
 		var app = new FipStart();
 		ApplicationTestUtils.setControlMap(app, controlMap);
