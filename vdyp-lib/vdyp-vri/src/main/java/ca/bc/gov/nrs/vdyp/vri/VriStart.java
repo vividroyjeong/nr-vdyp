@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -165,7 +166,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		log.trace("Getting sites for polygon {}", polygon.getPolygonIdentifier());
 		Collection<VriSite> sites;
 		try {
-			sites = siteStream.next();
+			sites = new LinkedList<>( siteStream.next());
 		} catch (NoSuchElementException ex) {
 			throw validationError("Sites file has fewer records than polygon file.", ex);
 		}
@@ -451,6 +452,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		lBuilder.adaptSpecies(primaryLayer, (sBuilder, vriSpec) -> {
 			var vriSite = primaryLayer.getSites().get(vriSpec.getGenus());
 			float factor = primaryLayer.getSpecies().size() == 1 ? 1 : vriSpec.getFractionGenus();
+			
+			applyGroups(bec, vriSpec.getGenus(), sBuilder);
 
 			if (vriSite == primarySiteIn) {
 				sBuilder.loreyHeight(primaryHeight);
@@ -508,8 +511,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		}
 
 		lBuilder.loreyHeight(sumBaseAreaLoreyHeight / primaryBaseArea);
-
-		this.applyGroups(polygon, species);
 
 	}
 

@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.fip;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.closeTo;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.utilizationHeight;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.allOf;
@@ -37,6 +38,9 @@ import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.ApplicationTestUtils;
@@ -58,6 +62,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.MockStreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
+import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
@@ -282,7 +287,7 @@ class FipStartTest {
 							"message",
 							is(
 									"Polygon " + polygonId + " has " + LayerType.PRIMARY
-											+ " layer where total age is less than YTBH."
+											+ " layer where total age (7.0) is less than YTBH (8.0)."
 							)
 					)
 			);
@@ -1140,7 +1145,7 @@ class FipStartTest {
 			assertThat(
 					result,
 					allOf(
-							hasProperty("loreyHeightByUtilization", coe(-1, 7.14446497f, 31.3307228f)),
+							hasProperty("loreyHeightByUtilization", VdypMatchers.utilizationHeight(7.14446497f, 31.3307228f)),
 							hasProperty(
 									"baseAreaByUtilization",
 									VdypMatchers.utilization(
@@ -1555,7 +1560,7 @@ class FipStartTest {
 			assertThat(
 					speciesResult,
 					allOf(
-							hasProperty("loreyHeightByUtilization", coe(-1, 7.00809479f, 20.9070625f)),
+							hasProperty("loreyHeightByUtilization", VdypMatchers.utilizationHeight(7.00809479f, 20.9070625f)),
 							hasProperty(
 									"baseAreaByUtilization",
 									VdypMatchers.utilization(
@@ -1602,6 +1607,257 @@ class FipStartTest {
 									)
 							)
 
+					)
+			);
+		}
+	}
+
+	@Nested
+	class FindPrimaryHeightPass {
+		Map<String, Object> controlMap = FipTestUtils.loadControlMap();
+
+		BecDefinition bec;
+
+		FipStart app;
+
+		@BeforeEach
+		void setup() throws ProcessingException {
+			app = new FipStart();
+			ApplicationTestUtils.setControlMap(app, controlMap);
+			bec = Utils.getBec("CWH", controlMap);
+		}
+
+		@AfterEach
+		void teardown() throws IOException {
+			app.close();
+		}
+
+		@Test
+		void testPass1() throws ProcessingException {
+			var targets = Utils.<String, Float>constMap(map -> {
+				map.put("H", 9.0f);
+				map.put("B", 1.0f);
+				map.put("C", 7.0f);
+				map.put("S", 9.0f);
+				map.put("D", 74.0f);
+			});
+			var layer = VdypLayer.build(lb -> {
+				lb.polygonIdentifier("Test", 2024);
+				lb.layerType(LayerType.PRIMARY);
+
+				lb.addSpecies(sb -> {
+					sb.genus("B");
+					sb.percentGenus(1);
+
+					sb.volumeGroup(12);
+					sb.decayGroup(7);
+					sb.breakageGroup(5);
+
+					sb.addSpecies("B", 100);
+				});
+				lb.addSpecies(sb -> {
+					sb.genus("C");
+					sb.percentGenus(7);
+
+					sb.volumeGroup(20);
+					sb.decayGroup(14);
+					sb.breakageGroup(6);
+
+					sb.addSpecies("C", 100);
+				});
+				lb.addSpecies(sb -> {
+					sb.genus("S");
+					sb.percentGenus(9);
+
+					sb.volumeGroup(66);
+					sb.decayGroup(54);
+					sb.breakageGroup(28);
+
+					sb.addSpecies("S", 100);
+				});
+				lb.addSpecies(sb -> {
+					sb.genus("D");
+					sb.percentGenus(74);
+
+					sb.volumeGroup(25);
+					sb.decayGroup(19);
+					sb.breakageGroup(12);
+
+					sb.addSpecies("D", 100);
+				});
+				lb.addSpecies(sb -> {
+					sb.genus("H");
+					sb.percentGenus(9);
+
+					sb.volumeGroup(37);
+					sb.decayGroup(31);
+					sb.breakageGroup(17);
+
+					sb.addSpecies("H", 100);
+				});
+			});
+			var species = layer.getSpecies();
+			var primary = species.get("D");
+			app.findPrimaryHeightPass(bec, 620.50494f, species, primary, targets, 35.3f, 1);
+
+			assertThat(
+					species, hasEntry(
+							is("B"), //
+							hasProperty("loreyHeightByUtilization", utilizationHeight(0, 38.74565f))
+					)
+			);
+			assertThat(
+					species, hasEntry(
+							is("C"), //
+							hasProperty("loreyHeightByUtilization", utilizationHeight(0, 22.800163f))
+					)
+			);
+			assertThat(
+					species, hasEntry(
+							is("S"), //
+							hasProperty("loreyHeightByUtilization", utilizationHeight(0, 34.688877f))
+					)
+			);
+			assertThat(
+					species, hasEntry(
+							is("D"), //
+							hasProperty("loreyHeightByUtilization", utilizationHeight(0, 33.688976f))
+					)
+			);
+			assertThat(
+					species, hasEntry(
+							is("H"), //
+							hasProperty("loreyHeightByUtilization", utilizationHeight(0, 24.345116f))
+					)
+			);
+		}
+		
+		@Test
+		void testPass2() throws ProcessingException {
+			var targets = Utils.<String, Float>constMap(map -> {
+				map.put("H", 9.0f);
+				map.put("B", 1.0f);
+				map.put("C", 7.0f);
+				map.put("S", 9.0f);
+				map.put("D", 74.0f);
+			});
+			var layer = VdypLayer.build(lb -> {
+				lb.polygonIdentifier("Test", 2024);
+				lb.layerType(LayerType.PRIMARY);
+
+				lb.addSpecies(sb -> {
+					sb.genus("B");
+					sb.percentGenus(0.8918811f);
+
+					sb.volumeGroup(12);
+					sb.decayGroup(7);
+					sb.breakageGroup(5);
+
+					sb.addSpecies("B", 100);
+					
+					sb.baseArea(0.3980018f);
+					sb.loreyHeight(38.74565f);
+					sb.quadMeanDiameter(31.716667f);
+					sb.treesPerHectare(5.037558f);
+					// sb.wholeStemVolume(6.3858347f);
+				});
+				lb.addSpecies(sb -> {
+					sb.genus("C");
+					sb.percentGenus(11.449178f);
+
+					sb.volumeGroup(20);
+					sb.decayGroup(14);
+					sb.breakageGroup(6);
+
+					sb.addSpecies("C", 100);
+					
+					sb.baseArea(5.1091933f);
+					sb.loreyHeight(22.800163f);
+					sb.quadMeanDiameter(26.453901f);
+					sb.treesPerHectare(92.95719f);
+					// sb.wholeStemVolume(44.700314f);
+				});
+				lb.addSpecies(sb -> {
+					sb.genus("S");
+					sb.percentGenus(9.215943f);
+
+					sb.volumeGroup(66);
+					sb.decayGroup(54);
+					sb.breakageGroup(28);
+
+					sb.addSpecies("S", 100);
+					
+					sb.baseArea(4.1126127f);
+					sb.loreyHeight(34.688877f);
+					sb.quadMeanDiameter(34.462196f);
+					sb.treesPerHectare(44.0902f);
+					// sb.wholeStemVolume(57.47183f);
+				});
+				lb.addSpecies(sb -> {
+					sb.genus("D");
+					sb.percentGenus(66.05741f);
+
+					sb.volumeGroup(25);
+					sb.decayGroup(19);
+					sb.breakageGroup(12);
+
+					sb.addSpecies("D", 100);
+					
+					sb.baseArea(29.478107f);
+					sb.loreyHeight(33.688976f);
+					sb.quadMeanDiameter(33.973206f);
+					sb.treesPerHectare(325.1896f);
+					// sb.wholeStemVolume(472.54596f);
+				});
+				lb.addSpecies(sb -> {
+					sb.genus("H");
+					sb.percentGenus(12.385582f);
+
+					sb.volumeGroup(37);
+					sb.decayGroup(31);
+					sb.breakageGroup(17);
+
+					sb.addSpecies("H", 100);
+					
+					sb.baseArea(5.5270634f);
+					sb.loreyHeight(24.345116f);
+					sb.quadMeanDiameter(21.430225f);
+					sb.treesPerHectare(153.23257f);
+					// sb.wholeStemVolume(57.471436f);
+				});
+			});
+			var species = layer.getSpecies();
+			var primary = species.get("D");
+			app.findPrimaryHeightPass(bec, 620.50494f, species, primary, targets, 35.3f, 2);
+
+			assertThat(
+					species, hasEntry(
+							is("B"), //
+							hasProperty("loreyHeightByUtilization", utilizationHeight(0, 38.600403f))
+					)
+			);
+			assertThat(
+					species, hasEntry(
+							is("C"), //
+							hasProperty("loreyHeightByUtilization", utilizationHeight(0, 22.800163f))
+					)
+			);
+			assertThat(
+					species, hasEntry(
+							is("S"), //
+							hasProperty("loreyHeightByUtilization", utilizationHeight(0, 34.688877f))
+					)
+			);
+			assertThat(
+					species, hasEntry(
+							is("D"), //
+							hasProperty("loreyHeightByUtilization", utilizationHeight(0, 33.53749f))
+					)
+			);
+			assertThat(
+					species, hasEntry(
+							is("H"), //
+							hasProperty("loreyHeightByUtilization", utilizationHeight(0, 24.345116f))
 					)
 			);
 		}
@@ -3318,10 +3574,7 @@ class FipStartTest {
 		});
 
 		@SuppressWarnings("unused")
-		var spec = FipSpecies.build(layer, builder -> {
-			builder.genus("B");
-			builder.percentGenus(100f);
-		});
+		var spec = layer.getSpecies().get("B");
 
 		var app = new FipStart();
 		ApplicationTestUtils.setControlMap(app, controlMap);
