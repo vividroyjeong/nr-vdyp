@@ -959,7 +959,6 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	}
 
-
 	protected MatrixMap2<String, String, Integer> getGroupMap(ControlKey key) {
 		return Utils.expectParsedControl(controlMap, key, ca.bc.gov.nrs.vdyp.model.MatrixMap2.class);
 	}

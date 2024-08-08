@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasProperty;
@@ -547,32 +548,51 @@ class FipStartTest {
 		var polygonId = polygonId("Test Polygon", 2023);
 		var layer = LayerType.PRIMARY;
 
-		final var speciesList = Arrays.asList(
-				//
-				getTestSpecies(polygonId, layer, "B", x -> {
-					x.setPercentGenus(75 + 0.009f);
-				}), getTestSpecies(polygonId, layer, "C", x -> {
-					x.setPercentGenus(25f);
-				})
-		);
-		testWith(
-				FipTestUtils.loadControlMap(), Arrays.asList(getTestPolygon(polygonId, TestUtils.valid())), //
-				Arrays.asList(layerMap(getTestPrimaryLayer(polygonId, TestUtils.valid(), TestUtils.valid()))), //
-				Arrays.asList(speciesList), //
-				(app, controlMap) -> {
+		var polygon = FipPolygon.build(pb -> {
+			pb.polygonIdentifier("Test Polygon", 2024);
+			pb.forestInventoryZone("0");
+			pb.biogeoclimaticZone("BG");
+			pb.mode(PolygonMode.START);
+			pb.yieldFactor(1.0f);
 
-					app.process();
+			pb.addLayer(lb -> {
+				lb.layerType(LayerType.PRIMARY);
+				lb.crownClosure(0.9f);
 
-					// Testing exact floating point equality is intentional
-					assertThat(
-							speciesList, contains(
-									//
-									allOf(hasProperty("genus", is("B")), hasProperty("fractionGenus", is(0.75002253f))), //
-									allOf(hasProperty("genus", is("C")), hasProperty("fractionGenus", is(0.2499775f)))//
-							)
-					);
-				}
-		);
+				lb.addSpecies(sb -> {
+					sb.genus("B");
+					sb.percentGenus(75f + 0.009f);
+					sb.addSite(ib -> {
+						ib.ageTotal(8f);
+						ib.yearsToBreastHeight(7f);
+						ib.height(6f);
+						ib.siteIndex(5f);
+						ib.siteSpecies("B");
+					});
+				});
+				lb.addSpecies(sb -> {
+					sb.genus("C");
+					sb.percentGenus(25f);
+				});
+			});
+
+		});
+
+		var controlMap = FipTestUtils.loadControlMap();
+
+		try (var app = new FipStart()) {
+			ApplicationTestUtils.setControlMap(app, controlMap);
+
+			app.checkPolygon(polygon);
+			var speciesList = polygon.getLayers().get(LayerType.PRIMARY).getSpecies().values();
+			assertThat(
+					speciesList, containsInAnyOrder(
+							//
+							allOf(hasProperty("genus", is("B")), hasProperty("fractionGenus", is(0.75002253f))), //
+							allOf(hasProperty("genus", is("C")), hasProperty("fractionGenus", is(0.2499775f)))//
+					)
+			);
+		}
 
 	}
 
@@ -1145,7 +1165,9 @@ class FipStartTest {
 			assertThat(
 					result,
 					allOf(
-							hasProperty("loreyHeightByUtilization", VdypMatchers.utilizationHeight(7.14446497f, 31.3307228f)),
+							hasProperty(
+									"loreyHeightByUtilization", VdypMatchers.utilizationHeight(7.14446497f, 31.3307228f)
+							),
 							hasProperty(
 									"baseAreaByUtilization",
 									VdypMatchers.utilization(
@@ -1560,7 +1582,9 @@ class FipStartTest {
 			assertThat(
 					speciesResult,
 					allOf(
-							hasProperty("loreyHeightByUtilization", VdypMatchers.utilizationHeight(7.00809479f, 20.9070625f)),
+							hasProperty(
+									"loreyHeightByUtilization", VdypMatchers.utilizationHeight(7.00809479f, 20.9070625f)
+							),
 							hasProperty(
 									"baseAreaByUtilization",
 									VdypMatchers.utilization(
@@ -1731,7 +1755,7 @@ class FipStartTest {
 					)
 			);
 		}
-		
+
 		@Test
 		void testPass2() throws ProcessingException {
 			var targets = Utils.<String, Float>constMap(map -> {
@@ -1754,7 +1778,7 @@ class FipStartTest {
 					sb.breakageGroup(5);
 
 					sb.addSpecies("B", 100);
-					
+
 					sb.baseArea(0.3980018f);
 					sb.loreyHeight(38.74565f);
 					sb.quadMeanDiameter(31.716667f);
@@ -1770,7 +1794,7 @@ class FipStartTest {
 					sb.breakageGroup(6);
 
 					sb.addSpecies("C", 100);
-					
+
 					sb.baseArea(5.1091933f);
 					sb.loreyHeight(22.800163f);
 					sb.quadMeanDiameter(26.453901f);
@@ -1786,7 +1810,7 @@ class FipStartTest {
 					sb.breakageGroup(28);
 
 					sb.addSpecies("S", 100);
-					
+
 					sb.baseArea(4.1126127f);
 					sb.loreyHeight(34.688877f);
 					sb.quadMeanDiameter(34.462196f);
@@ -1802,7 +1826,7 @@ class FipStartTest {
 					sb.breakageGroup(12);
 
 					sb.addSpecies("D", 100);
-					
+
 					sb.baseArea(29.478107f);
 					sb.loreyHeight(33.688976f);
 					sb.quadMeanDiameter(33.973206f);
@@ -1818,7 +1842,7 @@ class FipStartTest {
 					sb.breakageGroup(17);
 
 					sb.addSpecies("H", 100);
-					
+
 					sb.baseArea(5.5270634f);
 					sb.loreyHeight(24.345116f);
 					sb.quadMeanDiameter(21.430225f);

@@ -168,7 +168,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		log.trace("Getting sites for polygon {}", polygon.getPolygonIdentifier());
 		Collection<VriSite> sites;
 		try {
-			sites = new LinkedList<>( siteStream.next());
+			sites = new LinkedList<>(siteStream.next());
 		} catch (NoSuchElementException ex) {
 			throw validationError("Sites file has fewer records than polygon file.", ex);
 		}
@@ -453,7 +453,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		lBuilder.adaptSpecies(primaryLayer, (sBuilder, vriSpec) -> {
 			var vriSite = primaryLayer.getSites().get(vriSpec.getGenus());
-			
+
 			applyGroups(bec, vriSpec.getGenus(), sBuilder);
 
 			if (vriSite == primarySiteIn) {
@@ -866,7 +866,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		return bap;
 	}
 
-	Coefficients estimateBaseAreaYieldCoefficients(Collection<? extends BaseVdypSpecies<?>> species, BecDefinition bec) {
+	Coefficients
+			estimateBaseAreaYieldCoefficients(Collection<? extends BaseVdypSpecies<?>> species, BecDefinition bec) {
 		var coe = sumCoefficientsWeightedBySpeciesAndDecayBec(species, bec, ControlKey.BA_YIELD, 7);
 
 		// TODO confirm going over 0.5 should drop to 0 as this seems odd.
