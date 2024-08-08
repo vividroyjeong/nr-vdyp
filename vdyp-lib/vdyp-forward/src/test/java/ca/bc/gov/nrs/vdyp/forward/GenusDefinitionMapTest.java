@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import org.hamcrest.Matchers;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,7 +36,7 @@ class GenusDefinitionMapTest {
 		controlMap = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
 		assertThat(
 				controlMap, (Matcher) controlMapHasEntry(
-						ControlKey.SP0_DEF, allOf(instanceOf(List.class), hasItem(instanceOf(GenusDefinition.class)))
+						ControlKey.SP0_DEF, Matchers.instanceOf(GenusDefinitionMap.class)
 				)
 		);
 	}

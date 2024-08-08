@@ -93,11 +93,8 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 
 			var is = fileResolver.resolveForInput(fileName);
 
-			@SuppressWarnings("unchecked")
-			var genusDefinitionMap = new GenusDefinitionMap(
-					(List<GenusDefinition>) control.get(ControlKey.SP0_DEF.name())
-			);
-
+			var genusDefinitionMap = (GenusDefinitionMap)control.get(ControlKey.SP0_DEF.name());
+			
 			var delegateStream = new AbstractStreamingParser<ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord>>(
 					is, lineParser, control
 			) {
