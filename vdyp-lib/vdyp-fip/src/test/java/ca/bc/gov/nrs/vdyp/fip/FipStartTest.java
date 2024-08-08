@@ -3588,7 +3588,7 @@ class FipStartTest {
 
 		var poly = FipPolygon.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
-			builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
+			builder.biogeoclimaticZone(Utils.getBec("CWH", controlMap));
 			builder.yieldFactor(1f);
 			builder.forestInventoryZone("0");
 			builder.mode(PolygonMode.START);
