@@ -453,7 +453,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		lBuilder.adaptSpecies(primaryLayer, (sBuilder, vriSpec) -> {
 			var vriSite = primaryLayer.getSites().get(vriSpec.getGenus());
-			float factor = primaryLayer.getSpecies().size() == 1 ? 1 : vriSpec.getFractionGenus();
 			
 			applyGroups(bec, vriSpec.getGenus(), sBuilder);
 
@@ -818,7 +817,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	// EMP106
 	float estimateBaseAreaYield(
 			float dominantHeight, float breastHeightAge, Optional<Float> baseAreaOverstory, boolean fullOccupancy,
-			Collection<? extends BaseVdypSpecies> species, BecDefinition bec, int baseAreaGroup
+			Collection<? extends BaseVdypSpecies<?>> species, BecDefinition bec, int baseAreaGroup
 	) throws StandProcessingException {
 		var coe = estimateBaseAreaYieldCoefficients(species, bec);
 
@@ -867,7 +866,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		return bap;
 	}
 
-	Coefficients estimateBaseAreaYieldCoefficients(Collection<? extends BaseVdypSpecies> species, BecDefinition bec) {
+	Coefficients estimateBaseAreaYieldCoefficients(Collection<? extends BaseVdypSpecies<?>> species, BecDefinition bec) {
 		var coe = sumCoefficientsWeightedBySpeciesAndDecayBec(species, bec, ControlKey.BA_YIELD, 7);
 
 		// TODO confirm going over 0.5 should drop to 0 as this seems odd.
@@ -876,7 +875,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	}
 
 	Coefficients sumCoefficientsWeightedBySpeciesAndDecayBec(
-			Collection<? extends BaseVdypSpecies> species, BecDefinition bec, ControlKey key, int size
+			Collection<? extends BaseVdypSpecies<?>> species, BecDefinition bec, ControlKey key, int size
 	) {
 		var coeMap = Utils
 				.<MatrixMap2<String, String, Coefficients>>expectParsedControl(controlMap, key, MatrixMap2.class);
@@ -906,7 +905,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	 */
 	float estimateQuadMeanDiameterYield(
 			float dominantHeight, float breastHeightAge, Optional<Float> veteranBaseArea,
-			Collection<? extends BaseVdypSpecies> species, BecDefinition bec, int baseAreaGroup
+			Collection<? extends BaseVdypSpecies<?>> species, BecDefinition bec, int baseAreaGroup
 	) throws StandProcessingException {
 		final var coe = sumCoefficientsWeightedBySpeciesAndDecayBec(species, bec, ControlKey.DQ_YIELD, 6);
 
