@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.model;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
@@ -115,4 +116,45 @@ class VdypSpeciesTest {
 				)
 		);
 	}
+
+	@Test
+	void adaptSite() throws Exception {
+		var toCopy = VdypSpecies.build(builder -> {
+			builder.polygonIdentifier("Test", 2024);
+			builder.layerType(LayerType.PRIMARY);
+			builder.genus("B");
+			builder.percentGenus(50f);
+			builder.volumeGroup(1);
+			builder.decayGroup(2);
+			builder.breakageGroup(3);
+			builder.addSpecies("B", 100f);
+			builder.addSite(ib -> {
+				ib.ageTotal(42);
+				ib.yearsToBreastHeight(5);
+				ib.siteCurveNumber(2);
+				ib.siteIndex(5.5f);
+			});
+		});
+		var result = VdypSpecies.build(builder -> {
+			builder.adapt(toCopy);
+
+			builder.volumeGroup(1);
+			builder.decayGroup(2);
+			builder.breakageGroup(3);
+
+			builder.adaptSiteFrom(toCopy, (ib, siteToCopy) -> {
+			});
+		});
+
+		var siteResult = result.getSite().get();
+
+		assertThat(siteResult, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
+		assertThat(siteResult, hasProperty("layerType", is(LayerType.PRIMARY)));
+		assertThat(siteResult, hasProperty("siteGenus", is("B")));
+		assertThat(siteResult, hasProperty("yearsToBreastHeight", present(is(5f))));
+		assertThat(siteResult, hasProperty("ageTotal", present(is(42f))));
+		assertThat(siteResult, hasProperty("siteCurveNumber", present(is(2))));
+		assertThat(siteResult, hasProperty("siteIndex", present(is(5.5f))));
+	}
+
 }

@@ -166,7 +166,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		log.trace("Getting sites for polygon {}", polygon.getPolygonIdentifier());
 		Collection<VriSite> sites;
 		try {
-			sites = new LinkedList<>( siteStream.next());
+			sites = new LinkedList<>(siteStream.next());
 		} catch (NoSuchElementException ex) {
 			throw validationError("Sites file has fewer records than polygon file.", ex);
 		}
@@ -451,34 +451,29 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		lBuilder.adaptSpecies(primaryLayer, (sBuilder, vriSpec) -> {
 			var vriSite = primaryLayer.getSites().get(vriSpec.getGenus());
-			float factor = primaryLayer.getSpecies().size() == 1 ? 1 : vriSpec.getFractionGenus();
-			
+
 			applyGroups(bec, vriSpec.getGenus(), sBuilder);
 
 			if (vriSite == primarySiteIn) {
 				sBuilder.loreyHeight(primaryHeight);
 
 				// Only use the primary site
-				sBuilder.adaptSite(vriSite, (iBuilder, vriSite2) -> {
-					iBuilder.height(vriSite2.getHeight().get());
-				});
+				sBuilder.adaptSite(vriSite, (iBuilder, vriSite2) -> iBuilder.height(vriSite2.getHeight().get()));
 			} else {
 
 				float loreyHeight = vriSite.getHeight().filter((x) -> getDebugMode(2) == 1).map(height -> {
 					float speciesQuadMeanDiameter = Math.max(7.5f, height / leadHeight * layerQuadMeanDiameter);
 					float speciesDensity = treesPerHectare(primaryBaseArea, speciesQuadMeanDiameter);
 					// EMP050 Method 1
-					float speciesLoreyHeight = estimationMethods.primaryHeightFromLeadHeight(
+					return estimationMethods.primaryHeightFromLeadHeight(
 							vriSite.getHeight().get(), vriSite.getSiteGenus(), bec.getRegion(), speciesDensity
 					);
-					return speciesLoreyHeight;
 				}).orElseGet(() -> {
 					try {
 						// EMP053
-						float speciesLoreyHeight = estimationMethods.estimateNonPrimaryLoreyHeight(
+						return estimationMethods.estimateNonPrimaryLoreyHeight(
 								vriSite.getSiteGenus(), primarySiteIn.getSiteGenus(), bec, leadHeight, primaryHeight
 						);
-						return speciesLoreyHeight;
 					} catch (ProcessingException e) {
 						throw new RuntimeProcessingException(e);
 					}

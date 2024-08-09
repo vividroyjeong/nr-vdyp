@@ -249,7 +249,7 @@ class VriInputValidationTest {
 
 		app.init(resolver, controlMap);
 
-		var poly = VriPolygon.build(pBuilder -> {
+		VriPolygon.build(pBuilder -> {
 			pBuilder.polygonIdentifier("082F074/0071         2001");
 			pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 			pBuilder.forestInventoryZone(" ");

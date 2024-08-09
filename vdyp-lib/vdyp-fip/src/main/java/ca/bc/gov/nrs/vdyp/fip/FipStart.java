@@ -831,6 +831,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			throw validationError("Species file has fewer records than polygon file.", ex);
 		}
 
+		var speciesPerLayerMap = new HashMap<LayerType, Map<String, FipSpecies>>();
+
 		// Validate that layers belong to the correct polygon
 		for (var layer : layers.values()) {
 			if (!layer.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
@@ -839,7 +841,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 						layer.getPolygonIdentifier(), polygon.getPolygonIdentifier()
 				);
 			}
-			layer.setSpecies(new HashMap<>());
+			speciesPerLayerMap.put(layer.getLayerType(), new HashMap<>());
 		}
 
 		for (var spec : species) {
@@ -857,7 +859,11 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 						polygon.getPolygonIdentifier()
 				);
 			}
-			layer.getSpecies().put(spec.getGenus(), spec);
+			speciesPerLayerMap.get(spec.getLayerType()).put(spec.getGenus(), spec);
+		}
+
+		for (var entry : speciesPerLayerMap.entrySet()) {
+			layers.get(entry.getKey()).setSpecies(entry.getValue());
 		}
 
 		polygon.setLayers(layers);
@@ -896,10 +902,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			var ageTotal = primaryLayer.getAgeTotal().map(Object::toString).orElse("N/A (0)");
 			var ytbh = primaryLayer.getYearsToBreastHeight().map(Object::toString).orElse("N/A (0)");
 			throw validationError(
-					"Polygon %s has %s layer where total age (%s) is less than YTBH (%s).", polygon.getPolygonIdentifier(),
-					LayerType.PRIMARY,
-					ageTotal,
-					ytbh
+					"Polygon %s has %s layer where total age (%s) is less than YTBH (%s).",
+					polygon.getPolygonIdentifier(), LayerType.PRIMARY, ageTotal, ytbh
 			);
 		}
 
