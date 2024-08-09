@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -188,10 +189,8 @@ class VdypLayerTest {
 		EasyMock.expect(speciesToCopy.getGenusIndex()).andStubReturn(3);
 		EasyMock.expect(speciesToCopy.getPercentGenus()).andStubReturn(100f);
 		EasyMock.expect(speciesToCopy.getFractionGenus()).andStubReturn(1f);
-		EasyMock.expect(speciesToCopy.getSpeciesPercent()).andStubReturn(Utils.constMap(map -> {
-			map.put("BL", 75f);
-			map.put("BX", 25f);
-		}));
+		EasyMock.expect(speciesToCopy.getSp64DistributionSet()).andStubReturn(
+				new Sp64DistributionSet(List.of(new Sp64Distribution(1, "BL", 75f), new Sp64Distribution(1, "BX", 25f))));
 
 		control.replay();
 
@@ -236,8 +235,8 @@ class VdypLayerTest {
 				speciesBuilder.volumeGroup(1);
 				speciesBuilder.decayGroup(2);
 				speciesBuilder.breakageGroup(3);
-				speciesBuilder.addSpecies("BL", 75f);
-				speciesBuilder.addSpecies("BX", 25f);
+				speciesBuilder.addSp64Distribution("BL", 75f);
+				speciesBuilder.addSp64Distribution("BX", 25f);
 			});
 
 		});

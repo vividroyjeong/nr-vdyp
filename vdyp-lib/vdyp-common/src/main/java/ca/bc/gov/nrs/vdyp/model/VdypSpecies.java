@@ -25,9 +25,9 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 
 	public VdypSpecies(
 			PolygonIdentifier polygonIdentifier, LayerType layer, String genus, int genusIndex, float percentGenus,
-			Optional<VdypSite> site, int volumeGroup, int decayGroup, int breakageGroup
+			Sp64DistributionSet sp64DistributionSet, Optional<VdypSite> site, int volumeGroup, int decayGroup, int breakageGroup
 	) {
-		super(polygonIdentifier, layer, genus, genusIndex, percentGenus, site);
+		super(polygonIdentifier, layer, genus, genusIndex, percentGenus, sp64DistributionSet, site);
 		this.volumeGroup = volumeGroup;
 		this.decayGroup = decayGroup;
 		this.breakageGroup = breakageGroup;
@@ -296,6 +296,7 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 					genus.get(), //
 					genusIndex.get(), //
 					percentGenus.get(), //
+					new Sp64DistributionSet(sp64DistributionList), //
 					site, //
 					volumeGroup.get(), //
 					decayGroup.get(), //
@@ -326,6 +327,11 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 		public Builder breakageGroup(int i) {
 			this.breakageGroup = Optional.of(i);
 			return this;
+		}
+
+		public void addSp64SpeciesDistribution(String string, int i) {
+			// TODO Auto-generated method stub
+			
 		}
 	}
 }

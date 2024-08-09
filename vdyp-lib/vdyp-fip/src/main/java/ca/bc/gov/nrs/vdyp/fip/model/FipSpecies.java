@@ -6,14 +6,15 @@ import java.util.function.Consumer;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
+import ca.bc.gov.nrs.vdyp.model.Sp64DistributionSet;
 
 public class FipSpecies extends BaseVdypSpecies<FipSite> {
 
 	public FipSpecies(
 			PolygonIdentifier polygonIdentifier, LayerType layer, String genus, int genusIndex, float percentGenus,
-			Optional<FipSite> site
+			Sp64DistributionSet sp64DistributionSet, Optional<FipSite> site
 	) {
-		super(polygonIdentifier, layer, genus, genusIndex, percentGenus, site);
+		super(polygonIdentifier, layer, genus, genusIndex, percentGenus, sp64DistributionSet, site);
 	}
 
 	/**
@@ -66,7 +67,9 @@ public class FipSpecies extends BaseVdypSpecies<FipSite> {
 					this.layerType.get(), //
 					this.genus.get(), //
 					this.genusIndex.get(), //
-					this.percentGenus.get(), this.site
+					this.percentGenus.get(), //
+					new Sp64DistributionSet(this.sp64DistributionList), //
+					this.site
 			);
 		}
 

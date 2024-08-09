@@ -100,7 +100,7 @@ class VdypSpeciesTest {
 			builder.volumeGroup(1);
 			builder.decayGroup(2);
 			builder.breakageGroup(3);
-			builder.addSpecies("B", 100f);
+			builder.addSp64Distribution("B", 100f);
 		});
 		assertThat(result, hasProperty("speciesPercent", hasEntry("B", 100f)));
 	}

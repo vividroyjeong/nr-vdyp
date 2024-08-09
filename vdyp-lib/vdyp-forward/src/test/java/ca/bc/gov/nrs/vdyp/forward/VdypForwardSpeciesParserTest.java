@@ -228,7 +228,8 @@ class VdypForwardSpeciesParserTest {
 														)
 												)
 										)
-								), hasProperty("ageTotal", is(12.0f)), hasProperty("ageAtBreastHeight", is(8.0f)),
+								), 
+								hasProperty("ageTotal", is(12.0f)), hasProperty("ageAtBreastHeight", is(8.0f)),
 								hasProperty("yearsToBreastHeight", is(4.0f)),
 								hasProperty("isPrimary", is(Optional.empty()))
 						),

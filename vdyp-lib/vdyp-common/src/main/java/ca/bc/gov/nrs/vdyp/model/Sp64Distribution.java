@@ -5,9 +5,15 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.ObjectUtils;
 
-public class GenusDistribution implements Comparable<GenusDistribution> {
+public class Sp64Distribution implements Comparable<Sp64Distribution> {
+	
+	/** the position of the distribution in the set - a number from 1 to 4. */
 	private final int index;
-	private final GenusDefinition genus;
+	
+	/** the species within the SP0 species whose percentage is defined here */
+	private final String genusAlias;
+	
+	/** the percentage of SP0's basal area allocated to this species */
 	private final float percentage;
 
 	/**
@@ -15,13 +21,14 @@ public class GenusDistribution implements Comparable<GenusDistribution> {
 	 *
 	 * @param index      the genus's index.
 	 * @param genus      the genus. Must not be null.
-	 * @param percentage the distribution percentage. Must be non null and in the range 0 .. 100.
+	 * @param percentage the distribution percentage, which must be in the range 0 .. 100.
 	 */
-	public GenusDistribution(int index, GenusDefinition genus, Float percentage) {
-		if (genus == null) {
-			throw new IllegalArgumentException(MessageFormat.format("Genus for index {0} is missing", genus));
+	public Sp64Distribution(int index, String genusAlias, float percentage) {
+		if (genusAlias == null) {
+			throw new IllegalArgumentException(MessageFormat.format("Alias for index {0} is missing", index));
 		}
-		if (percentage == null || percentage < 0 || percentage > 100) {
+		
+		if (percentage < 0 || percentage > 100) {
 			throw new IllegalArgumentException(
 					MessageFormat
 							.format("Percentage value {0} for index {1} must be between 0 and 100", index, percentage)
@@ -29,7 +36,7 @@ public class GenusDistribution implements Comparable<GenusDistribution> {
 		}
 
 		this.index = index;
-		this.genus = genus;
+		this.genusAlias = genusAlias;
 		this.percentage = percentage;
 	}
 
@@ -37,8 +44,8 @@ public class GenusDistribution implements Comparable<GenusDistribution> {
 		return index;
 	}
 
-	public GenusDefinition getGenus() {
-		return genus;
+	public String getGenusAlias() {
+		return genusAlias;
 	}
 
 	public Float getPercentage() {
@@ -47,8 +54,8 @@ public class GenusDistribution implements Comparable<GenusDistribution> {
 
 	@Override
 	public boolean equals(Object other) {
-		if (other instanceof GenusDistribution that) {
-			return this.index == that.index && Objects.equals(this.genus, that.genus)
+		if (other instanceof Sp64Distribution that) {
+			return this.index == that.index && Objects.equals(this.genusAlias, that.genusAlias)
 					&& this.percentage == that.percentage;
 		} else {
 			return false;
@@ -57,15 +64,15 @@ public class GenusDistribution implements Comparable<GenusDistribution> {
 
 	@Override
 	public int hashCode() {
-		return ( (index * 17) + genus.hashCode()) * 17 + Float.valueOf(percentage).hashCode();
+		return ( (index * 17) + genusAlias.hashCode()) * 17 + Float.valueOf(percentage).hashCode();
 	}
 
 	@Override
-	public int compareTo(GenusDistribution that) {
+	public int compareTo(Sp64Distribution that) {
 		if (that != null) {
 			int cr = this.index - that.index;
 			if (cr == 0) {
-				cr = ObjectUtils.compare(this.genus, that.genus);
+				cr = ObjectUtils.compare(this.genusAlias, that.genusAlias);
 				if (cr == 0)
 					cr = ObjectUtils.compare(this.percentage, that.percentage);
 			}

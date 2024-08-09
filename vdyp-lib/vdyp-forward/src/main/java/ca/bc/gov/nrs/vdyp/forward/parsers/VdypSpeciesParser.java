@@ -15,7 +15,6 @@ import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
 import ca.bc.gov.nrs.vdyp.io.EndOfRecord;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.common.InvalidGenusDistributionSet;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapValueReplacer;
@@ -24,10 +23,9 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.GroupingStreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ControlledValueParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
-import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
-import ca.bc.gov.nrs.vdyp.model.GenusDistribution;
-import ca.bc.gov.nrs.vdyp.model.GenusDistributionSet;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.Sp64Distribution;
+import ca.bc.gov.nrs.vdyp.model.Sp64DistributionSet;
 
 public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String> {
 
@@ -131,35 +129,29 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 					var builder = new ValueOrMarker.Builder<Optional<VdypLayerSpecies>, EndOfRecord>();
 					return layerType.handle(l -> builder.value(l.map(lt -> {
 
-						List<GenusDistribution> gdList = new ArrayList<>();
+						List<Sp64Distribution> gdList = new ArrayList<>();
 
 						Utils.ifBothPresent(
 								genusNameText0.filter(t -> genusDefinitionMap.contains(t)), percentGenus0,
-								(s, p) -> gdList.add(new GenusDistribution(0, genusDefinitionMap.getByAlias(s), p))
+								(s, p) -> gdList.add(new Sp64Distribution(0, s, p))
 						);
 
 						Utils.ifBothPresent(
 								genusNameText1.filter(t -> genusDefinitionMap.contains(t)), percentGenus1,
-								(s, p) -> gdList.add(new GenusDistribution(1, genusDefinitionMap.getByAlias(s), p))
+								(s, p) -> gdList.add(new Sp64Distribution(1, s, p))
 						);
 
 						Utils.ifBothPresent(
 								genusNameText2.filter(t -> genusDefinitionMap.contains(t)), percentGenus2,
-								(s, p) -> gdList.add(new GenusDistribution(2, genusDefinitionMap.getByAlias(s), p))
+								(s, p) -> gdList.add(new Sp64Distribution(2, s, p))
 						);
 
 						Utils.ifBothPresent(
 								genusNameText3.filter(t -> genusDefinitionMap.contains(t)), percentGenus3,
-								(s, p) -> gdList.add(new GenusDistribution(3, genusDefinitionMap.getByAlias(s), p))
+								(s, p) -> gdList.add(new Sp64Distribution(3, s, p))
 						);
 
-						try {
-							GenusDistributionSet.validate(3, gdList);
-						} catch (InvalidGenusDistributionSet e) {
-							new ResourceParseException(e);
-						}
-
-						GenusDistributionSet speciesDistributionSet = new GenusDistributionSet(3, gdList);
+						Sp64DistributionSet speciesDistributionSet = new Sp64DistributionSet(gdList);
 
 						var genus = optionalGenus.orElse(genusDefinitionMap.getByIndex(genusIndex).getAlias());
 

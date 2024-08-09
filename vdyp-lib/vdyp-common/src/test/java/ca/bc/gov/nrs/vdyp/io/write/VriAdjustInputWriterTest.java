@@ -147,7 +147,7 @@ class VriAdjustInputWriterTest {
 					specBuilder.volumeGroup(0);
 					specBuilder.decayGroup(0);
 					specBuilder.breakageGroup(0);
-					specBuilder.addSpecies("PL", 100);
+					specBuilder.addSp64SpeciesDistribution("PL", 100);
 
 					specBuilder.addSite(siteBuilder -> {
 						siteBuilder.height(15f);
@@ -201,7 +201,7 @@ class VriAdjustInputWriterTest {
 			var species = VdypSpecies.build(layer, builder -> {
 				builder.genus("PL");
 				builder.genusIndex(Utils.getGenusIndex("PL", controlMap));
-				builder.addSpecies("PL", 100f);
+				builder.addSp64Distribution("PL", 100f);
 
 				builder.percentGenus(100f);
 				builder.volumeGroup(0);
@@ -286,7 +286,7 @@ class VriAdjustInputWriterTest {
 			var species = VdypSpecies.build(layer, builder -> {
 				builder.genus("PL");
 				builder.genusIndex(Utils.getGenusIndex("PL", controlMap));
-				builder.addSpecies("PL", 100f);
+				builder.addSp64Distribution("PL", 100f);
 
 				builder.percentGenus(100f);
 				builder.volumeGroup(0);
@@ -363,7 +363,7 @@ class VriAdjustInputWriterTest {
 					specBuilder.volumeGroup(0);
 					specBuilder.decayGroup(0);
 					specBuilder.breakageGroup(0);
-					specBuilder.addSpecies("PL", 100);
+					specBuilder.addSp64SpeciesDistribution("PL", 100);
 
 					specBuilder.addSite(siteBuilder -> {
 						siteBuilder.height(15f);

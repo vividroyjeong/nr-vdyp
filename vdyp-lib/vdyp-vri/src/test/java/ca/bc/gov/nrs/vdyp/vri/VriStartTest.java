@@ -2034,7 +2034,7 @@ class VriStartTest {
 						sb.genus("B");
 						sb.genusIndex(3);
 						sb.percentGenus(10);
-						sb.addSpecies("BL", 100);
+						sb.addSp64Distribution("BL", 100);
 						sb.addSite(ib -> {
 							ib.siteSpecies("BL");
 						});
@@ -2045,7 +2045,7 @@ class VriStartTest {
 						sb.genus("C");
 						sb.genusIndex(4);
 						sb.percentGenus(20);
-						sb.addSpecies("CW", 100);
+						sb.addSp64Distribution("CW", 100);
 						sb.addSite(ib -> {
 							ib.siteCurveNumber(11);
 							ib.siteSpecies("CW");
@@ -2057,7 +2057,7 @@ class VriStartTest {
 						sb.genus("F");
 						sb.genusIndex(7);
 						sb.percentGenus(30);
-						sb.addSpecies("FD", 100);
+						sb.addSp64Distribution("FD", 100);
 						sb.addSite(ib -> {
 							ib.siteCurveNumber(23);
 							ib.ageTotal(24);
@@ -2074,7 +2074,7 @@ class VriStartTest {
 						sb.genus("H");
 						sb.genusIndex(8);
 						sb.percentGenus(30);
-						sb.addSpecies("HW", 100);
+						sb.addSp64Distribution("HW", 100);
 						sb.addSite(ib -> {
 							ib.siteCurveNumber(37);
 							ib.siteSpecies("HW");
@@ -2086,7 +2086,7 @@ class VriStartTest {
 						sb.genus("S");
 						sb.genusIndex(15);
 						sb.percentGenus(10);
-						sb.addSpecies("S", 100);
+						sb.addSp64Distribution("S", 100);
 						sb.addSite(ib -> {
 							ib.siteCurveNumber(71);
 							ib.siteSpecies("S");
@@ -2327,7 +2327,7 @@ class VriStartTest {
 						spb.genus("B");
 						spb.genusIndex(3);
 						spb.percentGenus(10);
-						spb.addSpecies("BL", 100);
+						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("BL");
 						});
@@ -2336,7 +2336,7 @@ class VriStartTest {
 						spb.genus("C");
 						spb.genusIndex(4);
 						spb.percentGenus(20);
-						spb.addSpecies("CW", 100);
+						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
 							sib.siteCurveNumber(11);
 							sib.siteSpecies("CW");
@@ -2346,7 +2346,7 @@ class VriStartTest {
 						spb.genus("F");
 						spb.genusIndex(7);
 						spb.percentGenus(30);
-						spb.addSpecies("FD", 100);
+						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("FD");
 							sib.siteCurveNumber(23);
@@ -2361,7 +2361,7 @@ class VriStartTest {
 						spb.genus("H");
 						spb.genusIndex(8);
 						spb.percentGenus(30);
-						spb.addSpecies("HW", 100);
+						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("HW");
 							sib.siteCurveNumber(37);
@@ -2371,7 +2371,7 @@ class VriStartTest {
 						spb.genus("S");
 						spb.genusIndex(15);
 						spb.percentGenus(10);
-						spb.addSpecies("S", 100);
+						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("S");
 							sib.siteCurveNumber(71);
@@ -2520,7 +2520,7 @@ class VriStartTest {
 						spb.genus("B");
 						spb.genusIndex(3);
 						spb.percentGenus(10);
-						spb.addSpecies("BL", 100);
+						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("BL");
 						});
@@ -2529,7 +2529,7 @@ class VriStartTest {
 						spb.genus("C");
 						spb.genusIndex(4);
 						spb.percentGenus(20);
-						spb.addSpecies("CW", 100);
+						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
 							sib.siteCurveNumber(11);
 							sib.siteSpecies("CW");
@@ -2539,7 +2539,7 @@ class VriStartTest {
 						spb.genus("F");
 						spb.genusIndex(7);
 						spb.percentGenus(30);
-						spb.addSpecies("FD", 100);
+						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("FD");
 							sib.siteCurveNumber(23);
@@ -2554,7 +2554,7 @@ class VriStartTest {
 						spb.genus("H");
 						spb.genusIndex(8);
 						spb.percentGenus(30);
-						spb.addSpecies("HW", 100);
+						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("HW");
 							sib.siteCurveNumber(37);
@@ -2564,7 +2564,7 @@ class VriStartTest {
 						spb.genus("S");
 						spb.genusIndex(15);
 						spb.percentGenus(10);
-						spb.addSpecies("S", 100);
+						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("S");
 							sib.siteCurveNumber(71);
@@ -2711,7 +2711,7 @@ class VriStartTest {
 						spb.genus("B");
 						spb.genusIndex(3);
 						spb.percentGenus(10);
-						spb.addSpecies("BL", 100);
+						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("BL");
 						});
@@ -2720,7 +2720,7 @@ class VriStartTest {
 						spb.genus("C");
 						spb.genusIndex(4);
 						spb.percentGenus(20);
-						spb.addSpecies("CW", 100);
+						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
 							sib.siteCurveNumber(11);
 							sib.siteSpecies("CW");
@@ -2730,7 +2730,7 @@ class VriStartTest {
 						spb.genus("F");
 						spb.genusIndex(7);
 						spb.percentGenus(30);
-						spb.addSpecies("FD", 100);
+						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("FD");
 							sib.siteCurveNumber(23);
@@ -2745,7 +2745,7 @@ class VriStartTest {
 						spb.genus("H");
 						spb.genusIndex(8);
 						spb.percentGenus(30);
-						spb.addSpecies("HW", 100);
+						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("HW");
 							sib.siteCurveNumber(37);
@@ -2755,7 +2755,7 @@ class VriStartTest {
 						spb.genus("S");
 						spb.genusIndex(15);
 						spb.percentGenus(10);
-						spb.addSpecies("S", 100);
+						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("S");
 							sib.siteCurveNumber(71);
@@ -2942,7 +2942,7 @@ class VriStartTest {
 						spb.genus("B");
 						spb.genusIndex(3);
 						spb.percentGenus(10);
-						spb.addSpecies("BL", 100);
+						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("BL");
 						});
@@ -2951,7 +2951,7 @@ class VriStartTest {
 						spb.genus("C");
 						spb.genusIndex(4);
 						spb.percentGenus(20);
-						spb.addSpecies("CW", 100);
+						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
 							sib.siteCurveNumber(11);
 							sib.siteSpecies("CW");
@@ -2961,7 +2961,7 @@ class VriStartTest {
 						spb.genus("F");
 						spb.genusIndex(7);
 						spb.percentGenus(30);
-						spb.addSpecies("FD", 100);
+						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("FD");
 							sib.siteCurveNumber(23);
@@ -2976,7 +2976,7 @@ class VriStartTest {
 						spb.genus("H");
 						spb.genusIndex(8);
 						spb.percentGenus(30);
-						spb.addSpecies("HW", 100);
+						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("HW");
 							sib.siteCurveNumber(37);
@@ -2986,7 +2986,7 @@ class VriStartTest {
 						spb.genus("S");
 						spb.genusIndex(15);
 						spb.percentGenus(10);
-						spb.addSpecies("S", 100);
+						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("S");
 							sib.siteCurveNumber(71);
@@ -3142,7 +3142,7 @@ class VriStartTest {
 						spb.genus("B");
 						spb.genusIndex(3);
 						spb.percentGenus(10);
-						spb.addSpecies("BL", 100);
+						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("BL");
 						});
@@ -3151,7 +3151,7 @@ class VriStartTest {
 						spb.genus("C");
 						spb.genusIndex(4);
 						spb.percentGenus(20);
-						spb.addSpecies("CW", 100);
+						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
 							sib.siteCurveNumber(11);
 							sib.siteSpecies("CW");
@@ -3161,7 +3161,7 @@ class VriStartTest {
 						spb.genus("F");
 						spb.genusIndex(7);
 						spb.percentGenus(30);
-						spb.addSpecies("FD", 100);
+						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("FD");
 							sib.siteCurveNumber(23);
@@ -3176,7 +3176,7 @@ class VriStartTest {
 						spb.genus("H");
 						spb.genusIndex(8);
 						spb.percentGenus(30);
-						spb.addSpecies("HW", 100);
+						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("HW");
 							sib.siteCurveNumber(37);
@@ -3186,7 +3186,7 @@ class VriStartTest {
 						spb.genus("S");
 						spb.genusIndex(15);
 						spb.percentGenus(10);
-						spb.addSpecies("S", 100);
+						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("S");
 							sib.siteCurveNumber(71);
@@ -3209,7 +3209,7 @@ class VriStartTest {
 						spb.genus("B");
 						spb.genusIndex(3);
 						spb.percentGenus(10);
-						spb.addSpecies("BL", 100);
+						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("BL");
 						});
@@ -3218,7 +3218,7 @@ class VriStartTest {
 						spb.genus("C");
 						spb.genusIndex(4);
 						spb.percentGenus(20);
-						spb.addSpecies("CW", 100);
+						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
 							sib.siteCurveNumber(11);
 							sib.siteSpecies("CW");
@@ -3228,7 +3228,7 @@ class VriStartTest {
 						spb.genus("F");
 						spb.genusIndex(7);
 						spb.percentGenus(30);
-						spb.addSpecies("FD", 100);
+						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("FD");
 							sib.siteCurveNumber(23);
@@ -3243,7 +3243,7 @@ class VriStartTest {
 						spb.genus("H");
 						spb.genusIndex(8);
 						spb.percentGenus(30);
-						spb.addSpecies("HW", 100);
+						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("HW");
 							sib.siteCurveNumber(37);
@@ -3253,7 +3253,7 @@ class VriStartTest {
 						spb.genus("S");
 						spb.genusIndex(15);
 						spb.percentGenus(10);
-						spb.addSpecies("S", 100);
+						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("S");
 							sib.siteCurveNumber(71);
@@ -3388,7 +3388,7 @@ class VriStartTest {
 						spb.genus("B");
 						spb.genusIndex(3);
 						spb.percentGenus(10);
-						spb.addSpecies("BL", 100);
+						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("BL");
 						});
@@ -3397,7 +3397,7 @@ class VriStartTest {
 						spb.genus("C");
 						spb.genusIndex(4);
 						spb.percentGenus(20);
-						spb.addSpecies("CW", 100);
+						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
 							sib.siteCurveNumber(11);
 							sib.siteSpecies("CW");
@@ -3407,7 +3407,7 @@ class VriStartTest {
 						spb.genus("F");
 						spb.genusIndex(7);
 						spb.percentGenus(30);
-						spb.addSpecies("FD", 100);
+						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("FD");
 							sib.siteCurveNumber(23);
@@ -3422,7 +3422,7 @@ class VriStartTest {
 						spb.genus("H");
 						spb.genusIndex(8);
 						spb.percentGenus(30);
-						spb.addSpecies("HW", 100);
+						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("HW");
 							sib.siteCurveNumber(37);
@@ -3432,7 +3432,7 @@ class VriStartTest {
 						spb.genus("S");
 						spb.genusIndex(15);
 						spb.percentGenus(10);
-						spb.addSpecies("S", 100);
+						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("S");
 							sib.siteCurveNumber(71);
@@ -3592,7 +3592,7 @@ class VriStartTest {
 						spb.genus("B");
 						spb.genusIndex(3);
 						spb.percentGenus(10);
-						spb.addSpecies("BL", 100);
+						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("BL");
 						});
@@ -3601,7 +3601,7 @@ class VriStartTest {
 						spb.genus("C");
 						spb.genusIndex(4);
 						spb.percentGenus(20);
-						spb.addSpecies("CW", 100);
+						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
 							sib.siteCurveNumber(11);
 							sib.siteSpecies("CW");
@@ -3611,7 +3611,7 @@ class VriStartTest {
 						spb.genus("F");
 						spb.genusIndex(7);
 						spb.percentGenus(30);
-						spb.addSpecies("FD", 100);
+						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("FD");
 							sib.siteCurveNumber(23);
@@ -3626,7 +3626,7 @@ class VriStartTest {
 						spb.genus("H");
 						spb.genusIndex(8);
 						spb.percentGenus(30);
-						spb.addSpecies("HW", 100);
+						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("HW");
 							sib.siteCurveNumber(37);
@@ -3636,7 +3636,7 @@ class VriStartTest {
 						spb.genus("S");
 						spb.genusIndex(15);
 						spb.percentGenus(10);
-						spb.addSpecies("S", 100);
+						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("S");
 							sib.siteCurveNumber(71);
@@ -3659,7 +3659,7 @@ class VriStartTest {
 						spb.genus("B");
 						spb.genusIndex(3);
 						spb.percentGenus(10);
-						spb.addSpecies("BL", 100);
+						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("BL");
 						});
@@ -3668,7 +3668,7 @@ class VriStartTest {
 						spb.genus("C");
 						spb.genusIndex(4);
 						spb.percentGenus(20);
-						spb.addSpecies("CW", 100);
+						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
 							sib.siteCurveNumber(11);
 							sib.siteSpecies("CW");
@@ -3678,7 +3678,7 @@ class VriStartTest {
 						spb.genus("F");
 						spb.genusIndex(7);
 						spb.percentGenus(30);
-						spb.addSpecies("FD", 100);
+						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("FD");
 							sib.siteCurveNumber(23);
@@ -3693,7 +3693,7 @@ class VriStartTest {
 						spb.genus("H");
 						spb.genusIndex(8);
 						spb.percentGenus(30);
-						spb.addSpecies("HW", 100);
+						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("HW");
 							sib.siteCurveNumber(37);
@@ -3703,7 +3703,7 @@ class VriStartTest {
 						spb.genus("S");
 						spb.genusIndex(15);
 						spb.percentGenus(10);
-						spb.addSpecies("S", 100);
+						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("S");
 							sib.siteCurveNumber(71);

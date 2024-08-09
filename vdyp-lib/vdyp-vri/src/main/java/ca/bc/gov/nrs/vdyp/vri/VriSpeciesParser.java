@@ -1,8 +1,8 @@
 package ca.bc.gov.nrs.vdyp.vri;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,6 +22,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ControlledValueParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.Sp64Distribution;
 import ca.bc.gov.nrs.vdyp.vri.model.VriSpecies;
 
 public class VriSpeciesParser
@@ -121,18 +122,18 @@ public class VriSpeciesParser
 					var markerBuilder = new ValueOrMarker.Builder<Optional<VriSpecies>, EndOfRecord>();
 					return species.handle(s -> {
 						return markerBuilder.value(s.map(layerType -> {
-							Map<String, Float> speciesPercent = new LinkedHashMap<>();
-							species1.ifPresent((sp) -> speciesPercent.put(sp, percentSpecies1));
-							species2.ifPresent((sp) -> speciesPercent.put(sp, percentSpecies2));
-							species3.ifPresent((sp) -> speciesPercent.put(sp, percentSpecies3));
-							species4.ifPresent((sp) -> speciesPercent.put(sp, percentSpecies4));
+							List<Sp64Distribution> sp64DistributionList = new ArrayList<>();
+							species1.ifPresent((sp) -> sp64DistributionList.add(new Sp64Distribution(1, sp, percentSpecies1)));
+							species2.ifPresent((sp) -> sp64DistributionList.add(new Sp64Distribution(2, sp, percentSpecies2)));
+							species3.ifPresent((sp) -> sp64DistributionList.add(new Sp64Distribution(3, sp, percentSpecies3)));
+							species4.ifPresent((sp) -> sp64DistributionList.add(new Sp64Distribution(4, sp, percentSpecies4)));
 							return VriSpecies.build(specBuilder -> {
 								specBuilder.polygonIdentifier(polygonId);
 								specBuilder.layerType(layerType);
 								specBuilder.genus(genus);
 								specBuilder.genusIndex(genusIndex);
 								specBuilder.percentGenus(percentGenus);
-								specBuilder.addSpecies(speciesPercent);
+								specBuilder.sp64DistributionList(sp64DistributionList);
 							});
 						}));
 					}, markerBuilder::marker);

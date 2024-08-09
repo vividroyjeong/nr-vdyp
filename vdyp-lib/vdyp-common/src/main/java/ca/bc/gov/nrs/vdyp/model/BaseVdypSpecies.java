@@ -1,8 +1,9 @@
 package ca.bc.gov.nrs.vdyp.model;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -12,15 +13,15 @@ import ca.bc.gov.nrs.vdyp.common.Computed;
 
 public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 	private final PolygonIdentifier polygonIdentifier; // FIP_P/POLYDESC
-	
+
 	// This is also represents the distinction between data stored in
 	// FIPL_1(A) and FIP_V(A). Where VDYP7 stores both and looks at certain values
 	// to determine if a layer is "present". VDYP8 stores them in a map keyed by
 	// this value.
-	private final LayerType layerType; 
+	private final LayerType layerType;
 
 	private final String genus; // FIPSA/SP0V
-	
+
 	/** the species index within species definition file (e.g. SPODEF_v0.dat) */
 	private final int genusIndex; // BANK1/ISPB, L1COM1/ISPL1, etc.
 
@@ -31,11 +32,13 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 	@Computed
 	private float fractionGenus; // FRBASP0/FR
 
-	private Map<String, Float> speciesPercent; // Map from
+	private Sp64DistributionSet sp64DistributionSet;
+	
 	private Optional<I> site;
 
 	protected BaseVdypSpecies(
-			PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, int genusIndex, float percentGenus, Optional<I> site
+			PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, int genusIndex, 
+			float percentGenus, Sp64DistributionSet sp64DistributionSet, Optional<I> site
 	) {
 		this.polygonIdentifier = polygonIdentifier;
 		this.layerType = layerType;
@@ -43,6 +46,7 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		this.setPercentGenus(percentGenus);
 		this.site = site;
 		this.genusIndex = genusIndex;
+		this.sp64DistributionSet = sp64DistributionSet;
 	}
 
 	public PolygonIdentifier getPolygonIdentifier() {
@@ -72,12 +76,34 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		this.fractionGenus = fractionGenus;
 	}
 
-	public Map<String, Float> getSpeciesPercent() {
-		return speciesPercent;
+	public Sp64DistributionSet getSp64DistributionSet() {
+		return sp64DistributionSet;
 	}
 
-	public void setSpeciesPercent(Map<String, Float> speciesPercent) {
-		this.speciesPercent = speciesPercent;
+	public void setSp64DistributionSet(Sp64DistributionSet sp64DistributionSet) {
+		this.sp64DistributionSet = sp64DistributionSet;
+	}
+
+	public void setSpeciesPercentages(Map<String, Float> speciesPercentages) {
+		
+		// build a list of Sp64Distributions, all with index 0. The indicies will be assigned below.
+		
+		List<Sp64Distribution> unindexedSp64Distributions = new ArrayList<Sp64Distribution>();
+		for (Map.Entry<String, Float> e : speciesPercentages.entrySet()) {
+			unindexedSp64Distributions.add(new Sp64Distribution(0, e.getKey(), e.getValue()));
+		}
+		
+		// sort the unindexed distributions in order of decreasing percentage
+		unindexedSp64Distributions.stream().sorted((o1, o2) -> o2.getPercentage().compareTo(o1.getPercentage()));
+		
+		// and assign them an index, starting with one.
+		int index = 1;
+		List<Sp64Distribution> sp64Distributions = new ArrayList<Sp64Distribution>();
+		for (Sp64Distribution uiSp64Distribution: unindexedSp64Distributions) {
+			sp64Distributions.add(new Sp64Distribution(index++, uiSp64Distribution.getGenusAlias(), uiSp64Distribution.getPercentage()));
+		}
+		
+		this.sp64DistributionSet = new Sp64DistributionSet(sp64Distributions);
 	}
 
 	public String getGenus() {
@@ -87,7 +113,7 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 	public int getGenusIndex() {
 		return genusIndex;
 	}
-	
+
 	public Optional<I> getSite() {
 		return site;
 	}
@@ -100,7 +126,7 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		protected Optional<Integer> genusIndex = Optional.empty();
 		protected Optional<Float> percentGenus = Optional.empty();
 		protected Optional<Float> fractionGenus = Optional.empty();
-		protected Map<String, Float> speciesPercent = new LinkedHashMap<>();
+		protected List<Sp64Distribution> sp64DistributionList = new ArrayList<>();
 		protected Optional<Consumer<IB>> siteBuilder = Optional.empty();
 		protected Optional<I> site = Optional.empty();
 
@@ -144,13 +170,8 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 			return this;
 		}
 
-		public Builder<T, I, IB> addSpecies(String id, float percent) {
-			this.speciesPercent.put(id, percent);
-			return this;
-		}
-
-		public Builder<T, I, IB> addSpecies(Map<String, Float> toAdd) {
-			this.speciesPercent.putAll(toAdd);
+		public Builder<T, I, IB> sp64DistributionList(List<Sp64Distribution> sp64DistributionList) {
+			this.sp64DistributionList = sp64DistributionList;
 			return this;
 		}
 
@@ -175,6 +196,11 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 			return this;
 		}
 
+		public void addSp64Distribution(String sp64Alias, float f) {
+			int index = sp64DistributionList.size() + 1;
+			sp64DistributionList.add(new Sp64Distribution(index, sp64Alias, f));
+		}
+
 		@Override
 		protected void check(Collection<String> errors) {
 			requirePresent(polygonIdentifier, "polygonIdentifier", errors);
@@ -187,7 +213,6 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		@Override
 		protected void postProcess(T result) {
 			super.postProcess(result);
-			result.setSpeciesPercent(speciesPercent);
 			this.fractionGenus.ifPresent(result::setFractionGenus);
 		}
 
@@ -216,9 +241,7 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 
 			fractionGenus(toCopy.getFractionGenus());
 
-			for (var entry : toCopy.getSpeciesPercent().entrySet()) {
-				addSpecies(entry.getKey(), entry.getValue());
-			}
+			sp64DistributionList(toCopy.getSp64DistributionSet().getSp64DistributionList());
 
 			return this;
 		}
