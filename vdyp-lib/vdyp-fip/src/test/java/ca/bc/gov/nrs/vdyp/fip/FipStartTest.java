@@ -2900,10 +2900,6 @@ class FipStartTest {
 			processedLayers.put(LayerType.PRIMARY, VdypLayer.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				/*
-				 * builder.addSite(siteBuilder -> { siteBuilder.ageTotal(60f); siteBuilder.yearsToBreastHeight(8.5f);
-				 * siteBuilder.height(15f); siteBuilder.siteGenus("H"); });
-				 */
 			}));
 
 			FipSpecies.build(fipPrimaryLayer, builder -> {
@@ -2980,10 +2976,6 @@ class FipStartTest {
 			processedLayers.put(LayerType.PRIMARY, VdypLayer.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				/*
-				 * builder.addSite(siteBuilder -> { siteBuilder.ageTotal(60f); siteBuilder.yearsToBreastHeight(8.5f);
-				 * siteBuilder.height(15f); siteBuilder.siteGenus("L"); });
-				 */
 			}));
 
 			var vdypPolygon = app.createVdypPolygon(fipPolygon, processedLayers);
@@ -3039,10 +3031,6 @@ class FipStartTest {
 			processedLayers.put(LayerType.PRIMARY, VdypLayer.build(lb -> {
 				lb.polygonIdentifier("Test", 2024);
 				lb.layerType(LayerType.PRIMARY);
-				/*
-				 * lb.addSite(siteBuilder -> { siteBuilder.ageTotal(60f); siteBuilder.yearsToBreastHeight(8.5f);
-				 * siteBuilder.height(15f); siteBuilder.siteGenus("L"); });
-				 */
 			}));
 
 			var vdypPolygon = app.createVdypPolygon(fipPolygon, processedLayers);
