@@ -136,7 +136,7 @@ public class VriAdjustInputWriter implements Closeable {
 		// Ensure we have a list of 4 distribution entries
 		var specDistributionEntries = Stream.concat(
 				spec.getSp64DistributionSet().getSp64DistributionList().stream(),
-				Stream.generate(() -> new Sp64Distribution(spec.getSp64DistributionSet().size() + 1, "", 0f))
+				Stream.generate(() -> new Sp64Distribution(0, "", 0f))
 		).limit(4).toList();
 		// 082E004 615 1988 P 9 L LW 100.0 0.0 0.0 0.0 -9.00 -9.00 -9.0 -9.0 -9.0 0 -9
 		boolean isSiteSpec = layer.getSiteGenus().map(spec.getGenus()::equals).orElse(false);

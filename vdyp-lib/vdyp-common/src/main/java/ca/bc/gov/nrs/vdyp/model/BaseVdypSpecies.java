@@ -84,6 +84,14 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		this.sp64DistributionSet = sp64DistributionSet;
 	}
 
+	/** 
+	 * Construct the species sp64DistributionSet from the given list of species percentages.
+	 * The maxIndex of the Set is taken to be the size of the map, and the index of each
+	 * sp64Distribution is set to be its position in the list ordered by decreasing 
+	 * percentage.
+	 * 
+	 * @param speciesPercentages the source of the construction
+	 */
 	public void setSpeciesPercentages(Map<String, Float> speciesPercentages) {
 		
 		// build a list of Sp64Distributions, all with index 0. The indicies will be assigned below.
@@ -103,7 +111,7 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 			sp64Distributions.add(new Sp64Distribution(index++, uiSp64Distribution.getGenusAlias(), uiSp64Distribution.getPercentage()));
 		}
 		
-		this.sp64DistributionSet = new Sp64DistributionSet(sp64Distributions);
+		this.sp64DistributionSet = new Sp64DistributionSet(sp64Distributions.size(), sp64Distributions);
 	}
 
 	public String getGenus() {

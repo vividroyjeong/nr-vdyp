@@ -69,7 +69,7 @@ class VdypLayerTest {
 
 		Map<String, Object> controlMap = new HashMap<>();
 		TestUtils.populateControlMapBecReal(controlMap);
-				
+
 		var poly = VdypPolygon.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.percentAvailable(50f);
@@ -190,7 +190,8 @@ class VdypLayerTest {
 		EasyMock.expect(speciesToCopy.getPercentGenus()).andStubReturn(100f);
 		EasyMock.expect(speciesToCopy.getFractionGenus()).andStubReturn(1f);
 		EasyMock.expect(speciesToCopy.getSp64DistributionSet()).andStubReturn(
-				new Sp64DistributionSet(List.of(new Sp64Distribution(1, "BL", 75f), new Sp64Distribution(1, "BX", 25f))));
+				new Sp64DistributionSet(List.of(new Sp64Distribution(1, "BL", 75f), new Sp64Distribution(2, "BX", 25f)))
+		);
 
 		control.replay();
 
@@ -212,8 +213,15 @@ class VdypLayerTest {
 		assertThat(resultSpecies, hasProperty("percentGenus", is(100f)));
 		assertThat(resultSpecies, hasProperty("fractionGenus", is(1f)));
 		assertThat(
-				resultSpecies,
-				hasProperty("speciesPercent", allOf(hasEntry(is("BL"), is(75f)), hasEntry(is("BX"), is(25f))))
+				resultSpecies, hasProperty(
+						"sp64DistributionSet", hasProperty(
+								"sp64DistributionMap", hasEntry(
+										is(1), allOf(
+												hasProperty("genusAlias", is("BL")), hasProperty("percentage", is(75f))
+										)
+								)
+						)
+				)
 		);
 
 		control.verify();
@@ -261,10 +269,25 @@ class VdypLayerTest {
 		assertThat(resultSpecies, hasProperty("decayGroup", is(2)));
 		assertThat(resultSpecies, hasProperty("breakageGroup", is(3)));
 		assertThat(
-				resultSpecies,
-				hasProperty("speciesPercent", allOf(hasEntry(is("BL"), is(75f)), hasEntry(is("BX"), is(25f))))
+				resultSpecies, hasProperty(
+						"sp64DistributionSet", hasProperty(
+								"sp64DistributionMap", allOf(
+										hasEntry(
+												is(1), allOf(
+														hasProperty("genusAlias", is("BL")), 
+														hasProperty("percentage", is(75f))
+												)
+										),
+										hasEntry(
+												is(2), allOf(
+														hasProperty("genusAlias", is("BX")), 
+														hasProperty("percentage", is(25f))
+												)
+										)
+								)
+						)
+				)
 		);
-
 	}
 
 }

@@ -3,13 +3,14 @@ package ca.bc.gov.nrs.vdyp.model;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.anEmptyMap;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 class VdypSpeciesTest {
@@ -33,7 +34,7 @@ class VdypSpeciesTest {
 		assertThat(result, hasProperty("volumeGroup", is(1)));
 		assertThat(result, hasProperty("decayGroup", is(2)));
 		assertThat(result, hasProperty("breakageGroup", is(3)));
-		assertThat(result, hasProperty("speciesPercent", anEmptyMap()));
+		assertThat(result, hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", anEmptyMap())));
 	}
 
 	@Test
@@ -41,13 +42,13 @@ class VdypSpeciesTest {
 		var ex = assertThrows(IllegalStateException.class, () -> VdypSpecies.build(builder -> {
 		}));
 		assertThat(
-				ex,
-				hasProperty(
-						"message",
-						allOf(
-								containsString("polygonIdentifier"), containsString("layer"), containsString("genus"),
-								containsString("percentGenus"), containsString("volumeGroup"),
-								containsString("decayGroup")
+				ex, hasProperty(
+						"message", allOf(
+								containsString("polygonIdentifier"), containsString("layer"), containsString(
+										"genus"
+								), containsString(
+										"percentGenus"
+								), containsString("volumeGroup"), containsString("decayGroup")
 						)
 				)
 		);
@@ -84,7 +85,7 @@ class VdypSpeciesTest {
 		assertThat(result, hasProperty("volumeGroup", is(1)));
 		assertThat(result, hasProperty("decayGroup", is(2)));
 		assertThat(result, hasProperty("breakageGroup", is(3)));
-		assertThat(result, hasProperty("speciesPercent", anEmptyMap()));
+		assertThat(result, hasProperty("sp64DistributionSet", hasProperty("size", is(0))));
 
 		assertThat(layer.getSpecies(), hasEntry("B", result));
 	}
@@ -102,7 +103,16 @@ class VdypSpeciesTest {
 			builder.breakageGroup(3);
 			builder.addSp64Distribution("B", 100f);
 		});
-		assertThat(result, hasProperty("speciesPercent", hasEntry("B", 100f)));
+		assertThat(
+				result, hasProperty(
+						"sp64DistributionSet", hasProperty(
+								"sp64DistributionMap", hasEntry(
+										is(1), allOf(
+												hasProperty("genusAlias", is("B")), hasProperty("percentage", is(100f))
+										)
+								)
+						)
+				)
+		);
 	}
-
 }

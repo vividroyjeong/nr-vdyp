@@ -1654,7 +1654,7 @@ class FipStartTest {
 					sb.decayGroup(7);
 					sb.breakageGroup(5);
 
-					sb.addSp64SpeciesDistribution("B", 100);
+					sb.addSp64Distribution("B", 100);
 				});
 				lb.addSpecies(sb -> {
 					sb.genus("C");
@@ -1665,7 +1665,7 @@ class FipStartTest {
 					sb.decayGroup(14);
 					sb.breakageGroup(6);
 
-					sb.addSp64SpeciesDistribution("C", 100);
+					sb.addSp64Distribution("C", 100);
 				});
 				lb.addSpecies(sb -> {
 					sb.genus("S");
@@ -1676,7 +1676,7 @@ class FipStartTest {
 					sb.decayGroup(54);
 					sb.breakageGroup(28);
 
-					sb.addSp64SpeciesDistribution("S", 100);
+					sb.addSp64Distribution("S", 100);
 				});
 				lb.addSpecies(sb -> {
 					sb.genus("D");
@@ -1687,7 +1687,7 @@ class FipStartTest {
 					sb.decayGroup(19);
 					sb.breakageGroup(12);
 
-					sb.addSp64SpeciesDistribution("D", 100);
+					sb.addSp64Distribution("D", 100);
 				});
 				lb.addSpecies(sb -> {
 					sb.genus("H");
@@ -1698,7 +1698,7 @@ class FipStartTest {
 					sb.decayGroup(31);
 					sb.breakageGroup(17);
 
-					sb.addSp64SpeciesDistribution("H", 100);
+					sb.addSp64Distribution("H", 100);
 				});
 			});
 			var species = layer.getSpecies();
@@ -1759,7 +1759,7 @@ class FipStartTest {
 					sb.decayGroup(7);
 					sb.breakageGroup(5);
 
-					sb.addSp64SpeciesDistribution("B", 100);
+					sb.addSp64Distribution("B", 100);
 					
 					sb.baseArea(0.3980018f);
 					sb.loreyHeight(38.74565f);
@@ -1776,7 +1776,7 @@ class FipStartTest {
 					sb.decayGroup(14);
 					sb.breakageGroup(6);
 
-					sb.addSp64SpeciesDistribution("C", 100);
+					sb.addSp64Distribution("C", 100);
 					
 					sb.baseArea(5.1091933f);
 					sb.loreyHeight(22.800163f);
@@ -1793,7 +1793,7 @@ class FipStartTest {
 					sb.decayGroup(54);
 					sb.breakageGroup(28);
 
-					sb.addSp64SpeciesDistribution("S", 100);
+					sb.addSp64Distribution("S", 100);
 					
 					sb.baseArea(4.1126127f);
 					sb.loreyHeight(34.688877f);
@@ -1810,7 +1810,7 @@ class FipStartTest {
 					sb.decayGroup(19);
 					sb.breakageGroup(12);
 
-					sb.addSp64SpeciesDistribution("D", 100);
+					sb.addSp64Distribution("D", 100);
 					
 					sb.baseArea(29.478107f);
 					sb.loreyHeight(33.688976f);
@@ -1827,7 +1827,7 @@ class FipStartTest {
 					sb.decayGroup(31);
 					sb.breakageGroup(17);
 
-					sb.addSp64SpeciesDistribution("H", 100);
+					sb.addSp64Distribution("H", 100);
 					
 					sb.baseArea(5.5270634f);
 					sb.loreyHeight(24.345116f);

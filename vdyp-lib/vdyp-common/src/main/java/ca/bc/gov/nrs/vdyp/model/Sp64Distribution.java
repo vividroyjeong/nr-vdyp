@@ -82,4 +82,9 @@ public class Sp64Distribution implements Comparable<Sp64Distribution> {
 			return 1 /* null is always less than not null */;
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return genusAlias + "[" + index + "]:" + percentage;
+	}
 }

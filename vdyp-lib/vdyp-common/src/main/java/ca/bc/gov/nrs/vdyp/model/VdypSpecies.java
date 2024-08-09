@@ -328,10 +328,5 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 			this.breakageGroup = Optional.of(i);
 			return this;
 		}
-
-		public void addSp64SpeciesDistribution(String string, int i) {
-			// TODO Auto-generated method stub
-			
-		}
 	}
 }

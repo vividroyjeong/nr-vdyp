@@ -147,7 +147,7 @@ class VriAdjustInputWriterTest {
 					specBuilder.volumeGroup(0);
 					specBuilder.decayGroup(0);
 					specBuilder.breakageGroup(0);
-					specBuilder.addSp64SpeciesDistribution("PL", 100);
+					specBuilder.addSp64Distribution("PL", 100);
 
 					specBuilder.addSite(siteBuilder -> {
 						siteBuilder.height(15f);
@@ -363,7 +363,7 @@ class VriAdjustInputWriterTest {
 					specBuilder.volumeGroup(0);
 					specBuilder.decayGroup(0);
 					specBuilder.breakageGroup(0);
-					specBuilder.addSp64SpeciesDistribution("PL", 100);
+					specBuilder.addSp64Distribution("PL", 100);
 
 					specBuilder.addSite(siteBuilder -> {
 						siteBuilder.height(15f);

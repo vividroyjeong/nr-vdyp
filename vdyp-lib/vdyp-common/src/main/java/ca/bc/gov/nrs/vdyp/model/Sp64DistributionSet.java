@@ -32,21 +32,31 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 	/** The highest index in the given distributions */
 	private final int maxIndex;
 
+	/**
+	 * Builds an {@link Sp64DistributionSet} whose maxIndex is the maximum index that appears
+	 * in the given list of {@link Sp64Distribution}.
+	 * @param sdList the {@link Sp64Distribution} from which the set is to be constructed.
+	 */
 	public Sp64DistributionSet(List<Sp64Distribution> sdList) {
 
+		this(sdList.isEmpty() ? 0 : sdList.stream().max((o1, o2) -> o1.getIndex() - o2.getIndex()).get().getIndex(), sdList);
+	}
+
+	public Sp64DistributionSet(int maxIndex, List<Sp64Distribution> sdList) {
+
+		// sort the list by increasing index
 		sp64DistributionList = sdList.stream().sorted((o1, o2) -> o1.getIndex() - o2.getIndex()).toList();
 		
-		this.maxIndex = sp64DistributionList.get(sp64DistributionList.size() - 1).getIndex();
+		this.maxIndex = maxIndex;
 		
 		try {
-			validate(maxIndex, sdList);
+			validate(maxIndex, sp64DistributionList);
 		} catch (InvalidGenusDistributionSet e) {
 			throw new IllegalArgumentException(e);
 		}
 
 		for (Sp64Distribution sd : sdList) {
 			sp64DistributionMap.put(sd.getIndex(), sd);
-			sp64DistributionList.add(sd);
 		}
 	}
 
@@ -82,7 +92,7 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 		return Collections.unmodifiableMap(sp64DistributionMap);
 	}
 	
-	public int size() { 
+	public int getSize() { 
 		return sp64DistributionList.size();
 	}
 

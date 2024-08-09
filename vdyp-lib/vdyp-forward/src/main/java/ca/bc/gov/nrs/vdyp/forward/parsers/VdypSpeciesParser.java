@@ -151,7 +151,7 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 								(s, p) -> gdList.add(new Sp64Distribution(3, s, p))
 						);
 
-						Sp64DistributionSet speciesDistributionSet = new Sp64DistributionSet(gdList);
+						Sp64DistributionSet speciesDistributionSet = new Sp64DistributionSet(4, gdList);
 
 						var genus = optionalGenus.orElse(genusDefinitionMap.getByIndex(genusIndex).getAlias());
 
