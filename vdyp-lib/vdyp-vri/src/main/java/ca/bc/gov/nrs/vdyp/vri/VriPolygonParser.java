@@ -64,7 +64,7 @@ public class VriPolygonParser implements ControlMapValueReplacer<StreamingParser
 							() -> fipMode
 									.flatMap(mode -> mode == PolygonMode.BATC ? Optional.of(85f) : Optional.empty())
 					);
-					
+
 					BecDefinition bec;
 					try {
 						bec = Utils.getBec(becAlias, control);

@@ -79,7 +79,7 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 					} catch (IllegalArgumentException e) {
 						throw new ResourceParseException(e);
 					}
-					
+
 					if (ForestInventoryZone.toRegion(fizId) == SiteIndexForestInventoryZone.FIZ_UNKNOWN) {
 						throw new ResourceParseException(
 								"Forest Inventory Zone " + fizId

@@ -19,7 +19,7 @@ public class GenusDefinition extends AliasedEntity implements Comparable<GenusDe
 
 	@Override
 	public int hashCode() {
-		return ((this.getAlias().hashCode() * 17) + this.getName().hashCode()) * 17 + index;
+		return ( (this.getAlias().hashCode() * 17) + this.getName().hashCode()) * 17 + index;
 	}
 
 	@Override

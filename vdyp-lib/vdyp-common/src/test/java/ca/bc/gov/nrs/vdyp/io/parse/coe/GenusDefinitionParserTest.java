@@ -34,8 +34,7 @@ public class GenusDefinitionParserTest {
 		var result = parser.parse(TestUtils.class, "coe/SP0DEF_v0.dat", Collections.emptyMap());
 
 		assertThat(
-				result.getGenera(),
-				contains(
+				result.getGenera(), contains(
 						allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("AC")), //

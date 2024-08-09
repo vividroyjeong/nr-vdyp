@@ -85,13 +85,13 @@ class Sp64DistributionSetTest {
 		assertNotNull(sp64Set1);
 		assertTrue(sp64Set1.getSpeciesDistribution(1).get().equals(gd1));
 		assertTrue(sp64Set1.getSpeciesDistribution(2).get().equals(gd2a));
-		
+
 		// Same sp64 aliases
 		assertThrows(IllegalArgumentException.class, () -> new Sp64DistributionSet(2, List.of(gd1, gd1a)));
 
 		// maxIndex too low
 		assertThrows(IllegalArgumentException.class, () -> new Sp64DistributionSet(1, List.of(gd1, gd2)));
-		
+
 		// same indicies
 		assertThrows(IllegalArgumentException.class, () -> new Sp64DistributionSet(2, List.of(gd1a, gd2a)));
 	}
@@ -110,7 +110,7 @@ class Sp64DistributionSetTest {
 		assertThat(set.getSpeciesDistribution(3), is(Optional.empty()));
 		assertThat(set.getSpeciesDistribution(4), is(Optional.empty()));
 		assertThrows(IllegalArgumentException.class, () -> set.getSpeciesDistribution(5));
-		
+
 		assertThat(set.getSp64DistributionList().size(), is(set.getSize()));
 		assertThat(set.getSp64DistributionMap().size(), is(set.getSize()));
 	}

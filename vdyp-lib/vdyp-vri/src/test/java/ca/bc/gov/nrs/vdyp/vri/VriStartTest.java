@@ -2869,7 +2869,7 @@ class VriStartTest {
 			MockFileResolver resolver = dummyInput();
 
 			TestUtils.populateControlMapBecReal(controlMap);
-			
+
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPolygon", 1899);
 				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
@@ -3920,9 +3920,24 @@ class VriStartTest {
 		return hasEntry(
 				genus, //
 				both(hasProperty("genus", genus))
-						.and(hasProperty("speciesPercent", allOf(aMapWithSize(1), hasEntry(species, is(100f)))))
-						.and(hasProperty("percentGenus", percent))//
-						.and((Matcher<? super Object>) additional)
+					.and(hasProperty("percentGenus", percent))
+					.and(hasProperty(
+						"sp64DistributionSet",
+						hasProperty(
+							"sp64DistributionMap",
+							allOf(
+								aMapWithSize(1),
+								hasEntry(
+										1,
+										allOf(
+												hasProperty("genusAlias", species),
+												hasProperty("percentage", is(100f))
+										)
+								)
+							)
+						)
+					))
+					.and((Matcher<? super Object>) additional)
 		);
 	}
 

@@ -319,7 +319,7 @@ class VriAdjustInputWriterTest {
 			);
 
 			// Should be ignored and computed from BA and TPH
-			species.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f)); 
+			species.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f));
 
 			unit.writeUtilization(layer, species);
 		}
@@ -406,7 +406,7 @@ class VriAdjustInputWriterTest {
 			);
 
 			// Should be ignored and computed from BA and TPH.
-			layer.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f)); 
+			layer.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f));
 
 			species.setBaseAreaByUtilization(
 					Utils.utilizationVector(0.02865f, 19.97867f, 6.79731f, 8.54690f, 3.63577f, 0f)

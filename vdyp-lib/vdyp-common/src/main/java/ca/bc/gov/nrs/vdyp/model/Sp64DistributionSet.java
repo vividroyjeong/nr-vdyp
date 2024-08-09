@@ -13,42 +13,44 @@ import java.util.Set;
 import ca.bc.gov.nrs.vdyp.io.parse.common.InvalidGenusDistributionSet;
 
 /**
- * A Sp64DistributionSet contains <code>maxIndex</code> (>= 0) {@link Sp64Distribution} 
- * instances. The provided list of Sp64Distributions is sorted in increasing index order.
- * The resulting list must have percentages in decreasing order.
+ * A Sp64DistributionSet contains <code>maxIndex</code> (>= 0) {@link Sp64Distribution} instances. The provided list of
+ * Sp64Distributions is sorted in increasing index order. The resulting list must have percentages in decreasing order.
  * <p>
- * The percentage values PCT1 + PCT2 + PCT3 + PCT4 should, but not must, sum to 100. The 
- * PCT’s should be in decreasing order: PCT1 >= PCT2 >= PCT3 >= PCT4. This is because the
- * first will be used when assigning the site curve number (SCN) if not provided 
- * directly by the user and so must be the dominant sp64.
+ * The percentage values PCT1 + PCT2 + PCT3 + PCT4 should, but not must, sum to 100. The PCT’s should be in decreasing
+ * order: PCT1 >= PCT2 >= PCT3 >= PCT4. This is because the first will be used when assigning the site curve number
+ * (SCN) if not provided directly by the user and so must be the dominant sp64.
  */
 public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 
 	private Map<Integer, Sp64Distribution> sp64DistributionMap = new HashMap<>();
-	
+
 	/** The Sp64Distributions, sorted by increasing index */
 	private List<Sp64Distribution> sp64DistributionList = new ArrayList<>();
-	
+
 	/** The highest index in the given distributions */
 	private final int maxIndex;
 
 	/**
-	 * Builds an {@link Sp64DistributionSet} whose maxIndex is the maximum index that appears
-	 * in the given list of {@link Sp64Distribution}.
+	 * Builds an {@link Sp64DistributionSet} whose maxIndex is the maximum index that appears in the given list of
+	 * {@link Sp64Distribution}.
+	 *
 	 * @param sdList the {@link Sp64Distribution} from which the set is to be constructed.
 	 */
 	public Sp64DistributionSet(List<Sp64Distribution> sdList) {
 
-		this(sdList.isEmpty() ? 0 : sdList.stream().max((o1, o2) -> o1.getIndex() - o2.getIndex()).get().getIndex(), sdList);
+		this(
+				sdList.isEmpty() ? 0 : sdList.stream().max((o1, o2) -> o1.getIndex() - o2.getIndex()).get().getIndex(),
+				sdList
+		);
 	}
 
 	public Sp64DistributionSet(int maxIndex, List<Sp64Distribution> sdList) {
 
 		// sort the list by increasing index
 		sp64DistributionList = sdList.stream().sorted((o1, o2) -> o1.getIndex() - o2.getIndex()).toList();
-		
+
 		this.maxIndex = maxIndex;
-		
+
 		try {
 			validate(maxIndex, sp64DistributionList);
 		} catch (InvalidGenusDistributionSet e) {
@@ -61,9 +63,9 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 	}
 
 	private Sp64DistributionSet(Sp64DistributionSet other) {
-		
+
 		this.maxIndex = other.maxIndex;
-		
+
 		this.sp64DistributionMap = new HashMap<>();
 		for (var e : other.sp64DistributionMap.entrySet()) {
 			this.sp64DistributionMap.put(
@@ -83,16 +85,16 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 	}
 
 	public List<Sp64Distribution> getSp64DistributionList() {
-		
+
 		return Collections.unmodifiableList(sp64DistributionList);
 	}
 
 	public Map<Integer, Sp64Distribution> getSp64DistributionMap() {
-		
+
 		return Collections.unmodifiableMap(sp64DistributionMap);
 	}
-	
-	public int getSize() { 
+
+	public int getSize() {
 		return sp64DistributionList.size();
 	}
 
@@ -118,12 +120,13 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 		Set<Integer> indicesSeen = new HashSet<>();
 
 		Sp64Distribution prevGd = null;
-				
+
 		for (Sp64Distribution gd : gdList) {
 			if (sp64Seen.contains(gd.getGenusAlias())) {
 				throw new InvalidGenusDistributionSet(
-						MessageFormat
-								.format("Species {0} appears more than once in GenusDistributionSet", gd.getGenusAlias())
+						MessageFormat.format(
+								"Species {0} appears more than once in GenusDistributionSet", gd.getGenusAlias()
+						)
 				);
 			}
 			if (indicesSeen.contains(gd.getIndex())) {
@@ -139,7 +142,7 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 						)
 				);
 			}
-			
+
 			if (prevGd != null && prevGd.getPercentage() < gd.getPercentage()) {
 				throw new InvalidGenusDistributionSet(
 						MessageFormat.format(
@@ -148,7 +151,7 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 						)
 				);
 			}
-			
+
 			sp64Seen.add(gd.getGenusAlias());
 			indicesSeen.add(gd.getIndex());
 		}
@@ -170,7 +173,7 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 
 	@Override
 	public int compareTo(Sp64DistributionSet that) {
-		
+
 		if (that != null) {
 			if (that.sp64DistributionMap.size() != sp64DistributionMap.size()) {
 				return sp64DistributionMap.size() - that.sp64DistributionMap.size();

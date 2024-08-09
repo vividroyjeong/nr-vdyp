@@ -293,9 +293,9 @@ public class Utils {
 	}
 
 	/**
-	 * Returns the BecDefinition of the given bec zone alias, throwing an IllegalArgumentException
-	 * if the alias does not identify a known Bec Zone, or <code>controlMap</code> does not contain
-	 * {@code ControlKey.BEC_DEF}.
+	 * Returns the BecDefinition of the given bec zone alias, throwing an IllegalArgumentException if the alias does not
+	 * identify a known Bec Zone, or <code>controlMap</code> does not contain {@code ControlKey.BEC_DEF}.
+	 *
 	 * @param becZoneAlias
 	 * @param controlMap
 	 * @return as described
@@ -307,25 +307,26 @@ public class Utils {
 				.orElseThrow(() -> new IllegalArgumentException("Reference to unexpected BEC " + becZoneAlias));
 	}
 
-	/** 
+	/**
 	 * Returns the index of the genus with the given alias.
-	 * 
+	 *
 	 * @param genusAlias
 	 * @return as described
 	 */
-	public static int getGenusIndex(String genusAlias, Map<String, Object> controlMap)
-			throws IllegalArgumentException {
-		
+	public static int getGenusIndex(String genusAlias, Map<String, Object> controlMap) throws IllegalArgumentException {
+
 		GenusDefinition gd = getGenusDefinition(genusAlias, controlMap);
 		if (gd == null) {
 			throw new IllegalArgumentException(String.format("Reference to unknown sp0 {0}", genusAlias));
 		}
-		
+
 		return gd.getIndex();
 	}
 
 	public static GenusDefinition getGenusDefinition(String genusAlias, Map<String, Object> controlMap) {
-		GenusDefinition gd = (GenusDefinition)expectParsedControl(controlMap, ControlKey.SP0_DEF, GenusDefinitionMap.class).getByAlias(genusAlias);
+		GenusDefinition gd = (GenusDefinition) expectParsedControl(
+				controlMap, ControlKey.SP0_DEF, GenusDefinitionMap.class
+		).getByAlias(genusAlias);
 		if (gd == null) {
 			throw new IllegalArgumentException(String.format("Reference to unknown sp0 {0}", genusAlias));
 		}
@@ -346,8 +347,7 @@ public class Utils {
 	}
 
 	/**
-	 * If the Optional value is present, return its default string representation and otherwise 
-	 * return "N/A".
+	 * If the Optional value is present, return its default string representation and otherwise return "N/A".
 	 *
 	 * @param value
 	 * @return as described
@@ -357,8 +357,8 @@ public class Utils {
 	}
 
 	/**
-	 * If the Optional value (of type T) is present, return the result of the given stringify function and 
-	 * otherwise return "N/A".
+	 * If the Optional value (of type T) is present, return the result of the given stringify function and otherwise
+	 * return "N/A".
 	 *
 	 * @param <T>
 	 * @param value

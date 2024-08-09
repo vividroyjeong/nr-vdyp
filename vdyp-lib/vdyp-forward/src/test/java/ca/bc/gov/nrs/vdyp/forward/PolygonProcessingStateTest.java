@@ -40,12 +40,7 @@ class PolygonProcessingStateTest {
 
 		parser = new ForwardControlParser();
 		controlMap = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
-		assertThat(
-				controlMap,
-				(Matcher) controlMapHasEntry(
-						ControlKey.SP0_DEF, instanceOf(GenusDefinitionMap.class)
-				)
-		);
+		assertThat(controlMap, (Matcher) controlMapHasEntry(ControlKey.SP0_DEF, instanceOf(GenusDefinitionMap.class)));
 
 		var polygonDescriptionStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_GROWTO.name());
 		polygonDescriptionStream = ((StreamingParserFactory<VdypPolygonDescription>) polygonDescriptionStreamFactory)

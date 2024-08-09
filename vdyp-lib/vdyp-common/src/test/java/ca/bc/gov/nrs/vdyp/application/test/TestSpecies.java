@@ -14,7 +14,7 @@ public class TestSpecies extends BaseVdypSpecies<TestSite> {
 			PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, int genusIndex, float percentGenus,
 			Optional<TestSite> site
 	) {
-		super(polygonIdentifier, layerType, genus, genusIndex, percentGenus, new Sp64DistributionSet(),  site);
+		super(polygonIdentifier, layerType, genus, genusIndex, percentGenus, new Sp64DistributionSet(), site);
 	}
 
 	public static TestSpecies build(Consumer<TestSpecies.Builder> config) {
@@ -27,7 +27,9 @@ public class TestSpecies extends BaseVdypSpecies<TestSite> {
 
 		@Override
 		protected TestSpecies doBuild() {
-			return new TestSpecies(polygonIdentifier.get(), layerType.get(), genus.get(), genusIndex.get(), percentGenus.get(), site);
+			return new TestSpecies(
+					polygonIdentifier.get(), layerType.get(), genus.get(), genusIndex.get(), percentGenus.get(), site
+			);
 		}
 
 		@Override

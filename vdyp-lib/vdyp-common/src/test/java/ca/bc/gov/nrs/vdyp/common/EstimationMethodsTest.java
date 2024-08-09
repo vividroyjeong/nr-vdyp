@@ -671,7 +671,7 @@ class EstimationMethodsTest {
 
 		var becDefinition = becLookup.get("CWH").get();
 
-		var genera = (GenusDefinitionMap)controlMap.get(ControlKey.SP0_DEF.name());
+		var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
 		var genus = genera.getByIndex(3);
 
 		var volumeEquationGroupMatrix = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(

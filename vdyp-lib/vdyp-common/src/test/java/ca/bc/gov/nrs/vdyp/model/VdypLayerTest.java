@@ -213,12 +213,14 @@ class VdypLayerTest {
 		assertThat(resultSpecies, hasProperty("percentGenus", is(100f)));
 		assertThat(resultSpecies, hasProperty("fractionGenus", is(1f)));
 		assertThat(
-				resultSpecies, hasProperty(
-						"sp64DistributionSet", hasProperty(
-								"sp64DistributionMap", hasEntry(
-										is(1), allOf(
-												hasProperty("genusAlias", is("BL")), hasProperty("percentage", is(75f))
-										)
+				resultSpecies,
+				hasProperty(
+						"sp64DistributionSet",
+						hasProperty(
+								"sp64DistributionMap",
+								hasEntry(
+										is(1),
+										allOf(hasProperty("genusAlias", is("BL")), hasProperty("percentage", is(75f)))
 								)
 						)
 				)
@@ -269,18 +271,23 @@ class VdypLayerTest {
 		assertThat(resultSpecies, hasProperty("decayGroup", is(2)));
 		assertThat(resultSpecies, hasProperty("breakageGroup", is(3)));
 		assertThat(
-				resultSpecies, hasProperty(
-						"sp64DistributionSet", hasProperty(
-								"sp64DistributionMap", allOf(
+				resultSpecies,
+				hasProperty(
+						"sp64DistributionSet",
+						hasProperty(
+								"sp64DistributionMap",
+								allOf(
 										hasEntry(
-												is(1), allOf(
-														hasProperty("genusAlias", is("BL")), 
+												is(1),
+												allOf(
+														hasProperty("genusAlias", is("BL")),
 														hasProperty("percentage", is(75f))
 												)
 										),
 										hasEntry(
-												is(2), allOf(
-														hasProperty("genusAlias", is("BX")), 
+												is(2),
+												allOf(
+														hasProperty("genusAlias", is("BX")),
 														hasProperty("percentage", is(25f))
 												)
 										)

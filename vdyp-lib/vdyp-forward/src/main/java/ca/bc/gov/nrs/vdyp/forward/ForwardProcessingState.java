@@ -69,9 +69,8 @@ class ForwardProcessingState {
 
 		banks = new Bank[MAX_RECORDS];
 
-		this.genusDefinitionMap = Utils.<GenusDefinitionMap>expectParsedControl(
-				controlMap, ControlKey.SP0_DEF, GenusDefinitionMap.class
-		);
+		this.genusDefinitionMap = Utils
+				.<GenusDefinitionMap>expectParsedControl(controlMap, ControlKey.SP0_DEF, GenusDefinitionMap.class);
 		this.netDecayWasteCoeMap = Utils.<Map<String, Coefficients>>expectParsedControl(
 				controlMap, ControlKey.VOLUME_NET_DECAY_WASTE, Map.class
 		);

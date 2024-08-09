@@ -104,9 +104,9 @@ class VdypPolygonTest {
 
 	@Test
 	void copyWithoutLayers() throws Exception {
-		
+
 		var controlMap = TestUtils.loadControlMap();
-		
+
 		var toCopy = VdypPolygon.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.percentAvailable(90f);
@@ -131,9 +131,9 @@ class VdypPolygonTest {
 
 	@Test
 	void copyWithLayers() throws Exception {
-		
+
 		var controlMap = TestUtils.loadControlMap();
-		
+
 		var toCopy = VdypPolygon.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.percentAvailable(90f);

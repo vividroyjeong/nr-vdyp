@@ -13,10 +13,10 @@ import ca.bc.gov.nrs.vdyp.model.Sp64DistributionSet;
 public class VriSpecies extends BaseVdypSpecies<VriSite> {
 
 	public VriSpecies(
-			PolygonIdentifier polygonIdentifier, LayerType layer, String genus, int genusIndex, 
-			float percentGenus, Optional<VriSite> site
+			PolygonIdentifier polygonIdentifier, LayerType layer, String genus, int genusIndex, float percentGenus,
+			Sp64DistributionSet sp64DistributionSet, Optional<VriSite> site
 	) {
-		super(polygonIdentifier, layer, genus, genusIndex, percentGenus, new Sp64DistributionSet(new ArrayList<>()), site);
+		super(polygonIdentifier, layer, genus, genusIndex, percentGenus, sp64DistributionSet, site);
 	}
 
 	/**
@@ -52,6 +52,7 @@ public class VriSpecies extends BaseVdypSpecies<VriSite> {
 					this.genus.get(), //
 					this.genusIndex.get(), //
 					this.percentGenus.get(), //
+					new Sp64DistributionSet(this.sp64DistributionList), //
 					this.site
 			);
 		}
@@ -76,7 +77,8 @@ public class VriSpecies extends BaseVdypSpecies<VriSite> {
 				this.getGenus(), //
 				this.getPercentGenus(),
 				this.getSp64DistributionSet().getSp64DistributionList().stream()
-						.map(e -> String.format("%s: %s%%", e.getGenusAlias(), e.getPercentage())).collect(Collectors.joining(", "))
+						.map(e -> String.format("%s: %s%%", e.getGenusAlias(), e.getPercentage()))
+						.collect(Collectors.joining(", "))
 		);
 	}
 

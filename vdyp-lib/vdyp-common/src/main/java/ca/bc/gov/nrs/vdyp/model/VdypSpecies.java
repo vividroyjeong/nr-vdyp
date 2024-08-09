@@ -25,7 +25,8 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 
 	public VdypSpecies(
 			PolygonIdentifier polygonIdentifier, LayerType layer, String genus, int genusIndex, float percentGenus,
-			Sp64DistributionSet sp64DistributionSet, Optional<VdypSite> site, int volumeGroup, int decayGroup, int breakageGroup
+			Sp64DistributionSet sp64DistributionSet, Optional<VdypSite> site, int volumeGroup, int decayGroup,
+			int breakageGroup
 	) {
 		super(polygonIdentifier, layer, genus, genusIndex, percentGenus, sp64DistributionSet, site);
 		this.volumeGroup = volumeGroup;

@@ -961,8 +961,7 @@ public class ForwardProcessingEngine {
 				// First alternative is to use the name of the first of the species' sp64Distributions
 				if (sp0Dist.isPresent()) {
 					if (!siteCurveMap.isEmpty()) {
-						scIndex = Utils
-								.optSafe(siteCurveMap.get(sp0Dist.get().getGenusAlias(), becZone.getRegion()));
+						scIndex = Utils.optSafe(siteCurveMap.get(sp0Dist.get().getGenusAlias(), becZone.getRegion()));
 					} else {
 						SiteIndexEquation siCurve = SiteTool
 								.getSICurve(bank.speciesNames[i], becZone.getRegion().equals(Region.COASTAL));

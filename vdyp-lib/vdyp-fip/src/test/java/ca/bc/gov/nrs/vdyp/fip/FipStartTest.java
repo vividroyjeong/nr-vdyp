@@ -545,13 +545,12 @@ class FipStartTest {
 	@Test
 	void testFractionGenusCalculationWithSlightError() throws Exception {
 
-		var polygonId = polygonId("Test Polygon", 2023);
-		var layer = LayerType.PRIMARY;
+		var controlMap = FipTestUtils.loadControlMap();
 
 		var polygon = FipPolygon.build(pb -> {
 			pb.polygonIdentifier("Test Polygon", 2024);
 			pb.forestInventoryZone("0");
-			pb.biogeoclimaticZone("BG");
+			pb.biogeoclimaticZone(Utils.getBec("BG", controlMap));
 			pb.mode(PolygonMode.START);
 			pb.yieldFactor(1.0f);
 
@@ -561,6 +560,7 @@ class FipStartTest {
 
 				lb.addSpecies(sb -> {
 					sb.genus("B");
+					sb.genusIndex(3);
 					sb.percentGenus(75f + 0.009f);
 					sb.addSite(ib -> {
 						ib.ageTotal(8f);
@@ -572,13 +572,12 @@ class FipStartTest {
 				});
 				lb.addSpecies(sb -> {
 					sb.genus("C");
+					sb.genusIndex(4);
 					sb.percentGenus(25f);
 				});
 			});
 
 		});
-
-		var controlMap = FipTestUtils.loadControlMap();
 
 		try (var app = new FipStart()) {
 			ApplicationTestUtils.setControlMap(app, controlMap);
@@ -666,7 +665,9 @@ class FipStartTest {
 			assertThat(speciesResult, hasProperty("percentGenus", is(100f)));
 
 			// Species distribution
-			assertThat(speciesResult, hasProperty("speciesPercent", anEmptyMap())); // Test map was empty
+			assertThat(
+					speciesResult, hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", anEmptyMap()))
+			);
 		}
 	}
 
@@ -749,7 +750,9 @@ class FipStartTest {
 		assertThat(speciesResult1, hasProperty("percentGenus", is(22f)));
 
 		// Species distribution
-		assertThat(speciesResult1, hasProperty("speciesPercent", aMapWithSize(1)));
+		assertThat(
+				speciesResult1, hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1)))
+		);
 
 		var speciesResult2 = result.getSpecies().get("H");
 
@@ -762,7 +765,9 @@ class FipStartTest {
 		assertThat(speciesResult2, hasProperty("percentGenus", is(60f)));
 
 		// Species distribution
-		assertThat(speciesResult2, hasProperty("speciesPercent", aMapWithSize(1)));
+		assertThat(
+				speciesResult2, hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1)))
+		);
 
 		var speciesResult3 = result.getSpecies().get("S");
 
@@ -775,7 +780,9 @@ class FipStartTest {
 		assertThat(speciesResult3, hasProperty("percentGenus", is(18f)));
 
 		// Species distribution
-		assertThat(speciesResult3, hasProperty("speciesPercent", aMapWithSize(1)));
+		assertThat(
+				speciesResult3, hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1)))
+		);
 
 		// These Utilizations should differ between the layer and each genus
 
@@ -1095,12 +1102,26 @@ class FipStartTest {
 			assertThat(speciesResult, hasProperty("percentGenus", is(100f)));
 
 			// Species distribution
-			assertThat(speciesResult, hasProperty("speciesPercent", aMapWithSize(2)));
+			assertThat(
+					speciesResult,
+					hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(2)))
+			);
 
 			var distributionResult = speciesResult.getSp64DistributionSet();
 
-			assertThat(distributionResult.getSp64DistributionMap(), hasEntry("S1", 75f));
-			assertThat(distributionResult.getSp64DistributionMap(), hasEntry("S2", 25f));
+			assertThat(
+					distributionResult.getSp64DistributionMap(),
+					allOf(
+							hasEntry(
+									is(1),
+									allOf(hasProperty("genusAlias", is("S1")), hasProperty("percentage", is(75f)))
+							),
+							hasEntry(
+									is(2),
+									allOf(hasProperty("genusAlias", is("S2")), hasProperty("percentage", is(25f)))
+							)
+					)
+			);
 		}
 
 	}
@@ -1233,7 +1254,10 @@ class FipStartTest {
 
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.00890319888f)));
 
-			assertThat(speciesResult, hasProperty("speciesPercent", aMapWithSize(1)));
+			assertThat(
+					speciesResult,
+					hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1)))
+			);
 
 			assertThat(
 					speciesResult,
@@ -1286,7 +1310,10 @@ class FipStartTest {
 
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.114011094f)));
 
-			assertThat(speciesResult, hasProperty("speciesPercent", aMapWithSize(1)));
+			assertThat(
+					speciesResult,
+					hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1)))
+			);
 
 			assertThat(
 					speciesResult,
@@ -1341,7 +1368,10 @@ class FipStartTest {
 
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.661987007f)));
 
-			assertThat(speciesResult, hasProperty("speciesPercent", aMapWithSize(1)));
+			assertThat(
+					speciesResult,
+					hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1)))
+			);
 
 			assertThat(
 					speciesResult,
@@ -1397,7 +1427,10 @@ class FipStartTest {
 
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.123297341f)));
 
-			assertThat(speciesResult, hasProperty("speciesPercent", aMapWithSize(1)));
+			assertThat(
+					speciesResult,
+					hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1)))
+			);
 
 			assertThat(
 					speciesResult,
@@ -1450,7 +1483,10 @@ class FipStartTest {
 
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.0918014571f)));
 
-			assertThat(speciesResult, hasProperty("speciesPercent", aMapWithSize(1)));
+			assertThat(
+					speciesResult,
+					hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1)))
+			);
 
 			assertThat(
 					speciesResult,
@@ -1577,7 +1613,10 @@ class FipStartTest {
 
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.787526369f)));
 
-			assertThat(speciesResult, hasProperty("speciesPercent", aMapWithSize(1)));
+			assertThat(
+					speciesResult,
+					hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1)))
+			);
 
 			assertThat(
 					speciesResult,
@@ -1784,7 +1823,7 @@ class FipStartTest {
 					sb.breakageGroup(5);
 
 					sb.addSp64Distribution("B", 100);
-					
+
 					sb.baseArea(0.3980018f);
 					sb.loreyHeight(38.74565f);
 					sb.quadMeanDiameter(31.716667f);
@@ -1801,7 +1840,7 @@ class FipStartTest {
 					sb.breakageGroup(6);
 
 					sb.addSp64Distribution("C", 100);
-					
+
 					sb.baseArea(5.1091933f);
 					sb.loreyHeight(22.800163f);
 					sb.quadMeanDiameter(26.453901f);
@@ -1818,7 +1857,7 @@ class FipStartTest {
 					sb.breakageGroup(28);
 
 					sb.addSp64Distribution("S", 100);
-					
+
 					sb.baseArea(4.1126127f);
 					sb.loreyHeight(34.688877f);
 					sb.quadMeanDiameter(34.462196f);
@@ -1835,7 +1874,7 @@ class FipStartTest {
 					sb.breakageGroup(12);
 
 					sb.addSp64Distribution("D", 100);
-					
+
 					sb.baseArea(29.478107f);
 					sb.loreyHeight(33.688976f);
 					sb.quadMeanDiameter(33.973206f);
@@ -1852,7 +1891,7 @@ class FipStartTest {
 					sb.breakageGroup(17);
 
 					sb.addSp64Distribution("H", 100);
-					
+
 					sb.baseArea(5.5270634f);
 					sb.loreyHeight(24.345116f);
 					sb.quadMeanDiameter(21.430225f);
@@ -3733,10 +3772,10 @@ class FipStartTest {
 	}
 
 	FipPolygon getTestPolygon(PolygonIdentifier polygonId, Consumer<FipPolygon> mutator) {
-		
-		Map<String, Object> controlMap = new HashMap<>();		
+
+		Map<String, Object> controlMap = new HashMap<>();
 		TestUtils.populateControlMapBecReal(controlMap);
-		
+
 		var result = FipPolygon.build(builder -> {
 			builder.polygonIdentifier(polygonId);
 			builder.forestInventoryZone("0");
@@ -3795,8 +3834,9 @@ class FipStartTest {
 		return getTestSpecies(polygonId, layer, "B", 3, mutator);
 	}
 
-	FipSpecies
-			getTestSpecies(PolygonIdentifier polygonId, LayerType layer, String genusId, int genusIndex, Consumer<FipSpecies> mutator) {
+	FipSpecies getTestSpecies(
+			PolygonIdentifier polygonId, LayerType layer, String genusId, int genusIndex, Consumer<FipSpecies> mutator
+	) {
 		var result = FipSpecies.build(builder -> {
 			builder.polygonIdentifier(polygonId);
 			builder.layerType(layer);

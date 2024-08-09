@@ -213,7 +213,9 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			}
 		}
 		// FIPSTK
-		adjustForStocking(resultPoly.getLayers().get(LayerType.PRIMARY), fipPrimeLayer, polygon.getBiogeoclimaticZone());
+		adjustForStocking(
+				resultPoly.getLayers().get(LayerType.PRIMARY), fipPrimeLayer, polygon.getBiogeoclimaticZone()
+		);
 		return Optional.of(resultPoly);
 	}
 

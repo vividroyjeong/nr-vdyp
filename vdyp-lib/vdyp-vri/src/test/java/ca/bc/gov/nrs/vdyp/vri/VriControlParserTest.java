@@ -68,12 +68,7 @@ class VriControlParserTest {
 	void testParseSP0() throws Exception {
 		BaseControlParser parser = new VriControlParser();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
-		assertThat(
-				result,
-				(Matcher) controlMapHasEntry(
-						ControlKey.SP0_DEF, instanceOf(GenusDefinitionMap.class)
-				)
-		);
+		assertThat(result, (Matcher) controlMapHasEntry(ControlKey.SP0_DEF, instanceOf(GenusDefinitionMap.class)));
 	}
 
 	@Test

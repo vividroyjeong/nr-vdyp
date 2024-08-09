@@ -93,13 +93,19 @@ class FipSpeciesParserTest {
 								hasProperty("percentGenus", is(100.0f)), //
 								hasProperty(
 										"sp64DistributionSet",
-										hasProperty("sp64DistributionMap", allOf(
-												aMapWithSize(1), 
-												hasEntry(is(1), allOf(
-														hasProperty("genusAlias", is("B")), 
-														hasProperty("percentage", is(100f))
-												))
-										))
+										hasProperty(
+												"sp64DistributionMap",
+												allOf(
+														aMapWithSize(1),
+														hasEntry(
+																is(1),
+																allOf(
+																		hasProperty("genusAlias", is("B")),
+																		hasProperty("percentage", is(100f))
+																)
+														)
+												)
+										)
 								)
 						)
 				)
@@ -148,13 +154,19 @@ class FipSpeciesParserTest {
 								hasProperty("percentGenus", is(75.0f)), //
 								hasProperty(
 										"sp64DistributionSet",
-										hasProperty("sp64DistributionMap", allOf(
-												aMapWithSize(1), 
-												hasEntry(is(1), allOf(
-														hasProperty("genusAlias", is("B")), 
-														hasProperty("percentage", is(100f))
-												))
-										))
+										hasProperty(
+												"sp64DistributionMap",
+												allOf(
+														aMapWithSize(1),
+														hasEntry(
+																is(1),
+																allOf(
+																		hasProperty("genusAlias", is("B")),
+																		hasProperty("percentage", is(100f))
+																)
+														)
+												)
+										)
 								)
 						),
 						allOf(
@@ -163,13 +175,19 @@ class FipSpeciesParserTest {
 								hasProperty("percentGenus", is(25.0f)), //
 								hasProperty(
 										"sp64DistributionSet",
-										hasProperty("sp64DistributionMap", allOf(
-												aMapWithSize(1), 
-												hasEntry(is(1), allOf(
-														hasProperty("genusAlias", is("C")), 
-														hasProperty("percentage", is(100f))
-												))
-										))
+										hasProperty(
+												"sp64DistributionMap",
+												allOf(
+														aMapWithSize(1),
+														hasEntry(
+																is(1),
+																allOf(
+																		hasProperty("genusAlias", is("C")),
+																		hasProperty("percentage", is(100f))
+																)
+														)
+												)
+										)
 								)
 						)
 				)
@@ -219,13 +237,19 @@ class FipSpeciesParserTest {
 								hasProperty("percentGenus", is(100.0f)), //
 								hasProperty(
 										"sp64DistributionSet",
-										hasProperty("sp64DistributionMap", allOf(
-												aMapWithSize(1), 
-												hasEntry(is(1), allOf(
-														hasProperty("genusAlias", is("B")), 
-														hasProperty("percentage", is(100f))
-												))
-										))
+										hasProperty(
+												"sp64DistributionMap",
+												allOf(
+														aMapWithSize(1),
+														hasEntry(
+																is(1),
+																allOf(
+																		hasProperty("genusAlias", is("B")),
+																		hasProperty("percentage", is(100f))
+																)
+														)
+												)
+										)
 								)
 						),
 						allOf(
@@ -234,13 +258,19 @@ class FipSpeciesParserTest {
 								hasProperty("percentGenus", is(100.0f)), //
 								hasProperty(
 										"sp64DistributionSet",
-										hasProperty("sp64DistributionMap", allOf(
-												aMapWithSize(1), 
-												hasEntry(is(1), allOf(
-														hasProperty("genusAlias", is("B")), 
-														hasProperty("percentage", is(100f))
-												))
-										))
+										hasProperty(
+												"sp64DistributionMap",
+												allOf(
+														aMapWithSize(1),
+														hasEntry(
+																is(1),
+																allOf(
+																		hasProperty("genusAlias", is("B")),
+																		hasProperty("percentage", is(100f))
+																)
+														)
+												)
+										)
 								)
 						)
 				)
@@ -290,13 +320,19 @@ class FipSpeciesParserTest {
 								hasProperty("percentGenus", is(100.0f)), //
 								hasProperty(
 										"sp64DistributionSet",
-										hasProperty("sp64DistributionMap", allOf(
-												aMapWithSize(1), 
-												hasEntry(is(1), allOf(
-														hasProperty("genusAlias", is("B")), 
-														hasProperty("percentage", is(100f))
-												))
-										))
+										hasProperty(
+												"sp64DistributionMap",
+												allOf(
+														aMapWithSize(1),
+														hasEntry(
+																is(1),
+																allOf(
+																		hasProperty("genusAlias", is("B")),
+																		hasProperty("percentage", is(100f))
+																)
+														)
+												)
+										)
 								)
 						)
 				)
@@ -312,13 +348,19 @@ class FipSpeciesParserTest {
 								hasProperty("percentGenus", is(100.0f)), //
 								hasProperty(
 										"sp64DistributionSet",
-										hasProperty("sp64DistributionMap", allOf(
-												aMapWithSize(1), 
-												hasEntry(is(1), allOf(
-														hasProperty("genusAlias", is("B")), 
-														hasProperty("percentage", is(100f))
-												))
-										))
+										hasProperty(
+												"sp64DistributionMap",
+												allOf(
+														aMapWithSize(1),
+														hasEntry(
+																is(1),
+																allOf(
+																		hasProperty("genusAlias", is("B")),
+																		hasProperty("percentage", is(100f))
+																)
+														)
+												)
+										)
 								)
 						)
 				)
@@ -366,25 +408,40 @@ class FipSpeciesParserTest {
 								hasProperty("percentGenus", is(100.0f)), //
 								hasProperty(
 										"sp64DistributionSet",
-										hasProperty("sp64DistributionMap", allOf(
-												aMapWithSize(4), 
-												hasEntry(is(1), allOf(
-														hasProperty("genusAlias", is("B1")), 
-														hasProperty("percentage", is(75f))
-												)),
-												hasEntry(is(2), allOf(
-														hasProperty("genusAlias", is("B2")), 
-														hasProperty("percentage", is(10f))
-												)),
-												hasEntry(is(3), allOf(
-														hasProperty("genusAlias", is("B3")), 
-														hasProperty("percentage", is(8f))
-												)),
-												hasEntry(is(4), allOf(
-														hasProperty("genusAlias", is("B4")), 
-														hasProperty("percentage", is(7f))
-												))
-										))
+										hasProperty(
+												"sp64DistributionMap",
+												allOf(
+														aMapWithSize(4),
+														hasEntry(
+																is(1),
+																allOf(
+																		hasProperty("genusAlias", is("B1")),
+																		hasProperty("percentage", is(75f))
+																)
+														),
+														hasEntry(
+																is(2),
+																allOf(
+																		hasProperty("genusAlias", is("B2")),
+																		hasProperty("percentage", is(10f))
+																)
+														),
+														hasEntry(
+																is(3),
+																allOf(
+																		hasProperty("genusAlias", is("B3")),
+																		hasProperty("percentage", is(8f))
+																)
+														),
+														hasEntry(
+																is(4),
+																allOf(
+																		hasProperty("genusAlias", is("B4")),
+																		hasProperty("percentage", is(7f))
+																)
+														)
+												)
+										)
 								)
 						)
 				)

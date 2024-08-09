@@ -30,7 +30,7 @@ public class GenusDefinitionMap {
 				aliasesSortedByIndex.add(g.getAlias());
 				genusDefinitionsSortedByIndex.add(g);
 			}
-			
+
 			aliasesSortedByIndex.stream().sorted((o1, o2) -> indexByAliasMap.get(o1) - indexByAliasMap.get(o2));
 			genusDefinitionsSortedByIndex.stream().sorted((o1, o2) -> o1.getIndex() - o2.getIndex());
 		} else {

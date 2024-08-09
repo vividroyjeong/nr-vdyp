@@ -66,10 +66,9 @@ public class VriSpeciesParser
 					.strippedString(25, VriPolygonParser.POLYGON_IDENTIFIER) //
 					.space(1) //
 					.value(
-							1, VriLayerParser.LAYER,
-							ValueParser.valueOrMarker(
-									ValueParser.LAYER,
-									ValueParser.optionalSingleton("Z"::equals, EndOfRecord.END_OF_RECORD)
+							1, VriLayerParser.LAYER, ValueParser.valueOrMarker(
+									ValueParser.LAYER, ValueParser
+											.optionalSingleton("Z"::equals, EndOfRecord.END_OF_RECORD)
 							)
 					) //
 					.space(1) //
@@ -123,10 +122,18 @@ public class VriSpeciesParser
 					return species.handle(s -> {
 						return markerBuilder.value(s.map(layerType -> {
 							List<Sp64Distribution> sp64DistributionList = new ArrayList<>();
-							species1.ifPresent((sp) -> sp64DistributionList.add(new Sp64Distribution(1, sp, percentSpecies1)));
-							species2.ifPresent((sp) -> sp64DistributionList.add(new Sp64Distribution(2, sp, percentSpecies2)));
-							species3.ifPresent((sp) -> sp64DistributionList.add(new Sp64Distribution(3, sp, percentSpecies3)));
-							species4.ifPresent((sp) -> sp64DistributionList.add(new Sp64Distribution(4, sp, percentSpecies4)));
+							species1.ifPresent(
+									(sp) -> sp64DistributionList.add(new Sp64Distribution(1, sp, percentSpecies1))
+							);
+							species2.ifPresent(
+									(sp) -> sp64DistributionList.add(new Sp64Distribution(2, sp, percentSpecies2))
+							);
+							species3.ifPresent(
+									(sp) -> sp64DistributionList.add(new Sp64Distribution(3, sp, percentSpecies3))
+							);
+							species4.ifPresent(
+									(sp) -> sp64DistributionList.add(new Sp64Distribution(4, sp, percentSpecies4))
+							);
 							return VriSpecies.build(specBuilder -> {
 								specBuilder.polygonIdentifier(polygonId);
 								specBuilder.layerType(layerType);

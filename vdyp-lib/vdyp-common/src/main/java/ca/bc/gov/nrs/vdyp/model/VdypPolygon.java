@@ -7,7 +7,7 @@ import java.util.function.Function;
 public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float, VdypSpecies, VdypSite> {
 
 	private final Optional<Integer> targetYear;
-	
+
 	public VdypPolygon(
 			PolygonIdentifier polygonIdentifier, Float percentAvailable, String fiz, BecDefinition bec,
 			Optional<PolygonMode> modeFip
@@ -20,7 +20,7 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float, VdypSpecies, 
 			Optional<PolygonMode> modeFip, Optional<Integer> targetYear
 	) {
 		super(polygonIdentifier, percentAvailable, fiz, bec, modeFip);
-		
+
 		this.targetYear = targetYear;
 	}
 
@@ -42,7 +42,7 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float, VdypSpecies, 
 			this.targetYear = Optional.empty();
 		}
 	}
-	
+
 	public Optional<Integer> getTargetYear() {
 		return targetYear;
 	}
@@ -71,7 +71,7 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float, VdypSpecies, 
 			BaseVdypPolygon.Builder<VdypPolygon, VdypLayer, Float, VdypSpecies, VdypSite, VdypLayer.Builder, VdypSpecies.Builder, VdypSite.Builder> {
 
 		protected Optional<Integer> targetYear = Optional.empty();
-		
+
 		@Override
 		protected VdypPolygon doBuild() {
 			return new VdypPolygon(

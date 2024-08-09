@@ -69,12 +69,7 @@ class NonFipControlParserTest {
 	void testParseSP0() throws Exception {
 		BaseControlParser parser = getUnit();
 		var result = parse(parser, TestUtils.class, CONTROL_FILE);
-		assertThat(
-				result,
-				(Matcher) controlMapHasEntry(
-						ControlKey.SP0_DEF, instanceOf(GenusDefinitionMap.class)
-				)
-		);
+		assertThat(result, (Matcher) controlMapHasEntry(ControlKey.SP0_DEF, instanceOf(GenusDefinitionMap.class)));
 	}
 
 	@Test

@@ -33,12 +33,12 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 	private float fractionGenus; // FRBASP0/FR
 
 	private Sp64DistributionSet sp64DistributionSet;
-	
+
 	private Optional<I> site;
 
 	protected BaseVdypSpecies(
-			PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, int genusIndex, 
-			float percentGenus, Sp64DistributionSet sp64DistributionSet, Optional<I> site
+			PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, int genusIndex, float percentGenus,
+			Sp64DistributionSet sp64DistributionSet, Optional<I> site
 	) {
 		this.polygonIdentifier = polygonIdentifier;
 		this.layerType = layerType;
@@ -84,33 +84,36 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		this.sp64DistributionSet = sp64DistributionSet;
 	}
 
-	/** 
-	 * Construct the species sp64DistributionSet from the given list of species percentages.
-	 * The maxIndex of the Set is taken to be the size of the map, and the index of each
-	 * sp64Distribution is set to be its position in the list ordered by decreasing 
-	 * percentage.
-	 * 
+	/**
+	 * Construct the species sp64DistributionSet from the given list of species percentages. The maxIndex of the Set is
+	 * taken to be the size of the map, and the index of each sp64Distribution is set to be its position in the list
+	 * ordered by decreasing percentage.
+	 *
 	 * @param speciesPercentages the source of the construction
 	 */
 	public void setSpeciesPercentages(Map<String, Float> speciesPercentages) {
-		
+
 		// build a list of Sp64Distributions, all with index 0. The indicies will be assigned below.
-		
+
 		List<Sp64Distribution> unindexedSp64Distributions = new ArrayList<Sp64Distribution>();
 		for (Map.Entry<String, Float> e : speciesPercentages.entrySet()) {
 			unindexedSp64Distributions.add(new Sp64Distribution(0, e.getKey(), e.getValue()));
 		}
-		
+
 		// sort the unindexed distributions in order of decreasing percentage
 		unindexedSp64Distributions.stream().sorted((o1, o2) -> o2.getPercentage().compareTo(o1.getPercentage()));
-		
+
 		// and assign them an index, starting with one.
 		int index = 1;
 		List<Sp64Distribution> sp64Distributions = new ArrayList<Sp64Distribution>();
-		for (Sp64Distribution uiSp64Distribution: unindexedSp64Distributions) {
-			sp64Distributions.add(new Sp64Distribution(index++, uiSp64Distribution.getGenusAlias(), uiSp64Distribution.getPercentage()));
+		for (Sp64Distribution uiSp64Distribution : unindexedSp64Distributions) {
+			sp64Distributions.add(
+					new Sp64Distribution(
+							index++, uiSp64Distribution.getGenusAlias(), uiSp64Distribution.getPercentage()
+					)
+			);
 		}
-		
+
 		this.sp64DistributionSet = new Sp64DistributionSet(sp64Distributions.size(), sp64Distributions);
 	}
 

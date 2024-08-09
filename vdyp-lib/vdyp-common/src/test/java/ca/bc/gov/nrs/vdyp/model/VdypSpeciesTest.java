@@ -4,14 +4,13 @@ import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.anEmptyMap;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 class VdypSpeciesTest {
@@ -43,13 +42,13 @@ class VdypSpeciesTest {
 		var ex = assertThrows(IllegalStateException.class, () -> VdypSpecies.build(builder -> {
 		}));
 		assertThat(
-				ex, hasProperty(
-						"message", allOf(
-								containsString("polygonIdentifier"), containsString("layer"), containsString(
-										"genus"
-								), containsString(
-										"percentGenus"
-								), containsString("volumeGroup"), containsString("decayGroup")
+				ex,
+				hasProperty(
+						"message",
+						allOf(
+								containsString("polygonIdentifier"), containsString("layer"), containsString("genus"),
+								containsString("percentGenus"), containsString("volumeGroup"),
+								containsString("decayGroup")
 						)
 				)
 		);
@@ -105,12 +104,14 @@ class VdypSpeciesTest {
 			builder.addSp64Distribution("B", 100f);
 		});
 		assertThat(
-				result, hasProperty(
-						"sp64DistributionSet", hasProperty(
-								"sp64DistributionMap", hasEntry(
-										is(1), allOf(
-												hasProperty("genusAlias", is("B")), hasProperty("percentage", is(100f))
-										)
+				result,
+				hasProperty(
+						"sp64DistributionSet",
+						hasProperty(
+								"sp64DistributionMap",
+								hasEntry(
+										is(1),
+										allOf(hasProperty("genusAlias", is("B")), hasProperty("percentage", is(100f)))
 								)
 						)
 				)
@@ -123,11 +124,12 @@ class VdypSpeciesTest {
 			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.genus("B");
+			builder.genusIndex(3);
 			builder.percentGenus(50f);
 			builder.volumeGroup(1);
 			builder.decayGroup(2);
 			builder.breakageGroup(3);
-			builder.addSpecies("B", 100f);
+			builder.addSp64Distribution("B", 100f);
 			builder.addSite(ib -> {
 				ib.ageTotal(42);
 				ib.yearsToBreastHeight(5);

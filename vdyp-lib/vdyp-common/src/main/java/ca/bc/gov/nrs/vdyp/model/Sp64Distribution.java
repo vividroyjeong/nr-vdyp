@@ -6,13 +6,13 @@ import java.util.Objects;
 import org.apache.commons.lang3.ObjectUtils;
 
 public class Sp64Distribution implements Comparable<Sp64Distribution> {
-	
+
 	/** the position of the distribution in the set - a number from 1 to 4. */
 	private final int index;
-	
+
 	/** the species within the SP0 species whose percentage is defined here */
 	private final String genusAlias;
-	
+
 	/** the percentage of SP0's basal area allocated to this species */
 	private final float percentage;
 
@@ -27,7 +27,7 @@ public class Sp64Distribution implements Comparable<Sp64Distribution> {
 		if (genusAlias == null) {
 			throw new IllegalArgumentException(MessageFormat.format("Alias for index {0} is missing", index));
 		}
-		
+
 		if (percentage < 0 || percentage > 100) {
 			throw new IllegalArgumentException(
 					MessageFormat
@@ -82,7 +82,7 @@ public class Sp64Distribution implements Comparable<Sp64Distribution> {
 			return 1 /* null is always less than not null */;
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		return genusAlias + "[" + index + "]:" + percentage;

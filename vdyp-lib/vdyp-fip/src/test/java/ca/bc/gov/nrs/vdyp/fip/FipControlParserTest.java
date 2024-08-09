@@ -61,12 +61,7 @@ class FipControlParserTest {
 	void testParseSP0() throws Exception {
 		BaseControlParser parser = new FipControlParser();
 		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
-		assertThat(
-				result,
-				(Matcher) controlMapHasEntry(
-						ControlKey.SP0_DEF, instanceOf(GenusDefinitionMap.class)
-				)
-		);
+		assertThat(result, (Matcher) controlMapHasEntry(ControlKey.SP0_DEF, instanceOf(GenusDefinitionMap.class)));
 	}
 
 	@Test

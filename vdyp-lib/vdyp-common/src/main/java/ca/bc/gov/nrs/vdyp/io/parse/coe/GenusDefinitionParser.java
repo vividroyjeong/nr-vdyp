@@ -68,9 +68,9 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<GenusD
 	@Override
 	public GenusDefinitionMap parse(InputStream is, Map<String, Object> control)
 			throws IOException, ResourceParseException {
-		
+
 		GenusDefinition[] result = new GenusDefinition[numSp0];
-		
+
 		result = lineParser.parse(is, result, (value, r, line) -> {
 			String alias = (String) value.get("alias");
 			Optional<Integer> preference = (Optional<Integer>) value.get("preference");
@@ -86,28 +86,36 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<GenusD
 
 			if (index > numSp0 || index < 1) {
 				throw new ValueParseException(
-						Integer.toString(index), String.format("preference values must be between %d and %d (inclusive); saw value %d", 1, numSp0, index)
+						Integer.toString(index),
+						String.format(
+								"preference values must be between %d and %d (inclusive); saw value %d", 1, numSp0,
+								index
+						)
 				);
 			}
 			if (r[index - 1] != null) {
 				throw new ValueParseException(
 						Integer.toString(index),
-						String.format("Genera ordering %d has already been specified for genera %s", index, r[index - 1].getAlias())
+						String.format(
+								"Genera ordering %d has already been specified for genera %s", index,
+								r[index - 1].getAlias()
+						)
 				);
 			}
 
 			r[index - 1] = new GenusDefinition(alias, index, name);
 			return r;
 		}, control);
-		
+
 		if (Arrays.stream(result).anyMatch(Objects::isNull)) {
 			throw new ResourceParseValidException("Not all genus definitions were provided.");
 		}
-		
+
 		return new GenusDefinitionMap(Arrays.asList(result));
 	}
 
-	public static void checkSpecies(final Collection<String> speciesIndicies, final String sp0) throws ValueParseException {
+	public static void checkSpecies(final Collection<String> speciesIndicies, final String sp0)
+			throws ValueParseException {
 		if (!speciesIndicies.contains(sp0)) {
 			throw new ValueParseException(sp0, sp0 + " is not a valid genus (SP0)");
 		}
@@ -119,7 +127,9 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<GenusD
 	}
 
 	public static GenusDefinitionMap getSpecies(final Map<String, Object> controlMap) {
-		return Utils.<GenusDefinitionMap>expectParsedControl(controlMap, ControlKey.SP0_DEF.name(), GenusDefinitionMap.class);
+		return Utils.<GenusDefinitionMap>expectParsedControl(
+				controlMap, ControlKey.SP0_DEF.name(), GenusDefinitionMap.class
+		);
 	}
 
 	public static Collection<String> getSpeciesAliases(final Map<String, Object> controlMap) {
