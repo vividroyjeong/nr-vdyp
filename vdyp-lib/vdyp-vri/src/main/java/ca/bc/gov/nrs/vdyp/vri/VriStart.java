@@ -1106,6 +1106,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 							);
 
 						});
+						lBuilder.ageIncrease(inc.ageIncrease());
 					});
 				});
 			});
