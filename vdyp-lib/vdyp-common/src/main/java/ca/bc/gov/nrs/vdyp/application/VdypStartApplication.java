@@ -589,7 +589,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	public S leadGenus(L fipLayer) {
 		return fipLayer.getSpecies().values().stream()
-				.sorted(Utils.compareUsing(BaseVdypSpecies<? extends BaseVdypSite>::getFractionGenus).reversed()).findFirst().orElseThrow();
+				.sorted(Utils.compareUsing(BaseVdypSpecies<? extends BaseVdypSite>::getFractionGenus).reversed())
+				.findFirst().orElseThrow();
 	}
 
 	protected L getPrimaryLayer(P poly) throws StandProcessingException {
@@ -852,12 +853,17 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		return quadMeanDiameter;
 	}
 
-	protected Map<String, Float>
-			applyGroups(BaseVdypPolygon<?, ?, ?, ?> fipPolygon, Collection<VdypSpecies> vdypSpecies)
-					throws ProcessingException {
-		// Lookup volume group, Decay Group, and Breakage group for each species.
+	protected Map<String, Float> applyGroupsAndGetTargetPercentages(
+			BaseVdypPolygon<?, ?, ?, ?> fipPolygon, Collection<VdypSpecies> vdypSpecies
+	) throws ProcessingException {
 
-		Map<String, Float> targetPercentages = new HashMap<>(vdypSpecies.size());
+		applyGroups(fipPolygon, vdypSpecies);
+		return getTargetPercentages(vdypSpecies);
+	}
+
+	protected void applyGroups(BaseVdypPolygon<?, ?, ?, ?> fipPolygon, Collection<VdypSpecies> vdypSpecies)
+			throws ProcessingException {
+		// Lookup volume group, Decay Group, and Breakage group for each species.
 
 		BecDefinition bec = Utils.getBec(fipPolygon.getBiogeoclimaticZone(), controlMap);
 		var volumeGroupMap = getGroupMap(ControlKey.VOLUME_EQN_GROUPS);
@@ -874,6 +880,15 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			vSpec.setVolumeGroup(volumeGroup);
 			vSpec.setDecayGroup(decayGroup);
 			vSpec.setBreakageGroup(breakageGroup);
+
+		}
+
+	}
+
+	protected Map<String, Float> getTargetPercentages(Collection<VdypSpecies> vdypSpecies) {
+		Map<String, Float> targetPercentages = new HashMap<>(vdypSpecies.size());
+
+		for (var vSpec : vdypSpecies) {
 
 			targetPercentages.put(vSpec.getGenus(), vSpec.getPercentGenus());
 		}

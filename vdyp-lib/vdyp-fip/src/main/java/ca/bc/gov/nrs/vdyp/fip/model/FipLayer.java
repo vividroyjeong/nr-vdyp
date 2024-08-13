@@ -67,10 +67,10 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> implements In
 
 			var spec = this.getSpecies().get(site.getSiteGenus());
 			if (spec != null) {
-				FipSpecies.build(sb -> {
+				this.getSpecies().put(site.getSiteGenus(), FipSpecies.build(sb -> {
 					sb.copy(spec);
 					sb.addSite(siteWithoutSpecies);
-				});
+				}));
 				siteWithoutSpecies = Optional.empty();
 			}
 
