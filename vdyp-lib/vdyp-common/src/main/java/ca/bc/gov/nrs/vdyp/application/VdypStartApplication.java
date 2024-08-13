@@ -633,7 +633,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	public S leadGenus(L fipLayer) {
 		return fipLayer.getSpecies().values().stream()
-				.sorted(Utils.compareUsing(BaseVdypSpecies<?>::getFractionGenus).reversed()).findFirst().orElseThrow();
+				.sorted(Utils.compareUsing(BaseVdypSpecies<? extends BaseVdypSite>::getFractionGenus).reversed())
+				.findFirst().orElseThrow();
 	}
 
 	protected L getPrimaryLayer(P poly) throws StandProcessingException {
