@@ -98,12 +98,12 @@ class VdypForwardSpeciesParserTest {
 								hasProperty(
 										"speciesDistributions",
 										hasProperty(
-												"speciesDistributionMap",
+												"sp64DistributionMap",
 												hasEntry(
-														is(0),
+														is(1),
 														allOf(
-																hasProperty("index", is(0)),
-																hasProperty("genus", hasProperty("alias", is("S"))),
+																hasProperty("index", is(1)),
+																hasProperty("genusAlias", is("S")),
 																hasProperty("percentage", is(100.0f))
 														)
 												)
@@ -209,22 +209,20 @@ class VdypForwardSpeciesParserTest {
 								hasProperty(
 										"speciesDistributions",
 										hasProperty(
-												"speciesDistributionMap",
+												"sp64DistributionMap",
 												allOf(
-														hasEntry(
-																is(0),
-																allOf(
-																		hasProperty(
-																				"genus", hasProperty("alias", is("B"))
-																		), hasProperty("percentage", is(50.0f))
-																)
-														),
 														hasEntry(
 																is(1),
 																allOf(
-																		hasProperty(
-																				"genus", hasProperty("alias", is("S"))
-																		), hasProperty("percentage", is(50.0f))
+																		hasProperty("genusAlias", is("B")),
+																		hasProperty("percentage", is(50.0f))
+																)
+														),
+														hasEntry(
+																is(2),
+																allOf(
+																		hasProperty("genusAlias", is("S")),
+																		hasProperty("percentage", is(50.0f))
 																)
 														)
 												)
@@ -237,38 +235,34 @@ class VdypForwardSpeciesParserTest {
 								hasProperty(
 										"speciesDistributions",
 										hasProperty(
-												"speciesDistributionMap",
+												"sp64DistributionMap",
 												allOf(
-														hasEntry(
-																is(0),
-																allOf(
-																		hasProperty(
-																				"genus", hasProperty("alias", is("L"))
-																		), hasProperty("percentage", is(50.0f))
-																)
-														),
 														hasEntry(
 																is(1),
 																allOf(
-																		hasProperty(
-																				"genus", hasProperty("alias", is("S"))
-																		), hasProperty("percentage", is(25.0f))
+																		hasProperty("genusAlias", is("L")), 
+																		hasProperty("percentage", is(50.0f))
 																)
 														),
 														hasEntry(
 																is(2),
 																allOf(
-																		hasProperty(
-																				"genus", hasProperty("alias", is("AC"))
-																		), hasProperty("percentage", is(15.0f))
+																		hasProperty("genusAlias", is("S")),
+																		hasProperty("percentage", is(25.0f))
 																)
 														),
 														hasEntry(
 																is(3),
 																allOf(
-																		hasProperty(
-																				"genus", hasProperty("alias", is("B"))
-																		), hasProperty("percentage", is(10.0f))
+																		hasProperty("genusAlias", is("AC")),
+																		hasProperty("percentage", is(15.0f))
+																)
+														),
+														hasEntry(
+																is(4),
+																allOf(
+																		hasProperty("genusAlias", is("B")),
+																		hasProperty("percentage", is(10.0f))
 																)
 														)
 												)
@@ -326,12 +320,12 @@ class VdypForwardSpeciesParserTest {
 								hasProperty(
 										"speciesDistributions",
 										hasProperty(
-												"speciesDistributionMap",
+												"sp64DistributionMap",
 												hasEntry(
-														is(0),
+														is(1),
 														allOf(
-																hasProperty("index", is(0)),
-																hasProperty("genus", hasProperty("alias", is("S"))),
+																hasProperty("index", is(1)),
+																hasProperty("genusAlias", is("S")),
 																hasProperty("percentage", is(100.0f))
 														)
 												)
@@ -351,24 +345,22 @@ class VdypForwardSpeciesParserTest {
 								hasProperty(
 										"speciesDistributions",
 										hasProperty(
-												"speciesDistributionMap",
+												"sp64DistributionMap",
 												allOf(
-														hasEntry(
-																is(0),
-																allOf(
-																		hasProperty("index", is(0)),
-																		hasProperty(
-																				"genus", hasProperty("alias", is("B"))
-																		), hasProperty("percentage", is(50.0f))
-																)
-														),
 														hasEntry(
 																is(1),
 																allOf(
 																		hasProperty("index", is(1)),
-																		hasProperty(
-																				"genus", hasProperty("alias", is("S"))
-																		), hasProperty("percentage", is(50.0f))
+																		hasProperty("genusAlias", is("B")),
+																		hasProperty("percentage", is(50.0f))
+																)
+														),
+														hasEntry(
+																is(2),
+																allOf(
+																		hasProperty("index", is(2)),
+																		hasProperty("genusAlias", is("S")), 
+																		hasProperty("percentage", is(50.0f))
 																)
 														)
 												)

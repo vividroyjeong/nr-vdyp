@@ -3,11 +3,9 @@ package ca.bc.gov.nrs.vdyp.io.write;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -15,10 +13,10 @@ import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
-import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
-import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.PolygonMode;
+import ca.bc.gov.nrs.vdyp.model.Sp64Distribution;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
@@ -30,7 +28,6 @@ import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
  */
 public class VriAdjustInputWriter implements Closeable {
 
-	private Map<String, Object> controlMap;
 	private OutputStream polygonFile;
 	private OutputStream speciesFile;
 	private OutputStream utilizationFile;
@@ -76,7 +73,6 @@ public class VriAdjustInputWriter implements Closeable {
 			OutputStream polygonFile, OutputStream speciesFile, OutputStream utilizationFile,
 			Map<String, Object> controlMap
 	) {
-		this.controlMap = controlMap;
 		this.polygonFile = polygonFile;
 		this.speciesFile = speciesFile;
 		this.utilizationFile = utilizationFile;
@@ -118,7 +114,7 @@ public class VriAdjustInputWriter implements Closeable {
 				POLY_FORMAT, //
 
 				polygon.getPolygonIdentifier(), //
-				polygon.getBiogeoclimaticZone(), //
+				polygon.getBiogeoclimaticZone().getAlias(), //
 				polygon.getForestInventoryZone(), //
 
 				polygon.getPercentAvailable().intValue(), //
@@ -139,11 +135,10 @@ public class VriAdjustInputWriter implements Closeable {
 
 		// Ensure we have a list of 4 distribution entries
 		var specDistributionEntries = Stream.concat(
-				spec.getSpeciesPercent().entrySet().stream().sorted(Utils.compareUsing(Entry::getValue)),
-				Stream.generate(() -> new AbstractMap.SimpleEntry<String, Float>("", 0f))
+				spec.getSp64DistributionSet().getSp64DistributionList().stream(),
+				Stream.generate(() -> new Sp64Distribution(0, "", 0f))
 		).limit(4).toList();
 		// 082E004 615 1988 P 9 L LW 100.0 0.0 0.0 0.0 -9.00 -9.00 -9.0 -9.0 -9.0 0 -9
-		var specIndex = GenusDefinitionParser.getIndex(spec.getGenus(), controlMap);
 		boolean isSiteSpec = layer.getSiteGenus().map(spec.getGenus()::equals).orElse(false);
 		writeFormat(
 				speciesFile, //
@@ -152,17 +147,17 @@ public class VriAdjustInputWriter implements Closeable {
 				spec.getPolygonIdentifier(), //
 				spec.getLayerType().getAlias(), //
 
-				specIndex.orElse(0), //
+				spec.getGenusIndex(), //
 				spec.getGenus(), //
 
-				specDistributionEntries.get(0).getKey(), //
-				specDistributionEntries.get(0).getValue(), //
-				specDistributionEntries.get(1).getKey(), //
-				specDistributionEntries.get(1).getValue(), //
-				specDistributionEntries.get(2).getKey(), //
-				specDistributionEntries.get(2).getValue(), //
-				specDistributionEntries.get(3).getKey(), //
-				specDistributionEntries.get(3).getValue(), //
+				specDistributionEntries.get(0).getGenusAlias(), //
+				specDistributionEntries.get(0).getPercentage(), //
+				specDistributionEntries.get(1).getGenusAlias(), //
+				specDistributionEntries.get(1).getPercentage(), //
+				specDistributionEntries.get(2).getGenusAlias(), //
+				specDistributionEntries.get(2).getPercentage(), //
+				specDistributionEntries.get(3).getGenusAlias(), //
+				specDistributionEntries.get(3).getPercentage(), //
 
 				layer.getSiteIndex().filter(x -> isSiteSpec).orElse(EMPTY_FLOAT), //
 				layer.getHeight().filter(x -> isSiteSpec).orElse(EMPTY_FLOAT), //
@@ -187,11 +182,11 @@ public class VriAdjustInputWriter implements Closeable {
 	// V7W_AIU Internalized loop over utilization classes
 	void writeUtilization(VdypLayer layer, VdypUtilizationHolder utils) throws IOException {
 		Optional<String> specId = Optional.empty();
+		Optional<Integer> specIndex = Optional.empty();
 		if (utils instanceof VdypSpecies spec) {
 			specId = Optional.of(spec.getGenus());
+			specIndex = Optional.of(spec.getGenusIndex());
 		}
-
-		Optional<Integer> specIndex = specId.flatMap(id -> GenusDefinitionParser.getIndex(id, controlMap));
 
 		for (var uc : UtilizationClass.values()) {
 			Optional<Float> height = Optional.empty();

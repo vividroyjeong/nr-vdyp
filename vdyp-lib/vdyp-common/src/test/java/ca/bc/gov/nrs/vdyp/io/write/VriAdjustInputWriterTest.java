@@ -36,6 +36,7 @@ class VriAdjustInputWriterTest {
 	@BeforeEach
 	void initStreams() {
 		controlMap = new HashMap<String, Object>();
+		TestUtils.populateControlMapBecReal(controlMap);
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		polyStream = new TestUtils.MockOutputStream("polygons");
@@ -93,7 +94,7 @@ class VriAdjustInputWriterTest {
 
 				builder.polygonIdentifier("082E004    615       1988");
 				builder.percentAvailable(90f);
-				builder.biogeoclimaticZone("IDF");
+				builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				builder.forestInventoryZone("D");
 				builder.mode(PolygonMode.START);
 			});
@@ -103,6 +104,7 @@ class VriAdjustInputWriterTest {
 
 				builder.addSpecies(specBuilder -> {
 					specBuilder.genus("PL");
+					specBuilder.genusIndex(Utils.getGenusIndex("PL", controlMap));
 					specBuilder.percentGenus(100);
 					specBuilder.volumeGroup(1);
 					specBuilder.decayGroup(2);
@@ -140,11 +142,12 @@ class VriAdjustInputWriterTest {
 
 				builder.addSpecies(specBuilder -> {
 					specBuilder.genus("PL");
+					specBuilder.genusIndex(Utils.getGenusIndex("PL", controlMap));
 					specBuilder.percentGenus(100);
 					specBuilder.volumeGroup(0);
 					specBuilder.decayGroup(0);
 					specBuilder.breakageGroup(0);
-					specBuilder.addSpecies("PL", 100);
+					specBuilder.addSp64Distribution("PL", 100);
 
 					specBuilder.addSite(siteBuilder -> {
 						siteBuilder.height(15f);
@@ -177,6 +180,7 @@ class VriAdjustInputWriterTest {
 
 				builder.addSpecies(specBuilder -> {
 					specBuilder.genus("PL");
+					specBuilder.genusIndex(Utils.getGenusIndex("PL", controlMap));
 					specBuilder.percentGenus(100);
 					specBuilder.volumeGroup(1);
 					specBuilder.decayGroup(2);
@@ -196,7 +200,8 @@ class VriAdjustInputWriterTest {
 			@SuppressWarnings("unused")
 			var species = VdypSpecies.build(layer, builder -> {
 				builder.genus("PL");
-				builder.addSpecies("PL", 100f);
+				builder.genusIndex(Utils.getGenusIndex("PL", controlMap));
+				builder.addSp64Distribution("PL", 100f);
 
 				builder.percentGenus(100f);
 				builder.volumeGroup(0);
@@ -262,6 +267,7 @@ class VriAdjustInputWriterTest {
 
 				builder.addSpecies(specBuilder -> {
 					specBuilder.genus("PL");
+					specBuilder.genusIndex(Utils.getGenusIndex("PL", controlMap));
 					specBuilder.percentGenus(100);
 					specBuilder.volumeGroup(1);
 					specBuilder.decayGroup(2);
@@ -279,7 +285,8 @@ class VriAdjustInputWriterTest {
 
 			var species = VdypSpecies.build(layer, builder -> {
 				builder.genus("PL");
-				builder.addSpecies("PL", 100f);
+				builder.genusIndex(Utils.getGenusIndex("PL", controlMap));
+				builder.addSp64Distribution("PL", 100f);
 
 				builder.percentGenus(100f);
 				builder.volumeGroup(0);
@@ -311,13 +318,8 @@ class VriAdjustInputWriterTest {
 					Utils.utilizationVector(0f, 65.4214f, 2.3464f, 35.7128f, 21.2592f, 6.1030f)
 			);
 
-			species.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f)); // Should be
-																											// ignored
-																											// and
-																											// computed
-																											// from
-																											// BA and
-																											// TPH
+			// Should be ignored and computed from BA and TPH
+			species.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f));
 
 			unit.writeUtilization(layer, species);
 		}
@@ -340,13 +342,13 @@ class VriAdjustInputWriterTest {
 
 	@Test
 	void testWritePolygonWithChildren() throws IOException {
-		try (var unit = new VriAdjustInputWriter(controlMap, fileResolver);) {
+		try (var unit = new VriAdjustInputWriter(controlMap, fileResolver)) {
 
 			VdypPolygon polygon = VdypPolygon.build(builder -> {
 
 				builder.polygonIdentifier("082E004    615       1988");
 				builder.percentAvailable(90f);
-				builder.biogeoclimaticZone("IDF");
+				builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				builder.forestInventoryZone("D");
 				builder.mode(PolygonMode.START);
 			});
@@ -356,11 +358,12 @@ class VriAdjustInputWriterTest {
 
 				builder.addSpecies(specBuilder -> {
 					specBuilder.genus("PL");
+					specBuilder.genusIndex(Utils.getGenusIndex("PL", controlMap));
 					specBuilder.percentGenus(100);
 					specBuilder.volumeGroup(0);
 					specBuilder.decayGroup(0);
 					specBuilder.breakageGroup(0);
-					specBuilder.addSpecies("PL", 100);
+					specBuilder.addSp64Distribution("PL", 100);
 
 					specBuilder.addSite(siteBuilder -> {
 						siteBuilder.height(15f);
@@ -402,13 +405,8 @@ class VriAdjustInputWriterTest {
 					Utils.utilizationVector(0f, 65.4214f, 2.3464f, 35.7128f, 21.2592f, 6.1030f)
 			);
 
-			layer.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f)); // Should be
-																											// ignored
-																											// and
-																											// computed
-																											// from
-																											// BA and
-																											// TPH
+			// Should be ignored and computed from BA and TPH.
+			layer.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f));
 
 			species.setBaseAreaByUtilization(
 					Utils.utilizationVector(0.02865f, 19.97867f, 6.79731f, 8.54690f, 3.63577f, 0f)

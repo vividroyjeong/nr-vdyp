@@ -75,9 +75,12 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 					var basalAreaGroup = Utils.<Integer>optSafe(entry.get(BASAL_AREA_GROUP));
 					var fipMode = Utils.<Integer>optSafe(entry.get(POLYGON_MODE));
 
-					BecLookup becLookup = (BecLookup) control.get(ControlKey.BEC_DEF.name());
-					BecDefinition bec = becLookup.get(becAlias)
-							.orElseThrow(() -> new ResourceParseException(becAlias + " is not a recognized BEC alias"));
+					BecDefinition bec;
+					try {
+						bec = Utils.getBec(becAlias, control);
+					} catch (IllegalArgumentException e) {
+						throw new ResourceParseException(e);
+					}
 
 					if (ForestInventoryZone.toRegion(fizId) == SiteIndexForestInventoryZone.FIZ_UNKNOWN) {
 						throw new ResourceParseException(

@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.vri.model;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -7,14 +8,15 @@ import java.util.stream.Collectors;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
+import ca.bc.gov.nrs.vdyp.model.Sp64DistributionSet;
 
 public class VriSpecies extends BaseVdypSpecies<VriSite> {
 
 	public VriSpecies(
-			PolygonIdentifier polygonIdentifier, LayerType layer, String genus, float percentGenus,
-			Optional<VriSite> site
+			PolygonIdentifier polygonIdentifier, LayerType layer, String genus, int genusIndex, float percentGenus,
+			Sp64DistributionSet sp64DistributionSet, Optional<VriSite> site
 	) {
-		super(polygonIdentifier, layer, genus, percentGenus, site);
+		super(polygonIdentifier, layer, genus, genusIndex, percentGenus, sp64DistributionSet, site);
 	}
 
 	/**
@@ -25,6 +27,7 @@ public class VriSpecies extends BaseVdypSpecies<VriSite> {
 			builder.polygonIdentifier(polygonId);
 			builder.layerType(LayerType.VETERAN);
 			builder.genus("B");
+			builder.genusIndex(3);
 			builder.percentGenus(6f);
 	 * })
 	 * </pre>
@@ -47,7 +50,10 @@ public class VriSpecies extends BaseVdypSpecies<VriSite> {
 					this.polygonIdentifier.get(), //
 					this.layerType.get(), //
 					this.genus.get(), //
-					this.percentGenus.get(), this.site
+					this.genusIndex.get(), //
+					this.percentGenus.get(), //
+					new Sp64DistributionSet(this.sp64DistributionList), //
+					this.site
 			);
 		}
 
@@ -70,8 +76,9 @@ public class VriSpecies extends BaseVdypSpecies<VriSite> {
 				this.getLayerType(), //
 				this.getGenus(), //
 				this.getPercentGenus(),
-				this.getSpeciesPercent().entrySet().stream()
-						.map(e -> String.format("%s: %s%%", e.getKey(), e.getValue())).collect(Collectors.joining(", "))
+				this.getSp64DistributionSet().getSp64DistributionList().stream()
+						.map(e -> String.format("%s: %s%%", e.getGenusAlias(), e.getPercentage()))
+						.collect(Collectors.joining(", "))
 		);
 	}
 

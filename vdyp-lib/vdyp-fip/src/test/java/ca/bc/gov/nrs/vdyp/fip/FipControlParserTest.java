@@ -10,7 +10,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
@@ -21,7 +20,6 @@ import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.hamcrest.Matcher;
@@ -29,7 +27,7 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveAgeMaximumParserTest;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -37,8 +35,6 @@ import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
-import ca.bc.gov.nrs.vdyp.model.ComponentSizeLimits;
-import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
@@ -65,12 +61,7 @@ class FipControlParserTest {
 	void testParseSP0() throws Exception {
 		BaseControlParser parser = new FipControlParser();
 		var result = parse(parser, TestUtils.class, "FIPSTART.CTR");
-		assertThat(
-				result,
-				(Matcher) controlMapHasEntry(
-						ControlKey.SP0_DEF, allOf(instanceOf(List.class), hasItem(instanceOf(GenusDefinition.class)))
-				)
-		);
+		assertThat(result, (Matcher) controlMapHasEntry(ControlKey.SP0_DEF, instanceOf(GenusDefinitionMap.class)));
 	}
 
 	@Test
@@ -332,14 +323,9 @@ class FipControlParserTest {
 				result,
 				(Matcher) controlMapHasEntry(
 						ControlKey.SPECIES_COMPONENT_SIZE_LIMIT,
-						mmHasEntry(isA(ComponentSizeLimits.class), "AC", Region.COASTAL))
-				);
-		var cslMap = Utils.<MatrixMap2<String, Region, ComponentSizeLimits>>expectParsedControl(result, ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, MatrixMap2.class);
-		var csl = cslMap.get("AC", Region.COASTAL);
-		assertThat(csl.loreyHeightMaximum(), is(49.4f));
-		assertThat(csl.quadMeanDiameterMaximum(), is(153.3f));
-		assertThat(csl.maxQuadMeanDiameterLoreyHeightRatio(), is(3.647f));
-		assertThat(csl.minQuadMeanDiameterLoreyHeightRatio(), is(0.726f));
+						allOf(mmHasEntry(coe(1, contains(49.4f, 153.3f, 0.726f, 3.647f)), "AC", Region.COASTAL))
+				)
+		);
 	}
 
 	@Test
@@ -619,7 +605,7 @@ class FipControlParserTest {
 		}
 	}
 
-	Map<String, Object> parse(BaseControlParser parser, Class<?> klazz, String resourceName)
+	Map<String, ?> parse(BaseControlParser parser, Class<?> klazz, String resourceName)
 			throws IOException, ResourceParseException {
 		try (var is = klazz.getResourceAsStream(resourceName)) {
 

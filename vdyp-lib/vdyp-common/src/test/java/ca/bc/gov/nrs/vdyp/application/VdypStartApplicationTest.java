@@ -709,13 +709,15 @@ class VdypStartApplicationTest {
 					lb.crownClosure(82.8000031f);
 					lb.addSpecies(sb -> {
 						sb.genus("B");
+						sb.genusIndex(3);
 						sb.percentGenus(33f);
-						sb.addSpecies("B", 100f);
+						sb.addSp64Distribution("B", 100f);
 					});
 					lb.addSpecies(sb -> {
 						sb.genus("H");
+						sb.genusIndex(8);
 						sb.percentGenus(67f);
-						sb.addSpecies("H", 100f);
+						sb.addSp64Distribution("H", 100f);
 						sb.addSite(ib -> {
 							ib.ageTotal(85f);
 							ib.height(38.2999992f);
@@ -746,13 +748,15 @@ class VdypStartApplicationTest {
 					lb.crownClosure(82.8000031f);
 					lb.addSpecies(sb -> {
 						sb.genus("B");
+						sb.genusIndex(3);
 						sb.percentGenus(33f);
-						sb.addSpecies("B", 100f);
+						sb.addSp64Distribution("B", 100f);
 					});
 					lb.addSpecies(sb -> {
 						sb.genus("H");
+						sb.genusIndex(8);
 						sb.percentGenus(67f);
-						sb.addSpecies("H", 100f);
+						sb.addSp64Distribution("H", 100f);
 						sb.addSite(ib -> {
 							ib.ageTotal(85f);
 							ib.height(10.1667995f); // Altered this in the debugger while running VDYP7
@@ -783,13 +787,15 @@ class VdypStartApplicationTest {
 					lb.crownClosure(9f);// Altered this in the debugger while running VDYP7
 					lb.addSpecies(sb -> {
 						sb.genus("B");
+						sb.genusIndex(3);
 						sb.percentGenus(33f);
-						sb.addSpecies("B", 100f);
+						sb.addSp64Distribution("B", 100f);
 					});
 					lb.addSpecies(sb -> {
 						sb.genus("H");
+						sb.genusIndex(8);
 						sb.percentGenus(67f);
-						sb.addSpecies("H", 100f);
+						sb.addSp64Distribution("H", 100f);
 						sb.addSite(ib -> {
 							ib.ageTotal(85f);
 							ib.height(38.2999992f);
@@ -820,13 +826,15 @@ class VdypStartApplicationTest {
 					lb.crownClosure(82.8000031f);
 					lb.addSpecies(sb -> {
 						sb.genus("B");
+						sb.genusIndex(3);
 						sb.percentGenus(33f);
-						sb.addSpecies("B", 100f);
+						sb.addSp64Distribution("B", 100f);
 					});
 					lb.addSpecies(sb -> {
 						sb.genus("H");
+						sb.genusIndex(8);
 						sb.percentGenus(67f);
-						sb.addSpecies("H", 100f);
+						sb.addSp64Distribution("H", 100f);
 						sb.addSite(ib -> {
 							ib.ageTotal(85f);
 							ib.height(7f); // Altered this in the debugger while running VDYP7
@@ -867,13 +875,15 @@ class VdypStartApplicationTest {
 					lb.crownClosure(82.8000031f);
 					lb.addSpecies(sb -> {
 						sb.genus("B");
+						sb.genusIndex(3);
 						sb.percentGenus(33f);
-						sb.addSpecies("B", 100f);
+						sb.addSp64Distribution("B", 100f);
 					});
 					lb.addSpecies(sb -> {
 						sb.genus("H");
+						sb.genusIndex(8);
 						sb.percentGenus(67f);
-						sb.addSpecies("H", 100f);
+						sb.addSp64Distribution("H", 100f);
 						sb.addSite(ib -> {
 							ib.ageTotal(85f);
 							ib.height(38.2999992f);
@@ -905,13 +915,15 @@ class VdypStartApplicationTest {
 					lb.crownClosure(82.8000031f);
 					lb.addSpecies(sb -> {
 						sb.genus("B");
+						sb.genusIndex(3);
 						sb.percentGenus(33f);
-						sb.addSpecies("B", 100f);
+						sb.addSp64Distribution("B", 100f);
 					});
 					lb.addSpecies(sb -> {
 						sb.genus("H");
+						sb.genusIndex(8);
 						sb.percentGenus(67f);
-						sb.addSpecies("H", 100f);
+						sb.addSp64Distribution("H", 100f);
 						sb.addSite(ib -> {
 							ib.ageTotal(85f);
 							ib.height(4.74730005f);
@@ -943,13 +955,15 @@ class VdypStartApplicationTest {
 					lb.crownClosure(82.8000031f);
 					lb.addSpecies(sb -> {
 						sb.genus("B");
+						sb.genusIndex(3);
 						sb.percentGenus(33f);
-						sb.addSpecies("B", 100f);
+						sb.addSp64Distribution("B", 100f);
 					});
 					lb.addSpecies(sb -> {
 						sb.genus("H");
+						sb.genusIndex(8);
 						sb.percentGenus(67f);
-						sb.addSpecies("H", 100f);
+						sb.addSp64Distribution("H", 100f);
 						sb.addSite(ib -> {
 							ib.ageTotal(350f);
 							ib.height(80f);
@@ -979,7 +993,7 @@ class VdypStartApplicationTest {
 
 				var polygon = TestPolygon.build(pb -> {
 					pb.polygonIdentifier("TestPolygon", 2024);
-					pb.biogeoclimaticZone("IDF");
+					pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 					pb.forestInventoryZone("Z");
 					pb.mode(PolygonMode.START);
 
@@ -1003,7 +1017,7 @@ class VdypStartApplicationTest {
 
 				var polygon = TestPolygon.build(pb -> {
 					pb.polygonIdentifier("TestPolygon", 2024);
-					pb.biogeoclimaticZone("IDF");
+					pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 					pb.forestInventoryZone("Z");
 					pb.mode(PolygonMode.START);
 
@@ -1016,6 +1030,7 @@ class VdypStartApplicationTest {
 
 						lb.addSpecies(sb -> {
 							sb.genus("L");
+							sb.genusIndex(9);
 							sb.percentGenus(10);
 							sb.addSite(ib -> {
 								ib.siteGenus("L");
@@ -1027,6 +1042,7 @@ class VdypStartApplicationTest {
 						});
 						lb.addSpecies(sb -> {
 							sb.genus("PL");
+							sb.genusIndex(12);
 							sb.percentGenus(90);
 						});
 					});
@@ -1055,7 +1071,7 @@ class VdypStartApplicationTest {
 
 				var polygon = TestPolygon.build(pb -> {
 					pb.polygonIdentifier("TestPolygon", 2024);
-					pb.biogeoclimaticZone("CWH");
+					pb.biogeoclimaticZone(Utils.getBec("CWH", controlMap));
 					pb.forestInventoryZone("A");
 					pb.mode(PolygonMode.START);
 
@@ -1068,14 +1084,17 @@ class VdypStartApplicationTest {
 
 						lb.addSpecies(sb -> {
 							sb.genus("B");
+							sb.genusIndex(3);
 							sb.percentGenus(15);
 						});
 						lb.addSpecies(sb -> {
 							sb.genus("D");
+							sb.genusIndex(5);
 							sb.percentGenus(7);
 						});
 						lb.addSpecies(sb -> {
 							sb.genus("H");
+							sb.genusIndex(8);
 							sb.percentGenus(77);
 							sb.addSite(ib -> {
 								ib.ageTotal(45f);
@@ -1087,6 +1106,7 @@ class VdypStartApplicationTest {
 						});
 						lb.addSpecies(sb -> {
 							sb.genus("S");
+							sb.genusIndex(15);
 							sb.percentGenus(1);
 						});
 					});
@@ -1097,6 +1117,7 @@ class VdypStartApplicationTest {
 
 						lb.addSpecies(sb -> {
 							sb.genus("H");
+							sb.genusIndex(8);
 							sb.percentGenus(100);
 							sb.addSite(ib -> {
 								ib.siteGenus("H");
@@ -1125,12 +1146,12 @@ class VdypStartApplicationTest {
 		@ParameterizedTest
 		@CsvSource(
 				value = { //
-						"'A:100.0', 100.0", //
-						"'A:99.991', 99.991", //
-						"'A:100.009', 100.009", //
-						"'A:75.0 B:25.0', 100.0", //
-						"'A:75.0 B:25.009', 100.009", //
-						"'A:75.0 B:24.991', 99.991" //
+						"'C:100.0', 100.0", //
+						"'C:99.991', 99.991", //
+						"'C:100.009', 100.009", //
+						"'C:75.0 B:25.0', 100.0", //
+						"'C:75.0 B:25.009', 100.009", //
+						"'C:75.0 B:24.991', 99.991" //
 				}
 		)
 		void testPass(String dist, float expected) throws Exception {
@@ -1145,6 +1166,7 @@ class VdypStartApplicationTest {
 						var parts = s.split(":");
 						lb.addSpecies(sb -> {
 							sb.genus(parts[0]);
+							sb.genusIndex(Utils.getGenusIndex(parts[0], controlMap));
 							sb.percentGenus(Float.valueOf(parts[1]));
 						});
 					}
@@ -1159,10 +1181,10 @@ class VdypStartApplicationTest {
 		@ParameterizedTest
 		@ValueSource(
 				strings = { //
-						"A:99.989", //
-						"A:100.011", //
-						"A:75.0 B:25.011", //
-						"A:75.0 B:24.989" //
+						"C:99.989", //
+						"C:100.011", //
+						"C:75.0 B:25.011", //
+						"C:75.0 B:24.989" //
 				}
 		)
 		void testFail(String dist) throws Exception {
@@ -1177,6 +1199,7 @@ class VdypStartApplicationTest {
 						var parts = s.split(":");
 						lb.addSpecies(sb -> {
 							sb.genus(parts[0]);
+							sb.genusIndex(Utils.getGenusIndex(parts[0], controlMap));
 							sb.percentGenus(Float.valueOf(parts[1]));
 						});
 					}
@@ -1198,7 +1221,7 @@ class VdypStartApplicationTest {
 				var fPoly = TestPolygon.build(builder -> {
 					builder.polygonIdentifier("Test", 2024);
 					builder.forestInventoryZone("A");
-					builder.biogeoclimaticZone("CWH");
+					builder.biogeoclimaticZone(Utils.getBec("CWH", controlMap));
 					builder.percentAvailable(Optional.of(100f));
 				});
 
@@ -1207,6 +1230,7 @@ class VdypStartApplicationTest {
 					lb.layerType(LayerType.PRIMARY);
 					lb.addSpecies(sb -> {
 						sb.genus("B");
+						sb.genusIndex(3);
 						sb.percentGenus(20f);
 						sb.volumeGroup(-1);
 						sb.decayGroup(-1);
@@ -1220,6 +1244,7 @@ class VdypStartApplicationTest {
 					});
 					lb.addSpecies(sb -> {
 						sb.genus("C");
+						sb.genusIndex(4);
 						sb.percentGenus(20f);
 						sb.volumeGroup(-1);
 						sb.decayGroup(-1);
@@ -1232,6 +1257,7 @@ class VdypStartApplicationTest {
 					});
 					lb.addSpecies(sb -> {
 						sb.genus("D");
+						sb.genusIndex(5);
 						sb.percentGenus(20f);
 						sb.volumeGroup(-1);
 						sb.decayGroup(-1);
@@ -1244,6 +1270,7 @@ class VdypStartApplicationTest {
 					});
 					lb.addSpecies(sb -> {
 						sb.genus("H");
+						sb.genusIndex(8);
 						sb.percentGenus(20f);
 						sb.volumeGroup(-1);
 						sb.decayGroup(-1);
@@ -1262,6 +1289,7 @@ class VdypStartApplicationTest {
 					});
 					lb.addSpecies(sb -> {
 						sb.genus("S");
+						sb.genusIndex(15);
 						sb.percentGenus(20f);
 						sb.volumeGroup(-1);
 						sb.decayGroup(-1);
@@ -1342,6 +1370,7 @@ class VdypStartApplicationTest {
 					sb.polygonIdentifier("Test", 2024);
 					sb.layerType(LayerType.PRIMARY);
 					sb.genus("B");
+					sb.genusIndex(3);
 					sb.percentGenus(100);
 					app.applyGroups(bec, "B", sb);
 				});
@@ -1360,12 +1389,13 @@ class VdypStartApplicationTest {
 				var poly = VdypPolygon.build(pb -> {
 					pb.polygonIdentifier("Test", 2024);
 					pb.percentAvailable(90f);
-					pb.biogeoclimaticZone("IDF");
+					pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 					pb.forestInventoryZone("");
 					pb.addLayer(lb -> {
 						lb.layerType(LayerType.PRIMARY);
 						lb.addSpecies(sb -> {
 							sb.genus("B");
+							sb.genusIndex(3);
 							sb.percentGenus(100);
 
 							sb.volumeGroup(0);
@@ -1424,7 +1454,7 @@ class VdypStartApplicationTest {
 					sb.polygonIdentifier("TestPolygon", 2024);
 					sb.layerType(LayerType.PRIMARY);
 					sb.genus("MB");
-
+					sb.genusIndex(10);
 					sb.percentGenus(90);
 				});
 				var result = app.getCoeForSpecies(species, ControlKey.SMALL_COMP_BA);
@@ -1500,6 +1530,7 @@ class VdypStartApplicationTest {
 
 			var spec1 = VdypSpecies.build(layer, builder -> {
 				builder.genus("L");
+				builder.genusIndex(9);
 				builder.percentGenus(11.0567074f);
 				builder.volumeGroup(46);
 				builder.decayGroup(38);
@@ -1520,6 +1551,7 @@ class VdypStartApplicationTest {
 
 			var spec2 = VdypSpecies.build(layer, builder -> {
 				builder.genus("PL");
+				builder.genusIndex(12);
 				builder.percentGenus(88.9432907f);
 				builder.volumeGroup(54);
 				builder.decayGroup(42);
@@ -1667,7 +1699,7 @@ class VdypStartApplicationTest {
 		return TestPolygon.build(builder -> {
 			builder.polygonIdentifier(polygonId);
 			builder.forestInventoryZone("0");
-			builder.biogeoclimaticZone("BG");
+			builder.biogeoclimaticZone(Utils.getBec("BG", controlMap));
 			builder.mode(PolygonMode.START);
 			mutator.accept(builder);
 		});
@@ -1681,6 +1713,7 @@ class VdypStartApplicationTest {
 			builder.layerType(LayerType.PRIMARY);
 			builder.addSpecies(specBuilder -> {
 				specBuilder.genus("B");
+				specBuilder.genusIndex(3);
 				specBuilder.addSite(siteBuilder -> {
 					siteBuilder.ageTotal(8f);
 					siteBuilder.yearsToBreastHeight(7f);
@@ -1706,6 +1739,7 @@ class VdypStartApplicationTest {
 
 			builder.addSpecies(specBuilder -> {
 				specBuilder.genus("B");
+				specBuilder.genusIndex(3);
 				specBuilder.addSite(siteBuilder -> {
 					siteBuilder.ageTotal(8f);
 					siteBuilder.yearsToBreastHeight(7f);
@@ -1723,18 +1757,19 @@ class VdypStartApplicationTest {
 	};
 
 	TestSpecies getTestSpecies(PolygonIdentifier polygonId, LayerType layer, Consumer<TestSpecies> mutator) {
-		return getTestSpecies(polygonId, layer, "B", mutator);
+		return getTestSpecies(polygonId, layer, "B", 3, mutator);
 	};
 
 	TestSpecies getTestSpecies(
-			PolygonIdentifier polygonId, LayerType layer, String genusId, Consumer<TestSpecies> mutator
+			PolygonIdentifier polygonId, LayerType layer, String genusId, int genusIndex, Consumer<TestSpecies> mutator
 	) {
 		var result = TestSpecies.build(builder -> {
 			builder.polygonIdentifier(polygonId);
 			builder.layerType(layer);
 			builder.genus(genusId);
+			builder.genusIndex(genusIndex);
 			builder.percentGenus(100.0f);
-			builder.addSpecies(genusId, 100f);
+			builder.addSp64Distribution(genusId, 100f);
 		});
 		mutator.accept(result);
 		return result;

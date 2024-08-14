@@ -117,6 +117,7 @@ class RootFinderTest {
 
 		var spec3 = VdypSpecies.build(layer, builder -> {
 			builder.genus(GenusDefinitionParser.getSpeciesByIndex(3, control).getAlias()); // B
+			builder.genusIndex(3);
 			builder.percentGenus(20f);
 			builder.volumeGroup(-1);
 			builder.decayGroup(-1);
@@ -126,6 +127,7 @@ class RootFinderTest {
 
 		var spec4 = VdypSpecies.build(layer, builder -> {
 			builder.genus(GenusDefinitionParser.getSpeciesByIndex(4, control).getAlias()); // C
+			builder.genusIndex(4);
 			builder.percentGenus(20f);
 			builder.volumeGroup(-1);
 			builder.decayGroup(-1);
@@ -135,6 +137,7 @@ class RootFinderTest {
 
 		var spec5 = VdypSpecies.build(layer, builder -> {
 			builder.genus(GenusDefinitionParser.getSpeciesByIndex(5, control).getAlias()); // D
+			builder.genusIndex(5);
 			builder.percentGenus(20f);
 			builder.volumeGroup(-1);
 			builder.decayGroup(-1);
@@ -144,6 +147,7 @@ class RootFinderTest {
 
 		var spec8 = VdypSpecies.build(layer, builder -> {
 			builder.genus(GenusDefinitionParser.getSpeciesByIndex(8, control).getAlias()); // 8
+			builder.genusIndex(8);
 			builder.percentGenus(20f);
 			builder.volumeGroup(-1);
 			builder.decayGroup(-1);
@@ -153,6 +157,7 @@ class RootFinderTest {
 
 		var spec15 = VdypSpecies.build(layer, builder -> {
 			builder.genus(GenusDefinitionParser.getSpeciesByIndex(15, control).getAlias()); // S
+			builder.genusIndex(15);
 			builder.percentGenus(20f);
 			builder.volumeGroup(-1);
 			builder.decayGroup(-1);

@@ -1,6 +1,8 @@
 package ca.bc.gov.nrs.vdyp.model;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
@@ -11,23 +13,35 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import org.easymock.EasyMock;
 import org.junit.jupiter.api.Test;
+
+import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 class VdypPolygonTest {
 
 	@Test
 	void build() throws Exception {
+		Map<String, Object> controlMap = new HashMap<>();
+		TestUtils.populateControlMapBecReal(controlMap);
+
 		var result = VdypPolygon.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.percentAvailable(90f);
 
 			builder.forestInventoryZone("?");
-			builder.biogeoclimaticZone("?");
+			builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
+			builder.targetYear(Optional.of(2024));
 		});
 		assertThat(result, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
 		assertThat(result, hasProperty("percentAvailable", is(90f)));
 		assertThat(result, hasProperty("layers", anEmptyMap()));
+		assertThat(result.getTargetYear(), present(is(2024)));
 	}
 
 	@Test
@@ -42,6 +56,9 @@ class VdypPolygonTest {
 
 	@Test
 	void buildAddLayer() throws Exception {
+		Map<String, Object> controlMap = new HashMap<>();
+		TestUtils.populateControlMapBecReal(controlMap);
+
 		VdypLayer mock = EasyMock.mock(VdypLayer.class);
 		EasyMock.expect(mock.getLayerType()).andStubReturn(LayerType.PRIMARY);
 		EasyMock.replay(mock);
@@ -50,23 +67,27 @@ class VdypPolygonTest {
 			builder.percentAvailable(90f);
 
 			builder.forestInventoryZone("?");
-			builder.biogeoclimaticZone("?");
+			builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 
 			builder.addLayer(mock);
 		});
 		assertThat(result, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
 		assertThat(result, hasProperty("percentAvailable", is(90f)));
 		assertThat(result, hasProperty("layers", hasEntry(LayerType.PRIMARY, mock)));
+		assertThat(result, hasProperty("targetYear", notPresent()));
 	}
 
 	@Test
 	void buildAddLayerSubBuild() throws Exception {
+		Map<String, Object> controlMap = new HashMap<>();
+		TestUtils.populateControlMapBecReal(controlMap);
+
 		var result = VdypPolygon.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.percentAvailable(90f);
 
 			builder.forestInventoryZone("?");
-			builder.biogeoclimaticZone("?");
+			builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 
 			builder.addLayer(layerBuilder -> {
 				layerBuilder.layerType(LayerType.PRIMARY);
@@ -83,12 +104,15 @@ class VdypPolygonTest {
 
 	@Test
 	void copyWithoutLayers() throws Exception {
+
+		var controlMap = TestUtils.loadControlMap();
+
 		var toCopy = VdypPolygon.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.percentAvailable(90f);
 
 			builder.forestInventoryZone("Z");
-			builder.biogeoclimaticZone("IDF");
+			builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 
 			builder.addLayer(layerBuilder -> {
 				layerBuilder.layerType(LayerType.PRIMARY);
@@ -101,18 +125,21 @@ class VdypPolygonTest {
 		assertThat(result, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
 		assertThat(result, hasProperty("percentAvailable", is(90f)));
 		assertThat(result, hasProperty("forestInventoryZone", is("Z")));
-		assertThat(result, hasProperty("biogeoclimaticZone", is("IDF")));
+		assertThat(result, hasProperty("biogeoclimaticZone", hasProperty("alias", is("IDF"))));
 		assertThat(result, hasProperty("layers", anEmptyMap()));
 	}
 
 	@Test
 	void copyWithLayers() throws Exception {
+
+		var controlMap = TestUtils.loadControlMap();
+
 		var toCopy = VdypPolygon.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.percentAvailable(90f);
 
 			builder.forestInventoryZone("Z");
-			builder.biogeoclimaticZone("IDF");
+			builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 
 			builder.addLayer(layerBuilder -> {
 				layerBuilder.layerType(LayerType.PRIMARY);
@@ -128,7 +155,7 @@ class VdypPolygonTest {
 		assertThat(result, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
 		assertThat(result, hasProperty("percentAvailable", is(90f)));
 		assertThat(result, hasProperty("forestInventoryZone", is("Z")));
-		assertThat(result, hasProperty("biogeoclimaticZone", is("IDF")));
+		assertThat(result, hasProperty("biogeoclimaticZone", hasProperty("alias", is("IDF"))));
 		assertThat(result, hasProperty("layers", hasEntry(is(LayerType.PRIMARY), anything())));
 		var resultLayer = result.getLayers().get(LayerType.PRIMARY);
 

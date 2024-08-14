@@ -605,10 +605,6 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		return Utils.optSafe(poly.getLayers().get(LayerType.VETERAN));
 	}
 
-	protected BecDefinition getBec(P poly) throws ProcessingException {
-		return Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
-	}
-
 	protected static <E extends Throwable> void throwIfPresent(Optional<E> opt) throws E {
 		if (opt.isPresent()) {
 			throw opt.get();
@@ -724,7 +720,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 		float yieldFactor = getYieldFactor(polygon);
 
-		var bec = Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap);
+		var bec = polygon.getBiogeoclimaticZone();
 
 		breastHeightAge = max(5.0f, breastHeightAge);
 		// EMP040
@@ -865,7 +861,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			throws ProcessingException {
 		// Lookup volume group, Decay Group, and Breakage group for each species.
 
-		BecDefinition bec = Utils.getBec(fipPolygon.getBiogeoclimaticZone(), controlMap);
+		BecDefinition bec = fipPolygon.getBiogeoclimaticZone();
 		var volumeGroupMap = getGroupMap(ControlKey.VOLUME_EQN_GROUPS);
 		var decayGroupMap = getGroupMap(ControlKey.DECAY_GROUPS);
 		var breakageGroupMap = getGroupMap(ControlKey.BREAKAGE_GROUPS);
@@ -932,7 +928,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		float treesPerHectareSum = 0f;
 		float volumeSum = 0f;
 
-		Region region = Utils.getBec(fPoly.getBiogeoclimaticZone(), controlMap).getRegion();
+		Region region = fPoly.getBiogeoclimaticZone().getRegion();
 
 		for (VdypSpecies spec : layer.getSpecies().values()) {
 			@SuppressWarnings("unused")

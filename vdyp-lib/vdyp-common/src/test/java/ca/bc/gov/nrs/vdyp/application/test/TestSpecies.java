@@ -6,14 +6,15 @@ import java.util.function.Consumer;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
+import ca.bc.gov.nrs.vdyp.model.Sp64DistributionSet;
 
 public class TestSpecies extends BaseVdypSpecies<TestSite> {
 
 	protected TestSpecies(
-			PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, float percentGenus,
+			PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, int genusIndex, float percentGenus,
 			Optional<TestSite> site
 	) {
-		super(polygonIdentifier, layerType, genus, percentGenus, site);
+		super(polygonIdentifier, layerType, genus, genusIndex, percentGenus, new Sp64DistributionSet(), site);
 	}
 
 	public static TestSpecies build(Consumer<TestSpecies.Builder> config) {
@@ -26,7 +27,9 @@ public class TestSpecies extends BaseVdypSpecies<TestSite> {
 
 		@Override
 		protected TestSpecies doBuild() {
-			return new TestSpecies(polygonIdentifier.get(), layerType.get(), genus.get(), percentGenus.get(), site);
+			return new TestSpecies(
+					polygonIdentifier.get(), layerType.get(), genus.get(), genusIndex.get(), percentGenus.get(), site
+			);
 		}
 
 		@Override

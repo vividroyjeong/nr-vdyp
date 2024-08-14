@@ -55,7 +55,6 @@ import ca.bc.gov.nrs.vdyp.fip.model.FipLayerPrimary;
 import ca.bc.gov.nrs.vdyp.fip.model.FipPolygon;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSite;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
-import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
@@ -213,10 +212,10 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				throw new LowValueException("Predicted base area", predictedBaseArea, minimumPredictedBaseArea);
 			}
 		}
-		BecDefinition bec = BecDefinitionParser.getBecs(controlMap).get(polygon.getBiogeoclimaticZone())
-				.orElseThrow(() -> new ProcessingException("Missing Bec " + polygon.getBiogeoclimaticZone()));
 		// FIPSTK
-		adjustForStocking(resultPoly.getLayers().get(LayerType.PRIMARY), fipPrimeLayer, bec);
+		adjustForStocking(
+				resultPoly.getLayers().get(LayerType.PRIMARY), fipPrimeLayer, polygon.getBiogeoclimaticZone()
+		);
 		return Optional.of(resultPoly);
 	}
 
@@ -271,7 +270,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		// locally
 		var itg = findItg(primarySpecies);
 
-		BecDefinition bec = Utils.getBec(fipPolygon.getBiogeoclimaticZone(), controlMap);
+		BecDefinition bec = fipPolygon.getBiogeoclimaticZone();
 
 		// GRPBA1FD
 		int empiricalRelationshipParameterIndex = findEmpiricalRelationshipParameterIndex(
@@ -610,8 +609,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 		var crownClosure = fipLayer.getCrownClosure();
 
-		var becId = fipPolygon.getBiogeoclimaticZone();
-		var bec = Utils.getBec(becId, controlMap);
+		var bec = fipPolygon.getBiogeoclimaticZone();
 		var region = bec.getRegion();
 
 		// Call EMP098 to get Veteran Basal Area, store in LVCOM1/BA array at positions

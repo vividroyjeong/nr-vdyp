@@ -8,7 +8,6 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -20,8 +19,6 @@ import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.controlmap.ResolvedControlMapImpl;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
-import ca.bc.gov.nrs.vdyp.model.ComponentSizeLimits;
-import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
@@ -52,9 +49,8 @@ class EstimatorsTest {
 		void testWhenBasalAreaAllIsZero() throws ProcessingException {
 			var becDefinition = becLookup.get("IDF").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(0);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(1);
 
 			UtilizationVector quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
 			UtilizationVector basalAreaByUtilization = Utils.utilizationVector(0.0f);
@@ -72,9 +68,8 @@ class EstimatorsTest {
 		void testWhenBasalAreaAllIsTenAndQuadMeanDiametersAreAllZero() throws ProcessingException {
 			var becDefinition = becLookup.get("IDF").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(0);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(1);
 
 			UtilizationVector quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
 			UtilizationVector basalAreaByUtilization = Utils.utilizationVector(10.0f);
@@ -96,9 +91,8 @@ class EstimatorsTest {
 
 			var becDefinition = becLookup.get("CDF").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(2);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(3);
 
 			UtilizationVector quadMeanDiameterByUtilization = Utils.utilizationVector(31.5006275f);
 			UtilizationVector basalAreaByUtilization = Utils.utilizationVector(0.406989872f);
@@ -148,9 +142,8 @@ class EstimatorsTest {
 
 			var becDefinition = becLookup.get("IDF").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(0);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(1);
 
 			var volumeEquationGroupMatrix = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
 					controlMap, ControlKey.VOLUME_EQN_GROUPS, MatrixMap2.class
@@ -176,9 +169,8 @@ class EstimatorsTest {
 
 			var becDefinition = becLookup.get("CDF").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(2);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(3);
 
 			var volumeEquationGroupMatrix = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
 					controlMap, ControlKey.VOLUME_EQN_GROUPS, MatrixMap2.class
@@ -232,9 +224,8 @@ class EstimatorsTest {
 
 			var becDefinition = becLookup.get("CDF").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(2);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(3);
 
 			Coefficients aAdjust = Utils.utilizationVector(0.0f);
 			UtilizationVector quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
@@ -259,9 +250,8 @@ class EstimatorsTest {
 
 			var becDefinition = becLookup.get("CWH").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(2);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(3);
 
 			Coefficients aAdjust = Utils.utilizationVector(0.0f);
 			UtilizationVector quadMeanDiameterByUtilization = Utils
@@ -292,9 +282,8 @@ class EstimatorsTest {
 
 			var becDefinition = becLookup.get("CDF").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(2);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(3);
 
 			Coefficients aAdjust = Utils.utilizationVector(0.0f);
 			UtilizationVector quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
@@ -316,9 +305,8 @@ class EstimatorsTest {
 
 			var becDefinition = becLookup.get("CWH").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(2);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(3);
 
 			Coefficients aAdjust = Utils.utilizationVector(0.0f);
 			UtilizationVector quadMeanDiameterByUtilization = Utils
@@ -348,9 +336,8 @@ class EstimatorsTest {
 
 			var becDefinition = becLookup.get("CDF").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(2);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(3);
 
 			UtilizationVector quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
 			UtilizationVector closeUtilization = Utils.utilizationVector(0.0f);
@@ -375,9 +362,8 @@ class EstimatorsTest {
 
 			var becDefinition = becLookup.get("CWH").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(2);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(3);
 
 			UtilizationVector quadMeanDiameterByUtilization = Utils
 					.utilizationVector(0.0f, 31.5006275f, 9.17065048f, 13.6603403f, 18.1786556f, 42.0707741f);
@@ -452,6 +438,7 @@ class EstimatorsTest {
 			// sp B, C, D, H, S
 			var spec1 = VdypSpecies.build(layer, builder -> {
 				builder.genus("B");
+				builder.genusIndex(3);
 				builder.volumeGroup(12);
 				builder.decayGroup(7);
 				builder.breakageGroup(5);
@@ -462,7 +449,8 @@ class EstimatorsTest {
 
 			var spec2 = VdypSpecies.build(layer, builder -> {
 				builder.genus("C");
-				builder.volumeGroup(20);
+				builder.genusIndex(4);
+				builder.volumeGroup(4);
 				builder.decayGroup(14);
 				builder.breakageGroup(6);
 				builder.percentGenus(7f);
@@ -472,6 +460,7 @@ class EstimatorsTest {
 
 			var spec3 = VdypSpecies.build(layer, builder -> {
 				builder.genus("D");
+				builder.genusIndex(5);
 				builder.volumeGroup(25);
 				builder.decayGroup(19);
 				builder.breakageGroup(12);
@@ -482,6 +471,7 @@ class EstimatorsTest {
 
 			var spec4 = VdypSpecies.build(layer, builder -> {
 				builder.genus("H");
+				builder.genusIndex(8);
 				builder.volumeGroup(37);
 				builder.decayGroup(31);
 				builder.breakageGroup(17);
@@ -497,6 +487,7 @@ class EstimatorsTest {
 
 			var spec5 = VdypSpecies.build(layer, builder -> {
 				builder.genus("S");
+				builder.genusIndex(15);
 				builder.volumeGroup(66);
 				builder.decayGroup(54);
 				builder.breakageGroup(28);
@@ -629,9 +620,8 @@ class EstimatorsTest {
 
 			var becDefinition = becLookup.get("CWH").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(2);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(3);
 
 			UtilizationVector quadMeanDiameterByUtilization = Utils
 					.utilizationVector(0.0f, 31.5006275f, 9.17065048f, 13.6603403f, 18.1786556f, 42.0707741f);
@@ -683,9 +673,8 @@ class EstimatorsTest {
 
 		var becDefinition = becLookup.get("CWH").get();
 
-		@SuppressWarnings("unchecked")
-		var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-		var genus = genera.get(2);
+		var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+		var genus = genera.getByIndex(3);
 
 		var volumeEquationGroupMatrix = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
 				controlMap, ControlKey.VOLUME_EQN_GROUPS, MatrixMap2.class
@@ -710,6 +699,7 @@ class EstimatorsTest {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
 				builder.genus("B");
+				builder.genusIndex(3);
 				builder.percentGenus(50f);
 				builder.volumeGroup(-1);
 				builder.decayGroup(-1);
@@ -719,6 +709,7 @@ class EstimatorsTest {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
 				builder.genus("H");
+				builder.genusIndex(8);
 				builder.percentGenus(50f);
 				builder.volumeGroup(-1);
 				builder.decayGroup(-1);
@@ -742,6 +733,7 @@ class EstimatorsTest {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
 				builder.genus("B");
+				builder.genusIndex(3);
 				builder.percentGenus(50f);
 				builder.volumeGroup(-1);
 				builder.decayGroup(-1);
@@ -751,6 +743,7 @@ class EstimatorsTest {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
 				builder.genus("D");
+				builder.genusIndex(5);
 				builder.percentGenus(50f);
 				builder.volumeGroup(-1);
 				builder.decayGroup(-1);

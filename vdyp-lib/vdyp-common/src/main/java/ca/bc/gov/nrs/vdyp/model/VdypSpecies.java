@@ -24,14 +24,14 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 	int breakageGroup;
 
 	public VdypSpecies(
-			PolygonIdentifier polygonIdentifier, LayerType layer, String genus, float percentGenus,
-			Optional<VdypSite> site, int volumeGroup, int decayGroup, int breakageGroup
+			PolygonIdentifier polygonIdentifier, LayerType layer, String genus, int genusIndex, float percentGenus,
+			Sp64DistributionSet sp64DistributionSet, Optional<VdypSite> site, int volumeGroup, int decayGroup,
+			int breakageGroup
 	) {
-		super(polygonIdentifier, layer, genus, percentGenus, site);
+		super(polygonIdentifier, layer, genus, genusIndex, percentGenus, sp64DistributionSet, site);
 		this.volumeGroup = volumeGroup;
 		this.decayGroup = decayGroup;
 		this.breakageGroup = breakageGroup;
-
 	}
 
 	/**
@@ -295,8 +295,11 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 					polygonIdentifier.get(), //
 					layerType.get(), //
 					genus.get(), //
+					genusIndex.get(), //
 					percentGenus.get(), //
-					site, volumeGroup.get(), //
+					new Sp64DistributionSet(sp64DistributionList), //
+					site, //
+					volumeGroup.get(), //
 					decayGroup.get(), //
 					breakageGroup.get() //
 			);
