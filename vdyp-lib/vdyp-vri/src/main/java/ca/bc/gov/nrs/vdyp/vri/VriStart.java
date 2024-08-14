@@ -457,10 +457,10 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			applyGroups(bec, vriSpec.getGenus(), sBuilder);
 
 			float fraction = primaryLayer.getSpecies().size() == 1 ? 1 : vriSpec.getFractionGenus();
-			
+
 			float specBaseArea = primaryBaseArea * fraction;
 			sBuilder.baseArea(specBaseArea);
-			
+
 			if (vriSite == primarySiteIn) {
 				sBuilder.loreyHeight(primaryHeight);
 
@@ -641,7 +641,20 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 	private void processVeteranLayer(VriPolygon polygon, VdypLayer.Builder lBuilder) throws StandProcessingException {
 		var veteranLayer = polygon.getLayers().get(LayerType.VETERAN);
-
+		lBuilder.layerType(LayerType.VETERAN);
+		
+		lBuilder.adapt(veteranLayer);
+		
+		var lowDq=false;
+		
+		var primarySite = veteranLayer.getPrimarySite();
+		var primarySpecies = veteranLayer.getPrimarySpeciesRecord();
+		
+		float ageTotal = primarySite.flatMap(VriSite::getAgeTotal).map(at->at+veteranLayer.getAgeIncrease()).orElse(0f);
+		float yearsToBreastHeight = primarySite.flatMap(VriSite::getYearsToBreastHeight).orElse(0f);
+		float breastHeightAge = ageTotal - yearsToBreastHeight;
+		
+		
 		// TODO
 	}
 
