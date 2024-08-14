@@ -48,16 +48,16 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 	public Sp64DistributionSet(int maxIndex, List<Sp64Distribution> sdList) {
 
 		// sort the list by increasing index
-		sp64DistributionList = sdList.stream().sorted((o1, o2) -> o1.getIndex() - o2.getIndex()).toList();
-
-		this.maxIndex = maxIndex;
+		var sp64DistributionListSortedByIndex = sdList.stream().sorted((o1, o2) -> o1.getIndex() - o2.getIndex()).toList();
 
 		try {
-			validate(maxIndex, sp64DistributionList);
+			validate(maxIndex, sp64DistributionListSortedByIndex);
 		} catch (InvalidGenusDistributionSet e) {
 			throw new IllegalArgumentException(e);
 		}
 
+		this.sp64DistributionList = sp64DistributionListSortedByIndex;
+		this.maxIndex = maxIndex;
 		for (Sp64Distribution sd : sdList) {
 			sp64DistributionMap.put(sd.getIndex(), sd);
 		}
@@ -65,15 +65,11 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 
 	private Sp64DistributionSet(Sp64DistributionSet other) {
 
+		this.sp64DistributionList = new ArrayList<>(other.sp64DistributionList);
 		this.maxIndex = other.maxIndex;
 
-		this.sp64DistributionMap = new HashMap<>();
-		for (var e : other.sp64DistributionMap.entrySet()) {
-			this.sp64DistributionMap.put(
-					e.getKey(), new Sp64Distribution(
-							e.getValue().getIndex(), e.getValue().getGenusAlias(), e.getValue().getPercentage()
-					)
-			);
+		for (Sp64Distribution sd : this.sp64DistributionList) {
+			sp64DistributionMap.put(sd.getIndex(), sd);
 		}
 	}
 
