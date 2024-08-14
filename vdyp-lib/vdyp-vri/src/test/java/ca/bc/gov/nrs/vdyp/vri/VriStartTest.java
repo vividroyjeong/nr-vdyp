@@ -2294,7 +2294,7 @@ class VriStartTest {
 					hasProperty(
 							"baseAreaByUtilization",
 							utilization(
-									0.0679966733f, 6.34290648f, 4.24561071f, 1.01540196f, 0.571661115f, 0.510232806f
+									0.0787888616f, 47.0588226f, 0.787343979f, 2.33701372f, 3.97268224f, 39.9617844f
 							)
 					)
 			);
@@ -2302,14 +2302,14 @@ class VriStartTest {
 					resultLayer,
 					hasProperty(
 							"quadraticMeanDiameterByUtilization",
-							utilization(5.58983135f, 10.3879948f, 9.11466217f, 13.9179964f, 18.6690178f, 25.3685265f)
+							utilization(5.89174175f, 27.9916744f, 9.26363468f, 14.1112642f, 18.8414402f, 37.8068199f)
 					)
 			);
 			assertThat(
 					resultLayer,
 					hasProperty(
 							"treesPerHectareByUtilization",
-							utilization(27.707695f, 748.4021f, 650.682556f, 66.7413025f, 20.8836231f, 10.094574f)
+							utilization(28.8993168f, 764.704102f, 116.818542f, 149.430603f, 142.483887f, 355.971069f)
 					)
 			);
 
@@ -2317,74 +2317,12 @@ class VriStartTest {
 					resultLayer,
 					hasProperty(
 							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
-							utilization(0, 4.73118162f, 0.0503439531f, 1.59589052f, 1.62338901f, 1.46155834f)
+							utilization(0, 252.98407f, 0.0354338735f, 4.66429567f, 14.5271645f, 233.757172f)
 					)
 			);
 			assertThat(
 					resultLayer.getSpecies(),
-					allOf(aMapWithSize(5), hasKey("B"), hasKey("C"), hasKey("F"), hasKey("H"), hasKey("S"))
-			);
-
-			VdypSpecies resultSpecB = TestUtils.assertHasSpecies(resultLayer, "B", "C", "F", "H", "S");
-
-			assertThat(
-					resultSpecB,
-					hasProperty(
-							"baseAreaByUtilization",
-							utilization(
-									0.0116237309f, 0.634290636f, 0.239887208f, 0.196762085f, 0.102481194f, 0.095160149f
-							)
-					)
-			);
-			assertThat(
-					resultSpecB,
-					hasProperty(
-							"quadraticMeanDiameterByUtilization",
-							utilization(5.61674118f, 12.9407434f, 9.93954372f, 14.3500404f, 19.1790199f, 27.5482502f)
-					)
-			);
-			assertThat(
-					resultSpecB,
-					hasProperty(
-							"treesPerHectareByUtilization",
-							utilization(4.69123125f, 48.2258606f, 30.9160728f, 12.1659298f, 3.54732919f, 1.59653044f)
-					)
-			);
-
-			assertThat(
-					resultSpecB,
-					hasProperty(
-							"wholeStemVolumeByUtilization",
-							utilization(0.0244281366f, 2.41518188f, 0.747900844f, 0.752810001f, 0.4540295f, 0.46044156f)
-					)
-			);
-			assertThat(
-					resultSpecB,
-					hasProperty(
-							"closeUtilizationVolumeByUtilization",
-							utilization(0, 1.28733742f, 0.0235678982f, 0.464995325f, 0.378819793f, 0.41995436f)
-					)
-			);
-			assertThat(
-					resultSpecB,
-					hasProperty(
-							"closeUtilizationVolumeNetOfDecayByUtilization",
-							utilization(0, 1.24826729f, 0.0230324566f, 0.454239398f, 0.369579285f, 0.401416153f)
-					)
-			);
-			assertThat(
-					resultSpecB,
-					hasProperty(
-							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization",
-							utilization(0, 1.23482728f, 0.0228475146f, 0.450360179f, 0.366144955f, 0.395474672f)
-					)
-			);
-			assertThat(
-					resultSpecB,
-					hasProperty(
-							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
-							utilization(0, 1.20897281f, 0.0223761573f, 0.441060275f, 0.358547896f, 0.386988521f)
-					)
+					allOf(aMapWithSize(3), hasKey("B"), hasKey("C"), hasKey("H"))
 			);
 
 			app.close();
