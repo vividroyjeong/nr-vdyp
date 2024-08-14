@@ -133,22 +133,22 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 
 						Utils.ifBothPresent(
 								genusNameText0.filter(t -> genusDefinitionMap.contains(t)), percentGenus0,
-								(s, p) -> gdList.add(new Sp64Distribution(0, s, p))
-						);
-
-						Utils.ifBothPresent(
-								genusNameText1.filter(t -> genusDefinitionMap.contains(t)), percentGenus1,
 								(s, p) -> gdList.add(new Sp64Distribution(1, s, p))
 						);
 
 						Utils.ifBothPresent(
-								genusNameText2.filter(t -> genusDefinitionMap.contains(t)), percentGenus2,
+								genusNameText1.filter(t -> genusDefinitionMap.contains(t)), percentGenus1,
 								(s, p) -> gdList.add(new Sp64Distribution(2, s, p))
 						);
 
 						Utils.ifBothPresent(
-								genusNameText3.filter(t -> genusDefinitionMap.contains(t)), percentGenus3,
+								genusNameText2.filter(t -> genusDefinitionMap.contains(t)), percentGenus2,
 								(s, p) -> gdList.add(new Sp64Distribution(3, s, p))
+						);
+
+						Utils.ifBothPresent(
+								genusNameText3.filter(t -> genusDefinitionMap.contains(t)), percentGenus3,
+								(s, p) -> gdList.add(new Sp64Distribution(4, s, p))
 						);
 
 						Sp64DistributionSet speciesDistributionSet = new Sp64DistributionSet(4, gdList);
