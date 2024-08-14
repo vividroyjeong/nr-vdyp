@@ -456,6 +456,11 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 			applyGroups(bec, vriSpec.getGenus(), sBuilder);
 
+			float fraction = primaryLayer.getSpecies().size() == 1 ? 1 : vriSpec.getFractionGenus();
+			
+			float specBaseArea = primaryBaseArea * fraction;
+			sBuilder.baseArea(specBaseArea);
+			
 			if (vriSite == primarySiteIn) {
 				sBuilder.loreyHeight(primaryHeight);
 
@@ -463,9 +468,9 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				sBuilder.adaptSite(vriSite, (iBuilder, vriSite2) -> iBuilder.height(vriSite2.getHeight().get()));
 			} else {
 
-				float loreyHeight = vriSite.getHeight().filter((x) -> getDebugMode(2) == 1).map(height -> {
+				float loreyHeight = vriSite.getHeight().filter((x) -> getDebugMode(2) != 1).map(height -> {
 					float speciesQuadMeanDiameter = Math.max(7.5f, height / leadHeight * layerQuadMeanDiameter);
-					float speciesDensity = treesPerHectare(primaryBaseArea, speciesQuadMeanDiameter);
+					float speciesDensity = treesPerHectare(specBaseArea, speciesQuadMeanDiameter);
 					// EMP050 Method 1
 					return estimationMethods.primaryHeightFromLeadHeight(
 							vriSite.getHeight().get(), vriSite.getSiteGenus(), bec.getRegion(), speciesDensity
@@ -494,13 +499,12 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		var species = lBuilder.getSpecies();
 
 		float sumBaseAreaLoreyHeight = 0;
-		// Assign BA by species
+		// find aggregate lorey height
 		if (species.size() == 1) {
-			species.get(0).getBaseAreaByUtilization().setAll(primaryBaseArea);
 			sumBaseAreaLoreyHeight = primaryBaseArea;
 		} else {
 			for (var spec : species) {
-				float specBaseArea = primaryBaseArea * spec.getFractionGenus();
+				float specBaseArea = spec.getBaseAreaByUtilization().getAll();
 				float specHeight = spec.getLoreyHeightByUtilization().getAll();
 				spec.getBaseAreaByUtilization().setAll(specBaseArea);
 				sumBaseAreaLoreyHeight += specBaseArea * specHeight;

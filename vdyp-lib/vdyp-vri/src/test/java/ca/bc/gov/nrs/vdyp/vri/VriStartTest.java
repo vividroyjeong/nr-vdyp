@@ -2188,6 +2188,7 @@ class VriStartTest {
 
 			app.close();
 		}
+		
 		@Test
 		void testProcessVeteran() throws Exception {
 
@@ -2201,19 +2202,22 @@ class VriStartTest {
 				pb.polygonIdentifier("TestPoly", 2024);
 				pb.biogeoclimaticZone("IDF");
 				pb.yieldFactor(1.0f);
-				pb.mode(PolygonMode.BATN);
 				pb.forestInventoryZone("");
 				pb.percentAvailable(85);
 				pb.addLayer(lb -> {
 					lb.layerType(LayerType.PRIMARY);
 					lb.crownClosure(40.2f);
 					lb.utilization(7.5f);
+					lb.baseArea(47.0588226f);
+					lb.treesPerHectare(764.705872f);
+					lb.utilization(7.5f);
+					
 
 					lb.inventoryTypeGroup(14);
 					lb.empiricalRelationshipParameterIndex(33);
 
 					lb.primaryGenus("C");
-					// 1
+					// 1  3
 					lb.addSpecies(sb -> {
 						sb.genus("B");
 						sb.percentGenus(10);
@@ -2224,7 +2228,7 @@ class VriStartTest {
 						});
 					});
 
-					// 2 (Primary)
+					// 2  4 (Primary)
 					lb.addSpecies(sb -> {
 						sb.genus("C");
 						sb.percentGenus(50);
@@ -2241,7 +2245,7 @@ class VriStartTest {
 						});
 					});
 
-					// 3
+					// 3  8
 					lb.addSpecies(sb -> {
 						sb.genus("H");
 						sb.percentGenus(40);
@@ -2267,7 +2271,7 @@ class VriStartTest {
 			assertThat(result, hasProperty("polygonIdentifier", isPolyId("TestPoly", 2024)));
 			assertThat(result, hasProperty("biogeoclimaticZone", is("IDF")));
 			assertThat(result, hasProperty("forestInventoryZone", blankString()));
-			assertThat(result, hasProperty("mode", present(is(PolygonMode.BATN))));
+			assertThat(result, hasProperty("mode", present(is(PolygonMode.START))));
 			assertThat(result, hasProperty("percentAvailable", is(85f)));
 
 			var resultLayer = assertHasPrimaryLayer(result);
@@ -2283,7 +2287,7 @@ class VriStartTest {
 			assertThat(resultLayer, hasProperty("empiricalRelationshipParameterIndex", present(is(33))));
 
 			assertThat(
-					resultLayer, hasProperty("loreyHeightByUtilization", utilizationHeight(4.14067888f, 6.61390257f))
+					resultLayer, hasProperty("loreyHeightByUtilization", utilizationHeight(5.45770216f, 21.0985336f))
 			);
 			assertThat(
 					resultLayer,
