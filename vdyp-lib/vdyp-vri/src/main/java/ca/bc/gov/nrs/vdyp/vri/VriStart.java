@@ -4,6 +4,7 @@ import static ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter.
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.EstimationMethods.Limits;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
+import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndex2Height;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType;
@@ -44,6 +46,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.Region;
+import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder;
@@ -73,6 +76,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	static final Logger log = LoggerFactory.getLogger(VriStart.class);
 
 	static final float EMPOC = 0.85f;
+
+	static final float VETERAN_MIN_DQ = UtilizationClass.OVER225.lowBound;
 
 	public static void main(final String... args) throws IOException {
 
@@ -642,19 +647,48 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	private void processVeteranLayer(VriPolygon polygon, VdypLayer.Builder lBuilder) throws StandProcessingException {
 		var veteranLayer = polygon.getLayers().get(LayerType.VETERAN);
 		lBuilder.layerType(LayerType.VETERAN);
-		
+
 		lBuilder.adapt(veteranLayer);
 		
-		var lowDq=false;
-		
+		try {
+			var bec = Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap);
+		} catch (ProcessingException e) {
+			throw new StandProcessingException(e);
+		}
+
+		var lowDq = false;
+
 		var primarySite = veteranLayer.getPrimarySite();
 		var primarySpecies = veteranLayer.getPrimarySpeciesRecord();
+
+		float ageTotal = primarySite.flatMap(VriSite::getAgeTotal).map(at -> at + veteranLayer.getAgeIncrease())
+				.orElse(0f); // AGETOTLV
+		float yearsToBreastHeight = primarySite.flatMap(VriSite::getYearsToBreastHeight).orElse(0f); // YTBHLV
+		float breastHeightAge = ageTotal - yearsToBreastHeight; // AGEBHLV
+		float dominantHeight = primarySite.flatMap(VriSite::getHeight).orElse(0f); // HDLV
+
+		var baseArea = veteranLayer.getBaseArea().orElseThrow(()->new StandProcessingException("Expected veteran layer to have a base area")); // BA_V1
+		var treesPerHectare = veteranLayer.getTreesPerHectare().orElseThrow(()->new StandProcessingException("Expected veteran layer to have a trees per hectare")); // BA_V1
+
+		if (BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea, treesPerHectare) < VETERAN_MIN_DQ) {
+			lowDq = true;
+			treesPerHectare = BaseAreaTreeDensityDiameter.treesPerHectare(breastHeightAge, VETERAN_MIN_DQ);
+		}
+		float inputTreesPerHectare = treesPerHectare; // TPHInput
 		
-		float ageTotal = primarySite.flatMap(VriSite::getAgeTotal).map(at->at+veteranLayer.getAgeIncrease()).orElse(0f);
-		float yearsToBreastHeight = primarySite.flatMap(VriSite::getYearsToBreastHeight).orElse(0f);
-		float breastHeightAge = ageTotal - yearsToBreastHeight;
+		if(baseArea<=0) {
+			throw new StandProcessingException(MessageFormat.format("Veteran layer base area ({0}) was not positive", baseArea));
+		}
+		if(treesPerHectare<=0) {
+			throw new StandProcessingException(MessageFormat.format("Veteran layer trees per hectare ({0}) was not positive", baseArea));
+		}
+		var quadMeanDiameter = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea, treesPerHectare); // DQ(0,0)
 		
-		
+		lBuilder.adaptSpecies(veteranLayer, (sBuilder,spec)->{
+			applyGroups(null, AVERSION, sBuilder);
+			sBuilder.volumeGroup(CONFIG_LOAD_ERROR);
+		});
+
 		// TODO
 	}
 
