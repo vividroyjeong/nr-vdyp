@@ -12,23 +12,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class Sp64DistributionSetTest {
 
-	private static String aAlias;
-	private static String bAlias;
-	private static Sp64Distribution a;
-	private static Sp64Distribution b;
-
-	@BeforeAll
-	static void beforeAll() {
-		aAlias = "A";
-		bAlias = "B";
-		a = new Sp64Distribution(1, aAlias, 75f);
-		b = new Sp64Distribution(1, bAlias, 25f);
-	}
+	private static final String aAlias = "A";
+	private static final String bAlias = "B";
+	private static final String cAlias = "C";
 
 	@Test
 	void testSp64DistributionConstruction() {
@@ -39,6 +29,10 @@ class Sp64DistributionSetTest {
 
 	@Test
 	void testSp64DistributionComparison1() {
+		
+		var a = new Sp64Distribution(1, aAlias, 75f);
+		var b = new Sp64Distribution(1, bAlias, 25f);
+
 		assertNotEquals(a, null);
 
 		assertNotEquals(a, b);
@@ -79,12 +73,19 @@ class Sp64DistributionSetTest {
 		var gd1a = new Sp64Distribution(2, aAlias, 30.0f);
 		var gd2 = new Sp64Distribution(2, bAlias, 30.0f);
 		var gd2a = new Sp64Distribution(2, bAlias, 25.0f);
-
+		var gd3 = new Sp64Distribution(1, cAlias, 20.0f);
+		
 		assertNotNull(new Sp64DistributionSet(2, List.of(gd1, gd2)));
 		var sp64Set1 = new Sp64DistributionSet(3, List.of(gd1, gd2a));
 		assertNotNull(sp64Set1);
 		assertTrue(sp64Set1.getSpeciesDistribution(1).get().equals(gd1));
 		assertTrue(sp64Set1.getSpeciesDistribution(2).get().equals(gd2a));
+		
+		// Test copy constructor
+		var sp64Set1Copy = sp64Set1.copy();
+		assertNotNull(sp64Set1Copy);
+		assertTrue(sp64Set1Copy.getSpeciesDistribution(1).get().equals(gd1));
+		assertTrue(sp64Set1Copy.getSpeciesDistribution(2).get().equals(gd2a));
 
 		// Same sp64 aliases
 		assertThrows(IllegalArgumentException.class, () -> new Sp64DistributionSet(2, List.of(gd1, gd1a)));
@@ -94,6 +95,9 @@ class Sp64DistributionSetTest {
 
 		// same indicies
 		assertThrows(IllegalArgumentException.class, () -> new Sp64DistributionSet(2, List.of(gd1a, gd2a)));
+
+		// percentages not decreasing
+		assertThrows(IllegalArgumentException.class, () -> new Sp64DistributionSet(2, List.of(gd3, gd2)));
 	}
 
 	@Test
@@ -113,5 +117,49 @@ class Sp64DistributionSetTest {
 
 		assertThat(set.getSp64DistributionList().size(), is(set.getSize()));
 		assertThat(set.getSp64DistributionMap().size(), is(set.getSize()));
+	}
+
+	@Test
+	void testSp64DistributionSetComparison() {
+		var sd1 = new Sp64Distribution(1, aAlias, 70.0f);
+		var sd2 = new Sp64Distribution(2, bAlias, 30.0f);
+		var sd3 = new Sp64Distribution(3, cAlias, 30.0f);
+		var sd4 = new Sp64Distribution(3, bAlias, 30.0f);
+		var sd5 = new Sp64Distribution(2, bAlias, 20.0f);
+
+		{
+			// maxIndex differences
+			var set1 = new Sp64DistributionSet(4, List.of(sd1, sd2));
+			var set2 = new Sp64DistributionSet(3, List.of(sd1, sd2));
+			assertThat(set1.compareTo(set2), is(1));
+			assertThat(set2.compareTo(set1), is(-1));
+			assertThat(set1.compareTo(set1), is(0));
+		}
+
+		{
+			// maxIndex same, length differences
+			var set1 = new Sp64DistributionSet(4, List.of(sd1, sd2));
+			var set2 = new Sp64DistributionSet(4, List.of(sd1));
+			assertThat(set1.compareTo(set2), is(1));
+		}
+
+		{
+			// maxIndex same, length same, element differences
+			
+			// lower index
+			var set1 = new Sp64DistributionSet(4, List.of(sd1, sd2));
+			var set2 = new Sp64DistributionSet(4, List.of(sd1, sd4));
+			assertThat(set1.compareTo(set2), is(-1));
+
+			// lower alias
+			var set3 = new Sp64DistributionSet(4, List.of(sd1, sd2));
+			var set4 = new Sp64DistributionSet(4, List.of(sd1, sd3));
+			assertThat(set3.compareTo(set4), is(-1));
+
+			// lower percentage
+			var set5 = new Sp64DistributionSet(4, List.of(sd1, sd2));
+			var set6 = new Sp64DistributionSet(4, List.of(sd1, sd5));
+			assertThat(set5.compareTo(set6), is(1));
+		}
 	}
 }

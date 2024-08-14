@@ -315,22 +315,13 @@ public class Utils {
 	 */
 	public static int getGenusIndex(String genusAlias, Map<String, Object> controlMap) throws IllegalArgumentException {
 
-		GenusDefinition gd = getGenusDefinition(genusAlias, controlMap);
-		if (gd == null) {
-			throw new IllegalArgumentException(String.format("Reference to unknown sp0 {0}", genusAlias));
-		}
-
-		return gd.getIndex();
+		return getGenusDefinition(genusAlias, controlMap).getIndex();
 	}
 
 	public static GenusDefinition getGenusDefinition(String genusAlias, Map<String, Object> controlMap) {
-		GenusDefinition gd = (GenusDefinition) expectParsedControl(
+		return (GenusDefinition) expectParsedControl(
 				controlMap, ControlKey.SP0_DEF, GenusDefinitionMap.class
 		).getByAlias(genusAlias);
-		if (gd == null) {
-			throw new IllegalArgumentException(String.format("Reference to unknown sp0 {0}", genusAlias));
-		}
-		return gd;
 	}
 
 	/**

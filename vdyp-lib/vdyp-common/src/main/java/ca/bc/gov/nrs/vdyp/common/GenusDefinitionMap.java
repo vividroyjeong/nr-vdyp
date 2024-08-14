@@ -15,25 +15,30 @@ public class GenusDefinitionMap {
 	private final Map<String, Integer> indexByAliasMap = new HashMap<>();
 	private final Map<Integer, GenusDefinition> genusByIndexMap = new HashMap<>();
 	private final int nGenera;
-	private final List<String> aliasesSortedByIndex = new ArrayList<>();
-	private final List<GenusDefinition> genusDefinitionsSortedByIndex = new ArrayList<>();
+	private final List<String> aliasesSortedByIndex;
+	private final List<GenusDefinition> genusDefinitionsSortedByIndex;
 
 	public GenusDefinitionMap(List<GenusDefinition> genusDefinitionList) {
 
 		if (genusDefinitionList != null) {
 			nGenera = genusDefinitionList.size();
 
+			List<String> aliases = new ArrayList<>();
+			List<GenusDefinition> genusDefinitions = new ArrayList<>();
+
 			for (GenusDefinition g : genusDefinitionList) {
 				genusByAliasMap.put(g.getAlias(), g);
 				indexByAliasMap.put(g.getAlias(), g.getIndex());
 				genusByIndexMap.put(g.getIndex(), g);
-				aliasesSortedByIndex.add(g.getAlias());
-				genusDefinitionsSortedByIndex.add(g);
+				aliases.add(g.getAlias());
+				genusDefinitions.add(g);
 			}
 
-			aliasesSortedByIndex.stream().sorted((o1, o2) -> indexByAliasMap.get(o1) - indexByAliasMap.get(o2));
-			genusDefinitionsSortedByIndex.stream().sorted((o1, o2) -> o1.getIndex() - o2.getIndex());
+			aliasesSortedByIndex = aliases.stream().sorted((o1, o2) -> indexByAliasMap.get(o1) - indexByAliasMap.get(o2)).toList();
+			genusDefinitionsSortedByIndex = genusDefinitions.stream().sorted((o1, o2) -> o1.getIndex() - o2.getIndex()).toList();
 		} else {
+			aliasesSortedByIndex = new ArrayList<>();
+			genusDefinitionsSortedByIndex = new ArrayList<>();
 			nGenera = 0;
 		}
 	}
@@ -70,7 +75,7 @@ public class GenusDefinitionMap {
 		return nGenera;
 	}
 
-	public Collection<GenusDefinition> getGenera() {
+	public List<GenusDefinition> getGenera() {
 		return Collections.unmodifiableList(genusDefinitionsSortedByIndex);
 	}
 

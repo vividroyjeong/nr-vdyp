@@ -39,7 +39,8 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 	public Sp64DistributionSet(List<Sp64Distribution> sdList) {
 
 		this(
-				sdList.isEmpty() ? 0 : sdList.stream().max((o1, o2) -> o1.getIndex() - o2.getIndex()).get().getIndex(),
+				(sdList == null || sdList.isEmpty()) ? 0
+						: sdList.stream().max((o1, o2) -> o1.getIndex() - o2.getIndex()).get().getIndex(),
 				sdList
 		);
 	}
@@ -69,8 +70,7 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 		this.sp64DistributionMap = new HashMap<>();
 		for (var e : other.sp64DistributionMap.entrySet()) {
 			this.sp64DistributionMap.put(
-					e.getKey(),
-					new Sp64Distribution(
+					e.getKey(), new Sp64Distribution(
 							e.getValue().getIndex(), e.getValue().getGenusAlias(), e.getValue().getPercentage()
 					)
 			);
@@ -116,13 +116,13 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 
 	private static void validate(int maxIndex, List<Sp64Distribution> gdList) throws InvalidGenusDistributionSet {
 
-		Set<String> sp64Seen = new HashSet<>();
+		Set<String> sp64sSeen = new HashSet<>();
 		Set<Integer> indicesSeen = new HashSet<>();
 
 		Sp64Distribution prevGd = null;
 
 		for (Sp64Distribution gd : gdList) {
-			if (sp64Seen.contains(gd.getGenusAlias())) {
+			if (sp64sSeen.contains(gd.getGenusAlias())) {
 				throw new InvalidGenusDistributionSet(
 						MessageFormat.format(
 								"Species {0} appears more than once in GenusDistributionSet", gd.getGenusAlias()
@@ -137,8 +137,8 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 			if (gd.getIndex() < 1 || gd.getIndex() > maxIndex) {
 				throw new InvalidGenusDistributionSet(
 						MessageFormat.format(
-								"Index {0} is out of range - acceptable values are between 1 and {1}, inclusive",
-								gd.getIndex(), maxIndex
+								"Index {0} is out of range - acceptable values are between 1 and {1}, inclusive", gd
+										.getIndex(), maxIndex
 						)
 				);
 			}
@@ -146,14 +146,16 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 			if (prevGd != null && prevGd.getPercentage() < gd.getPercentage()) {
 				throw new InvalidGenusDistributionSet(
 						MessageFormat.format(
-								"The percentage of index {0} is {1} and is greater than {2}, that of a species distribution with a lower index",
-								gd.getIndex(), maxIndex
+								"The percentage of index {0} is {1} and is greater than {2}, that of a species distribution with a lower index", gd
+										.getIndex(), maxIndex
 						)
 				);
 			}
 
-			sp64Seen.add(gd.getGenusAlias());
+			sp64sSeen.add(gd.getGenusAlias());
 			indicesSeen.add(gd.getIndex());
+			
+			prevGd = gd;
 		}
 	}
 
@@ -175,17 +177,28 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 	public int compareTo(Sp64DistributionSet that) {
 
 		if (that != null) {
-			if (that.sp64DistributionMap.size() != sp64DistributionMap.size()) {
-				return sp64DistributionMap.size() - that.sp64DistributionMap.size();
+			if (this.maxIndex != that.maxIndex) {
+				return this.maxIndex - that.maxIndex;
 			}
-
-			for (Sp64Distribution sd : this.sp64DistributionMap.values()) {
-				if (that.sp64DistributionMap.containsKey(sd.getIndex())) {
-					var result = sd.compareTo(that.sp64DistributionMap.get(sd.getIndex()));
-					if (result != 0) {
-						return result;
-					}
+			
+			var thisIterator = this.sp64DistributionList.iterator();
+			var thatIterator = that.sp64DistributionList.iterator();
+			
+			while (thisIterator.hasNext()) {
+				if (!thatIterator.hasNext()) {
+					return 1 /* this is longer than that */;
 				}
+				
+				var thisElement = thisIterator.next();
+				var thatElement = thatIterator.next();
+				int result = thisElement.compareTo(thatElement);
+				if (result != 0) {
+					return result;
+				}
+			}
+			
+			if (thatIterator.hasNext()) {
+				return -1 /* this is shorter than that */;
 			}
 
 			return 0;
