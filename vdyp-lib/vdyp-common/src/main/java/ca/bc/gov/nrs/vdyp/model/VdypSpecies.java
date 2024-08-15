@@ -297,7 +297,7 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 					genus.get(), //
 					genusIndex.get(), //
 					percentGenus.get(), //
-					new Sp64DistributionSet(sp64DistributionList), //
+					sp64DistributionSet.get(), //
 					site, //
 					volumeGroup.get(), //
 					decayGroup.get(), //

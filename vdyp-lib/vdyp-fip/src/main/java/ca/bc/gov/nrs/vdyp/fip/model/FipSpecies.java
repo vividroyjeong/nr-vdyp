@@ -68,7 +68,7 @@ public class FipSpecies extends BaseVdypSpecies<FipSite> {
 					this.genus.get(), //
 					this.genusIndex.get(), //
 					this.percentGenus.get(), //
-					new Sp64DistributionSet(this.sp64DistributionList), //
+					this.sp64DistributionSet.get(), //
 					this.site
 			);
 		}

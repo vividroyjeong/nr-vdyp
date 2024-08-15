@@ -43,7 +43,7 @@ import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.CommonData;
-import ca.bc.gov.nrs.vdyp.model.Sp64Distribution;
+import ca.bc.gov.nrs.vdyp.model.ComponentSizeLimits;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
@@ -53,13 +53,13 @@ import ca.bc.gov.nrs.vdyp.model.ModelCoefficients;
 import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
+import ca.bc.gov.nrs.vdyp.model.Sp64Distribution;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClassVariable;
 import ca.bc.gov.nrs.vdyp.model.UtilizationVector;
 import ca.bc.gov.nrs.vdyp.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
-import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.VolumeVariable;
 import ca.bc.gov.nrs.vdyp.si32.site.SiteTool;
 
@@ -557,7 +557,7 @@ public class ForwardProcessingEngine {
 		tphNew[0] = tphStart + BaseAreaTreeDensityDiameter.treesPerHectare(baNew[0], dqNew[0]);
 
 		Map<String, Float> basalAreaPercentagesPerSpecies = new HashMap<>();
-		for (String spAlias : fps.fcm.getGenusDefinitionMap().getAliases()) {
+		for (String spAlias : fps.fcm.getGenusDefinitionMap().getAllGeneraAliases()) {
 			basalAreaPercentagesPerSpecies.put(spAlias, 0.0f);
 		}
 		for (int i : pps.getIndices()) {

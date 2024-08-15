@@ -37,10 +37,12 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
-import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
+import ca.bc.gov.nrs.vdyp.model.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
+import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.UtilizationClassVariable;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })

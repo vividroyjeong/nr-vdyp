@@ -33,7 +33,6 @@ import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.EstimationMethods.Limits;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndex2Height;
@@ -50,6 +49,7 @@ import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.CompatibilityVariableMode;
+import ca.bc.gov.nrs.vdyp.model.ComponentSizeLimits;
 import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
@@ -479,7 +479,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				});
 
 				float maxHeight = estimationMethods.getLimitsForHeightAndDiameter(vriSpec.getGenus(), bec.getRegion())
-						.maxLoreyHeight();
+						.loreyHeightMaximum();
 				loreyHeight = Math.min(loreyHeight, maxHeight);
 				sBuilder.loreyHeight(loreyHeight);
 			}
@@ -585,9 +585,9 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 			var limits = getLimitsForSpecies(spec, region);
 
-			float min = Math.max(7.6f, limits.minDiameterHeight() * spec.getLoreyHeightByUtilization().getAll());
+			float min = Math.max(7.6f, limits.minQuadMeanDiameterLoreyHeightRatio() * spec.getLoreyHeightByUtilization().getAll());
 			float loreyHeightToUse = Math.max(spec.getLoreyHeightByUtilization().getAll(), 7.0f);
-			float max = Math.min(limits.maxQuadMeanDiameter(), limits.maxDiameterHeight() * loreyHeightToUse);
+			float max = Math.min(limits.maxQuadMeanDiameterLoreyHeightRatio(), limits.quadMeanDiameterMaximum() * loreyHeightToUse);
 			max = Math.max(7.75f, max);
 
 			minPerSpecies.put(spec.getGenus(), min);
@@ -601,7 +601,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		}
 	}
 
-	protected Limits getLimitsForSpecies(VdypSpecies spec, Region region) {
+	protected ComponentSizeLimits getLimitsForSpecies(VdypSpecies spec, Region region) {
 		// TODO for JPROGRAM = 7 implement this differently, see ROOTV01 L91-L99
 
 		// EMP061

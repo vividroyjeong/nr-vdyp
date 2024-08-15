@@ -2,11 +2,9 @@ package ca.bc.gov.nrs.vdyp.forward;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -23,7 +21,6 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
-import ca.bc.gov.nrs.vdyp.model.UtilizationVector;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
@@ -103,54 +100,28 @@ public class ForwardDataStreamReader {
 					polygon.setTargetYear(polygonDescription.getYear());
 				}
 
-				var speciesCollection = layerSpeciesStream.next();
-				var primarySpecies = new HashMap<String, VdypSpecies>();
-				var veteranSpecies = new HashMap<String, VdypSpecies>();
-				for (var species : speciesCollection) {
-					logger.trace("Saw species {}", species);
+				var layerSpeciesSet = layerSpeciesStream.next();
+				var primarySpecies = new HashMap<Integer, VdypSpecies>();
+				var veteranSpecies = new HashMap<Integer, VdypSpecies>();
+				for (var s : layerSpeciesSet) {
+					logger.trace("Saw species {}", s);
 
-					var key = new UtilizationBySpeciesKey(species.getLayerType(), species.getGenusIndex());
+					var key = new UtilizationBySpeciesKey(s.getLayerType(), s.getGenusIndex());
 					var speciesUtilizations = utilizationsBySpeciesMap.get(key);
 
-					if (speciesUtilizations != null) {
-						
-						UtilizationVector basalAreaUtilizations = new UtilizationVector();
-						UtilizationVector liveTreesPerHectareUtilizations = new UtilizationVector();
-						UtilizationVector loreyHeightUtilizations = new UtilizationVector();
-						UtilizationVector wholeStemVolumeUtilizations = new UtilizationVector();
-						UtilizationVector closeUtilizationVolumeUtilizations = new UtilizationVector();
-						UtilizationVector cuVolumeMinusDecayUtilizations = new UtilizationVector();
-						UtilizationVector cuVolumeMinusDecayWastageUtilizations = new UtilizationVector();
-						UtilizationVector cuVolumeMinusDecayWastageBreakageUtilizations = new UtilizationVector();
-						UtilizationVector quadraticMeanDiameterAtBHUtilizations = new UtilizationVector();
-						
-						for (var e: speciesUtilizations.entrySet()) {
-							var uc = e.getKey();
-							var ucUtilizations = e.getValue();
-
-							basalAreaUtilizations.set(uc, ucUtilizations.getBasalArea());
-							liveTreesPerHectareUtilizations.set(uc, ucUtilizations.getLiveTreesPerHectare());
-							if (uc == UtilizationClass.SMALL || uc == UtilizationClass.ALL) {
-								loreyHeightUtilizations.set(uc, ucUtilizations.getLoreyHeight());
-							}
-							wholeStemVolumeUtilizations.set(uc, ucUtilizations.getWholeStemVolume());
-							closeUtilizationVolumeUtilizations.set(uc, ucUtilizations.getCloseUtilizationVolume());
-							cuVolumeMinusDecayUtilizations.set(uc, ucUtilizations.getCuVolumeMinusDecay());
-							cuVolumeMinusDecayWastageUtilizations.set(uc, ucUtilizations.getCuVolumeMinusDecayWastage());
-							cuVolumeMinusDecayWastageBreakageUtilizations.set(uc, ucUtilizations.getCuVolumeMinusDecayWastageBreakage());
-							quadraticMeanDiameterAtBHUtilizations.set(uc, ucUtilizations.getQuadraticMeanDiameterAtBH());
-						}
+					if (speciesUtilizations != null) {						
+						setUtilizations(s, speciesUtilizations);
 					}
-
-					if (LayerType.PRIMARY.equals(species.getLayerType())) {
-						primarySpecies.put(species.getGenusIndex(), species);
-					} else if (LayerType.VETERAN.equals(species.getLayerType())) {
-						veteranSpecies.put(species.getGenusIndex(), species);
+					
+					if (LayerType.PRIMARY.equals(s.getLayerType())) {
+						primarySpecies.put(s.getGenusIndex(), s);
+					} else if (LayerType.VETERAN.equals(s.getLayerType())) {
+						veteranSpecies.put(s.getGenusIndex(), s);
 					} else {
 						throw new IllegalStateException(
 								MessageFormat.format(
 										"Unrecognized layer type {} for species {} of polygon {}",
-										species.getLayerType(), species.getGenusIndex(), polygon.getPolygonIdentifier()
+										s.getLayerType(), s.getGenusIndex(), polygon.getPolygonIdentifier()
 								)
 						);
 					}
@@ -165,9 +136,14 @@ public class ForwardDataStreamReader {
 					Map<UtilizationClass, VdypUtilization> defaultSpeciesUtilization = utilizationsBySpeciesMap
 							.get(key);
 
-					primaryLayer = new VdypLayer(
-							LayerType.PRIMARY, polygon, primarySpecies, Optional.ofNullable(defaultSpeciesUtilization)
-					);
+					primaryLayer = VdypLayer.build(builder -> {
+						builder.layerType(LayerType.PRIMARY);
+						builder.polygonIdentifier(polygon.getPolygonIdentifier());
+						builder.inventoryTypeGroup(polygon.getInventoryTypeGroup());
+						builder.addSpecies(layerSpeciesSet);
+					});
+					
+					setUtilizations(primaryLayer, defaultSpeciesUtilization);
 					
 					layerMap.put(LayerType.PRIMARY, primaryLayer);
 				}
@@ -179,9 +155,14 @@ public class ForwardDataStreamReader {
 					Map<UtilizationClass, VdypUtilization> defaultSpeciesUtilization = utilizationsBySpeciesMap
 							.get(key);
 
-					veteranLayer = new VdypLayer(
-							LayerType.VETERAN, polygon, veteranSpecies, Optional.ofNullable(defaultSpeciesUtilization)
-					);
+					veteranLayer = VdypLayer.build(builder -> {
+						builder.layerType(LayerType.VETERAN);
+						builder.polygonIdentifier(polygon.getPolygonIdentifier());
+						builder.inventoryTypeGroup(polygon.getInventoryTypeGroup());
+						builder.addSpecies(layerSpeciesSet);
+					});
+					
+					setUtilizations(veteranLayer, defaultSpeciesUtilization);
 					
 					layerMap.put(LayerType.VETERAN, veteranLayer);
 				}
@@ -196,6 +177,26 @@ public class ForwardDataStreamReader {
 		}
 
 		return thePolygon;
+	}
+
+	private void setUtilizations(VdypUtilizationHolder u, Map<UtilizationClass, VdypUtilization> speciesUtilizations) {
+		
+		for (var e: speciesUtilizations.entrySet()) {
+			var uc = e.getKey();
+			var ucUtilizations = e.getValue();
+
+			u.getBaseAreaByUtilization().set(uc, ucUtilizations.getBasalArea());
+			u.getTreesPerHectareByUtilization().set(uc, ucUtilizations.getLiveTreesPerHectare());
+			if (uc == UtilizationClass.SMALL || uc == UtilizationClass.ALL) {
+				u.getLoreyHeightByUtilization().set(uc, ucUtilizations.getLoreyHeight());
+			}
+			u.getWholeStemVolumeByUtilization().set(uc, ucUtilizations.getWholeStemVolume());
+			u.getCloseUtilizationVolumeByUtilization().set(uc, ucUtilizations.getCloseUtilizationVolume());
+			u.getCloseUtilizationVolumeNetOfDecayByUtilization().set(uc, ucUtilizations.getCuVolumeMinusDecay());
+			u.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization().set(uc, ucUtilizations.getCuVolumeMinusDecayWastage());
+			u.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization().set(uc, ucUtilizations.getCuVolumeMinusDecayWastageBreakage());
+			u.getQuadraticMeanDiameterByUtilization().set(uc, ucUtilizations.getQuadraticMeanDiameterAtBH());
+		}
 	}
 
 	private class UtilizationBySpeciesKey {

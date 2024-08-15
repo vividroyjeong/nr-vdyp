@@ -16,23 +16,21 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonDescription;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonLayer;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypSpeciesUtilization;
+import ca.bc.gov.nrs.vdyp.forward.Bank.CopyMode;
 import ca.bc.gov.nrs.vdyp.forward.test.VdypForwardTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
-import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
+import ca.bc.gov.nrs.vdyp.model.GenusDefinitionMap;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.VdypLayer;
+import ca.bc.gov.nrs.vdyp.model.VdypSite;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
+import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 
 class PolygonProcessingStateTest {
 
 	private ForwardControlParser parser;
 	private Map<String, Object> controlMap;
-
-	private StreamingParser<VdypPolygonDescription> polygonDescriptionStream;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@BeforeEach
@@ -41,28 +39,21 @@ class PolygonProcessingStateTest {
 		parser = new ForwardControlParser();
 		controlMap = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
 		assertThat(controlMap, (Matcher) controlMapHasEntry(ControlKey.SP0_DEF, instanceOf(GenusDefinitionMap.class)));
-
-		var polygonDescriptionStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_GROWTO.name());
-		polygonDescriptionStream = ((StreamingParserFactory<VdypPolygonDescription>) polygonDescriptionStreamFactory)
-				.get();
 	}
 
 	@Test
 	void testConstruction() throws IOException, ResourceParseException, ProcessingException {
 
-		assertThat(polygonDescriptionStream.hasNext(), is(true));
-		var polygonDescription = polygonDescriptionStream.next();
-
 		ForwardDataStreamReader reader = new ForwardDataStreamReader(controlMap);
 
-		var polygon = reader.readNextPolygon(polygonDescription);
+		var polygon = reader.readNextPolygon().orElseThrow(() -> new AssertionError("No polygons defined"));
 
-		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
+		VdypLayer pLayer = polygon.getLayers().get(LayerType.PRIMARY);
 		assertThat(pLayer, notNullValue());
 
 		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone(), s -> true);
 
-		int nSpecies = pLayer.getGenera().size();
+		int nSpecies = pLayer.getSpecies().size();
 
 		assertThat(pps, notNullValue());
 		assertThat(pps.yearsAtBreastHeight.length, is(nSpecies + 1));
@@ -114,14 +105,11 @@ class PolygonProcessingStateTest {
 	@Test
 	void testSetCopy() throws IOException, ResourceParseException, ProcessingException {
 
-		assertThat(polygonDescriptionStream.hasNext(), is(true));
-		var polygonDescription = polygonDescriptionStream.next();
-
 		ForwardDataStreamReader reader = new ForwardDataStreamReader(controlMap);
 
-		var polygon = reader.readNextPolygon(polygonDescription);
+		var polygon = reader.readNextPolygon().orElseThrow(() -> new AssertionError("No polygons defined"));
 
-		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
+		VdypLayer pLayer = polygon.getLayers().get(LayerType.PRIMARY);
 		assertThat(pLayer, notNullValue());
 
 		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone(), s -> true);
@@ -136,29 +124,25 @@ class PolygonProcessingStateTest {
 	@Test
 	void testRemoveSmallLayers() throws IOException, ResourceParseException, ProcessingException {
 
-		assertThat(polygonDescriptionStream.hasNext(), is(true));
-		var polygonDescription = polygonDescriptionStream.next();
 		ForwardDataStreamReader reader = new ForwardDataStreamReader(controlMap);
 
-		var polygon = reader.readNextPolygon(polygonDescription);
+		var polygon = reader.readNextPolygon().orElseThrow(() -> new AssertionError("No polygons defined"));
 
-		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
+		VdypLayer pLayer = polygon.getLayers().get(LayerType.PRIMARY);
 		assertThat(pLayer, notNullValue());
 
 		Bank bank1 = new Bank(
 				pLayer, polygon.getBiogeoclimaticZone(),
-				s -> s.getUtilizations().isPresent()
-						? s.getUtilizations().get().get(UtilizationClass.ALL).getBasalArea() >= 0.5 : true
+				s -> s.getBaseAreaByUtilization().get(UtilizationClass.ALL) >= 0.5
 		);
 
 		// the filter should have removed genus B (index 3) since it's ALL basal area is below 0.5
-		assertThat(bank1.getNSpecies(), is(pLayer.getGenera().size() - 1));
+		assertThat(bank1.getNSpecies(), is(pLayer.getSpecies().size() - 1));
 		assertThat(bank1.speciesIndices, is(new int[] { 0, 4, 5, 8, 15 }));
 
 		Bank bank2 = new Bank(
 				pLayer, polygon.getBiogeoclimaticZone(),
-				s -> s.getUtilizations().isPresent()
-						? s.getUtilizations().get().get(UtilizationClass.ALL).getBasalArea() >= 100.0 : true
+				s -> s.getBaseAreaByUtilization().get(UtilizationClass.ALL) >= 100.0
 		);
 
 		// the filter should have removed all genera.
@@ -169,73 +153,68 @@ class PolygonProcessingStateTest {
 	@Test
 	void testCopyConstructor() throws IOException, ResourceParseException, ProcessingException {
 
-		assertThat(polygonDescriptionStream.hasNext(), is(true));
-		var polygonDescription = polygonDescriptionStream.next();
 		ForwardDataStreamReader reader = new ForwardDataStreamReader(controlMap);
 
-		var polygon = reader.readNextPolygon(polygonDescription);
+		var polygon = reader.readNextPolygon().orElseThrow(() -> new AssertionError("No polygons defined"));
 
-		VdypPolygonLayer pLayer = polygon.getPrimaryLayer();
+		VdypLayer pLayer = polygon.getLayers().get(LayerType.PRIMARY);
 		assertThat(pLayer, notNullValue());
 
 		Bank pps = new Bank(pLayer, polygon.getBiogeoclimaticZone(), s -> true);
 
-		Bank ppsCopy = new Bank(pps);
+		Bank ppsCopy = new Bank(pps, CopyMode.CopyAll);
 
 		verifyProcessingStateMatchesLayer(ppsCopy, pLayer);
 	}
 
-	private void verifyProcessingStateMatchesLayer(Bank pps, VdypPolygonLayer layer) {
+	private void verifyProcessingStateMatchesLayer(Bank pps, VdypLayer layer) {
 
-		List<Integer> sortedSpIndices = layer.getGenera().keySet().stream().sorted().toList();
+		List<Integer> sortedSpIndices = layer.getSpecies().values().stream().map(s -> s.getGenusIndex()).sorted().toList();
 
+		int arrayIndex = 1;
 		for (int i = 0; i < sortedSpIndices.size(); i++) {
-
-			int arrayIndex = i + 1;
-
-			VdypLayerSpecies genus = layer.getGenera().get(sortedSpIndices.get(i));
+			VdypSpecies genus = layer.getSpeciesByIndex(i);
+			
 			verifyProcessingStateSpeciesMatchesSpecies(pps, arrayIndex, genus);
 
-			if (genus.getUtilizations().isPresent()) {
-				verifyProcessingStateSpeciesUtilizationsMatchesUtilizations(
-						pps, arrayIndex, genus.getUtilizations().get()
-				);
-			}
+			verifyProcessingStateSpeciesUtilizationsMatchesUtilizations(
+					pps, arrayIndex, genus
+			);
+			
+			arrayIndex += 1;
 		}
 
-		if (layer.getDefaultUtilizationMap().isPresent()) {
-			verifyProcessingStateSpeciesUtilizationsMatchesUtilizations(pps, 0, layer.getDefaultUtilizationMap().get());
-		}
+		verifyProcessingStateSpeciesUtilizationsMatchesUtilizations(pps, 0, layer);
 	}
 
 	private void verifyProcessingStateSpeciesUtilizationsMatchesUtilizations(
-			Bank pps, int spIndex, Map<UtilizationClass, VdypSpeciesUtilization> map
+			Bank pps, int spIndex, VdypUtilizationHolder u
 	) {
 
 		for (UtilizationClass uc : UtilizationClass.values()) {
-			VdypSpeciesUtilization u = map.get(uc);
-
-			assertThat(pps.basalAreas[spIndex][uc.index + 1], is(u.getBasalArea()));
-			assertThat(pps.closeUtilizationVolumes[spIndex][uc.index + 1], is(u.getCloseUtilizationVolume()));
-			assertThat(pps.cuVolumesMinusDecay[spIndex][uc.index + 1], is(u.getCuVolumeMinusDecay()));
-			assertThat(pps.cuVolumesMinusDecayAndWastage[spIndex][uc.index + 1], is(u.getCuVolumeMinusDecayWastage()));
+			assertThat(pps.basalAreas[spIndex][uc.index + 1], is(u.getBaseAreaByUtilization().get(uc)));
+			assertThat(pps.closeUtilizationVolumes[spIndex][uc.index + 1], is(u.getCloseUtilizationVolumeByUtilization().get(uc)));
+			assertThat(pps.cuVolumesMinusDecay[spIndex][uc.index + 1], is(u.getCloseUtilizationVolumeNetOfDecayByUtilization().get(uc)));
+			assertThat(pps.cuVolumesMinusDecayAndWastage[spIndex][uc.index + 1], is(u.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization().get(uc)));
 			if (uc.index <= 0) {
-				assertThat(pps.loreyHeights[spIndex][uc.index + 1], is(u.getLoreyHeight()));
+				assertThat(pps.loreyHeights[spIndex][uc.index + 1], is(u.getLoreyHeightByUtilization().get(uc)));
 			}
-			assertThat(pps.quadMeanDiameters[spIndex][uc.index + 1], is(u.getQuadraticMeanDiameterAtBH()));
-			assertThat(pps.treesPerHectare[spIndex][uc.index + 1], is(u.getLiveTreesPerHectare()));
-			assertThat(pps.wholeStemVolumes[spIndex][uc.index + 1], is(u.getWholeStemVolume()));
+			assertThat(pps.quadMeanDiameters[spIndex][uc.index + 1], is(u.getQuadraticMeanDiameterByUtilization().get(uc)));
+			assertThat(pps.treesPerHectare[spIndex][uc.index + 1], is(u.getTreesPerHectareByUtilization().get(uc)));
+			assertThat(pps.wholeStemVolumes[spIndex][uc.index + 1], is(u.getWholeStemVolumeByUtilization().get(uc)));
 		}
 	}
 
-	private void verifyProcessingStateSpeciesMatchesSpecies(Bank pps, int index, VdypLayerSpecies species) {
-		assertThat(pps.yearsAtBreastHeight[index], is(species.getAgeAtBreastHeight()));
-		assertThat(pps.ageTotals[index], is(species.getAgeTotal()));
-		assertThat(pps.dominantHeights[index], is(species.getDominantHeight()));
-		assertThat(pps.siteIndices[index], is(species.getSiteIndex()));
-		assertThat(pps.sp64Distributions[index], is(species.getSpeciesDistributions()));
+	private void verifyProcessingStateSpeciesMatchesSpecies(Bank pps, int index, VdypSpecies species) {
+		VdypSite site = species.getSite().orElseThrow();
+		
+		assertThat(pps.yearsAtBreastHeight[index], is(site.getYearsAtBreastHeight()));
+		assertThat(pps.ageTotals[index], is(site.getAgeTotal()));
+		assertThat(pps.dominantHeights[index], is(site.getHeight()));
+		assertThat(pps.siteIndices[index], is(site.getSiteIndex()));
+		assertThat(pps.sp64Distributions[index], is(species.getSp64DistributionSet()));
 		assertThat(pps.speciesIndices[index], is(species.getGenusIndex()));
 		assertThat(pps.speciesNames[index], is(species.getGenus()));
-		assertThat(pps.yearsToBreastHeight[index], is(species.getYearsToBreastHeight()));
+		assertThat(pps.yearsToBreastHeight[index], is(site.getYearsToBreastHeight()));
 	}
 }

@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.model;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,7 +17,8 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies<I>, I extends Base
 
 	private final PolygonIdentifier polygonIdentifier;
 	private final LayerType layerType;
-	private LinkedHashMap<String, S> species = new LinkedHashMap<>();
+	private LinkedHashMap<String, S> speciesBySp0 = new LinkedHashMap<>();
+	private HashMap<Integer, S> speciesByIndex = new HashMap<>();
 	private Optional<Integer> inventoryTypeGroup = Optional.empty();
 
 	protected BaseVdypLayer(
@@ -38,22 +40,35 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies<I>, I extends Base
 	}
 
 	public LinkedHashMap<String, S> getSpecies() {
-		return species;
+		return speciesBySp0;
 	}
 
 	public void setSpecies(Map<String, S> species) {
-		this.species.clear();
-		this.species.putAll(species);
+		this.speciesBySp0.clear();
+		this.speciesByIndex.clear();
+		this.speciesBySp0.putAll(species);
 	}
 
 	public void setSpecies(Collection<S> species) {
-		this.species.clear();
-		species.forEach(spec -> this.species.put(spec.getGenus(), spec));
+		this.speciesBySp0.clear();
+		this.speciesByIndex.clear();
+		species.forEach(spec -> { 
+			this.speciesBySp0.put(spec.getGenus(), spec);
+			this.speciesByIndex.put(spec.getGenusIndex(), spec);
+		});
 	}
 
+	public S getSpeciesBySp0(String sp0) {
+		return speciesBySp0.get(sp0);
+	}
+
+	public S getSpeciesByIndex(int index) {
+		return speciesByIndex.get(index);
+	}
+	
 	public LinkedHashMap<String, I> getSites() {
-		var result = new LinkedHashMap<String, I>(species.size());
-		species.forEach((key, spec) -> spec.getSite().ifPresent(site -> result.put(key, site)));
+		var result = new LinkedHashMap<String, I>(speciesBySp0.size());
+		speciesBySp0.forEach((key, spec) -> spec.getSite().ifPresent(site -> result.put(key, site)));
 		return result;
 	}
 
@@ -207,7 +222,5 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies<I>, I extends Base
 					layerType.map(Object::toString).orElse("N/A") //
 			);
 		}
-
 	}
-
 }

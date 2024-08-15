@@ -51,9 +51,7 @@ class ForwardProcessingState {
 
 	public void setPolygon(VdypPolygon polygon) throws ProcessingException {
 		
-		BecDefinition becZone = fcm.getBecLookup().get(polygon.getBiogeoclimaticZone()).orElseThrow(() ->
-			new ProcessingException(MessageFormat.format("{0}: BEC zone {1} is unsupported", polygon.getPolygonIdentifier(),
-					polygon.getBiogeoclimaticZone())));
+		BecDefinition becZone = polygon.getBiogeoclimaticZone();
 		
 		// Move the primary layer of the given polygon to bank zero.
 		Bank primaryBank = banks[0][LayerType.PRIMARY.getIndex()] = new Bank(

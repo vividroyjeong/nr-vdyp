@@ -101,7 +101,8 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		}
 
 		// sort the unindexed distributions in order of decreasing percentage
-		unindexedSp64Distributions = unindexedSp64Distributions.stream().sorted((o1, o2) -> o2.getPercentage().compareTo(o1.getPercentage())).toList();
+		unindexedSp64Distributions = unindexedSp64Distributions.stream()
+				.sorted((o1, o2) -> o2.getPercentage().compareTo(o1.getPercentage())).toList();
 
 		// and assign them an index, starting with one.
 		int index = 1;
@@ -137,7 +138,7 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		protected Optional<Integer> genusIndex = Optional.empty();
 		protected Optional<Float> percentGenus = Optional.empty();
 		protected Optional<Float> fractionGenus = Optional.empty();
-		protected List<Sp64Distribution> sp64DistributionList = new ArrayList<>();
+		protected Optional<Sp64DistributionSet> sp64DistributionSet = Optional.empty();
 		protected Optional<Consumer<IB>> siteBuilder = Optional.empty();
 		protected Optional<I> site = Optional.empty();
 
@@ -182,7 +183,12 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		}
 
 		public Builder<T, I, IB> sp64DistributionList(List<Sp64Distribution> sp64DistributionList) {
-			this.sp64DistributionList = sp64DistributionList;
+			this.sp64DistributionSet = Optional.of(new Sp64DistributionSet(sp64DistributionList));
+			return this;
+		}
+
+		public Builder<T, I, IB> sp64DistributionSet(Sp64DistributionSet sp64DistributionSet) {
+			this.sp64DistributionSet = Optional.of(sp64DistributionSet);
 			return this;
 		}
 
@@ -208,8 +214,9 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		}
 
 		public void addSp64Distribution(String sp64Alias, float f) {
-			int index = sp64DistributionList.size() + 1;
-			sp64DistributionList.add(new Sp64Distribution(index, sp64Alias, f));
+			var sp64DistributionList = sp64DistributionSet.map(set -> set.getSp64DistributionList()).orElse(new ArrayList<Sp64Distribution>());
+			sp64DistributionList.add(new Sp64Distribution(sp64DistributionList.size() + 1, sp64Alias, f));
+			sp64DistributionSet = Optional.of(new Sp64DistributionSet(sp64DistributionList));
 		}
 
 		@Override
@@ -219,6 +226,7 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 			requirePresent(genus, "genus", errors);
 			requirePresent(genusIndex, "genusIndex", errors);
 			requirePresent(percentGenus, "percentGenus", errors);
+			requirePresent(sp64DistributionSet, "sp64DistributionSet", errors);
 		}
 
 		@Override

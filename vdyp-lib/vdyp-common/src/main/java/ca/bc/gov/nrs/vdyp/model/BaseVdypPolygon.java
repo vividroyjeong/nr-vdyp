@@ -21,10 +21,11 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 	protected BecDefinition biogeoclimaticZone;
 	protected String forestInventoryZone;
 	protected Optional<PolygonMode> mode;
+	protected Optional<Integer> inventoryTypeGroup;
 
 	protected BaseVdypPolygon(
 			PolygonIdentifier polygonIdentifier, PA percentAvailable, String fiz, BecDefinition biogeoclimaticZone,
-			Optional<PolygonMode> mode
+			Optional<PolygonMode> mode, Optional<Integer> inventoryTypeGroup
 	) {
 		super();
 		this.forestInventoryZone = fiz;
@@ -32,6 +33,7 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 		this.mode = mode;
 		this.polygonIdentifier = polygonIdentifier;
 		this.percentAvailable = percentAvailable;
+		this.inventoryTypeGroup = inventoryTypeGroup;
 	}
 
 	/**
@@ -47,7 +49,8 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 	) {
 		this(
 				toCopy.getPolygonIdentifier(), convertPercentAvailable.apply(toCopy.getPercentAvailable()),
-				toCopy.getForestInventoryZone(), toCopy.getBiogeoclimaticZone(), toCopy.getMode()
+				toCopy.getForestInventoryZone(), toCopy.getBiogeoclimaticZone(), toCopy.getMode(),
+				toCopy.getInventoryTypeGroup()
 		);
 	}
 
@@ -96,6 +99,14 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 		this.forestInventoryZone = forestInventoryZone;
 	}
 
+	public Optional<Integer> getInventoryTypeGroup() {
+		return inventoryTypeGroup;
+	}
+
+	public void setInventoryTypeGroup(Optional<Integer> inventoryTypeGroup) {
+		this.inventoryTypeGroup = inventoryTypeGroup;
+	}
+
 	public Optional<PolygonMode> getMode() {
 		return mode;
 	}
@@ -120,6 +131,7 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 		protected Optional<BecDefinition> biogeoclimaticZone = Optional.empty();
 		protected Optional<String> forestInventoryZone = Optional.empty();
 		protected Optional<PolygonMode> mode = Optional.empty();
+		protected Optional<Integer> inventoryTypeGroup = Optional.empty();
 
 		protected List<L> layers = new LinkedList<>();
 		protected List<Consumer<LB>> layersBuilders = new LinkedList<>();
@@ -161,6 +173,15 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 
 		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> mode(PolygonMode mode) {
 			return mode(Optional.of(mode));
+		}
+
+		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> inventoryTypeGroup(Optional<Integer> inventoryTypeGroup) {
+			this.inventoryTypeGroup = inventoryTypeGroup;
+			return this;
+		}
+
+		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> inventoryTypeGroup(int inventoryTypeGroup) {
+			return inventoryTypeGroup(Optional.of(inventoryTypeGroup));
 		}
 
 		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> addLayer(L layer) {

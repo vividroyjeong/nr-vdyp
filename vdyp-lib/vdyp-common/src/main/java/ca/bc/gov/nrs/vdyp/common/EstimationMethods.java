@@ -252,7 +252,7 @@ public class EstimationMethods {
 		}
 
 		var coeMap = controlMap.<Map<String, Coefficients>>get(ControlKey.BY_SPECIES_DQ, Map.class);
-		var specAliases = controlMap.getGenusDefinitionMap().getAliases();
+		var specAliases = controlMap.getGenusDefinitionMap().getAllGeneraAliases();
 
 		var specIt = specAliases.iterator();
 		var spec1 = specIt.next();

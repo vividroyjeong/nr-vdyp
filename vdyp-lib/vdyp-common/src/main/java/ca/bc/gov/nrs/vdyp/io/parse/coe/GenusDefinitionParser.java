@@ -9,7 +9,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -18,6 +17,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapSubResourceParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
+import ca.bc.gov.nrs.vdyp.model.GenusDefinitionMap;
 
 /**
  * Parser for a Genus (SP0; Species) Definition data file.

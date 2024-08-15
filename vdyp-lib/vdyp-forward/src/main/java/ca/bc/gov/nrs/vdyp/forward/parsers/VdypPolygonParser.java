@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.forward.parsers;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,6 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ControlledValueParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
-import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
@@ -102,10 +102,16 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 						percentForestLand = DEFAULT_FORESTED_LAND_PERCENTAGE;
 					}
 
-					return new VdypPolygon(
-							description, bec, fizId, percentForestLand, inventoryTypeGroup, basalAreaGroup,
-							fipMode.flatMap(PolygonMode::getByCode)
-					);
+					final float percentAvailable = percentForestLand;
+					
+					return VdypPolygon.build(builder -> {
+							builder.polygonIdentifier(descriptionText);
+							builder.biogeoclimaticZone(bec);
+							builder.forestInventoryZone(fizId.toString());
+							fipMode.ifPresentOrElse(m -> builder.mode(PolygonMode.getByCode(m)), () -> Optional.empty());
+							builder.percentAvailable(percentAvailable);
+							builder.inventoryTypeGroup(inventoryTypeGroup);
+					});
 				}
 			};
 		};

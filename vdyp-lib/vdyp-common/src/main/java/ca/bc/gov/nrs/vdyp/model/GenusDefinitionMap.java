@@ -1,4 +1,4 @@
-package ca.bc.gov.nrs.vdyp.common;
+package ca.bc.gov.nrs.vdyp.model;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -7,8 +7,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 
 public class GenusDefinitionMap {
 	private final Map<String, GenusDefinition> genusByAliasMap = new HashMap<>();

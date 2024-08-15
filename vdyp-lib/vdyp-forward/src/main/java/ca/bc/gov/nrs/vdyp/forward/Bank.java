@@ -1,7 +1,6 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
@@ -10,12 +9,15 @@ import java.util.stream.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonLayer;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypSpeciesUtilization;
+import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Sp64DistributionSet;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.VdypEntity;
+import ca.bc.gov.nrs.vdyp.model.VdypLayer;
+import ca.bc.gov.nrs.vdyp.model.VdypSite;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
+import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 
 class Bank {
 
@@ -58,20 +60,20 @@ class Bank {
 	public final float[/* nSpecies + 1, including 0 */][/* all ucs */] treesPerHectare; // BANK1 TPHB
 	public final float[/* nSpecies + 1, including 0 */][/* all ucs */] wholeStemVolumes; // BANK1 VOLWSB
 
-	public Bank(VdypLayer layer, BecDefinition becZone, Predicate<VdypSpecies> retainCriteria) {
+	public Bank(VdypLayer layer, BecDefinition becZone, Predicate<VdypSpecies> retainCriteria) throws ProcessingException {
 
 		this.layer = layer;
 		this.becZone = becZone;
 		
 		List<VdypSpecies> speciesToRetain = layer.getSpecies().values().stream().filter(s -> retainCriteria.test(s))
-				.sorted((s1, s2) -> s1.getGenusIndex().compareTo(s2.getGenusIndex())).toList();
+				.sorted((s1, s2) -> s1.getGenusIndex() - s2.getGenusIndex()).toList();
 
 		this.nSpecies = speciesToRetain.size();
 		this.indices = IntStream.range(1, nSpecies + 1).toArray();
 
 		// In the following, index 0 is unused
 		speciesNames = new String[nSpecies + 1];
-		sp64Distributions = new GenusDistributionSet[getNSpecies() + 1];
+		sp64Distributions = new Sp64DistributionSet[getNSpecies() + 1];
 		siteIndices = new float[nSpecies + 1];
 		dominantHeights = new float[nSpecies + 1];
 		ageTotals = new float[nSpecies + 1];
@@ -196,14 +198,14 @@ class Bank {
 		return layer;
 	}
 
-	private void transferSpeciesIntoBank(int index, VdypSpecies species) {
+	private void transferSpeciesIntoBank(int index, VdypSpecies species) throws ProcessingException {
 
 		VdypSite site = species.getSite().orElseThrow(() -> new ProcessingException(MessageFormat.format(
 				"Species {0} of Polygon {1} must contain a Site definition but does not.", 
 				species.getGenus(), species.getPolygonIdentifier().toStringCompact())));
 		
 		speciesNames[index] = species.getGenus();
-		sp64Distributions[index] = new GenusDistributionSet(species.getSpeciesPercent());
+		sp64Distributions[index] = species.getSp64DistributionSet();
 		siteIndices[index] = site.getSiteIndex().orElse(VdypEntity.MISSING_FLOAT_VALUE);
 		dominantHeights[index] = site.getHeight().orElse(VdypEntity.MISSING_FLOAT_VALUE);
 		ageTotals[index] = site.getAgeTotal().orElse(VdypEntity.MISSING_FLOAT_VALUE);
@@ -282,8 +284,6 @@ class Bank {
 		transferUtilizationsIntoBank(index, species);
 	}
 
-	private Sp64DistributionSet[] copy(Sp64DistributionSet[] a) {
-		return Arrays.stream(a).map(g -> g == null ? null : g.copy()).toArray(Sp64DistributionSet[]::new);
 	private void transferUtilizationsFromBank(int index, VdypUtilizationHolder uh) {
 
 		for (UtilizationClass uc: UtilizationClass.values()) {
@@ -303,7 +303,6 @@ class Bank {
 
 	public Bank copy() {
 		return new Bank(this, CopyMode.CopyAll);
-	}
 	
 	}
 
@@ -329,5 +328,9 @@ class Bank {
 
 	private float[][] copy(float[][] a) {
 		return Arrays.stream(a).map(float[]::clone).toArray(float[][]::new);
+	}
+
+	private Sp64DistributionSet[] copy(Sp64DistributionSet[] sp64Distributions) {
+		return Arrays.stream(sp64Distributions).map(Sp64DistributionSet::copy).toArray(Sp64DistributionSet[]::new);
 	}
 }
