@@ -18,9 +18,9 @@ public class TestPolygon extends BaseVdypPolygon<TestLayer, Optional<Float>, Tes
 
 	protected TestPolygon(
 			PolygonIdentifier polygonIdentifier, Optional<Float> percentAvailable, String fiz,
-			BecDefinition becIdentifier, Optional<PolygonMode> mode
+			BecDefinition bec, Optional<PolygonMode> mode
 	) {
-		super(polygonIdentifier, percentAvailable, fiz, becIdentifier, mode);
+		super(polygonIdentifier, percentAvailable, fiz, bec, mode);
 	}
 
 	public static class Builder extends

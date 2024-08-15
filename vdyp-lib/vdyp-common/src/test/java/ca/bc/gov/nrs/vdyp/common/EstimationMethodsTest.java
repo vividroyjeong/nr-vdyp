@@ -435,8 +435,7 @@ class EstimationMethodsTest {
 			// sp 3, 4, 5, 8, 15
 			// sp B, C, D, H, S
 			var spec1 = VdypSpecies.build(layer, builder -> {
-				builder.genus("B");
-				builder.genusIndex(3);
+				builder.genus("B", controlMap);
 				builder.volumeGroup(12);
 				builder.decayGroup(7);
 				builder.breakageGroup(5);
@@ -446,8 +445,7 @@ class EstimationMethodsTest {
 			spec1.setFractionGenus(0.00817133673f);
 
 			var spec2 = VdypSpecies.build(layer, builder -> {
-				builder.genus("C");
-				builder.genusIndex(4);
+				builder.genus("C", controlMap);
 				builder.volumeGroup(4);
 				builder.decayGroup(14);
 				builder.breakageGroup(6);
@@ -457,8 +455,7 @@ class EstimationMethodsTest {
 			spec2.setFractionGenus(0.0972022042f);
 
 			var spec3 = VdypSpecies.build(layer, builder -> {
-				builder.genus("D");
-				builder.genusIndex(5);
+				builder.genus("D", controlMap);
 				builder.volumeGroup(25);
 				builder.decayGroup(19);
 				builder.breakageGroup(12);
@@ -468,8 +465,7 @@ class EstimationMethodsTest {
 			spec3.setFractionGenus(0.695440531f);
 
 			var spec4 = VdypSpecies.build(layer, builder -> {
-				builder.genus("H");
-				builder.genusIndex(8);
+				builder.genus("H", controlMap);
 				builder.volumeGroup(37);
 				builder.decayGroup(31);
 				builder.breakageGroup(17);
@@ -484,8 +480,7 @@ class EstimationMethodsTest {
 			spec4.setFractionGenus(0.117043354f);
 
 			var spec5 = VdypSpecies.build(layer, builder -> {
-				builder.genus("S");
-				builder.genusIndex(15);
+				builder.genus("S", controlMap);
 				builder.volumeGroup(66);
 				builder.decayGroup(54);
 				builder.breakageGroup(28);
@@ -697,8 +692,7 @@ class EstimationMethodsTest {
 			var spec = VdypSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("B");
-				builder.genusIndex(3);
+				builder.genus("B", controlMap);
 				builder.percentGenus(50f);
 				builder.volumeGroup(-1);
 				builder.decayGroup(-1);
@@ -707,8 +701,7 @@ class EstimationMethodsTest {
 			var specPrime = VdypSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("H");
-				builder.genusIndex(8);
+				builder.genus("H", controlMap);
 				builder.percentGenus(50f);
 				builder.volumeGroup(-1);
 				builder.decayGroup(-1);
@@ -729,8 +722,7 @@ class EstimationMethodsTest {
 			var spec = VdypSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("B");
-				builder.genusIndex(3);
+				builder.genus("B", controlMap);
 				builder.percentGenus(50f);
 				builder.volumeGroup(-1);
 				builder.decayGroup(-1);
@@ -739,8 +731,7 @@ class EstimationMethodsTest {
 			var specPrime = VdypSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("D");
-				builder.genusIndex(5);
+				builder.genus("D", controlMap);
 				builder.percentGenus(50f);
 				builder.volumeGroup(-1);
 				builder.decayGroup(-1);

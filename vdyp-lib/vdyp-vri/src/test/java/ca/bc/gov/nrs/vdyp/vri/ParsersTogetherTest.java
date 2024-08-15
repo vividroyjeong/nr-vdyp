@@ -124,8 +124,7 @@ class ParsersTogetherTest {
 		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
 			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
-			specBuilder.genus("B");
-			specBuilder.genusIndex(3);
+			specBuilder.genus("B", controlMap);
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
@@ -194,8 +193,7 @@ class ParsersTogetherTest {
 		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
 			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
-			specBuilder.genus("B");
-			specBuilder.genusIndex(3);
+			specBuilder.genus("B", controlMap);
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
@@ -274,8 +272,7 @@ class ParsersTogetherTest {
 		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
 			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
-			specBuilder.genus("B");
-			specBuilder.genusIndex(3);
+			specBuilder.genus("B", controlMap);
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
@@ -352,8 +349,7 @@ class ParsersTogetherTest {
 		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
 			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
-			specBuilder.genus("B");
-			specBuilder.genusIndex(3);
+			specBuilder.genus("B", controlMap);
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
@@ -429,14 +425,12 @@ class ParsersTogetherTest {
 		speciesStream.addValue(List.of(VriSpecies.build(specBuilder -> {
 			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
-			specBuilder.genus("B");
-			specBuilder.genusIndex(3);
+			specBuilder.genus("B", controlMap);
 			specBuilder.percentGenus(80f);
 		}), VriSpecies.build(specBuilder -> {
 			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
-			specBuilder.genus("S");
-			specBuilder.genusIndex(15);
+			specBuilder.genus("S", controlMap);
 			specBuilder.percentGenus(20f);
 		})));
 		siteStream.addValue(List.of(VriSite.build(siteBuilder -> {
@@ -511,14 +505,12 @@ class ParsersTogetherTest {
 		speciesStream.addValue(List.of(VriSpecies.build(specBuilder -> {
 			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
-			specBuilder.genus("B");
-			specBuilder.genusIndex(3);
+			specBuilder.genus("B", controlMap);
 			specBuilder.percentGenus(80f);
 		}), VriSpecies.build(specBuilder -> {
 			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
-			specBuilder.genus("S");
-			specBuilder.genusIndex(15);
+			specBuilder.genus("S", controlMap);
 			specBuilder.percentGenus(20f);
 		})));
 		siteStream.addValue(List.of(VriSite.build(siteBuilder -> {
@@ -614,8 +606,7 @@ class ParsersTogetherTest {
 		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
 			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
-			specBuilder.genus("B");
-			specBuilder.genusIndex(3);
+			specBuilder.genus("B", controlMap);
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
@@ -697,8 +688,7 @@ class ParsersTogetherTest {
 		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
 			specBuilder.polygonIdentifier(polygonId);
 			specBuilder.layerType(layerType);
-			specBuilder.genus("B");
-			specBuilder.genusIndex(3);
+			specBuilder.genus("B", controlMap);
 			specBuilder.percentGenus(100f);
 		})));
 		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {

@@ -103,8 +103,7 @@ class VriAdjustInputWriterTest {
 				builder.layerType(LayerType.PRIMARY);
 
 				builder.addSpecies(specBuilder -> {
-					specBuilder.genus("PL");
-					specBuilder.genusIndex(Utils.getGenusIndex("PL", controlMap));
+					specBuilder.genus("PL", controlMap);
 					specBuilder.percentGenus(100);
 					specBuilder.volumeGroup(1);
 					specBuilder.decayGroup(2);
@@ -141,8 +140,7 @@ class VriAdjustInputWriterTest {
 				builder.layerType(LayerType.PRIMARY);
 
 				builder.addSpecies(specBuilder -> {
-					specBuilder.genus("PL");
-					specBuilder.genusIndex(Utils.getGenusIndex("PL", controlMap));
+					specBuilder.genus("PL", controlMap);
 					specBuilder.percentGenus(100);
 					specBuilder.volumeGroup(0);
 					specBuilder.decayGroup(0);
@@ -179,8 +177,7 @@ class VriAdjustInputWriterTest {
 				builder.layerType(LayerType.PRIMARY);
 
 				builder.addSpecies(specBuilder -> {
-					specBuilder.genus("PL");
-					specBuilder.genusIndex(Utils.getGenusIndex("PL", controlMap));
+					specBuilder.genus("PL", controlMap);
 					specBuilder.percentGenus(100);
 					specBuilder.volumeGroup(1);
 					specBuilder.decayGroup(2);
@@ -199,8 +196,7 @@ class VriAdjustInputWriterTest {
 
 			@SuppressWarnings("unused")
 			var species = VdypSpecies.build(layer, builder -> {
-				builder.genus("PL");
-				builder.genusIndex(Utils.getGenusIndex("PL", controlMap));
+				builder.genus("PL", controlMap);
 				builder.addSp64Distribution("PL", 100f);
 
 				builder.percentGenus(100f);
@@ -266,8 +262,7 @@ class VriAdjustInputWriterTest {
 				builder.layerType(LayerType.PRIMARY);
 
 				builder.addSpecies(specBuilder -> {
-					specBuilder.genus("PL");
-					specBuilder.genusIndex(Utils.getGenusIndex("PL", controlMap));
+					specBuilder.genus("PL", controlMap);
 					specBuilder.percentGenus(100);
 					specBuilder.volumeGroup(1);
 					specBuilder.decayGroup(2);
@@ -284,8 +279,7 @@ class VriAdjustInputWriterTest {
 			});
 
 			var species = VdypSpecies.build(layer, builder -> {
-				builder.genus("PL");
-				builder.genusIndex(Utils.getGenusIndex("PL", controlMap));
+				builder.genus("PL", controlMap);
 				builder.addSp64Distribution("PL", 100f);
 
 				builder.percentGenus(100f);
@@ -357,8 +351,7 @@ class VriAdjustInputWriterTest {
 				builder.layerType(LayerType.PRIMARY);
 
 				builder.addSpecies(specBuilder -> {
-					specBuilder.genus("PL");
-					specBuilder.genusIndex(Utils.getGenusIndex("PL", controlMap));
+					specBuilder.genus("PL", controlMap);
 					specBuilder.percentGenus(100);
 					specBuilder.volumeGroup(0);
 					specBuilder.decayGroup(0);

@@ -10,6 +10,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.common.Computed;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 
 public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 	private final PolygonIdentifier polygonIdentifier; // FIP_P/POLYDESC
@@ -161,12 +162,30 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 			return this;
 		}
 
-		public Builder<T, I, IB> genus(String genus) {
+		/**
+		 * Set both the genus, and at the same time calculates genusIndex from the given controlMap.
+		 * @param genus the species genus
+		 * @param controlMap the control map defining the configuration
+		 * @return this builder
+		 */
+		public Builder<T, I, IB> genus(String genus, Map<String, Object> controlMap) {
 			this.genus = Optional.of(genus);
+			this.genusIndex = Optional.of(GenusDefinitionParser.getIndex(genus, controlMap));
 			return this;
 		}
 
-		public Builder<T, I, IB> genusIndex(int genusIndex) {
+		/**
+		 * Set both the genus and its index. It is the responsibility of the caller to ensure 
+		 * that the index is correct for the given genus. Use of this method is appropriate 
+		 * only when logic dictates the given genusIndex is correct or in those unit tests 
+		 * where correctness isn't critical.
+		 * 
+		 * @param genus the species genus
+		 * @param genusIndex the index of the genus in the configuration (control map entry 10)
+		 * @return this builder
+		 */
+		public Builder<T, I, IB> genus(String genus, int genusIndex) {
+			this.genus = Optional.of(genus);
 			this.genusIndex = Optional.of(genusIndex);
 			return this;
 		}
@@ -246,8 +265,7 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		public Builder<T, I, IB> adapt(BaseVdypSpecies<?> toCopy) {
 			polygonIdentifier(toCopy.getPolygonIdentifier());
 			layerType(toCopy.getLayerType());
-			genus(toCopy.getGenus());
-			genusIndex(toCopy.getGenusIndex());
+			genus(toCopy.getGenus(), toCopy.getGenusIndex());
 			percentGenus(toCopy.getPercentGenus());
 
 			fractionGenus(toCopy.getFractionGenus());

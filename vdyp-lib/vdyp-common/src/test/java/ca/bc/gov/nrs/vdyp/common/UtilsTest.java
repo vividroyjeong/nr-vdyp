@@ -145,8 +145,7 @@ class UtilsTest {
 				lb.baseArea(0.7f, 0.9f, 1.1f, 1.3f, 1.5f);
 
 				lb.addSpecies(sb -> {
-					sb.genus("B");
-					sb.genusIndex(3);
+					sb.genus("B", 3);
 					sb.baseArea(0.1f, 0.2f, 0.3f, 0.4f, 0.5f);
 					sb.percentGenus(40);
 					sb.volumeGroup(42);
@@ -154,8 +153,7 @@ class UtilsTest {
 					sb.breakageGroup(42);
 				});
 				lb.addSpecies(sb -> {
-					sb.genus("C");
-					sb.genusIndex(4);
+					sb.genus("C", 4);
 					sb.baseArea(0.6f, 0.7f, 0.8f, 0.9f, 1f);
 					sb.percentGenus(60);
 					sb.volumeGroup(42);

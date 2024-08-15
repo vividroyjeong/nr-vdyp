@@ -1,6 +1,5 @@
 package ca.bc.gov.nrs.vdyp.vri.model;
 
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -27,7 +26,6 @@ public class VriSpecies extends BaseVdypSpecies<VriSite> {
 			builder.polygonIdentifier(polygonId);
 			builder.layerType(LayerType.VETERAN);
 			builder.genus("B");
-			builder.genusIndex(3);
 			builder.percentGenus(6f);
 	 * })
 	 * </pre>

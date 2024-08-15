@@ -101,6 +101,7 @@ class VriStartTest {
 		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
 		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
 		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+		TestUtils.populateControlMapGenusReal(controlMap);
 
 		MockFileResolver resolver = new MockFileResolver("Test");
 
@@ -135,23 +136,19 @@ class VriStartTest {
 					lBuilder.empiricalRelationshipParameterIndex(76);
 
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("B");
-						sBuilder.genusIndex(3);
+						sBuilder.genus("B", controlMap);
 						sBuilder.percentGenus(2.99999993f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("C");
-						sBuilder.genusIndex(4);
+						sBuilder.genus("C", controlMap);
 						sBuilder.percentGenus(30.0000012f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("H");
-						sBuilder.genusIndex(8);
+						sBuilder.genus("H", controlMap);
 						sBuilder.percentGenus(48.9000022f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("S");
-						sBuilder.genusIndex(15);
+						sBuilder.genus("S", controlMap);
 						sBuilder.percentGenus(18.1000009f);
 					});
 				});
@@ -185,24 +182,19 @@ class VriStartTest {
 					lBuilder.empiricalRelationshipParameterIndex(76);
 
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("B");
-						sBuilder.genusIndex(3);
-						sBuilder.genusIndex(Utils.getGenusIndex("B", controlMap));
+						sBuilder.genus("B", controlMap);
 						sBuilder.percentGenus(2.99999993f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("C");
-						sBuilder.genusIndex(4);
+						sBuilder.genus("C", controlMap);
 						sBuilder.percentGenus(30.0000012f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("H");
-						sBuilder.genusIndex(8);
+						sBuilder.genus("H", controlMap);
 						sBuilder.percentGenus(48.9000022f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("S");
-						sBuilder.genusIndex(15);
+						sBuilder.genus("S", controlMap);
 						sBuilder.percentGenus(18.1000009f);
 					});
 				});
@@ -263,8 +255,7 @@ class VriStartTest {
 			Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("B");
-				builder.genusIndex(3);
+				builder.genus("B", controlMap);
 				builder.percentGenus(100f);
 			}));
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
@@ -317,8 +308,7 @@ class VriStartTest {
 			Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("B");
-				builder.genusIndex(3);
+				builder.genus("B", controlMap);
 				builder.percentGenus(100f);
 			}));
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
@@ -371,8 +361,7 @@ class VriStartTest {
 			Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("B");
-				builder.genusIndex(3);
+				builder.genus("B", controlMap);
 				builder.percentGenus(100f);
 			}));
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
@@ -425,8 +414,7 @@ class VriStartTest {
 			Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("B");
-				builder.genusIndex(3);
+				builder.genus("B", controlMap);
 				builder.percentGenus(100f);
 			}));
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
@@ -479,8 +467,7 @@ class VriStartTest {
 			Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("B");
-				builder.genusIndex(3);
+				builder.genus("B", controlMap);
 				builder.percentGenus(100f);
 			}));
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
@@ -533,8 +520,7 @@ class VriStartTest {
 			Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("B");
-				builder.genusIndex(3);
+				builder.genus("B", controlMap);
 				builder.percentGenus(100f);
 			}));
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
@@ -1432,8 +1418,7 @@ class VriStartTest {
 					lb.polygonIdentifier("Test", 2024);
 					lb.layerType(LayerType.PRIMARY);
 					lb.addSpecies(sb -> {
-						sb.genus("B");
-						sb.genusIndex(3);
+						sb.genus("B", controlMap);
 						sb.percentGenus(10);
 						sb.volumeGroup(15);
 						sb.decayGroup(11);
@@ -1442,8 +1427,7 @@ class VriStartTest {
 						sb.baseArea(0.634290636f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("C");
-						sb.genusIndex(4);
+						sb.genus("C", controlMap);
 						sb.percentGenus(20);
 						sb.volumeGroup(23);
 						sb.decayGroup(15);
@@ -1452,8 +1436,7 @@ class VriStartTest {
 						sb.baseArea(1.26858127f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("F");
-						sb.genusIndex(7);
+						sb.genus("F", controlMap);
 						sb.percentGenus(30);
 						sb.volumeGroup(33);
 						sb.decayGroup(27);
@@ -1462,8 +1445,7 @@ class VriStartTest {
 						sb.baseArea(1.90287197f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("H");
-						sb.genusIndex(8);
+						sb.genus("H", controlMap);
 						sb.percentGenus(30);
 						sb.volumeGroup(40);
 						sb.decayGroup(33);
@@ -1472,8 +1454,7 @@ class VriStartTest {
 						sb.baseArea(1.90287197f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("S");
-						sb.genusIndex(15);
+						sb.genus("S", controlMap);
 						sb.percentGenus(10);
 						sb.volumeGroup(69);
 						sb.decayGroup(59);
@@ -1551,8 +1532,7 @@ class VriStartTest {
 					lb.polygonIdentifier("Test", 2024);
 					lb.layerType(LayerType.PRIMARY);
 					lb.addSpecies(sb -> {
-						sb.genus("B");
-						sb.genusIndex(3);
+						sb.genus("B", controlMap);
 						sb.percentGenus(10);
 						sb.volumeGroup(15);
 						sb.decayGroup(11);
@@ -1561,8 +1541,7 @@ class VriStartTest {
 						sb.baseArea(0.634290636f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("C");
-						sb.genusIndex(4);
+						sb.genus("C", controlMap);
 						sb.percentGenus(20);
 						sb.volumeGroup(23);
 						sb.decayGroup(15);
@@ -1571,8 +1550,7 @@ class VriStartTest {
 						sb.baseArea(1.26858127f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("F");
-						sb.genusIndex(7);
+						sb.genus("F", controlMap);
 						sb.percentGenus(30);
 						sb.volumeGroup(33);
 						sb.decayGroup(27);
@@ -1581,8 +1559,7 @@ class VriStartTest {
 						sb.baseArea(1.90287197f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("H");
-						sb.genusIndex(8);
+						sb.genus("H", controlMap);
 						sb.percentGenus(30);
 						sb.volumeGroup(40);
 						sb.decayGroup(33);
@@ -1591,8 +1568,7 @@ class VriStartTest {
 						sb.baseArea(1.90287197f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("S");
-						sb.genusIndex(15);
+						sb.genus("S", controlMap);
 						sb.percentGenus(10);
 						sb.volumeGroup(69);
 						sb.decayGroup(59);
@@ -1651,8 +1627,7 @@ class VriStartTest {
 					lb.quadMeanDiameter(10.3879938f);
 					lb.loreyHeight(6.61390257f);
 					lb.addSpecies(sb -> {
-						sb.genus("B");
-						sb.genusIndex(3);
+						sb.genus("B", controlMap);
 						sb.percentGenus(10);
 						sb.volumeGroup(15);
 						sb.decayGroup(11);
@@ -1661,8 +1636,7 @@ class VriStartTest {
 						sb.baseArea(0.634290636f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("C");
-						sb.genusIndex(4);
+						sb.genus("C", controlMap);
 						sb.percentGenus(20);
 						sb.volumeGroup(23);
 						sb.decayGroup(15);
@@ -1671,8 +1645,7 @@ class VriStartTest {
 						sb.baseArea(1.26858127f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("F");
-						sb.genusIndex(7);
+						sb.genus("F", controlMap);
 						sb.percentGenus(30);
 						sb.volumeGroup(33);
 						sb.decayGroup(27);
@@ -1681,8 +1654,7 @@ class VriStartTest {
 						sb.baseArea(1.90287197f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("H");
-						sb.genusIndex(8);
+						sb.genus("H", controlMap);
 						sb.percentGenus(30);
 						sb.volumeGroup(40);
 						sb.decayGroup(33);
@@ -1691,8 +1663,7 @@ class VriStartTest {
 						sb.baseArea(1.90287197f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("S");
-						sb.genusIndex(15);
+						sb.genus("S", controlMap);
 						sb.percentGenus(10);
 						sb.volumeGroup(69);
 						sb.decayGroup(59);
@@ -2024,8 +1995,7 @@ class VriStartTest {
 					lb.primaryGenus("F");
 					// 1
 					lb.addSpecies(sb -> {
-						sb.genus("B");
-						sb.genusIndex(3);
+						sb.genus("B", controlMap);
 						sb.percentGenus(10);
 						sb.addSp64Distribution("BL", 100);
 						sb.addSite(ib -> {
@@ -2035,8 +2005,7 @@ class VriStartTest {
 
 					// 2
 					lb.addSpecies(sb -> {
-						sb.genus("C");
-						sb.genusIndex(4);
+						sb.genus("C", controlMap);
 						sb.percentGenus(20);
 						sb.addSp64Distribution("CW", 100);
 						sb.addSite(ib -> {
@@ -2047,8 +2016,7 @@ class VriStartTest {
 
 					// 3
 					lb.addSpecies(sb -> {
-						sb.genus("F");
-						sb.genusIndex(7);
+						sb.genus("F", controlMap);
 						sb.percentGenus(30);
 						sb.addSp64Distribution("FD", 100);
 						sb.addSite(ib -> {
@@ -2064,8 +2032,7 @@ class VriStartTest {
 
 					// 4
 					lb.addSpecies(sb -> {
-						sb.genus("H");
-						sb.genusIndex(8);
+						sb.genus("H", controlMap);
 						sb.percentGenus(30);
 						sb.addSp64Distribution("HW", 100);
 						sb.addSite(ib -> {
@@ -2076,8 +2043,7 @@ class VriStartTest {
 
 					// 5
 					lb.addSpecies(sb -> {
-						sb.genus("S");
-						sb.genusIndex(15);
+						sb.genus("S", controlMap);
 						sb.percentGenus(10);
 						sb.addSp64Distribution("S", 100);
 						sb.addSite(ib -> {
@@ -2314,8 +2280,7 @@ class VriStartTest {
 					lb.empiricalRelationshipParameterIndex(61);
 
 					lb.addSpecies(spb -> {
-						spb.genus("B");
-						spb.genusIndex(3);
+						spb.genus("B", controlMap);
 						spb.percentGenus(10);
 						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
@@ -2323,8 +2288,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("C");
-						spb.genusIndex(4);
+						spb.genus("C", controlMap);
 						spb.percentGenus(20);
 						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
@@ -2333,8 +2297,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("F");
-						spb.genusIndex(7);
+						spb.genus("F", controlMap);
 						spb.percentGenus(30);
 						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
@@ -2348,8 +2311,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("H");
-						spb.genusIndex(8);
+						spb.genus("H", controlMap);
 						spb.percentGenus(30);
 						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
@@ -2358,8 +2320,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("S");
-						spb.genusIndex(15);
+						spb.genus("S", controlMap);
 						spb.percentGenus(10);
 						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
@@ -2507,8 +2468,7 @@ class VriStartTest {
 					lb.empiricalRelationshipParameterIndex(61);
 
 					lb.addSpecies(spb -> {
-						spb.genus("B");
-						spb.genusIndex(3);
+						spb.genus("B", controlMap);
 						spb.percentGenus(10);
 						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
@@ -2516,8 +2476,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("C");
-						spb.genusIndex(4);
+						spb.genus("C", controlMap);
 						spb.percentGenus(20);
 						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
@@ -2526,8 +2485,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("F");
-						spb.genusIndex(7);
+						spb.genus("F", controlMap);
 						spb.percentGenus(30);
 						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
@@ -2541,8 +2499,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("H");
-						spb.genusIndex(8);
+						spb.genus("H", controlMap);
 						spb.percentGenus(30);
 						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
@@ -2551,8 +2508,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("S");
-						spb.genusIndex(15);
+						spb.genus("S", controlMap);
 						spb.percentGenus(10);
 						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
@@ -2698,8 +2654,7 @@ class VriStartTest {
 					lb.inventoryTypeGroup(3);
 
 					lb.addSpecies(spb -> {
-						spb.genus("B");
-						spb.genusIndex(3);
+						spb.genus("B", controlMap);
 						spb.percentGenus(10);
 						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
@@ -2707,8 +2662,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("C");
-						spb.genusIndex(4);
+						spb.genus("C", controlMap);
 						spb.percentGenus(20);
 						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
@@ -2717,8 +2671,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("F");
-						spb.genusIndex(7);
+						spb.genus("F", controlMap);
 						spb.percentGenus(30);
 						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
@@ -2732,8 +2685,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("H");
-						spb.genusIndex(8);
+						spb.genus("H", controlMap);
 						spb.percentGenus(30);
 						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
@@ -2742,8 +2694,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("S");
-						spb.genusIndex(15);
+						spb.genus("S", controlMap);
 						spb.percentGenus(10);
 						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
@@ -2929,8 +2880,7 @@ class VriStartTest {
 					lb.empiricalRelationshipParameterIndex(61);
 
 					lb.addSpecies(spb -> {
-						spb.genus("B");
-						spb.genusIndex(3);
+						spb.genus("B", controlMap);
 						spb.percentGenus(10);
 						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
@@ -2938,8 +2888,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("C");
-						spb.genusIndex(4);
+						spb.genus("C", controlMap);
 						spb.percentGenus(20);
 						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
@@ -2948,8 +2897,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("F");
-						spb.genusIndex(7);
+						spb.genus("F", controlMap);
 						spb.percentGenus(30);
 						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
@@ -2963,8 +2911,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("H");
-						spb.genusIndex(8);
+						spb.genus("H", controlMap);
 						spb.percentGenus(30);
 						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
@@ -2973,8 +2920,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("S");
-						spb.genusIndex(15);
+						spb.genus("S", controlMap);
 						spb.percentGenus(10);
 						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
@@ -3129,8 +3075,7 @@ class VriStartTest {
 					lb.empiricalRelationshipParameterIndex(61);
 
 					lb.addSpecies(spb -> {
-						spb.genus("B");
-						spb.genusIndex(3);
+						spb.genus("B", controlMap);
 						spb.percentGenus(10);
 						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
@@ -3138,8 +3083,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("C");
-						spb.genusIndex(4);
+						spb.genus("C", controlMap);
 						spb.percentGenus(20);
 						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
@@ -3148,8 +3092,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("F");
-						spb.genusIndex(7);
+						spb.genus("F", controlMap);
 						spb.percentGenus(30);
 						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
@@ -3163,8 +3106,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("H");
-						spb.genusIndex(8);
+						spb.genus("H", controlMap);
 						spb.percentGenus(30);
 						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
@@ -3173,8 +3115,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("S");
-						spb.genusIndex(15);
+						spb.genus("S", controlMap);
 						spb.percentGenus(10);
 						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
@@ -3196,8 +3137,7 @@ class VriStartTest {
 					lb.empiricalRelationshipParameterIndex(61);
 
 					lb.addSpecies(spb -> {
-						spb.genus("B");
-						spb.genusIndex(3);
+						spb.genus("B", controlMap);
 						spb.percentGenus(10);
 						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
@@ -3205,8 +3145,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("C");
-						spb.genusIndex(4);
+						spb.genus("C", controlMap);
 						spb.percentGenus(20);
 						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
@@ -3215,8 +3154,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("F");
-						spb.genusIndex(7);
+						spb.genus("F", controlMap);
 						spb.percentGenus(30);
 						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
@@ -3230,8 +3168,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("H");
-						spb.genusIndex(8);
+						spb.genus("H", controlMap);
 						spb.percentGenus(30);
 						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
@@ -3240,8 +3177,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("S");
-						spb.genusIndex(15);
+						spb.genus("S", controlMap);
 						spb.percentGenus(10);
 						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
@@ -3374,8 +3310,7 @@ class VriStartTest {
 					lb.empiricalRelationshipParameterIndex(61);
 
 					lb.addSpecies(spb -> {
-						spb.genus("B");
-						spb.genusIndex(3);
+						spb.genus("B", controlMap);
 						spb.percentGenus(10);
 						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
@@ -3383,8 +3318,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("C");
-						spb.genusIndex(4);
+						spb.genus("C", controlMap);
 						spb.percentGenus(20);
 						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
@@ -3393,8 +3327,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("F");
-						spb.genusIndex(7);
+						spb.genus("F", controlMap);
 						spb.percentGenus(30);
 						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
@@ -3408,8 +3341,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("H");
-						spb.genusIndex(8);
+						spb.genus("H", controlMap);
 						spb.percentGenus(30);
 						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
@@ -3418,8 +3350,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("S");
-						spb.genusIndex(15);
+						spb.genus("S", controlMap);
 						spb.percentGenus(10);
 						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
@@ -3578,8 +3509,7 @@ class VriStartTest {
 					lb.empiricalRelationshipParameterIndex(61);
 
 					lb.addSpecies(spb -> {
-						spb.genus("B");
-						spb.genusIndex(3);
+						spb.genus("B", controlMap);
 						spb.percentGenus(10);
 						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
@@ -3587,8 +3517,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("C");
-						spb.genusIndex(4);
+						spb.genus("C", controlMap);
 						spb.percentGenus(20);
 						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
@@ -3597,8 +3526,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("F");
-						spb.genusIndex(7);
+						spb.genus("F", controlMap);
 						spb.percentGenus(30);
 						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
@@ -3612,8 +3540,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("H");
-						spb.genusIndex(8);
+						spb.genus("H", controlMap);
 						spb.percentGenus(30);
 						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
@@ -3622,8 +3549,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("S");
-						spb.genusIndex(15);
+						spb.genus("S", controlMap);
 						spb.percentGenus(10);
 						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
@@ -3645,8 +3571,7 @@ class VriStartTest {
 					lb.empiricalRelationshipParameterIndex(61);
 
 					lb.addSpecies(spb -> {
-						spb.genus("B");
-						spb.genusIndex(3);
+						spb.genus("B", controlMap);
 						spb.percentGenus(10);
 						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
@@ -3654,8 +3579,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("C");
-						spb.genusIndex(4);
+						spb.genus("C", controlMap);
 						spb.percentGenus(20);
 						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
@@ -3664,8 +3588,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("F");
-						spb.genusIndex(7);
+						spb.genus("F", controlMap);
 						spb.percentGenus(30);
 						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
@@ -3679,8 +3602,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("H");
-						spb.genusIndex(8);
+						spb.genus("H", controlMap);
 						spb.percentGenus(30);
 						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
@@ -3689,8 +3611,7 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("S");
-						spb.genusIndex(15);
+						spb.genus("S", controlMap);
 						spb.percentGenus(10);
 						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
@@ -3792,28 +3713,23 @@ class VriStartTest {
 					lBuilder.empiricalRelationshipParameterIndex(61);
 
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("B");
-						sBuilder.genusIndex(3);
+						sBuilder.genus("B", controlMap);
 						sBuilder.percentGenus(10f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("C");
-						sBuilder.genusIndex(4);
+						sBuilder.genus("C", controlMap);
 						sBuilder.percentGenus(20f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("F");
-						sBuilder.genusIndex(7);
+						sBuilder.genus("F", controlMap);
 						sBuilder.percentGenus(30f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("H");
-						sBuilder.genusIndex(8);
+						sBuilder.genus("H", controlMap);
 						sBuilder.percentGenus(30f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("S");
-						sBuilder.genusIndex(15);
+						sBuilder.genus("S", controlMap);
 						sBuilder.percentGenus(10f);
 					});
 
@@ -3848,28 +3764,23 @@ class VriStartTest {
 					lBuilder.empiricalRelationshipParameterIndex(61);
 
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("B");
-						sBuilder.genusIndex(3);
+						sBuilder.genus("B", controlMap);
 						sBuilder.percentGenus(10f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("C");
-						sBuilder.genusIndex(4);
+						sBuilder.genus("C", controlMap);
 						sBuilder.percentGenus(20f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("F");
-						sBuilder.genusIndex(7);
+						sBuilder.genus("F", controlMap);
 						sBuilder.percentGenus(30f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("H");
-						sBuilder.genusIndex(8);
+						sBuilder.genus("H", controlMap);
 						sBuilder.percentGenus(30f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("S");
-						sBuilder.genusIndex(15);
+						sBuilder.genus("S", controlMap);
 						sBuilder.percentGenus(10f);
 					});
 

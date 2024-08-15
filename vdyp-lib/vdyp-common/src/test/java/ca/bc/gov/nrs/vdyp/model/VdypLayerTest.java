@@ -34,8 +34,7 @@ class VdypLayerTest {
 			builder.layerType(LayerType.PRIMARY);
 
 			builder.addSpecies(specBuilder -> {
-				specBuilder.genus("PL");
-				specBuilder.genusIndex(12);
+				specBuilder.genus("PL", 12);
 				specBuilder.percentGenus(100);
 				specBuilder.volumeGroup(-1);
 				specBuilder.decayGroup(-1);
@@ -81,8 +80,7 @@ class VdypLayerTest {
 		var result = VdypLayer.build(poly, builder -> {
 			builder.layerType(LayerType.PRIMARY);
 			builder.addSpecies(specBuilder -> {
-				specBuilder.genus("PL");
-				specBuilder.genusIndex(12);
+				specBuilder.genus("PL", 12);
 				specBuilder.percentGenus(100);
 				specBuilder.volumeGroup(-1);
 				specBuilder.decayGroup(-1);
@@ -117,8 +115,7 @@ class VdypLayerTest {
 			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.addSpecies(specBuilder -> {
-				specBuilder.genus("PL");
-				specBuilder.genusIndex(12);
+				specBuilder.genus("PL", 12);
 				specBuilder.percentGenus(100);
 				specBuilder.volumeGroup(-1);
 				specBuilder.decayGroup(-1);
@@ -132,8 +129,7 @@ class VdypLayerTest {
 			});
 
 			builder.addSpecies(specBuilder -> {
-				specBuilder.genus("B");
-				specBuilder.genusIndex(3);
+				specBuilder.genus("B", 3);
 				specBuilder.percentGenus(90f);
 				specBuilder.volumeGroup(10);
 				specBuilder.decayGroup(10);
@@ -238,8 +234,7 @@ class VdypLayerTest {
 			builder.layerType(LayerType.PRIMARY);
 
 			builder.addSpecies(speciesBuilder -> {
-				speciesBuilder.genus("B");
-				speciesBuilder.genusIndex(3);
+				speciesBuilder.genus("B", 3);
 				speciesBuilder.percentGenus(100f);
 				speciesBuilder.fractionGenus(1f);
 				speciesBuilder.volumeGroup(1);
