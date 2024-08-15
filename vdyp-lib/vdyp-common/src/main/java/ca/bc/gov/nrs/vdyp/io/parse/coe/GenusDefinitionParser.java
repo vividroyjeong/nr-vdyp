@@ -49,8 +49,7 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<GenusD
 
 	private LineParser lineParser = new LineParser().strippedString(2, "alias").space(1).strippedString(32, "name")
 			.space(1).value(
-					2, "preference",
-					(s, c) -> ValueParser.optional(ValueParser.INTEGER).parse(s)
+					2, "preference", (s, c) -> ValueParser.optional(ValueParser.INTEGER).parse(s)
 							.flatMap(v -> v == 0 ? Optional.empty() : Optional.of(v))
 			);
 
@@ -88,8 +87,7 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<GenusD
 				throw new ValueParseException(
 						Integer.toString(index),
 						String.format(
-								"preference values must be between %d and %d (inclusive); saw value %d", 1, numSp0,
-								index
+								"preference values must be between %d and %d (inclusive); saw value %d", 1, numSp0, index
 						)
 				);
 			}
@@ -97,8 +95,8 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<GenusD
 				throw new ValueParseException(
 						Integer.toString(index),
 						String.format(
-								"Genera ordering %d has already been specified for genera %s", index,
-								r[index - 1].getAlias()
+								"Genera ordering %d has already been specified for genera %s", index, r[index - 1]
+										.getAlias()
 						)
 				);
 			}

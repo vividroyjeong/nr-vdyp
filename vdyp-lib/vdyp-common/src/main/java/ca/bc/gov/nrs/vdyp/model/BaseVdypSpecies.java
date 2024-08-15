@@ -102,7 +102,8 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		}
 
 		// sort the unindexed distributions in order of decreasing percentage
-		unindexedSp64Distributions = unindexedSp64Distributions.stream().sorted((o1, o2) -> o2.getPercentage().compareTo(o1.getPercentage())).toList();
+		unindexedSp64Distributions = unindexedSp64Distributions.stream()
+				.sorted((o1, o2) -> o2.getPercentage().compareTo(o1.getPercentage())).toList();
 
 		// and assign them an index, starting with one.
 		int index = 1;

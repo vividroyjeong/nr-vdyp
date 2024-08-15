@@ -90,24 +90,24 @@ class Height2SiteIndexTest {
 		@Test
 		void testInvalidHeightForBreastHeightAge() {
 			assertThrows(
-					LessThan13Exception.class,
-					() -> Height2SiteIndex.heightToIndex(null, 0.0, SI_AT_BREAST, 1.2, SI_EST_ITERATE)
+					LessThan13Exception.class, () -> Height2SiteIndex
+							.heightToIndex(null, 0.0, SI_AT_BREAST, 1.2, SI_EST_ITERATE)
 			);
 		}
 
 		@Test
 		void testInvalidHeightForIteration() {
 			assertThrows(
-					NoAnswerException.class,
-					() -> Height2SiteIndex.heightToIndex(null, 0.0, SI_AT_TOTAL, 0, SI_EST_ITERATE)
+					NoAnswerException.class, () -> Height2SiteIndex
+							.heightToIndex(null, 0.0, SI_AT_TOTAL, 0, SI_EST_ITERATE)
 			);
 		}
 
 		@Test
 		void testInvalidAgeForIteration() {
 			assertThrows(
-					NoAnswerException.class,
-					() -> Height2SiteIndex.heightToIndex(null, 0.0, SI_AT_TOTAL, 1.3, SI_EST_ITERATE)
+					NoAnswerException.class, () -> Height2SiteIndex
+							.heightToIndex(null, 0.0, SI_AT_TOTAL, 1.3, SI_EST_ITERATE)
 			);
 		}
 
@@ -178,8 +178,8 @@ class Height2SiteIndexTest {
 		@Test
 		void testInvalidBhage() {
 			assertThrows(
-					GrowthInterceptMinimumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(null, 0.5, 1.0, SiteIndexEstimationType.SI_EST_ITERATE)
+					GrowthInterceptMinimumException.class, () -> Height2SiteIndex
+							.baHeightToIndex(null, 0.5, 1.0, SiteIndexEstimationType.SI_EST_ITERATE)
 			); // SI_AT_TOTAL = 0
 		}
 
@@ -750,8 +750,8 @@ class Height2SiteIndexTest {
 		void testInvalidSI_FDI_NIGHGI() {
 			double height = 1.3;
 			assertThrows(
-					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_FDI_NIGHGI, 51, height, SI_EST_DIRECT)
+					GrowthInterceptMaximumException.class, () -> Height2SiteIndex
+							.baHeightToIndex(SI_FDI_NIGHGI, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -990,8 +990,8 @@ class Height2SiteIndexTest {
 		void testInvalidSI_PLI_NIGHGI97() {
 			double height = 1.3;
 			assertThrows(
-					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_PLI_NIGHGI97, 51, height, SI_EST_DIRECT)
+					GrowthInterceptMaximumException.class, () -> Height2SiteIndex
+							.baHeightToIndex(SI_PLI_NIGHGI97, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -1149,8 +1149,8 @@ class Height2SiteIndexTest {
 		void testInvalidSI_SW_NIGHGI() { // checks minimum and maximum for bhage
 			double height = 1.3;
 			assertThrows(
-					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_SW_NIGHGI, 31, height, SI_EST_DIRECT)
+					GrowthInterceptMaximumException.class, () -> Height2SiteIndex
+							.baHeightToIndex(SI_SW_NIGHGI, 31, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -1388,8 +1388,8 @@ class Height2SiteIndexTest {
 		void testInvalidSI_SW_NIGHGI99() { // checks minimum and maximum for bhage
 			double height = 1.3;
 			assertThrows(
-					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_SW_NIGHGI99, 51, height, SI_EST_DIRECT)
+					GrowthInterceptMaximumException.class, () -> Height2SiteIndex
+							.baHeightToIndex(SI_SW_NIGHGI99, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -1628,8 +1628,8 @@ class Height2SiteIndexTest {
 		void testInvalidSI_SW_NIGHGI2004() { // checks minimum and maximum for bhage
 			double height = 1.3;
 			assertThrows(
-					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_SW_NIGHGI2004, 51, height, SI_EST_DIRECT)
+					GrowthInterceptMaximumException.class, () -> Height2SiteIndex
+							.baHeightToIndex(SI_SW_NIGHGI2004, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -1868,8 +1868,8 @@ class Height2SiteIndexTest {
 		void testInvalidSI_HWC_NIGHGI99() { // checks minimum and maximum for bhage
 			double height = 1.3;
 			assertThrows(
-					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_HWC_NIGHGI99, 51, height, SI_EST_DIRECT)
+					GrowthInterceptMaximumException.class, () -> Height2SiteIndex
+							.baHeightToIndex(SI_HWC_NIGHGI99, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -2028,8 +2028,8 @@ class Height2SiteIndexTest {
 		void testInvalidSI_HWC_NIGHGI() { // checks minimum and maximum for bhage
 			double height = 1.3;
 			assertThrows(
-					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_HWC_NIGHGI, 31, height, SI_EST_DIRECT)
+					GrowthInterceptMaximumException.class, () -> Height2SiteIndex
+							.baHeightToIndex(SI_HWC_NIGHGI, 31, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -2268,8 +2268,8 @@ class Height2SiteIndexTest {
 		void testInvalidSI_HWI_NIGHGI() { // checks minimum and maximum for bhage
 			double height = 1.3;
 			assertThrows(
-					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_HWI_NIGHGI, 51, height, SI_EST_DIRECT)
+					GrowthInterceptMaximumException.class, () -> Height2SiteIndex
+							.baHeightToIndex(SI_HWI_NIGHGI, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -2508,8 +2508,8 @@ class Height2SiteIndexTest {
 		void testInvalidSI_FDC_NIGHGI() { // checks minimum and maximum for bhage
 			double height = 1.3;
 			assertThrows(
-					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_FDC_NIGHGI, 51, height, SI_EST_DIRECT)
+					GrowthInterceptMaximumException.class, () -> Height2SiteIndex
+							.baHeightToIndex(SI_FDC_NIGHGI, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -2745,8 +2745,8 @@ class Height2SiteIndexTest {
 		void testInvalidSI_SE_NIGHGI() { // checks minimum and maximum for bhage
 			double height = 1.3;
 			assertThrows(
-					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_SE_NIGHGI, 51, height, SI_EST_DIRECT)
+					GrowthInterceptMaximumException.class, () -> Height2SiteIndex
+							.baHeightToIndex(SI_SE_NIGHGI, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -2903,8 +2903,8 @@ class Height2SiteIndexTest {
 		void testInvalidSI_SS_NIGHGI() { // checks minimum and maximum for bhage
 			double height = 1.3;
 			assertThrows(
-					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_SS_NIGHGI, 31, height, SI_EST_DIRECT)
+					GrowthInterceptMaximumException.class, () -> Height2SiteIndex
+							.baHeightToIndex(SI_SS_NIGHGI, 31, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -3142,8 +3142,8 @@ class Height2SiteIndexTest {
 			// checks minimum and maximum for bhage
 			double height = 1.3;
 			assertThrows(
-					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_SS_NIGHGI99, 51, height, SI_EST_DIRECT)
+					GrowthInterceptMaximumException.class, () -> Height2SiteIndex
+							.baHeightToIndex(SI_SS_NIGHGI99, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -3380,8 +3380,8 @@ class Height2SiteIndexTest {
 		void testInvalidSI_CWI_NIGHGI() { // checks minimum and maximum for bhage
 			double height = 1.3;
 			assertThrows(
-					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_CWI_NIGHGI, 51, height, SI_EST_DIRECT)
+					GrowthInterceptMaximumException.class, () -> Height2SiteIndex
+							.baHeightToIndex(SI_CWI_NIGHGI, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -3618,8 +3618,8 @@ class Height2SiteIndexTest {
 		void testInvalidSI_LW_NIGHGI() { // checks minimum and maximum for bhage
 			double height = 1.3;
 			assertThrows(
-					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_LW_NIGHGI, 51, height, SI_EST_DIRECT)
+					GrowthInterceptMaximumException.class, () -> Height2SiteIndex
+							.baHeightToIndex(SI_LW_NIGHGI, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -3856,8 +3856,8 @@ class Height2SiteIndexTest {
 		void testInvalidSI_PY_NIGHGI() { // checks minimum and maximum for bhage
 			double height = 1.3;
 			assertThrows(
-					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_PY_NIGHGI, 51, height, SI_EST_DIRECT)
+					GrowthInterceptMaximumException.class, () -> Height2SiteIndex
+							.baHeightToIndex(SI_PY_NIGHGI, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -4094,8 +4094,8 @@ class Height2SiteIndexTest {
 		void testInvalidSI_BA_NIGHGI() { // checks minimum and maximum for bhage
 			double height = 1.3;
 			assertThrows(
-					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_BA_NIGHGI, 51, height, SI_EST_DIRECT)
+					GrowthInterceptMaximumException.class, () -> Height2SiteIndex
+							.baHeightToIndex(SI_BA_NIGHGI, 51, height, SI_EST_DIRECT)
 			);
 		}
 
@@ -4332,8 +4332,8 @@ class Height2SiteIndexTest {
 		void testInvalidSI_BL_THROWERGI() { // checks minimum and maximum for bhage
 			double height = 1.3;
 			assertThrows(
-					GrowthInterceptMaximumException.class,
-					() -> Height2SiteIndex.baHeightToIndex(SI_BL_THROWERGI, 51, height, SI_EST_DIRECT)
+					GrowthInterceptMaximumException.class, () -> Height2SiteIndex
+							.baHeightToIndex(SI_BL_THROWERGI, 51, height, SI_EST_DIRECT)
 			);
 		}
 

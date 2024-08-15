@@ -33,8 +33,10 @@ public class GenusDefinitionMap {
 				genusDefinitions.add(g);
 			}
 
-			aliasesSortedByIndex = aliases.stream().sorted((o1, o2) -> indexByAliasMap.get(o1) - indexByAliasMap.get(o2)).toList();
-			genusDefinitionsSortedByIndex = genusDefinitions.stream().sorted((o1, o2) -> o1.getIndex() - o2.getIndex()).toList();
+			aliasesSortedByIndex = aliases.stream()
+					.sorted((o1, o2) -> indexByAliasMap.get(o1) - indexByAliasMap.get(o2)).toList();
+			genusDefinitionsSortedByIndex = genusDefinitions.stream().sorted((o1, o2) -> o1.getIndex() - o2.getIndex())
+					.toList();
 		} else {
 			aliasesSortedByIndex = new ArrayList<>();
 			genusDefinitionsSortedByIndex = new ArrayList<>();

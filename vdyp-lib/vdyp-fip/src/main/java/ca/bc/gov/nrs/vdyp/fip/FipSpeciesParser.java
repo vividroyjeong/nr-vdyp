@@ -50,8 +50,7 @@ public class FipSpeciesParser
 					throws IOException, ResourceParseException {
 		return () -> {
 			var lineParser = new LineParser().strippedString(25, FipPolygonParser.POLYGON_IDENTIFIER).space(1).value(
-					1, FipLayerParser.LAYER,
-					ValueParser.valueOrMarker(
+					1, FipLayerParser.LAYER, ValueParser.valueOrMarker(
 							ValueParser.LAYER, ValueParser.optionalSingleton("Z"::equals, EndOfRecord.END_OF_RECORD)
 					)
 			).space(1).value(2, GENUS, ControlledValueParser.optional(ValueParser.GENUS))

@@ -36,7 +36,7 @@ class GenusDefinitionMapTest {
 		assertThat(gdMap.getByIndex(3), hasProperty("alias", is("B")));
 		assertThat(gdMap.getIndexByAlias("B"), is(3));
 		assertThat(gdMap.getNGenera(), is(16));
-		
+
 		assertThat(gdMap.getGenera().size(), is(16));
 		assertThat(gdMap.getGenera(), Matchers.hasItem(new GenusDefinition("B", 3, "Balsam")));
 		assertThat(gdMap.getAllGeneraAliases(), Matchers.hasItems("B", "C"));

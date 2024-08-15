@@ -3819,18 +3819,23 @@ class VriStartTest {
 		return hasEntry(
 				genus, //
 				both(hasProperty("genus", genus))
-					.and(hasProperty("percentGenus", percent))
-					.and(hasProperty("sp64DistributionSet", 
-							hasProperty("sp64DistributionMap", 
-								allOf(aMapWithSize(1), 
-									hasEntry(is(1), allOf(
-										hasProperty("genusAlias", species), 
-										hasProperty("percentage", is(100f))
-									))
+						.and(hasProperty("percentGenus", percent))
+						.and(
+								hasProperty(
+										"sp64DistributionSet", hasProperty(
+												"sp64DistributionMap", allOf(
+														aMapWithSize(1), hasEntry(
+																is(1), allOf(
+																		hasProperty("genusAlias", species), hasProperty(
+																				"percentage", is(100f)
+																		)
+																)
+														)
+												)
+										)
 								)
-							)
-						))
-					.and((Matcher<? super Object>) additional)
+						)
+						.and((Matcher<? super Object>) additional)
 		);
 	}
 

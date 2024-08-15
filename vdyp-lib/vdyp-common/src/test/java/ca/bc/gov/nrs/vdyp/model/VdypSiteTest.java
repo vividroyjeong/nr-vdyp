@@ -42,11 +42,11 @@ class VdypSiteTest {
 		var ex = assertThrows(IllegalStateException.class, () -> VdypSite.build(builder -> {
 		}));
 		assertThat(
-				ex,
-				hasProperty(
-						"message",
-						allOf(
-								containsString("polygonIdentifier"), containsString("layerType"), containsString("siteGenus")
+				ex, hasProperty(
+						"message", allOf(
+								containsString("polygonIdentifier"), containsString("layerType"), containsString(
+										"siteGenus"
+								)
 						)
 				)
 		);
@@ -64,9 +64,9 @@ class VdypSiteTest {
 			builder.siteIndex(42.5f);
 			builder.yearsToBreastHeight(5.0f);
 		});
-		
+
 		var copiedResult = VdypSite.build(builder -> builder.copy(result));
-		
+
 		assertThat(copiedResult, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
 		assertThat(copiedResult, hasProperty("layerType", is(LayerType.PRIMARY)));
 		assertThat(copiedResult, hasProperty("ageTotal", is(Optional.of(35.0f))));

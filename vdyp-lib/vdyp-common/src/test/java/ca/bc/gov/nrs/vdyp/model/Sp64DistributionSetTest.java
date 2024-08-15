@@ -29,7 +29,7 @@ class Sp64DistributionSetTest {
 
 	@Test
 	void testSp64DistributionComparison1() {
-		
+
 		var a = new Sp64Distribution(1, aAlias, 75f);
 		var b = new Sp64Distribution(1, bAlias, 25f);
 
@@ -74,13 +74,13 @@ class Sp64DistributionSetTest {
 		var gd2 = new Sp64Distribution(2, bAlias, 30.0f);
 		var gd2a = new Sp64Distribution(2, bAlias, 25.0f);
 		var gd3 = new Sp64Distribution(1, cAlias, 20.0f);
-		
+
 		assertNotNull(new Sp64DistributionSet(2, List.of(gd1, gd2)));
 		var sp64Set1 = new Sp64DistributionSet(3, List.of(gd1, gd2a));
 		assertNotNull(sp64Set1);
 		assertTrue(sp64Set1.getSpeciesDistribution(1).get().equals(gd1));
 		assertTrue(sp64Set1.getSpeciesDistribution(2).get().equals(gd2a));
-		
+
 		// Test copy constructor
 		var sp64Set1Copy = sp64Set1.copy();
 		assertNotNull(sp64Set1Copy);
@@ -145,7 +145,7 @@ class Sp64DistributionSetTest {
 
 		{
 			// maxIndex same, length same, element differences
-			
+
 			// lower index
 			var set1 = new Sp64DistributionSet(4, List.of(sd1, sd2));
 			var set2 = new Sp64DistributionSet(4, List.of(sd1, sd4));
