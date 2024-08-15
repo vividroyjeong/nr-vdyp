@@ -50,13 +50,13 @@ class AgeToAgeTest {
 	@Test
 	void testShouldBranchInvalid() {
 		assertThrows(
-				AgeTypeErrorException.class,
-				() -> AgeToAge.ageToAge(SI_ACB_HUANGAC, 0.0, SI_AT_BREAST, SI_AT_BREAST, 0.0)
+				AgeTypeErrorException.class, () -> AgeToAge
+						.ageToAge(SI_ACB_HUANGAC, 0.0, SI_AT_BREAST, SI_AT_BREAST, 0.0)
 		);
 
 		assertThrows(
-				AgeTypeErrorException.class,
-				() -> AgeToAge.ageToAge(SI_ACT_THROWERAC, 0.0, SI_AT_TOTAL, SI_AT_TOTAL, 0.0)
+				AgeTypeErrorException.class, () -> AgeToAge
+						.ageToAge(SI_ACT_THROWERAC, 0.0, SI_AT_TOTAL, SI_AT_TOTAL, 0.0)
 		);
 	}
 

@@ -80,7 +80,7 @@ class FipPolygonParserTest {
 
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("Test Polygon", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
-		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
+		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("percentAvailable", present(is(90.0f))));
 		assertThat(poly, hasProperty("mode", present(is(PolygonMode.YOUNG))));
 		assertThat(poly, hasProperty("nonproductiveDescription", present(is("BLAH"))));
@@ -118,7 +118,7 @@ class FipPolygonParserTest {
 
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
-		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
+		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
@@ -138,18 +138,17 @@ class FipPolygonParserTest {
 		TestUtils.populateControlMapBecReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat",
-				TestUtils.makeInputStream(
-						"01002 S000001 00     1970 A CWH                1.00",
-						"01002 S000002 00     1970 A CWH                1.00",
-						"01002 S000003 00     1970 A CWH                1.00",
-						"01002 S000004 00     1970 A CWH                1.00",
-						"01003AS000001 00     1953 B CWH                1.00",
-						"01003AS000003 00     1953 B CWH                1.00",
-						"01004 S000002 00     1953 B CWH                1.00",
-						"01004 S000036 00     1957 B CWH                1.00",
-						"01004 S000037 00     1957 B CWH                1.00",
-						"01004 S000038 00     1957 B CWH                1.00"
+				"test.dat", TestUtils.makeInputStream(
+						"01002 S000001 00     1970 A CWH                1.00", //
+						"01002 S000002 00     1970 A CWH                1.00", //
+						"01002 S000003 00     1970 A CWH                1.00", //
+						"01002 S000004 00     1970 A CWH                1.00", //
+						"01003AS000001 00     1953 B CWH                1.00", //
+						"01003AS000003 00     1953 B CWH                1.00", //
+						"01004 S000002 00     1953 B CWH                1.00", //
+						"01004 S000036 00     1957 B CWH                1.00", //
+						"01004 S000037 00     1957 B CWH                1.00", //
+						"01004 S000038 00     1957 B CWH                1.00" //
 				)
 		);
 
@@ -168,7 +167,7 @@ class FipPolygonParserTest {
 
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
-		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
+		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
@@ -178,7 +177,7 @@ class FipPolygonParserTest {
 
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000002 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
-		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
+		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
@@ -188,7 +187,7 @@ class FipPolygonParserTest {
 
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000003 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
-		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
+		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
@@ -198,7 +197,7 @@ class FipPolygonParserTest {
 
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000004 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
-		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
+		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
@@ -208,7 +207,7 @@ class FipPolygonParserTest {
 
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01003AS000001 00", 1953)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("B")));
-		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
+		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
@@ -218,7 +217,7 @@ class FipPolygonParserTest {
 
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01003AS000003 00", 1953)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("B")));
-		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
+		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
@@ -228,7 +227,7 @@ class FipPolygonParserTest {
 
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01004 S000002 00", 1953)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("B")));
-		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
+		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
@@ -238,7 +237,7 @@ class FipPolygonParserTest {
 
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01004 S000036 00", 1957)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("B")));
-		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
+		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
@@ -248,7 +247,7 @@ class FipPolygonParserTest {
 
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01004 S000037 00", 1957)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("B")));
-		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
+		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
@@ -258,7 +257,7 @@ class FipPolygonParserTest {
 
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01004 S000038 00", 1957)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("B")));
-		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
+		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
@@ -296,7 +295,7 @@ class FipPolygonParserTest {
 
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
-		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
+		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
@@ -334,7 +333,7 @@ class FipPolygonParserTest {
 
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
-		assertThat(poly, hasProperty("biogeoclimaticZone", is("CWH")));
+		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
 		assertThat(poly, hasProperty("percentAvailable", notPresent()));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));

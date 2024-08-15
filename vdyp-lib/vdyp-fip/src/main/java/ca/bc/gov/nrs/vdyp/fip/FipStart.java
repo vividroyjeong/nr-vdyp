@@ -55,7 +55,6 @@ import ca.bc.gov.nrs.vdyp.fip.model.FipLayerPrimary;
 import ca.bc.gov.nrs.vdyp.fip.model.FipPolygon;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSite;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
-import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
@@ -190,8 +189,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		FipLayerPrimary fipPrimeLayer = (FipLayerPrimary) fipLayers.get(LayerType.PRIMARY);
 		assert fipPrimeLayer != null;
 		var resultPrimeLayer = processLayerAsPrimary(
-				polygon, fipPrimeLayer,
-				resultVetLayer.map(VdypLayer::getBaseAreaByUtilization).map(coe -> coe.getAll()).orElse(0f)
+				polygon, fipPrimeLayer, resultVetLayer.map(VdypLayer::getBaseAreaByUtilization).map(coe -> coe.getAll())
+						.orElse(0f)
 		);
 		processedLayers.put(LayerType.PRIMARY, resultPrimeLayer);
 
@@ -213,10 +212,10 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 				throw new LowValueException("Predicted base area", predictedBaseArea, minimumPredictedBaseArea);
 			}
 		}
-		BecDefinition bec = BecDefinitionParser.getBecs(controlMap).get(polygon.getBiogeoclimaticZone())
-				.orElseThrow(() -> new ProcessingException("Missing Bec " + polygon.getBiogeoclimaticZone()));
 		// FIPSTK
-		adjustForStocking(resultPoly.getLayers().get(LayerType.PRIMARY), fipPrimeLayer, bec);
+		adjustForStocking(
+				resultPoly.getLayers().get(LayerType.PRIMARY), fipPrimeLayer, polygon.getBiogeoclimaticZone()
+		);
 		return Optional.of(resultPoly);
 	}
 
@@ -271,7 +270,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		// locally
 		var itg = findItg(primarySpecies);
 
-		BecDefinition bec = Utils.getBec(fipPolygon.getBiogeoclimaticZone(), controlMap);
+		BecDefinition bec = fipPolygon.getBiogeoclimaticZone();
 
 		// GRPBA1FD
 		int empiricalRelationshipParameterIndex = findEmpiricalRelationshipParameterIndex(
@@ -359,8 +358,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 					.primaryHeightFromLeadHeightInitial(leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion());
 		} else {
 			primaryHeight = estimationMethods.primaryHeightFromLeadHeight(
-					leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion(),
-					vdypPrimarySpecies.getTreesPerHectareByUtilization().getAll()
+					leadHeight, vdypPrimarySpecies.getGenus(), bec.getRegion(), vdypPrimarySpecies
+							.getTreesPerHectareByUtilization().getAll()
 			);
 		}
 		vdypPrimarySpecies.getLoreyHeightByUtilization().setAll(primaryHeight);
@@ -470,15 +469,15 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 					var dqMin = limits.minDiameterHeight() * spec.getLoreyHeightByUtilization().getAll();
 					var dqMax = max(
-							limits.maxQuadMeanDiameter(),
-							limits.maxDiameterHeight() * spec.getLoreyHeightByUtilization().getAll()
+							limits.maxQuadMeanDiameter(), limits.maxDiameterHeight()
+									* spec.getLoreyHeightByUtilization().getAll()
 					);
 
 					// EMP060
 					float quadMeanDiameter = clamp(
 							estimationMethods.estimateQuadMeanDiameterForSpecies(
-									spec, result.getSpecies(), bec.getRegion(), quadMeanDiameterTotal, baseAreaTotal,
-									treesPerHectareTotal, loreyHeightTotal
+									spec, result.getSpecies(), bec
+											.getRegion(), quadMeanDiameterTotal, baseAreaTotal, treesPerHectareTotal, loreyHeightTotal
 							), //
 							dqMin, dqMax
 					);
@@ -550,8 +549,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			// EMP090
 			var wholeStemVolume = spec.getTreesPerHectareByUtilization().getAll()
 					* EstimationMethods.estimateWholeStemVolumePerTree(
-							controlMap, spec.getVolumeGroup(), spec.getLoreyHeightByUtilization().getAll(),
-							spec.getQuadraticMeanDiameterByUtilization().getAll()
+							controlMap, spec.getVolumeGroup(), spec.getLoreyHeightByUtilization().getAll(), spec
+									.getQuadraticMeanDiameterByUtilization().getAll()
 					);
 			spec.getWholeStemVolumeByUtilization().setAll(wholeStemVolume);
 			volumeSum += wholeStemVolume;
@@ -585,8 +584,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 		assert fipLayer.getLayerType().equals(LayerType.VETERAN) : "Layer must be VETERAN";
 		assert fipPolygon.getPolygonIdentifier().equals(fipLayer.getPolygonIdentifier()) : String.format(
-				"Polygon polygonIdentifier '%s' doesn't match that of layer '%s'", fipPolygon.getPolygonIdentifier(),
-				fipLayer.getPolygonIdentifier()
+				"Polygon polygonIdentifier '%s' doesn't match that of layer '%s'", fipPolygon
+						.getPolygonIdentifier(), fipLayer.getPolygonIdentifier()
 		);
 
 		var layer = LayerType.VETERAN;
@@ -610,8 +609,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 		var crownClosure = fipLayer.getCrownClosure();
 
-		var becId = fipPolygon.getBiogeoclimaticZone();
-		var bec = Utils.getBec(becId, controlMap);
+		var bec = fipPolygon.getBiogeoclimaticZone();
 		var region = bec.getRegion();
 
 		// Call EMP098 to get Veteran Basal Area, store in LVCOM1/BA array at positions
@@ -687,8 +685,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 	private void computeUtilizationComponentsVeteran(VdypLayer vdypLayer, BecDefinition bec)
 			throws ProcessingException {
 		log.trace(
-				"computeUtilizationComponentsVeterany for {}, stand total age is {}", vdypLayer.getPolygonIdentifier(),
-				vdypLayer.getAgeTotal()
+				"computeUtilizationComponentsVeterany for {}, stand total age is {}", vdypLayer
+						.getPolygonIdentifier(), vdypLayer.getAgeTotal()
 		);
 
 		var volumeAdjustMap = Utils.<Map<String, Coefficients>>expectParsedControl(
@@ -733,23 +731,24 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 				// EMP091
 				EstimationMethods.estimateWholeStemVolume(
-						controlMap, utilizationClass, volumeAdjustCoe.getCoe(1), vdypSpecies.getVolumeGroup(), hlSp,
-						quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
+						controlMap, utilizationClass, volumeAdjustCoe.getCoe(1), vdypSpecies
+								.getVolumeGroup(), hlSp, quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
 				);
 
 				adjust.setCoe(4, volumeAdjustCoe.getCoe(2));
 				// EMP092
 				EstimationMethods.estimateCloseUtilizationVolume(
-						controlMap, utilizationClass, adjust, vdypSpecies.getVolumeGroup(), hlSp, quadMeanDiameterUtil,
-						wholeStemVolumeUtil, closeUtilizationVolumeUtil
+						controlMap, utilizationClass, adjust, vdypSpecies
+								.getVolumeGroup(), hlSp, quadMeanDiameterUtil, wholeStemVolumeUtil, closeUtilizationVolumeUtil
 				);
 
 				adjust.setCoe(4, volumeAdjustCoe.getCoe(3));
 				// EMP093
 				EstimationMethods.estimateNetDecayVolume(
-						controlMap, vdypSpecies.getGenus(), bec.getRegion(), utilizationClass, adjust,
-						vdypSpecies.getDecayGroup(), vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil,
-						closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil
+						controlMap, vdypSpecies.getGenus(), bec.getRegion(), utilizationClass, adjust, vdypSpecies
+								.getDecayGroup(), vdypLayer.getBreastHeightAge().orElse(
+										0f
+								), quadMeanDiameterUtil, closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil
 				);
 
 				adjust.setCoe(4, volumeAdjustCoe.getCoe(4));
@@ -761,17 +760,15 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 						controlMap, ControlKey.WASTE_MODIFIERS, MatrixMap2.class
 				);
 				EstimationMethods.estimateNetDecayAndWasteVolume(
-						bec.getRegion(), utilizationClass, adjust, vdypSpecies.getGenus(), hlSp, netDecayCoeMap,
-						wasteModifierMap, quadMeanDiameterUtil, closeUtilizationVolumeUtil,
-						closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
+						bec.getRegion(), utilizationClass, adjust, vdypSpecies
+								.getGenus(), hlSp, netDecayCoeMap, wasteModifierMap, quadMeanDiameterUtil, closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
 				);
 
 				if (getId().isStart()) {
 					// EMP095
 					EstimationMethods.estimateNetDecayWasteAndBreakageVolume(
-							controlMap, utilizationClass, vdypSpecies.getBreakageGroup(), quadMeanDiameterUtil,
-							closeUtilizationVolumeUtil, closeUtilizationNetOfDecayAndWasteUtil,
-							closeUtilizationNetOfDecayWasteAndBreakageUtil
+							controlMap, utilizationClass, vdypSpecies
+									.getBreakageGroup(), quadMeanDiameterUtil, closeUtilizationVolumeUtil, closeUtilizationNetOfDecayAndWasteUtil, closeUtilizationNetOfDecayWasteAndBreakageUtil
 					);
 				}
 
@@ -841,8 +838,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		for (var layer : layers.values()) {
 			if (!layer.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
 				throw validationError(
-						"Record in layer file contains layer for polygon %s when expecting one for %s.",
-						layer.getPolygonIdentifier(), polygon.getPolygonIdentifier()
+						"Record in layer file contains layer for polygon %s when expecting one for %s.", layer
+								.getPolygonIdentifier(), polygon.getPolygonIdentifier()
 				);
 			}
 			speciesPerLayerMap.put(layer.getLayerType(), new HashMap<>());
@@ -853,14 +850,14 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			// Validate that species belong to the correct polygon
 			if (!spec.getPolygonIdentifier().equals(polygon.getPolygonIdentifier())) {
 				throw validationError(
-						"Record in species file contains species for polygon %s when expecting one for %s.",
-						layer.getPolygonIdentifier(), polygon.getPolygonIdentifier()
+						"Record in species file contains species for polygon %s when expecting one for %s.", layer
+								.getPolygonIdentifier(), polygon.getPolygonIdentifier()
 				);
 			}
 			if (Objects.isNull(layer)) {
 				throw validationError(
-						"Species entry references layer %s of polygon %s but it is not present.", layer,
-						polygon.getPolygonIdentifier()
+						"Species entry references layer %s of polygon %s but it is not present.", layer, polygon
+								.getPolygonIdentifier()
 				);
 			}
 			speciesPerLayerMap.get(spec.getLayerType()).put(spec.getGenus(), spec);
@@ -906,8 +903,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			var ageTotal = primaryLayer.getAgeTotal().map(Object::toString).orElse("N/A (0)");
 			var ytbh = primaryLayer.getYearsToBreastHeight().map(Object::toString).orElse("N/A (0)");
 			throw validationError(
-					"Polygon %s has %s layer where total age (%s) is less than YTBH (%s).",
-					polygon.getPolygonIdentifier(), LayerType.PRIMARY, ageTotal, ytbh
+					"Polygon %s has %s layer where total age (%s) is less than YTBH (%s).", polygon
+							.getPolygonIdentifier(), LayerType.PRIMARY, ageTotal, ytbh
 			);
 		}
 
@@ -923,8 +920,9 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			throwIfPresent(
 					heightMinimum(layer.getLayerType()).filter(minimum -> height < minimum).map(
 							minimum -> validationError(
-									"Polygon %s has %s layer where height %.1f is less than minimum %.1f.",
-									polygon.getPolygonIdentifier(), layer.getLayerType(), layer.getHeightSafe(), minimum
+									"Polygon %s has %s layer where height %.1f is less than minimum %.1f.", polygon
+											.getPolygonIdentifier(), layer
+													.getLayerType(), layer.getHeightSafe(), minimum
 							)
 					)
 			);
@@ -938,16 +936,16 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 		if (primaryLayer.getYearsToBreastHeight().orElse(0f) < 0.5) {
 			throw validationError(
-					"Polygon %s has %s layer where years to breast height %.1f is less than minimum %.1f years.",
-					polygon.getPolygonIdentifier(), LayerType.PRIMARY, primaryLayer.getYearsToBreastHeightSafe(), 0.5f
+					"Polygon %s has %s layer where years to breast height %.1f is less than minimum %.1f years.", polygon
+							.getPolygonIdentifier(), LayerType.PRIMARY, primaryLayer.getYearsToBreastHeightSafe(), 0.5f
 			);
 		}
 
 		if (primaryLayer.getSiteIndex().orElse(0f) < 0.5) {
 			throw validationError(
-					"Polygon %s has %s layer where site index %s is less than minimum %.1f years.",
-					polygon.getPolygonIdentifier(), LayerType.PRIMARY,
-					primaryLayer.getSiteIndex().map(x -> String.format("%.1f", x)).orElse("N/A"), 0.5f
+					"Polygon %s has %s layer where site index %s is less than minimum %.1f years.", polygon
+							.getPolygonIdentifier(), LayerType.PRIMARY, primaryLayer.getSiteIndex()
+									.map(x -> String.format("%.1f", x)).orElse("N/A"), 0.5f
 			);
 		}
 

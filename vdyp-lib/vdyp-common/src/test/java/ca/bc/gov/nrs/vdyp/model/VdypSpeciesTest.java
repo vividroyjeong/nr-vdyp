@@ -20,7 +20,7 @@ class VdypSpeciesTest {
 		var result = VdypSpecies.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
-			builder.genus("B");
+			builder.genus("B", 3);
 			builder.percentGenus(50f);
 			builder.volumeGroup(1);
 			builder.decayGroup(2);
@@ -33,7 +33,7 @@ class VdypSpeciesTest {
 		assertThat(result, hasProperty("volumeGroup", is(1)));
 		assertThat(result, hasProperty("decayGroup", is(2)));
 		assertThat(result, hasProperty("breakageGroup", is(3)));
-		assertThat(result, hasProperty("speciesPercent", anEmptyMap()));
+		assertThat(result, hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", anEmptyMap())));
 	}
 
 	@Test
@@ -41,13 +41,13 @@ class VdypSpeciesTest {
 		var ex = assertThrows(IllegalStateException.class, () -> VdypSpecies.build(builder -> {
 		}));
 		assertThat(
-				ex,
-				hasProperty(
-						"message",
-						allOf(
-								containsString("polygonIdentifier"), containsString("layer"), containsString("genus"),
-								containsString("percentGenus"), containsString("volumeGroup"),
-								containsString("decayGroup")
+				ex, hasProperty(
+						"message", allOf(
+								containsString("polygonIdentifier"), containsString("layer"), containsString(
+										"genus"
+								), containsString(
+										"percentGenus"
+								), containsString("volumeGroup"), containsString("decayGroup")
 						)
 				)
 		);
@@ -63,7 +63,7 @@ class VdypSpeciesTest {
 
 		var result = VdypSpecies.build(layer, builder -> {
 			builder.polygonIdentifier("Test", 2024);
-			builder.genus("B");
+			builder.genus("B", 3);
 			builder.percentGenus(50f);
 			builder.volumeGroup(1);
 			builder.decayGroup(2);
@@ -83,7 +83,7 @@ class VdypSpeciesTest {
 		assertThat(result, hasProperty("volumeGroup", is(1)));
 		assertThat(result, hasProperty("decayGroup", is(2)));
 		assertThat(result, hasProperty("breakageGroup", is(3)));
-		assertThat(result, hasProperty("speciesPercent", anEmptyMap()));
+		assertThat(result, hasProperty("sp64DistributionSet", hasProperty("size", is(0))));
 
 		assertThat(layer.getSpecies(), hasEntry("B", result));
 	}
@@ -93,14 +93,24 @@ class VdypSpeciesTest {
 		var result = VdypSpecies.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
-			builder.genus("B");
+			builder.genus("B", 3);
 			builder.percentGenus(50f);
 			builder.volumeGroup(1);
 			builder.decayGroup(2);
 			builder.breakageGroup(3);
-			builder.addSpecies("B", 100f);
+			builder.addSp64Distribution("B", 100f);
 		});
-		assertThat(result, hasProperty("speciesPercent", hasEntry("B", 100f)));
+		assertThat(
+				result, hasProperty(
+						"sp64DistributionSet", hasProperty(
+								"sp64DistributionMap", hasEntry(
+										is(1), allOf(
+												hasProperty("genusAlias", is("B")), hasProperty("percentage", is(100f))
+										)
+								)
+						)
+				)
+		);
 	}
 
 	@Test
@@ -108,12 +118,12 @@ class VdypSpeciesTest {
 		var toCopy = VdypSpecies.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
-			builder.genus("B");
+			builder.genus("B", 3);
 			builder.percentGenus(50f);
 			builder.volumeGroup(1);
 			builder.decayGroup(2);
 			builder.breakageGroup(3);
-			builder.addSpecies("B", 100f);
+			builder.addSp64Distribution("B", 100f);
 			builder.addSite(ib -> {
 				ib.ageTotal(42);
 				ib.yearsToBreastHeight(5);

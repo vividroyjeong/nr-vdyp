@@ -76,9 +76,9 @@ public abstract class CoefficientParser
 	public MatrixMap2<String, String, Coefficients> parse(InputStream is, Map<String, Object> control)
 			throws IOException, ResourceParseException {
 		var becAliases = BecDefinitionParser.getBecs(control).getBecAliases();
-		var speciesIndecies = GenusDefinitionParser.getSpeciesAliases(control);
+		var speciesIndicies = GenusDefinitionParser.getSpeciesAliases(control);
 		MatrixMap2<String, String, Coefficients> result = new MatrixMap2Impl<>(
-				becAliases, speciesIndecies, (k1, k2) -> Coefficients.empty(NUM_COEFFICIENTS, 0)
+				becAliases, speciesIndicies, (k1, k2) -> Coefficients.empty(NUM_COEFFICIENTS, 0)
 		);
 		IntFunction<String> speciesLookup = index -> GenusDefinitionParser.getSpeciesByIndex(index, control).getAlias();
 
@@ -96,24 +96,24 @@ public abstract class CoefficientParser
 				throw new ValueParseException(Integer.toString(index), index + " is not a valid coefficient index");
 			}
 
-			for (int species = 0; species < speciesIndecies.size(); species++) {
+			for (int speciesIndex = 0; speciesIndex < speciesIndicies.size(); speciesIndex++) {
 				float c;
 				switch (indicator) {
 				case 2:
-					c = coefficients.get(species);
+					c = coefficients.get(speciesIndex);
 					break;
 				case 1:
-					if (species == 0)
+					if (speciesIndex == 0)
 						c = coefficients.get(0);
 					else
-						c = coefficients.get(0) + coefficients.get(species);
+						c = coefficients.get(0) + coefficients.get(speciesIndex);
 					break;
 				case 0:
 				default:
 					c = coefficients.get(0);
 					break;
 				}
-				r.get(bec, speciesLookup.apply(species + 1)).setCoe(index, c);
+				r.get(bec, speciesLookup.apply(speciesIndex + 1)).setCoe(index, c);
 			}
 			return r;
 		}, control);

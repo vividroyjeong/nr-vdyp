@@ -18,17 +18,17 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 	private PolygonIdentifier polygonIdentifier; // FIP_P/POLYDESC
 	private PA percentAvailable; // FIP_P2/PCTFLAND
 	private Map<LayerType, L> layers = new LinkedHashMap<>();
-	protected String biogeoclimaticZone;
+	protected BecDefinition biogeoclimaticZone;
 	protected String forestInventoryZone;
 	protected Optional<PolygonMode> mode;
 
 	protected BaseVdypPolygon(
-			PolygonIdentifier polygonIdentifier, PA percentAvailable, String fiz, String becIdentifier,
+			PolygonIdentifier polygonIdentifier, PA percentAvailable, String fiz, BecDefinition biogeoclimaticZone,
 			Optional<PolygonMode> mode
 	) {
 		super();
 		this.forestInventoryZone = fiz;
-		this.biogeoclimaticZone = becIdentifier;
+		this.biogeoclimaticZone = biogeoclimaticZone;
 		this.mode = mode;
 		this.polygonIdentifier = polygonIdentifier;
 		this.percentAvailable = percentAvailable;
@@ -80,11 +80,11 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 		this.percentAvailable = percentAvailable;
 	}
 
-	public String getBiogeoclimaticZone() {
+	public BecDefinition getBiogeoclimaticZone() {
 		return biogeoclimaticZone;
 	}
 
-	public void setBiogeoclimaticZone(String biogeoclimaticZone) {
+	public void setBiogeoclimaticZone(BecDefinition biogeoclimaticZone) {
 		this.biogeoclimaticZone = biogeoclimaticZone;
 	}
 
@@ -117,7 +117,7 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 			extends ModelClassBuilder<T> {
 		protected Optional<PolygonIdentifier> polygonIdentifier = Optional.empty();
 		protected Optional<PA> percentAvailable = Optional.empty();
-		protected Optional<String> biogeoclimaticZone = Optional.empty();
+		protected Optional<BecDefinition> biogeoclimaticZone = Optional.empty();
 		protected Optional<String> forestInventoryZone = Optional.empty();
 		protected Optional<PolygonMode> mode = Optional.empty();
 
@@ -144,7 +144,7 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 			return this;
 		}
 
-		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> biogeoclimaticZone(String biogeoclimaticZone) {
+		public Builder<T, L, PA, SP, SI, LB, SPB, SIB> biogeoclimaticZone(BecDefinition biogeoclimaticZone) {
 			this.biogeoclimaticZone = Optional.of(biogeoclimaticZone);
 			return this;
 		}

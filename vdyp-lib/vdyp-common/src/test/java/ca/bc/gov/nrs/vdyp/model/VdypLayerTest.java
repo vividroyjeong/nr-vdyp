@@ -13,13 +13,17 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.easymock.EasyMock;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 class VdypLayerTest {
 
@@ -30,7 +34,7 @@ class VdypLayerTest {
 			builder.layerType(LayerType.PRIMARY);
 
 			builder.addSpecies(specBuilder -> {
-				specBuilder.genus("PL");
+				specBuilder.genus("PL", 12);
 				specBuilder.percentGenus(100);
 				specBuilder.volumeGroup(-1);
 				specBuilder.decayGroup(-1);
@@ -62,18 +66,21 @@ class VdypLayerTest {
 	@Test
 	void buildForPolygon() throws Exception {
 
+		Map<String, Object> controlMap = new HashMap<>();
+		TestUtils.populateControlMapBecReal(controlMap);
+
 		var poly = VdypPolygon.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.percentAvailable(50f);
 
 			builder.forestInventoryZone("?");
-			builder.biogeoclimaticZone("?");
+			builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 		});
 
 		var result = VdypLayer.build(poly, builder -> {
 			builder.layerType(LayerType.PRIMARY);
 			builder.addSpecies(specBuilder -> {
-				specBuilder.genus("PL");
+				specBuilder.genus("PL", 12);
 				specBuilder.percentGenus(100);
 				specBuilder.volumeGroup(-1);
 				specBuilder.decayGroup(-1);
@@ -108,7 +115,7 @@ class VdypLayerTest {
 			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.addSpecies(specBuilder -> {
-				specBuilder.genus("PL");
+				specBuilder.genus("PL", 12);
 				specBuilder.percentGenus(100);
 				specBuilder.volumeGroup(-1);
 				specBuilder.decayGroup(-1);
@@ -122,7 +129,7 @@ class VdypLayerTest {
 			});
 
 			builder.addSpecies(specBuilder -> {
-				specBuilder.genus("B");
+				specBuilder.genus("B", 3);
 				specBuilder.percentGenus(90f);
 				specBuilder.volumeGroup(10);
 				specBuilder.decayGroup(10);
@@ -175,12 +182,12 @@ class VdypLayerTest {
 		EasyMock.expect(toCopy.getSpecies())
 				.andStubReturn(new LinkedHashMap<>(Collections.singletonMap("B", speciesToCopy)));
 		EasyMock.expect(speciesToCopy.getGenus()).andStubReturn("B");
+		EasyMock.expect(speciesToCopy.getGenusIndex()).andStubReturn(3);
 		EasyMock.expect(speciesToCopy.getPercentGenus()).andStubReturn(100f);
 		EasyMock.expect(speciesToCopy.getFractionGenus()).andStubReturn(1f);
-		EasyMock.expect(speciesToCopy.getSpeciesPercent()).andStubReturn(Utils.constMap(map -> {
-			map.put("BL", 75f);
-			map.put("BX", 25f);
-		}));
+		EasyMock.expect(speciesToCopy.getSp64DistributionSet()).andStubReturn(
+				new Sp64DistributionSet(List.of(new Sp64Distribution(1, "BL", 75f), new Sp64Distribution(2, "BX", 25f)))
+		);
 
 		control.replay();
 
@@ -202,8 +209,15 @@ class VdypLayerTest {
 		assertThat(resultSpecies, hasProperty("percentGenus", is(100f)));
 		assertThat(resultSpecies, hasProperty("fractionGenus", is(1f)));
 		assertThat(
-				resultSpecies,
-				hasProperty("speciesPercent", allOf(hasEntry(is("BL"), is(75f)), hasEntry(is("BX"), is(25f))))
+				resultSpecies, hasProperty(
+						"sp64DistributionSet", hasProperty(
+								"sp64DistributionMap", hasEntry(
+										is(1), allOf(
+												hasProperty("genusAlias", is("BL")), hasProperty("percentage", is(75f))
+										)
+								)
+						)
+				)
 		);
 
 		control.verify();
@@ -218,14 +232,14 @@ class VdypLayerTest {
 			builder.layerType(LayerType.PRIMARY);
 
 			builder.addSpecies(speciesBuilder -> {
-				speciesBuilder.genus("B");
+				speciesBuilder.genus("B", 3);
 				speciesBuilder.percentGenus(100f);
 				speciesBuilder.fractionGenus(1f);
 				speciesBuilder.volumeGroup(1);
 				speciesBuilder.decayGroup(2);
 				speciesBuilder.breakageGroup(3);
-				speciesBuilder.addSpecies("BL", 75f);
-				speciesBuilder.addSpecies("BX", 25f);
+				speciesBuilder.addSp64Distribution("BL", 75f);
+				speciesBuilder.addSp64Distribution("BX", 25f);
 			});
 
 		});
@@ -250,10 +264,26 @@ class VdypLayerTest {
 		assertThat(resultSpecies, hasProperty("decayGroup", is(2)));
 		assertThat(resultSpecies, hasProperty("breakageGroup", is(3)));
 		assertThat(
-				resultSpecies,
-				hasProperty("speciesPercent", allOf(hasEntry(is("BL"), is(75f)), hasEntry(is("BX"), is(25f))))
+				resultSpecies, hasProperty(
+						"sp64DistributionSet", hasProperty(
+								"sp64DistributionMap", allOf(
+										hasEntry(
+												is(1), allOf(
+														hasProperty("genusAlias", is("BL")), hasProperty(
+																"percentage", is(75f)
+														)
+												)
+										), hasEntry(
+												is(2), allOf(
+														hasProperty("genusAlias", is("BX")), hasProperty(
+																"percentage", is(25f)
+														)
+												)
+										)
+								)
+						)
+				)
 		);
-
 	}
 
 }

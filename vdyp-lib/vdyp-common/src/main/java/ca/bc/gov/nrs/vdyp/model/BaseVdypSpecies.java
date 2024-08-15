@@ -1,23 +1,30 @@
 package ca.bc.gov.nrs.vdyp.model;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.common.Computed;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 
 public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 	private final PolygonIdentifier polygonIdentifier; // FIP_P/POLYDESC
-	private final LayerType layerType; // This is also represents the distinction between data stored in
+
+	// This is also represents the distinction between data stored in
 	// FIPL_1(A) and FIP_V(A). Where VDYP7 stores both and looks at certain values
 	// to determine if a layer is "present". VDYP8 stores them in a map keyed by
-	// this value
+	// this value.
+	private final LayerType layerType;
 
 	private final String genus; // FIPSA/SP0V
+
+	/** the species index within species definition file (e.g. SPODEF_v0.dat) */
+	private final int genusIndex; // BANK1/ISPB, L1COM1/ISPL1, etc.
 
 	private float percentGenus; // FIPS/PCTVOLV L1COM1/PCTL1
 
@@ -26,17 +33,21 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 	@Computed
 	private float fractionGenus; // FRBASP0/FR
 
-	private Map<String, Float> speciesPercent; // Map from
+	private Sp64DistributionSet sp64DistributionSet;
+
 	private Optional<I> site;
 
 	protected BaseVdypSpecies(
-			PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, float percentGenus, Optional<I> site
+			PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, int genusIndex, float percentGenus,
+			Sp64DistributionSet sp64DistributionSet, Optional<I> site
 	) {
 		this.polygonIdentifier = polygonIdentifier;
 		this.layerType = layerType;
 		this.genus = genus;
 		this.setPercentGenus(percentGenus);
 		this.site = site;
+		this.genusIndex = genusIndex;
+		this.sp64DistributionSet = sp64DistributionSet;
 	}
 
 	public PolygonIdentifier getPolygonIdentifier() {
@@ -66,16 +77,54 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		this.fractionGenus = fractionGenus;
 	}
 
-	public Map<String, Float> getSpeciesPercent() {
-		return speciesPercent;
+	public Sp64DistributionSet getSp64DistributionSet() {
+		return sp64DistributionSet;
 	}
 
-	public void setSpeciesPercent(Map<String, Float> speciesPercent) {
-		this.speciesPercent = speciesPercent;
+	public void setSp64DistributionSet(Sp64DistributionSet sp64DistributionSet) {
+		this.sp64DistributionSet = sp64DistributionSet;
+	}
+
+	/**
+	 * Construct the species sp64DistributionSet from the given list of species percentages. The maxIndex of the Set is
+	 * taken to be the size of the map, and the index of each sp64Distribution is set to be its position in the list
+	 * ordered by decreasing percentage.
+	 *
+	 * @param speciesPercentages the source of the construction
+	 */
+	public void setSpeciesPercentages(Map<String, Float> speciesPercentages) {
+
+		// build a list of Sp64Distributions, all with index 0. The indicies will be assigned below.
+
+		List<Sp64Distribution> unindexedSp64Distributions = new ArrayList<Sp64Distribution>();
+		for (Map.Entry<String, Float> e : speciesPercentages.entrySet()) {
+			unindexedSp64Distributions.add(new Sp64Distribution(0, e.getKey(), e.getValue()));
+		}
+
+		// sort the unindexed distributions in order of decreasing percentage
+		unindexedSp64Distributions = unindexedSp64Distributions.stream()
+				.sorted((o1, o2) -> o2.getPercentage().compareTo(o1.getPercentage())).toList();
+
+		// and assign them an index, starting with one.
+		int index = 1;
+		List<Sp64Distribution> sp64Distributions = new ArrayList<Sp64Distribution>();
+		for (Sp64Distribution uiSp64Distribution : unindexedSp64Distributions) {
+			sp64Distributions.add(
+					new Sp64Distribution(
+							index++, uiSp64Distribution.getGenusAlias(), uiSp64Distribution.getPercentage()
+					)
+			);
+		}
+
+		this.sp64DistributionSet = new Sp64DistributionSet(sp64Distributions.size(), sp64Distributions);
 	}
 
 	public String getGenus() {
 		return genus;
+	}
+
+	public int getGenusIndex() {
+		return genusIndex;
 	}
 
 	public Optional<I> getSite() {
@@ -87,9 +136,10 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		protected Optional<PolygonIdentifier> polygonIdentifier = Optional.empty();
 		protected Optional<LayerType> layerType = Optional.empty();
 		protected Optional<String> genus = Optional.empty();
+		protected Optional<Integer> genusIndex = Optional.empty();
 		protected Optional<Float> percentGenus = Optional.empty();
 		protected Optional<Float> fractionGenus = Optional.empty();
-		protected Map<String, Float> speciesPercent = new LinkedHashMap<>();
+		protected List<Sp64Distribution> sp64DistributionList = new ArrayList<>();
 		protected Optional<Consumer<IB>> siteBuilder = Optional.empty();
 		protected Optional<I> site = Optional.empty();
 
@@ -113,8 +163,31 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 			return this;
 		}
 
-		public Builder<T, I, IB> genus(String genus) {
+		/**
+		 * Set both the genus, and at the same time calculates genusIndex from the given controlMap.
+		 * @param genus the species genus
+		 * @param controlMap the control map defining the configuration
+		 * @return this builder
+		 */
+		public Builder<T, I, IB> genus(String genus, Map<String, Object> controlMap) {
 			this.genus = Optional.of(genus);
+			this.genusIndex = Optional.of(GenusDefinitionParser.getIndex(genus, controlMap));
+			return this;
+		}
+
+		/**
+		 * Set both the genus and its index. It is the responsibility of the caller to ensure 
+		 * that the index is correct for the given genus. Use of this method is appropriate 
+		 * only when logic dictates the given genusIndex is correct or in those unit tests 
+		 * where correctness isn't critical.
+		 * 
+		 * @param genus the species genus
+		 * @param genusIndex the index of the genus in the configuration (control map entry 10)
+		 * @return this builder
+		 */
+		public Builder<T, I, IB> genus(String genus, int genusIndex) {
+			this.genus = Optional.of(genus);
+			this.genusIndex = Optional.of(genusIndex);
 			return this;
 		}
 
@@ -128,13 +201,8 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 			return this;
 		}
 
-		public Builder<T, I, IB> addSpecies(String id, float percent) {
-			this.speciesPercent.put(id, percent);
-			return this;
-		}
-
-		public Builder<T, I, IB> addSpecies(Map<String, Float> toAdd) {
-			this.speciesPercent.putAll(toAdd);
+		public Builder<T, I, IB> sp64DistributionList(List<Sp64Distribution> sp64DistributionList) {
+			this.sp64DistributionList = sp64DistributionList;
 			return this;
 		}
 
@@ -159,18 +227,23 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 			return this;
 		}
 
+		public void addSp64Distribution(String sp64Alias, float f) {
+			int index = sp64DistributionList.size() + 1;
+			sp64DistributionList.add(new Sp64Distribution(index, sp64Alias, f));
+		}
+
 		@Override
 		protected void check(Collection<String> errors) {
 			requirePresent(polygonIdentifier, "polygonIdentifier", errors);
 			requirePresent(layerType, "layerType", errors);
 			requirePresent(genus, "genus", errors);
+			requirePresent(genusIndex, "genusIndex", errors);
 			requirePresent(percentGenus, "percentGenus", errors);
 		}
 
 		@Override
 		protected void postProcess(T result) {
 			super.postProcess(result);
-			result.setSpeciesPercent(speciesPercent);
 			this.fractionGenus.ifPresent(result::setFractionGenus);
 		}
 
@@ -193,14 +266,12 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		public Builder<T, I, IB> adapt(BaseVdypSpecies<?> toCopy) {
 			polygonIdentifier(toCopy.getPolygonIdentifier());
 			layerType(toCopy.getLayerType());
-			genus(toCopy.getGenus());
+			genus(toCopy.getGenus(), toCopy.getGenusIndex());
 			percentGenus(toCopy.getPercentGenus());
 
 			fractionGenus(toCopy.getFractionGenus());
 
-			for (var entry : toCopy.getSpeciesPercent().entrySet()) {
-				addSpecies(entry.getKey(), entry.getValue());
-			}
+			sp64DistributionList(toCopy.getSp64DistributionSet().getSp64DistributionList());
 
 			return this;
 		}

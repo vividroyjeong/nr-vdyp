@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
+import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 
@@ -16,10 +17,10 @@ public class TestPolygon extends BaseVdypPolygon<TestLayer, Optional<Float>, Tes
 	}
 
 	protected TestPolygon(
-			PolygonIdentifier polygonIdentifier, Optional<Float> percentAvailable, String fiz, String becIdentifier,
-			Optional<PolygonMode> mode
+			PolygonIdentifier polygonIdentifier, Optional<Float> percentAvailable, String fiz,
+			BecDefinition bec, Optional<PolygonMode> mode
 	) {
-		super(polygonIdentifier, percentAvailable, fiz, becIdentifier, mode);
+		super(polygonIdentifier, percentAvailable, fiz, bec, mode);
 	}
 
 	public static class Builder extends

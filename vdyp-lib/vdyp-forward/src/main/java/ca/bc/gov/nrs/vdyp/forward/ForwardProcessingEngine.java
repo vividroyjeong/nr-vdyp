@@ -35,7 +35,7 @@ import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.CommonData;
-import ca.bc.gov.nrs.vdyp.model.GenusDistribution;
+import ca.bc.gov.nrs.vdyp.model.Sp64Distribution;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
@@ -956,13 +956,12 @@ public class ForwardProcessingEngine {
 
 				Optional<SiteIndexEquation> scIndex = Optional.empty();
 
-				Optional<GenusDistribution> sp0Dist = bank.sp64Distributions[i].getSpeciesDistribution(0);
+				Optional<Sp64Distribution> sp0Dist = bank.sp64Distributions[i].getSpeciesDistribution(0);
 
 				// First alternative is to use the name of the first of the species' sp64Distributions
 				if (sp0Dist.isPresent()) {
 					if (!siteCurveMap.isEmpty()) {
-						scIndex = Utils
-								.optSafe(siteCurveMap.get(sp0Dist.get().getGenus().getAlias(), becZone.getRegion()));
+						scIndex = Utils.optSafe(siteCurveMap.get(sp0Dist.get().getGenusAlias(), becZone.getRegion()));
 					} else {
 						SiteIndexEquation siCurve = SiteTool
 								.getSICurve(bank.speciesNames[i], becZone.getRegion().equals(Region.COASTAL));
