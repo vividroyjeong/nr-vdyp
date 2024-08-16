@@ -516,8 +516,9 @@ class VdypStartApplicationTest {
 			for (var sec : secondary) {
 				var result = app.findItg(primarySecondarySpecies(primary, sec));
 				assertThat(
-						result,
-						describedAs("ITG for " + primary + " and " + sec + " should be " + expected, is(expected))
+						result, describedAs(
+								"ITG for " + primary + " and " + sec + " should be " + expected, is(expected)
+						)
 				);
 			}
 		}
@@ -528,8 +529,9 @@ class VdypStartApplicationTest {
 				var mocks = primarySecondarySpecies(primary, sec);
 				var result = app.findItg(mocks);
 				assertThat(
-						result,
-						describedAs("ITG for " + primary + " and " + sec + " should be " + expected, is(expected))
+						result, describedAs(
+								"ITG for " + primary + " and " + sec + " should be " + expected, is(expected)
+						)
 				);
 			}
 		}
@@ -634,12 +636,12 @@ class VdypStartApplicationTest {
 			var mockControl = EasyMock.createControl();
 
 			controlMap.put(
-					ControlKey.DEFAULT_EQ_NUM.name(),
-					new MatrixMap2Impl(Collections.singletonList("D"), Collections.singletonList("CDF"), (x, y) -> 42)
+					ControlKey.DEFAULT_EQ_NUM.name(), new MatrixMap2Impl(
+							Collections.singletonList("D"), Collections.singletonList("CDF"), (x, y) -> 42
+					)
 			);
 			controlMap.put(
-					ControlKey.EQN_MODIFIERS.name(),
-					new MatrixMap2Impl(
+					ControlKey.EQN_MODIFIERS.name(), new MatrixMap2Impl(
 							Collections.singletonList(42), Collections.singletonList(37), (x, y) -> Optional.of(64)
 					)
 			);
@@ -665,12 +667,12 @@ class VdypStartApplicationTest {
 			var mockControl = EasyMock.createControl();
 
 			controlMap.put(
-					ControlKey.DEFAULT_EQ_NUM.name(),
-					new MatrixMap2Impl(Collections.singletonList("D"), Collections.singletonList("CDF"), (x, y) -> 42)
+					ControlKey.DEFAULT_EQ_NUM.name(), new MatrixMap2Impl(
+							Collections.singletonList("D"), Collections.singletonList("CDF"), (x, y) -> 42
+					)
 			);
 			controlMap.put(
-					ControlKey.EQN_MODIFIERS.name(),
-					new MatrixMap2Impl(
+					ControlKey.EQN_MODIFIERS.name(), new MatrixMap2Impl(
 							Collections.singletonList(42), Collections.singletonList(37), (x, y) -> Optional.empty()
 					)
 			);
@@ -708,14 +710,12 @@ class VdypStartApplicationTest {
 					lb.layerType(LayerType.PRIMARY);
 					lb.crownClosure(82.8000031f);
 					lb.addSpecies(sb -> {
-						sb.genus("B");
-						sb.genusIndex(3);
+						sb.genus("B", controlMap);
 						sb.percentGenus(33f);
 						sb.addSp64Distribution("B", 100f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("H");
-						sb.genusIndex(8);
+						sb.genus("H", controlMap);
 						sb.percentGenus(67f);
 						sb.addSp64Distribution("H", 100f);
 						sb.addSite(ib -> {
@@ -747,14 +747,12 @@ class VdypStartApplicationTest {
 					lb.layerType(LayerType.PRIMARY);
 					lb.crownClosure(82.8000031f);
 					lb.addSpecies(sb -> {
-						sb.genus("B");
-						sb.genusIndex(3);
+						sb.genus("B", controlMap);
 						sb.percentGenus(33f);
 						sb.addSp64Distribution("B", 100f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("H");
-						sb.genusIndex(8);
+						sb.genus("H", controlMap);
 						sb.percentGenus(67f);
 						sb.addSp64Distribution("H", 100f);
 						sb.addSite(ib -> {
@@ -786,14 +784,12 @@ class VdypStartApplicationTest {
 					lb.layerType(LayerType.PRIMARY);
 					lb.crownClosure(9f);// Altered this in the debugger while running VDYP7
 					lb.addSpecies(sb -> {
-						sb.genus("B");
-						sb.genusIndex(3);
+						sb.genus("B", controlMap);
 						sb.percentGenus(33f);
 						sb.addSp64Distribution("B", 100f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("H");
-						sb.genusIndex(8);
+						sb.genus("H", controlMap);
 						sb.percentGenus(67f);
 						sb.addSp64Distribution("H", 100f);
 						sb.addSite(ib -> {
@@ -825,14 +821,12 @@ class VdypStartApplicationTest {
 					lb.layerType(LayerType.PRIMARY);
 					lb.crownClosure(82.8000031f);
 					lb.addSpecies(sb -> {
-						sb.genus("B");
-						sb.genusIndex(3);
+						sb.genus("B", controlMap);
 						sb.percentGenus(33f);
 						sb.addSp64Distribution("B", 100f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("H");
-						sb.genusIndex(8);
+						sb.genus("H", controlMap);
 						sb.percentGenus(67f);
 						sb.addSp64Distribution("H", 100f);
 						sb.addSite(ib -> {
@@ -846,8 +840,8 @@ class VdypStartApplicationTest {
 				});
 
 				var ex = assertThrows(
-						LowValueException.class,
-						() -> app.estimatePrimaryBaseArea(layer, bec, 1f, 79.5999985f, 3.13497972f)
+						LowValueException.class, () -> app
+								.estimatePrimaryBaseArea(layer, bec, 1f, 79.5999985f, 3.13497972f)
 				);
 
 				assertThat(ex, hasProperty("value", is(0f)));
@@ -874,14 +868,12 @@ class VdypStartApplicationTest {
 					lb.layerType(LayerType.PRIMARY);
 					lb.crownClosure(82.8000031f);
 					lb.addSpecies(sb -> {
-						sb.genus("B");
-						sb.genusIndex(3);
+						sb.genus("B", controlMap);
 						sb.percentGenus(33f);
 						sb.addSp64Distribution("B", 100f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("H");
-						sb.genusIndex(8);
+						sb.genus("H", controlMap);
 						sb.percentGenus(67f);
 						sb.addSp64Distribution("H", 100f);
 						sb.addSite(ib -> {
@@ -914,14 +906,12 @@ class VdypStartApplicationTest {
 					lb.layerType(LayerType.PRIMARY);
 					lb.crownClosure(82.8000031f);
 					lb.addSpecies(sb -> {
-						sb.genus("B");
-						sb.genusIndex(3);
+						sb.genus("B", controlMap);
 						sb.percentGenus(33f);
 						sb.addSp64Distribution("B", 100f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("H");
-						sb.genusIndex(8);
+						sb.genus("H", controlMap);
 						sb.percentGenus(67f);
 						sb.addSp64Distribution("H", 100f);
 						sb.addSite(ib -> {
@@ -954,14 +944,12 @@ class VdypStartApplicationTest {
 					lb.layerType(LayerType.PRIMARY);
 					lb.crownClosure(82.8000031f);
 					lb.addSpecies(sb -> {
-						sb.genus("B");
-						sb.genusIndex(3);
+						sb.genus("B", controlMap);
 						sb.percentGenus(33f);
 						sb.addSp64Distribution("B", 100f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("H");
-						sb.genusIndex(8);
+						sb.genus("H", controlMap);
 						sb.percentGenus(67f);
 						sb.addSp64Distribution("H", 100f);
 						sb.addSite(ib -> {
@@ -978,7 +966,7 @@ class VdypStartApplicationTest {
 
 				assertThat(result, closeTo(61.1f)); // Clamp to the COE043/UPPER_BA_BY_CI_S0_P DQ value for this species
 													// and
-				// region
+													// region
 			}
 		}
 	}
@@ -1029,8 +1017,7 @@ class VdypStartApplicationTest {
 						lb.crownClosure(60f);
 
 						lb.addSpecies(sb -> {
-							sb.genus("L");
-							sb.genusIndex(9);
+							sb.genus("L", controlMap);
 							sb.percentGenus(10);
 							sb.addSite(ib -> {
 								ib.siteGenus("L");
@@ -1041,8 +1028,7 @@ class VdypStartApplicationTest {
 							});
 						});
 						lb.addSpecies(sb -> {
-							sb.genus("PL");
-							sb.genusIndex(12);
+							sb.genus("PL", controlMap);
 							sb.percentGenus(90);
 						});
 					});
@@ -1083,18 +1069,15 @@ class VdypStartApplicationTest {
 						lb.crownClosure(82.8f);
 
 						lb.addSpecies(sb -> {
-							sb.genus("B");
-							sb.genusIndex(3);
+							sb.genus("B", controlMap);
 							sb.percentGenus(15);
 						});
 						lb.addSpecies(sb -> {
-							sb.genus("D");
-							sb.genusIndex(5);
+							sb.genus("D", controlMap);
 							sb.percentGenus(7);
 						});
 						lb.addSpecies(sb -> {
-							sb.genus("H");
-							sb.genusIndex(8);
+							sb.genus("H", controlMap);
 							sb.percentGenus(77);
 							sb.addSite(ib -> {
 								ib.ageTotal(45f);
@@ -1105,8 +1088,7 @@ class VdypStartApplicationTest {
 
 						});
 						lb.addSpecies(sb -> {
-							sb.genus("S");
-							sb.genusIndex(15);
+							sb.genus("S", controlMap);
 							sb.percentGenus(1);
 						});
 					});
@@ -1116,8 +1098,7 @@ class VdypStartApplicationTest {
 						lb.crownClosure(4f);
 
 						lb.addSpecies(sb -> {
-							sb.genus("H");
-							sb.genusIndex(8);
+							sb.genus("H", controlMap);
 							sb.percentGenus(100);
 							sb.addSite(ib -> {
 								ib.siteGenus("H");
@@ -1165,8 +1146,7 @@ class VdypStartApplicationTest {
 					for (String s : dist.split(" ")) {
 						var parts = s.split(":");
 						lb.addSpecies(sb -> {
-							sb.genus(parts[0]);
-							sb.genusIndex(Utils.getGenusIndex(parts[0], controlMap));
+							sb.genus(parts[0], controlMap);
 							sb.percentGenus(Float.valueOf(parts[1]));
 						});
 					}
@@ -1198,8 +1178,7 @@ class VdypStartApplicationTest {
 					for (String s : dist.split(" ")) {
 						var parts = s.split(":");
 						lb.addSpecies(sb -> {
-							sb.genus(parts[0]);
-							sb.genusIndex(Utils.getGenusIndex(parts[0], controlMap));
+							sb.genus(parts[0], controlMap);
 							sb.percentGenus(Float.valueOf(parts[1]));
 						});
 					}
@@ -1229,8 +1208,7 @@ class VdypStartApplicationTest {
 					lb.polygonIdentifier("Test", 2024);
 					lb.layerType(LayerType.PRIMARY);
 					lb.addSpecies(sb -> {
-						sb.genus("B");
-						sb.genusIndex(3);
+						sb.genus("B", controlMap);
 						sb.percentGenus(20f);
 						sb.volumeGroup(-1);
 						sb.decayGroup(-1);
@@ -1243,8 +1221,7 @@ class VdypStartApplicationTest {
 						sb.wholeStemVolume(635.659668f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("C");
-						sb.genusIndex(4);
+						sb.genus("C", controlMap);
 						sb.percentGenus(20f);
 						sb.volumeGroup(-1);
 						sb.decayGroup(-1);
@@ -1256,8 +1233,7 @@ class VdypStartApplicationTest {
 						sb.wholeStemVolume(6.35662031f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("D");
-						sb.genusIndex(5);
+						sb.genus("D", controlMap);
 						sb.percentGenus(20f);
 						sb.volumeGroup(-1);
 						sb.decayGroup(-1);
@@ -1269,8 +1245,7 @@ class VdypStartApplicationTest {
 						sb.wholeStemVolume(44.496151f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("H");
-						sb.genusIndex(8);
+						sb.genus("H", controlMap);
 						sb.percentGenus(20f);
 						sb.volumeGroup(-1);
 						sb.decayGroup(-1);
@@ -1288,8 +1263,7 @@ class VdypStartApplicationTest {
 
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("S");
-						sb.genusIndex(15);
+						sb.genus("S", controlMap);
 						sb.percentGenus(20f);
 						sb.volumeGroup(-1);
 						sb.decayGroup(-1);
@@ -1369,8 +1343,7 @@ class VdypStartApplicationTest {
 				var result = VdypSpecies.build(sb -> {
 					sb.polygonIdentifier("Test", 2024);
 					sb.layerType(LayerType.PRIMARY);
-					sb.genus("B");
-					sb.genusIndex(3);
+					sb.genus("B", controlMap);
 					sb.percentGenus(100);
 					app.applyGroups(bec, "B", sb);
 				});
@@ -1394,8 +1367,7 @@ class VdypStartApplicationTest {
 					pb.addLayer(lb -> {
 						lb.layerType(LayerType.PRIMARY);
 						lb.addSpecies(sb -> {
-							sb.genus("B");
-							sb.genusIndex(3);
+							sb.genus("B", controlMap);
 							sb.percentGenus(100);
 
 							sb.volumeGroup(0);
@@ -1433,10 +1405,8 @@ class VdypStartApplicationTest {
 				assertThat(result, is(layer));
 				var ex = assertThrows(StandProcessingException.class, () -> app.requireLayer(poly, LayerType.VETERAN));
 				assertThat(
-						ex,
-						hasProperty(
-								"message",
-								is(
+						ex, hasProperty(
+								"message", is(
 										"Polygon \"TestPoly             2024\" has no VETERAN layer, or that layer has non-positive height or crown closure."
 								)
 						)
@@ -1453,8 +1423,7 @@ class VdypStartApplicationTest {
 				var species = TestSpecies.build(sb -> {
 					sb.polygonIdentifier("TestPolygon", 2024);
 					sb.layerType(LayerType.PRIMARY);
-					sb.genus("MB");
-					sb.genusIndex(10);
+					sb.genus("MB", controlMap);
 					sb.percentGenus(90);
 				});
 				var result = app.getCoeForSpecies(species, ControlKey.SMALL_COMP_BA);
@@ -1494,10 +1463,9 @@ class VdypStartApplicationTest {
 					});
 
 			assertThat(
-					result,
-					coe(
-							1, 2f, 2f + 0.3f + 0.3f, 7f, 6f * 0.4f - 3f * 0.1f + 0.3f * 1f, 9f,
-							4f * 0.4f + 3f * 0.1f + 0.3f * 1f
+					result, coe(
+							1, 2f, 2f + 0.3f + 0.3f, 7f, 6f * 0.4f - 3f * 0.1f + 0.3f * 1f, 9f, 4f * 0.4f + 3f * 0.1f
+									+ 0.3f * 1f
 					)
 			);
 		}
@@ -1529,8 +1497,7 @@ class VdypStartApplicationTest {
 			layer.getWholeStemVolumeByUtilization().setSmall(0.107688069f);
 
 			var spec1 = VdypSpecies.build(layer, builder -> {
-				builder.genus("L");
-				builder.genusIndex(9);
+				builder.genus("L", controlMap);
 				builder.percentGenus(11.0567074f);
 				builder.volumeGroup(46);
 				builder.decayGroup(38);
@@ -1550,8 +1517,7 @@ class VdypStartApplicationTest {
 			spec1.getWholeStemVolumeByUtilization().setSmall(0.0411359742f);
 
 			var spec2 = VdypSpecies.build(layer, builder -> {
-				builder.genus("PL");
-				builder.genusIndex(12);
+				builder.genus("PL", controlMap);
 				builder.percentGenus(88.9432907f);
 				builder.volumeGroup(54);
 				builder.decayGroup(42);
@@ -1590,107 +1556,131 @@ class VdypStartApplicationTest {
 			assertThat(spec2.getLoreyHeightByUtilization(), utilizationHeight(7.81696558f, 12.9176102f));
 
 			assertThat(
-					spec1.getBaseAreaByUtilization(),
-					utilization(0.012636207f, 2.20898318f, 0.691931725f, 0.862404406f, 0.433804274f, 0.220842764f)
+					spec1.getBaseAreaByUtilization(), utilization(
+							0.012636207f, 2.20898318f, 0.691931725f, 0.862404406f, 0.433804274f, 0.220842764f
+					)
 			);
 			assertThat(
-					spec2.getBaseAreaByUtilization(),
-					utilization(0.0160128288f, 17.7696857f, 6.10537529f, 7.68449211f, 3.20196891f, 0.777849257f)
+					spec2.getBaseAreaByUtilization(), utilization(
+							0.0160128288f, 17.7696857f, 6.10537529f, 7.68449211f, 3.20196891f, 0.777849257f
+					)
 			);
 			assertThat(
-					layer.getBaseAreaByUtilization(),
-					utilization(0.0286490358f, 19.9786682f, 6.79730701f, 8.54689693f, 3.63577318f, 0.998692036f)
-			);
-
-			assertThat(
-					spec1.getTreesPerHectareByUtilization(),
-					utilization(3.68722916f, 154.454025f, 84.0144501f, 51.3837852f, 14.7746315f, 4.28116179f)
-			);
-			assertThat(
-					spec2.getTreesPerHectareByUtilization(),
-					utilization(5.60301685f, 1331.36682f, 750.238892f, 457.704498f, 108.785675f, 14.6378069f)
-			);
-			assertThat(
-					layer.getTreesPerHectareByUtilization(),
-					utilization(9.29024601f, 1485.8208f, 834.253357f, 509.088287f, 123.560303f, 18.9189682f)
+					layer.getBaseAreaByUtilization(), utilization(
+							0.0286490358f, 19.9786682f, 6.79730701f, 8.54689693f, 3.63577318f, 0.998692036f
+					)
 			);
 
 			assertThat(
-					spec1.getQuadraticMeanDiameterByUtilization(),
-					utilization(6.60561657f, 13.4943399f, 10.2402296f, 14.6183214f, 19.3349762f, 25.6280651f)
+					spec1.getTreesPerHectareByUtilization(), utilization(
+							3.68722916f, 154.454025f, 84.0144501f, 51.3837852f, 14.7746315f, 4.28116179f
+					)
 			);
 			assertThat(
-					spec2.getQuadraticMeanDiameterByUtilization(),
-					utilization(6.03223324f, 13.0360518f, 10.1791487f, 14.6207638f, 19.3587704f, 26.0114632f)
+					spec2.getTreesPerHectareByUtilization(), utilization(
+							5.60301685f, 1331.36682f, 750.238892f, 457.704498f, 108.785675f, 14.6378069f
+					)
 			);
 			assertThat(
-					layer.getQuadraticMeanDiameterByUtilization(),
-					utilization(6.26608753f, 13.0844393f, 10.1853161f, 14.6205177f, 19.3559265f, 25.9252014f)
-			);
-
-			assertThat(
-					spec1.getWholeStemVolumeByUtilization(),
-					utilization(0.0411359742f, 11.7993851f, 3.13278913f, 4.76524019f, 2.63645673f, 1.26489878f)
-			);
-			assertThat(
-					spec2.getWholeStemVolumeByUtilization(),
-					utilization(0.0665520951f, 106.194412f, 30.2351704f, 47.6655998f, 22.5931034f, 5.70053911f)
-			);
-			assertThat(
-					layer.getWholeStemVolumeByUtilization(),
-					utilization(0.107688069f, 117.993797f, 33.3679581f, 52.4308395f, 25.2295609f, 6.96543789f)
+					layer.getTreesPerHectareByUtilization(), utilization(
+							9.29024601f, 1485.8208f, 834.253357f, 509.088287f, 123.560303f, 18.9189682f
+					)
 			);
 
 			assertThat(
-					spec1.getCloseUtilizationVolumeByUtilization(),
-					utilization(0f, 6.41845179f, 0.0353721268f, 2.99654913f, 2.23212862f, 1.1544019f)
+					spec1.getQuadraticMeanDiameterByUtilization(), utilization(
+							6.60561657f, 13.4943399f, 10.2402296f, 14.6183214f, 19.3349762f, 25.6280651f
+					)
 			);
 			assertThat(
-					spec2.getCloseUtilizationVolumeByUtilization(),
-					utilization(0f, 61.335495f, 2.38199472f, 33.878521f, 19.783432f, 5.29154539f)
+					spec2.getQuadraticMeanDiameterByUtilization(), utilization(
+							6.03223324f, 13.0360518f, 10.1791487f, 14.6207638f, 19.3587704f, 26.0114632f
+					)
 			);
 			assertThat(
-					layer.getCloseUtilizationVolumeByUtilization(),
-					utilization(0f, 67.7539444f, 2.41736674f, 36.8750687f, 22.0155602f, 6.44594717f)
-			);
-
-			assertThat(
-					spec1.getCloseUtilizationVolumeNetOfDecayByUtilization(),
-					utilization(0f, 6.26433992f, 0.0349677317f, 2.95546484f, 2.18952441f, 1.08438313f)
-			);
-			assertThat(
-					spec2.getCloseUtilizationVolumeNetOfDecayByUtilization(),
-					utilization(0f, 60.8021164f, 2.36405492f, 33.6109734f, 19.6035042f, 5.2235837f)
-			);
-			assertThat(
-					layer.getCloseUtilizationVolumeNetOfDecayByUtilization(),
-					utilization(0f, 67.0664597f, 2.39902258f, 36.5664368f, 21.7930279f, 6.30796671f)
+					layer.getQuadraticMeanDiameterByUtilization(), utilization(
+							6.26608753f, 13.0844393f, 10.1853161f, 14.6205177f, 19.3559265f, 25.9252014f
+					)
 			);
 
 			assertThat(
-					spec1.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(),
-					utilization(0f, 6.18276405f, 0.0347718038f, 2.93580461f, 2.16927385f, 1.04291379f)
+					spec1.getWholeStemVolumeByUtilization(), utilization(
+							0.0411359742f, 11.7993851f, 3.13278913f, 4.76524019f, 2.63645673f, 1.26489878f
+					)
 			);
 			assertThat(
-					spec2.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(),
-					utilization(0f, 60.6585732f, 2.36029577f, 33.544487f, 19.5525551f, 5.20123625f)
+					spec2.getWholeStemVolumeByUtilization(), utilization(
+							0.0665520951f, 106.194412f, 30.2351704f, 47.6655998f, 22.5931034f, 5.70053911f
+					)
 			);
 			assertThat(
-					layer.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(),
-					utilization(0f, 66.8413391f, 2.39506769f, 36.4802933f, 21.7218285f, 6.24415016f)
+					layer.getWholeStemVolumeByUtilization(), utilization(
+							0.107688069f, 117.993797f, 33.3679581f, 52.4308395f, 25.2295609f, 6.96543789f
+					)
 			);
 
 			assertThat(
-					spec1.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(),
-					utilization(0f, 5.989573f, 0.0337106399f, 2.84590816f, 2.10230994f, 1.00764418f)
+					spec1.getCloseUtilizationVolumeByUtilization(), utilization(
+							0f, 6.41845179f, 0.0353721268f, 2.99654913f, 2.23212862f, 1.1544019f
+					)
 			);
 			assertThat(
-					spec2.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(),
-					utilization(0f, 59.4318657f, 2.31265593f, 32.8669167f, 19.1568871f, 5.09540558f)
+					spec2.getCloseUtilizationVolumeByUtilization(), utilization(
+							0f, 61.335495f, 2.38199472f, 33.878521f, 19.783432f, 5.29154539f
+					)
 			);
 			assertThat(
-					layer.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(),
-					utilization(0f, 65.4214401f, 2.34636664f, 35.7128258f, 21.2591972f, 6.10304976f)
+					layer.getCloseUtilizationVolumeByUtilization(), utilization(
+							0f, 67.7539444f, 2.41736674f, 36.8750687f, 22.0155602f, 6.44594717f
+					)
+			);
+
+			assertThat(
+					spec1.getCloseUtilizationVolumeNetOfDecayByUtilization(), utilization(
+							0f, 6.26433992f, 0.0349677317f, 2.95546484f, 2.18952441f, 1.08438313f
+					)
+			);
+			assertThat(
+					spec2.getCloseUtilizationVolumeNetOfDecayByUtilization(), utilization(
+							0f, 60.8021164f, 2.36405492f, 33.6109734f, 19.6035042f, 5.2235837f
+					)
+			);
+			assertThat(
+					layer.getCloseUtilizationVolumeNetOfDecayByUtilization(), utilization(
+							0f, 67.0664597f, 2.39902258f, 36.5664368f, 21.7930279f, 6.30796671f
+					)
+			);
+
+			assertThat(
+					spec1.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(), utilization(
+							0f, 6.18276405f, 0.0347718038f, 2.93580461f, 2.16927385f, 1.04291379f
+					)
+			);
+			assertThat(
+					spec2.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(), utilization(
+							0f, 60.6585732f, 2.36029577f, 33.544487f, 19.5525551f, 5.20123625f
+					)
+			);
+			assertThat(
+					layer.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(), utilization(
+							0f, 66.8413391f, 2.39506769f, 36.4802933f, 21.7218285f, 6.24415016f
+					)
+			);
+
+			assertThat(
+					spec1.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(), utilization(
+							0f, 5.989573f, 0.0337106399f, 2.84590816f, 2.10230994f, 1.00764418f
+					)
+			);
+			assertThat(
+					spec2.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(), utilization(
+							0f, 59.4318657f, 2.31265593f, 32.8669167f, 19.1568871f, 5.09540558f
+					)
+			);
+			assertThat(
+					layer.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(), utilization(
+							0f, 65.4214401f, 2.34636664f, 35.7128258f, 21.2591972f, 6.10304976f
+					)
 			);
 		}
 	}
@@ -1712,8 +1702,7 @@ class VdypStartApplicationTest {
 			builder.polygonIdentifier(polygonId);
 			builder.layerType(LayerType.PRIMARY);
 			builder.addSpecies(specBuilder -> {
-				specBuilder.genus("B");
-				specBuilder.genusIndex(3);
+				specBuilder.genus("B", controlMap);
 				specBuilder.addSite(siteBuilder -> {
 					siteBuilder.ageTotal(8f);
 					siteBuilder.yearsToBreastHeight(7f);
@@ -1738,8 +1727,7 @@ class VdypStartApplicationTest {
 			builder.layerType(LayerType.VETERAN);
 
 			builder.addSpecies(specBuilder -> {
-				specBuilder.genus("B");
-				specBuilder.genusIndex(3);
+				specBuilder.genus("B", controlMap);
 				specBuilder.addSite(siteBuilder -> {
 					siteBuilder.ageTotal(8f);
 					siteBuilder.yearsToBreastHeight(7f);
@@ -1766,8 +1754,7 @@ class VdypStartApplicationTest {
 		var result = TestSpecies.build(builder -> {
 			builder.polygonIdentifier(polygonId);
 			builder.layerType(layer);
-			builder.genus(genusId);
-			builder.genusIndex(genusIndex);
+			builder.genus(genusId, controlMap);
 			builder.percentGenus(100.0f);
 			builder.addSp64Distribution(genusId, 100f);
 		});

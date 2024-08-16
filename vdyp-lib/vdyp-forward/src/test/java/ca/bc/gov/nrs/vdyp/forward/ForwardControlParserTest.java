@@ -65,11 +65,7 @@ class VdypForwardControlParserTest {
 	void testParseSP0_10() throws Exception {
 		var parser = new ForwardControlParser();
 		var result = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
-		assertThat(
-				result,
-				(Matcher) controlMapHasEntry(
-						ControlKey.SP0_DEF, instanceOf(GenusDefinitionMap.class))
-				);
+		assertThat(result, (Matcher) controlMapHasEntry(ControlKey.SP0_DEF, instanceOf(GenusDefinitionMap.class)));
 	}
 
 	@Test

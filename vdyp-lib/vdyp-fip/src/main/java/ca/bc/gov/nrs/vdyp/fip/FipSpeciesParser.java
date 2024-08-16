@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
 import ca.bc.gov.nrs.vdyp.io.EndOfRecord;
@@ -47,12 +46,11 @@ public class FipSpeciesParser
 
 	@Override
 	public StreamingParserFactory<Collection<FipSpecies>>
-			map(String fileName, FileResolver fileResolver, Map<String, Object> control)
+			map(String fileName, FileResolver fileResolver, Map<String, Object> controlMap)
 					throws IOException, ResourceParseException {
 		return () -> {
 			var lineParser = new LineParser().strippedString(25, FipPolygonParser.POLYGON_IDENTIFIER).space(1).value(
-					1, FipLayerParser.LAYER,
-					ValueParser.valueOrMarker(
+					1, FipLayerParser.LAYER, ValueParser.valueOrMarker(
 							ValueParser.LAYER, ValueParser.optionalSingleton("Z"::equals, EndOfRecord.END_OF_RECORD)
 					)
 			).space(1).value(2, GENUS, ControlledValueParser.optional(ValueParser.GENUS))
@@ -69,7 +67,7 @@ public class FipSpeciesParser
 			var is = fileResolver.resolveForInput(fileName);
 
 			var delegateStream = new AbstractStreamingParser<ValueOrMarker<Optional<FipSpecies>, EndOfRecord>>(
-					is, lineParser, control
+					is, lineParser, controlMap
 			) {
 
 				@SuppressWarnings("unchecked")
@@ -79,17 +77,14 @@ public class FipSpeciesParser
 					var polygonId = (String) entry.get(FipPolygonParser.POLYGON_IDENTIFIER);
 					var layer = (ValueOrMarker<Optional<LayerType>, EndOfRecord>) entry.get(FipLayerParser.LAYER);
 					String genus;
-					int genusIndex;
 					if (layer.isValue()) {
 						genus = ((Optional<String>) entry.get(GENUS)).orElseThrow(
 								() -> new ResourceParseValidException(
 										"Genus identifier can not be empty except in end of record entries"
 								)
 						);
-						genusIndex = Utils.getGenusIndex(genus, control);
 					} else {
 						genus = null;
-						genusIndex = 0;
 					}
 					var percentGenus = (Float) entry.get(PERCENT_GENUS);
 					var species1 = (Optional<String>) entry.get(SPECIES_1);
@@ -120,8 +115,7 @@ public class FipSpeciesParser
 							return FipSpecies.build(specBuilder -> {
 								specBuilder.polygonIdentifier(polygonId);
 								specBuilder.layerType(layerType);
-								specBuilder.genus(genus);
-								specBuilder.genusIndex(genusIndex);
+								specBuilder.genus(genus, controlMap);
 								specBuilder.percentGenus(percentGenus);
 								specBuilder.sp64DistributionList(sp64SpeciesDistributions);
 							});

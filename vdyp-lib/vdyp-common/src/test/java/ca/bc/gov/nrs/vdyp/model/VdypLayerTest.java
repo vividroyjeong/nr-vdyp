@@ -34,8 +34,7 @@ class VdypLayerTest {
 			builder.layerType(LayerType.PRIMARY);
 
 			builder.addSpecies(specBuilder -> {
-				specBuilder.genus("PL");
-				specBuilder.genusIndex(12);
+				specBuilder.genus("PL", 12);
 				specBuilder.percentGenus(100);
 				specBuilder.volumeGroup(-1);
 				specBuilder.decayGroup(-1);
@@ -81,8 +80,7 @@ class VdypLayerTest {
 		var result = VdypLayer.build(poly, builder -> {
 			builder.layerType(LayerType.PRIMARY);
 			builder.addSpecies(specBuilder -> {
-				specBuilder.genus("PL");
-				specBuilder.genusIndex(12);
+				specBuilder.genus("PL", 12);
 				specBuilder.percentGenus(100);
 				specBuilder.volumeGroup(-1);
 				specBuilder.decayGroup(-1);
@@ -117,8 +115,7 @@ class VdypLayerTest {
 			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.addSpecies(specBuilder -> {
-				specBuilder.genus("PL");
-				specBuilder.genusIndex(12);
+				specBuilder.genus("PL", 12);
 				specBuilder.percentGenus(100);
 				specBuilder.volumeGroup(-1);
 				specBuilder.decayGroup(-1);
@@ -132,8 +129,7 @@ class VdypLayerTest {
 			});
 
 			builder.addSpecies(specBuilder -> {
-				specBuilder.genus("B");
-				specBuilder.genusIndex(3);
+				specBuilder.genus("B", 3);
 				specBuilder.percentGenus(90f);
 				specBuilder.volumeGroup(10);
 				specBuilder.decayGroup(10);
@@ -213,14 +209,12 @@ class VdypLayerTest {
 		assertThat(resultSpecies, hasProperty("percentGenus", is(100f)));
 		assertThat(resultSpecies, hasProperty("fractionGenus", is(1f)));
 		assertThat(
-				resultSpecies,
-				hasProperty(
-						"sp64DistributionSet",
-						hasProperty(
-								"sp64DistributionMap",
-								hasEntry(
-										is(1),
-										allOf(hasProperty("genusAlias", is("BL")), hasProperty("percentage", is(75f)))
+				resultSpecies, hasProperty(
+						"sp64DistributionSet", hasProperty(
+								"sp64DistributionMap", hasEntry(
+										is(1), allOf(
+												hasProperty("genusAlias", is("BL")), hasProperty("percentage", is(75f))
+										)
 								)
 						)
 				)
@@ -238,8 +232,7 @@ class VdypLayerTest {
 			builder.layerType(LayerType.PRIMARY);
 
 			builder.addSpecies(speciesBuilder -> {
-				speciesBuilder.genus("B");
-				speciesBuilder.genusIndex(3);
+				speciesBuilder.genus("B", 3);
 				speciesBuilder.percentGenus(100f);
 				speciesBuilder.fractionGenus(1f);
 				speciesBuilder.volumeGroup(1);
@@ -271,24 +264,20 @@ class VdypLayerTest {
 		assertThat(resultSpecies, hasProperty("decayGroup", is(2)));
 		assertThat(resultSpecies, hasProperty("breakageGroup", is(3)));
 		assertThat(
-				resultSpecies,
-				hasProperty(
-						"sp64DistributionSet",
-						hasProperty(
-								"sp64DistributionMap",
-								allOf(
+				resultSpecies, hasProperty(
+						"sp64DistributionSet", hasProperty(
+								"sp64DistributionMap", allOf(
 										hasEntry(
-												is(1),
-												allOf(
-														hasProperty("genusAlias", is("BL")),
-														hasProperty("percentage", is(75f))
+												is(1), allOf(
+														hasProperty("genusAlias", is("BL")), hasProperty(
+																"percentage", is(75f)
+														)
 												)
-										),
-										hasEntry(
-												is(2),
-												allOf(
-														hasProperty("genusAlias", is("BX")),
-														hasProperty("percentage", is(25f))
+										), hasEntry(
+												is(2), allOf(
+														hasProperty("genusAlias", is("BX")), hasProperty(
+																"percentage", is(25f)
+														)
 												)
 										)
 								)

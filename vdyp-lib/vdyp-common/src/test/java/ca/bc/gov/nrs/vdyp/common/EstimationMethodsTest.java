@@ -105,8 +105,9 @@ class EstimatorsTest {
 
 			// Result of run in FORTRAN VDYP7 with the above parameters.
 			assertThat(
-					basalAreaByUtilization,
-					contains(0.0f, 0.406989872f, 0.00509467721f, 0.0138180256f, 0.023145527f, 0.36493164f)
+					basalAreaByUtilization, contains(
+							0.0f, 0.406989872f, 0.00509467721f, 0.0138180256f, 0.023145527f, 0.36493164f
+					)
 			);
 		}
 
@@ -127,8 +128,7 @@ class EstimatorsTest {
 			emp.estimateBaseAreaByUtilization(bec, dq, ba, "B");
 
 			assertThat(
-					ba,
-					VdypMatchers
+					ba, VdypMatchers
 							.utilization(0f, 0.397305071f, 0.00485289097f, 0.0131751001f, 0.0221586525f, 0.357118428f)
 			);
 
@@ -210,8 +210,7 @@ class EstimatorsTest {
 			var closeUtilizationUtil = Utils.utilizationVector(0f, 0f, 0f, 0f, 0f);
 
 			emp.estimateCloseUtilizationVolume(
-					utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, wholeStemVolumeUtil,
-					closeUtilizationUtil
+					utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, wholeStemVolumeUtil, closeUtilizationUtil
 			);
 
 			assertThat(closeUtilizationUtil, utilization(0f, 0f, 0f, 0f, 0f, 5.86088896f));
@@ -439,8 +438,7 @@ class EstimatorsTest {
 			// sp 3, 4, 5, 8, 15
 			// sp B, C, D, H, S
 			var spec1 = VdypSpecies.build(layer, builder -> {
-				builder.genus("B");
-				builder.genusIndex(3);
+				builder.genus("B", controlMap);
 				builder.volumeGroup(12);
 				builder.decayGroup(7);
 				builder.breakageGroup(5);
@@ -450,8 +448,7 @@ class EstimatorsTest {
 			spec1.setFractionGenus(0.00817133673f);
 
 			var spec2 = VdypSpecies.build(layer, builder -> {
-				builder.genus("C");
-				builder.genusIndex(4);
+				builder.genus("C", controlMap);
 				builder.volumeGroup(4);
 				builder.decayGroup(14);
 				builder.breakageGroup(6);
@@ -461,8 +458,7 @@ class EstimatorsTest {
 			spec2.setFractionGenus(0.0972022042f);
 
 			var spec3 = VdypSpecies.build(layer, builder -> {
-				builder.genus("D");
-				builder.genusIndex(5);
+				builder.genus("D", controlMap);
 				builder.volumeGroup(25);
 				builder.decayGroup(19);
 				builder.breakageGroup(12);
@@ -472,8 +468,7 @@ class EstimatorsTest {
 			spec3.setFractionGenus(0.695440531f);
 
 			var spec4 = VdypSpecies.build(layer, builder -> {
-				builder.genus("H");
-				builder.genusIndex(8);
+				builder.genus("H", controlMap);
 				builder.volumeGroup(37);
 				builder.decayGroup(31);
 				builder.breakageGroup(17);
@@ -488,8 +483,7 @@ class EstimatorsTest {
 			spec4.setFractionGenus(0.117043354f);
 
 			var spec5 = VdypSpecies.build(layer, builder -> {
-				builder.genus("S");
-				builder.genusIndex(15);
+				builder.genus("S", controlMap);
 				builder.volumeGroup(66);
 				builder.decayGroup(54);
 				builder.breakageGroup(28);
@@ -526,8 +520,7 @@ class EstimatorsTest {
 			float quadMeanDiameter2 = 30.249138f;
 
 			float dq = emp.estimateQuadMeanDiameterClampResult(
-					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
-					quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2, quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
 			);
 
 			assertThat(dq, is(quadMeanDiameter1));
@@ -552,8 +545,7 @@ class EstimatorsTest {
 			float quadMeanDiameter1 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea1, treesPerHectare1);
 
 			float dq = emp.estimateQuadMeanDiameterClampResult(
-					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
-					quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2, quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
 			);
 
 			assertThat(dq, closeTo(30.722431f));
@@ -578,8 +570,7 @@ class EstimatorsTest {
 			float quadMeanDiameter2 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea2, treesPerHectare2);
 
 			float dq = emp.estimateQuadMeanDiameterClampResult(
-					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
-					quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2, quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
 			);
 
 			assertThat(dq, closeTo(28.245578f));
@@ -604,8 +595,7 @@ class EstimatorsTest {
 			float quadMeanDiameter2 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea2, treesPerHectare2);
 
 			float dq = emp.estimateQuadMeanDiameterClampResult(
-					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
-					quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2, quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
 			);
 
 			assertThat(dq, closeTo(66.565033f));
@@ -644,8 +634,9 @@ class EstimatorsTest {
 
 			// Result of run in FORTRAN VDYP7 with the above parameters.
 			assertThat(
-					wholeStemVolumeByUtilization,
-					contains(0.0f, 6.27250576f, 0.01865777f, 0.07648385f, 0.17615195f, 6.00121212f)
+					wholeStemVolumeByUtilization, contains(
+							0.0f, 6.27250576f, 0.01865777f, 0.07648385f, 0.17615195f, 6.00121212f
+					)
 			);
 		}
 
@@ -660,8 +651,7 @@ class EstimatorsTest {
 			var wholeStemVolumeUtil = Utils.utilizationVector();
 
 			emp.estimateWholeStemVolume(
-					utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, baseAreaUtil,
-					wholeStemVolumeUtil
+					utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
 			);
 
 			assertThat(wholeStemVolumeUtil, utilization(0f, 0f, 0f, 0f, 0f, 6.11904192f));
@@ -700,8 +690,7 @@ class EstimatorsTest {
 			var spec = VdypSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("B");
-				builder.genusIndex(3);
+				builder.genus("B", controlMap);
 				builder.percentGenus(50f);
 				builder.volumeGroup(-1);
 				builder.decayGroup(-1);
@@ -710,8 +699,7 @@ class EstimatorsTest {
 			var specPrime = VdypSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("H");
-				builder.genusIndex(8);
+				builder.genus("H", controlMap);
 				builder.percentGenus(50f);
 				builder.volumeGroup(-1);
 				builder.decayGroup(-1);
@@ -734,8 +722,7 @@ class EstimatorsTest {
 			var spec = VdypSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("B");
-				builder.genusIndex(3);
+				builder.genus("B", controlMap);
 				builder.percentGenus(50f);
 				builder.volumeGroup(-1);
 				builder.decayGroup(-1);
@@ -744,8 +731,7 @@ class EstimatorsTest {
 			var specPrime = VdypSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("D");
-				builder.genusIndex(5);
+				builder.genus("D", controlMap);
 				builder.percentGenus(50f);
 				builder.volumeGroup(-1);
 				builder.decayGroup(-1);

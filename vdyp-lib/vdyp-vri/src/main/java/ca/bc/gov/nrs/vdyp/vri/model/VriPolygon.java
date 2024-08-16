@@ -16,7 +16,7 @@ public class VriPolygon extends BaseVdypPolygon<VriLayer, Optional<Float>, VriSp
 	public static final String FIZ = " ";
 
 	public VriPolygon(
-			PolygonIdentifier polygonIdentifier, String fiz, BecDefinition becIdentifier,
+			PolygonIdentifier polygonIdentifier, String fiz, BecDefinition bec,
 			Optional<Float> percentAvailable, Optional<PolygonMode> modeFip, Optional<String> nonproductiveDescription,
 			float yieldFactor
 	) {

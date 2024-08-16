@@ -25,7 +25,6 @@ public class FipSpecies extends BaseVdypSpecies<FipSite> {
 			builder.polygonIdentifier(polygonId);
 			builder.layerType(LayerType.VETERAN);
 			builder.genus("B");
-			builder.genusIndex(3);
 			builder.percentGenus(6f);
 	 * })
 	 * </pre>

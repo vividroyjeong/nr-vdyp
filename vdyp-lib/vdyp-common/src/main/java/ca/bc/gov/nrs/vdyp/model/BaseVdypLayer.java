@@ -88,7 +88,6 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies<I>, I extends Base
 		protected Optional<Integer> inventoryTypeGroup = Optional.empty();
 
 		protected List<S> species = new LinkedList<>();
-		protected List<I> sites = new LinkedList<>();
 		protected List<Consumer<SB>> speciesBuilders = new LinkedList<>();
 		protected List<Consumer<IB>> siteBuilders = new LinkedList<>();
 
@@ -182,13 +181,6 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies<I>, I extends Base
 				throw new IllegalStateException("Tried to get species when there are unbuilt species builders");
 			}
 			return Collections.unmodifiableList(species);
-		}
-
-		public List<I> getSites() {
-			if (!siteBuilders.isEmpty()) {
-				throw new IllegalStateException("Tried to get sites when there are unbuilt site builders");
-			}
-			return Collections.unmodifiableList(sites);
 		}
 
 		@Override

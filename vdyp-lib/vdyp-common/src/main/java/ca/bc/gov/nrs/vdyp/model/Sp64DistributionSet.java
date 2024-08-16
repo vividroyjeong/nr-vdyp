@@ -48,7 +48,8 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 	public Sp64DistributionSet(int maxIndex, List<Sp64Distribution> sdList) {
 
 		// sort the list by increasing index
-		var sp64DistributionListSortedByIndex = sdList.stream().sorted((o1, o2) -> o1.getIndex() - o2.getIndex()).toList();
+		var sp64DistributionListSortedByIndex = sdList.stream().sorted((o1, o2) -> o1.getIndex() - o2.getIndex())
+				.toList();
 
 		try {
 			validate(maxIndex, sp64DistributionListSortedByIndex);
@@ -150,7 +151,7 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 
 			sp64sSeen.add(gd.getGenusAlias());
 			indicesSeen.add(gd.getIndex());
-			
+
 			prevGd = gd;
 		}
 	}
@@ -176,15 +177,15 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 			if (this.maxIndex != that.maxIndex) {
 				return this.maxIndex - that.maxIndex;
 			}
-			
+
 			var thisIterator = this.sp64DistributionList.iterator();
 			var thatIterator = that.sp64DistributionList.iterator();
-			
+
 			while (thisIterator.hasNext()) {
 				if (!thatIterator.hasNext()) {
 					return 1 /* this is longer than that */;
 				}
-				
+
 				var thisElement = thisIterator.next();
 				var thatElement = thatIterator.next();
 				int result = thisElement.compareTo(thatElement);
@@ -192,7 +193,7 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 					return result;
 				}
 			}
-			
+
 			if (thatIterator.hasNext()) {
 				return -1 /* this is shorter than that */;
 			}

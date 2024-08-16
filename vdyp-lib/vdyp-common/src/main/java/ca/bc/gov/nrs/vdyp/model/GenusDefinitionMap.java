@@ -2,7 +2,6 @@ package ca.bc.gov.nrs.vdyp.model;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -32,8 +31,10 @@ public class GenusDefinitionMap {
 				genusDefinitions.add(g);
 			}
 
-			aliasesSortedByIndex = aliases.stream().sorted((o1, o2) -> indexByAliasMap.get(o1) - indexByAliasMap.get(o2)).toList();
-			genusDefinitionsSortedByIndex = genusDefinitions.stream().sorted((o1, o2) -> o1.getIndex() - o2.getIndex()).toList();
+			aliasesSortedByIndex = aliases.stream()
+					.sorted((o1, o2) -> indexByAliasMap.get(o1) - indexByAliasMap.get(o2)).toList();
+			genusDefinitionsSortedByIndex = genusDefinitions.stream().sorted((o1, o2) -> o1.getIndex() - o2.getIndex())
+					.toList();
 		} else {
 			aliasesSortedByIndex = new ArrayList<>();
 			genusDefinitionsSortedByIndex = new ArrayList<>();

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.common.Computed;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 
 public abstract class BaseVdypSite {
 
@@ -68,11 +69,7 @@ public abstract class BaseVdypSite {
 
 	@Computed
 	public Optional<Float> getYearsAtBreastHeight() {
-		if (ageTotal.isPresent() && yearsToBreastHeight.isPresent()) {
-			return Optional.of(ageTotal.get() - yearsToBreastHeight.get());
-		} else {
-			return Optional.empty();
-		}
+		return Utils.mapBoth(ageTotal, yearsToBreastHeight, (age, ytbh) -> age - ytbh);
 	}
 
 	public abstract static class Builder<T extends BaseVdypSite> extends ModelClassBuilder<T> {

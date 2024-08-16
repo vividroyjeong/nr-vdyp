@@ -632,6 +632,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	}
 
 	private void processVeteranLayer(VriPolygon polygon, VdypLayer.Builder lBuilder) throws StandProcessingException {
+		@SuppressWarnings("unused")
 		var veteranLayer = polygon.getLayers().get(LayerType.VETERAN);
 
 		// TODO
