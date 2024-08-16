@@ -229,7 +229,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 					Math.max(utilization.get(), 7.5f), //
 					primaryGenus, //
 					secondaryGenus, //
-					empericalRelationshipParameterIndex,
+					empericalRelationshipParameterIndex, //
 					ageIncrease.orElse(DEFAULT_AGE_INCREASE)
 			);
 			result.setInventoryTypeGroup(inventoryTypeGroup);

@@ -5,6 +5,7 @@ import static ca.bc.gov.nrs.vdyp.test.TestUtils.assertHasVeteranLayer;
 import static ca.bc.gov.nrs.vdyp.test.TestUtils.assertOnlyPrimaryLayer;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.closeTo;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isBec;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.isPolyId;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
@@ -2316,7 +2317,7 @@ class VriStartTest {
 			var result = app.processPolygon(0, poly).get();
 
 			assertThat(result, hasProperty("polygonIdentifier", isPolyId("TestPoly", 2024)));
-			assertThat(result, hasProperty("biogeoclimaticZone", is("IDF")));
+			assertThat(result, hasProperty("biogeoclimaticZone", isBec("IDF")));
 			assertThat(result, hasProperty("forestInventoryZone", blankString()));
 			assertThat(result, hasProperty("mode", present(is(PolygonMode.START))));
 			assertThat(result, hasProperty("percentAvailable", is(85f)));
@@ -2376,25 +2377,16 @@ class VriStartTest {
 			assertThat(veteranLayer, hasProperty("siteGenus", present(is("H"))));
 
 			assertThat(veteranLayer, hasProperty("height", present(closeTo(34f))));
-			assertThat(veteranLayer, hasProperty("inventoryTypeGroup", notPresent())); // ?
+			assertThat(veteranLayer, hasProperty("inventoryTypeGroup", present(is(14)))); // ?
 			assertThat(veteranLayer, hasProperty("empiricalRelationshipParameterIndex", notPresent())); // ?
 
 			assertThat(veteranLayer, hasProperty("loreyHeightByUtilization", utilizationHeight(0f, 32.8f)));
 			assertThat(veteranLayer, hasProperty("baseAreaByUtilization", utilizationAllAndBiggest(20f)));
 			assertThat(
 					veteranLayer,
-					hasProperty(
-							"quadraticMeanDiameterByUtilization",
-							utilizationAllAndBiggest(45.5006409f)
-					)
+					hasProperty("quadraticMeanDiameterByUtilization", utilizationAllAndBiggest(45.5006409f))
 			);
-			assertThat(
-					veteranLayer,
-					hasProperty(
-							"treesPerHectareByUtilization",
-							utilizationAllAndBiggest(123f)
-					)
-			);
+			assertThat(veteranLayer, hasProperty("treesPerHectareByUtilization", utilizationAllAndBiggest(123f)));
 
 			assertThat(
 					veteranLayer,
@@ -2407,48 +2399,21 @@ class VriStartTest {
 			VdypSpecies resultSpecB = TestUtils.assertHasSpecies(veteranLayer, "B", "C", "H");
 
 			assertThat(resultSpecB, hasProperty("loreyHeightByUtilization", utilizationHeight(0f, 34f)));
+			assertThat(resultSpecB, hasProperty("baseAreaByUtilization", utilizationAllAndBiggest(4f)));
 			assertThat(
 					resultSpecB,
-					hasProperty(
-							"baseAreaByUtilization",
-							utilizationAllAndBiggest(4f)
-					)
+					hasProperty("quadraticMeanDiameterByUtilization", utilizationAllAndBiggest(45.8757401f))
 			);
-			assertThat(
-					resultSpecB,
-					hasProperty(
-							"quadraticMeanDiameterByUtilization",
-							utilizationAllAndBiggest(45.8757401f)
-					)
-			);
-			assertThat(
-					resultSpecB,
-					hasProperty(
-							"treesPerHectareByUtilization",
-							utilizationAllAndBiggest(24.1993656f)
-					)
-			);
+			assertThat(resultSpecB, hasProperty("treesPerHectareByUtilization", utilizationAllAndBiggest(24.1993656f)));
 
+			assertThat(resultSpecB, hasProperty("wholeStemVolumeByUtilization", utilizationAllAndBiggest(47.5739288f)));
 			assertThat(
 					resultSpecB,
-					hasProperty(
-							"wholeStemVolumeByUtilization",
-							utilizationAllAndBiggest(47.5739288f)
-					)
+					hasProperty("closeUtilizationVolumeByUtilization", utilizationAllAndBiggest(45.9957237f))
 			);
 			assertThat(
 					resultSpecB,
-					hasProperty(
-							"closeUtilizationVolumeByUtilization",
-							utilizationAllAndBiggest(45.9957237f)
-					)
-			);
-			assertThat(
-					resultSpecB,
-					hasProperty(
-							"closeUtilizationVolumeNetOfDecayByUtilization",
-							utilizationAllAndBiggest(39.5351295f)
-					)
+					hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", utilizationAllAndBiggest(39.5351295f))
 			);
 			assertThat(
 					resultSpecB,
