@@ -39,7 +39,6 @@ public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl
 	final MatrixMap2<String, Integer, Optional<Coefficients>> nonPrimarySpeciesBasalAreaGrowthCoefficients;
 	final Map<Integer, ModelCoefficients> primaryQuadMeanDiameterGrowthCoefficients;
 	final MatrixMap2<String, Integer, Optional<Coefficients>> nonPrimaryQuadMeanDiameterGrowthCoefficients;
-	final MatrixMap2<String, Region, Coefficients> componentSizeCoefficients;
 
 	public ForwardResolvedControlMapImpl(Map<String, Object> controlMap) {
 
@@ -63,7 +62,6 @@ public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl
 		this.nonPrimarySpeciesBasalAreaGrowthCoefficients = this.get(ControlKey.NON_PRIMARY_SP_BA_GROWTH, MatrixMap2.class);
 		this.primaryQuadMeanDiameterGrowthCoefficients = this.get(ControlKey.PRIMARY_SP_DQ_GROWTH, Map.class);
 		this.nonPrimaryQuadMeanDiameterGrowthCoefficients = this.get(ControlKey.NON_PRIMARY_SP_DQ_GROWTH, MatrixMap2.class);
-		this.componentSizeCoefficients = this.get(ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, MatrixMap2.class);
 	}
 	
 	@Override
@@ -154,10 +152,5 @@ public class ForwardResolvedControlMapImpl extends CachingResolvedControlMapImpl
 	@Override
 	public MatrixMap2<String, Integer, Optional<Coefficients>> getNonPrimarySpeciesQuadMeanDiameterGrowthCoefficients() {
 		return nonPrimaryQuadMeanDiameterGrowthCoefficients;
-	}
-
-	@Override
-	public MatrixMap2<String, Region, Coefficients> getComponentSizeCoefficients() {
-		return this.componentSizeCoefficients;
 	}
 }

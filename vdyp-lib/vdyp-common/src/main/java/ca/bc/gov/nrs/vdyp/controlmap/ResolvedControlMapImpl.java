@@ -14,6 +14,7 @@ import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
+import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
 
@@ -28,8 +29,7 @@ public class ResolvedControlMapImpl implements ResolvedControlMap {
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
-	public <U> U get(ControlKey key, Class<? super U> clazz) {
+	private <U> U get(ControlKey key, Class<? super U> clazz) {
 
 		U entity = (U) entityCache.get(key);
 		if (entity == null) {
@@ -144,5 +144,50 @@ public class ResolvedControlMapImpl implements ResolvedControlMap {
 	@Override
 	public MatrixMap2<String, Region, Coefficients> getHl1Coefficients() {
 		return this.get(ControlKey.HL_PRIMARY_SP_EQN_P1, MatrixMap2.class);
+	}
+
+	@Override
+	public MatrixMap2<String, Region, Coefficients> getHl2Coefficients() {
+		return this.get(ControlKey.HL_PRIMARY_SP_EQN_P2, MatrixMap2.class);
+	}
+
+	@Override
+	public MatrixMap2<String, Region, Coefficients> getHl3Coefficients() {
+		return this.get(ControlKey.HL_PRIMARY_SP_EQN_P3, MatrixMap2.class);
+	}
+
+	@Override
+	public MatrixMap3<String, String, Region, Optional<NonprimaryHLCoefficients>> getHlNonPrimaryCoefficients() {
+		return this.get(ControlKey.HL_NONPRIMARY, MatrixMap3.class);
+	}
+
+	@Override
+	public MatrixMap2<String, Region, Coefficients> getComponentSizeLimitCoefficients() {
+		return this.get(ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, MatrixMap2.class);
+	}
+
+	@Override
+	public Map<Integer, Coefficients> getNetBreakageMap() {
+		return this.get(ControlKey.BREAKAGE, Map.class);
+	}
+
+	@Override
+	public MatrixMap2<String, String, Integer> getVolumeEquationGroups() {
+		return this.get(ControlKey.VOLUME_EQN_GROUPS, MatrixMap2.class);
+	}
+
+	@Override
+	public MatrixMap2<String, String, Integer> getDecayEquationGroups() {
+		return this.get(ControlKey.DECAY_GROUPS, MatrixMap2.class);
+	}
+
+	@Override
+	public MatrixMap2<String, String, Integer> getBreakageEquationGroups() {
+		return this.get(ControlKey.BREAKAGE_GROUPS, MatrixMap2.class);
+	}
+
+	@Override
+	public Map<String, Coefficients> getQuadMeanDiameterBySpeciesCoefficients() {
+		return this.get(ControlKey.BY_SPECIES_DQ, Map.class);
 	}
 }

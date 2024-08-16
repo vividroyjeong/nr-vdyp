@@ -3,17 +3,16 @@ package ca.bc.gov.nrs.vdyp.controlmap;
 import java.util.Map;
 import java.util.Optional;
 
-import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
+import ca.bc.gov.nrs.vdyp.model.NonprimaryHLCoefficients;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
 
 public interface ResolvedControlMap {
-	<U> U get(ControlKey key, Class<? super U> clazz);
 
 	/** 9 - BEC_DEF */
 	BecLookup getBecLookup();
@@ -21,6 +20,15 @@ public interface ResolvedControlMap {
 	/** 10 - SP0_DEF */
 	GenusDefinitionMap getGenusDefinitionMap();
 
+	/** 20 - VOLUME_EQN_GROUPS */
+	MatrixMap2<String, String, Integer> getVolumeEquationGroups();
+	
+	/** 21 - DECAY_GROUPS */
+	MatrixMap2<String, String, Integer> getDecayEquationGroups();
+
+	/** 22 - BREAKAGE_GROUPS */
+	MatrixMap2<String, String, Integer> getBreakageEquationGroups();
+	
 	/** 26 - SITE_CURVE_AGE_MAX */
 	Map<Integer, SiteCurveAgeMaximum> getMaximumAgeBySiteCurveNumber();
 
@@ -33,6 +41,21 @@ public interface ResolvedControlMap {
 	/** 50 - HL_PRIMARY_SP_EQN_P1 */
 	MatrixMap2<String, Region, Coefficients> getHl1Coefficients();
 
+	/** 51 - HL_PRIMARY_SP_EQN_P2 */
+	MatrixMap2<String, Region, Coefficients> getHl2Coefficients();
+
+	/** 52 - HL_PRIMARY_SP_EQN_P3 */
+	MatrixMap2<String, Region, Coefficients> getHl3Coefficients();
+	
+	/** 53 - HL_NONPRIMARY */
+	MatrixMap3<String, String, Region, Optional<NonprimaryHLCoefficients>> getHlNonPrimaryCoefficients();
+
+	/** 60 - BY_SPECIES_DQ */
+	Map<String, Coefficients> getQuadMeanDiameterBySpeciesCoefficients();
+
+	/** 61 - SPECIES_COMPONENT_SIZE_LIMIT */
+	MatrixMap2<String, Region, Coefficients> getComponentSizeLimitCoefficients();
+	
 	/** 70 - UTIL_COMP_BA */
 	MatrixMap3<Integer, String, String, Coefficients> getBasalAreaDiameterUtilizationComponentMap();
 
@@ -69,6 +92,9 @@ public interface ResolvedControlMap {
 	/** 94 - VOLUME_NET_DECAY_WASTE */
 	Map<String, Coefficients> getNetDecayWasteCoeMap();
 
+	/** 95 - BREAKAGE */
+	Map<Integer, Coefficients> getNetBreakageMap();
+	
 	/** 108 - BA_DQ_UPPER_BOUNDS */
 	Map<Integer, Coefficients> getUpperBounds();
 

@@ -19,7 +19,7 @@ public class FipPolygon extends BaseVdypPolygon<FipLayer, Optional<Float>, FipSp
 			Optional<Float> percentAvailable, Optional<PolygonMode> modeFip, Optional<String> nonproductiveDescription,
 			float yieldFactor
 	) {
-		super(polygonIdentifier, percentAvailable, fiz, becIdentifier, modeFip, Optional.empty());
+		super(polygonIdentifier, percentAvailable, fiz, bec, modeFip, Optional.empty());
 		this.nonproductiveDescription = nonproductiveDescription;
 		this.yieldFactor = yieldFactor;
 	}

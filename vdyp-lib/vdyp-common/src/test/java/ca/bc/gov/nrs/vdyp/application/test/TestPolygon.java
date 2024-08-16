@@ -20,7 +20,7 @@ public class TestPolygon extends BaseVdypPolygon<TestLayer, Optional<Float>, Tes
 			PolygonIdentifier polygonIdentifier, Optional<Float> percentAvailable, String fiz,
 			BecDefinition bec, Optional<PolygonMode> mode
 	) {
-		super(polygonIdentifier, percentAvailable, fiz, becIdentifier, mode, Optional.empty());
+		super(polygonIdentifier, percentAvailable, fiz, bec, mode, Optional.empty());
 	}
 
 	protected TestPolygon(

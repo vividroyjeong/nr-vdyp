@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.forward.model.ControlVariable;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
@@ -19,7 +19,7 @@ import ca.bc.gov.nrs.vdyp.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VolumeVariable;
 
-class PolygonProcessingState {
+class LayerProcessingState {
 
 	private static final String COMPATIBILITY_VARIABLES_SET_CAN_BE_SET_ONCE_ONLY = "CompatibilityVariablesSet can be set once only";
 	private static final String PRIMARY_SPECIES_DETAILS_CAN_BE_SET_ONCE_ONLY = "PrimarySpeciesDetails can be set once only";
@@ -35,19 +35,19 @@ class PolygonProcessingState {
 	private static final String UNSET_SITE_CURVE_NUMBERS = "unset siteCurveNumbers";
 	private static final String UNSET_INVENTORY_TYPE_GROUP = "unset inventoryTypeGroup";
 
-	private static final Logger logger = LoggerFactory.getLogger(PolygonProcessingState.class);
+	private static final Logger logger = LoggerFactory.getLogger(LayerProcessingState.class);
 
 	/** The containing ForwardProcessingState */
 	private final ForwardProcessingState fps;
 
-	/** Polygon on which the processor is operating */
+	/** The containing polygon of the layer on which the Processor is operating */
 	private final VdypPolygon polygon;
 
 	// L1COM1, L1COM4 and L1COM5 - these common blocks mirror BANK1, BANK2 and BANK3 and are initialized
 	// when copied to "active" in ForwardProcessingEngine.
 	
 	/** 
-	 * State of the polygon at the start of processing; read-write during preparation for grow 
+	 * State of the layer at the start of processing; read-write during preparation for grow 
 	 * and read-only after that.
 	 */
 	private Bank start;
@@ -111,23 +111,20 @@ class PolygonProcessingState {
 	// MNSP - MSPL1, MSPLV
 	// TODO
 
-	public PolygonProcessingState(
-			ForwardProcessingState fps, VdypPolygon polygon, Bank bank
-	) {
+	public LayerProcessingState(ForwardProcessingState fps, VdypPolygon polygon, LayerType subjectLayer) throws ProcessingException {
 
 		this.fps = fps;
 		this.polygon = polygon;
-		this.start = bank.copy();
-
-		var volumeEquationGroupMatrix = this.fps.fcm.<MatrixMap2<String, String, Integer>>get(
-				ControlKey.VOLUME_EQN_GROUPS, MatrixMap2.class
-		);
-		var decayEquationGroupMatrix = this.fps.fcm.<MatrixMap2<String, String, Integer>>get(
-				ControlKey.DECAY_GROUPS, MatrixMap2.class
-		);
-		var breakageEquationGroupMatrix = this.fps.fcm.<MatrixMap2<String, String, Integer>>get(
-				ControlKey.BREAKAGE_GROUPS, MatrixMap2.class
-		);
+		
+		BecDefinition becZone = polygon.getBiogeoclimaticZone();
+		
+		this.start = new Bank(
+				polygon.getLayers().get(subjectLayer), becZone,
+				s -> s.getBaseAreaByUtilization().get(UtilizationClass.ALL) >= ForwardProcessingEngine.MIN_BASAL_AREA);
+		
+		var volumeEquationGroupMatrix = this.fps.fcm.getVolumeEquationGroups();
+		var decayEquationGroupMatrix = this.fps.fcm.getDecayEquationGroups();
+		var breakageEquationGroupMatrix = this.fps.fcm.getBreakageEquationGroups();
 
 		this.volumeEquationGroups = new int[this.start.getNSpecies() + 1];
 		this.decayEquationGroups = new int[this.start.getNSpecies() + 1];

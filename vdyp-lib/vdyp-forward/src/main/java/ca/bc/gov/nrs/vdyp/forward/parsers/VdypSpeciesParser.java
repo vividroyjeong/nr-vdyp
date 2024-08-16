@@ -58,7 +58,7 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 
 	@Override
 	public StreamingParserFactory<Collection<VdypSpecies>>
-			map(String fileName, FileResolver fileResolver, Map<String, Object> control)
+			map(String fileName, FileResolver fileResolver, Map<String, Object> controlMap)
 					throws IOException, ResourceParseException {
 		return () -> {
 			var lineParser = new LineParser().strippedString(25, DESCRIPTION).space(1)
@@ -91,10 +91,10 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 
 			var is = fileResolver.resolveForInput(fileName);
 
-			var genusDefinitionMap = (GenusDefinitionMap) control.get(ControlKey.SP0_DEF.name());
+			var genusDefinitionMap = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
 
 			var delegateStream = new AbstractStreamingParser<ValueOrMarker<Optional<VdypSpecies>, EndOfRecord>>(
-					is, lineParser, control
+					is, lineParser, controlMap
 			) {
 				@SuppressWarnings("unchecked")
 				@Override
@@ -159,8 +159,7 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 							speciesBuilder.sp64DistributionSet(speciesDistributionSet);
 							speciesBuilder.polygonIdentifier(polygonId);
 							speciesBuilder.layerType(lt);
-							speciesBuilder.genusIndex(genusIndex);
-							speciesBuilder.genus(genus);
+							speciesBuilder.genus(genus, controlMap);
 							speciesBuilder.addSite(siteBuilder -> {
 								siteBuilder.ageTotal(totalAge);
 								siteBuilder.height(dominantHeight);

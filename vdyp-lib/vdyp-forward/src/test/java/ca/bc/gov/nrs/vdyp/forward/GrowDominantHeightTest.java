@@ -31,6 +31,7 @@ import ca.bc.gov.nrs.vdyp.forward.test.VdypForwardTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
+import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 
@@ -65,7 +66,7 @@ class GrowDominantHeightTest {
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 		
 		// Select the first polygon - 01002 S000001 00(1970)
-		fpe.fps.setPolygon(forwardDataStreamReader.readNextPolygon().orElseThrow());
+		fpe.fps.setPolygonLayer(forwardDataStreamReader.readNextPolygon().orElseThrow(), LayerType.PRIMARY);
 
 		float hd = 35.2999992f;
 		int sc = 13;
@@ -88,7 +89,7 @@ class GrowDominantHeightTest {
 			polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 		} while (! polygon.getPolygonIdentifier().getName().equals("01003AS000001 00"));
 		
-		fpe.fps.setPolygon(polygon);
+		fpe.fps.setPolygonLayer(polygon, LayerType.PRIMARY);
 
 		float hd = 29.5f;
 		int sc = 11;
@@ -111,7 +112,7 @@ class GrowDominantHeightTest {
 			polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 		} while (! polygon.getPolygonIdentifier().getName().equals("01003AS000001 00"));
 		
-		fpe.fps.setPolygon(polygon);
+		fpe.fps.setPolygonLayer(polygon, LayerType.PRIMARY);
 		
 		float hd = 26.5f;
 		int sc = 11;

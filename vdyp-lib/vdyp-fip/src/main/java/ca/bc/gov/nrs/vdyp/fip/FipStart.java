@@ -46,7 +46,6 @@ import ca.bc.gov.nrs.vdyp.application.StandProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.application.VdypStartApplication;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.EstimationMethods;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
@@ -469,7 +468,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 					var dqMin = limits.minQuadMeanDiameterLoreyHeightRatio() * spec.getLoreyHeightByUtilization().getAll();
 					var dqMax = max(
-							limits.maxQuadMeanDiameter(), limits.maxDiameterHeight()
+							limits.quadMeanDiameterMaximum(), limits.maxQuadMeanDiameterLoreyHeightRatio()
 									* spec.getLoreyHeightByUtilization().getAll()
 					);
 
@@ -752,15 +751,9 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 				adjust.setCoe(4, volumeAdjustCoe.getCoe(4));
 				// EMP094
-				final var netDecayCoeMap = Utils.<Map<String, Coefficients>>expectParsedControl(
-						controlMap, ControlKey.VOLUME_NET_DECAY_WASTE, Map.class
-				);
-				final var wasteModifierMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
-						controlMap, ControlKey.WASTE_MODIFIERS, MatrixMap2.class
-				);
-				EstimationMethods.estimateNetDecayAndWasteVolume(
+				estimationMethods.estimateNetDecayAndWasteVolume(
 						bec.getRegion(), utilizationClass, adjust, vdypSpecies
-								.getGenus(), hlSp, netDecayCoeMap, wasteModifierMap, quadMeanDiameterUtil, closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
+								.getGenus(), hlSp, quadMeanDiameterUtil, closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
 				);
 
 				if (getId().isStart()) {

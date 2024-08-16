@@ -32,10 +32,7 @@ public interface ForwardResolvedControlMap extends ResolvedControlMap {
 	
 	/** 53 - HL_NONPRIMARY */
 	MatrixMap3<String, String, Region, Optional<NonprimaryHLCoefficients>> getLoreyHeightNonPrimaryCoefficients();
-	
-	/** 61 - SPECIES_COMPONENT_SIZE_LIMIT */
-	MatrixMap2<String, Region, Coefficients> getComponentSizeCoefficients();
-	
+
 	/** 101 - VTROL */
 	ForwardControlVariables getForwardControlVariables();
 	
