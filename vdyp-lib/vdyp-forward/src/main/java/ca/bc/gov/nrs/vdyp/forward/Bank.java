@@ -14,7 +14,7 @@ import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonLayer;
 import ca.bc.gov.nrs.vdyp.forward.model.VdypSpeciesUtilization;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
-import ca.bc.gov.nrs.vdyp.model.GenusDistributionSet;
+import ca.bc.gov.nrs.vdyp.model.Sp64DistributionSet;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
 class Bank {
@@ -37,7 +37,7 @@ class Bank {
 	// Species information
 
 	public final String[/* nSpecies + 1 */] speciesNames; // BANK2 SP0B
-	public final GenusDistributionSet[/* nSpecies + 1 */] sp64Distributions; // BANK2 SP64DISTB
+	public final Sp64DistributionSet[/* nSpecies + 1 */] sp64Distributions; // BANK2 SP64DISTB
 	public final float[/* nSpecies + 1 */] siteIndices; // BANK3 SIB
 	public final float[/* nSpecies + 1 */] dominantHeights; // BANK3 HDB
 	public final float[/* nSpecies + 1 */] ageTotals; // BANK3 AGETOTB
@@ -76,7 +76,7 @@ class Bank {
 
 		// In the following, index 0 is unused
 		speciesNames = new String[getNSpecies() + 1];
-		sp64Distributions = new GenusDistributionSet[getNSpecies() + 1];
+		sp64Distributions = new Sp64DistributionSet[getNSpecies() + 1];
 		siteIndices = new float[getNSpecies() + 1];
 		dominantHeights = new float[getNSpecies() + 1];
 		ageTotals = new float[getNSpecies() + 1];
@@ -210,8 +210,8 @@ class Bank {
 		return new Bank(this);
 	}
 
-	private GenusDistributionSet[] copy(GenusDistributionSet[] a) {
-		return Arrays.stream(a).map(g -> g == null ? null : g.copy()).toArray(GenusDistributionSet[]::new);
+	private Sp64DistributionSet[] copy(Sp64DistributionSet[] a) {
+		return Arrays.stream(a).map(g -> g == null ? null : g.copy()).toArray(Sp64DistributionSet[]::new);
 	}
 
 	private String[] copy(String[] a) {

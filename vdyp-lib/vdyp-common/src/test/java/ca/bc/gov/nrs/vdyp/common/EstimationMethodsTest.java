@@ -8,7 +8,6 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +18,6 @@ import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
-import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
@@ -49,9 +47,8 @@ class EstimationMethodsTest {
 		void testWhenBasalAreaAllIsZero() throws ProcessingException {
 			var becDefinition = becLookup.get("IDF").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(0);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(1);
 
 			UtilizationVector quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
 			UtilizationVector basalAreaByUtilization = Utils.utilizationVector(0.0f);
@@ -69,9 +66,8 @@ class EstimationMethodsTest {
 		void testWhenBasalAreaAllIsTenAndQuadMeanDiametersAreAllZero() throws ProcessingException {
 			var becDefinition = becLookup.get("IDF").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(0);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(1);
 
 			UtilizationVector quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
 			UtilizationVector basalAreaByUtilization = Utils.utilizationVector(10.0f);
@@ -93,9 +89,8 @@ class EstimationMethodsTest {
 
 			var becDefinition = becLookup.get("CDF").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(2);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(3);
 
 			UtilizationVector quadMeanDiameterByUtilization = Utils.utilizationVector(31.5006275f);
 			UtilizationVector basalAreaByUtilization = Utils.utilizationVector(0.406989872f);
@@ -106,8 +101,9 @@ class EstimationMethodsTest {
 
 			// Result of run in FORTRAN VDYP7 with the above parameters.
 			assertThat(
-					basalAreaByUtilization,
-					contains(0.0f, 0.406989872f, 0.00509467721f, 0.0138180256f, 0.023145527f, 0.36493164f)
+					basalAreaByUtilization, contains(
+							0.0f, 0.406989872f, 0.00509467721f, 0.0138180256f, 0.023145527f, 0.36493164f
+					)
 			);
 		}
 
@@ -128,8 +124,7 @@ class EstimationMethodsTest {
 			emp.estimateBaseAreaByUtilization(bec, dq, ba, "B");
 
 			assertThat(
-					ba,
-					VdypMatchers
+					ba, VdypMatchers
 							.utilization(0f, 0.397305071f, 0.00485289097f, 0.0131751001f, 0.0221586525f, 0.357118428f)
 			);
 
@@ -145,9 +140,8 @@ class EstimationMethodsTest {
 
 			var becDefinition = becLookup.get("IDF").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(0);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(1);
 
 			var volumeEquationGroupMatrix = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
 					controlMap, ControlKey.VOLUME_EQN_GROUPS, MatrixMap2.class
@@ -161,8 +155,7 @@ class EstimationMethodsTest {
 			float loreyHeight = 30.0f;
 
 			EstimationMethods.estimateCloseUtilizationVolume(
-					controlMap, UtilizationClass.U75TO125, aAdjust, volumeGroup, loreyHeight,
-					quadMeanDiameterByUtilization, wholeStemVolumeByUtilization, closeUtilizationVolume
+					controlMap, UtilizationClass.U75TO125, aAdjust, volumeGroup, loreyHeight, quadMeanDiameterByUtilization, wholeStemVolumeByUtilization, closeUtilizationVolume
 			);
 
 			assertThat(closeUtilizationVolume, contains(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
@@ -173,9 +166,8 @@ class EstimationMethodsTest {
 
 			var becDefinition = becLookup.get("CDF").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(2);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(3);
 
 			var volumeEquationGroupMatrix = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
 					controlMap, ControlKey.VOLUME_EQN_GROUPS, MatrixMap2.class
@@ -191,8 +183,7 @@ class EstimationMethodsTest {
 			float loreyHeight = 36.7552986f;
 
 			EstimationMethods.estimateCloseUtilizationVolume(
-					controlMap, UtilizationClass.U175TO225, aAdjust, volumeGroup, loreyHeight,
-					quadMeanDiameterByUtilization, wholeStemVolumeByUtilization, closeUtilizationVolume
+					controlMap, UtilizationClass.U175TO225, aAdjust, volumeGroup, loreyHeight, quadMeanDiameterByUtilization, wholeStemVolumeByUtilization, closeUtilizationVolume
 			);
 
 			// Result of run in FORTRAN VDYP7 with the above parameters.
@@ -213,8 +204,7 @@ class EstimationMethodsTest {
 			var closeUtilizationUtil = Utils.utilizationVector(0f, 0f, 0f, 0f, 0f);
 
 			emp.estimateCloseUtilizationVolume(
-					utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, wholeStemVolumeUtil,
-					closeUtilizationUtil
+					utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, wholeStemVolumeUtil, closeUtilizationUtil
 			);
 
 			assertThat(closeUtilizationUtil, utilization(0f, 0f, 0f, 0f, 0f, 5.86088896f));
@@ -229,9 +219,8 @@ class EstimationMethodsTest {
 
 			var becDefinition = becLookup.get("CDF").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(2);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(3);
 
 			Coefficients aAdjust = Utils.utilizationVector(0.0f);
 			UtilizationVector quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
@@ -244,8 +233,8 @@ class EstimationMethodsTest {
 			int volumeGroup = volumeEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
 			EstimationMethods.estimateNetDecayVolume(
-					controlMap, genus.getAlias(), becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust,
-					volumeGroup, 0.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay
+					controlMap, genus.getAlias(), becDefinition
+							.getRegion(), UtilizationClass.U175TO225, aAdjust, volumeGroup, 0.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay
 			);
 
 			assertThat(closeUtilizationNetOfDecay, contains(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
@@ -256,9 +245,8 @@ class EstimationMethodsTest {
 
 			var becDefinition = becLookup.get("CWH").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(2);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(3);
 
 			Coefficients aAdjust = Utils.utilizationVector(0.0f);
 			UtilizationVector quadMeanDiameterByUtilization = Utils
@@ -273,8 +261,8 @@ class EstimationMethodsTest {
 			int decayGroup = decayEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
 			EstimationMethods.estimateNetDecayVolume(
-					controlMap, genus.getAlias(), becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust,
-					decayGroup, 54.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay
+					controlMap, genus.getAlias(), becDefinition
+							.getRegion(), UtilizationClass.U175TO225, aAdjust, decayGroup, 54.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay
 			);
 
 			// Result of run in FORTRAN VDYP7 with the above parameters.
@@ -289,9 +277,8 @@ class EstimationMethodsTest {
 
 			var becDefinition = becLookup.get("CDF").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(2);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(3);
 
 			Coefficients aAdjust = Utils.utilizationVector(0.0f);
 			UtilizationVector quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
@@ -300,9 +287,8 @@ class EstimationMethodsTest {
 			UtilizationVector closeUtilizationNetOfDecayAndWastage = Utils.utilizationVector(0.0f);
 
 			EstimationMethods.estimateNetDecayAndWasteVolume(
-					controlMap, becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus.getAlias(), 0.0f,
-					quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay,
-					closeUtilizationNetOfDecayAndWastage
+					controlMap, becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus
+							.getAlias(), 0.0f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay, closeUtilizationNetOfDecayAndWastage
 			);
 
 			assertThat(closeUtilizationNetOfDecay, contains(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
@@ -313,9 +299,8 @@ class EstimationMethodsTest {
 
 			var becDefinition = becLookup.get("CWH").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(2);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(3);
 
 			Coefficients aAdjust = Utils.utilizationVector(0.0f);
 			UtilizationVector quadMeanDiameterByUtilization = Utils
@@ -327,9 +312,8 @@ class EstimationMethodsTest {
 			UtilizationVector closeUtilizationNetOfDecayAndWastage = Utils.utilizationVector(0.0f);
 
 			EstimationMethods.estimateNetDecayAndWasteVolume(
-					controlMap, becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus.getAlias(),
-					36.7552986f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay,
-					closeUtilizationNetOfDecayAndWastage
+					controlMap, becDefinition.getRegion(), UtilizationClass.U175TO225, aAdjust, genus
+							.getAlias(), 36.7552986f, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecay, closeUtilizationNetOfDecayAndWastage
 			);
 
 			// Result of run in FORTRAN VDYP7 with the above parameters.
@@ -345,9 +329,8 @@ class EstimationMethodsTest {
 
 			var becDefinition = becLookup.get("CDF").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(2);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(3);
 
 			UtilizationVector quadMeanDiameterByUtilization = Utils.utilizationVector(0.0f);
 			UtilizationVector closeUtilization = Utils.utilizationVector(0.0f);
@@ -360,8 +343,7 @@ class EstimationMethodsTest {
 			int breakageGroup = breakageEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
 			EstimationMethods.estimateNetDecayWasteAndBreakageVolume(
-					controlMap, UtilizationClass.U175TO225, breakageGroup, quadMeanDiameterByUtilization,
-					closeUtilization, closeUtilizationNetOfDecayAndWastage, closeUtilizationNetOfDecayWastageAndBreakage
+					controlMap, UtilizationClass.U175TO225, breakageGroup, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecayAndWastage, closeUtilizationNetOfDecayWastageAndBreakage
 			);
 
 			assertThat(closeUtilizationNetOfDecayAndWastage, contains(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
@@ -372,9 +354,8 @@ class EstimationMethodsTest {
 
 			var becDefinition = becLookup.get("CWH").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(2);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(3);
 
 			UtilizationVector quadMeanDiameterByUtilization = Utils
 					.utilizationVector(0.0f, 31.5006275f, 9.17065048f, 13.6603403f, 18.1786556f, 42.0707741f);
@@ -390,8 +371,7 @@ class EstimationMethodsTest {
 			int breakageGroup = breakageEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
 			EstimationMethods.estimateNetDecayWasteAndBreakageVolume(
-					controlMap, UtilizationClass.U175TO225, breakageGroup, quadMeanDiameterByUtilization,
-					closeUtilization, closeUtilizationNetOfDecayAndWastage, closeUtilizationNetOfDecayWastageAndBreakage
+					controlMap, UtilizationClass.U175TO225, breakageGroup, quadMeanDiameterByUtilization, closeUtilization, closeUtilizationNetOfDecayAndWastage, closeUtilizationNetOfDecayWastageAndBreakage
 			);
 
 			// Result of run in FORTRAN VDYP7 with the above parameters.
@@ -448,7 +428,7 @@ class EstimationMethodsTest {
 			// sp 3, 4, 5, 8, 15
 			// sp B, C, D, H, S
 			var spec1 = VdypSpecies.build(layer, builder -> {
-				builder.genus("B");
+				builder.genus("B", controlMap);
 				builder.volumeGroup(12);
 				builder.decayGroup(7);
 				builder.breakageGroup(5);
@@ -458,8 +438,8 @@ class EstimationMethodsTest {
 			spec1.setFractionGenus(0.00817133673f);
 
 			var spec2 = VdypSpecies.build(layer, builder -> {
-				builder.genus("C");
-				builder.volumeGroup(20);
+				builder.genus("C", controlMap);
+				builder.volumeGroup(4);
 				builder.decayGroup(14);
 				builder.breakageGroup(6);
 				builder.percentGenus(7f);
@@ -468,7 +448,7 @@ class EstimationMethodsTest {
 			spec2.setFractionGenus(0.0972022042f);
 
 			var spec3 = VdypSpecies.build(layer, builder -> {
-				builder.genus("D");
+				builder.genus("D", controlMap);
 				builder.volumeGroup(25);
 				builder.decayGroup(19);
 				builder.breakageGroup(12);
@@ -478,7 +458,7 @@ class EstimationMethodsTest {
 			spec3.setFractionGenus(0.695440531f);
 
 			var spec4 = VdypSpecies.build(layer, builder -> {
-				builder.genus("H");
+				builder.genus("H", controlMap);
 				builder.volumeGroup(37);
 				builder.decayGroup(31);
 				builder.breakageGroup(17);
@@ -493,7 +473,7 @@ class EstimationMethodsTest {
 			spec4.setFractionGenus(0.117043354f);
 
 			var spec5 = VdypSpecies.build(layer, builder -> {
-				builder.genus("S");
+				builder.genus("S", controlMap);
 				builder.volumeGroup(66);
 				builder.decayGroup(54);
 				builder.breakageGroup(28);
@@ -530,8 +510,7 @@ class EstimationMethodsTest {
 			float quadMeanDiameter2 = 30.249138f;
 
 			float dq = emp.estimateQuadMeanDiameterClampResult(
-					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
-					quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2, quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
 			);
 
 			assertThat(dq, is(quadMeanDiameter1));
@@ -556,8 +535,7 @@ class EstimationMethodsTest {
 			float quadMeanDiameter1 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea1, treesPerHectare1);
 
 			float dq = emp.estimateQuadMeanDiameterClampResult(
-					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
-					quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2, quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
 			);
 
 			assertThat(dq, closeTo(30.722431f));
@@ -582,8 +560,7 @@ class EstimationMethodsTest {
 			float quadMeanDiameter2 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea2, treesPerHectare2);
 
 			float dq = emp.estimateQuadMeanDiameterClampResult(
-					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
-					quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2, quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
 			);
 
 			assertThat(dq, closeTo(28.245578f));
@@ -608,8 +585,7 @@ class EstimationMethodsTest {
 			float quadMeanDiameter2 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea2, treesPerHectare2);
 
 			float dq = emp.estimateQuadMeanDiameterClampResult(
-					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
-					quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2, quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
 			);
 
 			assertThat(dq, closeTo(66.565033f));
@@ -626,9 +602,8 @@ class EstimationMethodsTest {
 
 			var becDefinition = becLookup.get("CWH").get();
 
-			@SuppressWarnings("unchecked")
-			var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-			var genus = genera.get(2);
+			var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+			var genus = genera.getByIndex(3);
 
 			UtilizationVector quadMeanDiameterByUtilization = Utils
 					.utilizationVector(0.0f, 31.5006275f, 9.17065048f, 13.6603403f, 18.1786556f, 42.0707741f);
@@ -643,14 +618,14 @@ class EstimationMethodsTest {
 			int volumeGroup = volumeEquationGroupMatrix.get(genus.getAlias(), becDefinition.getAlias());
 
 			EstimationMethods.estimateWholeStemVolume(
-					controlMap, UtilizationClass.ALL, 0.0f, volumeGroup, 36.7552986f, quadMeanDiameterByUtilization,
-					basalAreaByUtilization, wholeStemVolumeByUtilization
+					controlMap, UtilizationClass.ALL, 0.0f, volumeGroup, 36.7552986f, quadMeanDiameterByUtilization, basalAreaByUtilization, wholeStemVolumeByUtilization
 			);
 
 			// Result of run in FORTRAN VDYP7 with the above parameters.
 			assertThat(
-					wholeStemVolumeByUtilization,
-					contains(0.0f, 6.27250576f, 0.01865777f, 0.07648385f, 0.17615195f, 6.00121212f)
+					wholeStemVolumeByUtilization, contains(
+							0.0f, 6.27250576f, 0.01865777f, 0.07648385f, 0.17615195f, 6.00121212f
+					)
 			);
 		}
 
@@ -665,8 +640,7 @@ class EstimationMethodsTest {
 			var wholeStemVolumeUtil = Utils.utilizationVector();
 
 			emp.estimateWholeStemVolume(
-					utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, baseAreaUtil,
-					wholeStemVolumeUtil
+					utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
 			);
 
 			assertThat(wholeStemVolumeUtil, utilization(0f, 0f, 0f, 0f, 0f, 6.11904192f));
@@ -680,9 +654,8 @@ class EstimationMethodsTest {
 
 		var becDefinition = becLookup.get("CWH").get();
 
-		@SuppressWarnings("unchecked")
-		var genera = (List<GenusDefinition>) controlMap.get(ControlKey.SP0_DEF.name());
-		var genus = genera.get(2);
+		var genera = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
+		var genus = genera.getByIndex(3);
 
 		var volumeEquationGroupMatrix = Utils.<MatrixMap2<String, String, Integer>>expectParsedControl(
 				controlMap, ControlKey.VOLUME_EQN_GROUPS, MatrixMap2.class
@@ -707,7 +680,7 @@ class EstimationMethodsTest {
 			var spec = VdypSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("B");
+				builder.genus("B", controlMap);
 				builder.percentGenus(50f);
 				builder.volumeGroup(-1);
 				builder.decayGroup(-1);
@@ -716,7 +689,7 @@ class EstimationMethodsTest {
 			var specPrime = VdypSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("H");
+				builder.genus("H", controlMap);
 				builder.percentGenus(50f);
 				builder.volumeGroup(-1);
 				builder.decayGroup(-1);
@@ -737,7 +710,7 @@ class EstimationMethodsTest {
 			var spec = VdypSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("B");
+				builder.genus("B", controlMap);
 				builder.percentGenus(50f);
 				builder.volumeGroup(-1);
 				builder.decayGroup(-1);
@@ -746,7 +719,7 @@ class EstimationMethodsTest {
 			var specPrime = VdypSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("D");
+				builder.genus("D", controlMap);
 				builder.percentGenus(50f);
 				builder.volumeGroup(-1);
 				builder.decayGroup(-1);

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -285,7 +286,7 @@ public class ModifierParser implements OptionalResourceControlMapModifier {
 		return programs.get(index - 1);
 	}
 
-	List<String> getSpeciesByIndex(int index, Map<String, Object> control) {
+	Collection<String> getSpeciesByIndex(int index, Map<String, Object> control) {
 		if (index == 0) {
 			return GenusDefinitionParser.getSpeciesAliases(control);
 		}

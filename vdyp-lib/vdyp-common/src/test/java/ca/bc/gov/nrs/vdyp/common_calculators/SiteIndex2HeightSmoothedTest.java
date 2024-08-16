@@ -23,24 +23,24 @@ class SiteIndex2HeightSmoothedTest {
 		@Test
 		void testInvalidSiteIndex() throws CommonCalculatorException {
 			assertThrows(
-					LessThan13Exception.class,
-					() -> SiteIndex2HeightSmoothed.indexToHeightSmoothed(null, 0.0, SI_AT_TOTAL, 1.2, 0.0, 0.0, 0.0)
+					LessThan13Exception.class, () -> SiteIndex2HeightSmoothed
+							.indexToHeightSmoothed(null, 0.0, SI_AT_TOTAL, 1.2, 0.0, 0.0, 0.0)
 			);
 		}
 
 		@Test
 		void testInvalidY2BH() throws CommonCalculatorException {
 			assertThrows(
-					NoAnswerException.class,
-					() -> SiteIndex2HeightSmoothed.indexToHeightSmoothed(null, 0.0, SI_AT_TOTAL, 1.31, -1.0, 0.0, 0.0)
+					NoAnswerException.class, () -> SiteIndex2HeightSmoothed
+							.indexToHeightSmoothed(null, 0.0, SI_AT_TOTAL, 1.31, -1.0, 0.0, 0.0)
 			);
 		}
 
 		@Test
 		void testItageInvalid() throws CommonCalculatorException {
 			assertThrows(
-					NoAnswerException.class,
-					() -> SiteIndex2HeightSmoothed.indexToHeightSmoothed(null, -1.0, SI_AT_BREAST, 1.31, 0.0, 0.0, 0.0)
+					NoAnswerException.class, () -> SiteIndex2HeightSmoothed
+							.indexToHeightSmoothed(null, -1.0, SI_AT_BREAST, 1.31, 0.0, 0.0, 0.0)
 			);
 
 			double actualResult = SiteIndex2HeightSmoothed
@@ -52,8 +52,7 @@ class SiteIndex2HeightSmoothedTest {
 		@Test
 		void testIterationCannotConverge() throws CommonCalculatorException {
 			assertThrows(
-					NoAnswerException.class,
-					() -> SiteIndex2HeightSmoothed
+					NoAnswerException.class, () -> SiteIndex2HeightSmoothed
 							.indexToHeightSmoothed(SI_PLI_THROWER, 0.0, SI_AT_BREAST, 1.31, 1.0, 0, 0)
 			);
 		}

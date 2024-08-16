@@ -14,6 +14,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseValidException;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
@@ -30,9 +31,9 @@ class SiteCurveParserTest {
 		Map<String, Object> controlMap = new HashMap<>();
 		List<GenusDefinition> sp0List = new ArrayList<>();
 
-		sp0List.add(new GenusDefinition("S1", java.util.Optional.empty(), "Test Species 1"));
+		sp0List.add(new GenusDefinition("S1", 1, "Test Species 1"));
 
-		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), new GenusDefinitionMap(sp0List));
 
 		var result = parser.parse(is, controlMap);
 
@@ -48,9 +49,9 @@ class SiteCurveParserTest {
 		Map<String, Object> controlMap = new HashMap<>();
 		List<GenusDefinition> sp0List = new ArrayList<>();
 
-		sp0List.add(new GenusDefinition("S1", java.util.Optional.empty(), "Test Species 1"));
+		sp0List.add(new GenusDefinition("S1", 1, "Test Species 1"));
 
-		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), new GenusDefinitionMap(sp0List));
 
 		var result = parser.parse(is, controlMap);
 
@@ -68,10 +69,10 @@ class SiteCurveParserTest {
 		Map<String, Object> controlMap = new HashMap<>();
 		List<GenusDefinition> sp0List = new ArrayList<>();
 
-		sp0List.add(new GenusDefinition("S1", java.util.Optional.empty(), "Test Species 1"));
-		sp0List.add(new GenusDefinition("S2", java.util.Optional.empty(), "Test Species 2"));
+		sp0List.add(new GenusDefinition("S1", 1, "Test Species 1"));
+		sp0List.add(new GenusDefinition("S2", 2, "Test Species 2"));
 
-		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), new GenusDefinitionMap(sp0List));
 
 		var ex = assertThrows(ResourceParseValidException.class, () -> parser.parse(is, controlMap));
 
@@ -86,9 +87,9 @@ class SiteCurveParserTest {
 		Map<String, Object> controlMap = new HashMap<>();
 		List<GenusDefinition> sp0List = new ArrayList<>();
 
-		sp0List.add(new GenusDefinition("S1", java.util.Optional.empty(), "Test Species 1"));
+		sp0List.add(new GenusDefinition("S1", 1, "Test Species 1"));
 
-		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), new GenusDefinitionMap(sp0List));
 
 		var result = parser.parse(is, controlMap);
 
@@ -104,9 +105,9 @@ class SiteCurveParserTest {
 		Map<String, Object> controlMap = new HashMap<>();
 		List<GenusDefinition> sp0List = new ArrayList<>();
 
-		sp0List.add(new GenusDefinition("S1", java.util.Optional.empty(), "Test Species 1"));
+		sp0List.add(new GenusDefinition("S1", 1, "Test Species 1"));
 
-		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), new GenusDefinitionMap(sp0List));
 
 		var result = parser.parse(is, controlMap);
 
@@ -122,9 +123,9 @@ class SiteCurveParserTest {
 		Map<String, Object> controlMap = new HashMap<>();
 		List<GenusDefinition> sp0List = new ArrayList<>();
 
-		sp0List.add(new GenusDefinition("S1", java.util.Optional.empty(), "Test Species 1"));
+		sp0List.add(new GenusDefinition("S1", 1, "Test Species 1"));
 
-		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);
+		controlMap.put(ControlKey.SP0_DEF.name(), new GenusDefinitionMap(sp0List));
 
 		var result = parser.parse(is, controlMap);
 

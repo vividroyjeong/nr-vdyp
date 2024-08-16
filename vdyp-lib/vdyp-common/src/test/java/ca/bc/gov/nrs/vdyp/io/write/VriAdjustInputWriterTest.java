@@ -36,6 +36,7 @@ class VriAdjustInputWriterTest {
 	@BeforeEach
 	void initStreams() {
 		controlMap = new HashMap<String, Object>();
+		TestUtils.populateControlMapBecReal(controlMap);
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		polyStream = new TestUtils.MockOutputStream("polygons");
@@ -93,7 +94,7 @@ class VriAdjustInputWriterTest {
 
 				builder.polygonIdentifier("082E004    615       1988");
 				builder.percentAvailable(90f);
-				builder.biogeoclimaticZone("IDF");
+				builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				builder.forestInventoryZone("D");
 				builder.mode(PolygonMode.START);
 			});
@@ -102,7 +103,7 @@ class VriAdjustInputWriterTest {
 				builder.layerType(LayerType.PRIMARY);
 
 				builder.addSpecies(specBuilder -> {
-					specBuilder.genus("PL");
+					specBuilder.genus("PL", controlMap);
 					specBuilder.percentGenus(100);
 					specBuilder.volumeGroup(1);
 					specBuilder.decayGroup(2);
@@ -139,12 +140,12 @@ class VriAdjustInputWriterTest {
 				builder.layerType(LayerType.PRIMARY);
 
 				builder.addSpecies(specBuilder -> {
-					specBuilder.genus("PL");
+					specBuilder.genus("PL", controlMap);
 					specBuilder.percentGenus(100);
 					specBuilder.volumeGroup(0);
 					specBuilder.decayGroup(0);
 					specBuilder.breakageGroup(0);
-					specBuilder.addSpecies("PL", 100);
+					specBuilder.addSp64Distribution("PL", 100);
 
 					specBuilder.addSite(siteBuilder -> {
 						siteBuilder.height(15f);
@@ -176,7 +177,7 @@ class VriAdjustInputWriterTest {
 				builder.layerType(LayerType.PRIMARY);
 
 				builder.addSpecies(specBuilder -> {
-					specBuilder.genus("PL");
+					specBuilder.genus("PL", controlMap);
 					specBuilder.percentGenus(100);
 					specBuilder.volumeGroup(1);
 					specBuilder.decayGroup(2);
@@ -195,8 +196,8 @@ class VriAdjustInputWriterTest {
 
 			@SuppressWarnings("unused")
 			var species = VdypSpecies.build(layer, builder -> {
-				builder.genus("PL");
-				builder.addSpecies("PL", 100f);
+				builder.genus("PL", controlMap);
+				builder.addSp64Distribution("PL", 100f);
 
 				builder.percentGenus(100f);
 				builder.volumeGroup(0);
@@ -228,24 +229,19 @@ class VriAdjustInputWriterTest {
 					Utils.utilizationVector(0f, 65.4214f, 2.3464f, 35.7128f, 21.2592f, 6.1030f)
 			);
 
-			layer.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f)); // Should be
-																											// ignored
-																											// and
-																											// computed
-																											// from
-																											// BA and
-																											// TPH
+			// Should be ignored and computed from BA and TPH
+			layer.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f));
 
 			unit.writeUtilization(layer, layer);
 		}
 		utilStream.assertContent(
 				VdypMatchers.hasLines(
-						"082E004    615       1988 P  0    -1  0.02865     9.29   7.8377   0.1077   0.0000   0.0000   0.0000   0.0000   6.3",
-						"082E004    615       1988 P  0     0 19.97867  1485.82  13.0660 117.9938  67.7539  67.0665  66.8413  65.4214  13.1",
-						"082E004    615       1988 P  0     1  6.79731   834.25  -9.0000  33.3680   2.4174   2.3990   2.3951   2.3464  10.2",
-						"082E004    615       1988 P  0     2  8.54690   509.09  -9.0000  52.4308  36.8751  36.5664  36.4803  35.7128  14.6",
-						"082E004    615       1988 P  0     3  3.63577   123.56  -9.0000  25.2296  22.0156  21.7930  21.7218  21.2592  19.4",
-						"082E004    615       1988 P  0     4  0.99869    18.92  -9.0000   6.9654   6.4459   6.3080   6.2442   6.1030  25.9"
+						"082E004    615       1988 P  0    -1  0.02865     9.29   7.8377   0.1077   0.0000   0.0000   0.0000   0.0000   6.3", //
+						"082E004    615       1988 P  0     0 19.97867  1485.82  13.0660 117.9938  67.7539  67.0665  66.8413  65.4214  13.1", //
+						"082E004    615       1988 P  0     1  6.79731   834.25  -9.0000  33.3680   2.4174   2.3990   2.3951   2.3464  10.2", //
+						"082E004    615       1988 P  0     2  8.54690   509.09  -9.0000  52.4308  36.8751  36.5664  36.4803  35.7128  14.6", //
+						"082E004    615       1988 P  0     3  3.63577   123.56  -9.0000  25.2296  22.0156  21.7930  21.7218  21.2592  19.4", //
+						"082E004    615       1988 P  0     4  0.99869    18.92  -9.0000   6.9654   6.4459   6.3080   6.2442   6.1030  25.9" //
 				)
 		);
 		polyStream.assertContent(emptyString());
@@ -261,7 +257,7 @@ class VriAdjustInputWriterTest {
 				builder.layerType(LayerType.PRIMARY);
 
 				builder.addSpecies(specBuilder -> {
-					specBuilder.genus("PL");
+					specBuilder.genus("PL", controlMap);
 					specBuilder.percentGenus(100);
 					specBuilder.volumeGroup(1);
 					specBuilder.decayGroup(2);
@@ -278,8 +274,8 @@ class VriAdjustInputWriterTest {
 			});
 
 			var species = VdypSpecies.build(layer, builder -> {
-				builder.genus("PL");
-				builder.addSpecies("PL", 100f);
+				builder.genus("PL", controlMap);
+				builder.addSp64Distribution("PL", 100f);
 
 				builder.percentGenus(100f);
 				builder.volumeGroup(0);
@@ -311,27 +307,20 @@ class VriAdjustInputWriterTest {
 					Utils.utilizationVector(0f, 65.4214f, 2.3464f, 35.7128f, 21.2592f, 6.1030f)
 			);
 
-			species.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f)); // Should be
-																											// ignored
-																											// and
-																											// computed
-																											// from
-																											// BA and
-																											// TPH
+			// Should be ignored and computed from BA and TPH
+			species.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f));
 
 			unit.writeUtilization(layer, species);
 		}
 		utilStream.assertContent(
 				VdypMatchers.hasLines(
-						"082E004    615       1988 P 12 PL -1  0.02865     9.29   7.8377   0.1077   0.0000   0.0000   0.0000   0.0000   6.3",
-						"082E004    615       1988 P 12 PL  0 19.97867  1485.82  13.0660 117.9938  67.7539  67.0665  66.8413  65.4214  13.1",
-						"082E004    615       1988 P 12 PL  1  6.79731   834.25  -9.0000  33.3680   2.4174   2.3990   2.3951   2.3464  10.2",
-						"082E004    615       1988 P 12 PL  2  8.54690   509.09  -9.0000  52.4308  36.8751  36.5664  36.4803  35.7128  14.6",
-						"082E004    615       1988 P 12 PL  3  3.63577   123.56  -9.0000  25.2296  22.0156  21.7930  21.7218  21.2592  19.4",
-						"082E004    615       1988 P 12 PL  4  0.00000    18.92  -9.0000   6.9654   6.4459   6.3080   6.2442   6.1030  -9.0" // DQ
-																																				// should
-																																				// be
-																																				// -9
+						"082E004    615       1988 P 12 PL -1  0.02865     9.29   7.8377   0.1077   0.0000   0.0000   0.0000   0.0000   6.3", //
+						"082E004    615       1988 P 12 PL  0 19.97867  1485.82  13.0660 117.9938  67.7539  67.0665  66.8413  65.4214  13.1", //
+						"082E004    615       1988 P 12 PL  1  6.79731   834.25  -9.0000  33.3680   2.4174   2.3990   2.3951   2.3464  10.2", //
+						"082E004    615       1988 P 12 PL  2  8.54690   509.09  -9.0000  52.4308  36.8751  36.5664  36.4803  35.7128  14.6", //
+						"082E004    615       1988 P 12 PL  3  3.63577   123.56  -9.0000  25.2296  22.0156  21.7930  21.7218  21.2592  19.4", //
+						"082E004    615       1988 P 12 PL  4  0.00000    18.92  -9.0000   6.9654   6.4459   6.3080   6.2442   6.1030  -9.0" // 
+						/* DQ should be -9 */
 				)
 		);
 		polyStream.assertContent(emptyString());
@@ -340,13 +329,13 @@ class VriAdjustInputWriterTest {
 
 	@Test
 	void testWritePolygonWithChildren() throws IOException {
-		try (var unit = new VriAdjustInputWriter(controlMap, fileResolver);) {
+		try (var unit = new VriAdjustInputWriter(controlMap, fileResolver)) {
 
 			VdypPolygon polygon = VdypPolygon.build(builder -> {
 
 				builder.polygonIdentifier("082E004    615       1988");
 				builder.percentAvailable(90f);
-				builder.biogeoclimaticZone("IDF");
+				builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				builder.forestInventoryZone("D");
 				builder.mode(PolygonMode.START);
 			});
@@ -355,12 +344,12 @@ class VriAdjustInputWriterTest {
 				builder.layerType(LayerType.PRIMARY);
 
 				builder.addSpecies(specBuilder -> {
-					specBuilder.genus("PL");
+					specBuilder.genus("PL", controlMap);
 					specBuilder.percentGenus(100);
 					specBuilder.volumeGroup(0);
 					specBuilder.decayGroup(0);
 					specBuilder.breakageGroup(0);
-					specBuilder.addSpecies("PL", 100);
+					specBuilder.addSp64Distribution("PL", 100);
 
 					specBuilder.addSite(siteBuilder -> {
 						siteBuilder.height(15f);
@@ -402,13 +391,8 @@ class VriAdjustInputWriterTest {
 					Utils.utilizationVector(0f, 65.4214f, 2.3464f, 35.7128f, 21.2592f, 6.1030f)
 			);
 
-			layer.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f)); // Should be
-																											// ignored
-																											// and
-																											// computed
-																											// from
-																											// BA and
-																											// TPH
+			// Should be ignored and computed from BA and TPH.
+			layer.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f));
 
 			species.setBaseAreaByUtilization(
 					Utils.utilizationVector(0.02865f, 19.97867f, 6.79731f, 8.54690f, 3.63577f, 0f)
@@ -434,37 +418,32 @@ class VriAdjustInputWriterTest {
 					Utils.utilizationVector(0f, 65.4214f, 2.3464f, 35.7128f, 21.2592f, 6.1030f)
 			);
 
-			species.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f)); // Should be
-																											// ignored
-																											// and
-																											// computed
-																											// from
-																											// BA and
-																											// TPH
+			// Should be ignored and computed from BA and TPH
+			species.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f));
 
 			unit.writePolygonWithSpeciesAndUtilization(polygon);
 		}
 		polyStream.assertContent(is("082E004    615       1988 IDF  D    90 28119  1\n"));
 		utilStream.assertContent(
 				VdypMatchers.hasLines(
-						"082E004    615       1988 P  0    -1  0.02865     9.29   7.8377   0.1077   0.0000   0.0000   0.0000   0.0000   6.3",
-						"082E004    615       1988 P  0     0 19.97867  1485.82  13.0660 117.9938  67.7539  67.0665  66.8413  65.4214  13.1",
-						"082E004    615       1988 P  0     1  6.79731   834.25  -9.0000  33.3680   2.4174   2.3990   2.3951   2.3464  10.2",
-						"082E004    615       1988 P  0     2  8.54690   509.09  -9.0000  52.4308  36.8751  36.5664  36.4803  35.7128  14.6",
-						"082E004    615       1988 P  0     3  3.63577   123.56  -9.0000  25.2296  22.0156  21.7930  21.7218  21.2592  19.4",
-						"082E004    615       1988 P  0     4  0.99869    18.92  -9.0000   6.9654   6.4459   6.3080   6.2442   6.1030  25.9",
-						"082E004    615       1988 P 12 PL -1  0.02865     9.29   7.8377   0.1077   0.0000   0.0000   0.0000   0.0000   6.3",
-						"082E004    615       1988 P 12 PL  0 19.97867  1485.82  13.0660 117.9938  67.7539  67.0665  66.8413  65.4214  13.1",
-						"082E004    615       1988 P 12 PL  1  6.79731   834.25  -9.0000  33.3680   2.4174   2.3990   2.3951   2.3464  10.2",
-						"082E004    615       1988 P 12 PL  2  8.54690   509.09  -9.0000  52.4308  36.8751  36.5664  36.4803  35.7128  14.6",
-						"082E004    615       1988 P 12 PL  3  3.63577   123.56  -9.0000  25.2296  22.0156  21.7930  21.7218  21.2592  19.4",
-						"082E004    615       1988 P 12 PL  4  0.00000    18.92  -9.0000   6.9654   6.4459   6.3080   6.2442   6.1030  -9.0",
+						"082E004    615       1988 P  0    -1  0.02865     9.29   7.8377   0.1077   0.0000   0.0000   0.0000   0.0000   6.3", //
+						"082E004    615       1988 P  0     0 19.97867  1485.82  13.0660 117.9938  67.7539  67.0665  66.8413  65.4214  13.1", //
+						"082E004    615       1988 P  0     1  6.79731   834.25  -9.0000  33.3680   2.4174   2.3990   2.3951   2.3464  10.2", //
+						"082E004    615       1988 P  0     2  8.54690   509.09  -9.0000  52.4308  36.8751  36.5664  36.4803  35.7128  14.6", //
+						"082E004    615       1988 P  0     3  3.63577   123.56  -9.0000  25.2296  22.0156  21.7930  21.7218  21.2592  19.4", //
+						"082E004    615       1988 P  0     4  0.99869    18.92  -9.0000   6.9654   6.4459   6.3080   6.2442   6.1030  25.9", //
+						"082E004    615       1988 P 12 PL -1  0.02865     9.29   7.8377   0.1077   0.0000   0.0000   0.0000   0.0000   6.3", //
+						"082E004    615       1988 P 12 PL  0 19.97867  1485.82  13.0660 117.9938  67.7539  67.0665  66.8413  65.4214  13.1", //
+						"082E004    615       1988 P 12 PL  1  6.79731   834.25  -9.0000  33.3680   2.4174   2.3990   2.3951   2.3464  10.2", //
+						"082E004    615       1988 P 12 PL  2  8.54690   509.09  -9.0000  52.4308  36.8751  36.5664  36.4803  35.7128  14.6", //
+						"082E004    615       1988 P 12 PL  3  3.63577   123.56  -9.0000  25.2296  22.0156  21.7930  21.7218  21.2592  19.4", //
+						"082E004    615       1988 P 12 PL  4  0.00000    18.92  -9.0000   6.9654   6.4459   6.3080   6.2442   6.1030  -9.0", //
 						"082E004    615       1988  "
 				)
 		);
 		specStream.assertContent(
 				VdypMatchers.hasLines(
-						"082E004    615       1988 P 12 PL PL 100.0     0.0     0.0     0.0 14.70 15.00  60.0  51.5   8.5 1  0",
+						"082E004    615       1988 P 12 PL PL 100.0     0.0     0.0     0.0 14.70 15.00  60.0  51.5   8.5 1  0", //
 						"082E004    615       1988  "
 				)
 		);

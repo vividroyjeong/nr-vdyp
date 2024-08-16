@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseLineException;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseValidException;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
@@ -33,82 +34,68 @@ public class GenusDefinitionParserTest {
 		var result = parser.parse(TestUtils.class, "coe/SP0DEF_v0.dat", Collections.emptyMap());
 
 		assertThat(
-				result, contains(
+				result.getGenera(), contains(
 						allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("AC")), //
 								Matchers.hasProperty("name", equalTo("Cottonwood"))
-						),
-						allOf(
+						), allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("AT")), //
 								Matchers.hasProperty("name", equalTo("Aspen"))
-						),
-						allOf(
+						), allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("B")), //
 								Matchers.hasProperty("name", equalTo("Balsam"))
-						),
-						allOf(
+						), allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("C")), //
 								Matchers.hasProperty("name", equalTo("Cedar (X yellow)"))
-						),
-						allOf(
+						), allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("D")), //
 								Matchers.hasProperty("name", equalTo("Alder"))
-						),
-						allOf(
+						), allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("E")), //
 								Matchers.hasProperty("name", equalTo("Birch"))
-						),
-						allOf(
+						), allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("F")), //
 								Matchers.hasProperty("name", equalTo("Douglas Fir"))
-						),
-						allOf(
+						), allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("H")), //
 								Matchers.hasProperty("name", equalTo("Hemlock"))
-						),
-						allOf(
-								Matchers.instanceOf(GenusDefinition.class), Matchers.hasProperty("alias", equalTo("L")),
+						), allOf(
+								Matchers.instanceOf(GenusDefinition.class), //
+								Matchers.hasProperty("alias", equalTo("L")), //
 								Matchers.hasProperty("name", equalTo("Larch"))
-						),
-						allOf(
+						), allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("MB")), //
 								Matchers.hasProperty("name", equalTo("Maple"))
-						),
-						allOf(
+						), allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("PA")), //
 								Matchers.hasProperty("name", equalTo("White-bark pine"))
-						),
-						allOf(
+						), allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("PL")), //
 								Matchers.hasProperty("name", equalTo("Lodgepole Pine"))
-						),
-						allOf(
+						), allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("PW")), //
 								Matchers.hasProperty("name", equalTo("White pine"))
-						),
-						allOf(
+						), allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("PY")), //
 								Matchers.hasProperty("name", equalTo("Yellow pine"))
-						),
-						allOf(
+						), allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("S")), //
 								Matchers.hasProperty("name", equalTo("Spruce"))
-						),
-						allOf(
+						), allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("Y")), //
 								Matchers.hasProperty("name", equalTo("Yellow cedar"))
@@ -122,7 +109,7 @@ public class GenusDefinitionParserTest {
 	void testOrderByPreference() throws Exception {
 		var parser = new GenusDefinitionParser(2);
 
-		List<GenusDefinition> result;
+		GenusDefinitionMap result;
 		try (
 				var is = new ByteArrayInputStream(
 						"AT Aspen                            02\r\nAC Cottonwood                       01".getBytes()
@@ -131,13 +118,12 @@ public class GenusDefinitionParserTest {
 			result = parser.parse(is, Collections.emptyMap());
 		}
 		assertThat(
-				result, contains(
+				result.getGenera(), contains(
 						allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("AC")), //
 								Matchers.hasProperty("name", equalTo("Cottonwood"))
-						),
-						allOf(
+						), allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("AT")), //
 								Matchers.hasProperty("name", equalTo("Aspen"))
@@ -150,7 +136,7 @@ public class GenusDefinitionParserTest {
 	void testOrderByLinesBlank() throws Exception {
 		var parser = new GenusDefinitionParser(2);
 
-		List<GenusDefinition> result;
+		GenusDefinitionMap result;
 		try (
 				var is = new ByteArrayInputStream(
 						"AT Aspen                              \r\nAC Cottonwood                         ".getBytes()
@@ -159,13 +145,12 @@ public class GenusDefinitionParserTest {
 			result = parser.parse(is, Collections.emptyMap());
 		}
 		assertThat(
-				result, contains(
+				result.getGenera(), contains(
 						allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("AT")), //
 								Matchers.hasProperty("name", equalTo("Aspen"))
-						),
-						allOf(
+						), allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("AC")), //
 								Matchers.hasProperty("name", equalTo("Cottonwood"))
@@ -178,7 +163,7 @@ public class GenusDefinitionParserTest {
 	void testOrderByLinesZero() throws Exception {
 		var parser = new GenusDefinitionParser(2);
 
-		List<GenusDefinition> result;
+		GenusDefinitionMap result;
 		try (
 				var is = new ByteArrayInputStream(
 						"AT Aspen                            00\r\nAC Cottonwood                       00".getBytes()
@@ -187,13 +172,12 @@ public class GenusDefinitionParserTest {
 			result = parser.parse(is, Collections.emptyMap());
 		}
 		assertThat(
-				result, contains(
+				result.getGenera(), contains(
 						allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("AT")), //
 								Matchers.hasProperty("name", equalTo("Aspen"))
-						),
-						allOf(
+						), allOf(
 								Matchers.instanceOf(GenusDefinition.class), //
 								Matchers.hasProperty("alias", equalTo("AC")), //
 								Matchers.hasProperty("name", equalTo("Cottonwood"))
@@ -212,12 +196,11 @@ public class GenusDefinitionParserTest {
 						"AT Aspen                            00\r\nAC Cottonwood                       03".getBytes()
 				);
 		) {
-
 			ex1 = Assertions
 					.assertThrows(ResourceParseLineException.class, () -> parser.parse(is, Collections.emptyMap()));
 		}
 		assertThat(ex1, hasProperty("line", is(2)));
-		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 2", "Preference 3", "larger than 2")));
+		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 2", "must be between 1 and 2", "value 3")));
 	}
 
 	@Test
@@ -235,7 +218,7 @@ public class GenusDefinitionParserTest {
 					.assertThrows(ResourceParseLineException.class, () -> parser.parse(is, Collections.emptyMap()));
 		}
 		assertThat(ex1, hasProperty("line", is(2)));
-		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 2", "Preference -1", "less than 0")));
+		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 2", "between 1 and 2", "value -1")));
 	}
 
 	@Test
@@ -253,7 +236,7 @@ public class GenusDefinitionParserTest {
 					.assertThrows(ResourceParseLineException.class, () -> parser.parse(is, Collections.emptyMap()));
 		}
 		assertThat(ex1, hasProperty("line", is(2)));
-		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 2", "Preference 1", "set to AT")));
+		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 2", "Genera ordering 1", "for genera AT")));
 	}
 
 	@Test
@@ -289,7 +272,7 @@ public class GenusDefinitionParserTest {
 			ex1 = Assertions
 					.assertThrows(ResourceParseLineException.class, () -> parser.parse(is, Collections.emptyMap()));
 		}
-		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 3", "Preference 3", "larger than 2")));
+		assertThat(ex1, hasProperty("message", stringContainsInOrder("line 3", "between 1 and 2", "value 3")));
 	}
 
 	// TODO Confirm if following methods are still needed after merge
@@ -321,8 +304,9 @@ public class GenusDefinitionParserTest {
 
 		List<GenusDefinition> sp0List = new ArrayList<>();
 
+		int index = 1;
 		for (var alias : aliases) {
-			sp0List.add(new GenusDefinition(alias, java.util.Optional.empty(), "Test " + alias));
+			sp0List.add(new GenusDefinition(alias, index, "Test " + alias));
 		}
 
 		controlMap.put(ControlKey.SP0_DEF.name(), sp0List);

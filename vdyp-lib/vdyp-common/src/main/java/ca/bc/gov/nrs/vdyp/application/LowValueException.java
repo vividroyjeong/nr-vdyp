@@ -13,7 +13,7 @@ public class LowValueException extends StandProcessingException {
 	final private float threshold;
 
 	public LowValueException(String message, float value, float threshold) {
-		super(String.format("%s %f was lass than %f", message, value, threshold));
+		super(String.format("%s %f was less than %f", message, value, threshold));
 		this.value = value;
 		this.threshold = threshold;
 	}

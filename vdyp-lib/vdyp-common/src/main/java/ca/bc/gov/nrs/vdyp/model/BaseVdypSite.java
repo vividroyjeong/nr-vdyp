@@ -4,6 +4,9 @@ import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Optional;
 
+import ca.bc.gov.nrs.vdyp.common.Computed;
+import ca.bc.gov.nrs.vdyp.common.Utils;
+
 public abstract class BaseVdypSite {
 
 	private final PolygonIdentifier polygonIdentifier;
@@ -62,6 +65,11 @@ public abstract class BaseVdypSite {
 
 	public Optional<Float> getYearsToBreastHeight() {
 		return yearsToBreastHeight;
+	}
+
+	@Computed
+	public Optional<Float> getYearsAtBreastHeight() {
+		return Utils.mapBoth(ageTotal, yearsToBreastHeight, (age, ytbh) -> age - ytbh);
 	}
 
 	public abstract static class Builder<T extends BaseVdypSite> extends ModelClassBuilder<T> {

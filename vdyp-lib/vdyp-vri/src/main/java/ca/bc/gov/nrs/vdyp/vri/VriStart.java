@@ -25,6 +25,7 @@ import org.apache.commons.math3.exception.NoBracketingException;
 import org.apache.commons.math3.exception.TooManyEvaluationsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.application.RuntimeProcessingException;
 import ca.bc.gov.nrs.vdyp.application.RuntimeStandProcessingException;
@@ -44,14 +45,11 @@ import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
-import ca.bc.gov.nrs.vdyp.model.PolygonMode;
-import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
-import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.CompatibilityVariableMode;
 import ca.bc.gov.nrs.vdyp.model.InputLayer;
@@ -59,6 +57,8 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.ModelClassBuilder;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
+import ca.bc.gov.nrs.vdyp.model.PolygonMode;
+import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
@@ -160,13 +160,10 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			StreamingParser<Collection<VriSpecies>> speciesStream, StreamingParser<Collection<VriSite>> siteStream
 	) throws StandProcessingException, IOException, ResourceParseException {
 
-		var becLookup = Utils.expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class);
-
 		log.trace("Getting polygon");
 		var polygon = polyStream.next();
 
-		BecDefinition bec = becLookup.get(polygon.getBiogeoclimaticZone())
-				.orElseThrow(() -> new StandProcessingException("Unknown BEC " + polygon.getBiogeoclimaticZone()));
+		BecDefinition bec = polygon.getBiogeoclimaticZone();
 
 		log.trace("Getting species for polygon {}", polygon.getPolygonIdentifier());
 
@@ -341,7 +338,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	Optional<VdypPolygon> processPolygon(int polygonsRead, VriPolygon polygon) throws ProcessingException {
 		log.atInfo().setMessage("Read polygon {}, preparing to process").addArgument(polygon.getPolygonIdentifier())
 				.log();
-		var bec = Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap);
+		var bec = polygon.getBiogeoclimaticZone();
 
 		var mode = polygon.getMode().orElse(PolygonMode.START);
 
@@ -423,7 +420,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 	void processPrimaryLayer(VriPolygon polygon, VdypLayer.Builder lBuilder) throws ProcessingException {
 		var primaryLayer = polygon.getLayers().get(LayerType.PRIMARY);
-		var bec = Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap);
+		var bec = polygon.getBiogeoclimaticZone();
 
 		// BA_L1
 		float primaryBaseArea = requirePositive(primaryLayer.getBaseArea(), "Primary layer base area");
@@ -645,16 +642,13 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	}
 
 	private void processVeteranLayer(VriPolygon polygon, VdypLayer.Builder lBuilder) throws StandProcessingException {
+		@SuppressWarnings("unused")
 		var veteranLayer = polygon.getLayers().get(LayerType.VETERAN);
 		lBuilder.layerType(LayerType.VETERAN);
 
 		lBuilder.adapt(veteranLayer);
 		
-		try {
-			var bec = Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap);
-		} catch (ProcessingException e) {
-			throw new StandProcessingException(e);
-		}
+		var bec = polygon.getBiogeoclimaticZone();
 
 		var lowDq = false;
 
@@ -667,24 +661,30 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		float breastHeightAge = ageTotal - yearsToBreastHeight; // AGEBHLV
 		float dominantHeight = primarySite.flatMap(VriSite::getHeight).orElse(0f); // HDLV
 
-		var baseArea = veteranLayer.getBaseArea().orElseThrow(()->new StandProcessingException("Expected veteran layer to have a base area")); // BA_V1
-		var treesPerHectare = veteranLayer.getTreesPerHectare().orElseThrow(()->new StandProcessingException("Expected veteran layer to have a trees per hectare")); // BA_V1
+		var baseArea = veteranLayer.getBaseArea()
+				.orElseThrow(() -> new StandProcessingException("Expected veteran layer to have a base area")); // BA_V1
+		var treesPerHectare = veteranLayer.getTreesPerHectare()
+				.orElseThrow(() -> new StandProcessingException("Expected veteran layer to have a trees per hectare")); // BA_V1
 
 		if (BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea, treesPerHectare) < VETERAN_MIN_DQ) {
 			lowDq = true;
 			treesPerHectare = BaseAreaTreeDensityDiameter.treesPerHectare(breastHeightAge, VETERAN_MIN_DQ);
 		}
 		float inputTreesPerHectare = treesPerHectare; // TPHInput
-		
-		if(baseArea<=0) {
-			throw new StandProcessingException(MessageFormat.format("Veteran layer base area ({0}) was not positive", baseArea));
+
+		if (baseArea <= 0) {
+			throw new StandProcessingException(
+					MessageFormat.format("Veteran layer base area ({0}) was not positive", baseArea)
+			);
 		}
-		if(treesPerHectare<=0) {
-			throw new StandProcessingException(MessageFormat.format("Veteran layer trees per hectare ({0}) was not positive", baseArea));
+		if (treesPerHectare <= 0) {
+			throw new StandProcessingException(
+					MessageFormat.format("Veteran layer trees per hectare ({0}) was not positive", baseArea)
+			);
 		}
 		var quadMeanDiameter = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea, treesPerHectare); // DQ(0,0)
-		
-		lBuilder.adaptSpecies(veteranLayer, (sBuilder,spec)->{
+
+		lBuilder.adaptSpecies(veteranLayer, (sBuilder, spec) -> {
 			applyGroups(null, AVERSION, sBuilder);
 			sBuilder.volumeGroup(CONFIG_LOAD_ERROR);
 		});
@@ -695,7 +695,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	// VRI_CHK
 	PolygonMode checkPolygon(VriPolygon polygon) throws ProcessingException {
 
-		BecDefinition bec = Utils.getBec(polygon.getBiogeoclimaticZone(), controlMap);
+		BecDefinition bec = polygon.getBiogeoclimaticZone();
 
 		// At this point the Fortran implementation nulled the BA and TPH of Primary
 		// layers if the BA and TPH were present and resulted in a DQ <7.5
@@ -864,7 +864,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	// EMP106
 	float estimateBaseAreaYield(
 			float dominantHeight, float breastHeightAge, Optional<Float> baseAreaOverstory, boolean fullOccupancy,
-			Collection<? extends BaseVdypSpecies<?>> species, BecDefinition bec, int baseAreaGroup
+			Collection<? extends BaseVdypSpecies<? extends BaseVdypSite>> species, BecDefinition bec, int baseAreaGroup
 	) throws StandProcessingException {
 		var coe = estimateBaseAreaYieldCoefficients(species, bec);
 
@@ -913,8 +913,9 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		return bap;
 	}
 
-	Coefficients
-			estimateBaseAreaYieldCoefficients(Collection<? extends BaseVdypSpecies<?>> species, BecDefinition bec) {
+	Coefficients estimateBaseAreaYieldCoefficients(
+			Collection<? extends BaseVdypSpecies<? extends BaseVdypSite>> species, BecDefinition bec
+	) {
 		var coe = sumCoefficientsWeightedBySpeciesAndDecayBec(species, bec, ControlKey.BA_YIELD, 7);
 
 		// TODO confirm going over 0.5 should drop to 0 as this seems odd.
@@ -923,7 +924,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	}
 
 	Coefficients sumCoefficientsWeightedBySpeciesAndDecayBec(
-			Collection<? extends BaseVdypSpecies<?>> species, BecDefinition bec, ControlKey key, int size
+			Collection<? extends BaseVdypSpecies<? extends BaseVdypSite>> species, BecDefinition bec, ControlKey key,
+			int size
 	) {
 		var coeMap = Utils
 				.<MatrixMap2<String, String, Coefficients>>expectParsedControl(controlMap, key, MatrixMap2.class);
@@ -935,7 +937,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				species, //
 				BaseVdypSpecies::getFractionGenus, // Weight by fraction
 				spec -> coeMap.get(decayBecAlias, spec.getGenus())
-
 		);
 	}
 
@@ -953,7 +954,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	 */
 	float estimateQuadMeanDiameterYield(
 			float dominantHeight, float breastHeightAge, Optional<Float> veteranBaseArea,
-			Collection<? extends BaseVdypSpecies<?>> species, BecDefinition bec, int baseAreaGroup
+			Collection<? extends BaseVdypSpecies<? extends BaseVdypSite>> species, BecDefinition bec, int baseAreaGroup
 	) throws StandProcessingException {
 		final var coe = sumCoefficientsWeightedBySpeciesAndDecayBec(species, bec, ControlKey.DQ_YIELD, 6);
 
@@ -1070,7 +1071,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			throw new StandProcessingException("Year for YOUNG stand should be at least 1900 but was " + year);
 		}
 
-		var bec = Utils.getBec(poly.getBiogeoclimaticZone(), controlMap);
+		var bec = poly.getBiogeoclimaticZone();
 
 		var primaryLayer = poly.getLayers().get(LayerType.PRIMARY);
 		var primarySite = primaryLayer.getPrimarySite().orElseThrow();
@@ -1235,7 +1236,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		VriLayer primaryLayer = getPrimaryLayer(poly);
 		Optional<VriLayer> veteranLayer = getVeteranLayer(poly);
-		BecDefinition bec = getBec(poly);
+		var bec = poly.getBiogeoclimaticZone();
 
 		try {
 			//
@@ -1293,7 +1294,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		final VriSite primarySite = primaryLayer.getPrimarySite()
 				.orElseThrow(() -> new StandProcessingException("Primary layer does not have a primary site"));
 		final Optional<VriLayer> veteranLayer = Utils.optSafe(poly.getLayers().get(LayerType.VETERAN));
-		BecDefinition bec = getBec(poly);
+		BecDefinition bec = poly.getBiogeoclimaticZone();
 
 		final float primaryHeight = primarySite.getHeight()
 				.orElseThrow(() -> new StandProcessingException("Primary site does not have a height"));

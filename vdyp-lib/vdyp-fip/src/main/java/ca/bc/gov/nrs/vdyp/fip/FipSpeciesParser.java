@@ -1,8 +1,8 @@
 package ca.bc.gov.nrs.vdyp.fip;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,6 +22,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ControlledValueParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
+import ca.bc.gov.nrs.vdyp.model.Sp64Distribution;
 
 public class FipSpeciesParser
 		implements ControlMapValueReplacer<StreamingParserFactory<Collection<FipSpecies>>, String> {
@@ -45,12 +46,11 @@ public class FipSpeciesParser
 
 	@Override
 	public StreamingParserFactory<Collection<FipSpecies>>
-			map(String fileName, FileResolver fileResolver, Map<String, Object> control)
+			map(String fileName, FileResolver fileResolver, Map<String, Object> controlMap)
 					throws IOException, ResourceParseException {
 		return () -> {
 			var lineParser = new LineParser().strippedString(25, FipPolygonParser.POLYGON_IDENTIFIER).space(1).value(
-					1, FipLayerParser.LAYER,
-					ValueParser.valueOrMarker(
+					1, FipLayerParser.LAYER, ValueParser.valueOrMarker(
 							ValueParser.LAYER, ValueParser.optionalSingleton("Z"::equals, EndOfRecord.END_OF_RECORD)
 					)
 			).space(1).value(2, GENUS, ControlledValueParser.optional(ValueParser.GENUS))
@@ -67,7 +67,7 @@ public class FipSpeciesParser
 			var is = fileResolver.resolveForInput(fileName);
 
 			var delegateStream = new AbstractStreamingParser<ValueOrMarker<Optional<FipSpecies>, EndOfRecord>>(
-					is, lineParser, control
+					is, lineParser, controlMap
 			) {
 
 				@SuppressWarnings("unchecked")
@@ -99,17 +99,25 @@ public class FipSpeciesParser
 					var layerBuilder = new ValueOrMarker.Builder<Optional<FipSpecies>, EndOfRecord>();
 					return layer.handle(l -> {
 						return layerBuilder.value(l.map(layerType -> {
-							Map<String, Float> speciesPercent = new LinkedHashMap<>();
-							species1.ifPresent((sp) -> speciesPercent.put(sp, percentSpecies1));
-							species2.ifPresent((sp) -> speciesPercent.put(sp, percentSpecies2));
-							species3.ifPresent((sp) -> speciesPercent.put(sp, percentSpecies3));
-							species4.ifPresent((sp) -> speciesPercent.put(sp, percentSpecies4));
+							List<Sp64Distribution> sp64SpeciesDistributions = new ArrayList<>();
+							species1.ifPresent((sp) -> {
+								sp64SpeciesDistributions.add(new Sp64Distribution(1, sp, percentSpecies1));
+							});
+							species2.ifPresent((sp) -> {
+								sp64SpeciesDistributions.add(new Sp64Distribution(2, sp, percentSpecies2));
+							});
+							species3.ifPresent((sp) -> {
+								sp64SpeciesDistributions.add(new Sp64Distribution(3, sp, percentSpecies3));
+							});
+							species4.ifPresent((sp) -> {
+								sp64SpeciesDistributions.add(new Sp64Distribution(4, sp, percentSpecies4));
+							});
 							return FipSpecies.build(specBuilder -> {
 								specBuilder.polygonIdentifier(polygonId);
 								specBuilder.layerType(layerType);
-								specBuilder.genus(genus);
+								specBuilder.genus(genus, controlMap);
 								specBuilder.percentGenus(percentGenus);
-								specBuilder.addSpecies(speciesPercent);
+								specBuilder.sp64DistributionList(sp64SpeciesDistributions);
 							});
 						}));
 					}, layerBuilder::marker);

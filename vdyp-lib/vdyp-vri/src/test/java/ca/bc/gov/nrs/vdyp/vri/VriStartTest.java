@@ -104,6 +104,7 @@ class VriStartTest {
 		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
 		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
 		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+		TestUtils.populateControlMapGenusReal(controlMap);
 
 		MockFileResolver resolver = new MockFileResolver("Test");
 
@@ -119,7 +120,6 @@ class VriStartTest {
 
 	@Nested
 	class EstimateBaseAreaYield {
-		@SuppressWarnings("resource")
 		@Test
 		void testCompute() throws StandProcessingException {
 			Map<String, Object> controlMap = VriTestUtils.loadControlMap();
@@ -128,7 +128,7 @@ class VriStartTest {
 
 			var polygon = VriPolygon.build(pBuilder -> {
 				pBuilder.polygonIdentifier("Test", 2024);
-				pBuilder.biogeoclimaticZone("IDF");
+				pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pBuilder.yieldFactor(1.0f);
 				pBuilder.addLayer(lBuilder -> {
 					lBuilder.layerType(LayerType.PRIMARY);
@@ -139,19 +139,19 @@ class VriStartTest {
 					lBuilder.empiricalRelationshipParameterIndex(76);
 
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("B"); // 3
+						sBuilder.genus("B", controlMap);
 						sBuilder.percentGenus(2.99999993f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("C"); // 4
+						sBuilder.genus("C", controlMap);
 						sBuilder.percentGenus(30.0000012f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("H"); // 8
+						sBuilder.genus("H", controlMap);
 						sBuilder.percentGenus(48.9000022f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("S"); // 15
+						sBuilder.genus("S", controlMap);
 						sBuilder.percentGenus(18.1000009f);
 					});
 				});
@@ -166,7 +166,6 @@ class VriStartTest {
 			assertThat(result, closeTo(62.0858421f));
 		}
 
-		@SuppressWarnings("resource")
 		@Test
 		void testGetCoefficients() throws StandProcessingException {
 			Map<String, Object> controlMap = VriTestUtils.loadControlMap();
@@ -175,7 +174,7 @@ class VriStartTest {
 
 			var polygon = VriPolygon.build(pBuilder -> {
 				pBuilder.polygonIdentifier("Test", 2024);
-				pBuilder.biogeoclimaticZone("IDF");
+				pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pBuilder.yieldFactor(1.0f);
 				pBuilder.addLayer(lBuilder -> {
 					lBuilder.layerType(LayerType.PRIMARY);
@@ -186,19 +185,19 @@ class VriStartTest {
 					lBuilder.empiricalRelationshipParameterIndex(76);
 
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("B"); // 3
+						sBuilder.genus("B", controlMap);
 						sBuilder.percentGenus(2.99999993f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("C"); // 4
+						sBuilder.genus("C", controlMap);
 						sBuilder.percentGenus(30.0000012f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("H"); // 8
+						sBuilder.genus("H", controlMap);
 						sBuilder.percentGenus(48.9000022f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("S"); // 15
+						sBuilder.genus("S", controlMap);
 						sBuilder.percentGenus(18.1000009f);
 					});
 				});
@@ -211,8 +210,7 @@ class VriStartTest {
 			Coefficients result = app.estimateBaseAreaYieldCoefficients(species, bec);
 
 			assertThat(
-					result,
-					VdypMatchers.coe(
+					result, VdypMatchers.coe(
 							0, 7.29882717f, 0.934803009f, 7.22950029f, 0.478330702f, 0.00542420009f, 0f, -0.00899999961f
 					)
 			);
@@ -260,14 +258,14 @@ class VriStartTest {
 			Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("B");
+				builder.genus("B", controlMap);
 				builder.percentGenus(100f);
 			}));
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 			var result = app.findDefaultPolygonMode(
-					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
-					Optional.of(76)
+					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
+							.of(76)
 			);
 
 			assertThat(result, is(PolygonMode.YOUNG));
@@ -313,14 +311,14 @@ class VriStartTest {
 			Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("B");
+				builder.genus("B", controlMap);
 				builder.percentGenus(100f);
 			}));
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 			var result = app.findDefaultPolygonMode(
-					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
-					Optional.of(76)
+					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
+							.of(76)
 			);
 
 			assertThat(result, is(PolygonMode.YOUNG));
@@ -366,14 +364,14 @@ class VriStartTest {
 			Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("B");
+				builder.genus("B", controlMap);
 				builder.percentGenus(100f);
 			}));
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 			var result = app.findDefaultPolygonMode(
-					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
-					Optional.of(76)
+					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
+							.of(76)
 			);
 
 			assertThat(result, is(PolygonMode.YOUNG));
@@ -419,14 +417,14 @@ class VriStartTest {
 			Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("B");
+				builder.genus("B", controlMap);
 				builder.percentGenus(100f);
 			}));
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 			var result = app.findDefaultPolygonMode(
-					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
-					Optional.of(76)
+					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
+							.of(76)
 			);
 
 			assertThat(result, is(PolygonMode.YOUNG));
@@ -472,14 +470,14 @@ class VriStartTest {
 			Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("B");
+				builder.genus("B", controlMap);
 				builder.percentGenus(100f);
 			}));
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 			var result = app.findDefaultPolygonMode(
-					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
-					Optional.of(76)
+					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
+							.of(76)
 			);
 
 			assertThat(result, is(PolygonMode.YOUNG));
@@ -525,14 +523,14 @@ class VriStartTest {
 			Collection<VriSpecies> species = List.of(VriSpecies.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
-				builder.genus("B");
+				builder.genus("B", controlMap);
 				builder.percentGenus(100f);
 			}));
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 			var result = app.findDefaultPolygonMode(
-					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
-					Optional.of(76)
+					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
+							.of(76)
 			);
 
 			assertThat(result, is(PolygonMode.START));
@@ -861,8 +859,8 @@ class VriStartTest {
 
 				var evaluated = result.evaluate(errorFunc);
 				assertTrue(
-						evaluated.start() * evaluated.end() <= 0,
-						() -> "F(" + result + ") should have mixed signs but was " + evaluated
+						evaluated.start() * evaluated.end() <= 0, () -> "F(" + result
+								+ ") should have mixed signs but was " + evaluated
 				);
 
 			}
@@ -883,8 +881,8 @@ class VriStartTest {
 
 				var evaluated = result.evaluate(errorFunc);
 				assertTrue(
-						evaluated.start() * evaluated.end() <= 0,
-						() -> "F(" + result + ") should have mixed signs but was " + evaluated
+						evaluated.start() * evaluated.end() <= 0, () -> "F(" + result
+								+ ") should have mixed signs but was " + evaluated
 				);
 
 			}
@@ -905,8 +903,8 @@ class VriStartTest {
 
 				var evaluated = result.evaluate(errorFunc);
 				assertTrue(
-						evaluated.start() * evaluated.end() <= 0,
-						() -> "F(" + result + ") should have mixed signs but was " + evaluated
+						evaluated.start() * evaluated.end() <= 0, () -> "F(" + result
+								+ ") should have mixed signs but was " + evaluated
 				);
 
 			}
@@ -1058,8 +1056,7 @@ class VriStartTest {
 				app.setDebugMode(1, 2);
 
 				assertThrows(
-						StandProcessingException.class,
-						() -> app.findRootForQuadMeanDiameterFractionalError(
+						StandProcessingException.class, () -> app.findRootForQuadMeanDiameterFractionalError(
 								x1, x2, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph
 						)
 				);
@@ -1209,8 +1206,7 @@ class VriStartTest {
 				app.setDebugMode(1, 2);
 
 				assertThrows(
-						StandProcessingException.class,
-						() -> app.findRootForQuadMeanDiameterFractionalError(
+						StandProcessingException.class, () -> app.findRootForQuadMeanDiameterFractionalError(
 								x1, x2, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph
 						)
 				);
@@ -1280,13 +1276,12 @@ class VriStartTest {
 
 				assertThat(result, closeTo((float) expectedX));
 				assertThat(
-						resultPerSpecies,
-						allOf(
-								appliedX("B", expectedX, app, initialDqs, minDq, maxDq),
-								appliedX("C", expectedX, app, initialDqs, minDq, maxDq),
-								appliedX("F", expectedX, app, initialDqs, minDq, maxDq),
-								appliedX("H", expectedX, app, initialDqs, minDq, maxDq),
-								appliedX("S", expectedX, app, initialDqs, minDq, maxDq)
+						resultPerSpecies, allOf(
+								appliedX("B", expectedX, app, initialDqs, minDq, maxDq), appliedX(
+										"C", expectedX, app, initialDqs, minDq, maxDq
+								), appliedX("F", expectedX, app, initialDqs, minDq, maxDq), appliedX(
+										"H", expectedX, app, initialDqs, minDq, maxDq
+								), appliedX("S", expectedX, app, initialDqs, minDq, maxDq)
 						)
 				);
 
@@ -1351,8 +1346,7 @@ class VriStartTest {
 				app.setDebugMode(1, 0);
 
 				assertThrows(
-						StandProcessingException.class,
-						() -> app.findRootForQuadMeanDiameterFractionalError(
+						StandProcessingException.class, () -> app.findRootForQuadMeanDiameterFractionalError(
 								x1, x2, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph
 						)
 				);
@@ -1363,8 +1357,7 @@ class VriStartTest {
 					Map<String, Float> minDq, Map<String, Float> maxDq
 			) {
 				return hasEntry(
-						is(species),
-						closeTo(
+						is(species), closeTo(
 								app.quadMeanDiameterSpeciesAdjust(
 										expectedX, initialDqs.get(species), minDq.get(species), maxDq.get(species)
 								)
@@ -1428,7 +1421,7 @@ class VriStartTest {
 					lb.polygonIdentifier("Test", 2024);
 					lb.layerType(LayerType.PRIMARY);
 					lb.addSpecies(sb -> {
-						sb.genus("B");
+						sb.genus("B", controlMap);
 						sb.percentGenus(10);
 						sb.volumeGroup(15);
 						sb.decayGroup(11);
@@ -1437,7 +1430,7 @@ class VriStartTest {
 						sb.baseArea(0.634290636f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("C");
+						sb.genus("C", controlMap);
 						sb.percentGenus(20);
 						sb.volumeGroup(23);
 						sb.decayGroup(15);
@@ -1446,7 +1439,7 @@ class VriStartTest {
 						sb.baseArea(1.26858127f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("F");
+						sb.genus("F", controlMap);
 						sb.percentGenus(30);
 						sb.volumeGroup(33);
 						sb.decayGroup(27);
@@ -1455,7 +1448,7 @@ class VriStartTest {
 						sb.baseArea(1.90287197f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("H");
+						sb.genus("H", controlMap);
 						sb.percentGenus(30);
 						sb.volumeGroup(40);
 						sb.decayGroup(33);
@@ -1464,7 +1457,7 @@ class VriStartTest {
 						sb.baseArea(1.90287197f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("S");
+						sb.genus("S", controlMap);
 						sb.percentGenus(10);
 						sb.volumeGroup(69);
 						sb.decayGroup(59);
@@ -1487,8 +1480,7 @@ class VriStartTest {
 				Map<String, Float> maxPerSpecies = new HashMap<>(5);
 
 				app.getDqBySpeciesInitial(
-						layer, region, quadMeanDiameterTotal, baseAreaTotal, treeDensityTotal, loreyHeightTotal,
-						initialDqs, baseAreaPerSpecies, minPerSpecies, maxPerSpecies
+						layer, region, quadMeanDiameterTotal, baseAreaTotal, treeDensityTotal, loreyHeightTotal, initialDqs, baseAreaPerSpecies, minPerSpecies, maxPerSpecies
 				);
 
 				assertThat(
@@ -1543,7 +1535,7 @@ class VriStartTest {
 					lb.polygonIdentifier("Test", 2024);
 					lb.layerType(LayerType.PRIMARY);
 					lb.addSpecies(sb -> {
-						sb.genus("B");
+						sb.genus("B", controlMap);
 						sb.percentGenus(10);
 						sb.volumeGroup(15);
 						sb.decayGroup(11);
@@ -1552,7 +1544,7 @@ class VriStartTest {
 						sb.baseArea(0.634290636f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("C");
+						sb.genus("C", controlMap);
 						sb.percentGenus(20);
 						sb.volumeGroup(23);
 						sb.decayGroup(15);
@@ -1561,7 +1553,7 @@ class VriStartTest {
 						sb.baseArea(1.26858127f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("F");
+						sb.genus("F", controlMap);
 						sb.percentGenus(30);
 						sb.volumeGroup(33);
 						sb.decayGroup(27);
@@ -1570,7 +1562,7 @@ class VriStartTest {
 						sb.baseArea(1.90287197f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("H");
+						sb.genus("H", controlMap);
 						sb.percentGenus(30);
 						sb.volumeGroup(40);
 						sb.decayGroup(33);
@@ -1579,7 +1571,7 @@ class VriStartTest {
 						sb.baseArea(1.90287197f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("S");
+						sb.genus("S", controlMap);
 						sb.percentGenus(10);
 						sb.volumeGroup(69);
 						sb.decayGroup(59);
@@ -1638,7 +1630,7 @@ class VriStartTest {
 					lb.quadMeanDiameter(10.3879938f);
 					lb.loreyHeight(6.61390257f);
 					lb.addSpecies(sb -> {
-						sb.genus("B");
+						sb.genus("B", controlMap);
 						sb.percentGenus(10);
 						sb.volumeGroup(15);
 						sb.decayGroup(11);
@@ -1647,7 +1639,7 @@ class VriStartTest {
 						sb.baseArea(0.634290636f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("C");
+						sb.genus("C", controlMap);
 						sb.percentGenus(20);
 						sb.volumeGroup(23);
 						sb.decayGroup(15);
@@ -1656,7 +1648,7 @@ class VriStartTest {
 						sb.baseArea(1.26858127f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("F");
+						sb.genus("F", controlMap);
 						sb.percentGenus(30);
 						sb.volumeGroup(33);
 						sb.decayGroup(27);
@@ -1665,7 +1657,7 @@ class VriStartTest {
 						sb.baseArea(1.90287197f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("H");
+						sb.genus("H", controlMap);
 						sb.percentGenus(30);
 						sb.volumeGroup(40);
 						sb.decayGroup(33);
@@ -1674,7 +1666,7 @@ class VriStartTest {
 						sb.baseArea(1.90287197f);
 					});
 					lb.addSpecies(sb -> {
-						sb.genus("S");
+						sb.genus("S", controlMap);
 						sb.percentGenus(10);
 						sb.volumeGroup(69);
 						sb.decayGroup(59);
@@ -1724,7 +1716,7 @@ class VriStartTest {
 
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPoly", 2024);
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(mode);
 				pb.addLayer(lb -> {
@@ -1736,7 +1728,7 @@ class VriStartTest {
 
 			var polyYoung = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPolyYoung", 2024);
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(mode);
 				pb.addLayer(lb -> {
@@ -1747,7 +1739,7 @@ class VriStartTest {
 			});
 			var polyBatc = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPolyBatc", 2024);
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(mode);
 				pb.addLayer(lb -> {
@@ -1758,7 +1750,7 @@ class VriStartTest {
 			});
 			var polyBatn = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPolyBatn", 2024);
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(mode);
 				pb.addLayer(lb -> {
@@ -1800,15 +1792,15 @@ class VriStartTest {
 
 			MockFileResolver resolver = dummyInput();
 
+			// expect no calls
+			TestUtils.populateControlMapBecReal(controlMap);
+
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPoly", 2024);
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(mode);
 			});
-
-			// expect no calls
-			TestUtils.populateControlMapBecReal(controlMap);
 
 			control.replay();
 
@@ -1886,13 +1878,6 @@ class VriStartTest {
 
 			MockFileResolver resolver = dummyInput();
 
-			var poly = VriPolygon.build(pb -> {
-				pb.polygonIdentifier("TestPoly", 2024);
-				pb.biogeoclimaticZone("IDF");
-				pb.yieldFactor(1.0f);
-				pb.mode(PolygonMode.DONT_PROCESS);
-			});
-
 			StreamingParser<VriPolygon> polyStream = easyMockInputStreamFactory(
 					controlMap, ControlKey.VRI_INPUT_YIELD_POLY, control
 			);
@@ -1906,6 +1891,13 @@ class VriStartTest {
 					controlMap, ControlKey.VRI_INPUT_YIELD_HEIGHT_AGE_SI, control
 			);
 			TestUtils.populateControlMapBecReal(controlMap);
+
+			var poly = VriPolygon.build(pb -> {
+				pb.polygonIdentifier("TestPoly", 2024);
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
+				pb.yieldFactor(1.0f);
+				pb.mode(PolygonMode.DONT_PROCESS);
+			});
 
 			EasyMock.expect(polyStream.hasNext()).andReturn(true);
 			EasyMock.expect(app.getPolygon(polyStream, layerStream, specStream, siteStream)).andReturn(poly);
@@ -1954,7 +1946,7 @@ class VriStartTest {
 
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPoly", 2024);
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(mode);
 				pb.addLayer(lb -> {
@@ -1990,7 +1982,7 @@ class VriStartTest {
 
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPoly", 2024);
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(PolygonMode.BATN);
 				pb.forestInventoryZone("");
@@ -2006,9 +1998,9 @@ class VriStartTest {
 					lb.primaryGenus("F");
 					// 1
 					lb.addSpecies(sb -> {
-						sb.genus("B");
+						sb.genus("B", controlMap);
 						sb.percentGenus(10);
-						sb.addSpecies("BL", 100);
+						sb.addSp64Distribution("BL", 100);
 						sb.addSite(ib -> {
 							ib.siteSpecies("BL");
 						});
@@ -2016,9 +2008,9 @@ class VriStartTest {
 
 					// 2
 					lb.addSpecies(sb -> {
-						sb.genus("C");
+						sb.genus("C", controlMap);
 						sb.percentGenus(20);
-						sb.addSpecies("CW", 100);
+						sb.addSp64Distribution("CW", 100);
 						sb.addSite(ib -> {
 							ib.siteCurveNumber(11);
 							ib.siteSpecies("CW");
@@ -2027,9 +2019,9 @@ class VriStartTest {
 
 					// 3
 					lb.addSpecies(sb -> {
-						sb.genus("F");
+						sb.genus("F", controlMap);
 						sb.percentGenus(30);
-						sb.addSpecies("FD", 100);
+						sb.addSp64Distribution("FD", 100);
 						sb.addSite(ib -> {
 							ib.siteCurveNumber(23);
 							ib.ageTotal(24);
@@ -2043,9 +2035,9 @@ class VriStartTest {
 
 					// 4
 					lb.addSpecies(sb -> {
-						sb.genus("H");
+						sb.genus("H", controlMap);
 						sb.percentGenus(30);
-						sb.addSpecies("HW", 100);
+						sb.addSp64Distribution("HW", 100);
 						sb.addSite(ib -> {
 							ib.siteCurveNumber(37);
 							ib.siteSpecies("HW");
@@ -2054,9 +2046,9 @@ class VriStartTest {
 
 					// 5
 					lb.addSpecies(sb -> {
-						sb.genus("S");
+						sb.genus("S", controlMap);
 						sb.percentGenus(10);
-						sb.addSpecies("S", 100);
+						sb.addSp64Distribution("S", 100);
 						sb.addSite(ib -> {
 							ib.siteCurveNumber(71);
 							ib.siteSpecies("S");
@@ -2070,7 +2062,7 @@ class VriStartTest {
 			var result = app.processPolygon(0, poly).get();
 
 			assertThat(result, hasProperty("polygonIdentifier", isPolyId("TestPoly", 2024)));
-			assertThat(result, hasProperty("biogeoclimaticZone", is("IDF")));
+			assertThat(result, hasProperty("biogeoclimaticZone", hasProperty("alias", is("IDF"))));
 			assertThat(result, hasProperty("forestInventoryZone", blankString()));
 			assertThat(result, hasProperty("mode", present(is(PolygonMode.BATN))));
 			assertThat(result, hasProperty("percentAvailable", is(85f)));
@@ -2091,100 +2083,97 @@ class VriStartTest {
 					resultLayer, hasProperty("loreyHeightByUtilization", utilizationHeight(4.14067888f, 6.61390257f))
 			);
 			assertThat(
-					resultLayer,
-					hasProperty(
-							"baseAreaByUtilization",
-							utilization(
+					resultLayer, hasProperty(
+							"baseAreaByUtilization", utilization(
 									0.0679966733f, 6.34290648f, 4.24561071f, 1.01540196f, 0.571661115f, 0.510232806f
 							)
 					)
 			);
 			assertThat(
-					resultLayer,
-					hasProperty(
-							"quadraticMeanDiameterByUtilization",
-							utilization(5.58983135f, 10.3879948f, 9.11466217f, 13.9179964f, 18.6690178f, 25.3685265f)
+					resultLayer, hasProperty(
+							"quadraticMeanDiameterByUtilization", utilization(
+									5.58983135f, 10.3879948f, 9.11466217f, 13.9179964f, 18.6690178f, 25.3685265f
+							)
 					)
 			);
 			assertThat(
-					resultLayer,
-					hasProperty(
-							"treesPerHectareByUtilization",
-							utilization(27.707695f, 748.4021f, 650.682556f, 66.7413025f, 20.8836231f, 10.094574f)
+					resultLayer, hasProperty(
+							"treesPerHectareByUtilization", utilization(
+									27.707695f, 748.4021f, 650.682556f, 66.7413025f, 20.8836231f, 10.094574f
+							)
 					)
 			);
 
 			assertThat(
-					resultLayer,
-					hasProperty(
-							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
-							utilization(0, 4.73118162f, 0.0503439531f, 1.59589052f, 1.62338901f, 1.46155834f)
+					resultLayer, hasProperty(
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", utilization(
+									0, 4.73118162f, 0.0503439531f, 1.59589052f, 1.62338901f, 1.46155834f
+							)
 					)
 			);
 			assertThat(
-					resultLayer.getSpecies(),
-					allOf(aMapWithSize(5), hasKey("B"), hasKey("C"), hasKey("F"), hasKey("H"), hasKey("S"))
+					resultLayer.getSpecies(), allOf(
+							aMapWithSize(5), hasKey("B"), hasKey("C"), hasKey("F"), hasKey("H"), hasKey("S")
+					)
 			);
 
 			VdypSpecies resultSpecB = TestUtils.assertHasSpecies(resultLayer, "B", "C", "F", "H", "S");
 
 			assertThat(
-					resultSpecB,
-					hasProperty(
-							"baseAreaByUtilization",
-							utilization(
+					resultSpecB, hasProperty(
+							"baseAreaByUtilization", utilization(
 									0.0116237309f, 0.634290636f, 0.239887208f, 0.196762085f, 0.102481194f, 0.095160149f
 							)
 					)
 			);
 			assertThat(
-					resultSpecB,
-					hasProperty(
-							"quadraticMeanDiameterByUtilization",
-							utilization(5.61674118f, 12.9407434f, 9.93954372f, 14.3500404f, 19.1790199f, 27.5482502f)
+					resultSpecB, hasProperty(
+							"quadraticMeanDiameterByUtilization", utilization(
+									5.61674118f, 12.9407434f, 9.93954372f, 14.3500404f, 19.1790199f, 27.5482502f
+							)
 					)
 			);
 			assertThat(
-					resultSpecB,
-					hasProperty(
-							"treesPerHectareByUtilization",
-							utilization(4.69123125f, 48.2258606f, 30.9160728f, 12.1659298f, 3.54732919f, 1.59653044f)
+					resultSpecB, hasProperty(
+							"treesPerHectareByUtilization", utilization(
+									4.69123125f, 48.2258606f, 30.9160728f, 12.1659298f, 3.54732919f, 1.59653044f
+							)
 					)
 			);
 
 			assertThat(
-					resultSpecB,
-					hasProperty(
-							"wholeStemVolumeByUtilization",
-							utilization(0.0244281366f, 2.41518188f, 0.747900844f, 0.752810001f, 0.4540295f, 0.46044156f)
+					resultSpecB, hasProperty(
+							"wholeStemVolumeByUtilization", utilization(
+									0.0244281366f, 2.41518188f, 0.747900844f, 0.752810001f, 0.4540295f, 0.46044156f
+							)
 					)
 			);
 			assertThat(
-					resultSpecB,
-					hasProperty(
-							"closeUtilizationVolumeByUtilization",
-							utilization(0, 1.28733742f, 0.0235678982f, 0.464995325f, 0.378819793f, 0.41995436f)
+					resultSpecB, hasProperty(
+							"closeUtilizationVolumeByUtilization", utilization(
+									0, 1.28733742f, 0.0235678982f, 0.464995325f, 0.378819793f, 0.41995436f
+							)
 					)
 			);
 			assertThat(
-					resultSpecB,
-					hasProperty(
-							"closeUtilizationVolumeNetOfDecayByUtilization",
-							utilization(0, 1.24826729f, 0.0230324566f, 0.454239398f, 0.369579285f, 0.401416153f)
+					resultSpecB, hasProperty(
+							"closeUtilizationVolumeNetOfDecayByUtilization", utilization(
+									0, 1.24826729f, 0.0230324566f, 0.454239398f, 0.369579285f, 0.401416153f
+							)
 					)
 			);
 			assertThat(
-					resultSpecB,
-					hasProperty(
-							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization",
-							utilization(0, 1.23482728f, 0.0228475146f, 0.450360179f, 0.366144955f, 0.395474672f)
+					resultSpecB, hasProperty(
+							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization", utilization(
+									0, 1.23482728f, 0.0228475146f, 0.450360179f, 0.366144955f, 0.395474672f
+							)
 					)
 			);
 			assertThat(
-					resultSpecB,
-					hasProperty(
-							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
-							utilization(0, 1.20897281f, 0.0223761573f, 0.441060275f, 0.358547896f, 0.386988521f)
+					resultSpecB, hasProperty(
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", utilization(
+									0, 1.20897281f, 0.0223761573f, 0.441060275f, 0.358547896f, 0.386988521f
+							)
 					)
 			);
 
@@ -2202,7 +2191,7 @@ class VriStartTest {
 
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPoly", 2024);
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.forestInventoryZone("");
 				pb.percentAvailable(85);
@@ -2220,9 +2209,9 @@ class VriStartTest {
 					lb.primaryGenus("C");
 					// 1 3
 					lb.addSpecies(sb -> {
-						sb.genus("B");
+						sb.genus("B", controlMap);
 						sb.percentGenus(10);
-						sb.addSpecies("BL", 100);
+						sb.addSp64Distribution("BL", 100);
 						sb.addSite(ib -> {
 							ib.siteSpecies("BL");
 							ib.siteCurveNumber(8);
@@ -2231,9 +2220,9 @@ class VriStartTest {
 
 					// 2 4 (Primary)
 					lb.addSpecies(sb -> {
-						sb.genus("C");
+						sb.genus("C", controlMap);
 						sb.percentGenus(50);
-						sb.addSpecies("CW", 100);
+						sb.addSp64Distribution("CW", 100);
 						sb.addSite(ib -> {
 							ib.siteCurveNumber(11);
 							ib.ageTotal(100);
@@ -2248,9 +2237,9 @@ class VriStartTest {
 
 					// 3 8
 					lb.addSpecies(sb -> {
-						sb.genus("H");
+						sb.genus("H", controlMap);
 						sb.percentGenus(40);
-						sb.addSpecies("HW", 100);
+						sb.addSp64Distribution("HW", 100);
 						sb.addSite(ib -> {
 							ib.siteCurveNumber(37);
 							ib.height(25f);
@@ -2277,9 +2266,9 @@ class VriStartTest {
 					lb.primaryGenus("H"); // 3
 					// 1 3
 					lb.addSpecies(sb -> {
-						sb.genus("B");
+						sb.genus("B", controlMap);
 						sb.percentGenus(20);
-						sb.addSpecies("BL", 100);
+						sb.addSp64Distribution("BL", 100);
 						sb.addSite(ib -> {
 							ib.siteSpecies("BL");
 							ib.siteCurveNumber(8);
@@ -2288,9 +2277,9 @@ class VriStartTest {
 
 					// 2 4
 					lb.addSpecies(sb -> {
-						sb.genus("C");
+						sb.genus("C", controlMap);
 						sb.percentGenus(30);
-						sb.addSpecies("CW", 100);
+						sb.addSp64Distribution("CW", 100);
 						sb.addSite(ib -> {
 							ib.siteCurveNumber(11);
 							ib.ageTotal(100);
@@ -2305,9 +2294,9 @@ class VriStartTest {
 
 					// 3 8 (Primary)
 					lb.addSpecies(sb -> {
-						sb.genus("H");
+						sb.genus("H", controlMap);
 						sb.percentGenus(50);
-						sb.addSpecies("HW", 100);
+						sb.addSp64Distribution("HW", 100);
 						sb.addSite(ib -> {
 							ib.siteCurveNumber(37);
 							ib.height(34f);
@@ -2566,7 +2555,7 @@ class VriStartTest {
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("082F074/0142", 1997);
 				pb.forestInventoryZone(" ");
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(PolygonMode.YOUNG);
 
@@ -2582,26 +2571,26 @@ class VriStartTest {
 					lb.empiricalRelationshipParameterIndex(61);
 
 					lb.addSpecies(spb -> {
-						spb.genus("B");
+						spb.genus("B", controlMap);
 						spb.percentGenus(10);
-						spb.addSpecies("BL", 100);
+						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("BL");
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("C");
+						spb.genus("C", controlMap);
 						spb.percentGenus(20);
-						spb.addSpecies("CW", 100);
+						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
 							sib.siteCurveNumber(11);
 							sib.siteSpecies("CW");
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("F");
+						spb.genus("F", controlMap);
 						spb.percentGenus(30);
-						spb.addSpecies("FD", 100);
+						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("FD");
 							sib.siteCurveNumber(23);
@@ -2613,18 +2602,18 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("H");
+						spb.genus("H", controlMap);
 						spb.percentGenus(30);
-						spb.addSpecies("HW", 100);
+						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("HW");
 							sib.siteCurveNumber(37);
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("S");
+						spb.genus("S", controlMap);
 						spb.percentGenus(10);
-						spb.addSpecies("S", 100);
+						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("S");
 							sib.siteCurveNumber(71);
@@ -2662,24 +2651,24 @@ class VriStartTest {
 							"sites", allOf(
 									aMapWithSize(5), //
 									hasSite(
-											is("B"), is("BL"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", notPresent()))
+											is("B"), is("BL"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", notPresent()))
 									), //
 									hasSite(
-											is("C"), is("CW"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(11))))
+											is("C"), is("CW"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", present(is(11))))
 									), //
 									hasSite(
-											is("F"), is("FD"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(23))))
+											is("F"), is("FD"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", present(is(23))))
 									), //
 									hasSite(
-											is("H"), is("HW"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(37))))
+											is("H"), is("HW"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", present(is(37))))
 									), //
 									hasSite(
-											is("S"), is("S"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(71))))
+											is("S"), is("S"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", present(is(71))))
 									)
 							)
 					)
@@ -2752,7 +2741,7 @@ class VriStartTest {
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("082F074/0142", 1997);
 				pb.forestInventoryZone(" ");
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(PolygonMode.YOUNG);
 
@@ -2770,26 +2759,26 @@ class VriStartTest {
 					lb.empiricalRelationshipParameterIndex(61);
 
 					lb.addSpecies(spb -> {
-						spb.genus("B");
+						spb.genus("B", controlMap);
 						spb.percentGenus(10);
-						spb.addSpecies("BL", 100);
+						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("BL");
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("C");
+						spb.genus("C", controlMap);
 						spb.percentGenus(20);
-						spb.addSpecies("CW", 100);
+						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
 							sib.siteCurveNumber(11);
 							sib.siteSpecies("CW");
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("F");
+						spb.genus("F", controlMap);
 						spb.percentGenus(30);
-						spb.addSpecies("FD", 100);
+						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("FD");
 							sib.siteCurveNumber(23);
@@ -2801,18 +2790,18 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("H");
+						spb.genus("H", controlMap);
 						spb.percentGenus(30);
-						spb.addSpecies("HW", 100);
+						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("HW");
 							sib.siteCurveNumber(37);
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("S");
+						spb.genus("S", controlMap);
 						spb.percentGenus(10);
-						spb.addSpecies("S", 100);
+						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("S");
 							sib.siteCurveNumber(71);
@@ -2850,24 +2839,24 @@ class VriStartTest {
 							"sites", allOf(
 									aMapWithSize(5), //
 									hasSite(
-											is("B"), is("BL"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", notPresent()))
+											is("B"), is("BL"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", notPresent()))
 									), //
 									hasSite(
-											is("C"), is("CW"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(11))))
+											is("C"), is("CW"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", present(is(11))))
 									), //
 									hasSite(
-											is("F"), is("FD"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(23))))
+											is("F"), is("FD"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", present(is(23))))
 									), //
 									hasSite(
-											is("H"), is("HW"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(37))))
+											is("H"), is("HW"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", present(is(37))))
 									), //
 									hasSite(
-											is("S"), is("S"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(71))))
+											is("S"), is("S"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", present(is(71))))
 									)
 							)
 					)
@@ -2938,7 +2927,7 @@ class VriStartTest {
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("082F074/0142", 1997);
 				pb.forestInventoryZone(" ");
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(PolygonMode.YOUNG);
 				pb.percentAvailable(85f);
@@ -2956,26 +2945,26 @@ class VriStartTest {
 					lb.inventoryTypeGroup(3);
 
 					lb.addSpecies(spb -> {
-						spb.genus("B");
+						spb.genus("B", controlMap);
 						spb.percentGenus(10);
-						spb.addSpecies("BL", 100);
+						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("BL");
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("C");
+						spb.genus("C", controlMap);
 						spb.percentGenus(20);
-						spb.addSpecies("CW", 100);
+						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
 							sib.siteCurveNumber(11);
 							sib.siteSpecies("CW");
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("F");
+						spb.genus("F", controlMap);
 						spb.percentGenus(30);
-						spb.addSpecies("FD", 100);
+						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("FD");
 							sib.siteCurveNumber(23);
@@ -2987,18 +2976,18 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("H");
+						spb.genus("H", controlMap);
 						spb.percentGenus(30);
-						spb.addSpecies("HW", 100);
+						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("HW");
 							sib.siteCurveNumber(37);
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("S");
+						spb.genus("S", controlMap);
 						spb.percentGenus(10);
-						spb.addSpecies("S", 100);
+						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("S");
 							sib.siteCurveNumber(71);
@@ -3036,24 +3025,24 @@ class VriStartTest {
 							"sites", allOf(
 									aMapWithSize(5), //
 									hasSite(
-											is("B"), is("BL"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", notPresent()))
+											is("B"), is("BL"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", notPresent()))
 									), //
 									hasSite(
-											is("C"), is("CW"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(11))))
+											is("C"), is("CW"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", present(is(11))))
 									), //
 									hasSite(
-											is("F"), is("FD"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(23))))
+											is("F"), is("FD"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", present(is(23))))
 									), //
 									hasSite(
-											is("H"), is("HW"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(37))))
+											is("H"), is("HW"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", present(is(37))))
 									), //
 									hasSite(
-											is("S"), is("S"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(71))))
+											is("S"), is("S"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", present(is(71))))
 									)
 							)
 					)
@@ -3111,9 +3100,11 @@ class VriStartTest {
 
 			MockFileResolver resolver = dummyInput();
 
+			TestUtils.populateControlMapBecReal(controlMap);
+
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("TestPolygon", 1899);
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(PolygonMode.YOUNG);
 			});
@@ -3164,7 +3155,7 @@ class VriStartTest {
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("082F074/0142", 1997);
 				pb.forestInventoryZone(" ");
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(PolygonMode.BATC);
 
@@ -3180,26 +3171,26 @@ class VriStartTest {
 					lb.empiricalRelationshipParameterIndex(61);
 
 					lb.addSpecies(spb -> {
-						spb.genus("B");
+						spb.genus("B", controlMap);
 						spb.percentGenus(10);
-						spb.addSpecies("BL", 100);
+						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("BL");
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("C");
+						spb.genus("C", controlMap);
 						spb.percentGenus(20);
-						spb.addSpecies("CW", 100);
+						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
 							sib.siteCurveNumber(11);
 							sib.siteSpecies("CW");
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("F");
+						spb.genus("F", controlMap);
 						spb.percentGenus(30);
-						spb.addSpecies("FD", 100);
+						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("FD");
 							sib.siteCurveNumber(23);
@@ -3211,18 +3202,18 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("H");
+						spb.genus("H", controlMap);
 						spb.percentGenus(30);
-						spb.addSpecies("HW", 100);
+						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("HW");
 							sib.siteCurveNumber(37);
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("S");
+						spb.genus("S", controlMap);
 						spb.percentGenus(10);
-						spb.addSpecies("S", 100);
+						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("S");
 							sib.siteCurveNumber(71);
@@ -3263,24 +3254,24 @@ class VriStartTest {
 							"sites", allOf(
 									aMapWithSize(5), //
 									hasSite(
-											is("B"), is("BL"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", notPresent()))
+											is("B"), is("BL"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", notPresent()))
 									), //
 									hasSite(
-											is("C"), is("CW"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(11))))
+											is("C"), is("CW"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", present(is(11))))
 									), //
 									hasSite(
-											is("F"), is("FD"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(23))))
+											is("F"), is("FD"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", present(is(23))))
 									), //
 									hasSite(
-											is("H"), is("HW"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(37))))
+											is("H"), is("HW"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", present(is(37))))
 									), //
 									hasSite(
-											is("S"), is("S"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(71))))
+											is("S"), is("S"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", present(is(71))))
 									)
 							)
 					)
@@ -3359,7 +3350,7 @@ class VriStartTest {
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("082F074/0142", 1997);
 				pb.forestInventoryZone(" ");
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(PolygonMode.BATC);
 
@@ -3375,26 +3366,26 @@ class VriStartTest {
 					lb.empiricalRelationshipParameterIndex(61);
 
 					lb.addSpecies(spb -> {
-						spb.genus("B");
+						spb.genus("B", controlMap);
 						spb.percentGenus(10);
-						spb.addSpecies("BL", 100);
+						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("BL");
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("C");
+						spb.genus("C", controlMap);
 						spb.percentGenus(20);
-						spb.addSpecies("CW", 100);
+						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
 							sib.siteCurveNumber(11);
 							sib.siteSpecies("CW");
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("F");
+						spb.genus("F", controlMap);
 						spb.percentGenus(30);
-						spb.addSpecies("FD", 100);
+						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("FD");
 							sib.siteCurveNumber(23);
@@ -3406,18 +3397,18 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("H");
+						spb.genus("H", controlMap);
 						spb.percentGenus(30);
-						spb.addSpecies("HW", 100);
+						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("HW");
 							sib.siteCurveNumber(37);
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("S");
+						spb.genus("S", controlMap);
 						spb.percentGenus(10);
-						spb.addSpecies("S", 100);
+						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("S");
 							sib.siteCurveNumber(71);
@@ -3437,26 +3428,26 @@ class VriStartTest {
 					lb.empiricalRelationshipParameterIndex(61);
 
 					lb.addSpecies(spb -> {
-						spb.genus("B");
+						spb.genus("B", controlMap);
 						spb.percentGenus(10);
-						spb.addSpecies("BL", 100);
+						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("BL");
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("C");
+						spb.genus("C", controlMap);
 						spb.percentGenus(20);
-						spb.addSpecies("CW", 100);
+						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
 							sib.siteCurveNumber(11);
 							sib.siteSpecies("CW");
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("F");
+						spb.genus("F", controlMap);
 						spb.percentGenus(30);
-						spb.addSpecies("FD", 100);
+						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("FD");
 							sib.siteCurveNumber(23);
@@ -3468,18 +3459,18 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("H");
+						spb.genus("H", controlMap);
 						spb.percentGenus(30);
-						spb.addSpecies("HW", 100);
+						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("HW");
 							sib.siteCurveNumber(37);
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("S");
+						spb.genus("S", controlMap);
 						spb.percentGenus(10);
-						spb.addSpecies("S", 100);
+						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("S");
 							sib.siteCurveNumber(71);
@@ -3507,12 +3498,11 @@ class VriStartTest {
 			assertThat(result, hasProperty("mode", present(is(PolygonMode.BATC))));
 
 			assertThat(
-					result,
-					hasProperty(
-							"layers",
-							allOf(
-									aMapWithSize(2), hasEntry(is(LayerType.PRIMARY), anything()),
-									hasEntry(is(LayerType.VETERAN), anything())
+					result, hasProperty(
+							"layers", allOf(
+									aMapWithSize(2), hasEntry(is(LayerType.PRIMARY), anything()), hasEntry(
+											is(LayerType.VETERAN), anything()
+									)
 							)
 					)
 			);
@@ -3595,7 +3585,7 @@ class VriStartTest {
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("082F074/0142", 1997);
 				pb.forestInventoryZone(" ");
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(PolygonMode.BATN);
 
@@ -3611,26 +3601,26 @@ class VriStartTest {
 					lb.empiricalRelationshipParameterIndex(61);
 
 					lb.addSpecies(spb -> {
-						spb.genus("B");
+						spb.genus("B", controlMap);
 						spb.percentGenus(10);
-						spb.addSpecies("BL", 100);
+						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("BL");
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("C");
+						spb.genus("C", controlMap);
 						spb.percentGenus(20);
-						spb.addSpecies("CW", 100);
+						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
 							sib.siteCurveNumber(11);
 							sib.siteSpecies("CW");
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("F");
+						spb.genus("F", controlMap);
 						spb.percentGenus(30);
-						spb.addSpecies("FD", 100);
+						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("FD");
 							sib.siteCurveNumber(23);
@@ -3642,18 +3632,18 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("H");
+						spb.genus("H", controlMap);
 						spb.percentGenus(30);
-						spb.addSpecies("HW", 100);
+						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("HW");
 							sib.siteCurveNumber(37);
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("S");
+						spb.genus("S", controlMap);
 						spb.percentGenus(10);
-						spb.addSpecies("S", 100);
+						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("S");
 							sib.siteCurveNumber(71);
@@ -3694,24 +3684,24 @@ class VriStartTest {
 							"sites", allOf(
 									aMapWithSize(5), //
 									hasSite(
-											is("B"), is("BL"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", notPresent()))
+											is("B"), is("BL"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", notPresent()))
 									), //
 									hasSite(
-											is("C"), is("CW"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(11))))
+											is("C"), is("CW"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", present(is(11))))
 									), //
 									hasSite(
-											is("F"), is("FD"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(23))))
+											is("F"), is("FD"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", present(is(23))))
 									), //
 									hasSite(
-											is("H"), is("HW"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(37))))
+											is("H"), is("HW"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", present(is(37))))
 									), //
 									hasSite(
-											is("S"), is("S"),
-											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(71))))
+											is("S"), is("S"), forPrimeLayer
+													.and(hasProperty("siteCurveNumber", present(is(71))))
 									)
 							)
 					)
@@ -3794,7 +3784,7 @@ class VriStartTest {
 			var poly = VriPolygon.build(pb -> {
 				pb.polygonIdentifier("082F074/0142", 1997);
 				pb.forestInventoryZone(" ");
-				pb.biogeoclimaticZone("IDF");
+				pb.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pb.yieldFactor(1.0f);
 				pb.mode(PolygonMode.BATN);
 
@@ -3810,26 +3800,26 @@ class VriStartTest {
 					lb.empiricalRelationshipParameterIndex(61);
 
 					lb.addSpecies(spb -> {
-						spb.genus("B");
+						spb.genus("B", controlMap);
 						spb.percentGenus(10);
-						spb.addSpecies("BL", 100);
+						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("BL");
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("C");
+						spb.genus("C", controlMap);
 						spb.percentGenus(20);
-						spb.addSpecies("CW", 100);
+						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
 							sib.siteCurveNumber(11);
 							sib.siteSpecies("CW");
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("F");
+						spb.genus("F", controlMap);
 						spb.percentGenus(30);
-						spb.addSpecies("FD", 100);
+						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("FD");
 							sib.siteCurveNumber(23);
@@ -3841,18 +3831,18 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("H");
+						spb.genus("H", controlMap);
 						spb.percentGenus(30);
-						spb.addSpecies("HW", 100);
+						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("HW");
 							sib.siteCurveNumber(37);
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("S");
+						spb.genus("S", controlMap);
 						spb.percentGenus(10);
-						spb.addSpecies("S", 100);
+						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("S");
 							sib.siteCurveNumber(71);
@@ -3872,26 +3862,26 @@ class VriStartTest {
 					lb.empiricalRelationshipParameterIndex(61);
 
 					lb.addSpecies(spb -> {
-						spb.genus("B");
+						spb.genus("B", controlMap);
 						spb.percentGenus(10);
-						spb.addSpecies("BL", 100);
+						spb.addSp64Distribution("BL", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("BL");
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("C");
+						spb.genus("C", controlMap);
 						spb.percentGenus(20);
-						spb.addSpecies("CW", 100);
+						spb.addSp64Distribution("CW", 100);
 						spb.addSite(sib -> {
 							sib.siteCurveNumber(11);
 							sib.siteSpecies("CW");
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("F");
+						spb.genus("F", controlMap);
 						spb.percentGenus(30);
-						spb.addSpecies("FD", 100);
+						spb.addSp64Distribution("FD", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("FD");
 							sib.siteCurveNumber(23);
@@ -3903,18 +3893,18 @@ class VriStartTest {
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("H");
+						spb.genus("H", controlMap);
 						spb.percentGenus(30);
-						spb.addSpecies("HW", 100);
+						spb.addSp64Distribution("HW", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("HW");
 							sib.siteCurveNumber(37);
 						});
 					});
 					lb.addSpecies(spb -> {
-						spb.genus("S");
+						spb.genus("S", controlMap);
 						spb.percentGenus(10);
-						spb.addSpecies("S", 100);
+						spb.addSp64Distribution("S", 100);
 						spb.addSite(sib -> {
 							sib.siteSpecies("S");
 							sib.siteCurveNumber(71);
@@ -3942,12 +3932,11 @@ class VriStartTest {
 			assertThat(result, hasProperty("mode", present(is(PolygonMode.BATN))));
 
 			assertThat(
-					result,
-					hasProperty(
-							"layers",
-							allOf(
-									aMapWithSize(2), hasEntry(is(LayerType.PRIMARY), anything()),
-									hasEntry(is(LayerType.VETERAN), anything())
+					result, hasProperty(
+							"layers", allOf(
+									aMapWithSize(2), hasEntry(is(LayerType.PRIMARY), anything()), hasEntry(
+											is(LayerType.VETERAN), anything()
+									)
 							)
 					)
 			);
@@ -4006,7 +3995,7 @@ class VriStartTest {
 
 			var polygon = VriPolygon.build(pBuilder -> {
 				pBuilder.polygonIdentifier("Test", 2024);
-				pBuilder.biogeoclimaticZone("IDF");
+				pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pBuilder.yieldFactor(1.0f);
 				pBuilder.addLayer(lBuilder -> {
 					lBuilder.layerType(LayerType.PRIMARY);
@@ -4015,23 +4004,23 @@ class VriStartTest {
 					lBuilder.empiricalRelationshipParameterIndex(61);
 
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("B"); // 3
+						sBuilder.genus("B", controlMap);
 						sBuilder.percentGenus(10f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("C"); // 4
+						sBuilder.genus("C", controlMap);
 						sBuilder.percentGenus(20f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("F"); // 4
+						sBuilder.genus("F", controlMap);
 						sBuilder.percentGenus(30f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("H"); // 8
+						sBuilder.genus("H", controlMap);
 						sBuilder.percentGenus(30f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("S"); // 15
+						sBuilder.genus("S", controlMap);
 						sBuilder.percentGenus(10f);
 					});
 
@@ -4057,7 +4046,7 @@ class VriStartTest {
 
 			var polygon = VriPolygon.build(pBuilder -> {
 				pBuilder.polygonIdentifier("Test", 2024);
-				pBuilder.biogeoclimaticZone("IDF");
+				pBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				pBuilder.yieldFactor(1.0f);
 				pBuilder.addLayer(lBuilder -> {
 					lBuilder.layerType(LayerType.PRIMARY);
@@ -4066,23 +4055,23 @@ class VriStartTest {
 					lBuilder.empiricalRelationshipParameterIndex(61);
 
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("B"); // 3
+						sBuilder.genus("B", controlMap);
 						sBuilder.percentGenus(10f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("C"); // 4
+						sBuilder.genus("C", controlMap);
 						sBuilder.percentGenus(20f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("F"); // 4
+						sBuilder.genus("F", controlMap);
 						sBuilder.percentGenus(30f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("H"); // 8
+						sBuilder.genus("H", controlMap);
 						sBuilder.percentGenus(30f);
 					});
 					lBuilder.addSpecies(sBuilder -> {
-						sBuilder.genus("S"); // 15
+						sBuilder.genus("S", controlMap);
 						sBuilder.percentGenus(10f);
 					});
 
@@ -4095,8 +4084,8 @@ class VriStartTest {
 			var bec = Utils.expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class).get("IDF").get();
 
 			var ex = assertThrows(
-					StandProcessingException.class,
-					() -> app.estimateQuadMeanDiameterYield(7.6f, breastHeightAge, Optional.empty(), species, bec, 61)
+					StandProcessingException.class, () -> app
+							.estimateQuadMeanDiameterYield(7.6f, breastHeightAge, Optional.empty(), species, bec, 61)
 			);
 
 			assertThat(ex, hasProperty("message", endsWith(Float.toString(breastHeightAge))));
@@ -4121,8 +4110,22 @@ class VriStartTest {
 		return hasEntry(
 				genus, //
 				both(hasProperty("genus", genus))
-						.and(hasProperty("speciesPercent", allOf(aMapWithSize(1), hasEntry(species, is(100f)))))
-						.and(hasProperty("percentGenus", percent))//
+						.and(hasProperty("percentGenus", percent))
+						.and(
+								hasProperty(
+										"sp64DistributionSet", hasProperty(
+												"sp64DistributionMap", allOf(
+														aMapWithSize(1), hasEntry(
+																is(1), allOf(
+																		hasProperty("genusAlias", species), hasProperty(
+																				"percentage", is(100f)
+																		)
+																)
+														)
+												)
+										)
+								)
+						)
 						.and((Matcher<? super Object>) additional)
 		);
 	}

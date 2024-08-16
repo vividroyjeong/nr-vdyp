@@ -3,13 +3,13 @@ package ca.bc.gov.nrs.vdyp.io.parse.coe;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -30,8 +30,7 @@ import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
  * </ol>
  * The preference values define an ordering of the species from 1 to 16. If a line provides no value or the value 0, the
  * ordering is implicitly chosen to be the line number. Otherwise, a value from 1 - 16 must be provided and this value
- * is used as the ordering. In the end, all values from 1 - 16 must be used. Note that it's possible, when ordering is
- * explicitly given, for a given ordering to appear more than once; in this case, the last one present wins.
+ * is used as the ordering. In the end, all values from 1 - 16 must be used.
  * <p>
  * All lines in the file are read; there is no provision for blank lines (except the last line, if empty).
  * <p>
@@ -44,14 +43,13 @@ import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
  * @author Kevin Smith, Vivid Solutions
  * @see ControlMapSubResourceParser
  */
-public class GenusDefinitionParser implements ControlMapSubResourceParser<List<GenusDefinition>> {
+public class GenusDefinitionParser implements ControlMapSubResourceParser<GenusDefinitionMap> {
 
 	private int numSp0;
 
 	private LineParser lineParser = new LineParser().strippedString(2, "alias").space(1).strippedString(32, "name")
 			.space(1).value(
-					2, "preference",
-					(s, c) -> ValueParser.optional(ValueParser.INTEGER).parse(s)
+					2, "preference", (s, c) -> ValueParser.optional(ValueParser.INTEGER).parse(s)
 							.flatMap(v -> v == 0 ? Optional.empty() : Optional.of(v))
 			);
 
@@ -67,45 +65,55 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<List<G
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<GenusDefinition> parse(InputStream is, Map<String, Object> control)
+	public GenusDefinitionMap parse(InputStream is, Map<String, Object> control)
 			throws IOException, ResourceParseException {
+
 		GenusDefinition[] result = new GenusDefinition[numSp0];
+
 		result = lineParser.parse(is, result, (value, r, line) -> {
 			String alias = (String) value.get("alias");
 			Optional<Integer> preference = (Optional<Integer>) value.get("preference");
 			String name = (String) value.get("name");
 			Integer lineNumber = (Integer) value.get(LineParser.LINE_NUMBER_KEY);
 
-			var defn = new GenusDefinition(alias, preference, name);
-			int p = preference.orElse(lineNumber);
-
-			if (p > numSp0) {
-				throw new ValueParseException(
-						Integer.toString(p), String.format("Preference %d is larger than %d", p, numSp0)
-				);
-			}
-			if (p < 1) {
-				throw new ValueParseException(
-						Integer.toString(p), String.format("Preference %d is less than %d", p, 0)
-				);
-			}
-			if (r[p - 1] != null) {
-				throw new ValueParseException(
-						Integer.toString(p),
-						String.format("Preference %d has already been set to %s", p, r[p - 1].getAlias())
-				);
+			int index;
+			if (preference.isPresent() && preference.get() != 0) {
+				index = preference.get();
+			} else {
+				index = lineNumber;
 			}
 
-			r[p - 1] = defn;
+			if (index > numSp0 || index < 1) {
+				throw new ValueParseException(
+						Integer.toString(index),
+						String.format(
+								"preference values must be between %d and %d (inclusive); saw value %d", 1, numSp0, index
+						)
+				);
+			}
+			if (r[index - 1] != null) {
+				throw new ValueParseException(
+						Integer.toString(index),
+						String.format(
+								"Genera ordering %d has already been specified for genera %s", index, r[index - 1]
+										.getAlias()
+						)
+				);
+			}
+
+			r[index - 1] = new GenusDefinition(alias, index, name);
 			return r;
 		}, control);
+
 		if (Arrays.stream(result).anyMatch(Objects::isNull)) {
 			throw new ResourceParseValidException("Not all genus definitions were provided.");
 		}
-		return Collections.unmodifiableList(Arrays.asList(result));
+
+		return new GenusDefinitionMap(Arrays.asList(result));
 	}
 
-	public static void checkSpecies(final List<String> speciesIndicies, final String sp0) throws ValueParseException {
+	public static void checkSpecies(final Collection<String> speciesIndicies, final String sp0)
+			throws ValueParseException {
 		if (!speciesIndicies.contains(sp0)) {
 			throw new ValueParseException(sp0, sp0 + " is not a valid genus (SP0)");
 		}
@@ -116,12 +124,14 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<List<G
 		checkSpecies(speciesIndicies, sp0);
 	}
 
-	public static List<GenusDefinition> getSpecies(final Map<String, Object> controlMap) {
-		return Utils.<List<GenusDefinition>>expectParsedControl(controlMap, ControlKey.SP0_DEF.name(), List.class);
+	public static GenusDefinitionMap getSpecies(final Map<String, Object> controlMap) {
+		return Utils.<GenusDefinitionMap>expectParsedControl(
+				controlMap, ControlKey.SP0_DEF.name(), GenusDefinitionMap.class
+		);
 	}
 
-	public static List<String> getSpeciesAliases(final Map<String, Object> controlMap) {
-		return getSpecies(controlMap).stream().map(GenusDefinition::getAlias).toList();
+	public static Collection<String> getSpeciesAliases(final Map<String, Object> controlMap) {
+		return getSpecies(controlMap).getAllGeneraAliases();
 	}
 
 	/**
@@ -133,16 +143,15 @@ public class GenusDefinitionParser implements ControlMapSubResourceParser<List<G
 	 */
 	public static GenusDefinition getSpeciesByIndex(final int index, final Map<String, Object> controlMap) {
 
-		return getSpecies(controlMap).get(index - 1);
+		return getSpecies(controlMap).getByIndex(index);
 	}
 
-	public static Optional<Integer> getIndex(final String alias, final Map<String, Object> controlMap) {
-		return Optional.of(getSpeciesAliases(controlMap).indexOf(alias) + 1).filter(x -> x != 0);
+	public static int getIndex(final String alias, final Map<String, Object> controlMap) {
+		return getSpecies(controlMap).getIndexByAlias(alias);
 	}
 
 	@Override
 	public ControlKey getControlKey() {
 		return ControlKey.SP0_DEF;
 	}
-
 }

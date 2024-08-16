@@ -43,8 +43,8 @@ class UtilsTest {
 		@Test
 		void testMissing() {
 			var ex = assertThrows(
-					IllegalStateException.class,
-					() -> Utils.expectParsedControl(Collections.emptyMap(), "NOT_PRESENT", Integer.class)
+					IllegalStateException.class, () -> Utils
+							.expectParsedControl(Collections.emptyMap(), "NOT_PRESENT", Integer.class)
 			);
 			assertThat(
 					ex, hasProperty("message", stringContainsInOrder("Expected control map to have", "NOT_PRESENT"))
@@ -54,16 +54,13 @@ class UtilsTest {
 		@Test
 		void testWrongType() {
 			var ex = assertThrows(
-					IllegalStateException.class,
-					() -> Utils.expectParsedControl(
+					IllegalStateException.class, () -> Utils.expectParsedControl(
 							Collections.singletonMap("WRONG_TYPE", 2d), "WRONG_TYPE", Integer.class
 					)
 			);
 			assertThat(
-					ex,
-					hasProperty(
-							"message",
-							stringContainsInOrder(
+					ex, hasProperty(
+							"message", stringContainsInOrder(
 									"Expected control map entry", "WRONG_TYPE", "to be", "Integer", "was", "Double"
 							)
 					)
@@ -73,16 +70,13 @@ class UtilsTest {
 		@Test
 		void testStillString() {
 			var ex = assertThrows(
-					IllegalStateException.class,
-					() -> Utils.expectParsedControl(
+					IllegalStateException.class, () -> Utils.expectParsedControl(
 							Collections.singletonMap("WRONG_TYPE", "UNPARSED"), "WRONG_TYPE", Integer.class
 					)
 			);
 			assertThat(
-					ex,
-					hasProperty(
-							"message",
-							stringContainsInOrder(
+					ex, hasProperty(
+							"message", stringContainsInOrder(
 									"Expected control map entry", "WRONG_TYPE", "to be parsed but was still a String"
 							)
 					)
@@ -145,7 +139,7 @@ class UtilsTest {
 				lb.baseArea(0.7f, 0.9f, 1.1f, 1.3f, 1.5f);
 
 				lb.addSpecies(sb -> {
-					sb.genus("B");
+					sb.genus("B", 3);
 					sb.baseArea(0.1f, 0.2f, 0.3f, 0.4f, 0.5f);
 					sb.percentGenus(40);
 					sb.volumeGroup(42);
@@ -153,7 +147,7 @@ class UtilsTest {
 					sb.breakageGroup(42);
 				});
 				lb.addSpecies(sb -> {
-					sb.genus("C");
+					sb.genus("C", 4);
 					sb.baseArea(0.6f, 0.7f, 0.8f, 0.9f, 1f);
 					sb.percentGenus(60);
 					sb.volumeGroup(42);

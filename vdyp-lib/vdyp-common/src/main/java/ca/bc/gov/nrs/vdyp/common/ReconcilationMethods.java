@@ -103,8 +103,7 @@ public class ReconcilationMethods {
 		}
 		UtilizationClass.UTIL_CLASSES.forEach(
 				uc -> treesPerHectareUtil.setCoe(
-						uc.index,
-						BaseAreaTreeDensityDiameter
+						uc.index, BaseAreaTreeDensityDiameter
 								.treesPerHectare(baseAreaUtil.getCoe(uc.index), quadMeanDiameterUtil.getCoe(uc.index))
 				)
 		);
@@ -222,8 +221,7 @@ public class ReconcilationMethods {
 		for (var uc : UtilizationClass.UTIL_CLASSES) {
 			quadMeanDiameterUtil.setCoe(uc.index, dqTrial.getCoe(uc.index));
 			treesPerHectareUtil.setCoe(
-					uc.index,
-					BaseAreaTreeDensityDiameter
+					uc.index, BaseAreaTreeDensityDiameter
 							.treesPerHectare(baseAreaUtil.getCoe(uc.index), quadMeanDiameterUtil.getCoe(uc.index))
 			);
 		}

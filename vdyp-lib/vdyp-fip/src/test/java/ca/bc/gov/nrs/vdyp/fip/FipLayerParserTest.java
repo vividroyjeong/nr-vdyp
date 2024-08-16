@@ -64,10 +64,9 @@ class FipLayerParserTest {
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat",
-				TestUtils.makeInputStream(
-						"01002 S000001 00     1970 1  55 35.3 35.0 87.4   D  D  1.0 0              13",
-						"01002 S000001 00     1970 Z  55  0.0  0.0  0.0         0.0"
+				"test.dat", TestUtils.makeInputStream(
+						"01002 S000001 00     1970 1  55 35.3 35.0 87.4   D  D  1.0 0              13", //
+						"01002 S000001 00     1970 Z  55  0.0  0.0  0.0         0.0" //
 				)
 		);
 
@@ -87,8 +86,7 @@ class FipLayerParserTest {
 		assertThat(layers, aMapWithSize(1));
 
 		assertThat(
-				layers,
-				hasSpecificEntry(
+				layers, hasSpecificEntry(
 						LayerType.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)), //
 								hasProperty("layerType", is(LayerType.PRIMARY)), //
@@ -120,11 +118,10 @@ class FipLayerParserTest {
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat",
-				TestUtils.makeInputStream(
-						"01002 S000004 00     1970 V 195 45.2 22.3  4.0   B  B  9.4 2               8",
-						"01002 S000004 00     1970 1  85 42.3 31.9 82.8   H  H  4.9 0              34",
-						"01002 S000004 00     1970 Z  85  0.0  0.0  0.0         0.0"
+				"test.dat", TestUtils.makeInputStream(
+						"01002 S000004 00     1970 V 195 45.2 22.3  4.0   B  B  9.4 2               8", //
+						"01002 S000004 00     1970 1  85 42.3 31.9 82.8   H  H  4.9 0              34", //
+						"01002 S000004 00     1970 Z  85  0.0  0.0  0.0         0.0" //
 				)
 		);
 
@@ -144,8 +141,7 @@ class FipLayerParserTest {
 		assertThat(layers, aMapWithSize(2));
 
 		assertThat(
-				layers,
-				hasSpecificEntry(
+				layers, hasSpecificEntry(
 						LayerType.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", isPolyId("01002 S000004 00", 1970)), //
 								hasProperty("layerType", is(LayerType.PRIMARY)), //
@@ -163,8 +159,7 @@ class FipLayerParserTest {
 				)
 		);
 		assertThat(
-				layers,
-				hasSpecificEntry(
+				layers, hasSpecificEntry(
 						LayerType.VETERAN, allOf(
 								hasProperty("polygonIdentifier", isPolyId("01002 S000004 00", 1970)), //
 								hasProperty("layerType", is(LayerType.VETERAN)), //
@@ -195,11 +190,10 @@ class FipLayerParserTest {
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat",
-				TestUtils.makeInputStream(
-						"01002 S000004 00     1970 V 195 45.2 22.3  0.0   B  B  9.4 2               8",
-						"01002 S000004 00     1970 1  85 42.3 31.9 82.8   H  H  4.9 0              34",
-						"01002 S000004 00     1970 Z  85  0.0  0.0  0.0         0.0"
+				"test.dat", TestUtils.makeInputStream(
+						"01002 S000004 00     1970 V 195 45.2 22.3  0.0   B  B  9.4 2               8", //
+						"01002 S000004 00     1970 1  85 42.3 31.9 82.8   H  H  4.9 0              34", //
+						"01002 S000004 00     1970 Z  85  0.0  0.0  0.0         0.0" //
 				)
 		);
 
@@ -219,8 +213,7 @@ class FipLayerParserTest {
 		assertThat(layers, aMapWithSize(1));
 
 		assertThat(
-				layers,
-				hasSpecificEntry(
+				layers, hasSpecificEntry(
 						LayerType.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", isPolyId("01002 S000004 00", 1970)), //
 								hasProperty("layerType", is(LayerType.PRIMARY)), //
@@ -252,11 +245,10 @@ class FipLayerParserTest {
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat",
-				TestUtils.makeInputStream(
-						"01002 S000004 00     1970 V 195  0.0 22.3  4.0   B  B  9.4 2               8",
-						"01002 S000004 00     1970 1  85 42.3 31.9 82.8   H  H  4.9 0              34",
-						"01002 S000004 00     1970 Z  85  0.0  0.0  0.0         0.0"
+				"test.dat", TestUtils.makeInputStream(
+						"01002 S000004 00     1970 V 195  0.0 22.3  4.0   B  B  9.4 2               8", //
+						"01002 S000004 00     1970 1  85 42.3 31.9 82.8   H  H  4.9 0              34", //
+						"01002 S000004 00     1970 Z  85  0.0  0.0  0.0         0.0" //
 				)
 		);
 
@@ -276,8 +268,7 @@ class FipLayerParserTest {
 		assertThat(layers, aMapWithSize(1));
 
 		assertThat(
-				layers,
-				hasSpecificEntry(
+				layers, hasSpecificEntry(
 						LayerType.PRIMARY, allOf(
 								hasProperty("polygonIdentifier", isPolyId("01002 S000004 00", 1970)), //
 								hasProperty("layerType", is(LayerType.PRIMARY)), //
@@ -287,8 +278,9 @@ class FipLayerParserTest {
 								hasProperty("crownClosure", is(82.8f)), //
 								hasProperty("siteGenus", present(is("H"))), //
 								hasProperty("siteSpecies", present(is("H"))), //
-								hasProperty("yearsToBreastHeightSafe", is(4.9f)),
-								hasProperty("stockingClass", present(is('0'))), //
+								hasProperty("yearsToBreastHeightSafe", is(4.9f)), hasProperty(
+										"stockingClass", present(is('0'))
+								), //
 								hasProperty("inventoryTypeGroup", notPresent()), //
 								hasProperty("siteCurveNumber", present(is(34)))
 						)
