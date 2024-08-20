@@ -256,7 +256,7 @@ public class EstimationMethods {
 				a0 += multI * coeMap.get(specIAlias).getCoe(0);
 				a1 += multI * coeMap.get(specIAlias).getCoe(1);
 			} else {
-				float spIFraction = basalAreaFractionPerSpecies.get(specIAlias);
+				float spIFraction = basalAreaFractionPerSpecies.getOrDefault(specIAlias, 0.0f);
 				if (spIFraction > 0f) {
 					float multI = -spIFraction / fractionOther;
 					a0 += multI * coeMap.get(specIAlias).getCoe(0);
@@ -368,10 +368,7 @@ public class EstimationMethods {
 	 * @return as described
 	 */
 	public ComponentSizeLimits getLimitsForHeightAndDiameter(String sp0, Region region) {
-		var coeMap = controlMap.getComponentSizeLimitCoefficients();
-
-		var coe = coeMap.get(sp0, region);
-		return new ComponentSizeLimits(coe.getCoe(1), coe.getCoe(2), coe.getCoe(3), coe.getCoe(4));
+		return controlMap.getComponentSizeLimits().get(sp0, region);
 	}
 
 	/**

@@ -1,7 +1,6 @@
 package ca.bc.gov.nrs.vdyp.controlmap;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -10,7 +9,7 @@ import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
-import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
+import ca.bc.gov.nrs.vdyp.model.ComponentSizeLimits;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
@@ -42,8 +41,8 @@ public class ResolvedControlMapImpl implements ResolvedControlMap {
 
 	@Override
 	public GenusDefinitionMap getGenusDefinitionMap() {
-		List<GenusDefinition> genusDefinitions = this.<List<GenusDefinition>>get(ControlKey.SP0_DEF, List.class);
-		return new GenusDefinitionMap(genusDefinitions);
+		GenusDefinitionMap genusDefinitions = this.<GenusDefinitionMap>get(ControlKey.SP0_DEF, GenusDefinitionMap.class);
+		return genusDefinitions;
 	}
 
 	@Override
@@ -162,7 +161,7 @@ public class ResolvedControlMapImpl implements ResolvedControlMap {
 	}
 
 	@Override
-	public MatrixMap2<String, Region, Coefficients> getComponentSizeLimitCoefficients() {
+	public MatrixMap2<String, Region, ComponentSizeLimits> getComponentSizeLimits() {
 		return this.get(ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, MatrixMap2.class);
 	}
 

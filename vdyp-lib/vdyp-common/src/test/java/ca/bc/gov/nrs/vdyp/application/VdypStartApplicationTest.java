@@ -629,7 +629,7 @@ class VdypStartApplicationTest {
 	}
 
 	@Nested
-	class FindEmpericalRelationshipParameterIndex {
+	class FindEmpiricalRelationshipParameterIndex {
 
 		@Test
 		void testModified() throws Exception {
@@ -1544,7 +1544,7 @@ class VdypStartApplicationTest {
 			layer.setSpecies(Arrays.asList(spec1, spec2));
 
 			EstimationMethods estimationMethods = new EstimationMethods(new ResolvedControlMapImpl(controlMap));
-			ComputationMethods computationMethods = new ComputationMethods(estimationMethods, null);
+			ComputationMethods computationMethods = new ComputationMethods(estimationMethods, VdypApplicationIdentifier.FIP_START);
 			computationMethods.computeUtilizationComponentsPrimary(
 					bec, layer, VolumeComputeMode.BY_UTIL, CompatibilityVariableMode.NONE
 			);

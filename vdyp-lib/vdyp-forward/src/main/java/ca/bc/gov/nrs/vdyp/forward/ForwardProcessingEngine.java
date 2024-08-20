@@ -803,11 +803,7 @@ public class ForwardProcessingEngine {
 	 * @return as described
 	 */
 	private ComponentSizeLimits getComponentSizeLimits(String genusAlias, Region region) {
-
-		MatrixMap2<String, Region, Coefficients> limits = fps.fcm.getComponentSizeLimitCoefficients();
-		Coefficients coe = limits.get(genusAlias, region);
-
-		return new ComponentSizeLimits(coe.getCoe(1), coe.getCoe(2), coe.getCoe(3), coe.getCoe(4));
+		return fps.fcm.getComponentSizeLimits().get(genusAlias, region);
 	}
 
 	/**

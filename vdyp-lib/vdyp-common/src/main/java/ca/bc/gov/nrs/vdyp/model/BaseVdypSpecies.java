@@ -139,7 +139,7 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		protected Optional<Integer> genusIndex = Optional.empty();
 		protected Optional<Float> percentGenus = Optional.empty();
 		protected Optional<Float> fractionGenus = Optional.empty();
-		protected Optional<Sp64DistributionSet> sp64DistributionSet = Optional.empty();
+		protected Sp64DistributionSet sp64DistributionSet = new Sp64DistributionSet();
 		protected Optional<Consumer<IB>> siteBuilder = Optional.empty();
 		protected Optional<I> site = Optional.empty();
 
@@ -202,12 +202,12 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		}
 
 		public Builder<T, I, IB> sp64DistributionList(List<Sp64Distribution> sp64DistributionList) {
-			this.sp64DistributionSet = Optional.of(new Sp64DistributionSet(sp64DistributionList));
+			this.sp64DistributionSet = new Sp64DistributionSet(sp64DistributionList);
 			return this;
 		}
 
 		public Builder<T, I, IB> sp64DistributionSet(Sp64DistributionSet sp64DistributionSet) {
-			this.sp64DistributionSet = Optional.of(sp64DistributionSet);
+			this.sp64DistributionSet = sp64DistributionSet;
 			return this;
 		}
 
@@ -233,9 +233,9 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		}
 
 		public void addSp64Distribution(String sp64Alias, float f) {
-			var sp64DistributionList = sp64DistributionSet.map(set -> set.getSp64DistributionList()).orElse(new ArrayList<Sp64Distribution>());
-			sp64DistributionList.add(new Sp64Distribution(sp64DistributionList.size() + 1, sp64Alias, f));
-			sp64DistributionSet = Optional.of(new Sp64DistributionSet(sp64DistributionList));
+			var newSp64DistributionList = new ArrayList<>(this.sp64DistributionSet.getSp64DistributionList());
+			newSp64DistributionList.add(new Sp64Distribution(newSp64DistributionList.size() + 1, sp64Alias, f));
+			sp64DistributionSet = new Sp64DistributionSet(newSp64DistributionList);
 		}
 
 		@Override
@@ -245,7 +245,6 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 			requirePresent(genus, "genus", errors);
 			requirePresent(genusIndex, "genusIndex", errors);
 			requirePresent(percentGenus, "percentGenus", errors);
-			requirePresent(sp64DistributionSet, "sp64DistributionSet", errors);
 		}
 
 		@Override

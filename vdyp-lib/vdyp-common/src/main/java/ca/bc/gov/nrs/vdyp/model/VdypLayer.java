@@ -189,10 +189,10 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 	public static class Builder
 			extends BaseVdypLayer.Builder<VdypLayer, VdypSpecies, VdypSite, VdypSpecies.Builder, VdypSite.Builder> {
 
-		Optional<Integer> empericalRelationshipParameterIndex = Optional.empty();
+		Optional<Integer> empiricalRelationshipParameterIndex = Optional.empty();
 
 		public void empiricalRelationshipParameterIndex(Optional<Integer> empiricalRelationshipParameterIndex) {
-			this.empericalRelationshipParameterIndex = empiricalRelationshipParameterIndex;
+			this.empiricalRelationshipParameterIndex = empiricalRelationshipParameterIndex;
 		}
 
 		public void empiricalRelationshipParameterIndex(int empiricalRelationshipParameterIndex) {
@@ -265,7 +265,7 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 					polygonIdentifier.get(), //
 					layerType.get(), //
 					inventoryTypeGroup, //
-					empericalRelationshipParameterIndex
+					empiricalRelationshipParameterIndex
 			);
 		}
 

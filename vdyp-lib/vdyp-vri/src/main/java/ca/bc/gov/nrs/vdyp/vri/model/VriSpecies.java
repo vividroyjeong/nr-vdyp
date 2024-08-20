@@ -50,7 +50,7 @@ public class VriSpecies extends BaseVdypSpecies<VriSite> {
 					this.genus.get(), //
 					this.genusIndex.get(), //
 					this.percentGenus.get(), //
-					this.sp64DistributionSet.get(), //
+					this.sp64DistributionSet, //
 					this.site
 			);
 		}

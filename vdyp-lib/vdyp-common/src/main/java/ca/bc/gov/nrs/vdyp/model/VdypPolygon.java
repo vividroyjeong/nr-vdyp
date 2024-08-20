@@ -77,7 +77,7 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float, VdypSpecies, 
 		protected VdypPolygon doBuild() {
 			return new VdypPolygon(
 					polygonIdentifier.get(), percentAvailable.get(), forestInventoryZone.get(),
-					biogeoclimaticZone.get(), mode, targetYear
+					biogeoclimaticZone.get(), mode, inventoryTypeGroup, targetYear
 			);
 		}
 

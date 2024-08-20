@@ -9,6 +9,7 @@ import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
+import ca.bc.gov.nrs.vdyp.model.ComponentSizeLimits;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
@@ -43,7 +44,7 @@ public class CachingResolvedControlMapImpl implements ResolvedControlMap {
 	final MatrixMap2<String, Region, Coefficients> hl2Coefficients;
 	final MatrixMap2<String, Region, Coefficients> hl3Coefficients;
 	final MatrixMap3<String, String, Region, Optional<NonprimaryHLCoefficients>> hlNonPrimaryCoefficients;
-	final MatrixMap2<String, Region, Coefficients> componentSizeLimitCoefficients;
+	final MatrixMap2<String, Region, ComponentSizeLimits> componentSizeLimitCoefficients;
 	final Map<Integer, Coefficients> breakageMap;
 	final MatrixMap2<String, String, Integer> volumeEquationGroups;
 	final MatrixMap2<String, String, Integer> decayEquationGroups;
@@ -58,9 +59,7 @@ public class CachingResolvedControlMapImpl implements ResolvedControlMap {
 		
 		this.becLookup = this.get(ControlKey.BEC_DEF, BecLookup.class);
 
-		List<GenusDefinition> genusDefinitions = this.get(ControlKey.SP0_DEF, List.class);
-		this.genusDefinitionMap = new GenusDefinitionMap(genusDefinitions);
-
+		this.genusDefinitionMap = this.get(ControlKey.SP0_DEF, GenusDefinitionMap.class);
 		this.netDecayWasteCoeMap = this.get(ControlKey.VOLUME_NET_DECAY_WASTE, Map.class);
 		this.netDecayCoeMap = this.get(ControlKey.VOLUME_NET_DECAY, MatrixMap2.class);
 		this.wasteModifierMap = this.get(ControlKey.WASTE_MODIFIERS, MatrixMap2.class);
@@ -224,7 +223,7 @@ public class CachingResolvedControlMapImpl implements ResolvedControlMap {
 	}
 
 	@Override
-	public MatrixMap2<String, Region, Coefficients> getComponentSizeLimitCoefficients() {
+	public MatrixMap2<String, Region, ComponentSizeLimits> getComponentSizeLimits() {
 		return componentSizeLimitCoefficients;
 	}
 

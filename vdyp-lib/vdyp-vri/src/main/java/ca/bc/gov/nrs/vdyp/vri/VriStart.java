@@ -587,7 +587,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 			float min = Math.max(7.6f, limits.minQuadMeanDiameterLoreyHeightRatio() * spec.getLoreyHeightByUtilization().getAll());
 			float loreyHeightToUse = Math.max(spec.getLoreyHeightByUtilization().getAll(), 7.0f);
-			float max = Math.min(limits.maxQuadMeanDiameterLoreyHeightRatio(), limits.quadMeanDiameterMaximum() * loreyHeightToUse);
+			float max = Math.min(limits.quadMeanDiameterMaximum(), limits.maxQuadMeanDiameterLoreyHeightRatio() * loreyHeightToUse);
 			max = Math.max(7.75f, max);
 
 			minPerSpecies.put(spec.getGenus(), min);
