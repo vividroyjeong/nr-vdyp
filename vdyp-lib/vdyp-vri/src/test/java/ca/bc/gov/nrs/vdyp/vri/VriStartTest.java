@@ -2370,32 +2370,6 @@ class VriStartTest {
 
 			var veteranLayer = assertHasVeteranLayer(result);
 
-			assertThat(veteranLayer, hasProperty("ageTotal", present(closeTo(200))));
-			assertThat(veteranLayer, hasProperty("breastHeightAge", present(closeTo(190.3f))));
-			assertThat(veteranLayer, hasProperty("yearsToBreastHeight", present(closeTo(9.7f))));
-
-			assertThat(veteranLayer, hasProperty("siteGenus", present(is("H"))));
-
-			assertThat(veteranLayer, hasProperty("height", present(closeTo(34f))));
-			assertThat(veteranLayer, hasProperty("inventoryTypeGroup", present(is(14)))); // ?
-			assertThat(veteranLayer, hasProperty("empiricalRelationshipParameterIndex", notPresent())); // ?
-
-			assertThat(veteranLayer, hasProperty("loreyHeightByUtilization", utilizationHeight(0f, 32.8f)));
-			assertThat(veteranLayer, hasProperty("baseAreaByUtilization", utilizationAllAndBiggest(20f)));
-			assertThat(
-					veteranLayer,
-					hasProperty("quadraticMeanDiameterByUtilization", utilizationAllAndBiggest(45.5006409f))
-			);
-			assertThat(veteranLayer, hasProperty("treesPerHectareByUtilization", utilizationAllAndBiggest(123f)));
-
-			assertThat(
-					veteranLayer,
-					hasProperty(
-							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
-							utilizationAllAndBiggest(167.61972f)
-					)
-			);
-
 			VdypSpecies resultSpecB = TestUtils.assertHasSpecies(veteranLayer, "B", "C", "H");
 
 			assertThat(resultSpecB, hasProperty("loreyHeightByUtilization", utilizationHeight(0f, 34f)));
@@ -2427,6 +2401,32 @@ class VriStartTest {
 					hasProperty(
 							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
 							utilizationAllAndBiggest(36.8912659f)
+					)
+			);
+
+			assertThat(veteranLayer, hasProperty("ageTotal", present(closeTo(200))));
+			assertThat(veteranLayer, hasProperty("breastHeightAge", present(closeTo(190.3f))));
+			assertThat(veteranLayer, hasProperty("yearsToBreastHeight", present(closeTo(9.7f))));
+
+			assertThat(veteranLayer, hasProperty("siteGenus", present(is("H"))));
+
+			assertThat(veteranLayer, hasProperty("height", present(closeTo(34f))));
+			assertThat(veteranLayer, hasProperty("inventoryTypeGroup", present(is(14)))); // ?
+			assertThat(veteranLayer, hasProperty("empiricalRelationshipParameterIndex", notPresent())); // ?
+
+			assertThat(veteranLayer, hasProperty("loreyHeightByUtilization", utilizationHeight(0f, 32.8f)));
+			assertThat(veteranLayer, hasProperty("baseAreaByUtilization", utilizationAllAndBiggest(20f)));
+			assertThat(
+					veteranLayer,
+					hasProperty("quadraticMeanDiameterByUtilization", utilizationAllAndBiggest(45.5006409f))
+			);
+			assertThat(veteranLayer, hasProperty("treesPerHectareByUtilization", utilizationAllAndBiggest(123f)));
+
+			assertThat(
+					veteranLayer,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+							utilizationAllAndBiggest(167.61972f)
 					)
 			);
 

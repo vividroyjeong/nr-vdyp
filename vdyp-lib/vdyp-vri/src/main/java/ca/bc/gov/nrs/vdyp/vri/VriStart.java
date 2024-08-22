@@ -415,8 +415,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 						// YUCV
 						computeUtilizationComponentsVeteran(resultVeteranLayer, bec);
-						
-						
+
 					}
 				} catch (ProcessingException e) {
 					throw new RuntimeProcessingException(e);
@@ -703,12 +702,13 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			float specHeight = spec.getSite().flatMap(VriSite::getHeight).filter(x -> x > 0).orElse(dominantHeight);
 			float specBaseArea = spec.getFractionGenus() * baseArea;
 			float specQuadMeanDiameter = max(
-					estimateVeteranQuadMeanDiameter(spec.getGenus(), bec, specHeight), VETERAN_MIN_HL
+					estimateVeteranQuadMeanDiameter(spec.getGenus(), bec, specHeight), VETERAN_MIN_DQ
 			);
 			float specTreeDensity = BaseAreaTreeDensityDiameter.treesPerHectare(specBaseArea, specQuadMeanDiameter);
 			sBuilder.loreyHeight(specHeight);
 			sBuilder.baseArea(specBaseArea);
 			sBuilder.quadMeanDiameter(specQuadMeanDiameter);
+			sBuilder.treesPerHectare(specTreeDensity);
 		});
 
 		lBuilder.buildChildren();
@@ -754,28 +754,22 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		return inputTreesPerHectare;
 	}
-	
-	static final String MINIMUM_DIAMETER_BASE_MESSAGE = "Quadratic mean diameter {0} cm was lower than {1} cm";
-	static final String MINIMUM_DIAMETER_WARN_MESSAGE = MINIMUM_DIAMETER_BASE_MESSAGE+", raising tree density to {2} trees/ha";
-	static final String MINIMUM_DIAMETER_FAIL_MESSAGE = MINIMUM_DIAMETER_BASE_MESSAGE+".";
 
+	static final String MINIMUM_DIAMETER_BASE_MESSAGE = "Quadratic mean diameter {0} cm was lower than {1} cm";
+	static final String MINIMUM_DIAMETER_WARN_MESSAGE = MINIMUM_DIAMETER_BASE_MESSAGE
+			+ ", raising tree density to {2} trees/ha";
+	static final String MINIMUM_DIAMETER_FAIL_MESSAGE = MINIMUM_DIAMETER_BASE_MESSAGE + ".";
 
 	private Float enforceMinimumDiameter(Float baseArea, Float treesPerHectare) throws StandProcessingException {
 		final float quadMeanDiameter = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea, treesPerHectare);
 		if (quadMeanDiameter < VETERAN_MIN_DQ) {
 			if (this.getId() == VdypApplicationIdentifier.VRI_START && this.getDebugMode(1) == 2) {
 				throw new StandProcessingException(
-						MessageFormat.format(
-								MINIMUM_DIAMETER_FAIL_MESSAGE,
-								quadMeanDiameter, VETERAN_MIN_DQ
-						)
+						MessageFormat.format(MINIMUM_DIAMETER_FAIL_MESSAGE, quadMeanDiameter, VETERAN_MIN_DQ)
 				);
 			}
 			treesPerHectare = BaseAreaTreeDensityDiameter.treesPerHectare(baseArea, VETERAN_MIN_DQ);
-			log.atWarn()
-					.setMessage(
-							MINIMUM_DIAMETER_WARN_MESSAGE
-					).addArgument(treesPerHectare);
+			log.atWarn().setMessage(MINIMUM_DIAMETER_WARN_MESSAGE).addArgument(treesPerHectare);
 		}
 		return treesPerHectare;
 	}
