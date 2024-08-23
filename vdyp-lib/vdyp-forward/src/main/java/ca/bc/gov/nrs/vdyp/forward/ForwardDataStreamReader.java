@@ -15,9 +15,12 @@ import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.UtilizationOperations;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.forward.controlmap.ForwardResolvedControlMap;
+import ca.bc.gov.nrs.vdyp.forward.controlmap.ForwardResolvedControlMapImpl;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
+import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
@@ -31,33 +34,54 @@ public class ForwardDataStreamReader {
 
 	private static final Logger logger = LoggerFactory.getLogger(ForwardDataStreamReader.class);
 
+	private final ForwardResolvedControlMap resolvedControlMap;
+	
 	private final StreamingParser<VdypPolygon> polygonStream;
 	private final StreamingParser<Collection<VdypSpecies>> layerSpeciesStream;
 	private final StreamingParser<Collection<VdypUtilization>> speciesUtilizationStream;
 	Optional<StreamingParser<PolygonIdentifier>> polygonDescriptionStream;
 
 	@SuppressWarnings("unchecked")
-	public ForwardDataStreamReader(Map<String, Object> controlMap) throws IOException {
-
-		var polygonStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_POLY.name());
-		polygonStream = ((StreamingParserFactory<VdypPolygon>) polygonStreamFactory).get();
-
-		var layerSpeciesStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SPECIES.name());
-		layerSpeciesStream = ((StreamingParserFactory<Collection<VdypSpecies>>) layerSpeciesStreamFactory).get();
-
-		var speciesUtilizationStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name());
-		speciesUtilizationStream = ((StreamingParserFactory<Collection<VdypUtilization>>) speciesUtilizationStreamFactory)
-				.get();
+	public ForwardDataStreamReader(ForwardResolvedControlMap resolvedControlMap) throws ProcessingException {
 		
-		polygonDescriptionStream = Optional.empty();
-		if (controlMap.containsKey(ControlKey.FORWARD_INPUT_GROWTO.name())) {
-			var polygonDescriptionStreamFactory = Utils.<StreamingParserFactory<PolygonIdentifier>>
-					expectParsedControl(controlMap, ControlKey.FORWARD_INPUT_GROWTO, StreamingParserFactory.class);
+		try {
+			this.resolvedControlMap = resolvedControlMap;
+			Map<String, Object> controlMap = resolvedControlMap.getControlMap();
 			
-			polygonDescriptionStream = Optional.of(polygonDescriptionStreamFactory.get());
-		} else {
+			var polygonStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_POLY.name());
+			polygonStream = ((StreamingParserFactory<VdypPolygon>) polygonStreamFactory).get();
+	
+			var layerSpeciesStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SPECIES.name());
+			layerSpeciesStream = ((StreamingParserFactory<Collection<VdypSpecies>>) layerSpeciesStreamFactory).get();
+	
+			var speciesUtilizationStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name());
+			speciesUtilizationStream = ((StreamingParserFactory<Collection<VdypUtilization>>) speciesUtilizationStreamFactory)
+					.get();
+			
 			polygonDescriptionStream = Optional.empty();
+			if (controlMap.containsKey(ControlKey.FORWARD_INPUT_GROWTO.name())) {
+				var polygonDescriptionStreamFactory = Utils.<StreamingParserFactory<PolygonIdentifier>>
+						expectParsedControl(controlMap, ControlKey.FORWARD_INPUT_GROWTO, StreamingParserFactory.class);
+				
+				polygonDescriptionStream = Optional.of(polygonDescriptionStreamFactory.get());
+			} else {
+				polygonDescriptionStream = Optional.empty();
+			}
+		} catch (IOException e) {
+			throw new ProcessingException(e);
 		}
+	}
+
+	/** 
+	 * Constructor that takes a raw control map. This should only be used from unit tests. 
+	 * 
+	 * @param controlMap
+	 * @throws IOException in the event of an error
+	 * @throws ProcessingException 
+	 */
+	ForwardDataStreamReader(Map<String, Object> controlMap) throws ProcessingException {
+
+		this(new ForwardResolvedControlMapImpl(controlMap));
 	}
 
 	public Optional<VdypPolygon> readNextPolygon() throws ProcessingException {
@@ -106,11 +130,19 @@ public class ForwardDataStreamReader {
 				for (var s : layerSpeciesSet) {
 					logger.trace("Saw species {}", s);
 
-					var key = new UtilizationBySpeciesKey(s.getLayerType(), s.getGenusIndex());
-					var speciesUtilizations = utilizationsBySpeciesMap.get(key);
+					applyGroups(polygon.getBiogeoclimaticZone(), s.getGenus(), s);
+					
+					var perSpeciesKey = new UtilizationBySpeciesKey(s.getLayerType(), s.getGenusIndex());
+					var speciesUtilizations = utilizationsBySpeciesMap.get(perSpeciesKey);
 
 					if (speciesUtilizations != null) {						
 						setUtilizations(s, speciesUtilizations);
+						
+						var defaultKey = new UtilizationBySpeciesKey(LayerType.PRIMARY, 0);
+						Map<UtilizationClass, VdypUtilization> defaultUtilization = utilizationsBySpeciesMap
+								.get(defaultKey);
+
+						calculateSpeciesCoverage(s, defaultUtilization);
 					}
 					
 					if (LayerType.PRIMARY.equals(s.getLayerType())) {
@@ -152,7 +184,7 @@ public class ForwardDataStreamReader {
 				if (veteranSpecies.size() > 0) {
 
 					var key = new UtilizationBySpeciesKey(LayerType.VETERAN, 0);
-					Map<UtilizationClass, VdypUtilization> defaultSpeciesUtilization = utilizationsBySpeciesMap
+					Map<UtilizationClass, VdypUtilization> defaultUtilization = utilizationsBySpeciesMap
 							.get(key);
 
 					veteranLayer = VdypLayer.build(builder -> {
@@ -162,7 +194,7 @@ public class ForwardDataStreamReader {
 						builder.addSpecies(layerSpeciesSet);
 					});
 					
-					setUtilizations(veteranLayer, defaultSpeciesUtilization);
+					setUtilizations(veteranLayer, defaultUtilization);
 					
 					layerMap.put(LayerType.VETERAN, veteranLayer);
 				}
@@ -177,6 +209,33 @@ public class ForwardDataStreamReader {
 		}
 
 		return thePolygon;
+	}
+
+	private void calculateSpeciesCoverage(VdypSpecies s, Map<UtilizationClass, VdypUtilization> defaultUtilization) {
+		
+		float speciesCoverage = s.getBaseAreaByUtilization().get(UtilizationClass.ALL)
+				/ defaultUtilization.get(UtilizationClass.ALL).getBasalArea();
+
+		s.setPercentGenus(speciesCoverage);
+	}
+
+	protected void applyGroups(BecDefinition bec, String genus, VdypSpecies species) {
+		// Look up Volume group, Decay Group, and Breakage group for each species.
+
+		var volumeGroupMap = resolvedControlMap.getVolumeEquationGroups();
+		var decayGroupMap = resolvedControlMap.getDecayEquationGroups();
+		var breakageGroupMap = resolvedControlMap.getBreakageEquationGroups();
+
+		// VGRPFIND
+		var volumeGroup = volumeGroupMap.get(genus, bec.getVolumeBec().getAlias());
+		// DGRPFIND
+		var decayGroup = decayGroupMap.get(genus, bec.getDecayBec().getAlias());
+		// BGRPFIND (Breakage uses decay BEC)
+		var breakageGroup = breakageGroupMap.get(genus, bec.getDecayBec().getAlias());
+
+		species.setVolumeGroup(volumeGroup);
+		species.setDecayGroup(decayGroup);
+		species.setBreakageGroup(breakageGroup);
 	}
 
 	private void setUtilizations(VdypUtilizationHolder u, Map<UtilizationClass, VdypUtilization> speciesUtilizations) {

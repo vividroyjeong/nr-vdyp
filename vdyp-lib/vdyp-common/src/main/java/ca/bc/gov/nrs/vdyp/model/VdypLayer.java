@@ -28,14 +28,14 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 	private UtilizationVector closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOL_DWB species 0
 
-	private Optional<Integer> empericalRelationshipParameterIndex = Optional.empty(); // INXL1/GRPBA1
+	private Optional<Integer> empiricalRelationshipParameterIndex = Optional.empty(); // INXL1/GRPBA1
 
 	public VdypLayer(
 			PolygonIdentifier polygonIdentifier, LayerType layer, Optional<Integer> inventoryTypeGroup,
-			Optional<Integer> empericalRelationshipParameterIndex
+			Optional<Integer> empiricalRelationshipParameterIndex
 	) {
 		super(polygonIdentifier, layer, inventoryTypeGroup);
-		this.empericalRelationshipParameterIndex = empericalRelationshipParameterIndex;
+		this.empiricalRelationshipParameterIndex = empiricalRelationshipParameterIndex;
 	}
 
 	@Computed
@@ -140,11 +140,11 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 	}
 
 	public Optional<Integer> getEmpiricalRelationshipParameterIndex() {
-		return empericalRelationshipParameterIndex;
+		return empiricalRelationshipParameterIndex;
 	}
 
 	public void setEmpericalRelationshipParameterIndex(Optional<Integer> empericalRelationshipParameterIndex) {
-		this.empericalRelationshipParameterIndex = empericalRelationshipParameterIndex;
+		this.empiricalRelationshipParameterIndex = empericalRelationshipParameterIndex;
 	}
 
 	/**

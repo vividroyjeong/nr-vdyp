@@ -117,45 +117,30 @@ class RootFinderTest {
 		var spec3 = VdypSpecies.build(layer, builder -> {
 			builder.genus(GenusDefinitionParser.getSpeciesByIndex(3, control).getAlias(), control); // B
 			builder.percentGenus(20f);
-			builder.volumeGroup(-1);
-			builder.decayGroup(-1);
-			builder.breakageGroup(-1);
 		});
 		spec3.getLoreyHeightByUtilization().setAll(38.7456512f);
 
 		var spec4 = VdypSpecies.build(layer, builder -> {
 			builder.genus(GenusDefinitionParser.getSpeciesByIndex(4, control).getAlias(), control); // C
 			builder.percentGenus(20f);
-			builder.volumeGroup(-1);
-			builder.decayGroup(-1);
-			builder.breakageGroup(-1);
 		});
 		spec4.getLoreyHeightByUtilization().setAll(22.8001652f);
 
 		var spec5 = VdypSpecies.build(layer, builder -> {
 			builder.genus(GenusDefinitionParser.getSpeciesByIndex(5, control).getAlias(), control); // D
 			builder.percentGenus(20f);
-			builder.volumeGroup(-1);
-			builder.decayGroup(-1);
-			builder.breakageGroup(-1);
 		});
 		spec5.getLoreyHeightByUtilization().setAll(33.6889763f);
 
 		var spec8 = VdypSpecies.build(layer, builder -> {
 			builder.genus(GenusDefinitionParser.getSpeciesByIndex(8, control).getAlias(), control); // 8
 			builder.percentGenus(20f);
-			builder.volumeGroup(-1);
-			builder.decayGroup(-1);
-			builder.breakageGroup(-1);
 		});
 		spec8.getLoreyHeightByUtilization().setAll(24.3451157f);
 
 		var spec15 = VdypSpecies.build(layer, builder -> {
 			builder.genus(GenusDefinitionParser.getSpeciesByIndex(15, control).getAlias(), control); // S
 			builder.percentGenus(20f);
-			builder.volumeGroup(-1);
-			builder.decayGroup(-1);
-			builder.breakageGroup(-1);
 		});
 		spec15.getLoreyHeightByUtilization().setAll(34.6888771f);
 

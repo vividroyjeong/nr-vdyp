@@ -1,6 +1,8 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 
@@ -21,10 +23,12 @@ import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
-import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
+import ca.bc.gov.nrs.vdyp.model.VdypSite;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 @SuppressWarnings({ "unchecked" })
@@ -62,46 +66,26 @@ class VdypForwardReadPolygonTest {
 
 			assertThat(polygon.getPolygonIdentifier().toStringCompact(), is("01002 S000001 00(1970)"));
 
-			var primaryLayer = polygon.getLayers().get(LayerType.PRIMARY);
+			for (VdypLayer layer: polygon.getLayers().values())
 			{
-				assertThat(primaryLayer, hasProperty("layerType", is(LayerType.PRIMARY)));
-				assertThat(primaryLayer, hasProperty("defaultUtilizationMap"));
-				assertThat(primaryLayer.getPolygonIdentifier().getName(), is(polygon.getPolygonIdentifier().getName()));
-				assertThat(primaryLayer.getPolygonIdentifier().getYear(), is(polygon.getPolygonIdentifier().getYear()));
+				assertThat(layer.getPolygonIdentifier().getName(), is(polygon.getPolygonIdentifier().getName()));
+				assertThat(layer.getPolygonIdentifier().getYear(), is(polygon.getPolygonIdentifier().getYear()));
 
-				assertThat(UtilizationClass.values().length, is(primaryLayer.getBaseAreaByUtilization().size()));
+				assertThat(UtilizationClass.values().length, is(layer.getBaseAreaByUtilization().size()));
 
-				var speciesMap = primaryLayer.getSpecies();
-				assertThat(speciesMap.size(), is(5));
-
-				var species = speciesMap.values().iterator().next();
-
-				assertThat(species, hasProperty("layerType", is(primaryLayer.getLayerType())));
-				assertThat(species, hasProperty("polygonIdentifier", is(polygon.getPolygonIdentifier())));
-				assertThat(species, hasProperty("utilizations"));
-
-				for (var u : UtilizationClass.values()) {
-					assertThat(u, hasProperty("genusIndex", is(species.getGenusIndex())));
-					assertThat(u, hasProperty("polygonIdentifier", is("01002 S000001 00   (1970)")));
+				var speciesMap = layer.getSpecies();
+				for (VdypSpecies species: speciesMap.values()) {
+					assertThat(species, hasProperty("layerType", is(layer.getLayerType())));
+					assertThat(species, hasProperty("polygonIdentifier", is(polygon.getPolygonIdentifier())));
+					
+					assertThat(species.getSite(), present(Matchers.anything()));
+					
+					VdypSite site = species.getSite().get();
+					assertThat(site, allOf(
+							hasProperty("polygonIdentifier", is(polygon.getPolygonIdentifier())),
+							hasProperty("layerType", is(layer.getLayerType()))
+					));
 				}
-			}
-
-			var veteranLayer = polygon.getLayers().get(LayerType.VETERAN);
-			if (veteranLayer != null) {
-
-				assertThat(primaryLayer.getBaseAreaByUtilization().size(), is(UtilizationClass.values().length));
-				assertThat(primaryLayer.getLoreyHeightByUtilization().size(), is(2));
-				for (UtilizationClass uc : UtilizationClass.values()) {
-					assertThat(primaryLayer.getBaseAreaByUtilization(), hasProperty("genusIndex", is(0)));
-				}
-
-				var speciesMap = veteranLayer.getSpecies();
-				assertThat(speciesMap.size(), is(5));
-
-				var genus = speciesMap.values().iterator().next();
-
-				assertThat(genus, hasProperty("parent", is(veteranLayer)));
-				assertThat(genus, hasProperty("utilizations"));
 			}
 		} catch (ResourceParseException | IOException e) {
 			throw new ProcessingException(e);

@@ -1369,10 +1369,6 @@ class VdypStartApplicationTest {
 						lb.addSpecies(sb -> {
 							sb.genus("B", controlMap);
 							sb.percentGenus(100);
-
-							sb.volumeGroup(0);
-							sb.decayGroup(0);
-							sb.breakageGroup(0);
 						});
 					});
 				});

@@ -15,6 +15,8 @@ import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
 
 public interface ResolvedControlMap {
 
+	Map<String, Object> getControlMap();
+	
 	/** 9 - BEC_DEF */
 	BecLookup getBecLookup();
 

@@ -19,11 +19,11 @@ class ForwardProcessingState {
 	/** The estimators instance used by this engine */
 	final EstimationMethods estimators;
 
-	/** The compuation instance used by this engine */
+	/** The computation instance used by this engine */
 	final ComputationMethods computers;
 
 	/** The active state */
-	private LayerProcessingState pps;
+	private LayerProcessingState lps;
 
 	public ForwardProcessingState(Map<String, Object> controlMap) {
 		this.fcm = new ForwardResolvedControlMapImpl(controlMap);
@@ -33,10 +33,10 @@ class ForwardProcessingState {
 
 	public void setPolygonLayer(VdypPolygon polygon, LayerType subjectLayer) throws ProcessingException {
 		
-		pps = new LayerProcessingState(this, polygon, subjectLayer);
+		lps = new LayerProcessingState(this, polygon, subjectLayer);
 	}
 
 	public LayerProcessingState getLayerProcessingState() {
-		return pps;
+		return lps;
 	}
 }

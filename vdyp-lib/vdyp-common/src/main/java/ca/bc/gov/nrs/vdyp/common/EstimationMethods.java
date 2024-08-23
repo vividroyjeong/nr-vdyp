@@ -813,17 +813,16 @@ public class EstimationMethods {
 	 * @param breastHeightAge breast height age (years)
 	 * @param veteranBaseArea basal area of overstory (>= 0)
 	 * @param fullOccupancy if true, the empirically fitted curve is increased to become 
-	 *                      a full occupancy curve. If false, BAP is for mean conditions.
-	 * @param basalAreaGroup index of the basal area group
+	 *                      a full occupancy curve. If false, BAP is for mean conditions
+	 * @param upperBoundBasalArea limit on the resulting basal area
 	 * @return as described
 	 * @throws StandProcessingException
 	 */
 	public float estimateBaseAreaYield(
 			Coefficients estimateBasalAreaYieldCoefficients, int controlVariable2Setting, float dominantHeight, 
-			float breastHeightAge, Optional<Float> veteranBasalArea, boolean fullOccupancy, int baseAreaGroup
+			float breastHeightAge, Optional<Float> veteranBasalArea, boolean fullOccupancy, float upperBoundBasalArea
 	) throws StandProcessingException {
-		float upperBoundBaseArea = upperBoundsBaseArea(baseAreaGroup);
-
+		
 		// The original Fortran had the following comment and a commented out modification to upperBoundsBaseArea
 		// (BATOP98):
 
@@ -853,12 +852,12 @@ public class EstimationMethods {
 		float trAge = FloatMath.log(ageToUse);
 
 		float a0 = estimateBasalAreaYieldCoefficients.getCoe(0);
-		float a1 = estimateBasalAreaYieldCoefficients.getCoe(0);
-		float a2 = estimateBasalAreaYieldCoefficients.getCoe(0);
-		float a3 = estimateBasalAreaYieldCoefficients.getCoe(0);
-		float a4 = estimateBasalAreaYieldCoefficients.getCoe(0);
-		float a5 = estimateBasalAreaYieldCoefficients.getCoe(0);
-		float a6 = estimateBasalAreaYieldCoefficients.getCoe(0);
+		float a1 = estimateBasalAreaYieldCoefficients.getCoe(1);
+		float a2 = estimateBasalAreaYieldCoefficients.getCoe(2);
+		float a3 = estimateBasalAreaYieldCoefficients.getCoe(3);
+		float a4 = estimateBasalAreaYieldCoefficients.getCoe(4);
+		float a5 = estimateBasalAreaYieldCoefficients.getCoe(5);
+		float a6 = estimateBasalAreaYieldCoefficients.getCoe(6);
 		
 		float a00 = Math.max(a0 + a1 * trAge, 0);
 		float ap = Math.max(a3 + a4 * trAge, 0);
@@ -869,7 +868,7 @@ public class EstimationMethods {
 		} else {
 			bap = a00 * FloatMath.pow(dominantHeight - a2, ap)
 					* FloatMath.exp(a5 * dominantHeight + a6 * veteranBasalArea.orElse(0f));
-			bap = Math.min(bap, upperBoundBaseArea);
+			bap = Math.min(bap, upperBoundBasalArea);
 		}
 
 		if (fullOccupancy) {
@@ -887,21 +886,19 @@ public class EstimationMethods {
 	 * @param dominantHeight dominant height (m)
 	 * @param breastHeightAge breast height age (years)
 	 * @param veteranBaseArea basal area of overstory (>= 0)
-	 * @param basalAreaGroup index of the basal area group
+	 * @param upperBoundQuadMeanDiameter upper bound on the result of this call
 	 * @return quad-mean-diameter of primary layer (with DBH >= 7.5)
 	 * @throws StandProcessingException in the event of a processing error
 	 */
 	public float estimateQuadMeanDiameterYield(
 			Coefficients coefficients, int controlVariable2Setting, float dominantHeight, 
-			float breastHeightAge, Optional<Float> veteranBaseArea, int basalAreaGroup
+			float breastHeightAge, Optional<Float> veteranBaseArea, float upperBoundQuadMeanDiameter
 	) throws StandProcessingException {
 
 		if (dominantHeight <= 5) {
 			return 7.6f;
 		}
 		
-		final float upperBoundsQuadMeanDiameter = upperBoundsQuadMeanDiameter(basalAreaGroup);
-
 		final float ageUse = breastHeightAge;
 
 		if (ageUse <= 0f) {
@@ -916,37 +913,7 @@ public class EstimationMethods {
 
 		float dq = c0 + c1 * FloatMath.pow(dominantHeight - 5f, c2);
 		
-		return FloatMath.clamp(dq, 7.6f, upperBoundsQuadMeanDiameter);
-	}
-
-	/**
-	 * @param basalAreaGroup the basal area group in question
-	 * @return the quad-mean-diameter upper bound for the given basal area group 
-	 */
-	float upperBoundsQuadMeanDiameter(int basalAreaGroup) {
-		return upperBounds(basalAreaGroup).getCoe(2);
-	}
-
-	/**
-	 * @param basalAreaGroup the basal area group in question
-	 * @return the basal area upper bound for the given basal area group 
-	 */
-	float upperBoundsBaseArea(int basalAreaGroup) {
-		return upperBounds(basalAreaGroup).getCoe(1);
-	}
-
-	/**
-	 * UPPERGEN Method 1 - return the upper bounds of basal area and quad-mean-diameter for a given 
-	 * basal area group as a list of (two) floats.
-	 * 
-	 * @param basalAreaGroup the basal area group in question
-	 * @return as described
-	 */
-	Coefficients upperBounds(int basalAreaGroup) {
-		var upperBoundsMap = controlMap.getUpperBounds();
-		return Utils.<Coefficients>optSafe(upperBoundsMap.get(basalAreaGroup)).orElseThrow(
-				() -> new IllegalStateException("Could not find limits for basal area group " + basalAreaGroup)
-		);
+		return FloatMath.clamp(dq, 7.6f, upperBoundQuadMeanDiameter);
 	}
 
 	@FunctionalInterface

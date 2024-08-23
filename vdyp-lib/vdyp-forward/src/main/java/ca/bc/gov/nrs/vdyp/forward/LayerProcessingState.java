@@ -16,7 +16,9 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClassVariable;
 import ca.bc.gov.nrs.vdyp.model.VdypEntity;
+import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.VolumeVariable;
 
 class LayerProcessingState {
@@ -279,6 +281,7 @@ class LayerProcessingState {
 	public int[] getSiteCurveNumbers() {
 		return siteCurveNumbers;
 	}
+	
 	public MatrixMap3<UtilizationClass, VolumeVariable, LayerType, Float>[] getCvVolume() {
 		return cvVolume;
 	}
@@ -490,5 +493,18 @@ class LayerProcessingState {
 		}
 
 		return cvPrimaryLayerSmall[speciesIndex].get(variable);
+	}
+
+	public VdypLayer getLayerFromBank(Bank bank) {
+		
+		VdypLayer updatedLayer = bank.getUpdatedLayer();
+		
+		for (int i = 1; i < getNSpecies() + 1; i++) {
+			VdypSpecies species = updatedLayer.getSpeciesBySp0(bank.speciesNames[i]);
+			species.setCompatibilityVariables(
+					cvVolume[i], cvBasalArea[i], cvQuadraticMeanDiameter[i], cvPrimaryLayerSmall[i]);
+		}
+		
+		return updatedLayer;
 	}
 }

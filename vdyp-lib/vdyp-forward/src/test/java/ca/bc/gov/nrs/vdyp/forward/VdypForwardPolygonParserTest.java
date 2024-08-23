@@ -78,13 +78,12 @@ class VdypForwardPolygonParserTest {
 		var poly = assertNext(stream);
 
 		assertThat(poly.toString(), is("01002 S000001 00     1970"));
-		assertThat(poly, hasProperty("year", is(1970)));
+		assertThat(poly, hasProperty("polygonIdentifier", hasProperty("year", is(1970))));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
-		assertThat(poly, hasProperty("forestInventoryZone", is('A')));
-		assertThat(poly, hasProperty("percentForestLand", is(99.0f)));
+		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
+		assertThat(poly, hasProperty("percentAvailable", is(99.0f)));
 		assertThat(poly, hasProperty("inventoryTypeGroup", present(is(37))));
-		assertThat(poly, hasProperty("basalAreaGroup", present(is(1))));
-		assertThat(poly, hasProperty("polygonMode", present(is(PolygonMode.START))));
+		assertThat(poly, hasProperty("mode", present(is(PolygonMode.START))));
 
 		VdypMatchers.assertEmpty(stream);
 	}
@@ -116,13 +115,12 @@ class VdypForwardPolygonParserTest {
 		var poly = assertNext(stream);
 
 		assertThat(poly.toString(), is("01002 S000001 00     1970"));
-		assertThat(poly, hasProperty("year", is(1970)));
+		assertThat(poly, hasProperty("polygonIdentifier", hasProperty("year", is(1970))));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
-		assertThat(poly, hasProperty("forestInventoryZone", is('A')));
-		assertThat(poly, hasProperty("percentForestLand", is(99.0f)));
+		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
+		assertThat(poly, hasProperty("percentAvailable", is(99.0f)));
 		assertThat(poly, hasProperty("inventoryTypeGroup", notPresent()));
-		assertThat(poly, hasProperty("basalAreaGroup", notPresent()));
-		assertThat(poly, hasProperty("polygonMode", notPresent()));
+		assertThat(poly, hasProperty("mode", notPresent()));
 
 		VdypMatchers.assertEmpty(stream);
 	}
@@ -167,115 +165,102 @@ class VdypForwardPolygonParserTest {
 		var poly = assertNext(stream); // 1
 
 		assertThat(poly.toString(), is("01002 S000001 00     1970"));
-		assertThat(poly, hasProperty("year", is(1970)));
+		assertThat(poly, hasProperty("polygonIdentifier", hasProperty("year", is(1970))));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
-		assertThat(poly, hasProperty("forestInventoryZone", is('A')));
-		assertThat(poly, hasProperty("percentForestLand", is(99.0f)));
+		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
+		assertThat(poly, hasProperty("percentAvailable", is(99.0f)));
 		assertThat(poly, hasProperty("inventoryTypeGroup", present(is(37))));
-		assertThat(poly, hasProperty("basalAreaGroup", present(is(1))));
-		assertThat(poly, hasProperty("polygonMode", present(is(PolygonMode.START))));
+		assertThat(poly, hasProperty("mode", present(is(PolygonMode.START))));
 
 		poly = assertNext(stream); // 2
 
 		assertThat(poly.toString(), is("01002 S000002 00     1970"));
-		assertThat(poly, hasProperty("year", is(1970)));
+		assertThat(poly, hasProperty("polygonIdentifier", hasProperty("year", is(1970))));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
-		assertThat(poly, hasProperty("forestInventoryZone", is('A')));
-		assertThat(poly, hasProperty("percentForestLand", is(98.0f)));
+		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
+		assertThat(poly, hasProperty("percentAvailable", is(98.0f)));
 		assertThat(poly, hasProperty("inventoryTypeGroup", present(is(15))));
-		assertThat(poly, hasProperty("basalAreaGroup", present(is(75))));
-		assertThat(poly, hasProperty("polygonMode", present(is(PolygonMode.START))));
+		assertThat(poly, hasProperty("mode", present(is(PolygonMode.START))));
 
 		poly = assertNext(stream); // 3
 
 		assertThat(poly.toString(), is("01002 S000003 00     1970"));
-		assertThat(poly, hasProperty("year", is(1970)));
+		assertThat(poly, hasProperty("polygonIdentifier", hasProperty("year", is(1970))));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
-		assertThat(poly, hasProperty("forestInventoryZone", is('A')));
-		assertThat(poly, hasProperty("percentForestLand", is(99.0f)));
+		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
+		assertThat(poly, hasProperty("percentAvailable", is(99.0f)));
 		assertThat(poly, hasProperty("inventoryTypeGroup", present(is(15))));
-		assertThat(poly, hasProperty("basalAreaGroup", present(is(75))));
-		assertThat(poly, hasProperty("polygonMode", present(is(PolygonMode.START))));
+		assertThat(poly, hasProperty("mode", present(is(PolygonMode.START))));
 
 		poly = assertNext(stream); // 4
 
 		assertThat(poly.toString(), is("01002 S000004 00     1970"));
-		assertThat(poly, hasProperty("year", is(1970)));
+		assertThat(poly, hasProperty("polygonIdentifier", hasProperty("year", is(1970))));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("MH"))));
-		assertThat(poly, hasProperty("forestInventoryZone", is('A')));
-		assertThat(poly, hasProperty("percentForestLand", is(99.0f)));
+		assertThat(poly, hasProperty("forestInventoryZone", is("A")));
+		assertThat(poly, hasProperty("percentAvailable", is(99.0f)));
 		assertThat(poly, hasProperty("inventoryTypeGroup", present(is(15))));
-		assertThat(poly, hasProperty("basalAreaGroup", present(is(75))));
-		assertThat(poly, hasProperty("polygonMode", present(is(PolygonMode.START))));
+		assertThat(poly, hasProperty("mode", present(is(PolygonMode.START))));
 
 		poly = assertNext(stream); // 5
 
 		assertThat(poly.toString(), is("01003AS000001 00     1953"));
-		assertThat(poly, hasProperty("year", is(1953)));
+		assertThat(poly, hasProperty("polygonIdentifier", hasProperty("year", is(1953))));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
-		assertThat(poly, hasProperty("forestInventoryZone", is('B')));
-		assertThat(poly, hasProperty("percentForestLand", is(91.0f)));
+		assertThat(poly, hasProperty("forestInventoryZone", is("B")));
+		assertThat(poly, hasProperty("percentAvailable", is(91.0f)));
 		assertThat(poly, hasProperty("inventoryTypeGroup", present(is(11))));
-		assertThat(poly, hasProperty("basalAreaGroup", present(is(31))));
-		assertThat(poly, hasProperty("polygonMode", present(is(PolygonMode.YOUNG))));
+		assertThat(poly, hasProperty("mode", present(is(PolygonMode.YOUNG))));
 
 		poly = assertNext(stream); // 6
 
 		assertThat(poly.toString(), is("01003AS000003 00     1953"));
-		assertThat(poly, hasProperty("year", is(1953)));
+		assertThat(poly, hasProperty("polygonIdentifier", hasProperty("year", is(1953))));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("SBS"))));
-		assertThat(poly, hasProperty("forestInventoryZone", is('B')));
-		assertThat(poly, hasProperty("percentForestLand", is(92.0f)));
+		assertThat(poly, hasProperty("forestInventoryZone", is("B")));
+		assertThat(poly, hasProperty("percentAvailable", is(92.0f)));
 		assertThat(poly, hasProperty("inventoryTypeGroup", present(is(11))));
-		assertThat(poly, hasProperty("basalAreaGroup", present(is(31))));
-		assertThat(poly, hasProperty("polygonMode", present(is(PolygonMode.START))));
+		assertThat(poly, hasProperty("mode", present(is(PolygonMode.START))));
 
 		poly = assertNext(stream); // 7
 
-		assertThat(poly, hasProperty("description", hasProperty("name", is("01004 S000002 00"))));
-		assertThat(poly, hasProperty("year", is(1953)));
+		assertThat(poly, hasProperty("polygonIdentifier", hasProperty("name", is("01004 S000002 00"))));
+		assertThat(poly, hasProperty("polygonIdentifier", hasProperty("year", is(1953))));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
-		assertThat(poly, hasProperty("forestInventoryZone", is('B')));
-		assertThat(poly, hasProperty("percentForestLand", is(96.0f)));
+		assertThat(poly, hasProperty("forestInventoryZone", is("B")));
+		assertThat(poly, hasProperty("percentAvailable", is(96.0f)));
 		assertThat(poly, hasProperty("inventoryTypeGroup", present(is(11))));
-		assertThat(poly, hasProperty("basalAreaGroup", present(is(31))));
-		assertThat(poly, hasProperty("polygonMode", present(is(PolygonMode.START))));
+		assertThat(poly, hasProperty("mode", present(is(PolygonMode.START))));
 
 		poly = assertNext(stream); // 8
 
-		assertThat(poly, hasProperty("description", hasProperty("name", is("01004 S000036 00"))));
-		assertThat(poly, hasProperty("description", hasProperty("year", is(1957))));
-		assertThat(poly, hasProperty("year", is(1957)));
+		assertThat(poly, hasProperty("polygonIdentifier", hasProperty("name", is("01004 S000036 00"))));
+		assertThat(poly, hasProperty("polygonIdentifier", hasProperty("year", is(1957))));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("MH"))));
-		assertThat(poly, hasProperty("forestInventoryZone", is('B')));
-		assertThat(poly, hasProperty("percentForestLand", is(97.0f)));
+		assertThat(poly, hasProperty("forestInventoryZone", is("B")));
+		assertThat(poly, hasProperty("percentAvailable", is(97.0f)));
 		assertThat(poly, hasProperty("inventoryTypeGroup", present(is(11))));
-		assertThat(poly, hasProperty("basalAreaGroup", present(is(31))));
-		assertThat(poly, hasProperty("polygonMode", notPresent()));
+		assertThat(poly, hasProperty("mode", notPresent()));
 
 		poly = assertNext(stream); // 9
 
-		assertThat(poly, hasProperty("description", hasProperty("name", is("01004 S000037 00"))));
-		assertThat(poly, hasProperty("description", hasProperty("year", is(1957))));
-		assertThat(poly, hasProperty("year", is(1957)));
+		assertThat(poly, hasProperty("polygonIdentifier", hasProperty("name", is("01004 S000037 00"))));
+		assertThat(poly, hasProperty("polygonIdentifier", hasProperty("year", is(1957))));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("SBS"))));
-		assertThat(poly, hasProperty("forestInventoryZone", is('B')));
-		assertThat(poly, hasProperty("percentForestLand", is(94.0f)));
+		assertThat(poly, hasProperty("forestInventoryZone", is("B")));
+		assertThat(poly, hasProperty("percentAvailable", is(94.0f)));
 		assertThat(poly, hasProperty("inventoryTypeGroup", present(is(11))));
-		assertThat(poly, hasProperty("basalAreaGroup", notPresent()));
-		assertThat(poly, hasProperty("polygonMode", notPresent()));
+		assertThat(poly, hasProperty("mode", notPresent()));
 
 		poly = assertNext(stream); // 10
 
-		assertThat(poly, hasProperty("description", hasProperty("name", is("01004 S000038 00"))));
-		assertThat(poly, hasProperty("description", hasProperty("year", is(1957))));
-		assertThat(poly, hasProperty("year", is(1957)));
+		assertThat(poly, hasProperty("polygonIdentifier", hasProperty("name", is("01004 S000038 00"))));
+		assertThat(poly, hasProperty("polygonIdentifier", hasProperty("year", is(1957))));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
-		assertThat(poly, hasProperty("forestInventoryZone", is('B')));
-		assertThat(poly, hasProperty("percentForestLand", is(90.0f)));
+		assertThat(poly, hasProperty("forestInventoryZone", is("B")));
+		assertThat(poly, hasProperty("percentAvailable", is(90.0f)));
 		assertThat(poly, hasProperty("inventoryTypeGroup", notPresent()));
-		assertThat(poly, hasProperty("basalAreaGroup", notPresent()));
-		assertThat(poly, hasProperty("polygonMode", notPresent()));
+		assertThat(poly, hasProperty("mode", notPresent()));
 
 		VdypMatchers.assertEmpty(stream);
 	}
@@ -310,11 +295,11 @@ class VdypForwardPolygonParserTest {
 
 		var poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("percentForestLand", is(90.0f)));
+		assertThat(poly, hasProperty("percentAvailable", is(90.0f)));
 
 		poly = assertNext(stream);
 
-		assertThat(poly, hasProperty("percentForestLand", is(90.0f)));
+		assertThat(poly, hasProperty("percentAvailable", is(90.0f)));
 
 		VdypMatchers.assertEmpty(stream);
 	}

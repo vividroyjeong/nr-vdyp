@@ -1,6 +1,6 @@
 package ca.bc.gov.nrs.vdyp.controlmap;
 
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -10,7 +10,6 @@ import ca.bc.gov.nrs.vdyp.io.parse.coe.ModifierParser;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.ComponentSizeLimits;
-import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
@@ -88,6 +87,14 @@ public class CachingResolvedControlMapImpl implements ResolvedControlMap {
 		this.decayEquationGroups = this.get(ControlKey.DECAY_GROUPS, MatrixMap2.class);
 		this.breakageEquationGroups = this.get(ControlKey.BREAKAGE_GROUPS, MatrixMap2.class);
 		this.quadMeanDiameterBySpeciesCoefficients = this.get(ControlKey.BY_SPECIES_DQ, Map.class);
+	}
+
+	/** 
+	 * @return the underlying control map
+	 */
+	@Override
+	public Map<String, Object> getControlMap() {
+		return Collections.unmodifiableMap(controlMap);
 	}
 
 	protected <U> U get(ControlKey key, Class<? super U> clazz) {
@@ -216,10 +223,6 @@ public class CachingResolvedControlMapImpl implements ResolvedControlMap {
 
 	public Map<Integer, Coefficients> getBreakageMap() {
 		return breakageMap;
-	}
-
-	public Map<String, Object> getControlMap() {
-		return controlMap;
 	}
 
 	@Override

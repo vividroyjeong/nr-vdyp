@@ -45,9 +45,7 @@ class VdypSpeciesTest {
 						"message", allOf(
 								containsString("polygonIdentifier"), containsString("layer"), containsString(
 										"genus"
-								), containsString(
-										"percentGenus"
-								), containsString("volumeGroup"), containsString("decayGroup")
+								)
 						)
 				)
 		);

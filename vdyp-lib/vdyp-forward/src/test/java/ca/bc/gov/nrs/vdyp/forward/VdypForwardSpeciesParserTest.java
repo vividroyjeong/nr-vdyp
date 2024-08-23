@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.vdyp.forward;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.assertEmpty;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.assertNext;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasEntry;
@@ -15,8 +16,8 @@ import static org.hamcrest.Matchers.is;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
@@ -91,12 +92,13 @@ class VdypForwardSpeciesParserTest {
 				genera,
 				hasItem(
 						allOf(
-								hasProperty("polygonId", hasProperty("name", is("01002 S000001 00"))),
-								hasProperty("polygonId", hasProperty("year", is(1970))),
-								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genusIndex", is(15)),
+								hasProperty("polygonIdentifier", hasProperty("base", is("01002 S000001 00"))),
+								hasProperty("polygonIdentifier", hasProperty("year", is(1970))),
+								hasProperty("layerType", is(LayerType.PRIMARY)), 
+								hasProperty("genusIndex", is(15)),
 								hasProperty("genus", is("S")),
 								hasProperty(
-										"speciesDistributions",
+										"sp64DistributionSet",
 										hasProperty(
 												"sp64DistributionMap",
 												hasEntry(
@@ -108,12 +110,16 @@ class VdypForwardSpeciesParserTest {
 														)
 												)
 										)
-								), hasProperty("siteIndex", is(Float.NaN)),
-								hasProperty("dominantHeight", is(Float.NaN)), hasProperty("ageTotal", is(Float.NaN)),
-								hasProperty("ageAtBreastHeight", is(Float.NaN)),
-								hasProperty("yearsToBreastHeight", is(Float.NaN)),
-								hasProperty("isPrimary", is(Optional.of(false))),
-								hasProperty("siteCurveNumber", is(VdypEntity.MISSING_INTEGER_VALUE))
+								),
+								hasProperty("site", present(allOf(
+									hasProperty("siteIndex", present(is(Float.NaN))),
+									hasProperty("siteGenus", is("S")),
+									hasProperty("height", present(is(Float.NaN))), 
+									hasProperty("ageTotal", present(is(Float.NaN))),
+									hasProperty("yearsToBreastHeight", present(is(Float.NaN))),
+									hasProperty("layerType", is(LayerType.PRIMARY)),
+									hasProperty("siteCurveNumber", present(is(VdypEntity.MISSING_INTEGER_VALUE)))
+								)))
 						)
 				)
 		);
@@ -201,13 +207,15 @@ class VdypForwardSpeciesParserTest {
 				genera,
 				hasItems(
 						allOf(
-								hasProperty("ageTotal", is(20.0f)), hasProperty("ageAtBreastHeight", is(12.0f)),
-								hasProperty("yearsToBreastHeight", is(8.0f)),
-								hasProperty("isPrimary", is(Optional.of(false)))
-						),
+								hasProperty("layerType", is(LayerType.PRIMARY)),
+								hasProperty("site", present(allOf(
+										hasProperty("ageTotal", present(is(20.0f))), 
+										// hasProperty("yearsAtBreastHeight", present(is(12.0f))),
+										hasProperty("yearsToBreastHeight", present(is(8.0f)))
+								)))),
 						allOf(
 								hasProperty(
-										"speciesDistributions",
+										"sp64DistributionSet",
 										hasProperty(
 												"sp64DistributionMap",
 												allOf(
@@ -227,13 +235,16 @@ class VdypForwardSpeciesParserTest {
 														)
 												)
 										)
-								), hasProperty("ageTotal", is(12.0f)), hasProperty("ageAtBreastHeight", is(8.0f)),
-								hasProperty("yearsToBreastHeight", is(4.0f)),
-								hasProperty("isPrimary", is(Optional.empty()))
-						),
+								),
+								hasProperty("layerType", is(LayerType.VETERAN)),
+								hasProperty("site", present(allOf(
+										hasProperty("ageTotal", present(is(12.0f))), 
+										// hasProperty("yearsAtBreastHeight", present(is(8.0f))),
+										hasProperty("yearsToBreastHeight", present(is(4.0f))))
+						))),
 						allOf(
 								hasProperty(
-										"speciesDistributions",
+										"sp64DistributionSet",
 										hasProperty(
 												"sp64DistributionMap",
 												allOf(
@@ -267,13 +278,21 @@ class VdypForwardSpeciesParserTest {
 														)
 												)
 										)
-								), hasProperty("ageTotal", is(14.0f)), hasProperty("ageAtBreastHeight", is(8.0f)),
-								hasProperty("yearsToBreastHeight", is(6.0f)),
-								hasProperty("isPrimary", is(Optional.of(true)))
+								), 
+								hasProperty("layerType", is(LayerType.VETERAN)),
+								hasProperty("site", present(allOf(
+										hasProperty("ageTotal", present(is(14.0f))), 
+										// hasProperty("yearsAtBreastHeight", present(is(8.0f))),
+										hasProperty("yearsToBreastHeight", present(is(6.0f)))
+									))
+								)
 						)
 				)
 		);
 
+		assertThat(genera.stream().map(s -> s.getSite().get().getYearsAtBreastHeight()).toList(),
+				hasItems(present(is(12.0f)), present(is(8.0f)), present(is(8.0f))));
+				
 		assertEmpty(stream);
 	}
 
@@ -313,12 +332,13 @@ class VdypForwardSpeciesParserTest {
 				genera,
 				hasItems(
 						allOf(
-								hasProperty("polygonId", hasProperty("name", is("01002 S000002 00"))),
-								hasProperty("polygonId", hasProperty("year", is(1970))),
-								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genusIndex", is(15)),
+								hasProperty("polygonIdentifier", hasProperty("base", is("01002 S000002 00"))),
+								hasProperty("polygonIdentifier", hasProperty("year", is(1970))),
+								hasProperty("layerType", is(LayerType.PRIMARY)), 
+								hasProperty("genusIndex", is(15)),
 								hasProperty("genus", is("S")),
 								hasProperty(
-										"speciesDistributions",
+										"sp64DistributionSet",
 										hasProperty(
 												"sp64DistributionMap",
 												hasEntry(
@@ -330,20 +350,25 @@ class VdypForwardSpeciesParserTest {
 														)
 												)
 										)
-								), hasProperty("siteIndex", is(Float.NaN)),
-								hasProperty("dominantHeight", is(Float.NaN)), hasProperty("ageTotal", is(Float.NaN)),
-								hasProperty("ageAtBreastHeight", is(Float.NaN)),
-								hasProperty("yearsToBreastHeight", is(Float.NaN)),
-								hasProperty("isPrimary", is(Optional.of(false))),
-								hasProperty("siteCurveNumber", is(VdypEntity.MISSING_INTEGER_VALUE))
+								),
+								hasProperty("site", present(allOf(
+									hasProperty("siteIndex", present(is(Float.NaN))),
+									hasProperty("siteGenus", is("S")),
+									hasProperty("height", present(is(Float.NaN))), 
+									hasProperty("ageTotal", present(is(Float.NaN))),
+									hasProperty("yearsToBreastHeight", present(is(Float.NaN))),
+									hasProperty("layerType", is(LayerType.PRIMARY)),
+									hasProperty("siteCurveNumber", present(is(VdypEntity.MISSING_INTEGER_VALUE)))
+								)))
 						),
 						allOf(
-								hasProperty("polygonId", hasProperty("name", is("01002 S000002 00"))),
-								hasProperty("polygonId", hasProperty("year", is(1970))),
-								hasProperty("layerType", is(LayerType.VETERAN)), hasProperty("genusIndex", is(3)),
+								hasProperty("polygonIdentifier", hasProperty("base", is("01002 S000002 00"))),
+								hasProperty("polygonIdentifier", hasProperty("year", is(1970))),
+								hasProperty("layerType", is(LayerType.VETERAN)), 
+								hasProperty("genusIndex", is(3)),
 								hasProperty("genus", is("B")),
 								hasProperty(
-										"speciesDistributions",
+										"sp64DistributionSet",
 										hasProperty(
 												"sp64DistributionMap",
 												allOf(
@@ -365,12 +390,16 @@ class VdypForwardSpeciesParserTest {
 														)
 												)
 										)
-								), hasProperty("siteIndex", is(Float.NaN)),
-								hasProperty("dominantHeight", is(Float.NaN)), hasProperty("ageTotal", is(Float.NaN)),
-								hasProperty("ageAtBreastHeight", is(Float.NaN)),
-								hasProperty("yearsToBreastHeight", is(Float.NaN)),
-								hasProperty("isPrimary", is(Optional.empty())),
-								hasProperty("siteCurveNumber", is(VdypEntity.MISSING_INTEGER_VALUE))
+								),
+								hasProperty("site", present(allOf(
+									hasProperty("siteIndex", present(is(Float.NaN))),
+									hasProperty("siteGenus", is("B")),
+									hasProperty("height", present(is(Float.NaN))), 
+									hasProperty("ageTotal", present(is(Float.NaN))),
+									hasProperty("yearsAtBreastHeight", present(is(Float.NaN))),
+									hasProperty("layerType", is(LayerType.VETERAN)),
+									hasProperty("siteCurveNumber", present(is(VdypEntity.MISSING_INTEGER_VALUE)))
+								)))
 						)
 				)
 		);

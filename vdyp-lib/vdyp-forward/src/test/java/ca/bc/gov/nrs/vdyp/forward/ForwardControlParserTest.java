@@ -29,6 +29,7 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.forward.test.VdypForwardTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.SiteCurveAgeMaximumParserTest;
@@ -37,6 +38,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
+import ca.bc.gov.nrs.vdyp.model.ComponentSizeLimits;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.Region;
@@ -285,11 +287,18 @@ class VdypForwardControlParserTest {
 		var result = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
 		assertThat(
 				result,
-				(Matcher) controlMapHasEntry(
-						ControlKey.SPECIES_COMPONENT_SIZE_LIMIT,
-						allOf(mmHasEntry(coe(1, contains(49.4f, 153.3f, 0.726f, 3.647f)), "AC", Region.COASTAL))
-				)
+				(Matcher) controlMapHasEntry(ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, Matchers.anything())
 		);
+		
+		MatrixMap2<String, Region, ComponentSizeLimits> coastalSpeciesComponentSizeMap = Utils.expectParsedControl(result, ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, MatrixMap2.class);
+		var acCoastalSpeciesComponentSizeLimits = coastalSpeciesComponentSizeMap.get("AC", Region.COASTAL);
+		assertThat(
+				acCoastalSpeciesComponentSizeLimits,
+				Matchers.instanceOf(ComponentSizeLimits.class));
+		assertThat(acCoastalSpeciesComponentSizeLimits.loreyHeightMaximum(), is(49.4f));
+		assertThat(acCoastalSpeciesComponentSizeLimits.maxQuadMeanDiameterLoreyHeightRatio(), is(3.647f));
+		assertThat(acCoastalSpeciesComponentSizeLimits.minQuadMeanDiameterLoreyHeightRatio(), is(0.726f));
+		assertThat(acCoastalSpeciesComponentSizeLimits.quadMeanDiameterMaximum(), is(153.3f));
 	}
 
 	@Test

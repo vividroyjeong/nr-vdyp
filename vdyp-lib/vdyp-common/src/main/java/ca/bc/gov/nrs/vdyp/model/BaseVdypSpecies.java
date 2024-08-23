@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import ca.bc.gov.nrs.vdyp.application.InitializationIncompleteException;
 import ca.bc.gov.nrs.vdyp.common.Computed;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 
@@ -26,25 +27,25 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 	/** the species index within species definition file (e.g. SPODEF_v0.dat) */
 	private final int genusIndex; // BANK1/ISPB, L1COM1/ISPL1, etc.
 
-	private float percentGenus; // FIPS/PCTVOLV L1COM1/PCTL1
+	private Optional<Float> percentGenus = Optional.empty(); // FIPS/PCTVOLV L1COM1/PCTL1
 
 	// This is computed from percentGenus, but VDYP7 computes it in a way that might
 	// lead to a slight difference so it's stored separately and can be modified.
 	@Computed
-	private float fractionGenus; // FRBASP0/FR
+	private Optional<Float> fractionGenus = Optional.empty(); // FRBASP0/FR
 
 	private Sp64DistributionSet sp64DistributionSet;
 
 	private Optional<I> site;
 
 	protected BaseVdypSpecies(
-			PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, int genusIndex, float percentGenus,
+			PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, int genusIndex, Optional<Float> percentGenus,
 			Sp64DistributionSet sp64DistributionSet, Optional<I> site
 	) {
 		this.polygonIdentifier = polygonIdentifier;
 		this.layerType = layerType;
 		this.genus = genus;
-		this.setPercentGenus(percentGenus);
+		percentGenus.ifPresent(p -> this.setPercentGenus(p));
 		this.site = site;
 		this.genusIndex = genusIndex;
 		this.sp64DistributionSet = sp64DistributionSet;
@@ -59,30 +60,33 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 	}
 
 	public float getPercentGenus() {
-		return percentGenus;
+		return percentGenus.orElseThrow(() -> new InitializationIncompleteException(MessageFormat.format("Species {0}, percentGenus", this)));
+	}
+
+	public void setPercentGenus(float value) {
+		// Note - it is permitted to set percentGenus more than once.
+		this.percentGenus = Optional.of(value);
+		setFractionGenus(percentGenus.get() / 100f);
 	}
 
 	@Computed
 	public float getFractionGenus() {
-		return fractionGenus;
-	}
-
-	public void setPercentGenus(float percentGenus) {
-		this.percentGenus = percentGenus;
-		this.fractionGenus = percentGenus / 100f;
+		return fractionGenus.orElseThrow(() -> new InitializationIncompleteException(MessageFormat.format("Species {0}, fractionGenus", this)));
 	}
 
 	@Computed
-	public void setFractionGenus(float fractionGenus) {
-		this.fractionGenus = fractionGenus;
+	public void setFractionGenus(float value) {
+		// Note - it is permitted to set fractionGenus more than once.
+		this.fractionGenus = Optional.of(value);
 	}
 
 	public Sp64DistributionSet getSp64DistributionSet() {
 		return sp64DistributionSet;
 	}
 
-	public void setSp64DistributionSet(Sp64DistributionSet sp64DistributionSet) {
-		this.sp64DistributionSet = sp64DistributionSet;
+	@Override
+	public String toString() {
+		return MessageFormat.format("{0} {1} {2}", polygonIdentifier, layerType, genus);
 	}
 
 	/**
@@ -244,7 +248,10 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 			requirePresent(layerType, "layerType", errors);
 			requirePresent(genus, "genus", errors);
 			requirePresent(genusIndex, "genusIndex", errors);
-			requirePresent(percentGenus, "percentGenus", errors);
+			
+			// percentGenus is not required on build because the Forward
+			// input data format does not include it in the species data files.
+			// requirePresent(percentGenus, "percentGenus", errors);
 		}
 
 		@Override

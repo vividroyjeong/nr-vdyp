@@ -95,6 +95,12 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 		return sp64DistributionList.size();
 	}
 
+	/**
+	 * Returns the Sp64Distribution at index <code>withIndex</code>. THIS INDEX is
+	 * one-based - that is, the first entry has index one.
+	 * @param withIndex index, one-based, in list.
+	 * @return as described
+	 */
 	public Optional<Sp64Distribution> getSpeciesDistribution(int withIndex) {
 		if (withIndex > maxIndex) {
 			throw new IllegalArgumentException(
@@ -203,5 +209,10 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 			// null is less than non-null, per ObjectUtils.compare()
 			return 1;
 		}
+	}
+	
+	@Override 
+	public String toString() {
+		return this.sp64DistributionList.toString();
 	}
 }

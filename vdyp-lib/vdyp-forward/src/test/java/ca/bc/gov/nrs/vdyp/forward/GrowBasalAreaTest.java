@@ -38,7 +38,7 @@ class GrowBasalAreaTest {
 
 	@SuppressWarnings("unchecked")
 	@BeforeEach
-	void beforeTest() throws IOException, ResourceParseException {
+	void beforeTest() throws IOException, ResourceParseException, ProcessingException {
 		parser = new ForwardControlParser();
 		controlMap = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
 
@@ -90,7 +90,7 @@ class GrowBasalAreaTest {
 	}
 
 	@Test
-	void testDebugSettings2EqualsZeroPath() throws ProcessingException {
+	void testDebugSettings3EqualsZeroPath() throws ProcessingException {
 		
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 		
@@ -102,13 +102,13 @@ class GrowBasalAreaTest {
 		float yabh = 54.0f;
 		float hd = 35.2999992f;
 		float ba = 45.3864441f;
-		float growthInHd = 0.173380271f;
+		float hdDelta = 0.173380271f;
 		
 		ForwardDebugSettings debugSettings = fpe.fps.fcm.getDebugSettings();
 		debugSettings.setValue(Vars.BASAL_AREA_GROWTH_MODEL_3, 0);
 		
-		float gba = fpe.growBasalArea(yabh, debugSettings, hd, ba, Optional.empty(), growthInHd);
+		float gba = fpe.growBasalArea(yabh, debugSettings, hd, ba, Optional.empty(), hdDelta);
 		
-		assertThat(gba, is(3.7865982f));
+		assertThat(gba, is(-0.10392746f));
 	}
 }

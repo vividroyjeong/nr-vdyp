@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.forward.parsers.VdypPolygonParser;
 import ca.bc.gov.nrs.vdyp.forward.parsers.VdypSpeciesParser;
@@ -33,7 +34,7 @@ abstract class AbstractForwardProcessingEngineTest {
 
 	@SuppressWarnings("unchecked")
 	@BeforeEach
-	void beforeTest() throws IOException, ResourceParseException {
+	void beforeTest() throws ProcessingException, ResourceParseException, IOException {
 		parser = new ForwardControlParser();
 		controlMap = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
 

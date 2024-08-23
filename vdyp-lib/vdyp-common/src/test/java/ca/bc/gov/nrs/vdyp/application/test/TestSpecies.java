@@ -14,7 +14,7 @@ public class TestSpecies extends BaseVdypSpecies<TestSite> {
 			PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, int genusIndex, float percentGenus,
 			Optional<TestSite> site
 	) {
-		super(polygonIdentifier, layerType, genus, genusIndex, percentGenus, new Sp64DistributionSet(), site);
+		super(polygonIdentifier, layerType, genus, genusIndex, Optional.of(percentGenus), new Sp64DistributionSet(), site);
 	}
 
 	public static TestSpecies build(Consumer<TestSpecies.Builder> config) {

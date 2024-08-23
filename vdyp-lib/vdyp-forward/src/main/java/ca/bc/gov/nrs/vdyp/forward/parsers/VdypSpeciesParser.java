@@ -120,12 +120,12 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 					var siteIndex = (Float) (entry.get(SITE_INDEX));
 					var dominantHeight = (Float) (entry.get(DOMINANT_HEIGHT));
 					var totalAge = (Float) (entry.get(TOTAL_AGE));
-					var ageAtBreastHeight = (Float) (entry.get(AGE_AT_BREAST_HEIGHT));
+					var yearsAtBreastHeight = (Float) (entry.get(AGE_AT_BREAST_HEIGHT));
 					var yearsToBreastHeight = (Float) (entry.get(YEARS_TO_BREAST_HEIGHT));
 					var isPrimarySpecies = Utils.<Boolean>optSafe(entry.get(IS_PRIMARY_SPECIES));
 					var siteCurveNumber = Utils.<Integer>optSafe(entry.get(SITE_CURVE_NUMBER))
 							.orElse(VdypEntity.MISSING_INTEGER_VALUE);
-
+					
 					var builder = new ValueOrMarker.Builder<Optional<VdypSpecies>, EndOfRecord>();
 					return layerType.handle(l -> builder.value(l.map(lt -> {
 
@@ -155,20 +155,35 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 
 						var genus = optionalGenus.orElse(genusDefinitionMap.getByIndex(genusIndex).getAlias());
 
+						var iTotalAge = totalAge;
+						var iYearsToBreastHeight = yearsToBreastHeight;
+						
+						// From VDYPGETS.FOR, lines 235 onwards
+						if (Float.isNaN(totalAge)) {
+							if (yearsAtBreastHeight > 0.0 && yearsToBreastHeight > 0.0)
+								iTotalAge = yearsAtBreastHeight + yearsToBreastHeight;
+						} else if (Float.isNaN(yearsToBreastHeight)) {
+							if (yearsAtBreastHeight > 0.0 && totalAge > yearsAtBreastHeight)
+								iYearsToBreastHeight = totalAge - yearsAtBreastHeight;
+						}
+
+						var inferredTotalAge = iTotalAge;
+						var inferredYearsToBreastHeight = iYearsToBreastHeight;
+
 						return VdypSpecies.build(speciesBuilder -> {
 							speciesBuilder.sp64DistributionSet(speciesDistributionSet);
 							speciesBuilder.polygonIdentifier(polygonId);
 							speciesBuilder.layerType(lt);
 							speciesBuilder.genus(genus, controlMap);
 							speciesBuilder.addSite(siteBuilder -> {
-								siteBuilder.ageTotal(totalAge);
+								siteBuilder.ageTotal(inferredTotalAge);
 								siteBuilder.height(dominantHeight);
 								siteBuilder.polygonIdentifier(polygonId);
 								siteBuilder.siteCurveNumber(siteCurveNumber);
 								siteBuilder.layerType(lt);
 								siteBuilder.siteGenus(genus);
 								siteBuilder.siteIndex(siteIndex);
-								siteBuilder.yearsToBreastHeight(yearsToBreastHeight);
+								siteBuilder.yearsToBreastHeight(inferredYearsToBreastHeight);
 							});
 						});
 					})), builder::marker);

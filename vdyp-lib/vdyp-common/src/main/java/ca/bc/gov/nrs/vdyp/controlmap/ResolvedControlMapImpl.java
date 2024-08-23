@@ -1,5 +1,6 @@
 package ca.bc.gov.nrs.vdyp.controlmap;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -27,6 +28,14 @@ public class ResolvedControlMapImpl implements ResolvedControlMap {
 		this.controlMap = controlMap;
 	}
 
+	/** 
+	 * @return the underlying control map
+	 */
+	@Override
+	public Map<String, Object> getControlMap() {
+		return Collections.unmodifiableMap(controlMap);
+	}
+	
 	@SuppressWarnings("unchecked")
 	private <U> U get(ControlKey key, Class<? super U> clazz) {
 

@@ -8,6 +8,7 @@ import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
+import ca.bc.gov.nrs.vdyp.model.UtilizationVector;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
@@ -103,8 +104,8 @@ public class UtilizationOperations {
 	}
 
 	private static final float MAX_ACCEPTABLE_BASAL_AREA_ERROR = 0.1f;
-	private static final float[] CLASS_LOWER_BOUNDS = { 4.0f, 7.5f, 7.5f, 12.5f, 17.5f, 22.5f };
-	private static final float[] CLASS_UPPER_BOUNDS = { 7.5f, 2000.0f, 12.5f, 17.5f, 22.5f, 2000.0f };
+	private static final UtilizationVector CLASS_LOWER_BOUNDS = new UtilizationVector(4.0f, 7.5f, 7.5f, 12.5f, 17.5f, 22.5f);
+	private static final UtilizationVector CLASS_UPPER_BOUNDS = new UtilizationVector(7.5f, 2000.0f, 12.5f, 17.5f, 22.5f, 2000.0f);
 	private static final float DQ_EPS = 0.005f;
 
 	/**
@@ -113,7 +114,7 @@ public class UtilizationOperations {
 	private static void resetOnMissingValues(VdypUtilizationHolder uh) {
 
 		for (UtilizationClass uc: UtilizationClass.values()) {
-			if (uh.getBaseAreaByUtilization().get(uc) <= 0.0f || uh.getLoreyHeightByUtilization().get(uc) <= 0.0f) {
+			if (uh.getBaseAreaByUtilization().get(uc) <= 0.0f || uh.getTreesPerHectareByUtilization().get(uc) <= 0.0f) {
 				uh.getBaseAreaByUtilization().set(uc, 0.0f);
 				uh.getTreesPerHectareByUtilization().set(uc, 0.0f);
 				// DO NOT zero-out the lorey height value.
@@ -134,18 +135,18 @@ public class UtilizationOperations {
 	private static void adjustBasalAreaToMatchTreesPerHectare(VdypUtilizationHolder uh) throws ProcessingException {
 
 		for (UtilizationClass uc: UtilizationClass.values()) {
-			float tph = uh.getTreesPerHectareByUtilization().get(0);
+			float tph = uh.getTreesPerHectareByUtilization().get(uc);
 			if (tph > 0.0f) {
 				float basalAreaLowerBound = BaseAreaTreeDensityDiameter
-						.basalArea(CLASS_LOWER_BOUNDS[uc.ordinal()] + DQ_EPS, tph);
+						.basalArea(CLASS_LOWER_BOUNDS.get(uc) + DQ_EPS, tph);
 				float basalAreaUpperBound = BaseAreaTreeDensityDiameter
-						.basalArea(CLASS_UPPER_BOUNDS[uc.ordinal()] - DQ_EPS, tph);
+						.basalArea(CLASS_UPPER_BOUNDS.get(uc) - DQ_EPS, tph);
 	
 				float basalAreaError;
 				float newBasalArea;
 				String message = null;
 	
-				float basalArea = uh.getBaseAreaByUtilization().get(0);
+				float basalArea = uh.getBaseAreaByUtilization().get(uc);
 				if (basalArea < basalAreaLowerBound) {
 					basalAreaError = FloatMath.abs(basalArea - basalAreaLowerBound);
 					newBasalArea = basalAreaLowerBound;
@@ -189,23 +190,23 @@ public class UtilizationOperations {
 				float tph = uh.getTreesPerHectareByUtilization().get(uc);
 				float qmd = BaseAreaTreeDensityDiameter.quadMeanDiameter(basalArea, tph);
 	
-				if (qmd < CLASS_LOWER_BOUNDS[uc.ordinal()]) {
+				if (qmd < CLASS_LOWER_BOUNDS.get(uc)) {
 					qmd = qmd + DQ_EPS;
-					if (qmd /* is still */ < CLASS_LOWER_BOUNDS[uc.ordinal()]) {
+					if (qmd /* is still */ < CLASS_LOWER_BOUNDS.get(uc)) {
 						throw new ProcessingException(
 								MessageFormat.format(
 										"{0}: Error 6: calculated quad-mean-diameter value {1} is below lower limit {2}",
-										uh, qmd, CLASS_LOWER_BOUNDS[uc.ordinal()]
+										uh, qmd, CLASS_LOWER_BOUNDS.get(uc)
 								)
 						);
 					}
-				} else if (qmd > CLASS_UPPER_BOUNDS[uc.ordinal()]) {
+				} else if (qmd > CLASS_UPPER_BOUNDS.get(uc)) {
 					qmd = qmd - DQ_EPS;
-					if (qmd /* is still */ > CLASS_UPPER_BOUNDS[uc.ordinal()]) {
+					if (qmd /* is still */ > CLASS_UPPER_BOUNDS.get(uc)) {
 						throw new ProcessingException(
 								MessageFormat.format(
 										"{0}: Error 6: calculated quad-mean-diameter value {1} is above upper limit {2}",
-										uh, qmd, CLASS_UPPER_BOUNDS[uc.ordinal()]
+										uh, qmd, CLASS_UPPER_BOUNDS.get(uc)
 								)
 						);
 					}

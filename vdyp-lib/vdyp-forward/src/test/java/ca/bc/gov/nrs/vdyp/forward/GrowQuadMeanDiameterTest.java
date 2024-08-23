@@ -40,7 +40,7 @@ class GrowQuadMeanDiameterTest {
 
 	@SuppressWarnings("unchecked")
 	@BeforeEach
-	void beforeTest() throws IOException, ResourceParseException {
+	void beforeTest() throws IOException, ResourceParseException, ProcessingException {
 		parser = new ForwardControlParser();
 		controlMap = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
 

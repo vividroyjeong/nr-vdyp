@@ -71,34 +71,34 @@ class GeneralForwardProcessingEngineTest extends AbstractForwardProcessingEngine
 			ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 			fpe.fps.setPolygonLayer(polygon, LayerType.PRIMARY);
 
-			LayerProcessingState pps = fpe.fps.getLayerProcessingState();
+			LayerProcessingState lps = fpe.fps.getLayerProcessingState();
 
 			fpe.calculateCoverages();
 			fpe.determinePolygonRankings(CommonData.PRIMARY_SPECIES_TO_COMBINE);
 
-			assertThat(pps.getPrimarySpeciesIndex(), is(3));
-			assertThat(pps.getSecondarySpeciesIndex(), is(4));
-			assertThat(pps.getInventoryTypeGroup(), is(37));
-			assertThat(pps.getPrimarySpeciesGroupNumber(), is(1));
-			assertThat(pps.getPrimarySpeciesStratumNumber(), is(1));
+			assertThat(lps.getPrimarySpeciesIndex(), is(3));
+			assertThat(lps.getSecondarySpeciesIndex(), is(4));
+			assertThat(lps.getInventoryTypeGroup(), is(37));
+			assertThat(lps.getPrimarySpeciesGroupNumber(), is(1));
+			assertThat(lps.getPrimarySpeciesStratumNumber(), is(1));
 		}
 		{
 			ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 			fpe.fps.setPolygonLayer(polygon, LayerType.PRIMARY);
-			LayerProcessingState pps = fpe.fps.getLayerProcessingState();
+			LayerProcessingState lps = fpe.fps.getLayerProcessingState();
 
-			var speciesToCombine = Arrays.asList(Arrays.asList(pps.getStartBank().speciesNames[3], pps.getStartBank().speciesNames[4]));
+			var speciesToCombine = Arrays.asList(Arrays.asList(lps.getStartBank().speciesNames[3], lps.getStartBank().speciesNames[4]));
 
 			fpe.calculateCoverages();
 			fpe.determinePolygonRankings(speciesToCombine);
 
 			// The test-specific speciesToCombine will combine 3 & 4 into 3 (leaving 4 at 0.0), promoting 2 to
 			// secondary.
-			assertThat(pps.getPrimarySpeciesIndex(), is(3));
-			assertThat(pps.getSecondarySpeciesIndex(), is(2));
-			assertThat(pps.getInventoryTypeGroup(), is(37));
-			assertThat(pps.getPrimarySpeciesGroupNumber(), is(1));
-			assertThat(pps.getPrimarySpeciesStratumNumber(), is(1));
+			assertThat(lps.getPrimarySpeciesIndex(), is(3));
+			assertThat(lps.getSecondarySpeciesIndex(), is(2));
+			assertThat(lps.getInventoryTypeGroup(), is(37));
+			assertThat(lps.getPrimarySpeciesGroupNumber(), is(1));
+			assertThat(lps.getPrimarySpeciesStratumNumber(), is(1));
 		}
 	}
 
@@ -108,7 +108,7 @@ class GeneralForwardProcessingEngineTest extends AbstractForwardProcessingEngine
 		// We want the 
 		//     "equationModifierGroup.isPresent()"
 		// and the 
-		//     "   Region.INTERIOR.equals(pps.wallet.getBecZone().getRegion()) 
+		//     "   Region.INTERIOR.equals(lps.wallet.getBecZone().getRegion()) 
 		//      && exceptedSpeciesIndicies.contains(primarySpeciesIndex)" 
 		// cases in determinePolygonRankings.
 		

@@ -60,11 +60,12 @@ class Bank {
 	public final float[/* nSpecies + 1, including 0 */][/* all ucs */] treesPerHectare; // BANK1 TPHB
 	public final float[/* nSpecies + 1, including 0 */][/* all ucs */] wholeStemVolumes; // BANK1 VOLWSB
 
-	public Bank(VdypLayer layer, BecDefinition becZone, Predicate<VdypSpecies> retainCriteria) throws ProcessingException {
+	public Bank(VdypLayer layer, BecDefinition becZone, Predicate<VdypSpecies> retainCriteria)
+			throws ProcessingException {
 
 		this.layer = layer;
 		this.becZone = becZone;
-		
+
 		List<VdypSpecies> speciesToRetain = layer.getSpecies().values().stream().filter(s -> retainCriteria.test(s))
 				.sorted((s1, s2) -> s1.getGenusIndex() - s2.getGenusIndex()).toList();
 
@@ -103,37 +104,39 @@ class Bank {
 		}
 	}
 
-	enum CopyMode { CopyAll, CopyStructure };
-	
-	public Bank(Bank s, CopyMode copyMode) {
+	enum CopyMode {
+		CopyAll, CopyStructure
+	};
 
-		this.becZone = s.becZone;
-		this.layer = s.layer;
+	public Bank(Bank source, CopyMode copyMode) {
 
-		this.nSpecies = s.nSpecies;
-		this.indices = copy(s.indices);
-		this.speciesNames = copy(s.speciesNames);
-		this.speciesIndices = copy(s.speciesIndices);
+		this.becZone = source.becZone;
+		this.layer = source.layer;
 
-		this.siteCurveNumbers = copy(s.siteCurveNumbers);
-		this.sp64Distributions = copy(s.sp64Distributions);
+		this.nSpecies = source.nSpecies;
+		this.indices = copy(source.indices);
+		this.speciesNames = copy(source.speciesNames);
+		this.speciesIndices = copy(source.speciesIndices);
+
+		this.siteCurveNumbers = copy(source.siteCurveNumbers);
+		this.sp64Distributions = copy(source.sp64Distributions);
 
 		if (copyMode == CopyMode.CopyAll) {
-			this.ageTotals = copy(s.ageTotals);
-			this.dominantHeights = copy(s.dominantHeights);
-			this.percentagesOfForestedLand = copy(s.percentagesOfForestedLand);
-			this.siteIndices = copy(s.siteIndices);
-			this.yearsAtBreastHeight = copy(s.yearsAtBreastHeight);
-			this.yearsToBreastHeight = copy(s.yearsToBreastHeight);
-			
-			this.basalAreas = copy(s.basalAreas);
-			this.closeUtilizationVolumes = copy(s.closeUtilizationVolumes);
-			this.cuVolumesMinusDecay = copy(s.cuVolumesMinusDecay);
-			this.cuVolumesMinusDecayAndWastage = copy(s.cuVolumesMinusDecayAndWastage);
-			this.loreyHeights = copy(s.loreyHeights);
-			this.quadMeanDiameters = copy(s.quadMeanDiameters);
-			this.treesPerHectare = copy(s.treesPerHectare);
-			this.wholeStemVolumes = copy(s.wholeStemVolumes);
+			this.ageTotals = copy(source.ageTotals);
+			this.dominantHeights = copy(source.dominantHeights);
+			this.percentagesOfForestedLand = copy(source.percentagesOfForestedLand);
+			this.siteIndices = copy(source.siteIndices);
+			this.yearsAtBreastHeight = copy(source.yearsAtBreastHeight);
+			this.yearsToBreastHeight = copy(source.yearsToBreastHeight);
+
+			this.basalAreas = copy(source.basalAreas);
+			this.closeUtilizationVolumes = copy(source.closeUtilizationVolumes);
+			this.cuVolumesMinusDecay = copy(source.cuVolumesMinusDecay);
+			this.cuVolumesMinusDecayAndWastage = copy(source.cuVolumesMinusDecayAndWastage);
+			this.loreyHeights = copy(source.loreyHeights);
+			this.quadMeanDiameters = copy(source.quadMeanDiameters);
+			this.treesPerHectare = copy(source.treesPerHectare);
+			this.wholeStemVolumes = copy(source.wholeStemVolumes);
 		} else {
 			this.ageTotals = buildShell(nSpecies);
 			this.dominantHeights = buildShell(nSpecies);
@@ -141,7 +144,7 @@ class Bank {
 			this.siteIndices = buildShell(nSpecies);
 			this.yearsAtBreastHeight = buildShell(nSpecies);
 			this.yearsToBreastHeight = buildShell(nSpecies);
-			
+
 			int nUtilizationClasses = UtilizationClass.values().length;
 			this.basalAreas = buildShell(nSpecies, nUtilizationClasses);
 			this.closeUtilizationVolumes = buildShell(nSpecies, nUtilizationClasses);
@@ -153,24 +156,24 @@ class Bank {
 			this.wholeStemVolumes = buildShell(nSpecies, nUtilizationClasses);
 		}
 	}
-	
+
 	private float[] buildShell(int n) {
-		
+
 		float[] result = new float[nSpecies + 1];
 		Arrays.fill(result, Float.NaN);
 		return result;
 	}
 
 	private float[][] buildShell(int n, int m) {
-		
+
 		float[][] result = new float[nSpecies + 1][];
-		
-		for (int i = 0; i < n; i++) {
+
+		for (int i = 0; i <= n; i++) {
 			float[] row = new float[m];
 			Arrays.fill(row, Float.NaN);
 			result[i] = row;
 		}
-		
+
 		return result;
 	}
 
@@ -185,32 +188,39 @@ class Bank {
 	BecDefinition getBecZone() {
 		return becZone;
 	}
-	
+
 	/**
-	 * This method copies the Bank contents out to the VdypLayer instance used to create it
-	 * and returns that. It is a relatively expensive operation and should not be called 
-	 * without due consideration.
+	 * This method copies the Bank contents out to the VdypLayer instance used to create it and returns that. It is a
+	 * relatively expensive operation and should not be called without due consideration.
 	 * 
 	 * @return as described
 	 */
 	VdypLayer getUpdatedLayer() {
+		
 		transferLayerFromBank();
+		
 		return layer;
 	}
 
 	private void transferSpeciesIntoBank(int index, VdypSpecies species) throws ProcessingException {
 
-		VdypSite site = species.getSite().orElseThrow(() -> new ProcessingException(MessageFormat.format(
-				"Species {0} of Polygon {1} must contain a Site definition but does not.", 
-				species.getGenus(), species.getPolygonIdentifier().toStringCompact())));
-		
+		VdypSite site = species.getSite().orElseThrow(
+				() -> new ProcessingException(
+						MessageFormat.format(
+								"Species {0} of Polygon {1} must contain a Site definition but does not.",
+								species.getGenus(), species.getPolygonIdentifier().toStringCompact()
+						)
+				)
+		);
+
 		speciesNames[index] = species.getGenus();
 		sp64Distributions[index] = species.getSp64DistributionSet();
 		siteIndices[index] = site.getSiteIndex().orElse(VdypEntity.MISSING_FLOAT_VALUE);
 		dominantHeights[index] = site.getHeight().orElse(VdypEntity.MISSING_FLOAT_VALUE);
 		ageTotals[index] = site.getAgeTotal().orElse(VdypEntity.MISSING_FLOAT_VALUE);
 		yearsToBreastHeight[index] = site.getYearsToBreastHeight().orElse(VdypEntity.MISSING_FLOAT_VALUE);
-		if (ageTotals[index] != VdypEntity.MISSING_FLOAT_VALUE && yearsToBreastHeight[index] != VdypEntity.MISSING_FLOAT_VALUE) {
+		if (ageTotals[index] != VdypEntity.MISSING_FLOAT_VALUE
+				&& yearsToBreastHeight[index] != VdypEntity.MISSING_FLOAT_VALUE) {
 			yearsAtBreastHeight[index] = ageTotals[index] - yearsToBreastHeight[index];
 		} else {
 			yearsAtBreastHeight[index] = VdypEntity.MISSING_FLOAT_VALUE;
@@ -224,12 +234,13 @@ class Bank {
 
 	private void transferUtilizationsIntoBank(int index, VdypUtilizationHolder uh) {
 
-		for (UtilizationClass uc: UtilizationClass.values()) {
+		for (UtilizationClass uc : UtilizationClass.values()) {
 			int ucIndex = uc.ordinal();
 			basalAreas[index][ucIndex] = uh.getBaseAreaByUtilization().get(uc);
 			closeUtilizationVolumes[index][ucIndex] = uh.getCloseUtilizationVolumeByUtilization().get(uc);
 			cuVolumesMinusDecay[index][ucIndex] = uh.getCloseUtilizationVolumeNetOfDecayByUtilization().get(uc);
-			cuVolumesMinusDecayAndWastage[index][ucIndex] = uh.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization().get(uc);
+			cuVolumesMinusDecayAndWastage[index][ucIndex] = uh
+					.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization().get(uc);
 			if (ucIndex < 2 /* only uc 0 and 1 have a lorey height */) {
 				loreyHeights[index][ucIndex] = uh.getLoreyHeightByUtilization().get(uc);
 			}
@@ -239,59 +250,37 @@ class Bank {
 		}
 	}
 
-	private void transferDefaultUtilizationsIntoBank(int index) {
-
-		for (var uc : UtilizationClass.values()) {
-			int ucIndex = uc.ordinal();
-			basalAreas[index][ucIndex] = Float.NaN;
-			closeUtilizationVolumes[index][ucIndex] = Float.NaN;
-			cuVolumesMinusDecay[index][ucIndex] = Float.NaN;
-			cuVolumesMinusDecayAndWastage[index][ucIndex] = Float.NaN;
-			if (ucIndex < 2 /* only uc 0 and 1 have a lorey height */) {
-				loreyHeights[index][ucIndex] = Float.NaN;
-			}
-			quadMeanDiameters[index][ucIndex] = Float.NaN;
-			treesPerHectare[index][ucIndex] = Float.NaN;
-			wholeStemVolumes[index][ucIndex] = Float.NaN;
-		}
-	}
-
 	private void transferLayerFromBank() {
 
 		transferUtilizationsFromBank(0, layer);
-		
-		for (int i: indices) {
-			transferSpeciesFromBank(i, layer.getSpecies().get(speciesNames[i]));
+
+		for (int i : indices) {
+			transferSpeciesFromBank(i, layer.getSpecies().get(speciesNames[i]));			
 		}
 	}
 
 	private void transferSpeciesFromBank(int index, VdypSpecies species) {
 
 		VdypSite site = species.getSite().get();
-		
-		VdypSite updatedSite = new VdypSite.Builder()
-				.adapt(site)
-				.siteIndex(siteIndices[index])
-				.ageTotal(ageTotals[index])
-				.height(dominantHeights[index])
-				.yearsToBreastHeight(yearsToBreastHeight[index])
-				.build();
-		
-		VdypSpecies speciesBuilder = new VdypSpecies.Builder()
-				.addSite(updatedSite)
-				.adapt(species).build();
 
+		VdypSite updatedSite = new VdypSite.Builder().adapt(site).siteIndex(siteIndices[index])
+				.ageTotal(ageTotals[index]).height(dominantHeights[index])
+				.yearsToBreastHeight(yearsToBreastHeight[index]).build();
+
+		species = new VdypSpecies.Builder().addSite(updatedSite).adapt(species).build();
+		
 		transferUtilizationsIntoBank(index, species);
 	}
 
 	private void transferUtilizationsFromBank(int index, VdypUtilizationHolder uh) {
 
-		for (UtilizationClass uc: UtilizationClass.values()) {
+		for (UtilizationClass uc : UtilizationClass.values()) {
 			int ucIndex = uc.ordinal();
 			uh.getBaseAreaByUtilization().set(uc, basalAreas[index][ucIndex]);
 			uh.getCloseUtilizationVolumeByUtilization().set(uc, closeUtilizationVolumes[index][ucIndex]);
 			uh.getCloseUtilizationVolumeNetOfDecayByUtilization().set(uc, cuVolumesMinusDecay[index][ucIndex]);
-			uh.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization().set(uc, cuVolumesMinusDecayAndWastage[index][ucIndex]);
+			uh.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization()
+					.set(uc, cuVolumesMinusDecayAndWastage[index][ucIndex]);
 			if (ucIndex < 2 /* only uc 0 and 1 have a lorey height */) {
 				uh.getLoreyHeightByUtilization().set(uc, loreyHeights[index][ucIndex]);
 			}
@@ -303,7 +292,7 @@ class Bank {
 
 	public Bank copy() {
 		return new Bank(this, CopyMode.CopyAll);
-	
+
 	}
 
 	private String[] copy(String[] a) {
@@ -331,6 +320,7 @@ class Bank {
 	}
 
 	private Sp64DistributionSet[] copy(Sp64DistributionSet[] sp64Distributions) {
-		return Arrays.stream(sp64Distributions).map(Sp64DistributionSet::copy).toArray(Sp64DistributionSet[]::new);
+		return Arrays.stream(sp64Distributions).map(s -> s == null ? null : s.copy())
+				.toArray(Sp64DistributionSet[]::new);
 	}
 }

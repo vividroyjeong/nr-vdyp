@@ -324,7 +324,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				continue;
 			}
 			var groupPrimary = copySpecies(
-					// groupSpecies.size() is at least 2 so findFirest will not be empty
+					// groupSpecies.size() is at least 2 so findFirst will not be empty
 					groupSpecies.stream().sorted(PERCENT_GENUS_DESCENDING).findFirst().orElseThrow(), builder -> {
 						var total = (float) groupSpecies.stream().mapToDouble(BaseVdypSpecies::getPercentGenus).sum();
 						builder.percentGenus(total);

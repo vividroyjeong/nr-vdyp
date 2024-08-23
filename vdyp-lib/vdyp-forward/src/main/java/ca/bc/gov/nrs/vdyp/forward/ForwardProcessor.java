@@ -115,36 +115,31 @@ public class ForwardProcessor {
 
 		if (vdypPassSet.contains(ForwardPass.PASS_3)) {
 
-			try {
-				var fpe = new ForwardProcessingEngine(controlMap);
+			var fpe = new ForwardProcessingEngine(controlMap);
 
-				var forwardDataStreamReader = new ForwardDataStreamReader(controlMap);
+			var forwardDataStreamReader = new ForwardDataStreamReader(fpe.fps.fcm);
 
-				// Fetch the next polygon to process.
-				int nPolygonsProcessed = 0;
-				while (true) {
+			// Fetch the next polygon to process.
+			int nPolygonsProcessed = 0;
+			while (true) {
 
-					if (nPolygonsProcessed == maxPoly) {
-						logger.info(
-								"Prematurely terminating polygon processing since MAX_POLY ({}) polygons have been processed",
-								maxPoly
-						);
-					}
+				if (nPolygonsProcessed == maxPoly) {
+					logger.info(
+							"Prematurely terminating polygon processing since MAX_POLY ({}) polygons have been processed",
+							maxPoly
+					);
+				}
 
-					var polygonHolder = forwardDataStreamReader.readNextPolygon();
-					if (polygonHolder.isEmpty()) {
-						break;
-					}
-					
-					var polygon = polygonHolder.get();
-					
-					fpe.processPolygon(polygon);
-
-					nPolygonsProcessed += 1;
+				var polygonHolder = forwardDataStreamReader.readNextPolygon();
+				if (polygonHolder.isEmpty()) {
+					break;
 				}
 				
-			} catch (IOException e) {
-				throw new ProcessingException(e);
+				var polygon = polygonHolder.get();
+				
+				fpe.processPolygon(polygon);
+
+				nPolygonsProcessed += 1;
 			}
 		}
 	}
