@@ -250,9 +250,13 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 			return factory.get();
 		} catch (IllegalStateException ex) {
-			throw new ProcessingException(String.format("Data file %s not specified in control map.", key), ex);
+			throw new ProcessingException(
+					String.format(
+							"Data file %s (%s) not specified in control map.", key, Utils.optPretty(key.sequence)
+					), ex
+			);
 		} catch (IOException ex) {
-			throw new ProcessingException("Error while opening data file.", ex);
+			throw new ProcessingException(String.format("Error while opening data file %s.", key), ex);
 		}
 	}
 

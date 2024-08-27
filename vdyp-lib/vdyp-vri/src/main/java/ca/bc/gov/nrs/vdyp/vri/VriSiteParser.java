@@ -39,7 +39,7 @@ public class VriSiteParser implements ControlMapValueReplacer<StreamingParserFac
 
 	@Override
 	public ControlKey getControlKey() {
-		return ControlKey.VRI_INPUT_YIELD_SPEC_DIST;
+		return ControlKey.VRI_INPUT_YIELD_HEIGHT_AGE_SI;
 	}
 
 	@Override
