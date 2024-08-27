@@ -79,6 +79,22 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies<I>, I extends Base
 	public void setInventoryTypeGroup(Optional<Integer> inventoryTypeGroup) {
 		this.inventoryTypeGroup = inventoryTypeGroup;
 	}
+	
+	@Override
+	public String toString() {
+		return polygonIdentifier.toStringCompact() + "-" + layerType;
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof BaseVdypLayer that) {
+			// This is the "business key" of a layer.
+			return this.polygonIdentifier.equals(that.polygonIdentifier)
+					&& this.layerType.equals(that.layerType);
+		} else {
+			return false;
+		}
+	}
 
 	public abstract static class Builder<T extends BaseVdypLayer<S, I>, S extends BaseVdypSpecies<I>, I extends BaseVdypSite, SB extends BaseVdypSpecies.Builder<S, I, IB>, IB extends BaseVdypSite.Builder<I>>
 			extends ModelClassBuilder<T> {

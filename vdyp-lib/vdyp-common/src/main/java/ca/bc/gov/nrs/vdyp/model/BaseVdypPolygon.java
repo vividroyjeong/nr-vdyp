@@ -114,6 +114,21 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 	public void setMode(Optional<PolygonMode> mode) {
 		this.mode = mode;
 	}
+	
+	@Override
+	public String toString() {
+		return polygonIdentifier.toStringCompact();
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof BaseVdypPolygon that) {
+			// This is the "business key" of a polygon.
+			return this.polygonIdentifier.equals(that.polygonIdentifier);
+		} else {
+			return false;
+		}
+	}
 
 	protected abstract static class Builder< //
 			T extends BaseVdypPolygon<L, PA, SP, SI>, //

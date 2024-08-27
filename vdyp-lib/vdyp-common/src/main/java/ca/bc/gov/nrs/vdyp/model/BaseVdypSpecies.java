@@ -88,6 +88,18 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 	public String toString() {
 		return MessageFormat.format("{0} {1} {2}", polygonIdentifier, layerType, genus);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof BaseVdypSpecies that) {
+			// This is the "business key" of a species.
+			return this.polygonIdentifier.equals(that.polygonIdentifier)
+					&& this.layerType.equals(that.layerType)
+					&& this.genus.equals(that.genus);
+		} else {
+			return false;
+		}
+	}
 
 	/**
 	 * Construct the species sp64DistributionSet from the given list of species percentages. The maxIndex of the Set is

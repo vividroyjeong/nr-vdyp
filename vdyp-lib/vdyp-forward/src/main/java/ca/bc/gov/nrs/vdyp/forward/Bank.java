@@ -189,6 +189,32 @@ class Bank {
 		return becZone;
 	}
 
+	/** 
+	 * Refresh the values in the bank with an updated version (given) of the layer used
+	 * to create the bank. The modifications cannot include any changes to the set of
+	 * species, although the details of those species may of course change.
+	 * 
+	 * @param layer a (presumably modified) version of the layer.
+	 * @throws ProcessingException 
+	 */
+	void refreshBank(VdypLayer layer) throws ProcessingException {
+		
+		if (! this.layer.equals(layer)) {
+			throw new IllegalArgumentException(MessageFormat.format("One cannot refresh a bank from a"
+					+ " layer ({0}) different from the one used to create the bank ({1})", this.layer, layer));
+		}
+		
+		List<VdypSpecies> species = layer.getSpecies().values().stream()
+				.sorted((s1, s2) -> s1.getGenusIndex() - s2.getGenusIndex()).toList();
+
+		transferUtilizationsIntoBank(0, layer);
+
+		int nextSlot = 1;
+		for (VdypSpecies s : species) {
+			transferSpeciesIntoBank(nextSlot++, s);
+		}
+	}
+	
 	/**
 	 * This method copies the Bank contents out to the VdypLayer instance used to create it and returns that. It is a
 	 * relatively expensive operation and should not be called without due consideration.
