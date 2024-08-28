@@ -650,7 +650,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	}
 
 	private float processVeteranLayer(VriPolygon polygon, VdypLayer.Builder lBuilder) throws StandProcessingException {
-		@SuppressWarnings("unused")
 		var veteranLayer = polygon.getLayers().get(LayerType.VETERAN);
 		lBuilder.layerType(LayerType.VETERAN);
 
@@ -658,15 +657,12 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		
 		var bec = polygon.getBiogeoclimaticZone();
 
-		var lowDq = false;
-
 		var primarySite = veteranLayer.getPrimarySite();
 		var primarySpecies = veteranLayer.getPrimarySpeciesRecord();
 
 		float ageTotal = primarySite.flatMap(VriSite::getAgeTotal).map(at -> at + veteranLayer.getAgeIncrease())
 				.orElse(0f); // AGETOTLV
 		float yearsToBreastHeight = primarySite.flatMap(VriSite::getYearsToBreastHeight).orElse(0f); // YTBHLV
-		float breastHeightAge = ageTotal - yearsToBreastHeight; // AGEBHLV
 		float dominantHeight = primarySite.flatMap(VriSite::getHeight).orElse(0f); // HDLV
 
 		var baseArea = veteranLayer.getBaseArea()
