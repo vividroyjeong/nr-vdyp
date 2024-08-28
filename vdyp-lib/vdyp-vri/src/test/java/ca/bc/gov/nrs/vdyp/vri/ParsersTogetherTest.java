@@ -159,6 +159,75 @@ class ParsersTogetherTest {
 	}
 
 	@Test
+	void testAddsSpecies() throws IOException, StandProcessingException, ResourceParseException {
+		var app = new VriStart();
+
+		final var polygonId = new PolygonIdentifier("Test", 2024);
+		final var layerType = LayerType.PRIMARY;
+
+		mockControl.replay();
+
+		app.init(resolver, controlMap);
+
+		var polyStream = new MockStreamingParser<VriPolygon>();
+		var layerStream = new MockStreamingParser<Map<LayerType, VriLayer.Builder>>();
+		var speciesStream = new MockStreamingParser<Collection<VriSpecies>>();
+		var siteStream = new MockStreamingParser<Collection<VriSite>>();
+
+		polyStream.addValue(VriPolygon.build(polyBuilder -> {
+			polyBuilder.polygonIdentifier(polygonId);
+			polyBuilder.percentAvailable(Optional.of(100.0f));
+			polyBuilder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
+			polyBuilder.yieldFactor(0.9f);
+		}));
+
+		var layerBuilder = new VriLayer.Builder();
+		layerBuilder.polygonIdentifier(polygonId);
+		layerBuilder.layerType(layerType);
+		layerBuilder.crownClosure(95f);
+		layerBuilder.utilization(0.6f);
+		layerBuilder.baseArea(20);
+		layerBuilder.treesPerHectare(300);
+		layerStream.addValue(Collections.singletonMap(layerType, layerBuilder));
+
+		speciesStream.addValue(Collections.singleton(VriSpecies.build(specBuilder -> {
+			specBuilder.polygonIdentifier(polygonId);
+			specBuilder.layerType(layerType);
+			specBuilder.genus("B", controlMap);
+			specBuilder.percentGenus(100f);
+		})));
+		siteStream.addValue(Collections.singleton(VriSite.build(siteBuilder -> {
+			siteBuilder.polygonIdentifier(polygonId);
+			siteBuilder.layerType(layerType);
+			siteBuilder.siteGenus("B");
+			siteBuilder.siteSpecies("B");
+		})));
+
+		var result = app.getPolygon(polyStream, layerStream, speciesStream, siteStream);
+
+		assertThat(result, hasProperty("layers", Matchers.aMapWithSize(1)));
+		var primaryResult = result.getLayers().get(LayerType.PRIMARY);
+		var veteranResult = result.getLayers().get(LayerType.VETERAN);
+		primaryResult.getPrimaryGenus();
+		assertThat(
+				primaryResult, allOf(
+						hasProperty("polygonIdentifier", is(polygonId)), //
+						hasProperty("layerType", is(LayerType.PRIMARY)), //
+						hasProperty("crownClosure", is(95f)), //
+						hasProperty("utilization", is(7.5f)), // Raised to minimum
+						hasProperty("baseArea", present(is(20f))), //
+						hasProperty("treesPerHectare", present(is(300f))), //
+						hasProperty("primaryGenus", present(is("B"))), //
+						hasProperty("secondaryGenus", notPresent())
+				)
+		);
+
+		assertThat(veteranResult, nullValue());
+
+		app.close();
+	}
+
+	@Test
 	void testVeteranOnly() throws IOException, StandProcessingException, ResourceParseException {
 		var app = new VriStart();
 

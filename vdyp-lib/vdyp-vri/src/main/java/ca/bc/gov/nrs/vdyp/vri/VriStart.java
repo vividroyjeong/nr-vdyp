@@ -43,7 +43,6 @@ import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndex2Height;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexAgeType;
 import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
-import ca.bc.gov.nrs.vdyp.fip.FipControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
@@ -232,7 +231,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 								.getPolygonIdentifier(), polygon.getPolygonIdentifier()
 				);
 			}
-			layer.setSpecies(new HashMap<>());
+			//layer.setSpecies(new HashMap<>());
 		}
 
 		polygon.setLayers(layers);
