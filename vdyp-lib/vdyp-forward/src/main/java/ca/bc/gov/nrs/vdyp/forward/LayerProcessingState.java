@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
+import ca.bc.gov.nrs.vdyp.forward.Bank.CopyMode;
 import ca.bc.gov.nrs.vdyp.forward.model.ControlVariable;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
@@ -22,6 +23,10 @@ import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.VolumeVariable;
 
 class LayerProcessingState {
+
+	enum BankType {
+		Start, End
+	};
 
 	private static final String COMPATIBILITY_VARIABLES_SET_CAN_BE_SET_ONCE_ONLY = "CompatibilityVariablesSet can be set once only";
 	private static final String PRIMARY_SPECIES_DETAILS_CAN_BE_SET_ONCE_ONLY = "PrimarySpeciesDetails can be set once only";
@@ -57,6 +62,12 @@ class LayerProcessingState {
 	 */
 	private Bank startBank;
 	
+	/** 
+	 * State of the layer at the end of processing. The information comprising this is calculated
+	 * during the execution of <code>grow()</code>.
+	 */
+	private Bank endBank;
+
 	// L1COM2 - equation groups. From the configuration, narrowed to the
 	// polygon's BEC zone.
 
@@ -128,6 +139,8 @@ class LayerProcessingState {
 				polygon.getLayers().get(subjectLayerType), becZone,
 				s -> s.getBaseAreaByUtilization().get(UtilizationClass.ALL) >= ForwardProcessingEngine.MIN_BASAL_AREA);
 		
+		this.endBank = new Bank(this.startBank, CopyMode.CopyStructure);
+		
 		var volumeEquationGroupMatrix = this.fps.fcm.getVolumeEquationGroups();
 		var decayEquationGroupMatrix = this.fps.fcm.getDecayEquationGroups();
 		var breakageEquationGroupMatrix = this.fps.fcm.getBreakageEquationGroups();
@@ -157,11 +170,10 @@ class LayerProcessingState {
 	 * Set the layer processing state to the given Bank. This is normally done at the conclusion of
 	 * the growth of a layer for one growth period; the Bank resulting from that calculation is
 	 * assigned as the start bank for the next growth period.
-	 * 
-	 * @param newStartBank
 	 */
-	public void swapBank(Bank newStartBank) {
-		this.startBank = newStartBank;
+	public void swapBanks() {
+		this.startBank = endBank;
+		this.endBank = new Bank(this.startBank, CopyMode.CopyStructure);
 	}
 
 	public VdypPolygon getPolygon() {
@@ -271,6 +283,10 @@ class LayerProcessingState {
 
 	public Bank getStartBank() {
 		return startBank;
+	}
+
+	public Bank getEndBank() {
+		return endBank;
 	}
 
 	public int[] getVolumeEquationGroups() {
@@ -514,12 +530,14 @@ class LayerProcessingState {
 		return cvPrimaryLayerSmall[speciesIndex].get(variable);
 	}
 
-	public VdypLayer getLayerFromBank(Bank bank) {
+	public VdypLayer getLayerFromBank(BankType bankType) {
 		
-		VdypLayer updatedLayer = bank.getUpdatedLayer();
+		Bank sourceBank = bankType == BankType.Start ? startBank : endBank;
+		
+		VdypLayer updatedLayer = sourceBank.getUpdatedLayer();
 		
 		for (int i = 1; i < getNSpecies() + 1; i++) {
-			VdypSpecies species = updatedLayer.getSpeciesBySp0(bank.speciesNames[i]);
+			VdypSpecies species = updatedLayer.getSpeciesBySp0(sourceBank.speciesNames[i]);
 			species.setCompatibilityVariables(
 					cvVolume[i], cvBasalArea[i], cvQuadraticMeanDiameter[i], cvPrimaryLayerSmall[i]);
 		}

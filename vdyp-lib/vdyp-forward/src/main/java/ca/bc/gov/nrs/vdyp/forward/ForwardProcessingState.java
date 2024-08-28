@@ -1,6 +1,8 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
+import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
@@ -8,6 +10,8 @@ import ca.bc.gov.nrs.vdyp.common.ComputationMethods;
 import ca.bc.gov.nrs.vdyp.common.EstimationMethods;
 import ca.bc.gov.nrs.vdyp.forward.controlmap.ForwardResolvedControlMap;
 import ca.bc.gov.nrs.vdyp.forward.controlmap.ForwardResolvedControlMapImpl;
+import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
+import ca.bc.gov.nrs.vdyp.io.write.VdypOutputWriter;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 
@@ -24,11 +28,28 @@ class ForwardProcessingState {
 
 	/** The active state */
 	private LayerProcessingState lps;
+	
+	/** The entity to which result information is written */
+	private Optional<VdypOutputWriter> outputWriter = Optional.empty();
 
-	public ForwardProcessingState(Map<String, Object> controlMap) {
+	public ForwardProcessingState(Map<String, Object> controlMap) 
+			throws ProcessingException {
+		this(controlMap, Optional.empty());
+	}
+
+	public ForwardProcessingState(Map<String, Object> controlMap, Optional<FileSystemFileResolver> outputFileResolver) 
+			throws ProcessingException {
 		this.fcm = new ForwardResolvedControlMapImpl(controlMap);
 		this.estimators = new EstimationMethods(this.fcm);
 		this.computers = new ComputationMethods(estimators, VdypApplicationIdentifier.VDYP_FORWARD);
+		
+		if (outputFileResolver.isPresent()) {
+			try {
+				outputWriter = Optional.of(new VdypOutputWriter(controlMap, outputFileResolver.get()));
+			} catch (IOException e) {
+				throw new ProcessingException(e);
+			}
+		}
 	}
 
 	public void setPolygonLayer(VdypPolygon polygon, LayerType subjectLayer) throws ProcessingException {
@@ -38,5 +59,9 @@ class ForwardProcessingState {
 
 	public LayerProcessingState getLayerProcessingState() {
 		return lps;
+	}
+	
+	public Optional<VdypOutputWriter> getOutputWriter() {
+		return outputWriter;
 	}
 }

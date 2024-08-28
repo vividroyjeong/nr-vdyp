@@ -73,7 +73,7 @@ class GeneralForwardProcessingEngineTest extends AbstractForwardProcessingEngine
 
 			LayerProcessingState lps = fpe.fps.getLayerProcessingState();
 
-			fpe.calculateCoverages();
+			ForwardProcessingEngine.calculateCoverages(lps);
 			fpe.determinePolygonRankings(CommonData.PRIMARY_SPECIES_TO_COMBINE);
 
 			assertThat(lps.getPrimarySpeciesIndex(), is(3));
@@ -89,7 +89,7 @@ class GeneralForwardProcessingEngineTest extends AbstractForwardProcessingEngine
 
 			var speciesToCombine = Arrays.asList(Arrays.asList(lps.getStartBank().speciesNames[3], lps.getStartBank().speciesNames[4]));
 
-			fpe.calculateCoverages();
+			ForwardProcessingEngine.calculateCoverages(lps);
 			fpe.determinePolygonRankings(speciesToCombine);
 
 			// The test-specific speciesToCombine will combine 3 & 4 into 3 (leaving 4 at 0.0), promoting 2 to

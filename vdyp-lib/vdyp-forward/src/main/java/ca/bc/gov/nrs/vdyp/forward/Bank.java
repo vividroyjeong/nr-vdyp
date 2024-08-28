@@ -21,6 +21,10 @@ import ca.bc.gov.nrs.vdyp.model.VdypUtilizationHolder;
 
 class Bank {
 
+	enum CopyMode {
+		CopyAll, CopyStructure
+	};
+
 	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(Bank.class);
 
@@ -103,10 +107,6 @@ class Bank {
 			transferSpeciesIntoBank(nextSlot++, s);
 		}
 	}
-
-	enum CopyMode {
-		CopyAll, CopyStructure
-	};
 
 	public Bank(Bank source, CopyMode copyMode) {
 

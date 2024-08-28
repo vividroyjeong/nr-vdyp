@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -75,6 +76,8 @@ public class ForwardProcessor {
 
 		var parser = new ForwardControlParser();
 
+		Optional<FileSystemFileResolver> outputFileResolver = Optional.empty();
+		
 		for (var controlFileName : controlFileNames) {
 			logger.info("Resolving and parsing {}", controlFileName);
 
@@ -83,18 +86,23 @@ public class ForwardProcessor {
 				FileSystemFileResolver relativeResolver = new FileSystemFileResolver(controlFilePath);
 
 				parser.parse(is, relativeResolver, controlMap);
+				
+				if (controlMap.containsKey(ControlKey.VDYP_OUTPUT_VDYP_POLYGON.name())) {
+					outputFileResolver = Optional.of(relativeResolver);
+				}
 			}
 		}
 
-		process(vdypPassSet, controlMap);
+		process(vdypPassSet, controlMap, outputFileResolver);
 	}
 
 	/**
 	 * Implements VDYP_SUB
+	 * @param outputFileResolver 
 	 *
 	 * @throws ProcessingException
 	 */
-	public void process(Set<ForwardPass> vdypPassSet, Map<String, Object> controlMap) throws ProcessingException {
+	public void process(Set<ForwardPass> vdypPassSet, Map<String, Object> controlMap, Optional<FileSystemFileResolver> outputFileResolver) throws ProcessingException {
 
 		logger.info("Beginning processing with given configuration");
 
@@ -115,7 +123,7 @@ public class ForwardProcessor {
 
 		if (vdypPassSet.contains(ForwardPass.PASS_3)) {
 
-			var fpe = new ForwardProcessingEngine(controlMap);
+			var fpe = new ForwardProcessingEngine(controlMap, outputFileResolver);
 
 			var forwardDataStreamReader = new ForwardDataStreamReader(fpe.fps.fcm);
 
