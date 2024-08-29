@@ -161,7 +161,9 @@ class VdypStartApplicationTest {
 			var ex = assertThrows(
 					ProcessingException.class, () -> app.getStreamingParser(ControlKey.FIP_INPUT_YIELD_LAYER)
 			);
-			assertThat(ex, hasProperty("message", is("Data file FIP_INPUT_YIELD_LAYER not specified in control map.")));
+			assertThat(
+					ex, hasProperty("message", is("Data file FIP_INPUT_YIELD_LAYER (12) not specified in control map."))
+			);
 
 			app.close();
 		}
@@ -189,7 +191,7 @@ class VdypStartApplicationTest {
 			var ex = assertThrows(
 					ProcessingException.class, () -> app.getStreamingParser(ControlKey.FIP_INPUT_YIELD_LAYER)
 			);
-			assertThat(ex, hasProperty("message", is("Error while opening data file.")));
+			assertThat(ex, hasProperty("message", is("Error while opening data file FIP_INPUT_YIELD_LAYER.")));
 			assertThat(ex, causedBy(is(exception)));
 
 			mockControl.verify();

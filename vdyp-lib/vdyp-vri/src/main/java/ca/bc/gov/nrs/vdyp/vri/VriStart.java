@@ -417,6 +417,9 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					);
 
 					if (resultVeteranLayer != null) {
+						// YUCV
+						computeUtilizationComponentsVeteran(resultVeteranLayer, bec);
+
 						var input = inputTph.get();
 						var computed = resultVeteranLayer.getTreesPerHectareByUtilization().getAll();
 						if (FloatMath.abs(input - computed) / input > 0.0005) {
@@ -427,9 +430,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 									)
 							);
 						}
-
-						// YUCV
-						computeUtilizationComponentsVeteran(resultVeteranLayer, bec);
 
 					}
 				} catch (ProcessingException e) {
