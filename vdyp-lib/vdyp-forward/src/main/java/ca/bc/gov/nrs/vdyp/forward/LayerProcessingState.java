@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
-import ca.bc.gov.nrs.vdyp.forward.Bank.CopyMode;
 import ca.bc.gov.nrs.vdyp.forward.model.ControlVariable;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
@@ -23,10 +22,6 @@ import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.VolumeVariable;
 
 class LayerProcessingState {
-
-	enum BankType {
-		Start, End
-	};
 
 	private static final String COMPATIBILITY_VARIABLES_SET_CAN_BE_SET_ONCE_ONLY = "CompatibilityVariablesSet can be set once only";
 	private static final String PRIMARY_SPECIES_DETAILS_CAN_BE_SET_ONCE_ONLY = "PrimarySpeciesDetails can be set once only";
@@ -57,17 +52,10 @@ class LayerProcessingState {
 	// when copied to "active" in ForwardProcessingEngine.
 	
 	/** 
-	 * State of the layer at the start of processing; read-write during preparation for grow 
-	 * and read-only after that.
+	 * State of the layer during processing.
 	 */
-	private Bank startBank;
+	private Bank bank;
 	
-	/** 
-	 * State of the layer at the end of processing. The information comprising this is calculated
-	 * during the execution of <code>grow()</code>.
-	 */
-	private Bank endBank;
-
 	// L1COM2 - equation groups. From the configuration, narrowed to the
 	// polygon's BEC zone.
 
@@ -135,27 +123,25 @@ class LayerProcessingState {
 		
 		BecDefinition becZone = polygon.getBiogeoclimaticZone();
 		
-		this.startBank = new Bank(
+		this.bank = new Bank(
 				polygon.getLayers().get(subjectLayerType), becZone,
 				s -> s.getBaseAreaByUtilization().get(UtilizationClass.ALL) >= ForwardProcessingEngine.MIN_BASAL_AREA);
-		
-		this.endBank = new Bank(this.startBank, CopyMode.CopyStructure);
 		
 		var volumeEquationGroupMatrix = this.fps.fcm.getVolumeEquationGroups();
 		var decayEquationGroupMatrix = this.fps.fcm.getDecayEquationGroups();
 		var breakageEquationGroupMatrix = this.fps.fcm.getBreakageEquationGroups();
 
-		this.volumeEquationGroups = new int[this.startBank.getNSpecies() + 1];
-		this.decayEquationGroups = new int[this.startBank.getNSpecies() + 1];
-		this.breakageEquationGroups = new int[this.startBank.getNSpecies() + 1];
+		this.volumeEquationGroups = new int[this.bank.getNSpecies() + 1];
+		this.decayEquationGroups = new int[this.bank.getNSpecies() + 1];
+		this.breakageEquationGroups = new int[this.bank.getNSpecies() + 1];
 
 		this.volumeEquationGroups[0] = VdypEntity.MISSING_INTEGER_VALUE;
 		this.decayEquationGroups[0] = VdypEntity.MISSING_INTEGER_VALUE;
 		this.breakageEquationGroups[0] = VdypEntity.MISSING_INTEGER_VALUE;
 
 		String becZoneAlias = this.getBecZone().getAlias();
-		for (int i = 1; i < this.startBank.getNSpecies() + 1; i++) {
-			String speciesName = this.startBank.speciesNames[i];
+		for (int i = 1; i < this.bank.getNSpecies() + 1; i++) {
+			String speciesName = this.bank.speciesNames[i];
 			this.volumeEquationGroups[i] = volumeEquationGroupMatrix.get(speciesName, becZoneAlias);
 			// From VGRPFIND, volumeEquationGroup 10 is mapped to 11.
 			if (this.volumeEquationGroups[i] == 10) {
@@ -166,16 +152,6 @@ class LayerProcessingState {
 		}
 	}
 	
-	/** 
-	 * Set the layer processing state to the given Bank. This is normally done at the conclusion of
-	 * the growth of a layer for one growth period; the Bank resulting from that calculation is
-	 * assigned as the start bank for the next growth period.
-	 */
-	public void swapBanks() {
-		this.startBank = endBank;
-		this.endBank = new Bank(this.startBank, CopyMode.CopyStructure);
-	}
-
 	public VdypPolygon getPolygon() {
 		return polygon;
 	}
@@ -185,15 +161,15 @@ class LayerProcessingState {
 	}
 
 	public int getNSpecies() {
-		return startBank.getNSpecies();
+		return bank.getNSpecies();
 	}
 
 	public int[] getIndices() {
-		return startBank.getIndices();
+		return bank.getIndices();
 	}
 
 	public BecDefinition getBecZone() {
-		return startBank.getBecZone();
+		return bank.getBecZone();
 	}
 
 	public int getPrimarySpeciesIndex() {
@@ -207,7 +183,7 @@ class LayerProcessingState {
 		if (!areRankingDetailsSet) {
 			throw new IllegalStateException("unset primarySpeciesIndex");
 		}
-		return startBank.speciesNames[primarySpeciesIndex];
+		return bank.speciesNames[primarySpeciesIndex];
 	}
 
 	public boolean hasSecondarySpeciesIndex() {
@@ -281,12 +257,8 @@ class LayerProcessingState {
 		return fps;
 	}
 
-	public Bank getStartBank() {
-		return startBank;
-	}
-
-	public Bank getEndBank() {
-		return endBank;
+	public Bank getBank() {
+		return bank;
 	}
 
 	public int[] getVolumeEquationGroups() {
@@ -424,26 +396,34 @@ class LayerProcessingState {
 		this.primarySpeciesAgeAtBreastHeight = details.primarySpeciesAgeAtBreastHeight();
 		this.primarySpeciesAgeToBreastHeight = details.primarySpeciesAgeToBreastHeight();
 
-		// Store these values into start - VHDOM1 lines 182 - 186
-		if (startBank.dominantHeights[primarySpeciesIndex] <= 0.0) {
-			startBank.dominantHeights[primarySpeciesIndex] = this.primarySpeciesDominantHeight;
+		// Store these values into bank if not already set - VHDOM1 lines 182 - 186
+		if (bank.dominantHeights[primarySpeciesIndex] <= 0.0) {
+			bank.dominantHeights[primarySpeciesIndex] = this.primarySpeciesDominantHeight;
 		}
-		if (startBank.siteIndices[primarySpeciesIndex] <= 0.0) {
-			startBank.siteIndices[primarySpeciesIndex] = this.primarySpeciesSiteIndex;
+		if (bank.siteIndices[primarySpeciesIndex] <= 0.0) {
+			bank.siteIndices[primarySpeciesIndex] = this.primarySpeciesSiteIndex;
 		}
-		if (startBank.ageTotals[primarySpeciesIndex] <= 0.0) {
-			startBank.ageTotals[primarySpeciesIndex] = this.primarySpeciesTotalAge;
+		if (bank.ageTotals[primarySpeciesIndex] <= 0.0) {
+			bank.ageTotals[primarySpeciesIndex] = this.primarySpeciesTotalAge;
 		}
-		if (startBank.yearsAtBreastHeight[primarySpeciesIndex] <= 0.0) {
-			startBank.yearsAtBreastHeight[primarySpeciesIndex] = this.primarySpeciesAgeAtBreastHeight;
+		if (bank.yearsAtBreastHeight[primarySpeciesIndex] <= 0.0) {
+			bank.yearsAtBreastHeight[primarySpeciesIndex] = this.primarySpeciesAgeAtBreastHeight;
 		}
-		if (startBank.yearsAtBreastHeight[primarySpeciesIndex] <= 0.0) {
-			startBank.yearsAtBreastHeight[primarySpeciesIndex] = this.primarySpeciesAgeToBreastHeight;
+		if (bank.yearsToBreastHeight[primarySpeciesIndex] <= 0.0) {
+			bank.yearsToBreastHeight[primarySpeciesIndex] = this.primarySpeciesAgeToBreastHeight;
 		}
 
 		this.arePrimarySpeciesDetailsSet = true;
 	}
 	
+	/** 
+	 * Update the cached primary species details after growth. These changes are made to
+	 * the cached values only at this time. Later, if Control Variable 6 is > 0, 
+	 * <code>setPrimarySpeciesDetails</code> will be called before the next growth
+	 * period is run and the bank values will be updated, too.
+	 * 
+	 * @param newPrimarySpeciesDominantHeight
+	 */
 	public void updatePrimarySpeciesDetailsAfterGrowth(float newPrimarySpeciesDominantHeight) {
 		
 		this.primarySpeciesDominantHeight = newPrimarySpeciesDominantHeight;
@@ -530,14 +510,12 @@ class LayerProcessingState {
 		return cvPrimaryLayerSmall[speciesIndex].get(variable);
 	}
 
-	public VdypLayer getLayerFromBank(BankType bankType) {
+	public VdypLayer getLayer() {
 		
-		Bank sourceBank = bankType == BankType.Start ? startBank : endBank;
-		
-		VdypLayer updatedLayer = sourceBank.getUpdatedLayer();
+		VdypLayer updatedLayer = bank.getUpdatedLayer();
 		
 		for (int i = 1; i < getNSpecies() + 1; i++) {
-			VdypSpecies species = updatedLayer.getSpeciesBySp0(sourceBank.speciesNames[i]);
+			VdypSpecies species = updatedLayer.getSpeciesBySp0(bank.speciesNames[i]);
 			species.setCompatibilityVariables(
 					cvVolume[i], cvBasalArea[i], cvQuadraticMeanDiameter[i], cvPrimaryLayerSmall[i]);
 		}

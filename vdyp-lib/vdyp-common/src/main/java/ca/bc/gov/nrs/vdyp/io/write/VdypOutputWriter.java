@@ -32,6 +32,8 @@ public class VdypOutputWriter implements Closeable {
 	private OutputStream polygonFile;
 	private OutputStream speciesFile;
 	private OutputStream utilizationFile;
+	@SuppressWarnings("unused")
+	private OutputStream compatibilityVariablesFile;
 	
 	private Optional<Integer> currentYear = Optional.empty();
 
@@ -70,14 +72,17 @@ public class VdypOutputWriter implements Closeable {
 	 * @param polygonFile
 	 * @param speciesFile
 	 * @param utilizationFile
+	 * @param compatibilityVariablesFile
 	 * @param controlMap
 	 */
 	public VdypOutputWriter(
-			OutputStream polygonFile, OutputStream speciesFile, OutputStream utilizationFile
+			OutputStream polygonFile, OutputStream speciesFile, OutputStream utilizationFile,
+			OutputStream compatibilityVariablesFile
 	) {
 		this.polygonFile = polygonFile;
 		this.speciesFile = speciesFile;
 		this.utilizationFile = utilizationFile;
+		this.compatibilityVariablesFile = compatibilityVariablesFile;
 	}
 
 	/**
@@ -90,9 +95,10 @@ public class VdypOutputWriter implements Closeable {
 	 */
 	public VdypOutputWriter(Map<String, Object> controlMap, FileResolver resolver) throws IOException {
 		this(
-				getOutputStream(controlMap, resolver, ControlKey.VRI_OUTPUT_VDYP_POLYGON.name()),
-				getOutputStream(controlMap, resolver, ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name()),
-				getOutputStream(controlMap, resolver, ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name())
+				getOutputStream(controlMap, resolver, ControlKey.VDYP_OUTPUT_VDYP_POLYGON.name()),
+				getOutputStream(controlMap, resolver, ControlKey.VDYP_OUTPUT_VDYP_LAYER_BY_SPECIES.name()),
+				getOutputStream(controlMap, resolver, ControlKey.VDYP_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name()),
+				getOutputStream(controlMap, resolver, ControlKey.VDYP_OUTPUT_COMPATIBILITY_VARIABLES.name())
 		);
 	}
 

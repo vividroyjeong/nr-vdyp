@@ -98,7 +98,10 @@ public class ForwardControlParser extends BaseControlParser {
 
 	@Override
 	protected List<ControlKey> outputFileParsers() {
-		return Collections.emptyList();
+		return List.of(
+				ControlKey.VDYP_OUTPUT_VDYP_POLYGON, ControlKey.VDYP_OUTPUT_VDYP_LAYER_BY_SPECIES,
+				ControlKey.VDYP_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL, ControlKey.VDYP_OUTPUT_COMPATIBILITY_VARIABLES
+		);
 	}
 
 	@Override

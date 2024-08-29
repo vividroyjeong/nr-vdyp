@@ -289,13 +289,16 @@ class Bank {
 
 		VdypSite site = species.getSite().get();
 
-		VdypSite updatedSite = new VdypSite.Builder().adapt(site).siteIndex(siteIndices[index])
-				.ageTotal(ageTotals[index]).height(dominantHeights[index])
-				.yearsToBreastHeight(yearsToBreastHeight[index]).build();
+		VdypSite updatedSite = new VdypSite.Builder().adapt(site) //
+				.siteIndex(siteIndices[index]) //
+				.ageTotal(ageTotals[index]) //
+				.height(dominantHeights[index]) //
+				.yearsToBreastHeight(yearsToBreastHeight[index]) //
+				.build();
 
 		species = new VdypSpecies.Builder().addSite(updatedSite).adapt(species).build();
 		
-		transferUtilizationsIntoBank(index, species);
+		transferUtilizationsFromBank(index, species);
 	}
 
 	private void transferUtilizationsFromBank(int index, VdypUtilizationHolder uh) {
