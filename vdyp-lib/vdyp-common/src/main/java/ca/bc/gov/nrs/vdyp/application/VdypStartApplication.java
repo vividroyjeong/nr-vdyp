@@ -1364,6 +1364,12 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			});
 			var ba = vdypLayer.getBaseAreaByUtilization();
 			hlVector.scalarInPlace((float x, UtilizationClass uc) -> ba.get(uc) > 0 ? x / ba.get(uc) : x);
+
+			// Update percent based on updated areas 
+			vdypLayer.getSpecies().values().stream().forEach(spec -> {
+				spec.setPercentGenus(100 * spec.getBaseAreaByUtilization().getAll() / ba.getAll());
+			});
+
 			vdypLayer.setLoreyHeightByUtilization(hlVector);
 		}
 		// Quadratic mean diameter for the layer is computed from the BA and TPH after
@@ -1374,6 +1380,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			);
 			vdypLayer.setQuadraticMeanDiameterByUtilization(utilVector);
 		}
+
 	}
 
 	// TODO De-reflectify this when we want to make it work in GralVM

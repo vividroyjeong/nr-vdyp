@@ -1402,6 +1402,8 @@ class VdypStartApplicationTest {
 
 				VdypSpecies resultSpecB = TestUtils.assertHasSpecies(layer, "B", "C", "H");
 
+				assertThat(resultSpecB, hasProperty("percentGenus", closeTo(20f)));
+
 				assertThat(resultSpecB, hasProperty("loreyHeightByUtilization", utilizationHeight(0f, 34f)));
 				assertThat(resultSpecB, hasProperty("baseAreaByUtilization", utilizationAllAndBiggest(4f)));
 				assertThat(
