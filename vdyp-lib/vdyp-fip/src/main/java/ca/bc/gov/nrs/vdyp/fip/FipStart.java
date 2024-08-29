@@ -653,6 +653,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		);
 
 		for (var vSpec : vdypSpecies.values()) {
+			// TODO this should probably be using estimateVeteranQuadMeanDiameter
 			var genus = vSpec.getGenus();
 			var coe = vetDqMap.get(genus, region);
 			var a0 = coe.getCoe(1);
@@ -678,126 +679,6 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		computeUtilizationComponentsVeteran(vdypLayer, bec);
 
 		return vdypLayer;
-	}
-
-	// YUCV
-	private void computeUtilizationComponentsVeteran(VdypLayer vdypLayer, BecDefinition bec)
-			throws ProcessingException {
-		log.trace(
-				"computeUtilizationComponentsVeterany for {}, stand total age is {}", vdypLayer
-						.getPolygonIdentifier(), vdypLayer.getAgeTotal()
-		);
-
-		var volumeAdjustMap = Utils.<Map<String, Coefficients>>expectParsedControl(
-				controlMap, ControlKey.VETERAN_LAYER_VOLUME_ADJUST, Map.class
-		);
-		try {
-			for (var vdypSpecies : vdypLayer.getSpecies().values()) {
-
-				var treesPerHectareUtil = Utils.utilizationVector();
-				var quadMeanDiameterUtil = Utils.utilizationVector();
-				var baseAreaUtil = Utils.utilizationVector();
-				var wholeStemVolumeUtil = Utils.utilizationVector();
-
-				var closeUtilizationVolumeUtil = Utils.utilizationVector();
-				var closeUtilizationNetOfDecayUtil = Utils.utilizationVector();
-				var closeUtilizationNetOfDecayAndWasteUtil = Utils.utilizationVector();
-				var closeUtilizationNetOfDecayWasteAndBreakageUtil = Utils.utilizationVector();
-
-				var hlSp = vdypSpecies.getLoreyHeightByUtilization().getAll();
-				{
-					var baSp = vdypSpecies.getBaseAreaByUtilization().getLarge();
-					var tphSp = vdypSpecies.getTreesPerHectareByUtilization().getLarge();
-					var dqSp = vdypSpecies.getQuadraticMeanDiameterByUtilization().getLarge();
-
-					treesPerHectareUtil.setAll(tphSp);
-					quadMeanDiameterUtil.setAll(dqSp);
-					baseAreaUtil.setAll(baSp);
-					wholeStemVolumeUtil.setAll(0f);
-
-					treesPerHectareUtil.setLarge(tphSp);
-					quadMeanDiameterUtil.setLarge(dqSp);
-					baseAreaUtil.setLarge(baSp);
-					wholeStemVolumeUtil.setLarge(0f);
-				}
-				// AADJUSTV
-				var volumeAdjustCoe = volumeAdjustMap.get(vdypSpecies.getGenus());
-
-				var utilizationClass = UtilizationClass.OVER225; // IUC_VET
-
-				// ADJ
-				var adjust = new Coefficients(new float[] { 0f, 0f, 0f, 0f }, 1);
-
-				// EMP091
-				estimationMethods.estimateWholeStemVolume(
-						utilizationClass, volumeAdjustCoe.getCoe(1), vdypSpecies.getVolumeGroup(), hlSp,
-						quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
-				);
-
-				adjust.setCoe(4, volumeAdjustCoe.getCoe(2));
-				// EMP092
-				estimationMethods.estimateCloseUtilizationVolume(
-						utilizationClass, adjust, vdypSpecies.getVolumeGroup(), hlSp, quadMeanDiameterUtil,
-						wholeStemVolumeUtil, closeUtilizationVolumeUtil
-				);
-
-				adjust.setCoe(4, volumeAdjustCoe.getCoe(3));
-				// EMP093
-				estimationMethods.estimateNetDecayVolume(
-						vdypSpecies.getGenus(), bec.getRegion(), utilizationClass, adjust,
-						vdypSpecies.getDecayGroup(), vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil,
-						closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil
-				);
-
-				adjust.setCoe(4, volumeAdjustCoe.getCoe(4));
-				// EMP094
-				estimationMethods.estimateNetDecayAndWasteVolume(
-						bec.getRegion(), utilizationClass, adjust, vdypSpecies
-								.getGenus(), hlSp, quadMeanDiameterUtil, closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
-				);
-
-				if (getId().isStart()) {
-					// EMP095
-					estimationMethods.estimateNetDecayWasteAndBreakageVolume(
-							utilizationClass, vdypSpecies.getBreakageGroup(), quadMeanDiameterUtil,
-							closeUtilizationVolumeUtil, closeUtilizationNetOfDecayAndWasteUtil,
-							closeUtilizationNetOfDecayWasteAndBreakageUtil
-					);
-				}
-
-				vdypSpecies.setBaseAreaByUtilization(baseAreaUtil);
-				vdypSpecies.setTreesPerHectareByUtilization(treesPerHectareUtil);
-				vdypSpecies.setQuadraticMeanDiameterByUtilization(quadMeanDiameterUtil);
-				vdypSpecies.setWholeStemVolumeByUtilization(wholeStemVolumeUtil);
-				vdypSpecies.setCloseUtilizationVolumeByUtilization(closeUtilizationVolumeUtil);
-				vdypSpecies.setCloseUtilizationVolumeNetOfDecayByUtilization(closeUtilizationNetOfDecayUtil);
-				vdypSpecies.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(
-						closeUtilizationNetOfDecayAndWasteUtil
-				);
-				vdypSpecies.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
-						closeUtilizationNetOfDecayWasteAndBreakageUtil
-				);
-
-				for (var accessors : UTILIZATION_VECTOR_ACCESSORS) {
-					UtilizationVector utilVector = (UtilizationVector) accessors.getReadMethod().invoke(vdypSpecies);
-
-					// Set all components other than 4 to 0.0
-					for (var uc : UtilizationClass.ALL_BUT_LARGEST) {
-						utilVector.set(uc, 0f);
-					}
-
-					// Set component 0 to equal component 4.
-					utilVector.setAll(utilVector.getLarge());
-
-					accessors.getWriteMethod().invoke(vdypSpecies, utilVector);
-				}
-			}
-
-			computeLayerUtilizationComponentsFromSpecies(vdypLayer);
-
-		} catch (IllegalAccessException | InvocationTargetException ex) {
-			throw new IllegalStateException(ex);
-		}
 	}
 
 	// FIP_GET
