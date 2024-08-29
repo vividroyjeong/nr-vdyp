@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.EstimationMethods;
+import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.common.ReconcilationMethods;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
@@ -170,8 +171,6 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	public EstimationMethods estimationMethods;
 
-	static final Comparator<BaseVdypSpecies<?>> PERCENT_GENUS_DESCENDING = Utils
-			.compareUsing(BaseVdypSpecies<?>::getPercentGenus).reversed();
 
 	/**
 	 * When finding primary species these genera should be combined
@@ -297,7 +296,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				.sum();
 		if (Math.abs(percentTotal - 100f) > 0.01f) {
 			throw validationError(
-					"Polygon \"%s\" has %s layer where species entries have a percentage total that does not sum to 100%%.", layer
+					"Polygon \"%s\" has %s layer where species entries have a percentage total that does not sum to 100%%.",
+					layer
 							.getPolygonIdentifier(), LayerType.PRIMARY
 			);
 		}
@@ -310,6 +310,18 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	 * Returns the primary, and secondary if present species records as a one or two element list.
 	 */
 	protected List<S> findPrimarySpecies(Collection<S> allSpecies) {
+		var sp0Lookup = Utils.expectParsedControl(
+				controlMap, ControlKey.SP0_DEF, GenusDefinitionMap.class
+		);
+		final Comparator<BaseVdypSpecies<?>> percentGenusDescending = Utils.compareWithFallback(
+				// Sort first by percent
+				Utils.compareUsing(BaseVdypSpecies<?>::getPercentGenus).reversed(),
+				// Resolve ties using SP0 preference order which is equal to index.
+				Utils.compareUsing(
+						spec -> sp0Lookup.getByAlias(spec.getGenus()).getIndex()
+				)
+		);
+
 		if (allSpecies.isEmpty()) {
 			throw new IllegalArgumentException("Can not find primary species as there are no species");
 		}
@@ -327,8 +339,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				continue;
 			}
 			var groupPrimary = copySpecies(
-					// groupSpecies.size() is at least 2 so findFirest will not be empty
-					groupSpecies.stream().sorted(PERCENT_GENUS_DESCENDING).findFirst().orElseThrow(), builder -> {
+					// groupSpecies.size() is at least 2 so findFirst will not be empty
+					groupSpecies.stream().sorted(percentGenusDescending).findFirst().orElseThrow(), builder -> {
 						var total = (float) groupSpecies.stream().mapToDouble(BaseVdypSpecies::getPercentGenus).sum();
 						builder.percentGenus(total);
 					}
@@ -345,7 +357,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		} else {
 			switch (this.getDebugMode(22)) {
 			case 0:
-				combined.values().stream().sorted(PERCENT_GENUS_DESCENDING).limit(2).forEach(result::add);
+				combined.values().stream().sorted(percentGenusDescending).limit(2).forEach(result::add);
 				break;
 			case 1:
 				// TODO
@@ -1233,7 +1245,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				estimationMethods.estimateWholeStemVolume(
 						UtilizationClass.ALL, adjustCloseUtil.getCoe(
 								4
-						), spec.getVolumeGroup(), loreyHeightSpec, quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
+						), spec.getVolumeGroup(), loreyHeightSpec, quadMeanDiameterUtil, baseAreaUtil,
+						wholeStemVolumeUtil
 				);
 
 				if (compatibilityVariableMode == CompatibilityVariableMode.ALL) {
@@ -1249,7 +1262,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				// EMP092
 				estimationMethods.estimateCloseUtilizationVolume(
 						UtilizationClass.ALL, adjustCloseUtil, spec
-								.getVolumeGroup(), loreyHeightSpec, quadMeanDiameterUtil, wholeStemVolumeUtil, closeVolumeUtil
+								.getVolumeGroup(), loreyHeightSpec, quadMeanDiameterUtil, wholeStemVolumeUtil,
+						closeVolumeUtil
 				);
 
 				// EMP093
@@ -1262,14 +1276,16 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				// EMP094
 				estimationMethods.estimateNetDecayAndWasteVolume(
 						bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec
-								.getGenus(), loreyHeightSpec, quadMeanDiameterUtil, closeVolumeUtil, closeVolumeNetDecayUtil, closeVolumeNetDecayWasteUtil
+								.getGenus(), loreyHeightSpec, quadMeanDiameterUtil, closeVolumeUtil,
+						closeVolumeNetDecayUtil, closeVolumeNetDecayWasteUtil
 				);
 
 				if (this.getId().isStart()) {
 					// EMP095
 					estimationMethods.estimateNetDecayWasteAndBreakageVolume(
 							UtilizationClass.ALL, spec
-									.getBreakageGroup(), quadMeanDiameterUtil, closeVolumeUtil, closeVolumeNetDecayWasteUtil, closeVolumeNetDecayWasteBreakUtil
+									.getBreakageGroup(), quadMeanDiameterUtil, closeVolumeUtil,
+							closeVolumeNetDecayWasteUtil, closeVolumeNetDecayWasteBreakUtil
 					);
 				}
 			}
