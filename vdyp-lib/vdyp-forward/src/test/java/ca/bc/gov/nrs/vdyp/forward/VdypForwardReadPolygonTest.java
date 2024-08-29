@@ -1,6 +1,5 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasProperty;
@@ -27,7 +26,6 @@ import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
-import ca.bc.gov.nrs.vdyp.model.VdypSite;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -78,13 +76,12 @@ class VdypForwardReadPolygonTest {
 					assertThat(species, hasProperty("layerType", is(layer.getLayerType())));
 					assertThat(species, hasProperty("polygonIdentifier", is(polygon.getPolygonIdentifier())));
 					
-					assertThat(species.getSite(), present(Matchers.anything()));
-					
-					VdypSite site = species.getSite().get();
-					assertThat(site, allOf(
-							hasProperty("polygonIdentifier", is(polygon.getPolygonIdentifier())),
-							hasProperty("layerType", is(layer.getLayerType()))
-					));
+					species.getSite().ifPresent(site -> {
+						assertThat(site, allOf(
+								hasProperty("polygonIdentifier", is(polygon.getPolygonIdentifier())),
+								hasProperty("layerType", is(layer.getLayerType()))
+						));
+					});
 				}
 			}
 		} catch (ResourceParseException | IOException e) {

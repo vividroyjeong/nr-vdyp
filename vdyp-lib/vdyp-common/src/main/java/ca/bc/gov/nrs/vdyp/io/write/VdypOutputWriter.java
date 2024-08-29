@@ -33,7 +33,7 @@ public class VdypOutputWriter implements Closeable {
 	private OutputStream speciesFile;
 	private OutputStream utilizationFile;
 	@SuppressWarnings("unused")
-	private OutputStream compatibilityVariablesFile;
+	private Optional<OutputStream> compatibilityVariablesFile;
 	
 	private Optional<Integer> currentYear = Optional.empty();
 
@@ -76,8 +76,24 @@ public class VdypOutputWriter implements Closeable {
 	 * @param controlMap
 	 */
 	public VdypOutputWriter(
+			OutputStream polygonFile, OutputStream speciesFile, OutputStream utilizationFile
+	) {
+		this(polygonFile, speciesFile, utilizationFile, Optional.empty());
+	}
+
+	/**
+	 * Create a writer for Vdyp output files using provided OutputStreams. The Streams will be 
+	 * closed when the writer is closed.
+	 *
+	 * @param polygonFile
+	 * @param speciesFile
+	 * @param utilizationFile
+	 * @param compatibilityVariablesFile
+	 * @param controlMap
+	 */
+	public VdypOutputWriter(
 			OutputStream polygonFile, OutputStream speciesFile, OutputStream utilizationFile,
-			OutputStream compatibilityVariablesFile
+			Optional<OutputStream> compatibilityVariablesFile
 	) {
 		this.polygonFile = polygonFile;
 		this.speciesFile = speciesFile;
@@ -98,7 +114,7 @@ public class VdypOutputWriter implements Closeable {
 				getOutputStream(controlMap, resolver, ControlKey.VDYP_OUTPUT_VDYP_POLYGON.name()),
 				getOutputStream(controlMap, resolver, ControlKey.VDYP_OUTPUT_VDYP_LAYER_BY_SPECIES.name()),
 				getOutputStream(controlMap, resolver, ControlKey.VDYP_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name()),
-				getOutputStream(controlMap, resolver, ControlKey.VDYP_OUTPUT_COMPATIBILITY_VARIABLES.name())
+				Optional.of(getOutputStream(controlMap, resolver, ControlKey.VDYP_OUTPUT_COMPATIBILITY_VARIABLES.name()))
 		);
 	}
 
@@ -108,8 +124,8 @@ public class VdypOutputWriter implements Closeable {
 		return resolver.resolveForOutput(fileName);
 	}
 
-	private void setPolygonYear(Optional<Integer> polygonYear) {
-		this.currentYear = polygonYear;
+	public void setPolygonYear(int currentYear) {
+		this.currentYear = Optional.of(currentYear);
 	}
 	
 	private PolygonIdentifier getCurrentPolygonDescriptor(PolygonIdentifier originalIdentifier) {
@@ -128,7 +144,6 @@ public class VdypOutputWriter implements Closeable {
 	 * @throws IOException
 	 */
 	void writePolygon(VdypPolygon polygon) throws IOException {
-		setPolygonYear(polygon.getTargetYear());
 		
 		writeFormat(
 				polygonFile, //

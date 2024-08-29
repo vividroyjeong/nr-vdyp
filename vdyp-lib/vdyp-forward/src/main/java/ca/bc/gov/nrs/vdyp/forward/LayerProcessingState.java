@@ -512,7 +512,7 @@ class LayerProcessingState {
 
 	public VdypLayer getLayer() {
 		
-		VdypLayer updatedLayer = bank.getUpdatedLayer();
+		VdypLayer updatedLayer = bank.getLayer();
 		
 		for (int i = 1; i < getNSpecies() + 1; i++) {
 			VdypSpecies species = updatedLayer.getSpeciesBySp0(bank.speciesNames[i]);

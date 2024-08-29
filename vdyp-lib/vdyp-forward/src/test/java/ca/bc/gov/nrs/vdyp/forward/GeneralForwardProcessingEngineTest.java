@@ -376,13 +376,17 @@ class GeneralForwardProcessingEngineTest extends AbstractForwardProcessingEngine
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.ESTIMATE_MISSING_SITE_INDICES);
 
-		var sourceSiteCurve = SiteIndexEquation.SI_CWC_KURUCZ;
-		var sourceSiteIndex = 13.4;
-		var targetSiteCurve = SiteIndexEquation.SI_HWC_WILEYAC;
-		double expectedValue = SiteTool
-				.convertSiteIndexBetweenCurves(sourceSiteCurve, sourceSiteIndex, targetSiteCurve);
+		// Despite 13.40 being in the data stream, the change (2024/8/29) to ignore site information
+		// for all species of the layer except the primary means that method (1) will never be 
+		// successful, since none of the non-primary species will have a site index value.
+		
+//		var sourceSiteCurve = SiteIndexEquation.SI_CWC_KURUCZ;
+//		var sourceSiteIndex = 13.4;
+//		var targetSiteCurve = SiteIndexEquation.SI_HWC_WILEYAC;
+//		double expectedValue = SiteTool
+//				.convertSiteIndexBetweenCurves(sourceSiteCurve, sourceSiteIndex, targetSiteCurve);
 
-		assertThat(fpe.fps.getLayerProcessingState().getBank().siteIndices[4], is((float) expectedValue));
+		assertThat(fpe.fps.getLayerProcessingState().getBank().siteIndices[4], is(VdypEntity.MISSING_FLOAT_VALUE));
 	}
 
 	@Test
@@ -431,7 +435,7 @@ class GeneralForwardProcessingEngineTest extends AbstractForwardProcessingEngine
 
 		buildSpeciesParserForStream(
 				"testSpecies.dat", //
-				"01002 S000001 00     1970 P  3 B  B  100.0     0.0     0.0     0.0 -9.00 -9.00  15.0  11.0  -9.0 0 -9", //
+				"01002 S000001 00     1970 P  3 B  B  100.0     0.0     0.0     0.0 -9.00 -9.00  -9.0  -9.0  -9.0 0 -9", //
 				"01002 S000001 00     1970 P  4 C  C  100.0     0.0     0.0     0.0 -9.00 -9.00  -9.0  -9.0  -9.0 0 -9", //
 				"01002 S000001 00     1970 P  5 D  D  100.0     0.0     0.0     0.0 35.00 35.30  55.0  54.0   1.0 1 13", //
 				"01002 S000001 00     1970 P  8 H  H  100.0     0.0     0.0     0.0 -9.00 -9.00  -9.0  -9.0  -9.0 0 -9", //
@@ -450,7 +454,7 @@ class GeneralForwardProcessingEngineTest extends AbstractForwardProcessingEngine
 
 		assertThat(
 				fpe.fps.getLayerProcessingState().getBank().yearsToBreastHeight,
-				is(new float[] { 0.0f, 4.0f, 4.6f, 1.0f, 5.0f, 5.0f })
+				is(new float[] { 0.0f, 4.7f, 4.6f, 1.0f, 5.0f, 5.0f })
 		);
 	}
 
@@ -474,14 +478,12 @@ class GeneralForwardProcessingEngineTest extends AbstractForwardProcessingEngine
 
 		var polygon = reader.readNextPolygon().orElseThrow();
 
+		// Since the change to ignore site information for all but non-primary species, there is
+		// no way to successfully estimate age for a primary species from the non-primary species.
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.CALCULATE_DOMINANT_HEIGHT_AGE_SITE_INDEX);
-
-		assertThat(fpe.fps.getLayerProcessingState().getPrimarySpeciesDominantHeight(), is(35.31195f));
-		assertThat(fpe.fps.getLayerProcessingState().getPrimarySpeciesSiteIndex(), is(34.0f));
-		assertThat(fpe.fps.getLayerProcessingState().getPrimarySpeciesTotalAge(), is(15.0f));
-		assertThat(fpe.fps.getLayerProcessingState().getPrimarySpeciesAgeAtBreastHeight(), is(14.0f));
-		assertThat(fpe.fps.getLayerProcessingState().getPrimarySpeciesAgeToBreastHeight(), is(1.0f));
+		assertThrows(ProcessingException.class, () -> fpe.processPolygon(polygon, 
+				ForwardProcessingEngine.ExecutionStep.CALCULATE_DOMINANT_HEIGHT_AGE_SITE_INDEX)
+				);
 	}
 
 	@Test
@@ -513,7 +515,7 @@ class GeneralForwardProcessingEngineTest extends AbstractForwardProcessingEngine
 
 		buildSpeciesParserForStream(
 				"testSpecies.dat", //
-				"01002 S000001 00     1970 P  4 C  C  100.0     0.0     0.0     0.0 34.00 -9.00  22.0  -9.0  -9.0 0 -9", //
+				"01002 S000001 00     1970 P  4 C  C  100.0     0.0     0.0     0.0 34.00 -9.00  22.0  -9.0  -9.0 1 -9", //
 				"01002 S000001 00     1970"
 		);
 

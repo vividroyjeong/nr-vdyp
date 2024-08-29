@@ -175,16 +175,19 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 							speciesBuilder.polygonIdentifier(polygonId);
 							speciesBuilder.layerType(lt);
 							speciesBuilder.genus(genus, controlMap);
-							speciesBuilder.addSite(siteBuilder -> {
-								siteBuilder.ageTotal(inferredTotalAge);
-								siteBuilder.height(dominantHeight);
-								siteBuilder.polygonIdentifier(polygonId);
-								siteBuilder.siteCurveNumber(siteCurveNumber);
-								siteBuilder.layerType(lt);
-								siteBuilder.siteGenus(genus);
-								siteBuilder.siteIndex(siteIndex);
-								siteBuilder.yearsToBreastHeight(inferredYearsToBreastHeight);
-							});
+							
+							if (isPrimarySpecies.isPresent() && isPrimarySpecies.get() == true) {
+								speciesBuilder.addSite(siteBuilder -> {
+									siteBuilder.ageTotal(inferredTotalAge);
+									siteBuilder.height(dominantHeight);
+									siteBuilder.polygonIdentifier(polygonId);
+									siteBuilder.siteCurveNumber(siteCurveNumber);
+									siteBuilder.layerType(lt);
+									siteBuilder.siteGenus(genus);
+									siteBuilder.siteIndex(siteIndex);
+									siteBuilder.yearsToBreastHeight(inferredYearsToBreastHeight);
+								});
+							}
 						});
 					})), builder::marker);
 				}

@@ -38,7 +38,6 @@ import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.forward.model.ControlVariable;
 import ca.bc.gov.nrs.vdyp.forward.model.ForwardControlVariables;
 import ca.bc.gov.nrs.vdyp.forward.model.ForwardDebugSettings;
-import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperBoundsParser;
 import ca.bc.gov.nrs.vdyp.io.write.VdypOutputWriter;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
@@ -88,12 +87,12 @@ public class ForwardProcessingEngine {
 	/* pp */ final ForwardProcessingState fps;
 	
 	/** The entity to which result information is written */
-	private Optional<VdypOutputWriter> outputWriter;
+	private Optional<VdypOutputWriter> outputWriter = Optional.empty();
 
 	public ForwardProcessingEngine(Map<String, Object> controlMap, Optional<VdypOutputWriter> outputWriter) 
 			throws ProcessingException {
 		this.fps = new ForwardProcessingState(controlMap);
-		this.outputWriter = outputWriter;
+		this.outputWriter = outputWriter == null ? Optional.empty() : outputWriter;
 	}
 
 	public ForwardProcessingEngine(Map<String, Object> controlMap) 
@@ -191,7 +190,7 @@ public class ForwardProcessingEngine {
 		executeForwardAlgorithm(lastStepInclusive, targetYear);
 	}
 
-	private void executeForwardAlgorithm(ExecutionStep lastStepInclusive, int untilYear) throws ProcessingException {
+	private void executeForwardAlgorithm(ExecutionStep lastStepInclusive, int stoppingYearInclusive) throws ProcessingException {
 
 		LayerProcessingState lps = fps.getLayerProcessingState();
 
@@ -201,11 +200,6 @@ public class ForwardProcessingEngine {
 		} else {
 			veteranLayer = Optional.empty();
 		}
-
-		logger.info(
-				"Beginning processing of polygon {} Primary layer {}", lps.getPolygon().getPolygonIdentifier()
-						.toStringCompact()
-		);
 
 		// BANKCHK1, simplified for the parameters METH_CHK = 4, LayerI = 1, and INSTANCE = 1
 		if (lastStepInclusive.ordinal() >= ExecutionStep.CHECK_FOR_WORK.ordinal()) {
@@ -251,7 +245,7 @@ public class ForwardProcessingEngine {
 
 			VdypPolygon vdypPolygon = lps.getPolygon();
 			
-			writePolygon(vdypPolygon, startingYear, startingYear, untilYear);
+			writePolygon(vdypPolygon, startingYear, startingYear, stoppingYearInclusive);
 
 			Map<LayerType, VdypLayer> polygonLayers = vdypPolygon.getLayers();
 			
@@ -262,8 +256,13 @@ public class ForwardProcessingEngine {
 			boolean doRecalculateGroups = fps.fcm.getForwardControlVariables()
 					.getControlVariable(ControlVariable.UPDATE_DURING_GROWTH_6) >= 1;
 					
-			int currentYear = startingYear;
-			while (currentYear <= untilYear) {
+			int currentYear = startingYear + 1;
+			while (currentYear <= stoppingYearInclusive) {
+
+				logger.info(
+						"Growing polygon {} Primary layer for year {}", lps.getPolygon().getPolygonIdentifier()
+								.toStringCompact(), currentYear
+				);
 
 				grow(lps, currentYear, veteranLayer);
 				
@@ -273,10 +272,12 @@ public class ForwardProcessingEngine {
 					calculateDominantHeightAgeSiteIndex(lps, fps.fcm.getHl1Coefficients());
 				}
 				
-				polygonLayers.put(LayerType.PRIMARY, lps.getLayer());
+				VdypLayer updatedLayer = lps.getLayer();
+				polygonLayers.put(LayerType.PRIMARY, updatedLayer);
 				
+				logger.atInfo().addArgument(updatedLayer.getBaseAreaByUtilization().toString()).log("{}");
 				// Store polygon (both primary and veteran layers) to output
-				writePolygon(vdypPolygon, startingYear, currentYear, untilYear);
+				writePolygon(vdypPolygon, startingYear, currentYear, stoppingYearInclusive);
 
 				// If update-during-growth is set, and not already recalculated, recalculate 
 				// context now.
@@ -305,10 +306,7 @@ public class ForwardProcessingEngine {
 	private void grow(LayerProcessingState lps, int currentYear, Optional<VdypLayer> veteranLayer)
 			throws ProcessingException {
 
-		VdypPolygon polygon = lps.getPolygon();
 		Bank bank = lps.getBank();
-
-		logger.info("Performing grow of {} for year {}", polygon.getPolygonIdentifier().getName(), currentYear);
 
 		float dhStart = lps.getPrimarySpeciesDominantHeight();
 		int pspSiteCurveNumber = lps.getSiteCurveNumber(lps.getPrimarySpeciesIndex());
@@ -2206,46 +2204,51 @@ public class ForwardProcessingEngine {
 	private void writePolygon(VdypPolygon polygon, int startYear, int currentYear, int endYear) 
 			throws ProcessingException {
 
-		logger.info("Writing polygon {} for year {}", polygon, currentYear);
+		try {
+			outputWriter.ifPresent((o) -> {
+				logger.info("Writing polygon {} for year {}", polygon, currentYear);
+				
+				int controlVariable4Value = fps.fcm.getForwardControlVariables().getControlVariable(ControlVariable.OUTPUT_FILES_4);
 		
-		int controlVariable4Value = fps.fcm.getForwardControlVariables().getControlVariable(ControlVariable.OUTPUT_FILES_4);
-
-		switch (controlVariable4Value) {
-			case 0: {
-				/* never write output */ 
-				return;
-			}
-			case 1: {
-				/* write only first growth period */
-				if (currentYear != startYear) {
-					return;
+				switch (controlVariable4Value) {
+					case 0: {
+						/* never write output */ 
+						return;
+					}
+					case 1: {
+						/* write only first growth period */
+						if (currentYear != startYear) {
+							return;
+						}
+					}
+					case 2: {
+						/* write only first and last growth periods */
+						if (currentYear != startYear && currentYear != endYear) {
+							return;
+						}
+					}
+					case 4: {
+						/* write only the first, every tenth subsequent, and the last periods */
+						if ((currentYear - startYear) % 10 != 0 && currentYear != endYear) {
+							return;
+						}
+					}
+					case 3: {
+						break;
+					}
+					default:
+						throw new LambdaProcessingException(new ProcessingException(MessageFormat.format("Invalid value for control variable 4: {0}", controlVariable4Value)));
 				}
-			}
-			case 2: {
-				/* write only first and last growth periods */
-				if (currentYear != startYear && currentYear != endYear) {
-					return;
+				
+				try {
+					o.setPolygonYear(currentYear);
+					o.writePolygonWithSpeciesAndUtilization(polygon);
+				} catch (IOException e) {
+					throw new LambdaProcessingException(new ProcessingException(e));
 				}
-			}
-			case 4: {
-				/* write only the first, every tenth subsequent, and the last periods */
-				if ((currentYear - startYear) % 10 != 0 && currentYear != endYear) {
-					return;
-				}
-			}
-			case 3: {
-				break;
-			}
-			default:
-				throw new ProcessingException(MessageFormat.format("Invalid value for control variable 4: {0}", controlVariable4Value));
-		}
-		
-		if (outputWriter.isPresent()) {
-			try {
-				outputWriter.get().writePolygonWithSpeciesAndUtilization(polygon);
-			} catch (IOException e) {
-				throw new ProcessingException(e);
-			}
+			});
+		} catch (LambdaProcessingException e) {
+			throw e.getCause();
 		}
 	}
 
@@ -2936,7 +2939,9 @@ public class ForwardProcessingEngine {
 					} catch (NoAnswerException e) {
 						logger.warn(
 								MessageFormat.format(
-										"there is no conversion from curves {0} to {1}. Skipping species {3}", spSiteCurve, pspSiteCurve, spIndex
+										"there is no conversion from curves {0} to {1}. Excluding species {2}"
+										+ " from the estimation of the site index of {3}", spSiteCurve, pspSiteCurve, 
+										bank.speciesNames[spIndex], bank.speciesNames[pspIndex] 
 								)
 						);
 					} catch (CurveErrorException | SpeciesErrorException e) {
@@ -2976,13 +2981,14 @@ public class ForwardProcessingEngine {
 					} catch (NoAnswerException e) {
 						logger.warn(
 								MessageFormat.format(
-										"there is no conversion between curves {0} and {1}. Skipping species {2}", pspSiteCurve, spSiteCurve, spIndex
+										"there is no conversion between curves {0} and {1}. Not calculating site index for species {2}", 
+										pspSiteCurve, spSiteCurve, bank.speciesNames[spIndex]
 								)
 						);
 					} catch (CurveErrorException | SpeciesErrorException e) {
 						throw new ProcessingException(
 								MessageFormat.format(
-										"convertSiteIndexBetweenCurves on {0}, {1} and {2} failed. Skipping species {3}", pspSiteCurve, pspSiteIndex, spSiteCurve, spIndex
+										"convertSiteIndexBetweenCurves on {0}, {1} and {2} failed", pspSiteCurve, pspSiteIndex, spSiteCurve
 								), e
 						);
 					}
