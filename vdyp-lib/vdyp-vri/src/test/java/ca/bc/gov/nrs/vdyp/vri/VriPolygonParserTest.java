@@ -119,7 +119,7 @@ class VriPolygonParserTest {
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("082F074/0071", 2001)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("IDF"))));
-		assertThat(poly, hasProperty("percentAvailable", notPresent()));
+		assertThat(poly, hasProperty("percentAvailable", present(is(85f))));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
 		assertThat(poly, hasProperty("yieldFactor", is(1.0f)));
@@ -168,7 +168,7 @@ class VriPolygonParserTest {
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
-		assertThat(poly, hasProperty("percentAvailable", notPresent()));
+		assertThat(poly, hasProperty("percentAvailable", present(is(85f))));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
 		assertThat(poly, hasProperty("yieldFactor", is(1.0f)));
@@ -178,7 +178,7 @@ class VriPolygonParserTest {
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000002 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
-		assertThat(poly, hasProperty("percentAvailable", notPresent()));
+		assertThat(poly, hasProperty("percentAvailable", present(is(85f))));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
 		assertThat(poly, hasProperty("yieldFactor", is(1.0f)));
@@ -188,7 +188,7 @@ class VriPolygonParserTest {
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000003 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
-		assertThat(poly, hasProperty("percentAvailable", notPresent()));
+		assertThat(poly, hasProperty("percentAvailable", present(is(85f))));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
 		assertThat(poly, hasProperty("yieldFactor", is(1.0f)));
@@ -198,7 +198,7 @@ class VriPolygonParserTest {
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000004 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
-		assertThat(poly, hasProperty("percentAvailable", notPresent()));
+		assertThat(poly, hasProperty("percentAvailable", present(is(85f))));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
 		assertThat(poly, hasProperty("yieldFactor", is(1.0f)));
@@ -208,7 +208,7 @@ class VriPolygonParserTest {
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01003AS000001 00", 1953)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
-		assertThat(poly, hasProperty("percentAvailable", notPresent()));
+		assertThat(poly, hasProperty("percentAvailable", present(is(85f))));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
 		assertThat(poly, hasProperty("yieldFactor", is(1.0f)));
@@ -218,7 +218,7 @@ class VriPolygonParserTest {
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01003AS000003 00", 1953)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
-		assertThat(poly, hasProperty("percentAvailable", notPresent()));
+		assertThat(poly, hasProperty("percentAvailable", present(is(85f))));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
 		assertThat(poly, hasProperty("yieldFactor", is(1.0f)));
@@ -228,7 +228,7 @@ class VriPolygonParserTest {
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01004 S000002 00", 1953)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
-		assertThat(poly, hasProperty("percentAvailable", notPresent()));
+		assertThat(poly, hasProperty("percentAvailable", present(is(85f))));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
 		assertThat(poly, hasProperty("yieldFactor", is(1.0f)));
@@ -238,7 +238,7 @@ class VriPolygonParserTest {
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01004 S000036 00", 1957)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
-		assertThat(poly, hasProperty("percentAvailable", notPresent()));
+		assertThat(poly, hasProperty("percentAvailable", present(is(85f))));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
 		assertThat(poly, hasProperty("yieldFactor", is(1.0f)));
@@ -248,7 +248,7 @@ class VriPolygonParserTest {
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01004 S000037 00", 1957)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
-		assertThat(poly, hasProperty("percentAvailable", notPresent()));
+		assertThat(poly, hasProperty("percentAvailable", present(is(85f))));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
 		assertThat(poly, hasProperty("yieldFactor", is(1.0f)));
@@ -258,7 +258,7 @@ class VriPolygonParserTest {
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01004 S000038 00", 1957)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
-		assertThat(poly, hasProperty("percentAvailable", notPresent()));
+		assertThat(poly, hasProperty("percentAvailable", present(is(85f))));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
 		assertThat(poly, hasProperty("yieldFactor", is(1.0f)));
@@ -296,7 +296,7 @@ class VriPolygonParserTest {
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
-		assertThat(poly, hasProperty("percentAvailable", notPresent()));
+		assertThat(poly, hasProperty("percentAvailable", present(is(85f))));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
 		assertThat(poly, hasProperty("yieldFactor", is(1.0f)));
@@ -334,7 +334,7 @@ class VriPolygonParserTest {
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("CWH"))));
-		assertThat(poly, hasProperty("percentAvailable", notPresent()));
+		assertThat(poly, hasProperty("percentAvailable", present(is(85f))));
 		assertThat(poly, hasProperty("mode", notPresent()));
 		assertThat(poly, hasProperty("nonproductiveDescription", notPresent()));
 		assertThat(poly, hasProperty("yieldFactor", is(1.0f)));
@@ -372,7 +372,7 @@ class VriPolygonParserTest {
 		assertThat(poly, hasProperty("polygonIdentifier", isPolyId("082F074/0071", 2001)));
 		assertThat(poly, hasProperty("forestInventoryZone", is(" ")));
 		assertThat(poly, hasProperty("biogeoclimaticZone", hasProperty("alias", is("IDF"))));
-		assertThat(poly, hasProperty("percentAvailable", present(is(85.0f))));
+		assertThat(poly, hasProperty("percentAvailable", notPresent()));
 		assertThat(poly, hasProperty("mode", present(is(PolygonMode.BATC))));
 		assertThat(poly, hasProperty("nonproductiveDescription", present(is("BLAH"))));
 		assertThat(poly, hasProperty("yieldFactor", is(0.95f)));
