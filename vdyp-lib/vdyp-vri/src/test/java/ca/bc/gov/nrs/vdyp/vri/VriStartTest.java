@@ -1765,6 +1765,7 @@ class VriStartTest {
 			EasyMock.expect(app.processYoung(poly)).andReturn(polyYoung).times(0, 1);
 			EasyMock.expect(app.processBatc(poly)).andReturn(polyBatc).times(0, 1);
 			EasyMock.expect(app.processBatn(poly)).andReturn(polyBatn).times(0, 1);
+			EasyMock.expect(app.processBatn(polyYoung)).andReturn(polyBatn).times(0, 1);
 			app.processPrimaryLayer(EasyMock.anyObject(VriPolygon.class), EasyMock.anyObject(VdypLayer.Builder.class));
 			EasyMock.expectLastCall().once();
 			EasyMock.expect(app.getDebugMode(9)).andStubReturn(0);
@@ -2602,7 +2603,7 @@ class VriStartTest {
 			final var forPrimeLayer = both(forPolygon).and(hasProperty("layerType", is(LayerType.PRIMARY)));
 
 			assertThat(result, forPolygon);
-			assertThat(result, hasProperty("mode", present(is(PolygonMode.BATN))));
+			assertThat(result, hasProperty("mode", present(is(PolygonMode.YOUNG))));
 
 			assertThat(
 					result, hasProperty("layers", allOf(aMapWithSize(1), hasEntry(is(LayerType.PRIMARY), anything())))
@@ -2790,7 +2791,7 @@ class VriStartTest {
 			final var forPrimeLayer = both(forPolygon).and(hasProperty("layerType", is(LayerType.PRIMARY)));
 
 			assertThat(result, forPolygon);
-			assertThat(result, hasProperty("mode", present(is(PolygonMode.BATN))));
+			assertThat(result, hasProperty("mode", present(is(PolygonMode.YOUNG))));
 
 			assertThat(
 					result, hasProperty("layers", allOf(aMapWithSize(1), hasEntry(is(LayerType.PRIMARY), anything())))
@@ -2976,7 +2977,7 @@ class VriStartTest {
 			final var forPrimeLayer = both(forPolygon).and(hasProperty("layerType", is(LayerType.PRIMARY)));
 
 			assertThat(result, forPolygon);
-			assertThat(result, hasProperty("mode", present(is(PolygonMode.BATN))));
+			assertThat(result, hasProperty("mode", present(is(PolygonMode.YOUNG))));
 
 			assertThat(
 					result, hasProperty("layers", allOf(aMapWithSize(1), hasEntry(is(LayerType.PRIMARY), anything())))

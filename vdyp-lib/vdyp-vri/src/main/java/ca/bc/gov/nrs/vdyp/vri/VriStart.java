@@ -361,7 +361,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		switch (mode) {
 		case YOUNG:
 			log.atTrace().setMessage(SPECIAL_PROCESSING_LOG_TEMPLATE).addArgument(mode).log();
-			preProcessedPolygon = processYoung(polygon);
+			preProcessedPolygon = processBatn(processYoung(polygon));
 			break;
 		case BATC:
 			log.atTrace().setMessage(SPECIAL_PROCESSING_LOG_TEMPLATE).addArgument(mode).log();
@@ -1240,7 +1240,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			return VriPolygon.build(pBuilder -> {
 				pBuilder.copy(poly);
 				pBuilder.polygonIdentifier(polygonIdentifier.forYear(year + (int) inc.ageIncrease));
-				pBuilder.mode(PolygonMode.BATN);
+				pBuilder.mode(PolygonMode.YOUNG);
 				pBuilder.copyLayers(poly, (lBuilder, layer) -> {
 
 					lBuilder.copySpecies(layer, (sBuilder, species) -> {
