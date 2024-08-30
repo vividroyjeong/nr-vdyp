@@ -13,10 +13,10 @@ RUN npm ci --ignore-scripts --no-update-notifier --omit=dev && \
 # Deploy container
 # Caddy serves static files
 FROM caddy:2.8.4-alpine
-RUN apk add --no-cache ca-certificates
 
-# Ensure Caddy has write permissions to necessary directories
-RUN mkdir -p /config/caddy /data/caddy && \
+# Install packages and ensure permissions in one RUN command
+RUN apk add --no-cache ca-certificates && \
+    mkdir -p /config/caddy /data/caddy && \
     chown -R 1001:1001 /config/caddy /data/caddy
 
 # Copy static files and run formatting
@@ -26,5 +26,5 @@ RUN caddy fmt --overwrite /etc/caddy/Caddyfile
 
 # Ports, health check and non-root user
 EXPOSE 3000 3001
-HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/:3001/health || exit 1
+HEALTHCHECK --interval=30s --timeout=3s CMD ["curl", "-f", "http://localhost:3001/health"]
 USER 1001
