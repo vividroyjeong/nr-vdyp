@@ -834,11 +834,11 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			this.getPercentTotal(layer); // Validate that percent total is close to 100%
 		Optional<VriSite> primarySite = layer.getPrimaryGenus().flatMap(id -> Utils.optSafe(layer.getSites().get(id)));
 		var ageTotal = primarySite.flatMap(VriSite::getAgeTotal);
-		var treesPerHectare = layer.getTreesPerHectare();
+		var yearsToBreastHeight = primarySite.flatMap(VriSite::getYearsToBreastHeight);
 		var height = primarySite.flatMap(VriSite::getHeight);
 		if (polygon.getMode().map(x -> x == PolygonMode.YOUNG).orElse(false)
 				&& layer.getLayerType() == LayerType.PRIMARY) {
-			if (ageTotal.map(x -> x <= 0f).orElse(true) || treesPerHectare.map(x -> x <= 0f).orElse(true)) {
+			if (ageTotal.map(x -> x <= 0f).orElse(true) || yearsToBreastHeight.map(x -> x <= 0f).orElse(true)) {
 				throw validationError(
 						"Age Total and Trees Per Hectare must be positive for a PRIMARY layer in mode YOUNG"
 				);

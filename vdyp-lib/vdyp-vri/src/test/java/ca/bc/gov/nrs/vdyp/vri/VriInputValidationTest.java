@@ -406,7 +406,7 @@ class VriInputValidationTest {
 	}
 
 	@Test
-	void testFailIfPrimaryModeYoungAndLacksTreesPerHectare() throws Exception {
+	void testFailIfPrimaryModeYoungAndLacksYearsToBreastHeight() throws Exception {
 		var app = new VriStart();
 
 		MockFileResolver resolver = dummyInput();
@@ -430,7 +430,7 @@ class VriInputValidationTest {
 				lBuilder.layerType(LayerType.PRIMARY);
 				lBuilder.crownClosure(57.8f);
 				lBuilder.baseArea(66.0f);
-				// lBuilder.treesPerHectare(850f);
+				lBuilder.treesPerHectare(850f);
 				lBuilder.utilization(7.5f);
 
 				// Species
@@ -452,7 +452,7 @@ class VriInputValidationTest {
 						iBuilder.height(28.0f);
 						iBuilder.siteIndex(14.3f);
 						iBuilder.siteSpecies("CW");
-						iBuilder.yearsToBreastHeight(10.9f);
+						//iBuilder.yearsToBreastHeight(10.9f);
 						iBuilder.breastHeightAge(189.1f);
 						iBuilder.siteCurveNumber(11);
 					});
@@ -466,7 +466,7 @@ class VriInputValidationTest {
 						iBuilder.height(32.0f);
 						iBuilder.siteIndex(14.6f);
 						iBuilder.siteSpecies("HW");
-						iBuilder.yearsToBreastHeight(9.7f);
+						//iBuilder.yearsToBreastHeight(9.7f);
 						iBuilder.breastHeightAge(190.3f);
 						iBuilder.siteCurveNumber(37);
 					});
