@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.is;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,17 +14,18 @@ import org.slf4j.LoggerFactory;
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.forward.ForwardProcessingEngine.ExecutionStep;
-import ca.bc.gov.nrs.vdyp.forward.model.ForwardDebugSettings.Vars;
+import ca.bc.gov.nrs.vdyp.forward.model.ForwardDebugSettings;
 import ca.bc.gov.nrs.vdyp.forward.test.VdypForwardTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
+import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 
-class GrowBasalAreaTest {
+class GrowLoreyHeightsTest {
 
-	protected static final Logger logger = LoggerFactory.getLogger(GrowBasalAreaTest.class);
+	protected static final Logger logger = LoggerFactory.getLogger(GrowLoreyHeightsTest.class);
 
 	protected static ForwardControlParser parser;
 	protected static Map<String, Object> controlMap;
@@ -57,19 +57,27 @@ class GrowBasalAreaTest {
 		VdypPolygon polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 
 		fpe.processPolygon(polygon, ExecutionStep.GROW.predecessor());
+		LayerProcessingState lps = fpe.fps.getLayerProcessingState();
 		
-		float yabh = 54.0f;
-		float hd = 35.2999992f;
-		float ba = 45.3864441f;
-		float growthInHd = 0.173380271f;
+		float dhStart = 35.3f;
+		float dhEnd = 35.473381f;
+		float pspTphStart = 290.61615f;
+		float pspTphEnd = 287.107788f;
+		float pspLhStart = 33.7439995f;
 		
-		float gba = fpe.growBasalArea(yabh, hd, ba, Optional.empty(), growthInHd);
+		fpe.growLoreyHeights(lps, dhStart, dhEnd, pspTphStart, pspTphEnd, pspLhStart);
 		
-		assertThat(gba, is(0.35185286f));
+		// Results are stored in bank.loreyHeights[1..nSpecies]
+		assertThat(lps.getIndices().length, is(5));
+		assertThat(lps.getBank().loreyHeights[1][UtilizationClass.ALL.ordinal()], is(36.9653244f));
+		assertThat(lps.getBank().loreyHeights[2][UtilizationClass.ALL.ordinal()], is(23.03769f));
+		assertThat(lps.getBank().loreyHeights[3][UtilizationClass.ALL.ordinal()], is(33.930603f));
+		assertThat(lps.getBank().loreyHeights[4][UtilizationClass.ALL.ordinal()], is(22.8913193f));
+		assertThat(lps.getBank().loreyHeights[5][UtilizationClass.ALL.ordinal()], is(32.2539024f));
 	}
 
 	@Test
-	void testYoungPath() throws ProcessingException {
+	void testDebug8Setting2Path() throws ProcessingException {
 		
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 		
@@ -77,36 +85,24 @@ class GrowBasalAreaTest {
 		VdypPolygon polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 
 		fpe.processPolygon(polygon, ExecutionStep.GROW.predecessor());
+		LayerProcessingState lps = fpe.fps.getLayerProcessingState();
 		
-		float yabh = 30.0f;
-		float hd = 10.0f;
-		float ba = 200.0f;
-		float growthInHd = 0.173380271f;
+		float dhStart = 35.3f;
+		float dhEnd = 35.3f;
+		float pspTphStart = 290.61615f;
+		float pspTphEnd = 287.107788f;
+		float pspLhStart = 33.7439995f;
 		
-		float gba = fpe.growBasalArea(yabh, hd, ba, Optional.empty(), growthInHd);
+		fpe.fps.fcm.getDebugSettings().setValue(ForwardDebugSettings.Vars.LOREY_HEIGHT_CHANGE_STRATEGY_8, 2);
 		
-		assertThat(gba, is(0.0f));
-	}
-
-	@Test
-	void testDebugSettings3EqualsZeroPath() throws ProcessingException {
+		fpe.growLoreyHeights(lps, dhStart, dhEnd, pspTphStart, pspTphEnd, pspLhStart);
 		
-		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		
-		// Select the first polygon - 01002 S000001 00(1970)
-		VdypPolygon polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
-
-		fpe.processPolygon(polygon, ExecutionStep.GROW.predecessor());
-		
-		float yabh = 54.0f;
-		float hd = 35.2999992f;
-		float ba = 45.3864441f;
-		float hdDelta = 0.173380271f;
-		
-		fpe.fps.fcm.getDebugSettings().setValue(Vars.BASAL_AREA_GROWTH_MODEL_3, 0);
-		
-		float gba = fpe.growBasalArea(yabh, hd, ba, Optional.empty(), hdDelta);
-		
-		assertThat(gba, is(-0.10392746f));
+		// Results are stored in bank.loreyHeights[1..nSpecies]
+		assertThat(lps.getIndices().length, is(5));
+		assertThat(lps.getBank().loreyHeights[1][UtilizationClass.ALL.ordinal()], is(36.7552986f));
+		assertThat(lps.getBank().loreyHeights[2][UtilizationClass.ALL.ordinal()], is(22.9584007f));
+		assertThat(lps.getBank().loreyHeights[3][UtilizationClass.ALL.ordinal()], is(33.7439995f));
+		assertThat(lps.getBank().loreyHeights[4][UtilizationClass.ALL.ordinal()], is(22.7703991f));
+		assertThat(lps.getBank().loreyHeights[5][UtilizationClass.ALL.ordinal()], is(32.0125008f));
 	}
 }

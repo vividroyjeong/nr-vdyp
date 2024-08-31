@@ -30,7 +30,7 @@ import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 
-class VdypForwardSpeciesParserTest {
+class ForwardSpeciesParserTest {
 
 	@Test
 	void testParseEmpty() throws Exception {

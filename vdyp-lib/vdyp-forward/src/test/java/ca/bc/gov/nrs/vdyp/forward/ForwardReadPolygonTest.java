@@ -30,7 +30,7 @@ import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
 @SuppressWarnings({ "unchecked" })
-class VdypForwardReadPolygonTest {
+class ForwardReadPolygonTest {
 
 	@Test
 	void testReadPolygons() throws Exception {

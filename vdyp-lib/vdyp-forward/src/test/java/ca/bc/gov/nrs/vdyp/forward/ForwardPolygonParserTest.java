@@ -23,7 +23,7 @@ import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 
-class VdypForwardPolygonParserTest {
+class ForwardPolygonParserTest {
 
 	@Test
 	void testParseEmpty() throws Exception {

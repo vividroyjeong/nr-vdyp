@@ -27,7 +27,7 @@ import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.VdypUtilization;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
-public class VdypForwardUtilizationParserTest {
+public class ForwardUtilizationParserTest {
 
 	@Test
 	void testParseEmpty() throws Exception {
