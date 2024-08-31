@@ -54,14 +54,15 @@ public class ForwardProcessor {
 	/**
 	 * Initialize VdypForwardProcessor
 	 *
-	 * @param resolver
+	 * @param inputFileResolver
+	 * @param outputFileResolver
 	 * @param controlFileNames
 	 *
 	 * @throws IOException
 	 * @throws ResourceParseException
 	 * @throws ProcessingException
 	 */
-	void run(FileResolver resolver, List<String> controlFileNames, Set<ForwardPass> vdypPassSet)
+	void run(FileResolver inputFileResolver, FileResolver outputFileResolver, List<String> controlFileNames, Set<ForwardPass> vdypPassSet)
 			throws IOException, ResourceParseException, ProcessingException {
 
 		logger.info("VDYPPASS: {}", vdypPassSet);
@@ -77,24 +78,18 @@ public class ForwardProcessor {
 
 		var parser = new ForwardControlParser();
 
-		Optional<FileSystemFileResolver> outputFileResolver = Optional.empty();
-		
 		for (var controlFileName : controlFileNames) {
 			logger.info("Resolving and parsing {}", controlFileName);
 
-			try (var is = resolver.resolveForInput(controlFileName)) {
-				Path controlFilePath = Path.of(resolver.toString(controlFileName)).getParent();
+			try (var is = inputFileResolver.resolveForInput(controlFileName)) {
+				Path controlFilePath = inputFileResolver.toPath(controlFileName).getParent();
 				FileSystemFileResolver relativeResolver = new FileSystemFileResolver(controlFilePath);
 
 				parser.parse(is, relativeResolver, controlMap);
-				
-				if (controlMap.containsKey(ControlKey.VDYP_OUTPUT_VDYP_POLYGON.name())) {
-					outputFileResolver = Optional.of(relativeResolver);
-				}
 			}
 		}
 
-		process(vdypPassSet, controlMap, outputFileResolver);
+		process(vdypPassSet, controlMap, Optional.of(outputFileResolver));
 	}
 
 	/**
@@ -103,7 +98,7 @@ public class ForwardProcessor {
 	 *
 	 * @throws ProcessingException
 	 */
-	public void process(Set<ForwardPass> vdypPassSet, Map<String, Object> controlMap, Optional<FileSystemFileResolver> outputFileResolver) throws ProcessingException {
+	public void process(Set<ForwardPass> vdypPassSet, Map<String, Object> controlMap, Optional<FileResolver> outputFileResolver) throws ProcessingException {
 
 		logger.info("Beginning processing with given configuration");
 

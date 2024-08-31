@@ -15,6 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -398,6 +399,11 @@ public class TestUtils {
 			public FileResolver relative(String path) throws IOException {
 				fail("Should not be requesting relative file resolver " + path);
 				return null;
+			}
+
+			@Override
+			public Path toPath(String filename) throws IOException {
+				return Path.of(toString(filename));
 			}
 
 		};

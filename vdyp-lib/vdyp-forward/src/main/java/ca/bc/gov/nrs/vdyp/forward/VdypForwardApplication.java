@@ -80,7 +80,7 @@ public class VdypForwardApplication extends VdypApplication {
 		try {
 			ForwardProcessor processor = new ForwardProcessor();
 
-			processor.run(new FileSystemFileResolver(), controlFileNames, vdypPassSet);
+			processor.run(new FileSystemFileResolver(), new FileSystemFileResolver(), controlFileNames, vdypPassSet);
 
 		} catch (Exception ex) {
 			logger.error("Error during processing", ex);

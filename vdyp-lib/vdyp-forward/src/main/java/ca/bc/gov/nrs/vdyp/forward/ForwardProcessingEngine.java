@@ -276,6 +276,7 @@ public class ForwardProcessingEngine {
 				polygonLayers.put(LayerType.PRIMARY, updatedLayer);
 				
 				logger.atInfo().addArgument(updatedLayer.getBaseAreaByUtilization().toString()).log("{}");
+				
 				// Store polygon (both primary and veteran layers) to output
 				writePolygon(vdypPolygon, startingYear, currentYear, stoppingYearInclusive);
 
@@ -329,26 +330,29 @@ public class ForwardProcessingEngine {
 		float lhStart = bank.loreyHeights[0][UC_ALL_INDEX];
 
 		float baDelta = growBasalArea(
-				pspYabhStart, fps.fcm.getDebugSettings(), dhStart, baStart, veteranLayerBasalArea, dhDelta
+				pspYabhStart, dhStart, baStart, veteranLayerBasalArea, dhDelta
 		);
 
 		// (3) Calculate change in quad-mean-diameter (layer)
 
 		Reference<Boolean> wasDqGrowthLimitApplied = new Reference<>();
 		float dqDelta = growQuadMeanDiameter(
-				pspYtbhStart, baStart, dhStart, dqStart, veteranLayerBasalArea, veteranLayerBasalArea, dhDelta, wasDqGrowthLimitApplied
+				pspYabhStart, baStart, dhStart, dqStart, veteranLayerBasalArea, veteranLayerBasalArea, dhDelta, wasDqGrowthLimitApplied
 		);
 
-		if (wasDqGrowthLimitApplied.get() /* is true */) {
+		int debugSetting9Value = fps.fcm.getDebugSettings().getValue(ForwardDebugSettings.Vars.DO_LIMIT_BA_WHEN_DQ_LIMITED_9);
+		if (debugSetting9Value == 1 && wasDqGrowthLimitApplied.get() /* is true */) {
 			// Limit BA growth if DQ hit limit.
 			float dqEnd = dqStart + dqDelta;
 			float baEndMax = baStart * (dqEnd * dqEnd) / (dqStart * dqStart);
 			baDelta = Math.min(baDelta, baEndMax - baStart);
 		}
 
-		// Cache some values for calculations below.
-
 		float baChangeRate = baDelta / baStart;
+
+		// (4) Begin storing computed results - dq, ba and tph for the layer
+		
+		// Cache some values for calculations below.
 
 		float pspLhStart = bank.loreyHeights[lps.getPrimarySpeciesIndex()][UC_ALL_INDEX];
 		float pspTphStart = bank.treesPerHectare[lps.getPrimarySpeciesIndex()][UC_ALL_INDEX];
@@ -359,33 +363,40 @@ public class ForwardProcessingEngine {
 		float tphEnd = BaseAreaTreeDensityDiameter.treesPerHectare(baEnd, dqEnd);
 		float tphMultiplier = tphEnd / tphStart;
 
-		// (4) Begin storing computed results - dq, ba and tph for the layer
-
 		bank.quadMeanDiameters[0][UC_ALL_INDEX] = dqEnd;
 		bank.basalAreas[0][UC_ALL_INDEX] = baEnd;
 		bank.treesPerHectare[0][UC_ALL_INDEX] = tphEnd;
 
-		// (5) Now do DQ growth by species, using one of several options: "full species", "dynamic", 
-		// "partial dynamics" or "no dynamics."
+		// (5) Now calculate per-species (UC All only) end values for basal area, quad-mean-diameter 
+		// and trees-per-hectare, using one of several options: "full species dynamics", 
+		// "partial species dynamics" or "no species dynamics."
+		
 		int debugSetting1Value = fps.fcm.getDebugSettings().getValue(ForwardDebugSettings.Vars.SPECIES_DYNAMICS_1);
 
 		boolean wasSolutionFound = false;
 		if (debugSetting1Value == 2) {
 			// (5a) This is the PARTIAL SPECIES DYNAMICS section. 
 
-			// (5a1) Begin by updating HL for all species 
+			// (5a1) Begin by updating HL for all species (UC All only), as well
+			// as the per-layer value (UC All).
 			
-			// First save the ungrown HLs
-			float[] startingLoreyHeights = new float[bank.getNSpecies() + 1];
-			startingLoreyHeights[0] = bank.loreyHeights[0][UC_ALL_INDEX];
+			// First save the at-start Lorey Height values, needed for the - they will be restored
+			// below and re-calculated later once more precise information is known.
+			
+			float[] lhAtStart = new float[bank.getNSpecies() + 1];
+			lhAtStart[0] = bank.loreyHeights[0][UC_ALL_INDEX];
 			for (int i : bank.getIndices()) {
-				startingLoreyHeights[i] = bank.loreyHeights[i][UC_ALL_INDEX];
+				lhAtStart[i] = bank.loreyHeights[i][UC_ALL_INDEX];
 			}
 
+			// Compute the per-species Lorey Height estimates.
+			
 			float pspTphEndEstimate = pspTphStart * (tphEnd / tphStart);
 
 			growLoreyHeights(lps, dhStart, dhEnd, pspTphStart, pspTphEndEstimate, pspLhStart);
 
+			// Calculate the per-site Lorey Height estimate.
+			
 			float sum1 = 0.0f;
 			float sum2 = 0.0f;
 
@@ -396,34 +407,38 @@ public class ForwardProcessingEngine {
 
 			bank.loreyHeights[0][UC_ALL_INDEX] = sum1 / sum2;
 
-			// Now do the actual updates of DQ by species
+			// Now do the actual per-species updates of ba, qmd and tph, based in part 
+			// on both the starting Lorey Heights and the estimated Lorey Heights at the 
+			// end of the growth period.
+			
 			wasSolutionFound = growUsingPartialSpeciesDynamics(
-					dqDelta, baDelta, baStart, dqStart, tphStart, startingLoreyHeights
+					baStart, baDelta, dqStart, dqDelta, tphStart, lhAtStart
 			);
 
 			// Restore the Lorey Heights back to the values at the beginning of the period.
 			// They will be updated below using the new estimate of TPH-primary species.
-			for (int i = 1; i < bank.getNSpecies(); i++) {
-				bank.loreyHeights[i][UC_ALL_INDEX] = startingLoreyHeights[i];
+			
+			for (int i = 0; i < bank.getNSpecies(); i++) {
+				bank.loreyHeights[i][UC_ALL_INDEX] = lhAtStart[i];
 			}
 		}
 
-		// (6) Calculate the basal area, trees-per-hectare and quad-mean-diameter for all
-		// species in the polygon (UC All)
-		
 		if (!wasSolutionFound) {
+			// Calculate the basal area, trees-per-hectare and quad-mean-diameter for all
+			// species in the polygon (UC All)
+			
 			if (debugSetting1Value == 1 || bank.getNSpecies() == 1) {
 
-				// This is the NO SPECIES DYNAMICS section
+				// (5b) This is the NO SPECIES DYNAMICS section
 				growUsingNoSpeciesDynamics(baChangeRate, tphMultiplier);
 			} else {
 
-				// This is the FULL SPECIES DYNAMICS section
-				growUsingFullSpeciesDynamics(dqDelta, baDelta, baStart, dqStart, tphStart, lhStart);
+				// (5c) This is the FULL SPECIES DYNAMICS section
+				growUsingFullSpeciesDynamics(baStart, baDelta, dqStart, dqDelta, tphStart, lhStart);
 			}
 		}
 
-		// (7) Calculate layer trees-per-hectare, uc All
+		// (6) Calculate layer trees-per-hectare, UC All
 
 		float tphEndSum = 0.0f;
 		for (int i : bank.getIndices()) {
@@ -433,13 +448,13 @@ public class ForwardProcessingEngine {
 		}
 		bank.treesPerHectare[0][UC_ALL_INDEX] = tphEndSum;
 
-		// (8) Calculate layer quad-mean-diameter, uc All
+		// (7) Calculate layer quad-mean-diameter, uc All
 
 		bank.quadMeanDiameters[0][UC_ALL_INDEX] = BaseAreaTreeDensityDiameter.quadMeanDiameter(
 				bank.basalAreas[0][UC_ALL_INDEX], bank.treesPerHectare[0][UC_ALL_INDEX]
 		);
 
-		// (9) Calculate layer Lorey heights over all species, uc UC_ALL_INDEX
+		// (8) Calculate layer Lorey heights over all species, uc UC_ALL_INDEX
 
 		float pspTphEnd = bank.treesPerHectare[lps.getPrimarySpeciesIndex()][UC_ALL_INDEX];
 		growLoreyHeights(lps, dhStart, dhEnd, pspTphStart, pspTphEnd, pspLhStart);
@@ -447,13 +462,13 @@ public class ForwardProcessingEngine {
 		// We now have site (layer) level predications for basal area, quad-mean-diameter, 
 		// trees-per-hectare and Lorey height. Proceed to per-species estimates.
 
-		// (10) Calculate basal area percentages per species, uc UC_ALL_INDEX
+		// (9) Calculate basal area percentages per species, uc UC_ALL_INDEX
 		for (int i : bank.getIndices()) {
 			bank.percentagesOfForestedLand[i] = 100.0f * bank.basalAreas[i][UC_ALL_INDEX]
 					/ bank.basalAreas[0][UC_ALL_INDEX];
 		}
 
-		// (11) Update the running values. TODO: why isn't siteIndex being updated?
+		// (10) Update the running values. TODO: why isn't siteIndex being updated?
 		lps.updatePrimarySpeciesDetailsAfterGrowth(dhEnd);
 
 		for (int i = 1; i < bank.getNSpecies(); i++) {
@@ -481,10 +496,10 @@ public class ForwardProcessingEngine {
 			}
 		}
 
-		// (12) update the compatibility variables to reflect the changes during the growth period
+		// (11) update the compatibility variables to reflect the changes during the growth period
 		lps.updateCompatibilityVariablesAfterGrowth();
 
-		// (13) calculate All and the large component volumes to reflect the changes in growth
+		// (12) calculate All and the large component volumes to reflect the changes in growth
 		
 		VdypLayer primaryLayer = lps.getLayer();
 		
@@ -495,7 +510,7 @@ public class ForwardProcessingEngine {
 
 		bank.refreshBank(primaryLayer);
 		
-		// (14) calculate the small component volumes to reflect the changes in growth
+		// (13) calculate the small component volumes to reflect the changes in growth
 		
 		calculateSmallComponentYields(lps);
 	}
@@ -566,20 +581,20 @@ public class ForwardProcessingEngine {
 	 * GRSPpart - calculate, using the "no species dynamics" algorithm, the basal area, trees-per-hectare 
 	 * and quad-mean-diameter at the end of the growth period for all species in the polygon.
 	 * 
-	 * @param dqDelta change in overall quad-mean-diameter during the growth period
-	 * @param baDelta change in overall basal area during the growth period
 	 * @param baStart overall basal area at start of growth period
+	 * @param baDelta change in overall basal area during the growth period
 	 * @param dqStart overall quad-mean-diameter at start of growth period
+	 * @param dqDelta change in overall quad-mean-diameter during the growth period
 	 * @param tphStart overall trees-per-hectare value at the start of growth period
-	 * @param currentLoreyHeights the current Lorey heights of each of the species 
-	 * (indices 1 - # species) | overall (index 0) the start of the growth period 
+	 * @param lhAtStart stand and per-species (UC All) Lorey heights at the start of the growth period 
+	 * index 0 - stand; indices 1 - # species for the individual species
 	 * 
 	 * @return true if and only if a solution was found.
 	 * @throws ProcessingException 
 	 */
 	private boolean growUsingPartialSpeciesDynamics(
-			float dqDelta, float baDelta, float baStart, float dqStart,
-			float tphStart, float[] currentLoreyHeights
+			float baStart, float baDelta, float dqStart, float dqDelta,
+			float tphStart, float[] lhAtStart
 	) throws ProcessingException {
 
 		LayerProcessingState lps = fps.getLayerProcessingState();
@@ -622,25 +637,25 @@ public class ForwardProcessingEngine {
 
 			dqs1[i] = fps.estimators.estimateQuadMeanDiameterForSpecies(
 					bank.speciesNames[i],
-					bank.basalAreas[i][0],
-					bank.quadMeanDiameters[i][0],
+					lhAtStart[i],
+					bank.quadMeanDiameters[i][UC_ALL_INDEX],
 					basalAreaPercentagesPerSpecies,
 					lps.getBecZone().getRegion(),
 					dqStart,
 					baStart,
 					tphStart,
-					currentLoreyHeights[0]);
+					lhAtStart[0]);
 			
 			dqs2[i] = fps.estimators.estimateQuadMeanDiameterForSpecies(
 					bank.speciesNames[i],
-					baNew[0],
+					bank.loreyHeights[i][UC_ALL_INDEX],
 					dqNew[0],
 					basalAreaPercentagesPerSpecies,
 					lps.getBecZone().getRegion(),
-					dqStart,
-					baStart,
-					tphStart,
-					bank.loreyHeights[i][0]);
+					dqNew[0],
+					baNew[0],
+					tphNew[0],
+					bank.loreyHeights[0][UC_ALL_INDEX]);
 		}
 		
 		float[] dqLowerBoundBySpecies = new float[lps.getNSpecies() + 1];
@@ -889,16 +904,16 @@ public class ForwardProcessingEngine {
 	/**
 	 * Calculate the overall per-species basal area, trees-per-hectare and quad-mean-diameter growth
 	 * during the growth period. The result is stored in <code>end</code>, Utilization Class ALL.
-	 * @param dqDelta per-layer change in quad-mean-diameter during growth period
-	 * @param baDelta per-layer change in basal area during growth period
 	 * @param baStart per-layer basal area at start of growth period
+	 * @param baDelta per-layer change in basal area during growth period
 	 * @param dqStart per-layer quad-mean-diameter at the start of growth period
+	 * @param dqDelta per-layer change in quad-mean-diameter during growth period
 	 * @param tphStart per-layer trees-per-breast-height at that of growth period
 	 * @param lhStart per-layer Lorey height at the start of the growth period
 	 * @throws ProcessingException
 	 */
 	private void growUsingFullSpeciesDynamics(
-			float dqDelta, float baDelta, float baStart, float dqStart, float tphStart,
+			float baStart, float baDelta, float dqStart, float dqDelta, float tphStart,
 			float lhStart
 	) throws ProcessingException {
 
@@ -1445,7 +1460,7 @@ public class ForwardProcessingEngine {
 	 * @param pspTphEnd primary species trees-per-hectare at end
 	 * @param pspLhStart primary species Lorey height at end
 	 */
-	private void growLoreyHeights(
+	void growLoreyHeights(
 			LayerProcessingState lps, float dhStart, float dhEnd, float pspTphStart, float pspTphEnd, float pspLhStart
 	) {
 		Bank bank = lps.getBank();
@@ -1482,7 +1497,7 @@ public class ForwardProcessingEngine {
 					);
 
 					float otherF = (bank.loreyHeights[i][UC_ALL_INDEX] - 1.3f) / (spLhEstimate1 - 1.3f);
-					otherF = 1.0f - (otherF - 1.0f) * nonPrimaryLhAdjustment;
+					otherF = 1.0f + (otherF - 1.0f) * nonPrimaryLhAdjustment;
 					bank.loreyHeights[i][UC_ALL_INDEX] = 1.3f + (spLhEstimate2 - 1.3f) * otherF;
 				}
 			}
@@ -1559,16 +1574,18 @@ public class ForwardProcessingEngine {
 	}
 
 	/**
-	 * EMP117 - Quad Mean Diameter growth for the primary layer.
+	 * EMP117A - Calculate and return the change in quad-mean-diameter for the primary layer over
+	 * the growth period.
 	 * 
 	 * @param pspYabhStart primary species years at breast height (age) at start of growth period
+	 * @param baStart layer basal area at start of growth period
 	 * @param dhStart layer dominant height (i.e., the height of the primary species) at start of growth period
 	 * @param dqStart layer quad-mean-diameter at start of growth period
 	 * @param veteranBaStart veteran layer basal area at start of growth period
 	 * @param veteranBaEnd veteran layer basal area at end of growth period
 	 * @param dhDelta growth in dominant height during growth period
 	 * 
-	 * @return growth in quad-mean-diameter for the year. This may be negative.
+	 * @return growth in quad-mean-diameter for the growth period. This may be negative.
 	 * 
 	 * @throws StandProcessingException
 	 */
@@ -1780,10 +1797,11 @@ public class ForwardProcessingEngine {
 	 * @throws StandProcessingException in the event of an error
 	 */
 	float growBasalArea(
-			float pspYabhStart, ForwardDebugSettings debugSettings, float pspDhStart,
-			float baStart, Optional<Float> veteranLayerBaStart, float dhDelta
+			float pspYabhStart, float pspDhStart, float baStart, Optional<Float> veteranLayerBaStart, 
+			float dhDelta
 	) throws StandProcessingException {
 
+		ForwardDebugSettings debugSettings = fps.fcm.getDebugSettings();
 		LayerProcessingState lps = fps.getLayerProcessingState();
 		Bank bank = lps.getBank();
 

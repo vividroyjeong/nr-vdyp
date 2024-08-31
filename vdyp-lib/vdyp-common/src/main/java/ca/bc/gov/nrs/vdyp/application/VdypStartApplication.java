@@ -1457,44 +1457,37 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				var adjust = new Coefficients(new float[] { 0f, 0f, 0f, 0f }, 1);
 
 				// EMP091
-				EstimationMethods.estimateWholeStemVolume(
-						controlMap, utilizationClass, volumeAdjustCoe.getCoe(1), vdypSpecies.getVolumeGroup(), hlSp,
+				estimationMethods.estimateWholeStemVolume(
+						utilizationClass, volumeAdjustCoe.getCoe(1), vdypSpecies.getVolumeGroup(), hlSp,
 						quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
 				);
 
 				adjust.setCoe(4, volumeAdjustCoe.getCoe(2));
 				// EMP092
-				EstimationMethods.estimateCloseUtilizationVolume(
-						controlMap, utilizationClass, adjust, vdypSpecies.getVolumeGroup(), hlSp, quadMeanDiameterUtil,
+				estimationMethods.estimateCloseUtilizationVolume(
+						utilizationClass, adjust, vdypSpecies.getVolumeGroup(), hlSp, quadMeanDiameterUtil,
 						wholeStemVolumeUtil, closeUtilizationVolumeUtil
 				);
 
 				adjust.setCoe(4, volumeAdjustCoe.getCoe(3));
 				// EMP093
-				EstimationMethods.estimateNetDecayVolume(
-						controlMap, vdypSpecies.getGenus(), bec.getRegion(), utilizationClass, adjust,
+				estimationMethods.estimateNetDecayVolume(
+						vdypSpecies.getGenus(), bec.getRegion(), utilizationClass, adjust,
 						vdypSpecies.getDecayGroup(), vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil,
 						closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil
 				);
 
 				adjust.setCoe(4, volumeAdjustCoe.getCoe(4));
 				// EMP094
-				final var netDecayCoeMap = Utils.<Map<String, Coefficients>>expectParsedControl(
-						controlMap, ControlKey.VOLUME_NET_DECAY_WASTE, java.util.Map.class
-				);
-				final var wasteModifierMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
-						controlMap, ControlKey.WASTE_MODIFIERS, ca.bc.gov.nrs.vdyp.model.MatrixMap2.class
-				);
-				EstimationMethods.estimateNetDecayAndWasteVolume(
-						bec.getRegion(), utilizationClass, adjust, vdypSpecies.getGenus(), hlSp, netDecayCoeMap,
-						wasteModifierMap, quadMeanDiameterUtil, closeUtilizationVolumeUtil,
-						closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
+				estimationMethods.estimateNetDecayAndWasteVolume(
+						bec.getRegion(), utilizationClass, adjust, vdypSpecies.getGenus(), hlSp, quadMeanDiameterUtil, 
+						closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
 				);
 
 				if (getId().isStart()) {
 					// EMP095
-					EstimationMethods.estimateNetDecayWasteAndBreakageVolume(
-							controlMap, utilizationClass, vdypSpecies.getBreakageGroup(), quadMeanDiameterUtil,
+					estimationMethods.estimateNetDecayWasteAndBreakageVolume(
+							utilizationClass, vdypSpecies.getBreakageGroup(), quadMeanDiameterUtil,
 							closeUtilizationVolumeUtil, closeUtilizationNetOfDecayAndWasteUtil,
 							closeUtilizationNetOfDecayWasteAndBreakageUtil
 					);
