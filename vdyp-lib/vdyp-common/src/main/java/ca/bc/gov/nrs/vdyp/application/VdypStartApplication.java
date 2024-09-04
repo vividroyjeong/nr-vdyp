@@ -272,8 +272,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	protected L requireLayer(P polygon, LayerType type) throws ProcessingException {
 		if (!polygon.getLayers().containsKey(type)) {
 			throw validationError(
-					"Polygon \"%s\" has no %s layer, or that layer has non-positive height or crown closure.", polygon
-							.getPolygonIdentifier(), type
+					"Polygon \"%s\" has no %s layer, or that layer has non-positive height or crown closure.",
+					polygon.getPolygonIdentifier(), type
 			);
 		}
 
@@ -294,8 +294,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				.sum();
 		if (Math.abs(percentTotal - 100f) > 0.01f) {
 			throw validationError(
-					"Polygon \"%s\" has %s layer where species entries have a percentage total that does not sum to 100%%.", layer
-							.getPolygonIdentifier(), LayerType.PRIMARY
+					"Polygon \"%s\" has %s layer where species entries have a percentage total that does not sum to 100%%.",
+					layer.getPolygonIdentifier(), LayerType.PRIMARY
 			);
 		}
 		return percentTotal;
@@ -534,8 +534,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 		var decayBecAlias = bec.getDecayBec().getAlias();
 		Coefficients coe = weightedCoefficientSum(
-				List.of(0, 1, 2, 3, 4, 5), 9, 0, layer.getSpecies()
-						.values(), BaseVdypSpecies::getFractionGenus, s -> coeMap.get(decayBecAlias, s.getGenus())
+				List.of(0, 1, 2, 3, 4, 5), 9, 0, layer.getSpecies().values(), BaseVdypSpecies::getFractionGenus,
+				s -> coeMap.get(decayBecAlias, s.getGenus())
 		);
 
 		float ageToUse = clamp(breastHeightAge, 5f, 350f);
@@ -848,8 +848,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 		var decayBecAlias = bec.getDecayBec().getAlias();
 		Coefficients coe = weightedCoefficientSum(
-				List.of(0, 1, 2, 3, 4), 8, 0, layer.getSpecies()
-						.values(), BaseVdypSpecies::getFractionGenus, s -> coeMap.get(decayBecAlias, s.getGenus())
+				List.of(0, 1, 2, 3, 4), 8, 0, layer.getSpecies().values(), BaseVdypSpecies::getFractionGenus,
+				s -> coeMap.get(decayBecAlias, s.getGenus())
 		);
 
 		var trAge = log(clamp(breastHeightAge, 5f, 350f));
@@ -1193,7 +1193,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			// Calculate tree density components
 			for (var uc : VdypStartApplication.UTIL_CLASSES) {
 				treesPerHectareUtil.set(
-						uc, BaseAreaTreeDensityDiameter
+						uc,
+						BaseAreaTreeDensityDiameter
 								.treesPerHectare(baseAreaUtil.getCoe(uc.index), quadMeanDiameterUtil.get(uc))
 				);
 			}
@@ -1211,7 +1212,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 			for (var uc : VdypStartApplication.UTIL_CLASSES) {
 				treesPerHectareUtil.setCoe(
-						uc.index, BaseAreaTreeDensityDiameter
+						uc.index,
+						BaseAreaTreeDensityDiameter
 								.treesPerHectare(baseAreaUtil.getCoe(uc.index), quadMeanDiameterUtil.getCoe(uc.index))
 				);
 			}
@@ -1228,9 +1230,8 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 				// EMP091
 				estimationMethods.estimateWholeStemVolume(
-						UtilizationClass.ALL, adjustCloseUtil.getCoe(
-								4
-						), spec.getVolumeGroup(), loreyHeightSpec, quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
+						UtilizationClass.ALL, adjustCloseUtil.getCoe(4), spec.getVolumeGroup(), loreyHeightSpec,
+						quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
 				);
 
 				if (compatibilityVariableMode == CompatibilityVariableMode.ALL) {
@@ -1245,28 +1246,28 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 				// EMP092
 				estimationMethods.estimateCloseUtilizationVolume(
-						UtilizationClass.ALL, adjustCloseUtil, spec
-								.getVolumeGroup(), loreyHeightSpec, quadMeanDiameterUtil, wholeStemVolumeUtil, closeVolumeUtil
+						UtilizationClass.ALL, adjustCloseUtil, spec.getVolumeGroup(), loreyHeightSpec,
+						quadMeanDiameterUtil, wholeStemVolumeUtil, closeVolumeUtil
 				);
 
 				// EMP093
 				estimationMethods.estimateNetDecayVolume(
-						spec.getGenus(), bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec
-								.getDecayGroup(), vdypLayer.getBreastHeightAge()
-										.orElse(0f), quadMeanDiameterUtil, closeVolumeUtil, closeVolumeNetDecayUtil
+						spec.getGenus(), bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec.getDecayGroup(),
+						vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil, closeVolumeUtil,
+						closeVolumeNetDecayUtil
 				);
 
 				// EMP094
 				estimationMethods.estimateNetDecayAndWasteVolume(
-						bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec
-								.getGenus(), loreyHeightSpec, quadMeanDiameterUtil, closeVolumeUtil, closeVolumeNetDecayUtil, closeVolumeNetDecayWasteUtil
+						bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec.getGenus(), loreyHeightSpec,
+						quadMeanDiameterUtil, closeVolumeUtil, closeVolumeNetDecayUtil, closeVolumeNetDecayWasteUtil
 				);
 
 				if (this.getId().isStart()) {
 					// EMP095
 					estimationMethods.estimateNetDecayWasteAndBreakageVolume(
-							UtilizationClass.ALL, spec
-									.getBreakageGroup(), quadMeanDiameterUtil, closeVolumeUtil, closeVolumeNetDecayWasteUtil, closeVolumeNetDecayWasteBreakUtil
+							UtilizationClass.ALL, spec.getBreakageGroup(), quadMeanDiameterUtil, closeVolumeUtil,
+							closeVolumeNetDecayWasteUtil, closeVolumeNetDecayWasteBreakUtil
 					);
 				}
 			}
@@ -1317,12 +1318,12 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 							"For species {}, Species LH (7.5cm+): {}, Species BA (7.5cm+): {}, Weighted LH (7.5cm+): {}"
 					).log();
 			vdypLayer.getLoreyHeightByUtilization().scalarInPlace(
-					UtilizationClass.SMALL, x -> x
-							+ spec.getLoreyHeightByUtilization().getSmall() * spec.getBaseAreaByUtilization().getSmall()
+					UtilizationClass.SMALL,
+					x -> x + spec.getLoreyHeightByUtilization().getSmall() * spec.getBaseAreaByUtilization().getSmall()
 			);
 			vdypLayer.getLoreyHeightByUtilization().scalarInPlace(
-					UtilizationClass.ALL, x -> x
-							+ spec.getLoreyHeightByUtilization().getAll() * spec.getBaseAreaByUtilization().getAll()
+					UtilizationClass.ALL,
+					x -> x + spec.getLoreyHeightByUtilization().getAll() * spec.getBaseAreaByUtilization().getAll()
 			);
 		}
 		{
@@ -1355,14 +1356,14 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			vdypLayer.getSpecies().values().stream().forEach(spec -> {
 				var ba = spec.getBaseAreaByUtilization();
 				hlVector.pairwiseInPlace(
-						spec.getLoreyHeightByUtilization(), (float x, float y, UtilizationClass uc) -> x
-								+ y * ba.get(uc)
+						spec.getLoreyHeightByUtilization(),
+						(float x, float y, UtilizationClass uc) -> x + y * ba.get(uc)
 				);
 			});
 			var ba = vdypLayer.getBaseAreaByUtilization();
 			hlVector.scalarInPlace((float x, UtilizationClass uc) -> ba.get(uc) > 0 ? x / ba.get(uc) : x);
 
-			// Update percent based on updated areas 
+			// Update percent based on updated areas
 			vdypLayer.getSpecies().values().stream().forEach(spec -> {
 				spec.setPercentGenus(100 * spec.getBaseAreaByUtilization().getAll() / ba.getAll());
 			});
@@ -1472,16 +1473,17 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				adjust.setCoe(4, volumeAdjustCoe.getCoe(3));
 				// EMP093
 				estimationMethods.estimateNetDecayVolume(
-						vdypSpecies.getGenus(), bec.getRegion(), utilizationClass, adjust,
-						vdypSpecies.getDecayGroup(), vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil,
-						closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil
+						vdypSpecies.getGenus(), bec.getRegion(), utilizationClass, adjust, vdypSpecies.getDecayGroup(),
+						vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil, closeUtilizationVolumeUtil,
+						closeUtilizationNetOfDecayUtil
 				);
 
 				adjust.setCoe(4, volumeAdjustCoe.getCoe(4));
 				// EMP094
 				estimationMethods.estimateNetDecayAndWasteVolume(
-						bec.getRegion(), utilizationClass, adjust, vdypSpecies.getGenus(), hlSp, quadMeanDiameterUtil, 
-						closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
+						bec.getRegion(), utilizationClass, adjust, vdypSpecies.getGenus(), hlSp, quadMeanDiameterUtil,
+						closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil,
+						closeUtilizationNetOfDecayAndWasteUtil
 				);
 
 				if (getId().isStart()) {

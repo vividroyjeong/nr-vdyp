@@ -181,51 +181,59 @@ class BankTest {
 		Bank bank = new Bank(pLayer, polygon.getBiogeoclimaticZone(), s -> true);
 
 		VdypLayer currentLayer = bank.getLayer();
-		
+
 		verifyBankMatchesLayer(bank, currentLayer);
-		
+
 		UtilizationVector uv = currentLayer.getBaseAreaByUtilization();
 		float newValue = uv.get(UtilizationClass.ALL) + 1.0f;
 		uv.set(UtilizationClass.ALL, newValue);
 		currentLayer.setBaseAreaByUtilization(uv);
 
 		bank.refreshBank(currentLayer);
-		
+
 		verifyBankMatchesLayer(bank, currentLayer);
 	}
 
 	private void verifyBankMatchesLayer(Bank lps, VdypLayer layer) {
 
-		List<Integer> sortedSpIndices = layer.getSpecies().values().stream().map(s -> s.getGenusIndex()).sorted().toList();
+		List<Integer> sortedSpIndices = layer.getSpecies().values().stream().map(s -> s.getGenusIndex()).sorted()
+				.toList();
 
 		int arrayIndex = 1;
 		for (int i = 0; i < sortedSpIndices.size(); i++) {
 			VdypSpecies genus = layer.getSpeciesByIndex(sortedSpIndices.get(i));
-			
+
 			verifyBankSpeciesMatchesSpecies(lps, arrayIndex, genus);
 
-			verifyBankUtilizationsMatchesUtilizations(
-					lps, arrayIndex, genus
-			);
-			
+			verifyBankUtilizationsMatchesUtilizations(lps, arrayIndex, genus);
+
 			arrayIndex += 1;
 		}
 
 		verifyBankUtilizationsMatchesUtilizations(lps, 0, layer);
 	}
 
-	private void verifyBankUtilizationsMatchesUtilizations(
-			Bank lps, int spIndex, VdypUtilizationHolder u
-	) {
+	private void verifyBankUtilizationsMatchesUtilizations(Bank lps, int spIndex, VdypUtilizationHolder u) {
 		for (UtilizationClass uc : UtilizationClass.values()) {
 			assertThat(lps.basalAreas[spIndex][uc.index + 1], is(u.getBaseAreaByUtilization().get(uc)));
-			assertThat(lps.closeUtilizationVolumes[spIndex][uc.index + 1], is(u.getCloseUtilizationVolumeByUtilization().get(uc)));
-			assertThat(lps.cuVolumesMinusDecay[spIndex][uc.index + 1], is(u.getCloseUtilizationVolumeNetOfDecayByUtilization().get(uc)));
-			assertThat(lps.cuVolumesMinusDecayAndWastage[spIndex][uc.index + 1], is(u.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization().get(uc)));
+			assertThat(
+					lps.closeUtilizationVolumes[spIndex][uc.index + 1],
+					is(u.getCloseUtilizationVolumeByUtilization().get(uc))
+			);
+			assertThat(
+					lps.cuVolumesMinusDecay[spIndex][uc.index + 1],
+					is(u.getCloseUtilizationVolumeNetOfDecayByUtilization().get(uc))
+			);
+			assertThat(
+					lps.cuVolumesMinusDecayAndWastage[spIndex][uc.index + 1],
+					is(u.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization().get(uc))
+			);
 			if (uc.index <= 0) {
 				assertThat(lps.loreyHeights[spIndex][uc.index + 1], is(u.getLoreyHeightByUtilization().get(uc)));
 			}
-			assertThat(lps.quadMeanDiameters[spIndex][uc.index + 1], is(u.getQuadraticMeanDiameterByUtilization().get(uc)));
+			assertThat(
+					lps.quadMeanDiameters[spIndex][uc.index + 1], is(u.getQuadraticMeanDiameterByUtilization().get(uc))
+			);
 			assertThat(lps.treesPerHectare[spIndex][uc.index + 1], is(u.getTreesPerHectareByUtilization().get(uc)));
 			assertThat(lps.wholeStemVolumes[spIndex][uc.index + 1], is(u.getWholeStemVolumeByUtilization().get(uc)));
 		}
@@ -235,7 +243,7 @@ class BankTest {
 		assertThat(bank.sp64Distributions[index], is(species.getSp64DistributionSet()));
 		assertThat(bank.speciesIndices[index], is(species.getGenusIndex()));
 		assertThat(bank.speciesNames[index], is(species.getGenus()));
-		
+
 		species.getSite().ifPresentOrElse(site -> {
 			assertThat(bank.yearsAtBreastHeight[index], is(site.getYearsAtBreastHeight().get()));
 			assertThat(bank.ageTotals[index], is(site.getAgeTotal().get()));
@@ -248,8 +256,7 @@ class BankTest {
 				assertThat(bank.siteCurveNumbers[index], is(VdypEntity.MISSING_INTEGER_VALUE));
 			});
 			assertThat(bank.speciesNames[index], is(site.getSiteGenus()));
-		}, 
-		() -> {
+		}, () -> {
 			assertThat(bank.yearsAtBreastHeight[index], is(VdypEntity.MISSING_FLOAT_VALUE));
 			assertThat(bank.ageTotals[index], is(VdypEntity.MISSING_FLOAT_VALUE));
 			assertThat(bank.dominantHeights[index], is(VdypEntity.MISSING_FLOAT_VALUE));

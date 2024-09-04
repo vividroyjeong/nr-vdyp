@@ -26,9 +26,9 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 
-class GrowQuadMeanDiameterTest {
+class CalculateQuadMeanDiameterDeltaTest {
 
-	protected static final Logger logger = LoggerFactory.getLogger(GrowQuadMeanDiameterTest.class);
+	protected static final Logger logger = LoggerFactory.getLogger(CalculateQuadMeanDiameterDeltaTest.class);
 
 	protected static ForwardControlParser parser;
 	protected static Map<String, Object> controlMap;
@@ -53,17 +53,17 @@ class GrowQuadMeanDiameterTest {
 
 	@Test
 	void testMixedModel() throws ProcessingException {
-		
+
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		
+
 		// Select the first polygon - 01002 S000001 00(1970)
 		VdypPolygon polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 
 		fpe.processPolygon(polygon, ExecutionStep.GROW.predecessor());
-		
+
 		ForwardDebugSettings debugSettings = fpe.fps.fcm.getDebugSettings();
 		debugSettings.setValue(Vars.DQ_GROWTH_MODEL_6, 2);
-		
+
 		float yabh = 54.0f;
 		float hd = 35.2999992f;
 		float ba = 45.3864441f;
@@ -72,9 +72,11 @@ class GrowQuadMeanDiameterTest {
 		Optional<Float> v_ba_start = Optional.empty();
 		Optional<Float> v_ba_end = Optional.empty();
 		Reference<Boolean> dqGrowthLimitApplied = new Reference<>();
-		
-		float gba = fpe.growQuadMeanDiameter(yabh, ba, hd, dq, v_ba_start, v_ba_end, growthInHd, dqGrowthLimitApplied);
-		
+
+		float gba = fpe.calculateQuadMeanDiameterDelta(
+				yabh, ba, hd, dq, v_ba_start, v_ba_end, growthInHd, dqGrowthLimitApplied
+		);
+
 		assertThat(gba, is(0.30947846f));
 		assertTrue(dqGrowthLimitApplied.isPresent());
 		assertThat(dqGrowthLimitApplied.get(), is(false));
@@ -82,17 +84,17 @@ class GrowQuadMeanDiameterTest {
 
 	@Test
 	void testFiatOnlyModel() throws ProcessingException {
-		
+
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		
+
 		// Select the first polygon - 01002 S000001 00(1970)
 		VdypPolygon polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 
 		fpe.processPolygon(polygon, ExecutionStep.GROW.predecessor());
-		
+
 		ForwardDebugSettings debugSettings = fpe.fps.fcm.getDebugSettings();
 		debugSettings.setValue(Vars.DQ_GROWTH_MODEL_6, 0); /* this value will force the fiat only calculations. */
-		
+
 		float yabh = 54.0f;
 		float hd = 35.2999992f;
 		float ba = 45.3864441f;
@@ -101,9 +103,11 @@ class GrowQuadMeanDiameterTest {
 		Optional<Float> v_ba_start = Optional.empty();
 		Optional<Float> v_ba_end = Optional.empty();
 		Reference<Boolean> dqGrowthLimitApplied = new Reference<>();
-		
-		float gba = fpe.growQuadMeanDiameter(yabh, ba, hd, dq, v_ba_start, v_ba_end, growthInHd, dqGrowthLimitApplied);
-		
+
+		float gba = fpe.calculateQuadMeanDiameterDelta(
+				yabh, ba, hd, dq, v_ba_start, v_ba_end, growthInHd, dqGrowthLimitApplied
+		);
+
 		assertThat(gba, is(0.3194551f));
 		assertTrue(dqGrowthLimitApplied.isPresent());
 		assertThat(dqGrowthLimitApplied.get(), is(false));
@@ -111,17 +115,17 @@ class GrowQuadMeanDiameterTest {
 
 	@Test
 	void testEmpiricalOnlyModel() throws ProcessingException {
-		
+
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		
+
 		// Select the first polygon - 01002 S000001 00(1970)
 		VdypPolygon polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 
 		fpe.processPolygon(polygon, ExecutionStep.GROW.predecessor());
-		
+
 		ForwardDebugSettings debugSettings = fpe.fps.fcm.getDebugSettings();
 		debugSettings.setValue(Vars.DQ_GROWTH_MODEL_6, 1); /* this value will force the empirical only calculations. */
-		
+
 		float yabh = 54.0f;
 		float hd = 35.2999992f;
 		float ba = 45.3864441f;
@@ -130,9 +134,11 @@ class GrowQuadMeanDiameterTest {
 		Optional<Float> v_ba_start = Optional.empty();
 		Optional<Float> v_ba_end = Optional.empty();
 		Reference<Boolean> dqGrowthLimitApplied = new Reference<>();
-		
-		float gba = fpe.growQuadMeanDiameter(yabh, ba, hd, dq, v_ba_start, v_ba_end, growthInHd, dqGrowthLimitApplied);
-		
+
+		float gba = fpe.calculateQuadMeanDiameterDelta(
+				yabh, ba, hd, dq, v_ba_start, v_ba_end, growthInHd, dqGrowthLimitApplied
+		);
+
 		assertThat(gba, is(0.30947846f));
 		assertTrue(dqGrowthLimitApplied.isPresent());
 		assertThat(dqGrowthLimitApplied.get(), is(false));
@@ -140,17 +146,17 @@ class GrowQuadMeanDiameterTest {
 
 	@Test
 	void testMixedModelWithInterpolation() throws ProcessingException {
-		
+
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		
+
 		// Select the first polygon - 01002 S000001 00(1970)
 		VdypPolygon polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 
 		fpe.processPolygon(polygon, ExecutionStep.GROW.predecessor());
-		
+
 		ForwardDebugSettings debugSettings = fpe.fps.fcm.getDebugSettings();
 		debugSettings.setValue(Vars.DQ_GROWTH_MODEL_6, 2);
-		
+
 		float yabh = 104.0f; /* this value will force interpolation. */
 		float hd = 35.2999992f;
 		float ba = 45.3864441f;
@@ -159,9 +165,11 @@ class GrowQuadMeanDiameterTest {
 		Optional<Float> v_ba_start = Optional.empty();
 		Optional<Float> v_ba_end = Optional.empty();
 		Reference<Boolean> dqGrowthLimitApplied = new Reference<>();
-		
-		float gba = fpe.growQuadMeanDiameter(yabh, ba, hd, dq, v_ba_start, v_ba_end, growthInHd, dqGrowthLimitApplied);
-		
+
+		float gba = fpe.calculateQuadMeanDiameterDelta(
+				yabh, ba, hd, dq, v_ba_start, v_ba_end, growthInHd, dqGrowthLimitApplied
+		);
+
 		assertThat(gba, is(0.28309992f));
 		assertTrue(dqGrowthLimitApplied.isPresent());
 		assertThat(dqGrowthLimitApplied.get(), is(false));
@@ -169,17 +177,17 @@ class GrowQuadMeanDiameterTest {
 
 	@Test
 	void testMinimumApplied() throws ProcessingException {
-		
+
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		
+
 		// Select the first polygon - 01002 S000001 00(1970)
 		VdypPolygon polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 
 		fpe.processPolygon(polygon, ExecutionStep.GROW.predecessor());
-		
+
 		ForwardDebugSettings debugSettings = fpe.fps.fcm.getDebugSettings();
 		debugSettings.setValue(Vars.DQ_GROWTH_MODEL_6, 0);
-		
+
 		float yabh = 54.0f;
 		float hd = 35.3f;
 		float ba = 45.3864441f;
@@ -188,9 +196,11 @@ class GrowQuadMeanDiameterTest {
 		Optional<Float> v_ba_start = Optional.empty();
 		Optional<Float> v_ba_end = Optional.empty();
 		Reference<Boolean> dqGrowthLimitApplied = new Reference<>();
-		
-		float gba = fpe.growQuadMeanDiameter(yabh, ba, hd, dq, v_ba_start, v_ba_end, growthInHd, dqGrowthLimitApplied);
-		
+
+		float gba = fpe.calculateQuadMeanDiameterDelta(
+				yabh, ba, hd, dq, v_ba_start, v_ba_end, growthInHd, dqGrowthLimitApplied
+		);
+
 		assertThat(gba, is(4.6f));
 		assertTrue(dqGrowthLimitApplied.isPresent());
 		assertThat(dqGrowthLimitApplied.get(), is(false));
@@ -198,17 +208,17 @@ class GrowQuadMeanDiameterTest {
 
 	@Test
 	void testLimitApplied() throws ProcessingException {
-		
+
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		
+
 		// Select the first polygon - 01002 S000001 00(1970)
 		VdypPolygon polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 
 		fpe.processPolygon(polygon, ExecutionStep.GROW.predecessor());
-		
+
 		ForwardDebugSettings debugSettings = fpe.fps.fcm.getDebugSettings();
 		debugSettings.setValue(Vars.DQ_GROWTH_MODEL_6, 0);
-		
+
 		float yabh = 54.0f;
 		float hd = 35.3f;
 		float ba = 45.3864441f;
@@ -217,9 +227,11 @@ class GrowQuadMeanDiameterTest {
 		Optional<Float> v_ba_start = Optional.empty();
 		Optional<Float> v_ba_end = Optional.empty();
 		Reference<Boolean> dqGrowthLimitApplied = new Reference<>();
-		
-		float gba = fpe.growQuadMeanDiameter(yabh, ba, hd, dq, v_ba_start, v_ba_end, growthInHd, dqGrowthLimitApplied);
-		
+
+		float gba = fpe.calculateQuadMeanDiameterDelta(
+				yabh, ba, hd, dq, v_ba_start, v_ba_end, growthInHd, dqGrowthLimitApplied
+		);
+
 		assertThat(gba, is(0.0f));
 		assertTrue(dqGrowthLimitApplied.isPresent());
 		assertThat(dqGrowthLimitApplied.get(), is(true));

@@ -95,8 +95,8 @@ public class FloatMath {
 	}
 
 	/**
-	 * Compute the maximum of three float values, using <code>Math.max</code> to do pairwise
-	 * comparisons.
+	 * Compute the maximum of three float values, using <code>Math.max</code> to do pairwise comparisons.
+	 *
 	 * @param f1
 	 * @param f2
 	 * @param f3
@@ -105,10 +105,10 @@ public class FloatMath {
 	public static float max(float f1, float f2, float f3) {
 		return Math.max(f1, Math.max(f2, f3));
 	}
-	
+
 	/**
-	 * Compute the maximum of four float values, using <code>Math.max</code> to do pairwise
-	 * comparisons.
+	 * Compute the maximum of four float values, using <code>Math.max</code> to do pairwise comparisons.
+	 *
 	 * @param f1
 	 * @param f2
 	 * @param f3

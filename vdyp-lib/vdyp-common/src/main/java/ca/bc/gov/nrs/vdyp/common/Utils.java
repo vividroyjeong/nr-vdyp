@@ -320,9 +320,8 @@ public class Utils {
 	}
 
 	public static GenusDefinition getGenusDefinition(String genusAlias, Map<String, Object> controlMap) {
-		return (GenusDefinition) expectParsedControl(
-				controlMap, ControlKey.SP0_DEF, GenusDefinitionMap.class
-		).getByAlias(genusAlias);
+		return (GenusDefinition) expectParsedControl(controlMap, ControlKey.SP0_DEF, GenusDefinitionMap.class)
+				.getByAlias(genusAlias);
 	}
 
 	/**

@@ -16,7 +16,7 @@ import ca.bc.gov.nrs.vdyp.model.SiteCurveAgeMaximum;
 public interface ResolvedControlMap {
 
 	Map<String, Object> getControlMap();
-	
+
 	/** 9 - BEC_DEF */
 	BecLookup getBecLookup();
 
@@ -25,13 +25,13 @@ public interface ResolvedControlMap {
 
 	/** 20 - VOLUME_EQN_GROUPS */
 	MatrixMap2<String, String, Integer> getVolumeEquationGroups();
-	
+
 	/** 21 - DECAY_GROUPS */
 	MatrixMap2<String, String, Integer> getDecayEquationGroups();
 
 	/** 22 - BREAKAGE_GROUPS */
 	MatrixMap2<String, String, Integer> getBreakageEquationGroups();
-	
+
 	/** 26 - SITE_CURVE_AGE_MAX */
 	Map<Integer, SiteCurveAgeMaximum> getMaximumAgeBySiteCurveNumber();
 
@@ -49,7 +49,7 @@ public interface ResolvedControlMap {
 
 	/** 52 - HL_PRIMARY_SP_EQN_P3 */
 	MatrixMap2<String, Region, Coefficients> getHl3Coefficients();
-	
+
 	/** 53 - HL_NONPRIMARY */
 	MatrixMap3<String, String, Region, Optional<NonprimaryHLCoefficients>> getHlNonPrimaryCoefficients();
 
@@ -58,7 +58,7 @@ public interface ResolvedControlMap {
 
 	/** 61 - SPECIES_COMPONENT_SIZE_LIMIT */
 	MatrixMap2<String, Region, ComponentSizeLimits> getComponentSizeLimits();
-	
+
 	/** 70 - UTIL_COMP_BA */
 	MatrixMap3<Integer, String, String, Coefficients> getBasalAreaDiameterUtilizationComponentMap();
 
@@ -97,7 +97,7 @@ public interface ResolvedControlMap {
 
 	/** 95 - BREAKAGE */
 	Map<Integer, Coefficients> getNetBreakageMap();
-	
+
 	/** 108 - BA_DQ_UPPER_BOUNDS */
 	Map<Integer, Coefficients> getUpperBounds();
 

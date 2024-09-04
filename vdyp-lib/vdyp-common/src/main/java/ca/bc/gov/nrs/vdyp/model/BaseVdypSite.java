@@ -71,18 +71,17 @@ public abstract class BaseVdypSite {
 	public Optional<Float> getYearsAtBreastHeight() {
 		return Utils.mapBoth(ageTotal, yearsToBreastHeight, (age, ytbh) -> age - ytbh);
 	}
-	
+
 	@Override
 	public String toString() {
 		return polygonIdentifier.toStringCompact() + "-" + layerType + "-" + siteGenus;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		if (other instanceof BaseVdypSite that) {
 			// This is the "business key" of a site.
-			return this.polygonIdentifier.equals(that.polygonIdentifier)
-					&& this.layerType.equals(that.layerType)
+			return this.polygonIdentifier.equals(that.polygonIdentifier) && this.layerType.equals(that.layerType)
 					&& this.siteGenus.equals(that.siteGenus);
 		} else {
 			return false;
@@ -198,7 +197,6 @@ public abstract class BaseVdypSite {
 			requirePresent(layerType, "layerType", errors);
 			requirePresent(siteGenus, "siteGenus", errors);
 		}
-	
 
 		@Override
 		protected String getBuilderId() {

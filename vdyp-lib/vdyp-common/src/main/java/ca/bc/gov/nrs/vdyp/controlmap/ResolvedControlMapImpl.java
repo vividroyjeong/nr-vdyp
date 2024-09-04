@@ -28,14 +28,14 @@ public class ResolvedControlMapImpl implements ResolvedControlMap {
 		this.controlMap = controlMap;
 	}
 
-	/** 
+	/**
 	 * @return the underlying control map
 	 */
 	@Override
 	public Map<String, Object> getControlMap() {
 		return Collections.unmodifiableMap(controlMap);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private <U> U get(ControlKey key, Class<? super U> clazz) {
 
@@ -50,7 +50,8 @@ public class ResolvedControlMapImpl implements ResolvedControlMap {
 
 	@Override
 	public GenusDefinitionMap getGenusDefinitionMap() {
-		GenusDefinitionMap genusDefinitions = this.<GenusDefinitionMap>get(ControlKey.SP0_DEF, GenusDefinitionMap.class);
+		GenusDefinitionMap genusDefinitions = this
+				.<GenusDefinitionMap>get(ControlKey.SP0_DEF, GenusDefinitionMap.class);
 		return genusDefinitions;
 	}
 

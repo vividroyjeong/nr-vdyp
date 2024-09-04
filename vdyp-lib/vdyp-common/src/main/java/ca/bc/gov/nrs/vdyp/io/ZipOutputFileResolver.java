@@ -14,8 +14,9 @@ import java.util.zip.ZipOutputStream;
 
 public class ZipOutputFileResolver implements FileResolver {
 
-	private record OutputStreamDetails(Path outputStreamLocation, OutputStream outputStream) {};
-	
+	private record OutputStreamDetails(Path outputStreamLocation, OutputStream outputStream) {
+	};
+
 	private Map<String, OutputStreamDetails> entryOutputStreams = new HashMap<>();
 
 	@Override
@@ -33,7 +34,7 @@ public class ZipOutputFileResolver implements FileResolver {
 		Path tempFile = Files.createTempFile("vdyp", filename);
 		OutputStream entryOutputStream = Files.newOutputStream(tempFile);
 		entryOutputStreams.put(filename, new OutputStreamDetails(tempFile, entryOutputStream));
-		
+
 		return entryOutputStream;
 	}
 
@@ -46,19 +47,22 @@ public class ZipOutputFileResolver implements FileResolver {
 	public ZipOutputFileResolver relative(String path) throws IOException {
 		throw new UnsupportedOperationException();
 	}
-	
+
 	private static final int BUFFER_SIZE = 64 * 1024;
-	
+
 	public void generate(Path zipFile) throws IOException {
 		try (ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(zipFile.toFile()))) {
-			
-			for (Map.Entry<String, OutputStreamDetails> e: entryOutputStreams.entrySet()) {
+
+			for (Map.Entry<String, OutputStreamDetails> e : entryOutputStreams.entrySet()) {
 				close(e.getValue().outputStream);
 
 				ZipEntry entry = new ZipEntry(e.getKey());
-				try (InputStream entryReader = Files.newInputStream(e.getValue().outputStreamLocation, StandardOpenOption.READ)) {
+				try (
+						InputStream entryReader = Files
+								.newInputStream(e.getValue().outputStreamLocation, StandardOpenOption.READ)
+				) {
 					zipOutputStream.putNextEntry(entry);
-					
+
 					byte[] cBuffer = new byte[BUFFER_SIZE];
 					int nCharsRead = entryReader.read(cBuffer, 0, BUFFER_SIZE);
 					while (nCharsRead >= 0) {
@@ -71,19 +75,22 @@ public class ZipOutputFileResolver implements FileResolver {
 			}
 		}
 	}
-	
+
 	public InputStream generateStream() throws IOException {
-		
+
 		Path tempFile = Files.createTempFile("vdypOutputZipFile", ".zip");
-		
+
 		try (ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(tempFile.toFile()))) {
-			for (Map.Entry<String, OutputStreamDetails> e: entryOutputStreams.entrySet()) {
+			for (Map.Entry<String, OutputStreamDetails> e : entryOutputStreams.entrySet()) {
 				close(e.getValue().outputStream);
-	
+
 				ZipEntry entry = new ZipEntry(e.getKey());
-				try (InputStream entryReader = Files.newInputStream(e.getValue().outputStreamLocation, StandardOpenOption.READ)) {
+				try (
+						InputStream entryReader = Files
+								.newInputStream(e.getValue().outputStreamLocation, StandardOpenOption.READ)
+				) {
 					zipOutputStream.putNextEntry(entry);
-					
+
 					byte[] cBuffer = new byte[BUFFER_SIZE];
 					int nCharsRead = entryReader.read(cBuffer, 0, BUFFER_SIZE);
 					while (nCharsRead >= 0) {
@@ -95,10 +102,10 @@ public class ZipOutputFileResolver implements FileResolver {
 				}
 			}
 		}
-		
+
 		return Files.newInputStream(tempFile);
 	}
-	
+
 	private static void close(OutputStream os) {
 		try {
 			os.close();

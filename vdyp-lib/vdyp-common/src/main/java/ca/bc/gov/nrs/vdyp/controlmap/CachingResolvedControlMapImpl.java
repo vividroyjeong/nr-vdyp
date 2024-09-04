@@ -49,13 +49,13 @@ public class CachingResolvedControlMapImpl implements ResolvedControlMap {
 	final MatrixMap2<String, String, Integer> decayEquationGroups;
 	final MatrixMap2<String, String, Integer> breakageEquationGroups;
 	final Map<String, Coefficients> quadMeanDiameterBySpeciesCoefficients;
-	
+
 	private final Map<String, Object> controlMap;
-	
+
 	public CachingResolvedControlMapImpl(Map<String, Object> controlMap) {
 
 		this.controlMap = controlMap;
-		
+
 		this.becLookup = this.get(ControlKey.BEC_DEF, BecLookup.class);
 
 		this.genusDefinitionMap = this.get(ControlKey.SP0_DEF, GenusDefinitionMap.class);
@@ -89,7 +89,7 @@ public class CachingResolvedControlMapImpl implements ResolvedControlMap {
 		this.quadMeanDiameterBySpeciesCoefficients = this.get(ControlKey.BY_SPECIES_DQ, Map.class);
 	}
 
-	/** 
+	/**
 	 * @return the underlying control map
 	 */
 	@Override

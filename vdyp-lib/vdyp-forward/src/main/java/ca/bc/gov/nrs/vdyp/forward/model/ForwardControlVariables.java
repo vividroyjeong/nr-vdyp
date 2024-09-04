@@ -64,14 +64,14 @@ public class ForwardControlVariables {
 
 		for (; index < MAX_CONTROL_VARIABLE_VALUES; index++)
 			this.controlVariables[index] = DEFAULT_CONTROL_VARIABLE_VALUE;
-		
+
 		validate();
 	}
-	
+
 	private void validate() throws ValueParseException {
 
 		// Validate the control variable values.
-		
+
 		var yearCounter = getControlVariable(ControlVariable.GROW_TARGET_1);
 		if (yearCounter != -1 && (yearCounter < 0 || yearCounter > 400 && yearCounter < 1920 || yearCounter > 2400)) {
 			throw new ValueParseException(
@@ -84,15 +84,19 @@ public class ForwardControlVariables {
 		if (compatibilityVariableOutputVariableValue < 0 || compatibilityVariableOutputVariableValue > 2) {
 			throw new ValueParseException(
 					Integer.toString(compatibilityVariableOutputVariableValue),
-					"VdypControlVariableParser: compatibility variable output value \"" + compatibilityVariableOutputVariableValue + "\" is out of range [0-2]"
+					"VdypControlVariableParser: compatibility variable output value \""
+							+ compatibilityVariableOutputVariableValue + "\" is out of range [0-2]"
 			);
 		}
 
-		var compatibilityVariableApplicationVariableValue = getControlVariable(ControlVariable.COMPAT_VAR_APPLICATION_3);
+		var compatibilityVariableApplicationVariableValue = getControlVariable(
+				ControlVariable.COMPAT_VAR_APPLICATION_3
+		);
 		if (compatibilityVariableApplicationVariableValue < 0 || compatibilityVariableApplicationVariableValue > 2) {
 			throw new ValueParseException(
 					Integer.toString(compatibilityVariableApplicationVariableValue),
-					"VdypControlVariableParser: compatibility variable application value \"" + compatibilityVariableApplicationVariableValue + "\" is out of range [0-2]"
+					"VdypControlVariableParser: compatibility variable application value \""
+							+ compatibilityVariableApplicationVariableValue + "\" is out of range [0-2]"
 			);
 		}
 
@@ -100,15 +104,20 @@ public class ForwardControlVariables {
 		if (outputFileDirectiveVariableValue < 0 || outputFileDirectiveVariableValue > 4) {
 			throw new ValueParseException(
 					Integer.toString(outputFileDirectiveVariableValue),
-					"VdypControlVariableParser: output file directive value \"" + outputFileDirectiveVariableValue + "\" is out of range [0-4]"
+					"VdypControlVariableParser: output file directive value \"" + outputFileDirectiveVariableValue
+							+ "\" is out of range [0-4]"
 			);
 		}
 
-		var allowCompatibilityVariableCalculationsVariableValue = getControlVariable(ControlVariable.ALLOW_COMPAT_VAR_CALCS_5);
-		if (allowCompatibilityVariableCalculationsVariableValue < 0 || allowCompatibilityVariableCalculationsVariableValue > 1) {
+		var allowCompatibilityVariableCalculationsVariableValue = getControlVariable(
+				ControlVariable.ALLOW_COMPAT_VAR_CALCS_5
+		);
+		if (allowCompatibilityVariableCalculationsVariableValue < 0
+				|| allowCompatibilityVariableCalculationsVariableValue > 1) {
 			throw new ValueParseException(
 					Integer.toString(allowCompatibilityVariableCalculationsVariableValue),
-					"VdypControlVariableParser: compatibility variable calculations allowed value \"" + allowCompatibilityVariableCalculationsVariableValue + "\" is out of range [0-1]"
+					"VdypControlVariableParser: compatibility variable calculations allowed value \""
+							+ allowCompatibilityVariableCalculationsVariableValue + "\" is out of range [0-1]"
 			);
 		}
 
@@ -116,7 +125,8 @@ public class ForwardControlVariables {
 		if (updateDuringGrowthVariableValue < 0 || updateDuringGrowthVariableValue > 1) {
 			throw new ValueParseException(
 					Integer.toString(updateDuringGrowthVariableValue),
-					"VdypControlVariableParser: update site species and ITG during grow value \"" + updateDuringGrowthVariableValue + "\" is out of range [0-1]"
+					"VdypControlVariableParser: update site species and ITG during grow value \""
+							+ updateDuringGrowthVariableValue + "\" is out of range [0-1]"
 			);
 		}
 	}

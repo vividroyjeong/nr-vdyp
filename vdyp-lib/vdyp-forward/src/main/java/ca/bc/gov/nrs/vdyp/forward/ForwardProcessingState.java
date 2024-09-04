@@ -24,16 +24,15 @@ class ForwardProcessingState {
 
 	/** The active state */
 	private LayerProcessingState lps;
-	
-	public ForwardProcessingState(Map<String, Object> controlMap) 
-			throws ProcessingException {
+
+	public ForwardProcessingState(Map<String, Object> controlMap) throws ProcessingException {
 		this.fcm = new ForwardResolvedControlMapImpl(controlMap);
 		this.estimators = new EstimationMethods(this.fcm);
 		this.computers = new ComputationMethods(estimators, VdypApplicationIdentifier.VDYP_FORWARD);
 	}
 
 	public void setPolygonLayer(VdypPolygon polygon, LayerType subjectLayer) throws ProcessingException {
-		
+
 		lps = new LayerProcessingState(this, polygon, subjectLayer);
 	}
 

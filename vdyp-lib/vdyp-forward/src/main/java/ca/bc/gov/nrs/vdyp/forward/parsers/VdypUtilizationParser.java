@@ -80,8 +80,8 @@ public class VdypUtilizationParser implements ControlMapValueReplacer<Object, St
 			) {
 				@SuppressWarnings("unchecked")
 				@Override
-				protected ValueOrMarker<Optional<VdypUtilization>, EndOfRecord>
-						convert(Map<String, Object> entry) throws ResourceParseException {
+				protected ValueOrMarker<Optional<VdypUtilization>, EndOfRecord> convert(Map<String, Object> entry)
+						throws ResourceParseException {
 
 					var polygonId = PolygonIdentifier.split((String) entry.get(DESCRIPTION));
 					var layerType = (ValueOrMarker<Optional<LayerType>, EndOfRecord>) entry.get(LAYER_TYPE);

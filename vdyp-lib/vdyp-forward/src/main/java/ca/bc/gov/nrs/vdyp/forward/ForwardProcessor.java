@@ -62,8 +62,10 @@ public class ForwardProcessor {
 	 * @throws ResourceParseException
 	 * @throws ProcessingException
 	 */
-	void run(FileResolver inputFileResolver, FileResolver outputFileResolver, List<String> controlFileNames, Set<ForwardPass> vdypPassSet)
-			throws IOException, ResourceParseException, ProcessingException {
+	void run(
+			FileResolver inputFileResolver, FileResolver outputFileResolver, List<String> controlFileNames,
+			Set<ForwardPass> vdypPassSet
+	) throws IOException, ResourceParseException, ProcessingException {
 
 		logger.info("VDYPPASS: {}", vdypPassSet);
 		logger.debug("VDYPPASS(1): Perform Initiation activities?");
@@ -94,11 +96,14 @@ public class ForwardProcessor {
 
 	/**
 	 * Implements VDYP_SUB
-	 * @param outputFileResolver 
+	 *
+	 * @param outputFileResolver
 	 *
 	 * @throws ProcessingException
 	 */
-	public void process(Set<ForwardPass> vdypPassSet, Map<String, Object> controlMap, Optional<FileResolver> outputFileResolver) throws ProcessingException {
+	public void process(
+			Set<ForwardPass> vdypPassSet, Map<String, Object> controlMap, Optional<FileResolver> outputFileResolver
+	) throws ProcessingException {
 
 		logger.info("Beginning processing with given configuration");
 
@@ -120,7 +125,7 @@ public class ForwardProcessor {
 		if (vdypPassSet.contains(ForwardPass.PASS_3)) {
 
 			Optional<VdypOutputWriter> outputWriter = Optional.empty();
-			
+
 			if (outputFileResolver.isPresent()) {
 				try {
 					outputWriter = Optional.of(new VdypOutputWriter(controlMap, outputFileResolver.get()));
@@ -128,7 +133,7 @@ public class ForwardProcessor {
 					throw new ProcessingException(e);
 				}
 			}
-			
+
 			var fpe = new ForwardProcessingEngine(controlMap, outputWriter);
 
 			var forwardDataStreamReader = new ForwardDataStreamReader(fpe.fps.fcm);
@@ -148,14 +153,14 @@ public class ForwardProcessor {
 				if (polygonHolder.isEmpty()) {
 					break;
 				}
-				
+
 				var polygon = polygonHolder.get();
-				
+
 				fpe.processPolygon(polygon);
 
 				nPolygonsProcessed += 1;
 			}
-			
+
 			outputWriter.ifPresent(ow -> {
 				try {
 					ow.close();

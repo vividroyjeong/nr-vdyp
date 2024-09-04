@@ -64,23 +64,25 @@ class ForwardReadPolygonTest {
 
 			assertThat(polygon.getPolygonIdentifier().toStringCompact(), is("01002 S000001 00(1970)"));
 
-			for (VdypLayer layer: polygon.getLayers().values())
-			{
+			for (VdypLayer layer : polygon.getLayers().values()) {
 				assertThat(layer.getPolygonIdentifier().getName(), is(polygon.getPolygonIdentifier().getName()));
 				assertThat(layer.getPolygonIdentifier().getYear(), is(polygon.getPolygonIdentifier().getYear()));
 
 				assertThat(UtilizationClass.values().length, is(layer.getBaseAreaByUtilization().size()));
 
 				var speciesMap = layer.getSpecies();
-				for (VdypSpecies species: speciesMap.values()) {
+				for (VdypSpecies species : speciesMap.values()) {
 					assertThat(species, hasProperty("layerType", is(layer.getLayerType())));
 					assertThat(species, hasProperty("polygonIdentifier", is(polygon.getPolygonIdentifier())));
-					
+
 					species.getSite().ifPresent(site -> {
-						assertThat(site, allOf(
-								hasProperty("polygonIdentifier", is(polygon.getPolygonIdentifier())),
-								hasProperty("layerType", is(layer.getLayerType()))
-						));
+						assertThat(
+								site,
+								allOf(
+										hasProperty("polygonIdentifier", is(polygon.getPolygonIdentifier())),
+										hasProperty("layerType", is(layer.getLayerType()))
+								)
+						);
 					});
 				}
 			}

@@ -13,7 +13,7 @@ public enum CompatibilityVariableMode {
 	 * Apply compatibility variables to all components
 	 */
 	ALL; // 2
-	
+
 	public static CompatibilityVariableMode getByInteger(int v) {
 		return values()[v];
 	}

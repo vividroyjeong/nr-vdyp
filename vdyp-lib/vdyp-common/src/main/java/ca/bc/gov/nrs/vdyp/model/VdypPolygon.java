@@ -98,7 +98,12 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float, VdypSpecies, 
 
 	public void setTargetYear(int year) {
 		if (targetYear.isPresent()) {
-			throw new IllegalStateException(MessageFormat.format("Polygon {} has already had a target year ({}) assigned", this.getPolygonIdentifier(), this.getTargetYear()));
+			throw new IllegalStateException(
+					MessageFormat.format(
+							"Polygon {} has already had a target year ({}) assigned", this.getPolygonIdentifier(),
+							this.getTargetYear()
+					)
+			);
 		} else {
 			this.targetYear = Optional.of(year);
 		}

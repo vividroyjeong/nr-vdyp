@@ -15,7 +15,7 @@ class ForwardControlVariablesTest {
 	@Test
 	void testNull() throws ValueParseException {
 		ForwardControlVariables fcv = new ForwardControlVariables(null);
-		
+
 		MatcherAssert.assertThat(fcv.getControlVariable(ControlVariable.GROW_TARGET_1), Matchers.equalTo(0));
 		MatcherAssert.assertThat(fcv.getControlVariable(ControlVariable.COMPAT_VAR_OUTPUT_2), Matchers.equalTo(0));
 		MatcherAssert.assertThat(fcv.getControlVariable(ControlVariable.COMPAT_VAR_APPLICATION_3), Matchers.equalTo(0));
@@ -27,7 +27,7 @@ class ForwardControlVariablesTest {
 	@Test
 	void testEmpty() throws ValueParseException {
 		ForwardControlVariables fcv = new ForwardControlVariables(new Integer[0]);
-		
+
 		MatcherAssert.assertThat(fcv.getControlVariable(ControlVariable.GROW_TARGET_1), Matchers.equalTo(0));
 		MatcherAssert.assertThat(fcv.getControlVariable(ControlVariable.COMPAT_VAR_OUTPUT_2), Matchers.equalTo(0));
 		MatcherAssert.assertThat(fcv.getControlVariable(ControlVariable.COMPAT_VAR_APPLICATION_3), Matchers.equalTo(0));
@@ -39,7 +39,7 @@ class ForwardControlVariablesTest {
 	@Test
 	void testSimple() throws ValueParseException {
 		ForwardControlVariables fcv = new ForwardControlVariables(new Integer[] { 1, 1, 1, 1, 1, 1 });
-		
+
 		MatcherAssert.assertThat(fcv.getControlVariable(ControlVariable.GROW_TARGET_1), Matchers.equalTo(1));
 		MatcherAssert.assertThat(fcv.getControlVariable(ControlVariable.COMPAT_VAR_OUTPUT_2), Matchers.equalTo(1));
 		MatcherAssert.assertThat(fcv.getControlVariable(ControlVariable.COMPAT_VAR_APPLICATION_3), Matchers.equalTo(1));
@@ -55,11 +55,17 @@ class ForwardControlVariablesTest {
 		new ForwardControlVariables(new Integer[] { 0, 0, 0, 0, 0, 0 });
 		new ForwardControlVariables(new Integer[] { 1, 0, 0, 0, 0, 0 });
 		new ForwardControlVariables(new Integer[] { 400, 0, 0, 0, 0, 0 });
-		assertThrows(ValueParseException.class, () -> new ForwardControlVariables(new Integer[] { 401, 0, 0, 0, 0, 0 }));
-		assertThrows(ValueParseException.class, () -> new ForwardControlVariables(new Integer[] { 1919, 0, 0, 0, 0, 0 }));
+		assertThrows(
+				ValueParseException.class, () -> new ForwardControlVariables(new Integer[] { 401, 0, 0, 0, 0, 0 })
+		);
+		assertThrows(
+				ValueParseException.class, () -> new ForwardControlVariables(new Integer[] { 1919, 0, 0, 0, 0, 0 })
+		);
 		new ForwardControlVariables(new Integer[] { 1920, 0, 0, 0, 0, 0 });
 		new ForwardControlVariables(new Integer[] { 2400, 0, 0, 0, 0, 0 });
-		assertThrows(ValueParseException.class, () -> new ForwardControlVariables(new Integer[] { 2401, 0, 0, 0, 0, 0 }));
+		assertThrows(
+				ValueParseException.class, () -> new ForwardControlVariables(new Integer[] { 2401, 0, 0, 0, 0, 0 })
+		);
 	}
 
 	@Test

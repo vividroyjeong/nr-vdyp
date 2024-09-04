@@ -42,24 +42,24 @@ class ForwardProcessorTest {
 		FileResolver inputFileResolver = TestUtils.fileResolver(TestUtils.class);
 
 		var outputResolver = new ZipOutputFileResolver();
-		
+
 		fp.run(inputFileResolver, outputResolver, List.of("VDYP.CTR"), vdypPassSet);
-		
+
 		Path resourceDirectory = Paths.get("src", "test", "resources", "output");
 		Files.createDirectories(resourceDirectory);
-		
+
 		Path zipFile = Paths.get(resourceDirectory.toString(), this.getClass().getSimpleName() + ".zip");
 		Files.deleteIfExists(zipFile);
-		
+
 		outputResolver.generate(zipFile);
-		
+
 		InputStream os = outputResolver.generateStream();
 
-		byte[] zipFileBytes = Files.readAllBytes(zipFile);		
+		byte[] zipFileBytes = Files.readAllBytes(zipFile);
 		byte[] zipStreamBytes = os.readAllBytes();
-		
+
 		assertTrue(zipFileBytes.length == zipStreamBytes.length);
 		assertTrue(Arrays.equals(zipFileBytes, zipStreamBytes));
-	
+
 	}
 }

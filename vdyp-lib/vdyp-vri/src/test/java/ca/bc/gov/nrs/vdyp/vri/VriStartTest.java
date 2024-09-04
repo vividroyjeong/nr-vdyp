@@ -211,7 +211,8 @@ class VriStartTest {
 			Coefficients result = app.estimateBaseAreaYieldCoefficients(species, bec);
 
 			assertThat(
-					result, VdypMatchers.coe(
+					result,
+					VdypMatchers.coe(
 							0, 7.29882717f, 0.934803009f, 7.22950029f, 0.478330702f, 0.00542420009f, 0f, -0.00899999961f
 					)
 			);
@@ -265,8 +266,8 @@ class VriStartTest {
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 			var result = app.findDefaultPolygonMode(
-					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
-							.of(76)
+					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
+					Optional.of(76)
 			);
 
 			assertThat(result, is(PolygonMode.YOUNG));
@@ -318,8 +319,8 @@ class VriStartTest {
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 			var result = app.findDefaultPolygonMode(
-					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
-							.of(76)
+					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
+					Optional.of(76)
 			);
 
 			assertThat(result, is(PolygonMode.YOUNG));
@@ -371,8 +372,8 @@ class VriStartTest {
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 			var result = app.findDefaultPolygonMode(
-					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
-							.of(76)
+					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
+					Optional.of(76)
 			);
 
 			assertThat(result, is(PolygonMode.YOUNG));
@@ -424,8 +425,8 @@ class VriStartTest {
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 			var result = app.findDefaultPolygonMode(
-					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
-							.of(76)
+					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
+					Optional.of(76)
 			);
 
 			assertThat(result, is(PolygonMode.YOUNG));
@@ -477,8 +478,8 @@ class VriStartTest {
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 			var result = app.findDefaultPolygonMode(
-					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
-							.of(76)
+					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
+					Optional.of(76)
 			);
 
 			assertThat(result, is(PolygonMode.YOUNG));
@@ -530,8 +531,8 @@ class VriStartTest {
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 			var result = app.findDefaultPolygonMode(
-					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
-							.of(76)
+					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
+					Optional.of(76)
 			);
 
 			assertThat(result, is(PolygonMode.START));
@@ -860,8 +861,8 @@ class VriStartTest {
 
 				var evaluated = result.evaluate(errorFunc);
 				assertTrue(
-						evaluated.start() * evaluated.end() <= 0, () -> "F(" + result
-								+ ") should have mixed signs but was " + evaluated
+						evaluated.start() * evaluated.end() <= 0,
+						() -> "F(" + result + ") should have mixed signs but was " + evaluated
 				);
 
 			}
@@ -882,8 +883,8 @@ class VriStartTest {
 
 				var evaluated = result.evaluate(errorFunc);
 				assertTrue(
-						evaluated.start() * evaluated.end() <= 0, () -> "F(" + result
-								+ ") should have mixed signs but was " + evaluated
+						evaluated.start() * evaluated.end() <= 0,
+						() -> "F(" + result + ") should have mixed signs but was " + evaluated
 				);
 
 			}
@@ -904,8 +905,8 @@ class VriStartTest {
 
 				var evaluated = result.evaluate(errorFunc);
 				assertTrue(
-						evaluated.start() * evaluated.end() <= 0, () -> "F(" + result
-								+ ") should have mixed signs but was " + evaluated
+						evaluated.start() * evaluated.end() <= 0,
+						() -> "F(" + result + ") should have mixed signs but was " + evaluated
 				);
 
 			}
@@ -1057,7 +1058,8 @@ class VriStartTest {
 				app.setDebugMode(1, 2);
 
 				assertThrows(
-						StandProcessingException.class, () -> app.findRootForQuadMeanDiameterFractionalError(
+						StandProcessingException.class,
+						() -> app.findRootForQuadMeanDiameterFractionalError(
 								x1, x2, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph
 						)
 				);
@@ -1207,7 +1209,8 @@ class VriStartTest {
 				app.setDebugMode(1, 2);
 
 				assertThrows(
-						StandProcessingException.class, () -> app.findRootForQuadMeanDiameterFractionalError(
+						StandProcessingException.class,
+						() -> app.findRootForQuadMeanDiameterFractionalError(
 								x1, x2, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph
 						)
 				);
@@ -1277,12 +1280,13 @@ class VriStartTest {
 
 				assertThat(result, closeTo((float) expectedX));
 				assertThat(
-						resultPerSpecies, allOf(
-								appliedX("B", expectedX, app, initialDqs, minDq, maxDq), appliedX(
-										"C", expectedX, app, initialDqs, minDq, maxDq
-								), appliedX("F", expectedX, app, initialDqs, minDq, maxDq), appliedX(
-										"H", expectedX, app, initialDqs, minDq, maxDq
-								), appliedX("S", expectedX, app, initialDqs, minDq, maxDq)
+						resultPerSpecies,
+						allOf(
+								appliedX("B", expectedX, app, initialDqs, minDq, maxDq),
+								appliedX("C", expectedX, app, initialDqs, minDq, maxDq),
+								appliedX("F", expectedX, app, initialDqs, minDq, maxDq),
+								appliedX("H", expectedX, app, initialDqs, minDq, maxDq),
+								appliedX("S", expectedX, app, initialDqs, minDq, maxDq)
 						)
 				);
 
@@ -1347,7 +1351,8 @@ class VriStartTest {
 				app.setDebugMode(1, 0);
 
 				assertThrows(
-						StandProcessingException.class, () -> app.findRootForQuadMeanDiameterFractionalError(
+						StandProcessingException.class,
+						() -> app.findRootForQuadMeanDiameterFractionalError(
 								x1, x2, resultPerSpecies, initialDqs, baseAreas, minDq, maxDq, tph
 						)
 				);
@@ -1358,7 +1363,8 @@ class VriStartTest {
 					Map<String, Float> minDq, Map<String, Float> maxDq
 			) {
 				return hasEntry(
-						is(species), closeTo(
+						is(species),
+						closeTo(
 								app.quadMeanDiameterSpeciesAdjust(
 										expectedX, initialDqs.get(species), minDq.get(species), maxDq.get(species)
 								)
@@ -1481,7 +1487,8 @@ class VriStartTest {
 				Map<String, Float> maxPerSpecies = new HashMap<>(5);
 
 				app.getDqBySpeciesInitial(
-						layer, region, quadMeanDiameterTotal, baseAreaTotal, treeDensityTotal, loreyHeightTotal, initialDqs, baseAreaPerSpecies, minPerSpecies, maxPerSpecies
+						layer, region, quadMeanDiameterTotal, baseAreaTotal, treeDensityTotal, loreyHeightTotal,
+						initialDqs, baseAreaPerSpecies, minPerSpecies, maxPerSpecies
 				);
 
 				assertThat(
@@ -2084,97 +2091,100 @@ class VriStartTest {
 					resultLayer, hasProperty("loreyHeightByUtilization", utilizationHeight(4.14067888f, 6.61390257f))
 			);
 			assertThat(
-					resultLayer, hasProperty(
-							"baseAreaByUtilization", utilization(
+					resultLayer,
+					hasProperty(
+							"baseAreaByUtilization",
+							utilization(
 									0.0679966733f, 6.34290648f, 4.24561071f, 1.01540196f, 0.571661115f, 0.510232806f
 							)
 					)
 			);
 			assertThat(
-					resultLayer, hasProperty(
-							"quadraticMeanDiameterByUtilization", utilization(
-									5.58983135f, 10.3879948f, 9.11466217f, 13.9179964f, 18.6690178f, 25.3685265f
-							)
+					resultLayer,
+					hasProperty(
+							"quadraticMeanDiameterByUtilization",
+							utilization(5.58983135f, 10.3879948f, 9.11466217f, 13.9179964f, 18.6690178f, 25.3685265f)
 					)
 			);
 			assertThat(
-					resultLayer, hasProperty(
-							"treesPerHectareByUtilization", utilization(
-									27.707695f, 748.4021f, 650.682556f, 66.7413025f, 20.8836231f, 10.094574f
-							)
+					resultLayer,
+					hasProperty(
+							"treesPerHectareByUtilization",
+							utilization(27.707695f, 748.4021f, 650.682556f, 66.7413025f, 20.8836231f, 10.094574f)
 					)
 			);
 
 			assertThat(
-					resultLayer, hasProperty(
-							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", utilization(
-									0, 4.73118162f, 0.0503439531f, 1.59589052f, 1.62338901f, 1.46155834f
-							)
+					resultLayer,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+							utilization(0, 4.73118162f, 0.0503439531f, 1.59589052f, 1.62338901f, 1.46155834f)
 					)
 			);
 			assertThat(
-					resultLayer.getSpecies(), allOf(
-							aMapWithSize(5), hasKey("B"), hasKey("C"), hasKey("F"), hasKey("H"), hasKey("S")
-					)
+					resultLayer.getSpecies(),
+					allOf(aMapWithSize(5), hasKey("B"), hasKey("C"), hasKey("F"), hasKey("H"), hasKey("S"))
 			);
 
 			VdypSpecies resultSpecB = TestUtils.assertHasSpecies(resultLayer, "B", "C", "F", "H", "S");
 
 			assertThat(
-					resultSpecB, hasProperty(
-							"baseAreaByUtilization", utilization(
+					resultSpecB,
+					hasProperty(
+							"baseAreaByUtilization",
+							utilization(
 									0.0116237309f, 0.634290636f, 0.239887208f, 0.196762085f, 0.102481194f, 0.095160149f
 							)
 					)
 			);
 			assertThat(
-					resultSpecB, hasProperty(
-							"quadraticMeanDiameterByUtilization", utilization(
-									5.61674118f, 12.9407434f, 9.93954372f, 14.3500404f, 19.1790199f, 27.5482502f
-							)
+					resultSpecB,
+					hasProperty(
+							"quadraticMeanDiameterByUtilization",
+							utilization(5.61674118f, 12.9407434f, 9.93954372f, 14.3500404f, 19.1790199f, 27.5482502f)
 					)
 			);
 			assertThat(
-					resultSpecB, hasProperty(
-							"treesPerHectareByUtilization", utilization(
-									4.69123125f, 48.2258606f, 30.9160728f, 12.1659298f, 3.54732919f, 1.59653044f
-							)
+					resultSpecB,
+					hasProperty(
+							"treesPerHectareByUtilization",
+							utilization(4.69123125f, 48.2258606f, 30.9160728f, 12.1659298f, 3.54732919f, 1.59653044f)
 					)
 			);
 
 			assertThat(
-					resultSpecB, hasProperty(
-							"wholeStemVolumeByUtilization", utilization(
-									0.0244281366f, 2.41518188f, 0.747900844f, 0.752810001f, 0.4540295f, 0.46044156f
-							)
+					resultSpecB,
+					hasProperty(
+							"wholeStemVolumeByUtilization",
+							utilization(0.0244281366f, 2.41518188f, 0.747900844f, 0.752810001f, 0.4540295f, 0.46044156f)
 					)
 			);
 			assertThat(
-					resultSpecB, hasProperty(
-							"closeUtilizationVolumeByUtilization", utilization(
-									0, 1.28733742f, 0.0235678982f, 0.464995325f, 0.378819793f, 0.41995436f
-							)
+					resultSpecB,
+					hasProperty(
+							"closeUtilizationVolumeByUtilization",
+							utilization(0, 1.28733742f, 0.0235678982f, 0.464995325f, 0.378819793f, 0.41995436f)
 					)
 			);
 			assertThat(
-					resultSpecB, hasProperty(
-							"closeUtilizationVolumeNetOfDecayByUtilization", utilization(
-									0, 1.24826729f, 0.0230324566f, 0.454239398f, 0.369579285f, 0.401416153f
-							)
+					resultSpecB,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayByUtilization",
+							utilization(0, 1.24826729f, 0.0230324566f, 0.454239398f, 0.369579285f, 0.401416153f)
 					)
 			);
 			assertThat(
-					resultSpecB, hasProperty(
-							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization", utilization(
-									0, 1.23482728f, 0.0228475146f, 0.450360179f, 0.366144955f, 0.395474672f
-							)
+					resultSpecB,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization",
+							utilization(0, 1.23482728f, 0.0228475146f, 0.450360179f, 0.366144955f, 0.395474672f)
 					)
 			);
 			assertThat(
-					resultSpecB, hasProperty(
-							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", utilization(
-									0, 1.20897281f, 0.0223761573f, 0.441060275f, 0.358547896f, 0.386988521f
-							)
+					resultSpecB,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+							utilization(0, 1.20897281f, 0.0223761573f, 0.441060275f, 0.358547896f, 0.386988521f)
 					)
 			);
 
@@ -2616,24 +2626,24 @@ class VriStartTest {
 							"sites", allOf(
 									aMapWithSize(5), //
 									hasSite(
-											is("B"), is("BL"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", notPresent()))
+											is("B"), is("BL"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", notPresent()))
 									), //
 									hasSite(
-											is("C"), is("CW"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", present(is(11))))
+											is("C"), is("CW"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(11))))
 									), //
 									hasSite(
-											is("F"), is("FD"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", present(is(23))))
+											is("F"), is("FD"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(23))))
 									), //
 									hasSite(
-											is("H"), is("HW"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", present(is(37))))
+											is("H"), is("HW"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(37))))
 									), //
 									hasSite(
-											is("S"), is("S"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", present(is(71))))
+											is("S"), is("S"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(71))))
 									)
 							)
 					)
@@ -2804,24 +2814,24 @@ class VriStartTest {
 							"sites", allOf(
 									aMapWithSize(5), //
 									hasSite(
-											is("B"), is("BL"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", notPresent()))
+											is("B"), is("BL"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", notPresent()))
 									), //
 									hasSite(
-											is("C"), is("CW"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", present(is(11))))
+											is("C"), is("CW"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(11))))
 									), //
 									hasSite(
-											is("F"), is("FD"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", present(is(23))))
+											is("F"), is("FD"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(23))))
 									), //
 									hasSite(
-											is("H"), is("HW"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", present(is(37))))
+											is("H"), is("HW"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(37))))
 									), //
 									hasSite(
-											is("S"), is("S"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", present(is(71))))
+											is("S"), is("S"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(71))))
 									)
 							)
 					)
@@ -2990,24 +3000,24 @@ class VriStartTest {
 							"sites", allOf(
 									aMapWithSize(5), //
 									hasSite(
-											is("B"), is("BL"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", notPresent()))
+											is("B"), is("BL"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", notPresent()))
 									), //
 									hasSite(
-											is("C"), is("CW"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", present(is(11))))
+											is("C"), is("CW"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(11))))
 									), //
 									hasSite(
-											is("F"), is("FD"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", present(is(23))))
+											is("F"), is("FD"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(23))))
 									), //
 									hasSite(
-											is("H"), is("HW"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", present(is(37))))
+											is("H"), is("HW"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(37))))
 									), //
 									hasSite(
-											is("S"), is("S"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", present(is(71))))
+											is("S"), is("S"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(71))))
 									)
 							)
 					)
@@ -3219,24 +3229,24 @@ class VriStartTest {
 							"sites", allOf(
 									aMapWithSize(5), //
 									hasSite(
-											is("B"), is("BL"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", notPresent()))
+											is("B"), is("BL"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", notPresent()))
 									), //
 									hasSite(
-											is("C"), is("CW"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", present(is(11))))
+											is("C"), is("CW"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(11))))
 									), //
 									hasSite(
-											is("F"), is("FD"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", present(is(23))))
+											is("F"), is("FD"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(23))))
 									), //
 									hasSite(
-											is("H"), is("HW"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", present(is(37))))
+											is("H"), is("HW"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(37))))
 									), //
 									hasSite(
-											is("S"), is("S"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", present(is(71))))
+											is("S"), is("S"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(71))))
 									)
 							)
 					)
@@ -3463,11 +3473,12 @@ class VriStartTest {
 			assertThat(result, hasProperty("mode", present(is(PolygonMode.BATC))));
 
 			assertThat(
-					result, hasProperty(
-							"layers", allOf(
-									aMapWithSize(2), hasEntry(is(LayerType.PRIMARY), anything()), hasEntry(
-											is(LayerType.VETERAN), anything()
-									)
+					result,
+					hasProperty(
+							"layers",
+							allOf(
+									aMapWithSize(2), hasEntry(is(LayerType.PRIMARY), anything()),
+									hasEntry(is(LayerType.VETERAN), anything())
 							)
 					)
 			);
@@ -3649,24 +3660,24 @@ class VriStartTest {
 							"sites", allOf(
 									aMapWithSize(5), //
 									hasSite(
-											is("B"), is("BL"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", notPresent()))
+											is("B"), is("BL"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", notPresent()))
 									), //
 									hasSite(
-											is("C"), is("CW"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", present(is(11))))
+											is("C"), is("CW"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(11))))
 									), //
 									hasSite(
-											is("F"), is("FD"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", present(is(23))))
+											is("F"), is("FD"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(23))))
 									), //
 									hasSite(
-											is("H"), is("HW"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", present(is(37))))
+											is("H"), is("HW"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(37))))
 									), //
 									hasSite(
-											is("S"), is("S"), forPrimeLayer
-													.and(hasProperty("siteCurveNumber", present(is(71))))
+											is("S"), is("S"),
+											forPrimeLayer.and(hasProperty("siteCurveNumber", present(is(71))))
 									)
 							)
 					)
@@ -3897,11 +3908,12 @@ class VriStartTest {
 			assertThat(result, hasProperty("mode", present(is(PolygonMode.BATN))));
 
 			assertThat(
-					result, hasProperty(
-							"layers", allOf(
-									aMapWithSize(2), hasEntry(is(LayerType.PRIMARY), anything()), hasEntry(
-											is(LayerType.VETERAN), anything()
-									)
+					result,
+					hasProperty(
+							"layers",
+							allOf(
+									aMapWithSize(2), hasEntry(is(LayerType.PRIMARY), anything()),
+									hasEntry(is(LayerType.VETERAN), anything())
 							)
 					)
 			);
@@ -4049,8 +4061,8 @@ class VriStartTest {
 			var bec = Utils.expectParsedControl(controlMap, ControlKey.BEC_DEF, BecLookup.class).get("IDF").get();
 
 			var ex = assertThrows(
-					StandProcessingException.class, () -> app
-							.estimateQuadMeanDiameterYield(7.6f, breastHeightAge, Optional.empty(), species, bec, 61)
+					StandProcessingException.class,
+					() -> app.estimateQuadMeanDiameterYield(7.6f, breastHeightAge, Optional.empty(), species, bec, 61)
 			);
 
 			assertThat(ex, hasProperty("message", endsWith(Float.toString(breastHeightAge))));
@@ -4074,24 +4086,25 @@ class VriStartTest {
 	) {
 		return hasEntry(
 				genus, //
-				both(hasProperty("genus", genus))
-						.and(hasProperty("percentGenus", percent))
+				both(hasProperty("genus", genus)).and(hasProperty("percentGenus", percent))
 						.and(
 								hasProperty(
-										"sp64DistributionSet", hasProperty(
-												"sp64DistributionMap", allOf(
-														aMapWithSize(1), hasEntry(
-																is(1), allOf(
-																		hasProperty("genusAlias", species), hasProperty(
-																				"percentage", is(100f)
-																		)
+										"sp64DistributionSet",
+										hasProperty(
+												"sp64DistributionMap",
+												allOf(
+														aMapWithSize(1),
+														hasEntry(
+																is(1),
+																allOf(
+																		hasProperty("genusAlias", species),
+																		hasProperty("percentage", is(100f))
 																)
 														)
 												)
 										)
 								)
-						)
-						.and((Matcher<? super Object>) additional)
+						).and((Matcher<? super Object>) additional)
 		);
 	}
 

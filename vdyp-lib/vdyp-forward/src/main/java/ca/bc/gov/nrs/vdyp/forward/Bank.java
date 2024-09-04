@@ -189,21 +189,26 @@ class Bank {
 		return becZone;
 	}
 
-	/** 
-	 * Refresh the values in the bank with an updated version (given) of the layer used
-	 * to create the bank. The modifications cannot include any changes to the set of
-	 * species, although the details of those species may of course change.
-	 * 
+	/**
+	 * Refresh the values in the bank with an updated version (given) of the layer used to create the bank. The
+	 * modifications cannot include any changes to the set of species, although the details of those species may of
+	 * course change.
+	 *
 	 * @param layer a (presumably modified) version of the layer.
-	 * @throws ProcessingException 
+	 * @throws ProcessingException
 	 */
 	void refreshBank(VdypLayer layer) throws ProcessingException {
-		
-		if (! this.layer.equals(layer)) {
-			throw new IllegalArgumentException(MessageFormat.format("One cannot refresh a bank from a"
-					+ " layer ({0}) different from the one used to create the bank ({1})", this.layer, layer));
+
+		if (!this.layer.equals(layer)) {
+			throw new IllegalArgumentException(
+					MessageFormat.format(
+							"One cannot refresh a bank from a"
+									+ " layer ({0}) different from the one used to create the bank ({1})",
+							this.layer, layer
+					)
+			);
 		}
-		
+
 		List<VdypSpecies> species = layer.getSpecies().values().stream()
 				.sorted((s1, s2) -> s1.getGenusIndex() - s2.getGenusIndex()).toList();
 
@@ -214,13 +219,13 @@ class Bank {
 			transferSpeciesIntoBank(nextSlot++, s);
 		}
 	}
-	
+
 	private void transferSpeciesIntoBank(int index, VdypSpecies species) throws ProcessingException {
 
 		speciesNames[index] = species.getGenus();
 		sp64Distributions[index] = species.getSp64DistributionSet();
 		speciesIndices[index] = species.getGenusIndex();
-		
+
 		species.getSite().ifPresentOrElse(s -> {
 			siteIndices[index] = s.getSiteIndex().orElse(VdypEntity.MISSING_FLOAT_VALUE);
 			dominantHeights[index] = s.getHeight().orElse(VdypEntity.MISSING_FLOAT_VALUE);
@@ -242,7 +247,7 @@ class Bank {
 			yearsAtBreastHeight[index] = VdypEntity.MISSING_FLOAT_VALUE;
 			siteCurveNumbers[index] = VdypEntity.MISSING_INTEGER_VALUE;
 		});
-		
+
 		transferUtilizationSetIntoBank(index, species);
 	}
 
@@ -267,17 +272,17 @@ class Bank {
 	/**
 	 * This method copies the Bank contents out to the VdypLayer instance used to create it and returns that. It is a
 	 * relatively expensive operation and should not be called without due consideration.
-	 * 
+	 *
 	 * @return as described
 	 */
 	VdypLayer getLayer() {
-		
+
 		transferUtilizationsFromBank(0, layer);
 
 		for (int i : indices) {
-			transferSpeciesFromBank(i, layer.getSpecies().get(speciesNames[i]));			
+			transferSpeciesFromBank(i, layer.getSpecies().get(speciesNames[i]));
 		}
-		
+
 		return layer;
 	}
 
@@ -286,20 +291,19 @@ class Bank {
 		VdypSpecies newSpecies = VdypSpecies.build(speciesBuilder -> {
 			speciesBuilder.adapt(species);
 			speciesBuilder.percentGenus(this.percentagesOfForestedLand[index]);
-			species.getSite().ifPresent(site -> 
-				speciesBuilder.addSite(VdypSite.build(siteBuilder -> {
-					siteBuilder.adapt(site);
-					siteBuilder.ageTotal(this.ageTotals[index]);
-					siteBuilder.height(this.dominantHeights[index]);
-					siteBuilder.siteCurveNumber(this.siteCurveNumbers[index]);
-					siteBuilder.siteGenus(this.speciesNames[index]);
-					siteBuilder.siteIndex(this.siteIndices[index]);
-					siteBuilder.yearsToBreastHeight(this.yearsToBreastHeight[index]);
+			species.getSite().ifPresent(site -> speciesBuilder.addSite(VdypSite.build(siteBuilder -> {
+				siteBuilder.adapt(site);
+				siteBuilder.ageTotal(this.ageTotals[index]);
+				siteBuilder.height(this.dominantHeights[index]);
+				siteBuilder.siteCurveNumber(this.siteCurveNumbers[index]);
+				siteBuilder.siteGenus(this.speciesNames[index]);
+				siteBuilder.siteIndex(this.siteIndices[index]);
+				siteBuilder.yearsToBreastHeight(this.yearsToBreastHeight[index]);
 			})));
 		});
-		
+
 		transferUtilizationsFromBank(index, newSpecies);
-		
+
 		return newSpecies;
 	}
 

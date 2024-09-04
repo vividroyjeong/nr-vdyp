@@ -78,8 +78,8 @@ abstract class AbstractForwardProcessingEngineTest {
 	protected void buildUtilizationParserForStandardStream(String fileName) throws ResourceParseException, IOException {
 
 		buildUtilizationParserForStream(
-				fileName, 
-			 // polygon               year P? I N  UC BasalArea TPH      Lorey H WhSt Vol CUtl Vol CU-Decay CU-DWst  CU-DWBrk  QMDBH
+				fileName,
+				// polygon year P? I N UC BasalArea TPH Lorey H WhSt Vol CUtl Vol CU-Decay CU-DWst CU-DWBrk QMDBH
 				"01002 S000001 00     1970 P  0    -1  0.01513     5.24   7.0166   0.0630   0.0000   0.0000   0.0000   0.0000   6.1", //
 				"01002 S000001 00     1970 P  0     0 44.93259   595.32  30.9724 620.9775 592.2023 580.1681 577.6229 549.0159  31.0", //
 				"01002 S000001 00     1970 P  0     1  0.53100    64.82  -9.0000   2.5979   0.3834   0.3794   0.3788   0.3623  10.2", //

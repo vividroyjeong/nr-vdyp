@@ -50,7 +50,7 @@ class GeneralForwardProcessingEngineTest extends AbstractForwardProcessingEngine
 		int nPolygonsProcessed = 0;
 		while (true) {
 			var polygon = forwardDataStreamReader.readNextPolygon();
-			
+
 			if (polygon.isPresent()) {
 				fpe.processPolygon(polygon.get());
 				nPolygonsProcessed += 1;
@@ -87,7 +87,8 @@ class GeneralForwardProcessingEngineTest extends AbstractForwardProcessingEngine
 			fpe.fps.setPolygonLayer(polygon, LayerType.PRIMARY);
 			LayerProcessingState lps = fpe.fps.getLayerProcessingState();
 
-			var speciesToCombine = Arrays.asList(Arrays.asList(lps.getBank().speciesNames[3], lps.getBank().speciesNames[4]));
+			var speciesToCombine = Arrays
+					.asList(Arrays.asList(lps.getBank().speciesNames[3], lps.getBank().speciesNames[4]));
 
 			ForwardProcessingEngine.calculateCoverages(lps);
 			fpe.determinePolygonRankings(speciesToCombine);
@@ -105,19 +106,19 @@ class GeneralForwardProcessingEngineTest extends AbstractForwardProcessingEngine
 	@Test
 	void testGroupAndStratumNumberSpecialCases() throws IOException, ResourceParseException, ProcessingException {
 
-		// We want the 
-		//     "equationModifierGroup.isPresent()"
-		// and the 
-		//     "   Region.INTERIOR.equals(lps.wallet.getBecZone().getRegion()) 
-		//      && exceptedSpeciesIndicies.contains(primarySpeciesIndex)" 
+		// We want the
+		// "equationModifierGroup.isPresent()"
+		// and the
+		// " Region.INTERIOR.equals(lps.wallet.getBecZone().getRegion())
+		// && exceptedSpeciesIndicies.contains(primarySpeciesIndex)"
 		// cases in determinePolygonRankings.
-		
+
 		buildPolygonParserForStream(
 				"testPolygon.dat", //
 				"01002 S000001 00     1970 IDF  A    99 37  1  1", //
 				""
 		);
-		
+
 		buildSpeciesParserForStream(
 				"testSpecies.dat", //
 				"01002 S000001 00     1970 P  4 C  C  100.0     0.0     0.0     0.0 -9.00 -9.00  -9.0 253.9  11.1 0 -9", //
@@ -137,7 +138,7 @@ class GeneralForwardProcessingEngineTest extends AbstractForwardProcessingEngine
 		assertThat(fpe.fps.getLayerProcessingState().getPrimarySpeciesGroupNumber(), is(35));
 		assertThat(fpe.fps.getLayerProcessingState().getPrimarySpeciesStratumNumber(), is(24));
 	}
-	
+
 	@Test
 	void testCombinePercentages() {
 
@@ -377,9 +378,9 @@ class GeneralForwardProcessingEngineTest extends AbstractForwardProcessingEngine
 		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.ESTIMATE_MISSING_SITE_INDICES);
 
 		// Despite 13.40 being in the data stream, the change (2024/8/29) to ignore site information
-		// for all species of the layer except the primary means that method (1) will never be 
+		// for all species of the layer except the primary means that method (1) will never be
 		// successful, since none of the non-primary species will have a site index value.
-		
+
 //		var sourceSiteCurve = SiteIndexEquation.SI_CWC_KURUCZ;
 //		var sourceSiteIndex = 13.4;
 //		var targetSiteCurve = SiteIndexEquation.SI_HWC_WILEYAC;
@@ -481,9 +482,12 @@ class GeneralForwardProcessingEngineTest extends AbstractForwardProcessingEngine
 		// Since the change to ignore site information for all but non-primary species, there is
 		// no way to successfully estimate age for a primary species from the non-primary species.
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		assertThrows(ProcessingException.class, () -> fpe.processPolygon(polygon, 
-				ForwardProcessingEngine.ExecutionStep.CALCULATE_DOMINANT_HEIGHT_AGE_SITE_INDEX)
-				);
+		assertThrows(
+				ProcessingException.class,
+				() -> fpe.processPolygon(
+						polygon, ForwardProcessingEngine.ExecutionStep.CALCULATE_DOMINANT_HEIGHT_AGE_SITE_INDEX
+				)
+		);
 	}
 
 	@Test

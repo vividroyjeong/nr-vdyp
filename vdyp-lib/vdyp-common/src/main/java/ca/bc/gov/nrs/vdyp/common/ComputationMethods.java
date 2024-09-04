@@ -146,7 +146,8 @@ public class ComputationMethods {
 			// Calculate tree density components
 			for (var uc : VdypStartApplication.UTIL_CLASSES) {
 				treesPerHectareUtil.set(
-						uc, BaseAreaTreeDensityDiameter
+						uc,
+						BaseAreaTreeDensityDiameter
 								.treesPerHectare(basalAreaUtil.getCoe(uc.index), quadMeanDiameterUtil.get(uc))
 				);
 			}
@@ -157,27 +158,31 @@ public class ComputationMethods {
 			ReconcilationMethods.reconcileComponents(basalAreaUtil, treesPerHectareUtil, quadMeanDiameterUtil);
 
 			if (compatibilityVariableMode != CompatibilityVariableMode.NONE) {
-				
+
 				float basalAreaSumForSpecies = 0.0f;
 				for (var uc : VdypStartApplication.UTIL_CLASSES) {
-					
+
 					float currentUcBasalArea = basalAreaUtil.get(uc);
 					basalAreaUtil.set(uc, currentUcBasalArea + spec.getCvBasalArea(uc, spec.getLayerType()));
 					if (basalAreaUtil.get(uc) < 0.0f) {
 						basalAreaUtil.set(uc, 0.0f);
 					}
-					
+
 					basalAreaSumForSpecies += basalAreaUtil.get(uc);
 
-					float newDqValue = quadMeanDiameterUtil.get(uc)	+ spec.getCvQuadraticMeanDiameter(uc, spec.getLayerType());
-					quadMeanDiameterUtil
-							.set(uc, FloatMath.clamp(
-									newDqValue, quadMeanDiameterLowerBounds.get(uc), quadMeanDiameterUpperBounds.get(uc)));
+					float newDqValue = quadMeanDiameterUtil.get(uc)
+							+ spec.getCvQuadraticMeanDiameter(uc, spec.getLayerType());
+					quadMeanDiameterUtil.set(
+							uc,
+							FloatMath.clamp(
+									newDqValue, quadMeanDiameterLowerBounds.get(uc), quadMeanDiameterUpperBounds.get(uc)
+							)
+					);
 				}
-				
+
 				float baMult = basalAreaUtil.get(UtilizationClass.ALL) / basalAreaSumForSpecies;
-				
-				for (UtilizationClass uc: UtilizationClass.ALL_CLASSES) {
+
+				for (UtilizationClass uc : UtilizationClass.ALL_CLASSES) {
 					basalAreaUtil.set(uc, basalAreaUtil.get(uc) * baMult);
 				}
 			}
@@ -186,7 +191,8 @@ public class ComputationMethods {
 
 			for (var uc : VdypStartApplication.UTIL_CLASSES) {
 				treesPerHectareUtil.setCoe(
-						uc.index, BaseAreaTreeDensityDiameter
+						uc.index,
+						BaseAreaTreeDensityDiameter
 								.treesPerHectare(basalAreaUtil.getCoe(uc.index), quadMeanDiameterUtil.getCoe(uc.index))
 				);
 			}
@@ -203,26 +209,37 @@ public class ComputationMethods {
 
 				// EMP091
 				estimationMethods.estimateWholeStemVolume(
-						UtilizationClass.ALL, adjustCloseUtil.getCoe(4), 
-						spec.getVolumeGroup(), loreyHeightSpec, quadMeanDiameterUtil, basalAreaUtil, wholeStemVolumeUtil
+						UtilizationClass.ALL, adjustCloseUtil.getCoe(4), spec.getVolumeGroup(), loreyHeightSpec,
+						quadMeanDiameterUtil, basalAreaUtil, wholeStemVolumeUtil
 				);
 
 				if (compatibilityVariableMode == CompatibilityVariableMode.ALL) {
 					// apply compatibility variables to WS volume
 
 					float wholeStemVolumeSum = 0.0f;
-					for (UtilizationClass uc: UtilizationClass.UTIL_CLASSES) {
-						wholeStemVolumeUtil.set(uc, wholeStemVolumeUtil.get(uc) 
-								* FloatMath.exp(spec.getCvVolume(uc, VolumeVariable.WHOLE_STEM_VOL, spec.getLayerType())));
+					for (UtilizationClass uc : UtilizationClass.UTIL_CLASSES) {
+						wholeStemVolumeUtil.set(
+								uc,
+								wholeStemVolumeUtil.get(uc) * FloatMath
+										.exp(spec.getCvVolume(uc, VolumeVariable.WHOLE_STEM_VOL, spec.getLayerType()))
+						);
 						wholeStemVolumeSum += wholeStemVolumeUtil.get(uc);
 					}
 					wholeStemVolumeUtil.set(UtilizationClass.ALL, wholeStemVolumeSum);
-					
+
 					// Set the adjustment factors for next three volume types
-					for (UtilizationClass uc: UtilizationClass.UTIL_CLASSES) {
-						adjustCloseUtil.set(uc, spec.getCvVolume(uc, VolumeVariable.CLOSE_UTIL_VOL, spec.getLayerType()));
-						adjustDecayUtil.set(uc, spec.getCvVolume(uc, VolumeVariable.CLOSE_UTIL_VOL_LESS_DECAY, spec.getLayerType()));
-						adjustDecayWasteUtil.set(uc, spec.getCvVolume(uc, VolumeVariable.CLOSE_UTIL_VOL_LESS_DECAY_LESS_WASTAGE, spec.getLayerType()));
+					for (UtilizationClass uc : UtilizationClass.UTIL_CLASSES) {
+						adjustCloseUtil
+								.set(uc, spec.getCvVolume(uc, VolumeVariable.CLOSE_UTIL_VOL, spec.getLayerType()));
+						adjustDecayUtil.set(
+								uc, spec.getCvVolume(uc, VolumeVariable.CLOSE_UTIL_VOL_LESS_DECAY, spec.getLayerType())
+						);
+						adjustDecayWasteUtil.set(
+								uc,
+								spec.getCvVolume(
+										uc, VolumeVariable.CLOSE_UTIL_VOL_LESS_DECAY_LESS_WASTAGE, spec.getLayerType()
+								)
+						);
 					}
 				} else {
 					// Do nothing as the adjustment vectors are already set to 0
@@ -230,28 +247,28 @@ public class ComputationMethods {
 
 				// EMP092
 				estimationMethods.estimateCloseUtilizationVolume(
-						UtilizationClass.ALL, adjustCloseUtil, spec
-								.getVolumeGroup(), loreyHeightSpec, quadMeanDiameterUtil, wholeStemVolumeUtil, closeVolumeUtil
+						UtilizationClass.ALL, adjustCloseUtil, spec.getVolumeGroup(), loreyHeightSpec,
+						quadMeanDiameterUtil, wholeStemVolumeUtil, closeVolumeUtil
 				);
 
 				// EMP093
 				estimationMethods.estimateNetDecayVolume(
-						spec.getGenus(), bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec
-								.getDecayGroup(), vdypLayer.getBreastHeightAge()
-										.orElse(0f), quadMeanDiameterUtil, closeVolumeUtil, closeVolumeNetDecayUtil
+						spec.getGenus(), bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec.getDecayGroup(),
+						vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil, closeVolumeUtil,
+						closeVolumeNetDecayUtil
 				);
 
 				// EMP094
 				estimationMethods.estimateNetDecayAndWasteVolume(
-						bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec
-								.getGenus(), loreyHeightSpec, quadMeanDiameterUtil, closeVolumeUtil, closeVolumeNetDecayUtil, closeVolumeNetDecayWasteUtil
+						bec.getRegion(), UtilizationClass.ALL, adjustCloseUtil, spec.getGenus(), loreyHeightSpec,
+						quadMeanDiameterUtil, closeVolumeUtil, closeVolumeNetDecayUtil, closeVolumeNetDecayWasteUtil
 				);
 
 				if (context.isStart()) {
 					// EMP095
 					estimationMethods.estimateNetDecayWasteAndBreakageVolume(
-							UtilizationClass.ALL, spec
-									.getBreakageGroup(), quadMeanDiameterUtil, closeVolumeUtil, closeVolumeNetDecayWasteUtil, closeVolumeNetDecayWasteBreakUtil
+							UtilizationClass.ALL, spec.getBreakageGroup(), quadMeanDiameterUtil, closeVolumeUtil,
+							closeVolumeNetDecayWasteUtil, closeVolumeNetDecayWasteBreakUtil
 					);
 				}
 			}
@@ -273,7 +290,7 @@ public class ComputationMethods {
 					.pairwiseInPlace(closeVolumeNetDecayWasteBreakUtil, EstimationMethods.COPY_IF_NOT_SMALL);
 
 		}
-		
+
 		computeLayerUtilizationComponentsFromSpecies(vdypLayer);
 
 		for (VdypSpecies spec : vdypLayer.getSpecies().values()) {
@@ -303,12 +320,12 @@ public class ComputationMethods {
 							"For species {}, Species LH (7.5cm+): {}, Species BA (7.5cm+): {}, Weighted LH (7.5cm+): {}"
 					).log();
 			vdypLayer.getLoreyHeightByUtilization().scalarInPlace(
-					UtilizationClass.SMALL, x -> x
-							+ spec.getLoreyHeightByUtilization().getSmall() * spec.getBaseAreaByUtilization().getSmall()
+					UtilizationClass.SMALL,
+					x -> x + spec.getLoreyHeightByUtilization().getSmall() * spec.getBaseAreaByUtilization().getSmall()
 			);
 			vdypLayer.getLoreyHeightByUtilization().scalarInPlace(
-					UtilizationClass.ALL, x -> x
-							+ spec.getLoreyHeightByUtilization().getAll() * spec.getBaseAreaByUtilization().getAll()
+					UtilizationClass.ALL,
+					x -> x + spec.getLoreyHeightByUtilization().getAll() * spec.getBaseAreaByUtilization().getAll()
 			);
 		}
 		{
@@ -332,7 +349,7 @@ public class ComputationMethods {
 	 * @param vdypLayer
 	 */
 	protected static void computeLayerUtilizationComponentsFromSpecies(VdypLayer vdypLayer) {
-		
+
 		// Layer utilization vectors other than quadratic mean diameter are the pairwise
 		// sums of those of their species
 		sumSpeciesUtilizationVectorsToLayer(vdypLayer);
@@ -342,15 +359,15 @@ public class ComputationMethods {
 			vdypLayer.getSpecies().values().stream().forEach(spec -> {
 				var ba = spec.getBaseAreaByUtilization();
 				hlVector.pairwiseInPlace(
-						spec.getLoreyHeightByUtilization(), (float x, float y, UtilizationClass uc) -> x
-								+ y * ba.get(uc)
+						spec.getLoreyHeightByUtilization(),
+						(float x, float y, UtilizationClass uc) -> x + y * ba.get(uc)
 				);
 			});
 			var ba = vdypLayer.getBaseAreaByUtilization();
 			hlVector.scalarInPlace((float x, UtilizationClass uc) -> ba.get(uc) > 0 ? x / ba.get(uc) : x);
 			vdypLayer.setLoreyHeightByUtilization(hlVector);
 		}
-		
+
 		// Quadratic mean diameter for the layer is computed from the BA and TPH after
 		// they have been found from the species
 		{

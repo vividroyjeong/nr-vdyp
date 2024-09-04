@@ -26,18 +26,18 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 	private Optional<Integer> volumeGroup;
 	private Optional<Integer> decayGroup;
 	private Optional<Integer> breakageGroup;
-	
+
 	// Compatibility Variables
-	
+
 	private Optional<MatrixMap3<UtilizationClass, VolumeVariable, LayerType, Float>> cvVolume = Optional.empty();
 	private Optional<MatrixMap2<UtilizationClass, LayerType, Float>> cvBasalArea = Optional.empty();
 	private Optional<MatrixMap2<UtilizationClass, LayerType, Float>> cvQuadraticMeanDiameter = Optional.empty();
 	private Optional<Map<UtilizationClassVariable, Float>> cvPrimaryLayerSmall = Optional.empty();
 
 	public VdypSpecies(
-			PolygonIdentifier polygonIdentifier, LayerType layer, String genus, int genusIndex, Optional<Float> percentGenus,
-			Sp64DistributionSet sp64DistributionSet, Optional<VdypSite> site, Optional<Integer> volumeGroup, 
-			Optional<Integer> decayGroup, Optional<Integer> breakageGroup
+			PolygonIdentifier polygonIdentifier, LayerType layer, String genus, int genusIndex,
+			Optional<Float> percentGenus, Sp64DistributionSet sp64DistributionSet, Optional<VdypSite> site,
+			Optional<Integer> volumeGroup, Optional<Integer> decayGroup, Optional<Integer> breakageGroup
 	) {
 		super(polygonIdentifier, layer, genus, genusIndex, percentGenus, sp64DistributionSet, site);
 		this.volumeGroup = volumeGroup;
@@ -78,41 +78,46 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 	}
 
 	public int getVolumeGroup() {
-		return volumeGroup.orElseThrow(() -> new NoSuchElementException(MessageFormat.format("Species {0} volumeGroup",
-				toString())));
+		return volumeGroup.orElseThrow(
+				() -> new NoSuchElementException(MessageFormat.format("Species {0} volumeGroup", toString()))
+		);
 	}
 
 	public void setVolumeGroup(int volumeGroup) {
 		if (this.volumeGroup.isPresent()) {
 			throw new IllegalStateException(MessageFormat.format("Species {0} volumeGroup is already set", toString()));
 		}
-		
+
 		this.volumeGroup = Optional.of(volumeGroup);
 	}
 
 	public int getDecayGroup() {
-		return decayGroup.orElseThrow(() -> new NoSuchElementException(MessageFormat.format("Species {0} decayGroup",
-				toString())));
+		return decayGroup.orElseThrow(
+				() -> new NoSuchElementException(MessageFormat.format("Species {0} decayGroup", toString()))
+		);
 	}
 
 	public void setDecayGroup(int decayGroup) {
 		if (this.decayGroup.isPresent()) {
 			throw new IllegalStateException(MessageFormat.format("Species {0} decayGroup is already set", toString()));
 		}
-		
+
 		this.decayGroup = Optional.of(decayGroup);
 	}
 
 	public int getBreakageGroup() {
-		return breakageGroup.orElseThrow(() -> new NoSuchElementException(MessageFormat.format("Species {0} breakageGroup",
-				toString())));
+		return breakageGroup.orElseThrow(
+				() -> new NoSuchElementException(MessageFormat.format("Species {0} breakageGroup", toString()))
+		);
 	}
 
 	public void setBreakageGroup(int breakageGroup) {
 		if (this.breakageGroup.isPresent()) {
-			throw new IllegalStateException(MessageFormat.format("Species {0} breakageGroup is already set", toString()));
+			throw new IllegalStateException(
+					MessageFormat.format("Species {0} breakageGroup is already set", toString())
+			);
 		}
-		
+
 		this.breakageGroup = Optional.of(breakageGroup);
 	}
 
@@ -196,8 +201,9 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 			MatrixMap3<UtilizationClass, VolumeVariable, LayerType, Float> cvVolume,
 			MatrixMap2<UtilizationClass, LayerType, Float> cvBasalArea,
 			MatrixMap2<UtilizationClass, LayerType, Float> cvQuadraticMeanDiameter,
-			Map<UtilizationClassVariable, Float> cvPrimaryLayerSmall) {
-		
+			Map<UtilizationClassVariable, Float> cvPrimaryLayerSmall
+	) {
+
 		this.cvVolume = Optional.of(cvVolume);
 		this.cvBasalArea = Optional.of(cvBasalArea);
 		this.cvQuadraticMeanDiameter = Optional.of(cvQuadraticMeanDiameter);
@@ -220,7 +226,9 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 
 	public float getCvQuadraticMeanDiameter(UtilizationClass uc, LayerType lt) {
 		if (cvQuadraticMeanDiameter.isEmpty()) {
-			throw new InitializationIncompleteException(MessageFormat.format("Species {0}: cvQuadraticMeanDiameter", this));
+			throw new InitializationIncompleteException(
+					MessageFormat.format("Species {0}: cvQuadraticMeanDiameter", this)
+			);
 		}
 		return cvQuadraticMeanDiameter.get().get(uc, lt);
 	}
@@ -316,7 +324,7 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 		public void quadMeanDiameter(float height) {
 			this.quadMeanDiameter = Utils.utilizationVector(height);
 		}
-		
+
 		protected UtilizationVector wholeStemVolume = VdypUtilizationHolder.emptyUtilization();
 
 		public void wholeStemVolume(float small, float u1, float u2, float u3, float u4) {

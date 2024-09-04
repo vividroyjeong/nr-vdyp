@@ -103,14 +103,14 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 					}
 
 					final float percentAvailable = percentForestLand;
-					
+
 					return VdypPolygon.build(builder -> {
-							builder.polygonIdentifier(descriptionText);
-							builder.biogeoclimaticZone(bec);
-							builder.forestInventoryZone(fizId.toString());
-							fipMode.ifPresentOrElse(m -> builder.mode(PolygonMode.getByCode(m)), () -> Optional.empty());
-							builder.percentAvailable(percentAvailable);
-							builder.inventoryTypeGroup(inventoryTypeGroup);
+						builder.polygonIdentifier(descriptionText);
+						builder.biogeoclimaticZone(bec);
+						builder.forestInventoryZone(fizId.toString());
+						fipMode.ifPresentOrElse(m -> builder.mode(PolygonMode.getByCode(m)), () -> Optional.empty());
+						builder.percentAvailable(percentAvailable);
+						builder.inventoryTypeGroup(inventoryTypeGroup);
 					});
 				}
 			};

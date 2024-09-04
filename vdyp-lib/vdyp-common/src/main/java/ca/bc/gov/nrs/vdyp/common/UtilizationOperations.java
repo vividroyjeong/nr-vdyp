@@ -21,11 +21,11 @@ public class UtilizationOperations {
 	 * <li>Scale the per-hectare values of all the utilizations of the primary layer of the given polygon, and
 	 * <li>For all utilizations of both the primary and veteran layer (if present) of the polygon:
 	 * <ul>
-	 * <li>Adjust the basal area to be within bounds of the utilization class, and 
+	 * <li>Adjust the basal area to be within bounds of the utilization class, and
 	 * <li>Calculate the quad-mean-diameter value from the basal area and trees per hectare.
 	 * </ul>
 	 * </ol>
-	 * 
+	 *
 	 * @param polygon the polygon on which to operate
 	 */
 	public static void doPostCreateAdjustments(VdypPolygon polygon) throws ProcessingException {
@@ -49,7 +49,8 @@ public class UtilizationOperations {
 				scale(uh, scalingFactor);
 			}
 
-			// Implements the logic in BANKIN2 (ICHECK == 2) adjusting the utilization values according to various rules.
+			// Implements the logic in BANKIN2 (ICHECK == 2) adjusting the utilization values according to various
+			// rules.
 
 			resetOnMissingValues(uh);
 
@@ -58,16 +59,16 @@ public class UtilizationOperations {
 			doCalculateQuadMeanDiameter(uh);
 		}
 	}
-	
+
 	/**
-	 * Implements VDYPGETU lines 224 - 229, in which the utilization-per-hectare values are scaled by 
-	 * the given factor - the % coverage of the primary layer.
+	 * Implements VDYPGETU lines 224 - 229, in which the utilization-per-hectare values are scaled by the given factor -
+	 * the % coverage of the primary layer.
 	 *
 	 * @param scalingFactor the factor by which the <code>uh</code> is to be scaled
 	 */
 	public static void scale(VdypUtilizationHolder uh, float scalingFactor) {
-	
-		for (UtilizationClass uc: UtilizationClass.values()) {
+
+		for (UtilizationClass uc : UtilizationClass.values()) {
 			float basalArea = uh.getBaseAreaByUtilization().get(uc);
 			if (basalArea > 0) {
 				uh.getBaseAreaByUtilization().set(uc, basalArea * scalingFactor);
@@ -92,11 +93,14 @@ public class UtilizationOperations {
 			}
 			float cuVolumeMinusDecayWastage = uh.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization().get(uc);
 			if (cuVolumeMinusDecayWastage > 0) {
-				uh.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization().set(uc, cuVolumeMinusDecayWastage * scalingFactor);
+				uh.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization()
+						.set(uc, cuVolumeMinusDecayWastage * scalingFactor);
 			}
-			float cuVolumeMinusDecayWastageBreakage = uh.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization().get(uc);
+			float cuVolumeMinusDecayWastageBreakage = uh
+					.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization().get(uc);
 			if (cuVolumeMinusDecayWastageBreakage > 0) {
-				uh.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization().set(uc, cuVolumeMinusDecayWastageBreakage * scalingFactor);
+				uh.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization()
+						.set(uc, cuVolumeMinusDecayWastageBreakage * scalingFactor);
 			}
 			// quadratic mean diameter is not a per-hectare value and
 			// therefore not scaled.
@@ -104,8 +108,12 @@ public class UtilizationOperations {
 	}
 
 	private static final float MAX_ACCEPTABLE_BASAL_AREA_ERROR = 0.1f;
-	private static final UtilizationVector CLASS_LOWER_BOUNDS = new UtilizationVector(4.0f, 7.5f, 7.5f, 12.5f, 17.5f, 22.5f);
-	private static final UtilizationVector CLASS_UPPER_BOUNDS = new UtilizationVector(7.5f, 2000.0f, 12.5f, 17.5f, 22.5f, 2000.0f);
+	private static final UtilizationVector CLASS_LOWER_BOUNDS = new UtilizationVector(
+			4.0f, 7.5f, 7.5f, 12.5f, 17.5f, 22.5f
+	);
+	private static final UtilizationVector CLASS_UPPER_BOUNDS = new UtilizationVector(
+			7.5f, 2000.0f, 12.5f, 17.5f, 22.5f, 2000.0f
+	);
 	private static final float DQ_EPS = 0.005f;
 
 	/**
@@ -113,7 +121,7 @@ public class UtilizationOperations {
 	 */
 	private static void resetOnMissingValues(VdypUtilizationHolder uh) {
 
-		for (UtilizationClass uc: UtilizationClass.values()) {
+		for (UtilizationClass uc : UtilizationClass.values()) {
 			if (uh.getBaseAreaByUtilization().get(uc) <= 0.0f || uh.getTreesPerHectareByUtilization().get(uc) <= 0.0f) {
 				uh.getBaseAreaByUtilization().set(uc, 0.0f);
 				uh.getTreesPerHectareByUtilization().set(uc, 0.0f);
@@ -134,18 +142,18 @@ public class UtilizationOperations {
 	 */
 	private static void adjustBasalAreaToMatchTreesPerHectare(VdypUtilizationHolder uh) throws ProcessingException {
 
-		for (UtilizationClass uc: UtilizationClass.values()) {
+		for (UtilizationClass uc : UtilizationClass.values()) {
 			float tph = uh.getTreesPerHectareByUtilization().get(uc);
 			if (tph > 0.0f) {
 				float basalAreaLowerBound = BaseAreaTreeDensityDiameter
 						.basalArea(CLASS_LOWER_BOUNDS.get(uc) + DQ_EPS, tph);
 				float basalAreaUpperBound = BaseAreaTreeDensityDiameter
 						.basalArea(CLASS_UPPER_BOUNDS.get(uc) - DQ_EPS, tph);
-	
+
 				float basalAreaError;
 				float newBasalArea;
 				String message = null;
-	
+
 				float basalArea = uh.getBaseAreaByUtilization().get(uc);
 				if (basalArea < basalAreaLowerBound) {
 					basalAreaError = FloatMath.abs(basalArea - basalAreaLowerBound);
@@ -165,7 +173,7 @@ public class UtilizationOperations {
 					basalAreaError = 0.0f;
 					newBasalArea = basalArea;
 				}
-	
+
 				if (basalAreaError > MAX_ACCEPTABLE_BASAL_AREA_ERROR) {
 					throw new ProcessingException(message);
 				} else {
@@ -184,12 +192,12 @@ public class UtilizationOperations {
 	 */
 	private static void doCalculateQuadMeanDiameter(VdypUtilizationHolder uh) throws ProcessingException {
 
-		for (UtilizationClass uc: UtilizationClass.values()) {
+		for (UtilizationClass uc : UtilizationClass.values()) {
 			float basalArea = uh.getBaseAreaByUtilization().get(uc);
 			if (basalArea > 0.0f) {
 				float tph = uh.getTreesPerHectareByUtilization().get(uc);
 				float qmd = BaseAreaTreeDensityDiameter.quadMeanDiameter(basalArea, tph);
-	
+
 				if (qmd < CLASS_LOWER_BOUNDS.get(uc)) {
 					qmd = qmd + DQ_EPS;
 					if (qmd /* is still */ < CLASS_LOWER_BOUNDS.get(uc)) {
@@ -211,7 +219,7 @@ public class UtilizationOperations {
 						);
 					}
 				}
-	
+
 				uh.getQuadraticMeanDiameterByUtilization().set(uc, qmd);
 			}
 		}

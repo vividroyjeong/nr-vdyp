@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.is;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
@@ -36,7 +37,6 @@ public class PrimarySpeciesDqGrowthParserTest {
 		assertThat(m.get(30), hasProperty("coefficients", contains(0.004418f, 0.010218f, -0.000047f)));
 
 		// Check that defaults are applied
-		assertThat(m.get(27), hasProperty("model", is(0)));
-		assertThat(m.get(27), hasProperty("coefficients", contains(0.0f, 0.0f, 0.0f)));
+		assertThat(m.get(27), Matchers.nullValue());
 	}
 }

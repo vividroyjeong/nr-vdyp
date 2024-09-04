@@ -285,16 +285,12 @@ class VdypForwardControlParserTest {
 	void testParseE061() throws Exception {
 		var parser = new ForwardControlParser();
 		var result = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
-		assertThat(
-				result,
-				(Matcher) controlMapHasEntry(ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, Matchers.anything())
-		);
-		
-		MatrixMap2<String, Region, ComponentSizeLimits> coastalSpeciesComponentSizeMap = Utils.expectParsedControl(result, ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, MatrixMap2.class);
+		assertThat(result, (Matcher) controlMapHasEntry(ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, Matchers.anything()));
+
+		MatrixMap2<String, Region, ComponentSizeLimits> coastalSpeciesComponentSizeMap = Utils
+				.expectParsedControl(result, ControlKey.SPECIES_COMPONENT_SIZE_LIMIT, MatrixMap2.class);
 		var acCoastalSpeciesComponentSizeLimits = coastalSpeciesComponentSizeMap.get("AC", Region.COASTAL);
-		assertThat(
-				acCoastalSpeciesComponentSizeLimits,
-				Matchers.instanceOf(ComponentSizeLimits.class));
+		assertThat(acCoastalSpeciesComponentSizeLimits, Matchers.instanceOf(ComponentSizeLimits.class));
 		assertThat(acCoastalSpeciesComponentSizeLimits.loreyHeightMaximum(), is(49.4f));
 		assertThat(acCoastalSpeciesComponentSizeLimits.maxQuadMeanDiameterLoreyHeightRatio(), is(3.647f));
 		assertThat(acCoastalSpeciesComponentSizeLimits.minQuadMeanDiameterLoreyHeightRatio(), is(0.726f));

@@ -35,7 +35,7 @@ public class ForwardDataStreamReader {
 	private static final Logger logger = LoggerFactory.getLogger(ForwardDataStreamReader.class);
 
 	private final ForwardResolvedControlMap resolvedControlMap;
-	
+
 	private final StreamingParser<VdypPolygon> polygonStream;
 	private final StreamingParser<Collection<VdypSpecies>> layerSpeciesStream;
 	private final StreamingParser<Collection<VdypUtilization>> speciesUtilizationStream;
@@ -43,26 +43,29 @@ public class ForwardDataStreamReader {
 
 	@SuppressWarnings("unchecked")
 	public ForwardDataStreamReader(ForwardResolvedControlMap resolvedControlMap) throws ProcessingException {
-		
+
 		try {
 			this.resolvedControlMap = resolvedControlMap;
 			Map<String, Object> controlMap = resolvedControlMap.getControlMap();
-			
+
 			var polygonStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_POLY.name());
 			polygonStream = ((StreamingParserFactory<VdypPolygon>) polygonStreamFactory).get();
-	
+
 			var layerSpeciesStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SPECIES.name());
 			layerSpeciesStream = ((StreamingParserFactory<Collection<VdypSpecies>>) layerSpeciesStreamFactory).get();
-	
-			var speciesUtilizationStreamFactory = controlMap.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name());
+
+			var speciesUtilizationStreamFactory = controlMap
+					.get(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name());
 			speciesUtilizationStream = ((StreamingParserFactory<Collection<VdypUtilization>>) speciesUtilizationStreamFactory)
 					.get();
-			
+
 			polygonDescriptionStream = Optional.empty();
 			if (controlMap.containsKey(ControlKey.FORWARD_INPUT_GROWTO.name())) {
-				var polygonDescriptionStreamFactory = Utils.<StreamingParserFactory<PolygonIdentifier>>
-						expectParsedControl(controlMap, ControlKey.FORWARD_INPUT_GROWTO, StreamingParserFactory.class);
-				
+				var polygonDescriptionStreamFactory = Utils
+						.<StreamingParserFactory<PolygonIdentifier>>expectParsedControl(
+								controlMap, ControlKey.FORWARD_INPUT_GROWTO, StreamingParserFactory.class
+						);
+
 				polygonDescriptionStream = Optional.of(polygonDescriptionStreamFactory.get());
 			} else {
 				polygonDescriptionStream = Optional.empty();
@@ -72,12 +75,12 @@ public class ForwardDataStreamReader {
 		}
 	}
 
-	/** 
-	 * Constructor that takes a raw control map. This should only be used from unit tests. 
-	 * 
+	/**
+	 * Constructor that takes a raw control map. This should only be used from unit tests.
+	 *
 	 * @param controlMap
-	 * @throws IOException in the event of an error
-	 * @throws ProcessingException 
+	 * @throws IOException         in the event of an error
+	 * @throws ProcessingException
 	 */
 	ForwardDataStreamReader(Map<String, Object> controlMap) throws ProcessingException {
 
@@ -105,22 +108,30 @@ public class ForwardDataStreamReader {
 					utilizationsBySpeciesMap.putIfAbsent(key, new EnumMap<>(UtilizationClass.class));
 					utilizationsBySpeciesMap.get(key).put(utilization.getUcIndex(), utilization);
 				}
-				
+
 				if (polygonDescriptionStream.isPresent()) {
 					var pdStream = polygonDescriptionStream.get();
 					if (!pdStream.hasNext()) {
-						throw new ProcessingException(MessageFormat.format("Grow-to-year file at {0} in the control file does"
-								+ " not contain a record for {1} as expected, but instead the end-of-file was reached"
-								, ControlKey.FORWARD_INPUT_GROWTO.name(), polygon.getPolygonIdentifier().getName()));
+						throw new ProcessingException(
+								MessageFormat.format(
+										"Grow-to-year file at {0} in the control file does"
+												+ " not contain a record for {1} as expected, but instead the end-of-file was reached",
+										ControlKey.FORWARD_INPUT_GROWTO.name(), polygon.getPolygonIdentifier().getName()
+								)
+						);
 					}
 					var polygonDescription = pdStream.next();
-					if (! polygonDescription.getName().equals(polygon.getPolygonIdentifier().getName())) {
-						throw new ProcessingException(MessageFormat.format("Grow-to-year file at {0} in the control file does"
-								+ " not contain a record for {1} as expected, but instead contains a record for {2}"
-								, ControlKey.FORWARD_INPUT_GROWTO.name(), polygon.getPolygonIdentifier().getName()
-								, polygonDescription.getName()));
+					if (!polygonDescription.getName().equals(polygon.getPolygonIdentifier().getName())) {
+						throw new ProcessingException(
+								MessageFormat.format(
+										"Grow-to-year file at {0} in the control file does"
+												+ " not contain a record for {1} as expected, but instead contains a record for {2}",
+										ControlKey.FORWARD_INPUT_GROWTO.name(),
+										polygon.getPolygonIdentifier().getName(), polygonDescription.getName()
+								)
+						);
 					}
-					
+
 					polygon.setTargetYear(polygonDescription.getYear());
 				}
 
@@ -131,20 +142,20 @@ public class ForwardDataStreamReader {
 					logger.trace("Saw species {}", s);
 
 					applyGroups(polygon.getBiogeoclimaticZone(), s.getGenus(), s);
-					
+
 					var perSpeciesKey = new UtilizationBySpeciesKey(s.getLayerType(), s.getGenusIndex());
 					var speciesUtilizations = utilizationsBySpeciesMap.get(perSpeciesKey);
 
-					if (speciesUtilizations != null) {						
+					if (speciesUtilizations != null) {
 						setUtilizations(s, speciesUtilizations);
-						
+
 						var defaultKey = new UtilizationBySpeciesKey(LayerType.PRIMARY, 0);
 						Map<UtilizationClass, VdypUtilization> defaultUtilization = utilizationsBySpeciesMap
 								.get(defaultKey);
 
 						calculateSpeciesCoverage(s, defaultUtilization);
 					}
-					
+
 					if (LayerType.PRIMARY.equals(s.getLayerType())) {
 						primarySpecies.put(s.getGenusIndex(), s);
 					} else if (LayerType.VETERAN.equals(s.getLayerType())) {
@@ -152,15 +163,15 @@ public class ForwardDataStreamReader {
 					} else {
 						throw new IllegalStateException(
 								MessageFormat.format(
-										"Unrecognized layer type {} for species {} of polygon {}",
-										s.getLayerType(), s.getGenusIndex(), polygon.getPolygonIdentifier()
+										"Unrecognized layer type {} for species {} of polygon {}", s.getLayerType(),
+										s.getGenusIndex(), polygon.getPolygonIdentifier()
 								)
 						);
 					}
 				}
 
 				Map<LayerType, VdypLayer> layerMap = new HashMap<>();
-				
+
 				VdypLayer primaryLayer = null;
 				if (primarySpecies.size() > 0) {
 
@@ -174,9 +185,9 @@ public class ForwardDataStreamReader {
 						builder.inventoryTypeGroup(polygon.getInventoryTypeGroup());
 						builder.addSpecies(layerSpeciesSet);
 					});
-					
+
 					setUtilizations(primaryLayer, defaultSpeciesUtilization);
-					
+
 					layerMap.put(LayerType.PRIMARY, primaryLayer);
 				}
 
@@ -184,8 +195,7 @@ public class ForwardDataStreamReader {
 				if (veteranSpecies.size() > 0) {
 
 					var key = new UtilizationBySpeciesKey(LayerType.VETERAN, 0);
-					Map<UtilizationClass, VdypUtilization> defaultUtilization = utilizationsBySpeciesMap
-							.get(key);
+					Map<UtilizationClass, VdypUtilization> defaultUtilization = utilizationsBySpeciesMap.get(key);
 
 					veteranLayer = VdypLayer.build(builder -> {
 						builder.layerType(LayerType.VETERAN);
@@ -193,9 +203,9 @@ public class ForwardDataStreamReader {
 						builder.inventoryTypeGroup(polygon.getInventoryTypeGroup());
 						builder.addSpecies(layerSpeciesSet);
 					});
-					
+
 					setUtilizations(veteranLayer, defaultUtilization);
-					
+
 					layerMap.put(LayerType.VETERAN, veteranLayer);
 				}
 
@@ -212,7 +222,7 @@ public class ForwardDataStreamReader {
 	}
 
 	private void calculateSpeciesCoverage(VdypSpecies s, Map<UtilizationClass, VdypUtilization> defaultUtilization) {
-		
+
 		float speciesCoverage = s.getBaseAreaByUtilization().get(UtilizationClass.ALL)
 				/ defaultUtilization.get(UtilizationClass.ALL).getBasalArea();
 
@@ -239,8 +249,8 @@ public class ForwardDataStreamReader {
 	}
 
 	private void setUtilizations(VdypUtilizationHolder u, Map<UtilizationClass, VdypUtilization> speciesUtilizations) {
-		
-		for (var e: speciesUtilizations.entrySet()) {
+
+		for (var e : speciesUtilizations.entrySet()) {
 			var uc = e.getKey();
 			var ucUtilizations = e.getValue();
 
@@ -252,8 +262,10 @@ public class ForwardDataStreamReader {
 			u.getWholeStemVolumeByUtilization().set(uc, ucUtilizations.getWholeStemVolume());
 			u.getCloseUtilizationVolumeByUtilization().set(uc, ucUtilizations.getCloseUtilizationVolume());
 			u.getCloseUtilizationVolumeNetOfDecayByUtilization().set(uc, ucUtilizations.getCuVolumeMinusDecay());
-			u.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization().set(uc, ucUtilizations.getCuVolumeMinusDecayWastage());
-			u.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization().set(uc, ucUtilizations.getCuVolumeMinusDecayWastageBreakage());
+			u.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization()
+					.set(uc, ucUtilizations.getCuVolumeMinusDecayWastage());
+			u.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization()
+					.set(uc, ucUtilizations.getCuVolumeMinusDecayWastageBreakage());
 			u.getQuadraticMeanDiameterByUtilization().set(uc, ucUtilizations.getQuadraticMeanDiameterAtBH());
 		}
 	}

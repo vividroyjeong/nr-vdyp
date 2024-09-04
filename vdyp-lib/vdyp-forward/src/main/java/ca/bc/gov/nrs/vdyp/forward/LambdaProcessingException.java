@@ -9,9 +9,9 @@ public class LambdaProcessingException extends RuntimeException {
 	public LambdaProcessingException(ProcessingException e) {
 		super(e);
 	}
-	
+
 	@Override
 	public ProcessingException getCause() {
-		return (ProcessingException)super.getCause();
+		return (ProcessingException) super.getCause();
 	}
 }

@@ -34,7 +34,7 @@ public class VdypOutputWriter implements Closeable {
 	private OutputStream utilizationFile;
 	@SuppressWarnings("unused")
 	private Optional<OutputStream> compatibilityVariablesFile;
-	
+
 	private Optional<Integer> currentYear = Optional.empty();
 
 	static final String POLY_IDENTIFIER_FORMAT = "%-25s";
@@ -66,8 +66,8 @@ public class VdypOutputWriter implements Closeable {
 	static final String END_RECORD_FORMAT = POLY_IDENTIFIER_FORMAT + "  \n";
 
 	/**
-	 * Create a writer for Vdyp output files using provided OutputStreams. The Streams will be 
-	 * closed when the writer is closed.
+	 * Create a writer for Vdyp output files using provided OutputStreams. The Streams will be closed when the writer is
+	 * closed.
 	 *
 	 * @param polygonFile
 	 * @param speciesFile
@@ -75,15 +75,13 @@ public class VdypOutputWriter implements Closeable {
 	 * @param compatibilityVariablesFile
 	 * @param controlMap
 	 */
-	public VdypOutputWriter(
-			OutputStream polygonFile, OutputStream speciesFile, OutputStream utilizationFile
-	) {
+	public VdypOutputWriter(OutputStream polygonFile, OutputStream speciesFile, OutputStream utilizationFile) {
 		this(polygonFile, speciesFile, utilizationFile, Optional.empty());
 	}
 
 	/**
-	 * Create a writer for Vdyp output files using provided OutputStreams. The Streams will be 
-	 * closed when the writer is closed.
+	 * Create a writer for Vdyp output files using provided OutputStreams. The Streams will be closed when the writer is
+	 * closed.
 	 *
 	 * @param polygonFile
 	 * @param speciesFile
@@ -114,7 +112,9 @@ public class VdypOutputWriter implements Closeable {
 				getOutputStream(controlMap, resolver, ControlKey.VDYP_OUTPUT_VDYP_POLYGON.name()),
 				getOutputStream(controlMap, resolver, ControlKey.VDYP_OUTPUT_VDYP_LAYER_BY_SPECIES.name()),
 				getOutputStream(controlMap, resolver, ControlKey.VDYP_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name()),
-				Optional.of(getOutputStream(controlMap, resolver, ControlKey.VDYP_OUTPUT_COMPATIBILITY_VARIABLES.name()))
+				Optional.of(
+						getOutputStream(controlMap, resolver, ControlKey.VDYP_OUTPUT_COMPATIBILITY_VARIABLES.name())
+				)
 		);
 	}
 
@@ -127,7 +127,7 @@ public class VdypOutputWriter implements Closeable {
 	public void setPolygonYear(int currentYear) {
 		this.currentYear = Optional.of(currentYear);
 	}
-	
+
 	private PolygonIdentifier getCurrentPolygonDescriptor(PolygonIdentifier originalIdentifier) {
 		if (currentYear.isPresent()) {
 			return new PolygonIdentifier(originalIdentifier.getBase(), currentYear.get());
@@ -135,7 +135,7 @@ public class VdypOutputWriter implements Closeable {
 			return originalIdentifier;
 		}
 	}
-	
+
 	// V7W_AIP
 	/**
 	 * Write a polygon record to the polygon file
@@ -144,7 +144,7 @@ public class VdypOutputWriter implements Closeable {
 	 * @throws IOException
 	 */
 	void writePolygon(VdypPolygon polygon) throws IOException {
-		
+
 		writeFormat(
 				polygonFile, //
 				POLY_FORMAT, //
@@ -171,8 +171,8 @@ public class VdypOutputWriter implements Closeable {
 
 		// Ensure we have a list of 4 distribution entries
 		var specDistributionEntries = Stream.concat(
-				spec.getSp64DistributionSet().getSp64DistributionList().stream(), Stream
-						.generate(() -> new Sp64Distribution(0, "", 0f))
+				spec.getSp64DistributionSet().getSp64DistributionList().stream(),
+				Stream.generate(() -> new Sp64Distribution(0, "", 0f))
 		).limit(4).toList();
 		// 082E004 615 1988 P 9 L LW 100.0 0.0 0.0 0.0 -9.00 -9.00 -9.0 -9.0 -9.0 0 -9
 		boolean isSiteSpec = layer.getSiteGenus().map(spec.getGenus()::equals).orElse(false);
@@ -233,8 +233,8 @@ public class VdypOutputWriter implements Closeable {
 			if (utils.getBaseAreaByUtilization().getCoe(uc.index) > 0) {
 				quadMeanDiameter = Optional.of(
 						BaseAreaTreeDensityDiameter.quadMeanDiameter(
-								utils.getBaseAreaByUtilization().getCoe(uc.index), utils
-										.getTreesPerHectareByUtilization().getCoe(uc.index)
+								utils.getBaseAreaByUtilization().getCoe(uc.index),
+								utils.getTreesPerHectareByUtilization().getCoe(uc.index)
 						)
 				);
 			}

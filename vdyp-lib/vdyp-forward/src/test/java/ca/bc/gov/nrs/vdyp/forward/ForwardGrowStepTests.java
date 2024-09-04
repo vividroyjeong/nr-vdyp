@@ -30,7 +30,7 @@ class ForwardGrowStepTests extends AbstractForwardProcessingEngineTest {
 
 		int nPolygonsProcessed = 0;
 		var polygon = forwardDataStreamReader.readNextPolygon();
-		
+
 		if (polygon.isPresent()) {
 			fpe.processPolygon(polygon.get(), ExecutionStep.GROW);
 			nPolygonsProcessed += 1;

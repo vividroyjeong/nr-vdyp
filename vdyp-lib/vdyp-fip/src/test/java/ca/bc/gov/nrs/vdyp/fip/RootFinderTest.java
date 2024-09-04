@@ -44,10 +44,10 @@ class RootFinderTest {
 
 			double[] y = func.value(x);
 			assertThat(
-					Arrays.stream(y).mapToObj(d -> d).toList(), contains(
-							closeTo(1 + 8.190178e-2), closeTo(7 - 2.869991e0), closeTo(74 + 5.996042e0), closeTo(
-									9 - 2.689271e0
-							), closeTo(30.2601795 + 1.002164e0)
+					Arrays.stream(y).mapToObj(d -> d).toList(),
+					contains(
+							closeTo(1 + 8.190178e-2), closeTo(7 - 2.869991e0), closeTo(74 + 5.996042e0),
+							closeTo(9 - 2.689271e0), closeTo(30.2601795 + 1.002164e0)
 					)
 			);
 		}
@@ -99,7 +99,8 @@ class RootFinderTest {
 			var point = app.findRoot(diameterBase, goal, x, layer, 2.0e-3f);
 
 			assertThat(
-					point, vectorCloseTo(
+					point,
+					vectorCloseTo(
 							new double[] { 0.891877294, 11.4491625, 66.0574265, 12.3855982, 0.00443319743 }, 2.0E-03
 					)
 			);

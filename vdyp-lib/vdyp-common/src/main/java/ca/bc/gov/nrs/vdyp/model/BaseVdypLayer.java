@@ -52,7 +52,7 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies<I>, I extends Base
 	public void setSpecies(Collection<S> species) {
 		this.speciesBySp0.clear();
 		this.speciesByIndex.clear();
-		species.forEach(spec -> { 
+		species.forEach(spec -> {
 			this.speciesBySp0.put(spec.getGenus(), spec);
 			this.speciesByIndex.put(spec.getGenusIndex(), spec);
 		});
@@ -65,7 +65,7 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies<I>, I extends Base
 	public S getSpeciesByIndex(int index) {
 		return speciesByIndex.get(index);
 	}
-	
+
 	public LinkedHashMap<String, I> getSites() {
 		var result = new LinkedHashMap<String, I>(speciesBySp0.size());
 		speciesBySp0.forEach((key, spec) -> spec.getSite().ifPresent(site -> result.put(key, site)));
@@ -79,18 +79,17 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies<I>, I extends Base
 	public void setInventoryTypeGroup(Optional<Integer> inventoryTypeGroup) {
 		this.inventoryTypeGroup = inventoryTypeGroup;
 	}
-	
+
 	@Override
 	public String toString() {
 		return polygonIdentifier.toStringCompact() + "-" + layerType;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		if (other instanceof BaseVdypLayer that) {
 			// This is the "business key" of a layer.
-			return this.polygonIdentifier.equals(that.polygonIdentifier)
-					&& this.layerType.equals(that.layerType);
+			return this.polygonIdentifier.equals(that.polygonIdentifier) && this.layerType.equals(that.layerType);
 		} else {
 			return false;
 		}

@@ -29,7 +29,7 @@ public class Coefficients extends AbstractList<Float> implements List<Float> {
 
 		this(listToArray(coe), indexFrom);
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

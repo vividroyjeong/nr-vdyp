@@ -23,9 +23,9 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 
-class GrowBasalAreaTest {
+class CalculateBasalAreaDeltaTest {
 
-	protected static final Logger logger = LoggerFactory.getLogger(GrowBasalAreaTest.class);
+	protected static final Logger logger = LoggerFactory.getLogger(CalculateBasalAreaDeltaTest.class);
 
 	protected static ForwardControlParser parser;
 	protected static Map<String, Object> controlMap;
@@ -50,63 +50,63 @@ class GrowBasalAreaTest {
 
 	@Test
 	void testStandardPath() throws ProcessingException {
-		
+
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		
+
 		// Select the first polygon - 01002 S000001 00(1970)
 		VdypPolygon polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 
 		fpe.processPolygon(polygon, ExecutionStep.GROW.predecessor());
-		
+
 		float yabh = 54.0f;
 		float hd = 35.2999992f;
 		float ba = 45.3864441f;
 		float growthInHd = 0.173380271f;
-		
-		float gba = fpe.growBasalArea(yabh, hd, ba, Optional.empty(), growthInHd);
-		
+
+		float gba = fpe.calculateBasalAreaDelta(yabh, hd, ba, Optional.empty(), growthInHd);
+
 		assertThat(gba, is(0.35185286f));
 	}
 
 	@Test
 	void testYoungPath() throws ProcessingException {
-		
+
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		
+
 		// Select the first polygon - 01002 S000001 00(1970)
 		VdypPolygon polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 
 		fpe.processPolygon(polygon, ExecutionStep.GROW.predecessor());
-		
+
 		float yabh = 30.0f;
 		float hd = 10.0f;
 		float ba = 200.0f;
 		float growthInHd = 0.173380271f;
-		
-		float gba = fpe.growBasalArea(yabh, hd, ba, Optional.empty(), growthInHd);
-		
+
+		float gba = fpe.calculateBasalAreaDelta(yabh, hd, ba, Optional.empty(), growthInHd);
+
 		assertThat(gba, is(0.0f));
 	}
 
 	@Test
 	void testDebugSettings3EqualsZeroPath() throws ProcessingException {
-		
+
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		
+
 		// Select the first polygon - 01002 S000001 00(1970)
 		VdypPolygon polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 
 		fpe.processPolygon(polygon, ExecutionStep.GROW.predecessor());
-		
+
 		float yabh = 54.0f;
 		float hd = 35.2999992f;
 		float ba = 45.3864441f;
 		float hdDelta = 0.173380271f;
-		
+
 		fpe.fps.fcm.getDebugSettings().setValue(Vars.BASAL_AREA_GROWTH_MODEL_3, 0);
-		
-		float gba = fpe.growBasalArea(yabh, hd, ba, Optional.empty(), hdDelta);
-		
+
+		float gba = fpe.calculateBasalAreaDelta(yabh, hd, ba, Optional.empty(), hdDelta);
+
 		assertThat(gba, is(-0.10392746f));
 	}
 }

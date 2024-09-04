@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.is;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
@@ -35,9 +36,8 @@ public class PrimarySpeciesBasalAreaGrowthParserTest {
 		assertThat(m.get(30), hasProperty("model", is(8)));
 		assertThat(m.get(30), hasProperty("coefficients", contains(0.00579f, -0.000076f, 0.00449f)));
 
-		// Check that defaults are applied
-		assertThat(m.get(27), hasProperty("model", is(0)));
-		assertThat(m.get(27), hasProperty("coefficients", contains(0.0f, 0.0f, 0.0f)));
+		// Check that missing entries are null
+		assertThat(m.get(27), Matchers.nullValue());
 	}
 
 	@Test
@@ -52,7 +52,6 @@ public class PrimarySpeciesBasalAreaGrowthParserTest {
 		Map<Integer, ModelCoefficients> m = parser.parse(is, controlMap);
 		assertThat(m.get(1), hasProperty("model", is(9)));
 		assertThat(m.get(1), hasProperty("coefficients", contains(-0.08960f, 0.007892f, 0.00105f)));
-		assertThat(m.get(2), hasProperty("model", is(0)));
-		assertThat(m.get(2), hasProperty("coefficients", contains(0.0f, 0.0f, 0.0f)));
+		assertThat(m.get(2), Matchers.nullValue());
 	}
 }

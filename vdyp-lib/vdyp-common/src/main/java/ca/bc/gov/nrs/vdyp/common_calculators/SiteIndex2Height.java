@@ -163,8 +163,8 @@ public class SiteIndex2Height {
 				siteIndex = -1.73 + 3.149 * ppow(siteIndex, 0.8279);
 
 				height = 1.37 + (22.87 + 0.9502 * (siteIndex - 1.37)) * ppow(
-						1 - Math.exp(-0.0020647 * ppow(siteIndex - 1.37, 0.5) * breastHeightAge), 1.3656
-								+ 2.046 / (siteIndex - 1.37)
+						1 - Math.exp(-0.0020647 * ppow(siteIndex - 1.37, 0.5) * breastHeightAge),
+						1.3656 + 2.046 / (siteIndex - 1.37)
 				);
 			} else
 				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;
@@ -175,8 +175,8 @@ public class SiteIndex2Height {
 				siteIndex = -1.73 + 3.149 * ppow(siteIndex, 0.8279);
 
 				height = 1.37 + (22.87 + 0.9502 * (siteIndex - 1.37)) * ppow(
-						1 - Math.exp(-0.0020647 * ppow(siteIndex - 1.37, 0.5) * (breastHeightAge - 0.5)), 1.3656
-								+ 2.046 / (siteIndex - 1.37)
+						1 - Math.exp(-0.0020647 * ppow(siteIndex - 1.37, 0.5) * (breastHeightAge - 0.5)),
+						1.3656 + 2.046 / (siteIndex - 1.37)
 				);
 			} else {
 				height = totalAge * totalAge * 1.37 / years2BreastHeight / years2BreastHeight;

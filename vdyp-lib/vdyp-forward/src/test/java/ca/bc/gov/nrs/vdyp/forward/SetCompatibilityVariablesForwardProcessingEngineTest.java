@@ -53,12 +53,10 @@ class SetCompatibilityVariablesForwardProcessingEngineTest extends AbstractForwa
 		);
 
 		assertThat(
-				fpe.fps.getLayerProcessingState().getCVVolume(1, U75TO125, CLOSE_UTIL_VOL, LayerType.PRIMARY),
-				is(0.0f)
+				fpe.fps.getLayerProcessingState().getCVVolume(1, U75TO125, CLOSE_UTIL_VOL, LayerType.PRIMARY), is(0.0f)
 		);
 		assertThat(
-				fpe.fps.getLayerProcessingState().getCVVolume(1, U125TO175, CLOSE_UTIL_VOL, LayerType.PRIMARY),
-				is(0.0f)
+				fpe.fps.getLayerProcessingState().getCVVolume(1, U125TO175, CLOSE_UTIL_VOL, LayerType.PRIMARY), is(0.0f)
 		);
 		assertThat(
 				fpe.fps.getLayerProcessingState().getCVVolume(1, U175TO225, CLOSE_UTIL_VOL, LayerType.PRIMARY),
@@ -153,8 +151,7 @@ class SetCompatibilityVariablesForwardProcessingEngineTest extends AbstractForwa
 				is(-0.004629612f)
 		);
 		assertThat(
-				fpe.fps.getLayerProcessingState()
-						.getCVVolume(1, OVER225, CLOSE_UTIL_VOL_LESS_DECAY, LayerType.PRIMARY),
+				fpe.fps.getLayerProcessingState().getCVVolume(1, OVER225, CLOSE_UTIL_VOL_LESS_DECAY, LayerType.PRIMARY),
 				is(1.3446808E-4f)
 		);
 
@@ -174,8 +171,7 @@ class SetCompatibilityVariablesForwardProcessingEngineTest extends AbstractForwa
 				is(2.2292137E-4f)
 		);
 		assertThat(
-				fpe.fps.getLayerProcessingState()
-						.getCVVolume(2, OVER225, CLOSE_UTIL_VOL_LESS_DECAY, LayerType.PRIMARY),
+				fpe.fps.getLayerProcessingState().getCVVolume(2, OVER225, CLOSE_UTIL_VOL_LESS_DECAY, LayerType.PRIMARY),
 				is(-1.9311905E-5f)
 		);
 
@@ -195,8 +191,7 @@ class SetCompatibilityVariablesForwardProcessingEngineTest extends AbstractForwa
 				is(7.638931E-4f)
 		);
 		assertThat(
-				fpe.fps.getLayerProcessingState()
-						.getCVVolume(3, OVER225, CLOSE_UTIL_VOL_LESS_DECAY, LayerType.PRIMARY),
+				fpe.fps.getLayerProcessingState().getCVVolume(3, OVER225, CLOSE_UTIL_VOL_LESS_DECAY, LayerType.PRIMARY),
 				is(-2.4795532E-5f)
 		);
 
@@ -216,8 +211,7 @@ class SetCompatibilityVariablesForwardProcessingEngineTest extends AbstractForwa
 				is(-9.3603134E-4f)
 		);
 		assertThat(
-				fpe.fps.getLayerProcessingState()
-						.getCVVolume(4, OVER225, CLOSE_UTIL_VOL_LESS_DECAY, LayerType.PRIMARY),
+				fpe.fps.getLayerProcessingState().getCVVolume(4, OVER225, CLOSE_UTIL_VOL_LESS_DECAY, LayerType.PRIMARY),
 				is(-5.4836273E-5f)
 		);
 
@@ -237,8 +231,7 @@ class SetCompatibilityVariablesForwardProcessingEngineTest extends AbstractForwa
 				is(-0.0014338493f)
 		);
 		assertThat(
-				fpe.fps.getLayerProcessingState()
-						.getCVVolume(5, OVER225, CLOSE_UTIL_VOL_LESS_DECAY, LayerType.PRIMARY),
+				fpe.fps.getLayerProcessingState().getCVVolume(5, OVER225, CLOSE_UTIL_VOL_LESS_DECAY, LayerType.PRIMARY),
 				is(-2.9087067E-5f)
 		);
 
@@ -348,8 +341,7 @@ class SetCompatibilityVariablesForwardProcessingEngineTest extends AbstractForwa
 		);
 
 		assertThat(
-				fpe.fps.getLayerProcessingState().getCVVolume(1, U75TO125, WHOLE_STEM_VOL, LayerType.PRIMARY),
-				is(0.0f)
+				fpe.fps.getLayerProcessingState().getCVVolume(1, U75TO125, WHOLE_STEM_VOL, LayerType.PRIMARY), is(0.0f)
 		);
 		assertThat(
 				fpe.fps.getLayerProcessingState().getCVVolume(1, U125TO175, WHOLE_STEM_VOL, LayerType.PRIMARY),
@@ -432,9 +424,7 @@ class SetCompatibilityVariablesForwardProcessingEngineTest extends AbstractForwa
 				is(-1.2636185E-5f)
 		);
 
-		assertThat(
-				fpe.fps.getLayerProcessingState().getCVBasalArea(1, OVER225, LayerType.PRIMARY), is(-2.065301E-5f)
-		);
+		assertThat(fpe.fps.getLayerProcessingState().getCVBasalArea(1, OVER225, LayerType.PRIMARY), is(-2.065301E-5f));
 		assertThat(
 				fpe.fps.getLayerProcessingState().getCVBasalArea(1, U125TO175, LayerType.PRIMARY), is(1.0924414E-5f)
 		);
@@ -445,22 +435,12 @@ class SetCompatibilityVariablesForwardProcessingEngineTest extends AbstractForwa
 				fpe.fps.getLayerProcessingState().getCVBasalArea(1, U75TO125, LayerType.PRIMARY), is(-3.9674342E-7f)
 		);
 
-		assertThat(
-				fpe.fps.getLayerProcessingState().getCVBasalArea(2, OVER225, LayerType.PRIMARY), is(-1.1444092E-5f)
-		);
-		assertThat(
-				fpe.fps.getLayerProcessingState().getCVBasalArea(2, U125TO175, LayerType.PRIMARY), is(5.00679E-6f)
-		);
-		assertThat(
-				fpe.fps.getLayerProcessingState().getCVBasalArea(2, U175TO225, LayerType.PRIMARY), is(9.596348E-6f)
-		);
-		assertThat(
-				fpe.fps.getLayerProcessingState().getCVBasalArea(2, U75TO125, LayerType.PRIMARY), is(6.660819E-6f)
-		);
+		assertThat(fpe.fps.getLayerProcessingState().getCVBasalArea(2, OVER225, LayerType.PRIMARY), is(-1.1444092E-5f));
+		assertThat(fpe.fps.getLayerProcessingState().getCVBasalArea(2, U125TO175, LayerType.PRIMARY), is(5.00679E-6f));
+		assertThat(fpe.fps.getLayerProcessingState().getCVBasalArea(2, U175TO225, LayerType.PRIMARY), is(9.596348E-6f));
+		assertThat(fpe.fps.getLayerProcessingState().getCVBasalArea(2, U75TO125, LayerType.PRIMARY), is(6.660819E-6f));
 
-		assertThat(
-				fpe.fps.getLayerProcessingState().getCVBasalArea(3, OVER225, LayerType.PRIMARY), is(7.6293945E-6f)
-		);
+		assertThat(fpe.fps.getLayerProcessingState().getCVBasalArea(3, OVER225, LayerType.PRIMARY), is(7.6293945E-6f));
 		assertThat(
 				fpe.fps.getLayerProcessingState().getCVBasalArea(3, U125TO175, LayerType.PRIMARY), is(-3.7066638E-6f)
 		);
@@ -478,22 +458,14 @@ class SetCompatibilityVariablesForwardProcessingEngineTest extends AbstractForwa
 		assertThat(
 				fpe.fps.getLayerProcessingState().getCVBasalArea(4, U175TO225, LayerType.PRIMARY), is(-9.059906E-6f)
 		);
-		assertThat(
-				fpe.fps.getLayerProcessingState().getCVBasalArea(4, U75TO125, LayerType.PRIMARY), is(-8.106232E-6f)
-		);
+		assertThat(fpe.fps.getLayerProcessingState().getCVBasalArea(4, U75TO125, LayerType.PRIMARY), is(-8.106232E-6f));
 
-		assertThat(
-				fpe.fps.getLayerProcessingState().getCVBasalArea(5, OVER225, LayerType.PRIMARY), is(-4.673004E-5f)
-		);
-		assertThat(
-				fpe.fps.getLayerProcessingState().getCVBasalArea(5, U125TO175, LayerType.PRIMARY), is(8.821487E-6f)
-		);
+		assertThat(fpe.fps.getLayerProcessingState().getCVBasalArea(5, OVER225, LayerType.PRIMARY), is(-4.673004E-5f));
+		assertThat(fpe.fps.getLayerProcessingState().getCVBasalArea(5, U125TO175, LayerType.PRIMARY), is(8.821487E-6f));
 		assertThat(
 				fpe.fps.getLayerProcessingState().getCVBasalArea(5, U175TO225, LayerType.PRIMARY), is(2.8401613E-5f)
 		);
-		assertThat(
-				fpe.fps.getLayerProcessingState().getCVBasalArea(5, U75TO125, LayerType.PRIMARY), is(-4.954636E-7f)
-		);
+		assertThat(fpe.fps.getLayerProcessingState().getCVBasalArea(5, U75TO125, LayerType.PRIMARY), is(-4.954636E-7f));
 
 		assertThat(
 				fpe.fps.getLayerProcessingState().getCVQuadraticMeanDiameter(1, OVER225, LayerType.PRIMARY),

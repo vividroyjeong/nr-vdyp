@@ -114,12 +114,12 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 	public void setMode(Optional<PolygonMode> mode) {
 		this.mode = mode;
 	}
-	
+
 	@Override
 	public String toString() {
 		return polygonIdentifier.toStringCompact();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		if (other instanceof BaseVdypPolygon that) {

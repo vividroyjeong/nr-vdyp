@@ -9,7 +9,10 @@ import ca.bc.gov.nrs.vdyp.common.FloatUnaryOperator;
 public class UtilizationVector extends Coefficients {
 
 	public UtilizationVector() {
-		super(new float[] { Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN }, UtilizationClass.SMALL.index);
+		super(
+				new float[] { Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN },
+				UtilizationClass.SMALL.index
+		);
 	}
 
 	public UtilizationVector(float small, float all, float uc1, float uc2, float uc3, float uc4) {

@@ -42,11 +42,12 @@ class VdypSiteTest {
 		var ex = assertThrows(IllegalStateException.class, () -> VdypSite.build(builder -> {
 		}));
 		assertThat(
-				ex, hasProperty(
-						"message", allOf(
-								containsString("polygonIdentifier"), containsString("layerType"), containsString(
-										"siteGenus"
-								)
+				ex,
+				hasProperty(
+						"message",
+						allOf(
+								containsString("polygonIdentifier"), containsString("layerType"),
+								containsString("siteGenus")
 						)
 				)
 		);

@@ -41,12 +41,10 @@ class VdypSpeciesTest {
 		var ex = assertThrows(IllegalStateException.class, () -> VdypSpecies.build(builder -> {
 		}));
 		assertThat(
-				ex, hasProperty(
-						"message", allOf(
-								containsString("polygonIdentifier"), containsString("layer"), containsString(
-										"genus"
-								)
-						)
+				ex,
+				hasProperty(
+						"message",
+						allOf(containsString("polygonIdentifier"), containsString("layer"), containsString("genus"))
 				)
 		);
 	}
@@ -99,12 +97,14 @@ class VdypSpeciesTest {
 			builder.addSp64Distribution("B", 100f);
 		});
 		assertThat(
-				result, hasProperty(
-						"sp64DistributionSet", hasProperty(
-								"sp64DistributionMap", hasEntry(
-										is(1), allOf(
-												hasProperty("genusAlias", is("B")), hasProperty("percentage", is(100f))
-										)
+				result,
+				hasProperty(
+						"sp64DistributionSet",
+						hasProperty(
+								"sp64DistributionMap",
+								hasEntry(
+										is(1),
+										allOf(hasProperty("genusAlias", is("B")), hasProperty("percentage", is(100f)))
 								)
 						)
 				)

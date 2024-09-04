@@ -39,8 +39,8 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 	private Optional<I> site;
 
 	protected BaseVdypSpecies(
-			PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, int genusIndex, Optional<Float> percentGenus,
-			Sp64DistributionSet sp64DistributionSet, Optional<I> site
+			PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, int genusIndex,
+			Optional<Float> percentGenus, Sp64DistributionSet sp64DistributionSet, Optional<I> site
 	) {
 		this.polygonIdentifier = polygonIdentifier;
 		this.layerType = layerType;
@@ -60,7 +60,9 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 	}
 
 	public float getPercentGenus() {
-		return percentGenus.orElseThrow(() -> new InitializationIncompleteException(MessageFormat.format("Species {0}, percentGenus", this)));
+		return percentGenus.orElseThrow(
+				() -> new InitializationIncompleteException(MessageFormat.format("Species {0}, percentGenus", this))
+		);
 	}
 
 	public void setPercentGenus(float value) {
@@ -71,7 +73,9 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 
 	@Computed
 	public float getFractionGenus() {
-		return fractionGenus.orElseThrow(() -> new InitializationIncompleteException(MessageFormat.format("Species {0}, fractionGenus", this)));
+		return fractionGenus.orElseThrow(
+				() -> new InitializationIncompleteException(MessageFormat.format("Species {0}, fractionGenus", this))
+		);
 	}
 
 	@Computed
@@ -88,13 +92,12 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 	public String toString() {
 		return MessageFormat.format("{0} {1} {2}", polygonIdentifier, layerType, genus);
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		if (other instanceof BaseVdypSpecies that) {
 			// This is the "business key" of a species.
-			return this.polygonIdentifier.equals(that.polygonIdentifier)
-					&& this.layerType.equals(that.layerType)
+			return this.polygonIdentifier.equals(that.polygonIdentifier) && this.layerType.equals(that.layerType)
 					&& this.genus.equals(that.genus);
 		} else {
 			return false;
@@ -181,7 +184,8 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 
 		/**
 		 * Set both the genus, and at the same time calculates genusIndex from the given controlMap.
-		 * @param genus the species genus
+		 *
+		 * @param genus      the species genus
 		 * @param controlMap the control map defining the configuration
 		 * @return this builder
 		 */
@@ -192,12 +196,11 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		}
 
 		/**
-		 * Set both the genus and its index. It is the responsibility of the caller to ensure 
-		 * that the index is correct for the given genus. Use of this method is appropriate 
-		 * only when logic dictates the given genusIndex is correct or in those unit tests 
-		 * where correctness isn't critical.
-		 * 
-		 * @param genus the species genus
+		 * Set both the genus and its index. It is the responsibility of the caller to ensure that the index is correct
+		 * for the given genus. Use of this method is appropriate only when logic dictates the given genusIndex is
+		 * correct or in those unit tests where correctness isn't critical.
+		 *
+		 * @param genus      the species genus
 		 * @param genusIndex the index of the genus in the configuration (control map entry 10)
 		 * @return this builder
 		 */
@@ -260,7 +263,7 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 			requirePresent(layerType, "layerType", errors);
 			requirePresent(genus, "genus", errors);
 			requirePresent(genusIndex, "genusIndex", errors);
-			
+
 			// percentGenus is not required on build because the Forward
 			// input data format does not include it in the species data files.
 			// requirePresent(percentGenus, "percentGenus", errors);

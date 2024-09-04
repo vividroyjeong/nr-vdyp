@@ -50,23 +50,23 @@ class GrowLoreyHeightsTest {
 
 	@Test
 	void testStandardPath() throws ProcessingException {
-		
+
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		
+
 		// Select the first polygon - 01002 S000001 00(1970)
 		VdypPolygon polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 
 		fpe.processPolygon(polygon, ExecutionStep.GROW.predecessor());
 		LayerProcessingState lps = fpe.fps.getLayerProcessingState();
-		
+
 		float dhStart = 35.3f;
 		float dhEnd = 35.473381f;
 		float pspTphStart = 290.61615f;
 		float pspTphEnd = 287.107788f;
 		float pspLhStart = 33.7439995f;
-		
+
 		fpe.growLoreyHeights(lps, dhStart, dhEnd, pspTphStart, pspTphEnd, pspLhStart);
-		
+
 		// Results are stored in bank.loreyHeights[1..nSpecies]
 		assertThat(lps.getIndices().length, is(5));
 		assertThat(lps.getBank().loreyHeights[1][UtilizationClass.ALL.ordinal()], is(36.9653244f));
@@ -78,25 +78,25 @@ class GrowLoreyHeightsTest {
 
 	@Test
 	void testDebug8Setting2Path() throws ProcessingException {
-		
+
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		
+
 		// Select the first polygon - 01002 S000001 00(1970)
 		VdypPolygon polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 
 		fpe.processPolygon(polygon, ExecutionStep.GROW.predecessor());
 		LayerProcessingState lps = fpe.fps.getLayerProcessingState();
-		
+
 		float dhStart = 35.3f;
 		float dhEnd = 35.3f;
 		float pspTphStart = 290.61615f;
 		float pspTphEnd = 287.107788f;
 		float pspLhStart = 33.7439995f;
-		
+
 		fpe.fps.fcm.getDebugSettings().setValue(ForwardDebugSettings.Vars.LOREY_HEIGHT_CHANGE_STRATEGY_8, 2);
-		
+
 		fpe.growLoreyHeights(lps, dhStart, dhEnd, pspTphStart, pspTphEnd, pspLhStart);
-		
+
 		// Results are stored in bank.loreyHeights[1..nSpecies]
 		assertThat(lps.getIndices().length, is(5));
 		assertThat(lps.getBank().loreyHeights[1][UtilizationClass.ALL.ordinal()], is(36.7552986f));

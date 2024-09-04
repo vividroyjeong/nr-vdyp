@@ -105,9 +105,8 @@ class EstimatorsTest {
 
 			// Result of run in FORTRAN VDYP7 with the above parameters.
 			assertThat(
-					basalAreaByUtilization, contains(
-							0.0f, 0.406989872f, 0.00509467721f, 0.0138180256f, 0.023145527f, 0.36493164f
-					)
+					basalAreaByUtilization,
+					contains(0.0f, 0.406989872f, 0.00509467721f, 0.0138180256f, 0.023145527f, 0.36493164f)
 			);
 		}
 
@@ -128,7 +127,8 @@ class EstimatorsTest {
 			emp.estimateBaseAreaByUtilization(bec, dq, ba, "B");
 
 			assertThat(
-					ba, VdypMatchers
+					ba,
+					VdypMatchers
 							.utilization(0f, 0.397305071f, 0.00485289097f, 0.0131751001f, 0.0221586525f, 0.357118428f)
 			);
 
@@ -210,7 +210,8 @@ class EstimatorsTest {
 			var closeUtilizationUtil = Utils.utilizationVector(0f, 0f, 0f, 0f, 0f);
 
 			emp.estimateCloseUtilizationVolume(
-					utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, wholeStemVolumeUtil, closeUtilizationUtil
+					utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, wholeStemVolumeUtil,
+					closeUtilizationUtil
 			);
 
 			assertThat(closeUtilizationUtil, utilization(0f, 0f, 0f, 0f, 0f, 5.86088896f));
@@ -520,7 +521,8 @@ class EstimatorsTest {
 			float quadMeanDiameter2 = 30.249138f;
 
 			float dq = emp.estimateQuadMeanDiameterClampResult(
-					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2, quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
+					quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
 			);
 
 			assertThat(dq, is(quadMeanDiameter1));
@@ -545,7 +547,8 @@ class EstimatorsTest {
 			float quadMeanDiameter1 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea1, treesPerHectare1);
 
 			float dq = emp.estimateQuadMeanDiameterClampResult(
-					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2, quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
+					quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
 			);
 
 			assertThat(dq, closeTo(30.722431f));
@@ -570,7 +573,8 @@ class EstimatorsTest {
 			float quadMeanDiameter2 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea2, treesPerHectare2);
 
 			float dq = emp.estimateQuadMeanDiameterClampResult(
-					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2, quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
+					quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
 			);
 
 			assertThat(dq, closeTo(28.245578f));
@@ -595,7 +599,8 @@ class EstimatorsTest {
 			float quadMeanDiameter2 = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea2, treesPerHectare2);
 
 			float dq = emp.estimateQuadMeanDiameterClampResult(
-					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2, quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
+					limits, standTreesPerHectare, minQuadMeanDiameter, loreyHeightSpec, baseArea1, baseArea2,
+					quadMeanDiameter1, treesPerHectare2, quadMeanDiameter2
 			);
 
 			assertThat(dq, closeTo(66.565033f));
@@ -634,9 +639,8 @@ class EstimatorsTest {
 
 			// Result of run in FORTRAN VDYP7 with the above parameters.
 			assertThat(
-					wholeStemVolumeByUtilization, contains(
-							0.0f, 6.27250576f, 0.01865777f, 0.07648385f, 0.17615195f, 6.00121212f
-					)
+					wholeStemVolumeByUtilization,
+					contains(0.0f, 6.27250576f, 0.01865777f, 0.07648385f, 0.17615195f, 6.00121212f)
 			);
 		}
 
@@ -651,7 +655,8 @@ class EstimatorsTest {
 			var wholeStemVolumeUtil = Utils.utilizationVector();
 
 			emp.estimateWholeStemVolume(
-					utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
+					utilizationClass, aAdjust, volumeGroup, lorieHeight, quadMeanDiameterUtil, baseAreaUtil,
+					wholeStemVolumeUtil
 			);
 
 			assertThat(wholeStemVolumeUtil, utilization(0f, 0f, 0f, 0f, 0f, 6.11904192f));

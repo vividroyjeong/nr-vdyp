@@ -44,18 +44,18 @@ class LayerProcessingState {
 
 	/** The containing polygon of the layer on which the Processor is operating */
 	private final VdypPolygon polygon;
-	
+
 	/** The type of Layer being processed */
 	private final LayerType layerType;
 
 	// L1COM1, L1COM4 and L1COM5 - these common blocks mirror BANK1, BANK2 and BANK3 and are initialized
 	// when copied to "active" in ForwardProcessingEngine.
-	
-	/** 
+
+	/**
 	 * State of the layer during processing.
 	 */
 	private Bank bank;
-	
+
 	// L1COM2 - equation groups. From the configuration, narrowed to the
 	// polygon's BEC zone.
 
@@ -115,18 +115,20 @@ class LayerProcessingState {
 	// MNSP - MSPL1, MSPLV
 	// TODO
 
-	public LayerProcessingState(ForwardProcessingState fps, VdypPolygon polygon, LayerType subjectLayerType) throws ProcessingException {
+	public LayerProcessingState(ForwardProcessingState fps, VdypPolygon polygon, LayerType subjectLayerType)
+			throws ProcessingException {
 
 		this.fps = fps;
 		this.polygon = polygon;
 		this.layerType = subjectLayerType;
-		
+
 		BecDefinition becZone = polygon.getBiogeoclimaticZone();
-		
+
 		this.bank = new Bank(
 				polygon.getLayers().get(subjectLayerType), becZone,
-				s -> s.getBaseAreaByUtilization().get(UtilizationClass.ALL) >= ForwardProcessingEngine.MIN_BASAL_AREA);
-		
+				s -> s.getBaseAreaByUtilization().get(UtilizationClass.ALL) >= ForwardProcessingEngine.MIN_BASAL_AREA
+		);
+
 		var volumeEquationGroupMatrix = this.fps.fcm.getVolumeEquationGroups();
 		var decayEquationGroupMatrix = this.fps.fcm.getDecayEquationGroups();
 		var breakageEquationGroupMatrix = this.fps.fcm.getBreakageEquationGroups();
@@ -151,11 +153,11 @@ class LayerProcessingState {
 			this.breakageEquationGroups[i] = breakageEquationGroupMatrix.get(speciesName, becZoneAlias);
 		}
 	}
-	
+
 	public VdypPolygon getPolygon() {
 		return polygon;
 	}
-	
+
 	public LayerType getLayerType() {
 		return layerType;
 	}
@@ -178,7 +180,7 @@ class LayerProcessingState {
 		}
 		return primarySpeciesIndex;
 	}
-	
+
 	public String getPrimarySpeciesAlias() {
 		if (!areRankingDetailsSet) {
 			throw new IllegalStateException("unset primarySpeciesIndex");
@@ -288,7 +290,7 @@ class LayerProcessingState {
 	public int[] getSiteCurveNumbers() {
 		return siteCurveNumbers;
 	}
-	
+
 	public MatrixMap3<UtilizationClass, VolumeVariable, LayerType, Float>[] getCvVolume() {
 		return cvVolume;
 	}
@@ -305,7 +307,7 @@ class LayerProcessingState {
 		return cvPrimaryLayerSmall;
 	}
 
-	/** 
+	/**
 	 * @param n index of species for whom the site curve number is to be returned.
 	 * @return the site curve number of the given species.
 	 */
@@ -383,10 +385,11 @@ class LayerProcessingState {
 	}
 
 	public void setPrimarySpeciesDetails(PrimarySpeciesDetails details) {
-		
-		// Normally, these values may only be set only once. However, during grow(), if the 
+
+		// Normally, these values may only be set only once. However, during grow(), if the
 		// control variable UPDATE_DURING_GROWTH_6 has value "1" then updates are allowed.
-		if (this.arePrimarySpeciesDetailsSet && fps.fcm.getForwardControlVariables().getControlVariable(ControlVariable.UPDATE_DURING_GROWTH_6) != 1) {
+		if (this.arePrimarySpeciesDetailsSet && fps.fcm.getForwardControlVariables()
+				.getControlVariable(ControlVariable.UPDATE_DURING_GROWTH_6) != 1) {
 			throw new IllegalStateException(PRIMARY_SPECIES_DETAILS_CAN_BE_SET_ONCE_ONLY);
 		}
 
@@ -415,21 +418,20 @@ class LayerProcessingState {
 
 		this.arePrimarySpeciesDetailsSet = true;
 	}
-	
-	/** 
-	 * Update the cached primary species details after growth. These changes are made to
-	 * the cached values only at this time. Later, if Control Variable 6 is > 0, 
-	 * <code>setPrimarySpeciesDetails</code> will be called before the next growth
-	 * period is run and the bank values will be updated, too.
-	 * 
+
+	/**
+	 * Update the cached primary species details after growth. These changes are made to the cached values only at this
+	 * time. Later, if Control Variable 6 is > 0, <code>setPrimarySpeciesDetails</code> will be called before the next
+	 * growth period is run and the bank values will be updated, too.
+	 *
 	 * @param newPrimarySpeciesDominantHeight
 	 */
 	public void updatePrimarySpeciesDetailsAfterGrowth(float newPrimarySpeciesDominantHeight) {
-		
+
 		this.primarySpeciesDominantHeight = newPrimarySpeciesDominantHeight;
 		this.primarySpeciesTotalAge += 1;
 		this.primarySpeciesAgeAtBreastHeight += 1;
-		
+
 		// primarySpeciesSiteIndex - does this change?
 		// primarySpeciesAgeToBreastHeight of course doesn't change.
 	}
@@ -456,22 +458,33 @@ class LayerProcessingState {
 	 * CVADJ1 - adjust the values of the compatibility variables after one year of growth.
 	 */
 	public void updateCompatibilityVariablesAfterGrowth() {
-		
+
 		var compVarAdjustments = fps.fcm.getCompVarAdjustments();
-		
-		for (int i: getIndices()) {
-			for (UtilizationClassVariable sucv: UtilizationClassVariable.values()) {
-				cvPrimaryLayerSmall[i].put(sucv, cvPrimaryLayerSmall[i].get(sucv) * compVarAdjustments.getValue(UtilizationClass.SMALL, sucv));
+
+		for (int i : getIndices()) {
+			for (UtilizationClassVariable sucv : UtilizationClassVariable.values()) {
+				cvPrimaryLayerSmall[i].put(
+						sucv,
+						cvPrimaryLayerSmall[i].get(sucv) * compVarAdjustments.getValue(UtilizationClass.SMALL, sucv)
+				);
 			}
-			for (UtilizationClass uc: UtilizationClass.UTIL_CLASSES) {
-				cvBasalArea[i].put(uc, LayerType.PRIMARY, cvBasalArea[i].get(uc, LayerType.PRIMARY) 
-						* compVarAdjustments.getValue(uc, UtilizationClassVariable.BASAL_AREA));
-				cvQuadraticMeanDiameter[i].put(uc, LayerType.PRIMARY, cvQuadraticMeanDiameter[i].get(uc, LayerType.PRIMARY)
-						* compVarAdjustments.getValue(uc, UtilizationClassVariable.QUAD_MEAN_DIAMETER));
-				
-				for (VolumeVariable vv: VolumeVariable.ALL) {
-					cvVolume[i].put(uc, vv, LayerType.PRIMARY, cvVolume[i].get(uc, vv, LayerType.PRIMARY)
-							* compVarAdjustments.getVolumeValue(uc, vv));
+			for (UtilizationClass uc : UtilizationClass.UTIL_CLASSES) {
+				cvBasalArea[i].put(
+						uc, LayerType.PRIMARY,
+						cvBasalArea[i].get(uc, LayerType.PRIMARY)
+								* compVarAdjustments.getValue(uc, UtilizationClassVariable.BASAL_AREA)
+				);
+				cvQuadraticMeanDiameter[i].put(
+						uc, LayerType.PRIMARY,
+						cvQuadraticMeanDiameter[i].get(uc, LayerType.PRIMARY)
+								* compVarAdjustments.getValue(uc, UtilizationClassVariable.QUAD_MEAN_DIAMETER)
+				);
+
+				for (VolumeVariable vv : VolumeVariable.ALL) {
+					cvVolume[i].put(
+							uc, vv, LayerType.PRIMARY,
+							cvVolume[i].get(uc, vv, LayerType.PRIMARY) * compVarAdjustments.getVolumeValue(uc, vv)
+					);
 				}
 			}
 		}
@@ -511,15 +524,16 @@ class LayerProcessingState {
 	}
 
 	public VdypLayer getLayer() {
-		
+
 		VdypLayer updatedLayer = bank.getLayer();
-		
+
 		for (int i = 1; i < getNSpecies() + 1; i++) {
 			VdypSpecies species = updatedLayer.getSpeciesBySp0(bank.speciesNames[i]);
 			species.setCompatibilityVariables(
-					cvVolume[i], cvBasalArea[i], cvQuadraticMeanDiameter[i], cvPrimaryLayerSmall[i]);
+					cvVolume[i], cvBasalArea[i], cvQuadraticMeanDiameter[i], cvPrimaryLayerSmall[i]
+			);
 		}
-		
+
 		return updatedLayer;
 	}
 }

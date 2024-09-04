@@ -35,9 +35,9 @@ import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 
-class GrowDominantHeightTest {
+class CalculateDominantHeightDeltaTest {
 
-	protected static final Logger logger = LoggerFactory.getLogger(GrowDominantHeightTest.class);
+	protected static final Logger logger = LoggerFactory.getLogger(CalculateDominantHeightDeltaTest.class);
 
 	protected static ForwardControlParser parser;
 	protected static Map<String, Object> controlMap;
@@ -62,9 +62,9 @@ class GrowDominantHeightTest {
 
 	@Test
 	void testNormalCurve() throws ProcessingException {
-		
+
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-		
+
 		// Select the first polygon - 01002 S000001 00(1970)
 		fpe.fps.setPolygonLayer(forwardDataStreamReader.readNextPolygon().orElseThrow(), LayerType.PRIMARY);
 
@@ -72,55 +72,55 @@ class GrowDominantHeightTest {
 		int sc = 13;
 		float si = 35;
 		float ytbh = 1.0f;
-		
-		float gdh = fpe.growDominantHeight(hd, sc, si, ytbh);
-		
+
+		float gdh = fpe.calculateDominantHeightDelta(hd, sc, si, ytbh);
+
 		assertThat(gdh, is(0.173380271f));
 	}
 
 	@Test
 	void testCurveExtension1() throws ProcessingException {
-		
+
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 
 		// Select polygon 01003AS000001 00(1953) - triggers curve extension code
 		VdypPolygon polygon;
 		do {
 			polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
-		} while (! polygon.getPolygonIdentifier().getName().equals("01003AS000001 00"));
-		
+		} while (!polygon.getPolygonIdentifier().getName().equals("01003AS000001 00"));
+
 		fpe.fps.setPolygonLayer(polygon, LayerType.PRIMARY);
 
 		float hd = 29.5f;
 		int sc = 11;
 		float si = 14.8000002f;
 		float ytbh = 10.8000002f;
-		
-		float gdh = fpe.growDominantHeight(hd, sc, si, ytbh);
-		
+
+		float gdh = fpe.calculateDominantHeightDelta(hd, sc, si, ytbh);
+
 		assertThat(gdh, is(0.0f));
 	}
 
 	@Test
 	void testCurveExtension2() throws ProcessingException {
-		
+
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 
 		// Select polygon 01003AS000001 00(1953) - triggers curve extension code
 		VdypPolygon polygon;
 		do {
 			polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
-		} while (! polygon.getPolygonIdentifier().getName().equals("01003AS000001 00"));
-		
+		} while (!polygon.getPolygonIdentifier().getName().equals("01003AS000001 00"));
+
 		fpe.fps.setPolygonLayer(polygon, LayerType.PRIMARY);
-		
+
 		float hd = 26.5f;
 		int sc = 11;
 		float si = 14.8000002f;
 		float ytbh = 5.8000002f;
-		
-		float gdh = fpe.growDominantHeight(hd, sc, si, ytbh);
-		
+
+		float gdh = fpe.calculateDominantHeightDelta(hd, sc, si, ytbh);
+
 		assertThat(gdh, is(0.045883115f));
 	}
 }
