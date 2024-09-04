@@ -19,7 +19,7 @@ spec:
           image: >-
             ghcr.io/bcgov/vdyp-web-ui:#{TAG}#
           ports:
-            - containerPort: #{TARGET_PORT}#
+            - containerPort: #{ACTIVE_PORT}#
               protocol: TCP
           env:
             - name: ACTIVE_PORT
