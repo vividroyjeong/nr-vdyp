@@ -114,6 +114,7 @@ public class ForwardProcessingEngine {
 		GROW_2_LAYER_BADELTA, //
 		GROW_3_LAYER_DQDELTA, //
 		GROW_4_LAYER_BA_AND_DQTPH_EST, //
+		GROW_5A_LH_EST, //
 		GROW_5_SPECIES_BADQTPH, //
 		GROW_6_LAYER_TPH2, //
 		GROW_7_LAYER_DQ2, //
@@ -453,6 +454,9 @@ public class ForwardProcessingEngine {
 
 			bank.loreyHeights[0][UC_ALL_INDEX] = sum1 / sum2;
 
+			if (ExecutionStep.GROW_5A_LH_EST.eq(lastStepInclusive))
+				return;
+
 			// Now do the actual per-species updates of ba, qmd and tph, based in part
 			// on both the starting Lorey Heights and the estimated Lorey Heights at the
 			// end of the growth period.
@@ -493,6 +497,14 @@ public class ForwardProcessingEngine {
 				tphEndSum += bank.treesPerHectare[i][UC_ALL_INDEX];
 			}
 		}
+
+		if (tphEndSum < 0.0f) {
+			throw new ProcessingException(
+					MessageFormat.format(
+							"During processing of {0}, trees-per-hectare was calculated to be negative ({1})",
+							lps.getPolygon().getLayers().get(LayerType.PRIMARY), tphEndSum));
+		}
+
 		bank.treesPerHectare[0][UC_ALL_INDEX] = tphEndSum;
 
 		if (ExecutionStep.GROW_6_LAYER_TPH2.eq(lastStepInclusive))

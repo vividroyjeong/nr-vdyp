@@ -51,15 +51,18 @@ class ForwardProcessorTest {
 		Path zipFile = Paths.get(resourceDirectory.toString(), this.getClass().getSimpleName() + ".zip");
 		Files.deleteIfExists(zipFile);
 
-		outputResolver.generate(zipFile);
+		try {
+			outputResolver.generate(zipFile);
 
-		InputStream os = outputResolver.generateStream();
+			InputStream os = outputResolver.generateStream();
 
-		byte[] zipFileBytes = Files.readAllBytes(zipFile);
-		byte[] zipStreamBytes = os.readAllBytes();
+			byte[] zipFileBytes = Files.readAllBytes(zipFile);
+			byte[] zipStreamBytes = os.readAllBytes();
 
-		assertTrue(zipFileBytes.length == zipStreamBytes.length);
-		assertTrue(Arrays.equals(zipFileBytes, zipStreamBytes));
-
+			assertTrue(zipFileBytes.length == zipStreamBytes.length);
+			assertTrue(Arrays.equals(zipFileBytes, zipStreamBytes));
+		} finally {
+			Files.delete(zipFile);
+		}
 	}
 }

@@ -23,9 +23,9 @@ import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 
-class GrowBaDqTphTest {
+class Grow5SpeciesBaDqTphTest {
 
-	protected static final Logger logger = LoggerFactory.getLogger(GrowBaDqTphTest.class);
+	protected static final Logger logger = LoggerFactory.getLogger(Grow5SpeciesBaDqTphTest.class);
 
 	protected static ForwardControlParser parser;
 	protected static Map<String, Object> controlMap;
@@ -56,7 +56,7 @@ class GrowBaDqTphTest {
 		// Select the first polygon - 01002 S000001 00(1970)
 		VdypPolygon polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 
-		fpe.processPolygon(polygon, ExecutionStep.GROW_6_LAYER_TPH2);
+		fpe.processPolygon(polygon, ExecutionStep.GROW_5A_LH_EST);
 		LayerProcessingState lps = fpe.fps.getLayerProcessingState();
 
 		float baStart = 45.3864441f;
@@ -109,7 +109,7 @@ class GrowBaDqTphTest {
 		// Select the first polygon - 01002 S000001 00(1970)
 		VdypPolygon polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 
-		fpe.processPolygon(polygon, ExecutionStep.GROW_6_LAYER_TPH2);
+		fpe.processPolygon(polygon, ExecutionStep.GROW_4_LAYER_BA_AND_DQTPH_EST);
 		LayerProcessingState lps = fpe.fps.getLayerProcessingState();
 
 		float baChangeRate = 0.00775236264f;
@@ -151,7 +151,7 @@ class GrowBaDqTphTest {
 		// Select the first polygon - 01002 S000001 00(1970)
 		VdypPolygon polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 
-		fpe.processPolygon(polygon, ExecutionStep.GROW_6_LAYER_TPH2);
+		fpe.processPolygon(polygon, ExecutionStep.GROW_4_LAYER_BA_AND_DQTPH_EST);
 		LayerProcessingState lps = fpe.fps.getLayerProcessingState();
 
 		float baStart = 45.3864441f;
