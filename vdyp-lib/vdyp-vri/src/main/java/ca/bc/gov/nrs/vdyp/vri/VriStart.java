@@ -54,7 +54,6 @@ import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.CompatibilityVariableMode;
-import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.ModelClassBuilder;
@@ -278,7 +277,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					modifyVeteranLayerBuild(layersBuilders, builder);
 				}
 				return builder;
-			}).map(InputLayer.Builder::build).collect(Collectors.toUnmodifiableMap(VriLayer::getLayerType, x -> x));
+			}).map(VriLayer.Builder::build).collect(Collectors.toUnmodifiableMap(VriLayer::getLayerType, x -> x));
 
 		} catch (NoSuchElementException ex) {
 			throw validationError("Layers file has fewer records than polygon file.", ex);
@@ -666,8 +665,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		
 		var bec = polygon.getBiogeoclimaticZone();
 
-		var primarySite = veteranLayer.getPrimarySite(veteranLayer);
-		var primarySpecies = veteranLayer.getPrimarySpeciesRecord(veteranLayer);
+		var primarySite = veteranLayer.getPrimarySite();
+		var primarySpecies = veteranLayer.getPrimarySpeciesRecord();
 
 		float ageTotal = primarySite.flatMap(VriSite::getAgeTotal).map(at -> at + veteranLayer.getAgeIncrease())
 				.orElse(0f); // AGETOTLV
@@ -812,7 +811,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		float veteranMinHeight = minMap.get(VriControlParser.MINIMUM_VETERAN_HEIGHT);
 
-		InputLayer veteranLayer = polygon.getLayers().get(LayerType.VETERAN);
+		VriLayer veteranLayer = polygon.getLayers().get(LayerType.VETERAN);
 		if (veteranLayer != null) {
 			Optional<Float> veteranHeight = veteranLayer.getPrimarySite().flatMap(VriSite::getHeight);
 			validateMinimum("Veteran layer primary species height", veteranHeight, veteranMinHeight, true);
@@ -1352,7 +1351,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			final float initialPrimaryBaseArea = this
 					.estimatePrimaryBaseArea(primaryLayer, bec, poly.getYieldFactor(), primaryBreastHeightAge, 0.0f);
 
-			final Optional<Float> veteranBaseArea = veteranLayer.map(InputLayer::getCrownClosure) // BAV
+			final Optional<Float> veteranBaseArea = veteranLayer.map(VriLayer::getCrownClosure) // BAV
 					.map(ccV -> ccV * initialPrimaryBaseArea / primaryLayer.getCrownClosure());
 
 			final float primaryBaseArea = this.estimatePrimaryBaseArea(
@@ -1479,7 +1478,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	}
 
 	@Override
-	protected Optional<VriSite> getPrimarySite(InputLayer layer) {
+	protected Optional<VriSite> getPrimarySite(VriLayer layer) {
 		return layer.getPrimarySite();
 	}
 

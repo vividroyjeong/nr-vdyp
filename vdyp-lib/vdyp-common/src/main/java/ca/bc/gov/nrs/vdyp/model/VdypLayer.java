@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.model;
 
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.common.Computed;
@@ -223,9 +224,13 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies, VdypSite> implements V
 
 		protected Optional<String> primarySp0 = Optional.empty();
 
-		public VdypLayer.Builder primaryGenus(String primarySp0) {
-			this.primarySp0 = Optional.of(primarySp0);
+		public VdypLayer.Builder primaryGenus(Optional<String> primarySp0) {
+			this.primarySp0 = primarySp0;
 			return this;
+		}
+
+		public VdypLayer.Builder primaryGenus(String primarySp0) {
+			return primaryGenus(Optional.of(primarySp0));
 		}
 
 		UtilizationVector loreyHeight = VdypUtilizationHolder.emptyLoreyHeightUtilization();
@@ -311,6 +316,25 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies, VdypSite> implements V
 		public void baseAreaByUtilization(UtilizationVector utilizationVector) {
 			// TODO Auto-generated method stub
 
+		}
+
+		@Override
+		public <S2 extends BaseVdypSpecies<I2>, I2 extends BaseVdypSite>
+				BaseVdypLayer.Builder<VdypLayer, VdypSpecies, VdypSite, VdypSpecies.Builder, VdypSite.Builder>
+				adaptSpecies(
+						BaseVdypLayer<S2, ?> toCopy, BiConsumer<VdypSpecies.Builder, S2> config
+				) {
+			this.primaryGenus(toCopy.getPrimaryGenus());
+			return super.adaptSpecies(toCopy, config);
+		}
+
+		@Override
+		public BaseVdypLayer.Builder<VdypLayer, VdypSpecies, VdypSite, VdypSpecies.Builder, VdypSite.Builder>
+				copySpecies(
+						VdypLayer toCopy, BiConsumer<VdypSpecies.Builder, VdypSpecies> config
+				) {
+			this.primaryGenus(toCopy.getPrimaryGenus());
+			return super.copySpecies(toCopy, config);
 		}
 
 	}
