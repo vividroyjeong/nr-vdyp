@@ -26,19 +26,18 @@ public class ZipOutputFileResolverTest {
 		}
 
 		Path zipFile = Files.createTempFile(this.getClass().getName(), ".zip");
-		try
-		{
+		try {
 			resolver.generate(zipFile);
-	
+
 			System.out.println("Output zip file written to " + zipFile.toString());
-	
+
 			try (ZipFile zip = new ZipFile(zipFile.toFile())) {
 				var entries = zip.entries();
-	
+
 				byte[] buffer = new byte[16];
 				while (entries.hasMoreElements()) {
 					ZipEntry e = entries.nextElement();
-	
+
 					InputStream is = zip.getInputStream(e);
 					int nBytesRead = is.read(buffer, 0, 10);
 					assertTrue(nBytesRead == 1);

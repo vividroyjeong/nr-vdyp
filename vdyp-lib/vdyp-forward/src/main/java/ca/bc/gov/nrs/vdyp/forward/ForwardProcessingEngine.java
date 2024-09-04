@@ -1187,8 +1187,8 @@ public class ForwardProcessingEngine {
 	}
 
 	/**
-	 * EMP150 - return the change in quad-mean-diameter over the growth period for the 
-	 * primary species of the Primary layer. Based on IPSJF150.doc (July, 1999).
+	 * EMP150 - return the change in quad-mean-diameter over the growth period for the primary species of the Primary
+	 * layer. Based on IPSJF150.doc (July, 1999).
 	 *
 	 * @param dqStart    primary layer quad-mean-diameter at start of growth period
 	 * @param dqDelta    change in quad-mean-diameter of primary layer during growth period
@@ -1223,15 +1223,14 @@ public class ForwardProcessingEngine {
 	}
 
 	/**
-	 * EMP151 - calculate and return the quad-mean-diameter delta over the growth period for a
-	 * non-primary species.
-	 * 
+	 * EMP151 - calculate and return the quad-mean-diameter delta over the growth period for a non-primary species.
+	 *
 	 * @param speciesIndex the index of the species (1..nSpecies) in the current bank
-	 * @param dqStart layer quad-mean-diameter at start of growth period
-	 * @param dqDelta layer quad-mean-diameter delta over growth period
-	 * @param spDqStart species quad-mean-diameter at start of growth period
-	 * @param lhStart layer Lorey height at start of growth period
-	 * @param spLhStart species Lorey height at start of growth period
+	 * @param dqStart      layer quad-mean-diameter at start of growth period
+	 * @param dqDelta      layer quad-mean-diameter delta over growth period
+	 * @param spDqStart    species quad-mean-diameter at start of growth period
+	 * @param lhStart      layer Lorey height at start of growth period
+	 * @param spLhStart    species Lorey height at start of growth period
 	 * @return as described
 	 * @throws ProcessingException
 	 */
@@ -1261,18 +1260,19 @@ public class ForwardProcessingEngine {
 			);
 		}
 
-		return calculateQuadMeanDiameterDelta(modelCoefficientsOpt.get(), dqStart, dqDelta, spDqStart, lhStart, spLhStart);
+		return calculateQuadMeanDiameterDelta(
+				modelCoefficientsOpt.get(), dqStart, dqDelta, spDqStart, lhStart, spLhStart
+		);
 	}
 
 	/**
-	 * Calculate and return the quad-mean-diameter delta over the growth period for a
-	 * non-primary species.
-	 * 
-	 * @param mc coefficients to use for the calculation
-	 * @param dqStart layer quad-mean-diameter at start of growth period
-	 * @param dqDelta layer quad-mean-diameter delta over growth period
+	 * Calculate and return the quad-mean-diameter delta over the growth period for a non-primary species.
+	 *
+	 * @param mc        coefficients to use for the calculation
+	 * @param dqStart   layer quad-mean-diameter at start of growth period
+	 * @param dqDelta   layer quad-mean-diameter delta over growth period
 	 * @param spDqStart species quad-mean-diameter at start of growth period
-	 * @param lhStart layer Lorey height at start of growth period
+	 * @param lhStart   layer Lorey height at start of growth period
 	 * @param spLhStart species Lorey height at start of growth period
 	 * @return as described
 	 * @throws ProcessingException
@@ -1335,7 +1335,7 @@ public class ForwardProcessingEngine {
 
 		int pspStratumNumber = lps.getPrimarySpeciesStratumNumber();
 
-		var coe = fps.fcm.getNonPrimarySpeciesBasalAreaGrowthCoefficients(); 
+		var coe = fps.fcm.getNonPrimarySpeciesBasalAreaGrowthCoefficients();
 		var modelCoefficientsOpt = coe.get(speciesName, pspStratumNumber);
 
 		if (modelCoefficientsOpt.isEmpty()) {
@@ -1390,7 +1390,7 @@ public class ForwardProcessingEngine {
 		LayerProcessingState lps = fps.getLayerProcessingState();
 
 		float pspBaDelta;
-		
+
 		float spToAllProportionStart = pspBaStart / baStart;
 		if (spToAllProportionStart <= 0.999f) {
 			var psStratumNumber = lps.getPrimarySpeciesStratumNumber();

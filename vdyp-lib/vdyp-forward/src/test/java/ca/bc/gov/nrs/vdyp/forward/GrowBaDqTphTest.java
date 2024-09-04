@@ -74,13 +74,15 @@ class GrowBaDqTphTest {
 		assertThat(
 				slice(lps.getBank().basalAreas, UtilizationClass.ALL),
 				// Results from VDYP7:
-				// Matchers.arrayContaining(45.7382965f, 0.410145015f, 5.13646269f, 29.8279209f, 5.91424417f, 4.44952154f)
+				// Matchers.arrayContaining(45.7382965f, 0.410145015f, 5.13646269f, 29.8279209f, 5.91424417f,
+				// 4.44952154f)
 				Matchers.arrayContaining(45.38645f, 0.41014494f, 5.1364512f, 29.827925f, 5.914243f, 4.449531f)
 		);
 		assertThat(
 				slice(lps.getBank().treesPerHectare, UtilizationClass.ALL),
 				// Results from VDYP7:
-				// Matchers.arrayContaining(594.113831f, 5.14728308f, 84.0494843f, 286.714783f, 167.523376f, 50.6789017f)
+				// Matchers.arrayContaining(594.113831f, 5.14728308f, 84.0494843f, 286.714783f, 167.523376f,
+				// 50.6789017f)
 				Matchers.arrayContaining(601.3333f, 5.150639f, 83.26706f, 287.04187f, 167.69823f, 50.955967f)
 		);
 		assertThat(
@@ -122,13 +124,15 @@ class GrowBaDqTphTest {
 		assertThat(
 				slice(lps.getBank().basalAreas, UtilizationClass.ALL),
 				// Results from VDYP7:
-				// Matchers.arrayContaining(45.7382965f, 0.410145015f, 5.13646269f, 29.8279209f, 5.91424417f, 4.44952154f)
+				// Matchers.arrayContaining(45.7382965f, 0.410145015f, 5.13646269f, 29.8279209f, 5.91424417f,
+				// 4.44952154f)
 				Matchers.arrayContaining(45.38645f, 0.410145f, 5.1364527f, 29.827932f, 5.914244f, 4.449532f)
 		);
 		assertThat(
 				slice(lps.getBank().treesPerHectare, UtilizationClass.ALL),
 				// Results from VDYP7:
-				// Matchers.arrayContaining(594.113831f, 5.15917826f, 83.2853012f, 287.107758f, 167.558533f, 51.0030174f)
+				// Matchers.arrayContaining(594.113831f, 5.15917826f, 83.2853012f, 287.107758f, 167.558533f,
+				// 51.0030174f)
 				Matchers.arrayContaining(601.3333f, 5.149199f, 83.2853f, 287.09778f, 167.54855f, 50.99304f)
 		);
 		assertThat(
@@ -157,7 +161,6 @@ class GrowBaDqTphTest {
 		float tphStart = 601.373718f;
 		float lhStart = 30.9723663f;
 
-
 		fpe.fps.fcm.getDebugSettings().setValue(Vars.SPECIES_DYNAMICS_1, 0);
 
 		fpe.growUsingFullSpeciesDynamics(baStart, baDelta, dqStart, dqDelta, tphStart, lhStart);
@@ -173,7 +176,8 @@ class GrowBaDqTphTest {
 		assertThat(
 				slice(lps.getBank().treesPerHectare, UtilizationClass.ALL),
 				// Results from VDYP7:
-				// Matchers.arrayContaining(594.113831f, 5.07865763f, 82.9379883f, 288.292511f, 167.419479f, 50.3814774f)
+				// Matchers.arrayContaining(594.113831f, 5.07865763f, 82.9379883f, 288.292511f, 167.419479f,
+				// 50.3814774f)
 				Matchers.arrayContaining(601.3333f, 5.151279f, 84.45613f, 292.43683f, 171.47192f, 51.14954f)
 		);
 		assertThat(
