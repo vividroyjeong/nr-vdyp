@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 import ca.bc.gov.nrs.vdyp.common.Computed;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 
-public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements VdypUtilizationHolder {
+public class VdypLayer extends BaseVdypLayer<VdypSpecies, VdypSite> implements VdypUtilizationHolder {
 
 	private UtilizationVector baseAreaByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/BA species 0
@@ -29,18 +29,35 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOL_DWB species 0
 
 	private Optional<Integer> empericalRelationshipParameterIndex = Optional.empty(); // INXL1/GRPBA1
+	private Optional<String> primarySp0;
 
 	public VdypLayer(
 			PolygonIdentifier polygonIdentifier, LayerType layer, Optional<Integer> inventoryTypeGroup,
-			Optional<Integer> empericalRelationshipParameterIndex
+			Optional<Integer> empericalRelationshipParameterIndex, Optional<String> primarySp0
 	) {
 		super(polygonIdentifier, layer, inventoryTypeGroup);
 		this.empericalRelationshipParameterIndex = empericalRelationshipParameterIndex;
+		this.primarySp0 = primarySp0;
 	}
 
 	@Computed
 	public Optional<Float> getBreastHeightAge() {
 		return this.getAgeTotal().flatMap(at -> this.getYearsToBreastHeight().map(bha -> at - bha));
+	}
+
+	@Computed
+	public Optional<Float> getAgeTotal() {
+		return this.getPrimarySite().flatMap(BaseVdypSite::getAgeTotal);
+	}
+
+	@Computed
+	public Optional<Float> getYearsToBreastHeight() {
+		return this.getPrimarySite().flatMap(BaseVdypSite::getYearsToBreastHeight);
+	}
+
+	@Computed
+	public Optional<Float> getHeight() {
+		return this.getPrimarySite().flatMap(BaseVdypSite::getHeight);
 	}
 
 	@Override
@@ -147,6 +164,11 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 		this.empericalRelationshipParameterIndex = empericalRelationshipParameterIndex;
 	}
 
+	@Override
+	public Optional<String> getPrimaryGenus() {
+		return primarySp0;
+	}
+
 	/**
 	 * Accepts a configuration function that accepts a builder to configure.
 	 *
@@ -197,6 +219,13 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 
 		public void empiricalRelationshipParameterIndex(int empiricalRelationshipParameterIndex) {
 			this.empiricalRelationshipParameterIndex(Optional.of(empiricalRelationshipParameterIndex));
+		}
+
+		protected Optional<String> primarySp0 = Optional.empty();
+
+		public VdypLayer.Builder primaryGenus(String primarySp0) {
+			this.primarySp0 = Optional.of(primarySp0);
+			return this;
 		}
 
 		UtilizationVector loreyHeight = VdypUtilizationHolder.emptyLoreyHeightUtilization();
@@ -265,7 +294,8 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 					polygonIdentifier.get(), //
 					layerType.get(), //
 					inventoryTypeGroup, //
-					empericalRelationshipParameterIndex
+					empericalRelationshipParameterIndex, //
+					primarySp0
 			);
 		}
 

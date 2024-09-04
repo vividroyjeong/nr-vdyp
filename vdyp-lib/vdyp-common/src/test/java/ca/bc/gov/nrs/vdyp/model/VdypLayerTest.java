@@ -33,6 +33,8 @@ class VdypLayerTest {
 			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 
+			builder.primaryGenus("PL");
+
 			builder.addSpecies(specBuilder -> {
 				specBuilder.genus("PL", 12);
 				specBuilder.percentGenus(100);
@@ -79,6 +81,9 @@ class VdypLayerTest {
 
 		var result = VdypLayer.build(poly, builder -> {
 			builder.layerType(LayerType.PRIMARY);
+
+			builder.primaryGenus("PL");
+
 			builder.addSpecies(specBuilder -> {
 				specBuilder.genus("PL", 12);
 				specBuilder.percentGenus(100);

@@ -164,7 +164,7 @@ public class VriAdjustInputWriter implements Closeable {
 				spec.getSite().flatMap(VdypSite::getAgeTotal).orElse(EMPTY_FLOAT),
 				spec.getSite().flatMap(VdypSite::getYearsAtBreastHeight).orElse(EMPTY_FLOAT),
 				spec.getSite().flatMap(VdypSite::getYearsToBreastHeight).orElse(EMPTY_FLOAT),
-				layer.getSiteGenus().map(spec.getGenus()::equals).orElse(false) ? 1 : 0,
+				layer.getPrimaryGenus().map(spec.getGenus()::equals).orElse(false) ? 1 : 0,
 				spec.getSite().flatMap(VdypSite::getSiteCurveNumber).orElse(EMPTY_INT)
 
 		);

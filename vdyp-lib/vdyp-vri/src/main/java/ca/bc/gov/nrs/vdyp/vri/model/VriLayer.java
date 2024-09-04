@@ -16,7 +16,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 	private final Optional<Float> baseArea; // VRIL/BAL
 	private final Optional<Float> treesPerHectare; // VRIL/TPHL
 	private final float utilization; // VRIL/UTLL
-	private final Optional<String> primaryGenus; // FIPL_1C/JPRIME_L1 ISPP
+	public final Optional<String> primaryGenus; // FIPL_1C/JPRIME_L1 ISPP
 	private final Optional<String> secondaryGenus; // FIPL_1C/JPRIME_L1 ISPS
 	private final Optional<Integer> empericalRelationshipParameterIndex; // INXL1/GRPBA1
 	private final float ageIncrease; // YOUNG1/AGE_INCR
@@ -54,6 +54,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 		return utilization;
 	}
 
+	@Override
 	public Optional<String> getPrimaryGenus() {
 		return primaryGenus;
 	}
@@ -63,18 +64,8 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 	}
 
 	@Computed
-	public Optional<VriSpecies> getPrimarySpeciesRecord() {
-		return primaryGenus.map(this.getSpecies()::get);
-	}
-
-	@Computed
 	public Optional<VriSpecies> getSecondarySpeciesRecord() {
 		return secondaryGenus.map(this.getSpecies()::get);
-	}
-
-	@Computed
-	public Optional<VriSite> getPrimarySite() {
-		return primaryGenus.map(this.getSites()::get);
 	}
 
 	@Computed
@@ -105,7 +96,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 		return builder.build();
 	}
 
-	public static VriLayer build(VriPolygon polygon, Consumer<Builder> config) {
+	public static InputLayer build(VriPolygon polygon, Consumer<Builder> config) {
 		var layer = build(builder -> {
 			builder.polygonIdentifier(polygon.getPolygonIdentifier());
 			config.accept(builder);
@@ -218,7 +209,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 		}
 
 		@Override
-		protected VriLayer doBuild() {
+		protected InputLayer doBuild() {
 			float multiplier = percentAvailable.orElse(100f) / 100f;
 			VriLayer result = new VriLayer(
 					polygonIdentifier.get(), //

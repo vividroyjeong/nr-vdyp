@@ -11,6 +11,8 @@ import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.SingleSiteLayer;
+import ca.bc.gov.nrs.vdyp.vri.model.VriSite;
+import ca.bc.gov.nrs.vdyp.vri.model.VriSpecies;
 
 public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> implements InputLayer {
 
@@ -88,6 +90,24 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> implements In
 	public void setSpecies(Collection<FipSpecies> species) {
 		super.setSpecies(species);
 		applySiteWithoutSpecies();
+	}
+
+	@Override
+	public Optional<VriSite> getPrimarySite() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Optional<VriSpecies> getPrimarySpeciesRecord() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Optional<String> getPrimaryGenus() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
