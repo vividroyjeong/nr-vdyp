@@ -95,6 +95,11 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies<I>, I extends Base
 		}
 	}
 
+	@Override
+	public int hashCode() {
+		return polygonIdentifier.hashCode() * 17 + layerType.hashCode();
+	}
+	
 	public abstract static class Builder<T extends BaseVdypLayer<S, I>, S extends BaseVdypSpecies<I>, I extends BaseVdypSite, SB extends BaseVdypSpecies.Builder<S, I, IB>, IB extends BaseVdypSite.Builder<I>>
 			extends ModelClassBuilder<T> {
 		protected Optional<PolygonIdentifier> polygonIdentifier = Optional.empty();

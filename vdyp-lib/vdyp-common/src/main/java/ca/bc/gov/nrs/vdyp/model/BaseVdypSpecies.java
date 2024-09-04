@@ -104,6 +104,11 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		}
 	}
 
+	@Override
+	public int hashCode() {
+		return (polygonIdentifier.hashCode() * 17 + layerType.hashCode()) * 17 + genus.hashCode();
+	}
+
 	/**
 	 * Construct the species sp64DistributionSet from the given list of species percentages. The maxIndex of the Set is
 	 * taken to be the size of the map, and the index of each sp64Distribution is set to be its position in the list

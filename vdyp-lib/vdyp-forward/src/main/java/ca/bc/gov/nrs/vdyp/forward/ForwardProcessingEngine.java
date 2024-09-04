@@ -91,7 +91,7 @@ public class ForwardProcessingEngine {
 	public ForwardProcessingEngine(Map<String, Object> controlMap, Optional<VdypOutputWriter> outputWriter)
 			throws ProcessingException {
 		this.fps = new ForwardProcessingState(controlMap);
-		this.outputWriter = outputWriter == null ? Optional.empty() : outputWriter;
+		this.outputWriter = outputWriter;
 	}
 
 	public ForwardProcessingEngine(Map<String, Object> controlMap) throws ProcessingException {

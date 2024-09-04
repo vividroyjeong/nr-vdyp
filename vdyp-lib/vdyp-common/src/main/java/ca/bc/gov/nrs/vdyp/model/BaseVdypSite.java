@@ -88,6 +88,11 @@ public abstract class BaseVdypSite {
 		}
 	}
 
+	@Override
+	public int hashCode() {
+		return (polygonIdentifier.hashCode() * 17 + layerType.hashCode()) * 17 + siteGenus.hashCode();
+	}
+
 	public abstract static class Builder<T extends BaseVdypSite> extends ModelClassBuilder<T> {
 		protected Optional<PolygonIdentifier> polygonIdentifier = Optional.empty();
 		protected Optional<LayerType> layerType = Optional.empty();

@@ -130,6 +130,11 @@ public abstract class BaseVdypPolygon<L extends BaseVdypLayer<SP, SI>, PA, SP ex
 		}
 	}
 
+	@Override
+	public int hashCode() {
+		return polygonIdentifier.hashCode();
+	}
+
 	protected abstract static class Builder< //
 			T extends BaseVdypPolygon<L, PA, SP, SI>, //
 			L extends BaseVdypLayer<SP, SI>, //

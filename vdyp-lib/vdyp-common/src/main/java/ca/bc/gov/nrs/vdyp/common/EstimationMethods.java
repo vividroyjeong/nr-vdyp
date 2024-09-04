@@ -829,7 +829,7 @@ public class EstimationMethods {
 		float ageToUse = breastHeightAge;
 
 		if (controlVariable2Setting > 0) {
-			ageToUse = Math.min(ageToUse, controlVariable2Setting * 100);
+			ageToUse = Math.min(ageToUse, controlVariable2Setting * 100f);
 		}
 
 		if (ageToUse <= 0f) {

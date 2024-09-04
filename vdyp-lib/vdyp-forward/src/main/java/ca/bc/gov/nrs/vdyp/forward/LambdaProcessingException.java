@@ -11,7 +11,7 @@ public class LambdaProcessingException extends RuntimeException {
 	}
 
 	@Override
-	public ProcessingException getCause() {
+	public synchronized ProcessingException getCause() {
 		return (ProcessingException) super.getCause();
 	}
 }

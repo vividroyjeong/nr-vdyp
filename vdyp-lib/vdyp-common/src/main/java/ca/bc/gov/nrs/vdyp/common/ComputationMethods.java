@@ -180,10 +180,12 @@ public class ComputationMethods {
 					);
 				}
 
-				float baMult = basalAreaUtil.get(UtilizationClass.ALL) / basalAreaSumForSpecies;
-
-				for (UtilizationClass uc : UtilizationClass.ALL_CLASSES) {
-					basalAreaUtil.set(uc, basalAreaUtil.get(uc) * baMult);
+				if (basalAreaSumForSpecies > 0.0f) {
+					float baMult = basalAreaUtil.get(UtilizationClass.ALL) / basalAreaSumForSpecies;
+	
+					for (UtilizationClass uc : UtilizationClass.ALL_CLASSES) {
+						basalAreaUtil.set(uc, basalAreaUtil.get(uc) * baMult);
+					}
 				}
 			}
 
