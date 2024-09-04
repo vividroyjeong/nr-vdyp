@@ -57,8 +57,7 @@ public class SingleSiteLayer<S extends BaseVdypSpecies<I>, I extends BaseVdypSit
 
 	@Override
 	public Optional<String> getPrimaryGenus() {
-		// TODO Auto-generated method stub
-		return null;
+		return getSiteGenus();
 	}
 
 }
