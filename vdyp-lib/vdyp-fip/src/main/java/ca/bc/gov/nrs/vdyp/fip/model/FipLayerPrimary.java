@@ -31,17 +31,13 @@ public class FipLayerPrimary extends FipLayer {
 		this.stockingClass = stockingClass;
 	}
 
+	@Override
 	public Optional<String> getPrimaryGenus() {
 		return primaryGenus;
 	}
 
 	public void setPrimaryGenus(Optional<String> primaryGenus) {
 		this.primaryGenus = primaryGenus;
-	}
-
-	@Computed
-	public Optional<FipSpecies> getPrimarySpeciesRecord() {
-		return primaryGenus.map(this.getSpecies()::get);
 	}
 
 	/**

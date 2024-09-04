@@ -7,12 +7,11 @@ import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.common.Computed;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.SingleSiteLayer;
-import ca.bc.gov.nrs.vdyp.vri.model.VriSite;
-import ca.bc.gov.nrs.vdyp.vri.model.VriSpecies;
 
 public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> implements InputLayer {
 
@@ -59,7 +58,7 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> implements In
 
 	@Override
 	public Optional<FipSite> getSite() {
-		return siteWithoutSpecies.or(() -> super.getSite());
+		return siteWithoutSpecies.or(super::getSite);
 	}
 
 	// This is a bit of a hack. The Layer holds on to a site until populated with Species at which point the site is
@@ -93,21 +92,8 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> implements In
 	}
 
 	@Override
-	public Optional<VriSite> getPrimarySite() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Optional<VriSpecies> getPrimarySpeciesRecord() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public Optional<String> getPrimaryGenus() {
-		// TODO Auto-generated method stub
-		return null;
+		return getSite().map(BaseVdypSite::getSiteGenus);
 	}
 
 	/**

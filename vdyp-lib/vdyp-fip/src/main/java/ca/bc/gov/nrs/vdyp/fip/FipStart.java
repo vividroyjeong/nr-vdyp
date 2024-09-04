@@ -281,6 +281,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			builder.adapt(fipLayer);
 			builder.inventoryTypeGroup(itg);
 			builder.empiricalRelationshipParameterIndex(empiricalRelationshipParameterIndex);
+			builder.primaryGenus(primarySpecies.get(0).getGenus());
 		});
 
 		var breastHeightAge = fipLayer.getSite()
@@ -477,7 +478,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 					float quadMeanDiameter = clamp(
 							estimationMethods.estimateQuadMeanDiameterForSpecies(
 									spec, result.getSpecies(), bec
-											.getRegion(), quadMeanDiameterTotal, baseAreaTotal, treesPerHectareTotal, loreyHeightTotal
+											.getRegion(), quadMeanDiameterTotal, baseAreaTotal, treesPerHectareTotal,
+									loreyHeightTotal
 							), //
 							dqMin, dqMax
 					);
@@ -671,7 +673,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		var vdypLayer = VdypLayer.build(builder -> {
 			builder.polygonIdentifier(polygonIdentifier);
 			builder.layerType(layer);
-
+			builder.primaryGenus(primaryGenus);
 			builder.addSpecies(vdypSpecies.values());
 		});
 
@@ -811,7 +813,8 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 
 		if (primaryLayer.getYearsToBreastHeight().orElse(0f) < 0.5) {
 			throw validationError(
-					"Polygon %s has %s layer where years to breast height %.1f is less than minimum %.1f years.", polygon
+					"Polygon %s has %s layer where years to breast height %.1f is less than minimum %.1f years.",
+					polygon
 							.getPolygonIdentifier(), LayerType.PRIMARY, primaryLayer.getYearsToBreastHeightSafe(), 0.5f
 			);
 		}
