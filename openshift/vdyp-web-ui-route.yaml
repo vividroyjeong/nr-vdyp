@@ -5,6 +5,7 @@ metadata:
   namespace: "#{NAMESPACE}#"
   labels: {}
 spec:
+  host: vdyp-ui-dev.apps.silver.devops.gov.bc.ca
   to:
     kind: Service
     name: vdyp-web-ui-service-#{ENV}#
