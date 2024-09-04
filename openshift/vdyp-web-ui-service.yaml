@@ -8,5 +8,5 @@ spec:
     app: vdyp-web-ui-#{ENV}#
   ports:
     - protocol: TCP
-      port: #{TARGET_PORT}#
+      port: #{ACTIVE_PORT}#
       targetPort: #{ACTIVE_PORT}#
