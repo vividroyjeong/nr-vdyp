@@ -488,9 +488,11 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 			if (vriSite.map(site -> site == primarySiteIn).orElse(false)) {
 				sBuilder.loreyHeight(primaryHeight);
-
-				// Only use the primary site
-				sBuilder.adaptSite(vriSite.get(), (iBuilder, vriSite2) -> iBuilder.height(vriSite2.getHeight().get()));
+				sBuilder.adaptSite(
+						vriSite.get(), (iBuilder, vriSite2) -> {
+							vriSite2.getHeight().ifPresent(iBuilder::height);
+						}
+				);
 			} else {
 				var loreyHeight = vriSite.flatMap(site -> {
 					return site.getHeight().filter((x) -> getDebugMode(2) != 1).map(height -> {
@@ -515,12 +517,14 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 						.maxLoreyHeight();
 				loreyHeight = Math.min(loreyHeight, maxHeight);
 				sBuilder.loreyHeight(loreyHeight);
-				vriSite.ifPresent(site -> {
-					sBuilder.addSite(iBuilder -> {
-						iBuilder.siteCurveNumber(site.getSiteCurveNumber());
-					});
-				});
 			}
+			vriSite.ifPresent(
+					site -> sBuilder.adaptSite(
+							site, (iBuilder, vriSite2) -> {
+								vriSite2.getHeight().ifPresent(iBuilder::height);
+							}
+					)
+			);
 			this.applyGroups(bec, vriSpec.getGenus(), sBuilder);
 		});
 
