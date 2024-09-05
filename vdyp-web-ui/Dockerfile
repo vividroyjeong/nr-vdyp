@@ -21,7 +21,7 @@ RUN apk add --no-cache ca-certificates && \
     chown -R 1001:1001 /config/caddy /data/caddy && \
     chmod -R 775 /config/caddy /data/caddy && \
     chmod +x /usr/bin/caddy && \
-    setcap -r /usr/bin/caddy  # This line removes the unnecessary capability
+    setcap -r /usr/bin/caddy
 
 # Copy static files and run formatting
 COPY --from=build /app/dist /srv
