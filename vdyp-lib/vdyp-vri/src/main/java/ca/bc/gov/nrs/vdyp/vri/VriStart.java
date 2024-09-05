@@ -479,15 +479,15 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 						}
 				);
 			} else {
-				var loreyHeight = vriSite.flatMap(site -> {
-					return site.getHeight().filter((x) -> getDebugMode(2) != 1).map(height -> {
-						float speciesQuadMeanDiameter = Math.max(7.5f, height / leadHeight * layerQuadMeanDiameter);
-						float speciesDensity = treesPerHectare(specBaseArea, speciesQuadMeanDiameter);
-						return (float) estimationMethods.primaryHeightFromLeadHeight(
-								site.getHeight().get(), site.getSiteGenus(), bec.getRegion(), speciesDensity
-						);
-					});
-				}).orElseGet(() -> {
+				var loreyHeight = vriSite.flatMap(
+						site -> site.getHeight().filter(x -> getDebugMode(2) != 1).map(height -> {
+							float speciesQuadMeanDiameter = Math.max(7.5f, height / leadHeight * layerQuadMeanDiameter);
+							float speciesDensity = treesPerHectare(specBaseArea, speciesQuadMeanDiameter);
+							return (float) estimationMethods.primaryHeightFromLeadHeight(
+									site.getHeight().get(), site.getSiteGenus(), bec.getRegion(), speciesDensity
+							);
+						})
+				).orElseGet(() -> {
 					try {
 						// EMP053
 						return estimationMethods.estimateNonPrimaryLoreyHeight(
