@@ -25,12 +25,13 @@ class VdypUtilizationTest {
 		var cuVolumeMinusDecay = 3.9f;
 		var cuVolumeMinusDecayWastage = 3.7f;
 		var cuVolumeMinusDecayWastageBreakage = 3.5f;
-	
-		VdypUtilization u = new VdypUtilization(polygonId, layerType, genusIndex, genus, ucIndex, 
-				basalArea, liveTreesPerHectare, loreyHeight, wholeStemVolume, closeUtilizationVolume,
-				cuVolumeMinusDecay, cuVolumeMinusDecayWastage, cuVolumeMinusDecayWastageBreakage, 
-				quadraticMeanDiameterAtBH);
-		
+
+		VdypUtilization u = new VdypUtilization(
+				polygonId, layerType, genusIndex, genus, ucIndex, basalArea, liveTreesPerHectare, loreyHeight,
+				wholeStemVolume, closeUtilizationVolume, cuVolumeMinusDecay, cuVolumeMinusDecayWastage,
+				cuVolumeMinusDecayWastageBreakage, quadraticMeanDiameterAtBH
+		);
+
 		assertThat(u.getPolygonId(), is(new PolygonIdentifier("Polygon1", 2024)));
 		assertThat(u.getLayerType(), is(LayerType.PRIMARY));
 		assertThat(u.getGenusIndex(), is(Integer.valueOf(3)));

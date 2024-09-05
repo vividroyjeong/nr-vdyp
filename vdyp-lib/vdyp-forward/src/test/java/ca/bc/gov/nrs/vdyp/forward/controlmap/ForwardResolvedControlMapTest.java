@@ -31,7 +31,7 @@ public class ForwardResolvedControlMapTest {
 	@Test
 	void testForwardResolvedControlMap() throws IOException, ResourceParseException {
 		logger.info(this.getClass().getName() + ":testForwardResolvedControlMap running...");
-		
+
 		var parser = new ForwardControlParser();
 		var rawControlMap = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
 		var forwardControlMap = new ForwardResolvedControlMapImpl(rawControlMap);
@@ -136,7 +136,7 @@ public class ForwardResolvedControlMapTest {
 		e = forwardControlMap.getQuadMeanDiameterBySpeciesCoefficients();
 		assertThat(e, instanceOf(Map.class));
 	}
-	
+
 	@Test
 	void testCachingResolvedControlMap() throws IOException, ResourceParseException {
 		logger.info(this.getClass().getName() + ":testCachingResolvedControlMap running...");
