@@ -40,12 +40,31 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: trimBranchName
+        name: trim branch name if necessary
+        run: |
+          export branchTag="${{ github.ref_name }}"
+          trimTag="${branchTag##*/}"
+          echo "BRANCH_TAG=$trimTag" >> $GITHUB_OUTPUT
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta_pr
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: ghcr.io/${{ github.repository }}-${{ inputs.BUILD_TARGET }}
+          tags: |
+            type=schedule
+            type=raw,value=${{ steps.trimBranchName.outputs.BRANCH_TAG }}
+            type=ref,event=tag
+            type=raw,value=${{ inputs.TAG }}
           
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: ./${{inputs.BUILD_TARGET}}
           push: true
-          tags: ${{inputs.BUILD_TARGET}}:${{inputs.TAG}}
+          tags: ${{ steps.meta_pr.outputs.tags }}
+          labels: ${{ steps.meta_pr.outputs.labels }}
 
     
