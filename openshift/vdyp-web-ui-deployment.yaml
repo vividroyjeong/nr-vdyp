@@ -17,7 +17,7 @@ spec:
       containers:
         - name: container
           image: >-
-            ghcr.io/bcgov/vdyp-web-ui:#{TAG}#
+            ghcr.io/vividroyjeong/nr-vdyp-vdyp-web-ui:#{TAG}#
           ports:
             - containerPort: #{ACTIVE_PORT}#
               protocol: TCP
