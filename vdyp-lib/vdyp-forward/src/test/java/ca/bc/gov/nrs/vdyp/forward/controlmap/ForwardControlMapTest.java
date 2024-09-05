@@ -26,9 +26,9 @@ public class ForwardControlMapTest {
 		var parser = new ForwardControlParser();
 		var rawControlMap = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
 		var forwardControlMap = new ForwardResolvedControlMapImpl(rawControlMap);
-		
+
 		assertThat(forwardControlMap.getControlMap(), is(rawControlMap));
-		
+
 		Object e;
 		e = forwardControlMap.getDebugSettings();
 		assertThat(e, instanceOf(ForwardDebugSettings.class));

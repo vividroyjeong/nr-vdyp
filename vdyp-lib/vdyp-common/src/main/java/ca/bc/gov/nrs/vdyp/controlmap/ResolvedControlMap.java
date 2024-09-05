@@ -88,7 +88,7 @@ public interface ResolvedControlMap {
 
 	/** 92 - CLOSE_UTIL_VOLUME */
 	MatrixMap2<Integer, Integer, Optional<Coefficients>> getCloseUtilizationCoeMap();
-	
+
 	/** 93 - VOLUME_NET_DECAY */
 	MatrixMap2<Integer, Integer, Optional<Coefficients>> getNetDecayCoeMap();
 

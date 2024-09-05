@@ -259,7 +259,8 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 			this.closeUtilizationVolumeByUtilization = Utils.utilizationVector(volume);
 		}
 
-		protected UtilizationVector closeUtilizationNetVolumeOfDecayByUtilization = VdypUtilizationHolder.emptyUtilization();
+		protected UtilizationVector closeUtilizationNetVolumeOfDecayByUtilization = VdypUtilizationHolder
+				.emptyUtilization();
 
 		public void closeUtilizationVolumeNetOfDecayByUtilization(float small, float u1, float u2, float u3, float u4) {
 			this.closeUtilizationNetVolumeOfDecayByUtilization = Utils.utilizationVector(small, u1, u2, u3, u4);
@@ -269,9 +270,12 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 			this.closeUtilizationNetVolumeOfDecayByUtilization = Utils.utilizationVector(volume);
 		}
 
-		protected UtilizationVector closeUtilizationVolumeNetOfDecayAndWasteByUtilization = VdypUtilizationHolder.emptyUtilization();
+		protected UtilizationVector closeUtilizationVolumeNetOfDecayAndWasteByUtilization = VdypUtilizationHolder
+				.emptyUtilization();
 
-		public void closeUtilizationVolumeNetOfDecayAndWasteByUtilization(float small, float u1, float u2, float u3, float u4) {
+		public void closeUtilizationVolumeNetOfDecayAndWasteByUtilization(
+				float small, float u1, float u2, float u3, float u4
+		) {
 			this.closeUtilizationVolumeNetOfDecayAndWasteByUtilization = Utils.utilizationVector(small, u1, u2, u3, u4);
 		}
 
@@ -279,10 +283,14 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 			this.closeUtilizationVolumeNetOfDecayAndWasteByUtilization = Utils.utilizationVector(volume);
 		}
 
-		protected UtilizationVector closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = VdypUtilizationHolder.emptyUtilization();
+		protected UtilizationVector closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = VdypUtilizationHolder
+				.emptyUtilization();
 
-		public void closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(float small, float u1, float u2, float u3, float u4) {
-			this.closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = Utils.utilizationVector(small, u1, u2, u3, u4);
+		public void closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
+				float small, float u1, float u2, float u3, float u4
+		) {
+			this.closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = Utils
+					.utilizationVector(small, u1, u2, u3, u4);
 		}
 
 		public void closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(float volume) {
@@ -292,7 +300,7 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 		@Override
 		public VdypLayer.Builder adapt(BaseVdypLayer<?, ?> baseSource) {
 			super.adapt(baseSource);
-			
+
 			if (baseSource instanceof VdypLayer source) {
 				loreyHeight = new UtilizationVector(source.loreyHeightByUtilization);
 				baseArea = new UtilizationVector(source.baseAreaByUtilization);
@@ -300,18 +308,24 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 				quadMeanDiameter = new UtilizationVector(source.quadraticMeanDiameterByUtilization);
 				wholeStemVolume = new UtilizationVector(source.wholeStemVolumeByUtilization);
 				closeUtilizationVolumeByUtilization = new UtilizationVector(source.closeUtilizationVolumeByUtilization);
-				closeUtilizationNetVolumeOfDecayByUtilization = new UtilizationVector(source.closeUtilizationVolumeNetOfDecayByUtilization);
-				closeUtilizationVolumeNetOfDecayAndWasteByUtilization = new UtilizationVector(source.closeUtilizationVolumeNetOfDecayAndWasteByUtilization);
-				closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = new UtilizationVector(source.closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization);
+				closeUtilizationNetVolumeOfDecayByUtilization = new UtilizationVector(
+						source.closeUtilizationVolumeNetOfDecayByUtilization
+				);
+				closeUtilizationVolumeNetOfDecayAndWasteByUtilization = new UtilizationVector(
+						source.closeUtilizationVolumeNetOfDecayAndWasteByUtilization
+				);
+				closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = new UtilizationVector(
+						source.closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization
+				);
 			}
-			
+
 			return this;
 		}
 
 		@Override
 		protected void postProcess(VdypLayer layer) {
 			super.postProcess(layer);
-			
+
 			layer.setLoreyHeightByUtilization(loreyHeight);
 			layer.setBaseAreaByUtilization(baseArea);
 			layer.setTreesPerHectareByUtilization(treesPerHectare);
@@ -319,8 +333,13 @@ public class VdypLayer extends SingleSiteLayer<VdypSpecies, VdypSite> implements
 			layer.setWholeStemVolumeByUtilization(wholeStemVolume);
 			layer.setCloseUtilizationVolumeByUtilization(closeUtilizationVolumeByUtilization);
 			layer.setCloseUtilizationVolumeNetOfDecayByUtilization(closeUtilizationNetVolumeOfDecayByUtilization);
-			layer.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(closeUtilizationVolumeNetOfDecayAndWasteByUtilization);
-			layer.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization);;
+			layer.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(
+					closeUtilizationVolumeNetOfDecayAndWasteByUtilization
+			);
+			layer.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
+					closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization
+			);
+			;
 		}
 
 		@Override

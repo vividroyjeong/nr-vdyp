@@ -77,9 +77,9 @@ public class UtilizationOperations {
 			if (treesPerHectare > 0) {
 				uh.getTreesPerHectareByUtilization().set(uc, treesPerHectare * scalingFactor);
 			}
-			
+
 			// lorey height is not a per-hectare value and therefore is excluded from scaling.
-			
+
 			float wholeStemVolume = uh.getWholeStemVolumeByUtilization().get(uc);
 			if (wholeStemVolume > 0) {
 				uh.getWholeStemVolumeByUtilization().set(uc, wholeStemVolume * scalingFactor);
@@ -103,7 +103,7 @@ public class UtilizationOperations {
 				uh.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization()
 						.set(uc, cuVolumeMinusDecayWastageBreakage * scalingFactor);
 			}
-			
+
 			// quadratic mean diameter is not a per-hectare value and therefore not scaled.
 		}
 	}

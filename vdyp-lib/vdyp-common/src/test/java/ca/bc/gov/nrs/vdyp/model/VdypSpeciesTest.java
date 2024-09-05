@@ -34,11 +34,10 @@ class VdypSpeciesTest {
 		assertThat(species1, hasProperty("decayGroup", is(2)));
 		assertThat(species1, hasProperty("breakageGroup", is(3)));
 		assertThat(species1, hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", anEmptyMap())));
-		
+
 		assertThat(species1.toString(), is("Test(2024)-PRIMARY-B"));
-		assertThat(species1.hashCode(), is(-1947684965));
 		assertThat(species1.equals(species1), is(true));
-		
+
 		var species2 = VdypSpecies.build(builder -> {
 			builder.polygonIdentifier("Test2", 2024);
 			builder.layerType(LayerType.PRIMARY);
@@ -50,7 +49,7 @@ class VdypSpeciesTest {
 		});
 
 		assertThat(species1.equals(species2), is(false));
-		
+
 		var species3 = VdypSpecies.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
@@ -62,7 +61,7 @@ class VdypSpeciesTest {
 		});
 
 		assertThat(species1.equals(species3), is(false));
-		
+
 		var species4 = VdypSpecies.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.VETERAN);

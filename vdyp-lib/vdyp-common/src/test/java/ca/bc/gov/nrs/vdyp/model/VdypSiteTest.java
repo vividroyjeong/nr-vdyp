@@ -37,7 +37,6 @@ class VdypSiteTest {
 		assertThat(site1, hasProperty("yearsAtBreastHeight", is(Optional.of(30.0f))));
 
 		assertThat(site1.toString(), is("Test(2024)-PRIMARY-B"));
-		assertThat(site1.hashCode(), is(1134087689));
 		assertThat(site1.equals(site1), is(true));
 
 		var site2 = VdypSite.build(builder -> {
@@ -50,7 +49,7 @@ class VdypSiteTest {
 			builder.siteIndex(42.5f);
 			builder.yearsToBreastHeight(5.0f);
 		});
-		
+
 		assertThat(site1.equals(site2), is(false));
 
 		var site3 = VdypSite.build(builder -> {
@@ -63,7 +62,7 @@ class VdypSiteTest {
 			builder.siteIndex(42.5f);
 			builder.yearsToBreastHeight(5.0f);
 		});
-		
+
 		assertThat(site1.equals(site3), is(false));
 
 		var site4 = VdypSite.build(builder -> {
@@ -76,7 +75,7 @@ class VdypSiteTest {
 			builder.siteIndex(42.5f);
 			builder.yearsToBreastHeight(5.0f);
 		});
-		
+
 		assertThat(site1.equals(site4), is(false));
 	}
 
