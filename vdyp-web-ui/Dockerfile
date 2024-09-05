@@ -19,6 +19,8 @@ COPY --from=build /app/dist /srv
 COPY Caddyfile /etc/caddy/Caddyfile
 RUN caddy fmt --overwrite /etc/caddy/Caddyfile
 
+RUN chmod a+x /usr/bin/caddy
+
 # Ports, health check and non-root user
 EXPOSE 3000 3001
 HEALTHCHECK --interval=30s --timeout=3s CMD ["curl", "-f", "http://localhost:3001/health"]
