@@ -18,6 +18,7 @@ FROM caddy:2.8.4-alpine
 RUN apk add --no-cache ca-certificates && \
     mkdir -p /config/caddy /data/caddy && \
     chown -R 1001:1001 /config/caddy /data/caddy /usr/bin/caddy && \
+    chmod -R 755 /config/caddy /data/caddy && \
     chmod +x /usr/bin/caddy
 
 # Copy static files and run formatting
