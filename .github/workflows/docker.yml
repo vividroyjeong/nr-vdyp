@@ -38,7 +38,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: ${{inputs.BUILD_TARGET}}
+          context: ./${{inputs.BUILD_TARGET}}
           push: true
           tags: ${{inputs.BUILD_TARGET}}:${{inputs.TAG}}
 
