@@ -17,7 +17,7 @@ RUN apk add --no-cache ca-certificates
 # Copy static files, verify Caddyfile formatting
 COPY --from=build /app/dist /srv
 COPY Caddyfile /etc/caddy/Caddyfile
-RUN caddy fmt /etc/caddy/Caddyfile
+RUN caddy fmt --overwrite /etc/caddy/Caddyfile
 
 # Ports, health check and non-root user
 EXPOSE 3000 3001
