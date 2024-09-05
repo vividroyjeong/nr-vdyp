@@ -221,10 +221,6 @@ public class CachingResolvedControlMapImpl implements ResolvedControlMap {
 		return hlNonPrimaryCoefficients;
 	}
 
-	public Map<Integer, Coefficients> getBreakageMap() {
-		return breakageMap;
-	}
-
 	@Override
 	public MatrixMap2<String, Region, ComponentSizeLimits> getComponentSizeLimits() {
 		return componentSizeLimitCoefficients;

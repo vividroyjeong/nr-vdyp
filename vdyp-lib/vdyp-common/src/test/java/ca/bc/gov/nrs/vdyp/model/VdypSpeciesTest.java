@@ -17,7 +17,7 @@ class VdypSpeciesTest {
 
 	@Test
 	void build() throws Exception {
-		var result = VdypSpecies.build(builder -> {
+		var species1 = VdypSpecies.build(builder -> {
 			builder.polygonIdentifier("Test", 2024);
 			builder.layerType(LayerType.PRIMARY);
 			builder.genus("B", 3);
@@ -26,15 +26,55 @@ class VdypSpeciesTest {
 			builder.decayGroup(2);
 			builder.breakageGroup(3);
 		});
-		assertThat(result, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
-		assertThat(result, hasProperty("layerType", is(LayerType.PRIMARY)));
-		assertThat(result, hasProperty("genus", is("B")));
-		assertThat(result, hasProperty("percentGenus", is(50f)));
-		assertThat(result, hasProperty("volumeGroup", is(1)));
-		assertThat(result, hasProperty("decayGroup", is(2)));
-		assertThat(result, hasProperty("breakageGroup", is(3)));
-		assertThat(result, hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", anEmptyMap())));
-	}
+		assertThat(species1, hasProperty("polygonIdentifier", isPolyId("Test", 2024)));
+		assertThat(species1, hasProperty("layerType", is(LayerType.PRIMARY)));
+		assertThat(species1, hasProperty("genus", is("B")));
+		assertThat(species1, hasProperty("percentGenus", is(50f)));
+		assertThat(species1, hasProperty("volumeGroup", is(1)));
+		assertThat(species1, hasProperty("decayGroup", is(2)));
+		assertThat(species1, hasProperty("breakageGroup", is(3)));
+		assertThat(species1, hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", anEmptyMap())));
+		
+		assertThat(species1.toString(), is("Test(2024)-PRIMARY-B"));
+		assertThat(species1.hashCode(), is(-1947684965));
+		assertThat(species1.equals(species1), is(true));
+		
+		var species2 = VdypSpecies.build(builder -> {
+			builder.polygonIdentifier("Test2", 2024);
+			builder.layerType(LayerType.PRIMARY);
+			builder.genus("B", 3);
+			builder.percentGenus(50f);
+			builder.volumeGroup(1);
+			builder.decayGroup(2);
+			builder.breakageGroup(3);
+		});
+
+		assertThat(species1.equals(species2), is(false));
+		
+		var species3 = VdypSpecies.build(builder -> {
+			builder.polygonIdentifier("Test", 2024);
+			builder.layerType(LayerType.PRIMARY);
+			builder.genus("D", 5);
+			builder.percentGenus(50f);
+			builder.volumeGroup(1);
+			builder.decayGroup(2);
+			builder.breakageGroup(3);
+		});
+
+		assertThat(species1.equals(species3), is(false));
+		
+		var species4 = VdypSpecies.build(builder -> {
+			builder.polygonIdentifier("Test", 2024);
+			builder.layerType(LayerType.VETERAN);
+			builder.genus("B", 3);
+			builder.percentGenus(50f);
+			builder.volumeGroup(1);
+			builder.decayGroup(2);
+			builder.breakageGroup(3);
+		});
+
+		assertThat(species1.equals(species4), is(false));
+	};
 
 	@Test
 	void buildNoProperties() throws Exception {
