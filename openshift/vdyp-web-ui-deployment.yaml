@@ -27,6 +27,10 @@ spec:
                 configMapKeyRef:
                   name: vdyp-web-ui-config-#{ENV}#
                   key: ACTIVE_PORT
+            - name: LOG_LEVEL
+              value: "#{LOG_LEVEL}#"
+            - name: BACKEND_URL
+              value: "#{BACKEND_URL}#"                  
           resources:
             requests:
               cpu: 100m
