@@ -23,7 +23,7 @@ COPY --from=build /app/dist /srv
 COPY Caddyfile /etc/caddy/Caddyfile
 RUN caddy fmt --overwrite /etc/caddy/Caddyfile
 
-RUN chmod a+x /usr/bin/caddy
+RUN chmod 755 /usr/bin/caddy
 
 # Ports, health check and non-root user
 EXPOSE 3000 3001
