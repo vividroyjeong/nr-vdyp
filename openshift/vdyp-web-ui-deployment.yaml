@@ -17,7 +17,7 @@ spec:
       containers:
         - name: container
           image: >-
-            ghcr.io/vividroyjeong/nr-vdyp-vdyp-web-ui:#{TAG}#
+            ghcr.io/vivid-cpreston/nr-vdyp-vdyp-web-ui:latest
           ports:
             - containerPort: #{ACTIVE_PORT}#
               protocol: TCP
