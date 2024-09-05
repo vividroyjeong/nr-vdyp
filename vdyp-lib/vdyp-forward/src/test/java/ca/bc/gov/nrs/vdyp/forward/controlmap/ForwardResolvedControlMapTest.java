@@ -8,12 +8,15 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.controlmap.CachingResolvedControlMapImpl;
 import ca.bc.gov.nrs.vdyp.forward.ForwardControlParser;
 import ca.bc.gov.nrs.vdyp.forward.model.ForwardControlVariables;
 import ca.bc.gov.nrs.vdyp.forward.model.ForwardDebugSettings;
 import ca.bc.gov.nrs.vdyp.forward.test.VdypForwardTestUtils;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.DebugSettingsParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.CompVarAdjustments;
@@ -23,8 +26,12 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap3;
 
 public class ForwardResolvedControlMapTest {
 
+	private static final Logger logger = LoggerFactory.getLogger(ForwardResolvedControlMapTest.class);
+
 	@Test
 	void testForwardResolvedControlMap() throws IOException, ResourceParseException {
+		logger.info(this.getClass().getName() + ":testForwardResolvedControlMap running...");
+		
 		var parser = new ForwardControlParser();
 		var rawControlMap = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
 		var forwardControlMap = new ForwardResolvedControlMapImpl(rawControlMap);
@@ -132,72 +139,74 @@ public class ForwardResolvedControlMapTest {
 	
 	@Test
 	void testCachingResolvedControlMap() throws IOException, ResourceParseException {
+		logger.info(this.getClass().getName() + ":testCachingResolvedControlMap running...");
+
 		var parser = new ForwardControlParser();
 		var rawControlMap = VdypForwardTestUtils.parse(parser, "VDYP.CTR");
-		var forwardControlMap = new CachingResolvedControlMapImpl(rawControlMap);
+		var cachingControlMap = new CachingResolvedControlMapImpl(rawControlMap);
 
-		assertThat(forwardControlMap.getControlMap(), is(rawControlMap));
+		assertThat(cachingControlMap.getControlMap(), is(rawControlMap));
 
 		Object e;
-		e = forwardControlMap.getBecLookup();
+		e = cachingControlMap.getBecLookup();
 		assertThat(e, instanceOf(BecLookup.class));
-		e = forwardControlMap.getGenusDefinitionMap();
+		e = cachingControlMap.getGenusDefinitionMap();
 		assertThat(e, instanceOf(GenusDefinitionMap.class));
-		e = forwardControlMap.getNetDecayWasteCoeMap();
+		e = cachingControlMap.getNetDecayWasteCoeMap();
 		assertThat(e, instanceOf(Map.class));
-		e = forwardControlMap.getNetDecayCoeMap();
+		e = cachingControlMap.getNetDecayCoeMap();
 		assertThat(e, instanceOf(MatrixMap2.class));
-		e = forwardControlMap.getWasteModifierMap();
+		e = cachingControlMap.getWasteModifierMap();
 		assertThat(e, instanceOf(MatrixMap2.class));
-		e = forwardControlMap.getDecayModifierMap();
+		e = cachingControlMap.getDecayModifierMap();
 		assertThat(e, instanceOf(MatrixMap2.class));
-		e = forwardControlMap.getCloseUtilizationCoeMap();
+		e = cachingControlMap.getCloseUtilizationCoeMap();
 		assertThat(e, instanceOf(MatrixMap2.class));
-		e = forwardControlMap.getTotalStandWholeStepVolumeCoeMap();
+		e = cachingControlMap.getTotalStandWholeStepVolumeCoeMap();
 		assertThat(e, instanceOf(Map.class));
-		e = forwardControlMap.getWholeStemUtilizationComponentMap();
+		e = cachingControlMap.getWholeStemUtilizationComponentMap();
 		assertThat(e, instanceOf(MatrixMap2.class));
-		e = forwardControlMap.getQuadMeanDiameterUtilizationComponentMap();
+		e = cachingControlMap.getQuadMeanDiameterUtilizationComponentMap();
 		assertThat(e, instanceOf(MatrixMap3.class));
-		e = forwardControlMap.getBasalAreaDiameterUtilizationComponentMap();
+		e = cachingControlMap.getBasalAreaDiameterUtilizationComponentMap();
 		assertThat(e, instanceOf(MatrixMap3.class));
-		e = forwardControlMap.getSmallComponentWholeStemVolumeCoefficients();
+		e = cachingControlMap.getSmallComponentWholeStemVolumeCoefficients();
 		assertThat(e, instanceOf(Map.class));
-		e = forwardControlMap.getSmallComponentLoreyHeightCoefficients();
+		e = cachingControlMap.getSmallComponentLoreyHeightCoefficients();
 		assertThat(e, instanceOf(Map.class));
-		e = forwardControlMap.getSmallComponentQuadMeanDiameterCoefficients();
+		e = cachingControlMap.getSmallComponentQuadMeanDiameterCoefficients();
 		assertThat(e, instanceOf(Map.class));
-		e = forwardControlMap.getSmallComponentBasalAreaCoefficients();
+		e = cachingControlMap.getSmallComponentBasalAreaCoefficients();
 		assertThat(e, instanceOf(Map.class));
-		e = forwardControlMap.getSmallComponentProbabilityCoefficients();
+		e = cachingControlMap.getSmallComponentProbabilityCoefficients();
 		assertThat(e, instanceOf(Map.class));
-		e = forwardControlMap.getMaximumAgeBySiteCurveNumber();
+		e = cachingControlMap.getMaximumAgeBySiteCurveNumber();
 		assertThat(e, instanceOf(Map.class));
-		e = forwardControlMap.getUpperBounds();
+		e = cachingControlMap.getUpperBounds();
 		assertThat(e, instanceOf(Map.class));
-		e = forwardControlMap.getDefaultEquationGroup();
+		e = cachingControlMap.getDefaultEquationGroup();
 		assertThat(e, instanceOf(MatrixMap2.class));
-		e = forwardControlMap.getEquationModifierGroup();
+		e = cachingControlMap.getEquationModifierGroup();
 		assertThat(e, instanceOf(MatrixMap2.class));
-		e = forwardControlMap.getHl1Coefficients();
+		e = cachingControlMap.getHl1Coefficients();
 		assertThat(e, instanceOf(MatrixMap2.class));
-		e = forwardControlMap.getHl2Coefficients();
+		e = cachingControlMap.getHl2Coefficients();
 		assertThat(e, instanceOf(MatrixMap2.class));
-		e = forwardControlMap.getHl3Coefficients();
+		e = cachingControlMap.getHl3Coefficients();
 		assertThat(e, instanceOf(MatrixMap2.class));
-		e = forwardControlMap.getHlNonPrimaryCoefficients();
+		e = cachingControlMap.getHlNonPrimaryCoefficients();
 		assertThat(e, instanceOf(MatrixMap3.class));
-		e = forwardControlMap.getComponentSizeLimits();
+		e = cachingControlMap.getComponentSizeLimits();
 		assertThat(e, instanceOf(MatrixMap2.class));
-		e = forwardControlMap.getNetBreakageMap();
+		e = cachingControlMap.getNetBreakageMap();
 		assertThat(e, instanceOf(Map.class));
-		e = forwardControlMap.getVolumeEquationGroups();
+		e = cachingControlMap.getVolumeEquationGroups();
 		assertThat(e, instanceOf(MatrixMap2.class));
-		e = forwardControlMap.getDecayEquationGroups();
+		e = cachingControlMap.getDecayEquationGroups();
 		assertThat(e, instanceOf(MatrixMap2.class));
-		e = forwardControlMap.getBreakageEquationGroups();
+		e = cachingControlMap.getBreakageEquationGroups();
 		assertThat(e, instanceOf(MatrixMap2.class));
-		e = forwardControlMap.getQuadMeanDiameterBySpeciesCoefficients();
+		e = cachingControlMap.getQuadMeanDiameterBySpeciesCoefficients();
 		assertThat(e, instanceOf(Map.class));
 	}
 }
