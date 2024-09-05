@@ -12,9 +12,13 @@ RUN npm ci --ignore-scripts --no-update-notifier --omit=dev && \
 
 # Deploy using Caddy to host static files
 FROM caddy:2.8.4-alpine
-RUN apk add --no-cache ca-certificates
 
-# Copy static files, verify Caddyfile formatting
+# Install packages and ensure permissions in one RUN command
+RUN apk add --no-cache ca-certificates && \
+    mkdir -p /config/caddy /data/caddy && \
+    chown -R 1001:1001 /config/caddy /data/caddy
+
+# Copy static files and run formatting
 COPY --from=build /app/dist /srv
 COPY Caddyfile /etc/caddy/Caddyfile
 RUN caddy fmt --overwrite /etc/caddy/Caddyfile
