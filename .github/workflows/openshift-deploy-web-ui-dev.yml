@@ -19,11 +19,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up environment variables
-        env:
-          LOG_LEVEL: ${{ vars.LOG_LEVEL }}
-          BACKEND_URL: ${{ vars.BACKEND_URL }}
-
       - name: Copy openshift yaml files
         run: mkdir staging && cp openshift/vdyp-web-ui*.yaml staging/
 
@@ -39,8 +34,8 @@ jobs:
 
           #Frontend variables
           ACTIVE_PORT: ${{ vars.TARGET_PORT }}
-          LOG_LEVEL: ${{ env.LOG_LEVEL }}
-          BACKEND_URL: ${{ env.BACKEND_URL }}          
+          LOG_LEVEL: ${{ vars.LOG_LEVEL }}
+          BACKEND_URL: ${{ vars.BACKEND_URL }}
 
       - name: Authenticate and set context
         uses: redhat-actions/oc-login@v1
