@@ -20,7 +20,8 @@ RUN apk add --no-cache ca-certificates && \
     touch /config/caddy/autosave.json /data/caddy/instance.uuid && \
     chown -R 1001:1001 /config/caddy /data/caddy && \
     chmod -R 775 /config/caddy /data/caddy && \
-    chmod +x /usr/bin/caddy
+    chmod +x /usr/bin/caddy && \
+    setcap -r /usr/bin/caddy  # This line removes the unnecessary capability
 
 # Copy static files and run formatting
 COPY --from=build /app/dist /srv
@@ -30,5 +31,4 @@ RUN caddy fmt --overwrite /etc/caddy/Caddyfile
 # Ports, health check and non-root user
 EXPOSE 3000 3001
 HEALTHCHECK --interval=30s --timeout=3s CMD ["curl", "-f", "http://localhost:3001/health"]
-USER root
-CMD ["/usr/bin/caddy", "run", "--config", "/etc/caddy/Caddyfile"]
+USER 1001
