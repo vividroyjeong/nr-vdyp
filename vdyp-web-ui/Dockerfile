@@ -16,9 +16,10 @@ FROM caddy:2.8.4-alpine
 
 # Install packages and ensure permissions in one RUN command
 RUN apk add --no-cache ca-certificates && \
-    mkdir -p /config/caddy /data/caddy && \
-    chown -R 1001:1001 /config/caddy /data/caddy /usr/bin/caddy && \
-    chmod -R 755 /config/caddy /data/caddy && \
+    mkdir -p /config/caddy /data/caddy /data/caddy/locks && \
+    touch /config/caddy/autosave.json /data/caddy/instance.uuid && \
+    chown -R 1001:1001 /config/caddy /data/caddy && \
+    chmod -R 775 /config/caddy /data/caddy && \
     chmod +x /usr/bin/caddy
 
 # Copy static files and run formatting
