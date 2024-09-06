@@ -2468,7 +2468,7 @@ public class ForwardProcessingEngine {
 				if (growthDetails.allowCalculation(baseVolume, V_BASE_MIN, (l, r) -> l > r)) {
 
 					// EMP093
-					int decayGroup = lps.decayEquationGroups[s];
+					int decayGroup = lps.getDecayEquationGroups()[s];
 					fps.estimators.estimateNetDecayVolume(
 							bank.speciesNames[s], lps.getBecZone().getRegion(), uc, aAdjust, decayGroup,
 							lps.getPrimarySpeciesAgeAtBreastHeight(), quadMeanDiameters, closeUtilizationVolumes,
@@ -2489,7 +2489,7 @@ public class ForwardProcessingEngine {
 				if (growthDetails.allowCalculation(baseVolume, V_BASE_MIN, (l, r) -> l > r)) {
 
 					// EMP092
-					int volumeGroup = lps.volumeEquationGroups[s];
+					int volumeGroup = lps.getVolumeEquationGroups()[s];
 					fps.estimators.estimateCloseUtilizationVolume(
 							uc, aAdjust, volumeGroup, spLoreyHeight_All, quadMeanDiameters, wholeStemVolumes,
 							closeUtilizationVolumes
@@ -2503,7 +2503,7 @@ public class ForwardProcessingEngine {
 				cvVolume[s].put(uc, VolumeVariable.CLOSE_UTIL_VOL, LayerType.PRIMARY, adjustment);
 			}
 
-			int primarySpeciesVolumeGroup = lps.volumeEquationGroups[s];
+			int primarySpeciesVolumeGroup = lps.getVolumeEquationGroups()[s];
 			float primarySpeciesQMDAll = bank.quadMeanDiameters[s][UC_ALL_INDEX];
 			var wholeStemVolume = bank.treesPerHectare[s][UC_ALL_INDEX] * fps.estimators
 					.estimateWholeStemVolumePerTree(primarySpeciesVolumeGroup, spLoreyHeight_All, primarySpeciesQMDAll);

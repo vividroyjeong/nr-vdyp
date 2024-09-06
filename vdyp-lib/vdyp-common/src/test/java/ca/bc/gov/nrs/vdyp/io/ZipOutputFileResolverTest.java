@@ -30,9 +30,7 @@ public class ZipOutputFileResolverTest {
 
 		assertThrows(UnsupportedOperationException.class, () -> resolver.resolveForInput("file"));
 
-		MatcherAssert.assertThat(
-				resolver.toString("file"), Matchers.endsWith("vdyp-lib/vdyp-common/file")
-		);
+		MatcherAssert.assertThat(resolver.toString("file"), Matchers.endsWith("vdyp-lib/vdyp-common/file"));
 
 		for (int i = 0; i < 5; i++) {
 			OutputStream os = resolver.resolveForOutput("file" + i);
