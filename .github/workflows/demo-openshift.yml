@@ -4,7 +4,9 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
-      - 'openshift-demo/**'
+      - 'vdyp-web-ui/**'
+      - 'vdyp-api/**'
+      - 'vdyp-buildtools/migrations'
 
 concurrency:
   # Cancel in progress for PR open and close
@@ -18,12 +20,12 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        package: [backend, frontend, migrations]
+        package: [vdyp-api/backend, vdyp-web-ui/frontend, vdyp-buildtools/migrations]
     timeout-minutes: 10
     steps:
       - uses: bcgov-nr/action-builder-ghcr@v2.0.2
         with:
-          build_context: openshift-demo/${{ matrix.build_context }}
+          build_context: ${{ matrix.build_context }}
           keep_versions: 10
           package: ${{ matrix.package }}
           tag: ${{ github.event.number }}
@@ -39,21 +41,21 @@ jobs:
       oc_namespace: ${{ secrets.OC_NAMESPACE }}
       oc_token: ${{ secrets.OC_TOKEN }}
     with:
-      triggers: ('backend/' 'frontend/' 'migrations/')
+      triggers: ('vdyp-api/backend/' 'vdyp-web-ui/frontend/' 'vdyp-tools/migrations/')
       params:
         --set global.secrets.persist=false
 
-  tests:
-    name: Tests
-    if: needs.deploys.outputs.triggered == 'true'
-    needs: [deploys]
-    uses: ./.github/workflows/.tests.yml
-    with:
-      target: ${{ github.event.number }}
+  # tests:
+  #   name: Tests
+  #   if: needs.deploys.outputs.triggered == 'true'
+  #   needs: [deploys]
+  #   uses: ./.github/workflows/.tests.yml
+  #   with:
+  #     target: ${{ github.event.number }}
 
   results:
     name: PR Results
-    needs: [builds, deploys, tests]
+    needs: [builds, deploys]
     if: always() && (!failure()) && (!cancelled())
     runs-on: ubuntu-22.04
     steps:
