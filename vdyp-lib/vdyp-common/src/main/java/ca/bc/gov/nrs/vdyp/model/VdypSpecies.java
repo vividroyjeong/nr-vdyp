@@ -417,9 +417,9 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 		public Builder copy(VdypSpecies source) {
 			super.copy(source);
 
-			source.volumeGroup.ifPresent(vg -> volumeGroup(vg));
-			source.decayGroup.ifPresent(dg -> decayGroup(dg));
-			source.breakageGroup.ifPresent(bg -> breakageGroup(bg));
+			source.volumeGroup.ifPresent(this::volumeGroup);
+			source.decayGroup.ifPresent(this::decayGroup);
+			source.breakageGroup.ifPresent(this::breakageGroup);
 
 			return this;
 		}

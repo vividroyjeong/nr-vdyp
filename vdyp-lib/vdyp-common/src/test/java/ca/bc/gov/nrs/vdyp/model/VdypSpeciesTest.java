@@ -11,7 +11,14 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.NoSuchElementException;
+
 import org.junit.jupiter.api.Test;
+
+import ca.bc.gov.nrs.vdyp.application.InitializationIncompleteException;
 
 class VdypSpeciesTest {
 
@@ -74,6 +81,57 @@ class VdypSpeciesTest {
 
 		assertThat(species1.equals(species4), is(false));
 	};
+
+	@Test
+	void testAdditionalBuildMethods() {
+		VdypSpecies sp = VdypSpecies.build(sb -> {
+			sb.polygonIdentifier(new PolygonIdentifier("Poly1", 2024));
+			sb.layerType(LayerType.PRIMARY);
+			sb.percentGenus(100.0f);
+			sb.genus("Species1", 5);
+			sb.baseArea(0.00155f, 0.01412f, 0.05128f, 0.45736f, 28.77972f);
+			sb.treesPerHectare(0.47f, 1.64f, 2.69f, 13.82f, 269.56f);
+			sb.loreyHeight(10.6033f, 33.7440f);
+			sb.wholeStemVolume(0.0078f, 0.1091f, 0.5602f, 6.0129f, 452.8412f);
+			sb.quadMeanDiameter(6.5f, 36.0f, 10.5f, 15.6f, 20.5f, 36.9f);
+			sb.closeUtilizationVolumeByUtilization(0.0078f, 0.1091f, 0.5602f, 6.0129f, 452.8412f);
+			sb.closeUtilizationVolumeNetOfDecayByUtilization(0.0000f, 0.0571f, 0.5048f, 5.6414f, 437.8810f);
+			sb.closeUtilizationVolumeNetOfDecayAndWasteByUtilization(0.0000f, 0.0566f, 0.5007f, 5.5975f, 430.3732f);
+			sb.closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
+					0.0000f, 0.0565f, 0.5005f, 5.5948f, 429.1300f
+			);
+		});
+
+		assertThrows(NoSuchElementException.class, () -> sp.getVolumeGroup());
+		assertThrows(NoSuchElementException.class, () -> sp.getDecayGroup());
+		assertThrows(NoSuchElementException.class, () -> sp.getBreakageGroup());
+
+		sp.setVolumeGroup(0);
+		sp.setDecayGroup(0);
+		sp.setBreakageGroup(0);
+
+		assertThrows(IllegalStateException.class, () -> sp.setVolumeGroup(1));
+		assertThrows(IllegalStateException.class, () -> sp.setDecayGroup(1));
+		assertThrows(IllegalStateException.class, () -> sp.setBreakageGroup(1));
+
+		List<UtilizationClass> ucs = Arrays.asList(UtilizationClass.values());
+		List<VolumeVariable> vvs = Arrays.asList(VolumeVariable.values());
+		List<LayerType> lts = Arrays.asList(LayerType.values());
+
+		assertThrows(InitializationIncompleteException.class, () -> sp.getCvVolume(null, null, null));
+		assertThrows(InitializationIncompleteException.class, () -> sp.getCvBasalArea(null, null));
+		assertThrows(InitializationIncompleteException.class, () -> sp.getCvQuadraticMeanDiameter(null, null));
+		assertThrows(InitializationIncompleteException.class, () -> sp.getCvPrimaryLayerSmall(null));
+
+		var cvVolume = new MatrixMap3Impl<UtilizationClass, VolumeVariable, LayerType, Float>(
+				ucs, vvs, lts, (x, y, z) -> 1.0f
+		);
+		var cvBasalArea = new MatrixMap2Impl<UtilizationClass, LayerType, Float>(ucs, lts, (x, y) -> 1.0f);
+		var cvQuadraticMeanDiameter = new MatrixMap2Impl<UtilizationClass, LayerType, Float>(ucs, lts, (x, y) -> 1.0f);
+		var cvPrimaryLayerSmall = new HashMap<UtilizationClassVariable, Float>();
+
+		sp.setCompatibilityVariables(cvVolume, cvBasalArea, cvQuadraticMeanDiameter, cvPrimaryLayerSmall);
+	}
 
 	@Test
 	void buildNoProperties() throws Exception {
