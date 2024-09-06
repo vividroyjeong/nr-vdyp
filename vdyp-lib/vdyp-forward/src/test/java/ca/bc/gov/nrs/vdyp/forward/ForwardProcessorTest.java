@@ -54,41 +54,44 @@ class ForwardProcessorTest {
 		Path zipFilePath = Paths.get(resourceDirectory.toString(), this.getClass().getSimpleName() + ".zip");
 		Files.deleteIfExists(zipFilePath);
 
+		Path zipFileFromStreamPath = Paths
+				.get(resourceDirectory.toString(), this.getClass().getSimpleName() + "FromStream.zip");
+
 		try {
 			outputResolver.generate(zipFilePath);
+			byte[] zipFileBytes = Files.readAllBytes(zipFilePath);
 
 			InputStream is = outputResolver.generateStream();
-
-			byte[] zipFileBytes = Files.readAllBytes(zipFilePath);
 			byte[] zipStreamBytes = is.readAllBytes();
+			Files.write(zipFileFromStreamPath, zipStreamBytes);
 
 			assertTrue(zipFileBytes.length == zipStreamBytes.length);
-			
-			Path zipFileFromStreamPath = Paths.get(resourceDirectory.toString(), this.getClass().getSimpleName() + "FromStream.zip");
-			Files.write(zipFileFromStreamPath, zipStreamBytes);
-			
+
 			try (ZipFile zipFileFromStream = new ZipFile(zipFileFromStreamPath.toFile())) {
 				try (ZipFile zipFileFromFile = new ZipFile(zipFilePath.toFile())) {
-				
+
 					var streamEntries = zipFileFromStream.entries().asIterator();
 					var fileEntries = zipFileFromFile.entries().asIterator();
-					
+
 					while (streamEntries.hasNext()) {
-						assertTrue(fileEntries.hasNext());	
-						
+						assertTrue(fileEntries.hasNext());
+
 						var streamEntry = streamEntries.next();
 						var fileEntry = fileEntries.next();
-						
-						logger.info("Saw file entry {} and stream entry {}", fileEntry.getName(), streamEntry.getName());
+
+						logger.info(
+								"Saw file entry {} and stream entry {}", fileEntry.getName(), streamEntry.getName()
+						);
 						assertTrue(streamEntry.hashCode() == fileEntry.hashCode());
 						assertTrue(streamEntry.getName().equals(fileEntry.getName()));
 					}
-				
-					assertFalse(fileEntries.hasNext());	
+
+					assertFalse(fileEntries.hasNext());
 				}
 			}
 		} finally {
 			Files.delete(zipFilePath);
+			Files.delete(zipFileFromStreamPath);
 		}
 	}
 }
