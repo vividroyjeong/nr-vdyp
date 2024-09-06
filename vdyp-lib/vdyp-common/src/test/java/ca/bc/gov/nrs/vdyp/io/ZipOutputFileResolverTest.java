@@ -31,7 +31,7 @@ public class ZipOutputFileResolverTest {
 		assertThrows(UnsupportedOperationException.class, () -> resolver.resolveForInput("file"));
 
 		MatcherAssert.assertThat(
-				resolver.toString("file"), Matchers.is("zip:/Users/mjunkin/source/vdyp-ssh/vdyp-lib/vdyp-common/file")
+				resolver.toString("file"), Matchers.endsWith("vdyp-lib/vdyp-common/file")
 		);
 
 		for (int i = 0; i < 5; i++) {
