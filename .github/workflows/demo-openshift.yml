@@ -2,7 +2,11 @@ name: PR
 
 on:
   workflow_dispatch:
-
+  pull_request:
+    paths:
+      - 'frontend/**'
+      - 'backend/**'
+      - 'migrations/**'
 concurrency:
   # Cancel if re-attempted
   group: ${{ github.event_name }}
@@ -26,7 +30,6 @@ jobs:
           tag_fallback: latest
           triggers: ('${{ matrix.package }}/')
 
-
   # https://github.com/bcgov/quickstart-openshift-helpers
   deploys:
     name: Deploys
@@ -39,7 +42,7 @@ jobs:
       triggers: ('backend/' 'frontend/' 'migrations/')
       params:
         --set global.secrets.persist=false
-
+        
   # tests:
   #   name: Tests
   #   if: needs.deploys.outputs.triggered == 'true'
