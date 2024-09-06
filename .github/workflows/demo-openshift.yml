@@ -41,7 +41,7 @@ jobs:
       oc_namespace: ${{ secrets.OC_NAMESPACE }}
       oc_token: ${{ secrets.OC_TOKEN }}
     with:
-      triggers: ('vdyp-api/backend/' 'vdyp-web-ui/frontend/' 'vdyp-tools/migrations/')
+      # triggers: ('vdyp-api/backend/' 'vdyp-web-ui/frontend/' 'vdyp-tools/migrations/')
       params:
         --set global.secrets.persist=false
 
