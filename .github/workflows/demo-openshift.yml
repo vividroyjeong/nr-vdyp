@@ -2,11 +2,6 @@ name: PR
 
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - 'frontend/**'
-      - 'backend/**'
-      - 'migrations/**'
 
 concurrency:
   # Cancel if re-attempted
@@ -23,27 +18,20 @@ jobs:
         package: [backend, frontend, migrations]
     timeout-minutes: 10
     steps:
-      - id: trimBranchName
-        name: trim branch name if necessary
-        run: |
-          export branchTag="${{ github.ref_name }}"
-          trimTag="${branchTag##*/}"
-          echo "BRANCH_TAG=$trimTag" >> $GITHUB_OUTPUT
-    
-      - uses: bcgov-nr/action-builder-ghcr@v2.0.2
+      - uses: bcgov-nr/action-builder-ghcr@v2.2.0
         with:
-          build_context: ${{ matrix.build_context }}
-          keep_versions: 10
+          keep_versions: 50
           package: ${{ matrix.package }}
-          tag: ${{ steps.trimBranchName.outputs.BRANCH_TAG }}
+          tag: ${{ github.event.number }}
           tag_fallback: latest
           triggers: ('${{ matrix.package }}/')
+
 
   # https://github.com/bcgov/quickstart-openshift-helpers
   deploys:
     name: Deploys
     needs: [builds]
-    uses: bcgov/quickstart-openshift-helpers/.github/workflows/.deployer.yml@v0.4.1
+    uses: bcgov/quickstart-openshift-helpers/.github/workflows/.deployer.yml@v0.6.1
     secrets:
       oc_namespace: ${{ secrets.OC_NAMESPACE }}
       oc_token: ${{ secrets.OC_TOKEN }}
