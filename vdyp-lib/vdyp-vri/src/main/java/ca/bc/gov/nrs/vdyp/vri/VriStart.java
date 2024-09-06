@@ -458,9 +458,9 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		);
 
 		float layerQuadMeanDiameter = quadMeanDiameter(primaryBaseArea, primaryLayerDensity);
-		lBuilder.quadMeanDiameter(layerQuadMeanDiameter);
-		lBuilder.baseArea(primaryBaseArea);
-		lBuilder.treesPerHectare(primaryLayerDensity);
+		lBuilder.quadraticMeanDiameterByUtilization(layerQuadMeanDiameter);
+		lBuilder.baseAreaByUtilization(primaryBaseArea);
+		lBuilder.treesPerHectareByUtilization(primaryLayerDensity);
 		lBuilder.empiricalRelationshipParameterIndex(primaryLayer.getEmpericalRelationshipParameterIndex());
 
 		lBuilder.adaptSpecies(primaryLayer, (sBuilder, vriSpec) -> {
@@ -523,7 +523,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			}
 		}
 
-		lBuilder.loreyHeight(sumBaseAreaLoreyHeight / primaryBaseArea);
+		lBuilder.loreyHeightByUtilization(sumBaseAreaLoreyHeight / primaryBaseArea);
 
 	}
 

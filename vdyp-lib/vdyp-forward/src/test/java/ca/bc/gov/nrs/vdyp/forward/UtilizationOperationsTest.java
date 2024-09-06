@@ -50,11 +50,11 @@ class UtilizationOperationsTest {
 				lb.layerType(LayerType.PRIMARY);
 				lb.inventoryTypeGroup(1);
 
-				lb.baseArea(0.01513f, 0.53100f, 1.27855f, 2.33020f, 40.79285f);
-				lb.treesPerHectare(5.24f, 64.82f, 71.93f, 73.60f, 384.98f);
-				lb.loreyHeight(7.0166f, 30.9724f);
-				lb.wholeStemVolume(0.0630f, 2.5979f, 9.1057f, 22.4019f, 586.8720f);
-				lb.quadMeanDiameter(6.1f, 31.0f, 10.2f, 15.0f, 20.1f, 36.7f);
+				lb.baseAreaByUtilization(0.01513f, 0.53100f, 1.27855f, 2.33020f, 40.79285f);
+				lb.treesPerHectareByUtilization(5.24f, 64.82f, 71.93f, 73.60f, 384.98f);
+				lb.loreyHeightByUtilization(7.0166f, 30.9724f);
+				lb.wholeStemVolumeByUtilization(0.0630f, 2.5979f, 9.1057f, 22.4019f, 586.8720f);
+				lb.quadraticMeanDiameterByUtilization(6.1f, 31.0f, 10.2f, 15.0f, 20.1f, 36.7f);
 				lb.closeUtilizationVolumeByUtilization(0.0630f, 2.5979f, 9.1057f, 22.4019f, 586.8720f);
 				lb.closeUtilizationVolumeNetOfDecayByUtilization(0.0000f, 0.3794f, 6.8469f, 19.8884f, 553.0534f);
 				lb.closeUtilizationVolumeNetOfDecayAndWasteByUtilization(
