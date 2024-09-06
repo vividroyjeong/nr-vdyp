@@ -9,8 +9,8 @@ on:
       - 'vdyp-buildtools/migrations'
 
 concurrency:
-  # Cancel in progress for PR open and close
-  group: ${{ github.event.number }}
+  # Cancel if re-attempted
+  group: ${{ github.event_name }}
   cancel-in-progress: true
 
 jobs:
@@ -23,12 +23,19 @@ jobs:
         package: [vdyp-api/backend, vdyp-web-ui/frontend, vdyp-buildtools/migrations]
     timeout-minutes: 10
     steps:
+      - id: trimBranchName
+        name: trim branch name if necessary
+        run: |
+          export branchTag="${{ github.ref_name }}"
+          trimTag="${branchTag##*/}"
+          echo "BRANCH_TAG=$trimTag" >> $GITHUB_OUTPUT
+    
       - uses: bcgov-nr/action-builder-ghcr@v2.0.2
         with:
           build_context: ${{ matrix.build_context }}
           keep_versions: 10
           package: ${{ matrix.package }}
-          tag: ${{ github.event.number }}
+          tag: ${{ steps.trimBranchName.outputs.BRANCH_TAG }}
           tag_fallback: latest
           triggers: ('${{ matrix.package }}/')
 
