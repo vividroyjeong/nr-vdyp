@@ -41,7 +41,7 @@ jobs:
       triggers: ('backend/' 'frontend/' 'migrations/')
       params:
         --set frontend.ingress.host=vdyp-ui-dev
-        
+
   # tests:
   #   name: Tests
   #   if: needs.deploys.outputs.triggered == 'true'
