@@ -23,8 +23,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: bcgov-nr/action-builder-ghcr@v2.2.0
-        with:
-          keep_versions: 50        
+        with:   
           package: ${{ matrix.package }}
           tag: ${{ github.event.number }}
           tag_fallback: latest
@@ -41,7 +40,7 @@ jobs:
     with:
       triggers: ('backend/' 'frontend/' 'migrations/')
       params:
-        --set global.secrets.persist=false
+        --set frontend.ingress.host=vdyp-ui-dev
         
   # tests:
   #   name: Tests
