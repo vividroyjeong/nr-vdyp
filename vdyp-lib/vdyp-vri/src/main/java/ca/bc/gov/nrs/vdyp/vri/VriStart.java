@@ -54,7 +54,6 @@ import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies.Builder;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.CompatibilityVariableMode;
-import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.ModelClassBuilder;
@@ -463,7 +462,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		lBuilder.empiricalRelationshipParameterIndex(primaryLayer.getEmpericalRelationshipParameterIndex());
 
 		lBuilder.adaptSpecies(primaryLayer, (sBuilder, vriSpec) -> {
-			var vriSite = primaryLayer.getSites().get(vriSpec.getGenus());
+			var vriSite = vriSpec.getSite();
 
 			applyGroups(bec, vriSpec.getGenus(), sBuilder);
 
@@ -472,25 +471,27 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			float specBaseArea = primaryBaseArea * fraction;
 			sBuilder.baseArea(specBaseArea);
 
-			if (vriSite == primarySiteIn) {
+			if (vriSite.map(site -> site == primarySiteIn).orElse(false)) {
 				sBuilder.loreyHeight(primaryHeight);
-
-				// Only use the primary site
-				sBuilder.adaptSite(vriSite, (iBuilder, vriSite2) -> iBuilder.height(vriSite2.getHeight().get()));
+				sBuilder.adaptSite(
+						vriSite.get(), (iBuilder, vriSite2) -> {
+							vriSite2.getHeight().ifPresent(iBuilder::height);
+						}
+				);
 			} else {
-
-				float loreyHeight = vriSite.getHeight().filter((x) -> getDebugMode(2) != 1).map(height -> {
-					float speciesQuadMeanDiameter = Math.max(7.5f, height / leadHeight * layerQuadMeanDiameter);
-					float speciesDensity = treesPerHectare(specBaseArea, speciesQuadMeanDiameter);
-					// EMP050 Method 1
-					return estimationMethods.primaryHeightFromLeadHeight(
-							vriSite.getHeight().get(), vriSite.getSiteGenus(), bec.getRegion(), speciesDensity
-					);
-				}).orElseGet(() -> {
+				var loreyHeight = vriSite.flatMap(
+						site -> site.getHeight().filter(x -> getDebugMode(2) != 1).map(height -> {
+							float speciesQuadMeanDiameter = Math.max(7.5f, height / leadHeight * layerQuadMeanDiameter);
+							float speciesDensity = treesPerHectare(specBaseArea, speciesQuadMeanDiameter);
+							return (float) estimationMethods.primaryHeightFromLeadHeight(
+									site.getHeight().get(), site.getSiteGenus(), bec.getRegion(), speciesDensity
+							);
+						})
+				).orElseGet(() -> {
 					try {
 						// EMP053
 						return estimationMethods.estimateNonPrimaryLoreyHeight(
-								vriSite.getSiteGenus(), primarySiteIn.getSiteGenus(), bec, leadHeight, primaryHeight
+								vriSpec.getGenus(), primarySiteIn.getSiteGenus(), bec, leadHeight, primaryHeight
 						);
 					} catch (ProcessingException e) {
 						throw new RuntimeProcessingException(e);
@@ -502,6 +503,13 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				loreyHeight = Math.min(loreyHeight, maxHeight);
 				sBuilder.loreyHeight(loreyHeight);
 			}
+			vriSite.ifPresent(
+					site -> sBuilder.adaptSite(
+							site, (iBuilder, vriSite2) -> {
+								vriSite2.getHeight().ifPresent(iBuilder::height);
+							}
+					)
+			);
 			this.applyGroups(bec, vriSpec.getGenus(), sBuilder);
 		});
 
@@ -1343,7 +1351,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			final float initialPrimaryBaseArea = this
 					.estimatePrimaryBaseArea(primaryLayer, bec, poly.getYieldFactor(), primaryBreastHeightAge, 0.0f);
 
-			final Optional<Float> veteranBaseArea = veteranLayer.map(InputLayer::getCrownClosure) // BAV
+			final Optional<Float> veteranBaseArea = veteranLayer.map(VriLayer::getCrownClosure) // BAV
 					.map(ccV -> ccV * initialPrimaryBaseArea / primaryLayer.getCrownClosure());
 
 			final float primaryBaseArea = this.estimatePrimaryBaseArea(

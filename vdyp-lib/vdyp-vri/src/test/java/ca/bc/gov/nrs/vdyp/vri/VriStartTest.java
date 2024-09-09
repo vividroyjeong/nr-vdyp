@@ -265,7 +265,8 @@ class VriStartTest {
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 			var result = app.findDefaultPolygonMode(
-					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
+					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
+					Optional
 							.of(76)
 			);
 
@@ -318,7 +319,8 @@ class VriStartTest {
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 			var result = app.findDefaultPolygonMode(
-					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
+					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
+					Optional
 							.of(76)
 			);
 
@@ -371,7 +373,8 @@ class VriStartTest {
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 			var result = app.findDefaultPolygonMode(
-					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
+					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
+					Optional
 							.of(76)
 			);
 
@@ -424,7 +427,8 @@ class VriStartTest {
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 			var result = app.findDefaultPolygonMode(
-					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
+					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
+					Optional
 							.of(76)
 			);
 
@@ -477,7 +481,8 @@ class VriStartTest {
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 			var result = app.findDefaultPolygonMode(
-					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
+					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
+					Optional
 							.of(76)
 			);
 
@@ -530,7 +535,8 @@ class VriStartTest {
 			var bec = new BecDefinition("IDF", Region.INTERIOR, "Interior Douglas Fir");
 
 			var result = app.findDefaultPolygonMode(
-					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec, Optional
+					ageTotal, yearsToBreastHeight, height, baseArea, treesPerHectare, percentForest, species, bec,
+					Optional
 							.of(76)
 			);
 
@@ -1481,7 +1487,8 @@ class VriStartTest {
 				Map<String, Float> maxPerSpecies = new HashMap<>(5);
 
 				app.getDqBySpeciesInitial(
-						layer, region, quadMeanDiameterTotal, baseAreaTotal, treeDensityTotal, loreyHeightTotal, initialDqs, baseAreaPerSpecies, minPerSpecies, maxPerSpecies
+						layer, region, quadMeanDiameterTotal, baseAreaTotal, treeDensityTotal, loreyHeightTotal,
+						initialDqs, baseAreaPerSpecies, minPerSpecies, maxPerSpecies
 				);
 
 				assertThat(
@@ -2074,7 +2081,7 @@ class VriStartTest {
 			assertThat(resultLayer, hasProperty("breastHeightAge", present(closeTo(15))));
 			assertThat(resultLayer, hasProperty("yearsToBreastHeight", present(closeTo(9))));
 
-			assertThat(resultLayer, hasProperty("siteGenus", present(is("F"))));
+			assertThat(resultLayer, hasProperty("primaryGenus", present(is("F"))));
 
 			assertThat(resultLayer, hasProperty("height", present(closeTo(7.6f))));
 			assertThat(resultLayer, hasProperty("inventoryTypeGroup", present(is(3))));
@@ -2328,7 +2335,7 @@ class VriStartTest {
 			assertThat(primaryLayer, hasProperty("breastHeightAge", present(closeTo(89.1f))));
 			assertThat(primaryLayer, hasProperty("yearsToBreastHeight", present(closeTo(10.9f))));
 
-			assertThat(primaryLayer, hasProperty("siteGenus", present(is("C"))));
+			assertThat(primaryLayer, hasProperty("primaryGenus", present(is("C"))));
 
 			assertThat(primaryLayer, hasProperty("height", present(closeTo(20f))));
 			assertThat(primaryLayer, hasProperty("inventoryTypeGroup", present(is(14))));
@@ -2408,7 +2415,7 @@ class VriStartTest {
 			assertThat(veteranLayer, hasProperty("breastHeightAge", present(closeTo(190.3f))));
 			assertThat(veteranLayer, hasProperty("yearsToBreastHeight", present(closeTo(9.7f))));
 
-			assertThat(veteranLayer, hasProperty("siteGenus", present(is("H"))));
+			assertThat(veteranLayer, hasProperty("primaryGenus", present(is("H"))));
 
 			assertThat(veteranLayer, hasProperty("height", present(closeTo(34f))));
 			assertThat(veteranLayer, hasProperty("inventoryTypeGroup", present(is(14)))); // ?
