@@ -13,6 +13,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import ca.bc.gov.nrs.vdyp.common.Computed;
+
 public abstract class BaseVdypLayer<S extends BaseVdypSpecies<I>, I extends BaseVdypSite> {
 
 	private final PolygonIdentifier polygonIdentifier;
@@ -80,6 +82,17 @@ public abstract class BaseVdypLayer<S extends BaseVdypSpecies<I>, I extends Base
 	public void setInventoryTypeGroup(Optional<Integer> inventoryTypeGroup) {
 		this.inventoryTypeGroup = inventoryTypeGroup;
 	}
+
+	public abstract Optional<String> getPrimaryGenus();
+
+	@Computed
+	public Optional<S> getPrimarySpeciesRecord() {
+		return getPrimaryGenus().map(this.getSpecies()::get);
+	}
+
+	@Computed
+	public Optional<I> getPrimarySite() {
+		return getPrimaryGenus().map(this.getSites()::get);
 
 	@Override
 	public String toString() {

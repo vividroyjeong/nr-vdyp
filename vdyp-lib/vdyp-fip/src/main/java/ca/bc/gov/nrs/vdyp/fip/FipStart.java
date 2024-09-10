@@ -280,6 +280,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 			builder.adapt(fipLayer);
 			builder.inventoryTypeGroup(itg);
 			builder.empiricalRelationshipParameterIndex(empiricalRelationshipParameterIndex);
+			builder.primaryGenus(primarySpecies.get(0).getGenus());
 		});
 
 		var breastHeightAge = fipLayer.getSite()
@@ -672,7 +673,7 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		var vdypLayer = VdypLayer.build(builder -> {
 			builder.polygonIdentifier(polygonIdentifier);
 			builder.layerType(layer);
-
+			builder.primaryGenus(primaryGenus);
 			builder.addSpecies(vdypSpecies.values());
 		});
 

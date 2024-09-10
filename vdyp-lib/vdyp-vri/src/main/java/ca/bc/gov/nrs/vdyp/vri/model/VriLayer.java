@@ -2,10 +2,13 @@ package ca.bc.gov.nrs.vdyp.vri.model;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.common.Computed;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
@@ -17,7 +20,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 	private final Optional<Float> baseArea; // VRIL/BAL
 	private final Optional<Float> treesPerHectare; // VRIL/TPHL
 	private final float utilization; // VRIL/UTLL
-	private final Optional<String> primaryGenus; // FIPL_1C/JPRIME_L1 ISPP
+	public final Optional<String> primaryGenus; // FIPL_1C/JPRIME_L1 ISPP
 	private final Optional<String> secondaryGenus; // FIPL_1C/JPRIME_L1 ISPS
 	private final Optional<Integer> empericalRelationshipParameterIndex; // INXL1/GRPBA1
 	private final float ageIncrease; // YOUNG1/AGE_INCR
@@ -55,6 +58,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 		return utilization;
 	}
 
+	@Override
 	public Optional<String> getPrimaryGenus() {
 		return primaryGenus;
 	}
@@ -64,18 +68,8 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 	}
 
 	@Computed
-	public Optional<VriSpecies> getPrimarySpeciesRecord() {
-		return primaryGenus.map(this.getSpecies()::get);
-	}
-
-	@Computed
 	public Optional<VriSpecies> getSecondarySpeciesRecord() {
 		return secondaryGenus.map(this.getSpecies()::get);
-	}
-
-	@Computed
-	public Optional<VriSite> getPrimarySite() {
-		return primaryGenus.map(this.getSites()::get);
 	}
 
 	@Computed
@@ -105,7 +99,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 		return builder.build();
 	}
 
-	public static VriLayer build(VriPolygon polygon, Consumer<Builder> config) {
+	public static InputLayer build(VriPolygon polygon, Consumer<Builder> config) {
 		var layer = build(builder -> {
 			builder.polygonIdentifier(polygon.getPolygonIdentifier());
 			config.accept(builder);
@@ -255,6 +249,26 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 			this.secondaryGenus(toCopy.getSecondaryGenus());
 			this.empiricalRelationshipParameterIndex(toCopy.getEmpericalRelationshipParameterIndex());
 			return this;
+		}
+
+		@Override
+		public <S2 extends BaseVdypSpecies<I2>, I2 extends BaseVdypSite>
+				BaseVdypLayer.Builder<VriLayer, VriSpecies, VriSite, VriSpecies.Builder, VriSite.Builder>
+				adaptSpecies(
+						BaseVdypLayer<S2, ?> toCopy,
+						BiConsumer<VriSpecies.Builder, S2> config
+				) {
+			this.primaryGenus(toCopy.getPrimaryGenus());
+			return super.adaptSpecies(toCopy, config);
+		}
+
+		@Override
+		public BaseVdypLayer.Builder<VriLayer, VriSpecies, VriSite, VriSpecies.Builder, VriSite.Builder>
+				copySpecies(
+						VriLayer toCopy, BiConsumer<VriSpecies.Builder, VriSpecies> config
+				) {
+			this.primaryGenus(toCopy.getPrimaryGenus());
+			return super.copySpecies(toCopy, config);
 		}
 
 	}
