@@ -16,7 +16,7 @@ public class VriSpecies extends BaseVdypSpecies<VriSite> {
 			PolygonIdentifier polygonIdentifier, LayerType layer, String genus, int genusIndex, float percentGenus,
 			Sp64DistributionSet sp64DistributionSet, Optional<VriSite> site
 	) {
-		super(polygonIdentifier, layer, genus, genusIndex, percentGenus, sp64DistributionSet, site);
+		super(polygonIdentifier, layer, genus, genusIndex, Optional.of(percentGenus), sp64DistributionSet, site);
 	}
 
 	/**
@@ -51,7 +51,7 @@ public class VriSpecies extends BaseVdypSpecies<VriSite> {
 					this.genus.get(), //
 					this.genusIndex.get(), //
 					this.percentGenus.get(), //
-					new Sp64DistributionSet(this.sp64DistributionList), //
+					this.sp64DistributionSet, //
 					this.site
 			);
 		}

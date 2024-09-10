@@ -93,4 +93,29 @@ public class FloatMath {
 		}
 		return exp(logit);
 	}
+
+	/**
+	 * Compute the maximum of three float values, using <code>Math.max</code> to do pairwise comparisons.
+	 *
+	 * @param f1
+	 * @param f2
+	 * @param f3
+	 * @return as described
+	 */
+	public static float max(float f1, float f2, float f3) {
+		return Math.max(f1, Math.max(f2, f3));
+	}
+
+	/**
+	 * Compute the maximum of four float values, using <code>Math.max</code> to do pairwise comparisons.
+	 *
+	 * @param f1
+	 * @param f2
+	 * @param f3
+	 * @param f4
+	 * @return as described
+	 */
+	public static float max(float f1, float f2, float f3, float f4) {
+		return Math.max(Math.max(f1, f2), Math.max(f3, f4));
+	}
 }

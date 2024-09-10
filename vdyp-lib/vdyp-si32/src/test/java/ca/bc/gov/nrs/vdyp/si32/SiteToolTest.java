@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import ca.bc.gov.nrs.vdyp.common.Reference;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteIndexNames;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.CommonCalculatorException;
 import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.LessThan13Exception;
@@ -32,7 +33,6 @@ import ca.bc.gov.nrs.vdyp.si32.site.NameFormat;
 import ca.bc.gov.nrs.vdyp.si32.site.SiteTool;
 import ca.bc.gov.nrs.vdyp.si32.vdyp.SP64Name;
 import ca.bc.gov.nrs.vdyp.si32.vdyp.SpeciesTable;
-import ca.bc.gov.nrs.vdyp.sindex.Reference;
 
 class SiteToolTest {
 

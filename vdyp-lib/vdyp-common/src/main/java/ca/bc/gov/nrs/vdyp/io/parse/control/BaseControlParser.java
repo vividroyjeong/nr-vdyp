@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
+import ca.bc.gov.nrs.vdyp.io.parse.coe.DebugSettingsParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 
@@ -64,7 +65,7 @@ public abstract class BaseControlParser {
 
 		controlParser.record(ControlKey.MINIMA, minimaParser());
 
-		controlParser.record(ControlKey.DEBUG_SWITCHES, ValueParser.list(ValueParser.INTEGER)); // IPSJF155
+		controlParser.record(ControlKey.DEBUG_SWITCHES, new DebugSettingsParser()); // IPSJF155
 	}
 
 	protected abstract ValueParser<Map<String, Float>> minimaParser();

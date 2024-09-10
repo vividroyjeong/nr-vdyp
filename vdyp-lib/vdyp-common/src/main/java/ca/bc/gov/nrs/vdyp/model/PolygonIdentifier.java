@@ -5,6 +5,10 @@ import java.util.function.IntUnaryOperator;
 
 public class PolygonIdentifier {
 
+	public static final int ID_LENGTH = 25;
+	public static final int YEAR_LENGTH = 4;
+	public static final int BASE_LENGTH = ID_LENGTH - YEAR_LENGTH;
+
 	private final String base;
 	private final int year;
 
@@ -28,13 +32,24 @@ public class PolygonIdentifier {
 		return new PolygonIdentifier(base, Integer.parseInt(year));
 	}
 
-	public static final int ID_LENGTH = 25;
-	public static final int YEAR_LENGTH = 4;
-	public static final int BASE_LENGTH = ID_LENGTH - YEAR_LENGTH;
+	private static final String FORMAT = "%-" + BASE_LENGTH + "s%" + YEAR_LENGTH + "d";
+	private static final String COMPACT_FORMAT = "%s(%" + YEAR_LENGTH + "d)";
 
-	public static final String FORMAT = "%-" + BASE_LENGTH + "s%" + YEAR_LENGTH + "d";
-
+	/**
+	 * Return the <code>base</code> (a.k.a. <code>name</code>) of the Polygon. These terms are synonomous.
+	 *
+	 * @return as described
+	 */
 	public String getBase() {
+		return base;
+	}
+
+	/**
+	 * Return the <code>name</code> (a.k.a. <code>base</code>) of the Polygon. These terms are synonomous.
+	 *
+	 * @return as described
+	 */
+	public String getName() {
 		return base;
 	}
 
@@ -49,6 +64,10 @@ public class PolygonIdentifier {
 		return result;
 	}
 
+	public String toStringCompact() {
+		return COMPACT_FORMAT.formatted(base, year);
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(base, year);
@@ -58,12 +77,10 @@ public class PolygonIdentifier {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
+		if (obj instanceof PolygonIdentifier other)
+			return Objects.equals(base, other.base) && year == other.year;
+		else
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		PolygonIdentifier other = (PolygonIdentifier) obj;
-		return Objects.equals(base, other.base) && year == other.year;
 	}
 
 	public PolygonIdentifier forYear(int year) {

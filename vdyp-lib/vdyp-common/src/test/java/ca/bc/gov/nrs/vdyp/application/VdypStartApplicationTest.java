@@ -45,8 +45,11 @@ import ca.bc.gov.nrs.vdyp.application.test.TestPolygon;
 import ca.bc.gov.nrs.vdyp.application.test.TestSite;
 import ca.bc.gov.nrs.vdyp.application.test.TestSpecies;
 import ca.bc.gov.nrs.vdyp.application.test.TestStartApplication;
+import ca.bc.gov.nrs.vdyp.common.ComputationMethods;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.EstimationMethods;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.controlmap.ResolvedControlMapImpl;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
@@ -109,9 +112,9 @@ class VdypStartApplicationTest {
 	}
 
 	private MockFileResolver dummyIo() {
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+		controlMap.put(ControlKey.VDYP_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
+		controlMap.put(ControlKey.VDYP_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
+		controlMap.put(ControlKey.VDYP_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
 
 		MockFileResolver resolver = new MockFileResolver("Test");
 		resolver.addStream("DUMMY1", (OutputStream) new ByteArrayOutputStream());
@@ -673,7 +676,7 @@ class VdypStartApplicationTest {
 	}
 
 	@Nested
-	class FindEmpericalRelationshipParameterIndex {
+	class FindEmpiricalRelationshipParameterIndex {
 
 		@Test
 		void testModified() throws Exception {
@@ -1251,6 +1254,9 @@ class VdypStartApplicationTest {
 				var layer = VdypLayer.build(lb -> {
 					lb.polygonIdentifier("Test", 2024);
 					lb.layerType(LayerType.PRIMARY);
+
+					lb.primaryGenus("H");
+
 					lb.addSpecies(sb -> {
 						sb.genus("B", controlMap);
 						sb.percentGenus(20f);
@@ -1319,11 +1325,11 @@ class VdypStartApplicationTest {
 						sb.wholeStemVolume(57.2091446f);
 					});
 
-					lb.loreyHeight(31.3307209f);
-					lb.baseArea(44.6249847f);
-					lb.treesPerHectare(620.484802f);
-					lb.quadMeanDiameter(30.2606697f);
-					lb.wholeStemVolume(635.659668f);
+					lb.loreyHeightByUtilization(31.3307209f);
+					lb.baseAreaByUtilization(44.6249847f);
+					lb.treesPerHectareByUtilization(620.484802f);
+					lb.quadraticMeanDiameterByUtilization(30.2606697f);
+					lb.wholeStemVolumeByUtilization(635.659668f);
 				});
 
 				app.estimateSmallComponents(fPoly, layer);
@@ -1387,6 +1393,7 @@ class VdypStartApplicationTest {
 					lb.polygonIdentifier("Test", 2024);
 					lb.layerType(LayerType.VETERAN);
 					lb.inventoryTypeGroup(14);
+					lb.primaryGenus("H");
 					lb.addSpecies(sb -> {
 						sb.genus("B", controlMap);
 						sb.percentGenus(20f);
@@ -1490,7 +1497,7 @@ class VdypStartApplicationTest {
 				assertThat(layer, hasProperty("breastHeightAge", present(closeTo(190.3f))));
 				assertThat(layer, hasProperty("yearsToBreastHeight", present(closeTo(9.7f))));
 
-				assertThat(layer, hasProperty("siteGenus", present(is("H"))));
+				assertThat(layer, hasProperty("primaryGenus", present(is("H"))));
 
 				assertThat(layer, hasProperty("height", present(closeTo(34f))));
 				assertThat(layer, hasProperty("inventoryTypeGroup", present(is(14)))); // ?
@@ -1554,10 +1561,6 @@ class VdypStartApplicationTest {
 						lb.addSpecies(sb -> {
 							sb.genus("B", controlMap);
 							sb.percentGenus(100);
-
-							sb.volumeGroup(0);
-							sb.decayGroup(0);
-							sb.breakageGroup(0);
 						});
 					});
 				});
@@ -1670,6 +1673,7 @@ class VdypStartApplicationTest {
 			var layer = VdypLayer.build(builder -> {
 				builder.polygonIdentifier("Test", 2024);
 				builder.layerType(LayerType.PRIMARY);
+				builder.primaryGenus("PL");
 			});
 
 			layer.getLoreyHeightByUtilization().setAll(13.0660105f);
@@ -1731,7 +1735,11 @@ class VdypStartApplicationTest {
 
 			layer.setSpecies(Arrays.asList(spec1, spec2));
 
-			app.computeUtilizationComponentsPrimary(
+			EstimationMethods estimationMethods = new EstimationMethods(new ResolvedControlMapImpl(controlMap));
+			ComputationMethods computationMethods = new ComputationMethods(
+					estimationMethods, VdypApplicationIdentifier.FIP_START
+			);
+			computationMethods.computeUtilizationComponentsPrimary(
 					bec, layer, VolumeComputeMode.BY_UTIL, CompatibilityVariableMode.NONE
 			);
 

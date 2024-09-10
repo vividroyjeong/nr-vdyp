@@ -23,13 +23,14 @@ public enum UtilizationClass {
 	private Optional<UtilizationClass> next = Optional.empty();
 	private Optional<UtilizationClass> previous = Optional.empty();
 
-	public static final Collection<UtilizationClass> UTIL_CLASSES = List.of(U75TO125, U125TO175, U175TO225, OVER225);
+	public static final Collection<UtilizationClass> UTIL_CLASSES = Collections
+			.unmodifiableList(List.of(U75TO125, U125TO175, U175TO225, OVER225));
 
 	public static final Collection<UtilizationClass> ALL_BUT_SMALL = Collections
-			.unmodifiableList(new ArrayList<>(Arrays.asList(ALL, U75TO125, U125TO175, U175TO225, OVER225)));
+			.unmodifiableList(List.of(ALL, U75TO125, U125TO175, U175TO225, OVER225));
 
-	public static final Collection<UtilizationClass> ALL_BUT_SMALL_ALL = Collections
-			.unmodifiableList(new ArrayList<>(Arrays.asList(U75TO125, U125TO175, U175TO225, OVER225)));
+	public static final Collection<UtilizationClass> ALL_CLASSES = Collections
+			.unmodifiableList(List.of(SMALL, U75TO125, U125TO175, U175TO225, OVER225));
 
 	public static final Collection<UtilizationClass> ALL_BUT_LARGEST = Collections
 			.unmodifiableList(new ArrayList<>(Arrays.asList(SMALL, ALL, U75TO125, U125TO175, U175TO225)));

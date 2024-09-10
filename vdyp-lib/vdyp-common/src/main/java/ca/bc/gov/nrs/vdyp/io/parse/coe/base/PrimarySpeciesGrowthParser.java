@@ -6,7 +6,6 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -35,10 +34,6 @@ public abstract class PrimarySpeciesGrowthParser
 		implements ControlMapSubResourceParser<Map<Integer, ModelCoefficients>> {
 
 	private static final int MAX_BASAL_AREA_GROUP_NUMBER = 30;
-
-	private static final ModelCoefficients defaultModelCoefficients = new ModelCoefficients(
-			0, new Coefficients(new float[] { 0.0f, 0.0f, 0.0f }, 1)
-	);
 
 	public static final String BASAL_AREA_GROUP_ID_KEY = "BasalAreaGroupId";
 	public static final String MODEL_NUMBER_KEY = "Model";
@@ -87,11 +82,6 @@ public abstract class PrimarySpeciesGrowthParser
 
 			return r;
 		}, control);
-
-		IntStream.rangeClosed(1, MAX_BASAL_AREA_GROUP_NUMBER).forEach(i -> {
-			if (!result.containsKey(i))
-				result.put(i, defaultModelCoefficients);
-		});
 
 		return result;
 	}

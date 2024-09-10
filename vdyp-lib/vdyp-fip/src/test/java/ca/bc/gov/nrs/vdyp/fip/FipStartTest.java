@@ -2315,18 +2315,15 @@ class FipStartTest {
 			var spec = VdypSpecies.build(layer, builder -> {
 				builder.genus("Y", controlMap);
 				builder.percentGenus(100f);
-				builder.volumeGroup(-1);
-				builder.decayGroup(-1);
-				builder.breakageGroup(-1);
+				builder.volumeGroup(74);
+				builder.decayGroup(63);
+				builder.breakageGroup(31);
 				builder.addSite(siteBuilder -> {
 					siteBuilder.ageTotal(285f);
 					siteBuilder.yearsToBreastHeight(11.3999996f);
 					siteBuilder.height(24.3999996f);
 				});
 			});
-			spec.setVolumeGroup(74);
-			spec.setDecayGroup(63);
-			spec.setBreakageGroup(31);
 			spec.getLoreyHeightByUtilization().setCoe(0, 19.9850883f);
 
 			var fipLayer = this.getTestPrimaryLayer(polygonId, l -> {

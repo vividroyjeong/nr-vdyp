@@ -37,18 +37,18 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.EstimationMethods;
-import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.common.ReconcilationMethods;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
+import ca.bc.gov.nrs.vdyp.controlmap.ResolvedControlMapImpl;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.UpperCoefficientParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
-import ca.bc.gov.nrs.vdyp.io.write.VriAdjustInputWriter;
+import ca.bc.gov.nrs.vdyp.io.write.VdypOutputWriter;
 import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypPolygon;
@@ -57,6 +57,7 @@ import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.CompatibilityVariableMode;
+import ca.bc.gov.nrs.vdyp.model.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
@@ -165,7 +166,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				.filter(x -> !x.getName().contains("Volume")).toList();
 	}
 
-	protected VriAdjustInputWriter vriWriter;
+	protected VdypOutputWriter vriWriter;
 
 	protected Map<String, Object> controlMap = new HashMap<>();
 
@@ -224,7 +225,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 		setControlMap(controlMap);
 		closeVriWriter();
-		vriWriter = new VriAdjustInputWriter(controlMap, resolver);
+		vriWriter = new VdypOutputWriter(controlMap, resolver);
 	}
 
 	protected abstract BaseControlParser getControlFileParser();
@@ -238,7 +239,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	protected void setControlMap(Map<String, Object> controlMap) {
 		this.controlMap = controlMap;
-		this.estimationMethods = new EstimationMethods(controlMap);
+		this.estimationMethods = new EstimationMethods(new ResolvedControlMapImpl(controlMap));
 	}
 
 	protected <T> StreamingParser<T> getStreamingParser(ControlKey key) throws ProcessingException {
@@ -517,7 +518,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		return group;
 	}
 
-	protected VriAdjustInputWriter getVriWriter() {
+	protected VdypOutputWriter getVriWriter() {
 		return vriWriter;
 	}
 
@@ -1467,44 +1468,38 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 				var adjust = new Coefficients(new float[] { 0f, 0f, 0f, 0f }, 1);
 
 				// EMP091
-				EstimationMethods.estimateWholeStemVolume(
-						controlMap, utilizationClass, volumeAdjustCoe.getCoe(1), vdypSpecies.getVolumeGroup(), hlSp,
+				estimationMethods.estimateWholeStemVolume(
+						utilizationClass, volumeAdjustCoe.getCoe(1), vdypSpecies.getVolumeGroup(), hlSp,
 						quadMeanDiameterUtil, baseAreaUtil, wholeStemVolumeUtil
 				);
 
 				adjust.setCoe(4, volumeAdjustCoe.getCoe(2));
 				// EMP092
-				EstimationMethods.estimateCloseUtilizationVolume(
-						controlMap, utilizationClass, adjust, vdypSpecies.getVolumeGroup(), hlSp, quadMeanDiameterUtil,
+				estimationMethods.estimateCloseUtilizationVolume(
+						utilizationClass, adjust, vdypSpecies.getVolumeGroup(), hlSp, quadMeanDiameterUtil,
 						wholeStemVolumeUtil, closeUtilizationVolumeUtil
 				);
 
 				adjust.setCoe(4, volumeAdjustCoe.getCoe(3));
 				// EMP093
-				EstimationMethods.estimateNetDecayVolume(
-						controlMap, vdypSpecies.getGenus(), bec.getRegion(), utilizationClass, adjust,
-						vdypSpecies.getDecayGroup(), vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil,
-						closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil
+				estimationMethods.estimateNetDecayVolume(
+						vdypSpecies.getGenus(), bec.getRegion(), utilizationClass, adjust, vdypSpecies.getDecayGroup(),
+						vdypLayer.getBreastHeightAge().orElse(0f), quadMeanDiameterUtil, closeUtilizationVolumeUtil,
+						closeUtilizationNetOfDecayUtil
 				);
 
 				adjust.setCoe(4, volumeAdjustCoe.getCoe(4));
 				// EMP094
-				final var netDecayCoeMap = Utils.<Map<String, Coefficients>>expectParsedControl(
-						controlMap, ControlKey.VOLUME_NET_DECAY_WASTE, java.util.Map.class
-				);
-				final var wasteModifierMap = Utils.<MatrixMap2<String, Region, Float>>expectParsedControl(
-						controlMap, ControlKey.WASTE_MODIFIERS, ca.bc.gov.nrs.vdyp.model.MatrixMap2.class
-				);
-				EstimationMethods.estimateNetDecayAndWasteVolume(
-						bec.getRegion(), utilizationClass, adjust, vdypSpecies.getGenus(), hlSp, netDecayCoeMap,
-						wasteModifierMap, quadMeanDiameterUtil, closeUtilizationVolumeUtil,
-						closeUtilizationNetOfDecayUtil, closeUtilizationNetOfDecayAndWasteUtil
+				estimationMethods.estimateNetDecayAndWasteVolume(
+						bec.getRegion(), utilizationClass, adjust, vdypSpecies.getGenus(), hlSp, quadMeanDiameterUtil,
+						closeUtilizationVolumeUtil, closeUtilizationNetOfDecayUtil,
+						closeUtilizationNetOfDecayAndWasteUtil
 				);
 
 				if (getId().isStart()) {
 					// EMP095
-					EstimationMethods.estimateNetDecayWasteAndBreakageVolume(
-							controlMap, utilizationClass, vdypSpecies.getBreakageGroup(), quadMeanDiameterUtil,
+					estimationMethods.estimateNetDecayWasteAndBreakageVolume(
+							utilizationClass, vdypSpecies.getBreakageGroup(), quadMeanDiameterUtil,
 							closeUtilizationVolumeUtil, closeUtilizationNetOfDecayAndWasteUtil,
 							closeUtilizationNetOfDecayWasteAndBreakageUtil
 					);

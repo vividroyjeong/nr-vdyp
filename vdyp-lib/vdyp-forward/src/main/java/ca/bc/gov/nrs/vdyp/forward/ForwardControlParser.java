@@ -16,11 +16,11 @@ import org.slf4j.LoggerFactory;
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.forward.parsers.ForwardControlVariableParser;
 import ca.bc.gov.nrs.vdyp.forward.parsers.VdypPolygonDescriptionParser;
 import ca.bc.gov.nrs.vdyp.forward.parsers.VdypPolygonParser;
 import ca.bc.gov.nrs.vdyp.forward.parsers.VdypSpeciesParser;
 import ca.bc.gov.nrs.vdyp.forward.parsers.VdypUtilizationParser;
-import ca.bc.gov.nrs.vdyp.forward.parsers.VdypControlVariableParser;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BasalAreaGrowthEmpiricalParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BasalAreaGrowthFiatParser;
@@ -84,8 +84,6 @@ public class ForwardControlParser extends BaseControlParser {
 
 	public ForwardControlParser() {
 		initialize();
-
-		controlParser.record(ControlKey.VTROL, new VdypControlVariableParser());
 	}
 
 	@Override
@@ -100,7 +98,10 @@ public class ForwardControlParser extends BaseControlParser {
 
 	@Override
 	protected List<ControlKey> outputFileParsers() {
-		return Collections.emptyList();
+		return List.of(
+				ControlKey.VDYP_OUTPUT_VDYP_POLYGON, ControlKey.VDYP_OUTPUT_VDYP_LAYER_BY_SPECIES,
+				ControlKey.VDYP_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL, ControlKey.VDYP_OUTPUT_COMPATIBILITY_VARIABLES
+		);
 	}
 
 	@Override
@@ -267,6 +268,8 @@ public class ForwardControlParser extends BaseControlParser {
 		addInputParser(new VdypPolygonDescriptionParser());
 
 		// 101 - a literal value of type VdypGrowthDetails
+
+		controlParser.record(ControlKey.VTROL, new ForwardControlVariableParser());
 		orderedControlKeys.add(ControlKey.VTROL);
 
 		// 199 - debug switches
@@ -319,8 +322,7 @@ public class ForwardControlParser extends BaseControlParser {
 		}
 
 		// Report any control map items that are a) not included in orderedControlKeys
-		// or b) for which
-		// not parser was registered.
+		// or b) for which not parser was registered.
 
 		// a
 		Set<ControlKey> parsersNotExecuted = new HashSet<>(

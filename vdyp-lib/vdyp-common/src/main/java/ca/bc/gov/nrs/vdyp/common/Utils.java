@@ -24,6 +24,7 @@ import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
+import ca.bc.gov.nrs.vdyp.model.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.UtilizationVector;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;

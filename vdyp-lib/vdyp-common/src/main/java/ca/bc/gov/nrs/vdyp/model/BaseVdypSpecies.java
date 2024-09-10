@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import ca.bc.gov.nrs.vdyp.application.InitializationIncompleteException;
 import ca.bc.gov.nrs.vdyp.common.Computed;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
 
@@ -26,25 +27,25 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 	/** the species index within species definition file (e.g. SPODEF_v0.dat) */
 	private final int genusIndex; // BANK1/ISPB, L1COM1/ISPL1, etc.
 
-	private float percentGenus; // FIPS/PCTVOLV L1COM1/PCTL1
+	private Optional<Float> percentGenus = Optional.empty(); // FIPS/PCTVOLV L1COM1/PCTL1
 
 	// This is computed from percentGenus, but VDYP7 computes it in a way that might
 	// lead to a slight difference so it's stored separately and can be modified.
 	@Computed
-	private float fractionGenus; // FRBASP0/FR
+	private Optional<Float> fractionGenus = Optional.empty(); // FRBASP0/FR
 
 	private Sp64DistributionSet sp64DistributionSet;
 
 	private Optional<I> site;
 
 	protected BaseVdypSpecies(
-			PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, int genusIndex, float percentGenus,
-			Sp64DistributionSet sp64DistributionSet, Optional<I> site
+			PolygonIdentifier polygonIdentifier, LayerType layerType, String genus, int genusIndex,
+			Optional<Float> percentGenus, Sp64DistributionSet sp64DistributionSet, Optional<I> site
 	) {
 		this.polygonIdentifier = polygonIdentifier;
 		this.layerType = layerType;
 		this.genus = genus;
-		this.setPercentGenus(percentGenus);
+		percentGenus.ifPresent(p -> this.setPercentGenus(p));
 		this.site = site;
 		this.genusIndex = genusIndex;
 		this.sp64DistributionSet = sp64DistributionSet;
@@ -59,30 +60,53 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 	}
 
 	public float getPercentGenus() {
-		return percentGenus;
+		return percentGenus.orElseThrow(
+				() -> new InitializationIncompleteException(MessageFormat.format("Species {0}, percentGenus", this))
+		);
+	}
+
+	public void setPercentGenus(float value) {
+		// Note - it is permitted to set percentGenus more than once.
+		this.percentGenus = Optional.of(value);
+		setFractionGenus(percentGenus.get() / 100f);
 	}
 
 	@Computed
 	public float getFractionGenus() {
-		return fractionGenus;
-	}
-
-	public void setPercentGenus(float percentGenus) {
-		this.percentGenus = percentGenus;
-		this.fractionGenus = percentGenus / 100f;
+		return fractionGenus.orElseThrow(
+				() -> new InitializationIncompleteException(MessageFormat.format("Species {0}, fractionGenus", this))
+		);
 	}
 
 	@Computed
-	public void setFractionGenus(float fractionGenus) {
-		this.fractionGenus = fractionGenus;
+	public void setFractionGenus(float value) {
+		// Note - it is permitted to set fractionGenus more than once.
+		this.fractionGenus = Optional.of(value);
 	}
 
 	public Sp64DistributionSet getSp64DistributionSet() {
 		return sp64DistributionSet;
 	}
 
-	public void setSp64DistributionSet(Sp64DistributionSet sp64DistributionSet) {
-		this.sp64DistributionSet = sp64DistributionSet;
+	@Override
+	public String toString() {
+		return MessageFormat.format("{0}-{1}-{2}", polygonIdentifier.toStringCompact(), layerType, genus);
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof BaseVdypSpecies that) {
+			// This is the "business key" of a species.
+			return this.polygonIdentifier.equals(that.polygonIdentifier) && this.layerType.equals(that.layerType)
+					&& this.genus.equals(that.genus);
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return (polygonIdentifier.hashCode() * 17 + layerType.hashCode()) * 17 + genus.hashCode();
 	}
 
 	/**
@@ -139,7 +163,7 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		protected Optional<Integer> genusIndex = Optional.empty();
 		protected Optional<Float> percentGenus = Optional.empty();
 		protected Optional<Float> fractionGenus = Optional.empty();
-		protected List<Sp64Distribution> sp64DistributionList = new ArrayList<>();
+		protected Sp64DistributionSet sp64DistributionSet = new Sp64DistributionSet();
 		protected Optional<Consumer<IB>> siteBuilder = Optional.empty();
 		protected Optional<I> site = Optional.empty();
 
@@ -202,12 +226,17 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		}
 
 		public Builder<T, I, IB> sp64DistributionList(List<Sp64Distribution> sp64DistributionList) {
-			this.sp64DistributionList = sp64DistributionList;
+			this.sp64DistributionSet = new Sp64DistributionSet(sp64DistributionList);
 			return this;
 		}
 
-		public Builder<T, I, IB> copy(T toCopy) {
-			return this.adapt(toCopy);
+		public Builder<T, I, IB> sp64DistributionSet(Sp64DistributionSet sp64DistributionSet) {
+			this.sp64DistributionSet = sp64DistributionSet;
+			return this;
+		}
+
+		public Builder<T, I, IB> copy(T source) {
+			return this.adapt(source);
 		}
 
 		public Builder<T, I, IB> addSite(Consumer<IB> config) {
@@ -228,8 +257,9 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 		}
 
 		public void addSp64Distribution(String sp64Alias, float f) {
-			int index = sp64DistributionList.size() + 1;
-			sp64DistributionList.add(new Sp64Distribution(index, sp64Alias, f));
+			var newSp64DistributionList = new ArrayList<>(this.sp64DistributionSet.getSp64DistributionList());
+			newSp64DistributionList.add(new Sp64Distribution(newSp64DistributionList.size() + 1, sp64Alias, f));
+			sp64DistributionSet = new Sp64DistributionSet(newSp64DistributionList);
 		}
 
 		@Override
@@ -238,7 +268,10 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 			requirePresent(layerType, "layerType", errors);
 			requirePresent(genus, "genus", errors);
 			requirePresent(genusIndex, "genusIndex", errors);
-			requirePresent(percentGenus, "percentGenus", errors);
+
+			// percentGenus is not required on build because the Forward
+			// input data format does not include it in the species data files.
+			// requirePresent(percentGenus, "percentGenus", errors);
 		}
 
 		@Override
@@ -263,48 +296,48 @@ public abstract class BaseVdypSpecies<I extends BaseVdypSite> {
 			);
 		}
 
-		public Builder<T, I, IB> adapt(BaseVdypSpecies<?> toCopy) {
-			polygonIdentifier(toCopy.getPolygonIdentifier());
-			layerType(toCopy.getLayerType());
-			genus(toCopy.getGenus(), toCopy.getGenusIndex());
-			percentGenus(toCopy.getPercentGenus());
+		public Builder<T, I, IB> adapt(BaseVdypSpecies<?> source) {
+			polygonIdentifier(source.getPolygonIdentifier());
+			layerType(source.getLayerType());
+			genus(source.getGenus(), source.getGenusIndex());
+			percentGenus(source.getPercentGenus());
 
-			fractionGenus(toCopy.getFractionGenus());
+			fractionGenus(source.getFractionGenus());
 
-			sp64DistributionList(toCopy.getSp64DistributionSet().getSp64DistributionList());
+			sp64DistributionList(source.getSp64DistributionSet().getSp64DistributionList());
 
 			return this;
 		}
 
-		public <I2 extends BaseVdypSite> Builder<T, I, IB> adaptSite(I2 toCopy, BiConsumer<IB, I2> config) {
+		public <I2 extends BaseVdypSite> Builder<T, I, IB> adaptSite(I2 source, BiConsumer<IB, I2> config) {
 			this.addSite(builder -> {
-				builder.adapt(toCopy);
+				builder.adapt(source);
 				builder.polygonIdentifier = Optional.empty();
 				builder.layerType = Optional.empty();
-				config.accept(builder, toCopy);
+				config.accept(builder, source);
 			});
 			return this;
 		}
 
 		public <S2 extends BaseVdypSpecies<I2>, I2 extends BaseVdypSite> Builder<T, I, IB>
 				adaptSiteFrom(S2 specToCopy, BiConsumer<IB, I2> config) {
-			specToCopy.getSite().ifPresent(toCopy -> this.adaptSite(toCopy, config));
+			specToCopy.getSite().ifPresent(source -> this.adaptSite(source, config));
 			return this;
 		}
 
-		public Builder<T, I, IB> copySite(I toCopy, BiConsumer<IB, I> config) {
+		public Builder<T, I, IB> copySite(I source, BiConsumer<IB, I> config) {
 			this.addSite(builder -> {
-				builder.copy(toCopy);
+				builder.copy(source);
 				builder.siteGenus = Optional.empty();
 				builder.polygonIdentifier = Optional.empty();
 				builder.layerType = Optional.empty();
-				config.accept(builder, toCopy);
+				config.accept(builder, source);
 			});
 			return this;
 		}
 
 		public Builder<T, I, IB> copySiteFrom(T specToCopy, BiConsumer<IB, I> config) {
-			specToCopy.getSite().ifPresent(toCopy -> this.copySite(toCopy, config));
+			specToCopy.getSite().ifPresent(source -> this.copySite(source, config));
 			return this;
 		}
 
