@@ -35,9 +35,9 @@ jobs:
     name: Deploys
     needs: [builds]
     uses: bcgov/quickstart-openshift-helpers/.github/workflows/.deployer.yml@v0.6.1
-    secrets:
-      oc_namespace: ${{ secrets.OC_NAMESPACE }}
-      oc_token: ${{ secrets.OC_TOKEN }}
+    secrets: inherit
+      # oc_namespace: ${{ secrets.OC_NAMESPACE }}
+      # oc_token: ${{ secrets.OC_TOKEN }}
     with:
       environment: dev
       values: "values-dev.yaml"
