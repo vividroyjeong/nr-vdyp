@@ -30,6 +30,16 @@ public class Coefficients extends AbstractList<Float> implements List<Float> {
 		this(listToArray(coe), indexFrom);
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		for (int i = 0; i < coe.length; i++) {
+			sb.append(indexFrom + i).append(':').append(coe[i]).append(", ");
+		}
+		return sb.delete(sb.length() - 2, sb.length()).append(']').toString();
+	}
+
 	private static float[] listToArray(List<Float> coe) {
 		float[] floatArray = new float[coe.size()];
 		int i = 0;

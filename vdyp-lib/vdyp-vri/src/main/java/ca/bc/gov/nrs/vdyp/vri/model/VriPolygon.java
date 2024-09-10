@@ -16,11 +16,10 @@ public class VriPolygon extends BaseVdypPolygon<VriLayer, Optional<Float>, VriSp
 	public static final String FIZ = " ";
 
 	public VriPolygon(
-			PolygonIdentifier polygonIdentifier, String fiz, BecDefinition bec,
-			Optional<Float> percentAvailable, Optional<PolygonMode> modeFip, Optional<String> nonproductiveDescription,
-			float yieldFactor
+			PolygonIdentifier polygonIdentifier, String fiz, BecDefinition bec, Optional<Float> percentAvailable,
+			Optional<PolygonMode> modeFip, Optional<String> nonproductiveDescription, float yieldFactor
 	) {
-		super(polygonIdentifier, percentAvailable, fiz, bec, modeFip);
+		super(polygonIdentifier, percentAvailable, fiz, bec, modeFip, Optional.empty());
 		this.nonproductiveDescription = nonproductiveDescription;
 		this.yieldFactor = yieldFactor;
 	}

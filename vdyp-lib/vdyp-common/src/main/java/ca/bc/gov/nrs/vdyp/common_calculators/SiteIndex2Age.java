@@ -523,7 +523,7 @@ public class SiteIndex2Age {
 		return (age);
 	}
 
-	public static double iterate(
+	private static double iterate(
 			SiteIndexEquation cuIndex, double siteHeight, SiteIndexAgeType ageType, double siteIndex,
 			double yearsToBreastHeight
 	) throws CommonCalculatorException {
@@ -538,12 +538,6 @@ public class SiteIndex2Age {
 		step = si2age / 2;
 		err_count = 0;
 
-		/* do a preliminary test to catch some obvious errors */
-		test_ht = SiteIndex2Height.indexToHeight(
-				cuIndex, si2age, SI_AT_TOTAL, siteIndex, yearsToBreastHeight, 0.5 /* may have to change */
-		);
-		// This would throw an illegal argument exception and move up the stack
-
 		/* loop until real close, or other end condition */
 		do {
 			if (TEST) {
@@ -556,8 +550,8 @@ public class SiteIndex2Age {
 						// Write to the file
 						fileWriter.write(
 								String.format(
-										"before index_to_height(age=%.2f, age_type=%s, site_index=%.2f, y2bh=%.2f)%n", si2age, ageType
-												.toString(), siteIndex, yearsToBreastHeight
+										"before index_to_height(age=%.2f, age_type=%s, site_index=%.2f, y2bh=%.2f)%n",
+										si2age, ageType.toString(), siteIndex, yearsToBreastHeight
 								)
 						);
 
@@ -603,7 +597,7 @@ public class SiteIndex2Age {
 			}
 
 			/* see if we're close enough */
-			if ( (test_ht - siteHeight > 0.005) || (test_ht - siteHeight < -0.005)) {
+			if (Math.abs(test_ht - siteHeight) > 0.005) {
 				/* not close enough */
 				if (test_ht > siteHeight) {
 					if (step > 0) {

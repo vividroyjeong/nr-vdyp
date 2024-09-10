@@ -64,7 +64,8 @@ class FipSpeciesParserTest {
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat", TestUtils.makeInputStream(
+				"test.dat",
+				TestUtils.makeInputStream(
 						"01002 S000001 00     1970 1 B  100.0B  100.0     0.0     0.0     0.0", //
 						"01002 S000001 00     1970 Z      0.0     0.0     0.0     0.0     0.0" //
 				)
@@ -90,13 +91,16 @@ class FipSpeciesParserTest {
 								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")), //
 								hasProperty("percentGenus", is(100.0f)), //
 								hasProperty(
-										"sp64DistributionSet", hasProperty(
-												"sp64DistributionMap", allOf(
-														aMapWithSize(1), hasEntry(
-																is(1), allOf(
-																		hasProperty("genusAlias", is("B")), hasProperty(
-																				"percentage", is(100f)
-																		)
+										"sp64DistributionSet",
+										hasProperty(
+												"sp64DistributionMap",
+												allOf(
+														aMapWithSize(1),
+														hasEntry(
+																is(1),
+																allOf(
+																		hasProperty("genusAlias", is("B")),
+																		hasProperty("percentage", is(100f))
 																)
 														)
 												)
@@ -120,7 +124,8 @@ class FipSpeciesParserTest {
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat", TestUtils.makeInputStream(
+				"test.dat",
+				TestUtils.makeInputStream(
 						"01002 S000001 00     1970 1 B   75.0B  100.0     0.0     0.0     0.0", //
 						"01002 S000001 00     1970 1 C   25.0C  100.0     0.0     0.0     0.0", //
 						"01002 S000001 00     1970 Z      0.0     0.0     0.0     0.0     0.0" //
@@ -147,30 +152,37 @@ class FipSpeciesParserTest {
 								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")), //
 								hasProperty("percentGenus", is(75.0f)), //
 								hasProperty(
-										"sp64DistributionSet", hasProperty(
-												"sp64DistributionMap", allOf(
-														aMapWithSize(1), hasEntry(
-																is(1), allOf(
-																		hasProperty("genusAlias", is("B")), hasProperty(
-																				"percentage", is(100f)
-																		)
+										"sp64DistributionSet",
+										hasProperty(
+												"sp64DistributionMap",
+												allOf(
+														aMapWithSize(1),
+														hasEntry(
+																is(1),
+																allOf(
+																		hasProperty("genusAlias", is("B")),
+																		hasProperty("percentage", is(100f))
 																)
 														)
 												)
 										)
 								)
-						), allOf(
+						),
+						allOf(
 								hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)), //
 								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("C")), //
 								hasProperty("percentGenus", is(25.0f)), //
 								hasProperty(
-										"sp64DistributionSet", hasProperty(
-												"sp64DistributionMap", allOf(
-														aMapWithSize(1), hasEntry(
-																is(1), allOf(
-																		hasProperty("genusAlias", is("C")), hasProperty(
-																				"percentage", is(100f)
-																		)
+										"sp64DistributionSet",
+										hasProperty(
+												"sp64DistributionMap",
+												allOf(
+														aMapWithSize(1),
+														hasEntry(
+																is(1),
+																allOf(
+																		hasProperty("genusAlias", is("C")),
+																		hasProperty("percentage", is(100f))
 																)
 														)
 												)
@@ -195,7 +207,8 @@ class FipSpeciesParserTest {
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat", TestUtils.makeInputStream(
+				"test.dat",
+				TestUtils.makeInputStream(
 						"01002 S000001 00     1970 1 B  100.0B  100.0     0.0     0.0     0.0", //
 						"01002 S000001 00     1970 V B  100.0B  100.0     0.0     0.0     0.0", //
 						"01002 S000001 00     1970 Z      0.0     0.0     0.0     0.0     0.0" //
@@ -222,30 +235,37 @@ class FipSpeciesParserTest {
 								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")), //
 								hasProperty("percentGenus", is(100.0f)), //
 								hasProperty(
-										"sp64DistributionSet", hasProperty(
-												"sp64DistributionMap", allOf(
-														aMapWithSize(1), hasEntry(
-																is(1), allOf(
-																		hasProperty("genusAlias", is("B")), hasProperty(
-																				"percentage", is(100f)
-																		)
+										"sp64DistributionSet",
+										hasProperty(
+												"sp64DistributionMap",
+												allOf(
+														aMapWithSize(1),
+														hasEntry(
+																is(1),
+																allOf(
+																		hasProperty("genusAlias", is("B")),
+																		hasProperty("percentage", is(100f))
 																)
 														)
 												)
 										)
 								)
-						), allOf(
+						),
+						allOf(
 								hasProperty("polygonIdentifier", isPolyId("01002 S000001 00", 1970)), //
 								hasProperty("layerType", is(LayerType.VETERAN)), hasProperty("genus", is("B")), //
 								hasProperty("percentGenus", is(100.0f)), //
 								hasProperty(
-										"sp64DistributionSet", hasProperty(
-												"sp64DistributionMap", allOf(
-														aMapWithSize(1), hasEntry(
-																is(1), allOf(
-																		hasProperty("genusAlias", is("B")), hasProperty(
-																				"percentage", is(100f)
-																		)
+										"sp64DistributionSet",
+										hasProperty(
+												"sp64DistributionMap",
+												allOf(
+														aMapWithSize(1),
+														hasEntry(
+																is(1),
+																allOf(
+																		hasProperty("genusAlias", is("B")),
+																		hasProperty("percentage", is(100f))
 																)
 														)
 												)
@@ -269,7 +289,8 @@ class FipSpeciesParserTest {
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat", TestUtils.makeInputStream(
+				"test.dat",
+				TestUtils.makeInputStream(
 						"01002 S000001 00     1970 1 B  100.0B  100.0     0.0     0.0     0.0", //
 						"01002 S000001 00     1970 Z      0.0     0.0     0.0     0.0     0.0", //
 						"01002 S000002 00     1970 1 B  100.0B  100.0     0.0     0.0     0.0", //
@@ -297,13 +318,16 @@ class FipSpeciesParserTest {
 								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")), //
 								hasProperty("percentGenus", is(100.0f)), //
 								hasProperty(
-										"sp64DistributionSet", hasProperty(
-												"sp64DistributionMap", allOf(
-														aMapWithSize(1), hasEntry(
-																is(1), allOf(
-																		hasProperty("genusAlias", is("B")), hasProperty(
-																				"percentage", is(100f)
-																		)
+										"sp64DistributionSet",
+										hasProperty(
+												"sp64DistributionMap",
+												allOf(
+														aMapWithSize(1),
+														hasEntry(
+																is(1),
+																allOf(
+																		hasProperty("genusAlias", is("B")),
+																		hasProperty("percentage", is(100f))
 																)
 														)
 												)
@@ -322,13 +346,16 @@ class FipSpeciesParserTest {
 								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")), //
 								hasProperty("percentGenus", is(100.0f)), //
 								hasProperty(
-										"sp64DistributionSet", hasProperty(
-												"sp64DistributionMap", allOf(
-														aMapWithSize(1), hasEntry(
-																is(1), allOf(
-																		hasProperty("genusAlias", is("B")), hasProperty(
-																				"percentage", is(100f)
-																		)
+										"sp64DistributionSet",
+										hasProperty(
+												"sp64DistributionMap",
+												allOf(
+														aMapWithSize(1),
+														hasEntry(
+																is(1),
+																allOf(
+																		hasProperty("genusAlias", is("B")),
+																		hasProperty("percentage", is(100f))
 																)
 														)
 												)
@@ -352,7 +379,8 @@ class FipSpeciesParserTest {
 		TestUtils.populateControlMapGenusReal(controlMap);
 
 		var fileResolver = TestUtils.fileResolver(
-				"test.dat", TestUtils.makeInputStream(
+				"test.dat",
+				TestUtils.makeInputStream(
 						"01002 S000001 00     1970 1 B  100.0B1  75.0B2  10.0B3   8.0B4   7.0", //
 						"01002 S000001 00     1970 Z      0.0     0.0     0.0     0.0     0.0" //
 				)
@@ -378,31 +406,37 @@ class FipSpeciesParserTest {
 								hasProperty("layerType", is(LayerType.PRIMARY)), hasProperty("genus", is("B")), //
 								hasProperty("percentGenus", is(100.0f)), //
 								hasProperty(
-										"sp64DistributionSet", hasProperty(
-												"sp64DistributionMap", allOf(
-														aMapWithSize(4), hasEntry(
-																is(1), allOf(
-																		hasProperty(
-																				"genusAlias", is("B1")
-																		), hasProperty("percentage", is(75f))
+										"sp64DistributionSet",
+										hasProperty(
+												"sp64DistributionMap",
+												allOf(
+														aMapWithSize(4),
+														hasEntry(
+																is(1),
+																allOf(
+																		hasProperty("genusAlias", is("B1")),
+																		hasProperty("percentage", is(75f))
 																)
-														), hasEntry(
-																is(2), allOf(
-																		hasProperty(
-																				"genusAlias", is("B2")
-																		), hasProperty("percentage", is(10f))
+														),
+														hasEntry(
+																is(2),
+																allOf(
+																		hasProperty("genusAlias", is("B2")),
+																		hasProperty("percentage", is(10f))
 																)
-														), hasEntry(
-																is(3), allOf(
-																		hasProperty(
-																				"genusAlias", is("B3")
-																		), hasProperty("percentage", is(8f))
+														),
+														hasEntry(
+																is(3),
+																allOf(
+																		hasProperty("genusAlias", is("B3")),
+																		hasProperty("percentage", is(8f))
 																)
-														), hasEntry(
-																is(4), allOf(
-																		hasProperty(
-																				"genusAlias", is("B4")
-																		), hasProperty("percentage", is(7f))
+														),
+														hasEntry(
+																is(4),
+																allOf(
+																		hasProperty("genusAlias", is("B4")),
+																		hasProperty("percentage", is(7f))
 																)
 														)
 												)

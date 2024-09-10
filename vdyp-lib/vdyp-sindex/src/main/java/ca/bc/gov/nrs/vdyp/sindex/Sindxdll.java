@@ -26,6 +26,7 @@ import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecie
 import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_SS;
 import static ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexSpecies.SI_SPEC_SW;
 
+import ca.bc.gov.nrs.vdyp.common.Reference;
 import ca.bc.gov.nrs.vdyp.common_calculators.AgeToAge;
 import ca.bc.gov.nrs.vdyp.common_calculators.Height2SiteIndex;
 import ca.bc.gov.nrs.vdyp.common_calculators.SiteClassCode2SiteIndex;
@@ -1464,7 +1465,7 @@ public class Sindxdll {
 							+ "Engelmann Spruce Growth Intercept Models. For. Anal. Inv. Br., B.C."
 							+ "Min. For., Lands, Nat. Resour. Oper., Victoria, B.C. Tech. Rep. 084. ",
 					"The growth intercept models were developed from 84 stem analysis plots "
-							+ "located throughout the range of the Engelmann Spruce � Subalpine Fir "
+							+ "located throughout the range of the Engelmann Spruce - Subalpine Fir "
 							+ "(ESSF) biogeoclimatic zone of British Columbia. Plots ranged in site "
 							+ "index from about 6 to 24 m. The models can be used to estimate site index "
 							+ "throughout the ESSF zone in British Columbia.", },

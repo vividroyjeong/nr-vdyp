@@ -8,11 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common.ValueOrMarker;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypLayerSpecies;
 import ca.bc.gov.nrs.vdyp.io.EndOfRecord;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
@@ -23,9 +20,12 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.GroupingStreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ControlledValueParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
+import ca.bc.gov.nrs.vdyp.model.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.Sp64Distribution;
 import ca.bc.gov.nrs.vdyp.model.Sp64DistributionSet;
+import ca.bc.gov.nrs.vdyp.model.VdypEntity;
+import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 
 public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String> {
 
@@ -57,8 +57,8 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 	}
 
 	@Override
-	public StreamingParserFactory<Collection<VdypLayerSpecies>>
-			map(String fileName, FileResolver fileResolver, Map<String, Object> control)
+	public StreamingParserFactory<Collection<VdypSpecies>>
+			map(String fileName, FileResolver fileResolver, Map<String, Object> controlMap)
 					throws IOException, ResourceParseException {
 		return () -> {
 			var lineParser = new LineParser().strippedString(25, DESCRIPTION).space(1)
@@ -91,14 +91,14 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 
 			var is = fileResolver.resolveForInput(fileName);
 
-			var genusDefinitionMap = (GenusDefinitionMap) control.get(ControlKey.SP0_DEF.name());
+			var genusDefinitionMap = (GenusDefinitionMap) controlMap.get(ControlKey.SP0_DEF.name());
 
-			var delegateStream = new AbstractStreamingParser<ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord>>(
-					is, lineParser, control
+			var delegateStream = new AbstractStreamingParser<ValueOrMarker<Optional<VdypSpecies>, EndOfRecord>>(
+					is, lineParser, controlMap
 			) {
 				@SuppressWarnings("unchecked")
 				@Override
-				protected ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord> convert(Map<String, Object> entry)
+				protected ValueOrMarker<Optional<VdypSpecies>, EndOfRecord> convert(Map<String, Object> entry)
 						throws ResourceParseException {
 
 					var polygonId = VdypPolygonDescriptionParser.parse((String) entry.get(DESCRIPTION));
@@ -120,13 +120,13 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 					var siteIndex = (Float) (entry.get(SITE_INDEX));
 					var dominantHeight = (Float) (entry.get(DOMINANT_HEIGHT));
 					var totalAge = (Float) (entry.get(TOTAL_AGE));
-					var ageAtBreastHeight = (Float) (entry.get(AGE_AT_BREAST_HEIGHT));
+					var yearsAtBreastHeight = (Float) (entry.get(AGE_AT_BREAST_HEIGHT));
 					var yearsToBreastHeight = (Float) (entry.get(YEARS_TO_BREAST_HEIGHT));
 					var isPrimarySpecies = Utils.<Boolean>optSafe(entry.get(IS_PRIMARY_SPECIES));
 					var siteCurveNumber = Utils.<Integer>optSafe(entry.get(SITE_CURVE_NUMBER))
 							.orElse(VdypEntity.MISSING_INTEGER_VALUE);
 
-					var builder = new ValueOrMarker.Builder<Optional<VdypLayerSpecies>, EndOfRecord>();
+					var builder = new ValueOrMarker.Builder<Optional<VdypSpecies>, EndOfRecord>();
 					return layerType.handle(l -> builder.value(l.map(lt -> {
 
 						List<Sp64Distribution> gdList = new ArrayList<>();
@@ -155,30 +155,60 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 
 						var genus = optionalGenus.orElse(genusDefinitionMap.getByIndex(genusIndex).getAlias());
 
-						return new VdypLayerSpecies(
-								polygonId, lt, genusIndex, genus, speciesDistributionSet, siteIndex, dominantHeight,
-								totalAge, ageAtBreastHeight, yearsToBreastHeight, isPrimarySpecies, siteCurveNumber
-						);
+						var iTotalAge = totalAge;
+						var iYearsToBreastHeight = yearsToBreastHeight;
+
+						// From VDYPGETS.FOR, lines 235 onwards
+						if (Float.isNaN(totalAge)) {
+							if (yearsAtBreastHeight > 0.0 && yearsToBreastHeight > 0.0)
+								iTotalAge = yearsAtBreastHeight + yearsToBreastHeight;
+						} else if (Float.isNaN(yearsToBreastHeight)) {
+							if (yearsAtBreastHeight > 0.0 && totalAge > yearsAtBreastHeight)
+								iYearsToBreastHeight = totalAge - yearsAtBreastHeight;
+						}
+
+						var inferredTotalAge = iTotalAge;
+						var inferredYearsToBreastHeight = iYearsToBreastHeight;
+
+						return VdypSpecies.build(speciesBuilder -> {
+							speciesBuilder.sp64DistributionSet(speciesDistributionSet);
+							speciesBuilder.polygonIdentifier(polygonId);
+							speciesBuilder.layerType(lt);
+							speciesBuilder.genus(genus, controlMap);
+
+							if (isPrimarySpecies.isPresent() && isPrimarySpecies.get() == true) {
+								speciesBuilder.addSite(siteBuilder -> {
+									siteBuilder.ageTotal(inferredTotalAge);
+									siteBuilder.height(dominantHeight);
+									siteBuilder.polygonIdentifier(polygonId);
+									siteBuilder.siteCurveNumber(siteCurveNumber);
+									siteBuilder.layerType(lt);
+									siteBuilder.siteGenus(genus);
+									siteBuilder.siteIndex(siteIndex);
+									siteBuilder.yearsToBreastHeight(inferredYearsToBreastHeight);
+								});
+							}
+						});
 					})), builder::marker);
 				}
 			};
 
-			return new GroupingStreamingParser<Collection<VdypLayerSpecies>, ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord>>(
+			return new GroupingStreamingParser<Collection<VdypSpecies>, ValueOrMarker<Optional<VdypSpecies>, EndOfRecord>>(
 					delegateStream
 			) {
 				@Override
-				protected boolean skip(ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord> nextChild) {
+				protected boolean skip(ValueOrMarker<Optional<VdypSpecies>, EndOfRecord> nextChild) {
 					return nextChild.getValue().map(Optional::isEmpty).orElse(false);
 				}
 
 				@Override
-				protected boolean stop(ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord> nextChild) {
+				protected boolean stop(ValueOrMarker<Optional<VdypSpecies>, EndOfRecord> nextChild) {
 					return nextChild.isMarker();
 				}
 
 				@Override
-				protected Collection<VdypLayerSpecies>
-						convert(List<ValueOrMarker<Optional<VdypLayerSpecies>, EndOfRecord>> children) {
+				protected Collection<VdypSpecies>
+						convert(List<ValueOrMarker<Optional<VdypSpecies>, EndOfRecord>> children) {
 					// Skip if empty (and unknown layer type)
 					return children.stream().map(ValueOrMarker::getValue).map(Optional::get).flatMap(Optional::stream)
 							.toList();

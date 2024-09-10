@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import ca.bc.gov.nrs.vdyp.common.HoldFirst;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.GenusDefinitionParser;
@@ -25,6 +23,9 @@ import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
  * Zone Alias and then sp0 Alias, one per index.
  *
  * Indices range from 0 to a parameterized value (7, for example).
+ *
+ * If, for a given input line, indicator is "one", coe i, i = 1 - 15, is set to coe 0 plus coe i. Otherwise (indicator
+ * is "zero"), coe i is set to the ith coe supplied in the input file.
  *
  * @author Michael Junkin, Vivid Solutions
  * @see ControlMapSubResourceParser
@@ -54,22 +55,14 @@ public abstract class BecZoneBySpeciesCoefficientParser
 				.value(4, BEC_ZONE_ID_KEY, ControlledValueParser.BEC) //
 				.space(2) //
 				.value(
-						1, INDEX_KEY, ValueParser
-								.range(ValueParser.INTEGER, 0, true, nCoefficients, false, "Index value")
+						1, INDEX_KEY,
+						ValueParser.range(ValueParser.INTEGER, 0, true, nCoefficients, false, "Index value")
 				) //
-				.value(2, INDICATOR_KEY, ValueParser.LOGICAL_0_1) //
+				.value(2, INDICATOR_KEY, ValueParser.range(ValueParser.INTEGER, 0, true, 1, true, "Indicator value")) //
 				.multiValue(NUM_SPECIES, 8, COEFFICIENTS_KEY, ValueParser.FLOAT);
 	}
 
 	private LineParser lineParser;
-
-	protected float value(float current, Optional<Float> first) {
-		return current;
-	}
-
-	protected float valueShared(float current, Optional<Float> first) {
-		return first.isPresent() ? 0f : current;
-	}
 
 	@Override
 	public MatrixMap2<String, String, Coefficients> parse(InputStream is, Map<String, Object> control)
@@ -84,28 +77,31 @@ public abstract class BecZoneBySpeciesCoefficientParser
 		lineParser.parse(is, result, (value, r, lineNumber) -> {
 			var becZoneId = (String) value.get(BEC_ZONE_ID_KEY);
 			var index = (int) value.get(INDEX_KEY);
-			var valueAppliesToAllSpecies = (!(boolean) value.get(INDICATOR_KEY));
+			var indicator = (int) value.get(INDICATOR_KEY);
 
 			@SuppressWarnings("unchecked")
 			var specCoefficients = (List<Float>) value.get(COEFFICIENTS_KEY);
 
 			var specIt = sp0Aliases.iterator();
 
+			Float first = null;
 			int coefficientIndex = 0;
-			var first = new HoldFirst<Float>();
 			while (specIt.hasNext()) {
 				var spec = specIt.next();
-				Coefficients coefficients = r.get(becZoneId, spec);
-				Float coe = specCoefficients.get(coefficientIndex);
 
-				if (valueAppliesToAllSpecies) {
-					coefficients.setCoe(index, valueShared(coe, first.get()));
+				Float coe = specCoefficients.get(coefficientIndex);
+				if (coefficientIndex == 0) {
+					first = coe;
+				}
+
+				Coefficients coefficients = r.get(becZoneId, spec);
+				if (indicator == 0 || coefficientIndex == 0) {
+					coefficients.setCoe(index, first);
 				} else {
-					coefficients.setCoe(index, value(coe, first.get()));
+					coefficients.setCoe(index, first + coe);
 				}
 
 				coefficientIndex += 1;
-				first.set(coe);
 			}
 
 			return r;
@@ -113,5 +109,4 @@ public abstract class BecZoneBySpeciesCoefficientParser
 
 		return result;
 	}
-
 }

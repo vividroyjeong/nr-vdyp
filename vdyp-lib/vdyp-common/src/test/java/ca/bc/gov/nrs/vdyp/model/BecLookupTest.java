@@ -44,9 +44,8 @@ class BecLookupTest {
 		var result = lookup.getBecs();
 
 		assertThat(
-				result, containsInAnyOrder(
-						allOf(hasProperty("alias", is("BG"))), allOf(hasProperty("alias", is("ESSF")))
-				)
+				result,
+				containsInAnyOrder(allOf(hasProperty("alias", is("BG"))), allOf(hasProperty("alias", is("ESSF"))))
 		);
 	}
 
@@ -77,9 +76,8 @@ class BecLookupTest {
 		var result = lookup.getBecsForRegion(Region.COASTAL);
 
 		assertThat(
-				result, containsInAnyOrder(
-						allOf(hasProperty("alias", is("CDF"))), allOf(hasProperty("alias", is("CWH")))
-				)
+				result,
+				containsInAnyOrder(allOf(hasProperty("alias", is("CDF"))), allOf(hasProperty("alias", is("CWH"))))
 		);
 	}
 
@@ -94,9 +92,8 @@ class BecLookupTest {
 		var result = lookup.getBecsForRegion(Region.INTERIOR);
 
 		assertThat(
-				result, containsInAnyOrder(
-						allOf(hasProperty("alias", is("BG"))), allOf(hasProperty("alias", is("ESSF")))
-				)
+				result,
+				containsInAnyOrder(allOf(hasProperty("alias", is("BG"))), allOf(hasProperty("alias", is("ESSF"))))
 		);
 	}
 
@@ -111,10 +108,10 @@ class BecLookupTest {
 		var result = lookup.getBecsForScope("");
 
 		assertThat(
-				result, containsInAnyOrder(
-						allOf(hasProperty("alias", is("CDF"))), allOf(hasProperty("alias", is("CWH"))), allOf(
-								hasProperty("alias", is("BG"))
-						), allOf(hasProperty("alias", is("ESSF")))
+				result,
+				containsInAnyOrder(
+						allOf(hasProperty("alias", is("CDF"))), allOf(hasProperty("alias", is("CWH"))),
+						allOf(hasProperty("alias", is("BG"))), allOf(hasProperty("alias", is("ESSF")))
 				)
 		);
 	}
@@ -130,9 +127,8 @@ class BecLookupTest {
 		var result = lookup.getBecsForScope("I");
 
 		assertThat(
-				result, containsInAnyOrder(
-						allOf(hasProperty("alias", is("BG"))), allOf(hasProperty("alias", is("ESSF")))
-				)
+				result,
+				containsInAnyOrder(allOf(hasProperty("alias", is("BG"))), allOf(hasProperty("alias", is("ESSF"))))
 		);
 	}
 

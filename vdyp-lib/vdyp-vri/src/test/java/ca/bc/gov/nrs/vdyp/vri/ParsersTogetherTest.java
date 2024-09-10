@@ -55,9 +55,9 @@ class ParsersTogetherTest {
 
 	@BeforeEach
 	void setUp() throws IOException, ResourceParseException {
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
-		controlMap.put(ControlKey.VRI_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
+		controlMap.put(ControlKey.VDYP_OUTPUT_VDYP_POLYGON.name(), "DUMMY1");
+		controlMap.put(ControlKey.VDYP_OUTPUT_VDYP_LAYER_BY_SPECIES.name(), "DUMMY2");
+		controlMap.put(ControlKey.VDYP_OUTPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), "DUMMY3");
 
 		resolver = new MockFileResolver("Test");
 
@@ -66,20 +66,20 @@ class ParsersTogetherTest {
 		resolver.addStream("DUMMY3", (OutputStream) new ByteArrayOutputStream());
 
 		controlMap.put(
-				ControlKey.BEC_DEF.name(), new BecDefinitionParser()
-						.parse(TestUtils.class, "coe/Becdef.dat", controlMap)
+				ControlKey.BEC_DEF.name(),
+				new BecDefinitionParser().parse(TestUtils.class, "coe/Becdef.dat", controlMap)
 		);
 		controlMap.put(
-				ControlKey.SP0_DEF.name(), new GenusDefinitionParser()
-						.parse(TestUtils.class, "coe/SP0DEF_v0.dat", controlMap)
+				ControlKey.SP0_DEF.name(),
+				new GenusDefinitionParser().parse(TestUtils.class, "coe/SP0DEF_v0.dat", controlMap)
 		);
 		controlMap.put(
-				ControlKey.DEFAULT_EQ_NUM.name(), new DefaultEquationNumberParser()
-						.parse(TestUtils.class, "coe/GRPBA1.DAT", controlMap)
+				ControlKey.DEFAULT_EQ_NUM.name(),
+				new DefaultEquationNumberParser().parse(TestUtils.class, "coe/GRPBA1.DAT", controlMap)
 		);
 		controlMap.put(
-				ControlKey.EQN_MODIFIERS.name(), new EquationModifierParser()
-						.parse(TestUtils.class, "coe/GMODBA1.DAT", controlMap)
+				ControlKey.EQN_MODIFIERS.name(),
+				new EquationModifierParser().parse(TestUtils.class, "coe/GMODBA1.DAT", controlMap)
 		);
 		TestUtils.populateControlMapBecReal(controlMap);
 	}
@@ -530,7 +530,7 @@ class ParsersTogetherTest {
 		assertThat(result, hasProperty("layers", Matchers.aMapWithSize(1)));
 		var primaryResult = result.getLayers().get(LayerType.PRIMARY);
 		var veteranResult = result.getLayers().get(LayerType.VETERAN);
-		assertThat(primaryResult, allOf(hasProperty("empericalRelationshipParameterIndex", present(is(27)))));
+		assertThat(primaryResult, allOf(hasProperty("empiricalRelationshipParameterIndex", present(is(27)))));
 		assertThat(veteranResult, nullValue());
 
 		app.close();

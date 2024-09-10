@@ -84,8 +84,8 @@ class ReconcilationMethodsTest {
 		ReconcilationMethods.reconcileComponents(ba, tph, dq);
 
 		assertThat(
-				ba, VdypMatchers
-						.utilization(0f, 0.397305071f, 0.00485289097f, 0.0131751001f, 0.0221586525f, 0.357118428f)
+				ba,
+				VdypMatchers.utilization(0f, 0.397305071f, 0.00485289097f, 0.0131751001f, 0.0221586525f, 0.357118428f)
 		);
 		assertThat(
 				tph, VdypMatchers.utilization(0f, 5.04602766f, 0.733301044f, 0.899351299f, 0.851697803f, 2.56167722f)

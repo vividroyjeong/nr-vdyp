@@ -6,7 +6,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonDescription;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -14,6 +13,7 @@ import ca.bc.gov.nrs.vdyp.io.parse.control.ControlMapValueReplacer;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.AbstractStreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 
 public class VdypPolygonDescriptionParser implements ControlMapValueReplacer<Object, String> {
 
@@ -26,7 +26,7 @@ public class VdypPolygonDescriptionParser implements ControlMapValueReplacer<Obj
 
 	private static Pattern descriptionPattern = Pattern.compile("(.*)([\\d]{4}$)");
 
-	public static VdypPolygonDescription parse(String description) throws ResourceParseException {
+	public static PolygonIdentifier parse(String description) throws ResourceParseException {
 
 		Matcher matcher = descriptionPattern.matcher(description);
 
@@ -35,7 +35,7 @@ public class VdypPolygonDescriptionParser implements ControlMapValueReplacer<Obj
 
 		if (matcher.matches() && matcher.group(2) != null) {
 			year = Integer.parseInt(matcher.group(2));
-			name = matcher.group(1);
+			name = matcher.group(1).trim();
 		} else {
 			throw new ResourceParseException(
 					"Polygon description " + description + " did not end with a four-digit year value."
@@ -44,11 +44,11 @@ public class VdypPolygonDescriptionParser implements ControlMapValueReplacer<Obj
 			);
 		}
 
-		return new VdypPolygonDescription(description, name, year);
+		return new PolygonIdentifier(name, year);
 	}
 
 	@Override
-	public StreamingParserFactory<VdypPolygonDescription>
+	public StreamingParserFactory<PolygonIdentifier>
 			map(String fileName, FileResolver fileResolver, Map<String, Object> control)
 					throws IOException, ResourceParseException {
 		return () -> {
@@ -61,10 +61,10 @@ public class VdypPolygonDescriptionParser implements ControlMapValueReplacer<Obj
 
 			var is = fileResolver.resolveForInput(fileName);
 
-			return new AbstractStreamingParser<VdypPolygonDescription>(is, lineParser, control) {
+			return new AbstractStreamingParser<PolygonIdentifier>(is, lineParser, control) {
 
 				@Override
-				protected VdypPolygonDescription convert(Map<String, Object> entry) throws ResourceParseException {
+				protected PolygonIdentifier convert(Map<String, Object> entry) throws ResourceParseException {
 
 					return parse((String) entry.get(DESCRIPTION));
 				}

@@ -46,6 +46,9 @@ public class UpperBoundsParser implements ControlMapSubResourceParser<Map<Intege
 	public static final String MAX_BA_KEY = "maxBaKey";
 	public static final String MAX_DQ_KEY = "maxDqKey";
 
+	public static final int BA_INDEX = 1;
+	public static final int DQ_INDEX = 2;
+
 	private static final Pattern ZEROES = Pattern.compile("0{0,3}");
 
 	public UpperBoundsParser() {
@@ -77,7 +80,8 @@ public class UpperBoundsParser implements ControlMapSubResourceParser<Map<Intege
 			if (baGroupId < 0 || baGroupId >= LAST_BA_GROUP_ID) {
 				throw new ValueParseException(
 						MessageFormat.format(
-								"Line {0}: Basal Area Group Id {0} is out of range; expecting a value from 1 to {1}", lineNumber, baGroupId, LAST_BA_GROUP_ID
+								"Line {0}: Basal Area Group Id {0} is out of range; expecting a value from 1 to {1}",
+								lineNumber, baGroupId, LAST_BA_GROUP_ID
 						)
 				);
 			}

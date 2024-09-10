@@ -37,8 +37,8 @@ class BasalAreaGrowthEmpiricalParserTest {
 		assertTrue(m.isFull());
 		assertThat(m.get("AT", "AC"), hasSize(8));
 		assertThat(
-				m.get("AT", "AC"), Matchers
-						.contains(7.9550f, -0.5818f, 0.00538f, 3.90488f, -1.0999f, 0.01348f, 0.82063f, 0.69837f)
+				m.get("AT", "AC"),
+				Matchers.contains(7.9550f, -0.5818f, 0.00538f, 3.90488f, -1.0999f, 0.01348f, 0.82063f, 0.69837f)
 		);
 		assertThat(m.get("AT", "AT"), Matchers.contains(0.0f, 0.0f, 0.0f, 0.0f, 0.0766f, -0.01473f, 0.0f, 0.0f));
 	}

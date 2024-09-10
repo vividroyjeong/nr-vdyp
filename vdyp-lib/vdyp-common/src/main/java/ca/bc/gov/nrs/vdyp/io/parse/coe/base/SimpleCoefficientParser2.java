@@ -44,7 +44,5 @@ public abstract class SimpleCoefficientParser2<K1, K2>
 		if (expected != parsed) {
 			throw new ResourceParseValidException("Expected " + expected + " records but there were " + parsed);
 		}
-
 	}
-
 }

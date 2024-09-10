@@ -24,6 +24,7 @@ import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
+import ca.bc.gov.nrs.vdyp.model.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.UtilizationVector;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
@@ -319,9 +320,8 @@ public class Utils {
 	}
 
 	public static GenusDefinition getGenusDefinition(String genusAlias, Map<String, Object> controlMap) {
-		return (GenusDefinition) expectParsedControl(
-				controlMap, ControlKey.SP0_DEF, GenusDefinitionMap.class
-		).getByAlias(genusAlias);
+		return (GenusDefinition) expectParsedControl(controlMap, ControlKey.SP0_DEF, GenusDefinitionMap.class)
+				.getByAlias(genusAlias);
 	}
 
 	/**

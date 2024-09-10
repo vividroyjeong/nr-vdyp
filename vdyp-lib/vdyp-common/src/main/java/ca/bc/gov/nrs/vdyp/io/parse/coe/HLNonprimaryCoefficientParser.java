@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +25,8 @@ import ca.bc.gov.nrs.vdyp.model.Region;
  * This file contains a (possibly incomplete) mapping of species aliases <b>x</b> species aliases <b>x</b> regions to a
  * (one-based) list of two coefficients. Each row contains:
  * <ol>
- * <li>(cols 0-1) species alias #1</li>
- * <li>(cols 3-4) species alias #2</li>
+ * <li>(cols 0-1) non-primary species alias</li>
+ * <li>(cols 3-4) primary species alias</li>
  * <li>(col 6) region character ('I' or 'C')</li>
  * <li>(col 8) an equation number</li>
  * <li>(cols 9-18, 19-28) two coefficients</li>
@@ -47,8 +48,8 @@ public class HLNonprimaryCoefficientParser
 
 	public static final int NUM_COEFFICIENTS = 2;
 
-	public static final String SPECIES_1_KEY = "species1";
-	public static final String SPECIES_2_KEY = "species2";
+	public static final String NON_PRIMARY_SPECIES_KEY = "nonPrimarySpecies";
+	public static final String PRIMARY_SPECIES_KEY = "primarySpecies";
 	public static final String REGION_KEY = "region";
 	public static final String EQUATION_KEY = "ieqn";
 	public static final String COEFFICIENT_KEY = "coefficient";
@@ -62,8 +63,10 @@ public class HLNonprimaryCoefficientParser
 				return (line.length() < 6 && line.isBlank()) || line.substring(0, 6).isBlank();
 			}
 
-		}.value(2, SPECIES_1_KEY, ValueParser.STRING).space(1).value(2, SPECIES_2_KEY, ValueParser.STRING).space(1)
-				.value(1, REGION_KEY, ValueParser.REGION).space(1).integer(1, EQUATION_KEY)
+		}.value(2, NON_PRIMARY_SPECIES_KEY, ValueParser.STRING).space(1) //
+				.value(2, PRIMARY_SPECIES_KEY, ValueParser.STRING).space(1) //
+				.value(1, REGION_KEY, ValueParser.REGION).space(1) //
+				.integer(1, EQUATION_KEY) //
 				.multiValue(NUM_COEFFICIENTS, 10, COEFFICIENT_KEY, ValueParser.FLOAT);
 	}
 
@@ -80,9 +83,9 @@ public class HLNonprimaryCoefficientParser
 		);
 		lineParser.parse(is, result, (value, r, line) -> {
 			@SuppressWarnings("java:S117")
-			var sp0_1 = (String) value.get(SPECIES_1_KEY);
+			var sp0_1 = (String) value.get(NON_PRIMARY_SPECIES_KEY);
 			@SuppressWarnings("java:S117")
-			var sp0_2 = (String) value.get(SPECIES_2_KEY);
+			var sp0_2 = (String) value.get(PRIMARY_SPECIES_KEY);
 			var ieqn = (Integer) value.get(EQUATION_KEY);
 			var region = (Region) value.get(REGION_KEY);
 			@SuppressWarnings("unchecked")
@@ -91,8 +94,19 @@ public class HLNonprimaryCoefficientParser
 			GenusDefinitionParser.checkSpecies(speciesIndicies, sp0_2);
 
 			if (coefficients.size() < NUM_COEFFICIENTS) {
-				throw new ValueParseException(null, "Expected 2 coefficients"); // TODO handle this better
+				throw new ValueParseException(
+						MessageFormat.format("{0}, {1}, {2}", sp0_1, sp0_2, region),
+						"Expected 2 coefficients but saw " + coefficients.size()
+				);
 			}
+
+			if (ieqn != 1 && ieqn != 2) {
+				throw new ValueParseException(
+						MessageFormat.format("{0}, {1}, {2}", sp0_1, sp0_2, region),
+						"Equation number " + ieqn + " is not 1 or 2"
+				);
+			}
+
 			r.put(sp0_1, sp0_2, region, Optional.of(new NonprimaryHLCoefficients(coefficients, ieqn)));
 
 			return r;

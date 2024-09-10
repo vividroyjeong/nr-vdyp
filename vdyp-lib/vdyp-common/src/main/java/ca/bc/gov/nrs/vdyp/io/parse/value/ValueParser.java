@@ -161,8 +161,8 @@ public interface ValueParser<T> extends ControlledValueParser<T> {
 			if (x.compareTo(min) < (includeMin ? 0 : 1)) {
 				return Optional.of(
 						String.format(
-								RANGE_ERROR_TEMPLATE, name, includeMin ? "greater than or equal to"
-										: "greater than", min
+								RANGE_ERROR_TEMPLATE, name, includeMin ? "greater than or equal to" : "greater than",
+								min
 						)
 				);
 			}

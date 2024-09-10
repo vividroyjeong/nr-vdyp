@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.vdyp.io.parse;
 
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.present;
+import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.notPresent;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.HashMap;
@@ -34,7 +35,7 @@ public class NonPrimarySpeciesDqGrowthParserTest {
 		assertThat(m.get("AC", 0), present(coe(1, -0.010264f, 0.005373f, -0.016904f)));
 		assertThat(m.get("Y", 30), present(coe(1, 0.069221f, -0.024821f, 0.001982f)));
 
-		// Check that defaults are applied
-		assertThat(m.get("PY", 3), present(coe(1, 0.0f, 0.0f, 0.0f)));
+		// Check that data not present in the source is not in the map
+		assertThat(m.get("PY", 3), notPresent());
 	}
 }

@@ -122,14 +122,16 @@ class LineParserTest {
 		parser.string(4, "part1").string("part2");
 
 		var result1 = parser.parseLine(
-				"123  67890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 ", Collections
-						.emptyMap()
+				"123  67890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 ",
+				Collections.emptyMap()
 		);
 
 		assertThat(result1, hasEntry("part1", "123 "));
 		assertThat(
-				result1, hasEntry(
-						"part2", " 67890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 "
+				result1,
+				hasEntry(
+						"part2",
+						" 67890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 "
 				)
 		);
 
@@ -141,14 +143,16 @@ class LineParserTest {
 		parser.strippedString(4, "part1").strippedString("part2");
 
 		var result1 = parser.parseLine(
-				"123  67890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 ", Collections
-						.emptyMap()
+				"123  67890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 ",
+				Collections.emptyMap()
 		);
 
 		assertThat(result1, hasEntry("part1", "123"));
 		assertThat(
-				result1, hasEntry(
-						"part2", "67890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+				result1,
+				hasEntry(
+						"part2",
+						"67890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
 				)
 		);
 
@@ -177,15 +181,15 @@ class LineParserTest {
 		}
 
 		assertThat(
-				result, contains(
+				result,
+				contains(
 						allOf(
-								(Matcher) hasEntry("part1", 42), (Matcher) hasEntry(
-										"part2", "Value1"
-								), (Matcher) hasEntry(LineParser.LINE_NUMBER_KEY, 1)
-						), allOf(
-								(Matcher) hasEntry("part1", 43), (Matcher) hasEntry(
-										"part2", "Value2"
-								), (Matcher) hasEntry(LineParser.LINE_NUMBER_KEY, 2)
+								(Matcher) hasEntry("part1", 42), (Matcher) hasEntry("part2", "Value1"),
+								(Matcher) hasEntry(LineParser.LINE_NUMBER_KEY, 1)
+						),
+						allOf(
+								(Matcher) hasEntry("part1", 43), (Matcher) hasEntry("part2", "Value2"),
+								(Matcher) hasEntry(LineParser.LINE_NUMBER_KEY, 2)
 						)
 				)
 		);
@@ -269,10 +273,10 @@ class LineParserTest {
 		}
 
 		assertThat(
-				result, contains(
-						allOf((Matcher) hasEntry("part1", 42), (Matcher) hasEntry("part2", "Value1")), allOf(
-								(Matcher) hasEntry("part1", 43), (Matcher) hasEntry("part2", "Value2")
-						)
+				result,
+				contains(
+						allOf((Matcher) hasEntry("part1", 42), (Matcher) hasEntry("part2", "Value1")),
+						allOf((Matcher) hasEntry("part1", 43), (Matcher) hasEntry("part2", "Value2"))
 				)
 		);
 	}
@@ -296,10 +300,10 @@ class LineParserTest {
 		}
 
 		assertThat(
-				result, contains(
-						allOf((Matcher) hasEntry("part1", 42), (Matcher) hasEntry("part2", "Value1")), allOf(
-								(Matcher) hasEntry("part1", 43), (Matcher) hasEntry("part2", "Value2")
-						)
+				result,
+				contains(
+						allOf((Matcher) hasEntry("part1", 42), (Matcher) hasEntry("part2", "Value1")),
+						allOf((Matcher) hasEntry("part1", 43), (Matcher) hasEntry("part2", "Value2"))
 				)
 		);
 	}
