@@ -40,6 +40,14 @@ spec:
               value: "http://{{ .Release.Name }}-backend"
             - name: LOG_LEVEL
               value: "info"
+            - name: VITE_SSO_AUTH_SERVER_URL
+              value: {{ .Values.frontend.env.VITE_SSO_AUTH_SERVER_URL | quote }}
+            - name: VITE_SSO_CLIENT_ID
+              value: {{ .Values.frontend.env.VITE_SSO_CLIENT_ID | quote }}
+            - name: VITE_SSO_REALM
+              value: {{ .Values.frontend.env.VITE_SSO_REALM | quote }}
+            - name: VITE_SSO_REDIRECT_URI
+              value: {{ .Values.frontend.env.VITE_SSO_REALM | quote }}              
           ports:
             - name: http
               containerPort: 3000

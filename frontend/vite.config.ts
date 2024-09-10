@@ -7,6 +7,24 @@ import packageVersion from 'vite-plugin-package-version'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
+    {
+      name: 'build-html',
+      apply: 'build',
+      transformIndexHtml: (html) => {
+        return {
+          html,
+          tags: [
+            {
+              tag: 'script',
+              attrs: {
+                src: '/env.js',
+              },
+              injectTo: 'head',
+            },
+          ],
+        }
+      },
+    },
     Vue(),
     packageVersion(),
     Vuetify({
