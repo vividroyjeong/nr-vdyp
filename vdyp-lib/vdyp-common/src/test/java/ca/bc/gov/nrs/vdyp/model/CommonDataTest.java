@@ -13,7 +13,8 @@ class CommonDataTest {
 	void test() {
 		assertThat(CommonData.ITG_PURE, aMapWithSize(16));
 		assertThat(
-				CommonData.ITG_PURE.keySet(), containsInAnyOrder(
+				CommonData.ITG_PURE.keySet(),
+				containsInAnyOrder(
 						"AC", "AT", "B", "C", "D", "E", "F", "H", "L", "MB", "PA", "PL", "PW", "PY", "S", "Y"
 				)
 		);

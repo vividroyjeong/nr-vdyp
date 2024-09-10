@@ -452,7 +452,7 @@ class VriInputValidationTest {
 						iBuilder.height(28.0f);
 						iBuilder.siteIndex(14.3f);
 						iBuilder.siteSpecies("CW");
-						//iBuilder.yearsToBreastHeight(10.9f);
+						// iBuilder.yearsToBreastHeight(10.9f);
 						iBuilder.breastHeightAge(189.1f);
 						iBuilder.siteCurveNumber(11);
 					});
@@ -466,7 +466,7 @@ class VriInputValidationTest {
 						iBuilder.height(32.0f);
 						iBuilder.siteIndex(14.6f);
 						iBuilder.siteSpecies("HW");
-						//iBuilder.yearsToBreastHeight(9.7f);
+						// iBuilder.yearsToBreastHeight(9.7f);
 						iBuilder.breastHeightAge(190.3f);
 						iBuilder.siteCurveNumber(37);
 					});
@@ -1575,10 +1575,10 @@ class VriInputValidationTest {
 
 		var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygon(poly));
 		assertThat(
-				ex, hasProperty(
-						"message", is(
-								"Veteran layer primary species height 34.0 should be greater than or equal to 36.0"
-						)
+				ex,
+				hasProperty(
+						"message",
+						is("Veteran layer primary species height 34.0 should be greater than or equal to 36.0")
 				)
 		);
 

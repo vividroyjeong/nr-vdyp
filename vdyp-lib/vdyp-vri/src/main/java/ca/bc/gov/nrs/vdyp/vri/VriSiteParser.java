@@ -52,9 +52,10 @@ public class VriSiteParser implements ControlMapValueReplacer<StreamingParserFac
 					.strippedString(25, VriPolygonParser.POLYGON_IDENTIFIER) //
 					.space(1) //
 					.value(
-							1, VriLayerParser.LAYER, ValueParser.valueOrMarker(
-									ValueParser.LAYER, ValueParser
-											.optionalSingleton("Z"::equals, EndOfRecord.END_OF_RECORD)
+							1, VriLayerParser.LAYER,
+							ValueParser.valueOrMarker(
+									ValueParser.LAYER,
+									ValueParser.optionalSingleton("Z"::equals, EndOfRecord.END_OF_RECORD)
 							)
 					) //
 					.value(4, AGE_TOTAL, ValueParser.SAFE_POSITIVE_FLOAT) //
@@ -111,12 +112,10 @@ public class VriSiteParser implements ControlMapValueReplacer<StreamingParserFac
 							siteBuilder.height(
 									// Default height to 0.05 if the layer is primary, age total is within 0.6 of 1,
 									// and site index is >=3. per VDYP7 Fortran, per memo JFmemo_20090329.doc
-									height.or(
-											() -> s.map(l -> l == LayerType.PRIMARY).orElse(false) && //
-													ageTotal.map(at -> FloatMath.abs(at - 1f) < 0.6).orElse(false) && //
-													siteIndex.map(si -> si >= 3f).orElse(false) //
-															? Optional.of(0.05f)
-															: Optional.empty()
+									height.or(() -> s.map(l -> l == LayerType.PRIMARY).orElse(false) && //
+											ageTotal.map(at -> FloatMath.abs(at - 1f) < 0.6).orElse(false) && //
+											siteIndex.map(si -> si >= 3f).orElse(false) //
+													? Optional.of(0.05f) : Optional.empty()
 									)
 							);
 							siteBuilder.ageTotal(ageTotal);
@@ -127,9 +126,8 @@ public class VriSiteParser implements ControlMapValueReplacer<StreamingParserFac
 									// present. per VDYP7 Fortran
 									breastHeightAge.filter(
 											x -> x != 0f || Utils.mapBoth(
-													ageTotal, yearsToBreastHeight, (
-															at, ytbh
-													) -> FloatMath.abs(at - ytbh) < 0.5
+													ageTotal, yearsToBreastHeight,
+													(at, ytbh) -> FloatMath.abs(at - ytbh) < 0.5
 											).orElse(false)
 									)
 							);

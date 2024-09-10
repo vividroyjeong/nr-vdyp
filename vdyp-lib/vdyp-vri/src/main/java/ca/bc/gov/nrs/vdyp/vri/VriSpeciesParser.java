@@ -66,9 +66,10 @@ public class VriSpeciesParser
 					.strippedString(25, VriPolygonParser.POLYGON_IDENTIFIER) //
 					.space(1) //
 					.value(
-							1, VriLayerParser.LAYER, ValueParser.valueOrMarker(
-									ValueParser.LAYER, ValueParser
-											.optionalSingleton("Z"::equals, EndOfRecord.END_OF_RECORD)
+							1, VriLayerParser.LAYER,
+							ValueParser.valueOrMarker(
+									ValueParser.LAYER,
+									ValueParser.optionalSingleton("Z"::equals, EndOfRecord.END_OF_RECORD)
 							)
 					) //
 					.space(1) //

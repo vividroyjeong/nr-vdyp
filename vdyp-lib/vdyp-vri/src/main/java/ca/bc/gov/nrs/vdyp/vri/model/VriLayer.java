@@ -86,11 +86,10 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 		return empericalRelationshipParameterIndex;
 	}
 
-	
 	public float getAgeIncrease() {
 		return this.ageIncrease;
 	};
-	
+
 	/**
 	 * Accepts a configuration function that accepts a builder to configure.
 	 *
@@ -116,9 +115,9 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 
 	public static class Builder
 			extends BaseVdypLayer.Builder<VriLayer, VriSpecies, VriSite, VriSpecies.Builder, VriSite.Builder> {
-		
+
 		private static final float DEFAULT_AGE_INCREASE = 0;
-		
+
 		protected Optional<Float> crownClosure = Optional.empty();
 		protected Optional<Float> baseArea = Optional.empty();
 		protected Optional<Float> treesPerHectare = Optional.empty();
@@ -204,7 +203,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 		public Builder secondaryGenus(String secondaryGenus) {
 			return secondaryGenus(Optional.of(secondaryGenus));
 		}
-		
+
 		public Builder ageIncrease(float ageIncrease) {
 			this.ageIncrease = Optional.of(ageIncrease);
 			return this;
