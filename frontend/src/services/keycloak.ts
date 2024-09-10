@@ -3,15 +3,21 @@ import { useAuthStore } from '@/stores/common/authStore'
 import type { KeycloakInitOptions } from 'keycloak-js'
 import { KEYCLOAK } from '@/constants/constants'
 import { Util } from '@/utils/util'
+import { env } from '@/env'
 
 let keycloakInstance: Keycloak | null = null
+
+const ssoAuthServerUrl = env.VITE_SSO_AUTH_SERVER_URL
+const ssoClientId = env.VITE_SSO_CLIENT_ID
+const ssoRealm = env.VITE_SSO_REALM
+const ssoRedirectUrl = env.VITE_SSO_REDIRECT_URI
 
 const createKeycloakInstance = (): Keycloak => {
   if (!keycloakInstance) {
     keycloakInstance = new Keycloak({
-      url: `${import.meta.env.VITE_SSO_AUTH_SERVER_URL}` as string,
-      realm: `${import.meta.env.VITE_SSO_REALM}` as string,
-      clientId: `${import.meta.env.VITE_SSO_CLIENT_ID}` as string,
+      url: `${ssoAuthServerUrl}` as string,
+      realm: `${ssoRealm}` as string,
+      clientId: `${ssoClientId}` as string,
     })
   }
   return keycloakInstance
@@ -26,7 +32,7 @@ const initOptions: KeycloakInitOptions = {
 }
 
 const loginOptions = {
-  redirectUri: import.meta.env.VITE_SSO_REDIRECT_URI as string,
+  redirectUri: ssoRedirectUrl as string,
 }
 
 export const initializeKeycloak = async (): Promise<Keycloak | undefined> => {
@@ -103,10 +109,7 @@ const validateAccessToken = (accessToken: string): boolean => {
     const tokenParsed = JSON.parse(atob(accessToken.split('.')[1]))
 
     // Validate issuer
-    if (
-      tokenParsed.iss !==
-      `${import.meta.env.VITE_SSO_AUTH_SERVER_URL}/realms/${import.meta.env.VITE_SSO_REALM}`
-    ) {
+    if (tokenParsed.iss !== `${ssoAuthServerUrl}/realms/${ssoRealm}`) {
       console.error('Invalid token issuer.')
       return false
     }
@@ -213,10 +216,10 @@ export const logout = (): void => {
   const authStore = useAuthStore()
   authStore.clearUser()
   window.location.href = `https://logon7.gov.bc.ca/clp-cgi/logoff.cgi?retnow=1&returl=${encodeURIComponent(
-    `${import.meta.env.VITE_SSO_AUTH_SERVER_URL}/realms/${import.meta.env.VITE_SSO_REALM}/protocol/openid-connect/logout?post_logout_redirect_uri=` +
-      import.meta.env.VITE_SSO_REDIRECT_URI +
+    `${ssoAuthServerUrl}/realms/${ssoRealm}/protocol/openid-connect/logout?post_logout_redirect_uri=` +
+      ssoRedirectUrl +
       '&client_id=' +
-      import.meta.env.VITE_SSO_CLIENT_ID,
+      ssoClientId,
   )}`
 }
 
