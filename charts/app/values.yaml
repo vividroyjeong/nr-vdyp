@@ -23,7 +23,6 @@ global:
   databaseAlias: bitnami-pg
 #-- the components of the application, backend.
 backend:
-  fullnameOverride: "vdyp-backend-dev"
   #-- enable or disable backend
   enabled: true
   #-- the deployment strategy, can be "Recreate" or "RollingUpdate"
