@@ -70,6 +70,7 @@ backend:
     minAvailable: 1 # the minimum number of pods that must be available during the disruption budget.
 
 frontend:
+  fullnameOverride: "vdyp-ui-dev"
   # -- enable or disable a component deployment.
   enabled: true
   # -- the deployment strategy, can be "Recreate" or "RollingUpdate"
