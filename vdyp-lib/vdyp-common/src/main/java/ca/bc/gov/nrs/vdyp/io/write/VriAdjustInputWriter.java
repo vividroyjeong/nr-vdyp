@@ -2,9 +2,15 @@ package ca.bc.gov.nrs.vdyp.io.write;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
+import ca.bc.gov.nrs.vdyp.common.Utils;
+import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
@@ -68,6 +74,7 @@ public class VriAdjustInputWriter extends VdypOutputWriter {
 	 * @param polygon
 	 * @throws IOException
 	 */
+	@Override
 	void writePolygon(VdypPolygon polygon) throws IOException {
 		writeFormat(
 				polygonFile, //
@@ -91,12 +98,13 @@ public class VriAdjustInputWriter extends VdypOutputWriter {
 	 * @param spec
 	 * @throws IOException
 	 */
+	@Override
 	void writeSpecies(VdypLayer layer, VdypSpecies spec) throws IOException {
 
 		// Ensure we have a list of 4 distribution entries
 		var specDistributionEntries = Stream.concat(
-				spec.getSp64DistributionSet().getSp64DistributionList().stream(), Stream
-						.generate(() -> new Sp64Distribution(0, "", 0f))
+				spec.getSp64DistributionSet().getSp64DistributionList().stream(),
+				Stream.generate(() -> new Sp64Distribution(0, "", 0f))
 		).limit(4).toList();
 		// 082E004 615 1988 P 9 L LW 100.0 0.0 0.0 0.0 -9.00 -9.00 -9.0 -9.0 -9.0 0 -9
 		writeFormat(
@@ -137,6 +145,7 @@ public class VriAdjustInputWriter extends VdypOutputWriter {
 	 * @param utils
 	 * @throws IOException
 	 */
+	@Override
 	// V7W_AIU Internalized loop over utilization classes
 	void writeUtilization(VdypLayer layer, VdypUtilizationHolder utils) throws IOException {
 		Optional<String> specId = Optional.empty();
@@ -155,8 +164,8 @@ public class VriAdjustInputWriter extends VdypOutputWriter {
 			if (utils.getBaseAreaByUtilization().getCoe(uc.index) > 0) {
 				quadMeanDiameter = Optional.of(
 						BaseAreaTreeDensityDiameter.quadMeanDiameter(
-								utils.getBaseAreaByUtilization().getCoe(uc.index), utils
-										.getTreesPerHectareByUtilization().getCoe(uc.index)
+								utils.getBaseAreaByUtilization().getCoe(uc.index),
+								utils.getTreesPerHectareByUtilization().getCoe(uc.index)
 						)
 				);
 			}
@@ -197,6 +206,7 @@ public class VriAdjustInputWriter extends VdypOutputWriter {
 	 * @throws IOException
 	 */
 	// VDYP_OUT when JPROGRAM = 1 (FIPSTART) or 3 (VRISTART)
+	@Override
 	public void writePolygonWithSpeciesAndUtilization(VdypPolygon polygon) throws IOException {
 
 		writePolygon(polygon);
@@ -226,6 +236,7 @@ public class VriAdjustInputWriter extends VdypOutputWriter {
 		writeEndRecord(speciesFile, polygon);
 	}
 
+	@Override
 	void writeFormat(OutputStream os, String format, Object... params) throws IOException {
 		os.write(String.format(format, params).getBytes());
 	}

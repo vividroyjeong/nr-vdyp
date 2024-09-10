@@ -22,13 +22,13 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 	private final float utilization; // VRIL/UTLL
 	public final Optional<String> primaryGenus; // FIPL_1C/JPRIME_L1 ISPP
 	private final Optional<String> secondaryGenus; // FIPL_1C/JPRIME_L1 ISPS
-	private final Optional<Integer> empericalRelationshipParameterIndex; // INXL1/GRPBA1
+	private final Optional<Integer> empiricalRelationshipParameterIndex; // INXL1/GRPBA1
 	private final float ageIncrease; // YOUNG1/AGE_INCR
 
 	public VriLayer(
 			PolygonIdentifier polygonIdentifier, LayerType layer, float crownClosure, Optional<Float> baseArea,
 			Optional<Float> treesPerHectare, float utilization, Optional<String> primaryGenus,
-			Optional<String> secondaryGenus, Optional<Integer> empericalRelationshipParameterIndex, float ageIncrease
+			Optional<String> secondaryGenus, Optional<Integer> empiricalRelationshipParameterIndex, float ageIncrease
 	) {
 		super(polygonIdentifier, layer, Optional.empty());
 		this.crownClosure = crownClosure;
@@ -37,7 +37,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 		this.utilization = utilization;
 		this.primaryGenus = primaryGenus;
 		this.secondaryGenus = secondaryGenus;
-		this.empericalRelationshipParameterIndex = empericalRelationshipParameterIndex;
+		this.empiricalRelationshipParameterIndex = empiricalRelationshipParameterIndex;
 		this.ageIncrease = ageIncrease;
 	}
 
@@ -77,8 +77,8 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 		return secondaryGenus.map(this.getSites()::get);
 	}
 
-	public Optional<Integer> getEmpericalRelationshipParameterIndex() {
-		return empericalRelationshipParameterIndex;
+	public Optional<Integer> getEmpiricalRelationshipParameterIndex() {
+		return empiricalRelationshipParameterIndex;
 	}
 
 	public float getAgeIncrease() {
@@ -120,11 +120,11 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 		protected Optional<Float> percentAvailable = Optional.empty();
 		protected Optional<String> primaryGenus = Optional.empty();
 		protected Optional<String> secondaryGenus = Optional.empty();
-		protected Optional<Integer> empericalRelationshipParameterIndex = Optional.empty();
+		protected Optional<Integer> empiricalRelationshipParameterIndex = Optional.empty();
 		protected Optional<Float> ageIncrease = Optional.empty();
 
 		public Builder empiricalRelationshipParameterIndex(Optional<Integer> empiricalRelationshipParameterIndex) {
-			this.empericalRelationshipParameterIndex = empiricalRelationshipParameterIndex;
+			this.empiricalRelationshipParameterIndex = empiricalRelationshipParameterIndex;
 			return this;
 		}
 
@@ -223,7 +223,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 					Math.max(utilization.get(), UtilizationClass.U75TO125.lowBound), //
 					primaryGenus, //
 					secondaryGenus, //
-					empericalRelationshipParameterIndex, //
+					empiricalRelationshipParameterIndex, //
 					ageIncrease.orElse(DEFAULT_AGE_INCREASE)
 			);
 			result.setInventoryTypeGroup(inventoryTypeGroup);
@@ -247,26 +247,21 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 			this.utilization(toCopy.getUtilization());
 			this.primaryGenus(toCopy.getPrimaryGenus());
 			this.secondaryGenus(toCopy.getSecondaryGenus());
-			this.empiricalRelationshipParameterIndex(toCopy.getEmpericalRelationshipParameterIndex());
+			this.empiricalRelationshipParameterIndex(toCopy.getEmpiricalRelationshipParameterIndex());
 			return this;
 		}
 
 		@Override
 		public <S2 extends BaseVdypSpecies<I2>, I2 extends BaseVdypSite>
 				BaseVdypLayer.Builder<VriLayer, VriSpecies, VriSite, VriSpecies.Builder, VriSite.Builder>
-				adaptSpecies(
-						BaseVdypLayer<S2, ?> toCopy,
-						BiConsumer<VriSpecies.Builder, S2> config
-				) {
+				adaptSpecies(BaseVdypLayer<S2, ?> toCopy, BiConsumer<VriSpecies.Builder, S2> config) {
 			this.primaryGenus(toCopy.getPrimaryGenus());
 			return super.adaptSpecies(toCopy, config);
 		}
 
 		@Override
 		public BaseVdypLayer.Builder<VriLayer, VriSpecies, VriSite, VriSpecies.Builder, VriSite.Builder>
-				copySpecies(
-						VriLayer toCopy, BiConsumer<VriSpecies.Builder, VriSpecies> config
-				) {
+				copySpecies(VriLayer toCopy, BiConsumer<VriSpecies.Builder, VriSpecies> config) {
 			this.primaryGenus(toCopy.getPrimaryGenus());
 			return super.copySpecies(toCopy, config);
 		}

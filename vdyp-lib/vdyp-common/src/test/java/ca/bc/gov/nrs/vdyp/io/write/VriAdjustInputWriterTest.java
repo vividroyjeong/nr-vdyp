@@ -120,7 +120,7 @@ class VriAdjustInputWriterTest {
 			});
 
 			// FIXME Add to builder
-			layer.setEmpericalRelationshipParameterIndex(Optional.of(119));
+			layer.setEmpiricalRelationshipParameterIndex(Optional.of(119));
 			layer.setInventoryTypeGroup(Optional.of(28));
 
 			unit.writePolygon(polygon);
@@ -369,7 +369,7 @@ class VriAdjustInputWriterTest {
 			var species = layer.getSpecies().get("PL");
 
 			// fixme add to builder
-			layer.setEmpericalRelationshipParameterIndex(Optional.of(119));
+			layer.setEmpiricalRelationshipParameterIndex(Optional.of(119));
 			layer.setInventoryTypeGroup(Optional.of(28));
 
 			layer.setBaseAreaByUtilization(

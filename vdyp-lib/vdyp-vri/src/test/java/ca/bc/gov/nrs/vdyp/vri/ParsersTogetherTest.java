@@ -530,7 +530,7 @@ class ParsersTogetherTest {
 		assertThat(result, hasProperty("layers", Matchers.aMapWithSize(1)));
 		var primaryResult = result.getLayers().get(LayerType.PRIMARY);
 		var veteranResult = result.getLayers().get(LayerType.VETERAN);
-		assertThat(primaryResult, allOf(hasProperty("empericalRelationshipParameterIndex", present(is(27)))));
+		assertThat(primaryResult, allOf(hasProperty("empiricalRelationshipParameterIndex", present(is(27)))));
 		assertThat(veteranResult, nullValue());
 
 		app.close();

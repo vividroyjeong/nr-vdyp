@@ -29,15 +29,15 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies, VdypSite> implements V
 	private UtilizationVector closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = //
 			VdypUtilizationHolder.emptyUtilization(); // LVCOM/VOL_DWB species 0
 
-	private Optional<Integer> empericalRelationshipParameterIndex = Optional.empty(); // INXL1/GRPBA1
+	private Optional<Integer> empiricalRelationshipParameterIndex = Optional.empty(); // INXL1/GRPBA1
 	private Optional<String> primarySp0;
 
 	public VdypLayer(
 			PolygonIdentifier polygonIdentifier, LayerType layer, Optional<Integer> inventoryTypeGroup,
-			Optional<Integer> empericalRelationshipParameterIndex, Optional<String> primarySp0
+			Optional<Integer> empiricalRelationshipParameterIndex, Optional<String> primarySp0
 	) {
 		super(polygonIdentifier, layer, inventoryTypeGroup);
-		this.empericalRelationshipParameterIndex = empericalRelationshipParameterIndex;
+		this.empiricalRelationshipParameterIndex = empiricalRelationshipParameterIndex;
 		this.primarySp0 = primarySp0;
 	}
 
@@ -161,8 +161,8 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies, VdypSite> implements V
 		return empiricalRelationshipParameterIndex;
 	}
 
-	public void setEmpericalRelationshipParameterIndex(Optional<Integer> empericalRelationshipParameterIndex) {
-		this.empiricalRelationshipParameterIndex = empericalRelationshipParameterIndex;
+	public void setEmpiricalRelationshipParameterIndex(Optional<Integer> empiricalRelationshipParameterIndex) {
+		this.empiricalRelationshipParameterIndex = empiricalRelationshipParameterIndex;
 	}
 
 	@Override
@@ -233,7 +233,7 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies, VdypSite> implements V
 			return primaryGenus(Optional.of(primarySp0));
 		}
 
-		UtilizationVector loreyHeight = VdypUtilizationHolder.emptyLoreyHeightUtilization();
+		UtilizationVector loreyHeightByUtilization = VdypUtilizationHolder.emptyLoreyHeightUtilization();
 
 		public void loreyHeightByUtilization(float height) {
 			this.loreyHeightByUtilization = Utils.heightVector(0, height);
@@ -382,7 +382,7 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies, VdypSite> implements V
 					polygonIdentifier.get(), //
 					layerType.get(), //
 					inventoryTypeGroup, //
-					empericalRelationshipParameterIndex, //
+					empiricalRelationshipParameterIndex, //
 					primarySp0
 			);
 		}
@@ -396,29 +396,19 @@ public class VdypLayer extends BaseVdypLayer<VdypSpecies, VdypSite> implements V
 			});
 		}
 
-		public void baseAreaByUtilization(UtilizationVector utilizationVector) {
-			// TODO Auto-generated method stub
-
-		}
-
 		@Override
 		public <S2 extends BaseVdypSpecies<I2>, I2 extends BaseVdypSite>
 				BaseVdypLayer.Builder<VdypLayer, VdypSpecies, VdypSite, VdypSpecies.Builder, VdypSite.Builder>
-				adaptSpecies(
-						BaseVdypLayer<S2, ?> toCopy, BiConsumer<VdypSpecies.Builder, S2> config
-				) {
+				adaptSpecies(BaseVdypLayer<S2, ?> toCopy, BiConsumer<VdypSpecies.Builder, S2> config) {
 			this.primaryGenus(toCopy.getPrimaryGenus());
 			return super.adaptSpecies(toCopy, config);
 		}
 
 		@Override
 		public BaseVdypLayer.Builder<VdypLayer, VdypSpecies, VdypSite, VdypSpecies.Builder, VdypSite.Builder>
-				copySpecies(
-						VdypLayer toCopy, BiConsumer<VdypSpecies.Builder, VdypSpecies> config
-				) {
+				copySpecies(VdypLayer toCopy, BiConsumer<VdypSpecies.Builder, VdypSpecies> config) {
 			this.primaryGenus(toCopy.getPrimaryGenus());
 			return super.copySpecies(toCopy, config);
 		}
-
 	}
 }
