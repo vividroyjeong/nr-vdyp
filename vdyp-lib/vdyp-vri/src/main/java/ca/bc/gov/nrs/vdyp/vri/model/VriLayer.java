@@ -9,6 +9,7 @@ import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
 import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
+import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 
 public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements InputLayer {
 
@@ -225,7 +226,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 					crownClosure.get(), //
 					baseArea.map(x -> x * multiplier), //
 					treesPerHectare.map(x -> x * multiplier), //
-					Math.max(utilization.get(), 7.5f), //
+					Math.max(utilization.get(), UtilizationClass.U75TO125.lowBound), //
 					primaryGenus, //
 					secondaryGenus, //
 					empericalRelationshipParameterIndex, //

@@ -80,7 +80,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	static final float EMPOC = 0.85f;
 
 	static final float VETERAN_MIN_DQ = UtilizationClass.OVER225.lowBound;
-	static final float VETERAN_MIN_HL = 22.5f; // Seems odd that that the min height is the same as the min diameter
+	static final float VETERAN_MIN_HL = UtilizationClass.OVER225.lowBound; // Seems odd that that the min height is the
+																			// same as the min diameter
 
 	public static void main(final String... args) throws IOException {
 
@@ -321,8 +322,10 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		// This was being done in VRI_CHK but I moved it here to when the object is
 		// being built instead.
 		if (builder.getBaseArea()
-				.flatMap(ba -> builder.getTreesPerHectare().map(tph -> quadMeanDiameter(ba, tph) < 7.5f))
-				.orElse(false)) {
+				.flatMap(
+						ba -> builder.getTreesPerHectare()
+								.map(tph -> quadMeanDiameter(ba, tph) < UtilizationClass.U75TO125.lowBound)
+				).orElse(false)) {
 			builder.baseArea(Optional.empty());
 			builder.treesPerHectare(Optional.empty());
 		}
@@ -481,7 +484,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			} else {
 
 				float loreyHeight = vriSite.getHeight().filter((x) -> getDebugMode(2) != 1).map(height -> {
-					float speciesQuadMeanDiameter = Math.max(7.5f, height / leadHeight * layerQuadMeanDiameter);
+					float speciesQuadMeanDiameter = Math
+							.max(UtilizationClass.U75TO125.lowBound, height / leadHeight * layerQuadMeanDiameter);
 					float speciesDensity = treesPerHectare(specBaseArea, speciesQuadMeanDiameter);
 					// EMP050 Method 1
 					return estimationMethods.primaryHeightFromLeadHeight(
@@ -652,7 +656,11 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 	}
 
 	float quadMeanDiameterSpeciesAdjust(float x, float initialDq, float min, float max) {
-		return FloatMath.clamp(7.5f + (initialDq - 7.5f) * FloatMath.exp(x), min, max);
+		return FloatMath.clamp(
+				UtilizationClass.U75TO125.lowBound
+						+ (initialDq - UtilizationClass.U75TO125.lowBound) * FloatMath.exp(x),
+				min, max
+		);
 	}
 
 	private float processVeteranLayer(VriPolygon polygon, VdypLayer.Builder lBuilder) throws StandProcessingException {
