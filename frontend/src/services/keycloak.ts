@@ -89,7 +89,6 @@ export const initializeKeycloak = async (): Promise<Keycloak | undefined> => {
 
       return keycloakInstance
     } else {
-      console.error('Keycloak initialization failed.')
       keycloakInstance.login(loginOptions)
     }
   } catch (err) {
