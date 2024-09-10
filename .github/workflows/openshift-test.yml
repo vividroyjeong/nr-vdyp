@@ -2,11 +2,7 @@ name: Build and Deploy to Openshift Test
 
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - "frontend/**"
-      - "backend/**"
-      - "migrations/**"
+
 concurrency:
   # Cancel if re-attempted
   group: ${{ github.event_name }}
