@@ -12,11 +12,6 @@ const ssoClientId = env.VITE_SSO_CLIENT_ID
 const ssoRealm = env.VITE_SSO_REALM
 const ssoRedirectUrl = env.VITE_SSO_REDIRECT_URI
 
-console.log(`ssoAuthServerUrl:${ssoAuthServerUrl}`)
-console.log(`ssoClientId:${ssoClientId}`)
-console.log(`ssoRealm:${ssoRealm}`)
-console.log(`ssoRedirectUrl:${ssoRedirectUrl}`)
-
 const createKeycloakInstance = (): Keycloak => {
   if (!keycloakInstance) {
     keycloakInstance = new Keycloak({
@@ -68,21 +63,18 @@ export const initializeKeycloak = async (): Promise<Keycloak | undefined> => {
 
       return keycloakInstance
     }
-    console.log('before keycloakinstance init')
+
     const auth = await keycloakInstance.init(initOptions)
-    console.log(`after keycloakinstance init auth: ${auth}`)
-    console.log(`after keycloakinstance init auth: ${keycloakInstance.token}`)
-    console.log(
-      `after keycloakinstance init auth: ${keycloakInstance.refreshToken}`,
-    )
-    console.log(`after keycloakinstance init auth: ${keycloakInstance.idToken}`)
+    console.info(`SSO initialization complete : ${auth}`)
     if (
       auth &&
       keycloakInstance.token &&
       keycloakInstance.refreshToken &&
       keycloakInstance.idToken
     ) {
+      console.info('Ready to parsed token payload')
       const tokenParsed = JSON.parse(atob(keycloakInstance.token.split('.')[1]))
+
       // do validate the IDP in the JWT
       if (tokenParsed.identity_provider !== KEYCLOAK.IDP_AZUR_IDIR) {
         console.error('Authentication failed: Invalid identity provider.')
@@ -108,11 +100,6 @@ export const initializeKeycloak = async (): Promise<Keycloak | undefined> => {
       keycloakInstance.login(loginOptions)
     }
   } catch (err) {
-    console.log(`ssoAuthServerUrl:${ssoAuthServerUrl}`)
-    console.log(`ssoClientId:${ssoClientId}`)
-    console.log(`ssoRealm:${ssoRealm}`)
-    console.log(`ssoRedirectUrl:${ssoRedirectUrl}`)
-
     console.error('Keycloak initialization failed:', err)
     keycloakInstance = null // Reset the instance on failure
     throw err
