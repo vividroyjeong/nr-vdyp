@@ -68,9 +68,14 @@ export const initializeKeycloak = async (): Promise<Keycloak | undefined> => {
 
       return keycloakInstance
     }
-
+    console.log('before keycloakinstance init')
     const auth = await keycloakInstance.init(initOptions)
-
+    console.log(`after keycloakinstance init auth: ${auth}`)
+    console.log(`after keycloakinstance init auth: ${keycloakInstance.token}`)
+    console.log(
+      `after keycloakinstance init auth: ${keycloakInstance.refreshToken}`,
+    )
+    console.log(`after keycloakinstance init auth: ${keycloakInstance.idToken}`)
     if (
       auth &&
       keycloakInstance.token &&
