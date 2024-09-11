@@ -47,7 +47,7 @@ spec:
             - name: VITE_SSO_REALM
               value: {{ .Values.frontend.env.VITE_SSO_REALM | quote }}
             - name: VITE_SSO_REDIRECT_URI
-              value: {{ .Values.frontend.env.VITE_SSO_REALM | quote }}              
+              value: {{ .Values.frontend.env.VITE_SSO_REDIRECT_URI | quote }}              
           ports:
             - name: http
               containerPort: 3000
