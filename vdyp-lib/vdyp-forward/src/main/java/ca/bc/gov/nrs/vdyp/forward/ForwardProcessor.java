@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -12,11 +13,10 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygonDescription;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
+import ca.bc.gov.nrs.vdyp.io.write.VdypOutputWriter;
 
 /**
  *
@@ -54,15 +54,18 @@ public class ForwardProcessor {
 	/**
 	 * Initialize VdypForwardProcessor
 	 *
-	 * @param resolver
+	 * @param inputFileResolver
+	 * @param outputFileResolver
 	 * @param controlFileNames
 	 *
 	 * @throws IOException
 	 * @throws ResourceParseException
 	 * @throws ProcessingException
 	 */
-	void run(FileResolver resolver, List<String> controlFileNames, Set<ForwardPass> vdypPassSet)
-			throws IOException, ResourceParseException, ProcessingException {
+	void run(
+			FileResolver inputFileResolver, FileResolver outputFileResolver, List<String> controlFileNames,
+			Set<ForwardPass> vdypPassSet
+	) throws IOException, ResourceParseException, ProcessingException {
 
 		logger.info("VDYPPASS: {}", vdypPassSet);
 		logger.debug("VDYPPASS(1): Perform Initiation activities?");
@@ -80,24 +83,27 @@ public class ForwardProcessor {
 		for (var controlFileName : controlFileNames) {
 			logger.info("Resolving and parsing {}", controlFileName);
 
-			try (var is = resolver.resolveForInput(controlFileName)) {
-				Path controlFilePath = Path.of(resolver.toString(controlFileName)).getParent();
+			try (var is = inputFileResolver.resolveForInput(controlFileName)) {
+				Path controlFilePath = inputFileResolver.toPath(controlFileName).getParent();
 				FileSystemFileResolver relativeResolver = new FileSystemFileResolver(controlFilePath);
 
 				parser.parse(is, relativeResolver, controlMap);
 			}
 		}
 
-		process(vdypPassSet, controlMap);
+		process(vdypPassSet, controlMap, Optional.of(outputFileResolver));
 	}
 
 	/**
 	 * Implements VDYP_SUB
 	 *
+	 * @param outputFileResolver
+	 *
 	 * @throws ProcessingException
 	 */
-	@SuppressWarnings("unchecked")
-	public void process(Set<ForwardPass> vdypPassSet, Map<String, Object> controlMap) throws ProcessingException {
+	public void process(
+			Set<ForwardPass> vdypPassSet, Map<String, Object> controlMap, Optional<FileResolver> outputFileResolver
+	) throws ProcessingException {
 
 		logger.info("Beginning processing with given configuration");
 
@@ -118,36 +124,50 @@ public class ForwardProcessor {
 
 		if (vdypPassSet.contains(ForwardPass.PASS_3)) {
 
-			try {
-				var polygonDescriptionStreamFactory = (StreamingParserFactory<VdypPolygonDescription>) controlMap
-						.get(ControlKey.FORWARD_INPUT_GROWTO.name());
-				var polygonDescriptionStream = polygonDescriptionStreamFactory.get();
+			Optional<VdypOutputWriter> outputWriter = Optional.empty();
 
-				var fpe = new ForwardProcessingEngine(controlMap);
+			if (outputFileResolver.isPresent()) {
+				try {
+					outputWriter = Optional.of(new VdypOutputWriter(controlMap, outputFileResolver.get()));
+				} catch (IOException e) {
+					throw new ProcessingException(e);
+				}
+			}
 
-				var forwardDataStreamReader = new ForwardDataStreamReader(controlMap);
+			var fpe = new ForwardProcessingEngine(controlMap, outputWriter);
 
-				// Fetch the next polygon to process.
-				int nPolygonsProcessed = 0;
-				while (polygonDescriptionStream.hasNext()) {
+			var forwardDataStreamReader = new ForwardDataStreamReader(fpe.fps.fcm);
 
-					if (nPolygonsProcessed == maxPoly) {
-						logger.info(
-								"Prematurely terminating polygon processing since MAX_POLY ({}) polygons have been processed",
-								maxPoly
-						);
-					}
+			// Fetch the next polygon to process.
+			int nPolygonsProcessed = 0;
+			while (true) {
 
-					var polygon = forwardDataStreamReader.readNextPolygon(polygonDescriptionStream.next());
-
-					fpe.processPolygon(polygon);
-
-					nPolygonsProcessed += 1;
+				if (nPolygonsProcessed == maxPoly) {
+					logger.info(
+							"Prematurely terminating polygon processing since MAX_POLY ({}) polygons have been processed",
+							maxPoly
+					);
 				}
 
-			} catch (ResourceParseException | IOException e) {
-				throw new ProcessingException(e);
+				var polygonHolder = forwardDataStreamReader.readNextPolygon();
+				if (polygonHolder.isEmpty()) {
+					break;
+				}
+
+				var polygon = polygonHolder.get();
+
+				fpe.processPolygon(polygon);
+
+				nPolygonsProcessed += 1;
 			}
+
+			outputWriter.ifPresent(ow -> {
+				try {
+					ow.close();
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			});
 		}
 	}
 }

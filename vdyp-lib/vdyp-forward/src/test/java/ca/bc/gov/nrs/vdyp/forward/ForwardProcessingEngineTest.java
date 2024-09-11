@@ -1,9 +1,10 @@
 package ca.bc.gov.nrs.vdyp.forward;
 
-import java.io.IOException;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
@@ -17,24 +18,24 @@ class ForwardProcessingEngineTest extends AbstractForwardProcessingEngineTest {
 
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 
-		assertThat(fpe.fps.getBecLookup(), notNullValue());
-		assertThat(fpe.fps.getGenusDefinitionMap(), notNullValue());
-		assertThat(fpe.fps.getSiteCurveMap(), notNullValue());
+		assertThat(fpe.fps.fcm.getBecLookup(), notNullValue());
+		assertThat(fpe.fps.fcm.getGenusDefinitionMap(), notNullValue());
+		assertThat(fpe.fps.fcm.getSiteCurveMap(), notNullValue());
 
 		// Fetch the next polygon to process.
 		int nPolygonsProcessed = 0;
 		while (polygonDescriptionStream.hasNext()) {
 
-			var polygonDescription = polygonDescriptionStream.next();
+			var polygon = forwardDataStreamReader.readNextPolygon();
 
-			var polygon = forwardDataStreamReader.readNextPolygon(polygonDescription);
-
-			fpe.processPolygon(polygon);
-
-			nPolygonsProcessed += 1;
+			if (polygon.isPresent()) {
+				fpe.processPolygon(polygon.get());
+				nPolygonsProcessed += 1;
+			} else {
+				break;
+			}
 		}
 
-		logger.info("{} polygons processed", nPolygonsProcessed);
+		assertEquals(10, nPolygonsProcessed);
 	}
-
 }

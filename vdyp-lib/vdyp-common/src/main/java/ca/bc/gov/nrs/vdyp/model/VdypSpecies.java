@@ -1,9 +1,13 @@
 package ca.bc.gov.nrs.vdyp.model;
 
+import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import ca.bc.gov.nrs.vdyp.application.InitializationIncompleteException;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 
 public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtilizationHolder {
@@ -15,18 +19,25 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 
 	private UtilizationVector wholeStemVolumeByUtilization = Utils.utilizationVector(); // LVCOM/VOLWS
 	private UtilizationVector closeUtilizationVolumeByUtilization = Utils.utilizationVector(); // LVCOM/VOLCU
-	private UtilizationVector closeUtilizationNetVolumeOfDecayByUtilization = Utils.utilizationVector(); // LVCOM/VOL_D
+	private UtilizationVector closeUtilizationVolumeNetOfDecayByUtilization = Utils.utilizationVector(); // LVCOM/VOL_D
 	private UtilizationVector closeUtilizationVolumeNetOfDecayAndWasteByUtilization = Utils.utilizationVector(); // LVCOM/VOL_DW
 	private UtilizationVector closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = Utils.utilizationVector(); // LVCOM/VOL_DWB
 
-	int volumeGroup;
-	int decayGroup;
-	int breakageGroup;
+	private Optional<Integer> volumeGroup;
+	private Optional<Integer> decayGroup;
+	private Optional<Integer> breakageGroup;
+
+	// Compatibility Variables
+
+	private Optional<MatrixMap3<UtilizationClass, VolumeVariable, LayerType, Float>> cvVolume = Optional.empty();
+	private Optional<MatrixMap2<UtilizationClass, LayerType, Float>> cvBasalArea = Optional.empty();
+	private Optional<MatrixMap2<UtilizationClass, LayerType, Float>> cvQuadraticMeanDiameter = Optional.empty();
+	private Optional<Map<UtilizationClassVariable, Float>> cvPrimaryLayerSmall = Optional.empty();
 
 	public VdypSpecies(
-			PolygonIdentifier polygonIdentifier, LayerType layer, String genus, int genusIndex, float percentGenus,
-			Sp64DistributionSet sp64DistributionSet, Optional<VdypSite> site, int volumeGroup, int decayGroup,
-			int breakageGroup
+			PolygonIdentifier polygonIdentifier, LayerType layer, String genus, int genusIndex,
+			Optional<Float> percentGenus, Sp64DistributionSet sp64DistributionSet, Optional<VdypSite> site,
+			Optional<Integer> volumeGroup, Optional<Integer> decayGroup, Optional<Integer> breakageGroup
 	) {
 		super(polygonIdentifier, layer, genus, genusIndex, percentGenus, sp64DistributionSet, site);
 		this.volumeGroup = volumeGroup;
@@ -67,27 +78,47 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 	}
 
 	public int getVolumeGroup() {
-		return volumeGroup;
+		return volumeGroup.orElseThrow(
+				() -> new NoSuchElementException(MessageFormat.format("Species {0} volumeGroup", toString()))
+		);
 	}
 
 	public void setVolumeGroup(int volumeGroup) {
-		this.volumeGroup = volumeGroup;
+		if (this.volumeGroup.isPresent()) {
+			throw new IllegalStateException(MessageFormat.format("Species {0} volumeGroup is already set", toString()));
+		}
+
+		this.volumeGroup = Optional.of(volumeGroup);
 	}
 
 	public int getDecayGroup() {
-		return decayGroup;
+		return decayGroup.orElseThrow(
+				() -> new NoSuchElementException(MessageFormat.format("Species {0} decayGroup", toString()))
+		);
 	}
 
 	public void setDecayGroup(int decayGroup) {
-		this.decayGroup = decayGroup;
+		if (this.decayGroup.isPresent()) {
+			throw new IllegalStateException(MessageFormat.format("Species {0} decayGroup is already set", toString()));
+		}
+
+		this.decayGroup = Optional.of(decayGroup);
 	}
 
 	public int getBreakageGroup() {
-		return breakageGroup;
+		return breakageGroup.orElseThrow(
+				() -> new NoSuchElementException(MessageFormat.format("Species {0} breakageGroup", toString()))
+		);
 	}
 
 	public void setBreakageGroup(int breakageGroup) {
-		this.breakageGroup = breakageGroup;
+		if (this.breakageGroup.isPresent()) {
+			throw new IllegalStateException(
+					MessageFormat.format("Species {0} breakageGroup is already set", toString())
+			);
+		}
+
+		this.breakageGroup = Optional.of(breakageGroup);
 	}
 
 	@Override
@@ -132,14 +163,14 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 
 	@Override
 	public UtilizationVector getCloseUtilizationVolumeNetOfDecayByUtilization() {
-		return closeUtilizationNetVolumeOfDecayByUtilization;
+		return closeUtilizationVolumeNetOfDecayByUtilization;
 	}
 
 	@Override
 	public void setCloseUtilizationVolumeNetOfDecayByUtilization(
 			UtilizationVector closeUtilizationNetVolumeOfDecayByUtilization
 	) {
-		this.closeUtilizationNetVolumeOfDecayByUtilization = closeUtilizationNetVolumeOfDecayByUtilization;
+		this.closeUtilizationVolumeNetOfDecayByUtilization = closeUtilizationNetVolumeOfDecayByUtilization;
 	}
 
 	@Override
@@ -164,6 +195,49 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 			UtilizationVector closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization
 	) {
 		this.closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization;
+	}
+
+	public void setCompatibilityVariables(
+			MatrixMap3<UtilizationClass, VolumeVariable, LayerType, Float> cvVolume,
+			MatrixMap2<UtilizationClass, LayerType, Float> cvBasalArea,
+			MatrixMap2<UtilizationClass, LayerType, Float> cvQuadraticMeanDiameter,
+			Map<UtilizationClassVariable, Float> cvPrimaryLayerSmall
+	) {
+
+		this.cvVolume = Optional.of(cvVolume);
+		this.cvBasalArea = Optional.of(cvBasalArea);
+		this.cvQuadraticMeanDiameter = Optional.of(cvQuadraticMeanDiameter);
+		this.cvPrimaryLayerSmall = Optional.of(cvPrimaryLayerSmall);
+	}
+
+	public float getCvVolume(UtilizationClass uc, VolumeVariable vv, LayerType lt) {
+		if (cvVolume.isEmpty()) {
+			throw new InitializationIncompleteException(MessageFormat.format("Species {0}: cvVolume", this));
+		}
+		return cvVolume.get().get(uc, vv, lt);
+	}
+
+	public float getCvBasalArea(UtilizationClass uc, LayerType lt) {
+		if (cvBasalArea.isEmpty()) {
+			throw new InitializationIncompleteException(MessageFormat.format("Species {0}: cvBasalArea", this));
+		}
+		return cvBasalArea.get().get(uc, lt);
+	}
+
+	public float getCvQuadraticMeanDiameter(UtilizationClass uc, LayerType lt) {
+		if (cvQuadraticMeanDiameter.isEmpty()) {
+			throw new InitializationIncompleteException(
+					MessageFormat.format("Species {0}: cvQuadraticMeanDiameter", this)
+			);
+		}
+		return cvQuadraticMeanDiameter.get().get(uc, lt);
+	}
+
+	public float getCvPrimaryLayerSmall(UtilizationClassVariable ucv) {
+		if (cvPrimaryLayerSmall.isEmpty()) {
+			throw new InitializationIncompleteException(MessageFormat.format("Species {0}: cvPrimaryLayerSmall", this));
+		}
+		return cvPrimaryLayerSmall.get().get(ucv);
 	}
 
 	/**
@@ -243,8 +317,8 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 
 		protected UtilizationVector quadMeanDiameter = VdypUtilizationHolder.emptyUtilization();
 
-		public void quadMeanDiameter(float small, float u1, float u2, float u3, float u4) {
-			this.quadMeanDiameter = Utils.utilizationVector(small, u1, u2, u3, u4);
+		public void quadMeanDiameter(float small, float uAll, float u1, float u2, float u3, float u4) {
+			this.quadMeanDiameter = Utils.utilizationVector(small, uAll, u1, u2, u3, u4);
 		}
 
 		public void quadMeanDiameter(float height) {
@@ -261,31 +335,113 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 			this.wholeStemVolume = Utils.utilizationVector(volume);
 		}
 
-		@Override
-		protected void check(Collection<String> errors) {
-			super.check(errors);
-			requirePresent(volumeGroup, "volumeGroup", errors);
-			requirePresent(decayGroup, "decayGroup", errors);
-			requirePresent(breakageGroup, "breakageGroup", errors);
+		protected UtilizationVector closeUtilizationVolumeByUtilization = VdypUtilizationHolder.emptyUtilization();
+
+		public void closeUtilizationVolumeByUtilization(float small, float u1, float u2, float u3, float u4) {
+			this.closeUtilizationVolumeByUtilization = Utils.utilizationVector(small, u1, u2, u3, u4);
+		}
+
+		public void closeUtilizationVolumeByUtilization(float volume) {
+			this.closeUtilizationVolumeByUtilization = Utils.utilizationVector(volume);
+		}
+
+		protected UtilizationVector closeUtilizationNetVolumeOfDecayByUtilization = VdypUtilizationHolder
+				.emptyUtilization();
+
+		public void closeUtilizationVolumeNetOfDecayByUtilization(float small, float u1, float u2, float u3, float u4) {
+			this.closeUtilizationNetVolumeOfDecayByUtilization = Utils.utilizationVector(small, u1, u2, u3, u4);
+		}
+
+		public void closeUtilizationVolumeNetOfDecayByUtilization(float volume) {
+			this.closeUtilizationNetVolumeOfDecayByUtilization = Utils.utilizationVector(volume);
+		}
+
+		protected UtilizationVector closeUtilizationVolumeNetOfDecayAndWasteByUtilization = VdypUtilizationHolder
+				.emptyUtilization();
+
+		public void closeUtilizationVolumeNetOfDecayAndWasteByUtilization(
+				float small, float u1, float u2, float u3, float u4
+		) {
+			this.closeUtilizationVolumeNetOfDecayAndWasteByUtilization = Utils.utilizationVector(small, u1, u2, u3, u4);
+		}
+
+		public void closeUtilizationVolumeNetOfDecayAndWasteByUtilization(float volume) {
+			this.closeUtilizationVolumeNetOfDecayAndWasteByUtilization = Utils.utilizationVector(volume);
+		}
+
+		protected UtilizationVector closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = VdypUtilizationHolder
+				.emptyUtilization();
+
+		public void closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
+				float small, float u1, float u2, float u3, float u4
+		) {
+			this.closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = Utils
+					.utilizationVector(small, u1, u2, u3, u4);
+		}
+
+		public void closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(float volume) {
+			this.closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = Utils.utilizationVector(volume);
 		}
 
 		@Override
-		public Builder copy(VdypSpecies toCopy) {
-			super.copy(toCopy);
-			volumeGroup(toCopy.getVolumeGroup());
-			decayGroup(toCopy.getDecayGroup());
-			breakageGroup(toCopy.getBreakageGroup());
+		protected void check(Collection<String> errors) {
+			super.check(errors);
+		}
+
+		@Override
+		public VdypSpecies.Builder adapt(BaseVdypSpecies<?> baseSource) {
+			super.adapt(baseSource);
+
+			if (baseSource instanceof VdypSpecies source) {
+				loreyHeight = new UtilizationVector(source.loreyHeightByUtilization);
+				baseArea = new UtilizationVector(source.baseAreaByUtilization);
+				treesPerHectare = new UtilizationVector(source.treesPerHectareByUtilization);
+				quadMeanDiameter = new UtilizationVector(source.quadraticMeanDiameterByUtilization);
+				wholeStemVolume = new UtilizationVector(source.wholeStemVolumeByUtilization);
+				closeUtilizationVolumeByUtilization = new UtilizationVector(source.closeUtilizationVolumeByUtilization);
+				closeUtilizationNetVolumeOfDecayByUtilization = new UtilizationVector(
+						source.closeUtilizationVolumeNetOfDecayByUtilization
+				);
+				closeUtilizationVolumeNetOfDecayAndWasteByUtilization = new UtilizationVector(
+						source.closeUtilizationVolumeNetOfDecayAndWasteByUtilization
+				);
+				closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization = new UtilizationVector(
+						source.closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization
+				);
+			}
+
+			return this;
+		}
+
+		@Override
+		public Builder copy(VdypSpecies source) {
+			super.copy(source);
+
+			source.volumeGroup.ifPresent(this::volumeGroup);
+			source.decayGroup.ifPresent(this::decayGroup);
+			source.breakageGroup.ifPresent(this::breakageGroup);
+
 			return this;
 		}
 
 		@Override
 		protected void postProcess(VdypSpecies spec) {
 			super.postProcess(spec);
+
 			spec.setLoreyHeightByUtilization(loreyHeight);
 			spec.setBaseAreaByUtilization(baseArea);
 			spec.setTreesPerHectareByUtilization(treesPerHectare);
 			spec.setQuadraticMeanDiameterByUtilization(quadMeanDiameter);
 			spec.setWholeStemVolumeByUtilization(wholeStemVolume);
+			spec.setCloseUtilizationVolumeByUtilization(closeUtilizationVolumeByUtilization);
+			spec.setCloseUtilizationVolumeNetOfDecayByUtilization(closeUtilizationNetVolumeOfDecayByUtilization);
+			spec.setCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(
+					closeUtilizationVolumeNetOfDecayAndWasteByUtilization
+			);
+			spec.setCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(
+					closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization
+			);
+			;
 		}
 
 		@Override
@@ -296,12 +452,12 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 					layerType.get(), //
 					genus.get(), //
 					genusIndex.get(), //
-					percentGenus.get(), //
-					new Sp64DistributionSet(sp64DistributionList), //
+					percentGenus, //
+					sp64DistributionSet, //
 					site, //
-					volumeGroup.get(), //
-					decayGroup.get(), //
-					breakageGroup.get() //
+					volumeGroup, //
+					decayGroup, //
+					breakageGroup //
 			);
 		}
 

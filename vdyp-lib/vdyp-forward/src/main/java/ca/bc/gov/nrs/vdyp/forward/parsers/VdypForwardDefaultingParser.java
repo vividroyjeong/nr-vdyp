@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
-import ca.bc.gov.nrs.vdyp.forward.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
+import ca.bc.gov.nrs.vdyp.model.VdypEntity;
 
 public interface VdypForwardDefaultingParser extends ValueParser<Float> {
 

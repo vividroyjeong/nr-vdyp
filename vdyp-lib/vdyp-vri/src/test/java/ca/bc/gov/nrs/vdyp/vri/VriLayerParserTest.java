@@ -86,8 +86,10 @@ class VriLayerParserTest {
 		assertThat(layers, aMapWithSize(1));
 
 		assertThat(
-				layers, hasSpecificEntry(
-						LayerType.PRIMARY, VdypMatchers.builds(
+				layers,
+				hasSpecificEntry(
+						LayerType.PRIMARY,
+						VdypMatchers.builds(
 								allOf(
 										hasProperty("polygonIdentifier", isPolyId("082F074/0071", 2001)), //
 										hasProperty("layerType", is(LayerType.PRIMARY)), //
@@ -135,8 +137,10 @@ class VriLayerParserTest {
 		assertThat(layers, aMapWithSize(1));
 
 		assertThat(
-				layers, hasSpecificEntry(
-						LayerType.VETERAN, VdypMatchers.builds(
+				layers,
+				hasSpecificEntry(
+						LayerType.VETERAN,
+						VdypMatchers.builds(
 								allOf(
 										hasProperty("polygonIdentifier", isPolyId("082F074/0071", 2001)), //
 										hasProperty("layerType", is(LayerType.VETERAN)), //
@@ -186,8 +190,10 @@ class VriLayerParserTest {
 		assertThat(layers, aMapWithSize(2));
 
 		assertThat(
-				layers, hasSpecificEntry(
-						LayerType.PRIMARY, VdypMatchers.builds(
+				layers,
+				hasSpecificEntry(
+						LayerType.PRIMARY,
+						VdypMatchers.builds(
 								allOf(
 										hasProperty("polygonIdentifier", isPolyId("082F074/0071", 2001)), //
 										hasProperty("layerType", is(LayerType.PRIMARY)), //
@@ -200,8 +206,10 @@ class VriLayerParserTest {
 				)
 		);
 		assertThat(
-				layers, hasSpecificEntry(
-						LayerType.VETERAN, VdypMatchers.builds(
+				layers,
+				hasSpecificEntry(
+						LayerType.VETERAN,
+						VdypMatchers.builds(
 								allOf(
 										hasProperty("polygonIdentifier", isPolyId("082F074/0071", 2001)), //
 										hasProperty("layerType", is(LayerType.VETERAN)), //

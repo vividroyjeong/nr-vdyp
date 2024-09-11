@@ -38,9 +38,10 @@ class BasalAreaYieldParserTest {
 				m.get("AT", "AC"), Matchers.contains(-4.8137f, 3.2029f, 7.2295f, 0.5142f, -0.0026f, -0.0054f, -0.0090f)
 		);
 		assertThat(
-				m.get("AT", "AT"), Matchers.contains(
-						-4.8137f - 0.8603f, 3.2029f - 0.2732f, 7.2295f, 0.5142f + 0.1973f, -0.0026f - 0.0272f, -0.0054f
-								- 0.0007f, -0.0090f
+				m.get("AT", "AT"),
+				Matchers.contains(
+						-4.8137f - 0.8603f, 3.2029f - 0.2732f, 7.2295f, 0.5142f + 0.1973f, -0.0026f - 0.0272f,
+						-0.0054f - 0.0007f, -0.0090f
 				)
 		);
 	}
@@ -66,8 +67,8 @@ class BasalAreaYieldParserTest {
 
 		assertThat(m.get("AT", "AC"), Matchers.contains(-4.8137f, 3.2029f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
 		assertThat(
-				m.get("AT", "AT"), Matchers
-						.contains(-4.8137f - 0.8603f, 3.2029f - 0.2732f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f)
+				m.get("AT", "AT"),
+				Matchers.contains(-4.8137f - 0.8603f, 3.2029f - 0.2732f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f)
 		);
 	}
 }

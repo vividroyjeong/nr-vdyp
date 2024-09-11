@@ -1,9 +1,8 @@
 package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
-import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.coe;
 import static ca.bc.gov.nrs.vdyp.test.VdypMatchers.mmHasEntry;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.HashMap;
@@ -12,6 +11,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseLineException;
+import ca.bc.gov.nrs.vdyp.model.ComponentSizeLimits;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.test.TestUtils;
 
@@ -35,7 +35,9 @@ class ComponentSizeParserTest {
 
 		var result = parser.parse(is, controlMap);
 
-		assertThat(result, mmHasEntry(coe(1, contains(49.4f, 153.3f, 0.726f, 3.647f)), "S1", Region.COASTAL));
+		assertThat(
+				result, mmHasEntry(is(new ComponentSizeLimits(49.4f, 153.3f, 0.726f, 3.647f)), "S1", Region.COASTAL)
+		);
 	}
 
 	@Test

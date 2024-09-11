@@ -78,14 +78,12 @@ class ValueParserTest {
 			assertThat(parser.parse("3.99999"), present(closeTo(3.99999f)));
 
 			assertThat(
-					assertThrows(ValueParseException.class, () -> parser.parse("4")), hasProperty(
-							"message", is("test must be less than 4.0.")
-					)
+					assertThrows(ValueParseException.class, () -> parser.parse("4")),
+					hasProperty("message", is("test must be less than 4.0."))
 			);
 			assertThat(
-					assertThrows(ValueParseException.class, () -> parser.parse("5")), hasProperty(
-							"message", is("test must be less than 4.0.")
-					)
+					assertThrows(ValueParseException.class, () -> parser.parse("5")),
+					hasProperty("message", is("test must be less than 4.0."))
 			);
 
 			var parser2 = ValueParser.rangeSilentLow(ValueParser.FLOAT, 1f, false, 4f, true, "test");
@@ -97,14 +95,12 @@ class ValueParserTest {
 			assertThat(parser2.parse("4"), present(closeTo(4f)));
 
 			assertThat(
-					assertThrows(ValueParseException.class, () -> parser2.parse("4.0001")), hasProperty(
-							"message", is("test must be less than or equal to 4.0.")
-					)
+					assertThrows(ValueParseException.class, () -> parser2.parse("4.0001")),
+					hasProperty("message", is("test must be less than or equal to 4.0."))
 			);
 			assertThat(
-					assertThrows(ValueParseException.class, () -> parser2.parse("5")), hasProperty(
-							"message", is("test must be less than or equal to 4.0.")
-					)
+					assertThrows(ValueParseException.class, () -> parser2.parse("5")),
+					hasProperty("message", is("test must be less than or equal to 4.0."))
 			);
 		}
 
@@ -301,7 +297,8 @@ class ValueParserTest {
 			defaults.put("B", 6);
 
 			var ex = assertThrows(
-					IllegalArgumentException.class, () -> ValueParser
+					IllegalArgumentException.class,
+					() -> ValueParser
 							.toMap(ValueParser.segmentList(3, ValueParser.INTEGER), defaults, "A", "B", "C", "D")
 			);
 			assertThat(ex, hasProperty("message", is("Keys with defaults must follow those without")));

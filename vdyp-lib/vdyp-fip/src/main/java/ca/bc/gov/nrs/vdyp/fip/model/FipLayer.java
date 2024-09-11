@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 
 import ca.bc.gov.nrs.vdyp.common.Computed;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypLayer;
+import ca.bc.gov.nrs.vdyp.model.BaseVdypSite;
 import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
@@ -57,7 +58,7 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> implements In
 
 	@Override
 	public Optional<FipSite> getSite() {
-		return siteWithoutSpecies.or(() -> super.getSite());
+		return siteWithoutSpecies.or(super::getSite);
 	}
 
 	// This is a bit of a hack. The Layer holds on to a site until populated with Species at which point the site is
@@ -90,6 +91,11 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> implements In
 		applySiteWithoutSpecies();
 	}
 
+	@Override
+	public Optional<String> getPrimaryGenus() {
+		return getSite().map(BaseVdypSite::getSiteGenus);
+	}
+
 	/**
 	 * Accepts a configuration function that accepts a builder to configure.
 	 *
@@ -100,7 +106,7 @@ public class FipLayer extends SingleSiteLayer<FipSpecies, FipSite> implements In
 			builder.ageTotal(8f);
 			builder.yearsToBreastHeight(7f);
 			builder.height(6f);
-	
+
 			builder.siteIndex(5f);
 			builder.crownClosure(0.9f);
 			builder.siteGenus("B");

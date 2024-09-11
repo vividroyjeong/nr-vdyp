@@ -1,7 +1,5 @@
 package ca.bc.gov.nrs.vdyp.io.parse.coe;
 
-import java.util.Optional;
-
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.base.BecZoneBySpeciesCoefficientParser;
 
@@ -36,17 +34,4 @@ public class QuadraticMeanDiameterYieldParser extends BecZoneBySpeciesCoefficien
 	public ControlKey getControlKey() {
 		return ControlKey.DQ_YIELD;
 	}
-
-	// Values after the first are offsets from the first.
-	@Override
-	protected float value(float current, Optional<Float> first) {
-		return first.map(x -> x + current).orElse(current);
-	}
-
-	// Duplicate first value to other species if shared instead of setting to 0.
-	@Override
-	protected float valueShared(float current, Optional<Float> first) {
-		return first.orElse(current);
-	}
-
 }

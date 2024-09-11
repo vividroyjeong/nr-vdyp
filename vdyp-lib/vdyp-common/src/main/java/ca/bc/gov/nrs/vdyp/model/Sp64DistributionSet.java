@@ -95,6 +95,13 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 		return sp64DistributionList.size();
 	}
 
+	/**
+	 * Returns the Sp64Distribution at index <code>withIndex</code>. THIS INDEX is one-based - that is, the first entry
+	 * has index one.
+	 *
+	 * @param withIndex index, one-based, in list.
+	 * @return as described
+	 */
 	public Optional<Sp64Distribution> getSpeciesDistribution(int withIndex) {
 		if (withIndex > maxIndex) {
 			throw new IllegalArgumentException(
@@ -134,8 +141,8 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 			if (gd.getIndex() < 1 || gd.getIndex() > maxIndex) {
 				throw new InvalidGenusDistributionSet(
 						MessageFormat.format(
-								"Index {0} is out of range - acceptable values are between 1 and {1}, inclusive", gd
-										.getIndex(), maxIndex
+								"Index {0} is out of range - acceptable values are between 1 and {1}, inclusive",
+								gd.getIndex(), maxIndex
 						)
 				);
 			}
@@ -143,8 +150,8 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 			if (prevGd != null && prevGd.getPercentage() < gd.getPercentage()) {
 				throw new InvalidGenusDistributionSet(
 						MessageFormat.format(
-								"The percentage of index {0} is {1} and is greater than {2}, that of a species distribution with a lower index", gd
-										.getIndex(), maxIndex
+								"The percentage of index {0} is {1} and is greater than {2}, that of a species distribution with a lower index",
+								gd.getIndex(), maxIndex
 						)
 				);
 			}
@@ -203,5 +210,10 @@ public class Sp64DistributionSet implements Comparable<Sp64DistributionSet> {
 			// null is less than non-null, per ObjectUtils.compare()
 			return 1;
 		}
+	}
+
+	@Override
+	public String toString() {
+		return this.sp64DistributionList.toString();
 	}
 }

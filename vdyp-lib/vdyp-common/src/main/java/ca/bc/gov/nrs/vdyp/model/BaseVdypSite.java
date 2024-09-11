@@ -72,6 +72,27 @@ public abstract class BaseVdypSite {
 		return Utils.mapBoth(ageTotal, yearsToBreastHeight, (age, ytbh) -> age - ytbh);
 	}
 
+	@Override
+	public String toString() {
+		return MessageFormat.format("{0}-{1}-{2}", polygonIdentifier.toStringCompact(), layerType, siteGenus);
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof BaseVdypSite that) {
+			// This is the "business key" of a site.
+			return this.polygonIdentifier.equals(that.polygonIdentifier) && this.layerType.equals(that.layerType)
+					&& this.siteGenus.equals(that.siteGenus);
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return (polygonIdentifier.hashCode() * 17 + layerType.hashCode()) * 17 + siteGenus.hashCode();
+	}
+
 	public abstract static class Builder<T extends BaseVdypSite> extends ModelClassBuilder<T> {
 		protected Optional<PolygonIdentifier> polygonIdentifier = Optional.empty();
 		protected Optional<LayerType> layerType = Optional.empty();
@@ -159,20 +180,20 @@ public abstract class BaseVdypSite {
 			return yearsToBreastHeight(Optional.of(yearsToBreastHeight));
 		}
 
-		public Builder<T> adapt(BaseVdypSite toCopy) {
-			polygonIdentifier(toCopy.getPolygonIdentifier());
-			layerType(toCopy.getLayerType());
-			ageTotal(toCopy.getAgeTotal());
-			yearsToBreastHeight(toCopy.getYearsToBreastHeight());
-			height(toCopy.getHeight());
-			siteIndex(toCopy.getSiteIndex());
-			siteCurveNumber(toCopy.getSiteCurveNumber());
-			siteGenus(toCopy.getSiteGenus());
+		public Builder<T> adapt(BaseVdypSite source) {
+			polygonIdentifier(source.getPolygonIdentifier());
+			layerType(source.getLayerType());
+			ageTotal(source.getAgeTotal());
+			yearsToBreastHeight(source.getYearsToBreastHeight());
+			height(source.getHeight());
+			siteIndex(source.getSiteIndex());
+			siteCurveNumber(source.getSiteCurveNumber());
+			siteGenus(source.getSiteGenus());
 			return this;
 		}
 
-		public Builder<T> copy(T toCopy) {
-			return adapt(toCopy);
+		public Builder<T> copy(T source) {
+			return adapt(source);
 		}
 
 		@Override

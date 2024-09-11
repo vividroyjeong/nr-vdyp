@@ -47,9 +47,10 @@ public class VriLayerParser
 					.strippedString(25, VriPolygonParser.POLYGON_IDENTIFIER) //
 					.space(1) //
 					.value(
-							1, LAYER, ValueParser.valueOrMarker(
-									ValueParser.LAYER, ValueParser
-											.optionalSingleton("Z"::equals, EndOfRecord.END_OF_RECORD)
+							1, LAYER,
+							ValueParser.valueOrMarker(
+									ValueParser.LAYER,
+									ValueParser.optionalSingleton("Z"::equals, EndOfRecord.END_OF_RECORD)
 							)
 					) //
 					.value(6, CROWN_CLOSURE, ValueParser.FLOAT) //

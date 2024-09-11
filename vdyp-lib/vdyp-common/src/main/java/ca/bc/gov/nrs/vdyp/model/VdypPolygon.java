@@ -1,25 +1,26 @@
 package ca.bc.gov.nrs.vdyp.model;
 
+import java.text.MessageFormat;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float, VdypSpecies, VdypSite> {
 
-	private final Optional<Integer> targetYear;
+	private Optional<Integer> targetYear;
 
 	public VdypPolygon(
 			PolygonIdentifier polygonIdentifier, Float percentAvailable, String fiz, BecDefinition bec,
-			Optional<PolygonMode> modeFip
+			Optional<PolygonMode> modeFip, Optional<Integer> inventoryTypeGroup
 	) {
-		this(polygonIdentifier, percentAvailable, fiz, bec, modeFip, Optional.empty());
+		this(polygonIdentifier, percentAvailable, fiz, bec, modeFip, inventoryTypeGroup, Optional.empty());
 	}
 
 	public VdypPolygon(
 			PolygonIdentifier polygonIdentifier, Float percentAvailable, String fiz, BecDefinition bec,
-			Optional<PolygonMode> modeFip, Optional<Integer> targetYear
+			Optional<PolygonMode> modeFip, Optional<Integer> inventoryTypeGroup, Optional<Integer> targetYear
 	) {
-		super(polygonIdentifier, percentAvailable, fiz, bec, modeFip);
+		super(polygonIdentifier, percentAvailable, fiz, bec, modeFip, inventoryTypeGroup);
 
 		this.targetYear = targetYear;
 	}
@@ -29,18 +30,33 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float, VdypSpecies, 
 	 *
 	 * @param <O>                     Type of the polygon to copy
 	 * @param <U>                     Type of percent available in the other polygon
-	 * @param toCopy                  The polygon to copy
+	 * @param source                  The polygon to copy
 	 * @param convertPercentAvailable Function to convert
 	 */
 	public <O extends BaseVdypPolygon<?, U, ?, ?>, U> VdypPolygon(
-			O toCopy, Function<U, Float> convertPercentAvailable
+			O source, Function<U, Float> convertPercentAvailable
 	) {
-		super(toCopy, convertPercentAvailable);
-		if (toCopy instanceof VdypPolygon vdypPolygonToCopy) {
+		super(source, convertPercentAvailable);
+		if (source instanceof VdypPolygon vdypPolygonToCopy) {
 			this.targetYear = vdypPolygonToCopy.getTargetYear();
 		} else {
 			this.targetYear = Optional.empty();
 		}
+	}
+
+	@Override
+	public String toString() {
+		return super.getPolygonIdentifier().toString();
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 
 	public Optional<Integer> getTargetYear() {
@@ -76,7 +92,7 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float, VdypSpecies, 
 		protected VdypPolygon doBuild() {
 			return new VdypPolygon(
 					polygonIdentifier.get(), percentAvailable.get(), forestInventoryZone.get(),
-					biogeoclimaticZone.get(), mode, targetYear
+					biogeoclimaticZone.get(), mode, inventoryTypeGroup, targetYear
 			);
 		}
 
@@ -87,6 +103,19 @@ public class VdypPolygon extends BaseVdypPolygon<VdypLayer, Float, VdypSpecies, 
 
 		public void targetYear(Optional<Integer> targetYear) {
 			this.targetYear = targetYear;
+		}
+	}
+
+	public void setTargetYear(int year) {
+		if (targetYear.isPresent()) {
+			throw new IllegalStateException(
+					MessageFormat.format(
+							"Polygon {} has already had a target year ({}) assigned", this.getPolygonIdentifier(),
+							this.getTargetYear()
+					)
+			);
+		} else {
+			this.targetYear = Optional.of(year);
 		}
 	}
 }

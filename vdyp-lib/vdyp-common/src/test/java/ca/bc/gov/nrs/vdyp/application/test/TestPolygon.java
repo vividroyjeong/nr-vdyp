@@ -17,10 +17,17 @@ public class TestPolygon extends BaseVdypPolygon<TestLayer, Optional<Float>, Tes
 	}
 
 	protected TestPolygon(
-			PolygonIdentifier polygonIdentifier, Optional<Float> percentAvailable, String fiz,
-			BecDefinition bec, Optional<PolygonMode> mode
+			PolygonIdentifier polygonIdentifier, Optional<Float> percentAvailable, String fiz, BecDefinition bec,
+			Optional<PolygonMode> mode
 	) {
-		super(polygonIdentifier, percentAvailable, fiz, bec, mode);
+		super(polygonIdentifier, percentAvailable, fiz, bec, mode, Optional.empty());
+	}
+
+	protected TestPolygon(
+			PolygonIdentifier polygonIdentifier, Optional<Float> percentAvailable, String fiz,
+			BecDefinition becIdentifier, Optional<PolygonMode> mode, Optional<Integer> inventoryTypeGroup
+	) {
+		super(polygonIdentifier, percentAvailable, fiz, becIdentifier, mode, inventoryTypeGroup);
 	}
 
 	public static class Builder extends
@@ -39,11 +46,9 @@ public class TestPolygon extends BaseVdypPolygon<TestLayer, Optional<Float>, Tes
 					percentAvailable.flatMap(x -> x), //
 					forestInventoryZone.get(), //
 					biogeoclimaticZone.get(), //
-					mode //
+					mode, //
+					inventoryTypeGroup
 			));
-
 		}
-
 	}
-
 }

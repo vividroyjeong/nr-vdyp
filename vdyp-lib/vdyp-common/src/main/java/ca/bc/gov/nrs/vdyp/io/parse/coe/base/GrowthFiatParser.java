@@ -45,7 +45,8 @@ public abstract class GrowthFiatParser implements ControlMapSubResourceParser<Ma
 			if (regionId != 1 && regionId != 2) {
 				throw new ValueParseException(
 						MessageFormat.format(
-								"Line {0}: region id {1} is not recognized; the value must be 1 or 2", lineNumber, regionId
+								"Line {0}: region id {1} is not recognized; the value must be 1 or 2", lineNumber,
+								regionId
 						)
 				);
 			}
@@ -53,9 +54,16 @@ public abstract class GrowthFiatParser implements ControlMapSubResourceParser<Ma
 			@SuppressWarnings("unchecked")
 			var coefficients = (List<Float>) value.get(COEFFICIENTS_KEY);
 
-			GrowthFiatDetails details = new GrowthFiatDetails(regionId, coefficients);
+			GrowthFiatDetails details;
+			try {
+				details = new GrowthFiatDetails(regionId, coefficients);
+			} catch (ResourceParseException e) {
+				throw new ValueParseException(
+						String.valueOf(regionId), "Error constructing GrowthFiatDetails instance", e
+				);
+			}
 
-			if (details.getNAges() == 0) {
+			if (details.getNAgesSupplied() == 0) {
 				throw new ValueParseException("0", "Region Id " + regionId + " contains no age ranges");
 			}
 

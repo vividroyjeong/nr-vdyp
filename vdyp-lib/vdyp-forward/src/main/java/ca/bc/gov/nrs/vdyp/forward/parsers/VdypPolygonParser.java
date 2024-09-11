@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.vdyp.forward.parsers;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +12,6 @@ import ca.bc.gov.nrs.vdyp.common.ControlKey;
 import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.ForestInventoryZone;
 import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexForestInventoryZone;
-import ca.bc.gov.nrs.vdyp.forward.model.FipMode;
-import ca.bc.gov.nrs.vdyp.forward.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.LineParser;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
@@ -22,6 +21,9 @@ import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ControlledValueParser;
 import ca.bc.gov.nrs.vdyp.io.parse.value.ValueParser;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
+import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
+import ca.bc.gov.nrs.vdyp.model.PolygonMode;
+import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 
 public class VdypPolygonParser implements ControlMapValueReplacer<Object, String> {
 
@@ -35,7 +37,7 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 	private static final String PERCENT_FOREST_LAND = "PERCENT_FOREST_LAND"; // PCTFLAND
 	private static final String INVENTORY_TYPE_GROUP = "INVENTORY_TYPE_GROUP"; // ITG
 	private static final String BASAL_AREA_GROUP = "BASAL_AREA_GROUP"; // GRPBA1
-	private static final String FIP_MODE = "FIP_MODE"; // MODEfip
+	private static final String POLYGON_MODE = "FIP_MODE"; // MODEfip
 
 	@Override
 	public ControlKey getControlKey() {
@@ -57,7 +59,7 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 					.value(6, PERCENT_FOREST_LAND, ValueParser.FLOAT)
 					.value(3, INVENTORY_TYPE_GROUP, ControlledValueParser.optional(ValueParser.INTEGER))
 					.value(3, BASAL_AREA_GROUP, ValueParser.optional(ValueParser.INTEGER))
-					.value(3, FIP_MODE, ValueParser.optional(ValueParser.INTEGER));
+					.value(3, POLYGON_MODE, ValueParser.optional(ValueParser.INTEGER));
 
 			var is = fileResolver.resolveForInput(fileName);
 
@@ -71,7 +73,7 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 					var percentForestLand = (Float) entry.get(PERCENT_FOREST_LAND);
 					var inventoryTypeGroup = Utils.<Integer>optSafe(entry.get(INVENTORY_TYPE_GROUP));
 					var basalAreaGroup = Utils.<Integer>optSafe(entry.get(BASAL_AREA_GROUP));
-					var fipMode = Utils.<Integer>optSafe(entry.get(FIP_MODE));
+					var fipMode = Utils.<Integer>optSafe(entry.get(POLYGON_MODE));
 
 					BecDefinition bec;
 					try {
@@ -87,7 +89,7 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 						);
 					}
 
-					var description = VdypPolygonDescriptionParser.parse(descriptionText);
+					var description = PolygonIdentifier.split(descriptionText);
 
 					if (percentForestLand <= 0.0) {
 						// VDYPGETP.for lines 146 - 154
@@ -100,10 +102,16 @@ public class VdypPolygonParser implements ControlMapValueReplacer<Object, String
 						percentForestLand = DEFAULT_FORESTED_LAND_PERCENTAGE;
 					}
 
-					return new VdypPolygon(
-							description, bec, fizId, percentForestLand, inventoryTypeGroup, basalAreaGroup,
-							fipMode.flatMap(FipMode::getByCode)
-					);
+					final float percentAvailable = percentForestLand;
+
+					return VdypPolygon.build(builder -> {
+						builder.polygonIdentifier(descriptionText);
+						builder.biogeoclimaticZone(bec);
+						builder.forestInventoryZone(fizId.toString());
+						fipMode.ifPresentOrElse(m -> builder.mode(PolygonMode.getByCode(m)), () -> Optional.empty());
+						builder.percentAvailable(percentAvailable);
+						builder.inventoryTypeGroup(inventoryTypeGroup);
+					});
 				}
 			};
 		};

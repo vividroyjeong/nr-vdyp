@@ -15,6 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,7 +35,6 @@ import org.hamcrest.Matchers;
 
 import ca.bc.gov.nrs.vdyp.application.VdypApplicationIdentifier;
 import ca.bc.gov.nrs.vdyp.common.ControlKey;
-import ca.bc.gov.nrs.vdyp.common.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.io.FileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BecDefinitionParser;
 import ca.bc.gov.nrs.vdyp.io.parse.coe.BreakageParser;
@@ -57,6 +57,7 @@ import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.BecLookup;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.GenusDefinition;
+import ca.bc.gov.nrs.vdyp.model.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
@@ -400,6 +401,11 @@ public class TestUtils {
 				return null;
 			}
 
+			@Override
+			public Path toPath(String filename) throws IOException {
+				return Path.of(toString(filename));
+			}
+
 		};
 	}
 
@@ -416,14 +422,17 @@ public class TestUtils {
 	}
 
 	public static Map<String, Object> loadControlMap() {
+		return loadControlMap(Path.of("VRISTART.CTR"));
+	}
+
+	public static Map<String, Object> loadControlMap(Path controlMapPath) {
 		BaseControlParser parser = new TestNonFipControlParser();
 		try {
-			return TestUtils.loadControlMap(parser, TestUtils.class, "VRISTART.CTR");
+			return TestUtils.loadControlMap(parser, TestUtils.class, controlMapPath.toString());
 		} catch (IOException | ResourceParseException ex) {
 			fail(ex);
 			return null;
 		}
-
 	}
 
 	public static PolygonIdentifier polygonId(String name, int year) {

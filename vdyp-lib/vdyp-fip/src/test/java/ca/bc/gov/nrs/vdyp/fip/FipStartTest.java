@@ -161,8 +161,10 @@ class FipStartTest {
 
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygon(polygon));
 			assertThat(
-					ex, hasProperty(
-							"message", is(
+					ex,
+					hasProperty(
+							"message",
+							is(
 									"Polygon \"" + polygonId + "\" has no " + LayerType.PRIMARY
 											+ " layer, or that layer has non-positive height or crown closure."
 							)
@@ -187,8 +189,10 @@ class FipStartTest {
 
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygon(polygon));
 			assertThat(
-					ex, hasProperty(
-							"message", is(
+					ex,
+					hasProperty(
+							"message",
+							is(
 									"Polygon " + polygonId + " has " + LayerType.PRIMARY
 											+ " layer where height 4.0 is less than minimum 5.0."
 							)
@@ -215,8 +219,10 @@ class FipStartTest {
 
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygon(polygon));
 			assertThat(
-					ex, hasProperty(
-							"message", is(
+					ex,
+					hasProperty(
+							"message",
+							is(
 									"Polygon " + polygonId + " has " + LayerType.VETERAN
 											+ " layer where height 9.0 is less than minimum 10.0."
 							)
@@ -243,8 +249,10 @@ class FipStartTest {
 
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygon(polygon));
 			assertThat(
-					ex, hasProperty(
-							"message", is(
+					ex,
+					hasProperty(
+							"message",
+							is(
 									"Polygon " + polygonId + " has " + LayerType.PRIMARY
 											+ " layer where years to breast height 0.2 is less than minimum 0.5 years."
 							)
@@ -275,8 +283,10 @@ class FipStartTest {
 
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygon(polygon));
 			assertThat(
-					ex, hasProperty(
-							"message", is(
+					ex,
+					hasProperty(
+							"message",
+							is(
 									"Polygon " + polygonId + " has " + LayerType.PRIMARY
 											+ " layer where total age (7.0) is less than YTBH (8.0)."
 							)
@@ -301,8 +311,10 @@ class FipStartTest {
 
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygon(polygon));
 			assertThat(
-					ex, hasProperty(
-							"message", is(
+					ex,
+					hasProperty(
+							"message",
+							is(
 									"Polygon " + polygonId + " has " + LayerType.PRIMARY
 											+ " layer where site index 0.2 is less than minimum 0.5 years."
 							)
@@ -327,10 +339,10 @@ class FipStartTest {
 
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygon(polygon));
 			assertThat(
-					ex, hasProperty(
-							"message", is(
-									"Polygon " + polygonId + " is using unsupported mode " + PolygonMode.YOUNG + "."
-							)
+					ex,
+					hasProperty(
+							"message",
+							is("Polygon " + polygonId + " is using unsupported mode " + PolygonMode.YOUNG + ".")
 					)
 			);
 		}
@@ -356,8 +368,10 @@ class FipStartTest {
 
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygon(polygon));
 			assertThat(
-					ex, hasProperty(
-							"message", is(
+					ex,
+					hasProperty(
+							"message",
+							is(
 									"Polygon \"" + polygonId
 											+ "\" has PRIMARY layer where species entries have a percentage total that does not sum to 100%."
 							)
@@ -386,8 +400,10 @@ class FipStartTest {
 
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygon(polygon));
 			assertThat(
-					ex, hasProperty(
-							"message", is(
+					ex,
+					hasProperty(
+							"message",
+							is(
 									"Polygon \"" + polygonId
 											+ "\" has PRIMARY layer where species entries have a percentage total that does not sum to 100%."
 							)
@@ -443,8 +459,10 @@ class FipStartTest {
 
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygon(polygon));
 			assertThat(
-					ex, hasProperty(
-							"message", is(
+					ex,
+					hasProperty(
+							"message",
+							is(
 									"Polygon \"" + polygonId
 											+ "\" has PRIMARY layer where species entries have a percentage total that does not sum to 100%."
 							)
@@ -476,8 +494,10 @@ class FipStartTest {
 
 			var ex = assertThrows(StandProcessingException.class, () -> app.checkPolygon(polygon));
 			assertThat(
-					ex, hasProperty(
-							"message", is(
+					ex,
+					hasProperty(
+							"message",
+							is(
 									"Polygon \"" + polygonId
 											+ "\" has PRIMARY layer where species entries have a percentage total that does not sum to 100%."
 							)
@@ -768,45 +788,47 @@ class FipStartTest {
 			var holder = speciesResult1;
 			String reason = "Genus " + holder.getGenus();
 			assertThat(
-					reason, holder, hasProperty(
-							"baseAreaByUtilization", VdypMatchers.utilizationAllAndBiggest(0.492921442f)
-					)
+					reason, holder,
+					hasProperty("baseAreaByUtilization", VdypMatchers.utilizationAllAndBiggest(0.492921442f))
 			);
 			assertThat(
-					reason, holder, hasProperty(
-							"treesPerHectareByUtilization", VdypMatchers.utilizationAllAndBiggest(2.3357718f)
-					)
+					reason, holder,
+					hasProperty("treesPerHectareByUtilization", VdypMatchers.utilizationAllAndBiggest(2.3357718f))
 			);
 			assertThat(
-					reason, holder, hasProperty(
-							"wholeStemVolumeByUtilization", VdypMatchers.utilizationAllAndBiggest(6.11904192f)
-					)
+					reason, holder,
+					hasProperty("wholeStemVolumeByUtilization", VdypMatchers.utilizationAllAndBiggest(6.11904192f))
 			);
 			assertThat(
-					reason, holder, hasProperty(
+					reason, holder,
+					hasProperty(
 							"closeUtilizationVolumeByUtilization", VdypMatchers.utilizationAllAndBiggest(5.86088896f)
 					)
 			);
 			assertThat(
-					reason, holder, hasProperty(
-							"closeUtilizationVolumeNetOfDecayByUtilization", VdypMatchers
-									.utilizationAllAndBiggest(5.64048958f)
+					reason, holder,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayByUtilization",
+							VdypMatchers.utilizationAllAndBiggest(5.64048958f)
 					)
 			);
 			assertThat(
-					reason, holder, hasProperty(
-							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization", VdypMatchers
-									.utilizationAllAndBiggest(5.57935333f)
+					reason, holder,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization",
+							VdypMatchers.utilizationAllAndBiggest(5.57935333f)
 					)
 			);
 			assertThat(
-					reason, holder, hasProperty(
-							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", VdypMatchers
-									.utilizationAllAndBiggest(5.27515411f)
+					reason, holder,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+							VdypMatchers.utilizationAllAndBiggest(5.27515411f)
 					)
 			);
 			assertThat(
-					reason, holder, hasProperty(
+					reason, holder,
+					hasProperty(
 							"quadraticMeanDiameterByUtilization", VdypMatchers.utilizationAllAndBiggest(51.8356705f)
 					)
 			);
@@ -815,45 +837,47 @@ class FipStartTest {
 			var holder = speciesResult2;
 			String reason = "Genus " + holder.getGenus();
 			assertThat(
-					reason, holder, hasProperty(
-							"baseAreaByUtilization", VdypMatchers.utilizationAllAndBiggest(1.34433115f)
-					)
+					reason, holder,
+					hasProperty("baseAreaByUtilization", VdypMatchers.utilizationAllAndBiggest(1.34433115f))
 			);
 			assertThat(
-					reason, holder, hasProperty(
-							"treesPerHectareByUtilization", VdypMatchers.utilizationAllAndBiggest(5.95467329f)
-					)
+					reason, holder,
+					hasProperty("treesPerHectareByUtilization", VdypMatchers.utilizationAllAndBiggest(5.95467329f))
 			);
 			assertThat(
-					reason, holder, hasProperty(
-							"wholeStemVolumeByUtilization", VdypMatchers.utilizationAllAndBiggest(14.5863571f)
-					)
+					reason, holder,
+					hasProperty("wholeStemVolumeByUtilization", VdypMatchers.utilizationAllAndBiggest(14.5863571f))
 			);
 			assertThat(
-					reason, holder, hasProperty(
+					reason, holder,
+					hasProperty(
 							"closeUtilizationVolumeByUtilization", VdypMatchers.utilizationAllAndBiggest(13.9343023f)
 					)
 			);
 			assertThat(
-					reason, holder, hasProperty(
-							"closeUtilizationVolumeNetOfDecayByUtilization", VdypMatchers
-									.utilizationAllAndBiggest(13.3831034f)
+					reason, holder,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayByUtilization",
+							VdypMatchers.utilizationAllAndBiggest(13.3831034f)
 					)
 			);
 			assertThat(
-					reason, holder, hasProperty(
-							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization", VdypMatchers
-									.utilizationAllAndBiggest(13.2065458f)
+					reason, holder,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization",
+							VdypMatchers.utilizationAllAndBiggest(13.2065458f)
 					)
 			);
 			assertThat(
-					reason, holder, hasProperty(
-							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", VdypMatchers
-									.utilizationAllAndBiggest(12.4877129f)
+					reason, holder,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+							VdypMatchers.utilizationAllAndBiggest(12.4877129f)
 					)
 			);
 			assertThat(
-					reason, holder, hasProperty(
+					reason, holder,
+					hasProperty(
 							"quadraticMeanDiameterByUtilization", VdypMatchers.utilizationAllAndBiggest(53.6141243f)
 					)
 			);
@@ -862,45 +886,47 @@ class FipStartTest {
 			var holder = speciesResult3;
 			String reason = "Genus " + holder.getGenus();
 			assertThat(
-					reason, holder, hasProperty(
-							"baseAreaByUtilization", VdypMatchers.utilizationAllAndBiggest(0.403299361f)
-					)
+					reason, holder,
+					hasProperty("baseAreaByUtilization", VdypMatchers.utilizationAllAndBiggest(0.403299361f))
 			);
 			assertThat(
-					reason, holder, hasProperty(
-							"treesPerHectareByUtilization", VdypMatchers.utilizationAllAndBiggest(2.38468361f)
-					)
+					reason, holder,
+					hasProperty("treesPerHectareByUtilization", VdypMatchers.utilizationAllAndBiggest(2.38468361f))
 			);
 			assertThat(
-					reason, holder, hasProperty(
-							"wholeStemVolumeByUtilization", VdypMatchers.utilizationAllAndBiggest(4.04864883f)
-					)
+					reason, holder,
+					hasProperty("wholeStemVolumeByUtilization", VdypMatchers.utilizationAllAndBiggest(4.04864883f))
 			);
 			assertThat(
-					reason, holder, hasProperty(
+					reason, holder,
+					hasProperty(
 							"closeUtilizationVolumeByUtilization", VdypMatchers.utilizationAllAndBiggest(3.81141663f)
 					)
 			);
 			assertThat(
-					reason, holder, hasProperty(
-							"closeUtilizationVolumeNetOfDecayByUtilization", VdypMatchers
-									.utilizationAllAndBiggest(3.75043678f)
+					reason, holder,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayByUtilization",
+							VdypMatchers.utilizationAllAndBiggest(3.75043678f)
 					)
 			);
 			assertThat(
-					reason, holder, hasProperty(
-							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization", VdypMatchers
-									.utilizationAllAndBiggest(3.72647476f)
+					reason, holder,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization",
+							VdypMatchers.utilizationAllAndBiggest(3.72647476f)
 					)
 			);
 			assertThat(
-					reason, holder, hasProperty(
-							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", VdypMatchers
-									.utilizationAllAndBiggest(3.56433797f)
+					reason, holder,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+							VdypMatchers.utilizationAllAndBiggest(3.56433797f)
 					)
 			);
 			assertThat(
-					reason, holder, hasProperty(
+					reason, holder,
+					hasProperty(
 							"quadraticMeanDiameterByUtilization", VdypMatchers.utilizationAllAndBiggest(46.4037895f)
 					)
 			);
@@ -909,45 +935,47 @@ class FipStartTest {
 			var holder = result;
 			String reason = "Layer";
 			assertThat(
-					reason, holder, hasProperty(
-							"baseAreaByUtilization", VdypMatchers.utilizationAllAndBiggest(2.24055195f)
-					)
+					reason, holder,
+					hasProperty("baseAreaByUtilization", VdypMatchers.utilizationAllAndBiggest(2.24055195f))
 			);
 			assertThat(
-					reason, holder, hasProperty(
-							"treesPerHectareByUtilization", VdypMatchers.utilizationAllAndBiggest(10.6751289f)
-					)
+					reason, holder,
+					hasProperty("treesPerHectareByUtilization", VdypMatchers.utilizationAllAndBiggest(10.6751289f))
 			);
 			assertThat(
-					reason, holder, hasProperty(
-							"wholeStemVolumeByUtilization", VdypMatchers.utilizationAllAndBiggest(24.7540474f)
-					)
+					reason, holder,
+					hasProperty("wholeStemVolumeByUtilization", VdypMatchers.utilizationAllAndBiggest(24.7540474f))
 			);
 			assertThat(
-					reason, holder, hasProperty(
+					reason, holder,
+					hasProperty(
 							"closeUtilizationVolumeByUtilization", VdypMatchers.utilizationAllAndBiggest(23.6066074f)
 					)
 			);
 			assertThat(
-					reason, holder, hasProperty(
-							"closeUtilizationVolumeNetOfDecayByUtilization", VdypMatchers
-									.utilizationAllAndBiggest(22.7740307f)
+					reason, holder,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayByUtilization",
+							VdypMatchers.utilizationAllAndBiggest(22.7740307f)
 					)
 			);
 			assertThat(
-					reason, holder, hasProperty(
-							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization", VdypMatchers
-									.utilizationAllAndBiggest(22.5123749f)
+					reason, holder,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization",
+							VdypMatchers.utilizationAllAndBiggest(22.5123749f)
 					)
 			);
 			assertThat(
-					reason, holder, hasProperty(
-							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", VdypMatchers
-									.utilizationAllAndBiggest(21.3272057f)
+					reason, holder,
+					hasProperty(
+							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+							VdypMatchers.utilizationAllAndBiggest(21.3272057f)
 					)
 			);
 			assertThat(
-					reason, holder, hasProperty(
+					reason, holder,
+					hasProperty(
 							"quadraticMeanDiameterByUtilization", VdypMatchers.utilizationAllAndBiggest(51.6946983f)
 					)
 			);
@@ -1073,23 +1101,22 @@ class FipStartTest {
 
 			// Species distribution
 			assertThat(
-					speciesResult, hasProperty(
-							"sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(2))
-					)
+					speciesResult,
+					hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(2)))
 			);
 
 			var distributionResult = speciesResult.getSp64DistributionSet();
 
 			assertThat(
-					distributionResult.getSp64DistributionMap(), allOf(
+					distributionResult.getSp64DistributionMap(),
+					allOf(
 							hasEntry(
-									is(1), allOf(
-											hasProperty("genusAlias", is("S1")), hasProperty("percentage", is(75f))
-									)
-							), hasEntry(
-									is(2), allOf(
-											hasProperty("genusAlias", is("S2")), hasProperty("percentage", is(25f))
-									)
+									is(1),
+									allOf(hasProperty("genusAlias", is("S1")), hasProperty("percentage", is(75f)))
+							),
+							hasEntry(
+									is(2),
+									allOf(hasProperty("genusAlias", is("S2")), hasProperty("percentage", is(25f)))
 							)
 					)
 			);
@@ -1155,24 +1182,35 @@ class FipStartTest {
 			assertThat(result, hasProperty("breastHeightAge", present(is(54f))));
 
 			assertThat(
-					result, allOf(
+					result,
+					allOf(
 							hasProperty(
 									"loreyHeightByUtilization", VdypMatchers.utilizationHeight(7.14446497f, 31.3307228f)
-							), hasProperty(
-									"baseAreaByUtilization", VdypMatchers.utilization(
-											0.0153773092f, 44.6249809f, 0.513127923f, 1.26773751f, 2.5276401f, 40.3164787f
+							),
+							hasProperty(
+									"baseAreaByUtilization",
+									VdypMatchers.utilization(
+											0.0153773092f, 44.6249809f, 0.513127923f, 1.26773751f, 2.5276401f,
+											40.3164787f
 									)
-							), hasProperty(
-									"quadraticMeanDiameterByUtilization", VdypMatchers.utilization(
+							),
+							hasProperty(
+									"quadraticMeanDiameterByUtilization",
+									VdypMatchers.utilization(
 											6.05058956f, 30.2606678f, 10.208025f, 15.0549212f, 20.11759f, 35.5117531f
 									)
-							), hasProperty(
-									"treesPerHectareByUtilization", VdypMatchers.utilization(
+							),
+							hasProperty(
+									"treesPerHectareByUtilization",
+									VdypMatchers.utilization(
 											5.34804535f, 620.484802f, 62.6977997f, 71.2168045f, 79.5194702f, 407.05072f
 									)
-							), hasProperty(
-									"wholeStemVolumeByUtilization", VdypMatchers.utilization(
-											0.0666879341f, 635.659668f, 2.66822577f, 9.68201256f, 26.5469246f, 596.762512f
+							),
+							hasProperty(
+									"wholeStemVolumeByUtilization",
+									VdypMatchers.utilization(
+											0.0666879341f, 635.659668f, 2.66822577f, 9.68201256f, 26.5469246f,
+											596.762512f
 									)
 							),
 
@@ -1181,10 +1219,10 @@ class FipStartTest {
 							// wrong
 
 							hasProperty(
-									"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", VdypMatchers
-											.utilization(
-													0f, 563.218933f, 0.414062887f, 7.01947737f, 22.6179276f, 533.16748f
-											)
+									"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+									VdypMatchers.utilization(
+											0f, 563.218933f, 0.414062887f, 7.01947737f, 22.6179276f, 533.16748f
+									)
 							)
 
 					)
@@ -1215,27 +1253,35 @@ class FipStartTest {
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.00890319888f)));
 
 			assertThat(
-					speciesResult, hasProperty(
-							"sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1))
-					)
+					speciesResult,
+					hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1)))
 			);
 
 			assertThat(
-					speciesResult, allOf(
-							hasProperty("loreyHeightByUtilization", coe(-1, 8.39441967f, 38.6004372f)), hasProperty(
-									"baseAreaByUtilization", VdypMatchers.utilization(
+					speciesResult,
+					allOf(
+							hasProperty("loreyHeightByUtilization", coe(-1, 8.39441967f, 38.6004372f)),
+							hasProperty(
+									"baseAreaByUtilization",
+									VdypMatchers.utilization(
 											0f, 0.397305071f, 0.00485289097f, 0.0131751001f, 0.0221586525f, 0.357118428f
 									)
-							), hasProperty(
-									"quadraticMeanDiameterByUtilization", VdypMatchers.utilization(
+							),
+							hasProperty(
+									"quadraticMeanDiameterByUtilization",
+									VdypMatchers.utilization(
 											6.13586617f, 31.6622887f, 9.17939758f, 13.6573782f, 18.2005272f, 42.1307297f
 									)
-							), hasProperty(
-									"treesPerHectareByUtilization", VdypMatchers.utilization(
+							),
+							hasProperty(
+									"treesPerHectareByUtilization",
+									VdypMatchers.utilization(
 											0f, 5.04602766f, 0.733301044f, 0.899351299f, 0.851697803f, 2.56167722f
 									)
-							), hasProperty(
-									"wholeStemVolumeByUtilization", VdypMatchers.utilization(
+							),
+							hasProperty(
+									"wholeStemVolumeByUtilization",
+									VdypMatchers.utilization(
 											0f, 6.35662031f, 0.0182443243f, 0.0747248605f, 0.172960356f, 6.09069061f
 									)
 							),
@@ -1245,10 +1291,10 @@ class FipStartTest {
 							// wrong
 
 							hasProperty(
-									"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", VdypMatchers
-											.utilization(
-													0f, 5.65764236f, 0.000855736958f, 0.046797853f, 0.143031254f, 5.46695757f
-											)
+									"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+									VdypMatchers.utilization(
+											0f, 5.65764236f, 0.000855736958f, 0.046797853f, 0.143031254f, 5.46695757f
+									)
 							)
 
 					)
@@ -1263,28 +1309,38 @@ class FipStartTest {
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.114011094f)));
 
 			assertThat(
-					speciesResult, hasProperty(
-							"sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1))
-					)
+					speciesResult,
+					hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1)))
 			);
 
 			assertThat(
-					speciesResult, allOf(
-							hasProperty("loreyHeightByUtilization", coe(-1, 6.61517191f, 22.8001652f)), hasProperty(
-									"baseAreaByUtilization", VdypMatchers.utilization(
-											0.0131671466f, 5.08774281f, 0.157695293f, 0.365746498f, 0.565057278f, 3.99924374f
+					speciesResult,
+					allOf(
+							hasProperty("loreyHeightByUtilization", coe(-1, 6.61517191f, 22.8001652f)),
+							hasProperty(
+									"baseAreaByUtilization",
+									VdypMatchers.utilization(
+											0.0131671466f, 5.08774281f, 0.157695293f, 0.365746498f, 0.565057278f,
+											3.99924374f
 									)
-							), hasProperty(
-									"quadraticMeanDiameterByUtilization", VdypMatchers.utilization(
+							),
+							hasProperty(
+									"quadraticMeanDiameterByUtilization",
+									VdypMatchers.utilization(
 											5.99067688f, 26.4735165f, 10.1137667f, 14.9345293f, 19.964777f, 38.7725677f
 									)
-							), hasProperty(
-									"treesPerHectareByUtilization", VdypMatchers.utilization(
+							),
+							hasProperty(
+									"treesPerHectareByUtilization",
+									VdypMatchers.utilization(
 											4.67143154f, 92.4298019f, 19.6292171f, 20.8788815f, 18.0498524f, 33.8718452f
 									)
-							), hasProperty(
-									"wholeStemVolumeByUtilization", VdypMatchers.utilization(
-											0.0556972362f, 44.496151f, 0.78884691f, 2.40446854f, 4.43335152f, 36.8694839f
+							),
+							hasProperty(
+									"wholeStemVolumeByUtilization",
+									VdypMatchers.utilization(
+											0.0556972362f, 44.496151f, 0.78884691f, 2.40446854f, 4.43335152f,
+											36.8694839f
 									)
 							),
 
@@ -1293,10 +1349,10 @@ class FipStartTest {
 							// wrong
 
 							hasProperty(
-									"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", VdypMatchers
-											.utilization(
-													0f, 33.6030083f, 0.138336331f, 1.6231581f, 3.49037051f, 28.3511429f
-											)
+									"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+									VdypMatchers.utilization(
+											0f, 33.6030083f, 0.138336331f, 1.6231581f, 3.49037051f, 28.3511429f
+									)
 							)
 
 					)
@@ -1311,28 +1367,39 @@ class FipStartTest {
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.661987007f)));
 
 			assertThat(
-					speciesResult, hasProperty(
-							"sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1))
-					)
+					speciesResult,
+					hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1)))
 			);
 
 			assertThat(
-					speciesResult, allOf(
-							hasProperty("loreyHeightByUtilization", coe(-1, 10.8831682f, 33.5375252f)), hasProperty(
-									"baseAreaByUtilization", VdypMatchers.utilization(
-											0.00163476227f, 29.5411568f, 0.0225830078f, 0.0963115692f, 0.748186111f, 28.6740761f
+					speciesResult,
+					allOf(
+							hasProperty("loreyHeightByUtilization", coe(-1, 10.8831682f, 33.5375252f)),
+							hasProperty(
+									"baseAreaByUtilization",
+									VdypMatchers.utilization(
+											0.00163476227f, 29.5411568f, 0.0225830078f, 0.0963115692f, 0.748186111f,
+											28.6740761f
 									)
-							), hasProperty(
-									"quadraticMeanDiameterByUtilization", VdypMatchers.utilization(
+							),
+							hasProperty(
+									"quadraticMeanDiameterByUtilization",
+									VdypMatchers.utilization(
 											6.46009731f, 33.9255791f, 10.4784775f, 15.5708427f, 20.4805717f, 35.0954628f
 									)
-							), hasProperty(
-									"treesPerHectareByUtilization", VdypMatchers.utilization(
-											0.498754263f, 326.800781f, 2.61875916f, 5.05783129f, 22.7109661f, 296.413239f
+							),
+							hasProperty(
+									"treesPerHectareByUtilization",
+									VdypMatchers.utilization(
+											0.498754263f, 326.800781f, 2.61875916f, 5.05783129f, 22.7109661f,
+											296.413239f
 									)
-							), hasProperty(
-									"wholeStemVolumeByUtilization", VdypMatchers.utilization(
-											0.0085867513f, 470.388489f, 0.182312608f, 1.08978188f, 10.1118069f, 459.004578f
+							),
+							hasProperty(
+									"wholeStemVolumeByUtilization",
+									VdypMatchers.utilization(
+											0.0085867513f, 470.388489f, 0.182312608f, 1.08978188f, 10.1118069f,
+											459.004578f
 									)
 							),
 
@@ -1341,10 +1408,10 @@ class FipStartTest {
 							// wrong
 
 							hasProperty(
-									"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", VdypMatchers
-											.utilization(
-													0f, 424.163849f, 0.0895428956f, 0.929004371f, 8.9712553f, 414.174042f
-											)
+									"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+									VdypMatchers.utilization(
+											0f, 424.163849f, 0.0895428956f, 0.929004371f, 8.9712553f, 414.174042f
+									)
 							)
 
 					)
@@ -1359,27 +1426,35 @@ class FipStartTest {
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.123297341f)));
 
 			assertThat(
-					speciesResult, hasProperty(
-							"sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1))
-					)
+					speciesResult,
+					hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1)))
 			);
 
 			assertThat(
-					speciesResult, allOf(
-							hasProperty("loreyHeightByUtilization", coe(-1, 7.93716192f, 24.3451157f)), hasProperty(
-									"baseAreaByUtilization", VdypMatchers.utilization(
+					speciesResult,
+					allOf(
+							hasProperty("loreyHeightByUtilization", coe(-1, 7.93716192f, 24.3451157f)),
+							hasProperty(
+									"baseAreaByUtilization",
+									VdypMatchers.utilization(
 											0f, 5.50214148f, 0.311808586f, 0.736046314f, 0.988982677f, 3.4653039f
 									)
-							), hasProperty(
-									"quadraticMeanDiameterByUtilization", VdypMatchers.utilization(
+							),
+							hasProperty(
+									"quadraticMeanDiameterByUtilization",
+									VdypMatchers.utilization(
 											6.03505516f, 21.4343796f, 10.260808f, 15.0888424f, 20.0664616f, 32.2813988f
 									)
-							), hasProperty(
-									"treesPerHectareByUtilization", VdypMatchers.utilization(
+							),
+							hasProperty(
+									"treesPerHectareByUtilization",
+									VdypMatchers.utilization(
 											0f, 152.482513f, 37.7081375f, 41.1626587f, 31.2721119f, 42.3395996f
 									)
-							), hasProperty(
-									"wholeStemVolumeByUtilization", VdypMatchers.utilization(
+							),
+							hasProperty(
+									"wholeStemVolumeByUtilization",
+									VdypMatchers.utilization(
 											0f, 57.2091446f, 1.57991886f, 5.59581661f, 9.53606987f, 40.4973412f
 									)
 							),
@@ -1389,10 +1464,10 @@ class FipStartTest {
 							// wrong
 
 							hasProperty(
-									"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", VdypMatchers
-											.utilization(
-													0f, 48.1333618f, 0.168331802f, 4.01862335f, 8.05745506f, 35.8889503f
-											)
+									"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+									VdypMatchers.utilization(
+											0f, 48.1333618f, 0.168331802f, 4.01862335f, 8.05745506f, 35.8889503f
+									)
 							)
 
 					)
@@ -1407,28 +1482,38 @@ class FipStartTest {
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.0918014571f)));
 
 			assertThat(
-					speciesResult, hasProperty(
-							"sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1))
-					)
+					speciesResult,
+					hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1)))
 			);
 
 			assertThat(
-					speciesResult, allOf(
-							hasProperty("loreyHeightByUtilization", coe(-1, 8.63455391f, 34.6888771f)), hasProperty(
-									"baseAreaByUtilization", VdypMatchers.utilization(
-											0.000575399841f, 4.0966382f, 0.0161881447f, 0.0564579964f, 0.203255415f, 3.82073665f
+					speciesResult,
+					allOf(
+							hasProperty("loreyHeightByUtilization", coe(-1, 8.63455391f, 34.6888771f)),
+							hasProperty(
+									"baseAreaByUtilization",
+									VdypMatchers.utilization(
+											0.000575399841f, 4.0966382f, 0.0161881447f, 0.0564579964f, 0.203255415f,
+											3.82073665f
 									)
-							), hasProperty(
-									"quadraticMeanDiameterByUtilization", VdypMatchers.utilization(
+							),
+							hasProperty(
+									"quadraticMeanDiameterByUtilization",
+									VdypMatchers.utilization(
 											6.41802597f, 34.5382729f, 10.1304808f, 14.9457884f, 19.7497196f, 39.0729332f
 									)
-							), hasProperty(
-									"treesPerHectareByUtilization", VdypMatchers.utilization(
+							),
+							hasProperty(
+									"treesPerHectareByUtilization",
+									VdypMatchers.utilization(
 											0.17785944f, 43.7256737f, 2.00838566f, 3.21808815f, 6.63483906f, 31.8643608f
 									)
-							), hasProperty(
-									"wholeStemVolumeByUtilization", VdypMatchers.utilization(
-											0.00240394124f, 57.2092552f, 0.0989032984f, 0.517220974f, 2.29273605f, 54.300396f
+							),
+							hasProperty(
+									"wholeStemVolumeByUtilization",
+									VdypMatchers.utilization(
+											0.00240394124f, 57.2092552f, 0.0989032984f, 0.517220974f, 2.29273605f,
+											54.300396f
 									)
 							),
 
@@ -1437,10 +1522,10 @@ class FipStartTest {
 							// wrong
 
 							hasProperty(
-									"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", VdypMatchers
-											.utilization(
-													0f, 51.6610985f, 0.0169961192f, 0.401893795f, 1.95581412f, 49.286396f
-											)
+									"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization",
+									VdypMatchers.utilization(
+											0f, 51.6610985f, 0.0169961192f, 0.401893795f, 1.95581412f, 49.286396f
+									)
 							)
 
 					)
@@ -1527,25 +1612,31 @@ class FipStartTest {
 			assertThat(speciesResult, hasProperty("fractionGenus", closeTo(0.787526369f)));
 
 			assertThat(
-					speciesResult, hasProperty(
-							"sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1))
-					)
+					speciesResult,
+					hasProperty("sp64DistributionSet", hasProperty("sp64DistributionMap", aMapWithSize(1)))
 			);
 
 			assertThat(
-					speciesResult, allOf(
+					speciesResult,
+					allOf(
 							hasProperty(
 									"loreyHeightByUtilization", VdypMatchers.utilizationHeight(7.00809479f, 20.9070625f)
-							), hasProperty(
-									"baseAreaByUtilization", VdypMatchers.utilization(
+							),
+							hasProperty(
+									"baseAreaByUtilization",
+									VdypMatchers.utilization(
 											0.512469947f, 35.401783f, 2.32033157f, 5.18892097f, 6.6573391f, 21.2351913f
 									)
-							), hasProperty(
-									"quadraticMeanDiameterByUtilization", VdypMatchers.utilization(
+							),
+							hasProperty(
+									"quadraticMeanDiameterByUtilization",
+									VdypMatchers.utilization(
 											5.94023561f, 20.7426338f, 10.2836504f, 15.1184902f, 20.1040707f, 31.6741638f
 									)
-							), hasProperty(
-									"treesPerHectareByUtilization", VdypMatchers.utilization(
+							),
+							hasProperty(
+									"treesPerHectareByUtilization",
+									VdypMatchers.utilization(
 											184.914597f, 1047.62891f, 279.36087f, 289.048248f, 209.72142f, 269.49826f
 									)
 							)
@@ -1554,17 +1645,25 @@ class FipStartTest {
 			);
 
 			assertThat(
-					result, allOf(
-							hasProperty("loreyHeightByUtilization", coe(-1, 7.01034021f, 21.1241722f)), hasProperty(
-									"baseAreaByUtilization", VdypMatchers.utilization(
-											0.553745031f, 44.9531403f, 2.83213019f, 6.17823505f, 8.11753464f, 27.8252392f
+					result,
+					allOf(
+							hasProperty("loreyHeightByUtilization", coe(-1, 7.01034021f, 21.1241722f)),
+							hasProperty(
+									"baseAreaByUtilization",
+									VdypMatchers.utilization(
+											0.553745031f, 44.9531403f, 2.83213019f, 6.17823505f, 8.11753464f,
+											27.8252392f
 									)
-							), hasProperty(
-									"quadraticMeanDiameterByUtilization", VdypMatchers.utilization(
+							),
+							hasProperty(
+									"quadraticMeanDiameterByUtilization",
+									VdypMatchers.utilization(
 											5.9399271f, 21.0548763f, 10.235322f, 15.0843554f, 20.0680523f, 32.0662689f
 									)
-							), hasProperty(
-									"treesPerHectareByUtilization", VdypMatchers.utilization(
+							),
+							hasProperty(
+									"treesPerHectareByUtilization",
+									VdypMatchers.utilization(
 											199.828629f, 1291.1145f, 344.207489f, 345.717224f, 256.639709f, 344.549957f
 									)
 							)
@@ -1888,11 +1987,12 @@ class FipStartTest {
 			Matcher<Float> zeroMatcher = is(0.0f);
 			// Expect the estimated HL in 0 (-1 to 0)
 			assertThat(
-					result, hasProperty(
-							"species", hasEntry(
-									is("B"), hasProperty(
-											"loreyHeightByUtilization", contains(zeroMatcher, heightMatcher)
-									)
+					result,
+					hasProperty(
+							"species",
+							hasEntry(
+									is("B"),
+									hasProperty("loreyHeightByUtilization", contains(zeroMatcher, heightMatcher))
 							)
 					)
 			);
@@ -2018,39 +2118,43 @@ class FipStartTest {
 			var resultB = result.getSpecies().get("B");
 
 			assertThat(
-					resultB, hasProperty(
-							"quadraticMeanDiameterByUtilization", contains(
-									zeroMatcher, closeTo(expectedDqB), zeroMatcher, zeroMatcher, zeroMatcher, closeTo(
-											expectedDqB
-									)
+					resultB,
+					hasProperty(
+							"quadraticMeanDiameterByUtilization",
+							contains(
+									zeroMatcher, closeTo(expectedDqB), zeroMatcher, zeroMatcher, zeroMatcher,
+									closeTo(expectedDqB)
 							)
 					)
 			);
 			assertThat(
-					resultB, hasProperty(
-							"treesPerHectareByUtilization", contains(
-									zeroMatcher, closeTo(3.8092144f), zeroMatcher, zeroMatcher, zeroMatcher, closeTo(
-											3.8092144f
-									)
+					resultB,
+					hasProperty(
+							"treesPerHectareByUtilization",
+							contains(
+									zeroMatcher, closeTo(3.8092144f), zeroMatcher, zeroMatcher, zeroMatcher,
+									closeTo(3.8092144f)
 							)
 					)
 			);
 			var resultC = result.getSpecies().get("C");
 			assertThat(
-					resultC, hasProperty(
-							"quadraticMeanDiameterByUtilization", contains(
-									zeroMatcher, closeTo(expectedDqC), zeroMatcher, zeroMatcher, zeroMatcher, closeTo(
-											expectedDqC
-									)
+					resultC,
+					hasProperty(
+							"quadraticMeanDiameterByUtilization",
+							contains(
+									zeroMatcher, closeTo(expectedDqC), zeroMatcher, zeroMatcher, zeroMatcher,
+									closeTo(expectedDqC)
 							)
 					)
 			);
 			assertThat(
-					resultC, hasProperty(
-							"treesPerHectareByUtilization", contains(
-									zeroMatcher, closeTo(2.430306f), zeroMatcher, zeroMatcher, zeroMatcher, closeTo(
-											2.430306f
-									)
+					resultC,
+					hasProperty(
+							"treesPerHectareByUtilization",
+							contains(
+									zeroMatcher, closeTo(2.430306f), zeroMatcher, zeroMatcher, zeroMatcher,
+									closeTo(2.430306f)
 							)
 					)
 			);
@@ -2211,18 +2315,15 @@ class FipStartTest {
 			var spec = VdypSpecies.build(layer, builder -> {
 				builder.genus("Y", controlMap);
 				builder.percentGenus(100f);
-				builder.volumeGroup(-1);
-				builder.decayGroup(-1);
-				builder.breakageGroup(-1);
+				builder.volumeGroup(74);
+				builder.decayGroup(63);
+				builder.breakageGroup(31);
 				builder.addSite(siteBuilder -> {
 					siteBuilder.ageTotal(285f);
 					siteBuilder.yearsToBreastHeight(11.3999996f);
 					siteBuilder.height(24.3999996f);
 				});
 			});
-			spec.setVolumeGroup(74);
-			spec.setDecayGroup(63);
-			spec.setBreakageGroup(31);
 			spec.getLoreyHeightByUtilization().setCoe(0, 19.9850883f);
 
 			var fipLayer = this.getTestPrimaryLayer(polygonId, l -> {
@@ -3099,9 +3200,8 @@ class FipStartTest {
 			assertThat(vdypLayer, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiedValue));
 			assertThat(vdypLayer, hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiedValue));
 			assertThat(
-					vdypLayer, hasProperty(
-							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiedValue
-					)
+					vdypLayer,
+					hasProperty("closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiedValue)
 			);
 
 			assertThat(spec1, hasProperty("loreyHeightByUtilization", neverModifiedValue));
@@ -3254,12 +3354,12 @@ class FipStartTest {
 					vdypLayer, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiableNotModifiedValue)
 			);
 			assertThat(
-					vdypLayer, hasProperty(
-							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue
-					)
+					vdypLayer,
+					hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
 			);
 			assertThat(
-					vdypLayer, hasProperty(
+					vdypLayer,
+					hasProperty(
 							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiableNotModifiedValue
 					)
 			);
@@ -3271,12 +3371,12 @@ class FipStartTest {
 			assertThat(spec1, hasProperty("treesPerHectareByUtilization", modifiableNotModifiedValue));
 			assertThat(spec1, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiableNotModifiedValue));
 			assertThat(
-					spec1, hasProperty(
-							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue
-					)
+					spec1,
+					hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
 			);
 			assertThat(
-					spec1, hasProperty(
+					spec1,
+					hasProperty(
 							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiableNotModifiedValue
 					)
 			);
@@ -3288,12 +3388,12 @@ class FipStartTest {
 			assertThat(spec2, hasProperty("treesPerHectareByUtilization", modifiableNotModifiedValue));
 			assertThat(spec2, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiableNotModifiedValue));
 			assertThat(
-					spec2, hasProperty(
-							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue
-					)
+					spec2,
+					hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
 			);
 			assertThat(
-					spec2, hasProperty(
+					spec2,
+					hasProperty(
 							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiableNotModifiedValue
 					)
 			);
@@ -3438,12 +3538,12 @@ class FipStartTest {
 					vdypLayer, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiableNotModifiedValue)
 			);
 			assertThat(
-					vdypLayer, hasProperty(
-							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue
-					)
+					vdypLayer,
+					hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
 			);
 			assertThat(
-					vdypLayer, hasProperty(
+					vdypLayer,
+					hasProperty(
 							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiableNotModifiedValue
 					)
 			);
@@ -3455,12 +3555,12 @@ class FipStartTest {
 			assertThat(spec1, hasProperty("treesPerHectareByUtilization", modifiableNotModifiedValue));
 			assertThat(spec1, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiableNotModifiedValue));
 			assertThat(
-					spec1, hasProperty(
-							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue
-					)
+					spec1,
+					hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
 			);
 			assertThat(
-					spec1, hasProperty(
+					spec1,
+					hasProperty(
 							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiableNotModifiedValue
 					)
 			);
@@ -3472,12 +3572,12 @@ class FipStartTest {
 			assertThat(spec2, hasProperty("treesPerHectareByUtilization", modifiableNotModifiedValue));
 			assertThat(spec2, hasProperty("closeUtilizationVolumeNetOfDecayByUtilization", modifiableNotModifiedValue));
 			assertThat(
-					spec2, hasProperty(
-							"closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue
-					)
+					spec2,
+					hasProperty("closeUtilizationVolumeNetOfDecayAndWasteByUtilization", modifiableNotModifiedValue)
 			);
 			assertThat(
-					spec2, hasProperty(
+					spec2,
+					hasProperty(
 							"closeUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization", modifiableNotModifiedValue
 					)
 			);
