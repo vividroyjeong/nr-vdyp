@@ -32,7 +32,7 @@ const initOptions: KeycloakInitOptions = {
   pkceMethod: KEYCLOAK.PKCE_METHOD,
   checkLoginIframe: KEYCLOAK.CHECK_LOGIN_IFRAME,
   onLoad: KEYCLOAK.ONLOAD,
-  silentCheckSsoRedirectUri: `${location.origin}${KEYCLOAK.SILENT_CHECK_SSO_REDIRECT_PAGE}`,
+  // silentCheckSsoRedirectUri: `${location.origin}${KEYCLOAK.SILENT_CHECK_SSO_REDIRECT_PAGE}`,
   enableLogging: KEYCLOAK.ENABLE_LOGGING,
 }
 
@@ -70,7 +70,7 @@ export const initializeKeycloak = async (): Promise<Keycloak | undefined> => {
     }
 
     console.info(
-      `SSO initialization Options - pkceMethod : ${initOptions.pkceMethod}, checkLoginIframe : ${initOptions.checkLoginIframe}, onLoad : {initOptions.onLoad}, silentCheckSsoRedirectUri : ${initOptions.silentCheckSsoRedirectUri}, enableLogging : ${initOptions.enableLogging}`,
+      `SSO initialization Options - pkceMethod : ${initOptions.pkceMethod}, checkLoginIframe : ${initOptions.checkLoginIframe}, onLoad : ${initOptions.onLoad}, silentCheckSsoRedirectUri : ${initOptions.silentCheckSsoRedirectUri}, enableLogging : ${initOptions.enableLogging}`,
     )
     const auth = await keycloakInstance.init(initOptions)
     console.log(`after keycloakinstance init auth: ${auth}`)
