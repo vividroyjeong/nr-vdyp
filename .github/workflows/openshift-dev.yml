@@ -6,7 +6,6 @@ on:
     paths:
       - "frontend/**"
       - "backend/**"
-      - "migrations/**"
 concurrency:
   # Cancel if re-attempted
   group: ${{ github.event_name }}
@@ -19,7 +18,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        package: [backend, frontend, migrations]
+        package: [backend, frontend]
     timeout-minutes: 10
     steps:
       - uses: bcgov-nr/action-builder-ghcr@v2.2.0
@@ -35,13 +34,14 @@ jobs:
     name: Deploys
     needs: [builds]
     uses: ./.github/workflows/.deployer.yml
-    secrets: inherit
+    secrets:
+      inherit
       # oc_namespace: ${{ secrets.OC_NAMESPACE }}
       # oc_token: ${{ secrets.OC_TOKEN }}
     with:
       environment: dev
       values: "values-dev.yaml"
-      triggers: ('backend/' 'frontend/' 'migrations/')
+      triggers: ('backend/' 'frontend/')
       params: |
         --set global.secrets.persist=false \
 
