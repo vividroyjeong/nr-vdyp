@@ -12,6 +12,11 @@ const ssoClientId = env.VITE_SSO_CLIENT_ID
 const ssoRealm = env.VITE_SSO_REALM
 const ssoRedirectUrl = env.VITE_SSO_REDIRECT_URI
 
+console.log(`ssoAuthServerUrl:${ssoAuthServerUrl}`)
+console.log(`ssoClientId:${ssoClientId}`)
+console.log(`ssoRealm:${ssoRealm}`)
+console.log(`ssoRedirectUrl:${ssoRedirectUrl}`)
+
 const createKeycloakInstance = (): Keycloak => {
   if (!keycloakInstance) {
     keycloakInstance = new Keycloak({
@@ -64,7 +69,17 @@ export const initializeKeycloak = async (): Promise<Keycloak | undefined> => {
       return keycloakInstance
     }
 
+    console.info(
+      `SSO initialization Options - pkceMethod : ${initOptions.pkceMethod}, checkLoginIframe : ${initOptions.checkLoginIframe}, onLoad : {initOptions.onLoad}, silentCheckSsoRedirectUri : ${initOptions.silentCheckSsoRedirectUri}, enableLogging : ${initOptions.enableLogging}`,
+    )
     const auth = await keycloakInstance.init(initOptions)
+    console.log(`after keycloakinstance init auth: ${auth}`)
+    console.log(`after keycloakinstance init auth: ${keycloakInstance.token}`)
+    console.log(
+      `after keycloakinstance init auth: ${keycloakInstance.refreshToken}`,
+    )
+    console.log(`after keycloakinstance init auth: ${keycloakInstance.idToken}`)
+
     console.info(`SSO initialization complete : ${auth}`)
     if (
       auth &&
@@ -97,9 +112,17 @@ export const initializeKeycloak = async (): Promise<Keycloak | undefined> => {
 
       return keycloakInstance
     } else {
+      console.info(
+        `SSO login with options - redirectUri : ${loginOptions.redirectUri}`,
+      )
       keycloakInstance.login(loginOptions)
     }
   } catch (err) {
+    console.log(`ssoAuthServerUrl:${ssoAuthServerUrl}`)
+    console.log(`ssoClientId:${ssoClientId}`)
+    console.log(`ssoRealm:${ssoRealm}`)
+    console.log(`ssoRedirectUrl:${ssoRedirectUrl}`)
+
     console.error('Keycloak initialization failed:', err)
     keycloakInstance = null // Reset the instance on failure
     throw err
