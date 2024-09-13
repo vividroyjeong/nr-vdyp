@@ -1,0 +1,61 @@
+name: Build and Deploy to Openshift Dev
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "frontend/**"
+      - "backend/**"
+concurrency:
+  # Cancel if re-attempted
+  group: ${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+  # https://github.com/bcgov-nr/action-builder-ghcr
+  builds:
+    name: Builds
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        package: [backend, frontend]
+    timeout-minutes: 10
+    steps:
+      - uses: bcgov-nr/action-builder-ghcr@v2.2.0
+        with:
+          package: ${{ matrix.package }}
+          tag: ${{ github.event.number }}
+          tag_fallback: latest
+          triggers: ('${{ matrix.package }}/')
+
+  # https://github.com/bcgov/quickstart-openshift-helpers
+  deploys:
+    name: Deploys
+    needs: [builds]
+    uses: ./.github/workflows/.deployer.yml
+    secrets:
+      inherit
+      # oc_namespace: ${{ secrets.OC_NAMESPACE }}
+      # oc_token: ${{ secrets.OC_TOKEN }}
+    with:
+      environment: dev
+      values: "values-dev.yaml"
+      triggers: ('backend/' 'frontend/')
+      params: |
+        --set global.secrets.persist=false \
+
+  # tests:
+  #   name: Tests
+  #   if: needs.deploys.outputs.triggered == 'true'
+  #   needs: [deploys]
+  #   uses: ./.github/workflows/.tests.yml
+  #   with:
+  #     target: ${{ github.event.number }}
+
+  results:
+    name: PR Results
+    needs: [builds, deploys]
+    if: always() && (!failure()) && (!cancelled())
+    runs-on: ubuntu-22.04
+    steps:
+      - run: echo "Success!"
