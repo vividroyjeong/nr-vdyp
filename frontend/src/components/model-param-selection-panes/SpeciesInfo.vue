@@ -15,8 +15,8 @@
             </v-col>
           </v-row>
         </v-expansion-panel-title>
-        <v-expansion-panel-text class="expansion-panel-text">
-          <div class="mt-n5">
+        <v-expansion-panel-text class="expansion-panel-text mt-n4">
+          <div>
             <v-row style="display: inline-flex; align-items: center">
               <v-col cols="auto" style="margin-bottom: 20px">
                 <span>Species % derived by:</span>
@@ -29,7 +29,6 @@
               </v-col>
             </v-row>
           </div>
-
           <div class="mt-n5">
             <v-row>
               <!-- input -->

@@ -15,8 +15,8 @@
             </v-col>
           </v-row>
         </v-expansion-panel-title>
-        <v-expansion-panel-text class="expansion-panel-text">
-          <div class="species-row mt-1">
+        <v-expansion-panel-text class="expansion-panel-text mt-n2">
+          <div>
             <v-row>
               <v-col cols="4">
                 <v-text-field

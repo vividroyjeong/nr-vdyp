@@ -15,8 +15,8 @@
             </v-col>
           </v-row>
         </v-expansion-panel-title>
-        <v-expansion-panel-text class="expansion-panel-text">
-          <div class="ml-n3">
+        <v-expansion-panel-text class="expansion-panel-text mt-n3">
+          <div>
             <v-row>
               <v-col cols="auto">
                 <v-radio-group v-model="computedValues">

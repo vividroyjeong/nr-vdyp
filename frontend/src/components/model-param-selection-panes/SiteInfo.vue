@@ -15,7 +15,7 @@
             </v-col>
           </v-row>
         </v-expansion-panel-title>
-        <v-expansion-panel-text class="expansion-panel-text">
+        <v-expansion-panel-text class="expansion-panel-text mt-n2">
           <div>
             <v-row>
               <v-col cols="3">
