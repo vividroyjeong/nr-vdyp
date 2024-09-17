@@ -18,7 +18,7 @@
         <v-expansion-panel-text class="expansion-panel-text mt-n2">
           <div>
             <v-row>
-              <v-col cols="4">
+              <v-col cols="3">
                 <v-text-field
                   label="Starting Age"
                   type="number"
@@ -32,7 +32,8 @@
                   dense
                 ></v-text-field>
               </v-col>
-              <v-col cols="4">
+              <v-col class="col-space" />
+              <v-col cols="3">
                 <v-text-field
                   label="Finishing Age"
                   type="number"
@@ -46,7 +47,8 @@
                   dense
                 ></v-text-field>
               </v-col>
-              <v-col cols="4">
+              <v-col class="col-space" />
+              <v-col cols="3">
                 <v-text-field
                   label="Age Increment"
                   type="number"
@@ -62,125 +64,123 @@
               </v-col>
             </v-row>
           </div>
-          <div>
-            <v-container class="mt-5">
-              <div class="ml-n4 mt-n5">
-                <span class="text-h6">Volume Reported</span>
-              </div>
-              <v-row class="ml-n6">
-                <v-col cols="12" md="2" sm="2">
+          <div class="ml-4 mt-5">
+            <div class="ml-n4 mt-n5">
+              <span class="text-h6">Volume Reported</span>
+            </div>
+            <v-row class="ml-n6">
+              <v-col cols="12" md="2" sm="2">
+                <div>
                   <div>
-                    <div>
-                      <v-checkbox
-                        v-model="selectedVolumeReported"
-                        label="Whole Stem"
-                        value="Whole Stem"
-                        hide-details
-                      ></v-checkbox>
-                    </div>
-                    <div class="mt-3">
-                      <v-checkbox
-                        v-model="selectedVolumeReported"
-                        label="Computed MAI"
-                        value="Computed MAI"
-                        hide-details
-                      ></v-checkbox>
-                    </div>
-                  </div>
-                </v-col>
-                <v-col cols="12" md="2" sm="2">
-                  <div>
-                    <div>
-                      <v-checkbox
-                        v-model="selectedVolumeReported"
-                        label="Close Utilization"
-                        value="Close Utilization"
-                        hide-details
-                      ></v-checkbox>
-                    </div>
-                    <div class="mt-3">
-                      <v-checkbox
-                        v-model="selectedVolumeReported"
-                        label="Species Composition"
-                        value="Species Composition"
-                        hide-details
-                      ></v-checkbox>
-                    </div>
-                  </div>
-                </v-col>
-                <v-col cols="12" md="2" sm="2">
-                  <div>
-                    <div>
-                      <v-checkbox
-                        v-model="selectedVolumeReported"
-                        label="Net Decay"
-                        value="Net Decay"
-                        hide-details
-                      ></v-checkbox>
-                    </div>
-                    <div class="mt-3">
-                      <v-checkbox
-                        v-model="selectedVolumeReported"
-                        label="Culmination Values"
-                        value="Culmination Values"
-                        hide-details
-                      ></v-checkbox>
-                    </div>
-                  </div>
-                </v-col>
-                <v-col cols="12" md="2" sm="2">
-                  <div class="ml-n3">
                     <v-checkbox
                       v-model="selectedVolumeReported"
-                      label="Net Decay and Waste"
-                      value="Net Decay and Waste"
+                      label="Whole Stem"
+                      value="Whole Stem"
                       hide-details
                     ></v-checkbox>
                   </div>
                   <div>
-                    <v-select
-                      label="Projection Type"
-                      :items="projectionTypeOptions"
-                      v-model="projectionType"
-                      item-title="label"
-                      item-value="value"
-                      clearable
-                      hide-details="auto"
-                      persistent-placeholder
-                      placeholder="Select..."
-                      density="compact"
-                      dense
-                    ></v-select>
-                  </div>
-                </v-col>
-                <v-col cols="12" md="1" sm="1"> </v-col>
-                <v-col cols="12" md="2" sm="2">
-                  <div class="ml-n3">
                     <v-checkbox
                       v-model="selectedVolumeReported"
-                      label="Net Decay, Waste and Breakage"
-                      value="Net Decay, Waste and Breakage"
+                      label="Computed MAI"
+                      value="Computed MAI"
+                      hide-details
+                    ></v-checkbox>
+                  </div>
+                </div>
+              </v-col>
+              <v-col cols="12" md="2" sm="2">
+                <div>
+                  <div>
+                    <v-checkbox
+                      v-model="selectedVolumeReported"
+                      label="Close Utilization"
+                      value="Close Utilization"
                       hide-details
                     ></v-checkbox>
                   </div>
                   <div>
-                    <v-select
-                      label="Report Title"
-                      :items="reportTitleOptions"
-                      v-model="reportTitle"
-                      item-title="label"
-                      item-value="value"
-                      clearable
-                      hide-details="auto"
-                      persistent-placeholder
-                      placeholder="Select..."
-                      density="compact"
-                      dense
-                    ></v-select>
+                    <v-checkbox
+                      v-model="selectedVolumeReported"
+                      label="Species Composition"
+                      value="Species Composition"
+                      hide-details
+                    ></v-checkbox>
                   </div>
-                </v-col>
-              </v-row>
-            </v-container>
+                </div>
+              </v-col>
+              <v-col cols="12" md="2" sm="2">
+                <div>
+                  <div>
+                    <v-checkbox
+                      v-model="selectedVolumeReported"
+                      label="Net Decay"
+                      value="Net Decay"
+                      hide-details
+                    ></v-checkbox>
+                  </div>
+                  <div>
+                    <v-checkbox
+                      v-model="selectedVolumeReported"
+                      label="Culmination Values"
+                      value="Culmination Values"
+                      hide-details
+                    ></v-checkbox>
+                  </div>
+                </div>
+              </v-col>
+              <v-col cols="12" md="2" sm="2">
+                <div class="ml-n3">
+                  <v-checkbox
+                    v-model="selectedVolumeReported"
+                    label="Net Decay and Waste"
+                    value="Net Decay and Waste"
+                    hide-details
+                  ></v-checkbox>
+                </div>
+                <div>
+                  <v-select
+                    label="Projection Type"
+                    :items="projectionTypeOptions"
+                    v-model="projectionType"
+                    item-title="label"
+                    item-value="value"
+                    clearable
+                    hide-details="auto"
+                    persistent-placeholder
+                    placeholder="Select..."
+                    density="compact"
+                    dense
+                  ></v-select>
+                </div>
+              </v-col>
+              <v-col cols="12" md="1" sm="1"> </v-col>
+              <v-col cols="12" md="2" sm="2">
+                <div class="ml-n3">
+                  <v-checkbox
+                    v-model="selectedVolumeReported"
+                    label="Net Decay, Waste and Breakage"
+                    value="Net Decay, Waste and Breakage"
+                    hide-details
+                  ></v-checkbox>
+                </div>
+                <div>
+                  <v-select
+                    label="Report Title"
+                    :items="reportTitleOptions"
+                    v-model="reportTitle"
+                    item-title="label"
+                    item-value="value"
+                    clearable
+                    hide-details="auto"
+                    persistent-placeholder
+                    placeholder="Select..."
+                    density="compact"
+                    dense
+                  ></v-select>
+                </div>
+              </v-col>
+            </v-row>
           </div>
           <div class="mt-5">
             <v-row>
@@ -196,7 +196,7 @@
                   readonly
                 ></v-text-field>
               </v-col>
-              <v-col cols="1"></v-col>
+              <v-col class="col-space" />
               <v-col cols="5" class="ma-5">
                 <!-- <div>value: {{ slidervalue1 }}</div> -->
                 <vue-slider
@@ -225,7 +225,7 @@
                   readonly
                 ></v-text-field>
               </v-col>
-              <v-col cols="1"></v-col>
+              <v-col class="col-space" />
               <v-col cols="5" class="ma-5">
                 <!-- <div>value: {{ slidervalue2 }}</div> -->
                 <vue-slider
@@ -254,7 +254,7 @@
                   readonly
                 ></v-text-field>
               </v-col>
-              <v-col cols="1"></v-col>
+              <v-col class="col-space" />
               <v-col cols="5" class="ma-5">
                 <!-- <div>value: {{ slidervalue3 }}</div> -->
                 <vue-slider
@@ -283,7 +283,7 @@
                   readonly
                 ></v-text-field>
               </v-col>
-              <v-col cols="1"></v-col>
+              <v-col class="col-space" />
               <v-col cols="5" class="ma-5">
                 <!-- <div>value: {{ slidervalue4 }}</div> -->
                 <vue-slider

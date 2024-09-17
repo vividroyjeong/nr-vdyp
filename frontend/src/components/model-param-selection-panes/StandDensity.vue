@@ -18,7 +18,7 @@
         <v-expansion-panel-text class="expansion-panel-text mt-n2">
           <div>
             <v-row>
-              <v-col cols="4">
+              <v-col cols="3">
                 <v-text-field
                   label="Percent Stockable Area"
                   type="number"
@@ -32,8 +32,8 @@
                   dense
                 ></v-text-field
               ></v-col>
-              <v-col cols="1"></v-col>
-              <v-col cols="4">
+              <v-col class="col-space" />
+              <v-col cols="3">
                 <v-text-field
                   type="number"
                   v-model="basalArea"
@@ -52,7 +52,7 @@
               >
             </v-row>
             <v-row>
-              <v-col cols="4">
+              <v-col cols="3">
                 <v-text-field
                   label="Trees per Hectare"
                   type="number"
@@ -66,8 +66,8 @@
                   dense
                 ></v-text-field>
               </v-col>
-              <v-col cols="1"></v-col>
-              <v-col cols="4">
+              <v-col class="col-space" />
+              <v-col cols="3">
                 <v-select
                   label="Minimum DBH Limit"
                   :items="minimumDBHLimits"
@@ -84,7 +84,7 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="4">
+              <v-col cols="3">
                 <v-text-field
                   label="Percent Crown Closure"
                   type="number"
@@ -98,8 +98,6 @@
                   dense
                 ></v-text-field>
               </v-col>
-              <v-col cols="1"></v-col>
-              <v-col cols="4"> </v-col>
             </v-row>
           </div>
           <v-card-actions class="mt-5 pr-0">
