@@ -246,8 +246,6 @@ input[type='number']::-webkit-outer-spin-button {
   border-top: 1px solid rgba(0, 0, 0, 0.12);
 }
 
-.species-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
+.col-space {
+  max-width: 3%;
 }

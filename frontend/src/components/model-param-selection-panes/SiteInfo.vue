@@ -33,6 +33,7 @@
                   dense
                 ></v-select>
               </v-col>
+              <v-col class="col-space" />
               <v-col cols="3">
                 <v-select
                   label="Eco Zone"
@@ -48,25 +49,30 @@
                   dense
                 ></v-select>
               </v-col>
-              <v-col cols="3 pl-0">
+              <v-col class="col-space" />
+              <v-col cols="3">
                 <v-checkbox
                   label="Include Secondary Dominant Height in Yield Table"
                   v-model="includeSecondaryHeight"
-                  hide-details
+                  hide-details="auto"
                 ></v-checkbox>
               </v-col>
-              <v-col cols="3">
-                <v-text-field
-                  label="Species Group"
-                  :model-value="speciesGroup"
-                  variant="underlined"
-                  readonly
-                  density="compact"
-                  dense
-                ></v-text-field>
+              <v-col class="col-space" />
+              <v-col>
+                <div class="mt-2">
+                  <v-text-field
+                    label="Species Group"
+                    :model-value="speciesGroup"
+                    variant="underlined"
+                    hide-details
+                    readonly
+                    density="compact"
+                    dense
+                  ></v-text-field>
+                </div>
               </v-col>
             </v-row>
-            <div class="hr-line"></div>
+            <div class="hr-line mt-2"></div>
             <v-row class="mt-7">
               <v-col cols="3">
                 <v-select
@@ -83,6 +89,7 @@
                   dense
                 ></v-select>
               </v-col>
+              <v-col class="col-space" />
               <v-col cols="3">
                 <v-select
                   label="Site Index Curve"
@@ -98,13 +105,14 @@
                   readonly
                 ></v-select>
               </v-col>
-              <v-col cols="6">
-                <div class="site-index-info">
+              <v-col class="col-space" />
+              <v-col>
+                <div class="mt-5 ml-2" style="font-size: 0.875rem">
                   *Ministry Default Curve for this Species
                 </div>
               </v-col>
             </v-row>
-            <div class="mt-5 hr-line"></div>
+            <div class="hr-line mt-6"></div>
             <v-row
               class="mt-7"
               style="display: inline-flex; align-items: center"
@@ -119,7 +127,7 @@
                 </v-radio-group>
               </v-col>
             </v-row>
-            <v-row class="mt-n7">
+            <v-row>
               <v-col cols="3">
                 <v-select
                   label="Age Type"
@@ -135,6 +143,7 @@
                   dense
                 ></v-select>
               </v-col>
+              <v-col class="col-space" />
               <v-col cols="3">
                 <v-text-field
                   label="Age (years)"
@@ -149,14 +158,18 @@
                   dense
                 ></v-text-field>
               </v-col>
-              <v-col cols="3">
-                <v-radio-group v-model="floatOptions1" row>
-                  <v-radio label="Float" value="float"></v-radio>
-                </v-radio-group>
+              <v-col class="col-space" />
+              <v-col>
+                <div class="mt-2">
+                  <v-radio-group v-model="floatOptions1" row>
+                    <v-radio label="Float" value="float"></v-radio>
+                  </v-radio-group>
+                </div>
               </v-col>
             </v-row>
             <v-row class="mt-n7">
               <v-col cols="3"> &nbsp; </v-col>
+              <v-col class="col-space" />
               <v-col cols="3">
                 <v-text-field
                   label="Height (meters)"
@@ -171,14 +184,18 @@
                   dense
                 ></v-text-field>
               </v-col>
-              <v-col cols="3">
-                <v-radio-group v-model="floatOptions2" row>
-                  <v-radio label="Float" value="float"></v-radio>
-                </v-radio-group>
+              <v-col class="col-space" />
+              <v-col>
+                <div class="mt-2">
+                  <v-radio-group v-model="floatOptions2" row>
+                    <v-radio label="Float" value="float"></v-radio>
+                  </v-radio-group>
+                </div>
               </v-col>
             </v-row>
             <v-row class="mt-n7">
               <v-col cols="3"> &nbsp; </v-col>
+              <v-col class="col-space" />
               <v-col cols="3">
                 <v-text-field
                   label="BHA 50 Site Index"
@@ -193,10 +210,13 @@
                   dense
                 ></v-text-field>
               </v-col>
-              <v-col cols="3">
-                <v-radio-group v-model="floatOptions3" row>
-                  <v-radio label="Float" value="float"></v-radio>
-                </v-radio-group>
+              <v-col class="col-space" />
+              <v-col>
+                <div class="mt-2">
+                  <v-radio-group v-model="floatOptions3" row>
+                    <v-radio label="Float" value="float"></v-radio>
+                  </v-radio-group>
+                </div>
               </v-col>
             </v-row>
           </div>
@@ -248,16 +268,4 @@ const clear = () => {}
 const confirm = () => {}
 </script>
 
-<style scoped>
-.site-index-info {
-  margin-top: -12px;
-  margin-left: 16px;
-  font-size: 0.875rem;
-  color: #666;
-}
-/* .full-height {
-  height: calc(100vh - 410px);
-  display: flex;
-  flex-direction: column;
-} */
-</style>
+<style scoped></style>

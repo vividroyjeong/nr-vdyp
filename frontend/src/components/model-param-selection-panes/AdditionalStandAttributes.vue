@@ -19,7 +19,7 @@
           <div>
             <v-row>
               <v-col cols="auto">
-                <v-radio-group v-model="computedValues">
+                <v-radio-group v-model="computedValues" density="compact" dense>
                   <v-radio
                     label="Use Computed Values (These additional Stand attributes require that a Stand Age and Basal Area be supplied on the Site Index and the Density pages)"
                     value="use"
@@ -32,9 +32,9 @@
               </v-col>
             </v-row>
           </div>
-          <div class="mt-n5">
+          <div>
             <v-row>
-              <v-col cols="4">
+              <v-col cols="3">
                 <v-text-field
                   label="Lorey Height - 7.5cm+ (meters)"
                   type="number"
@@ -48,8 +48,8 @@
                   dense
                 ></v-text-field>
               </v-col>
-              <v-col cols="1"></v-col>
-              <v-col cols="4">
+              <v-col class="col-space" />
+              <v-col cols="3">
                 <v-text-field
                   type="number"
                   v-model="wholeStemVolume75cm"
@@ -68,7 +68,7 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="4">
+              <v-col cols="3">
                 <v-text-field
                   type="number"
                   v-model="basalArea"
@@ -85,8 +85,8 @@
                   </template>
                 </v-text-field>
               </v-col>
-              <v-col cols="1"></v-col>
-              <v-col cols="4">
+              <v-col class="col-space" />
+              <v-col cols="3">
                 <v-text-field
                   type="number"
                   v-model="wholeStemVolume125cm"
@@ -105,7 +105,7 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="4">
+              <v-col cols="3">
                 <v-text-field
                   type="number"
                   v-model="closeUtilVolume"
@@ -122,8 +122,8 @@
                   </template>
                 </v-text-field>
               </v-col>
-              <v-col cols="1"></v-col>
-              <v-col cols="4">
+              <v-col class="col-space" />
+              <v-col cols="3">
                 <v-text-field
                   type="number"
                   v-model="closeUtilNetDecayVolume"
@@ -143,7 +143,7 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="4">
+              <v-col cols="3">
                 <v-text-field
                   type="number"
                   v-model="closeUtilNetDecayWasteVolume"
@@ -161,8 +161,6 @@
                   </template>
                 </v-text-field>
               </v-col>
-              <v-col cols="1"></v-col>
-              <v-col cols="4"></v-col>
             </v-row>
           </div>
           <v-card-actions class="mt-5 pr-0">
@@ -193,5 +191,4 @@ const closeUtilNetDecayVolume = ref('263.6')
 const clear = () => {}
 const confirm = () => {}
 </script>
-
 <style scoped></style>

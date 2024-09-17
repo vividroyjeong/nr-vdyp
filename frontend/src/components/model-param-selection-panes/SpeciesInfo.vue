@@ -32,10 +32,10 @@
           <div class="mt-n5">
             <v-row>
               <!-- input -->
-              <v-col cols="6" sm="6" md="6">
+              <v-col cols="5">
                 <div>
                   <v-row>
-                    <v-col cols="6" sm="6" md="6">
+                    <v-col cols="6">
                       <v-select
                         label="Species #1"
                         :items="speciesOptions"
@@ -50,7 +50,7 @@
                         dense
                       ></v-select>
                     </v-col>
-                    <v-col cols="6" sm="6" md="6">
+                    <v-col cols="6">
                       <v-text-field
                         label="Species #1 Percent"
                         type="number"
@@ -66,10 +66,10 @@
                     </v-col>
                   </v-row>
                 </div>
-                <div class="hr-line"></div>
+                <div class="hr-line mb-1"></div>
                 <div>
                   <v-row>
-                    <v-col cols="6" sm="6" md="6">
+                    <v-col cols="6">
                       <v-select
                         label="Species #2"
                         :items="speciesOptions"
@@ -84,7 +84,7 @@
                         dense
                       ></v-select>
                     </v-col>
-                    <v-col cols="6" sm="6" md="6">
+                    <v-col cols="6">
                       <v-text-field
                         label="Species #2 Percent"
                         type="number"
@@ -100,10 +100,10 @@
                     </v-col>
                   </v-row>
                 </div>
-                <div class="hr-line"></div>
+                <div class="hr-line mb-1"></div>
                 <div>
                   <v-row>
-                    <v-col cols="6" sm="6" md="6">
+                    <v-col cols="6">
                       <v-select
                         label="Species #3"
                         :items="speciesOptions"
@@ -118,7 +118,7 @@
                         dense
                       ></v-select>
                     </v-col>
-                    <v-col cols="6" sm="6" md="6">
+                    <v-col cols="6">
                       <v-text-field
                         label="Species #3 Percent"
                         type="number"
@@ -134,10 +134,10 @@
                     </v-col>
                   </v-row>
                 </div>
-                <div class="hr-line"></div>
+                <div class="hr-line mb-1"></div>
                 <div>
                   <v-row>
-                    <v-col cols="6" sm="6" md="6">
+                    <v-col cols="6">
                       <v-select
                         label="Species #4"
                         :items="speciesOptions"
@@ -152,7 +152,7 @@
                         dense
                       ></v-select>
                     </v-col>
-                    <v-col cols="6" sm="6" md="6">
+                    <v-col cols="6">
                       <v-text-field
                         label="Species #4 Percent"
                         type="number"
@@ -168,10 +168,10 @@
                     </v-col>
                   </v-row>
                 </div>
-                <div class="hr-line"></div>
+                <div class="hr-line mb-1"></div>
                 <div>
                   <v-row>
-                    <v-col cols="6" sm="6" md="6">
+                    <v-col cols="6">
                       <v-select
                         label="Species #5"
                         :items="speciesOptions"
@@ -186,7 +186,7 @@
                         dense
                       ></v-select>
                     </v-col>
-                    <v-col cols="6" sm="6" md="6">
+                    <v-col cols="6">
                       <v-text-field
                         label="Species #5 Percent"
                         type="number"
@@ -202,10 +202,10 @@
                     </v-col>
                   </v-row>
                 </div>
-                <div class="hr-line"></div>
+                <div class="hr-line mb-1"></div>
                 <div>
                   <v-row>
-                    <v-col cols="6" sm="6" md="6">
+                    <v-col cols="6">
                       <v-select
                         label="Species #6"
                         :items="speciesOptions"
@@ -220,7 +220,7 @@
                         dense
                       ></v-select>
                     </v-col>
-                    <v-col cols="6" sm="6" md="6">
+                    <v-col cols="6">
                       <v-text-field
                         label="Species #6 Percent"
                         type="number"
@@ -236,11 +236,12 @@
                     </v-col>
                   </v-row>
                 </div>
-                <div class="hr-line"></div>
+                <div class="hr-line mb-1"></div>
               </v-col>
+              <v-col class="vertical-line pb-0" />
               <!-- output -->
-              <v-col cols="6" sm="6" md="6">
-                <div>
+              <v-col cols="6">
+                <div class="mt-2">
                   <v-row>
                     <v-col cols="4" sm="4" md="4">
                       <v-text-field
@@ -274,6 +275,7 @@
                     </v-col>
                   </v-row>
                 </div>
+                <div class="hr-line mb-3"></div>
                 <div>
                   <v-row>
                     <v-col cols="4" sm="4" md="4">
@@ -308,6 +310,7 @@
                     </v-col>
                   </v-row>
                 </div>
+                <div class="hr-line mb-3"></div>
                 <div>
                   <v-row>
                     <v-col cols="4" sm="4" md="4">
@@ -342,6 +345,7 @@
                     </v-col>
                   </v-row>
                 </div>
+                <div class="hr-line mb-3"></div>
                 <div>
                   <v-row>
                     <v-col cols="4" sm="4" md="4">
@@ -379,20 +383,27 @@
               </v-col>
             </v-row>
           </div>
-
           <div>
             <v-row>
-              <v-col cols="3" sm="3" md="3"> &nbsp; </v-col>
-              <v-col cols="3" sm="3" md="3">
-                <v-text-field
-                  label="Total Species Percent"
-                  :model-value="totalSpeciesPercent"
-                  variant="underlined"
-                  readonly
-                  density="compact"
-                  dense
-                ></v-text-field>
+              <v-col cols="5">
+                <div>
+                  <v-row>
+                    <v-col cols="6"> </v-col>
+                    <v-col cols="6">
+                      <v-text-field
+                        label="Total Species Percent"
+                        :model-value="totalSpeciesPercent"
+                        variant="underlined"
+                        readonly
+                        density="compact"
+                        dense
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                </div>
               </v-col>
+              <v-col class="vertical-line" />
+              <v-col cols="6" />
             </v-row>
           </div>
           <v-card-actions class="mt-5 pr-0">
@@ -452,4 +463,18 @@ const clear = () => {}
 const confirm = () => {}
 </script>
 
-<style scoped></style>
+<style scoped>
+.vertical-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 1px;
+}
+
+.vertical-line::before {
+  content: '';
+  display: block;
+  border-left: 1px dashed rgba(0, 0, 0, 0.12);
+  height: 100%;
+}
+</style>
