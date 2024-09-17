@@ -161,6 +161,19 @@ public class Utils {
 		return (x, y) -> accessor.apply(x).compareTo(accessor.apply(y));
 	}
 
+	@SafeVarargs
+	public static <T> Comparator<T> compareWithFallback(Comparator<T>... comparators) {
+		return (x, y) -> {
+			for (var comparator : comparators) {
+				int comparison = comparator.compare(x, y);
+				if (comparison != 0) {
+					return comparison;
+				}
+			}
+			return 0;
+		};
+	}
+
 	/**
 	 * Compares two Optionals of comparables of the same type, treating "empty" as equal to "empty" and before
 	 * "present".

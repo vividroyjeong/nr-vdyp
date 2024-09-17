@@ -301,8 +301,8 @@ public class VdypSpecies extends BaseVdypSpecies<VdypSite> implements VdypUtiliz
 			this.baseArea = Utils.utilizationVector(small, u1, u2, u3, u4);
 		}
 
-		public void baseArea(float height) {
-			this.baseArea = Utils.utilizationVector(height);
+		public void baseArea(float baseArea) {
+			this.baseArea = Utils.utilizationVector(baseArea);
 		}
 
 		protected UtilizationVector treesPerHectare = VdypUtilizationHolder.emptyUtilization();

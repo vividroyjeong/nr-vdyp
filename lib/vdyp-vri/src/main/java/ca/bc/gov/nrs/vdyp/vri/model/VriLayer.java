@@ -213,7 +213,7 @@ public class VriLayer extends BaseVdypLayer<VriSpecies, VriSite> implements Inpu
 
 		@Override
 		protected VriLayer doBuild() {
-			float multiplier = percentAvailable.orElse(100f) / 100f;
+			float multiplier = 100f / percentAvailable.orElse(100f);
 			VriLayer result = new VriLayer(
 					polygonIdentifier.get(), //
 					layerType.get(), //
