@@ -28,8 +28,8 @@
 	</properties>
 
 	<modules>
-		<module>vdyp-lib</module>
-		<module>vdyp-buildtools</module>
+		<module>lib</module>
+		<module>buildtools</module>
 	</modules>
 
 	<dependencyManagement>
