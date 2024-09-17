@@ -363,9 +363,10 @@ class ParsersTogetherTest {
 						hasProperty("crownClosure", is(95f)), //
 						hasProperty("utilization", is(9f)), hasProperty(
 								"baseArea", //
-								present(closeTo(20f * 0.75f))
+								present(closeTo(20f * (1f / 0.75f)))
 						), // Apply Layer Percent Available
-						hasProperty("treesPerHectare", present(closeTo(300f * 0.75f))) // Apply Layer Percent Available
+						hasProperty("treesPerHectare", present(closeTo(300f * (1f / 0.75f)))) // Apply Layer Percent
+																								// Available
 				)
 		);
 

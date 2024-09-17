@@ -225,7 +225,12 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 		setControlMap(controlMap);
 		closeVriWriter();
-		vriWriter = new VdypOutputWriter(controlMap, resolver);
+		vriWriter = createWriter(resolver, controlMap);
+	}
+
+	protected VdypOutputWriter createWriter(FileSystemFileResolver resolver, Map<String, Object> controlMap)
+			throws IOException {
+		return new VdypOutputWriter(controlMap, resolver);
 	}
 
 	protected abstract BaseControlParser getControlFileParser();
