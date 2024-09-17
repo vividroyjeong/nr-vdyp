@@ -17,7 +17,7 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-public class ZipOutputFileResolverTest {
+class ZipOutputFileResolverTest {
 
 	@TempDir
 	Path outputLocation;
@@ -27,11 +27,11 @@ public class ZipOutputFileResolverTest {
 
 		ZipOutputFileResolver resolver = new ZipOutputFileResolver();
 
-		MatcherAssert.assertThat(resolver.toPath("file").toString(), Matchers.endsWith("vdyp-lib/vdyp-common/file"));
+		MatcherAssert.assertThat(resolver.toPath("file").toString(), Matchers.endsWith("lib/vdyp-common/file"));
 
 		assertThrows(UnsupportedOperationException.class, () -> resolver.resolveForInput("file"));
 
-		MatcherAssert.assertThat(resolver.toString("file"), Matchers.endsWith("vdyp-lib/vdyp-common/file"));
+		MatcherAssert.assertThat(resolver.toString("file"), Matchers.endsWith("lib/vdyp-common/file"));
 
 		for (int i = 0; i < 5; i++) {
 			OutputStream os = resolver.resolveForOutput("file" + i);
