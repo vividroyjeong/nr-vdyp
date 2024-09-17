@@ -25,9 +25,11 @@
                   v-model="percentStockableArea"
                   max="100"
                   min="0"
-                  step="0.1"
+                  step="5"
+                  :rules="[validatePercentStockableArea]"
+                  :error-messages="percentStockableAreaError"
+                  placeholder="Select..."
                   persistent-placeholder
-                  placeholder="N/A"
                   density="compact"
                   dense
                 ></v-text-field
@@ -37,9 +39,10 @@
                 <v-text-field
                   type="number"
                   v-model="basalArea"
-                  max="100"
                   min="0"
-                  step="0.1"
+                  step="0.0001"
+                  :rules="[validateMinimum]"
+                  :error-messages="basalAreaError"
                   persistent-placeholder
                   placeholder="N/A"
                   density="compact"
@@ -57,9 +60,10 @@
                   label="Trees per Hectare"
                   type="number"
                   v-model="treesPerHectare"
-                  max="100"
                   min="0"
-                  step="0.1"
+                  step="0.01"
+                  :rules="[validateMinimum]"
+                  :error-messages="treesPerHectareError"
                   persistent-placeholder
                   placeholder="N/A"
                   density="compact"
@@ -74,12 +78,12 @@
                   v-model="selectedMinimumDBHLimit"
                   item-title="label"
                   item-value="value"
-                  clearable
-                  hide-details="auto"
+                  hide-details
                   persistent-placeholder
                   placeholder="N/A"
                   density="compact"
                   dense
+                  readonly
                 ></v-select>
               </v-col>
             </v-row>
@@ -92,6 +96,8 @@
                   max="100"
                   min="0"
                   step="0.1"
+                  :rules="[validatePercentCrownClosure]"
+                  :error-messages="percentCrownClosureError"
                   persistent-placeholder
                   placeholder="N/A"
                   density="compact"
@@ -112,16 +118,66 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const panelOpen = ref(0)
 
 const minimumDBHLimits = ref(['Eco Zone 1', 'Eco Zone 2', 'Eco Zone 3'])
-const percentStockableArea = ref(55)
+const percentStockableArea = ref()
 const basalArea = ref()
 const treesPerHectare = ref()
 const selectedMinimumDBHLimit = ref('7.5 cm+')
 const percentCrownClosure = ref(50)
+
+const validatePercentStockableArea = (value: any) => {
+  if (value === null || value === '') {
+    return 'Percent Stockable Area is required'
+  }
+  if (value < 0 || value > 100) {
+    return 'Please enter a value between 0 and 100'
+  }
+  return true
+}
+
+const validatePercentCrownClosure = (value: any) => {
+  if (value === null || value === '') {
+    return true
+  }
+  if (value < 0 || value > 100) {
+    return 'Please enter a value between 0 and 100'
+  }
+  return true
+}
+
+const validateMinimum = (value: any) => {
+  if (value === null || value === '') {
+    return true
+  }
+  if (value < 0) {
+    return 'Please enter a value greater than 0'
+  }
+  return true
+}
+
+const percentStockableAreaError = computed(() => {
+  const error = validatePercentStockableArea(percentStockableArea.value)
+  return error === true ? [] : [error]
+})
+
+const percentCrownClosureError = computed(() => {
+  const error = validatePercentCrownClosure(percentCrownClosure.value)
+  return error === true ? [] : [error]
+})
+
+const basalAreaError = computed(() => {
+  const error = validateMinimum(basalArea.value)
+  return error === true ? [] : [error]
+})
+
+const treesPerHectareError = computed(() => {
+  const error = validateMinimum(treesPerHectare.value)
+  return error === true ? [] : [error]
+})
 
 const clear = () => {}
 const confirm = () => {}

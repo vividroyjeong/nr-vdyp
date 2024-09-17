@@ -38,10 +38,11 @@
                 <v-text-field
                   label="Lorey Height - 7.5cm+ (meters)"
                   type="number"
-                  max="100"
-                  min="0"
-                  step="0.1"
                   v-model="loreyHeight"
+                  min="0"
+                  step="0.01"
+                  :rules="[validateMinimum]"
+                  :error-messages="loreyHeightError"
                   persistent-placeholder
                   placeholder="N/A"
                   density="compact"
@@ -53,9 +54,10 @@
                 <v-text-field
                   type="number"
                   v-model="wholeStemVolume75cm"
-                  max="100"
                   min="0"
                   step="0.1"
+                  :rules="[validateMinimum]"
+                  :error-messages="wholeStemVolume75cmError"
                   persistent-placeholder
                   placeholder="N/A"
                   density="compact"
@@ -72,9 +74,10 @@
                 <v-text-field
                   type="number"
                   v-model="basalArea"
-                  max="100"
                   min="0"
-                  step="0.1"
+                  step="0.0001"
+                  :rules="[validateMinimum]"
+                  :error-messages="basalAreaError"
                   persistent-placeholder
                   placeholder="N/A"
                   density="compact"
@@ -90,9 +93,10 @@
                 <v-text-field
                   type="number"
                   v-model="wholeStemVolume125cm"
-                  max="100"
                   min="0"
                   step="0.1"
+                  :rules="[validateMinimum]"
+                  :error-messages="wholeStemVolume125cmError"
                   persistent-placeholder
                   placeholder="N/A"
                   density="compact"
@@ -109,9 +113,10 @@
                 <v-text-field
                   type="number"
                   v-model="closeUtilVolume"
-                  max="100"
                   min="0"
                   step="0.1"
+                  :rules="[validateMinimum]"
+                  :error-messages="closeUtilVolumeError"
                   persistent-placeholder
                   placeholder="N/A"
                   density="compact"
@@ -127,9 +132,10 @@
                 <v-text-field
                   type="number"
                   v-model="closeUtilNetDecayVolume"
-                  max="100"
                   min="0"
                   step="0.1"
+                  :rules="[validateMinimum]"
+                  :error-messages="closeUtilNetDecayVolumeError"
                   persistent-placeholder
                   placeholder="N/A"
                   density="compact"
@@ -147,9 +153,10 @@
                 <v-text-field
                   type="number"
                   v-model="closeUtilNetDecayWasteVolume"
-                  max="100"
                   min="0"
                   step="0.1"
+                  :rules="[validateMinimum]"
+                  :error-messages="closeUtilNetDecayWasteVolumeError"
                   persistent-placeholder
                   placeholder="N/A"
                   density="compact"
@@ -175,7 +182,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const panelOpen = ref(0)
 
@@ -187,6 +194,51 @@ const closeUtilNetDecayWasteVolume = ref('245.5')
 const wholeStemVolume75cm = ref('332.4')
 const wholeStemVolume125cm = ref('328.1')
 const closeUtilNetDecayVolume = ref('263.6')
+
+const validateMinimum = (value: any) => {
+  if (value === null || value === '') {
+    return true
+  }
+  if (value < 0) {
+    return 'Please enter a value greater than 0'
+  }
+  return true
+}
+
+const loreyHeightError = computed(() => {
+  const error = validateMinimum(loreyHeight.value)
+  return error === true ? [] : [error]
+})
+
+const wholeStemVolume75cmError = computed(() => {
+  const error = validateMinimum(wholeStemVolume75cm.value)
+  return error === true ? [] : [error]
+})
+
+const basalAreaError = computed(() => {
+  const error = validateMinimum(basalArea.value)
+  return error === true ? [] : [error]
+})
+
+const wholeStemVolume125cmError = computed(() => {
+  const error = validateMinimum(wholeStemVolume125cm.value)
+  return error === true ? [] : [error]
+})
+
+const closeUtilVolumeError = computed(() => {
+  const error = validateMinimum(closeUtilVolume.value)
+  return error === true ? [] : [error]
+})
+
+const closeUtilNetDecayVolumeError = computed(() => {
+  const error = validateMinimum(closeUtilNetDecayVolume.value)
+  return error === true ? [] : [error]
+})
+
+const closeUtilNetDecayWasteVolumeError = computed(() => {
+  const error = validateMinimum(closeUtilNetDecayWasteVolume.value)
+  return error === true ? [] : [error]
+})
 
 const clear = () => {}
 const confirm = () => {}

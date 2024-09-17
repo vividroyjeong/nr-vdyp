@@ -58,6 +58,8 @@
                         max="100"
                         min="0"
                         step="0.1"
+                        :rules="[validatePercent]"
+                        :error-messages="sp1PercentError"
                         persistent-placeholder
                         placeholder="Select..."
                         density="compact"
@@ -92,6 +94,8 @@
                         max="100"
                         min="0"
                         step="0.1"
+                        :rules="[validatePercent]"
+                        :error-messages="sp2PercentError"
                         persistent-placeholder
                         placeholder="Select..."
                         density="compact"
@@ -126,6 +130,8 @@
                         max="100"
                         min="0"
                         step="0.1"
+                        :rules="[validatePercent]"
+                        :error-messages="sp3PercentError"
                         persistent-placeholder
                         placeholder="Select..."
                         density="compact"
@@ -160,6 +166,8 @@
                         max="100"
                         min="0"
                         step="0.1"
+                        :rules="[validatePercent]"
+                        :error-messages="sp4PercentError"
                         persistent-placeholder
                         placeholder="Select..."
                         density="compact"
@@ -194,6 +202,8 @@
                         max="100"
                         min="0"
                         step="0.1"
+                        :rules="[validatePercent]"
+                        :error-messages="sp5PercentError"
                         persistent-placeholder
                         placeholder="Select..."
                         density="compact"
@@ -228,6 +238,8 @@
                         max="100"
                         min="0"
                         step="0.1"
+                        :rules="[validatePercent]"
+                        :error-messages="sp6PercentError"
                         persistent-placeholder
                         placeholder="Select..."
                         density="compact"
@@ -418,7 +430,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useSpeciesStore } from '@/stores/speciesStore'
 import { storeToRefs } from 'pinia'
 
@@ -458,6 +470,46 @@ const siteSpecies1 = ref<string | null>('PL')
 const siteSpecies2 = ref<string | null>('AC')
 const siteSpecies3 = ref<string | null>('H')
 const siteSpecies4 = ref<string | null>('S')
+
+const validatePercent = (value: any) => {
+  if (value === null || value === '') {
+    return true
+  }
+  if (value < 0 || value > 100) {
+    return 'Please enter a value between 0 and 100'
+  }
+  return true
+}
+
+const sp1PercentError = computed(() => {
+  const error = validatePercent(speciesPercent1.value)
+  return error === true ? [] : [error]
+})
+
+const sp2PercentError = computed(() => {
+  const error = validatePercent(speciesPercent2.value)
+  return error === true ? [] : [error]
+})
+
+const sp3PercentError = computed(() => {
+  const error = validatePercent(speciesPercent3.value)
+  return error === true ? [] : [error]
+})
+
+const sp4PercentError = computed(() => {
+  const error = validatePercent(speciesPercent4.value)
+  return error === true ? [] : [error]
+})
+
+const sp5PercentError = computed(() => {
+  const error = validatePercent(speciesPercent5.value)
+  return error === true ? [] : [error]
+})
+
+const sp6PercentError = computed(() => {
+  const error = validatePercent(speciesPercent6.value)
+  return error === true ? [] : [error]
+})
 
 const clear = () => {}
 const confirm = () => {}
