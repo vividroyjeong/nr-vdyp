@@ -1002,7 +1002,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			float conditionalExpectedBaseArea = conditionalExpectedBaseArea(spec, baseAreaSpec, region); // BACONDsp
 			conditionalExpectedBaseArea /= fractionAvailable;
 
-			float baseAreaSpecSmall = smallComponentProbability * conditionalExpectedBaseArea;
+			float baseAreaSpecSmall = smallComponentProbability * conditionalExpectedBaseArea; // BASMsp
 
 			// EMP082
 			float quadMeanDiameterSpecSmall = smallComponentQuadMeanDiameter(spec); // DQSMsp

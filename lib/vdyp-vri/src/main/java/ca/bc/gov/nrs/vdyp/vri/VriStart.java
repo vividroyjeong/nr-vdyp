@@ -459,7 +459,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		// TPH_L1
 
-		// TPHsp
+		// TPHsp before the individual species loop, then the fortran variable gets re-used, see speciesDensity below
 		var primarySpeciesDensity = primarySpeciesPercent * primaryLayerDensity;
 
 		// HDL1 or HT_L1
@@ -495,10 +495,14 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			} else {
 				var loreyHeight = vriSite
 						.flatMap(site -> site.getHeight().filter(x -> getDebugMode(2) != 1).map(height -> {
+							// DQsp
 							float speciesQuadMeanDiameter = Math.max(
 									UtilizationClass.U75TO125.lowBound, height / leadHeight * layerQuadMeanDiameter
 							);
+
+							// TPHsp inside the individual species loop, see primarySpeciesDensity above
 							float speciesDensity = treesPerHectare(specBaseArea, speciesQuadMeanDiameter);
+
 							// EMP050
 							return (float) estimationMethods.primaryHeightFromLeadHeight(
 									site.getHeight().get(), site.getSiteGenus(), bec.getRegion(), speciesDensity

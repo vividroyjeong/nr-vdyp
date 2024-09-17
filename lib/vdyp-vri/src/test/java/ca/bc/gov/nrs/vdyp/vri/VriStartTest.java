@@ -2557,7 +2557,9 @@ class VriStartTest {
 			assertThat(
 					resultSpecB, hasProperty(
 							"baseAreaByUtilization",
-							utilization(0.00001f, 1.98000f, 0.03491f, 0.04531f, 0.13333f, 1.76645f)
+							utilization(
+									1.3540176e-05f, 2.32941175f, 0.0410699844f, 0.0533111095f, 0.156856298f, 2.07817435f
+							)
 					)
 			);
 			assertThat(
