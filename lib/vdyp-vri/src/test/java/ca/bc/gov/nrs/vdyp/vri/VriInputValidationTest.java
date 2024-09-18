@@ -452,7 +452,6 @@ class VriInputValidationTest {
 						iBuilder.height(28.0f);
 						iBuilder.siteIndex(14.3f);
 						iBuilder.siteSpecies("CW");
-						// iBuilder.yearsToBreastHeight(10.9f);
 						iBuilder.breastHeightAge(189.1f);
 						iBuilder.siteCurveNumber(11);
 					});
@@ -466,7 +465,6 @@ class VriInputValidationTest {
 						iBuilder.height(32.0f);
 						iBuilder.siteIndex(14.6f);
 						iBuilder.siteSpecies("HW");
-						// iBuilder.yearsToBreastHeight(9.7f);
 						iBuilder.breastHeightAge(190.3f);
 						iBuilder.siteCurveNumber(37);
 					});

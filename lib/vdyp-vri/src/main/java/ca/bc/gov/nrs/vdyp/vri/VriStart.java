@@ -232,7 +232,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 						layer.getPolygonIdentifier(), polygon.getPolygonIdentifier()
 				);
 			}
-			// layer.setSpecies(new HashMap<>());
 		}
 
 		polygon.setLayers(layers);
