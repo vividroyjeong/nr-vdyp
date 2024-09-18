@@ -255,12 +255,12 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			return factory.get();
 		} catch (IllegalStateException ex) {
 			throw new ProcessingException(
-					String.format(
-							"Data file %s (%s) not specified in control map.", key, Utils.optPretty(key.sequence)
+					MessageFormat.format(
+							"Data file {0} ({1}) not specified in control map.", key, Utils.optPretty(key.sequence)
 					), ex
 			);
 		} catch (IOException ex) {
-			throw new ProcessingException(String.format("Error while opening data file %s.", key), ex);
+			throw new ProcessingException(MessageFormat.format("Error while opening data file {0}.", key), ex);
 		}
 	}
 
@@ -507,7 +507,9 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			}
 			return 41;
 		default:
-			throw new StandProcessingException("Unexpected primary species: " + primary.getGenus());
+			throw new StandProcessingException(
+					MessageFormat.format("Unexpected primary species: {0}", primary.getGenus())
+			);
 		}
 	}
 

@@ -161,6 +161,15 @@ public class Utils {
 		return (x, y) -> accessor.apply(x).compareTo(accessor.apply(y));
 	}
 
+	/**
+	 * Returns a Comparator combining the given comparators. The combined comparator returns the result of the first
+	 * constituent comparator to not evaluate as equals (0). It returns equals if all the constituent comparators
+	 * evaluate as equals.
+	 *
+	 * @param <T>
+	 * @param comparators
+	 * @return
+	 */
 	@SafeVarargs
 	public static <T> Comparator<T> compareWithFallback(Comparator<T>... comparators) {
 		return (x, y) -> {

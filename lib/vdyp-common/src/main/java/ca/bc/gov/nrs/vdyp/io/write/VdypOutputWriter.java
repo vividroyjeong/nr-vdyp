@@ -206,10 +206,24 @@ public class VdypOutputWriter implements Closeable {
 
 	}
 
+	/**
+	 * Returns a multiplier that will be applied to base area, tree density, and volume values when writing.
+	 *
+	 * @param polygon
+	 * @param layer
+	 * @return
+	 */
 	protected float fractionForest(VdypPolygon polygon, VdypLayer layer) {
 		return polygon.getPercentAvailable() / 100f;
 	}
 
+	/**
+	 * Multiply two values if the first is positive, otherwise return the first without modification.
+	 *
+	 * @param value
+	 * @param factor
+	 * @return
+	 */
 	float safeMultiply(float value, float factor) {
 		if (value <= 0) {
 			return value;

@@ -716,7 +716,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					MessageFormat.format("Veteran layer trees per hectare ({0}) was not positive", baseArea)
 			);
 		}
-		var quadMeanDiameter = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea, treesPerHectare); // DQ(0,0)
 
 		lBuilder.adaptSpecies(veteranLayer, (sBuilder, spec) -> {
 			applyGroups(bec, spec.getGenus(), sBuilder);
@@ -768,10 +767,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		// Sum BA and TPH
 		float tphSum = 0; // TPH(0,4)
-		float baSum = 0; // BA(0,4)
 		for (var spec : specList) {
 			tphSum += spec.getTreesPerHectareByUtilization().getAll();
-			baSum += spec.getBaseAreaByUtilization().getAll();
 		}
 
 		if (polygon.getMode().filter(mode -> mode == PolygonMode.BATC).isPresent()) {
