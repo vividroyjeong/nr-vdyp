@@ -155,7 +155,9 @@
               <v-btn
                 class="blue-btn ml-2"
                 @click="confirm"
-                :disabled="totalSpeciesPercent !== 100"
+                :disabled="
+                  totalSpeciesGroupPercent !== 100 || siteSpecies === null
+                "
               >
                 Confirm
               </v-btn>
@@ -183,7 +185,9 @@ const {
   speciesOptions,
   speciesGroups,
   totalSpeciesPercent,
+  totalSpeciesGroupPercent,
   isOverTotalPercent,
+  siteSpecies,
 } = storeToRefs(speciesStore)
 
 const updateSpeciesGroup = speciesStore.updateSpeciesGroup

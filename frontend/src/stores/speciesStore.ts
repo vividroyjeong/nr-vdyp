@@ -26,6 +26,27 @@ export const useSpeciesStore = defineStore('species', () => {
     'S - Spruce',
   ])
 
+  const totalSpeciesPercent = computed(() => {
+    return speciesList.value.reduce((acc, item) => {
+      return acc + (parseFloat(item.percent as any) || 0)
+    }, 0)
+  })
+
+  const totalSpeciesGroupPercent = computed(() => {
+    return speciesGroups.value.reduce((acc, group) => {
+      return acc + group.percent
+    }, 0)
+  })
+
+  const isOverTotalPercent = computed(() => {
+    return totalSpeciesPercent.value > 100
+  })
+
+  const siteSpecies = computed(() => {
+    if (speciesGroups.value.length === 0) return null
+    return speciesGroups.value[0].siteSpecies
+  })
+
   const updateSpeciesGroup = () => {
     const groupMap: { [key: string]: number } = {}
 
@@ -47,29 +68,15 @@ export const useSpeciesStore = defineStore('species', () => {
     speciesGroups.value.sort((a, b) => b.percent - a.percent)
   }
 
-  const totalSpeciesPercent = computed(() => {
-    return speciesList.value.reduce((acc, item) => {
-      return acc + (parseFloat(item.percent as any) || 0)
-    }, 0)
-  })
-
-  const isOverTotalPercent = computed(() => {
-    return totalSpeciesPercent.value > 100
-  })
-
-  const siteSpecies = computed(() => {
-    if (speciesGroups.value.length === 0) return null
-    return speciesGroups.value[0].siteSpecies
-  })
-
   return {
     derivedBy,
     speciesList,
-    speciesOptions,
     speciesGroups,
+    speciesOptions,
     totalSpeciesPercent,
-    updateSpeciesGroup,
+    totalSpeciesGroupPercent,
     isOverTotalPercent,
     siteSpecies,
+    updateSpeciesGroup,
   }
 })
