@@ -1,29 +1,75 @@
 import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
 
-export const useSpeciesStore = defineStore('speciesStore', {
-  state: () => ({
-    speciesList: [
-      { name: 'PL - Lodgepole', percent: 30, group: 'S', groupPercent: 30, siteSpecies: 'PL' },
-      { name: 'AC - Popular', percent: 30, group: 'AC', groupPercent: 30, siteSpecies: 'AC' },
-      { name: 'H - Hemlock', percent: 30, group: 'H', groupPercent: 30, siteSpecies: 'H' },
-      { name: 'S - Spruce', percent: 10, group: 'S', groupPercent: 10, siteSpecies: 'S' },
-      { name: 'S - Spruce', percent: 0, group: 'S', groupPercent: 10, siteSpecies: 'S' },
-      { name: 'S - Spruce', percent: 0, group: 'S', groupPercent: 10, siteSpecies: 'S' },
+export const useSpeciesStore = defineStore('species', () => {
+  const derivedBy = ref(null)
+
+  const speciesList = ref<{ species: string | null; percent: number | null }[]>(
+    [
+      { species: null, percent: null },
+      { species: null, percent: null },
+      { species: null, percent: null },
+      { species: null, percent: null },
+      { species: null, percent: null },
+      { species: null, percent: null },
     ],
-    speciesOptions: [
-      { value: 'PL - Lodgepole', label: 'PL - Lodgepole' },
-      { value: 'AC - Popular', label: 'AC - Popular' },
-      { value: 'H - Hemlock', label: 'H - Hemlock' },
-      { value: 'S - Spruce', label: 'S - Spruce' },
-    ],
-    speciesGroups: ['S', 'AC', 'H'],
-  }),
-  getters: {
-    totalSpeciesPercent: (state) => state.speciesList.reduce((sum, species) => sum + species.percent, 0),
-  },
-  actions: {
-    addMoreSpecies() {
-      this.speciesList.push({ name: '', percent: 0, group: '', groupPercent: 0, siteSpecies: '' })
-    },
-  },
+  )
+
+  const speciesGroups = ref<
+    { group: string; percent: number; siteSpecies: string }[]
+  >([])
+
+  const speciesOptions = ref<string[]>([
+    'PL - Lodgepole',
+    'AC - Popular',
+    'H - Hemlock',
+    'S - Spruce',
+  ])
+
+  const updateSpeciesGroup = () => {
+    const groupMap: { [key: string]: number } = {}
+
+    speciesList.value.forEach((item) => {
+      if (item.species && item.percent !== null) {
+        if (!groupMap[item.species]) {
+          groupMap[item.species] = 0
+        }
+        groupMap[item.species] += parseFloat(item.percent as any) || 0
+      }
+    })
+
+    speciesGroups.value = Object.keys(groupMap).map((key) => ({
+      group: key,
+      percent: groupMap[key],
+      siteSpecies: key,
+    }))
+
+    speciesGroups.value.sort((a, b) => b.percent - a.percent)
+  }
+
+  const totalSpeciesPercent = computed(() => {
+    return speciesList.value.reduce((acc, item) => {
+      return acc + (parseFloat(item.percent as any) || 0)
+    }, 0)
+  })
+
+  const isOverTotalPercent = computed(() => {
+    return totalSpeciesPercent.value > 100
+  })
+
+  const siteSpecies = computed(() => {
+    if (speciesGroups.value.length === 0) return null
+    return speciesGroups.value[0].siteSpecies
+  })
+
+  return {
+    derivedBy,
+    speciesList,
+    speciesOptions,
+    speciesGroups,
+    totalSpeciesPercent,
+    updateSpeciesGroup,
+    isOverTotalPercent,
+    siteSpecies,
+  }
 })

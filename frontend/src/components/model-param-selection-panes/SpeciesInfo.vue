@@ -4,11 +4,10 @@
       <v-expansion-panel hide-actions>
         <v-expansion-panel-title>
           <v-row no-gutters class="expander-header">
-            <!-- Place an arrow icon to the left of the title -->
             <v-col cols="auto" class="expansion-panel-icon-col">
-              <v-icon class="expansion-panel-icon">{{
-                panelOpen === 0 ? 'mdi-chevron-up' : 'mdi-chevron-down'
-              }}</v-icon>
+              <v-icon class="expansion-panel-icon">
+                {{ panelOpen === 0 ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+              </v-icon>
             </v-col>
             <v-col>
               <span class="text-h6">Species Information</span>
@@ -16,413 +15,152 @@
           </v-row>
         </v-expansion-panel-title>
         <v-expansion-panel-text class="expansion-panel-text mt-n4">
-          <div>
-            <v-row style="display: inline-flex; align-items: center">
-              <v-col cols="auto" style="margin-bottom: 20px">
-                <span>Species % derived by:</span>
-              </v-col>
-              <v-col cols="auto">
-                <v-radio-group v-model="derivedBy" inline>
-                  <v-radio label="Volume" value="volume"></v-radio>
-                  <v-radio label="Basal Area" value="basalArea"></v-radio>
-                </v-radio-group>
-              </v-col>
-            </v-row>
-          </div>
-          <div class="mt-n5">
-            <v-row>
-              <!-- input -->
-              <v-col cols="5">
-                <div>
-                  <v-row>
-                    <v-col cols="6">
-                      <v-select
-                        label="Species #1"
-                        :items="speciesOptions"
-                        v-model="species1"
-                        item-title="label"
-                        item-value="value"
-                        clearable
-                        hide-details="auto"
-                        persistent-placeholder
-                        placeholder="Select..."
-                        density="compact"
-                        dense
-                      ></v-select>
-                    </v-col>
-                    <v-col cols="6">
-                      <v-text-field
-                        label="Species #1 Percent"
-                        type="number"
-                        v-model="speciesPercent1"
-                        max="100"
-                        min="0"
-                        step="0.1"
-                        :rules="[validatePercent]"
-                        :error-messages="sp1PercentError"
-                        persistent-placeholder
-                        placeholder="Select..."
-                        density="compact"
-                        dense
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                </div>
-                <div class="hr-line mb-1"></div>
-                <div>
-                  <v-row>
-                    <v-col cols="6">
-                      <v-select
-                        label="Species #2"
-                        :items="speciesOptions"
-                        v-model="species2"
-                        item-title="label"
-                        item-value="value"
-                        clearable
-                        hide-details="auto"
-                        persistent-placeholder
-                        placeholder="Select..."
-                        density="compact"
-                        dense
-                      ></v-select>
-                    </v-col>
-                    <v-col cols="6">
-                      <v-text-field
-                        label="Species #2 Percent"
-                        type="number"
-                        v-model="speciesPercent2"
-                        max="100"
-                        min="0"
-                        step="0.1"
-                        :rules="[validatePercent]"
-                        :error-messages="sp2PercentError"
-                        persistent-placeholder
-                        placeholder="Select..."
-                        density="compact"
-                        dense
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                </div>
-                <div class="hr-line mb-1"></div>
-                <div>
-                  <v-row>
-                    <v-col cols="6">
-                      <v-select
-                        label="Species #3"
-                        :items="speciesOptions"
-                        v-model="species3"
-                        item-title="label"
-                        item-value="value"
-                        clearable
-                        hide-details="auto"
-                        persistent-placeholder
-                        placeholder="Select..."
-                        density="compact"
-                        dense
-                      ></v-select>
-                    </v-col>
-                    <v-col cols="6">
-                      <v-text-field
-                        label="Species #3 Percent"
-                        type="number"
-                        v-model="speciesPercent3"
-                        max="100"
-                        min="0"
-                        step="0.1"
-                        :rules="[validatePercent]"
-                        :error-messages="sp3PercentError"
-                        persistent-placeholder
-                        placeholder="Select..."
-                        density="compact"
-                        dense
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                </div>
-                <div class="hr-line mb-1"></div>
-                <div>
-                  <v-row>
-                    <v-col cols="6">
-                      <v-select
-                        label="Species #4"
-                        :items="speciesOptions"
-                        v-model="species4"
-                        item-title="label"
-                        item-value="value"
-                        clearable
-                        hide-details="auto"
-                        persistent-placeholder
-                        placeholder="Select..."
-                        density="compact"
-                        dense
-                      ></v-select>
-                    </v-col>
-                    <v-col cols="6">
-                      <v-text-field
-                        label="Species #4 Percent"
-                        type="number"
-                        v-model="speciesPercent4"
-                        max="100"
-                        min="0"
-                        step="0.1"
-                        :rules="[validatePercent]"
-                        :error-messages="sp4PercentError"
-                        persistent-placeholder
-                        placeholder="Select..."
-                        density="compact"
-                        dense
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                </div>
-                <div class="hr-line mb-1"></div>
-                <div>
-                  <v-row>
-                    <v-col cols="6">
-                      <v-select
-                        label="Species #5"
-                        :items="speciesOptions"
-                        v-model="species5"
-                        item-title="label"
-                        item-value="value"
-                        clearable
-                        hide-details="auto"
-                        persistent-placeholder
-                        placeholder="Select..."
-                        density="compact"
-                        dense
-                      ></v-select>
-                    </v-col>
-                    <v-col cols="6">
-                      <v-text-field
-                        label="Species #5 Percent"
-                        type="number"
-                        v-model="speciesPercent5"
-                        max="100"
-                        min="0"
-                        step="0.1"
-                        :rules="[validatePercent]"
-                        :error-messages="sp5PercentError"
-                        persistent-placeholder
-                        placeholder="Select..."
-                        density="compact"
-                        dense
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                </div>
-                <div class="hr-line mb-1"></div>
-                <div>
-                  <v-row>
-                    <v-col cols="6">
-                      <v-select
-                        label="Species #6"
-                        :items="speciesOptions"
-                        v-model="species6"
-                        item-title="label"
-                        item-value="value"
-                        clearable
-                        hide-details="auto"
-                        persistent-placeholder
-                        placeholder="Select..."
-                        density="compact"
-                        dense
-                      ></v-select>
-                    </v-col>
-                    <v-col cols="6">
-                      <v-text-field
-                        label="Species #6 Percent"
-                        type="number"
-                        v-model="speciesPercent6"
-                        max="100"
-                        min="0"
-                        step="0.1"
-                        :rules="[validatePercent]"
-                        :error-messages="sp6PercentError"
-                        persistent-placeholder
-                        placeholder="Select..."
-                        density="compact"
-                        dense
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                </div>
-                <div class="hr-line mb-1"></div>
-              </v-col>
-              <v-col class="vertical-line pb-0" />
-              <!-- output -->
-              <v-col cols="6">
-                <div class="mt-2">
-                  <v-row>
-                    <v-col cols="4" sm="4" md="4">
-                      <v-text-field
-                        label="Species Group"
-                        :model-value="speciesGroup1"
-                        variant="underlined"
-                        readonly
-                        density="compact"
-                        dense
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="4" sm="4" md="4">
-                      <v-text-field
-                        label="Species Group Percent"
-                        :model-value="speciesGroupPercent1"
-                        variant="underlined"
-                        readonly
-                        density="compact"
-                        dense
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="4" sm="4" md="4">
-                      <v-text-field
-                        label="Site Species"
-                        :model-value="siteSpecies1"
-                        variant="underlined"
-                        readonly
-                        density="compact"
-                        dense
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                </div>
-                <div class="hr-line mb-3"></div>
-                <div>
-                  <v-row>
-                    <v-col cols="4" sm="4" md="4">
-                      <v-text-field
-                        label="Species Group"
-                        :model-value="speciesGroup2"
-                        variant="underlined"
-                        readonly
-                        density="compact"
-                        dense
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="4" sm="4" md="4">
-                      <v-text-field
-                        label="Species Group Percent"
-                        :model-value="speciesGroupPercent2"
-                        variant="underlined"
-                        readonly
-                        density="compact"
-                        dense
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="4" sm="4" md="4">
-                      <v-text-field
-                        label="Site Species"
-                        :model-value="siteSpecies2"
-                        variant="underlined"
-                        readonly
-                        density="compact"
-                        dense
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                </div>
-                <div class="hr-line mb-3"></div>
-                <div>
-                  <v-row>
-                    <v-col cols="4" sm="4" md="4">
-                      <v-text-field
-                        label="Species Group"
-                        :model-value="speciesGroup3"
-                        variant="underlined"
-                        readonly
-                        density="compact"
-                        dense
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="4" sm="4" md="4">
-                      <v-text-field
-                        label="Species Group Percent"
-                        :model-value="speciesGroupPercent3"
-                        variant="underlined"
-                        readonly
-                        density="compact"
-                        dense
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="4" sm="4" md="4">
-                      <v-text-field
-                        label="Site Species"
-                        :model-value="siteSpecies3"
-                        variant="underlined"
-                        readonly
-                        density="compact"
-                        dense
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                </div>
-                <div class="hr-line mb-3"></div>
-                <div>
-                  <v-row>
-                    <v-col cols="4" sm="4" md="4">
-                      <v-text-field
-                        label="Species Group"
-                        :model-value="speciesGroup4"
-                        variant="underlined"
-                        readonly
-                        density="compact"
-                        dense
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="4" sm="4" md="4">
-                      <v-text-field
-                        label="Species Group Percent"
-                        :model-value="speciesGroupPercent4"
-                        variant="underlined"
-                        readonly
-                        density="compact"
-                        dense
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="4" sm="4" md="4">
-                      <v-text-field
-                        label="Site Species"
-                        :model-value="siteSpecies4"
-                        variant="underlined"
-                        readonly
-                        density="compact"
-                        dense
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                </div>
-              </v-col>
-            </v-row>
-          </div>
-          <div>
-            <v-row>
-              <v-col cols="5">
-                <div>
-                  <v-row>
-                    <v-col cols="6"> </v-col>
-                    <v-col cols="6">
-                      <v-text-field
-                        label="Total Species Percent"
-                        :model-value="totalSpeciesPercent"
-                        variant="underlined"
-                        readonly
-                        density="compact"
-                        dense
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                </div>
-              </v-col>
-              <v-col class="vertical-line" />
-              <v-col cols="6" />
-            </v-row>
-          </div>
-          <v-card-actions class="mt-5 pr-0">
-            <v-spacer></v-spacer>
-            <v-btn class="white-btn" @click="clear">Clear</v-btn>
-            <v-btn class="blue-btn ml-2" @click="confirm">Confirm</v-btn>
-          </v-card-actions>
+          <v-form ref="form">
+            <div class="mt-1">
+              <v-row style="display: inline-flex; align-items: center">
+                <v-col cols="auto" style="margin-bottom: 20px">
+                  <div>Species % derived by:</div>
+                </v-col>
+                <v-col cols="auto">
+                  <div>
+                    <v-radio-group
+                      v-model="derivedBy"
+                      inline
+                      required
+                      :rules="[
+                        (v) =>
+                          !!v || '&quot;Species % derived by&quot; is required',
+                      ]"
+                    >
+                      <v-radio label="Volume" value="volume"></v-radio>
+                      <v-radio label="Basal Area" value="basalArea"></v-radio>
+                    </v-radio-group>
+                  </div>
+                </v-col>
+              </v-row>
+            </div>
+            <div class="mt-n3">
+              <v-row>
+                <!-- input -->
+                <v-col cols="5">
+                  <div v-for="(item, index) in speciesList" :key="index">
+                    <v-row>
+                      <v-col cols="6">
+                        <v-select
+                          :label="`Species #${index + 1}`"
+                          :items="speciesOptions"
+                          v-model="item.species"
+                          item-title="label"
+                          item-value="value"
+                          clearable
+                          hide-details="auto"
+                          persistent-placeholder
+                          placeholder="Select..."
+                          density="compact"
+                          dense
+                        ></v-select>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-text-field
+                          :label="`Species #${index + 1} Percent`"
+                          type="number"
+                          v-model="item.percent"
+                          max="100"
+                          min="0"
+                          step="0.1"
+                          :rules="[validatePercent]"
+                          persistent-placeholder
+                          placeholder="Select..."
+                          density="compact"
+                          dense
+                        ></v-text-field>
+                      </v-col>
+                    </v-row>
+                    <div class="hr-line mb-1"></div>
+                  </div>
+                </v-col>
+                <v-col class="vertical-line pb-0" />
+                <!-- output -->
+                <v-col cols="6">
+                  <div
+                    v-for="(group, index) in speciesGroups"
+                    :key="index"
+                    class="mt-2"
+                  >
+                    <v-row>
+                      <v-col cols="4" sm="4" md="4">
+                        <v-text-field
+                          label="Species Group"
+                          :model-value="group.group"
+                          variant="underlined"
+                          readonly
+                          density="compact"
+                          dense
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="4" sm="4" md="4">
+                        <v-text-field
+                          label="Species Group Percent"
+                          :model-value="group.percent"
+                          variant="underlined"
+                          readonly
+                          density="compact"
+                          dense
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="4" sm="4" md="4">
+                        <v-text-field
+                          label="Site Species"
+                          :model-value="group.siteSpecies"
+                          variant="underlined"
+                          readonly
+                          density="compact"
+                          dense
+                        ></v-text-field>
+                      </v-col>
+                    </v-row>
+                    <div class="hr-line mb-3"></div>
+                  </div>
+                </v-col>
+              </v-row>
+            </div>
+            <div>
+              <v-row>
+                <v-col cols="5">
+                  <div>
+                    <v-row>
+                      <v-col cols="6"></v-col>
+                      <v-col cols="6">
+                        <v-text-field
+                          label="Total Species Percent"
+                          :model-value="totalSpeciesPercent"
+                          variant="underlined"
+                          readonly
+                          density="compact"
+                          dense
+                          :rules="[validateTotalPercent]"
+                          :error-messages="totalPercentError"
+                        ></v-text-field>
+                      </v-col>
+                    </v-row>
+                  </div>
+                </v-col>
+                <v-col class="vertical-line" />
+                <v-col cols="6" />
+              </v-row>
+            </div>
+            <v-card-actions class="mt-5 pr-0">
+              <v-spacer></v-spacer>
+              <v-btn class="white-btn" @click="clear">Clear</v-btn>
+              <v-btn
+                class="blue-btn ml-2"
+                @click="confirm"
+                :disabled="totalSpeciesPercent !== 100"
+              >
+                Confirm
+              </v-btn>
+            </v-card-actions>
+          </v-form>
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
@@ -430,46 +168,33 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useSpeciesStore } from '@/stores/speciesStore'
 import { storeToRefs } from 'pinia'
 
+const form = ref<HTMLFormElement>()
+
 const panelOpen = ref(0)
 
-const derivedBy = ref('volume')
-
 const speciesStore = useSpeciesStore()
-const { speciesList, speciesOptions, speciesGroups, totalSpeciesPercent } =
-  storeToRefs(speciesStore)
+const {
+  derivedBy,
+  speciesList,
+  speciesOptions,
+  speciesGroups,
+  totalSpeciesPercent,
+  isOverTotalPercent,
+} = storeToRefs(speciesStore)
 
-const species1 = ref<string | null>('PL - Lodgepole')
-const species2 = ref<string | null>('AC - Poplar')
-const species3 = ref<string | null>('H - Hemlock')
-const species4 = ref<string | null>('S - Spruce')
-const species5 = ref<string | null>(null)
-const species6 = ref<string | null>(null)
+const updateSpeciesGroup = speciesStore.updateSpeciesGroup
 
-const speciesPercent1 = ref<number | null>(30.0)
-const speciesPercent2 = ref<number | null>(30.0)
-const speciesPercent3 = ref<number | null>(30.0)
-const speciesPercent4 = ref<number | null>(10.0)
-const speciesPercent5 = ref<number | null>(null)
-const speciesPercent6 = ref<number | null>(null)
-
-const speciesGroup1 = ref<string | null>('PL')
-const speciesGroup2 = ref<string | null>('AC')
-const speciesGroup3 = ref<string | null>('H')
-const speciesGroup4 = ref<string | null>('S')
-
-const speciesGroupPercent1 = ref<number | null>(30.0)
-const speciesGroupPercent2 = ref<number | null>(30.0)
-const speciesGroupPercent3 = ref<number | null>(30.0)
-const speciesGroupPercent4 = ref<number | null>(10.0)
-
-const siteSpecies1 = ref<string | null>('PL')
-const siteSpecies2 = ref<string | null>('AC')
-const siteSpecies3 = ref<string | null>('H')
-const siteSpecies4 = ref<string | null>('S')
+watch(
+  speciesList,
+  () => {
+    updateSpeciesGroup()
+  },
+  { deep: true },
+)
 
 const validatePercent = (value: any) => {
   if (value === null || value === '') {
@@ -481,38 +206,34 @@ const validatePercent = (value: any) => {
   return true
 }
 
-const sp1PercentError = computed(() => {
-  const error = validatePercent(speciesPercent1.value)
-  return error === true ? [] : [error]
+const totalPercentError = computed(() => {
+  return isOverTotalPercent.value
+    ? ['Total Species Percent cannot exceed 100.']
+    : []
 })
 
-const sp2PercentError = computed(() => {
-  const error = validatePercent(speciesPercent2.value)
-  return error === true ? [] : [error]
-})
+const validateTotalPercent = () => {
+  if (isOverTotalPercent.value) {
+    return false
+  }
+  return true
+}
 
-const sp3PercentError = computed(() => {
-  const error = validatePercent(speciesPercent3.value)
-  return error === true ? [] : [error]
-})
+const clear = () => {
+  speciesList.value.forEach((item) => {
+    item.species = null
+    item.percent = null
+  })
 
-const sp4PercentError = computed(() => {
-  const error = validatePercent(speciesPercent4.value)
-  return error === true ? [] : [error]
-})
+  if (form.value) {
+    form.value.reset()
+  }
+}
 
-const sp5PercentError = computed(() => {
-  const error = validatePercent(speciesPercent5.value)
-  return error === true ? [] : [error]
-})
-
-const sp6PercentError = computed(() => {
-  const error = validatePercent(speciesPercent6.value)
-  return error === true ? [] : [error]
-})
-
-const clear = () => {}
-const confirm = () => {}
+const confirm = () => {
+  form.value?.validate()
+  console.log('form.value?.validate()' + form.value?.validate())
+}
 </script>
 
 <style scoped>

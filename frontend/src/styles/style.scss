@@ -159,6 +159,11 @@ body {
   color: rgba(0, 0, 0, 0.87);
 }
 
+/* RADIO */
+.v-selection-control-group--inline {
+  height: 30px; // reduce the height of an inline radio group containing an error message because it is too tall
+}
+
 /* input TEXT-FIELD */
 // input number field spin(arrows) button */
 input[type='number']::-webkit-inner-spin-button,
