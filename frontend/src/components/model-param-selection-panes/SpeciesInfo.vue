@@ -74,6 +74,7 @@
                           density="compact"
                           dense
                           @blur="triggerSpeciesSortByPercent"
+                          @input="handlePercentInput($event, index)"
                         ></v-text-field>
                       </v-col>
                     </v-row>
@@ -247,6 +248,22 @@ const triggerSpeciesSortByPercent = () => {
     if (b.percent === null) return -1
     return b.percent - a.percent
   })
+}
+
+const handlePercentInput = (event: Event, index: number) => {
+  const input = event.target as HTMLInputElement
+  let value = input.value
+
+  // allow only up to the first decimal place
+  if (value.includes('.')) {
+    const [integerPart, decimalPart] = value.split('.')
+    if (decimalPart.length > 1) {
+      value = `${integerPart}.${decimalPart.slice(0, 1)}`
+    }
+  }
+
+  // convert to number and store in speciesList
+  speciesList.value[index].percent = parseFloat(value)
 }
 </script>
 
