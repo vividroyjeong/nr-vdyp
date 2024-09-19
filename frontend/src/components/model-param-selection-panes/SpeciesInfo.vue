@@ -83,7 +83,7 @@
                 </v-col>
                 <v-col class="vertical-line pb-0" />
                 <!-- output -->
-                <v-col cols="6">
+                <v-col cols="6" v-if="speciesGroups.length > 0">
                   <div
                     v-for="(group, index) in speciesGroups"
                     :key="index"
@@ -124,6 +124,43 @@
                     <div class="hr-line mb-3"></div>
                   </div>
                 </v-col>
+                <v-col cols="6" v-else>
+                  <div class="mt-2">
+                    <v-row
+                      ><v-col cols="4" sm="4" md="4">
+                        <v-text-field
+                          label="Species Group"
+                          variant="underlined"
+                          readonly
+                          persistent-placeholder
+                          placeholder=""
+                          density="compact"
+                          dense
+                        ></v-text-field></v-col
+                      ><v-col cols="4" sm="4" md="4">
+                        <v-text-field
+                          label="Species Group Percent"
+                          variant="underlined"
+                          readonly
+                          persistent-placeholder
+                          placeholder=""
+                          density="compact"
+                          dense
+                        ></v-text-field></v-col
+                      ><v-col cols="4" sm="4" md="4">
+                        <v-text-field
+                          label="Site Species"
+                          variant="underlined"
+                          readonly
+                          persistent-placeholder
+                          placeholder=""
+                          density="compact"
+                          dense
+                        ></v-text-field
+                      ></v-col>
+                    </v-row>
+                  </div>
+                </v-col>
               </v-row>
             </div>
             <div>
@@ -158,7 +195,9 @@
                 class="blue-btn ml-2"
                 @click="confirm"
                 :disabled="
-                  totalSpeciesGroupPercent !== 100 || siteSpecies === null
+                  totalSpeciesGroupPercent !== 100 ||
+                  siteSpecies === null ||
+                  derivedBy === null
                 "
               >
                 Confirm
