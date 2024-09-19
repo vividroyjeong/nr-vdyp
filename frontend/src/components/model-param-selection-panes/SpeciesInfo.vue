@@ -73,6 +73,7 @@
                           placeholder="Select..."
                           density="compact"
                           dense
+                          @blur="triggerSpeciesSortByPercent"
                         ></v-text-field>
                       </v-col>
                     </v-row>
@@ -237,6 +238,14 @@ const clear = () => {
 const confirm = () => {
   form.value?.validate()
   console.log('form.value?.validate()' + form.value?.validate())
+}
+
+const triggerSpeciesSortByPercent = () => {
+  speciesList.value.sort((a, b) => {
+    if (a.percent === null) return 1
+    if (b.percent === null) return -1
+    return b.percent - a.percent
+  })
 }
 </script>
 
