@@ -72,119 +72,122 @@
           </div>
           <div class="ml-4 mt-5">
             <div class="ml-n4 mt-n5">
-              <span class="text-h6">Volume Reported</span>
+              <span class="text-h7">Volume Reported</span>
             </div>
             <v-row class="ml-n6">
-              <v-col cols="12" md="2" sm="2">
-                <div>
-                  <div>
+              <v-col cols="12" style="padding-top: 0px">
+                <v-row>
+                  <v-col style="max-width: 15% !important">
                     <v-checkbox
                       v-model="selectedVolumeReported"
                       label="Whole Stem"
                       value="Whole Stem"
                       hide-details
                     ></v-checkbox>
-                  </div>
-                  <div>
-                    <v-checkbox
-                      v-model="selectedVolumeReported"
-                      label="Computed MAI"
-                      value="Computed MAI"
-                      hide-details
-                    ></v-checkbox>
-                  </div>
-                </div>
-              </v-col>
-              <v-col cols="12" md="2" sm="2">
-                <div>
-                  <div>
+                  </v-col>
+                  <v-col style="max-width: 15% !important">
                     <v-checkbox
                       v-model="selectedVolumeReported"
                       label="Close Utilization"
                       value="Close Utilization"
                       hide-details
                     ></v-checkbox>
-                  </div>
-                  <div>
-                    <v-checkbox
-                      v-model="selectedVolumeReported"
-                      label="Species Composition"
-                      value="Species Composition"
-                      hide-details
-                    ></v-checkbox>
-                  </div>
-                </div>
-              </v-col>
-              <v-col cols="12" md="2" sm="2">
-                <div>
-                  <div>
+                  </v-col>
+                  <v-col style="max-width: 15% !important">
                     <v-checkbox
                       v-model="selectedVolumeReported"
                       label="Net Decay"
                       value="Net Decay"
                       hide-details
                     ></v-checkbox>
-                  </div>
-                  <div>
+                  </v-col>
+                  <v-col style="max-width: 20% !important">
+                    <v-checkbox
+                      v-model="selectedVolumeReported"
+                      label="Net Decay and Waste"
+                      value="Net Decay and Waste"
+                      hide-details
+                    ></v-checkbox>
+                  </v-col>
+                  <v-col>
+                    <v-checkbox
+                      v-model="selectedVolumeReported"
+                      label="Net Decay, Waste and Breakage"
+                      value="Net Decay, Waste and Breakage"
+                      hide-details
+                    ></v-checkbox>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+          </div>
+          <div class="ml-4 mt-5">
+            <div class="ml-n4 mt-n5">
+              <span class="text-h7">Include in Report</span>
+            </div>
+            <v-row class="ml-n6">
+              <v-col cols="12" style="padding-top: 0px">
+                <v-row>
+                  <v-col style="max-width: 15% !important">
+                    <v-checkbox
+                      v-model="selectedVolumeReported"
+                      label="Computed MAI"
+                      value="Computed MAI"
+                      hide-details
+                    ></v-checkbox>
+                  </v-col>
+                  <v-col style="max-width: 15% !important">
+                    <v-checkbox
+                      v-model="selectedVolumeReported"
+                      label="Species Composition"
+                      value="Species Composition"
+                      hide-details
+                    ></v-checkbox>
+                  </v-col>
+                  <v-col style="max-width: 15% !important">
                     <v-checkbox
                       v-model="selectedVolumeReported"
                       label="Culmination Values"
                       value="Culmination Values"
                       hide-details
                     ></v-checkbox>
-                  </div>
-                </div>
+                  </v-col>
+                  <v-col style="max-width: 20% !important">
+                    <v-select
+                      label="Projection Type"
+                      :items="projectionTypeOptions"
+                      v-model="projectionType"
+                      item-title="label"
+                      item-value="value"
+                      clearable
+                      hide-details="auto"
+                      persistent-placeholder
+                      placeholder="Select..."
+                      density="compact"
+                      dense
+                      style="max-width: 70% !important"
+                    ></v-select>
+                  </v-col>
+                </v-row>
               </v-col>
-              <v-col cols="12" md="2" sm="2">
-                <div class="ml-n3">
-                  <v-checkbox
-                    v-model="selectedVolumeReported"
-                    label="Net Decay and Waste"
-                    value="Net Decay and Waste"
-                    hide-details
-                  ></v-checkbox>
-                </div>
-                <div>
-                  <v-select
-                    label="Projection Type"
-                    :items="projectionTypeOptions"
-                    v-model="projectionType"
-                    item-title="label"
-                    item-value="value"
-                    clearable
-                    hide-details="auto"
-                    persistent-placeholder
-                    placeholder="Select..."
-                    density="compact"
-                    dense
-                  ></v-select>
-                </div>
-              </v-col>
-              <v-col cols="12" md="1" sm="1"> </v-col>
-              <v-col cols="12" md="2" sm="2">
-                <div class="ml-n3">
-                  <v-checkbox
-                    v-model="selectedVolumeReported"
-                    label="Net Decay, Waste and Breakage"
-                    value="Net Decay, Waste and Breakage"
-                    hide-details
-                  ></v-checkbox>
-                </div>
-                <div>
-                  <v-select
-                    label="Report Title"
-                    :items="reportTitleOptions"
-                    v-model="reportTitle"
-                    item-title="label"
-                    item-value="value"
-                    clearable
-                    hide-details="auto"
-                    persistent-placeholder
-                    placeholder="Select..."
-                    density="compact"
-                    dense
-                  ></v-select>
-                </div>
+            </v-row>
+          </div>
+          <div class="ml-4 mt-5">
+            <div class="ml-n4 mt-n5">
+              <span class="text-h7">Report Title</span>
+            </div>
+            <v-row>
+              <v-col cols="12">
+                <v-text-field
+                  type="string"
+                  v-model="reportTitle"
+                  hide-details="auto"
+                  persistent-placeholder
+                  placeholder="Enter a report title..."
+                  density="compact"
+                  dense
+                  style="max-width: 50% !important"
+                ></v-text-field>
               </v-col>
             </v-row>
           </div>
