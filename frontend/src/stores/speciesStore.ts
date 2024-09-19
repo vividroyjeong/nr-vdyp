@@ -27,9 +27,11 @@ export const useSpeciesStore = defineStore('species', () => {
   ])
 
   const totalSpeciesPercent = computed(() => {
-    return speciesList.value.reduce((acc, item) => {
+    const totalPercent = speciesList.value.reduce((acc, item) => {
       return acc + (parseFloat(item.percent as any) || 0)
     }, 0)
+    // preserve to the first decimal place and truncate after that
+    return Math.floor(totalPercent * 10) / 10
   })
 
   const totalSpeciesGroupPercent = computed(() => {

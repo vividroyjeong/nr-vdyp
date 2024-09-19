@@ -205,7 +205,8 @@ const validatePercent = (value: any) => {
   if (value === null || value === '') {
     return true
   }
-  if (value < 0 || value > 100) {
+  const numValue = Math.floor(parseFloat(value) * 10) / 10 // validate to the first decimal place only
+  if (numValue < 0 || numValue > 100) {
     return 'Please enter a value between 0 and 100'
   }
   return true
