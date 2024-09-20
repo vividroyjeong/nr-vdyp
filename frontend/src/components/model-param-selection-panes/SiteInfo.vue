@@ -253,7 +253,7 @@ const selectedSiteIndexCurve = ref('Thrower (1994)')
 
 const siteSpeciesValues = ref(null)
 
-const ageTypes = ref(['Total', 'Partial'])
+const ageTypes = ref(['Total', 'Breast'])
 const selectedAgeType = ref('Total')
 
 const ageYears = ref(60)
