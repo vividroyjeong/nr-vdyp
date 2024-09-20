@@ -212,14 +212,14 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
-import { useSpeciesStore } from '@/stores/speciesStore'
+import { useModelParameterStore } from '@/stores/modelParameterStore'
 import { storeToRefs } from 'pinia'
 
 const form = ref<HTMLFormElement>()
 
 const panelOpen = ref(0)
 
-const speciesStore = useSpeciesStore()
+const modelParameterStore = useModelParameterStore()
 const {
   derivedBy,
   speciesList,
@@ -229,9 +229,9 @@ const {
   totalSpeciesGroupPercent,
   isOverTotalPercent,
   siteSpecies,
-} = storeToRefs(speciesStore)
+} = storeToRefs(modelParameterStore)
 
-const updateSpeciesGroup = speciesStore.updateSpeciesGroup
+const updateSpeciesGroup = modelParameterStore.updateSpeciesGroup
 
 watch(
   speciesList,

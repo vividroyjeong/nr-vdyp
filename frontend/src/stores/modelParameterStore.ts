@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
-export const useSpeciesStore = defineStore('species', () => {
+export const useModelParameterStore = defineStore('modelParameter', () => {
   const derivedBy = ref(null)
 
   const speciesList = ref<{ species: string | null; percent: number | null }[]>(
