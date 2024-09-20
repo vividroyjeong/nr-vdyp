@@ -32,8 +32,12 @@
                           !!v || '&quot;Species % derived by&quot; is required',
                       ]"
                     >
-                      <v-radio label="Volume" value="volume"></v-radio>
-                      <v-radio label="Basal Area" value="basalArea"></v-radio>
+                      <v-radio
+                        v-for="option in derivedByOptions"
+                        :key="option.value"
+                        :label="option.label"
+                        :value="option.value"
+                      ></v-radio>
                     </v-radio-group>
                   </div>
                 </v-col>
@@ -209,11 +213,11 @@
     </v-expansion-panels>
   </v-card>
 </template>
-
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
 import { storeToRefs } from 'pinia'
+import { derivedByOptions, speciesOptions } from '@/constants/options'
 
 const form = ref<HTMLFormElement>()
 
@@ -223,7 +227,6 @@ const modelParameterStore = useModelParameterStore()
 const {
   derivedBy,
   speciesList,
-  speciesOptions,
   speciesGroups,
   totalSpeciesPercent,
   totalSpeciesGroupPercent,

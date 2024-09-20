@@ -74,16 +74,16 @@
               <v-col cols="3">
                 <v-select
                   label="Minimum DBH Limit"
-                  :items="minimumDBHLimits"
+                  :items="minimumDBHLimitsOptions"
                   v-model="selectedMinimumDBHLimit"
                   item-title="label"
                   item-value="value"
+                  clearable
                   hide-details
                   persistent-placeholder
-                  placeholder="N/A"
+                  placeholder="Select..."
                   density="compact"
                   dense
-                  readonly
                 ></v-select>
               </v-col>
             </v-row>
@@ -119,14 +119,14 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { minimumDBHLimitsOptions } from '@/constants/options'
 
 const panelOpen = ref(0)
 
-const minimumDBHLimits = ref(['Eco Zone 1', 'Eco Zone 2', 'Eco Zone 3'])
 const percentStockableArea = ref()
 const basalArea = ref()
 const treesPerHectare = ref()
-const selectedMinimumDBHLimit = ref('7.5 cm+')
+const selectedMinimumDBHLimit = ref(null)
 const percentCrownClosure = ref(50)
 
 const validatePercentStockableArea = (value: any) => {

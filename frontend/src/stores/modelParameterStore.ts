@@ -19,13 +19,6 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     { group: string; percent: number; siteSpecies: string }[]
   >([])
 
-  const speciesOptions = ref<string[]>([
-    'PL - Lodgepole',
-    'AC - Popular',
-    'H - Hemlock',
-    'S - Spruce',
-  ])
-
   const totalSpeciesPercent = computed(() => {
     const totalPercent = speciesList.value.reduce((acc, item) => {
       return acc + (parseFloat(item.percent as any) || 0)
@@ -74,7 +67,6 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     derivedBy,
     speciesList,
     speciesGroups,
-    speciesOptions,
     totalSpeciesPercent,
     totalSpeciesGroupPercent,
     isOverTotalPercent,

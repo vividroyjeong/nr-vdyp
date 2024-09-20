@@ -21,7 +21,7 @@
               <v-col cols="3">
                 <v-select
                   label="BEC Zone"
-                  :items="becZones"
+                  :items="becZoneOptions"
                   v-model="selectedBecZone"
                   item-title="label"
                   item-value="value"
@@ -37,7 +37,7 @@
               <v-col cols="3">
                 <v-select
                   label="Eco Zone"
-                  :items="ecoZones"
+                  :items="ecoZoneOptions"
                   v-model="selectedEcoZone"
                   item-title="label"
                   item-value="value"
@@ -77,7 +77,7 @@
               <v-col cols="3">
                 <v-select
                   label="Site Species"
-                  :items="siteSpecies"
+                  :items="siteSpeciesOptions"
                   v-model="selectedSpecies"
                   item-title="label"
                   item-value="value"
@@ -122,8 +122,12 @@
               </v-col>
               <v-col cols="auto">
                 <v-radio-group v-model="siteSpeciesValues" inline>
-                  <v-radio label="Computed" value="computed"></v-radio>
-                  <v-radio label="Supplied" value="supplied"></v-radio>
+                  <v-radio
+                    v-for="option in siteSpeciesValuesOptions"
+                    :key="option.value"
+                    :label="option.label"
+                    :value="option.value"
+                  ></v-radio>
                 </v-radio-group>
               </v-col>
             </v-row>
@@ -131,7 +135,7 @@
               <v-col cols="3">
                 <v-select
                   label="Age Type"
-                  :items="ageTypes"
+                  :items="ageTypeOptions"
                   v-model="selectedAgeType"
                   item-title="label"
                   item-value="value"
@@ -233,11 +237,17 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import {
+  becZoneOptions,
+  ecoZoneOptions,
+  siteSpeciesOptions,
+  siteIndexCurveOptions,
+  siteSpeciesValuesOptions,
+  ageTypeOptions,
+} from '@/constants/options'
 
 const panelOpen = ref(0)
 
-const becZones = ref(['IDF - Interior Douglas Fir', 'xxx'])
-const ecoZones = ref(['Eco Zone 1', 'Eco Zone 2', 'Eco Zone 3'])
 const selectedBecZone = ref('IDF - Interior Douglas Fir')
 const selectedEcoZone = ref(null)
 
@@ -245,15 +255,12 @@ const speciesGroup = ref('PL')
 
 const includeSecondaryHeight = ref(true)
 
-const siteSpecies = ref(['PL', 'AC', 'H', 'S'])
 const selectedSpecies = ref('PL')
 
-const siteIndexCurveOptions = ref(['Thrower (1994)'])
 const selectedSiteIndexCurve = ref('Thrower (1994)')
 
 const siteSpeciesValues = ref(null)
 
-const ageTypes = ref(['Total', 'Breast'])
 const selectedAgeType = ref('Total')
 
 const ageYears = ref(60)

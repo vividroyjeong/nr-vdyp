@@ -21,12 +21,10 @@
               <v-col cols="auto">
                 <v-radio-group v-model="computedValues" density="compact" dense>
                   <v-radio
-                    label="Use Computed Values (These additional Stand attributes require that a Stand Age and Basal Area be supplied on the Site Index and the Density pages)"
-                    value="use"
-                  ></v-radio>
-                  <v-radio
-                    label="Modify Computed Values"
-                    value="modify"
+                    v-for="option in additionalStandAttributesOptions"
+                    :key="option.value"
+                    :label="option.label"
+                    :value="option.value"
                   ></v-radio>
                 </v-radio-group>
               </v-col>
@@ -183,6 +181,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { additionalStandAttributesOptions } from '@/constants/options'
 
 const panelOpen = ref(0)
 

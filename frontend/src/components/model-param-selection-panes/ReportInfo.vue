@@ -77,43 +77,15 @@
             <v-row class="ml-n6">
               <v-col cols="12" style="padding-top: 0px">
                 <v-row>
-                  <v-col style="max-width: 15% !important">
+                  <v-col
+                    v-for="(option, index) in volumeReportedOptions"
+                    :key="index"
+                    :style="{ 'max-width': index < 4 ? '20%' : 'auto' }"
+                  >
                     <v-checkbox
                       v-model="selectedVolumeReported"
-                      label="Whole Stem"
-                      value="Whole Stem"
-                      hide-details
-                    ></v-checkbox>
-                  </v-col>
-                  <v-col style="max-width: 15% !important">
-                    <v-checkbox
-                      v-model="selectedVolumeReported"
-                      label="Close Utilization"
-                      value="Close Utilization"
-                      hide-details
-                    ></v-checkbox>
-                  </v-col>
-                  <v-col style="max-width: 15% !important">
-                    <v-checkbox
-                      v-model="selectedVolumeReported"
-                      label="Net Decay"
-                      value="Net Decay"
-                      hide-details
-                    ></v-checkbox>
-                  </v-col>
-                  <v-col style="max-width: 20% !important">
-                    <v-checkbox
-                      v-model="selectedVolumeReported"
-                      label="Net Decay and Waste"
-                      value="Net Decay and Waste"
-                      hide-details
-                    ></v-checkbox>
-                  </v-col>
-                  <v-col>
-                    <v-checkbox
-                      v-model="selectedVolumeReported"
-                      label="Net Decay, Waste and Breakage"
-                      value="Net Decay, Waste and Breakage"
+                      :label="option.label"
+                      :value="option.value"
                       hide-details
                     ></v-checkbox>
                   </v-col>
@@ -128,30 +100,19 @@
             <v-row class="ml-n6">
               <v-col cols="12" style="padding-top: 0px">
                 <v-row>
-                  <v-col style="max-width: 15% !important">
+                  <v-col
+                    v-for="(option, index) in includeInReportOptions"
+                    :key="index"
+                    :style="{ 'max-width': index < 4 ? '20%' : 'auto' }"
+                  >
                     <v-checkbox
                       v-model="selectedVolumeReported"
-                      label="Computed MAI"
-                      value="Computed MAI"
+                      :label="option.label"
+                      :value="option.value"
                       hide-details
                     ></v-checkbox>
                   </v-col>
-                  <v-col style="max-width: 15% !important">
-                    <v-checkbox
-                      v-model="selectedVolumeReported"
-                      label="Species Composition"
-                      value="Species Composition"
-                      hide-details
-                    ></v-checkbox>
-                  </v-col>
-                  <v-col style="max-width: 15% !important">
-                    <v-checkbox
-                      v-model="selectedVolumeReported"
-                      label="Culmination Values"
-                      value="Culmination Values"
-                      hide-details
-                    ></v-checkbox>
-                  </v-col>
+
                   <v-col style="max-width: 20% !important">
                     <v-select
                       label="Projection Type"
@@ -210,9 +171,9 @@
                 <!-- <div>value: {{ slidervalue1 }}</div> -->
                 <vue-slider
                   v-model="slidervalue1"
-                  :data="sliderData"
-                  :data-value="'id'"
-                  :data-label="'name'"
+                  :data="minimumDBHLimitsOptions"
+                  :data-value="'value'"
+                  :data-label="'label'"
                   :contained="true"
                   :tooltip="'none'"
                   :dotStyle="{ backgroundColor: '#787878' }"
@@ -239,9 +200,9 @@
                 <!-- <div>value: {{ slidervalue2 }}</div> -->
                 <vue-slider
                   v-model="slidervalue2"
-                  :data="sliderData"
-                  :data-value="'id'"
-                  :data-label="'name'"
+                  :data="minimumDBHLimitsOptions"
+                  :data-value="'value'"
+                  :data-label="'label'"
                   :contained="true"
                   :tooltip="'none'"
                   :dotStyle="{ backgroundColor: '#787878' }"
@@ -268,9 +229,9 @@
                 <!-- <div>value: {{ slidervalue3 }}</div> -->
                 <vue-slider
                   v-model="slidervalue3"
-                  :data="sliderData"
-                  :data-value="'id'"
-                  :data-label="'name'"
+                  :data="minimumDBHLimitsOptions"
+                  :data-value="'value'"
+                  :data-label="'label'"
                   :contained="true"
                   :tooltip="'none'"
                   :dotStyle="{ backgroundColor: '#787878' }"
@@ -297,9 +258,9 @@
                 <!-- <div>value: {{ slidervalue4 }}</div> -->
                 <vue-slider
                   v-model="slidervalue4"
-                  :data="sliderData"
-                  :data-value="'id'"
-                  :data-label="'name'"
+                  :data="minimumDBHLimitsOptions"
+                  :data-value="'value'"
+                  :data-label="'label'"
                   :contained="true"
                   :tooltip="'none'"
                   :dotStyle="{ backgroundColor: '#787878' }"
@@ -324,6 +285,12 @@
 import { ref, computed } from 'vue'
 import VueSlider from 'vue-slider-component'
 import 'vue-slider-component/theme/default.css'
+import {
+  volumeReportedOptions,
+  includeInReportOptions,
+  projectionTypeOptions,
+  minimumDBHLimitsOptions,
+} from '@/constants/options'
 
 const panelOpen = ref(0)
 
@@ -333,8 +300,6 @@ const ageIncrement = ref(null)
 const selectedVolumeReported = ref([])
 const projectionType = ref(null)
 const reportTitle = ref(null)
-const projectionTypeOptions = ref([])
-const reportTitleOptions = ref([])
 
 const minimumDBHLimit1 = ref(null)
 const minimumDBHLimit2 = ref(null)
@@ -345,29 +310,6 @@ const slidervalue1 = ref(4.0)
 const slidervalue2 = ref(4.0)
 const slidervalue3 = ref(4.0)
 const slidervalue4 = ref(4.0)
-
-const sliderData = [
-  {
-    id: 4.0,
-    name: '4.0 cm+',
-  },
-  {
-    id: 7.5,
-    name: '7.5 cm+',
-  },
-  {
-    id: 12.5,
-    name: '12.5 cm+',
-  },
-  {
-    id: 17.5,
-    name: '17.5 cm+',
-  },
-  {
-    id: 22.5,
-    name: '22.5 cm+',
-  },
-]
 
 const validateAge = (value: any) => {
   if (value === null || value === '') {
