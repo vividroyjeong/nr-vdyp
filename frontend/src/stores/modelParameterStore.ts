@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
 export const useModelParameterStore = defineStore('modelParameter', () => {
+  // species info
   const derivedBy = ref(null)
 
   const speciesList = ref<{ species: string | null; percent: number | null }[]>(
@@ -19,6 +20,8 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     { group: string; percent: number; siteSpecies: string }[]
   >([])
 
+  const siteSpecies = ref<string | null>(null)
+
   const totalSpeciesPercent = computed(() => {
     const totalPercent = speciesList.value.reduce((acc, item) => {
       return acc + (parseFloat(item.percent as any) || 0)
@@ -35,11 +38,6 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
 
   const isOverTotalPercent = computed(() => {
     return totalSpeciesPercent.value > 100
-  })
-
-  const siteSpecies = computed(() => {
-    if (speciesGroups.value.length === 0) return null
-    return speciesGroups.value[0].siteSpecies
   })
 
   const updateSpeciesGroup = () => {
@@ -61,7 +59,22 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     }))
 
     speciesGroups.value.sort((a, b) => b.percent - a.percent)
+
+    // update siteSpecies
+    siteSpecies.value =
+      speciesGroups.value.length > 0 ? speciesGroups.value[0].siteSpecies : null
   }
+
+  // site info
+  const becZone = ref(null)
+  const ecoZone = ref(null)
+  const incSecondaryHeight = ref(false)
+  const siteIndexCurve = ref(null)
+  const siteSpeciesValues = ref(null)
+  const ageType = ref(null)
+  const age = ref(null)
+  const height = ref(null)
+  const bha50SiteIndex = ref(null)
 
   return {
     derivedBy,
@@ -72,5 +85,14 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     isOverTotalPercent,
     siteSpecies,
     updateSpeciesGroup,
+    becZone,
+    ecoZone,
+    incSecondaryHeight,
+    siteIndexCurve,
+    siteSpeciesValues,
+    ageType,
+    age,
+    height,
+    bha50SiteIndex,
   }
 })

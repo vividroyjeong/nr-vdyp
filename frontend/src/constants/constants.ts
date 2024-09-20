@@ -13,3 +13,8 @@ export const SORT_ORDER = Object.freeze({
   ASC: 'ASC',
   DESC: 'DESC',
 })
+
+export const DERIVED_BY = Object.freeze({
+  VOLUME: 'Volume',
+  BASAL_AREA: 'Basal Area',
+})

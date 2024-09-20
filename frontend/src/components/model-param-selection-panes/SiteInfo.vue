@@ -22,7 +22,7 @@
                 <v-select
                   label="BEC Zone"
                   :items="becZoneOptions"
-                  v-model="selectedBecZone"
+                  v-model="becZone"
                   item-title="label"
                   item-value="value"
                   clearable
@@ -38,7 +38,7 @@
                 <v-select
                   label="Eco Zone"
                   :items="ecoZoneOptions"
-                  v-model="selectedEcoZone"
+                  v-model="ecoZone"
                   item-title="label"
                   item-value="value"
                   clearable
@@ -53,8 +53,9 @@
               <v-col cols="3">
                 <v-checkbox
                   label="Include Secondary Dominant Height in Yield Table"
-                  v-model="includeSecondaryHeight"
+                  v-model="incSecondaryHeight"
                   hide-details="auto"
+                  :disabled="derivedBy === DERIVED_BY.VOLUME"
                 ></v-checkbox>
               </v-col>
               <v-col class="col-space" />
@@ -78,15 +79,15 @@
                 <v-select
                   label="Site Species"
                   :items="siteSpeciesOptions"
-                  v-model="selectedSpecies"
+                  v-model="siteSpecies"
                   item-title="label"
                   item-value="value"
-                  clearable
                   hide-details="auto"
                   persistent-placeholder
                   placeholder="Select..."
                   density="compact"
                   dense
+                  :readonly="derivedBy === DERIVED_BY.VOLUME"
                 ></v-select>
               </v-col>
               <v-col class="col-space" />
@@ -94,7 +95,7 @@
                 <v-select
                   label="Site Index Curve"
                   :items="siteIndexCurveOptions"
-                  v-model="selectedSiteIndexCurve"
+                  v-model="siteIndexCurve"
                   item-title="label"
                   item-value="value"
                   hide-details="auto"
@@ -136,7 +137,7 @@
                 <v-select
                   label="Age Type"
                   :items="ageTypeOptions"
-                  v-model="selectedAgeType"
+                  v-model="ageType"
                   item-title="label"
                   item-value="value"
                   clearable
@@ -152,7 +153,7 @@
                 <v-text-field
                   label="Age (years)"
                   type="number"
-                  v-model="ageYears"
+                  v-model="age"
                   max="100"
                   min="0"
                   step="0.1"
@@ -178,7 +179,7 @@
                 <v-text-field
                   label="Height (meters)"
                   type="number"
-                  v-model="heightMeters"
+                  v-model="height"
                   max="100"
                   min="0"
                   step="0.1"
@@ -204,7 +205,7 @@
                 <v-text-field
                   label="BHA 50 Site Index"
                   type="number"
-                  v-model="siteIndex"
+                  v-model="bha50SiteIndex"
                   max="100"
                   min="0"
                   step="0.1"
@@ -236,7 +237,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { useModelParameterStore } from '@/stores/modelParameterStore'
+import { storeToRefs } from 'pinia'
 import {
   becZoneOptions,
   ecoZoneOptions,
@@ -245,31 +248,42 @@ import {
   siteSpeciesValuesOptions,
   ageTypeOptions,
 } from '@/constants/options'
+import { DERIVED_BY } from '@/constants/constants'
 
 const panelOpen = ref(0)
 
-const selectedBecZone = ref('IDF - Interior Douglas Fir')
-const selectedEcoZone = ref(null)
-
 const speciesGroup = ref('PL')
-
-const includeSecondaryHeight = ref(true)
-
-const selectedSpecies = ref('PL')
-
-const selectedSiteIndexCurve = ref('Thrower (1994)')
-
-const siteSpeciesValues = ref(null)
-
-const selectedAgeType = ref('Total')
-
-const ageYears = ref(60)
-const heightMeters = ref(17)
-const siteIndex = ref(30.0)
 
 const floatOptions1 = ref(null)
 const floatOptions2 = ref(null)
 const floatOptions3 = ref(null)
+
+const modelParameterStore = useModelParameterStore()
+const {
+  derivedBy,
+  siteSpecies,
+  becZone,
+  ecoZone,
+  incSecondaryHeight,
+  siteIndexCurve,
+  siteSpeciesValues,
+  ageType,
+  age,
+  height,
+  bha50SiteIndex,
+} = storeToRefs(modelParameterStore)
+
+watch(
+  derivedBy,
+  (newValue) => {
+    if (newValue === DERIVED_BY.VOLUME) {
+      incSecondaryHeight.value = false
+    } else if (newValue === DERIVED_BY.BASAL_AREA) {
+      incSecondaryHeight.value = true
+    }
+  },
+  { immediate: true }, // make it responsive from the start with 'immediate' settings
+)
 
 const clear = () => {}
 const confirm = () => {}
