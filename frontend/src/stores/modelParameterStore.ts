@@ -36,6 +36,11 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     }, 0)
   })
 
+  const speciesGroup = computed(() => {
+    if (speciesGroups.value.length === 0) return null
+    return speciesGroups.value[0].group
+  })
+
   const isOverTotalPercent = computed(() => {
     return totalSpeciesPercent.value > 100
   })
@@ -72,9 +77,9 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   const siteIndexCurve = ref(null)
   const siteSpeciesValues = ref(null)
   const ageType = ref(null)
-  const age = ref(null)
-  const height = ref(null)
-  const bha50SiteIndex = ref(null)
+  const age = ref<number | null>(null)
+  const height = ref<number | null>(null)
+  const bha50SiteIndex = ref<number | null>(null)
 
   return {
     derivedBy,
@@ -82,6 +87,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     speciesGroups,
     totalSpeciesPercent,
     totalSpeciesGroupPercent,
+    speciesGroup,
     isOverTotalPercent,
     siteSpecies,
     updateSpeciesGroup,

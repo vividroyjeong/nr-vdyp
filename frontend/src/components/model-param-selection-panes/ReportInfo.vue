@@ -34,7 +34,7 @@
                   dense
                 ></v-text-field>
               </v-col>
-              <v-col class="col-space" />
+              <v-col class="col-space-3" />
               <v-col cols="3">
                 <v-text-field
                   label="Finishing Age"
@@ -51,7 +51,7 @@
                   dense
                 ></v-text-field>
               </v-col>
-              <v-col class="col-space" />
+              <v-col class="col-space-3" />
               <v-col cols="3">
                 <v-text-field
                   label="Age Increment"
@@ -166,7 +166,7 @@
                   readonly
                 ></v-text-field>
               </v-col>
-              <v-col class="col-space" />
+              <v-col class="col-space-3" />
               <v-col cols="5" class="ma-5">
                 <!-- <div>value: {{ slidervalue1 }}</div> -->
                 <vue-slider
@@ -195,7 +195,7 @@
                   readonly
                 ></v-text-field>
               </v-col>
-              <v-col class="col-space" />
+              <v-col class="col-space-3" />
               <v-col cols="5" class="ma-5">
                 <!-- <div>value: {{ slidervalue2 }}</div> -->
                 <vue-slider
@@ -224,7 +224,7 @@
                   readonly
                 ></v-text-field>
               </v-col>
-              <v-col class="col-space" />
+              <v-col class="col-space-3" />
               <v-col cols="5" class="ma-5">
                 <!-- <div>value: {{ slidervalue3 }}</div> -->
                 <vue-slider
@@ -253,7 +253,7 @@
                   readonly
                 ></v-text-field>
               </v-col>
-              <v-col class="col-space" />
+              <v-col class="col-space-3" />
               <v-col cols="5" class="ma-5">
                 <!-- <div>value: {{ slidervalue4 }}</div> -->
                 <vue-slider

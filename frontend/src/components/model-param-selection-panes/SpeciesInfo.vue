@@ -292,11 +292,11 @@ const triggerSpeciesSortByPercent = () => {
   })
 }
 
+// allow only up to the first decimal place
 const handlePercentInput = (event: Event, index: number) => {
   const input = event.target as HTMLInputElement
   let value = input.value
 
-  // allow only up to the first decimal place
   if (value.includes('.')) {
     const [integerPart, decimalPart] = value.split('.')
     if (decimalPart.length > 1) {
@@ -304,7 +304,6 @@ const handlePercentInput = (event: Event, index: number) => {
     }
   }
 
-  // convert to number and store in speciesList
   speciesList.value[index].percent = parseFloat(value)
 }
 </script>

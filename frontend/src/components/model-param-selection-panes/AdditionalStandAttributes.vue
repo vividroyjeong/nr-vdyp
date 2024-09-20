@@ -47,7 +47,7 @@
                   dense
                 ></v-text-field>
               </v-col>
-              <v-col class="col-space" />
+              <v-col class="col-space-3" />
               <v-col cols="3">
                 <v-text-field
                   type="number"
@@ -86,7 +86,7 @@
                   </template>
                 </v-text-field>
               </v-col>
-              <v-col class="col-space" />
+              <v-col class="col-space-3" />
               <v-col cols="3">
                 <v-text-field
                   type="number"
@@ -125,7 +125,7 @@
                   </template>
                 </v-text-field>
               </v-col>
-              <v-col class="col-space" />
+              <v-col class="col-space-3" />
               <v-col cols="3">
                 <v-text-field
                   type="number"
