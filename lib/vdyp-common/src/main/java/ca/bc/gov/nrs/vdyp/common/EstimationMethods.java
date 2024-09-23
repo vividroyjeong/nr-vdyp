@@ -39,7 +39,7 @@ public class EstimationMethods {
 
 	public static final float EMPIRICAL_OCCUPANCY = 0.85f;
 
-	ResolvedControlMap controlMap;
+	private ResolvedControlMap controlMap;
 
 	public EstimationMethods(ResolvedControlMap controlMap) {
 		this.controlMap = controlMap;
@@ -133,7 +133,6 @@ public class EstimationMethods {
 	 *
 	 * @param vspec         The species.
 	 * @param vspecPrime    The primary species.
-	 * @param bec           The BEC zone containing the species.
 	 * @param leadHeight    lead height of the layer
 	 * @param primaryHeight height of the primary species
 	 * @throws ProcessingException
