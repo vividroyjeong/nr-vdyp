@@ -21,10 +21,6 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   >([])
 
   const siteSpecies = ref<string | null>(null)
-  const speciesGroup = computed(() => {
-    if (speciesGroups.value.length === 0) return null
-    return speciesGroups.value[0].group
-  })
 
   const totalSpeciesPercent = computed(() => {
     const totalPercent = speciesList.value.reduce((acc, item) => {
@@ -87,7 +83,6 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     siteSpecies,
     totalSpeciesPercent,
     totalSpeciesGroupPercent,
-    speciesGroup,
     isOverTotalPercent,
     updateSpeciesGroup,
     becZone,

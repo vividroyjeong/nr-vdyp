@@ -64,21 +64,6 @@
                       :disabled="derivedBy === DERIVED_BY.VOLUME"
                     ></v-checkbox>
                   </v-col>
-                  <v-col class="col-space-6" />
-                  <v-col>
-                    <div class="mt-2">
-                      <v-text-field
-                        label="Species Group"
-                        :model-value="speciesGroup"
-                        variant="underlined"
-                        persistent-placeholder
-                        placeholder=""
-                        readonly
-                        density="compact"
-                        dense
-                      ></v-text-field>
-                    </div>
-                  </v-col>
                 </v-row>
               </v-col>
             </v-row>
@@ -276,7 +261,6 @@ const floating = ref(null)
 const modelParameterStore = useModelParameterStore()
 const {
   derivedBy,
-  speciesGroup,
   siteSpecies,
   becZone,
   ecoZone,
