@@ -20,7 +20,11 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     { group: string; percent: number; siteSpecies: string }[]
   >([])
 
-  const siteSpecies = ref<string | null>(null)
+  // determined in Species Information
+  const highestPercentSpecies = ref<string | null>(null)
+
+  // auto-populated once highestPercentSpecies is determined, but could be changed in Site Information
+  const selectedSiteSpecies = ref<string | null>(null)
 
   const totalSpeciesPercent = computed(() => {
     const totalPercent = speciesList.value.reduce((acc, item) => {
@@ -60,8 +64,8 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
 
     speciesGroups.value.sort((a, b) => b.percent - a.percent)
 
-    // update siteSpecies
-    siteSpecies.value =
+    // update highestPercentSpecies and selectedSiteSpecies
+    highestPercentSpecies.value = selectedSiteSpecies.value =
       speciesGroups.value.length > 0 ? speciesGroups.value[0].siteSpecies : null
   }
 
@@ -80,7 +84,8 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     derivedBy,
     speciesList,
     speciesGroups,
-    siteSpecies,
+    highestPercentSpecies,
+    selectedSiteSpecies,
     totalSpeciesPercent,
     totalSpeciesGroupPercent,
     isOverTotalPercent,

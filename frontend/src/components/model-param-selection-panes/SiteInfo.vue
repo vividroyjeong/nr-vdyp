@@ -75,7 +75,7 @@
                     <v-select
                       label="Site Species"
                       :items="siteSpeciesOptions"
-                      v-model="siteSpecies"
+                      v-model="selectedSiteSpecies"
                       item-title="label"
                       item-value="value"
                       hide-details="auto"
@@ -241,13 +241,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
 import { storeToRefs } from 'pinia'
 import {
   becZoneOptions,
   ecoZoneOptions,
-  siteSpeciesOptions,
   siteIndexCurveOptions,
   siteSpeciesValuesOptions,
   ageTypeOptions,
@@ -261,7 +260,8 @@ const floating = ref(null)
 const modelParameterStore = useModelParameterStore()
 const {
   derivedBy,
-  siteSpecies,
+  speciesGroups,
+  selectedSiteSpecies,
   becZone,
   ecoZone,
   incSecondaryHeight,
@@ -272,6 +272,13 @@ const {
   height,
   bha50SiteIndex,
 } = storeToRefs(modelParameterStore)
+
+const siteSpeciesOptions = computed(() =>
+  speciesGroups.value.map((group) => ({
+    label: group.siteSpecies,
+    value: group.siteSpecies,
+  })),
+)
 
 const isSiteSpeciesValueComputed = ref(false)
 

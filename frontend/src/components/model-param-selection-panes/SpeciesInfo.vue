@@ -200,7 +200,7 @@
                 @click="confirm"
                 :disabled="
                   totalSpeciesGroupPercent !== 100 ||
-                  siteSpecies === null ||
+                  highestPercentSpecies === null ||
                   derivedBy === null
                 "
               >
@@ -231,7 +231,7 @@ const {
   totalSpeciesPercent,
   totalSpeciesGroupPercent,
   isOverTotalPercent,
-  siteSpecies,
+  highestPercentSpecies,
 } = storeToRefs(modelParameterStore)
 
 const updateSpeciesGroup = modelParameterStore.updateSpeciesGroup
