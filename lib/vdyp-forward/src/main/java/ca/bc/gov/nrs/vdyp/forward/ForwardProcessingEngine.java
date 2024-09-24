@@ -88,15 +88,20 @@ public class ForwardProcessingEngine {
 
 	/** The entity to which result information is written */
 	private Optional<VdypOutputWriter> outputWriter = Optional.empty();
+	
+	private final boolean doCheckpoint;
 
 	public ForwardProcessingEngine(Map<String, Object> controlMap, Optional<VdypOutputWriter> outputWriter)
 			throws ProcessingException {
 		this.fps = new ForwardProcessingState(controlMap);
 		this.outputWriter = outputWriter;
+		
+		int cv7Value = this.fps.fcm.getForwardControlVariables().getControlVariable(ControlVariable.CHECKPOINT_7);
+		doCheckpoint = cv7Value == 1;
 	}
 
 	public ForwardProcessingEngine(Map<String, Object> controlMap) throws ProcessingException {
-		this.fps = new ForwardProcessingState(controlMap);
+		this(controlMap, Optional.empty());
 	}
 
 	public enum ExecutionStep {
@@ -121,7 +126,7 @@ public class ForwardProcessingEngine {
 		GROW_7_LAYER_DQ2, //
 		GROW_8_SPECIES_LH, //
 		GROW_9_SPECIES_PCT, //
-		GROW_10_PRIMARY_SPECIES_DETAILS, //
+		GROW_10_STORE_SPECIES_DETAILS, //
 		GROW_11_COMPATIBILITY_VARS, //
 		GROW_12_SPECIES_UC, //
 		GROW_13_SPECIES_UC_SMALL, //
@@ -193,7 +198,9 @@ public class ForwardProcessingEngine {
 
 		fps.setPolygonLayer(polygon, LayerType.PRIMARY);
 
-		// All of BANKCHK1 that we need
+		// All of BANKCHK1 that we need. Note that setting UC ALL (METH_CHK == 1) in BANKCHK1 is
+		// performed when the Bank instance is created in setPolygonLayer, above.
+
 		validatePolygon(polygon);
 
 		// Determine the target year of the growth
@@ -235,7 +242,7 @@ public class ForwardProcessingEngine {
 			veteranLayer = Optional.empty();
 		}
 
-		// BANKCHK1, simplified for the parameters METH_CHK = 4, LayerI = 1, and INSTANCE = 1
+		// BANKCHK1, simplified for the parameters METH_IN = 4, LayerI = 1, and INSTANCE = 1
 		if (lastStepInclusive.ge(ExecutionStep.CHECK_FOR_WORK)) {
 			stopIfNoWork(lps);
 		}
@@ -274,7 +281,7 @@ public class ForwardProcessingEngine {
 		}
 
 		// VGROW1
-		if (lastStepInclusive.ge(ExecutionStep.GROW)) {
+		if (lastStepInclusive.gt(ExecutionStep.SET_COMPATIBILITY_VARIABLES)) {
 			int startingYear = lps.getPolygon().getPolygonIdentifier().getYear();
 
 			VdypPolygon vdypPolygon = lps.getPolygon();
@@ -298,6 +305,13 @@ public class ForwardProcessingEngine {
 				);
 
 				grow(lps, currentYear, veteranLayer, lastStepInclusive);
+
+				// Some unit tests require only some of the grow steps to be executed (and, by
+				// implication, only for the first growth year. If this is the case, stop
+				// processing now.
+				if (ExecutionStep.ALL.gt(lastStepInclusive)) {
+					break;
+				}
 
 				// If update-during-growth is set, update the context prior to output
 				if (doRecalculateGroupsPriorToOutput) {
@@ -344,6 +358,7 @@ public class ForwardProcessingEngine {
 		assert lastStepInclusive.ge(ExecutionStep.GROW_1_LAYER_DHDELTA);
 
 		Bank bank = lps.getBank();
+		VdypPolygon polygon = lps.getPolygon();
 
 		float dhStart = lps.getPrimarySpeciesDominantHeight();
 		int pspSiteCurveNumber = lps.getSiteCurveNumber(lps.getPrimarySpeciesIndex());
@@ -354,6 +369,8 @@ public class ForwardProcessingEngine {
 		// (1) Calculate change in dominant height (layer)
 
 		float dhDelta = calculateDominantHeightDelta(dhStart, pspSiteCurveNumber, pspSiteIndex, pspYtbhStart);
+
+		writeCheckpoint(polygon, currentYear);
 
 		if (ExecutionStep.GROW_1_LAYER_DHDELTA.eq(lastStepInclusive))
 			return;
@@ -369,6 +386,8 @@ public class ForwardProcessingEngine {
 		float lhStart = bank.loreyHeights[0][UC_ALL_INDEX];
 
 		float baDelta = calculateBasalAreaDelta(pspYabhStart, dhStart, baStart, veteranLayerBasalArea, dhDelta);
+
+		writeCheckpoint(polygon, currentYear);
 
 		if (ExecutionStep.GROW_2_LAYER_BADELTA.eq(lastStepInclusive))
 			return;
@@ -392,6 +411,8 @@ public class ForwardProcessingEngine {
 
 		float baChangeRate = baDelta / baStart;
 
+		writeCheckpoint(polygon, currentYear);
+
 		if (ExecutionStep.GROW_3_LAYER_DQDELTA.eq(lastStepInclusive))
 			return;
 
@@ -411,6 +432,8 @@ public class ForwardProcessingEngine {
 		bank.quadMeanDiameters[0][UC_ALL_INDEX] = dqEnd;
 		bank.basalAreas[0][UC_ALL_INDEX] = baEnd;
 		bank.treesPerHectare[0][UC_ALL_INDEX] = tphEnd;
+
+		writeCheckpoint(polygon, currentYear);
 
 		if (ExecutionStep.GROW_4_LAYER_BA_AND_DQTPH_EST.eq(lastStepInclusive))
 			return;
@@ -455,6 +478,8 @@ public class ForwardProcessingEngine {
 
 			bank.loreyHeights[0][UC_ALL_INDEX] = sum1 / sum2;
 
+			writeCheckpoint(polygon, currentYear);
+
 			if (ExecutionStep.GROW_5A_LH_EST.eq(lastStepInclusive))
 				return;
 
@@ -487,6 +512,8 @@ public class ForwardProcessingEngine {
 			}
 		}
 
+		writeCheckpoint(polygon, currentYear);
+
 		if (ExecutionStep.GROW_5_SPECIES_BADQTPH.eq(lastStepInclusive))
 			return;
 
@@ -510,6 +537,8 @@ public class ForwardProcessingEngine {
 
 		bank.treesPerHectare[0][UC_ALL_INDEX] = tphEndSum;
 
+		writeCheckpoint(polygon, currentYear);
+
 		if (ExecutionStep.GROW_6_LAYER_TPH2.eq(lastStepInclusive))
 			return;
 
@@ -517,6 +546,8 @@ public class ForwardProcessingEngine {
 
 		bank.quadMeanDiameters[0][UC_ALL_INDEX] = BaseAreaTreeDensityDiameter
 				.quadMeanDiameter(bank.basalAreas[0][UC_ALL_INDEX], bank.treesPerHectare[0][UC_ALL_INDEX]);
+
+		writeCheckpoint(polygon, currentYear);
 
 		if (ExecutionStep.GROW_7_LAYER_DQ2.eq(lastStepInclusive))
 			return;
@@ -529,6 +560,8 @@ public class ForwardProcessingEngine {
 		// We now have site (layer) level predications for basal area, quad-mean-diameter,
 		// trees-per-hectare and Lorey height. Proceed to per-species estimates.
 
+		writeCheckpoint(polygon, currentYear);
+
 		if (ExecutionStep.GROW_8_SPECIES_LH.eq(lastStepInclusive))
 			return;
 
@@ -538,10 +571,12 @@ public class ForwardProcessingEngine {
 					/ bank.basalAreas[0][UC_ALL_INDEX];
 		}
 
+		writeCheckpoint(polygon, currentYear);
+
 		if (ExecutionStep.GROW_9_SPECIES_PCT.eq(lastStepInclusive))
 			return;
 
-		// (10) Update the running values. TODO: why isn't siteIndex being updated?
+		// (10) Update the running values.
 		lps.updatePrimarySpeciesDetailsAfterGrowth(dhEnd);
 
 		for (int i = 1; i < bank.getNSpecies(); i++) {
@@ -551,6 +586,13 @@ public class ForwardProcessingEngine {
 				bank.siteIndices[i] = lps.getPrimarySpeciesSiteIndex();
 				bank.yearsAtBreastHeight[i] = lps.getPrimarySpeciesAgeAtBreastHeight();
 			} else {
+				if (bank.ageTotals[i] > 0.0f) {
+					bank.ageTotals[i] += 1;
+				}
+				if (bank.yearsAtBreastHeight[i] > 0.0) {
+					bank.yearsAtBreastHeight[i] += 1;
+				}
+
 				float spSiStart = bank.siteIndices[i];
 				float spDhStart = bank.dominantHeights[i];
 				float spYtbhStart = bank.yearsToBreastHeight[i];
@@ -569,11 +611,15 @@ public class ForwardProcessingEngine {
 			}
 		}
 
-		if (ExecutionStep.GROW_10_PRIMARY_SPECIES_DETAILS.eq(lastStepInclusive))
+		writeCheckpoint(polygon, currentYear);
+
+		if (ExecutionStep.GROW_10_STORE_SPECIES_DETAILS.eq(lastStepInclusive))
 			return;
 
 		// (11) update the compatibility variables to reflect the changes during the growth period
 		lps.updateCompatibilityVariablesAfterGrowth();
+
+		writeCheckpoint(polygon, currentYear);
 
 		if (ExecutionStep.GROW_11_COMPATIBILITY_VARS.eq(lastStepInclusive))
 			return;
@@ -593,6 +639,8 @@ public class ForwardProcessingEngine {
 
 		bank.refreshBank(primaryLayer);
 
+		writeCheckpoint(polygon, currentYear);
+
 		if (ExecutionStep.GROW_12_SPECIES_UC.eq(lastStepInclusive))
 			return;
 
@@ -602,6 +650,18 @@ public class ForwardProcessingEngine {
 
 		if (ExecutionStep.GROW_13_SPECIES_UC_SMALL.eq(lastStepInclusive))
 			return;
+	}
+	
+	private void writeCheckpoint(VdypPolygon polygon, int year) {
+		if (doCheckpoint) {
+			outputWriter.ifPresent(o -> {
+				try {
+					o.writePolygonWithSpeciesAndUtilizationForYear(polygon, year);
+				} catch (IOException e) {
+					throw new RuntimeProcessingException(new ProcessingException(e));
+				}
+			});
+		}
 	}
 
 	/**
@@ -1509,7 +1569,7 @@ public class ForwardProcessingEngine {
 				spDqSmall += lps.getCVSmall(speciesIndex, UtilizationClassVariable.QUAD_MEAN_DIAMETER);
 				FloatMath.clamp(spDqSmall, 4.01f, 7.49f);
 
-				spLhSmall = 1.3f * (spLhSmall - 1.3f)
+				spLhSmall = 1.3f + (spLhSmall - 1.3f)
 						* FloatMath.exp(lps.getCVSmall(speciesIndex, UtilizationClassVariable.LOREY_HEIGHT));
 
 				if (controlVar3Value >= 2 && meanVolumeSmall > 0.0f) {
@@ -2353,8 +2413,7 @@ public class ForwardProcessingEngine {
 				}
 
 				try {
-					o.setPolygonYear(currentYear);
-					o.writePolygonWithSpeciesAndUtilization(polygon);
+					o.writePolygonWithSpeciesAndUtilizationForYear(polygon, currentYear);
 				} catch (IOException e) {
 					throw new RuntimeProcessingException(new ProcessingException(e));
 				}
@@ -2363,7 +2422,7 @@ public class ForwardProcessingEngine {
 			throw e.getCause();
 		}
 	}
-
+	
 	private static final float[] DEFAULT_QUAD_MEAN_DIAMETERS = new float[] { Float.NaN, 10.0f, 15.0f, 20.0f, 25.0f };
 	private static final float V_BASE_MIN = 0.1f;
 	private static final float B_BASE_MIN = 0.01f;
@@ -2397,6 +2456,7 @@ public class ForwardProcessingEngine {
 		var cvQuadraticMeanDiameter = new MatrixMap2[lps.getNSpecies() + 1];
 		var cvSmall = new HashMap[lps.getNSpecies() + 1];
 
+		System.out.println("Polygon: " + lps.getPolygon());
 		for (int s : lps.getIndices()) {
 
 			String genusName = bank.speciesNames[s];
@@ -3125,8 +3185,8 @@ public class ForwardProcessingEngine {
 
 	/**
 	 * Calculate the siteCurve number of all species for which one was not supplied. All calculations are done in the
-	 * given bank, but the resulting site curve vector is stored in the given PolygonProcessingState.
-	 *
+	 * given bank but the result is also stored in the LayerProcessingState.
+	 * <p>
 	 * FORTRAN notes: the original SXINXSET function set both INXSC/INXSCV and BANK3/SCNB, except for index 0 of SCNB.
 	 *
 	 * @param bank         the bank in which the calculations are done.
@@ -3201,7 +3261,7 @@ public class ForwardProcessingEngine {
 	private static void stopIfNoWork(LayerProcessingState lps) throws ProcessingException {
 
 		// The following is extracted from BANKCHK1, simplified for the parameters
-		// METH_CHK = 4, LayerI = 1, and INSTANCE = 1. So IR = 1, which is the first
+		// METH_IN = 4, LayerI = 1, and INSTANCE = 1. So IR = 1, which is the first
 		// bank, numbered 0.
 
 		// => all that is done is that an exception is thrown if there are no species to
@@ -3374,33 +3434,32 @@ public class ForwardProcessingEngine {
 	/**
 	 * Find Inventory type group (ITG) for the given primary and secondary (if given) genera.
 	 *
-	 * @param primaryGenus           the genus of the primary species
-	 * @param optionalSecondaryGenus the genus of the primary species, which may be empty
-	 * @param primaryPercentage      the percentage covered by the primary species
+	 * @param primarySp0           the genus of the primary species
+	 * @param optionalSecondarySp0 the genus of the primary species, which may be empty
+	 * @param primaryPercentage    the percentage covered by the primary species
 	 * @return as described
 	 * @throws ProcessingException if primaryGenus is not a known genus
 	 */
-	static int findInventoryTypeGroup(
-			String primaryGenus, Optional<String> optionalSecondaryGenus, float primaryPercentage
-	) throws ProcessingException {
+	static int findInventoryTypeGroup(String primarySp0, Optional<String> optionalSecondarySp0, float primaryPercentage)
+			throws ProcessingException {
 
 		if (primaryPercentage > 79.999 /* Copied from VDYP7 */) {
 
-			Integer recordedInventoryTypeGroup = CommonData.ITG_PURE.get(primaryGenus);
+			Integer recordedInventoryTypeGroup = CommonData.ITG_PURE.get(primarySp0);
 			if (recordedInventoryTypeGroup == null) {
-				throw new ProcessingException("Unrecognized primary species: " + primaryGenus);
+				throw new ProcessingException("Unrecognized primary species: " + primarySp0);
 			}
 
 			return recordedInventoryTypeGroup;
 		}
 
-		String secondaryGenus = optionalSecondaryGenus.isPresent() ? optionalSecondaryGenus.get() : "";
+		String secondaryGenus = optionalSecondarySp0.isPresent() ? optionalSecondarySp0.get() : "";
 
-		if (primaryGenus.equals(secondaryGenus)) {
+		if (primarySp0.equals(secondaryGenus)) {
 			throw new IllegalArgumentException("The primary and secondary genera are the same");
 		}
 
-		switch (primaryGenus) {
+		switch (primarySp0) {
 		case "F":
 			switch (secondaryGenus) {
 			case "C", "Y":
@@ -3500,7 +3559,7 @@ public class ForwardProcessingEngine {
 			}
 			return 41;
 		default:
-			throw new ProcessingException("Unrecognized primary species: " + primaryGenus);
+			throw new ProcessingException("Unrecognized primary species: " + primarySp0);
 		}
 	}
 }

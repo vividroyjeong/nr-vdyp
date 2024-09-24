@@ -133,6 +133,7 @@ public class EstimationMethods {
 	 *
 	 * @param vspec         The species.
 	 * @param vspecPrime    The primary species.
+	 * @param bec           The BEC zone containing the species.
 	 * @param leadHeight    lead height of the layer
 	 * @param primaryHeight height of the primary species
 	 * @throws ProcessingException
