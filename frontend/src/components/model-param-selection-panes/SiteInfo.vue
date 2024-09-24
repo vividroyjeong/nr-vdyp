@@ -66,21 +66,23 @@
                   </v-col>
                   <v-col class="col-space-6" />
                   <v-col>
-                    <v-text-field
-                      label="Species Group"
-                      :model-value="speciesGroup"
-                      variant="underlined"
-                      persistent-placeholder
-                      placeholder=""
-                      readonly
-                      density="compact"
-                      dense
-                    ></v-text-field>
+                    <div class="mt-2">
+                      <v-text-field
+                        label="Species Group"
+                        :model-value="speciesGroup"
+                        variant="underlined"
+                        persistent-placeholder
+                        placeholder=""
+                        readonly
+                        density="compact"
+                        dense
+                      ></v-text-field>
+                    </div>
                   </v-col>
                 </v-row>
               </v-col>
             </v-row>
-            <div class="hr-line mt-2"></div>
+            <div class="hr-line"></div>
             <v-row class="mt-7">
               <v-col cols="6">
                 <v-row>
@@ -135,7 +137,11 @@
                 <div class="mt-2">Site Species Values:</div>
               </v-col>
               <v-col cols="auto">
-                <v-radio-group v-model="siteSpeciesValues" inline>
+                <v-radio-group
+                  v-model="siteSpeciesValues"
+                  inline
+                  :readonly="isSiteSpeciesValueComputed"
+                >
                   <v-radio
                     v-for="option in siteSpeciesValuesOptions"
                     :key="option.value"
@@ -282,6 +288,8 @@ const {
   height,
   bha50SiteIndex,
 } = storeToRefs(modelParameterStore)
+
+const isSiteSpeciesValueComputed = ref(false)
 
 watch(
   derivedBy,

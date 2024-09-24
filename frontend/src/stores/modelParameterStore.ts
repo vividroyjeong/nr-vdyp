@@ -21,6 +21,10 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   >([])
 
   const siteSpecies = ref<string | null>(null)
+  const speciesGroup = computed(() => {
+    if (speciesGroups.value.length === 0) return null
+    return speciesGroups.value[0].group
+  })
 
   const totalSpeciesPercent = computed(() => {
     const totalPercent = speciesList.value.reduce((acc, item) => {
@@ -34,11 +38,6 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     return speciesGroups.value.reduce((acc, group) => {
       return acc + group.percent
     }, 0)
-  })
-
-  const speciesGroup = computed(() => {
-    if (speciesGroups.value.length === 0) return null
-    return speciesGroups.value[0].group
   })
 
   const isOverTotalPercent = computed(() => {
@@ -75,7 +74,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   const ecoZone = ref(null)
   const incSecondaryHeight = ref(false)
   const siteIndexCurve = ref(null)
-  const siteSpeciesValues = ref(null)
+  const siteSpeciesValues = ref<string | null>(null)
   const ageType = ref(null)
   const age = ref<number | null>(null)
   const height = ref<number | null>(null)
@@ -85,11 +84,11 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     derivedBy,
     speciesList,
     speciesGroups,
+    siteSpecies,
     totalSpeciesPercent,
     totalSpeciesGroupPercent,
     speciesGroup,
     isOverTotalPercent,
-    siteSpecies,
     updateSpeciesGroup,
     becZone,
     ecoZone,
