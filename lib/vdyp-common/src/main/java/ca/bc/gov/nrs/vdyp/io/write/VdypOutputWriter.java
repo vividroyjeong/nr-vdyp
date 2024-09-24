@@ -146,13 +146,13 @@ public class VdypOutputWriter implements Closeable {
 	
 		writePolygon(polygon);
 		for (var layer : polygon.getLayers().values()) {
-			writeUtilization(layer, layer);
+			writeUtilization(polygon, layer, layer);
 			List<VdypSpecies> specs = new ArrayList<>(layer.getSpecies().size());
 			specs.addAll(layer.getSpecies().values());
 			specs.sort(Utils.compareUsing(BaseVdypSpecies::getGenus));
 			for (var species : specs) {
 				writeSpecies(layer, species);
-				writeUtilization(layer, species);
+				writeUtilization(polygon, layer, species);
 			}
 		}
 		writeSpeciesEndRecord(polygon);
