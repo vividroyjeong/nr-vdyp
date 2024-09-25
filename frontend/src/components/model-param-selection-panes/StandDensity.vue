@@ -75,7 +75,7 @@
                 <v-select
                   label="Minimum DBH Limit"
                   :items="minimumDBHLimitsOptions"
-                  v-model="selectedMinimumDBHLimit"
+                  v-model="minimumDBHLimit"
                   item-title="label"
                   item-value="value"
                   clearable
@@ -119,15 +119,20 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useModelParameterStore } from '@/stores/modelParameterStore'
+import { storeToRefs } from 'pinia'
 import { minimumDBHLimitsOptions } from '@/constants/options'
 
 const panelOpen = ref(0)
 
-const percentStockableArea = ref()
-const basalArea = ref()
-const treesPerHectare = ref()
-const selectedMinimumDBHLimit = ref(null)
-const percentCrownClosure = ref(50)
+const modelParameterStore = useModelParameterStore()
+const {
+  percentStockableArea,
+  basalArea,
+  treesPerHectare,
+  minimumDBHLimit,
+  percentCrownClosure,
+} = storeToRefs(modelParameterStore)
 
 const validatePercentStockableArea = (value: any) => {
   if (value === null || value === '') {

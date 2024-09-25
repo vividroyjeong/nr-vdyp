@@ -80,6 +80,13 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   const height = ref<number | null>(null)
   const bha50SiteIndex = ref<number | null>(null)
 
+  // stand density
+  const percentStockableArea = ref<number | null>(0)
+  const basalArea = ref<number | null>(null)
+  const treesPerHectare = ref<number | null>(null)
+  const minimumDBHLimit = ref(null)
+  const percentCrownClosure = ref<number | null>(null)
+
   return {
     derivedBy,
     speciesList,
@@ -99,5 +106,10 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     age,
     height,
     bha50SiteIndex,
+    percentStockableArea,
+    basalArea,
+    treesPerHectare,
+    minimumDBHLimit,
+    percentCrownClosure,
   }
 })
