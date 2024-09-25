@@ -52,7 +52,7 @@
                       <v-col cols="6">
                         <v-select
                           :label="`Species #${index + 1}`"
-                          :items="speciesOptions"
+                          :items="computedSpeciesOptions"
                           v-model="item.species"
                           item-title="label"
                           item-value="value"
@@ -217,7 +217,7 @@
 import { ref, watch, computed } from 'vue'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
 import { storeToRefs } from 'pinia'
-import { derivedByOptions, speciesOptions } from '@/constants/options'
+import { derivedByOptions, speciesMap } from '@/constants/options'
 
 const form = ref<HTMLFormElement>()
 
@@ -233,6 +233,13 @@ const {
   isOverTotalPercent,
   highestPercentSpecies,
 } = storeToRefs(modelParameterStore)
+
+const computedSpeciesOptions = computed(() =>
+  (Object.keys(speciesMap) as Array<keyof typeof speciesMap>).map((code) => ({
+    label: `${code} - ${speciesMap[code]}`,
+    value: code,
+  })),
+)
 
 const updateSpeciesGroup = modelParameterStore.updateSpeciesGroup
 

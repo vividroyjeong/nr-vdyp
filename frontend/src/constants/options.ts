@@ -3,19 +3,12 @@ export const derivedByOptions = [
   { label: 'Basal Area', value: 'Basal Area' },
 ]
 
-export const speciesOptions = [
-  { label: 'PL - Lodgepole', value: 'PL' },
-  { label: 'AC - Popular', value: 'AC' },
-  { label: 'H - Hemlock', value: 'H' },
-  { label: 'S - Spruce', value: 'S' },
-]
-
-export const siteSpeciesOptions = [
-  { label: 'PL', value: 'PL' },
-  { label: 'AC', value: 'AC' },
-  { label: 'H', value: 'H' },
-  { label: 'S', value: 'S' },
-]
+export const speciesMap = {
+  PL: 'Lodgepole',
+  AC: 'Popular',
+  H: 'Hemlock',
+  S: 'Spruce',
+}
 
 export const siteSpeciesValuesOptions = [
   { label: 'Computed', value: 'Computed' },
