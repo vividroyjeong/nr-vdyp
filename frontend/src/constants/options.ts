@@ -10,6 +10,23 @@ export const speciesMap = {
   S: 'Spruce',
 }
 
+export const becZoneMap = {
+  AT: 'Alpine Tundra',
+  BG: 'Bunch Grass',
+  BWBS: 'Boreal White and Black Spruce',
+  CDF: 'Coastal Douglas Fir',
+  CWH: 'Coastal Western Hemlock',
+  ESSF: 'Engelmann Spruce',
+  ICH: 'Interior Cedar Hemlock',
+  IDF: 'Interior Douglas Fir',
+  MH: 'Mountain Hemlock',
+  MS: 'Montane Spruce',
+  PP: 'Ponderosa Pine',
+  SBPS: 'Sub-Boreal Pine-Spruce',
+  SBS: 'Sub-Boreal Spruce',
+  SWB: 'Spruce-Willow-Birch',
+}
+
 export const siteSpeciesValuesOptions = [
   { label: 'Computed', value: 'Computed' },
   { label: 'Supplied', value: 'Supplied' },
@@ -20,11 +37,13 @@ export const ageTypeOptions = [
   { label: 'Breast', value: 'Breast' },
 ]
 
-export const becZoneOptions = [
-  { label: 'IDF - Interior Douglas Fir', value: 'IDF' },
+export const ecoZoneOptions = [
+  { label: 'Boreal Cordillera', value: 'Boreal Cordillera' },
+  { label: 'Boreal Plains', value: 'Boreal Plains' },
+  { label: 'Montane Cordillera', value: 'Montane Cordillera' },
+  { label: 'Pacific Maritime', value: 'Pacific Maritime' },
+  { label: 'Taiga Plains', value: 'Taiga Plains' },
 ]
-
-export const ecoZoneOptions = [{ label: '', value: '' }]
 
 export const siteIndexCurveOptions = [
   { label: 'Thrower (1994)', value: 'Thrower (1994)' },

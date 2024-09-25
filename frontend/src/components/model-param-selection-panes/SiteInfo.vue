@@ -23,7 +23,7 @@
                   <v-col cols="6">
                     <v-select
                       label="BEC Zone"
-                      :items="becZoneOptions"
+                      :items="computedBecZoneOptions"
                       v-model="becZone"
                       item-title="label"
                       item-value="value"
@@ -245,7 +245,7 @@ import { ref, computed, watch } from 'vue'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
 import { storeToRefs } from 'pinia'
 import {
-  becZoneOptions,
+  becZoneMap,
   ecoZoneOptions,
   siteIndexCurveOptions,
   siteSpeciesValuesOptions,
@@ -272,6 +272,13 @@ const {
   height,
   bha50SiteIndex,
 } = storeToRefs(modelParameterStore)
+
+const computedBecZoneOptions = computed(() =>
+  (Object.keys(becZoneMap) as Array<keyof typeof becZoneMap>).map((code) => ({
+    label: `${code} - ${becZoneMap[code]}`,
+    value: code,
+  })),
+)
 
 const siteSpeciesOptions = computed(() =>
   speciesGroups.value.map((group) => ({
