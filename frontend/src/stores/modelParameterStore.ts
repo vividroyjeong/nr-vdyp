@@ -79,6 +79,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   const age = ref<number | null>(null)
   const height = ref<number | null>(null)
   const bha50SiteIndex = ref<number | null>(null)
+  const floating = ref<string | null>(null)
 
   // stand density
   const percentStockableArea = ref<number | null>(0)
@@ -106,6 +107,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     age,
     height,
     bha50SiteIndex,
+    floating,
     percentStockableArea,
     basalArea,
     treesPerHectare,

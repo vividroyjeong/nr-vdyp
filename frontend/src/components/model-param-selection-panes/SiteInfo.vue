@@ -19,7 +19,7 @@
           <div>
             <v-row>
               <v-col cols="6">
-                <v-row>
+                <v-row class="mb-3">
                   <v-col cols="6">
                     <v-select
                       label="BEC Zone"
@@ -83,7 +83,7 @@
                       placeholder="Select..."
                       density="compact"
                       dense
-                      :readonly="derivedBy === DERIVED_BY.VOLUME"
+                      :disabled="derivedBy === DERIVED_BY.VOLUME"
                     ></v-select>
                   </v-col>
                   <v-col class="col-space-6" />
@@ -125,7 +125,7 @@
                 <v-radio-group
                   v-model="siteSpeciesValues"
                   inline
-                  :readonly="isSiteSpeciesValueComputed"
+                  :disabled="isSiteSpeciesValueDisabled"
                 >
                   <v-radio
                     v-for="option in siteSpeciesValuesOptions"
@@ -146,12 +146,12 @@
                       v-model="ageType"
                       item-title="label"
                       item-value="value"
-                      clearable
                       hide-details="auto"
                       persistent-placeholder
                       placeholder="Select..."
                       density="compact"
                       dense
+                      :disabled="isAgeTypeDisabled"
                     ></v-select>
                   </v-col>
                   <v-col class="col-space-6" />
@@ -167,6 +167,7 @@
                       placeholder="Select..."
                       density="compact"
                       dense
+                      :disabled="isAgeDisabled"
                       @input="handleAgeInput($event)"
                     ></v-text-field>
                   </v-col>
@@ -186,6 +187,7 @@
                       placeholder="Select..."
                       density="compact"
                       dense
+                      :disabled="isHeightDisabled"
                       @input="handleHeightInput($event)"
                     ></v-text-field>
                   </v-col>
@@ -206,24 +208,25 @@
                       density="compact"
                       dense
                       @input="handleBHA50SiteIndexInput($event)"
+                      :disabled="isBHA50SiteIndexDisabled"
                     ></v-text-field
                   ></v-col>
                 </v-row>
               </v-col>
               <v-col cols="6">
                 <div class="mt-2">
-                  <v-radio-group v-model="floating" row>
+                  <v-radio-group
+                    v-model="floating"
+                    row
+                    :disabled="isFloatingDisabled"
+                  >
                     <v-radio
-                      label="float"
-                      value="ageFloat"
+                      v-for="option in floatingOptions"
+                      :key="option.value"
+                      :label="option.label"
+                      :value="option.value"
                       style="margin-bottom: 45px"
                     ></v-radio>
-                    <v-radio
-                      label="float"
-                      value="heightFloat"
-                      style="margin-bottom: 45px"
-                    ></v-radio>
-                    <v-radio label="float" value="siteIndexFloat"></v-radio>
                   </v-radio-group>
                 </div>
               </v-col>
@@ -250,17 +253,21 @@ import {
   siteIndexCurveOptions,
   siteSpeciesValuesOptions,
   ageTypeOptions,
+  floatingOptions,
 } from '@/constants/options'
-import { DERIVED_BY } from '@/constants/constants'
+import {
+  DERIVED_BY,
+  SITE_SPECIES_VALUES,
+  FLOATING,
+} from '@/constants/constants'
 
 const panelOpen = ref(0)
-
-const floating = ref(null)
 
 const modelParameterStore = useModelParameterStore()
 const {
   derivedBy,
   speciesGroups,
+  highestPercentSpecies,
   selectedSiteSpecies,
   becZone,
   ecoZone,
@@ -271,6 +278,7 @@ const {
   age,
   height,
   bha50SiteIndex,
+  floating,
 } = storeToRefs(modelParameterStore)
 
 const computedBecZoneOptions = computed(() =>
@@ -287,18 +295,73 @@ const siteSpeciesOptions = computed(() =>
   })),
 )
 
-const isSiteSpeciesValueComputed = ref(false)
+const isSiteSpeciesValueDisabled = ref(false)
+const isAgeTypeDisabled = ref(false)
+const isAgeDisabled = ref(false)
+const isHeightDisabled = ref(false)
+const isBHA50SiteIndexDisabled = ref(false)
+const isFloatingDisabled = ref(false)
+
+const setFloatingState = (newFloating: string | null) => {
+  isAgeTypeDisabled.value = false
+  isAgeDisabled.value = false
+  isHeightDisabled.value = false
+  isBHA50SiteIndexDisabled.value = false
+  floating.value = newFloating
+
+  if (newFloating === FLOATING.AGE) {
+    isAgeTypeDisabled.value = true
+    isAgeDisabled.value = true
+  } else if (newFloating === FLOATING.HEIGHT) {
+    isHeightDisabled.value = true
+  } else if (newFloating === FLOATING.SITEINDEX) {
+    isBHA50SiteIndexDisabled.value = true
+  }
+}
+
+const handleSiteSpeciesValuesState = (
+  newSiteSpeciesValues: string | null,
+  newFloating: string | null,
+) => {
+  if (newSiteSpeciesValues === SITE_SPECIES_VALUES.COMPUTED) {
+    isFloatingDisabled.value = false
+    setFloatingState(newFloating)
+  } else if (newSiteSpeciesValues === SITE_SPECIES_VALUES.SUPPLIED) {
+    isAgeTypeDisabled.value = true
+    isAgeDisabled.value = true
+    isHeightDisabled.value = true
+    isBHA50SiteIndexDisabled.value = false
+    isFloatingDisabled.value = true
+  }
+}
+
+const handleDerivedByChange = (
+  newDerivedBy: string | null,
+  newSiteSpecies: string | null,
+  newSiteSpeciesValues: string | null,
+  newFloating: string | null,
+) => {
+  if (newDerivedBy === DERIVED_BY.VOLUME) {
+    incSecondaryHeight.value = false
+    handleSiteSpeciesValuesState(newSiteSpeciesValues, newFloating)
+  } else if (newDerivedBy === DERIVED_BY.BASAL_AREA) {
+    isSiteSpeciesValueDisabled.value =
+      newSiteSpecies !== highestPercentSpecies.value
+    handleSiteSpeciesValuesState(newSiteSpeciesValues, newFloating)
+  }
+}
 
 watch(
-  derivedBy,
-  (newValue) => {
-    if (newValue === DERIVED_BY.VOLUME) {
-      incSecondaryHeight.value = false
-    } else if (newValue === DERIVED_BY.BASAL_AREA) {
-      //
-    }
+  [derivedBy, selectedSiteSpecies, siteSpeciesValues, floating],
+  ([newDerivedBy, newSiteSpecies, newSiteSpeciesValues, newFloating]) => {
+    handleDerivedByChange(
+      newDerivedBy,
+      newSiteSpecies,
+      newSiteSpeciesValues,
+      newFloating,
+    )
   },
-  { immediate: true }, // make it responsive from the start with 'immediate' settings
+  { immediate: true },
 )
 
 const handleAgeInput = (event: Event) => {

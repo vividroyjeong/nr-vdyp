@@ -18,3 +18,14 @@ export const DERIVED_BY = Object.freeze({
   VOLUME: 'Volume',
   BASAL_AREA: 'Basal Area',
 })
+
+export const SITE_SPECIES_VALUES = Object.freeze({
+  COMPUTED: 'Computed',
+  SUPPLIED: 'Supplied',
+})
+
+export const FLOATING = Object.freeze({
+  AGE: 'Age',
+  HEIGHT: 'Height',
+  SITEINDEX: 'SiteIndex',
+})

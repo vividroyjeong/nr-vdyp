@@ -49,6 +49,12 @@ export const siteIndexCurveOptions = [
   { label: 'Thrower (1994)', value: 'Thrower (1994)' },
 ]
 
+export const floatingOptions = [
+  { label: 'Float', value: 'Age' },
+  { label: 'Float', value: 'Height' },
+  { label: 'Float', value: 'SiteIndex' },
+]
+
 export const minimumDBHLimitsOptions = [
   { label: '4.0 cm+', value: '4.0 cm+' },
   { label: '7.5 cm+', value: '7.5 cm+' },
