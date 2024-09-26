@@ -4,28 +4,56 @@ export const derivedByOptions = [
 ]
 
 export const speciesMap = {
-  PL: 'Lodgepole',
-  AC: 'Popular',
+  AC: 'Poplar',
+  AT: 'Aspen',
+  B: 'True Fir',
+  BA: 'Amabilis Fir',
+  BG: 'Grand Fir',
+  BL: 'Alpine Fir',
+  CW: 'Western Red Cedar',
+  DR: 'Red Alder',
+  E: 'Birch',
+  EA: 'Alaska Paper Birch',
+  EP: 'Common Paper Birch',
+  FD: 'Douglas Fir',
   H: 'Hemlock',
+  HM: 'Mountain Hemlock',
+  HW: 'Western Hemlock',
+  L: 'Larch',
+  LA: 'Alpine Larch',
+  LT: 'Tamarack',
+  LW: 'Western Larch',
+  MB: 'Bigleaf Maple',
+  PA: 'Whitebark Pine',
+  PF: 'Limber Pine',
+  PJ: 'Jack Pine',
+  PL: 'Lodgepole Pine',
+  PW: 'Western White Pine',
+  PY: 'Ponderosa (Yellow) Pine',
   S: 'Spruce',
+  SB: 'Black Spruce',
+  SE: 'Engelmann Spruce',
+  SS: 'Sitka Spruce',
+  SW: 'White Spruce',
+  YC: 'Yellow Cedar',
 }
 
-export const becZoneMap = {
-  AT: 'Alpine Tundra',
-  BG: 'Bunch Grass',
-  BWBS: 'Boreal White and Black Spruce',
-  CDF: 'Coastal Douglas Fir',
-  CWH: 'Coastal Western Hemlock',
-  ESSF: 'Engelmann Spruce',
-  ICH: 'Interior Cedar Hemlock',
-  IDF: 'Interior Douglas Fir',
-  MH: 'Mountain Hemlock',
-  MS: 'Montane Spruce',
-  PP: 'Ponderosa Pine',
-  SBPS: 'Sub-Boreal Pine-Spruce',
-  SBS: 'Sub-Boreal Spruce',
-  SWB: 'Spruce-Willow-Birch',
-}
+export const becZoneOptions = [
+  { label: 'AT - Alpine Tundra', value: '1' },
+  { label: 'BG - Bunch Grass', value: '2' },
+  { label: 'BWBS - Boreal White and Black Spruce', value: '3' },
+  { label: 'CDF - Coastal Douglas Fir', value: '4' },
+  { label: 'CWH - Coastal Western Hemlock', value: '5' },
+  { label: 'ESSF - Engelmann Spruce', value: '6' },
+  { label: 'ICH - Interior Cedar Hemlock', value: '7' },
+  { label: 'IDF - Interior Douglas Fir', value: '8' },
+  { label: 'MH - Mountain Hemlock', value: '9' },
+  { label: 'MS - Montane Spruce', value: '10' },
+  { label: 'PP - Ponderosa Pine', value: '11' },
+  { label: 'SBPS - Sub-Boreal Pine-Spruce', value: '12' },
+  { label: 'SBS - Sub-Boreal Spruce', value: '13' },
+  { label: 'SWB - Spruce-Willow-Birch', value: '14' },
+]
 
 export const siteSpeciesValuesOptions = [
   { label: 'Computed', value: 'Computed' },
@@ -38,11 +66,11 @@ export const ageTypeOptions = [
 ]
 
 export const ecoZoneOptions = [
-  { label: 'Boreal Cordillera', value: 'Boreal Cordillera' },
-  { label: 'Boreal Plains', value: 'Boreal Plains' },
-  { label: 'Montane Cordillera', value: 'Montane Cordillera' },
-  { label: 'Pacific Maritime', value: 'Pacific Maritime' },
-  { label: 'Taiga Plains', value: 'Taiga Plains' },
+  { label: 'Boreal Cordillera', value: '1' },
+  { label: 'Boreal Plains', value: '2' },
+  { label: 'Montane Cordillera', value: '3' },
+  { label: 'Pacific Maritime', value: '4' },
+  { label: 'Taiga Plains', value: '5' },
 ]
 
 export const siteIndexCurveOptions = [
@@ -89,4 +117,7 @@ export const includeInReportOptions = [
   { label: 'Culmination Values', value: 'Culmination Values' },
 ]
 
-export const projectionTypeOptions = [{ label: '', value: '' }]
+export const projectionTypeOptions = [
+  { label: 'Volume', value: 'Volume' },
+  { label: 'CFS Biomass', value: 'CFS Biomass' },
+]
