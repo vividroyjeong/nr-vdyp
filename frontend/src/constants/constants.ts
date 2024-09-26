@@ -29,3 +29,8 @@ export const FLOATING = Object.freeze({
   HEIGHT: 'Height',
   SITEINDEX: 'SiteIndex',
 })
+
+export const COMPUTED_VALUES = Object.freeze({
+  USE: 'Use Computed Values',
+  MODIFY: 'Modify Computed Values',
+})

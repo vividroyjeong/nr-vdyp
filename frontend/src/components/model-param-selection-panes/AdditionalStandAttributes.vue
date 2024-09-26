@@ -19,7 +19,12 @@
           <div>
             <v-row>
               <v-col cols="auto">
-                <v-radio-group v-model="computedValues" density="compact" dense>
+                <v-radio-group
+                  v-model="computedValues"
+                  density="compact"
+                  dense
+                  :disabled="isComputedValuesDisabled"
+                >
                   <v-radio
                     v-for="option in additionalStandAttributesOptions"
                     :key="option.value"
@@ -45,6 +50,7 @@
                   placeholder="N/A"
                   density="compact"
                   dense
+                  :disabled="isLoreyHeightDisabled"
                 ></v-text-field>
               </v-col>
               <v-col class="col-space-3" />
@@ -60,6 +66,7 @@
                   placeholder="N/A"
                   density="compact"
                   dense
+                  :disabled="isWholeStemVolume75cmDisabled"
                 >
                   <template v-slot:label>
                     Whole Stem Volume - 7.5cm+ (m<sup>3</sup>/ha)
@@ -71,15 +78,16 @@
               <v-col cols="3">
                 <v-text-field
                   type="number"
-                  v-model="basalArea"
+                  v-model="basalArea125cm"
                   min="0"
                   step="0.0001"
                   :rules="[validateMinimum]"
-                  :error-messages="basalAreaError"
+                  :error-messages="basalArea125cmError"
                   persistent-placeholder
                   placeholder="N/A"
                   density="compact"
                   dense
+                  :disabled="isBasalArea125cmDisabled"
                 >
                   <template v-slot:label>
                     Basal Area - 12.5cm+ (m<sup>2</sup>/ha)
@@ -99,6 +107,7 @@
                   placeholder="N/A"
                   density="compact"
                   dense
+                  :disabled="isWholeStemVolume125cmDisabled"
                 >
                   <template v-slot:label>
                     Whole Stem Volume - 12.5cm+ (m<sup>3</sup>/ha)
@@ -119,6 +128,7 @@
                   placeholder="N/A"
                   density="compact"
                   dense
+                  :disabled="isCloseUtilVolumeDisabled"
                 >
                   <template v-slot:label>
                     Close Utilization Volume - 12.5cm+ (m<sup>3</sup>/ha)
@@ -138,6 +148,7 @@
                   placeholder="N/A"
                   density="compact"
                   dense
+                  :disabled="isCloseUtilNetDecayVolumeDisabled"
                 >
                   <template v-slot:label>
                     Close Utilization Net Decay Volume - 12.5cm+
@@ -159,6 +170,7 @@
                   placeholder="N/A"
                   density="compact"
                   dense
+                  :disabled="isCloseUtilNetDecayWasteVolumeDisabled"
                 >
                   <template v-slot:label>
                     Close Utilization Net Decay Waste Volume - 12.5cm+
@@ -180,19 +192,75 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useModelParameterStore } from '@/stores/modelParameterStore'
+import { storeToRefs } from 'pinia'
 import { additionalStandAttributesOptions } from '@/constants/options'
+import {
+  DERIVED_BY,
+  SITE_SPECIES_VALUES,
+  COMPUTED_VALUES,
+} from '@/constants/constants'
 
 const panelOpen = ref(0)
 
-const computedValues = ref('use')
-const loreyHeight = ref('21.83')
-const basalArea = ref('39.3337')
-const closeUtilVolume = ref('304.8')
-const closeUtilNetDecayWasteVolume = ref('245.5')
-const wholeStemVolume75cm = ref('332.4')
-const wholeStemVolume125cm = ref('328.1')
-const closeUtilNetDecayVolume = ref('263.6')
+const modelParameterStore = useModelParameterStore()
+const {
+  derivedBy,
+  siteSpeciesValues,
+  computedValues,
+  loreyHeight,
+  basalArea125cm,
+  closeUtilVolume,
+  closeUtilNetDecayWasteVolume,
+  wholeStemVolume75cm,
+  wholeStemVolume125cm,
+  closeUtilNetDecayVolume,
+} = storeToRefs(modelParameterStore)
+
+const isComputedValuesDisabled = ref(false)
+const isLoreyHeightDisabled = ref(false)
+const isWholeStemVolume75cmDisabled = ref(false)
+const isBasalArea125cmDisabled = ref(false)
+const isWholeStemVolume125cmDisabled = ref(false)
+const isCloseUtilVolumeDisabled = ref(false)
+const isCloseUtilNetDecayVolumeDisabled = ref(false)
+const isCloseUtilNetDecayWasteVolumeDisabled = ref(false)
+
+const updateComputedValuesState = (
+  newDerivedBy: string | null,
+  newSiteSpeciesValues: string | null,
+) => {
+  isComputedValuesDisabled.value = !(
+    newDerivedBy === DERIVED_BY.BASAL_AREA &&
+    newSiteSpeciesValues === SITE_SPECIES_VALUES.COMPUTED
+  )
+
+  if (isComputedValuesDisabled.value) {
+    computedValues.value = COMPUTED_VALUES.USE
+  }
+}
+
+const updateFieldDisabledStates = (newComputedValues: string | null) => {
+  const isDisabled = newComputedValues === COMPUTED_VALUES.USE
+
+  isLoreyHeightDisabled.value = isDisabled
+  isWholeStemVolume75cmDisabled.value = isDisabled
+  isBasalArea125cmDisabled.value = isDisabled
+  isWholeStemVolume125cmDisabled.value = isDisabled
+  isCloseUtilVolumeDisabled.value = isDisabled
+  isCloseUtilNetDecayVolumeDisabled.value = isDisabled
+  isCloseUtilNetDecayWasteVolumeDisabled.value = isDisabled
+}
+
+watch(
+  [derivedBy, siteSpeciesValues, computedValues],
+  ([newDerivedBy, newSiteSpeciesValues, newComputedValues]) => {
+    updateComputedValuesState(newDerivedBy, newSiteSpeciesValues)
+    updateFieldDisabledStates(newComputedValues)
+  },
+  { immediate: true },
+)
 
 const validateMinimum = (value: any) => {
   if (value === null || value === '') {
@@ -214,8 +282,8 @@ const wholeStemVolume75cmError = computed(() => {
   return error === true ? [] : [error]
 })
 
-const basalAreaError = computed(() => {
-  const error = validateMinimum(basalArea.value)
+const basalArea125cmError = computed(() => {
+  const error = validateMinimum(basalArea125cm.value)
   return error === true ? [] : [error]
 })
 

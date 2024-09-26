@@ -88,7 +88,18 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   const minimumDBHLimit = ref(null)
   const percentCrownClosure = ref<number | null>(null)
 
+  // additional stand attributes
+  const computedValues = ref<string | null>(null)
+  const loreyHeight = ref<number | null>(null)
+  const basalArea125cm = ref<number | null>(null)
+  const closeUtilVolume = ref<number | null>(null)
+  const closeUtilNetDecayWasteVolume = ref<number | null>(null)
+  const wholeStemVolume75cm = ref<number | null>(null)
+  const wholeStemVolume125cm = ref<number | null>(null)
+  const closeUtilNetDecayVolume = ref<number | null>(null)
+
   return {
+    // species info
     derivedBy,
     speciesList,
     speciesGroups,
@@ -98,6 +109,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     totalSpeciesGroupPercent,
     isOverTotalPercent,
     updateSpeciesGroup,
+    // site info
     becZone,
     ecoZone,
     incSecondaryHeight,
@@ -108,10 +120,20 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     height,
     bha50SiteIndex,
     floating,
+    // stand density
     percentStockableArea,
     basalArea,
     treesPerHectare,
     minimumDBHLimit,
     percentCrownClosure,
+    // additional stand attributes
+    computedValues,
+    loreyHeight,
+    basalArea125cm,
+    closeUtilVolume,
+    closeUtilNetDecayWasteVolume,
+    wholeStemVolume75cm,
+    wholeStemVolume125cm,
+    closeUtilNetDecayVolume,
   }
 })
