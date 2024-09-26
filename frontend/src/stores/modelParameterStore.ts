@@ -17,7 +17,12 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   )
 
   const speciesGroups = ref<
-    { group: string; percent: number; siteSpecies: string }[]
+    {
+      group: string
+      percent: number
+      siteSpecies: string
+      minimumDBHLimit: string
+    }[]
   >([])
 
   // determined in Species Information
@@ -60,6 +65,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
       group: key,
       percent: groupMap[key],
       siteSpecies: key,
+      minimumDBHLimit: '4.0 cm+', // TODO -dealing with defualt value
     }))
 
     speciesGroups.value.sort((a, b) => b.percent - a.percent)
@@ -98,6 +104,14 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   const wholeStemVolume125cm = ref<number | null>(null)
   const closeUtilNetDecayVolume = ref<number | null>(null)
 
+  // report info
+  const startingAge = ref(null)
+  const finishingAge = ref(null)
+  const ageIncrement = ref(null)
+  const selectedVolumeReported = ref([])
+  const projectionType = ref(null)
+  const reportTitle = ref(null)
+
   return {
     // species info
     derivedBy,
@@ -135,5 +149,12 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     wholeStemVolume75cm,
     wholeStemVolume125cm,
     closeUtilNetDecayVolume,
+    // report info
+    startingAge,
+    finishingAge,
+    ageIncrement,
+    selectedVolumeReported,
+    projectionType,
+    reportTitle,
   }
 })

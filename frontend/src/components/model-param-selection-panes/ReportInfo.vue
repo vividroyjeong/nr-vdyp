@@ -153,12 +153,12 @@
             </v-row>
           </div>
           <div class="mt-5">
-            <v-row>
+            <v-row v-for="(group, index) in speciesGroups" :key="index">
               <v-col cols="3">
                 <v-text-field
-                  label="Minimum DBH Limit by Species #1"
+                  :label="`Minimum DBH Limit by Species #${index + 1}`"
                   type="string"
-                  v-model="minimumDBHLimit1"
+                  v-model="group.group"
                   persistent-placeholder
                   placeholder="Select..."
                   density="compact"
@@ -168,96 +168,8 @@
               </v-col>
               <v-col class="col-space-3" />
               <v-col cols="5" class="ma-5">
-                <!-- <div>value: {{ slidervalue1 }}</div> -->
                 <vue-slider
-                  v-model="slidervalue1"
-                  :data="minimumDBHLimitsOptions"
-                  :data-value="'value'"
-                  :data-label="'label'"
-                  :contained="true"
-                  :tooltip="'none'"
-                  :dotStyle="{ backgroundColor: '#787878' }"
-                  :rail-style="{ backgroundColor: '#f5f5f5' }"
-                  :process-style="{ backgroundColor: '#787878' }"
-                />
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="3">
-                <v-text-field
-                  label="Minimum DBH Limit by Species #2"
-                  type="string"
-                  v-model="minimumDBHLimit2"
-                  persistent-placeholder
-                  placeholder="Select..."
-                  density="compact"
-                  dense
-                  readonly
-                ></v-text-field>
-              </v-col>
-              <v-col class="col-space-3" />
-              <v-col cols="5" class="ma-5">
-                <!-- <div>value: {{ slidervalue2 }}</div> -->
-                <vue-slider
-                  v-model="slidervalue2"
-                  :data="minimumDBHLimitsOptions"
-                  :data-value="'value'"
-                  :data-label="'label'"
-                  :contained="true"
-                  :tooltip="'none'"
-                  :dotStyle="{ backgroundColor: '#787878' }"
-                  :rail-style="{ backgroundColor: '#f5f5f5' }"
-                  :process-style="{ backgroundColor: '#787878' }"
-                />
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="3">
-                <v-text-field
-                  label="Minimum DBH Limit by Species #3"
-                  type="string"
-                  v-model="minimumDBHLimit3"
-                  persistent-placeholder
-                  placeholder="Select..."
-                  density="compact"
-                  dense
-                  readonly
-                ></v-text-field>
-              </v-col>
-              <v-col class="col-space-3" />
-              <v-col cols="5" class="ma-5">
-                <!-- <div>value: {{ slidervalue3 }}</div> -->
-                <vue-slider
-                  v-model="slidervalue3"
-                  :data="minimumDBHLimitsOptions"
-                  :data-value="'value'"
-                  :data-label="'label'"
-                  :contained="true"
-                  :tooltip="'none'"
-                  :dotStyle="{ backgroundColor: '#787878' }"
-                  :rail-style="{ backgroundColor: '#f5f5f5' }"
-                  :process-style="{ backgroundColor: '#787878' }"
-                />
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="3">
-                <v-text-field
-                  label="Minimum DBH Limit by Species #4"
-                  type="string"
-                  v-model="minimumDBHLimit4"
-                  persistent-placeholder
-                  placeholder="Select..."
-                  density="compact"
-                  dense
-                  readonly
-                ></v-text-field>
-              </v-col>
-              <v-col class="col-space-3" />
-              <v-col cols="5" class="ma-5">
-                <!-- <div>value: {{ slidervalue4 }}</div> -->
-                <vue-slider
-                  v-model="slidervalue4"
+                  v-model="group.minimumDBHLimit"
                   :data="minimumDBHLimitsOptions"
                   :data-value="'value'"
                   :data-label="'label'"
@@ -283,6 +195,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useModelParameterStore } from '@/stores/modelParameterStore'
+import { storeToRefs } from 'pinia'
 import VueSlider from 'vue-slider-component'
 import 'vue-slider-component/theme/default.css'
 import {
@@ -294,22 +208,16 @@ import {
 
 const panelOpen = ref(0)
 
-const startingAge = ref(null)
-const finishingAge = ref(null)
-const ageIncrement = ref(null)
-const selectedVolumeReported = ref([])
-const projectionType = ref(null)
-const reportTitle = ref(null)
-
-const minimumDBHLimit1 = ref(null)
-const minimumDBHLimit2 = ref(null)
-const minimumDBHLimit3 = ref(null)
-const minimumDBHLimit4 = ref(null)
-
-const slidervalue1 = ref(4.0)
-const slidervalue2 = ref(4.0)
-const slidervalue3 = ref(4.0)
-const slidervalue4 = ref(4.0)
+const modelParameterStore = useModelParameterStore()
+const {
+  speciesGroups,
+  startingAge,
+  finishingAge,
+  ageIncrement,
+  selectedVolumeReported,
+  projectionType,
+  reportTitle,
+} = storeToRefs(modelParameterStore)
 
 const validateAge = (value: any) => {
   if (value === null || value === '') {
