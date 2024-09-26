@@ -47,6 +47,7 @@
                   placeholder="N/A"
                   density="compact"
                   dense
+                  :disabled="isBasalAreaDisabled"
                 >
                   <template v-slot:label>
                     Basal Area (m<sup>2</sup>/ha)
@@ -68,6 +69,7 @@
                   placeholder="N/A"
                   density="compact"
                   dense
+                  :disabled="isTreesPerHectareDisabled"
                 ></v-text-field>
               </v-col>
               <v-col class="col-space-3" />
@@ -84,6 +86,7 @@
                   placeholder="Select..."
                   density="compact"
                   dense
+                  disabled
                 ></v-select>
               </v-col>
             </v-row>
@@ -102,6 +105,7 @@
                   placeholder="N/A"
                   density="compact"
                   dense
+                  :disabled="isPercentCrownClosureDisabled"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -118,21 +122,59 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
 import { storeToRefs } from 'pinia'
 import { minimumDBHLimitsOptions } from '@/constants/options'
+import { DERIVED_BY, SITE_SPECIES_VALUES } from '@/constants/constants'
 
 const panelOpen = ref(0)
 
 const modelParameterStore = useModelParameterStore()
 const {
+  derivedBy,
+  siteSpeciesValues,
   percentStockableArea,
   basalArea,
   treesPerHectare,
   minimumDBHLimit,
   percentCrownClosure,
 } = storeToRefs(modelParameterStore)
+
+const isPercentCrownClosureDisabled = ref(false)
+const isBasalAreaDisabled = ref(false)
+const isTreesPerHectareDisabled = ref(false)
+
+const updatePercentCrownClosureState = (
+  newDerivedBy: string | null,
+  newSiteSpeciesValues: string | null,
+) => {
+  isPercentCrownClosureDisabled.value = !(
+    newDerivedBy === DERIVED_BY.VOLUME &&
+    newSiteSpeciesValues === SITE_SPECIES_VALUES.COMPUTED
+  )
+}
+
+const updateBasalAreaAndTreesState = (
+  newDerivedBy: string | null,
+  newSiteSpeciesValues: string | null,
+) => {
+  const isBasalAreaEnabled =
+    newDerivedBy === DERIVED_BY.BASAL_AREA &&
+    newSiteSpeciesValues === SITE_SPECIES_VALUES.COMPUTED
+
+  isBasalAreaDisabled.value = !isBasalAreaEnabled
+  isTreesPerHectareDisabled.value = !isBasalAreaEnabled
+}
+
+watch(
+  [derivedBy, siteSpeciesValues],
+  ([newDerivedBy, newSiteSpeciesValues]) => {
+    updatePercentCrownClosureState(newDerivedBy, newSiteSpeciesValues)
+    updateBasalAreaAndTreesState(newDerivedBy, newSiteSpeciesValues)
+  },
+  { immediate: true },
+)
 
 const validatePercentStockableArea = (value: any) => {
   if (value === null || value === '') {
