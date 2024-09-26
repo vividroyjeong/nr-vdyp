@@ -61,7 +61,7 @@
                       label="Include Secondary Dominant Height in Yield Table"
                       v-model="incSecondaryHeight"
                       hide-details="auto"
-                      :disabled="derivedBy === DERIVED_BY.VOLUME"
+                      :disabled="isIncSecondaryHeightDisabled"
                     ></v-checkbox>
                   </v-col>
                 </v-row>
@@ -83,14 +83,14 @@
                       placeholder="Select..."
                       density="compact"
                       dense
-                      :disabled="derivedBy === DERIVED_BY.VOLUME"
+                      :disabled="isSelectedSiteSpeciesDisabled"
                     ></v-select>
                   </v-col>
                   <v-col class="col-space-6" />
                   <v-col>
                     <v-select
                       label="Site Index Curve"
-                      :items="siteIndexCurveOptions"
+                      :items="computedSpeciesOptions"
                       v-model="siteIndexCurve"
                       item-title="label"
                       item-value="value"
@@ -99,9 +99,9 @@
                       placeholder="Select..."
                       density="compact"
                       dense
-                      readonly
-                    ></v-select>
-                  </v-col>
+                      disabled
+                    ></v-select
+                  ></v-col>
                 </v-row>
               </v-col>
               <v-col class="col-space-6" />
@@ -250,7 +250,7 @@ import { storeToRefs } from 'pinia'
 import {
   becZoneOptions,
   ecoZoneOptions,
-  siteIndexCurveOptions,
+  siteIndexCurveMap,
   siteSpeciesValuesOptions,
   ageTypeOptions,
   floatingOptions,
@@ -281,6 +281,15 @@ const {
   floating,
 } = storeToRefs(modelParameterStore)
 
+const computedSpeciesOptions = computed(() =>
+  (Object.keys(siteIndexCurveMap) as Array<keyof typeof siteIndexCurveMap>).map(
+    (code) => ({
+      label: `${siteIndexCurveMap[code]}`,
+      value: code,
+    }),
+  ),
+)
+
 const siteSpeciesOptions = computed(() =>
   speciesGroups.value.map((group) => ({
     label: group.siteSpecies,
@@ -288,6 +297,8 @@ const siteSpeciesOptions = computed(() =>
   })),
 )
 
+const isIncSecondaryHeightDisabled = ref(false)
+const isSelectedSiteSpeciesDisabled = ref(false)
 const isSiteSpeciesValueDisabled = ref(false)
 const isAgeTypeDisabled = ref(false)
 const isAgeDisabled = ref(false)
@@ -336,13 +347,30 @@ const handleDerivedByChange = (
 ) => {
   if (newDerivedBy === DERIVED_BY.VOLUME) {
     incSecondaryHeight.value = false
+    isIncSecondaryHeightDisabled.value = true
+    isSelectedSiteSpeciesDisabled.value = true
     handleSiteSpeciesValuesState(newSiteSpeciesValues, newFloating)
   } else if (newDerivedBy === DERIVED_BY.BASAL_AREA) {
+    isIncSecondaryHeightDisabled.value = false
+    isSelectedSiteSpeciesDisabled.value = false
     isSiteSpeciesValueDisabled.value =
       newSiteSpecies !== highestPercentSpecies.value
     handleSiteSpeciesValuesState(newSiteSpeciesValues, newFloating)
   }
 }
+
+// Update siteIndexCurve based on selectedSiteSpecies
+watch(selectedSiteSpecies, (newSiteSpecies) => {
+  if (
+    newSiteSpecies &&
+    siteIndexCurveMap[newSiteSpecies as keyof typeof siteIndexCurveMap]
+  ) {
+    siteIndexCurve.value =
+      siteIndexCurveMap[newSiteSpecies as keyof typeof siteIndexCurveMap]
+  } else {
+    siteIndexCurve.value = null // Clear if no mapping found
+  }
+})
 
 watch(
   [derivedBy, selectedSiteSpecies, siteSpeciesValues, floating],

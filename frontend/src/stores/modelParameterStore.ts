@@ -79,7 +79,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   const becZone = ref(null)
   const ecoZone = ref(null)
   const incSecondaryHeight = ref(false)
-  const siteIndexCurve = ref(null)
+  const siteIndexCurve = ref<string | null>(null)
   const siteSpeciesValues = ref<string | null>(null)
   const ageType = ref(null)
   const age = ref<number | null>(null)
