@@ -1,13 +1,15 @@
 <template>
   <v-card class="elevation-4">
-    <v-expansion-panels v-model="panelOpen">
+    <v-expansion-panels v-model="panelOpenStates.additionalStandAttributes">
       <v-expansion-panel hide-actions>
         <v-expansion-panel-title>
           <v-row no-gutters class="expander-header">
             <!-- Place an arrow icon to the left of the title -->
             <v-col cols="auto" class="expansion-panel-icon-col">
               <v-icon class="expansion-panel-icon">{{
-                panelOpen === 0 ? 'mdi-chevron-up' : 'mdi-chevron-down'
+                panelOpenStates.additionalStandAttributes === 0
+                  ? 'mdi-chevron-up'
+                  : 'mdi-chevron-down'
               }}</v-icon>
             </v-col>
             <v-col>
@@ -202,10 +204,9 @@ import {
   COMPUTED_VALUES,
 } from '@/constants/constants'
 
-const panelOpen = ref(0)
-
 const modelParameterStore = useModelParameterStore()
 const {
+  panelOpenStates,
   derivedBy,
   siteSpeciesValues,
   computedValues,

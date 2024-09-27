@@ -2,6 +2,15 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
 export const useModelParameterStore = defineStore('modelParameter', () => {
+  // panel open
+  const panelOpenStates = ref({
+    speciesInfo: 0, // 0: open, -1: closed
+    siteInfo: -1,
+    standDensity: -1,
+    additionalStandAttributes: -1,
+    reportInfo: -1,
+  })
+
   // species info
   const derivedBy = ref(null)
 
@@ -113,6 +122,8 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   const reportTitle = ref(null)
 
   return {
+    // panel open
+    panelOpenStates,
     // species info
     derivedBy,
     speciesList,

@@ -1,13 +1,15 @@
 <template>
   <v-card class="elevation-4">
-    <v-expansion-panels v-model="panelOpen">
+    <v-expansion-panels v-model="panelOpenStates.reportInfo">
       <v-expansion-panel hide-actions>
         <v-expansion-panel-title>
           <v-row no-gutters class="expander-header">
             <!-- Place an arrow icon to the left of the title -->
             <v-col cols="auto" class="expansion-panel-icon-col">
               <v-icon class="expansion-panel-icon">{{
-                panelOpen === 0 ? 'mdi-chevron-up' : 'mdi-chevron-down'
+                panelOpenStates.reportInfo === 0
+                  ? 'mdi-chevron-up'
+                  : 'mdi-chevron-down'
               }}</v-icon>
             </v-col>
             <v-col>
@@ -194,7 +196,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
 import { storeToRefs } from 'pinia'
 import VueSlider from 'vue-slider-component'
@@ -206,10 +208,9 @@ import {
   minimumDBHLimitsOptions,
 } from '@/constants/options'
 
-const panelOpen = ref(0)
-
 const modelParameterStore = useModelParameterStore()
 const {
+  panelOpenStates,
   speciesGroups,
   startingAge,
   finishingAge,
