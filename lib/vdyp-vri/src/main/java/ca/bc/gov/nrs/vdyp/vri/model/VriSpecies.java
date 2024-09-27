@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.vdyp.vri.model;
 
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -64,6 +65,16 @@ public class VriSpecies extends BaseVdypSpecies<VriSite> {
 				builder.siteGenus(this.genus);
 			});
 		}
+
+		@Override
+		public BaseVdypSpecies.Builder<VriSpecies, VriSite, VriSite.Builder>
+				copySite(VriSite toCopy, BiConsumer<VriSite.Builder, VriSite> config) {
+			return super.copySite(toCopy, (builder, toCopy2) -> {
+				builder.copy(toCopy2);
+				config.accept(builder, toCopy2);
+			});
+		}
+
 	}
 
 	@Override

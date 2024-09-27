@@ -57,6 +57,7 @@ import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
 import ca.bc.gov.nrs.vdyp.model.CompatibilityVariableMode;
+import ca.bc.gov.nrs.vdyp.model.GenusDefinitionMap;
 import ca.bc.gov.nrs.vdyp.model.InputLayer;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap;
@@ -171,9 +172,6 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 	public EstimationMethods estimationMethods;
 
-	static final Comparator<BaseVdypSpecies<?>> PERCENT_GENUS_DESCENDING = Utils
-			.compareUsing(BaseVdypSpecies<?>::getPercentGenus).reversed();
-
 	/**
 	 * When finding primary species these genera should be combined
 	 */
@@ -227,7 +225,12 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 		setControlMap(controlMap);
 		closeVriWriter();
-		vriWriter = new VdypOutputWriter(controlMap, resolver);
+		vriWriter = createWriter(resolver, controlMap);
+	}
+
+	protected VdypOutputWriter createWriter(FileSystemFileResolver resolver, Map<String, Object> controlMap)
+			throws IOException {
+		return new VdypOutputWriter(controlMap, resolver);
 	}
 
 	protected abstract BaseControlParser getControlFileParser();
@@ -251,9 +254,13 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 
 			return factory.get();
 		} catch (IllegalStateException ex) {
-			throw new ProcessingException(String.format("Data file %s not specified in control map.", key), ex);
+			throw new ProcessingException(
+					MessageFormat.format(
+							"Data file {0} ({1}) not specified in control map.", key, Utils.optPretty(key.sequence)
+					), ex
+			);
 		} catch (IOException ex) {
-			throw new ProcessingException("Error while opening data file.", ex);
+			throw new ProcessingException(MessageFormat.format("Error while opening data file {0}.", key), ex);
 		}
 	}
 
@@ -307,6 +314,14 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 	 * Returns the primary, and secondary if present species records as a one or two element list.
 	 */
 	protected List<S> findPrimarySpecies(Collection<S> allSpecies) {
+		var sp0Lookup = Utils.expectParsedControl(controlMap, ControlKey.SP0_DEF, GenusDefinitionMap.class);
+		final Comparator<BaseVdypSpecies<?>> percentGenusDescending = Utils.compareWithFallback(
+				// Sort first by percent
+				Utils.compareUsing(BaseVdypSpecies<?>::getPercentGenus).reversed(),
+				// Resolve ties using SP0 preference order which is equal to index.
+				Utils.compareUsing(spec -> sp0Lookup.getByAlias(spec.getGenus()).getIndex())
+		);
+
 		if (allSpecies.isEmpty()) {
 			throw new IllegalArgumentException("Can not find primary species as there are no species");
 		}
@@ -325,7 +340,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			}
 			var groupPrimary = copySpecies(
 					// groupSpecies.size() is at least 2 so findFirst will not be empty
-					groupSpecies.stream().sorted(PERCENT_GENUS_DESCENDING).findFirst().orElseThrow(), builder -> {
+					groupSpecies.stream().sorted(percentGenusDescending).findFirst().orElseThrow(), builder -> {
 						var total = (float) groupSpecies.stream().mapToDouble(BaseVdypSpecies::getPercentGenus).sum();
 						builder.percentGenus(total);
 					}
@@ -342,7 +357,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 		} else {
 			switch (this.getDebugMode(22)) {
 			case 0:
-				combined.values().stream().sorted(PERCENT_GENUS_DESCENDING).limit(2).forEach(result::add);
+				combined.values().stream().sorted(percentGenusDescending).limit(2).forEach(result::add);
 				break;
 			case 1:
 				// TODO
@@ -492,7 +507,9 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			}
 			return 41;
 		default:
-			throw new StandProcessingException("Unexpected primary species: " + primary.getGenus());
+			throw new StandProcessingException(
+					MessageFormat.format("Unexpected primary species: {0}", primary.getGenus())
+			);
 		}
 	}
 
@@ -992,7 +1009,7 @@ public abstract class VdypStartApplication<P extends BaseVdypPolygon<L, Optional
 			float conditionalExpectedBaseArea = conditionalExpectedBaseArea(spec, baseAreaSpec, region); // BACONDsp
 			conditionalExpectedBaseArea /= fractionAvailable;
 
-			float baseAreaSpecSmall = smallComponentProbability * conditionalExpectedBaseArea;
+			float baseAreaSpecSmall = smallComponentProbability * conditionalExpectedBaseArea; // BASMsp
 
 			// EMP082
 			float quadMeanDiameterSpecSmall = smallComponentQuadMeanDiameter(spec); // DQSMsp

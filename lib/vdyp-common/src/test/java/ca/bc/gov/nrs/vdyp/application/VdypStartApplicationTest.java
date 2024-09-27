@@ -33,6 +33,7 @@ import java.util.function.Consumer;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -164,7 +165,9 @@ class VdypStartApplicationTest {
 			var ex = assertThrows(
 					ProcessingException.class, () -> app.getStreamingParser(ControlKey.FIP_INPUT_YIELD_LAYER)
 			);
-			assertThat(ex, hasProperty("message", is("Data file FIP_INPUT_YIELD_LAYER not specified in control map.")));
+			assertThat(
+					ex, hasProperty("message", is("Data file FIP_INPUT_YIELD_LAYER (12) not specified in control map."))
+			);
 
 			app.close();
 		}
@@ -192,7 +195,7 @@ class VdypStartApplicationTest {
 			var ex = assertThrows(
 					ProcessingException.class, () -> app.getStreamingParser(ControlKey.FIP_INPUT_YIELD_LAYER)
 			);
-			assertThat(ex, hasProperty("message", is("Error while opening data file.")));
+			assertThat(ex, hasProperty("message", is("Error while opening data file FIP_INPUT_YIELD_LAYER.")));
 			assertThat(ex, causedBy(is(exception)));
 
 			mockControl.verify();
@@ -222,12 +225,18 @@ class VdypStartApplicationTest {
 
 	@Nested
 	class FindPrimarySpecies {
+		@BeforeEach
+		void init() {
+			controlMap = TestUtils.loadControlMap();
+		}
+
 		@Test
 		void testFindPrimarySpeciesNoSpecies() throws Exception {
 			var mockControl = EasyMock.createControl();
 
 			try (VdypStartApplication app = getTestUnit(mockControl)) {
 				mockControl.replay();
+				app.init(dummyIo(), controlMap);
 				var allSpecies = Collections.emptyList();
 				assertThrows(IllegalArgumentException.class, () -> app.findPrimarySpecies(allSpecies));
 			}
@@ -247,6 +256,7 @@ class VdypStartApplicationTest {
 			try (VdypStartApplication app = getTestUnit(mockControl)) {
 				EasyMock.expect(app.copySpecies(EasyMock.same(spec), EasyMock.anyObject())).andReturn(spec);
 				mockControl.replay();
+				app.init(dummyIo(), controlMap);
 				var allSpecies = List.of(spec);
 				List<BaseVdypSpecies> result = app.findPrimarySpecies(allSpecies);
 
@@ -281,6 +291,7 @@ class VdypStartApplicationTest {
 				EasyMock.expect(app.copySpecies(EasyMock.same(spec2), EasyMock.capture(configCapture)))
 						.andReturn(specCombined);
 				mockControl.replay();
+				app.init(dummyIo(), controlMap);
 
 				var allSpecies = List.of(spec1, spec2);
 
@@ -323,6 +334,7 @@ class VdypStartApplicationTest {
 				EasyMock.expect(app.copySpecies(EasyMock.same(spec1), EasyMock.capture(configCapture)))
 						.andReturn(specCombined);
 				mockControl.replay();
+				app.init(dummyIo(), controlMap);
 
 				var allSpecies = List.of(spec1, spec2);
 
@@ -366,6 +378,7 @@ class VdypStartApplicationTest {
 				EasyMock.expect(app.copySpecies(EasyMock.same(spec2), EasyMock.capture(configCapture)))
 						.andReturn(specCombined);
 				mockControl.replay();
+				app.init(dummyIo(), controlMap);
 
 				var allSpecies = List.of(spec1, spec2);
 
@@ -409,6 +422,7 @@ class VdypStartApplicationTest {
 				EasyMock.expect(app.copySpecies(EasyMock.same(spec1), EasyMock.capture(configCapture)))
 						.andReturn(specCombined);
 				mockControl.replay();
+				app.init(dummyIo(), controlMap);
 
 				var allSpecies = List.of(spec1, spec2);
 
@@ -433,11 +447,8 @@ class VdypStartApplicationTest {
 			BaseVdypSpecies spec1 = mockSpecies(mockControl, "B", 20f);
 			BaseVdypSpecies spec2 = mockSpecies(mockControl, "H", 70f);
 			BaseVdypSpecies spec3 = mockSpecies(mockControl, "MB", 10f);
-			BaseVdypSpecies.Builder copyBuilder = mockControl.createMock(BaseVdypSpecies.Builder.class); // Should not
-																											// have
-																											// any
-																											// methods
-																											// called.
+			BaseVdypSpecies.Builder copyBuilder = mockControl.createMock(BaseVdypSpecies.Builder.class);
+			// Should not have any methods called.
 
 			Capture<Consumer<BaseVdypSpecies.Builder>> copyCapture = Capture.newInstance();
 
@@ -447,8 +458,43 @@ class VdypStartApplicationTest {
 				EasyMock.expect(app.copySpecies(EasyMock.same(spec3), EasyMock.capture(copyCapture))).andReturn(spec3);
 				EasyMock.expect(app.getDebugMode(22)).andStubReturn(0);
 				mockControl.replay();
+				app.init(dummyIo(), controlMap);
 
 				var allSpecies = List.of(spec1, spec2, spec3);
+
+				List<BaseVdypSpecies> result = app.findPrimarySpecies(allSpecies);
+
+				assertThat(result, hasSize(2));
+				assertThat(result, contains(is(spec2), is(spec1)));
+
+				for (var config : copyCapture.getValues()) {
+					config.accept(copyBuilder);
+				}
+			}
+			mockControl.verify();
+
+		}
+
+		@Test
+		void testSortTie() throws Exception {
+
+			var mockControl = EasyMock.createControl();
+
+			BaseVdypSpecies spec1 = mockSpecies(mockControl, "H", 50f);
+			BaseVdypSpecies spec2 = mockSpecies(mockControl, "B", 50f);
+			BaseVdypSpecies.Builder copyBuilder = mockControl.createMock(BaseVdypSpecies.Builder.class);
+			// Should not have any methods called.
+
+			Capture<Consumer<BaseVdypSpecies.Builder>> copyCapture = Capture.newInstance();
+
+			try (VdypStartApplication app = getTestUnit(mockControl)) {
+				EasyMock.expect(app.copySpecies(EasyMock.same(spec1), EasyMock.capture(copyCapture))).andReturn(spec1);
+				EasyMock.expect(app.copySpecies(EasyMock.same(spec2), EasyMock.capture(copyCapture))).andReturn(spec2);
+				EasyMock.expect(app.getDebugMode(22)).andStubReturn(0);
+				mockControl.replay();
+				app.init(dummyIo(), controlMap);
+
+				var allSpecies = List.of(spec1, spec2);
 
 				List<BaseVdypSpecies> result = app.findPrimarySpecies(allSpecies);
 
