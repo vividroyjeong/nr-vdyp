@@ -173,8 +173,15 @@ class VdypOutputWriterTest {
 	void testWriteUtilizationForLayer() throws IOException {
 		try (var unit = new VdypOutputWriter(controlMap, fileResolver);) {
 
-			var layer = VdypLayer.build(builder -> {
+			var polygon = VdypPolygon.build(builder -> {
 				builder.polygonIdentifier("082E004    615       1988");
+
+				builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
+				builder.forestInventoryZone("D");
+
+				builder.percentAvailable(100f);
+			});
+			var layer = VdypLayer.build(polygon, builder -> {
 				builder.layerType(LayerType.PRIMARY);
 
 				builder.addSpecies(specBuilder -> {
@@ -233,7 +240,7 @@ class VdypOutputWriterTest {
 			// Should be ignored and computed from BA and TPH
 			layer.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f));
 
-			unit.writeUtilization(layer, layer);
+			unit.writeUtilization(polygon, layer, layer);
 		}
 		utilStream.assertContent(
 				VdypMatchers.hasLines(
@@ -253,8 +260,15 @@ class VdypOutputWriterTest {
 	void testWriteUtilizationZeroBaseArea() throws IOException {
 		try (var unit = new VdypOutputWriter(controlMap, fileResolver);) {
 
-			var layer = VdypLayer.build(builder -> {
+			var polygon = VdypPolygon.build(builder -> {
 				builder.polygonIdentifier("082E004    615       1988");
+
+				builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
+				builder.forestInventoryZone("D");
+
+				builder.percentAvailable(100f);
+			});
+			var layer = VdypLayer.build(polygon, builder -> {
 				builder.layerType(LayerType.PRIMARY);
 
 				builder.addSpecies(specBuilder -> {
@@ -311,7 +325,7 @@ class VdypOutputWriterTest {
 			// Should be ignored and computed from BA and TPH
 			species.setQuadraticMeanDiameterByUtilization(Utils.utilizationVector(4f, 4f, 4f, 4f, 4f, 4f));
 
-			unit.writeUtilization(layer, species);
+			unit.writeUtilization(polygon, layer, species);
 		}
 		utilStream.assertContent(
 				VdypMatchers.hasLines(
@@ -335,7 +349,7 @@ class VdypOutputWriterTest {
 			VdypPolygon polygon = VdypPolygon.build(builder -> {
 
 				builder.polygonIdentifier("082E004    615       1988");
-				builder.percentAvailable(90f);
+				builder.percentAvailable(100f);
 				builder.biogeoclimaticZone(Utils.getBec("IDF", controlMap));
 				builder.forestInventoryZone("D");
 				builder.mode(PolygonMode.START);
@@ -427,7 +441,7 @@ class VdypOutputWriterTest {
 
 			unit.writePolygonWithSpeciesAndUtilization(polygon);
 		}
-		polyStream.assertContent(is("082E004    615       1988 IDF  D    90 28119  1\n"));
+		polyStream.assertContent(is("082E004    615       1988 IDF  D   100 28119  1\n"));
 		utilStream.assertContent(
 				VdypMatchers.hasLines(
 						"082E004    615       1988 P  0    -1  0.02865     9.29   7.8377   0.1077   0.0000   0.0000   0.0000   0.0000   6.3", //

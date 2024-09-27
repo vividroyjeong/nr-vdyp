@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,6 +17,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -232,7 +232,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 						layer.getPolygonIdentifier(), polygon.getPolygonIdentifier()
 				);
 			}
-			layer.setSpecies(new HashMap<>());
 		}
 
 		polygon.setLayers(layers);
@@ -362,7 +361,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		switch (mode) {
 		case YOUNG:
 			log.atTrace().setMessage(SPECIAL_PROCESSING_LOG_TEMPLATE).addArgument(mode).log();
-			preProcessedPolygon = processYoung(polygon);
+			preProcessedPolygon = processBatn(processYoung(polygon));
 			break;
 		case BATC:
 			log.atTrace().setMessage(SPECIAL_PROCESSING_LOG_TEMPLATE).addArgument(mode).log();
@@ -379,6 +378,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 		}
 
 		try {
+			var inputTph = new AtomicReference<Float>();
 			var result = Optional.of(VdypPolygon.build(pBuilder -> {
 				pBuilder.adapt(preProcessedPolygon, x -> x.orElse(0f));
 
@@ -393,7 +393,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 				if (preProcessedPolygon.getLayers().containsKey(LayerType.VETERAN)) {
 					pBuilder.addLayer(lBuilder -> {
 						try {
-							processVeteranLayer(preProcessedPolygon, lBuilder);
+							inputTph.set(processVeteranLayer(preProcessedPolygon, lBuilder));
 						} catch (StandProcessingException e) {
 							throw new RuntimeStandProcessingException(e);
 						}
@@ -416,9 +416,19 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					);
 
 					if (resultVeteranLayer != null) {
-
 						// YUCV
 						computeUtilizationComponentsVeteran(resultVeteranLayer, bec);
+
+						var input = inputTph.get();
+						var computed = resultVeteranLayer.getTreesPerHectareByUtilization().getAll();
+						if (FloatMath.abs(input - computed) / input > 0.0005) {
+							throw new StandProcessingException(
+									MessageFormat.format(
+											"Computed tree density sum {0} trees/ha did not match input {1} trees/ha",
+											computed, input
+									)
+							);
+						}
 
 					}
 				} catch (ProcessingException e) {
@@ -448,7 +458,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		// TPH_L1
 
-		// TPHsp
+		// TPHsp before the individual species loop, then the fortran variable gets re-used, see speciesDensity below
 		var primarySpeciesDensity = primarySpeciesPercent * primaryLayerDensity;
 
 		// HDL1 or HT_L1
@@ -484,10 +494,14 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			} else {
 				var loreyHeight = vriSite
 						.flatMap(site -> site.getHeight().filter(x -> getDebugMode(2) != 1).map(height -> {
+							// DQsp
 							float speciesQuadMeanDiameter = Math.max(
 									UtilizationClass.U75TO125.lowBound, height / leadHeight * layerQuadMeanDiameter
 							);
+
+							// TPHsp inside the individual species loop, see primarySpeciesDensity above
 							float speciesDensity = treesPerHectare(specBaseArea, speciesQuadMeanDiameter);
+
 							// EMP050
 							return (float) estimationMethods.primaryHeightFromLeadHeight(
 									site.getHeight().get(), site.getSiteGenus(), bec.getRegion(), speciesDensity
@@ -702,7 +716,6 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 					MessageFormat.format("Veteran layer trees per hectare ({0}) was not positive", baseArea)
 			);
 		}
-		var quadMeanDiameter = BaseAreaTreeDensityDiameter.quadMeanDiameter(baseArea, treesPerHectare); // DQ(0,0)
 
 		lBuilder.adaptSpecies(veteranLayer, (sBuilder, spec) -> {
 			applyGroups(bec, spec.getGenus(), sBuilder);
@@ -754,10 +767,8 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 		// Sum BA and TPH
 		float tphSum = 0; // TPH(0,4)
-		float baSum = 0; // BA(0,4)
 		for (var spec : specList) {
 			tphSum += spec.getTreesPerHectareByUtilization().getAll();
-			baSum += spec.getBaseAreaByUtilization().getAll();
 		}
 
 		if (polygon.getMode().filter(mode -> mode == PolygonMode.BATC).isPresent()) {
@@ -837,11 +848,11 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			this.getPercentTotal(layer); // Validate that percent total is close to 100%
 		Optional<VriSite> primarySite = layer.getPrimaryGenus().flatMap(id -> Utils.optSafe(layer.getSites().get(id)));
 		var ageTotal = primarySite.flatMap(VriSite::getAgeTotal);
-		var treesPerHectare = layer.getTreesPerHectare();
+		var yearsToBreastHeight = primarySite.flatMap(VriSite::getYearsToBreastHeight);
 		var height = primarySite.flatMap(VriSite::getHeight);
 		if (polygon.getMode().map(x -> x == PolygonMode.YOUNG).orElse(false)
 				&& layer.getLayerType() == LayerType.PRIMARY) {
-			if (ageTotal.map(x -> x <= 0f).orElse(true) || treesPerHectare.map(x -> x <= 0f).orElse(true)) {
+			if (ageTotal.map(x -> x <= 0f).orElse(true) || yearsToBreastHeight.map(x -> x <= 0f).orElse(true)) {
 				throw validationError(
 						"Age Total and Trees Per Hectare must be positive for a PRIMARY layer in mode YOUNG"
 				);
@@ -1160,8 +1171,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 
 	@Override
 	protected BaseControlParser getControlFileParser() {
-		// TODO Auto-generated method stub
-		return null;
+		return new VriControlParser();
 	}
 
 	@Override
@@ -1244,7 +1254,7 @@ public class VriStart extends VdypStartApplication<VriPolygon, VriLayer, VriSpec
 			return VriPolygon.build(pBuilder -> {
 				pBuilder.copy(poly);
 				pBuilder.polygonIdentifier(polygonIdentifier.forYear(year + (int) inc.ageIncrease));
-				pBuilder.mode(PolygonMode.BATN);
+				pBuilder.mode(PolygonMode.YOUNG);
 				pBuilder.copyLayers(poly, (lBuilder, layer) -> {
 
 					lBuilder.copySpecies(layer, (sBuilder, species) -> {

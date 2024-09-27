@@ -207,6 +207,32 @@ public class VdypOutputWriter implements Closeable {
 	}
 
 	/**
+	 * Returns a multiplier that will be applied to base area, tree density, and volume values when writing.
+	 *
+	 * @param polygon
+	 * @param layer
+	 * @return
+	 */
+	protected float fractionForest(VdypPolygon polygon, VdypLayer layer) {
+		return polygon.getPercentAvailable() / 100f;
+	}
+
+	/**
+	 * Multiply two values if the first is positive, otherwise return the first without modification.
+	 *
+	 * @param value
+	 * @param factor
+	 * @return
+	 */
+	float safeMultiply(float value, float factor) {
+		if (value <= 0) {
+			return value;
+		}
+
+		return value * factor;
+	}
+
+	/**
 	 * Write the utilization records for a layer or species to the utilization file.
 	 *
 	 * @param layer
@@ -214,13 +240,15 @@ public class VdypOutputWriter implements Closeable {
 	 * @throws IOException
 	 */
 	// V7W_AIU Internalized loop over utilization classes
-	void writeUtilization(VdypLayer layer, VdypUtilizationHolder utils) throws IOException {
+	void writeUtilization(VdypPolygon polygon, VdypLayer layer, VdypUtilizationHolder utils) throws IOException {
 		Optional<String> specId = Optional.empty();
 		Optional<Integer> specIndex = Optional.empty();
 		if (utils instanceof VdypSpecies spec) {
 			specId = Optional.of(spec.getGenus());
 			specIndex = Optional.of(spec.getGenusIndex());
 		}
+
+		float fractionForest = fractionForest(polygon, layer);
 
 		for (var uc : UtilizationClass.values()) {
 			Optional<Float> height = Optional.empty();
@@ -249,15 +277,18 @@ public class VdypOutputWriter implements Closeable {
 
 					uc.index,
 
-					utils.getBaseAreaByUtilization().getCoe(uc.index), //
-					utils.getTreesPerHectareByUtilization().getCoe(uc.index), //
+					utils.getBaseAreaByUtilization().getCoe(uc.index) * fractionForest, //
+					utils.getTreesPerHectareByUtilization().getCoe(uc.index) * fractionForest, //
 					height.orElse(EMPTY_FLOAT), //
 
-					utils.getWholeStemVolumeByUtilization().getCoe(uc.index), //
-					utils.getCloseUtilizationVolumeByUtilization().getCoe(uc.index), //
-					utils.getCloseUtilizationVolumeNetOfDecayByUtilization().getCoe(uc.index), //
-					utils.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization().getCoe(uc.index), //
-					utils.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization().getCoe(uc.index), //
+					utils.getWholeStemVolumeByUtilization().getCoe(uc.index) * fractionForest, //
+					utils.getCloseUtilizationVolumeByUtilization().getCoe(uc.index) * fractionForest, //
+					utils.getCloseUtilizationVolumeNetOfDecayByUtilization().getCoe(uc.index) * fractionForest, //
+					utils.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization().getCoe(uc.index) * fractionForest, //
+					safeMultiply(
+							utils.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization().getCoe(uc.index),
+							fractionForest
+					), //
 
 					quadMeanDiameter.orElse(layer.getLayerType() == LayerType.PRIMARY ? //
 							EMPTY_FLOAT : 0f
@@ -277,13 +308,13 @@ public class VdypOutputWriter implements Closeable {
 
 		writePolygon(polygon);
 		for (var layer : polygon.getLayers().values()) {
-			writeUtilization(layer, layer);
+			writeUtilization(polygon, layer, layer);
 			List<VdypSpecies> specs = new ArrayList<>(layer.getSpecies().size());
 			specs.addAll(layer.getSpecies().values());
 			specs.sort(Utils.compareUsing(BaseVdypSpecies::getGenus));
 			for (var species : specs) {
 				writeSpecies(layer, species);
-				writeUtilization(layer, species);
+				writeUtilization(polygon, layer, species);
 			}
 		}
 		writeSpeciesEndRecord(polygon);

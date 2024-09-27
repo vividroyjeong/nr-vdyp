@@ -54,9 +54,11 @@ import ca.bc.gov.nrs.vdyp.fip.model.FipLayerPrimary;
 import ca.bc.gov.nrs.vdyp.fip.model.FipPolygon;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSite;
 import ca.bc.gov.nrs.vdyp.fip.model.FipSpecies;
+import ca.bc.gov.nrs.vdyp.io.FileSystemFileResolver;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.control.BaseControlParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
+import ca.bc.gov.nrs.vdyp.io.write.VdypOutputWriter;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Coefficients;
@@ -89,6 +91,19 @@ public class FipStart extends VdypStartApplication<FipPolygon, FipLayer, FipSpec
 		try (var app = new FipStart();) {
 			doMain(app, args);
 		}
+	}
+
+	@Override
+	protected VdypOutputWriter createWriter(FileSystemFileResolver resolver, Map<String, Object> controlMap)
+			throws IOException {
+		return new VdypOutputWriter(controlMap, resolver) {
+
+			@Override
+			protected float fractionForest(VdypPolygon polygon, VdypLayer layer) {
+				return 1f;
+			}
+
+		};
 	}
 
 	// FIP_SUB

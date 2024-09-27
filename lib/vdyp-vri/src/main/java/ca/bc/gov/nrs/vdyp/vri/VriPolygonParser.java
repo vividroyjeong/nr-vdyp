@@ -61,8 +61,8 @@ public class VriPolygonParser implements ControlMapValueReplacer<StreamingParser
 					var nonproductiveDesc = (Optional<String>) entry.get(NONPRODUCTIVE_DESCRIPTION);
 					var yieldFactor = ((Optional<Float>) entry.get(YIELD_FACTOR)).filter(x -> x > 0.0f);
 					var percentForestLandWithDefault = percentForestLand.or(
-							() -> fipMode
-									.flatMap(mode -> mode == PolygonMode.BATC ? Optional.of(85f) : Optional.empty())
+							() -> fipMode.orElse(PolygonMode.START) != PolygonMode.BATC ? Optional.of(85f)
+									: Optional.empty()
 					);
 
 					BecDefinition bec;
