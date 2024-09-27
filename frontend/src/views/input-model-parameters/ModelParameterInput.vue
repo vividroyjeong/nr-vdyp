@@ -25,7 +25,7 @@
     <div class="hr-line"></div>
     <v-spacer class="space"></v-spacer>
     <v-tabs
-      v-model="currentTab"
+      v-model="tabStore.currentTab"
       :hideSlider="true"
       :centerActive="true"
       :showArrows="true"
@@ -38,7 +38,7 @@
         >{{ tab.label }}</v-tab
       >
     </v-tabs>
-    <v-tabs-window v-model="currentTab">
+    <v-tabs-window v-model="tabStore.currentTab">
       <v-tabs-window-item
         v-for="(tab, index) in tabs"
         :key="index"
@@ -48,42 +48,45 @@
       </v-tabs-window-item>
     </v-tabs-window>
 
-    <v-spacer class="space"></v-spacer>
-    <SiteInfo />
-    <v-spacer class="space"></v-spacer>
-    <StandDensity />
-    <v-spacer class="space"></v-spacer>
-    <AdditionalStandAttributes />
-    <v-spacer class="space"></v-spacer>
-    <ReportInfo />
+    <template v-if="tabStore.currentTab === 0">
+      <v-spacer class="space"></v-spacer>
+      <SiteInfo />
+      <v-spacer class="space"></v-spacer>
+      <StandDensity />
+      <v-spacer class="space"></v-spacer>
+      <AdditionalStandAttributes />
+      <v-spacer class="space"></v-spacer>
+      <ReportInfo />
 
-    <v-card
-      class="mt-5 pa-4"
-      elevation="0"
-      style="
-        padding-bottom: 16px !important;
-        background-color: #f6f6f6;
-        border: 1px solid #0000001f;
-        border-top-left-radius: 0px;
-        border-top-right-radius: 0px;
-        border-bottom-left-radius: 10px;
-        border-bottom-right-radius: 10px;
-        display: flex;
-        justify-content: end;
-        align-items: end;
-        text-align: end;
-      "
-    >
-      <v-btn class="white-btn elevation-0 mr-3" @click="cancel">Cancel</v-btn>
-      <v-btn class="blue-btn elevation-0 ml-1" @click="runModel"
-        >Run Model</v-btn
+      <v-card
+        class="mt-5 pa-4"
+        elevation="0"
+        style="
+          padding-bottom: 16px !important;
+          background-color: #f6f6f6;
+          border: 1px solid #0000001f;
+          border-top-left-radius: 0px;
+          border-top-right-radius: 0px;
+          border-bottom-left-radius: 10px;
+          border-bottom-right-radius: 10px;
+          display: flex;
+          justify-content: end;
+          align-items: end;
+          text-align: end;
+        "
       >
-    </v-card>
+        <v-btn class="white-btn elevation-0 mr-3" @click="cancel">Cancel</v-btn>
+        <v-btn class="blue-btn elevation-0 ml-1" @click="runModel"
+          >Run Model</v-btn
+        >
+      </v-card>
+    </template>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { useInputModelParamTabStore } from '@/stores/inputModelParamTabStore'
+
 import JobTypeSelection from '@/components/JobTypeSelection.vue'
 
 import ModelParameterSelection from '@/views/input-model-parameters/ModelParameterSelection.vue'
@@ -96,7 +99,7 @@ import StandDensity from '@/components/model-param-selection-panes/StandDensity.
 import AdditionalStandAttributes from '@/components/model-param-selection-panes/AdditionalStandAttributes.vue'
 import ReportInfo from '@/components/model-param-selection-panes/ReportInfo.vue'
 
-const currentTab = ref(0)
+const tabStore = useInputModelParamTabStore()
 
 const tabs = [
   { label: 'Model Parameter Selection', component: ModelParameterSelection },
