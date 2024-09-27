@@ -58,7 +58,7 @@
               <v-col class="col-space-6" />
               <v-col>
                 <v-row>
-                  <v-col cols="6">
+                  <v-col cols="12">
                     <v-checkbox
                       label="Include Secondary Dominant Height in Yield Table"
                       v-model="incSecondaryHeight"

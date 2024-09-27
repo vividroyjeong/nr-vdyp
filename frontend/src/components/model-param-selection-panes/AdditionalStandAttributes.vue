@@ -17,7 +17,7 @@
             </v-col>
           </v-row>
         </v-expansion-panel-title>
-        <v-expansion-panel-text class="expansion-panel-text mt-n3">
+        <v-expansion-panel-text class="expansion-panel-text mt-n2">
           <div>
             <v-row>
               <v-col cols="auto">
@@ -39,7 +39,7 @@
           </div>
           <div>
             <v-row>
-              <v-col cols="3">
+              <v-col cols="5">
                 <v-text-field
                   label="Lorey Height - 7.5cm+ (meters)"
                   type="number"
@@ -56,7 +56,7 @@
                 ></v-text-field>
               </v-col>
               <v-col class="col-space-3" />
-              <v-col cols="3">
+              <v-col cols="5">
                 <v-text-field
                   type="number"
                   v-model="wholeStemVolume75cm"
@@ -77,7 +77,7 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="3">
+              <v-col cols="5">
                 <v-text-field
                   type="number"
                   v-model="basalArea125cm"
@@ -97,7 +97,7 @@
                 </v-text-field>
               </v-col>
               <v-col class="col-space-3" />
-              <v-col cols="3">
+              <v-col cols="5">
                 <v-text-field
                   type="number"
                   v-model="wholeStemVolume125cm"
@@ -118,7 +118,7 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="3">
+              <v-col cols="5">
                 <v-text-field
                   type="number"
                   v-model="closeUtilVolume"
@@ -138,7 +138,7 @@
                 </v-text-field>
               </v-col>
               <v-col class="col-space-3" />
-              <v-col cols="3">
+              <v-col cols="5">
                 <v-text-field
                   type="number"
                   v-model="closeUtilNetDecayVolume"
@@ -160,7 +160,7 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="3">
+              <v-col cols="5">
                 <v-text-field
                   type="number"
                   v-model="closeUtilNetDecayWasteVolume"
