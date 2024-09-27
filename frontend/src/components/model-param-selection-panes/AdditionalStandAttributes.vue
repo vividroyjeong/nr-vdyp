@@ -19,14 +19,17 @@
           <div>
             <v-row>
               <v-col cols="auto">
-                <v-radio-group v-model="computedValues" density="compact" dense>
+                <v-radio-group
+                  v-model="computedValues"
+                  density="compact"
+                  dense
+                  :disabled="isComputedValuesDisabled"
+                >
                   <v-radio
-                    label="Use Computed Values (These additional Stand attributes require that a Stand Age and Basal Area be supplied on the Site Index and the Density pages)"
-                    value="use"
-                  ></v-radio>
-                  <v-radio
-                    label="Modify Computed Values"
-                    value="modify"
+                    v-for="option in additionalStandAttributesOptions"
+                    :key="option.value"
+                    :label="option.label"
+                    :value="option.value"
                   ></v-radio>
                 </v-radio-group>
               </v-col>
@@ -38,28 +41,32 @@
                 <v-text-field
                   label="Lorey Height - 7.5cm+ (meters)"
                   type="number"
-                  max="100"
-                  min="0"
-                  step="0.1"
                   v-model="loreyHeight"
+                  min="0"
+                  step="0.01"
+                  :rules="[validateMinimum]"
+                  :error-messages="loreyHeightError"
                   persistent-placeholder
                   placeholder="N/A"
                   density="compact"
                   dense
+                  :disabled="isLoreyHeightDisabled"
                 ></v-text-field>
               </v-col>
-              <v-col class="col-space" />
+              <v-col class="col-space-3" />
               <v-col cols="3">
                 <v-text-field
                   type="number"
                   v-model="wholeStemVolume75cm"
-                  max="100"
                   min="0"
                   step="0.1"
+                  :rules="[validateMinimum]"
+                  :error-messages="wholeStemVolume75cmError"
                   persistent-placeholder
                   placeholder="N/A"
                   density="compact"
                   dense
+                  :disabled="isWholeStemVolume75cmDisabled"
                 >
                   <template v-slot:label>
                     Whole Stem Volume - 7.5cm+ (m<sup>3</sup>/ha)
@@ -71,32 +78,36 @@
               <v-col cols="3">
                 <v-text-field
                   type="number"
-                  v-model="basalArea"
-                  max="100"
+                  v-model="basalArea125cm"
                   min="0"
-                  step="0.1"
+                  step="0.0001"
+                  :rules="[validateMinimum]"
+                  :error-messages="basalArea125cmError"
                   persistent-placeholder
                   placeholder="N/A"
                   density="compact"
                   dense
+                  :disabled="isBasalArea125cmDisabled"
                 >
                   <template v-slot:label>
                     Basal Area - 12.5cm+ (m<sup>2</sup>/ha)
                   </template>
                 </v-text-field>
               </v-col>
-              <v-col class="col-space" />
+              <v-col class="col-space-3" />
               <v-col cols="3">
                 <v-text-field
                   type="number"
                   v-model="wholeStemVolume125cm"
-                  max="100"
                   min="0"
                   step="0.1"
+                  :rules="[validateMinimum]"
+                  :error-messages="wholeStemVolume125cmError"
                   persistent-placeholder
                   placeholder="N/A"
                   density="compact"
                   dense
+                  :disabled="isWholeStemVolume125cmDisabled"
                 >
                   <template v-slot:label>
                     Whole Stem Volume - 12.5cm+ (m<sup>3</sup>/ha)
@@ -109,31 +120,35 @@
                 <v-text-field
                   type="number"
                   v-model="closeUtilVolume"
-                  max="100"
                   min="0"
                   step="0.1"
+                  :rules="[validateMinimum]"
+                  :error-messages="closeUtilVolumeError"
                   persistent-placeholder
                   placeholder="N/A"
                   density="compact"
                   dense
+                  :disabled="isCloseUtilVolumeDisabled"
                 >
                   <template v-slot:label>
                     Close Utilization Volume - 12.5cm+ (m<sup>3</sup>/ha)
                   </template>
                 </v-text-field>
               </v-col>
-              <v-col class="col-space" />
+              <v-col class="col-space-3" />
               <v-col cols="3">
                 <v-text-field
                   type="number"
                   v-model="closeUtilNetDecayVolume"
-                  max="100"
                   min="0"
                   step="0.1"
+                  :rules="[validateMinimum]"
+                  :error-messages="closeUtilNetDecayVolumeError"
                   persistent-placeholder
                   placeholder="N/A"
                   density="compact"
                   dense
+                  :disabled="isCloseUtilNetDecayVolumeDisabled"
                 >
                   <template v-slot:label>
                     Close Utilization Net Decay Volume - 12.5cm+
@@ -147,13 +162,15 @@
                 <v-text-field
                   type="number"
                   v-model="closeUtilNetDecayWasteVolume"
-                  max="100"
                   min="0"
                   step="0.1"
+                  :rules="[validateMinimum]"
+                  :error-messages="closeUtilNetDecayWasteVolumeError"
                   persistent-placeholder
                   placeholder="N/A"
                   density="compact"
                   dense
+                  :disabled="isCloseUtilNetDecayWasteVolumeDisabled"
                 >
                   <template v-slot:label>
                     Close Utilization Net Decay Waste Volume - 12.5cm+
@@ -175,18 +192,120 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useModelParameterStore } from '@/stores/modelParameterStore'
+import { storeToRefs } from 'pinia'
+import { additionalStandAttributesOptions } from '@/constants/options'
+import {
+  DERIVED_BY,
+  SITE_SPECIES_VALUES,
+  COMPUTED_VALUES,
+} from '@/constants/constants'
 
 const panelOpen = ref(0)
 
-const computedValues = ref('use')
-const loreyHeight = ref('21.83')
-const basalArea = ref('39.3337')
-const closeUtilVolume = ref('304.8')
-const closeUtilNetDecayWasteVolume = ref('245.5')
-const wholeStemVolume75cm = ref('332.4')
-const wholeStemVolume125cm = ref('328.1')
-const closeUtilNetDecayVolume = ref('263.6')
+const modelParameterStore = useModelParameterStore()
+const {
+  derivedBy,
+  siteSpeciesValues,
+  computedValues,
+  loreyHeight,
+  basalArea125cm,
+  closeUtilVolume,
+  closeUtilNetDecayWasteVolume,
+  wholeStemVolume75cm,
+  wholeStemVolume125cm,
+  closeUtilNetDecayVolume,
+} = storeToRefs(modelParameterStore)
+
+const isComputedValuesDisabled = ref(false)
+const isLoreyHeightDisabled = ref(false)
+const isWholeStemVolume75cmDisabled = ref(false)
+const isBasalArea125cmDisabled = ref(false)
+const isWholeStemVolume125cmDisabled = ref(false)
+const isCloseUtilVolumeDisabled = ref(false)
+const isCloseUtilNetDecayVolumeDisabled = ref(false)
+const isCloseUtilNetDecayWasteVolumeDisabled = ref(false)
+
+const updateComputedValuesState = (
+  newDerivedBy: string | null,
+  newSiteSpeciesValues: string | null,
+) => {
+  isComputedValuesDisabled.value = !(
+    newDerivedBy === DERIVED_BY.BASAL_AREA &&
+    newSiteSpeciesValues === SITE_SPECIES_VALUES.COMPUTED
+  )
+
+  if (isComputedValuesDisabled.value) {
+    computedValues.value = COMPUTED_VALUES.USE
+  }
+}
+
+const updateFieldDisabledStates = (newComputedValues: string | null) => {
+  const isDisabled = newComputedValues === COMPUTED_VALUES.USE
+
+  isLoreyHeightDisabled.value = isDisabled
+  isWholeStemVolume75cmDisabled.value = isDisabled
+  isBasalArea125cmDisabled.value = isDisabled
+  isWholeStemVolume125cmDisabled.value = isDisabled
+  isCloseUtilVolumeDisabled.value = isDisabled
+  isCloseUtilNetDecayVolumeDisabled.value = isDisabled
+  isCloseUtilNetDecayWasteVolumeDisabled.value = isDisabled
+}
+
+watch(
+  [derivedBy, siteSpeciesValues, computedValues],
+  ([newDerivedBy, newSiteSpeciesValues, newComputedValues]) => {
+    updateComputedValuesState(newDerivedBy, newSiteSpeciesValues)
+    updateFieldDisabledStates(newComputedValues)
+  },
+  { immediate: true },
+)
+
+const validateMinimum = (value: any) => {
+  if (value === null || value === '') {
+    return true
+  }
+  if (value < 0) {
+    return 'Please enter a value greater than 0'
+  }
+  return true
+}
+
+const loreyHeightError = computed(() => {
+  const error = validateMinimum(loreyHeight.value)
+  return error === true ? [] : [error]
+})
+
+const wholeStemVolume75cmError = computed(() => {
+  const error = validateMinimum(wholeStemVolume75cm.value)
+  return error === true ? [] : [error]
+})
+
+const basalArea125cmError = computed(() => {
+  const error = validateMinimum(basalArea125cm.value)
+  return error === true ? [] : [error]
+})
+
+const wholeStemVolume125cmError = computed(() => {
+  const error = validateMinimum(wholeStemVolume125cm.value)
+  return error === true ? [] : [error]
+})
+
+const closeUtilVolumeError = computed(() => {
+  const error = validateMinimum(closeUtilVolume.value)
+  return error === true ? [] : [error]
+})
+
+const closeUtilNetDecayVolumeError = computed(() => {
+  const error = validateMinimum(closeUtilNetDecayVolume.value)
+  return error === true ? [] : [error]
+})
+
+const closeUtilNetDecayWasteVolumeError = computed(() => {
+  const error = validateMinimum(closeUtilNetDecayWasteVolume.value)
+  return error === true ? [] : [error]
+})
 
 const clear = () => {}
 const confirm = () => {}

@@ -18,203 +18,215 @@
         <v-expansion-panel-text class="expansion-panel-text mt-n2">
           <div>
             <v-row>
-              <v-col cols="3">
-                <v-select
-                  label="BEC Zone"
-                  :items="becZones"
-                  v-model="selectedBecZone"
-                  item-title="label"
-                  item-value="value"
-                  clearable
-                  hide-details="auto"
-                  persistent-placeholder
-                  placeholder="Select Bec Zone"
-                  density="compact"
-                  dense
-                ></v-select>
+              <v-col cols="6">
+                <v-row class="mb-3">
+                  <v-col cols="6">
+                    <v-select
+                      label="BEC Zone"
+                      :items="becZoneOptions"
+                      v-model="becZone"
+                      item-title="label"
+                      item-value="value"
+                      clearable
+                      hide-details="auto"
+                      persistent-placeholder
+                      placeholder="Select Bec Zone"
+                      density="compact"
+                      dense
+                    ></v-select>
+                  </v-col>
+                  <v-col class="col-space-6" />
+                  <v-col>
+                    <v-select
+                      label="Eco Zone"
+                      :items="ecoZoneOptions"
+                      v-model="ecoZone"
+                      item-title="label"
+                      item-value="value"
+                      clearable
+                      hide-details="auto"
+                      persistent-placeholder
+                      placeholder="Select Eco Zone"
+                      density="compact"
+                      dense
+                    ></v-select>
+                  </v-col>
+                </v-row>
               </v-col>
-              <v-col class="col-space" />
-              <v-col cols="3">
-                <v-select
-                  label="Eco Zone"
-                  :items="ecoZones"
-                  v-model="selectedEcoZone"
-                  item-title="label"
-                  item-value="value"
-                  clearable
-                  hide-details="auto"
-                  persistent-placeholder
-                  placeholder="Select Eco Zone"
-                  density="compact"
-                  dense
-                ></v-select>
-              </v-col>
-              <v-col class="col-space" />
-              <v-col cols="3">
-                <v-checkbox
-                  label="Include Secondary Dominant Height in Yield Table"
-                  v-model="includeSecondaryHeight"
-                  hide-details="auto"
-                ></v-checkbox>
-              </v-col>
-              <v-col class="col-space" />
+              <v-col class="col-space-6" />
               <v-col>
-                <div class="mt-2">
-                  <v-text-field
-                    label="Species Group"
-                    :model-value="speciesGroup"
-                    variant="underlined"
-                    hide-details
-                    readonly
-                    density="compact"
-                    dense
-                  ></v-text-field>
-                </div>
+                <v-row>
+                  <v-col cols="6">
+                    <v-checkbox
+                      label="Include Secondary Dominant Height in Yield Table"
+                      v-model="incSecondaryHeight"
+                      hide-details="auto"
+                      :disabled="isIncSecondaryHeightDisabled"
+                    ></v-checkbox>
+                  </v-col>
+                </v-row>
               </v-col>
             </v-row>
-            <div class="hr-line mt-2"></div>
+            <div class="hr-line"></div>
             <v-row class="mt-7">
-              <v-col cols="3">
-                <v-select
-                  label="Site Species"
-                  :items="siteSpecies"
-                  v-model="selectedSpecies"
-                  item-title="label"
-                  item-value="value"
-                  clearable
-                  hide-details="auto"
-                  persistent-placeholder
-                  placeholder="Select..."
-                  density="compact"
-                  dense
-                ></v-select>
+              <v-col cols="6">
+                <v-row>
+                  <v-col cols="6">
+                    <v-select
+                      label="Site Species"
+                      :items="siteSpeciesOptions"
+                      v-model="selectedSiteSpecies"
+                      item-title="label"
+                      item-value="value"
+                      hide-details="auto"
+                      persistent-placeholder
+                      placeholder="Select..."
+                      density="compact"
+                      dense
+                      :disabled="isSelectedSiteSpeciesDisabled"
+                    ></v-select>
+                  </v-col>
+                  <v-col class="col-space-6" />
+                  <v-col>
+                    <v-select
+                      label="Site Index Curve"
+                      :items="computedSpeciesOptions"
+                      v-model="siteIndexCurve"
+                      item-title="label"
+                      item-value="value"
+                      hide-details="auto"
+                      persistent-placeholder
+                      placeholder="Select..."
+                      density="compact"
+                      dense
+                      disabled
+                    ></v-select
+                  ></v-col>
+                </v-row>
               </v-col>
-              <v-col class="col-space" />
-              <v-col cols="3">
-                <v-select
-                  label="Site Index Curve"
-                  :items="siteIndexCurveOptions"
-                  v-model="selectedSiteIndexCurve"
-                  item-title="label"
-                  item-value="value"
-                  hide-details="auto"
-                  persistent-placeholder
-                  placeholder="Select..."
-                  density="compact"
-                  dense
-                  readonly
-                ></v-select>
-              </v-col>
-              <v-col class="col-space" />
+              <v-col class="col-space-6" />
               <v-col>
-                <div class="mt-5 ml-2" style="font-size: 0.875rem">
-                  *Ministry Default Curve for this Species
-                </div>
+                <v-col>
+                  <div class="mb-5" style="font-size: 0.875rem">
+                    *Ministry Default Curve for this Species
+                  </div></v-col
+                >
               </v-col>
             </v-row>
-            <div class="hr-line mt-6"></div>
+            <div class="hr-line"></div>
             <v-row
-              class="mt-7"
+              class="mt-1"
               style="display: inline-flex; align-items: center"
             >
               <v-col cols="auto" style="margin-bottom: 20px">
-                <span>Site Species Values:</span>
+                <div class="mt-2">Site Species Values:</div>
               </v-col>
               <v-col cols="auto">
-                <v-radio-group v-model="siteSpeciesValues" inline>
-                  <v-radio label="Computed" value="computed"></v-radio>
-                  <v-radio label="Supplied" value="supplied"></v-radio>
+                <v-radio-group
+                  v-model="siteSpeciesValues"
+                  inline
+                  :disabled="isSiteSpeciesValueDisabled"
+                >
+                  <v-radio
+                    v-for="option in siteSpeciesValuesOptions"
+                    :key="option.value"
+                    :label="option.label"
+                    :value="option.value"
+                  ></v-radio>
                 </v-radio-group>
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="3">
-                <v-select
-                  label="Age Type"
-                  :items="ageTypes"
-                  v-model="selectedAgeType"
-                  item-title="label"
-                  item-value="value"
-                  clearable
-                  hide-details="auto"
-                  persistent-placeholder
-                  placeholder="Select..."
-                  density="compact"
-                  dense
-                ></v-select>
+              <v-col cols="6">
+                <v-row>
+                  <v-col cols="6">
+                    <v-select
+                      label="Age Type"
+                      :items="ageTypeOptions"
+                      v-model="ageType"
+                      item-title="label"
+                      item-value="value"
+                      hide-details="auto"
+                      persistent-placeholder
+                      placeholder="Select..."
+                      density="compact"
+                      dense
+                      :disabled="isAgeTypeDisabled"
+                    ></v-select>
+                  </v-col>
+                  <v-col class="col-space-6" />
+                  <v-col>
+                    <v-text-field
+                      label="Age (years)"
+                      type="number"
+                      v-model="age"
+                      max="100"
+                      min="0"
+                      step="0.1"
+                      persistent-placeholder
+                      placeholder="Select..."
+                      density="compact"
+                      dense
+                      :disabled="isAgeDisabled"
+                      @input="handleAgeInput($event)"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="6" />
+                  <v-col class="col-space-6" />
+                  <v-col>
+                    <v-text-field
+                      label="Height (meters)"
+                      type="number"
+                      v-model="height"
+                      max="100"
+                      min="0"
+                      step="0.1"
+                      persistent-placeholder
+                      placeholder="Select..."
+                      density="compact"
+                      dense
+                      :disabled="isHeightDisabled"
+                      @input="handleHeightInput($event)"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="6" />
+                  <v-col class="col-space-6" />
+                  <v-col>
+                    <v-text-field
+                      label="BHA 50 Site Index"
+                      type="number"
+                      v-model="bha50SiteIndex"
+                      max="100"
+                      min="0"
+                      step="0.1"
+                      persistent-placeholder
+                      placeholder="Select..."
+                      density="compact"
+                      dense
+                      @input="handleBHA50SiteIndexInput($event)"
+                      :disabled="isBHA50SiteIndexDisabled"
+                    ></v-text-field
+                  ></v-col>
+                </v-row>
               </v-col>
-              <v-col class="col-space" />
-              <v-col cols="3">
-                <v-text-field
-                  label="Age (years)"
-                  type="number"
-                  v-model="ageYears"
-                  max="100"
-                  min="0"
-                  step="0.1"
-                  persistent-placeholder
-                  placeholder="Select..."
-                  density="compact"
-                  dense
-                ></v-text-field>
-              </v-col>
-              <v-col class="col-space" />
-              <v-col>
+              <v-col cols="6">
                 <div class="mt-2">
-                  <v-radio-group v-model="floatOptions1" row>
-                    <v-radio label="Float" value="float"></v-radio>
-                  </v-radio-group>
-                </div>
-              </v-col>
-            </v-row>
-            <v-row class="mt-n7">
-              <v-col cols="3"> &nbsp; </v-col>
-              <v-col class="col-space" />
-              <v-col cols="3">
-                <v-text-field
-                  label="Height (meters)"
-                  type="number"
-                  v-model="heightMeters"
-                  max="100"
-                  min="0"
-                  step="0.1"
-                  persistent-placeholder
-                  placeholder="Select..."
-                  density="compact"
-                  dense
-                ></v-text-field>
-              </v-col>
-              <v-col class="col-space" />
-              <v-col>
-                <div class="mt-2">
-                  <v-radio-group v-model="floatOptions2" row>
-                    <v-radio label="Float" value="float"></v-radio>
-                  </v-radio-group>
-                </div>
-              </v-col>
-            </v-row>
-            <v-row class="mt-n7">
-              <v-col cols="3"> &nbsp; </v-col>
-              <v-col class="col-space" />
-              <v-col cols="3">
-                <v-text-field
-                  label="BHA 50 Site Index"
-                  type="number"
-                  v-model="siteIndex"
-                  max="100"
-                  min="0"
-                  step="0.1"
-                  persistent-placeholder
-                  placeholder="Select..."
-                  density="compact"
-                  dense
-                ></v-text-field>
-              </v-col>
-              <v-col class="col-space" />
-              <v-col>
-                <div class="mt-2">
-                  <v-radio-group v-model="floatOptions3" row>
-                    <v-radio label="Float" value="float"></v-radio>
+                  <v-radio-group
+                    v-model="floating"
+                    row
+                    :disabled="isFloatingDisabled"
+                  >
+                    <v-radio
+                      v-for="option in floatingOptions"
+                      :key="option.value"
+                      :label="option.label"
+                      :value="option.value"
+                      style="margin-bottom: 45px"
+                    ></v-radio>
                   </v-radio-group>
                 </div>
               </v-col>
@@ -232,37 +244,217 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useModelParameterStore } from '@/stores/modelParameterStore'
+import { storeToRefs } from 'pinia'
+import {
+  becZoneOptions,
+  ecoZoneOptions,
+  siteIndexCurveMap,
+  siteSpeciesValuesOptions,
+  ageTypeOptions,
+  floatingOptions,
+} from '@/constants/options'
+import {
+  DERIVED_BY,
+  SITE_SPECIES_VALUES,
+  FLOATING,
+} from '@/constants/constants'
 
 const panelOpen = ref(0)
 
-const becZones = ref(['IDF - Interior Douglas Fir', 'xxx'])
-const ecoZones = ref(['Eco Zone 1', 'Eco Zone 2', 'Eco Zone 3'])
-const selectedBecZone = ref('IDF - Interior Douglas Fir')
-const selectedEcoZone = ref(null)
+const modelParameterStore = useModelParameterStore()
+const {
+  derivedBy,
+  speciesGroups,
+  highestPercentSpecies,
+  selectedSiteSpecies,
+  becZone,
+  ecoZone,
+  incSecondaryHeight,
+  siteIndexCurve,
+  siteSpeciesValues,
+  ageType,
+  age,
+  height,
+  bha50SiteIndex,
+  floating,
+} = storeToRefs(modelParameterStore)
 
-const speciesGroup = ref('PL')
+const computedSpeciesOptions = computed(() =>
+  (Object.keys(siteIndexCurveMap) as Array<keyof typeof siteIndexCurveMap>).map(
+    (code) => ({
+      label: `${siteIndexCurveMap[code]}`,
+      value: code,
+    }),
+  ),
+)
 
-const includeSecondaryHeight = ref(true)
+const siteSpeciesOptions = computed(() =>
+  speciesGroups.value.map((group) => ({
+    label: group.siteSpecies,
+    value: group.siteSpecies,
+  })),
+)
 
-const siteSpecies = ref(['PL', 'AC', 'H', 'S'])
-const selectedSpecies = ref('PL')
+const isIncSecondaryHeightDisabled = ref(false)
+const isSelectedSiteSpeciesDisabled = ref(false)
+const isSiteSpeciesValueDisabled = ref(false)
+const isAgeTypeDisabled = ref(false)
+const isAgeDisabled = ref(false)
+const isHeightDisabled = ref(false)
+const isBHA50SiteIndexDisabled = ref(false)
+const isFloatingDisabled = ref(false)
 
-const siteIndexCurveOptions = ref(['Thrower (1994)'])
-const selectedSiteIndexCurve = ref('Thrower (1994)')
+const setFloatingState = (newFloating: string | null) => {
+  isAgeTypeDisabled.value = false
+  isAgeDisabled.value = false
+  isHeightDisabled.value = false
+  isBHA50SiteIndexDisabled.value = false
+  floating.value = newFloating
 
-const siteSpeciesValues = ref(null)
+  if (newFloating === FLOATING.AGE) {
+    isAgeTypeDisabled.value = true
+    isAgeDisabled.value = true
+  } else if (newFloating === FLOATING.HEIGHT) {
+    isHeightDisabled.value = true
+  } else if (newFloating === FLOATING.SITEINDEX) {
+    isBHA50SiteIndexDisabled.value = true
+  }
+}
 
-const ageTypes = ref(['Total', 'Partial'])
-const selectedAgeType = ref('Total')
+const handleSiteSpeciesValuesState = (
+  newSiteSpeciesValues: string | null,
+  newFloating: string | null,
+) => {
+  if (newSiteSpeciesValues === SITE_SPECIES_VALUES.COMPUTED) {
+    isFloatingDisabled.value = false
+    setFloatingState(newFloating)
+  } else if (newSiteSpeciesValues === SITE_SPECIES_VALUES.SUPPLIED) {
+    isAgeTypeDisabled.value = true
+    isAgeDisabled.value = true
+    isHeightDisabled.value = true
+    isBHA50SiteIndexDisabled.value = false
+    isFloatingDisabled.value = true
+  }
+}
 
-const ageYears = ref(60)
-const heightMeters = ref(17)
-const siteIndex = ref(30.0)
+const handleDerivedByChange = (
+  newDerivedBy: string | null,
+  newSiteSpecies: string | null,
+  newSiteSpeciesValues: string | null,
+  newFloating: string | null,
+) => {
+  if (newDerivedBy === DERIVED_BY.VOLUME) {
+    incSecondaryHeight.value = false
+    isIncSecondaryHeightDisabled.value = true
+    isSelectedSiteSpeciesDisabled.value = true
+    handleSiteSpeciesValuesState(newSiteSpeciesValues, newFloating)
+  } else if (newDerivedBy === DERIVED_BY.BASAL_AREA) {
+    isIncSecondaryHeightDisabled.value = false
+    isSelectedSiteSpeciesDisabled.value = false
+    isSiteSpeciesValueDisabled.value =
+      newSiteSpecies !== highestPercentSpecies.value
+    handleSiteSpeciesValuesState(newSiteSpeciesValues, newFloating)
+  }
+}
 
-const floatOptions1 = ref(null)
-const floatOptions2 = ref(null)
-const floatOptions3 = ref(null)
+// Update siteIndexCurve based on selectedSiteSpecies
+watch(selectedSiteSpecies, (newSiteSpecies) => {
+  if (
+    newSiteSpecies &&
+    siteIndexCurveMap[newSiteSpecies as keyof typeof siteIndexCurveMap]
+  ) {
+    siteIndexCurve.value =
+      siteIndexCurveMap[newSiteSpecies as keyof typeof siteIndexCurveMap]
+  } else {
+    siteIndexCurve.value = null // Clear if no mapping found
+  }
+})
+
+watch(
+  [derivedBy, selectedSiteSpecies, siteSpeciesValues, floating],
+  ([newDerivedBy, newSiteSpecies, newSiteSpeciesValues, newFloating]) => {
+    handleDerivedByChange(
+      newDerivedBy,
+      newSiteSpecies,
+      newSiteSpeciesValues,
+      newFloating,
+    )
+  },
+  { immediate: true },
+)
+
+const handleAgeInput = (event: Event) => {
+  const input = event.target as HTMLInputElement
+  let value = input.value
+
+  // Remove any non-digit characters (also prevents the entry of '.')
+  value = value.replace(/\D/g, '')
+
+  // Ensure the value is a valid integer and between 0 and 100
+  const intValue = parseInt(value, 10)
+
+  if (!isNaN(intValue) && intValue >= 0 && intValue <= 100) {
+    age.value = intValue
+  } else if (intValue > 100) {
+    age.value = 100 // Limit to 100 if the value exceeds
+  } else {
+    age.value = null // Handle invalid or empty input
+  }
+}
+
+const handleHeightInput = (event: Event) => {
+  const input = event.target as HTMLInputElement
+  let value = input.value
+
+  // Allow only up to the first decimal place
+  if (value.includes('.')) {
+    const [integerPart, decimalPart] = value.split('.')
+    if (decimalPart.length > 1) {
+      value = `${integerPart}.${decimalPart.slice(0, 1)}`
+    }
+  }
+
+  // Convert value to a number and ensure it is between 0 and 100
+  let floatValue = parseFloat(value)
+  if (!isNaN(floatValue)) {
+    if (floatValue < 0) {
+      floatValue = 0
+    } else if (floatValue > 100) {
+      floatValue = 100
+    }
+    height.value = floatValue
+  } else {
+    height.value = null // Handle invalid or empty input
+  }
+}
+
+const handleBHA50SiteIndexInput = (event: Event) => {
+  const input = event.target as HTMLInputElement
+  let value = input.value
+
+  // allow only up to the first decimal place
+  if (value.includes('.')) {
+    const [integerPart, decimalPart] = value.split('.')
+    if (decimalPart.length > 1) {
+      value = `${integerPart}.${decimalPart.slice(0, 1)}`
+    }
+  }
+
+  // Convert value to a number and ensure it is between 0 and 100
+  let floatValue = parseFloat(value)
+  if (!isNaN(floatValue)) {
+    if (floatValue < 0) {
+      floatValue = 0
+    } else if (floatValue > 100) {
+      floatValue = 100
+    }
+    bha50SiteIndex.value = floatValue
+  } else {
+    bha50SiteIndex.value = null // Handle invalid or empty input
+  }
+}
 
 const clear = () => {}
 const confirm = () => {}
