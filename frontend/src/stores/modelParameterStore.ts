@@ -1,18 +1,24 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import {
+  DERIVED_BY,
+  SITE_SPECIES_VALUES,
+  AGE_TYPE,
+  FLOATING,
+} from '@/constants/constants'
 
 export const useModelParameterStore = defineStore('modelParameter', () => {
   // panel open
   const panelOpenStates = ref({
     speciesInfo: 0, // 0: open, -1: closed
-    siteInfo: -1,
-    standDensity: -1,
-    additionalStandAttributes: -1,
-    reportInfo: -1,
+    siteInfo: 0,
+    standDensity: 0,
+    additionalStandAttributes: 0,
+    reportInfo: 0,
   })
 
   // species info
-  const derivedBy = ref(null)
+  const derivedBy = ref<string | null>(null)
 
   const speciesList = ref<{ species: string | null; percent: number | null }[]>(
     [
@@ -74,7 +80,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
       group: key,
       percent: groupMap[key],
       siteSpecies: key,
-      minimumDBHLimit: '4.0 cm+', // TODO -dealing with defualt value
+      minimumDBHLimit: '7.5 cm+',
     }))
 
     speciesGroups.value.sort((a, b) => b.percent - a.percent)
@@ -85,12 +91,12 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   }
 
   // site info
-  const becZone = ref(null)
-  const ecoZone = ref(null)
+  const becZone = ref<string | null>(null)
+  const ecoZone = ref<string | null>(null)
   const incSecondaryHeight = ref(false)
   const siteIndexCurve = ref<string | null>(null)
   const siteSpeciesValues = ref<string | null>(null)
-  const ageType = ref(null)
+  const ageType = ref<string | null>(null)
   const age = ref<number | null>(null)
   const height = ref<number | null>(null)
   const bha50SiteIndex = ref<number | null>(null)
@@ -100,8 +106,8 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   const percentStockableArea = ref<number | null>(0)
   const basalArea = ref<number | null>(null)
   const treesPerHectare = ref<number | null>(null)
-  const minimumDBHLimit = ref(null)
-  const percentCrownClosure = ref<number | null>(null)
+  const minimumDBHLimit = ref<string | null>(null)
+  const percentCrownClosure = ref<number | string | null>(null)
 
   // additional stand attributes
   const computedValues = ref<string | null>(null)
@@ -114,12 +120,56 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   const closeUtilNetDecayVolume = ref<number | null>(null)
 
   // report info
-  const startingAge = ref(null)
-  const finishingAge = ref(null)
-  const ageIncrement = ref(null)
-  const selectedVolumeReported = ref([])
-  const projectionType = ref(null)
-  const reportTitle = ref(null)
+  const startingAge = ref<number | null>(null)
+  const finishingAge = ref<number | null>(null)
+  const ageIncrement = ref<number | null>(null)
+  const selectedVolumeReported = ref<string[]>([])
+  const projectionType = ref<string | null>(null)
+  const reportTitle = ref<string | null>(null)
+
+  // set default values
+  const setDefaultValues = () => {
+    derivedBy.value = DERIVED_BY.VOLUME
+    speciesList.value = [
+      { species: 'PL', percent: 30 },
+      { species: 'AC', percent: 30 },
+      { species: 'H', percent: 30 },
+      { species: 'S', percent: 10 },
+      { species: null, percent: 0 },
+      { species: null, percent: 0 },
+    ]
+
+    updateSpeciesGroup()
+
+    speciesGroups.value = speciesGroups.value.map((group) => ({
+      ...group,
+      minimumDBHLimit: '7.5 cm+',
+    }))
+
+    becZone.value = '8'
+    siteSpeciesValues.value = SITE_SPECIES_VALUES.COMPUTED
+    ageType.value = AGE_TYPE.TOTAL
+    age.value = 60
+    height.value = 17.0
+    bha50SiteIndex.value = 16.3
+    floating.value = FLOATING.SITEINDEX
+    percentStockableArea.value = 55
+    percentCrownClosure.value = 0
+    minimumDBHLimit.value = '7.5 cm+'
+    loreyHeight.value = 13.45
+    wholeStemVolume75cm.value = 106.6
+    basalArea125cm.value = 17.0482
+    wholeStemVolume125cm.value = 97.0
+    closeUtilVolume.value = 84.1
+    closeUtilNetDecayVolume.value = 78.2
+    closeUtilNetDecayWasteVolume.value = 75.1
+    startingAge.value = 0
+    finishingAge.value = 250
+    ageIncrement.value = 25
+    selectedVolumeReported.value = ['Whole Stem']
+    projectionType.value = 'Volume'
+    reportTitle.value = 'A Sample Report Title'
+  }
 
   return {
     // panel open
@@ -167,5 +217,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     selectedVolumeReported,
     projectionType,
     reportTitle,
+    // set default values
+    setDefaultValues,
   }
 })

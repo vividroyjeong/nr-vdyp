@@ -85,7 +85,9 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import { useInputModelParamTabStore } from '@/stores/inputModelParamTabStore'
+import { useModelParameterStore } from '@/stores/modelParameterStore'
 
 import JobTypeSelection from '@/components/JobTypeSelection.vue'
 
@@ -100,6 +102,7 @@ import AdditionalStandAttributes from '@/components/model-param-selection-panes/
 import ReportInfo from '@/components/model-param-selection-panes/ReportInfo.vue'
 
 const tabStore = useInputModelParamTabStore()
+const modelParameterStore = useModelParameterStore()
 
 const tabs = [
   { label: 'Model Parameter Selection', component: ModelParameterSelection },
@@ -107,6 +110,10 @@ const tabs = [
   { label: 'View Log File', component: ViewLogFile },
   { label: 'View Error Messages', component: ViewErrorMessages },
 ]
+
+onMounted(() => {
+  modelParameterStore.setDefaultValues()
+})
 
 const cancel = () => {}
 
