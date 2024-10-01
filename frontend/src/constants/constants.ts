@@ -24,6 +24,11 @@ export const SITE_SPECIES_VALUES = Object.freeze({
   SUPPLIED: 'Supplied',
 })
 
+export const AGE_TYPE = Object.freeze({
+  TOTAL: 'Total',
+  BREAST: 'Breast',
+})
+
 export const FLOATING = Object.freeze({
   AGE: 'Age',
   HEIGHT: 'Height',

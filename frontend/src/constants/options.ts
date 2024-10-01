@@ -73,6 +73,7 @@ export const ecoZoneOptions = [
   { label: 'Taiga Plains', value: '5' },
 ]
 
+// default Site Index Curve name for a species code
 export const siteIndexCurveMap = {
   AC: 'Huang, Titus, and Lakusta (1994ac)',
   AT: 'Nigh, Krestov, and Klinka 2002',
