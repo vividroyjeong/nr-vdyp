@@ -95,7 +95,7 @@
             <v-row>
               <v-col cols="3">
                 <v-text-field
-                  label="Percent Crown Closure"
+                  label="Percent Crown Closure (%)"
                   type="number"
                   v-model="percentCrownClosure"
                   max="100"
@@ -105,10 +105,20 @@
                   :error-messages="percentCrownClosureError"
                   persistent-placeholder
                   placeholder="N/A"
+                  hide-details
                   density="compact"
                   dense
                   :disabled="isPercentCrownClosureDisabled"
                 ></v-text-field>
+                <v-label
+                  v-show="
+                    percentCrownClosure === 0 ||
+                    percentCrownClosure === '0' ||
+                    percentCrownClosure === '0.0'
+                  "
+                  style="font-size: 12px"
+                  >Applying Default of 50%</v-label
+                >
               </v-col>
             </v-row>
           </div>
