@@ -102,17 +102,12 @@
                       density="compact"
                       dense
                       disabled
-                    ></v-select
-                  ></v-col>
+                    ></v-select>
+                    <v-label style="font-size: 12px"
+                      >*Ministry Default Curve for this Species
+                    </v-label>
+                  </v-col>
                 </v-row>
-              </v-col>
-              <v-col class="col-space-6" />
-              <v-col>
-                <v-col>
-                  <div class="mb-5" style="font-size: 0.875rem">
-                    *Ministry Default Curve for this Species
-                  </div></v-col
-                >
               </v-col>
             </v-row>
             <div class="hr-line"></div>
