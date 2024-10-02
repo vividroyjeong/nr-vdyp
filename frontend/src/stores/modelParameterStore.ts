@@ -1,11 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import {
-  DERIVED_BY,
-  SITE_SPECIES_VALUES,
-  AGE_TYPE,
-  FLOATING,
-} from '@/constants/constants'
+import { DERIVED_BY, FLOATING, DEFAULT_VALUES } from '@/constants/constants'
 
 export const useModelParameterStore = defineStore('modelParameter', () => {
   // panel open
@@ -80,7 +75,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
       group: key,
       percent: groupMap[key],
       siteSpecies: key,
-      minimumDBHLimit: '7.5 cm+',
+      minimumDBHLimit: DEFAULT_VALUES.MINIMUM_DBH_LIMIT,
     }))
 
     speciesGroups.value.sort((a, b) => b.percent - a.percent)
@@ -143,32 +138,33 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
 
     speciesGroups.value = speciesGroups.value.map((group) => ({
       ...group,
-      minimumDBHLimit: '7.5 cm+',
+      minimumDBHLimit: DEFAULT_VALUES.MINIMUM_DBH_LIMIT,
     }))
 
-    becZone.value = '8'
-    siteSpeciesValues.value = SITE_SPECIES_VALUES.COMPUTED
-    ageType.value = AGE_TYPE.TOTAL
-    age.value = 60
-    height.value = 17.0
-    bha50SiteIndex.value = 16.3
+    becZone.value = DEFAULT_VALUES.BEC_ZONE
+    siteSpeciesValues.value = DEFAULT_VALUES.SITE_SPECIES_VALUES
+    ageType.value = DEFAULT_VALUES.AGE_TYPE
+    age.value = DEFAULT_VALUES.AGE
+    height.value = DEFAULT_VALUES.HEIGHT
+    bha50SiteIndex.value = DEFAULT_VALUES.BHA50_SITE_INDEX
     floating.value = FLOATING.SITEINDEX
-    percentStockableArea.value = 55
-    percentCrownClosure.value = 0
-    minimumDBHLimit.value = '7.5 cm+'
-    loreyHeight.value = 13.45
-    wholeStemVolume75cm.value = 106.6
-    basalArea125cm.value = 17.0482
-    wholeStemVolume125cm.value = 97.0
-    closeUtilVolume.value = 84.1
-    closeUtilNetDecayVolume.value = 78.2
-    closeUtilNetDecayWasteVolume.value = 75.1
-    startingAge.value = 0
-    finishingAge.value = 250
-    ageIncrement.value = 25
-    selectedVolumeReported.value = ['Whole Stem']
-    projectionType.value = 'Volume'
-    reportTitle.value = 'A Sample Report Title'
+    percentStockableArea.value = DEFAULT_VALUES.PERCENT_STOCKABLE_AREA
+    percentCrownClosure.value = DEFAULT_VALUES.PERCENT_CROWN_CLOSURE
+    minimumDBHLimit.value = DEFAULT_VALUES.MINIMUM_DBH_LIMIT
+    loreyHeight.value = DEFAULT_VALUES.LOREY_HEIGHT
+    wholeStemVolume75cm.value = DEFAULT_VALUES.WHOLE_STEM_VOLUME
+    basalArea125cm.value = DEFAULT_VALUES.BASAL_AREA_125CM
+    wholeStemVolume125cm.value = DEFAULT_VALUES.WHOLE_STEM_VOLUME_125CM
+    closeUtilVolume.value = DEFAULT_VALUES.CLOSE_UTIL_VOLUME
+    closeUtilNetDecayVolume.value = DEFAULT_VALUES.CLOSE_UTIL_NET_DECAY_VOLUME
+    closeUtilNetDecayWasteVolume.value =
+      DEFAULT_VALUES.CLOSE_UTIL_NET_DECAY_WASTE_VOLUME
+    startingAge.value = DEFAULT_VALUES.STARTING_AGE
+    finishingAge.value = DEFAULT_VALUES.FINISHIN_GAGE
+    ageIncrement.value = DEFAULT_VALUES.AGE_INCREMENT
+    selectedVolumeReported.value = DEFAULT_VALUES.SELECTED_VOLUME_REPORTED
+    projectionType.value = DEFAULT_VALUES.PROJECTION_TYPE
+    reportTitle.value = DEFAULT_VALUES.REPORT_TITLE
   }
 
   return {
