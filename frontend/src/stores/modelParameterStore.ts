@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { DERIVED_BY, FLOATING, DEFAULT_VALUES } from '@/constants/constants'
+import { FLOATING, DEFAULT_VALUES } from '@/constants/constants'
 
 export const useModelParameterStore = defineStore('modelParameter', () => {
   // panel open
@@ -98,7 +98,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   const floating = ref<string | null>(null)
 
   // stand density
-  const percentStockableArea = ref<number | null>(0)
+  const percentStockableArea = ref<number | string | null>(null)
   const basalArea = ref<number | null>(null)
   const treesPerHectare = ref<number | null>(null)
   const minimumDBHLimit = ref<string | null>(null)
@@ -124,7 +124,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
 
   // set default values
   const setDefaultValues = () => {
-    derivedBy.value = DERIVED_BY.VOLUME
+    derivedBy.value = DEFAULT_VALUES.DERIVED_BY
     speciesList.value = [
       { species: 'PL', percent: 30 },
       { species: 'AC', percent: 30 },

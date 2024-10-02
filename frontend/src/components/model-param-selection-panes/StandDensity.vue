@@ -29,14 +29,26 @@
                     max="100"
                     min="0"
                     step="5"
-                    :rules="[validatePercentStockableArea]"
+                    :rules="[validatePercent]"
                     :error-messages="percentStockableAreaError"
-                    placeholder="Select..."
+                    placeholder=""
                     persistent-placeholder
+                    hide-details="auto"
                     density="compact"
                     dense
-                  ></v-text-field
-                ></v-col>
+                  ></v-text-field>
+                  <v-label
+                    v-show="
+                      percentStockableArea === 0 ||
+                      percentStockableArea === '0' ||
+                      percentStockableArea === '0.0' ||
+                      percentStockableArea === '' ||
+                      percentStockableArea === null
+                    "
+                    style="font-size: 12px"
+                    >A default will be computed when the model is run.</v-label
+                  >
+                </v-col>
                 <v-col class="col-space-3" />
                 <v-col cols="3">
                   <v-text-field
@@ -102,11 +114,11 @@
                     max="100"
                     min="0"
                     step="0.1"
-                    :rules="[validatePercentCrownClosure]"
+                    :rules="[validatePercent]"
                     :error-messages="percentCrownClosureError"
                     persistent-placeholder
-                    placeholder="N/A"
-                    hide-details
+                    placeholder=""
+                    hide-details="auto"
                     density="compact"
                     dense
                     :disabled="isPercentCrownClosureDisabled"
@@ -115,7 +127,9 @@
                     v-show="
                       percentCrownClosure === 0 ||
                       percentCrownClosure === '0' ||
-                      percentCrownClosure === '0.0'
+                      percentCrownClosure === '0.0' ||
+                      percentCrownClosure === '' ||
+                      percentCrownClosure === null
                     "
                     style="font-size: 12px"
                     >Applying Default of 50%</v-label
@@ -140,7 +154,11 @@ import { ref, computed, watch } from 'vue'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
 import { storeToRefs } from 'pinia'
 import { minimumDBHLimitsOptions } from '@/constants/options'
-import { DERIVED_BY, SITE_SPECIES_VALUES } from '@/constants/constants'
+import {
+  DERIVED_BY,
+  SITE_SPECIES_VALUES,
+  DEFAULT_VALUES,
+} from '@/constants/constants'
 
 const form = ref<HTMLFormElement>()
 
@@ -191,17 +209,7 @@ watch(
   { immediate: true },
 )
 
-const validatePercentStockableArea = (value: any) => {
-  if (value === null || value === '') {
-    return 'Percent Stockable Area is required'
-  }
-  if (value < 0 || value > 100) {
-    return 'Please enter a value between 0 and 100'
-  }
-  return true
-}
-
-const validatePercentCrownClosure = (value: any) => {
+const validatePercent = (value: any) => {
   if (value === null || value === '') {
     return true
   }
@@ -222,12 +230,12 @@ const validateMinimum = (value: any) => {
 }
 
 const percentStockableAreaError = computed(() => {
-  const error = validatePercentStockableArea(percentStockableArea.value)
+  const error = validatePercent(percentStockableArea.value)
   return error === true ? [] : [error]
 })
 
 const percentCrownClosureError = computed(() => {
-  const error = validatePercentCrownClosure(percentCrownClosure.value)
+  const error = validatePercent(percentCrownClosure.value)
   return error === true ? [] : [error]
 })
 
@@ -245,6 +253,8 @@ const clear = () => {
   if (form.value) {
     form.value.reset()
   }
+  minimumDBHLimit.value = DEFAULT_VALUES.MINIMUM_DBH_LIMIT
+  percentCrownClosure.value = DEFAULT_VALUES.PERCENT_CROWN_CLOSURE
 }
 const confirm = () => {}
 </script>
