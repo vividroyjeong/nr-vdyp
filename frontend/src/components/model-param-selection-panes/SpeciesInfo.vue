@@ -75,7 +75,7 @@
                           v-model="item.percent"
                           max="100"
                           min="0"
-                          step="0.1"
+                          step="5.0"
                           :rules="[validatePercent]"
                           persistent-placeholder
                           placeholder="Select..."
@@ -314,7 +314,13 @@ const handlePercentInput = (event: Event, index: number) => {
     }
   }
 
-  speciesList.value[index].percent = parseFloat(value)
+  const parsedValue = parseFloat(value)
+
+  speciesList.value[index].percent = parsedValue
+
+  if (parsedValue === 0) {
+    speciesList.value[index].species = null
+  }
 }
 </script>
 
