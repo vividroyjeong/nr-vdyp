@@ -204,6 +204,7 @@ import {
   DERIVED_BY,
   SITE_SPECIES_VALUES,
   COMPUTED_VALUES,
+  DEFAULT_VALUES,
 } from '@/constants/constants'
 
 const form = ref<HTMLFormElement>()
@@ -316,6 +317,10 @@ const clear = () => {
   if (form.value) {
     form.value.reset()
   }
+
+  computedValues.value = DEFAULT_VALUES.COMPUTED_VALUES
+
+  // TODO - set text-field with calculated values based on seleciton in the previous screen
 }
 const confirm = () => {}
 </script>

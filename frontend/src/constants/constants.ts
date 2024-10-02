@@ -40,6 +40,14 @@ export const COMPUTED_VALUES = Object.freeze({
   MODIFY: 'Modify Computed Values',
 })
 
+export const MINIMUM_DBH_LIMITS = Object.freeze({
+  CM4_0: '4.0 cm+',
+  CM7_5: '7.5 cm+',
+  CM12_5: '12.5 cm+',
+  CM17_5: '17.5 cm+',
+  CM22_5: '22.5 cm+',
+})
+
 export const DEFAULT_VALUES = Object.freeze({
   DERIVED_BY: DERIVED_BY.VOLUME,
   BEC_ZONE: '8',
@@ -51,7 +59,8 @@ export const DEFAULT_VALUES = Object.freeze({
   FLOATING: FLOATING.SITEINDEX,
   PERCENT_STOCKABLE_AREA: 55,
   PERCENT_CROWN_CLOSURE: 0,
-  MINIMUM_DBH_LIMIT: '7.5 cm+',
+  MINIMUM_DBH_LIMIT: MINIMUM_DBH_LIMITS.CM7_5,
+  COMPUTED_VALUES: COMPUTED_VALUES.USE,
   LOREY_HEIGHT: 13.45,
   WHOLE_STEM_VOLUME: 106.6,
   BASAL_AREA_125CM: 17.0482,

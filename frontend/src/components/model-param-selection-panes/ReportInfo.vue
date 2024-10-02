@@ -86,7 +86,7 @@
                       :style="{ 'max-width': index < 4 ? '20%' : 'auto' }"
                     >
                       <v-checkbox
-                        v-model="selectedVolumeReported"
+                        v-model="volumeReported"
                         :label="option.label"
                         :value="option.value"
                         hide-details
@@ -109,7 +109,7 @@
                       :style="{ 'max-width': index < 4 ? '20%' : 'auto' }"
                     >
                       <v-checkbox
-                        v-model="selectedVolumeReported"
+                        v-model="includeInReport"
                         :label="option.label"
                         :value="option.value"
                         hide-details
@@ -123,7 +123,6 @@
                         v-model="projectionType"
                         item-title="label"
                         item-value="value"
-                        clearable
                         hide-details="auto"
                         persistent-placeholder
                         placeholder="Select..."
@@ -209,6 +208,7 @@ import {
   projectionTypeOptions,
   minimumDBHLimitsOptions,
 } from '@/constants/options'
+import { DEFAULT_VALUES, MINIMUM_DBH_LIMITS } from '@/constants/constants'
 
 const form = ref<HTMLFormElement>()
 
@@ -219,7 +219,8 @@ const {
   startingAge,
   finishingAge,
   ageIncrement,
-  selectedVolumeReported,
+  volumeReported,
+  includeInReport,
   projectionType,
   reportTitle,
 } = storeToRefs(modelParameterStore)
@@ -264,9 +265,18 @@ const ageIncrementError = computed(() => {
 })
 
 const clear = () => {
-  if (form.value) {
-    form.value.reset()
-  }
+  startingAge.value = null
+  finishingAge.value = null
+  ageIncrement.value = null
+  volumeReported.value = []
+  includeInReport.value = []
+  reportTitle.value = null
+
+  projectionType.value = DEFAULT_VALUES.PROJECTION_TYPE
+  speciesGroups.value = speciesGroups.value.map((group) => ({
+    ...group,
+    minimumDBHLimit: MINIMUM_DBH_LIMITS.CM4_0,
+  }))
 }
 const confirm = () => {}
 </script>

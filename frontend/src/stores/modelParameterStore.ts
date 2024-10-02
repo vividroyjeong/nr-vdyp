@@ -118,7 +118,8 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   const startingAge = ref<number | null>(null)
   const finishingAge = ref<number | null>(null)
   const ageIncrement = ref<number | null>(null)
-  const selectedVolumeReported = ref<string[]>([])
+  const volumeReported = ref<string[]>([])
+  const includeInReport = ref<string[]>([])
   const projectionType = ref<string | null>(null)
   const reportTitle = ref<string | null>(null)
 
@@ -151,6 +152,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     percentStockableArea.value = DEFAULT_VALUES.PERCENT_STOCKABLE_AREA
     percentCrownClosure.value = DEFAULT_VALUES.PERCENT_CROWN_CLOSURE
     minimumDBHLimit.value = DEFAULT_VALUES.MINIMUM_DBH_LIMIT
+    computedValues.value = DEFAULT_VALUES.COMPUTED_VALUES
     loreyHeight.value = DEFAULT_VALUES.LOREY_HEIGHT
     wholeStemVolume75cm.value = DEFAULT_VALUES.WHOLE_STEM_VOLUME
     basalArea125cm.value = DEFAULT_VALUES.BASAL_AREA_125CM
@@ -162,7 +164,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     startingAge.value = DEFAULT_VALUES.STARTING_AGE
     finishingAge.value = DEFAULT_VALUES.FINISHING_AGE
     ageIncrement.value = DEFAULT_VALUES.AGE_INCREMENT
-    selectedVolumeReported.value = DEFAULT_VALUES.SELECTED_VOLUME_REPORTED
+    volumeReported.value = DEFAULT_VALUES.SELECTED_VOLUME_REPORTED
     projectionType.value = DEFAULT_VALUES.PROJECTION_TYPE
     reportTitle.value = DEFAULT_VALUES.REPORT_TITLE
   }
@@ -210,7 +212,8 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     startingAge,
     finishingAge,
     ageIncrement,
-    selectedVolumeReported,
+    volumeReported,
+    includeInReport,
     projectionType,
     reportTitle,
     // set default values

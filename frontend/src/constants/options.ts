@@ -1,3 +1,5 @@
+import { MINIMUM_DBH_LIMITS } from '@/constants/constants'
+
 export const derivedByOptions = [
   { label: 'Volume', value: 'Volume' },
   { label: 'Basal Area', value: 'Basal Area' },
@@ -116,11 +118,11 @@ export const floatingOptions = [
 ]
 
 export const minimumDBHLimitsOptions = [
-  { label: '4.0 cm+', value: '4.0 cm+' },
-  { label: '7.5 cm+', value: '7.5 cm+' },
-  { label: '12.5 cm+', value: '12.5 cm+' },
-  { label: '17.5 cm+', value: '17.5 cm+' },
-  { label: '22.5 cm+', value: '22.5 cm+' },
+  { label: '4.0 cm+', value: MINIMUM_DBH_LIMITS.CM4_0 },
+  { label: '7.5 cm+', value: MINIMUM_DBH_LIMITS.CM7_5 },
+  { label: '12.5 cm+', value: MINIMUM_DBH_LIMITS.CM12_5 },
+  { label: '17.5 cm+', value: MINIMUM_DBH_LIMITS.CM17_5 },
+  { label: '22.5 cm+', value: MINIMUM_DBH_LIMITS.CM22_5 },
 ]
 
 export const additionalStandAttributesOptions = [
