@@ -30,7 +30,6 @@
                         v-model="becZone"
                         item-title="label"
                         item-value="value"
-                        clearable
                         hide-details="auto"
                         persistent-placeholder
                         placeholder="Select Bec Zone"
@@ -258,6 +257,7 @@ import {
   DERIVED_BY,
   SITE_SPECIES_VALUES,
   FLOATING,
+  DEFAULT_VALUES,
 } from '@/constants/constants'
 
 const form = ref<HTMLFormElement>()
@@ -359,8 +359,7 @@ const handleDerivedByChange = (
   }
 }
 
-// Update siteIndexCurve based on selectedSiteSpecies
-watch(selectedSiteSpecies, (newSiteSpecies) => {
+const updateSiteIndexCurve = (newSiteSpecies: string | null) => {
   if (
     newSiteSpecies &&
     siteIndexCurveMap[newSiteSpecies as keyof typeof siteIndexCurveMap]
@@ -370,6 +369,10 @@ watch(selectedSiteSpecies, (newSiteSpecies) => {
   } else {
     siteIndexCurve.value = null // Clear if no mapping found
   }
+}
+// Update siteIndexCurve based on selectedSiteSpecies
+watch(selectedSiteSpecies, (newSiteSpecies) => {
+  updateSiteIndexCurve(newSiteSpecies)
 })
 
 watch(
@@ -460,6 +463,21 @@ const clear = () => {
   if (form.value) {
     form.value.reset()
   }
+
+  selectedSiteSpecies.value = highestPercentSpecies.value
+  updateSiteIndexCurve(selectedSiteSpecies.value)
+
+  becZone.value = DEFAULT_VALUES.BEC_ZONE
+  siteSpeciesValues.value = DEFAULT_VALUES.SITE_SPECIES_VALUES
+  ageType.value = DEFAULT_VALUES.AGE_TYPE
+  floating.value = DEFAULT_VALUES.FLOATING
+
+  handleDerivedByChange(
+    derivedBy.value,
+    selectedSiteSpecies.value,
+    siteSpeciesValues.value,
+    floating.value,
+  )
 }
 const confirm = () => {}
 </script>

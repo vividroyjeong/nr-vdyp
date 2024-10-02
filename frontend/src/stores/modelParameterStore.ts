@@ -160,7 +160,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     closeUtilNetDecayWasteVolume.value =
       DEFAULT_VALUES.CLOSE_UTIL_NET_DECAY_WASTE_VOLUME
     startingAge.value = DEFAULT_VALUES.STARTING_AGE
-    finishingAge.value = DEFAULT_VALUES.FINISHIN_GAGE
+    finishingAge.value = DEFAULT_VALUES.FINISHING_AGE
     ageIncrement.value = DEFAULT_VALUES.AGE_INCREMENT
     selectedVolumeReported.value = DEFAULT_VALUES.SELECTED_VOLUME_REPORTED
     projectionType.value = DEFAULT_VALUES.PROJECTION_TYPE
