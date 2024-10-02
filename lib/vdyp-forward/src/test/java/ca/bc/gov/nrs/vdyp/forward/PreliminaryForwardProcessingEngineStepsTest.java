@@ -285,12 +285,12 @@ class PreliminaryForwardProcessingEngineStepsTest extends AbstractForwardProcess
 		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.ESTIMATE_MISSING_SITE_INDICES);
 
 		var sourceSiteCurve = SiteIndexEquation.SI_CWC_BARKER;
-		var sourceSiteIndex = 13.4;
-		var targetSiteCurve = SiteIndexEquation.SI_CWC_NIGH;
+		var sourceSiteIndex = 13.4f;
+		var targetSiteCurve = SiteIndexEquation.SI_HWC_WILEYAC;
 		double expectedValue = SiteTool
 				.convertSiteIndexBetweenCurves(sourceSiteCurve, sourceSiteIndex, targetSiteCurve);
 
-		assertThat(fpe.fps.getPrimaryLayerProcessingState().getBank().siteIndices[2], is((float) expectedValue));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getBank().siteIndices[4], is((float) expectedValue));
 	}
 
 	@Test
@@ -319,7 +319,7 @@ class PreliminaryForwardProcessingEngineStepsTest extends AbstractForwardProcess
 
 		assertThat(
 				fpe.fps.getPrimaryLayerProcessingState().getBank().yearsToBreastHeight,
-				is(new float[] { 0.0f, 4.7f, 4.6f, 1.0f, 5.0f, 5.0f })
+				is(new float[] { 0.0f, 5.0f, 7.5f, 1.0f, 4.5f, 5.2f })
 		);
 	}
 
@@ -394,6 +394,6 @@ class PreliminaryForwardProcessingEngineStepsTest extends AbstractForwardProcess
 		assertThat(fpe.fps.getPrimaryLayerProcessingState().getPrimarySpeciesSiteIndex(), is(34.0f));
 		assertThat(fpe.fps.getPrimaryLayerProcessingState().getPrimarySpeciesTotalAge(), is(22.0f));
 		assertThat(fpe.fps.getPrimaryLayerProcessingState().getPrimarySpeciesAgeAtBreastHeight(), is(Float.NaN));
-		assertThat(fpe.fps.getPrimaryLayerProcessingState().getPrimarySpeciesAgeToBreastHeight(), is(4.7f));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getPrimarySpeciesAgeToBreastHeight(), is(7.7f));
 	}
 }
