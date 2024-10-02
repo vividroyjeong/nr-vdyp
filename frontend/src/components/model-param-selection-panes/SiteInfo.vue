@@ -18,222 +18,224 @@
           </v-row>
         </v-expansion-panel-title>
         <v-expansion-panel-text class="expansion-panel-text mt-n2">
-          <div>
-            <v-row>
-              <v-col cols="6">
-                <v-row class="mb-3">
-                  <v-col cols="6">
-                    <v-select
-                      label="BEC Zone"
-                      :items="becZoneOptions"
-                      v-model="becZone"
-                      item-title="label"
-                      item-value="value"
-                      clearable
-                      hide-details="auto"
-                      persistent-placeholder
-                      placeholder="Select Bec Zone"
-                      density="compact"
-                      dense
-                    ></v-select>
-                  </v-col>
-                  <v-col class="col-space-6" />
-                  <v-col>
-                    <v-select
-                      label="Eco Zone"
-                      :items="ecoZoneOptions"
-                      v-model="ecoZone"
-                      item-title="label"
-                      item-value="value"
-                      clearable
-                      hide-details="auto"
-                      persistent-placeholder
-                      placeholder="Select Eco Zone"
-                      density="compact"
-                      dense
-                    ></v-select>
-                  </v-col>
-                </v-row>
-              </v-col>
-              <v-col class="col-space-6" />
-              <v-col>
-                <v-row>
-                  <v-col cols="12">
-                    <v-checkbox
-                      label="Include Secondary Dominant Height in Yield Table"
-                      v-model="incSecondaryHeight"
-                      hide-details="auto"
-                      :disabled="isIncSecondaryHeightDisabled"
-                    ></v-checkbox>
-                  </v-col>
-                </v-row>
-              </v-col>
-            </v-row>
-            <div class="hr-line"></div>
-            <v-row class="mt-7">
-              <v-col cols="6">
-                <v-row>
-                  <v-col cols="6">
-                    <v-select
-                      label="Site Species"
-                      :items="siteSpeciesOptions"
-                      v-model="selectedSiteSpecies"
-                      item-title="label"
-                      item-value="value"
-                      hide-details="auto"
-                      persistent-placeholder
-                      placeholder="Select..."
-                      density="compact"
-                      dense
-                      :disabled="isSelectedSiteSpeciesDisabled"
-                    ></v-select>
-                  </v-col>
-                  <v-col class="col-space-6" />
-                  <v-col>
-                    <v-select
-                      label="Site Index Curve"
-                      :items="computedSpeciesOptions"
-                      v-model="siteIndexCurve"
-                      item-title="label"
-                      item-value="value"
-                      hide-details="auto"
-                      persistent-placeholder
-                      placeholder="Select..."
-                      density="compact"
-                      dense
-                      disabled
-                    ></v-select>
-                    <v-label style="font-size: 12px"
-                      >*Ministry Default Curve for this Species
-                    </v-label>
-                  </v-col>
-                </v-row>
-              </v-col>
-            </v-row>
-            <div class="hr-line"></div>
-            <v-row
-              class="mt-1"
-              style="display: inline-flex; align-items: center"
-            >
-              <v-col cols="auto" style="margin-bottom: 20px">
-                <div class="mt-2">Site Species Values:</div>
-              </v-col>
-              <v-col cols="auto">
-                <v-radio-group
-                  v-model="siteSpeciesValues"
-                  inline
-                  :disabled="isSiteSpeciesValueDisabled"
-                >
-                  <v-radio
-                    v-for="option in siteSpeciesValuesOptions"
-                    :key="option.value"
-                    :label="option.label"
-                    :value="option.value"
-                  ></v-radio>
-                </v-radio-group>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="6">
-                <v-row>
-                  <v-col cols="6">
-                    <v-select
-                      label="Age Type"
-                      :items="ageTypeOptions"
-                      v-model="ageType"
-                      item-title="label"
-                      item-value="value"
-                      hide-details="auto"
-                      persistent-placeholder
-                      placeholder="Select..."
-                      density="compact"
-                      dense
-                      :disabled="isAgeTypeDisabled"
-                    ></v-select>
-                  </v-col>
-                  <v-col class="col-space-6" />
-                  <v-col>
-                    <v-text-field
-                      label="Age (years)"
-                      type="number"
-                      v-model="age"
-                      max="100"
-                      min="0"
-                      step="0.1"
-                      persistent-placeholder
-                      placeholder="Select..."
-                      density="compact"
-                      dense
-                      :disabled="isAgeDisabled"
-                      @input="handleAgeInput($event)"
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
-                <v-row>
-                  <v-col cols="6" />
-                  <v-col class="col-space-6" />
-                  <v-col>
-                    <v-text-field
-                      label="Height (meters)"
-                      type="number"
-                      v-model="height"
-                      max="100"
-                      min="0"
-                      step="0.1"
-                      persistent-placeholder
-                      placeholder="Select..."
-                      density="compact"
-                      dense
-                      :disabled="isHeightDisabled"
-                      @input="handleHeightInput($event)"
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
-                <v-row>
-                  <v-col cols="6" />
-                  <v-col class="col-space-6" />
-                  <v-col>
-                    <v-text-field
-                      label="BHA 50 Site Index"
-                      type="number"
-                      v-model="bha50SiteIndex"
-                      max="100"
-                      min="0"
-                      step="0.1"
-                      persistent-placeholder
-                      placeholder="Select..."
-                      density="compact"
-                      dense
-                      @input="handleBHA50SiteIndexInput($event)"
-                      :disabled="isBHA50SiteIndexDisabled"
-                    ></v-text-field
-                  ></v-col>
-                </v-row>
-              </v-col>
-              <v-col cols="6">
-                <div class="mt-2">
+          <v-form ref="form">
+            <div>
+              <v-row>
+                <v-col cols="6">
+                  <v-row class="mb-3">
+                    <v-col cols="6">
+                      <v-select
+                        label="BEC Zone"
+                        :items="becZoneOptions"
+                        v-model="becZone"
+                        item-title="label"
+                        item-value="value"
+                        clearable
+                        hide-details="auto"
+                        persistent-placeholder
+                        placeholder="Select Bec Zone"
+                        density="compact"
+                        dense
+                      ></v-select>
+                    </v-col>
+                    <v-col class="col-space-6" />
+                    <v-col>
+                      <v-select
+                        label="Eco Zone"
+                        :items="ecoZoneOptions"
+                        v-model="ecoZone"
+                        item-title="label"
+                        item-value="value"
+                        clearable
+                        hide-details="auto"
+                        persistent-placeholder
+                        placeholder="Select Eco Zone"
+                        density="compact"
+                        dense
+                      ></v-select>
+                    </v-col>
+                  </v-row>
+                </v-col>
+                <v-col class="col-space-6" />
+                <v-col>
+                  <v-row>
+                    <v-col cols="12">
+                      <v-checkbox
+                        label="Include Secondary Dominant Height in Yield Table"
+                        v-model="incSecondaryHeight"
+                        hide-details="auto"
+                        :disabled="isIncSecondaryHeightDisabled"
+                      ></v-checkbox>
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+              <div class="hr-line"></div>
+              <v-row class="mt-7">
+                <v-col cols="6">
+                  <v-row>
+                    <v-col cols="6">
+                      <v-select
+                        label="Site Species"
+                        :items="siteSpeciesOptions"
+                        v-model="selectedSiteSpecies"
+                        item-title="label"
+                        item-value="value"
+                        hide-details="auto"
+                        persistent-placeholder
+                        placeholder="Select..."
+                        density="compact"
+                        dense
+                        :disabled="isSelectedSiteSpeciesDisabled"
+                      ></v-select>
+                    </v-col>
+                    <v-col class="col-space-6" />
+                    <v-col>
+                      <v-select
+                        label="Site Index Curve"
+                        :items="computedSpeciesOptions"
+                        v-model="siteIndexCurve"
+                        item-title="label"
+                        item-value="value"
+                        hide-details="auto"
+                        persistent-placeholder
+                        placeholder="Select..."
+                        density="compact"
+                        dense
+                        disabled
+                      ></v-select>
+                      <v-label style="font-size: 12px"
+                        >*Ministry Default Curve for this Species
+                      </v-label>
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+              <div class="hr-line"></div>
+              <v-row
+                class="mt-1"
+                style="display: inline-flex; align-items: center"
+              >
+                <v-col cols="auto" style="margin-bottom: 20px">
+                  <div class="mt-2">Site Species Values:</div>
+                </v-col>
+                <v-col cols="auto">
                   <v-radio-group
-                    v-model="floating"
-                    row
-                    :disabled="isFloatingDisabled"
+                    v-model="siteSpeciesValues"
+                    inline
+                    :disabled="isSiteSpeciesValueDisabled"
                   >
                     <v-radio
-                      v-for="option in floatingOptions"
+                      v-for="option in siteSpeciesValuesOptions"
                       :key="option.value"
                       :label="option.label"
                       :value="option.value"
-                      style="margin-bottom: 45px"
                     ></v-radio>
                   </v-radio-group>
-                </div>
-              </v-col>
-            </v-row>
-          </div>
-          <v-card-actions class="mt-5 pr-0">
-            <v-spacer></v-spacer>
-            <v-btn class="white-btn" @click="clear">Clear</v-btn>
-            <v-btn class="blue-btn ml-2" @click="confirm">Confirm</v-btn>
-          </v-card-actions>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="6">
+                  <v-row>
+                    <v-col cols="6">
+                      <v-select
+                        label="Age Type"
+                        :items="ageTypeOptions"
+                        v-model="ageType"
+                        item-title="label"
+                        item-value="value"
+                        hide-details="auto"
+                        persistent-placeholder
+                        placeholder="Select..."
+                        density="compact"
+                        dense
+                        :disabled="isAgeTypeDisabled"
+                      ></v-select>
+                    </v-col>
+                    <v-col class="col-space-6" />
+                    <v-col>
+                      <v-text-field
+                        label="Age (years)"
+                        type="number"
+                        v-model="age"
+                        max="100"
+                        min="0"
+                        step="0.1"
+                        persistent-placeholder
+                        placeholder="Select..."
+                        density="compact"
+                        dense
+                        :disabled="isAgeDisabled"
+                        @input="handleAgeInput($event)"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col cols="6" />
+                    <v-col class="col-space-6" />
+                    <v-col>
+                      <v-text-field
+                        label="Height (meters)"
+                        type="number"
+                        v-model="height"
+                        max="100"
+                        min="0"
+                        step="0.1"
+                        persistent-placeholder
+                        placeholder="Select..."
+                        density="compact"
+                        dense
+                        :disabled="isHeightDisabled"
+                        @input="handleHeightInput($event)"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col cols="6" />
+                    <v-col class="col-space-6" />
+                    <v-col>
+                      <v-text-field
+                        label="BHA 50 Site Index"
+                        type="number"
+                        v-model="bha50SiteIndex"
+                        max="100"
+                        min="0"
+                        step="0.1"
+                        persistent-placeholder
+                        placeholder="Select..."
+                        density="compact"
+                        dense
+                        @input="handleBHA50SiteIndexInput($event)"
+                        :disabled="isBHA50SiteIndexDisabled"
+                      ></v-text-field
+                    ></v-col>
+                  </v-row>
+                </v-col>
+                <v-col cols="6">
+                  <div class="mt-2">
+                    <v-radio-group
+                      v-model="floating"
+                      row
+                      :disabled="isFloatingDisabled"
+                    >
+                      <v-radio
+                        v-for="option in floatingOptions"
+                        :key="option.value"
+                        :label="option.label"
+                        :value="option.value"
+                        style="margin-bottom: 45px"
+                      ></v-radio>
+                    </v-radio-group>
+                  </div>
+                </v-col>
+              </v-row>
+            </div>
+            <v-card-actions class="mt-5 pr-0">
+              <v-spacer></v-spacer>
+              <v-btn class="white-btn" @click="clear">Clear</v-btn>
+              <v-btn class="blue-btn ml-2" @click="confirm">Confirm</v-btn>
+            </v-card-actions>
+          </v-form>
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
@@ -257,6 +259,8 @@ import {
   SITE_SPECIES_VALUES,
   FLOATING,
 } from '@/constants/constants'
+
+const form = ref<HTMLFormElement>()
 
 const modelParameterStore = useModelParameterStore()
 const {
@@ -452,7 +456,11 @@ const handleBHA50SiteIndexInput = (event: Event) => {
   }
 }
 
-const clear = () => {}
+const clear = () => {
+  if (form.value) {
+    form.value.reset()
+  }
+}
 const confirm = () => {}
 </script>
 

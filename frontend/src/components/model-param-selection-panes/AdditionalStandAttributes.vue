@@ -18,175 +18,177 @@
           </v-row>
         </v-expansion-panel-title>
         <v-expansion-panel-text class="expansion-panel-text mt-n2">
-          <div>
-            <v-row>
-              <v-col cols="auto">
-                <v-radio-group
-                  v-model="computedValues"
-                  density="compact"
-                  dense
-                  :disabled="isComputedValuesDisabled"
-                >
-                  <v-radio
-                    v-for="option in additionalStandAttributesOptions"
-                    :key="option.value"
-                    :label="option.label"
-                    :value="option.value"
-                  ></v-radio>
-                </v-radio-group>
-              </v-col>
-            </v-row>
-          </div>
-          <div>
-            <v-row>
-              <v-col cols="5">
-                <v-text-field
-                  label="Lorey Height - 7.5cm+ (meters)"
-                  type="number"
-                  v-model="loreyHeight"
-                  min="0"
-                  step="0.01"
-                  :rules="[validateMinimum]"
-                  :error-messages="loreyHeightError"
-                  persistent-placeholder
-                  placeholder="N/A"
-                  density="compact"
-                  dense
-                  :disabled="isLoreyHeightDisabled"
-                ></v-text-field>
-              </v-col>
-              <v-col class="col-space-3" />
-              <v-col cols="5">
-                <v-text-field
-                  type="number"
-                  v-model="wholeStemVolume75cm"
-                  min="0"
-                  step="0.1"
-                  :rules="[validateMinimum]"
-                  :error-messages="wholeStemVolume75cmError"
-                  persistent-placeholder
-                  placeholder="N/A"
-                  density="compact"
-                  dense
-                  :disabled="isWholeStemVolume75cmDisabled"
-                >
-                  <template v-slot:label>
-                    Whole Stem Volume - 7.5cm+ (m<sup>3</sup>/ha)
-                  </template>
-                </v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="5">
-                <v-text-field
-                  type="number"
-                  v-model="basalArea125cm"
-                  min="0"
-                  step="0.0001"
-                  :rules="[validateMinimum]"
-                  :error-messages="basalArea125cmError"
-                  persistent-placeholder
-                  placeholder="N/A"
-                  density="compact"
-                  dense
-                  :disabled="isBasalArea125cmDisabled"
-                >
-                  <template v-slot:label>
-                    Basal Area - 12.5cm+ (m<sup>2</sup>/ha)
-                  </template>
-                </v-text-field>
-              </v-col>
-              <v-col class="col-space-3" />
-              <v-col cols="5">
-                <v-text-field
-                  type="number"
-                  v-model="wholeStemVolume125cm"
-                  min="0"
-                  step="0.1"
-                  :rules="[validateMinimum]"
-                  :error-messages="wholeStemVolume125cmError"
-                  persistent-placeholder
-                  placeholder="N/A"
-                  density="compact"
-                  dense
-                  :disabled="isWholeStemVolume125cmDisabled"
-                >
-                  <template v-slot:label>
-                    Whole Stem Volume - 12.5cm+ (m<sup>3</sup>/ha)
-                  </template>
-                </v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="5">
-                <v-text-field
-                  type="number"
-                  v-model="closeUtilVolume"
-                  min="0"
-                  step="0.1"
-                  :rules="[validateMinimum]"
-                  :error-messages="closeUtilVolumeError"
-                  persistent-placeholder
-                  placeholder="N/A"
-                  density="compact"
-                  dense
-                  :disabled="isCloseUtilVolumeDisabled"
-                >
-                  <template v-slot:label>
-                    Close Utilization Volume - 12.5cm+ (m<sup>3</sup>/ha)
-                  </template>
-                </v-text-field>
-              </v-col>
-              <v-col class="col-space-3" />
-              <v-col cols="5">
-                <v-text-field
-                  type="number"
-                  v-model="closeUtilNetDecayVolume"
-                  min="0"
-                  step="0.1"
-                  :rules="[validateMinimum]"
-                  :error-messages="closeUtilNetDecayVolumeError"
-                  persistent-placeholder
-                  placeholder="N/A"
-                  density="compact"
-                  dense
-                  :disabled="isCloseUtilNetDecayVolumeDisabled"
-                >
-                  <template v-slot:label>
-                    Close Utilization Net Decay Volume - 12.5cm+
-                    (m<sup>3</sup>/ha)
-                  </template>
-                </v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="5">
-                <v-text-field
-                  type="number"
-                  v-model="closeUtilNetDecayWasteVolume"
-                  min="0"
-                  step="0.1"
-                  :rules="[validateMinimum]"
-                  :error-messages="closeUtilNetDecayWasteVolumeError"
-                  persistent-placeholder
-                  placeholder="N/A"
-                  density="compact"
-                  dense
-                  :disabled="isCloseUtilNetDecayWasteVolumeDisabled"
-                >
-                  <template v-slot:label>
-                    Close Utilization Net Decay Waste Volume - 12.5cm+
-                    (m<sup>3</sup>/ha)
-                  </template>
-                </v-text-field>
-              </v-col>
-            </v-row>
-          </div>
-          <v-card-actions class="mt-5 pr-0">
-            <v-spacer></v-spacer>
-            <v-btn class="white-btn" @click="clear">Clear</v-btn>
-            <v-btn class="blue-btn ml-2" @click="confirm">Confirm</v-btn>
-          </v-card-actions>
+          <v-form ref="form">
+            <div>
+              <v-row>
+                <v-col cols="auto">
+                  <v-radio-group
+                    v-model="computedValues"
+                    density="compact"
+                    dense
+                    :disabled="isComputedValuesDisabled"
+                  >
+                    <v-radio
+                      v-for="option in additionalStandAttributesOptions"
+                      :key="option.value"
+                      :label="option.label"
+                      :value="option.value"
+                    ></v-radio>
+                  </v-radio-group>
+                </v-col>
+              </v-row>
+            </div>
+            <div>
+              <v-row>
+                <v-col cols="5">
+                  <v-text-field
+                    label="Lorey Height - 7.5cm+ (meters)"
+                    type="number"
+                    v-model="loreyHeight"
+                    min="0"
+                    step="0.01"
+                    :rules="[validateMinimum]"
+                    :error-messages="loreyHeightError"
+                    persistent-placeholder
+                    placeholder="N/A"
+                    density="compact"
+                    dense
+                    :disabled="isLoreyHeightDisabled"
+                  ></v-text-field>
+                </v-col>
+                <v-col class="col-space-3" />
+                <v-col cols="5">
+                  <v-text-field
+                    type="number"
+                    v-model="wholeStemVolume75cm"
+                    min="0"
+                    step="0.1"
+                    :rules="[validateMinimum]"
+                    :error-messages="wholeStemVolume75cmError"
+                    persistent-placeholder
+                    placeholder="N/A"
+                    density="compact"
+                    dense
+                    :disabled="isWholeStemVolume75cmDisabled"
+                  >
+                    <template v-slot:label>
+                      Whole Stem Volume - 7.5cm+ (m<sup>3</sup>/ha)
+                    </template>
+                  </v-text-field>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="5">
+                  <v-text-field
+                    type="number"
+                    v-model="basalArea125cm"
+                    min="0"
+                    step="0.0001"
+                    :rules="[validateMinimum]"
+                    :error-messages="basalArea125cmError"
+                    persistent-placeholder
+                    placeholder="N/A"
+                    density="compact"
+                    dense
+                    :disabled="isBasalArea125cmDisabled"
+                  >
+                    <template v-slot:label>
+                      Basal Area - 12.5cm+ (m<sup>2</sup>/ha)
+                    </template>
+                  </v-text-field>
+                </v-col>
+                <v-col class="col-space-3" />
+                <v-col cols="5">
+                  <v-text-field
+                    type="number"
+                    v-model="wholeStemVolume125cm"
+                    min="0"
+                    step="0.1"
+                    :rules="[validateMinimum]"
+                    :error-messages="wholeStemVolume125cmError"
+                    persistent-placeholder
+                    placeholder="N/A"
+                    density="compact"
+                    dense
+                    :disabled="isWholeStemVolume125cmDisabled"
+                  >
+                    <template v-slot:label>
+                      Whole Stem Volume - 12.5cm+ (m<sup>3</sup>/ha)
+                    </template>
+                  </v-text-field>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="5">
+                  <v-text-field
+                    type="number"
+                    v-model="closeUtilVolume"
+                    min="0"
+                    step="0.1"
+                    :rules="[validateMinimum]"
+                    :error-messages="closeUtilVolumeError"
+                    persistent-placeholder
+                    placeholder="N/A"
+                    density="compact"
+                    dense
+                    :disabled="isCloseUtilVolumeDisabled"
+                  >
+                    <template v-slot:label>
+                      Close Utilization Volume - 12.5cm+ (m<sup>3</sup>/ha)
+                    </template>
+                  </v-text-field>
+                </v-col>
+                <v-col class="col-space-3" />
+                <v-col cols="5">
+                  <v-text-field
+                    type="number"
+                    v-model="closeUtilNetDecayVolume"
+                    min="0"
+                    step="0.1"
+                    :rules="[validateMinimum]"
+                    :error-messages="closeUtilNetDecayVolumeError"
+                    persistent-placeholder
+                    placeholder="N/A"
+                    density="compact"
+                    dense
+                    :disabled="isCloseUtilNetDecayVolumeDisabled"
+                  >
+                    <template v-slot:label>
+                      Close Utilization Net Decay Volume - 12.5cm+
+                      (m<sup>3</sup>/ha)
+                    </template>
+                  </v-text-field>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="5">
+                  <v-text-field
+                    type="number"
+                    v-model="closeUtilNetDecayWasteVolume"
+                    min="0"
+                    step="0.1"
+                    :rules="[validateMinimum]"
+                    :error-messages="closeUtilNetDecayWasteVolumeError"
+                    persistent-placeholder
+                    placeholder="N/A"
+                    density="compact"
+                    dense
+                    :disabled="isCloseUtilNetDecayWasteVolumeDisabled"
+                  >
+                    <template v-slot:label>
+                      Close Utilization Net Decay Waste Volume - 12.5cm+
+                      (m<sup>3</sup>/ha)
+                    </template>
+                  </v-text-field>
+                </v-col>
+              </v-row>
+            </div>
+            <v-card-actions class="mt-5 pr-0">
+              <v-spacer></v-spacer>
+              <v-btn class="white-btn" @click="clear">Clear</v-btn>
+              <v-btn class="blue-btn ml-2" @click="confirm">Confirm</v-btn>
+            </v-card-actions>
+          </v-form>
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
@@ -203,6 +205,8 @@ import {
   SITE_SPECIES_VALUES,
   COMPUTED_VALUES,
 } from '@/constants/constants'
+
+const form = ref<HTMLFormElement>()
 
 const modelParameterStore = useModelParameterStore()
 const {
@@ -308,7 +312,11 @@ const closeUtilNetDecayWasteVolumeError = computed(() => {
   return error === true ? [] : [error]
 })
 
-const clear = () => {}
+const clear = () => {
+  if (form.value) {
+    form.value.reset()
+  }
+}
 const confirm = () => {}
 </script>
 <style scoped></style>

@@ -18,115 +18,117 @@
           </v-row>
         </v-expansion-panel-title>
         <v-expansion-panel-text class="expansion-panel-text mt-n2">
-          <div>
-            <v-row>
-              <v-col cols="3">
-                <v-text-field
-                  label="Percent Stockable Area"
-                  type="number"
-                  v-model="percentStockableArea"
-                  max="100"
-                  min="0"
-                  step="5"
-                  :rules="[validatePercentStockableArea]"
-                  :error-messages="percentStockableAreaError"
-                  placeholder="Select..."
-                  persistent-placeholder
-                  density="compact"
-                  dense
-                ></v-text-field
-              ></v-col>
-              <v-col class="col-space-3" />
-              <v-col cols="3">
-                <v-text-field
-                  type="number"
-                  v-model="basalArea"
-                  min="0"
-                  step="0.0001"
-                  :rules="[validateMinimum]"
-                  :error-messages="basalAreaError"
-                  persistent-placeholder
-                  placeholder="N/A"
-                  density="compact"
-                  dense
-                  :disabled="isBasalAreaDisabled"
+          <v-form ref="form">
+            <div>
+              <v-row>
+                <v-col cols="3">
+                  <v-text-field
+                    label="Percent Stockable Area"
+                    type="number"
+                    v-model="percentStockableArea"
+                    max="100"
+                    min="0"
+                    step="5"
+                    :rules="[validatePercentStockableArea]"
+                    :error-messages="percentStockableAreaError"
+                    placeholder="Select..."
+                    persistent-placeholder
+                    density="compact"
+                    dense
+                  ></v-text-field
+                ></v-col>
+                <v-col class="col-space-3" />
+                <v-col cols="3">
+                  <v-text-field
+                    type="number"
+                    v-model="basalArea"
+                    min="0"
+                    step="0.0001"
+                    :rules="[validateMinimum]"
+                    :error-messages="basalAreaError"
+                    persistent-placeholder
+                    placeholder="N/A"
+                    density="compact"
+                    dense
+                    :disabled="isBasalAreaDisabled"
+                  >
+                    <template v-slot:label>
+                      Basal Area (m<sup>2</sup>/ha)
+                    </template>
+                  </v-text-field></v-col
                 >
-                  <template v-slot:label>
-                    Basal Area (m<sup>2</sup>/ha)
-                  </template>
-                </v-text-field></v-col
-              >
-            </v-row>
-            <v-row>
-              <v-col cols="3">
-                <v-text-field
-                  label="Trees per Hectare"
-                  type="number"
-                  v-model="treesPerHectare"
-                  min="0"
-                  step="0.01"
-                  :rules="[validateMinimum]"
-                  :error-messages="treesPerHectareError"
-                  persistent-placeholder
-                  placeholder="N/A"
-                  density="compact"
-                  dense
-                  :disabled="isTreesPerHectareDisabled"
-                ></v-text-field>
-              </v-col>
-              <v-col class="col-space-3" />
-              <v-col cols="3">
-                <v-select
-                  label="Minimum DBH Limit"
-                  :items="minimumDBHLimitsOptions"
-                  v-model="minimumDBHLimit"
-                  item-title="label"
-                  item-value="value"
-                  clearable
-                  hide-details
-                  persistent-placeholder
-                  placeholder="Select..."
-                  density="compact"
-                  dense
-                  disabled
-                ></v-select>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="3">
-                <v-text-field
-                  label="Percent Crown Closure (%)"
-                  type="number"
-                  v-model="percentCrownClosure"
-                  max="100"
-                  min="0"
-                  step="0.1"
-                  :rules="[validatePercentCrownClosure]"
-                  :error-messages="percentCrownClosureError"
-                  persistent-placeholder
-                  placeholder="N/A"
-                  hide-details
-                  density="compact"
-                  dense
-                  :disabled="isPercentCrownClosureDisabled"
-                ></v-text-field>
-                <v-label
-                  v-show="
-                    percentCrownClosure === 0 ||
-                    percentCrownClosure === '0' ||
-                    percentCrownClosure === '0.0'
-                  "
-                  style="font-size: 12px"
-                  >Applying Default of 50%</v-label
-                >
-              </v-col>
-            </v-row>
-          </div>
-          <v-card-actions class="mt-5 pr-0">
-            <v-spacer></v-spacer>
-            <v-btn class="white-btn" @click="clear">Clear</v-btn>
-            <v-btn class="blue-btn ml-2" @click="confirm">Confirm</v-btn>
-          </v-card-actions>
+              </v-row>
+              <v-row>
+                <v-col cols="3">
+                  <v-text-field
+                    label="Trees per Hectare"
+                    type="number"
+                    v-model="treesPerHectare"
+                    min="0"
+                    step="0.01"
+                    :rules="[validateMinimum]"
+                    :error-messages="treesPerHectareError"
+                    persistent-placeholder
+                    placeholder="N/A"
+                    density="compact"
+                    dense
+                    :disabled="isTreesPerHectareDisabled"
+                  ></v-text-field>
+                </v-col>
+                <v-col class="col-space-3" />
+                <v-col cols="3">
+                  <v-select
+                    label="Minimum DBH Limit"
+                    :items="minimumDBHLimitsOptions"
+                    v-model="minimumDBHLimit"
+                    item-title="label"
+                    item-value="value"
+                    clearable
+                    hide-details
+                    persistent-placeholder
+                    placeholder="Select..."
+                    density="compact"
+                    dense
+                    disabled
+                  ></v-select>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="3">
+                  <v-text-field
+                    label="Percent Crown Closure (%)"
+                    type="number"
+                    v-model="percentCrownClosure"
+                    max="100"
+                    min="0"
+                    step="0.1"
+                    :rules="[validatePercentCrownClosure]"
+                    :error-messages="percentCrownClosureError"
+                    persistent-placeholder
+                    placeholder="N/A"
+                    hide-details
+                    density="compact"
+                    dense
+                    :disabled="isPercentCrownClosureDisabled"
+                  ></v-text-field>
+                  <v-label
+                    v-show="
+                      percentCrownClosure === 0 ||
+                      percentCrownClosure === '0' ||
+                      percentCrownClosure === '0.0'
+                    "
+                    style="font-size: 12px"
+                    >Applying Default of 50%</v-label
+                  >
+                </v-col>
+              </v-row>
+            </div>
+            <v-card-actions class="mt-5 pr-0">
+              <v-spacer></v-spacer>
+              <v-btn class="white-btn" @click="clear">Clear</v-btn>
+              <v-btn class="blue-btn ml-2" @click="confirm">Confirm</v-btn>
+            </v-card-actions>
+          </v-form>
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
@@ -139,6 +141,8 @@ import { useModelParameterStore } from '@/stores/modelParameterStore'
 import { storeToRefs } from 'pinia'
 import { minimumDBHLimitsOptions } from '@/constants/options'
 import { DERIVED_BY, SITE_SPECIES_VALUES } from '@/constants/constants'
+
+const form = ref<HTMLFormElement>()
 
 const modelParameterStore = useModelParameterStore()
 const {
@@ -237,7 +241,11 @@ const treesPerHectareError = computed(() => {
   return error === true ? [] : [error]
 })
 
-const clear = () => {}
+const clear = () => {
+  if (form.value) {
+    form.value.reset()
+  }
+}
 const confirm = () => {}
 </script>
 

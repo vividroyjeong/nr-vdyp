@@ -18,177 +18,179 @@
           </v-row>
         </v-expansion-panel-title>
         <v-expansion-panel-text class="expansion-panel-text mt-n2">
-          <div>
-            <v-row>
-              <v-col cols="3">
-                <v-text-field
-                  label="Starting Age"
-                  type="number"
-                  v-model="startingAge"
-                  min="0"
-                  max="500"
-                  step="1"
-                  :rules="[validateAge]"
-                  :error-messages="startingAgeError"
-                  persistent-placeholder
-                  placeholder="Select..."
-                  density="compact"
-                  dense
-                ></v-text-field>
-              </v-col>
-              <v-col class="col-space-3" />
-              <v-col cols="3">
-                <v-text-field
-                  label="Finishing Age"
-                  type="number"
-                  v-model="finishingAge"
-                  min="0"
-                  max="500"
-                  step="10"
-                  :rules="[validateAge]"
-                  :error-messages="finishingAgeError"
-                  persistent-placeholder
-                  placeholder="Select..."
-                  density="compact"
-                  dense
-                ></v-text-field>
-              </v-col>
-              <v-col class="col-space-3" />
-              <v-col cols="3">
-                <v-text-field
-                  label="Age Increment"
-                  type="number"
-                  v-model="ageIncrement"
-                  min="1"
-                  max="350"
-                  step="5"
-                  :rules="[validateAgeIncrement]"
-                  :error-messages="ageIncrementError"
-                  persistent-placeholder
-                  placeholder="Select..."
-                  density="compact"
-                  dense
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </div>
-          <div class="ml-4 mt-5">
-            <div class="ml-n4 mt-n5">
-              <span class="text-h7">Volume Reported</span>
+          <v-form ref="form">
+            <div>
+              <v-row>
+                <v-col cols="3">
+                  <v-text-field
+                    label="Starting Age"
+                    type="number"
+                    v-model="startingAge"
+                    min="0"
+                    max="500"
+                    step="1"
+                    :rules="[validateAge]"
+                    :error-messages="startingAgeError"
+                    persistent-placeholder
+                    placeholder="Select..."
+                    density="compact"
+                    dense
+                  ></v-text-field>
+                </v-col>
+                <v-col class="col-space-3" />
+                <v-col cols="3">
+                  <v-text-field
+                    label="Finishing Age"
+                    type="number"
+                    v-model="finishingAge"
+                    min="0"
+                    max="500"
+                    step="10"
+                    :rules="[validateAge]"
+                    :error-messages="finishingAgeError"
+                    persistent-placeholder
+                    placeholder="Select..."
+                    density="compact"
+                    dense
+                  ></v-text-field>
+                </v-col>
+                <v-col class="col-space-3" />
+                <v-col cols="3">
+                  <v-text-field
+                    label="Age Increment"
+                    type="number"
+                    v-model="ageIncrement"
+                    min="1"
+                    max="350"
+                    step="5"
+                    :rules="[validateAgeIncrement]"
+                    :error-messages="ageIncrementError"
+                    persistent-placeholder
+                    placeholder="Select..."
+                    density="compact"
+                    dense
+                  ></v-text-field>
+                </v-col>
+              </v-row>
             </div>
-            <v-row class="ml-n6">
-              <v-col cols="12" style="padding-top: 0px">
-                <v-row>
-                  <v-col
-                    v-for="(option, index) in volumeReportedOptions"
-                    :key="index"
-                    :style="{ 'max-width': index < 4 ? '20%' : 'auto' }"
-                  >
-                    <v-checkbox
-                      v-model="selectedVolumeReported"
-                      :label="option.label"
-                      :value="option.value"
-                      hide-details
-                    ></v-checkbox>
-                  </v-col>
-                </v-row>
-              </v-col>
-            </v-row>
-          </div>
-          <div class="ml-4 mt-5">
-            <div class="ml-n4 mt-n5">
-              <span class="text-h7">Include in Report</span>
+            <div class="ml-4 mt-5">
+              <div class="ml-n4 mt-n5">
+                <span class="text-h7">Volume Reported</span>
+              </div>
+              <v-row class="ml-n6">
+                <v-col cols="12" style="padding-top: 0px">
+                  <v-row>
+                    <v-col
+                      v-for="(option, index) in volumeReportedOptions"
+                      :key="index"
+                      :style="{ 'max-width': index < 4 ? '20%' : 'auto' }"
+                    >
+                      <v-checkbox
+                        v-model="selectedVolumeReported"
+                        :label="option.label"
+                        :value="option.value"
+                        hide-details
+                      ></v-checkbox>
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
             </div>
-            <v-row class="ml-n6">
-              <v-col cols="12" style="padding-top: 0px">
-                <v-row>
-                  <v-col
-                    v-for="(option, index) in includeInReportOptions"
-                    :key="index"
-                    :style="{ 'max-width': index < 4 ? '20%' : 'auto' }"
-                  >
-                    <v-checkbox
-                      v-model="selectedVolumeReported"
-                      :label="option.label"
-                      :value="option.value"
-                      hide-details
-                    ></v-checkbox>
-                  </v-col>
+            <div class="ml-4 mt-5">
+              <div class="ml-n4 mt-n5">
+                <span class="text-h7">Include in Report</span>
+              </div>
+              <v-row class="ml-n6">
+                <v-col cols="12" style="padding-top: 0px">
+                  <v-row>
+                    <v-col
+                      v-for="(option, index) in includeInReportOptions"
+                      :key="index"
+                      :style="{ 'max-width': index < 4 ? '20%' : 'auto' }"
+                    >
+                      <v-checkbox
+                        v-model="selectedVolumeReported"
+                        :label="option.label"
+                        :value="option.value"
+                        hide-details
+                      ></v-checkbox>
+                    </v-col>
 
-                  <v-col style="max-width: 20% !important">
-                    <v-select
-                      label="Projection Type"
-                      :items="projectionTypeOptions"
-                      v-model="projectionType"
-                      item-title="label"
-                      item-value="value"
-                      clearable
-                      hide-details="auto"
-                      persistent-placeholder
-                      placeholder="Select..."
-                      density="compact"
-                      dense
-                      style="max-width: 70% !important"
-                    ></v-select>
-                  </v-col>
-                </v-row>
-              </v-col>
-            </v-row>
-          </div>
-          <div class="ml-4 mt-5">
-            <div class="ml-n4 mt-n5">
-              <span class="text-h7">Report Title</span>
+                    <v-col style="max-width: 20% !important">
+                      <v-select
+                        label="Projection Type"
+                        :items="projectionTypeOptions"
+                        v-model="projectionType"
+                        item-title="label"
+                        item-value="value"
+                        clearable
+                        hide-details="auto"
+                        persistent-placeholder
+                        placeholder="Select..."
+                        density="compact"
+                        dense
+                        style="max-width: 70% !important"
+                      ></v-select>
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
             </div>
-            <v-row>
-              <v-col cols="12">
-                <v-text-field
-                  type="string"
-                  v-model="reportTitle"
-                  hide-details="auto"
-                  persistent-placeholder
-                  placeholder="Enter a report title..."
-                  density="compact"
-                  dense
-                  style="max-width: 50% !important"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </div>
-          <div class="mt-5">
-            <v-row v-for="(group, index) in speciesGroups" :key="index">
-              <v-col cols="3">
-                <v-text-field
-                  :label="`Minimum DBH Limit by Species #${index + 1}`"
-                  type="string"
-                  v-model="group.group"
-                  persistent-placeholder
-                  placeholder="Select..."
-                  density="compact"
-                  dense
-                  readonly
-                ></v-text-field>
-              </v-col>
-              <v-col class="col-space-3" />
-              <v-col cols="5" class="ma-5">
-                <vue-slider
-                  v-model="group.minimumDBHLimit"
-                  :data="minimumDBHLimitsOptions"
-                  :data-value="'value'"
-                  :data-label="'label'"
-                  :contained="true"
-                  :tooltip="'none'"
-                  :dotStyle="{ backgroundColor: '#787878' }"
-                  :rail-style="{ backgroundColor: '#f5f5f5' }"
-                  :process-style="{ backgroundColor: '#787878' }"
-                />
-              </v-col>
-            </v-row>
-          </div>
-          <v-card-actions class="mt-5 pr-0">
-            <v-spacer></v-spacer>
-            <v-btn class="white-btn" @click="clear">Clear</v-btn>
-            <v-btn class="blue-btn ml-2" @click="confirm">Confirm</v-btn>
-          </v-card-actions>
+            <div class="ml-4 mt-5">
+              <div class="ml-n4 mt-n5">
+                <span class="text-h7">Report Title</span>
+              </div>
+              <v-row>
+                <v-col cols="12">
+                  <v-text-field
+                    type="string"
+                    v-model="reportTitle"
+                    hide-details="auto"
+                    persistent-placeholder
+                    placeholder="Enter a report title..."
+                    density="compact"
+                    dense
+                    style="max-width: 50% !important"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </div>
+            <div class="mt-5">
+              <v-row v-for="(group, index) in speciesGroups" :key="index">
+                <v-col cols="3">
+                  <v-text-field
+                    :label="`Minimum DBH Limit by Species #${index + 1}`"
+                    type="string"
+                    v-model="group.group"
+                    persistent-placeholder
+                    placeholder="Select..."
+                    density="compact"
+                    dense
+                    readonly
+                  ></v-text-field>
+                </v-col>
+                <v-col class="col-space-3" />
+                <v-col cols="5" class="ma-5">
+                  <vue-slider
+                    v-model="group.minimumDBHLimit"
+                    :data="minimumDBHLimitsOptions"
+                    :data-value="'value'"
+                    :data-label="'label'"
+                    :contained="true"
+                    :tooltip="'none'"
+                    :dotStyle="{ backgroundColor: '#787878' }"
+                    :rail-style="{ backgroundColor: '#f5f5f5' }"
+                    :process-style="{ backgroundColor: '#787878' }"
+                  />
+                </v-col>
+              </v-row>
+            </div>
+            <v-card-actions class="mt-5 pr-0">
+              <v-spacer></v-spacer>
+              <v-btn class="white-btn" @click="clear">Clear</v-btn>
+              <v-btn class="blue-btn ml-2" @click="confirm">Confirm</v-btn>
+            </v-card-actions>
+          </v-form>
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
@@ -196,7 +198,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
 import { storeToRefs } from 'pinia'
 import VueSlider from 'vue-slider-component'
@@ -207,6 +209,8 @@ import {
   projectionTypeOptions,
   minimumDBHLimitsOptions,
 } from '@/constants/options'
+
+const form = ref<HTMLFormElement>()
 
 const modelParameterStore = useModelParameterStore()
 const {
@@ -259,7 +263,11 @@ const ageIncrementError = computed(() => {
   return error === true ? [] : [error]
 })
 
-const clear = () => {}
+const clear = () => {
+  if (form.value) {
+    form.value.reset()
+  }
+}
 const confirm = () => {}
 </script>
 <style scoped></style>
