@@ -32,7 +32,6 @@ import ca.bc.gov.nrs.vdyp.forward.test.ForwardTestUtils;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParser;
 import ca.bc.gov.nrs.vdyp.io.parse.streaming.StreamingParserFactory;
-import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 
@@ -69,7 +68,7 @@ class Grow1CalculateDominantHeightDeltaTest {
 		var polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 
 		// Select the first polygon - 01002 S000001 00(1970)
-		fpe.fps.setPolygonLayer(polygon, LayerType.PRIMARY);
+		fpe.fps.setPolygon(polygon);
 
 		float hd = 35.2999992f;
 		int sc = 13;
@@ -92,7 +91,7 @@ class Grow1CalculateDominantHeightDeltaTest {
 			polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 		} while (!polygon.getPolygonIdentifier().getName().equals("01003AS000001 00"));
 
-		fpe.fps.setPolygonLayer(polygon, LayerType.PRIMARY);
+		fpe.fps.setPolygon(polygon);
 
 		float hd = 29.5f;
 		int sc = 11;
@@ -115,7 +114,7 @@ class Grow1CalculateDominantHeightDeltaTest {
 			polygon = forwardDataStreamReader.readNextPolygon().orElseThrow();
 		} while (!polygon.getPolygonIdentifier().getName().equals("01003AS000001 00"));
 
-		fpe.fps.setPolygonLayer(polygon, LayerType.PRIMARY);
+		fpe.fps.setPolygon(polygon);
 
 		fpe.processPolygon(polygon, ExecutionStep.GROW_1_LAYER_DHDELTA.predecessor());
 

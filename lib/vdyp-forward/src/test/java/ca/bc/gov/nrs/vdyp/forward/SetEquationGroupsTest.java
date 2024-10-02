@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
-import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.VdypEntity;
 
 public class SetEquationGroupsTest extends AbstractForwardProcessingEngineTest {
@@ -21,18 +20,18 @@ public class SetEquationGroupsTest extends AbstractForwardProcessingEngineTest {
 		var polygon = reader.readNextPolygon().get();
 
 		ForwardProcessingState fps = new ForwardProcessingState(controlMap);
-		fps.setPolygonLayer(polygon, LayerType.PRIMARY);
+		fps.setPolygon(polygon);
 
 		assertThat(
-				fps.getLayerProcessingState().getVolumeEquationGroups(),
+				fps.getPrimaryLayerProcessingState().getVolumeEquationGroups(),
 				Matchers.is(new int[] { VdypEntity.MISSING_INTEGER_VALUE, 12, 20, 25, 37, 66 })
 		);
 		assertThat(
-				fps.getLayerProcessingState().getDecayEquationGroups(),
+				fps.getPrimaryLayerProcessingState().getDecayEquationGroups(),
 				Matchers.is(new int[] { VdypEntity.MISSING_INTEGER_VALUE, 7, 14, 19, 31, 54 })
 		);
 		assertThat(
-				fps.getLayerProcessingState().getBreakageEquationGroups(),
+				fps.getPrimaryLayerProcessingState().getBreakageEquationGroups(),
 				Matchers.is(new int[] { VdypEntity.MISSING_INTEGER_VALUE, 5, 6, 12, 17, 28 })
 		);
 	}

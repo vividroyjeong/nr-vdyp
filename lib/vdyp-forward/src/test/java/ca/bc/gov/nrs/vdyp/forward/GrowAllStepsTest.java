@@ -30,8 +30,7 @@ import ca.bc.gov.nrs.vdyp.test.VdypMatchers;
 
 class GrowAllStepsTest {
 
-	protected static final Logger logger = LoggerFactory
-			.getLogger(GrowAllStepsTest.class);
+	protected static final Logger logger = LoggerFactory.getLogger(GrowAllStepsTest.class);
 
 	protected static ForwardControlParser parser;
 	protected static Map<String, Object> controlMap;
@@ -75,7 +74,7 @@ class GrowAllStepsTest {
 			var nextComparisonPolygonRef = comparisonDataStreamReader.readNextPolygon();
 
 			while (nextComparisonPolygonRef.isPresent()) {
-				
+
 				var polygon = forwardDataStreamReader.readNextPolygon().orElseThrow(() -> new WorkCompletedException());
 
 				var comparisonPolygon = nextComparisonPolygonRef.get();
@@ -87,24 +86,26 @@ class GrowAllStepsTest {
 					nextComparisonPolygonRef = comparisonDataStreamReader.readNextPolygon();
 				}
 
-				assertThat(polygon.getPolygonIdentifier().forYear(polygon.getTargetYear().get())
-						, is(comparisonPolygon.getPolygonIdentifier()));
-				
+				assertThat(
+						polygon.getPolygonIdentifier().forYear(polygon.getTargetYear().get()),
+						is(comparisonPolygon.getPolygonIdentifier())
+				);
+
 				fpe.processPolygon(polygon);
-				
+
 // 				comparePolygons(polygon, comparisonPolygon, 0.02f);
 			}
 		} catch (WorkCompletedException e) {
 			assertThat(comparisonDataStreamReader.readNextPolygon().isEmpty(), is(true));
 		}
-		
+
 		assertThat(forwardDataStreamReader.readNextPolygon().isEmpty(), is(true));
 	}
 
 	private static void comparePolygons(VdypPolygon a, VdypPolygon b, float tolerance) {
-		
+
 		VdypMatchers.setEpsilon(tolerance);
-		
+
 		assertThat(a.getPolygonIdentifier().forYear(a.getTargetYear().get()), is(b.getPolygonIdentifier()));
 		assertThat(a.getBiogeoclimaticZone(), is(b.getBiogeoclimaticZone()));
 		assertThat(a.getForestInventoryZone(), is(b.getForestInventoryZone()));
@@ -112,24 +113,26 @@ class GrowAllStepsTest {
 		// assertThat(a.getMode(), is(b.getMode())); -- comparison polys don't have modes
 		assertThat(a.getPercentAvailable(), is(b.getPercentAvailable()));
 		assertThat(a.getTargetYear().get(), is(b.getPolygonIdentifier().getYear()));
-		
+
 		assertThat(a.getLayers().size(), is(b.getLayers().size()));
-		
+
 		compareLayers(a.getLayers().get(LayerType.PRIMARY), b.getLayers().get(LayerType.PRIMARY));
 		// compareLayers(a.getLayers().get(LayerType.VETERAN), b.getLayers().get(LayerType.VETERAN));
 	}
 
 	private static void compareLayers(VdypLayer aLayer, VdypLayer bLayer) {
 		if (aLayer != null && bLayer != null) {
-			
+
 			assertThat(aLayer.getLayerType(), is(bLayer.getLayerType()));
 			assertThat(aLayer.getPrimaryGenus(), is(bLayer.getPrimaryGenus()));
 			assertThat(aLayer.getInventoryTypeGroup(), is(bLayer.getInventoryTypeGroup()));
 			assertThat(aLayer.getPolygonIdentifier().getName(), is(bLayer.getPolygonIdentifier().getName()));
 			assertThat(aLayer.getAgeTotal(), is(bLayer.getAgeTotal()));
-			assertThat(aLayer.getBaseAreaByUtilization(), VdypMatchers.coe(-1, VdypMatchers::closeTo, 
-					bLayer.getBaseAreaByUtilization().toArray(Float[]::new)));
-			
+			assertThat(
+					aLayer.getBaseAreaByUtilization(),
+					VdypMatchers.coe(-1, VdypMatchers::closeTo, bLayer.getBaseAreaByUtilization().toArray(Float[]::new))
+			);
+
 		} else if (aLayer != bLayer) {
 			fail();
 		}

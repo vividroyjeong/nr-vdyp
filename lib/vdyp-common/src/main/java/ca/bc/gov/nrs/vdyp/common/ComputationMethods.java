@@ -76,12 +76,12 @@ public class ComputationMethods {
 	}
 
 	/**
-	 * YUC1 - compute Utilization components (quad-mean-diameter, basal area and trees-per-hectare) and,
-	 * optionally, volumes for a polygon's primary layer.
-	 * 
-	 * @param bec Bec zone
-	 * @param vdypLayer (primary) layer in question
-	 * @param volumeComputeMode the {@link VolumeComputeMode} under which this method is to operate
+	 * YUC1 - compute Utilization components (quad-mean-diameter, basal area and trees-per-hectare) and, optionally,
+	 * volumes for a polygon's primary layer.
+	 *
+	 * @param bec                       Bec zone
+	 * @param vdypLayer                 (primary) layer in question
+	 * @param volumeComputeMode         the {@link VolumeComputeMode} under which this method is to operate
 	 * @param compatibilityVariableMode the {@link CompatibilityVariableMode} under which this method is to operate.
 	 * @throws ProcessingException
 	 */

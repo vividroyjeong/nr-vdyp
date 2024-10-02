@@ -62,9 +62,9 @@ public class Vdyp7OutputControlParser extends BaseControlParser {
 	@Override
 	protected ValueParser<Map<String, Float>> minimaParser() {
 		return ValueParser.toMap(
-						ValueParser.list(ValueParser.FLOAT), Collections.singletonMap(MINIMUM_VETERAN_HEIGHT, 10.0f),
-						MINIMUM_HEIGHT, MINIMUM_BASE_AREA, MINIMUM_PREDICTED_BASE_AREA, MINIMUM_VETERAN_HEIGHT
-				);
+				ValueParser.list(ValueParser.FLOAT), Collections.singletonMap(MINIMUM_VETERAN_HEIGHT, 10.0f),
+				MINIMUM_HEIGHT, MINIMUM_BASE_AREA, MINIMUM_PREDICTED_BASE_AREA, MINIMUM_VETERAN_HEIGHT
+		);
 	}
 
 	private final List<ControlKey> orderedControlKeys = new ArrayList<>();

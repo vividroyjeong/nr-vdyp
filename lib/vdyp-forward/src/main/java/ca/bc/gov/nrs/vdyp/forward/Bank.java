@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.application.ProcessingException;
+import ca.bc.gov.nrs.vdyp.common.Utils;
 import ca.bc.gov.nrs.vdyp.common_calculators.BaseAreaTreeDensityDiameter;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.Sp64DistributionSet;
@@ -65,8 +66,7 @@ class Bank {
 	public final float[/* nSpecies + 1, including 0 */][/* all ucs */] treesPerHectare; // BANK1 TPHB
 	public final float[/* nSpecies + 1, including 0 */][/* all ucs */] wholeStemVolumes; // BANK1 VOLWSB
 
-	public Bank(VdypLayer layer, BecDefinition becZone, Predicate<VdypSpecies> retainCriteria)
-			throws ProcessingException {
+	public Bank(VdypLayer layer, BecDefinition becZone, Predicate<VdypSpecies> retainCriteria) {
 
 		this.layer = layer;
 		this.becZone = becZone;
@@ -185,7 +185,7 @@ class Bank {
 		}
 	}
 
-	private void transferSpeciesIntoBank(int index, VdypSpecies species) throws ProcessingException {
+	private void transferSpeciesIntoBank(int index, VdypSpecies species) {
 
 		speciesNames[index] = species.getGenus();
 		sp64Distributions[index] = species.getSp64DistributionSet();
@@ -235,13 +235,12 @@ class Bank {
 	}
 
 	/**
-	 * For each species, set uc All to the sum of the UC values, UC 7.5 and above only, 
-	 * for the summable values, and calculate quad-mean-diameter from these values.
+	 * For each species, set uc All to the sum of the UC values, UC 7.5 and above only, for the summable values, and
+	 * calculate quad-mean-diameter from these values.
 	 * <p>
-	 * For the layer, set uc All values (for summable types) to the sum of those of the
- 	 * individual species and set the other uc values to the sum of those of the
- 	 * individual species. Calculate the uc All value for quad-mean-diameter, and the
- 	 * uc All and Small value for lorey-height.
+	 * For the layer, set uc All values (for summable types) to the sum of those of the individual species and set the
+	 * other uc values to the sum of those of the individual species. Calculate the uc All value for quad-mean-diameter,
+	 * and the uc All and Small value for lorey-height.
 	 */
 	private void setCalculateUtilizationClassAllValues() {
 
@@ -250,7 +249,7 @@ class Bank {
 		int ucSmallIndex = UtilizationClass.SMALL.ordinal();
 
 		// Each species
-		
+
 		for (int sp0Index : indices) {
 
 			basalAreas[sp0Index][ucAllIndex] = sumUtilizationClassValues(
@@ -277,7 +276,7 @@ class Bank {
 						.quadMeanDiameter(basalAreas[sp0Index][ucAllIndex], treesPerHectare[sp0Index][ucAllIndex]);
 			}
 		}
-		
+
 		// Layer
 
 		basalAreas[layerIndex][ucAllIndex] = sumSpeciesUtilizationClassValues(basalAreas, UtilizationClass.ALL);
@@ -366,7 +365,7 @@ class Bank {
 	 *
 	 * @return as described
 	 */
-	VdypLayer getLayer() {
+	VdypLayer buildLayerFromBank() {
 
 		transferUtilizationsFromBank(0, layer);
 
@@ -375,7 +374,7 @@ class Bank {
 			newSpecies.add(transferSpeciesFromBank(i, layer.getSpecies().get(speciesNames[i])));
 		}
 		layer.setSpecies(newSpecies);
-		
+
 		return layer;
 	}
 
@@ -384,15 +383,28 @@ class Bank {
 		VdypSpecies newSpecies = VdypSpecies.build(speciesBuilder -> {
 			speciesBuilder.copy(species);
 			speciesBuilder.percentGenus(this.percentagesOfForestedLand[index]);
-			species.getSite().ifPresent(site -> speciesBuilder.addSite(VdypSite.build(siteBuilder -> {
+			species.getSite().ifPresentOrElse(site -> speciesBuilder.addSite(VdypSite.build(siteBuilder -> {
 				siteBuilder.copy(site);
-				siteBuilder.ageTotal(this.ageTotals[index]);
-				siteBuilder.height(this.dominantHeights[index]);
-				siteBuilder.siteCurveNumber(this.siteCurveNumbers[index]);
 				siteBuilder.siteGenus(this.speciesNames[index]);
-				siteBuilder.siteIndex(this.siteIndices[index]);
-				siteBuilder.yearsToBreastHeight(this.yearsToBreastHeight[index]);
-			})));
+				siteBuilder.ageTotal(Utils.optFloat(ageTotals[index]));
+				siteBuilder.height(Utils.optFloat(this.dominantHeights[index]));
+				siteBuilder.siteCurveNumber(Utils.optInt(this.siteCurveNumbers[index]));
+				siteBuilder.siteIndex(Utils.optFloat(this.siteIndices[index]));
+				siteBuilder.yearsToBreastHeight(Utils.optFloat(this.yearsToBreastHeight[index]));
+			})), () -> {
+				VdypSite site = VdypSite.build(siteBuilder -> {
+					siteBuilder.polygonIdentifier(species.getPolygonIdentifier());
+					siteBuilder.layerType(species.getLayerType());
+					siteBuilder.siteGenus(this.speciesNames[index]);
+					siteBuilder.ageTotal(Utils.optFloat(this.ageTotals[index]));
+					siteBuilder.height(Utils.optFloat(this.dominantHeights[index]));
+					siteBuilder.siteCurveNumber(Utils.optInt(this.siteCurveNumbers[index]));
+					siteBuilder.siteIndex(Utils.optFloat(this.siteIndices[index]));
+					siteBuilder.yearsToBreastHeight(Utils.optFloat(this.yearsToBreastHeight[index]));
+				});
+
+				speciesBuilder.addSite(site);
+			});
 		});
 
 		transferUtilizationsFromBank(index, newSpecies);

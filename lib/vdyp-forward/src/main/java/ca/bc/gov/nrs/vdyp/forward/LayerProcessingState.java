@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.bc.gov.nrs.vdyp.application.ProcessingException;
 import ca.bc.gov.nrs.vdyp.forward.model.ControlVariable;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
@@ -17,7 +16,6 @@ import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 import ca.bc.gov.nrs.vdyp.model.UtilizationClassVariable;
 import ca.bc.gov.nrs.vdyp.model.VdypEntity;
 import ca.bc.gov.nrs.vdyp.model.VdypLayer;
-import ca.bc.gov.nrs.vdyp.model.VdypPolygon;
 import ca.bc.gov.nrs.vdyp.model.VdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.VolumeVariable;
 
@@ -41,9 +39,6 @@ class LayerProcessingState {
 
 	/** The containing ForwardProcessingState */
 	private final ForwardProcessingState fps;
-
-	/** The containing polygon of the layer on which the Processor is operating */
-	private final VdypPolygon polygon;
 
 	/** The type of Layer being processed */
 	private final LayerType layerType;
@@ -115,17 +110,13 @@ class LayerProcessingState {
 	// MNSP - MSPL1, MSPLV
 	// TODO
 
-	public LayerProcessingState(ForwardProcessingState fps, VdypPolygon polygon, LayerType subjectLayerType)
-			throws ProcessingException {
+	public LayerProcessingState(ForwardProcessingState fps, VdypLayer layer) {
 
 		this.fps = fps;
-		this.polygon = polygon;
-		this.layerType = subjectLayerType;
-
-		BecDefinition becZone = polygon.getBiogeoclimaticZone();
+		this.layerType = layer.getLayerType();
 
 		bank = new Bank(
-				polygon.getLayers().get(subjectLayerType), becZone,
+				layer, fps.getCurrentBecZone(),
 				s -> s.getBaseAreaByUtilization().get(UtilizationClass.ALL) >= ForwardProcessingEngine.MIN_BASAL_AREA
 		);
 
@@ -152,10 +143,6 @@ class LayerProcessingState {
 			decayEquationGroups[i] = decayEquationGroupMatrix.get(speciesName, becZoneAlias);
 			breakageEquationGroups[i] = breakageEquationGroupMatrix.get(speciesName, becZoneAlias);
 		}
-	}
-
-	public VdypPolygon getPolygon() {
-		return polygon;
 	}
 
 	public LayerType getLayerType() {
@@ -381,8 +368,8 @@ class LayerProcessingState {
 	public void updatePrimarySpeciesDetailsAfterGrowth(float newPrimarySpeciesDominantHeight) {
 
 		this.primarySpeciesDominantHeight = newPrimarySpeciesDominantHeight;
-		primarySpeciesTotalAge += 1;
-		primarySpeciesAgeAtBreastHeight += 1;
+		this.primarySpeciesTotalAge += 1;
+		this.primarySpeciesAgeAtBreastHeight += 1;
 
 		// primarySpeciesSiteIndex - does this change?
 		// primarySpeciesAgeToBreastHeight of course doesn't change.
@@ -475,15 +462,19 @@ class LayerProcessingState {
 		return cvPrimaryLayerSmall[speciesIndex].get(variable);
 	}
 
-	public VdypLayer getLayer() {
+	VdypLayer updateLayerFromBank() {
 
-		VdypLayer updatedLayer = bank.getLayer();
+		VdypLayer updatedLayer = bank.buildLayerFromBank();
 
-		for (int i = 1; i < getNSpecies() + 1; i++) {
-			VdypSpecies species = updatedLayer.getSpeciesBySp0(bank.speciesNames[i]);
-			species.setCompatibilityVariables(
-					cvVolume[i], cvBasalArea[i], cvQuadraticMeanDiameter[i], cvPrimaryLayerSmall[i]
-			);
+		if (layerType.equals(LayerType.PRIMARY)) {
+			// Inject the compatibility variable values.
+			for (int i = 1; i < getNSpecies() + 1; i++) {
+				VdypSpecies species = updatedLayer.getSpeciesBySp0(bank.speciesNames[i]);
+
+				species.setCompatibilityVariables(
+						cvVolume[i], cvBasalArea[i], cvQuadraticMeanDiameter[i], cvPrimaryLayerSmall[i]
+				);
+			}
 		}
 
 		return updatedLayer;

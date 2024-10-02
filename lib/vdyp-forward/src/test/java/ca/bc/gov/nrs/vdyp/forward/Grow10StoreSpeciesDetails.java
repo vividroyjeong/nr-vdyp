@@ -59,7 +59,7 @@ class Grow10StoreSpeciesDetails {
 		fpe.processPolygon(polygon, ExecutionStep.GROW_10_STORE_SPECIES_DETAILS);
 
 		// VDYP7 reports [], -9, -9, 35.473381, -9, -9)
-		Bank bank = fpe.fps.getLayerProcessingState().getBank();
+		Bank bank = fpe.fps.getPrimaryLayerProcessingState().getBank();
 		assertThat(
 				ForwardTestUtils.toFloatArray(bank.dominantHeights),
 				is(arrayContaining(0.0f, Float.NaN, Float.NaN, 35.47338f, Float.NaN, Float.NaN))

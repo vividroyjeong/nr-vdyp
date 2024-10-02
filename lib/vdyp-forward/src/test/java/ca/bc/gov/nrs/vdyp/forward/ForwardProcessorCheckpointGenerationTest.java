@@ -39,9 +39,9 @@ class ForwardProcessorCheckpointGenerationTest {
 
 		FileResolver inputFileResolver = TestUtils.fileResolver(TestUtils.class);
 
-		Path vdyp7OutputPath = Path.of(System.getenv().get("HOME"), "tmp", "vdyp7");
+		Path vdyp7OutputPath = Path.of(System.getenv().get("HOME"), "tmp", "vdyp-deltas", "vdyp8");
 		Files.createDirectories(vdyp7OutputPath);
-		
+
 		var outputResolver = new FileSystemFileResolver(vdyp7OutputPath);
 
 		fp.run(inputFileResolver, outputResolver, List.of("VDYP-Checkpoint.CTR"), vdypPassSet);

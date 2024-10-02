@@ -127,7 +127,7 @@ public class VdypOutputWriter implements Closeable {
 	 * Write the given polygon record for the given year to the polygon file.
 	 *
 	 * @param polygon the polygon to be written
-	 * @param year the year of the polygon
+	 * @param year    the year of the polygon
 	 * @throws IOException
 	 */
 	public void writePolygonWithSpeciesAndUtilizationForYear(VdypPolygon polygon, int year) throws IOException {
@@ -143,9 +143,13 @@ public class VdypOutputWriter implements Closeable {
 	 */
 	// VDYP_OUT when JPROGRAM = 1 (FIPSTART) or 3 (VRISTART)
 	public void writePolygonWithSpeciesAndUtilization(VdypPolygon polygon) throws IOException {
-	
+
 		writePolygon(polygon);
-		for (var layer : polygon.getLayers().values()) {
+
+		// Primary then Veteran (if present)
+		var sortedLayers = polygon.getLayers().values().stream()
+				.sorted((l1, l2) -> l1.getLayerType().getIndex() - l2.getLayerType().getIndex()).toList();
+		for (var layer : sortedLayers) {
 			writeUtilization(polygon, layer, layer);
 			List<VdypSpecies> specs = new ArrayList<>(layer.getSpecies().size());
 			specs.addAll(layer.getSpecies().values());

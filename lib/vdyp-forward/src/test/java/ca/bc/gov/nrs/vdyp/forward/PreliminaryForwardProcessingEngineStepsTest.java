@@ -22,7 +22,6 @@ import ca.bc.gov.nrs.vdyp.common_calculators.custom_exceptions.SpeciesErrorExcep
 import ca.bc.gov.nrs.vdyp.common_calculators.enumerations.SiteIndexEquation;
 import ca.bc.gov.nrs.vdyp.io.parse.common.ResourceParseException;
 import ca.bc.gov.nrs.vdyp.model.CommonData;
-import ca.bc.gov.nrs.vdyp.model.LayerType;
 import ca.bc.gov.nrs.vdyp.model.MatrixMap2Impl;
 import ca.bc.gov.nrs.vdyp.model.Region;
 import ca.bc.gov.nrs.vdyp.model.VdypEntity;
@@ -68,9 +67,9 @@ class PreliminaryForwardProcessingEngineStepsTest extends AbstractForwardProcess
 
 		{
 			ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-			fpe.fps.setPolygonLayer(polygon, LayerType.PRIMARY);
+			fpe.fps.setPolygon(polygon);
 
-			LayerProcessingState lps = fpe.fps.getLayerProcessingState();
+			LayerProcessingState lps = fpe.fps.getPrimaryLayerProcessingState();
 
 			ForwardProcessingEngine.calculateCoverages(lps);
 			fpe.determinePolygonRankings(CommonData.PRIMARY_SPECIES_TO_COMBINE);
@@ -83,8 +82,8 @@ class PreliminaryForwardProcessingEngineStepsTest extends AbstractForwardProcess
 		}
 		{
 			ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
-			fpe.fps.setPolygonLayer(polygon, LayerType.PRIMARY);
-			LayerProcessingState lps = fpe.fps.getLayerProcessingState();
+			fpe.fps.setPolygon(polygon);
+			LayerProcessingState lps = fpe.fps.getPrimaryLayerProcessingState();
 
 			var speciesToCombine = Arrays
 					.asList(Arrays.asList(lps.getBank().speciesNames[3], lps.getBank().speciesNames[4]));
@@ -132,11 +131,13 @@ class PreliminaryForwardProcessingEngineStepsTest extends AbstractForwardProcess
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.DETERMINE_POLYGON_RANKINGS);
 
-		assertThat(fpe.fps.getLayerProcessingState().getPrimarySpeciesIndex(), is(1));
-		assertThrows(IllegalStateException.class, () -> fpe.fps.getLayerProcessingState().getSecondarySpeciesIndex());
-		assertThat(fpe.fps.getLayerProcessingState().getInventoryTypeGroup(), is(9));
-		assertThat(fpe.fps.getLayerProcessingState().getPrimarySpeciesGroupNumber(), is(34));
-		assertThat(fpe.fps.getLayerProcessingState().getPrimarySpeciesStratumNumber(), is(24));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getPrimarySpeciesIndex(), is(1));
+		assertThrows(
+				IllegalStateException.class, () -> fpe.fps.getPrimaryLayerProcessingState().getSecondarySpeciesIndex()
+		);
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getInventoryTypeGroup(), is(9));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getPrimarySpeciesGroupNumber(), is(34));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getPrimarySpeciesStratumNumber(), is(24));
 	}
 
 	@Test
@@ -161,11 +162,11 @@ class PreliminaryForwardProcessingEngineStepsTest extends AbstractForwardProcess
 		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.CALCULATE_MISSING_SITE_CURVES);
 
 		// Cannot check 0 since determinePolygonRankings has not been executed.
-		assertThat(fpe.fps.getLayerProcessingState().getSiteCurveNumber(1), is(12));
-		assertThat(fpe.fps.getLayerProcessingState().getSiteCurveNumber(2), is(2));
-		assertThat(fpe.fps.getLayerProcessingState().getSiteCurveNumber(3), is(42));
-		assertThat(fpe.fps.getLayerProcessingState().getSiteCurveNumber(4), is(10));
-		assertThat(fpe.fps.getLayerProcessingState().getSiteCurveNumber(5), is(10));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getSiteCurveNumber(1), is(118));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getSiteCurveNumber(2), is(122));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getSiteCurveNumber(3), is(13));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getSiteCurveNumber(4), is(99));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getSiteCurveNumber(5), is(59));
 	}
 
 	@Test
@@ -197,11 +198,11 @@ class PreliminaryForwardProcessingEngineStepsTest extends AbstractForwardProcess
 		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.CALCULATE_MISSING_SITE_CURVES);
 
 		// Cannot check 0 since determinePolygonRankings has not been executed.
-		assertThat(fpe.fps.getLayerProcessingState().getSiteCurveNumber(1), is(118));
-		assertThat(fpe.fps.getLayerProcessingState().getSiteCurveNumber(2), is(122));
-		assertThat(fpe.fps.getLayerProcessingState().getSiteCurveNumber(3), is(13));
-		assertThat(fpe.fps.getLayerProcessingState().getSiteCurveNumber(4), is(99));
-		assertThat(fpe.fps.getLayerProcessingState().getSiteCurveNumber(5), is(59));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getSiteCurveNumber(1), is(118));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getSiteCurveNumber(2), is(122));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getSiteCurveNumber(3), is(13));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getSiteCurveNumber(4), is(99));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getSiteCurveNumber(5), is(59));
 	}
 
 	@Test
@@ -246,7 +247,9 @@ class PreliminaryForwardProcessingEngineStepsTest extends AbstractForwardProcess
 //		double expectedValue = SiteTool
 //				.convertSiteIndexBetweenCurves(sourceSiteCurve, sourceSiteIndex, targetSiteCurve);
 
-		assertThat(fpe.fps.getLayerProcessingState().getBank().siteIndices[4], is(VdypEntity.MISSING_FLOAT_VALUE));
+		assertThat(
+				fpe.fps.getPrimaryLayerProcessingState().getBank().siteIndices[4], is(VdypEntity.MISSING_FLOAT_VALUE)
+		);
 	}
 
 	@Test
@@ -287,7 +290,7 @@ class PreliminaryForwardProcessingEngineStepsTest extends AbstractForwardProcess
 		double expectedValue = SiteTool
 				.convertSiteIndexBetweenCurves(sourceSiteCurve, sourceSiteIndex, targetSiteCurve);
 
-		assertThat(fpe.fps.getLayerProcessingState().getBank().siteIndices[2], is((float) expectedValue));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getBank().siteIndices[2], is((float) expectedValue));
 	}
 
 	@Test
@@ -315,7 +318,7 @@ class PreliminaryForwardProcessingEngineStepsTest extends AbstractForwardProcess
 		);
 
 		assertThat(
-				fpe.fps.getLayerProcessingState().getBank().yearsToBreastHeight,
+				fpe.fps.getPrimaryLayerProcessingState().getBank().yearsToBreastHeight,
 				is(new float[] { 0.0f, 4.7f, 4.6f, 1.0f, 5.0f, 5.0f })
 		);
 	}
@@ -387,10 +390,10 @@ class PreliminaryForwardProcessingEngineStepsTest extends AbstractForwardProcess
 		ForwardProcessingEngine fpe = new ForwardProcessingEngine(controlMap);
 		fpe.processPolygon(polygon, ForwardProcessingEngine.ExecutionStep.CALCULATE_DOMINANT_HEIGHT_AGE_SITE_INDEX);
 
-		assertThat(fpe.fps.getLayerProcessingState().getPrimarySpeciesDominantHeight(), is(22.950302f));
-		assertThat(fpe.fps.getLayerProcessingState().getPrimarySpeciesSiteIndex(), is(34.0f));
-		assertThat(fpe.fps.getLayerProcessingState().getPrimarySpeciesTotalAge(), is(22.0f));
-		assertThat(fpe.fps.getLayerProcessingState().getPrimarySpeciesAgeAtBreastHeight(), is(Float.NaN));
-		assertThat(fpe.fps.getLayerProcessingState().getPrimarySpeciesAgeToBreastHeight(), is(4.7f));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getPrimarySpeciesDominantHeight(), is(22.950302f));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getPrimarySpeciesSiteIndex(), is(34.0f));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getPrimarySpeciesTotalAge(), is(22.0f));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getPrimarySpeciesAgeAtBreastHeight(), is(Float.NaN));
+		assertThat(fpe.fps.getPrimaryLayerProcessingState().getPrimarySpeciesAgeToBreastHeight(), is(4.7f));
 	}
 }

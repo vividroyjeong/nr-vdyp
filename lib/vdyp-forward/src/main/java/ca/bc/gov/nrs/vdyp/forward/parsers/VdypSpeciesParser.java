@@ -61,8 +61,7 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 			map(String fileName, FileResolver fileResolver, Map<String, Object> controlMap)
 					throws IOException, ResourceParseException {
 		return () -> {
-			var lineParser = new LineParser()
-					.strippedString(25, DESCRIPTION) //
+			var lineParser = new LineParser().strippedString(25, DESCRIPTION) //
 					.space(1) //
 					.value(
 							1, LAYER_TYPE,
@@ -72,7 +71,8 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 											x -> x == null || x.trim().length() == 0 || x.trim().equals("Z"),
 											EndOfRecord.END_OF_RECORD
 									)
-							)) //
+							)
+					) //
 					.space(1) //
 					.value(2, GENUS_INDEX, ValueParser.INTEGER) //
 					.space(1) //
@@ -163,7 +163,7 @@ public class VdypSpeciesParser implements ControlMapValueReplacer<Object, String
 						var iTotalAge = totalAge;
 						var iYearsToBreastHeight = yearsToBreastHeight;
 
-						// From VDYPGETS.FOR, lines 235 onwards
+						// From VDYPGETS.FOR, lines 235 to 255.
 						if (Float.isNaN(totalAge)) {
 							if (yearsAtBreastHeight > 0.0 && yearsToBreastHeight > 0.0)
 								iTotalAge = yearsAtBreastHeight + yearsToBreastHeight;

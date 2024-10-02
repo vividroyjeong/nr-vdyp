@@ -89,8 +89,6 @@ public class ForwardDataStreamReader {
 
 		// Advance all the streams until the definition for the polygon is found.
 
-		Optional<VdypPolygon> thePolygon = Optional.empty();
-
 		try {
 			if (polygonStream.hasNext()) {
 				var polygon = polygonStream.next();
@@ -176,9 +174,9 @@ public class ForwardDataStreamReader {
 					var key = new UtilizationBySpeciesKey(LayerType.PRIMARY, 0);
 					Map<UtilizationClass, VdypUtilization> defaultSpeciesUtilization = utilizationsBySpeciesMap
 							.get(key);
-					
+
 					String primarySp0 = getPrimarySpecies(polygon, primaryLayerSpecies.values()).getGenus();
-					
+
 					primaryLayer = VdypLayer.build(builder -> {
 						builder.layerType(LayerType.PRIMARY);
 						builder.polygonIdentifier(polygon.getPolygonIdentifier());
@@ -215,28 +213,38 @@ public class ForwardDataStreamReader {
 
 				polygon.setLayers(layerMap);
 
-				thePolygon = Optional.of(polygon);
 				UtilizationOperations.doPostCreateAdjustments(polygon);
+
+				return Optional.of(polygon);
+			} else {
+				return Optional.empty();
 			}
 		} catch (ResourceParseException | IOException e) {
 			throw new ProcessingException(e);
 		}
-
-		return thePolygon;
 	}
 
-	private static VdypSpecies getPrimarySpecies(VdypPolygon polygon, Collection<VdypSpecies> speciesList) throws ProcessingException {
-		
+	private static VdypSpecies getPrimarySpecies(VdypPolygon polygon, Collection<VdypSpecies> speciesList)
+			throws ProcessingException {
+
 		var primarySpecies = speciesList.stream().filter(s -> s.getSite().isPresent()).toList();
 		if (primarySpecies.size() == 0) {
-			throw new ProcessingException(MessageFormat.format("Primary layer of {0} does not contain a primary species",
-					polygon.getPolygonIdentifier().toStringCompact()));
+			throw new ProcessingException(
+					MessageFormat.format(
+							"Primary layer of {0} does not contain a primary species",
+							polygon.getPolygonIdentifier().toStringCompact()
+					)
+			);
 		} else if (primarySpecies.size() > 1) {
-			throw new ProcessingException(MessageFormat.format("Primary layer of {0} contains multiple primary species: {1}",
-					polygon.getPolygonIdentifier().toStringCompact(),
-					String.join(", ", primarySpecies.stream().map(s -> s.getGenus()).toList())));
+			throw new ProcessingException(
+					MessageFormat.format(
+							"Primary layer of {0} contains multiple primary species: {1}",
+							polygon.getPolygonIdentifier().toStringCompact(),
+							String.join(", ", primarySpecies.stream().map(s -> s.getGenus()).toList())
+					)
+			);
 		}
-		
+
 		return primarySpecies.get(0);
 	}
 

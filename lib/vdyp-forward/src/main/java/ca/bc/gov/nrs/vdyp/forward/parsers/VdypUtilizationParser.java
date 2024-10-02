@@ -62,8 +62,7 @@ public class VdypUtilizationParser implements ControlMapValueReplacer<Object, St
 											EndOfRecord.END_OF_RECORD
 									)
 							)
-					)
-					.value(3, GENUS_INDEX, ValueParser.INTEGER) //
+					).value(3, GENUS_INDEX, ValueParser.INTEGER) //
 					.space(1) //
 					.value(2, GENUS, ControlledValueParser.optional(ValueParser.GENUS))
 					.value(3, UTILIZATION_CLASS_INDEX, ControlledValueParser.UTILIZATION_CLASS)

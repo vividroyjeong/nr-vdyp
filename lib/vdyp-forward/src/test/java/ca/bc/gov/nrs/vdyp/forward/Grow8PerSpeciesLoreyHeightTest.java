@@ -59,7 +59,7 @@ class Grow8PerSpeciesLoreyHeightTest {
 		fpe.fps.fcm.getDebugSettings().setValue(Vars.LOREY_HEIGHT_CHANGE_STRATEGY_8, 0);
 		fpe.processPolygon(polygon, ExecutionStep.GROW_8_SPECIES_LH);
 
-		LayerProcessingState lps = fpe.fps.getLayerProcessingState();
+		LayerProcessingState lps = fpe.fps.getPrimaryLayerProcessingState();
 
 		var calculatedLayerDq = lps.getBank().quadMeanDiameters[0][UtilizationClass.ALL.ordinal()];
 
@@ -78,7 +78,7 @@ class Grow8PerSpeciesLoreyHeightTest {
 		fpe.fps.fcm.getDebugSettings().setValue(Vars.LOREY_HEIGHT_CHANGE_STRATEGY_8, 2);
 		fpe.processPolygon(polygon, ExecutionStep.GROW_8_SPECIES_LH);
 
-		LayerProcessingState lps = fpe.fps.getLayerProcessingState();
+		LayerProcessingState lps = fpe.fps.getPrimaryLayerProcessingState();
 
 		var calculatedLayerDq = lps.getBank().quadMeanDiameters[0][UtilizationClass.ALL.ordinal()];
 

@@ -53,9 +53,9 @@ import ca.bc.gov.nrs.vdyp.model.UtilizationClass;
 public class VdypMatchers {
 
 	static final float EPSILON = 0.001f;
-	
+
 	private static float currentEpsilon = EPSILON;
-	
+
 	public static void setEpsilon(float newValue) {
 		currentEpsilon = newValue;
 	}
