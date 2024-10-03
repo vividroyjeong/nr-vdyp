@@ -3,6 +3,7 @@
     <TheHeader />
 
     <v-main id="main">
+      <AppMessageDialog />
       <AppMessage />
       <AppConfirmDialog />
       <AppProgressCircular />
@@ -16,6 +17,7 @@
 </template>
 <script setup lang="ts">
 import TheHeader from '@/components/layout/TheHeader.vue'
+import AppMessageDialog from '@/components/common/AppMessageDialog.vue'
 import AppMessage from '@/components/common/AppMessage.vue'
 import AppConfirmDialog from '@/components/common/AppConfirmDialog.vue'
 import AppProgressCircular from '@/components/common/AppProgressCircular.vue'

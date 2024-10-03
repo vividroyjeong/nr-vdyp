@@ -199,17 +199,7 @@
             <v-card-actions class="mt-5 pr-0">
               <v-spacer></v-spacer>
               <v-btn class="white-btn" @click="clear">Clear</v-btn>
-              <v-btn
-                class="blue-btn ml-2"
-                @click="confirm"
-                :disabled="
-                  totalSpeciesGroupPercent !== 100 ||
-                  highestPercentSpecies === null ||
-                  derivedBy === null
-                "
-              >
-                Confirm
-              </v-btn>
+              <v-btn class="blue-btn ml-2" @click="confirm"> Confirm </v-btn>
             </v-card-actions>
           </v-form>
         </v-expansion-panel-text>
@@ -220,12 +210,17 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
+import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
+
 import { storeToRefs } from 'pinia'
 import { derivedByOptions, speciesMap } from '@/constants/options'
+import { DEFAULT_VALUES } from '@/constants/constants'
 
 const form = ref<HTMLFormElement>()
 
 const modelParameterStore = useModelParameterStore()
+const messageDialogStore = useMessageDialogStore()
+
 const {
   panelOpenStates,
   derivedBy,
@@ -278,22 +273,6 @@ const validateTotalPercent = () => {
   return true
 }
 
-const clear = () => {
-  speciesList.value.forEach((item) => {
-    item.species = null
-    item.percent = null
-  })
-
-  if (form.value) {
-    form.value.reset()
-  }
-}
-
-const confirm = () => {
-  form.value?.validate()
-  console.log('form.value?.validate()' + form.value?.validate())
-}
-
 const triggerSpeciesSortByPercent = () => {
   speciesList.value.sort((a, b) => {
     if (a.percent === null) return 1
@@ -320,6 +299,83 @@ const handlePercentInput = (event: Event, index: number) => {
 
   if (parsedValue === 0) {
     speciesList.value[index].species = null
+  }
+}
+
+const clear = () => {
+  speciesList.value.forEach((item) => {
+    item.species = null
+    item.percent = null
+  })
+
+  if (form.value) {
+    form.value.reset()
+  }
+
+  derivedBy.value = DEFAULT_VALUES.DERIVED_BY
+}
+
+const validateDuplicateSpecies = (): boolean => {
+  const speciesCount: { [key: string]: number } = {}
+  let duplicateSpecies = ''
+
+  speciesList.value.forEach((item) => {
+    if (item.species) {
+      if (!speciesCount[item.species]) {
+        speciesCount[item.species] = 0
+      }
+      speciesCount[item.species] += 1
+
+      if (speciesCount[item.species] > 1) {
+        duplicateSpecies = item.species
+      }
+    }
+  })
+
+  if (duplicateSpecies) {
+    messageDialogStore.openDialog(
+      'Data Duplicated!',
+      `Species '${duplicateSpecies}' already specified.`,
+    )
+    return false
+  }
+  return true
+}
+
+const validateTotalSpeciesPercent = (): boolean => {
+  if (
+    totalSpeciesGroupPercent.value !== 100 &&
+    highestPercentSpecies !== null
+  ) {
+    messageDialogStore.openDialog(
+      'Data Incomplete!',
+      'Species percentage must add up to a total of 100% in order to run a valid model.',
+      { width: 400 },
+    )
+    return false
+  }
+  return true
+}
+
+const validateDerivedBy = (): boolean => {
+  if (!derivedBy.value) {
+    messageDialogStore.openDialog(
+      'Missing Information',
+      "Input field - 'Species % derived by' - is missing essential information which must be filled in order to confirm and continue",
+      { width: 400 },
+    )
+    return false
+  }
+  return true
+}
+
+const confirm = () => {
+  const isDuplicateValid = validateDuplicateSpecies()
+  const isTotalPercentValid = validateTotalSpeciesPercent()
+  const isDerivedByValid = validateDerivedBy()
+
+  if (isDuplicateValid && isTotalPercentValid && isDerivedByValid) {
+    form.value?.validate()
   }
 }
 </script>
