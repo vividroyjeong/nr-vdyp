@@ -153,6 +153,7 @@
                     </v-col>
                     <v-col class="col-space-6" />
                     <v-col>
+                      agePlaceholder:{{ agePlaceholder }}
                       <v-text-field
                         label="Age (years)"
                         type="number"
@@ -161,12 +162,18 @@
                         min="0"
                         step="0.1"
                         persistent-placeholder
-                        placeholder="Select..."
+                        :placeholder="agePlaceholder"
+                        hide-details="auto"
                         density="compact"
                         dense
                         :disabled="isAgeDisabled"
                         @input="handleAgeInput($event)"
                       ></v-text-field>
+                      <v-label
+                        v-show="Util.isZeroValue(age)"
+                        style="font-size: 12px"
+                        >A value of zero indicates not known.</v-label
+                      >
                     </v-col>
                   </v-row>
                   <v-row>
@@ -181,12 +188,18 @@
                         min="0"
                         step="0.1"
                         persistent-placeholder
-                        placeholder="Select..."
+                        :placeholder="heightPlaceholder"
+                        hide-details="auto"
                         density="compact"
                         dense
                         :disabled="isHeightDisabled"
                         @input="handleHeightInput($event)"
                       ></v-text-field>
+                      <v-label
+                        v-show="Util.isZeroValue(height)"
+                        style="font-size: 12px"
+                        >A value of zero indicates not known.</v-label
+                      >
                     </v-col>
                   </v-row>
                   <v-row>
@@ -201,13 +214,19 @@
                         min="0"
                         step="0.1"
                         persistent-placeholder
-                        placeholder="Select..."
+                        placeholder=""
+                        hide-details="auto"
                         density="compact"
                         dense
                         @input="handleBHA50SiteIndexInput($event)"
                         :disabled="isBHA50SiteIndexDisabled"
-                      ></v-text-field
-                    ></v-col>
+                      ></v-text-field>
+                      <v-label
+                        v-show="Util.isZeroValue(bha50SiteIndex)"
+                        style="font-size: 12px"
+                        >A value of zero indicates not known.</v-label
+                      >
+                    </v-col>
                   </v-row>
                 </v-col>
                 <v-col cols="6">
@@ -327,6 +346,9 @@ const setFloatingState = (newFloating: string | null) => {
   }
 }
 
+const agePlaceholder = ref('')
+const heightPlaceholder = ref('')
+
 const handleSiteSpeciesValuesState = (
   newSiteSpeciesValues: string | null,
   newFloating: string | null,
@@ -334,12 +356,20 @@ const handleSiteSpeciesValuesState = (
   if (newSiteSpeciesValues === SITE_SPECIES_VALUES.COMPUTED) {
     isFloatingDisabled.value = false
     setFloatingState(newFloating)
+
+    agePlaceholder.value = ''
+    heightPlaceholder.value = ''
   } else if (newSiteSpeciesValues === SITE_SPECIES_VALUES.SUPPLIED) {
     isAgeTypeDisabled.value = true
     isAgeDisabled.value = true
     isHeightDisabled.value = true
     isBHA50SiteIndexDisabled.value = false
     isFloatingDisabled.value = true
+
+    age.value = null
+    height.value = null
+    agePlaceholder.value = 'N/A'
+    heightPlaceholder.value = 'N/A'
   }
 }
 
