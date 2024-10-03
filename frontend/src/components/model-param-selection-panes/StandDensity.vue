@@ -23,7 +23,7 @@
               <v-row>
                 <v-col cols="3">
                   <v-text-field
-                    label="Percent Stockable Area"
+                    label="% Stockable Area"
                     type="number"
                     v-model="percentStockableArea"
                     max="100"
@@ -53,7 +53,7 @@
                     :rules="[validateMinimum]"
                     :error-messages="basalAreaError"
                     persistent-placeholder
-                    placeholder="N/A"
+                    :placeholder="basalAreaPlaceholder"
                     density="compact"
                     dense
                     :disabled="isBasalAreaDisabled"
@@ -63,11 +63,17 @@
                     </template>
                   </v-text-field></v-col
                 >
+                <v-col cols="5" v-show="Util.isZeroValue(age)">
+                  <span style="font-size: 12px"
+                    >Density Measurements cannot be supplied without an
+                    Age.</span
+                  >
+                </v-col>
               </v-row>
               <v-row>
                 <v-col cols="3">
                   <v-text-field
-                    label="Trees per Hectare"
+                    label="Trees per Hectare (tree/ha)"
                     type="number"
                     v-model="treesPerHectare"
                     min="0"
@@ -75,11 +81,12 @@
                     :rules="[validateMinimum]"
                     :error-messages="treesPerHectareError"
                     persistent-placeholder
-                    placeholder="N/A"
+                    :placeholder="tphPlaceholder"
                     density="compact"
                     dense
                     :disabled="isTreesPerHectareDisabled"
-                  ></v-text-field>
+                  >
+                  </v-text-field>
                 </v-col>
                 <v-col class="col-space-3" />
                 <v-col cols="3">
@@ -102,7 +109,7 @@
               <v-row>
                 <v-col cols="3">
                   <v-text-field
-                    label="Percent Crown Closure (%)"
+                    label="Crown Closure (%)"
                     type="number"
                     v-model="percentCrownClosure"
                     max="100"
@@ -156,6 +163,7 @@ const {
   panelOpenStates,
   derivedBy,
   siteSpeciesValues,
+  age,
   percentStockableArea,
   basalArea,
   treesPerHectare,
@@ -166,6 +174,9 @@ const {
 const isPercentCrownClosureDisabled = ref(false)
 const isBasalAreaDisabled = ref(false)
 const isTreesPerHectareDisabled = ref(false)
+
+const basalAreaPlaceholder = ref('')
+const tphPlaceholder = ref('')
 
 const updatePercentCrownClosureState = (
   newDerivedBy: string | null,
@@ -180,6 +191,7 @@ const updatePercentCrownClosureState = (
 const updateBasalAreaAndTreesState = (
   newDerivedBy: string | null,
   newSiteSpeciesValues: string | null,
+  newAge: number | null,
 ) => {
   const isBasalAreaEnabled =
     newDerivedBy === DERIVED_BY.BASAL_AREA &&
@@ -187,13 +199,22 @@ const updateBasalAreaAndTreesState = (
 
   isBasalAreaDisabled.value = !isBasalAreaEnabled
   isTreesPerHectareDisabled.value = !isBasalAreaEnabled
+
+  // handle by Age change
+  if (Util.isEmptyOrZero(newAge)) {
+    isBasalAreaDisabled.value = true
+    isTreesPerHectareDisabled.value = true
+  }
+
+  basalAreaPlaceholder.value = isBasalAreaDisabled.value ? 'N/A' : ''
+  tphPlaceholder.value = isTreesPerHectareDisabled.value ? 'N/A' : ''
 }
 
 watch(
-  [derivedBy, siteSpeciesValues],
-  ([newDerivedBy, newSiteSpeciesValues]) => {
+  [derivedBy, siteSpeciesValues, age],
+  ([newDerivedBy, newSiteSpeciesValues, newAge]) => {
     updatePercentCrownClosureState(newDerivedBy, newSiteSpeciesValues)
-    updateBasalAreaAndTreesState(newDerivedBy, newSiteSpeciesValues)
+    updateBasalAreaAndTreesState(newDerivedBy, newSiteSpeciesValues, newAge)
   },
   { immediate: true },
 )

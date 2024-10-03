@@ -50,7 +50,7 @@
                     :rules="[validateMinimum]"
                     :error-messages="loreyHeightError"
                     persistent-placeholder
-                    placeholder="N/A"
+                    :placeholder="loreyHeightPlaceholder"
                     density="compact"
                     dense
                     :disabled="isLoreyHeightDisabled"
@@ -66,7 +66,7 @@
                     :rules="[validateMinimum]"
                     :error-messages="wholeStemVolume75cmError"
                     persistent-placeholder
-                    placeholder="N/A"
+                    :placeholder="wholeStemVolume75cmPlaceholder"
                     density="compact"
                     dense
                     :disabled="isWholeStemVolume75cmDisabled"
@@ -87,7 +87,7 @@
                     :rules="[validateMinimum]"
                     :error-messages="basalArea125cmError"
                     persistent-placeholder
-                    placeholder="N/A"
+                    :placeholder="basalArea125cmPlaceholder"
                     density="compact"
                     dense
                     :disabled="isBasalArea125cmDisabled"
@@ -107,7 +107,7 @@
                     :rules="[validateMinimum]"
                     :error-messages="wholeStemVolume125cmError"
                     persistent-placeholder
-                    placeholder="N/A"
+                    :placeholder="wholeStemVolume125cmPlaceholder"
                     density="compact"
                     dense
                     :disabled="isWholeStemVolume125cmDisabled"
@@ -128,7 +128,7 @@
                     :rules="[validateMinimum]"
                     :error-messages="closeUtilVolumeError"
                     persistent-placeholder
-                    placeholder="N/A"
+                    :placeholder="closeUtilVolumePlaceholder"
                     density="compact"
                     dense
                     :disabled="isCloseUtilVolumeDisabled"
@@ -148,7 +148,7 @@
                     :rules="[validateMinimum]"
                     :error-messages="closeUtilNetDecayVolumeError"
                     persistent-placeholder
-                    placeholder="N/A"
+                    :placeholder="closeUtilNetDecayVolumePlaceholder"
                     density="compact"
                     dense
                     :disabled="isCloseUtilNetDecayVolumeDisabled"
@@ -170,7 +170,7 @@
                     :rules="[validateMinimum]"
                     :error-messages="closeUtilNetDecayWasteVolumeError"
                     persistent-placeholder
-                    placeholder="N/A"
+                    :placeholder="closeUtilNetDecayWasteVolumePlaceholder"
                     density="compact"
                     dense
                     :disabled="isCloseUtilNetDecayWasteVolumeDisabled"
@@ -197,6 +197,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { Util } from '@/utils/util'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
 import { storeToRefs } from 'pinia'
 import { additionalStandAttributesOptions } from '@/constants/options'
@@ -215,6 +216,7 @@ const {
   derivedBy,
   siteSpeciesValues,
   computedValues,
+  age,
   loreyHeight,
   basalArea125cm,
   closeUtilVolume,
@@ -232,6 +234,14 @@ const isWholeStemVolume125cmDisabled = ref(false)
 const isCloseUtilVolumeDisabled = ref(false)
 const isCloseUtilNetDecayVolumeDisabled = ref(false)
 const isCloseUtilNetDecayWasteVolumeDisabled = ref(false)
+
+const loreyHeightPlaceholder = ref('')
+const wholeStemVolume75cmPlaceholder = ref('')
+const basalArea125cmPlaceholder = ref('')
+const wholeStemVolume125cmPlaceholder = ref('')
+const closeUtilVolumePlaceholder = ref('')
+const closeUtilNetDecayVolumePlaceholder = ref('')
+const closeUtilNetDecayWasteVolumePlaceholder = ref('')
 
 const updateComputedValuesState = (
   newDerivedBy: string | null,
@@ -259,11 +269,33 @@ const updateFieldDisabledStates = (newComputedValues: string | null) => {
   isCloseUtilNetDecayWasteVolumeDisabled.value = isDisabled
 }
 
+const updateFieldValueStates = (newAge: number | null) => {
+  // TO-DO - Make sure that all fields are changed to 'N/A' by Age.
+  if (Util.isEmptyOrZero(newAge)) {
+    loreyHeight.value = null
+    wholeStemVolume75cm.value = null
+    basalArea125cm.value = null
+    wholeStemVolume125cm.value = null
+    closeUtilVolume.value = null
+    closeUtilNetDecayVolume.value = null
+    closeUtilNetDecayWasteVolume.value = null
+
+    loreyHeightPlaceholder.value = 'N/A'
+    wholeStemVolume75cmPlaceholder.value = 'N/A'
+    basalArea125cmPlaceholder.value = 'N/A'
+    wholeStemVolume125cmPlaceholder.value = 'N/A'
+    closeUtilVolumePlaceholder.value = 'N/A'
+    closeUtilNetDecayVolumePlaceholder.value = 'N/A'
+    closeUtilNetDecayWasteVolumePlaceholder.value = 'N/A'
+  }
+}
+
 watch(
-  [derivedBy, siteSpeciesValues, computedValues],
-  ([newDerivedBy, newSiteSpeciesValues, newComputedValues]) => {
+  [derivedBy, siteSpeciesValues, computedValues, age],
+  ([newDerivedBy, newSiteSpeciesValues, newComputedValues, newAge]) => {
     updateComputedValuesState(newDerivedBy, newSiteSpeciesValues)
     updateFieldDisabledStates(newComputedValues)
+    updateFieldValueStates(newAge)
   },
   { immediate: true },
 )
@@ -320,7 +352,7 @@ const clear = () => {
 
   computedValues.value = DEFAULT_VALUES.COMPUTED_VALUES
 
-  // TODO - set text-field with calculated values based on seleciton in the previous screen
+  // TODO - set all text-fields on this screen with calculated values based on seleciton in the previous screen
 }
 const confirm = () => {}
 </script>

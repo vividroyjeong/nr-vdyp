@@ -153,7 +153,6 @@
                     </v-col>
                     <v-col class="col-space-6" />
                     <v-col>
-                      agePlaceholder:{{ agePlaceholder }}
                       <v-text-field
                         label="Age (years)"
                         type="number"
@@ -329,6 +328,9 @@ const isHeightDisabled = ref(false)
 const isBHA50SiteIndexDisabled = ref(false)
 const isFloatingDisabled = ref(false)
 
+const agePlaceholder = ref('')
+const heightPlaceholder = ref('')
+
 const setFloatingState = (newFloating: string | null) => {
   isAgeTypeDisabled.value = false
   isAgeDisabled.value = false
@@ -345,9 +347,6 @@ const setFloatingState = (newFloating: string | null) => {
     isBHA50SiteIndexDisabled.value = true
   }
 }
-
-const agePlaceholder = ref('')
-const heightPlaceholder = ref('')
 
 const handleSiteSpeciesValuesState = (
   newSiteSpeciesValues: string | null,
