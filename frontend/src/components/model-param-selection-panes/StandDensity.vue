@@ -38,13 +38,7 @@
                     dense
                   ></v-text-field>
                   <v-label
-                    v-show="
-                      percentStockableArea === 0 ||
-                      percentStockableArea === '0' ||
-                      percentStockableArea === '0.0' ||
-                      percentStockableArea === '' ||
-                      percentStockableArea === null
-                    "
+                    v-show="Util.isEmptyOrZero(percentStockableArea)"
                     style="font-size: 12px"
                     >A default will be computed when the model is run.</v-label
                   >
@@ -124,13 +118,7 @@
                     :disabled="isPercentCrownClosureDisabled"
                   ></v-text-field>
                   <v-label
-                    v-show="
-                      percentCrownClosure === 0 ||
-                      percentCrownClosure === '0' ||
-                      percentCrownClosure === '0.0' ||
-                      percentCrownClosure === '' ||
-                      percentCrownClosure === null
-                    "
+                    v-show="Util.isEmptyOrZero(percentCrownClosure)"
                     style="font-size: 12px"
                     >Applying Default of 50%</v-label
                   >
@@ -151,6 +139,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { Util } from '@/utils/util'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
 import { storeToRefs } from 'pinia'
 import { minimumDBHLimitsOptions } from '@/constants/options'

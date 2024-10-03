@@ -2,6 +2,29 @@ export class Util {
   /**
    * VALIDATATING
    */
+
+  static trimValue = (
+    value: number | string | null,
+  ): number | string | null => {
+    if (typeof value === 'string') {
+      return value.trim()
+    }
+    return value
+  }
+  static isZeroValue = (value: number | string | null): boolean => {
+    const trimmedValue = this.trimValue(value)
+    return trimmedValue === 0 || trimmedValue === '0' || trimmedValue === '0.0'
+  }
+
+  static isEmptyOrZero = (value: number | string | null): boolean => {
+    const trimmedValue = this.trimValue(value)
+    return (
+      this.isZeroValue(trimmedValue) ||
+      trimmedValue === '' ||
+      trimmedValue === null
+    )
+  }
+
   static isValidVal(item: any): any {
     return !Util.isBlank(item) ? item : ''
   }
@@ -63,7 +86,9 @@ export class Util {
     }
 
     const year = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(date)
-    const month = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(date)
+    const month = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(
+      date,
+    )
     const day = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(date)
 
     const hour = date.getHours().toString().padStart(2, '0')
@@ -81,7 +106,10 @@ export class Util {
     }
   }
 
-  static formatNumberFractionGroup(minimumFractionDigits: number, maximumFractionDigits: number): any {
+  static formatNumberFractionGroup(
+    minimumFractionDigits: number,
+    maximumFractionDigits: number,
+  ): any {
     return new Intl.NumberFormat('en-US', {
       minimumFractionDigits: minimumFractionDigits,
       maximumFractionDigits: maximumFractionDigits,
@@ -162,7 +190,9 @@ export class Util {
    * SPLITING
    */
   static splitStringByCharCamelCase(inString: string): string {
-    return !Util.isBlank(inString) ? inString.replace(/([a-z0-9])([A-Z])/g, '$1 $2') : ''
+    return !Util.isBlank(inString)
+      ? inString.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+      : ''
   }
 
   /**
@@ -185,8 +215,13 @@ export class Util {
     return result
   }
 
-  static openRequestedPopup(url: string, windowsName: string, windowFeatures?: string): void {
-    if (Util.isBlank(windowFeatures)) windowFeatures = 'toolbar=0,location=0,menubar=0'
+  static openRequestedPopup(
+    url: string,
+    windowsName: string,
+    windowFeatures?: string,
+  ): void {
+    if (Util.isBlank(windowFeatures))
+      windowFeatures = 'toolbar=0,location=0,menubar=0'
     window.open(url, windowsName, windowFeatures)
   }
 

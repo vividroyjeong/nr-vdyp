@@ -243,7 +243,9 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { Util } from '@/utils/util'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
+import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
 import { storeToRefs } from 'pinia'
 import {
   becZoneOptions,
@@ -263,6 +265,8 @@ import {
 const form = ref<HTMLFormElement>()
 
 const modelParameterStore = useModelParameterStore()
+const messageDialogStore = useMessageDialogStore()
+
 const {
   panelOpenStates,
   derivedBy,
@@ -479,7 +483,42 @@ const clear = () => {
     floating.value,
   )
 }
-const confirm = () => {}
+
+const validateRequiredFields = (): boolean => {
+  if (siteSpeciesValues.value === SITE_SPECIES_VALUES.COMPUTED) {
+    if (
+      Util.isEmptyOrZero(age.value) ||
+      Util.isEmptyOrZero(height.value) ||
+      Util.isEmptyOrZero(bha50SiteIndex.value)
+    ) {
+      messageDialogStore.openDialog(
+        'Missing Information',
+        `The species '${selectedSiteSpecies.value}' must have Age/Height/BHA 50 Site Index values supplied.`,
+        { width: 400 },
+      )
+      return false
+    }
+  } else if (siteSpeciesValues.value === SITE_SPECIES_VALUES.SUPPLIED) {
+    if (Util.isEmptyOrZero(bha50SiteIndex.value)) {
+      messageDialogStore.openDialog(
+        'Missing Information',
+        `The species '${selectedSiteSpecies.value}' must have an BHA 50 Site Index value supplied.`,
+        { width: 400 },
+      )
+      return false
+    }
+  }
+
+  return true
+}
+
+const confirm = () => {
+  const isRequiredFieldsValid = validateRequiredFields()
+
+  if (isRequiredFieldsValid) {
+    form.value?.validate()
+  }
+}
 </script>
 
 <style scoped></style>

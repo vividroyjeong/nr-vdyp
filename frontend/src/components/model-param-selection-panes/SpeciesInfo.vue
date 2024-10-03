@@ -357,7 +357,7 @@ const validateTotalSpeciesPercent = (): boolean => {
   return true
 }
 
-const validateDerivedBy = (): boolean => {
+const validateRequiredFields = (): boolean => {
   if (!derivedBy.value) {
     messageDialogStore.openDialog(
       'Missing Information',
@@ -372,9 +372,9 @@ const validateDerivedBy = (): boolean => {
 const confirm = () => {
   const isDuplicateValid = validateDuplicateSpecies()
   const isTotalPercentValid = validateTotalSpeciesPercent()
-  const isDerivedByValid = validateDerivedBy()
+  const isRequiredFieldsValid = validateRequiredFields()
 
-  if (isDuplicateValid && isTotalPercentValid && isDerivedByValid) {
+  if (isDuplicateValid && isTotalPercentValid && isRequiredFieldsValid) {
     form.value?.validate()
   }
 }
