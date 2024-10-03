@@ -132,6 +132,25 @@
                     >Applying Default of 50%</v-label
                   >
                 </v-col>
+                <v-col class="col-space-3" />
+                <v-col
+                  cols="3"
+                  v-show="
+                    derivedBy === DERIVED_BY.BASAL_AREA &&
+                    siteSpeciesValues === SITE_SPECIES_VALUES.COMPUTED
+                  "
+                >
+                  <v-text-field
+                    label="Current Diameter (cm)"
+                    v-model="currentDiameter"
+                    persistent-placeholder
+                    placeholder=""
+                    hide-details
+                    density="compact"
+                    dense
+                    disabled
+                  ></v-text-field>
+                </v-col>
               </v-row>
             </div>
             <v-card-actions class="mt-5 pr-0">
@@ -170,6 +189,7 @@ const {
   basalArea,
   treesPerHectare,
   minimumDBHLimit,
+  currentDiameter,
   percentCrownClosure,
 } = storeToRefs(modelParameterStore)
 

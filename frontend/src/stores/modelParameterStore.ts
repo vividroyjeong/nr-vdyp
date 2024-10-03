@@ -103,6 +103,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   const treesPerHectare = ref<number | null>(null)
   const minimumDBHLimit = ref<string | null>(null)
   const percentCrownClosure = ref<number | string | null>(null)
+  const currentDiameter = ref<number | null>(null)
 
   // additional stand attributes
   const computedValues = ref<string | null>(null)
@@ -150,8 +151,9 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     bha50SiteIndex.value = DEFAULT_VALUES.BHA50_SITE_INDEX
     floating.value = FLOATING.SITEINDEX
     percentStockableArea.value = DEFAULT_VALUES.PERCENT_STOCKABLE_AREA
-    percentCrownClosure.value = DEFAULT_VALUES.PERCENT_CROWN_CLOSURE
     minimumDBHLimit.value = DEFAULT_VALUES.MINIMUM_DBH_LIMIT
+    currentDiameter.value = DEFAULT_VALUES.CURRENT_DIAMETER
+    percentCrownClosure.value = DEFAULT_VALUES.PERCENT_CROWN_CLOSURE
     computedValues.value = DEFAULT_VALUES.COMPUTED_VALUES
     loreyHeight.value = DEFAULT_VALUES.LOREY_HEIGHT
     wholeStemVolume75cm.value = DEFAULT_VALUES.WHOLE_STEM_VOLUME
@@ -199,6 +201,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     treesPerHectare,
     minimumDBHLimit,
     percentCrownClosure,
+    currentDiameter,
     // additional stand attributes
     computedValues,
     loreyHeight,
