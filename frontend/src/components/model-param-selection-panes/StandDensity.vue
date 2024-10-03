@@ -96,10 +96,9 @@
                     v-model="minimumDBHLimit"
                     item-title="label"
                     item-value="value"
-                    clearable
                     hide-details
                     persistent-placeholder
-                    placeholder="Select..."
+                    placeholder=""
                     density="compact"
                     dense
                     disabled
@@ -118,14 +117,17 @@
                     :rules="[validatePercent]"
                     :error-messages="percentCrownClosureError"
                     persistent-placeholder
-                    placeholder=""
+                    :placeholder="crownClosurePlaceholder"
                     hide-details="auto"
                     density="compact"
                     dense
                     :disabled="isPercentCrownClosureDisabled"
                   ></v-text-field>
                   <v-label
-                    v-show="Util.isEmptyOrZero(percentCrownClosure)"
+                    v-show="
+                      Util.isEmptyOrZero(percentCrownClosure) &&
+                      !isPercentCrownClosureDisabled
+                    "
                     style="font-size: 12px"
                     >Applying Default of 50%</v-label
                   >
@@ -177,6 +179,7 @@ const isTreesPerHectareDisabled = ref(false)
 
 const basalAreaPlaceholder = ref('')
 const tphPlaceholder = ref('')
+const crownClosurePlaceholder = ref('')
 
 const updatePercentCrownClosureState = (
   newDerivedBy: string | null,
@@ -204,10 +207,29 @@ const updateBasalAreaAndTreesState = (
   if (Util.isEmptyOrZero(newAge)) {
     isBasalAreaDisabled.value = true
     isTreesPerHectareDisabled.value = true
+    isPercentCrownClosureDisabled.value = true
   }
 
-  basalAreaPlaceholder.value = isBasalAreaDisabled.value ? 'N/A' : ''
-  tphPlaceholder.value = isTreesPerHectareDisabled.value ? 'N/A' : ''
+  if (isBasalAreaDisabled.value) {
+    basalAreaPlaceholder.value = 'N/A'
+    basalArea.value = null
+  } else {
+    basalAreaPlaceholder.value = ''
+  }
+
+  if (isTreesPerHectareDisabled.value) {
+    tphPlaceholder.value = 'N/A'
+    treesPerHectare.value = null
+  } else {
+    tphPlaceholder.value = ''
+  }
+
+  if (isPercentCrownClosureDisabled.value) {
+    crownClosurePlaceholder.value = 'N/A'
+    percentCrownClosure.value = null
+  } else {
+    crownClosurePlaceholder.value = ''
+  }
 }
 
 watch(
