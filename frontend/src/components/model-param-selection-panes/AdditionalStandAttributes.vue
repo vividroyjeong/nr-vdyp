@@ -199,6 +199,7 @@
 import { ref, computed, watch } from 'vue'
 import { Util } from '@/utils/util'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
+import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
 import { storeToRefs } from 'pinia'
 import { additionalStandAttributesOptions } from '@/constants/options'
 import {
@@ -211,6 +212,8 @@ import {
 const form = ref<HTMLFormElement>()
 
 const modelParameterStore = useModelParameterStore()
+const messageDialogStore = useMessageDialogStore()
+
 const {
   panelOpenStates,
   derivedBy,
@@ -243,6 +246,14 @@ const closeUtilVolumePlaceholder = ref('')
 const closeUtilNetDecayVolumePlaceholder = ref('')
 const closeUtilNetDecayWasteVolumePlaceholder = ref('')
 
+const loreyHeightOriginal = ref<number | null>(null)
+const wholeStemVolume75cmOriginal = ref<number | null>(null)
+const basalArea125cmOriginal = ref<number | null>(null)
+const wholeStemVolume125cmOriginal = ref<number | null>(null)
+const closeUtilVolumeOriginal = ref<number | null>(null)
+const closeUtilNetDecayVolumeOriginal = ref<number | null>(null)
+const closeUtilNetDecayWasteVolumeOriginal = ref<number | null>(null)
+
 const updateComputedValuesState = (
   newDerivedBy: string | null,
   newSiteSpeciesValues: string | null,
@@ -269,6 +280,27 @@ const updateFieldDisabledStates = (newComputedValues: string | null) => {
   isCloseUtilNetDecayWasteVolumeDisabled.value = isDisabled
 }
 
+const updateFieldPlaceholderStates = (newAge: number | null) => {
+  // TODO - Make sure that all fields are changed to 'N/A' by Age.
+  if (Util.isEmptyOrZero(newAge)) {
+    loreyHeightPlaceholder.value = 'N/A'
+    wholeStemVolume75cmPlaceholder.value = 'N/A'
+    basalArea125cmPlaceholder.value = 'N/A'
+    wholeStemVolume125cmPlaceholder.value = 'N/A'
+    closeUtilVolumePlaceholder.value = 'N/A'
+    closeUtilNetDecayVolumePlaceholder.value = 'N/A'
+    closeUtilNetDecayWasteVolumePlaceholder.value = 'N/A'
+  } else {
+    loreyHeightPlaceholder.value = ''
+    wholeStemVolume75cmPlaceholder.value = ''
+    basalArea125cmPlaceholder.value = ''
+    wholeStemVolume125cmPlaceholder.value = ''
+    closeUtilVolumePlaceholder.value = ''
+    closeUtilNetDecayVolumePlaceholder.value = ''
+    closeUtilNetDecayWasteVolumePlaceholder.value = ''
+  }
+}
+
 const updateFieldValueStates = (newAge: number | null) => {
   // TODO - Make sure that all fields are changed to 'N/A' by Age.
   if (Util.isEmptyOrZero(newAge)) {
@@ -279,23 +311,44 @@ const updateFieldValueStates = (newAge: number | null) => {
     closeUtilVolume.value = null
     closeUtilNetDecayVolume.value = null
     closeUtilNetDecayWasteVolume.value = null
-
-    loreyHeightPlaceholder.value = 'N/A'
-    wholeStemVolume75cmPlaceholder.value = 'N/A'
-    basalArea125cmPlaceholder.value = 'N/A'
-    wholeStemVolume125cmPlaceholder.value = 'N/A'
-    closeUtilVolumePlaceholder.value = 'N/A'
-    closeUtilNetDecayVolumePlaceholder.value = 'N/A'
-    closeUtilNetDecayWasteVolumePlaceholder.value = 'N/A'
   }
+}
+
+const updateOriginalValues = () => {
+  if (computedValues.value === COMPUTED_VALUES.MODIFY) {
+    loreyHeightOriginal.value = loreyHeight.value
+    wholeStemVolume75cmOriginal.value = wholeStemVolume75cm.value
+    basalArea125cmOriginal.value = basalArea125cm.value
+    wholeStemVolume125cmOriginal.value = wholeStemVolume125cm.value
+    closeUtilVolumeOriginal.value = closeUtilVolume.value
+    closeUtilNetDecayVolumeOriginal.value = closeUtilNetDecayVolume.value
+    closeUtilNetDecayWasteVolumeOriginal.value =
+      closeUtilNetDecayWasteVolume.value
+  }
+}
+
+const handleStateChanges = (
+  newDerivedBy: string | null,
+  newSiteSpeciesValues: string | null,
+  newComputedValues: string | null,
+  newAge: number | null,
+) => {
+  updateComputedValuesState(newDerivedBy, newSiteSpeciesValues)
+  updateFieldDisabledStates(newComputedValues)
+  updateFieldValueStates(newAge)
+  updateFieldPlaceholderStates(newAge)
+  updateOriginalValues()
 }
 
 watch(
   [derivedBy, siteSpeciesValues, computedValues, age],
   ([newDerivedBy, newSiteSpeciesValues, newComputedValues, newAge]) => {
-    updateComputedValuesState(newDerivedBy, newSiteSpeciesValues)
-    updateFieldDisabledStates(newComputedValues)
-    updateFieldValueStates(newAge)
+    handleStateChanges(
+      newDerivedBy,
+      newSiteSpeciesValues,
+      newComputedValues,
+      newAge,
+    )
   },
   { immediate: true },
 )
@@ -354,6 +407,109 @@ const clear = () => {
 
   // TODO - set all text-fields on this screen with calculated values based on seleciton in the previous screen
 }
-const confirm = () => {}
+
+const validateFieldPresenceAndValue = (
+  fieldValue: number | null,
+  fieldName: string,
+): boolean => {
+  if (Util.isBlank(fieldValue)) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      `${fieldName}: is not a valid number`,
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (Util.isZeroValue(fieldValue)) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      `${fieldName}: must be greater than 0.0`,
+      { width: 450 },
+    )
+    return false
+  }
+
+  return true
+}
+
+const validateAllFields = (): boolean => {
+  const fieldsToValidate = [
+    { value: loreyHeight.value, name: 'Lorey Height - 7.5cm+' },
+    { value: wholeStemVolume75cm.value, name: 'Whole Stem Volume - 7.5cm+' },
+    { value: basalArea125cm.value, name: 'Basal Area - 12.5cm+' },
+    { value: wholeStemVolume125cm.value, name: 'Whole Stem Volume - 12.5cm+' },
+    {
+      value: closeUtilVolume.value,
+      name: 'Close Utilization Volume - 12.5cm+',
+    },
+    {
+      value: closeUtilNetDecayVolume.value,
+      name: 'Close Utilization Net Decay Volume - 12.5cm+',
+    },
+    {
+      value: closeUtilNetDecayWasteVolume.value,
+      name: 'Close Utilization Net Decay Waste Volume - 12.5cm+',
+    },
+  ]
+
+  for (const field of fieldsToValidate) {
+    if (!validateFieldPresenceAndValue(field.value, field.name)) {
+      return false
+    }
+  }
+
+  return true
+}
+
+const validateComputedValuesModification = (): boolean => {
+  if (computedValues.value === COMPUTED_VALUES.MODIFY) {
+    const fields = [
+      { original: loreyHeightOriginal, current: loreyHeight.value },
+      {
+        original: wholeStemVolume75cmOriginal,
+        current: wholeStemVolume75cm.value,
+      },
+      { original: basalArea125cmOriginal, current: basalArea125cm.value },
+      {
+        original: wholeStemVolume125cmOriginal,
+        current: wholeStemVolume125cm.value,
+      },
+      { original: closeUtilVolumeOriginal, current: closeUtilVolume.value },
+      {
+        original: closeUtilNetDecayVolumeOriginal,
+        current: closeUtilNetDecayVolume.value,
+      },
+      {
+        original: closeUtilNetDecayWasteVolumeOriginal,
+        current: closeUtilNetDecayWasteVolume.value,
+      },
+    ]
+
+    // Returns true if any element satisfies the condition, otherwise returns false.
+    const hasModification = fields.some((field) => {
+      return field.original.value !== field.current
+    })
+
+    if (!hasModification) {
+      messageDialogStore.openDialog(
+        'No Modifications!',
+        "At least one of the starting values must have been modified from the original computed values.\n\n Please modify at least one starting value or switch to 'Computed Values' mode.",
+        { width: 400 },
+      )
+      return false
+    }
+  }
+  return true
+}
+
+const confirm = () => {
+  const isAllFieldsValid = validateAllFields()
+  const isModificationValid = validateComputedValuesModification()
+
+  if (isAllFieldsValid && isModificationValid) {
+    form.value?.validate()
+  }
+}
 </script>
 <style scoped></style>

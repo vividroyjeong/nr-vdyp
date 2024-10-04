@@ -13,6 +13,7 @@
           font-size: 14px;
           padding-left: 35px !important;
           padding-right: 35px !important;
+          white-space: pre-line;
         "
       >
         {{ message }}

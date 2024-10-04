@@ -13,26 +13,19 @@ export class Util {
   }
   static isZeroValue = (value: number | string | null): boolean => {
     const trimmedValue = this.trimValue(value)
-    return trimmedValue === 0 || trimmedValue === '0' || trimmedValue === '0.0'
+    const numericValue = Number(trimmedValue)
+    return numericValue === 0
   }
 
   static isEmptyOrZero = (value: number | string | null): boolean => {
     const trimmedValue = this.trimValue(value)
-    return (
-      this.isZeroValue(trimmedValue) ||
-      trimmedValue === '' ||
-      trimmedValue === null
-    )
-  }
-
-  static isValidVal(item: any): any {
-    return !Util.isBlank(item) ? item : ''
+    return this.isZeroValue(trimmedValue) || this.isBlank(trimmedValue)
   }
 
   // undefined, null, NaN, 0, "" (empty string), and false
   // isBlank(" ") = false
   static isBlank(item: any): boolean {
-    if (!item) {
+    if (item === undefined || item === null || Number.isNaN(item)) {
       return true
     } else if (Array.isArray(item)) {
       return item.length === 0

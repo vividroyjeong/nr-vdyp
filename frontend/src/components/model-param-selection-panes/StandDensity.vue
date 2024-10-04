@@ -201,46 +201,37 @@ const basalAreaPlaceholder = ref('')
 const tphPlaceholder = ref('')
 const crownClosurePlaceholder = ref('')
 
-const updatePercentCrownClosureState = (
-  newDerivedBy: string | null,
-  newSiteSpeciesValues: string | null,
-) => {
-  isPercentCrownClosureDisabled.value = !(
-    newDerivedBy === DERIVED_BY.VOLUME &&
-    newSiteSpeciesValues === SITE_SPECIES_VALUES.COMPUTED
-  )
-}
-
-const updateBasalAreaAndTreesState = (
-  newDerivedBy: string | null,
-  newSiteSpeciesValues: string | null,
-  newAge: number | null,
-) => {
-  isBasalAreaDisabled.value = isTreesPerHectareDisabled.value = !(
-    newDerivedBy === DERIVED_BY.BASAL_AREA &&
-    newSiteSpeciesValues === SITE_SPECIES_VALUES.COMPUTED
-  )
-
-  // handle by Age change
-  if (Util.isEmptyOrZero(newAge)) {
-    isBasalAreaDisabled.value = true
-    isTreesPerHectareDisabled.value = true
-    isPercentCrownClosureDisabled.value = true
-  }
+const updateBasalAreaState = (isEnabled: boolean, isAgeZero: boolean) => {
+  isBasalAreaDisabled.value = !isEnabled || isAgeZero
 
   if (isBasalAreaDisabled.value) {
     basalAreaPlaceholder.value = 'N/A'
     basalArea.value = null
   } else {
     basalAreaPlaceholder.value = ''
+    basalArea.value = 10.0
   }
+}
+
+const updateTreesPerHectareState = (isEnabled: boolean, isAgeZero: boolean) => {
+  isTreesPerHectareDisabled.value = !isEnabled || isAgeZero
 
   if (isTreesPerHectareDisabled.value) {
     tphPlaceholder.value = 'N/A'
     treesPerHectare.value = null
   } else {
     tphPlaceholder.value = ''
+    treesPerHectare.value = 1000.0
   }
+}
+
+const updateCrownClosureState = (
+  isVolume: boolean,
+  isComputed: boolean,
+  isAgeEmptyOrZero: boolean,
+) => {
+  isPercentCrownClosureDisabled.value =
+    !(isVolume && isComputed) || isAgeEmptyOrZero
 
   if (isPercentCrownClosureDisabled.value) {
     crownClosurePlaceholder.value = 'N/A'
@@ -250,11 +241,26 @@ const updateBasalAreaAndTreesState = (
   }
 }
 
+const updateStates = (
+  newDerivedBy: string | null,
+  newSiteSpeciesValues: string | null,
+  newAge: number | null,
+) => {
+  const isVolume = newDerivedBy === DERIVED_BY.VOLUME
+  const isBasalArea = newDerivedBy === DERIVED_BY.BASAL_AREA
+  const isComputed = newSiteSpeciesValues === SITE_SPECIES_VALUES.COMPUTED
+  const isAgeEmptyOrZero = Util.isEmptyOrZero(newAge)
+
+  // Update states using individual functions
+  updateBasalAreaState(isBasalArea && isComputed, isAgeEmptyOrZero)
+  updateTreesPerHectareState(isBasalArea && isComputed, isAgeEmptyOrZero)
+  updateCrownClosureState(isVolume, isComputed, isAgeEmptyOrZero)
+}
+
 watch(
   [derivedBy, siteSpeciesValues, age],
   ([newDerivedBy, newSiteSpeciesValues, newAge]) => {
-    updatePercentCrownClosureState(newDerivedBy, newSiteSpeciesValues)
-    updateBasalAreaAndTreesState(newDerivedBy, newSiteSpeciesValues, newAge)
+    updateStates(newDerivedBy, newSiteSpeciesValues, newAge)
   },
   { immediate: true },
 )
