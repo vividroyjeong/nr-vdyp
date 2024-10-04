@@ -1,4 +1,12 @@
-import { MINIMUM_DBH_LIMITS } from '@/constants/constants'
+import {
+  MINIMUM_DBH_LIMITS,
+  COMPUTED_VALUES,
+  FLOATING,
+  SITE_SPECIES_VALUES,
+  AGE_TYPE,
+  VOLUME_REPORTED,
+  PROJECTION_TYPE,
+} from '@/constants/constants'
 
 export const derivedByOptions = [
   { label: 'Volume', value: 'Volume' },
@@ -58,13 +66,13 @@ export const becZoneOptions = [
 ]
 
 export const siteSpeciesValuesOptions = [
-  { label: 'Computed', value: 'Computed' },
-  { label: 'Supplied', value: 'Supplied' },
+  { label: 'Computed', value: SITE_SPECIES_VALUES.COMPUTED },
+  { label: 'Supplied', value: SITE_SPECIES_VALUES.SUPPLIED },
 ]
 
 export const ageTypeOptions = [
-  { label: 'Total', value: 'Total' },
-  { label: 'Breast', value: 'Breast' },
+  { label: 'Total', value: AGE_TYPE.TOTAL },
+  { label: 'Breast', value: AGE_TYPE.BREAST },
 ]
 
 export const ecoZoneOptions = [
@@ -112,9 +120,9 @@ export const siteIndexCurveMap = {
 }
 
 export const floatingOptions = [
-  { label: 'Float', value: 'Age' },
-  { label: 'Float', value: 'Height' },
-  { label: 'Float', value: 'SiteIndex' },
+  { label: 'Float', value: FLOATING.AGE },
+  { label: 'Float', value: FLOATING.HEIGHT },
+  { label: 'Float', value: FLOATING.SITEINDEX },
 ]
 
 export const minimumDBHLimitsOptions = [
@@ -127,21 +135,20 @@ export const minimumDBHLimitsOptions = [
 
 export const additionalStandAttributesOptions = [
   {
-    label:
-      'Use Computed Values (These additional Stand attributes require that a Stand Age and Basal Area be supplied on the Site Index and the Density pages)',
-    value: 'Use Computed Values',
+    label: 'Use Computed Values',
+    value: COMPUTED_VALUES.USE,
   },
-  { label: 'Modify Computed Values', value: 'Modify Computed Values' },
+  { label: 'Modify Computed Values', value: COMPUTED_VALUES.MODIFY },
 ]
 
 export const volumeReportedOptions = [
-  { label: 'Whole Stem', value: 'Whole Stem' },
-  { label: 'Close Utilization', value: 'Close Utilization' },
-  { label: 'Net Decay', value: 'Net Decay' },
-  { label: 'Net Decay and Waste', value: 'Net Decay and Waste' },
+  { label: 'Whole Stem', value: VOLUME_REPORTED.WHOLE_STEM },
+  { label: 'Close Utilization', value: VOLUME_REPORTED.CLOSE_UTIL },
+  { label: 'Net Decay', value: VOLUME_REPORTED.NET_DECAY },
+  { label: 'Net Decay and Waste', value: VOLUME_REPORTED.NET_DECAY_WASTE },
   {
     label: 'Net Decay, Waste and Breakage',
-    value: 'Net Decay, Waste and Breakage',
+    value: VOLUME_REPORTED.NET_DECAY_WASTE_BREAKAGE,
   },
 ]
 
@@ -152,6 +159,6 @@ export const includeInReportOptions = [
 ]
 
 export const projectionTypeOptions = [
-  { label: 'Volume', value: 'Volume' },
-  { label: 'CFS Biomass', value: 'CFS Biomass' },
+  { label: 'Volume', value: PROJECTION_TYPE.VOLUME },
+  { label: 'CFS Biomass', value: PROJECTION_TYPE.CFS_BIOMASS },
 ]

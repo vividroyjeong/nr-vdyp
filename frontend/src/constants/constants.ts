@@ -36,8 +36,8 @@ export const FLOATING = Object.freeze({
 })
 
 export const COMPUTED_VALUES = Object.freeze({
-  USE: 'Use Computed Values',
-  MODIFY: 'Modify Computed Values',
+  USE: 'Use',
+  MODIFY: 'Modify',
 })
 
 export const MINIMUM_DBH_LIMITS = Object.freeze({
@@ -46,6 +46,19 @@ export const MINIMUM_DBH_LIMITS = Object.freeze({
   CM12_5: '12.5 cm+',
   CM17_5: '17.5 cm+',
   CM22_5: '22.5 cm+',
+})
+
+export const VOLUME_REPORTED = Object.freeze({
+  WHOLE_STEM: 'Whole Stem',
+  CLOSE_UTIL: 'Close Utilization',
+  NET_DECAY: 'Net Decay',
+  NET_DECAY_WASTE: 'Net Decay and Waste',
+  NET_DECAY_WASTE_BREAKAGE: 'Net Decay, Waste and Breakage',
+})
+
+export const PROJECTION_TYPE = Object.freeze({
+  VOLUME: 'Volume',
+  CFS_BIOMASS: 'CFS Biomass',
 })
 
 export const DEFAULT_VALUES = Object.freeze({
@@ -72,7 +85,7 @@ export const DEFAULT_VALUES = Object.freeze({
   STARTING_AGE: 0,
   FINISHING_AGE: 250,
   AGE_INCREMENT: 25,
-  SELECTED_VOLUME_REPORTED: ['Whole Stem'],
-  PROJECTION_TYPE: 'Volume',
+  SELECTED_VOLUME_REPORTED: [VOLUME_REPORTED.WHOLE_STEM],
+  PROJECTION_TYPE: PROJECTION_TYPE.VOLUME,
   REPORT_TITLE: 'A Sample Report Title',
 })

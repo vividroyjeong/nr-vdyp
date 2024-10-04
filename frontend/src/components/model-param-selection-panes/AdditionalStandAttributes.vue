@@ -19,6 +19,10 @@
         </v-expansion-panel-title>
         <v-expansion-panel-text class="expansion-panel-text mt-n2">
           <v-form ref="form">
+            <div class="mb-2" style="font-size: 14px">
+              These additional Stand attributes require that a Stand Age and
+              Basal Area be supplied on the Site Index and the Density pages
+            </div>
             <div>
               <v-row>
                 <v-col cols="auto">
