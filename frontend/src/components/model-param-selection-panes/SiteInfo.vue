@@ -135,7 +135,7 @@
               </v-row>
               <v-row>
                 <v-col cols="6">
-                  <v-row>
+                  <v-row style="height: 70px !important">
                     <v-col cols="6">
                       <v-select
                         label="Age Type"
@@ -143,9 +143,9 @@
                         v-model="ageType"
                         item-title="label"
                         item-value="value"
-                        hide-details="auto"
+                        hide-details
                         persistent-placeholder
-                        placeholder="Select..."
+                        placeholder=""
                         density="compact"
                         dense
                         :disabled="isAgeTypeDisabled"
@@ -162,7 +162,7 @@
                         step="0.1"
                         persistent-placeholder
                         :placeholder="agePlaceholder"
-                        hide-details="auto"
+                        hide-details
                         density="compact"
                         dense
                         :disabled="isAgeDisabled"
@@ -175,7 +175,7 @@
                       >
                     </v-col>
                   </v-row>
-                  <v-row>
+                  <v-row style="height: 70px !important">
                     <v-col cols="6" />
                     <v-col class="col-space-6" />
                     <v-col>
@@ -188,7 +188,7 @@
                         step="0.1"
                         persistent-placeholder
                         :placeholder="heightPlaceholder"
-                        hide-details="auto"
+                        hide-details
                         density="compact"
                         dense
                         :disabled="isHeightDisabled"
@@ -201,7 +201,7 @@
                       >
                     </v-col>
                   </v-row>
-                  <v-row>
+                  <v-row style="height: 70px !important">
                     <v-col cols="6" />
                     <v-col class="col-space-6" />
                     <v-col>
@@ -214,7 +214,7 @@
                         step="0.1"
                         persistent-placeholder
                         placeholder=""
-                        hide-details="auto"
+                        hide-details
                         density="compact"
                         dense
                         @input="handleBHA50SiteIndexInput($event)"
@@ -233,6 +233,7 @@
                     <v-radio-group
                       v-model="floating"
                       row
+                      hide-details
                       :disabled="isFloatingDisabled"
                     >
                       <v-radio
@@ -240,7 +241,7 @@
                         :key="option.value"
                         :label="option.label"
                         :value="option.value"
-                        style="margin-bottom: 45px"
+                        style="margin-bottom: 30px"
                       ></v-radio>
                     </v-radio-group>
                   </div>
@@ -356,6 +357,11 @@ const handleSiteSpeciesValuesState = (
     isFloatingDisabled.value = false
     setFloatingState(newFloating)
 
+    // TODO - set values based on species, beczone, agetype
+    // if age or height float is selected, age, height or bha 50 site index should also be factored into the calculation for these values
+    age.value = 60
+    height.value = 17.0
+
     agePlaceholder.value = ''
     heightPlaceholder.value = ''
   } else if (newSiteSpeciesValues === SITE_SPECIES_VALUES.SUPPLIED) {
@@ -392,6 +398,7 @@ const handleDerivedByChange = (
   }
 }
 
+// Update siteIndexCurve based on selectedSiteSpecies
 const updateSiteIndexCurve = (newSiteSpecies: string | null) => {
   if (
     newSiteSpecies &&
@@ -403,7 +410,7 @@ const updateSiteIndexCurve = (newSiteSpecies: string | null) => {
     siteIndexCurve.value = null // Clear if no mapping found
   }
 }
-// Update siteIndexCurve based on selectedSiteSpecies
+
 watch(selectedSiteSpecies, (newSiteSpecies) => {
   updateSiteIndexCurve(newSiteSpecies)
 })

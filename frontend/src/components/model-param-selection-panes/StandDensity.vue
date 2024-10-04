@@ -216,12 +216,10 @@ const updateBasalAreaAndTreesState = (
   newSiteSpeciesValues: string | null,
   newAge: number | null,
 ) => {
-  const isBasalAreaEnabled =
+  isBasalAreaDisabled.value = isTreesPerHectareDisabled.value = !(
     newDerivedBy === DERIVED_BY.BASAL_AREA &&
     newSiteSpeciesValues === SITE_SPECIES_VALUES.COMPUTED
-
-  isBasalAreaDisabled.value = !isBasalAreaEnabled
-  isTreesPerHectareDisabled.value = !isBasalAreaEnabled
+  )
 
   // handle by Age change
   if (Util.isEmptyOrZero(newAge)) {

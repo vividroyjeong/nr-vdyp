@@ -270,7 +270,7 @@ const updateFieldDisabledStates = (newComputedValues: string | null) => {
 }
 
 const updateFieldValueStates = (newAge: number | null) => {
-  // TO-DO - Make sure that all fields are changed to 'N/A' by Age.
+  // TODO - Make sure that all fields are changed to 'N/A' by Age.
   if (Util.isEmptyOrZero(newAge)) {
     loreyHeight.value = null
     wholeStemVolume75cm.value = null
