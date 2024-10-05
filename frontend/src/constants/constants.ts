@@ -14,6 +14,11 @@ export const SORT_ORDER = Object.freeze({
   DESC: 'DESC',
 })
 
+export const PANEL = Object.freeze({
+  OPEN: 0,
+  CLOSE: -1,
+})
+
 export const DERIVED_BY = Object.freeze({
   VOLUME: 'Volume',
   BASAL_AREA: 'Basal Area',

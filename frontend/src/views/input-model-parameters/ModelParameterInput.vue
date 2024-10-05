@@ -75,10 +75,16 @@
           text-align: end;
         "
       >
-        <v-btn class="white-btn elevation-0 mr-3" @click="cancel">Cancel</v-btn>
-        <v-btn class="blue-btn elevation-0 ml-1" @click="runModel"
-          >Run Model</v-btn
-        >
+        <v-card-actions class="pr-0">
+          <v-spacer></v-spacer>
+          <v-btn class="white-btn mr-3" @click="cancel">Cancel</v-btn>
+          <v-btn
+            class="blue-btn mr-2"
+            :disabled="!modelParameterStore.runModelEnabled"
+            @click="runModel"
+            >Run Model</v-btn
+          >
+        </v-card-actions>
       </v-card>
     </template>
   </v-container>

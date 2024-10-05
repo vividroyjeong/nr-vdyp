@@ -7,7 +7,7 @@
             <!-- Place an arrow icon to the left of the title -->
             <v-col cols="auto" class="expansion-panel-icon-col">
               <v-icon class="expansion-panel-icon">{{
-                panelOpenStates.standDensity === 0
+                panelOpenStates.standDensity === PANEL.OPEN
                   ? 'mdi-chevron-up'
                   : 'mdi-chevron-down'
               }}</v-icon>
@@ -155,8 +155,22 @@
             </div>
             <v-card-actions class="mt-5 pr-0">
               <v-spacer></v-spacer>
-              <v-btn class="white-btn" @click="clear">Clear</v-btn>
-              <v-btn class="blue-btn ml-2" @click="confirm">Confirm</v-btn>
+              <v-btn
+                class="white-btn"
+                :disabled="!isConfirmEnabled"
+                @click="clear"
+                >Clear</v-btn
+              >
+              <v-btn
+                v-show="!isConfirmed"
+                class="blue-btn ml-2"
+                :disabled="!isConfirmEnabled"
+                @click="onConfirm"
+                >Confirm</v-btn
+              >
+              <v-btn v-show="isConfirmed" class="blue-btn ml-2" @click="onEdit"
+                >Edit</v-btn
+              >
             </v-card-actions>
           </v-form>
         </v-expansion-panel-text>
@@ -172,6 +186,7 @@ import { useModelParameterStore } from '@/stores/modelParameterStore'
 import { storeToRefs } from 'pinia'
 import { minimumDBHLimitsOptions } from '@/constants/options'
 import {
+  PANEL,
   DERIVED_BY,
   SITE_SPECIES_VALUES,
   DEFAULT_VALUES,
@@ -192,6 +207,14 @@ const {
   currentDiameter,
   percentCrownClosure,
 } = storeToRefs(modelParameterStore)
+
+const panelName = 'standDensity'
+const isConfirmEnabled = computed(
+  () => modelParameterStore.panelState[panelName].editable,
+)
+const isConfirmed = computed(
+  () => modelParameterStore.panelState[panelName].confirmed,
+)
 
 const isPercentCrownClosureDisabled = ref(false)
 const isBasalAreaDisabled = ref(false)
@@ -312,7 +335,20 @@ const clear = () => {
   minimumDBHLimit.value = DEFAULT_VALUES.MINIMUM_DBH_LIMIT
   percentCrownClosure.value = DEFAULT_VALUES.PERCENT_CROWN_CLOSURE
 }
-const confirm = () => {}
+const onConfirm = () => {
+  form.value?.validate()
+  // this panel is not in a confirmed state
+  if (!isConfirmed.value) {
+    modelParameterStore.confirmPanel(panelName)
+  }
+}
+
+const onEdit = () => {
+  // this panel has already been confirmed.
+  if (isConfirmed.value) {
+    modelParameterStore.editPanel(panelName)
+  }
+}
 </script>
 
 <style scoped></style>

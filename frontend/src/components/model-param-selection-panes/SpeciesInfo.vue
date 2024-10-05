@@ -7,7 +7,7 @@
             <v-col cols="auto" class="expansion-panel-icon-col">
               <v-icon class="expansion-panel-icon">
                 {{
-                  panelOpenStates.speciesInfo === 0
+                  panelOpenStates.speciesInfo === PANEL.OPEN
                     ? 'mdi-chevron-up'
                     : 'mdi-chevron-down'
                 }}
@@ -198,8 +198,22 @@
             </div>
             <v-card-actions class="mt-5 pr-0">
               <v-spacer></v-spacer>
-              <v-btn class="white-btn" @click="clear">Clear</v-btn>
-              <v-btn class="blue-btn ml-2" @click="confirm"> Confirm </v-btn>
+              <v-btn
+                class="white-btn"
+                :disabled="!isConfirmEnabled"
+                @click="clear"
+                >Clear</v-btn
+              >
+              <v-btn
+                v-show="!isConfirmed"
+                class="blue-btn ml-2"
+                :disabled="!isConfirmEnabled"
+                @click="onConfirm"
+                >Confirm</v-btn
+              >
+              <v-btn v-show="isConfirmed" class="blue-btn ml-2" @click="onEdit"
+                >Edit</v-btn
+              >
             </v-card-actions>
           </v-form>
         </v-expansion-panel-text>
@@ -214,7 +228,7 @@ import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
 
 import { storeToRefs } from 'pinia'
 import { derivedByOptions, speciesMap } from '@/constants/options'
-import { DEFAULT_VALUES } from '@/constants/constants'
+import { PANEL, DEFAULT_VALUES } from '@/constants/constants'
 
 const form = ref<HTMLFormElement>()
 
@@ -231,6 +245,14 @@ const {
   isOverTotalPercent,
   highestPercentSpecies,
 } = storeToRefs(modelParameterStore)
+
+const panelName = 'speciesInfo'
+const isConfirmEnabled = computed(
+  () => modelParameterStore.panelState[panelName].editable,
+)
+const isConfirmed = computed(
+  () => modelParameterStore.panelState[panelName].confirmed,
+)
 
 const computedSpeciesOptions = computed(() =>
   (Object.keys(speciesMap) as Array<keyof typeof speciesMap>).map((code) => ({
@@ -369,13 +391,24 @@ const validateRequiredFields = (): boolean => {
   return true
 }
 
-const confirm = () => {
+const onConfirm = () => {
   const isDuplicateValid = validateDuplicateSpecies()
   const isTotalPercentValid = validateTotalSpeciesPercent()
   const isRequiredFieldsValid = validateRequiredFields()
 
   if (isDuplicateValid && isTotalPercentValid && isRequiredFieldsValid) {
     form.value?.validate()
+    // this panel is not in a confirmed state
+    if (!isConfirmed.value) {
+      modelParameterStore.confirmPanel(panelName)
+    }
+  }
+}
+
+const onEdit = () => {
+  // this panel has already been confirmed.
+  if (isConfirmed.value) {
+    modelParameterStore.editPanel(panelName)
   }
 }
 </script>

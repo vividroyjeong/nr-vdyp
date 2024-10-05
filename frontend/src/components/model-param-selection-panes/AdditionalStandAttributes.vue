@@ -7,7 +7,7 @@
             <!-- Place an arrow icon to the left of the title -->
             <v-col cols="auto" class="expansion-panel-icon-col">
               <v-icon class="expansion-panel-icon">{{
-                panelOpenStates.additionalStandAttributes === 0
+                panelOpenStates.additionalStandAttributes === PANEL.OPEN
                   ? 'mdi-chevron-up'
                   : 'mdi-chevron-down'
               }}</v-icon>
@@ -189,8 +189,22 @@
             </div>
             <v-card-actions class="mt-5 pr-0">
               <v-spacer></v-spacer>
-              <v-btn class="white-btn" @click="clear">Clear</v-btn>
-              <v-btn class="blue-btn ml-2" @click="confirm">Confirm</v-btn>
+              <v-btn
+                class="white-btn"
+                :disabled="!isConfirmEnabled"
+                @click="clear"
+                >Clear</v-btn
+              >
+              <v-btn
+                v-show="!isConfirmed"
+                class="blue-btn ml-2"
+                :disabled="!isConfirmEnabled"
+                @click="onConfirm"
+                >Confirm</v-btn
+              >
+              <v-btn v-show="isConfirmed" class="blue-btn ml-2" @click="onEdit"
+                >Edit</v-btn
+              >
             </v-card-actions>
           </v-form>
         </v-expansion-panel-text>
@@ -207,6 +221,7 @@ import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
 import { storeToRefs } from 'pinia'
 import { additionalStandAttributesOptions } from '@/constants/options'
 import {
+  PANEL,
   DERIVED_BY,
   SITE_SPECIES_VALUES,
   COMPUTED_VALUES,
@@ -232,6 +247,14 @@ const {
   wholeStemVolume125cm,
   closeUtilNetDecayVolume,
 } = storeToRefs(modelParameterStore)
+
+const panelName = 'additionalStandAttributes'
+const isConfirmEnabled = computed(
+  () => modelParameterStore.panelState[panelName].editable,
+)
+const isConfirmed = computed(
+  () => modelParameterStore.panelState[panelName].confirmed,
+)
 
 const isComputedValuesDisabled = ref(false)
 const isLoreyHeightDisabled = ref(false)
@@ -507,12 +530,23 @@ const validateComputedValuesModification = (): boolean => {
   return true
 }
 
-const confirm = () => {
+const onConfirm = () => {
   const isAllFieldsValid = validateAllFields()
   const isModificationValid = validateComputedValuesModification()
 
   if (isAllFieldsValid && isModificationValid) {
     form.value?.validate()
+    // this panel is not in a confirmed state
+    if (!isConfirmed.value) {
+      modelParameterStore.confirmPanel(panelName)
+    }
+  }
+}
+
+const onEdit = () => {
+  // this panel has already been confirmed.
+  if (isConfirmed.value) {
+    modelParameterStore.editPanel(panelName)
   }
 }
 </script>

@@ -1,16 +1,105 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { FLOATING, DEFAULT_VALUES } from '@/constants/constants'
+import { PANEL, FLOATING, DEFAULT_VALUES } from '@/constants/constants'
+
+// Define a type for the panel names
+type PanelName =
+  | 'speciesInfo'
+  | 'siteInfo'
+  | 'standDensity'
+  | 'additionalStandAttributes'
+  | 'reportInfo'
+
+// Define a type for panel open states
+type PanelState = typeof PANEL.OPEN | typeof PANEL.CLOSE
 
 export const useModelParameterStore = defineStore('modelParameter', () => {
   // panel open
-  const panelOpenStates = ref({
-    speciesInfo: 0, // 0: open, -1: closed
-    siteInfo: 0,
-    standDensity: 0,
-    additionalStandAttributes: 0,
-    reportInfo: 0,
+  const panelOpenStates = ref<Record<string, PanelState>>({
+    speciesInfo: PANEL.OPEN,
+    siteInfo: PANEL.OPEN,
+    standDensity: PANEL.OPEN,
+    additionalStandAttributes: PANEL.OPEN,
+    reportInfo: PANEL.OPEN,
   })
+
+  // Panel states for confirming and editing
+  const panelState = ref<
+    Record<PanelName, { confirmed: boolean; editable: boolean }>
+  >({
+    speciesInfo: { confirmed: false, editable: true }, // Only speciesInfo is editable initially
+    siteInfo: { confirmed: false, editable: false },
+    standDensity: { confirmed: false, editable: false },
+    additionalStandAttributes: { confirmed: false, editable: false },
+    reportInfo: { confirmed: false, editable: false },
+  })
+
+  // Run Model button state
+  const runModelEnabled = ref(false)
+
+  // <confirmed === true>
+  // Indicates that the panel has validated and confirmed the user's input.
+  // When the user completes all of the input within the panel and clicks the confirm button to pass validation, confirmed is set to true.
+  // This state means that the data in that panel is currently valid and does not need to be modified.
+  // When this happens, the confirm button on the current panel changes to "Edit" and the confirm button on the next panel becomes active.
+
+  // <editable === true>
+  // Indicates that the panel can be modified by the user.
+  // editable becomes true when a panel is active and allows users to enter or modify data.
+  // On initial loading, only the first panel (SpeciesInfo) is set to editable to allow modification;
+  // the other panels start with editable false because the previous panel has not been confirmed.
+  // In this state, the user can modify the input fields within the panel, and the confirm button is enabled to confirm with validation.
+
+  // Method to handle confirm action for each panel
+  const confirmPanel = (panelName: PanelName) => {
+    panelState.value[panelName].confirmed = true
+    panelState.value[panelName].editable = false
+
+    // Enable the next panel's confirm and clear buttons
+    const panelOrder: PanelName[] = [
+      'speciesInfo',
+      'siteInfo',
+      'standDensity',
+      'additionalStandAttributes',
+      'reportInfo',
+    ]
+    const currentIndex = panelOrder.indexOf(panelName)
+    if (currentIndex !== -1 && currentIndex < panelOrder.length - 1) {
+      const nextPanel = panelOrder[currentIndex + 1]
+      panelState.value[nextPanel].editable = true
+    }
+
+    // Check if all panels are confirmed to enable the 'Run Model' button
+    runModelEnabled.value = panelOrder.every(
+      (panel) => panelState.value[panel].confirmed,
+    )
+  }
+
+  // Method to handle edit action for each panel
+  const editPanel = (panelName: PanelName) => {
+    panelState.value[panelName].confirmed = false
+    panelState.value[panelName].editable = true
+
+    // Disable all subsequent panels
+    const panelOrder: PanelName[] = [
+      'speciesInfo',
+      'siteInfo',
+      'standDensity',
+      'additionalStandAttributes',
+      'reportInfo',
+    ]
+    const currentIndex = panelOrder.indexOf(panelName)
+    if (currentIndex !== -1) {
+      for (let i = currentIndex + 1; i < panelOrder.length; i++) {
+        const nextPanel = panelOrder[i]
+        panelState.value[nextPanel].confirmed = false
+        panelState.value[nextPanel].editable = false
+      }
+    }
+
+    // Disable 'Run Model' button
+    runModelEnabled.value = false
+  }
 
   // species info
   const derivedBy = ref<string | null>(null)
@@ -174,6 +263,11 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   return {
     // panel open
     panelOpenStates,
+    // Panel state
+    panelState,
+    runModelEnabled,
+    confirmPanel,
+    editPanel,
     // species info
     derivedBy,
     speciesList,
