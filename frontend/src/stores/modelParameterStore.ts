@@ -2,17 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { PANEL, FLOATING } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
-
-// Define a type for the panel names
-type PanelName =
-  | 'speciesInfo'
-  | 'siteInfo'
-  | 'standDensity'
-  | 'additionalStandAttributes'
-  | 'reportInfo'
-
-// Define a type for panel open states
-type PanelState = typeof PANEL.OPEN | typeof PANEL.CLOSE
+import type { PanelName, PanelState } from '@/types/types'
 
 export const useModelParameterStore = defineStore('modelParameter', () => {
   // panel open
