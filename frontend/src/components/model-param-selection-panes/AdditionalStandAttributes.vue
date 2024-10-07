@@ -49,10 +49,9 @@
                     label="Lorey Height - 7.5cm+ (meters)"
                     type="number"
                     v-model="loreyHeight"
-                    min="0"
+                    min="0.01"
+                    max="99.90"
                     step="0.01"
-                    :rules="[validateMinimum]"
-                    :error-messages="loreyHeightError"
                     persistent-placeholder
                     :placeholder="loreyHeightPlaceholder"
                     density="compact"
@@ -65,10 +64,9 @@
                   <v-text-field
                     type="number"
                     v-model="wholeStemVolume75cm"
-                    min="0"
+                    min="0.1"
+                    max="2500.0"
                     step="0.1"
-                    :rules="[validateMinimum]"
-                    :error-messages="wholeStemVolume75cmError"
                     persistent-placeholder
                     :placeholder="wholeStemVolume75cmPlaceholder"
                     density="compact"
@@ -86,10 +84,9 @@
                   <v-text-field
                     type="number"
                     v-model="basalArea125cm"
-                    min="0"
+                    min="0.1000"
+                    max="250.0000"
                     step="0.0001"
-                    :rules="[validateMinimum]"
-                    :error-messages="basalArea125cmError"
                     persistent-placeholder
                     :placeholder="basalArea125cmPlaceholder"
                     density="compact"
@@ -106,10 +103,9 @@
                   <v-text-field
                     type="number"
                     v-model="wholeStemVolume125cm"
-                    min="0"
+                    min="0.0"
+                    max="2500.0"
                     step="0.1"
-                    :rules="[validateMinimum]"
-                    :error-messages="wholeStemVolume125cmError"
                     persistent-placeholder
                     :placeholder="wholeStemVolume125cmPlaceholder"
                     density="compact"
@@ -127,10 +123,9 @@
                   <v-text-field
                     type="number"
                     v-model="closeUtilVolume"
-                    min="0"
+                    min="0.0"
+                    max="2500.0"
                     step="0.1"
-                    :rules="[validateMinimum]"
-                    :error-messages="closeUtilVolumeError"
                     persistent-placeholder
                     :placeholder="closeUtilVolumePlaceholder"
                     density="compact"
@@ -147,10 +142,9 @@
                   <v-text-field
                     type="number"
                     v-model="closeUtilNetDecayVolume"
-                    min="0"
+                    min="0.0"
+                    max="2500.0"
                     step="0.1"
-                    :rules="[validateMinimum]"
-                    :error-messages="closeUtilNetDecayVolumeError"
                     persistent-placeholder
                     :placeholder="closeUtilNetDecayVolumePlaceholder"
                     density="compact"
@@ -169,10 +163,9 @@
                   <v-text-field
                     type="number"
                     v-model="closeUtilNetDecayWasteVolume"
-                    min="0"
+                    min="0.0"
+                    max="2500.0"
                     step="0.1"
-                    :rules="[validateMinimum]"
-                    :error-messages="closeUtilNetDecayWasteVolumeError"
                     persistent-placeholder
                     :placeholder="closeUtilNetDecayWasteVolumePlaceholder"
                     density="compact"
@@ -239,6 +232,7 @@ const {
   siteSpeciesValues,
   computedValues,
   age,
+  basalArea,
   loreyHeight,
   basalArea125cm,
   closeUtilVolume,
@@ -380,51 +374,6 @@ watch(
   { immediate: true },
 )
 
-const validateMinimum = (value: any) => {
-  if (value === null || value === '') {
-    return true
-  }
-  if (value < 0) {
-    return 'Please enter a value greater than 0'
-  }
-  return true
-}
-
-const loreyHeightError = computed(() => {
-  const error = validateMinimum(loreyHeight.value)
-  return error === true ? [] : [error]
-})
-
-const wholeStemVolume75cmError = computed(() => {
-  const error = validateMinimum(wholeStemVolume75cm.value)
-  return error === true ? [] : [error]
-})
-
-const basalArea125cmError = computed(() => {
-  const error = validateMinimum(basalArea125cm.value)
-  return error === true ? [] : [error]
-})
-
-const wholeStemVolume125cmError = computed(() => {
-  const error = validateMinimum(wholeStemVolume125cm.value)
-  return error === true ? [] : [error]
-})
-
-const closeUtilVolumeError = computed(() => {
-  const error = validateMinimum(closeUtilVolume.value)
-  return error === true ? [] : [error]
-})
-
-const closeUtilNetDecayVolumeError = computed(() => {
-  const error = validateMinimum(closeUtilNetDecayVolume.value)
-  return error === true ? [] : [error]
-})
-
-const closeUtilNetDecayWasteVolumeError = computed(() => {
-  const error = validateMinimum(closeUtilNetDecayWasteVolume.value)
-  return error === true ? [] : [error]
-})
-
 const clear = () => {
   if (form.value) {
     form.value.reset()
@@ -530,11 +479,179 @@ const validateComputedValuesModification = (): boolean => {
   return true
 }
 
+// Validation by comparing entered values
+const validateComparison = (): boolean => {
+  if (
+    basalArea125cm.value !== null &&
+    basalArea.value !== null &&
+    basalArea125cm.value > basalArea.value
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      `'Basal Area - 12.5cm+' is greater than the Basal Area defined on the Stand Density Pane.\n\n 'Basal Area - 7.5cm+' on Stand Density Pane: ${basalArea.value}`,
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    wholeStemVolume125cm.value !== null &&
+    wholeStemVolume75cm.value !== null &&
+    wholeStemVolume125cm.value > wholeStemVolume75cm.value
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Whole Stem Volume - 12.5cm+': is greater than 'Whole Stem Volume - 7.5cm+'",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    closeUtilVolume.value !== null &&
+    wholeStemVolume125cm.value !== null &&
+    closeUtilVolume.value > wholeStemVolume125cm.value
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Close Utilization Volume - 12.5cm+': is greater than 'Whole Stem Volume - 12.5cm+'",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    closeUtilNetDecayVolume.value !== null &&
+    closeUtilVolume.value !== null &&
+    closeUtilNetDecayVolume.value > closeUtilVolume.value
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Close Utilization Net Decay Volume - 12.5cm+': is greater than 'Close Utilization Volume - 12.5cm+'",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    closeUtilNetDecayWasteVolume.value !== null &&
+    closeUtilNetDecayVolume.value !== null &&
+    closeUtilNetDecayWasteVolume.value > closeUtilNetDecayVolume.value
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Close Utilization Net Decay Waste Volume - 12.5cm+': is greater than 'Close Utilization Net Decay Volume - 12.5cm+'",
+      { width: 400 },
+    )
+    return false
+  }
+
+  return true
+}
+
+// Validation to check the range of input values
+const validateRange = (): boolean => {
+  if (
+    loreyHeight.value !== null &&
+    (loreyHeight.value < 0.01 || loreyHeight.value > 99.9)
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Lorey Height - 7.5cm+': must range from 0.01 and 99.90",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    wholeStemVolume75cm.value !== null &&
+    (wholeStemVolume75cm.value < 0.1 || wholeStemVolume75cm.value > 2500.0)
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Whole Stem Volume - 7.5cm+': must range from 0.1 and 2500.0",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    basalArea125cm.value !== null &&
+    (basalArea125cm.value < 0.1 || basalArea125cm.value > 250.0)
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Basal Area - 12.5cm+': must range from 0.1000 and 250.0000",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    wholeStemVolume125cm.value !== null &&
+    (wholeStemVolume125cm.value < 0.0 || wholeStemVolume125cm.value > 2500.0)
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Whole Stem Volume - 12.5cm+': must range from 0.0 and 2500.0",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    closeUtilVolume.value !== null &&
+    (closeUtilVolume.value < 0.0 || closeUtilVolume.value > 2500.0)
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Close Utilization Volume - 12.5cm+': must range from 0.0 and 2500.0",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    closeUtilNetDecayVolume.value !== null &&
+    (closeUtilNetDecayVolume.value < 0.0 ||
+      closeUtilNetDecayVolume.value > 2500.0)
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Close Utilization Net Decay Volume - 12.5cm+': must range from 0.0 and 2500.0",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    closeUtilNetDecayWasteVolume.value !== null &&
+    (closeUtilNetDecayWasteVolume.value < 0.0 ||
+      closeUtilNetDecayWasteVolume.value > 2500.0)
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Close Utilization Net Decay Waste Volume - 12.5cm+': must range from 0.0 and 2500.0",
+      { width: 400 },
+    )
+    return false
+  }
+
+  return true
+}
+
 const onConfirm = () => {
   const isAllFieldsValid = validateAllFields()
   const isModificationValid = validateComputedValuesModification()
+  const isComparisonValid = validateComparison()
+  const isRangeValid = validateRange()
 
-  if (isAllFieldsValid && isModificationValid) {
+  if (
+    isAllFieldsValid &&
+    isModificationValid &&
+    isComparisonValid &&
+    isRangeValid
+  ) {
     form.value?.validate()
     // this panel is not in a confirmed state
     if (!isConfirmed.value) {
