@@ -227,8 +227,10 @@ import { useModelParameterStore } from '@/stores/modelParameterStore'
 import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
 
 import { storeToRefs } from 'pinia'
-import { derivedByOptions, speciesMap } from '@/constants/options'
-import { PANEL, DEFAULT_VALUES } from '@/constants/constants'
+import { derivedByOptions } from '@/constants/options'
+import { speciesMap } from '@/constants/mappings'
+import { PANEL } from '@/constants/constants'
+import { DEFAULT_VALUES } from '@/constants/defaults'
 
 const form = ref<HTMLFormElement>()
 

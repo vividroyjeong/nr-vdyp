@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { PANEL, FLOATING, DEFAULT_VALUES } from '@/constants/constants'
+import { PANEL, FLOATING } from '@/constants/constants'
+import { DEFAULT_VALUES } from '@/constants/defaults'
 
 // Define a type for the panel names
 type PanelName =

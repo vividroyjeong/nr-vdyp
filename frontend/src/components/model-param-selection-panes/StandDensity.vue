@@ -191,9 +191,9 @@ import {
   PANEL,
   DERIVED_BY,
   SITE_SPECIES_VALUES,
-  DEFAULT_VALUES,
   NOT_AVAILABLE_INDI,
 } from '@/constants/constants'
+import { DEFAULT_VALUES } from '@/constants/defaults'
 
 const form = ref<HTMLFormElement>()
 

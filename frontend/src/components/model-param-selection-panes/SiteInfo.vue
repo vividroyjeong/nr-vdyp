@@ -283,19 +283,19 @@ import { storeToRefs } from 'pinia'
 import {
   becZoneOptions,
   ecoZoneOptions,
-  siteIndexCurveMap,
   siteSpeciesValuesOptions,
   ageTypeOptions,
   floatingOptions,
 } from '@/constants/options'
+import { siteIndexCurveMap } from '@/constants/mappings'
 import {
   PANEL,
   DERIVED_BY,
   SITE_SPECIES_VALUES,
   FLOATING,
-  DEFAULT_VALUES,
   NOT_AVAILABLE_INDI,
 } from '@/constants/constants'
+import { DEFAULT_VALUES } from '@/constants/defaults'
 
 const form = ref<HTMLFormElement>()
 

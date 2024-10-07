@@ -217,11 +217,8 @@ import {
   projectionTypeOptions,
   minimumDBHLimitsOptions,
 } from '@/constants/options'
-import {
-  PANEL,
-  DEFAULT_VALUES,
-  MINIMUM_DBH_LIMITS,
-} from '@/constants/constants'
+import { PANEL, MINIMUM_DBH_LIMITS } from '@/constants/constants'
+import { DEFAULT_VALUES } from '@/constants/defaults'
 
 const form = ref<HTMLFormElement>()
 
