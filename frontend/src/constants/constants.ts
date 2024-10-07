@@ -94,3 +94,7 @@ export const DEFAULT_VALUES = Object.freeze({
   PROJECTION_TYPE: PROJECTION_TYPE.VOLUME,
   REPORT_TITLE: 'A Sample Report Title',
 })
+
+export const NOT_AVAILABLE_INDI = Object.freeze({
+  NA: 'N/A',
+})

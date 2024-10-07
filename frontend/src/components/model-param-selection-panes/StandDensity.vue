@@ -48,8 +48,9 @@
                   <v-text-field
                     type="number"
                     v-model="basalArea"
-                    min="0"
-                    step="0.0001"
+                    min="0.1000"
+                    max="250.0000"
+                    step="2.5"
                     :rules="[validateMinimum]"
                     :error-messages="basalAreaError"
                     persistent-placeholder
@@ -76,8 +77,9 @@
                     label="Trees per Hectare (tree/ha)"
                     type="number"
                     v-model="treesPerHectare"
-                    min="0"
-                    step="0.01"
+                    min="0.10"
+                    max="9999.90"
+                    step="250.00"
                     :rules="[validateMinimum]"
                     :error-messages="treesPerHectareError"
                     persistent-placeholder
@@ -113,7 +115,7 @@
                     v-model="percentCrownClosure"
                     max="100"
                     min="0"
-                    step="0.1"
+                    step="5"
                     :rules="[validatePercent]"
                     :error-messages="percentCrownClosureError"
                     persistent-placeholder
@@ -190,6 +192,7 @@ import {
   DERIVED_BY,
   SITE_SPECIES_VALUES,
   DEFAULT_VALUES,
+  NOT_AVAILABLE_INDI,
 } from '@/constants/constants'
 
 const form = ref<HTMLFormElement>()
@@ -228,7 +231,7 @@ const updateBasalAreaState = (isEnabled: boolean, isAgeZero: boolean) => {
   isBasalAreaDisabled.value = !isEnabled || isAgeZero
 
   if (isBasalAreaDisabled.value) {
-    basalAreaPlaceholder.value = 'N/A'
+    basalAreaPlaceholder.value = NOT_AVAILABLE_INDI.NA
     basalArea.value = null
   } else {
     basalAreaPlaceholder.value = ''
@@ -240,7 +243,7 @@ const updateTreesPerHectareState = (isEnabled: boolean, isAgeZero: boolean) => {
   isTreesPerHectareDisabled.value = !isEnabled || isAgeZero
 
   if (isTreesPerHectareDisabled.value) {
-    tphPlaceholder.value = 'N/A'
+    tphPlaceholder.value = NOT_AVAILABLE_INDI.NA
     treesPerHectare.value = null
   } else {
     tphPlaceholder.value = ''
@@ -257,7 +260,7 @@ const updateCrownClosureState = (
     !(isVolume && isComputed) || isAgeEmptyOrZero
 
   if (isPercentCrownClosureDisabled.value) {
-    crownClosurePlaceholder.value = 'N/A'
+    crownClosurePlaceholder.value = NOT_AVAILABLE_INDI.NA
     percentCrownClosure.value = null
   } else {
     crownClosurePlaceholder.value = ''

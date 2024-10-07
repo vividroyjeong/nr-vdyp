@@ -219,6 +219,7 @@ import {
   SITE_SPECIES_VALUES,
   COMPUTED_VALUES,
   DEFAULT_VALUES,
+  NOT_AVAILABLE_INDI,
 } from '@/constants/constants'
 
 const form = ref<HTMLFormElement>()
@@ -302,15 +303,15 @@ const updateFieldDisabledStates = (newComputedValues: string | null) => {
 }
 
 const updateFieldPlaceholderStates = (newAge: number | null) => {
-  // TODO - Make sure that all fields are changed to 'N/A' by Age.
+  // TODO - Make sure that all fields are changed to not available indicator by Age.
   if (Util.isEmptyOrZero(newAge)) {
-    loreyHeightPlaceholder.value = 'N/A'
-    wholeStemVolume75cmPlaceholder.value = 'N/A'
-    basalArea125cmPlaceholder.value = 'N/A'
-    wholeStemVolume125cmPlaceholder.value = 'N/A'
-    closeUtilVolumePlaceholder.value = 'N/A'
-    closeUtilNetDecayVolumePlaceholder.value = 'N/A'
-    closeUtilNetDecayWasteVolumePlaceholder.value = 'N/A'
+    loreyHeightPlaceholder.value = NOT_AVAILABLE_INDI.NA
+    wholeStemVolume75cmPlaceholder.value = NOT_AVAILABLE_INDI.NA
+    basalArea125cmPlaceholder.value = NOT_AVAILABLE_INDI.NA
+    wholeStemVolume125cmPlaceholder.value = NOT_AVAILABLE_INDI.NA
+    closeUtilVolumePlaceholder.value = NOT_AVAILABLE_INDI.NA
+    closeUtilNetDecayVolumePlaceholder.value = NOT_AVAILABLE_INDI.NA
+    closeUtilNetDecayWasteVolumePlaceholder.value = NOT_AVAILABLE_INDI.NA
   } else {
     loreyHeightPlaceholder.value = ''
     wholeStemVolume75cmPlaceholder.value = ''
@@ -323,7 +324,7 @@ const updateFieldPlaceholderStates = (newAge: number | null) => {
 }
 
 const updateFieldValueStates = (newAge: number | null) => {
-  // TODO - Make sure that all fields are changed to 'N/A' by Age.
+  // TODO - Make sure that all fields are changed to not available by Age.
   if (Util.isEmptyOrZero(newAge)) {
     loreyHeight.value = null
     wholeStemVolume75cm.value = null

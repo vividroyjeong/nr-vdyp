@@ -294,6 +294,7 @@ import {
   SITE_SPECIES_VALUES,
   FLOATING,
   DEFAULT_VALUES,
+  NOT_AVAILABLE_INDI,
 } from '@/constants/constants'
 
 const form = ref<HTMLFormElement>()
@@ -396,8 +397,8 @@ const handleSiteSpeciesValuesState = (
 
     age.value = null
     height.value = null
-    agePlaceholder.value = 'N/A'
-    heightPlaceholder.value = 'N/A'
+    agePlaceholder.value = NOT_AVAILABLE_INDI.NA
+    heightPlaceholder.value = NOT_AVAILABLE_INDI.NA
   }
 }
 

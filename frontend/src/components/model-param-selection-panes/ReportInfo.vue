@@ -28,11 +28,9 @@
                     v-model="startingAge"
                     min="0"
                     max="500"
-                    step="1"
-                    :rules="[validateAge]"
-                    :error-messages="startingAgeError"
+                    step="10"
                     persistent-placeholder
-                    placeholder="Select..."
+                    placeholder=""
                     density="compact"
                     dense
                   ></v-text-field>
@@ -43,13 +41,11 @@
                     label="Finishing Age"
                     type="number"
                     v-model="finishingAge"
-                    min="0"
-                    max="500"
+                    min="1"
+                    max="450"
                     step="10"
-                    :rules="[validateAge]"
-                    :error-messages="finishingAgeError"
                     persistent-placeholder
-                    placeholder="Select..."
+                    placeholder=""
                     density="compact"
                     dense
                   ></v-text-field>
@@ -63,10 +59,8 @@
                     min="1"
                     max="350"
                     step="5"
-                    :rules="[validateAgeIncrement]"
-                    :error-messages="ageIncrementError"
                     persistent-placeholder
-                    placeholder="Select..."
+                    placeholder=""
                     density="compact"
                     dense
                   ></v-text-field>
@@ -213,6 +207,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
+import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
 import { storeToRefs } from 'pinia'
 import VueSlider from 'vue-slider-component'
 import 'vue-slider-component/theme/default.css'
@@ -231,6 +226,8 @@ import {
 const form = ref<HTMLFormElement>()
 
 const modelParameterStore = useModelParameterStore()
+const messageDialogStore = useMessageDialogStore()
+
 const {
   panelOpenStates,
   speciesGroups,
@@ -251,45 +248,6 @@ const isConfirmed = computed(
   () => modelParameterStore.panelState[panelName].confirmed,
 )
 
-const validateAge = (value: any) => {
-  if (value === null || value === '') {
-    return true
-  }
-  if (value < 0 || value > 500) {
-    return 'Please enter a value between 0 and 500'
-  }
-  return true
-}
-
-const validateAgeIncrement = (value: any) => {
-  if (value === null || value === '') {
-    return true
-  }
-  if (value < 1 || value > 350) {
-    return 'Please enter a value between 1 and 350'
-  }
-  if (value !== null && value % 5 !== 0) {
-    return 'Please enter a value that is a multiple of 5.'
-  }
-
-  return true
-}
-
-const startingAgeError = computed(() => {
-  const error = validateAge(startingAge.value)
-  return error === true ? [] : [error]
-})
-
-const finishingAgeError = computed(() => {
-  const error = validateAge(finishingAge.value)
-  return error === true ? [] : [error]
-})
-
-const ageIncrementError = computed(() => {
-  const error = validateAgeIncrement(ageIncrement.value)
-  return error === true ? [] : [error]
-})
-
 const clear = () => {
   startingAge.value = null
   finishingAge.value = null
@@ -304,11 +262,68 @@ const clear = () => {
     minimumDBHLimit: MINIMUM_DBH_LIMITS.CM4_0,
   }))
 }
+// Validation by comparing entered values
+const validateComparison = (): boolean => {
+  if (finishingAge.value !== null && startingAge.value !== null) {
+    if (finishingAge.value < startingAge.value) {
+      messageDialogStore.openDialog(
+        'Invalid Input!',
+        "'Finish Age' must be at least as great as the 'Start Age'.",
+        { width: 400 },
+      )
+      return false
+    }
+  }
+  return true
+}
+
+// Validation to check the range of input values
+const validateRange = (): boolean => {
+  if (startingAge.value !== null) {
+    if (startingAge.value < 0 || startingAge.value > 500) {
+      messageDialogStore.openDialog(
+        'Invalid Input!',
+        "'Starting Age' must range from 0 and 500.",
+        { width: 400 },
+      )
+      return false
+    }
+  }
+
+  if (finishingAge.value !== null) {
+    if (finishingAge.value < 1 || finishingAge.value > 450) {
+      messageDialogStore.openDialog(
+        'Invalid Input!',
+        "'Finishing Age' must range from 1 and 450.",
+        { width: 400 },
+      )
+      return false
+    }
+  }
+
+  if (ageIncrement.value !== null) {
+    if (ageIncrement.value < 1 || ageIncrement.value > 350) {
+      messageDialogStore.openDialog(
+        'Invalid Input!',
+        "'Age Increment' must range from 1 and 350.",
+        { width: 400 },
+      )
+      return false
+    }
+  }
+
+  return true
+}
 const onConfirm = () => {
-  form.value?.validate()
-  // this panel is not in a confirmed state
-  if (!isConfirmed.value) {
-    modelParameterStore.confirmPanel(panelName)
+  const isComparisonValid = validateComparison()
+  const isRangeValid = validateRange()
+
+  if (isComparisonValid && isRangeValid) {
+    form.value?.validate()
+    // this panel is not in a confirmed state
+    if (!isConfirmed.value) {
+      modelParameterStore.confirmPanel(panelName)
+    }
   }
 }
 
