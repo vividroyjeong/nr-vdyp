@@ -188,7 +188,11 @@ import {
   NOT_AVAILABLE_INDI,
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
-import { isCoastalZone, validateBasalAreaLimits } from '@/utils/lookupMappings'
+import {
+  isCoastalZone,
+  validateBasalAreaLimits,
+  validateTreePerHectareLimits,
+} from '@/utils/lookupMappings'
 
 const form = ref<HTMLFormElement>()
 
@@ -364,6 +368,26 @@ function validateBALimits(): boolean {
   return true
 }
 
+function validateTPHLimits(): string | null {
+  if (
+    basalArea.value &&
+    treesPerHectare.value &&
+    height.value &&
+    selectedSiteSpecies.value &&
+    becZone.value
+  ) {
+    return validateTreePerHectareLimits(
+      basalArea.value,
+      treesPerHectare.value,
+      height.value,
+      selectedSiteSpecies.value,
+      isCoastalZone(becZone.value),
+    )
+  }
+
+  return null
+}
+
 async function validateFormInputs(): Promise<boolean> {
   if (!validateRange()) {
     return false
@@ -374,6 +398,18 @@ async function validateFormInputs(): Promise<boolean> {
     const userResponse = await confirmDialogStore.openDialog(
       'Confirm',
       'Basal Area is above a likely maximum for the entered height. Do you wish to proceed?',
+    )
+
+    if (!userResponse) {
+      return false
+    }
+  }
+
+  const validateTPHmessage = validateTPHLimits()
+  if (validateTPHmessage) {
+    const userResponse = await confirmDialogStore.openDialog(
+      'Confirm',
+      validateTPHmessage,
     )
 
     if (!userResponse) {
