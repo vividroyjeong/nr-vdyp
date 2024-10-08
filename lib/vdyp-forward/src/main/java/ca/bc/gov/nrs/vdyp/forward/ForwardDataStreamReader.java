@@ -260,8 +260,7 @@ public class ForwardDataStreamReader {
 	protected void applyGroups(BecDefinition bec, String genus, VdypSpecies species) {
 		// Look up Volume group, Decay Group, and Breakage group for each species.
 
-		try
-		{
+		try {
 			// VGRPFIND
 			var volumeGroupMap = resolvedControlMap.getVolumeEquationGroups();
 			var volumeGroup = volumeGroupMap.get(genus, bec.getVolumeBec().getAlias());
@@ -270,8 +269,7 @@ public class ForwardDataStreamReader {
 			// group will remain undefined
 		}
 
-		try
-		{
+		try {
 			// DGRPFIND
 			var decayGroupMap = resolvedControlMap.getDecayEquationGroups();
 			var decayGroup = decayGroupMap.get(genus, bec.getDecayBec().getAlias());
@@ -280,11 +278,10 @@ public class ForwardDataStreamReader {
 			// group will remain undefined
 		}
 
-		try
-		{
+		try {
 			// BGRPFIND (Breakage uses decay BEC)
 			var breakageGroupMap = resolvedControlMap.getBreakageEquationGroups();
-			var breakageGroup = breakageGroupMap.get(genus, bec.getDecayBec().getAlias());	
+			var breakageGroup = breakageGroupMap.get(genus, bec.getDecayBec().getAlias());
 			species.setBreakageGroup(breakageGroup);
 		} catch (NoSuchElementException e) {
 			// group will remain undefined

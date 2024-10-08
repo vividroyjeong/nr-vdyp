@@ -604,7 +604,7 @@ public class ForwardProcessingEngine {
 			return;
 
 		// (13) Update the running values.
-		
+
 		lps.updatePrimarySpeciesDetailsAfterGrowth(dhEnd);
 
 		for (int i : lps.getIndices()) {
@@ -1984,8 +1984,8 @@ public class ForwardProcessingEngine {
 		int debugSetting2Value = fps.fcm.getDebugSettings().getValue(Vars.MAX_BREAST_HEIGHT_AGE_2);
 
 		float baYieldStart = fps.estimators.estimateBaseAreaYield(
-				estimateBasalAreaYieldCoefficients, debugSetting2Value, pspDhStart, pspYabhStart,
-				veteranLayerBaStart, isFullOccupancy, baUpperBound
+				estimateBasalAreaYieldCoefficients, debugSetting2Value, pspDhStart, pspYabhStart, veteranLayerBaStart,
+				isFullOccupancy, baUpperBound
 		);
 
 		float pspDhEnd = pspDhStart + dhDelta;
@@ -2753,7 +2753,7 @@ public class ForwardProcessingEngine {
 
 	/**
 	 * EMP081 - calculate the conditional expected small component basal area. See IPSJF118.doc, equation 3.
-	 * 
+	 *
 	 * @param sp0Name the species group name
 	 * @param spBaEnd the species UC 0 (all) basal area
 	 * @param spLhEnd the species UC 0 (all) Lorey height

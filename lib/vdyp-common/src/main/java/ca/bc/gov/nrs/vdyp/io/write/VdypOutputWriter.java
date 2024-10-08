@@ -77,7 +77,7 @@ public class VdypOutputWriter implements Closeable {
 	/**
 	 * Create a writer for Vdyp output files using provided OutputStreams. The Streams will be closed when the writer is
 	 * closed.
-	 * 
+	 *
 	 * @param controlMap
 	 * @param polygonFile
 	 * @param speciesFile
@@ -94,7 +94,7 @@ public class VdypOutputWriter implements Closeable {
 	/**
 	 * Create a writer for Vdyp output files using provided OutputStreams. The Streams will be closed when the writer is
 	 * closed.
-	 * 
+	 *
 	 * @param controlMap
 	 * @param polygonFile
 	 * @param speciesFile
@@ -185,25 +185,25 @@ public class VdypOutputWriter implements Closeable {
 
 	private void calculateCuVolumeLessDecayWastageBreakage(VdypLayer layer, BecDefinition bec) {
 
-		// Technically, BreakageEquationGroups are not required. If missing, it will not be 
+		// Technically, BreakageEquationGroups are not required. If missing, it will not be
 		// possible for this method to do its work; but, it's still not an error.
 		try {
 			var beg = controlMap.getBreakageEquationGroups();
-		
+
 			for (VdypSpecies s : layer.getSpecies().values()) {
-	
+
 				String sp0 = s.getGenus();
 				int breakageEquationGroup = beg.get(sp0, bec.getAlias());
-	
+
 				var breakageCoefficients = controlMap.getNetBreakageMap().get(breakageEquationGroup);
 				var a1 = breakageCoefficients.getCoe(1);
 				var a2 = breakageCoefficients.getCoe(2);
 				var a3 = breakageCoefficients.getCoe(3);
 				var a4 = breakageCoefficients.getCoe(4);
-	
+
 				var speciesCuVolumeLessDWBByUtilization = s
 						.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization();
-	
+
 				var speciesCuVolumeLessDWBSum = 0.0f;
 				for (UtilizationClass uc : UtilizationClass.UTIL_CLASSES) {
 					var ba = s.getBaseAreaByUtilization().get(uc);
@@ -211,7 +211,7 @@ public class VdypOutputWriter implements Closeable {
 					var dq = (ba > 0) ? BaseAreaTreeDensityDiameter.quadMeanDiameter(ba, tph) : 0.0f;
 					var cuVolume = s.getCloseUtilizationVolumeByUtilization().get(uc);
 					var cuVolumeLessDW = s.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization().get(uc);
-	
+
 					var breakagePercent = FloatMath.clamp(a1 + a2 * FloatMath.log(dq), a3, a4);
 					var breakage = Math.min(breakagePercent / 100.0f * cuVolume, cuVolumeLessDW);
 					if (cuVolumeLessDW <= 0.0f) {
@@ -222,11 +222,11 @@ public class VdypOutputWriter implements Closeable {
 						speciesCuVolumeLessDWBSum += cuVolumeLessDWBforUc;
 					}
 				}
-	
+
 				speciesCuVolumeLessDWBByUtilization.set(UtilizationClass.SMALL, 0.0f);
 				speciesCuVolumeLessDWBByUtilization.set(UtilizationClass.ALL, speciesCuVolumeLessDWBSum);
 			}
-		
+
 			var layerCuVolumeLessDWBByUtilization = layer
 					.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization();
 			for (UtilizationClass uc : UtilizationClass.values()) {

@@ -236,7 +236,7 @@ class ForwardProcessorEndToEndTest {
 			assertEquals(s7.getPolygonIdentifier(), s8.getPolygonIdentifier());
 			assertEquals(s7.getSp64DistributionSet(), s8.getSp64DistributionSet());
 			assertEquals(s7.getVolumeGroup(), s8.getVolumeGroup());
-			
+
 			compareUtilizations(s7, s8);
 		}
 	}
@@ -276,7 +276,7 @@ class ForwardProcessorEndToEndTest {
 		}
 		if (ratio <= 0.01f) {
 			nWithin1Percent += 1;
-		} 
+		}
 		if (ratio <= 0.02f) {
 			nWithin2Percent += 1;
 		}
@@ -291,21 +291,32 @@ class ForwardProcessorEndToEndTest {
 	}
 
 	private void compareUtilizations(VdypUtilizationHolder u7, VdypUtilizationHolder u8) {
-		
+
 		compareUtilizationVector(u7.getBaseAreaByUtilization(), u8.getBaseAreaByUtilization());
-		compareUtilizationVector(u7.getCloseUtilizationVolumeByUtilization(), u8.getCloseUtilizationVolumeByUtilization());
-		compareUtilizationVector(u7.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(), u8.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization());
-		compareUtilizationVector(u7.getCloseUtilizationVolumeNetOfDecayByUtilization(), u8.getCloseUtilizationVolumeNetOfDecayByUtilization());
-		compareUtilizationVector(u7.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(), u8.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization());
+		compareUtilizationVector(
+				u7.getCloseUtilizationVolumeByUtilization(), u8.getCloseUtilizationVolumeByUtilization()
+		);
+		compareUtilizationVector(
+				u7.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization(),
+				u8.getCloseUtilizationVolumeNetOfDecayAndWasteByUtilization()
+		);
+		compareUtilizationVector(
+				u7.getCloseUtilizationVolumeNetOfDecayByUtilization(),
+				u8.getCloseUtilizationVolumeNetOfDecayByUtilization()
+		);
+		compareUtilizationVector(
+				u7.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization(),
+				u8.getCloseUtilizationVolumeNetOfDecayWasteAndBreakageByUtilization()
+		);
 		compareUtilizationVector(u7.getLoreyHeightByUtilization(), u8.getLoreyHeightByUtilization());
-		compareUtilizationVector(u7.getQuadraticMeanDiameterByUtilization(), u8.getQuadraticMeanDiameterByUtilization());
+		compareUtilizationVector(
+				u7.getQuadraticMeanDiameterByUtilization(), u8.getQuadraticMeanDiameterByUtilization()
+		);
 		compareUtilizationVector(u7.getTreesPerHectareByUtilization(), u8.getTreesPerHectareByUtilization());
 		compareUtilizationVector(u7.getWholeStemVolumeByUtilization(), u8.getWholeStemVolumeByUtilization());
 	}
 
-	private void compareUtilizationVector(
-			UtilizationVector uv7, UtilizationVector uv8
-	) {
+	private void compareUtilizationVector(UtilizationVector uv7, UtilizationVector uv8) {
 		assertEquals(uv7.size(), uv8.size());
 		var i8 = uv8.iterator();
 		uv7.forEach(uc7 -> compareFloats(uc7, i8.next()));

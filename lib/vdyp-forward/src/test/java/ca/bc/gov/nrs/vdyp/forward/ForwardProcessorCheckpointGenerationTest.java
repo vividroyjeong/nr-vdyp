@@ -59,23 +59,38 @@ class ForwardProcessorCheckpointGenerationTest {
 		var vdyp8InputResolver = new FileSystemFileResolver(vdyp8OutputPath);
 
 		// Verify that polygons are output 14 times for each year of growth.
-		
+
 		Map<String, Object> controlMap = new HashMap<>();
 		var polygonParser = new VdypPolygonParser();
-		controlMap.put(ControlKey.FORWARD_INPUT_VDYP_POLY.name(), polygonParser.map("vp_grow2.dat", vdyp8InputResolver, controlMap));
+		controlMap.put(
+				ControlKey.FORWARD_INPUT_VDYP_POLY.name(),
+				polygonParser.map("vp_grow2.dat", vdyp8InputResolver, controlMap)
+		);
 		var speciesParser = new VdypSpeciesParser();
-		controlMap.put(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SPECIES.name(), speciesParser.map("vs_grow2.dat", vdyp8InputResolver, controlMap));
+		controlMap.put(
+				ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SPECIES.name(),
+				speciesParser.map("vs_grow2.dat", vdyp8InputResolver, controlMap)
+		);
 		var utilizationParser = new VdypUtilizationParser();
-		controlMap.put(ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(), utilizationParser.map("vu_grow2.dat", vdyp8InputResolver, controlMap));
+		controlMap.put(
+				ControlKey.FORWARD_INPUT_VDYP_LAYER_BY_SP0_BY_UTIL.name(),
+				utilizationParser.map("vu_grow2.dat", vdyp8InputResolver, controlMap)
+		);
 		var becDefinitionParser = new BecDefinitionParser();
-		controlMap.put(ControlKey.BEC_DEF.name(), becDefinitionParser.parse(TestUtils.class, "coe/Becdef.dat", Collections.emptyMap()));
+		controlMap.put(
+				ControlKey.BEC_DEF.name(),
+				becDefinitionParser.parse(TestUtils.class, "coe/Becdef.dat", Collections.emptyMap())
+		);
 		var genusDefinitionParser = new GenusDefinitionParser();
-		controlMap.put(ControlKey.SP0_DEF.name(), genusDefinitionParser.parse(TestUtils.class, "coe/Sp0def_v0.dat", Collections.emptyMap()));
-		
+		controlMap.put(
+				ControlKey.SP0_DEF.name(),
+				genusDefinitionParser.parse(TestUtils.class, "coe/Sp0def_v0.dat", Collections.emptyMap())
+		);
+
 		var reader = new ForwardDataStreamReader(controlMap);
 		Optional<VdypPolygon> polygon = reader.readNextPolygon();
 		var polygonName = polygon.orElseThrow().getPolygonIdentifier().getBase();
-		
+
 		int count = 0;
 		var nextPolygonIdentifier = reader.readNextPolygon().get().getPolygonIdentifier();
 		var year = nextPolygonIdentifier.getYear();
@@ -83,7 +98,7 @@ class ForwardProcessorCheckpointGenerationTest {
 			count += 1;
 			nextPolygonIdentifier = reader.readNextPolygon().get().getPolygonIdentifier();
 		}
-		
-		assert(count == 14);
+
+		assert (count == 14);
 	}
 }
