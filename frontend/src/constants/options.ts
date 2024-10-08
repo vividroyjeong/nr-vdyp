@@ -6,20 +6,20 @@ export const derivedByOptions = [
 ]
 
 export const becZoneOptions = [
-  { label: 'AT - Alpine Tundra', value: '1' },
-  { label: 'BG - Bunch Grass', value: '2' },
-  { label: 'BWBS - Boreal White and Black Spruce', value: '3' },
-  { label: 'CDF - Coastal Douglas Fir', value: '4' },
-  { label: 'CWH - Coastal Western Hemlock', value: '5' },
-  { label: 'ESSF - Engelmann Spruce', value: '6' },
-  { label: 'ICH - Interior Cedar Hemlock', value: '7' },
-  { label: 'IDF - Interior Douglas Fir', value: '8' },
-  { label: 'MH - Mountain Hemlock', value: '9' },
-  { label: 'MS - Montane Spruce', value: '10' },
-  { label: 'PP - Ponderosa Pine', value: '11' },
-  { label: 'SBPS - Sub-Boreal Pine-Spruce', value: '12' },
-  { label: 'SBS - Sub-Boreal Spruce', value: '13' },
-  { label: 'SWB - Spruce-Willow-Birch', value: '14' },
+  { label: 'AT - Alpine Tundra', value: 'AT' },
+  { label: 'BG - Bunch Grass', value: 'BG' },
+  { label: 'BWBS - Boreal White and Black Spruce', value: 'BWBS' },
+  { label: 'CDF - Coastal Douglas Fir', value: 'CDF' },
+  { label: 'CWH - Coastal Western Hemlock', value: 'CWH' },
+  { label: 'ESSF - Engelmann Spruce', value: 'ESSF' },
+  { label: 'ICH - Interior Cedar Hemlock', value: 'ICH' },
+  { label: 'IDF - Interior Douglas Fir', value: 'IDF' },
+  { label: 'MH - Mountain Hemlock', value: 'MH' },
+  { label: 'MS - Montane Spruce', value: 'MS' },
+  { label: 'PP - Ponderosa Pine', value: 'PP' },
+  { label: 'SBPS - Sub-Boreal Pine-Spruce', value: 'SBPS' },
+  { label: 'SBS - Sub-Boreal Spruce', value: 'SBS' },
+  { label: 'SWB - Spruce-Willow-Birch', value: 'SWB' },
 ]
 
 export const siteSpeciesValuesOptions = [
