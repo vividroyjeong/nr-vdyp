@@ -84,7 +84,7 @@ class ForwardProcessorCheckpointGenerationTest {
 		var genusDefinitionParser = new GenusDefinitionParser();
 		controlMap.put(
 				ControlKey.SP0_DEF.name(),
-				genusDefinitionParser.parse(TestUtils.class, "coe/Sp0def_v0.dat", Collections.emptyMap())
+				genusDefinitionParser.parse(TestUtils.class, "coe/SP0DEF_v0.dat", Collections.emptyMap())
 		);
 
 		var reader = new ForwardDataStreamReader(controlMap);
