@@ -3463,10 +3463,6 @@ public class ForwardProcessingEngine {
 
 		String secondaryGenus = optionalSecondarySp0.isPresent() ? optionalSecondarySp0.get() : "";
 
-		if (primarySp0.equals(secondaryGenus)) {
-			throw new IllegalArgumentException("The primary and secondary genera are the same");
-		}
-
 		switch (primarySp0) {
 		case "F":
 			switch (secondaryGenus) {

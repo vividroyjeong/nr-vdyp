@@ -407,7 +407,7 @@ public class Utils {
 	 * @return as described.
 	 */
 	public static Optional<Integer> optInt(Integer i) {
-		if (i == null || i == VdypEntity.MISSING_INTEGER_VALUE) {
+		if (i == null || i.equals(VdypEntity.MISSING_INTEGER_VALUE)) {
 			return Optional.empty();
 		} else {
 			return Optional.of(i);
