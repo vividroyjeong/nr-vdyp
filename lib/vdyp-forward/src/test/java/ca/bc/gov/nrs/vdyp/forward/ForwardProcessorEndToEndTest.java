@@ -104,7 +104,7 @@ class ForwardProcessorEndToEndTest {
 		);
 		vdyp8ControlMap.put(
 				ControlKey.SP0_DEF.name(),
-				genusDefinitionParser.parse(TestUtils.class, "coe/Sp0def_v0.dat", Collections.emptyMap())
+				genusDefinitionParser.parse(TestUtils.class, "coe/SP0DEF_v0.dat", Collections.emptyMap())
 		);
 		vdyp8ControlMap.put(
 				ControlKey.BREAKAGE_GROUPS.name(),
@@ -140,11 +140,7 @@ class ForwardProcessorEndToEndTest {
 		);
 		vdyp7ControlMap.put(
 				ControlKey.SP0_DEF.name(),
-				genusDefinitionParser.parse(TestUtils.class, "coe/Sp0def_v0.dat", Collections.emptyMap())
-		);
-		vdyp7ControlMap.put(
-				ControlKey.BREAKAGE_GROUPS.name(),
-				genusDefinitionParser.parse(TestUtils.class, "coe/Sp0def_v0.dat", Collections.emptyMap())
+				genusDefinitionParser.parse(TestUtils.class, "coe/SP0DEF_v0.dat", Collections.emptyMap())
 		);
 		vdyp7ControlMap.put(
 				ControlKey.BREAKAGE_GROUPS.name(),
