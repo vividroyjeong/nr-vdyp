@@ -1,5 +1,5 @@
 // Mapping species code and species names
-export const speciesMap = {
+export const SPECIES_Map = {
   AC: 'Poplar',
   AT: 'Aspen',
   B: 'True Fir',
@@ -35,7 +35,7 @@ export const speciesMap = {
 }
 
 // Mapping species code and default Site Index Curve name
-export const siteIndexCurveMap = {
+export const SITE_INDEX_CURVE_MAP = {
   AC: 'Huang, Titus, and Lakusta (1994ac)',
   AT: 'Nigh, Krestov, and Klinka 2002',
   B: 'Chen and Klinka (2000ac)',

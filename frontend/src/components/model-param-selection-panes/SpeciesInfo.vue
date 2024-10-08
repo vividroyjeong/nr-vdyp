@@ -228,7 +228,7 @@ import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
 
 import { storeToRefs } from 'pinia'
 import { derivedByOptions } from '@/constants/options'
-import { speciesMap } from '@/constants/mappings'
+import { SPECIES_Map } from '@/constants/mappings'
 import { PANEL } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 
@@ -257,8 +257,8 @@ const isConfirmed = computed(
 )
 
 const computedSpeciesOptions = computed(() =>
-  (Object.keys(speciesMap) as Array<keyof typeof speciesMap>).map((code) => ({
-    label: `${code} - ${speciesMap[code]}`,
+  (Object.keys(SPECIES_Map) as Array<keyof typeof SPECIES_Map>).map((code) => ({
+    label: `${code} - ${SPECIES_Map[code]}`,
     value: code,
   })),
 )

@@ -287,7 +287,7 @@ import {
   ageTypeOptions,
   floatingOptions,
 } from '@/constants/options'
-import { siteIndexCurveMap } from '@/constants/mappings'
+import { SITE_INDEX_CURVE_MAP } from '@/constants/mappings'
 import {
   PANEL,
   DERIVED_BY,
@@ -329,12 +329,14 @@ const isConfirmed = computed(
 )
 
 const computedSpeciesOptions = computed(() =>
-  (Object.keys(siteIndexCurveMap) as Array<keyof typeof siteIndexCurveMap>).map(
-    (code) => ({
-      label: `${siteIndexCurveMap[code]}`,
-      value: code,
-    }),
-  ),
+  (
+    Object.keys(SITE_INDEX_CURVE_MAP) as Array<
+      keyof typeof SITE_INDEX_CURVE_MAP
+    >
+  ).map((code) => ({
+    label: `${SITE_INDEX_CURVE_MAP[code]}`,
+    value: code,
+  })),
 )
 
 const siteSpeciesOptions = computed(() =>
@@ -426,10 +428,10 @@ const handleDerivedByChange = (
 const updateSiteIndexCurve = (newSiteSpecies: string | null) => {
   if (
     newSiteSpecies &&
-    siteIndexCurveMap[newSiteSpecies as keyof typeof siteIndexCurveMap]
+    SITE_INDEX_CURVE_MAP[newSiteSpecies as keyof typeof SITE_INDEX_CURVE_MAP]
   ) {
     siteIndexCurve.value =
-      siteIndexCurveMap[newSiteSpecies as keyof typeof siteIndexCurveMap]
+      SITE_INDEX_CURVE_MAP[newSiteSpecies as keyof typeof SITE_INDEX_CURVE_MAP]
   } else {
     siteIndexCurve.value = null // Clear if no mapping found
   }
