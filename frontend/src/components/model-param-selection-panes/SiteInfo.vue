@@ -35,6 +35,7 @@
                         placeholder="Select Bec Zone"
                         density="compact"
                         dense
+                        :disabled="!isConfirmEnabled"
                       ></v-select>
                     </v-col>
                     <v-col class="col-space-6" />
@@ -51,6 +52,7 @@
                         placeholder="Select Eco Zone"
                         density="compact"
                         dense
+                        :disabled="!isConfirmEnabled"
                       ></v-select>
                     </v-col>
                   </v-row>
@@ -63,7 +65,9 @@
                         label="Include Secondary Dominant Height in Yield Table"
                         v-model="incSecondaryHeight"
                         hide-details="auto"
-                        :disabled="isIncSecondaryHeightDisabled"
+                        :disabled="
+                          isIncSecondaryHeightDisabled || !isConfirmEnabled
+                        "
                       ></v-checkbox>
                     </v-col>
                   </v-row>
@@ -85,7 +89,9 @@
                         placeholder="Select..."
                         density="compact"
                         dense
-                        :disabled="isSelectedSiteSpeciesDisabled"
+                        :disabled="
+                          isSelectedSiteSpeciesDisabled || !isConfirmEnabled
+                        "
                       ></v-select>
                     </v-col>
                     <v-col class="col-space-6" />
@@ -122,7 +128,7 @@
                   <v-radio-group
                     v-model="siteSpeciesValues"
                     inline
-                    :disabled="isSiteSpeciesValueDisabled"
+                    :disabled="isSiteSpeciesValueDisabled || !isConfirmEnabled"
                   >
                     <v-radio
                       v-for="option in siteSpeciesValuesOptions"
@@ -148,7 +154,7 @@
                         placeholder=""
                         density="compact"
                         dense
-                        :disabled="isAgeTypeDisabled"
+                        :disabled="isAgeTypeDisabled || !isConfirmEnabled"
                       ></v-select>
                     </v-col>
                     <v-col class="col-space-6" />
@@ -165,7 +171,7 @@
                         hide-details
                         density="compact"
                         dense
-                        :disabled="isAgeDisabled"
+                        :disabled="isAgeDisabled || !isConfirmEnabled"
                         @input="handleAgeInput($event)"
                       ></v-text-field>
                       <v-label
@@ -191,7 +197,7 @@
                         hide-details
                         density="compact"
                         dense
-                        :disabled="isHeightDisabled"
+                        :disabled="isHeightDisabled || !isConfirmEnabled"
                         @input="handleHeightInput($event)"
                       ></v-text-field>
                       <v-label
@@ -218,7 +224,9 @@
                         density="compact"
                         dense
                         @input="handleBHA50SiteIndexInput($event)"
-                        :disabled="isBHA50SiteIndexDisabled"
+                        :disabled="
+                          isBHA50SiteIndexDisabled || !isConfirmEnabled
+                        "
                       ></v-text-field>
                       <v-label
                         v-show="Util.isZeroValue(bha50SiteIndex)"
@@ -234,7 +242,7 @@
                       v-model="floating"
                       row
                       hide-details
-                      :disabled="isFloatingDisabled"
+                      :disabled="isFloatingDisabled || !isConfirmEnabled"
                     >
                       <v-radio
                         v-for="option in floatingOptions"

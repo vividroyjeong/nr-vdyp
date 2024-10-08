@@ -30,7 +30,7 @@
                     v-model="computedValues"
                     density="compact"
                     dense
-                    :disabled="isComputedValuesDisabled"
+                    :disabled="isComputedValuesDisabled || !isConfirmEnabled"
                   >
                     <v-radio
                       v-for="option in additionalStandAttributesOptions"
@@ -56,7 +56,7 @@
                     :placeholder="loreyHeightPlaceholder"
                     density="compact"
                     dense
-                    :disabled="isLoreyHeightDisabled"
+                    :disabled="isLoreyHeightDisabled || !isConfirmEnabled"
                   ></v-text-field>
                 </v-col>
                 <v-col class="col-space-3" />
@@ -71,7 +71,9 @@
                     :placeholder="wholeStemVolume75cmPlaceholder"
                     density="compact"
                     dense
-                    :disabled="isWholeStemVolume75cmDisabled"
+                    :disabled="
+                      isWholeStemVolume75cmDisabled || !isConfirmEnabled
+                    "
                   >
                     <template v-slot:label>
                       Whole Stem Volume - 7.5cm+ (m<sup>3</sup>/ha)
@@ -91,7 +93,7 @@
                     :placeholder="basalArea125cmPlaceholder"
                     density="compact"
                     dense
-                    :disabled="isBasalArea125cmDisabled"
+                    :disabled="isBasalArea125cmDisabled || !isConfirmEnabled"
                   >
                     <template v-slot:label>
                       Basal Area - 12.5cm+ (m<sup>2</sup>/ha)
@@ -110,7 +112,9 @@
                     :placeholder="wholeStemVolume125cmPlaceholder"
                     density="compact"
                     dense
-                    :disabled="isWholeStemVolume125cmDisabled"
+                    :disabled="
+                      isWholeStemVolume125cmDisabled || !isConfirmEnabled
+                    "
                   >
                     <template v-slot:label>
                       Whole Stem Volume - 12.5cm+ (m<sup>3</sup>/ha)
@@ -130,7 +134,7 @@
                     :placeholder="closeUtilVolumePlaceholder"
                     density="compact"
                     dense
-                    :disabled="isCloseUtilVolumeDisabled"
+                    :disabled="isCloseUtilVolumeDisabled || !isConfirmEnabled"
                   >
                     <template v-slot:label>
                       Close Utilization Volume - 12.5cm+ (m<sup>3</sup>/ha)
@@ -149,7 +153,9 @@
                     :placeholder="closeUtilNetDecayVolumePlaceholder"
                     density="compact"
                     dense
-                    :disabled="isCloseUtilNetDecayVolumeDisabled"
+                    :disabled="
+                      isCloseUtilNetDecayVolumeDisabled || !isConfirmEnabled
+                    "
                   >
                     <template v-slot:label>
                       Close Utilization Net Decay Volume - 12.5cm+
@@ -170,7 +176,10 @@
                     :placeholder="closeUtilNetDecayWasteVolumePlaceholder"
                     density="compact"
                     dense
-                    :disabled="isCloseUtilNetDecayWasteVolumeDisabled"
+                    :disabled="
+                      isCloseUtilNetDecayWasteVolumeDisabled ||
+                      !isConfirmEnabled
+                    "
                   >
                     <template v-slot:label>
                       Close Utilization Net Decay Waste Volume - 12.5cm+

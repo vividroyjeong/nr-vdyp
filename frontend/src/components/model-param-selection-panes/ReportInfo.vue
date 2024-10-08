@@ -33,6 +33,7 @@
                     placeholder=""
                     density="compact"
                     dense
+                    :disabled="!isConfirmEnabled"
                   ></v-text-field>
                 </v-col>
                 <v-col class="col-space-3" />
@@ -48,6 +49,7 @@
                     placeholder=""
                     density="compact"
                     dense
+                    :disabled="!isConfirmEnabled"
                   ></v-text-field>
                 </v-col>
                 <v-col class="col-space-3" />
@@ -63,6 +65,7 @@
                     placeholder=""
                     density="compact"
                     dense
+                    :disabled="!isConfirmEnabled"
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -84,6 +87,7 @@
                         :label="option.label"
                         :value="option.value"
                         hide-details
+                        :disabled="!isConfirmEnabled"
                       ></v-checkbox>
                     </v-col>
                   </v-row>
@@ -107,6 +111,7 @@
                         :label="option.label"
                         :value="option.value"
                         hide-details
+                        :disabled="!isConfirmEnabled"
                       ></v-checkbox>
                     </v-col>
 
@@ -123,6 +128,7 @@
                         density="compact"
                         dense
                         style="max-width: 70% !important"
+                        :disabled="!isConfirmEnabled"
                       ></v-select>
                     </v-col>
                   </v-row>
@@ -144,6 +150,7 @@
                     density="compact"
                     dense
                     style="max-width: 50% !important"
+                    :disabled="!isConfirmEnabled"
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -159,7 +166,7 @@
                     placeholder="Select..."
                     density="compact"
                     dense
-                    readonly
+                    disabled
                   ></v-text-field>
                 </v-col>
                 <v-col class="col-space-3" />
@@ -174,6 +181,7 @@
                     :dotStyle="{ backgroundColor: '#787878' }"
                     :rail-style="{ backgroundColor: '#f5f5f5' }"
                     :process-style="{ backgroundColor: '#787878' }"
+                    :disabled="!isConfirmEnabled"
                   />
                 </v-col>
               </v-row>

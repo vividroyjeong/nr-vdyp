@@ -34,6 +34,7 @@
                     hide-details="auto"
                     density="compact"
                     dense
+                    :disabled="!isConfirmEnabled"
                   ></v-text-field>
                   <v-label
                     v-show="Util.isEmptyOrZero(percentStockableArea)"
@@ -53,7 +54,7 @@
                     :placeholder="basalAreaPlaceholder"
                     density="compact"
                     dense
-                    :disabled="isBasalAreaDisabled"
+                    :disabled="isBasalAreaDisabled || !isConfirmEnabled"
                   >
                     <template v-slot:label>
                       Basal Area (m<sup>2</sup>/ha)
@@ -80,7 +81,7 @@
                     :placeholder="tphPlaceholder"
                     density="compact"
                     dense
-                    :disabled="isTreesPerHectareDisabled"
+                    :disabled="isTreesPerHectareDisabled || !isConfirmEnabled"
                   >
                   </v-text-field>
                 </v-col>
@@ -115,7 +116,9 @@
                     hide-details="auto"
                     density="compact"
                     dense
-                    :disabled="isPercentCrownClosureDisabled"
+                    :disabled="
+                      isPercentCrownClosureDisabled || !isConfirmEnabled
+                    "
                   ></v-text-field>
                   <v-label
                     v-show="

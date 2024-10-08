@@ -30,6 +30,7 @@
                     <v-radio-group
                       v-model="derivedBy"
                       inline
+                      :disabled="!isConfirmEnabled"
                       required
                       :rules="[
                         (v) =>
@@ -66,6 +67,7 @@
                           placeholder="Select..."
                           density="compact"
                           dense
+                          :disabled="!isConfirmEnabled"
                         ></v-select>
                       </v-col>
                       <v-col cols="6">
@@ -83,6 +85,7 @@
                           dense
                           @blur="triggerSpeciesSortByPercent"
                           @input="handlePercentInput($event, index)"
+                          :disabled="!isConfirmEnabled"
                         ></v-text-field>
                       </v-col>
                     </v-row>
@@ -103,7 +106,7 @@
                           label="Species Group"
                           :model-value="group.group"
                           variant="underlined"
-                          readonly
+                          disabled
                           density="compact"
                           dense
                         ></v-text-field>
@@ -113,7 +116,7 @@
                           label="Species Group Percent"
                           :model-value="group.percent"
                           variant="underlined"
-                          readonly
+                          disabled
                           density="compact"
                           dense
                         ></v-text-field>
@@ -123,7 +126,7 @@
                           label="Site Species"
                           :model-value="group.siteSpecies"
                           variant="underlined"
-                          readonly
+                          disabled
                           density="compact"
                           dense
                         ></v-text-field>
@@ -139,7 +142,7 @@
                         <v-text-field
                           label="Species Group"
                           variant="underlined"
-                          readonly
+                          disabled
                           persistent-placeholder
                           placeholder=""
                           density="compact"
@@ -149,7 +152,7 @@
                         <v-text-field
                           label="Species Group Percent"
                           variant="underlined"
-                          readonly
+                          disabled
                           persistent-placeholder
                           placeholder=""
                           density="compact"
@@ -159,7 +162,7 @@
                         <v-text-field
                           label="Site Species"
                           variant="underlined"
-                          readonly
+                          disabled
                           persistent-placeholder
                           placeholder=""
                           density="compact"
@@ -182,7 +185,7 @@
                           label="Total Species Percent"
                           :model-value="totalSpeciesPercent"
                           variant="underlined"
-                          readonly
+                          disabled
                           density="compact"
                           dense
                           :rules="[validateTotalPercent]"
