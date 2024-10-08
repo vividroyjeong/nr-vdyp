@@ -190,6 +190,20 @@ export class Util {
   /**
    * EXTRACTING
    */
+
+  /**
+   * Extracts the numeric value from a given string.
+   * It parses the leading numeric part of the string, ignoring any following non-numeric characters.
+   * If the input string does not contain a valid numeric prefix, the function returns 0.
+   *
+   * @param input - The input string that may contain numeric values.
+   * @returns A number parsed from the leading numeric part of the string, or 0 if no valid number is found.
+   */
+  static extractNumeric(input: string): number {
+    const match = input.match(/^\s*-?\d+(\.\d+)?/)
+    return match ? parseFloat(match[0]) : 0
+  }
+
   static translateCode(code: string, codeList: Array<any>): string {
     if (code && codeList && codeList.length > 0) {
       return codeList.find((c) => c.codeName === code).description

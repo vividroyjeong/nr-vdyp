@@ -195,6 +195,7 @@ import {
   isCoastalZone,
   validateBasalAreaLimits,
   validateTreePerHectareLimits,
+  validateQuadraticDiameter,
 } from '@/utils/lookupMappings'
 
 const form = ref<HTMLFormElement>()
@@ -391,6 +392,18 @@ function validateTPHLimits(): string | null {
   return null
 }
 
+function validateQuadDiameter(): string | null {
+  if (basalArea.value && treesPerHectare.value && minimumDBHLimit.value) {
+    return validateQuadraticDiameter(
+      basalArea.value,
+      treesPerHectare.value,
+      minimumDBHLimit.value,
+    )
+  }
+
+  return null
+}
+
 async function validateFormInputs(): Promise<boolean> {
   if (!validateRange()) {
     return false
@@ -419,6 +432,20 @@ async function validateFormInputs(): Promise<boolean> {
       return false
     }
   }
+
+  const validateQuadDiamMessage = validateQuadDiameter()
+  if (validateQuadDiamMessage) {
+    const userResponse = await confirmDialogStore.openDialog(
+      'Confirm',
+      validateQuadDiamMessage,
+    )
+
+    if (!userResponse) {
+      return false
+    }
+  }
+
+  validateQuadraticDiameter
 
   return true
 }

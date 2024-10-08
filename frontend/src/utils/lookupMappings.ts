@@ -1,4 +1,5 @@
 import * as MAP from '@/constants/mappings'
+import { Util } from '@/utils/util'
 
 /**
  * Function that takes in a BEC Zone and returns whether the Zone is coastal or not
@@ -158,6 +159,41 @@ export function validateTreePerHectareLimits(
 
   if (tph > tphMax) {
     return 'Trees/ha is above a likely maximum for entered height. Do you wish to proceed?'
+  }
+
+  // Return null if in range (valid value)
+  return null
+}
+
+/**
+ * Validates the quadratic mean diameter based on the basal area, trees per hectare (TPH), and minimum DBH limit.
+ * If the calculated quadratic diameter is less than the required minimum DBH limit, an error message is returned.
+ *
+ * @param {number} basalArea - The basal area in m²/ha.
+ * @param {number} tph - Trees per hectare.
+ * @param {string | null} minDBHLimit - The minimum DBH limit in cm, provided as a string.
+ * @returns {string | null} - Returns an error message if the quadratic diameter is less than the minimum limit, otherwise null.
+ *
+ * @example
+ * basalArea: 4, tph: 1000, minDBHLimit: 7.5 cm+
+ */
+export function validateQuadraticDiameter(
+  basalArea: number,
+  tph: number,
+  minDBHLimit: string | null,
+): string | null {
+  if (!minDBHLimit) {
+    console.warn('Unknown minDBHLimit')
+    return null
+  }
+
+  let diam = 0
+  if (tph > 0) {
+    diam = Math.sqrt(basalArea / tph / 0.00007854)
+  }
+
+  if (diam < Util.extractNumeric(minDBHLimit)) {
+    return `Quadratic Mean Diameter of ${diam.toFixed(1)} cm is less than the required diameter of: ${minDBHLimit}\nModify one or both of Basal Area or Trees per Hectare.`
   }
 
   // Return null if in range (valid value)
