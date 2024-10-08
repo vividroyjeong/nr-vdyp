@@ -185,6 +185,7 @@
 import { ref, computed, watch } from 'vue'
 import { Util } from '@/utils/util'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
+import { useConfirmDialogStore } from '@/stores/common/confirmDialogStore'
 import { storeToRefs } from 'pinia'
 import { minimumDBHLimitsOptions } from '@/constants/options'
 import {
@@ -194,15 +195,21 @@ import {
   NOT_AVAILABLE_INDI,
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
+import { isCoastalZone, validateBasalAreaLimits } from '@/utils/lookupMappings'
 
 const form = ref<HTMLFormElement>()
 
 const modelParameterStore = useModelParameterStore()
+const confirmDialogStore = useConfirmDialogStore()
+
 const {
   panelOpenStates,
   derivedBy,
+  becZone,
+  selectedSiteSpecies,
   siteSpeciesValues,
   age,
+  height,
   percentStockableArea,
   basalArea,
   treesPerHectare,
@@ -338,8 +345,51 @@ const clear = () => {
   minimumDBHLimit.value = DEFAULT_VALUES.MINIMUM_DBH_LIMIT
   percentCrownClosure.value = DEFAULT_VALUES.PERCENT_CROWN_CLOSURE
 }
-const onConfirm = () => {
+
+function validateBALimits(): boolean {
+  if (
+    selectedSiteSpecies.value &&
+    becZone.value &&
+    basalArea.value &&
+    height.value
+  ) {
+    const isValid = validateBasalAreaLimits(
+      selectedSiteSpecies.value,
+      isCoastalZone(becZone.value),
+      basalArea.value,
+      height.value,
+    )
+
+    return isValid
+  }
+  return true
+}
+
+async function validateFormInputs(): Promise<boolean> {
+  const isBasalAreaValid = validateBALimits()
+  if (!isBasalAreaValid) {
+    const userResponse = await confirmDialogStore.openDialog(
+      'Confirm',
+      'Basal Area is above a likely maximum for the entered height. Do you wish to proceed?',
+    )
+
+    if (!userResponse) {
+      return false
+    }
+  }
+
+  return true
+}
+
+const onConfirm = async () => {
+  const isFormValid = await validateFormInputs()
+
+  if (!isFormValid) {
+    return
+  }
+
   form.value?.validate()
+
   // this panel is not in a confirmed state
   if (!isConfirmed.value) {
     modelParameterStore.confirmPanel(panelName)
