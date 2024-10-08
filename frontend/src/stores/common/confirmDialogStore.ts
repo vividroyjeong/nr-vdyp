@@ -1,11 +1,8 @@
 import { defineStore } from 'pinia'
 
 interface DialogOptions {
-  color: string
   width: number
-  zIndex: number
   noconfirm: boolean
-  titleStyle: string
 }
 
 interface ConfirmDialogState {
@@ -23,11 +20,8 @@ export const useConfirmDialogStore = defineStore('confirmDialog', {
     title: null,
     message: null,
     options: {
-      color: 'grey lighten-3',
       width: 400,
-      zIndex: 200,
       noconfirm: false,
-      titleStyle: 'color: rgba(0,0,0,.87) !important;',
     },
   }),
 
@@ -39,7 +33,11 @@ export const useConfirmDialogStore = defineStore('confirmDialog', {
   },
 
   actions: {
-    openDialog(newTitle: string, newMessage: string, newOptions?: Partial<DialogOptions>): Promise<boolean> {
+    openDialog(
+      newTitle: string,
+      newMessage: string,
+      newOptions?: Partial<DialogOptions>,
+    ): Promise<boolean> {
       this.dialog = true
       this.title = newTitle
       this.message = newMessage
