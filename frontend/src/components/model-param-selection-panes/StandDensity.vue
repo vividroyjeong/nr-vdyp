@@ -29,8 +29,6 @@
                     max="100"
                     min="0"
                     step="5"
-                    :rules="[validatePercent]"
-                    :error-messages="percentStockableAreaError"
                     placeholder=""
                     persistent-placeholder
                     hide-details="auto"
@@ -51,8 +49,6 @@
                     min="0.1000"
                     max="250.0000"
                     step="2.5"
-                    :rules="[validateMinimum]"
-                    :error-messages="basalAreaError"
                     persistent-placeholder
                     :placeholder="basalAreaPlaceholder"
                     density="compact"
@@ -80,8 +76,6 @@
                     min="0.10"
                     max="9999.90"
                     step="250.00"
-                    :rules="[validateMinimum]"
-                    :error-messages="treesPerHectareError"
                     persistent-placeholder
                     :placeholder="tphPlaceholder"
                     density="compact"
@@ -116,8 +110,6 @@
                     max="100"
                     min="0"
                     step="5"
-                    :rules="[validatePercent]"
-                    :error-messages="percentCrownClosureError"
                     persistent-placeholder
                     :placeholder="crownClosurePlaceholder"
                     hide-details="auto"
@@ -185,6 +177,7 @@
 import { ref, computed, watch } from 'vue'
 import { Util } from '@/utils/util'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
+import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
 import { useConfirmDialogStore } from '@/stores/common/confirmDialogStore'
 import { storeToRefs } from 'pinia'
 import { minimumDBHLimitsOptions } from '@/constants/options'
@@ -200,6 +193,7 @@ import { isCoastalZone, validateBasalAreaLimits } from '@/utils/lookupMappings'
 const form = ref<HTMLFormElement>()
 
 const modelParameterStore = useModelParameterStore()
+const messageDialogStore = useMessageDialogStore()
 const confirmDialogStore = useConfirmDialogStore()
 
 const {
@@ -298,52 +292,57 @@ watch(
   { immediate: true },
 )
 
-const validatePercent = (value: any) => {
-  if (value === null || value === '') {
-    return true
-  }
-  if (value < 0 || value > 100) {
-    return 'Please enter a value between 0 and 100'
-  }
-  return true
-}
-
-const validateMinimum = (value: any) => {
-  if (value === null || value === '') {
-    return true
-  }
-  if (value < 0) {
-    return 'Please enter a value greater than 0'
-  }
-  return true
-}
-
-const percentStockableAreaError = computed(() => {
-  const error = validatePercent(percentStockableArea.value)
-  return error === true ? [] : [error]
-})
-
-const percentCrownClosureError = computed(() => {
-  const error = validatePercent(percentCrownClosure.value)
-  return error === true ? [] : [error]
-})
-
-const basalAreaError = computed(() => {
-  const error = validateMinimum(basalArea.value)
-  return error === true ? [] : [error]
-})
-
-const treesPerHectareError = computed(() => {
-  const error = validateMinimum(treesPerHectare.value)
-  return error === true ? [] : [error]
-})
-
 const clear = () => {
   if (form.value) {
     form.value.reset()
   }
   minimumDBHLimit.value = DEFAULT_VALUES.MINIMUM_DBH_LIMIT
   percentCrownClosure.value = DEFAULT_VALUES.PERCENT_CROWN_CLOSURE
+}
+
+// Validation to check the range of input values
+const validateRange = (): boolean => {
+  const psa = Util.toNumber(percentStockableArea.value)
+  if (psa && (psa < 0 || psa > 100)) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Percent Stockable Area' must range from 0 and 100.",
+      { width: 400 },
+    )
+    return false
+  }
+
+  const ba = Util.toNumber(basalArea.value)
+  if (ba && (ba < 0.1 || ba > 250.0)) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Basal Area' must range from 0.1000 and 250.0000.",
+      { width: 400 },
+    )
+    return false
+  }
+
+  const tph = Util.toNumber(treesPerHectare.value)
+  if (tph && (tph < 0.1 || tph > 9999.9)) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Trees per Hectare' must range from 0.10 and 9999.90.",
+      { width: 400 },
+    )
+    return false
+  }
+
+  const pcc = Util.toNumber(percentCrownClosure.value)
+  if (pcc && (pcc < 0 || pcc > 100)) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Crown Closure' must range from 0 and 100.",
+      { width: 400 },
+    )
+    return false
+  }
+
+  return true
 }
 
 function validateBALimits(): boolean {
@@ -366,6 +365,10 @@ function validateBALimits(): boolean {
 }
 
 async function validateFormInputs(): Promise<boolean> {
+  if (!validateRange()) {
+    return false
+  }
+
   const isBasalAreaValid = validateBALimits()
   if (!isBasalAreaValid) {
     const userResponse = await confirmDialogStore.openDialog(

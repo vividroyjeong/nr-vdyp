@@ -153,6 +153,32 @@ export class Util {
   /**
    * CONVERTING
    */
+
+  /**
+   * Converts the input to a number if it's a string and returns it,
+   * otherwise returns the input unchanged if it's a number.
+   * The conversion only occurs if the input is not blank.
+   *
+   * @param item - The input to be processed (string or number or null).
+   * @returns The processed input: number or unchanged if blank or not a string.
+   */
+  static toNumber(item: string | number | null): number | null {
+    if (Util.isBlank(item)) {
+      return null
+    }
+
+    if (typeof item === 'string') {
+      const convertedNumber = Number(this.trimValue(item))
+      return isNaN(convertedNumber) ? null : convertedNumber
+    }
+
+    if (typeof item === 'number') {
+      return item
+    }
+
+    return null
+  }
+
   static arrayToString(array: Array<any>, separator: string): string {
     if (array) {
       return array.join(separator)
