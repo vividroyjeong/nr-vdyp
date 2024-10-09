@@ -53,14 +53,16 @@ class UtilsTests {
 
 		{
 			assertEquals(0, Utils.compareOptionals(Optional.empty(), Optional.empty()));
-			assertEquals(-1, Utils.compareOptionals(Optional.empty(), Optional.of(0)));
-			assertEquals(1, Utils.compareOptionals(Optional.of(0), Optional.empty()));
+			Optional<Integer> e = Optional.empty();
+			assertEquals(-1, Utils.compareOptionals(e, Optional.of(0)));
+			assertEquals(1, Utils.compareOptionals(Optional.of(0), e));
 			assertEquals(-1, Utils.compareOptionals(Optional.of(0), Optional.of(1)));
 		}
 		
 		{
+			Optional<Integer> e = Optional.empty();
 			assertEquals(Optional.of(0), Utils.getIfPresent(List.of(0, 1, 2), 0));
-			assertEquals(Optional.empty(), Utils.getIfPresent(List.of(0, 1, 2), 3));
+			assertEquals(e, Utils.getIfPresent(List.of(0, 1, 2), 3));
 		}
 	}
 	
