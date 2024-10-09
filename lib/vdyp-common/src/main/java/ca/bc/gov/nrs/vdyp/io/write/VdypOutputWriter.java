@@ -20,7 +20,6 @@ import ca.bc.gov.nrs.vdyp.math.FloatMath;
 import ca.bc.gov.nrs.vdyp.model.BaseVdypSpecies;
 import ca.bc.gov.nrs.vdyp.model.BecDefinition;
 import ca.bc.gov.nrs.vdyp.model.LayerType;
-import ca.bc.gov.nrs.vdyp.model.MatrixMap2;
 import ca.bc.gov.nrs.vdyp.model.PolygonIdentifier;
 import ca.bc.gov.nrs.vdyp.model.PolygonMode;
 import ca.bc.gov.nrs.vdyp.model.Sp64Distribution;
@@ -167,7 +166,7 @@ public class VdypOutputWriter implements Closeable {
 		// a separate COMMON. Here, we store the result in the Polygon, knowing that the originally
 		// calculated values are not being used.
 		sortedLayers.stream()
-				.forEach(l -> calculateCuVolumeLessDecayWastageBreakage(l, polygon.getBiogeoclimaticZone()));
+				.forEach(l -> calculateCuVolumeLessDecayWastageBreakage(controlMap, l, polygon.getBiogeoclimaticZone()));
 
 		for (var layer : sortedLayers) {
 			writeUtilization(polygon, layer, layer);
@@ -183,7 +182,7 @@ public class VdypOutputWriter implements Closeable {
 		writeUtilizationEndRecord(polygon);
 	}
 
-	private void calculateCuVolumeLessDecayWastageBreakage(VdypLayer layer, BecDefinition bec) {
+	static void calculateCuVolumeLessDecayWastageBreakage(ResolvedControlMap controlMap, VdypLayer layer, BecDefinition bec) {
 
 		// Technically, BreakageEquationGroups are not required. If missing, it will not be
 		// possible for this method to do its work; but, it's still not an error.
