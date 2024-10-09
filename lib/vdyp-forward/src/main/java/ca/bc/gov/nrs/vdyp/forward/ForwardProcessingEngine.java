@@ -2371,6 +2371,7 @@ public class ForwardProcessingEngine {
 		}
 	}
 
+	@SuppressWarnings("java:S3776")
 	private void writeCurrentPolygon(int startYear, int currentYear, int endYear) throws ProcessingException {
 
 		try {
@@ -3448,6 +3449,7 @@ public class ForwardProcessingEngine {
 	 * @return as described
 	 * @throws ProcessingException if primaryGenus is not a known genus
 	 */
+	@SuppressWarnings("java:S3776")
 	static int findInventoryTypeGroup(String primarySp0, Optional<String> optionalSecondarySp0, float primaryPercentage)
 			throws ProcessingException {
 
