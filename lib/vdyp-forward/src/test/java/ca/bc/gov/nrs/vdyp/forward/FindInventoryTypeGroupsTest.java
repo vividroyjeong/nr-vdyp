@@ -20,10 +20,10 @@ public class FindInventoryTypeGroupsTest {
 		assertEquals(5, ForwardProcessingEngine.findInventoryTypeGroup("F", Optional.of("PL"), 75));
 		assertEquals(6, ForwardProcessingEngine.findInventoryTypeGroup("F", Optional.of("PY"), 75));
 		assertEquals(7, ForwardProcessingEngine.findInventoryTypeGroup("F", Optional.of("L"), 75));
-		
+
 		assertEquals(11, ForwardProcessingEngine.findInventoryTypeGroup("C", Optional.of("B"), 75));
 		assertEquals(10, ForwardProcessingEngine.findInventoryTypeGroup("Y", Optional.empty(), 75));
-		
+
 		assertEquals(14, ForwardProcessingEngine.findInventoryTypeGroup("H", Optional.of("C"), 75));
 		assertEquals(15, ForwardProcessingEngine.findInventoryTypeGroup("H", Optional.of("B"), 75));
 		assertEquals(16, ForwardProcessingEngine.findInventoryTypeGroup("H", Optional.of("S"), 75));
@@ -66,6 +66,9 @@ public class FindInventoryTypeGroupsTest {
 		assertEquals(42, ForwardProcessingEngine.findInventoryTypeGroup("AT", Optional.of("E"), 75));
 		assertEquals(41, ForwardProcessingEngine.findInventoryTypeGroup("AT", Optional.of("C"), 75));
 
-		assertThrows(ProcessingException.class, () -> ForwardProcessingEngine.findInventoryTypeGroup("Z", Optional.empty(), 90));
+		assertThrows(
+				ProcessingException.class,
+				() -> ForwardProcessingEngine.findInventoryTypeGroup("Z", Optional.empty(), 90)
+		);
 	}
 }

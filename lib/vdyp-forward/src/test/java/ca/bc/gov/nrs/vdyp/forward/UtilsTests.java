@@ -29,43 +29,50 @@ class UtilsTests {
 		{
 			class ResultHolder {
 				float result = 0.0f;
-				ResultHolder() {}
+
+				ResultHolder() {
+				}
+
 				void setResult(float f) {
 					result = f;
 				}
+
 				float getResult() {
 					return result;
 				}
-			};
+			}
+			;
 			ResultHolder result = new ResultHolder();
 			Utils.ifBothPresent(Optional.of(2.0f), Optional.of(3.0f), (a, b) -> result.setResult(a + b));
 			assertEquals(5.0f, result.getResult());
 		}
 
 		{
-			Optional<Float> result1 = Utils.flatMapBoth(Optional.of(2.0f), Optional.of(3.0f), (a, b) -> Optional.of(a + b));
+			Optional<Float> result1 = Utils
+					.flatMapBoth(Optional.of(2.0f), Optional.of(3.0f), (a, b) -> Optional.of(a + b));
 			assertEquals(5.0f, result1.get());
-			Optional<Float> result2 = Utils.flatMapBoth(Optional.empty(), Optional.of(3.0f), (a, b) -> Optional.of(a));
+			Optional<Float> e = Optional.empty();
+			Optional<Float> result2 = Utils.flatMapBoth(e, Optional.of(3.0f), (a, b) -> Optional.of(a));
 			assertEquals(Optional.empty(), result2);
-			Optional<Float> result3 = Utils.flatMapBoth(Optional.empty(), Optional.empty(), (a, b) -> Optional.of(b));
+			Optional<Float> result3 = Utils.flatMapBoth(e, e, (a, b) -> Optional.of(b));
 			assertEquals(Optional.empty(), result3);
 		}
 
 		{
-			assertEquals(0, Utils.compareOptionals(Optional.empty(), Optional.empty()));
 			Optional<Integer> e = Optional.empty();
+			assertEquals(0, Utils.compareOptionals(e, e));
 			assertEquals(-1, Utils.compareOptionals(e, Optional.of(0)));
 			assertEquals(1, Utils.compareOptionals(Optional.of(0), e));
 			assertEquals(-1, Utils.compareOptionals(Optional.of(0), Optional.of(1)));
 		}
-		
+
 		{
 			Optional<Integer> e = Optional.empty();
 			assertEquals(Optional.of(0), Utils.getIfPresent(List.of(0, 1, 2), 0));
 			assertEquals(e, Utils.getIfPresent(List.of(0, 1, 2), 3));
 		}
 	}
-	
+
 	@Test
 	void testGenusMethods() {
 		Map<String, Object> controlMap = TestUtils.loadControlMap();
@@ -73,15 +80,15 @@ class UtilsTests {
 		assertEquals(1, Utils.getGenusIndex("AC", controlMap));
 		assertThrows(IllegalArgumentException.class, () -> Utils.getGenusDefinition("Z", controlMap).getAlias());
 	}
-	
+
 	@Test
 	void testListMethods() {
 		var list = List.of(0, 1, 2);
 		var allButLastList = new ArrayList<Integer>();
 		var lastList = new ArrayList<Integer>();
-		
+
 		Utils.eachButLast(list, e -> allButLastList.add(e), e -> lastList.add(e));
-		
+
 		assertEquals(List.of(0, 1), allButLastList);
 		assertEquals(List.of(2), lastList);
 	}
@@ -91,7 +98,7 @@ class UtilsTests {
 		assertEquals(true, Utils.nullOrEmpty(null));
 		assertEquals(true, Utils.nullOrEmpty(""));
 		assertEquals(false, Utils.nullOrEmpty("a"));
-		
+
 		assertEquals(true, Utils.parsesBlankOrNonPositive(null));
 		assertEquals(true, Utils.parsesBlankOrNonPositive(""));
 		assertEquals(true, Utils.parsesBlankOrNonPositive("-4.3"));
