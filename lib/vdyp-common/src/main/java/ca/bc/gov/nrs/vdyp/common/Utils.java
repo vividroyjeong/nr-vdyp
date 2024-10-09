@@ -400,8 +400,8 @@ public class Utils {
 	}
 
 	/**
-	 * If <code>f</code> is <code>null</code> or <code>f.isNan()</code> is true, this method returns
-	 * <code>Optional.empty()</code> otherwise, <code>Optional.of(f)</code> is returned.
+	 * If <code>i</code> is <code>null</code> or <code>i</code> is <code>VdypEntity.MISSING_INTEGER_VALUE</code>, 
+	 * this method returns <code>Optional.empty()</code> otherwise, <code>Optional.of(f)</code> is returned.
 	 *
 	 * @param i the Float to be made into an Optional
 	 * @return as described.
