@@ -163,9 +163,9 @@
                         label="Age (years)"
                         type="number"
                         v-model="age"
-                        max="100"
+                        max="500"
                         min="0"
-                        step="0.1"
+                        step="10"
                         persistent-placeholder
                         :placeholder="agePlaceholder"
                         hide-details
@@ -189,9 +189,9 @@
                         label="Height (meters)"
                         type="number"
                         v-model="height"
-                        max="100"
+                        max="99.9"
                         min="0"
-                        step="0.1"
+                        step="1"
                         persistent-placeholder
                         :placeholder="heightPlaceholder"
                         hide-details
@@ -215,9 +215,9 @@
                         label="BHA 50 Site Index"
                         type="number"
                         v-model="bha50SiteIndex"
-                        max="100"
-                        min="0"
-                        step="0.1"
+                        max="60.0"
+                        min="0.0"
+                        step="1"
                         persistent-placeholder
                         placeholder=""
                         hide-details
@@ -554,6 +554,44 @@ const clear = () => {
   )
 }
 
+// Validation to check the range of input values
+const validateRange = (): boolean => {
+  if (age.value !== null) {
+    if (age.value < 0 || age.value > 500) {
+      messageDialogStore.openDialog(
+        'Invalid Input!',
+        "'Stand Age' must range from 0 and 500",
+        { width: 400 },
+      )
+      return false
+    }
+  }
+
+  if (height.value !== null) {
+    if (height.value < 0 || height.value > 99.9) {
+      messageDialogStore.openDialog(
+        'Invalid Input!',
+        "'Stand Height' must range from 0.00 and 99.90",
+        { width: 400 },
+      )
+      return false
+    }
+  }
+
+  if (height.value !== null) {
+    if (height.value < 0 || height.value > 60) {
+      messageDialogStore.openDialog(
+        'Invalid Input!',
+        "'Site Index' must range from 0.00 and 60.00",
+        { width: 400 },
+      )
+      return false
+    }
+  }
+
+  return true
+}
+
 const validateRequiredFields = (): boolean => {
   if (siteSpeciesValues.value === SITE_SPECIES_VALUES.COMPUTED) {
     if (
@@ -583,9 +621,10 @@ const validateRequiredFields = (): boolean => {
 }
 
 const onConfirm = () => {
+  const isRangeValid = validateRange()
   const isRequiredFieldsValid = validateRequiredFields()
 
-  if (isRequiredFieldsValid) {
+  if (isRangeValid && isRequiredFieldsValid) {
     form.value?.validate()
     // this panel is not in a confirmed state
     if (!isConfirmed.value) {
