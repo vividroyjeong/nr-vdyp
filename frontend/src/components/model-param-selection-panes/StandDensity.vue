@@ -25,7 +25,7 @@
                   <v-text-field
                     label="% Stockable Area"
                     type="number"
-                    v-model="percentStockableArea"
+                    v-model.number="percentStockableArea"
                     max="100"
                     min="0"
                     step="5"
@@ -107,7 +107,7 @@
                   <v-text-field
                     label="Crown Closure (%)"
                     type="number"
-                    v-model="percentCrownClosure"
+                    v-model.number="percentCrownClosure"
                     max="100"
                     min="0"
                     step="5"

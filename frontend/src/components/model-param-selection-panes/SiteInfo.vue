@@ -162,7 +162,7 @@
                       <v-text-field
                         label="Age (years)"
                         type="number"
-                        v-model="age"
+                        v-model.number="age"
                         :max="NUM_INPUT_LIMITS.AGE_MAX"
                         :min="NUM_INPUT_LIMITS.AGE_MIN"
                         :step="NUM_INPUT_LIMITS.AGE_STEP"
