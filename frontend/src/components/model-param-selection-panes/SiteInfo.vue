@@ -163,16 +163,15 @@
                         label="Age (years)"
                         type="number"
                         v-model="age"
-                        max="500"
-                        min="0"
-                        step="10"
+                        :max="NUM_INPUT_LIMITS.AGE_MAX"
+                        :min="NUM_INPUT_LIMITS.AGE_MIN"
+                        :step="NUM_INPUT_LIMITS.AGE_STEP"
                         persistent-placeholder
                         :placeholder="agePlaceholder"
                         hide-details
                         density="compact"
                         dense
                         :disabled="isAgeDisabled || !isConfirmEnabled"
-                        @input="handleAgeInput($event)"
                       ></v-text-field>
                       <v-label
                         v-show="Util.isZeroValue(age)"
@@ -185,49 +184,104 @@
                     <v-col cols="6" />
                     <v-col class="col-space-6" />
                     <v-col>
-                      <v-text-field
-                        label="Height (meters)"
-                        type="number"
-                        v-model="height"
-                        max="99.9"
-                        min="0"
-                        step="1"
-                        persistent-placeholder
-                        :placeholder="heightPlaceholder"
-                        hide-details
-                        density="compact"
-                        dense
-                        :disabled="isHeightDisabled || !isConfirmEnabled"
-                        @input="handleHeightInput($event)"
-                      ></v-text-field>
+                      <div style="position: relative; width: 100%">
+                        <v-text-field
+                          label="Height (meters)"
+                          type="text"
+                          v-model="height"
+                          persistent-placeholder
+                          :placeholder="heightPlaceholder"
+                          hide-details
+                          density="compact"
+                          dense
+                          style="padding-left: 15px"
+                          variant="plain"
+                          :disabled="isHeightDisabled || !isConfirmEnabled"
+                        ></v-text-field>
+                        <!-- spin buttons -->
+                        <div class="spin-box">
+                          <div
+                            class="spin-up-arrow-button"
+                            @mousedown="startIncrementHeight"
+                            @mouseup="stopIncrementHeight"
+                            @mouseleave="stopIncrementHeight"
+                            :class="{
+                              disabled: isHeightDisabled || !isConfirmEnabled,
+                            }"
+                          >
+                            {{ SPIN_BUTTON.UP }}
+                          </div>
+                          <div
+                            class="spin-down-arrow-button"
+                            @mousedown="startDecrementHeight"
+                            @mouseup="stopDecrementHeight"
+                            @mouseleave="stopDecrementHeight"
+                            :class="{
+                              disabled: isHeightDisabled || !isConfirmEnabled,
+                            }"
+                          >
+                            {{ SPIN_BUTTON.DOWN }}
+                          </div>
+                        </div>
+                        <div class="spin-text-field-bottom-line"></div>
+                      </div>
                       <v-label
                         v-show="Util.isZeroValue(height)"
                         style="font-size: 12px"
-                        >A value of zero indicates not known.</v-label
                       >
+                        A value of zero indicates not known.
+                      </v-label>
                     </v-col>
                   </v-row>
                   <v-row style="height: 70px !important">
                     <v-col cols="6" />
                     <v-col class="col-space-6" />
                     <v-col>
-                      <v-text-field
-                        label="BHA 50 Site Index"
-                        type="number"
-                        v-model="bha50SiteIndex"
-                        max="60.0"
-                        min="0.0"
-                        step="1"
-                        persistent-placeholder
-                        placeholder=""
-                        hide-details
-                        density="compact"
-                        dense
-                        @input="handleBHA50SiteIndexInput($event)"
-                        :disabled="
-                          isBHA50SiteIndexDisabled || !isConfirmEnabled
-                        "
-                      ></v-text-field>
+                      <div style="position: relative; width: 100%">
+                        <v-text-field
+                          label="BHA 50 Site Index"
+                          type="text"
+                          v-model="bha50SiteIndex"
+                          persistent-placeholder
+                          placeholder=""
+                          hide-details
+                          density="compact"
+                          dense
+                          style="padding-left: 15px"
+                          variant="plain"
+                          :disabled="
+                            isBHA50SiteIndexDisabled || !isConfirmEnabled
+                          "
+                        ></v-text-field>
+                        <!-- spin buttons -->
+                        <div class="spin-box">
+                          <div
+                            class="spin-up-arrow-button"
+                            @mousedown="startIncrementBHA50SiteIndex"
+                            @mouseup="stopIncrementBHA50SiteIndex"
+                            @mouseleave="stopIncrementBHA50SiteIndex"
+                            :class="{
+                              disabled:
+                                isBHA50SiteIndexDisabled || !isConfirmEnabled,
+                            }"
+                          >
+                            {{ SPIN_BUTTON.UP }}
+                          </div>
+                          <div
+                            class="spin-down-arrow-button"
+                            @mousedown="startDecrementBHA50SiteIndex"
+                            @mouseup="stopDecrementBHA50SiteIndex"
+                            @mouseleave="stopDecrementBHA50SiteIndex"
+                            :class="{
+                              disabled:
+                                isBHA50SiteIndexDisabled || !isConfirmEnabled,
+                            }"
+                          >
+                            {{ SPIN_BUTTON.DOWN }}
+                          </div>
+                        </div>
+                        <div class="spin-text-field-bottom-line"></div>
+                      </div>
                       <v-label
                         v-show="Util.isZeroValue(bha50SiteIndex)"
                         style="font-size: 12px"
@@ -249,7 +303,7 @@
                         :key="option.value"
                         :label="option.label"
                         :value="option.value"
-                        style="margin-bottom: 30px"
+                        style="margin-bottom: 25px"
                       ></v-radio>
                     </v-radio-group>
                   </div>
@@ -302,6 +356,10 @@ import {
   SITE_SPECIES_VALUES,
   FLOATING,
   NOT_AVAILABLE_INDI,
+  MODEL_PARAMETER_PANEL,
+  NUM_INPUT_LIMITS,
+  CONTINUOUS_INC_DEC,
+  SPIN_BUTTON,
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 
@@ -328,7 +386,7 @@ const {
   floating,
 } = storeToRefs(modelParameterStore)
 
-const panelName = 'siteInfo'
+const panelName = MODEL_PARAMETER_PANEL.SITE_INFO
 const isConfirmEnabled = computed(
   () => modelParameterStore.panelState[panelName].editable,
 )
@@ -366,6 +424,12 @@ const isFloatingDisabled = ref(false)
 const agePlaceholder = ref('')
 const heightPlaceholder = ref('')
 
+// Interval references for continuous increment/decrement
+let heightIncrementInterval: number | null = null
+let heightDecrementInterval: number | null = null
+let bha50IncrementInterval: number | null = null
+let bha50DecrementInterval: number | null = null
+
 const setFloatingState = (newFloating: string | null) => {
   isAgeTypeDisabled.value = false
   isAgeDisabled.value = false
@@ -394,7 +458,7 @@ const handleSiteSpeciesValuesState = (
     // TODO - set values based on species, beczone, agetype
     // if age or height float is selected, age, height or bha 50 site index should also be factored into the calculation for these values
     age.value = 60
-    height.value = 17.0
+    height.value = DEFAULT_VALUES.HEIGHT
 
     agePlaceholder.value = ''
     heightPlaceholder.value = ''
@@ -462,74 +526,113 @@ watch(
   { immediate: true },
 )
 
-const handleAgeInput = (event: Event) => {
-  const input = event.target as HTMLInputElement
-  let value = input.value
+const incrementHeight = () => {
+  const newValue = Util.increaseItemBySpinButton(
+    height.value,
+    NUM_INPUT_LIMITS.HEIGHT_MAX,
+    NUM_INPUT_LIMITS.HEIGHT_MIN,
+    NUM_INPUT_LIMITS.HEIGHT_STEP,
+  )
+  // Format the value to ##0.00
+  height.value = newValue.toFixed(NUM_INPUT_LIMITS.HEIGHT_DECIMAL_NUM)
+}
 
-  // Remove any non-digit characters (also prevents the entry of '.')
-  value = value.replace(/\D/g, '')
+const decrementHeight = () => {
+  let newValue = Util.decrementItemBySpinButton(
+    height.value,
+    NUM_INPUT_LIMITS.HEIGHT_MAX,
+    NUM_INPUT_LIMITS.HEIGHT_MIN,
+    NUM_INPUT_LIMITS.HEIGHT_STEP,
+  )
+  // Format the value to ##0.00
+  height.value = newValue.toFixed(NUM_INPUT_LIMITS.HEIGHT_DECIMAL_NUM)
+}
 
-  // Ensure the value is a valid integer and between 0 and 100
-  const intValue = parseInt(value, 10)
+const incrementBHA50SiteIndex = () => {
+  const newValue = Util.increaseItemBySpinButton(
+    bha50SiteIndex.value,
+    NUM_INPUT_LIMITS.BHA50_SITE_INDEX_MAX,
+    NUM_INPUT_LIMITS.BHA50_SITE_INDEX_MIN,
+    NUM_INPUT_LIMITS.BHA50_SITE_INDEX_STEP,
+  )
+  // Format the value to ##0.00
+  bha50SiteIndex.value = newValue.toFixed(
+    NUM_INPUT_LIMITS.BHA50_SITE_INDEX_DECIMAL_NUM,
+  )
+}
 
-  if (!isNaN(intValue) && intValue >= 0 && intValue <= 100) {
-    age.value = intValue
-  } else if (intValue > 100) {
-    age.value = 100 // Limit to 100 if the value exceeds
-  } else {
-    age.value = null // Handle invalid or empty input
+const decrementBHA50SiteIndex = () => {
+  let newValue = Util.decrementItemBySpinButton(
+    bha50SiteIndex.value,
+    NUM_INPUT_LIMITS.BHA50_SITE_INDEX_MAX,
+    NUM_INPUT_LIMITS.BHA50_SITE_INDEX_MIN,
+    NUM_INPUT_LIMITS.BHA50_SITE_INDEX_STEP,
+  )
+  // Format the value to ##0.00
+  bha50SiteIndex.value = newValue.toFixed(
+    NUM_INPUT_LIMITS.BHA50_SITE_INDEX_DECIMAL_NUM,
+  )
+}
+
+// Methods to handle continuous increment/decrement for Height
+const startIncrementHeight = () => {
+  incrementHeight()
+  heightIncrementInterval = window.setInterval(
+    incrementHeight,
+    CONTINUOUS_INC_DEC.INTERVAL,
+  )
+}
+
+const stopIncrementHeight = () => {
+  if (heightIncrementInterval !== null) {
+    clearInterval(heightIncrementInterval)
+    heightIncrementInterval = null
   }
 }
 
-const handleHeightInput = (event: Event) => {
-  const input = event.target as HTMLInputElement
-  let value = input.value
+const startDecrementHeight = () => {
+  decrementHeight()
+  heightDecrementInterval = window.setInterval(
+    decrementHeight,
+    CONTINUOUS_INC_DEC.INTERVAL,
+  )
+}
 
-  // Allow only up to the first decimal place
-  if (value.includes('.')) {
-    const [integerPart, decimalPart] = value.split('.')
-    if (decimalPart.length > 1) {
-      value = `${integerPart}.${decimalPart.slice(0, 1)}`
-    }
-  }
-
-  // Convert value to a number and ensure it is between 0 and 100
-  let floatValue = parseFloat(value)
-  if (!isNaN(floatValue)) {
-    if (floatValue < 0) {
-      floatValue = 0
-    } else if (floatValue > 100) {
-      floatValue = 100
-    }
-    height.value = floatValue
-  } else {
-    height.value = null // Handle invalid or empty input
+const stopDecrementHeight = () => {
+  if (heightDecrementInterval !== null) {
+    clearInterval(heightDecrementInterval)
+    heightDecrementInterval = null
   }
 }
 
-const handleBHA50SiteIndexInput = (event: Event) => {
-  const input = event.target as HTMLInputElement
-  let value = input.value
+// Methods to handle continuous increment/decrement for BHA 50 Site Index
+const startIncrementBHA50SiteIndex = () => {
+  incrementBHA50SiteIndex()
+  bha50IncrementInterval = window.setInterval(
+    incrementBHA50SiteIndex,
+    CONTINUOUS_INC_DEC.INTERVAL,
+  )
+}
 
-  // allow only up to the first decimal place
-  if (value.includes('.')) {
-    const [integerPart, decimalPart] = value.split('.')
-    if (decimalPart.length > 1) {
-      value = `${integerPart}.${decimalPart.slice(0, 1)}`
-    }
+const stopIncrementBHA50SiteIndex = () => {
+  if (bha50IncrementInterval !== null) {
+    clearInterval(bha50IncrementInterval)
+    bha50IncrementInterval = null
   }
+}
 
-  // Convert value to a number and ensure it is between 0 and 100
-  let floatValue = parseFloat(value)
-  if (!isNaN(floatValue)) {
-    if (floatValue < 0) {
-      floatValue = 0
-    } else if (floatValue > 100) {
-      floatValue = 100
-    }
-    bha50SiteIndex.value = floatValue
-  } else {
-    bha50SiteIndex.value = null // Handle invalid or empty input
+const startDecrementBHA50SiteIndex = () => {
+  decrementBHA50SiteIndex()
+  bha50DecrementInterval = window.setInterval(
+    decrementBHA50SiteIndex,
+    CONTINUOUS_INC_DEC.INTERVAL,
+  )
+}
+
+const stopDecrementBHA50SiteIndex = () => {
+  if (bha50DecrementInterval !== null) {
+    clearInterval(bha50DecrementInterval)
+    bha50DecrementInterval = null
   }
 }
 
@@ -568,7 +671,8 @@ const validateRange = (): boolean => {
   }
 
   if (height.value !== null) {
-    if (height.value < 0 || height.value > 99.9) {
+    const numericHeight = parseFloat(height.value)
+    if (isNaN(numericHeight) || numericHeight < 0 || numericHeight > 99.9) {
       messageDialogStore.openDialog(
         'Invalid Input!',
         "'Stand Height' must range from 0.00 and 99.90",
@@ -579,7 +683,8 @@ const validateRange = (): boolean => {
   }
 
   if (height.value !== null) {
-    if (height.value < 0 || height.value > 60) {
+    const numericHeight = parseFloat(height.value)
+    if (isNaN(numericHeight) || numericHeight < 0 || numericHeight > 60) {
       messageDialogStore.openDialog(
         'Invalid Input!',
         "'Site Index' must range from 0.00 and 60.00",
@@ -621,10 +726,10 @@ const validateRequiredFields = (): boolean => {
 }
 
 const onConfirm = () => {
-  const isRangeValid = validateRange()
   const isRequiredFieldsValid = validateRequiredFields()
+  const isRangeValid = validateRange()
 
-  if (isRangeValid && isRequiredFieldsValid) {
+  if (isRequiredFieldsValid && isRangeValid) {
     form.value?.validate()
     // this panel is not in a confirmed state
     if (!isConfirmed.value) {

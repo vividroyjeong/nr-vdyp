@@ -232,7 +232,7 @@ import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
 import { storeToRefs } from 'pinia'
 import { derivedByOptions } from '@/constants/options'
 import { SPECIES_Map } from '@/constants/mappings'
-import { PANEL } from '@/constants/constants'
+import { PANEL, MODEL_PARAMETER_PANEL } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 
 const form = ref<HTMLFormElement>()
@@ -251,7 +251,7 @@ const {
   highestPercentSpecies,
 } = storeToRefs(modelParameterStore)
 
-const panelName = 'speciesInfo'
+const panelName = MODEL_PARAMETER_PANEL.SPECIES_INFO
 const isConfirmEnabled = computed(
   () => modelParameterStore.panelState[panelName].editable,
 )

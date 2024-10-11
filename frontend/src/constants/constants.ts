@@ -69,3 +69,34 @@ export const PROJECTION_TYPE = Object.freeze({
 export const NOT_AVAILABLE_INDI = Object.freeze({
   NA: 'N/A',
 })
+
+export const MODEL_PARAMETER_PANEL = Object.freeze({
+  SPECIES_INFO: 'speciesInfo',
+  SITE_INFO: 'siteInfo',
+  STAND_DENSITY: 'standDensity',
+  ADDY_STAND_ATTR: 'additionalStandAttributes',
+  REPORT_INFO: 'reportInfo',
+})
+
+export const NUM_INPUT_LIMITS = Object.freeze({
+  AGE_MAX: 500,
+  AGE_MIN: 0,
+  AGE_STEP: 10,
+  HEIGHT_MAX: 99,
+  HEIGHT_MIN: 0,
+  HEIGHT_STEP: 1,
+  HEIGHT_DECIMAL_NUM: 2,
+  BHA50_SITE_INDEX_MAX: 60,
+  BHA50_SITE_INDEX_MIN: 0,
+  BHA50_SITE_INDEX_STEP: 1,
+  BHA50_SITE_INDEX_DECIMAL_NUM: 2,
+})
+
+export const CONTINUOUS_INC_DEC = Object.freeze({
+  INTERVAL: 100, // (e.g., 100ms)
+})
+
+export const SPIN_BUTTON = Object.freeze({
+  UP: '▲',
+  DOWN: '▼',
+})

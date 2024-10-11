@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { PANEL, FLOATING } from '@/constants/constants'
+import { PANEL, FLOATING, MODEL_PARAMETER_PANEL } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 import type { PanelName, PanelState } from '@/types/types'
 
 export const useModelParameterStore = defineStore('modelParameter', () => {
   // panel open
-  const panelOpenStates = ref<Record<string, PanelState>>({
+  const panelOpenStates = ref<Record<PanelName, PanelState>>({
     speciesInfo: PANEL.OPEN,
     siteInfo: PANEL.OPEN,
     standDensity: PANEL.OPEN,
@@ -48,11 +48,11 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
 
     // Enable the next panel's confirm and clear buttons
     const panelOrder: PanelName[] = [
-      'speciesInfo',
-      'siteInfo',
-      'standDensity',
-      'additionalStandAttributes',
-      'reportInfo',
+      MODEL_PARAMETER_PANEL.SPECIES_INFO,
+      MODEL_PARAMETER_PANEL.SITE_INFO,
+      MODEL_PARAMETER_PANEL.STAND_DENSITY,
+      MODEL_PARAMETER_PANEL.ADDY_STAND_ATTR,
+      MODEL_PARAMETER_PANEL.REPORT_INFO,
     ]
     const currentIndex = panelOrder.indexOf(panelName)
     if (currentIndex !== -1 && currentIndex < panelOrder.length - 1) {
@@ -73,11 +73,11 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
 
     // Disable all subsequent panels
     const panelOrder: PanelName[] = [
-      'speciesInfo',
-      'siteInfo',
-      'standDensity',
-      'additionalStandAttributes',
-      'reportInfo',
+      MODEL_PARAMETER_PANEL.SPECIES_INFO,
+      MODEL_PARAMETER_PANEL.SITE_INFO,
+      MODEL_PARAMETER_PANEL.STAND_DENSITY,
+      MODEL_PARAMETER_PANEL.ADDY_STAND_ATTR,
+      MODEL_PARAMETER_PANEL.REPORT_INFO,
     ]
     const currentIndex = panelOrder.indexOf(panelName)
     if (currentIndex !== -1) {
@@ -173,8 +173,8 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   const siteSpeciesValues = ref<string | null>(null)
   const ageType = ref<string | null>(null)
   const age = ref<number | null>(null)
-  const height = ref<number | null>(null)
-  const bha50SiteIndex = ref<number | null>(null)
+  const height = ref<string | null>(null)
+  const bha50SiteIndex = ref<string | null>(null)
   const floating = ref<string | null>(null)
 
   // stand density

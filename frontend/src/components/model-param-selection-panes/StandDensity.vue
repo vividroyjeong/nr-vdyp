@@ -189,6 +189,7 @@ import {
   DERIVED_BY,
   SITE_SPECIES_VALUES,
   NOT_AVAILABLE_INDI,
+  MODEL_PARAMETER_PANEL,
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 import {
@@ -220,7 +221,7 @@ const {
   percentCrownClosure,
 } = storeToRefs(modelParameterStore)
 
-const panelName = 'standDensity'
+const panelName = MODEL_PARAMETER_PANEL.STAND_DENSITY
 const isConfirmEnabled = computed(
   () => modelParameterStore.panelState[panelName].editable,
 )
@@ -444,8 +445,6 @@ async function validateFormInputs(): Promise<boolean> {
       return false
     }
   }
-
-  validateQuadraticDiameter
 
   return true
 }

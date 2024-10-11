@@ -25,13 +25,14 @@ export function isCoastalZone(becZone: string): boolean {
  * @param basalArea - The basal area to be validated.
  * @param height - The height of the stand used in the calculation.
  * @returns true if the basal area is within the valid limit, false otherwise.
+ *          Returns true on errors for input arguments that cannot be validated.
  * @example speceis:'H', coastal, ba: 50, height: 8
  */
 export function validateBasalAreaLimits(
   species: string,
   isCoastal: boolean,
   basalArea: number,
-  height: number,
+  height: string,
 ): boolean {
   if (!(species in MAP.BA_LIMIT_COEFFICIENTS)) {
     console.warn(`Species ${species} not found in BA_LIMIT_COEFFICIENTS.`)
@@ -49,12 +50,23 @@ export function validateBasalAreaLimits(
     return true
   }
 
+  // Ensure these arguments are valid, handle invalid input
+  const parsedHeight = parseFloat(height)
+
+  if (isNaN(parsedHeight) || parsedHeight <= 0) {
+    console.warn(
+      `Invalid height value: ${height}. Unable to perform calculation.`,
+    )
+    return true
+  }
+
   // Equation constants
   const { const1, const2 } = MAP.BA_EQUATION_CONSTANTS
 
   // Validate the basal area against the calculated limit
   const fBALimit =
-    Math.exp(coeffs.coeff2 / (height - const2)) * coeffs.coeff1 + const1
+    Math.exp(coeffs.coeff2 / (parseFloat(height) - const2)) * coeffs.coeff1 +
+    const1
 
   return basalArea <= fBALimit
 }
@@ -78,7 +90,7 @@ export function validateBasalAreaLimits(
 export function validateTreePerHectareLimits(
   basalArea: number,
   tph: number,
-  height: number,
+  height: string,
   species: string,
   coastal: boolean,
 ): string | null {
@@ -110,6 +122,16 @@ export function validateTreePerHectareLimits(
     return null
   }
 
+  // Ensure these input arguments are valid, handle invalid input
+  const parsedHeight = parseFloat(height)
+
+  if (isNaN(parsedHeight) || parsedHeight <= 0) {
+    console.warn(
+      `Invalid height value: ${height}. Unable to perform calculation.`,
+    )
+    return null
+  }
+
   // Defining constants
   const const1 = MAP.TPH_EQUATION_CONSTANTS.const1
   const const2 = MAP.TPH_EQUATION_CONSTANTS.const2
@@ -129,8 +151,8 @@ export function validateTreePerHectareLimits(
   const dqMax =
     const1 +
     P90.a0 +
-    P90.b0 * (height - const2) +
-    P90.b1 * (height - const2) ** 2
+    P90.b0 * (parseFloat(height) - const2) +
+    P90.b1 * (parseFloat(height) - const2) ** 2
 
   if (dqMax > 0) {
     tphMin = basalArea / (const3 * dqMax ** 2)
@@ -140,8 +162,8 @@ export function validateTreePerHectareLimits(
   const dqMin =
     -const1 +
     P10.a0 +
-    P10.b0 * (height - const2) +
-    P10.b1 * (height - const2) ** 2
+    P10.b0 * (parseFloat(height) - const2) +
+    P10.b1 * (parseFloat(height) - const2) ** 2
 
   if (dqMin > 0) {
     tphMax = basalArea / (const3 * dqMin ** 2)

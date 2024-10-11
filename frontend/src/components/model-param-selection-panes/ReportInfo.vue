@@ -225,7 +225,11 @@ import {
   projectionTypeOptions,
   minimumDBHLimitsOptions,
 } from '@/constants/options'
-import { PANEL, MINIMUM_DBH_LIMITS } from '@/constants/constants'
+import {
+  PANEL,
+  MINIMUM_DBH_LIMITS,
+  MODEL_PARAMETER_PANEL,
+} from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 
 const form = ref<HTMLFormElement>()
@@ -245,7 +249,7 @@ const {
   reportTitle,
 } = storeToRefs(modelParameterStore)
 
-const panelName = 'reportInfo'
+const panelName = MODEL_PARAMETER_PANEL.REPORT_INFO
 const isConfirmEnabled = computed(
   () => modelParameterStore.panelState[panelName].editable,
 )

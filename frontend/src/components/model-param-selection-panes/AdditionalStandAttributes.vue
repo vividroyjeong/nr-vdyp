@@ -228,6 +228,7 @@ import {
   SITE_SPECIES_VALUES,
   COMPUTED_VALUES,
   NOT_AVAILABLE_INDI,
+  MODEL_PARAMETER_PANEL,
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 
@@ -252,7 +253,7 @@ const {
   closeUtilNetDecayVolume,
 } = storeToRefs(modelParameterStore)
 
-const panelName = 'additionalStandAttributes'
+const panelName = MODEL_PARAMETER_PANEL.ADDY_STAND_ATTR
 const isConfirmEnabled = computed(
   () => modelParameterStore.panelState[panelName].editable,
 )

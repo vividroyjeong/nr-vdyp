@@ -2,22 +2,25 @@ export class Util {
   /**
    * VALIDATATING
    */
-
-  static trimValue = (
-    value: number | string | null,
-  ): number | string | null => {
-    if (typeof value === 'string') {
-      return value.trim()
+  public static readonly isZeroValue = (value: any): boolean => {
+    if (value === null || value === undefined) {
+      return false
     }
-    return value
-  }
-  static isZeroValue = (value: number | string | null): boolean => {
+
     const trimmedValue = this.trimValue(value)
+
+    if (typeof trimmedValue === 'string' && trimmedValue.trim() === '') {
+      return false
+    }
+
     const numericValue = Number(trimmedValue)
-    return numericValue === 0
+
+    return !isNaN(numericValue) && numericValue === 0
   }
 
-  static isEmptyOrZero = (value: number | string | null): boolean => {
+  public static readonly isEmptyOrZero = (
+    value: number | string | null,
+  ): boolean => {
     const trimmedValue = this.trimValue(value)
     return this.isZeroValue(trimmedValue) || this.isBlank(trimmedValue)
   }
@@ -154,6 +157,13 @@ export class Util {
    * CONVERTING
    */
 
+  public static readonly trimValue = (value: any): any => {
+    if (typeof value === 'string') {
+      return value.trim()
+    }
+    return value
+  }
+
   /**
    * Converts the input to a number if it's a string and returns it,
    * otherwise returns the input unchanged if it's a number.
@@ -264,5 +274,95 @@ export class Util {
 
   static deepCopy(obj: any): any {
     return JSON.parse(JSON.stringify(obj)) as typeof obj
+  }
+
+  /**
+   * Increases the numeric value extracted from the input string by a specified step,
+   * ensuring that the result stays within the provided minimum and maximum limits.
+   *
+   * @param value - The input value as a string (e.g., '10.5') or null. It can contain numeric and non-numeric characters.
+   * @param max - The maximum allowable value. If the calculated value exceeds this, the maximum value is returned.
+   * @param min - The minimum allowable value. If the calculated value is lower than this, the minimum value is returned.
+   * @param step - The amount by which to increase the numeric value.
+   * @returns The new value, ensuring it is within the [min, max] range.
+   */
+  static increaseItemBySpinButton(
+    value: string | null,
+    max: number,
+    min: number,
+    step: number,
+  ): number {
+    let newValue
+
+    // If value is null, assign step value and format
+    if (!value) {
+      newValue = step
+    } else {
+      // extract only numbers, commas, and minus signs
+      const extractedValue = value.replace(/[^\d.-]/g, '')
+
+      const numericValue = parseFloat(extractedValue)
+
+      // Check if the extracted value is a valid number
+      if (isNaN(numericValue)) {
+        newValue = step // Assign step value if invalid
+      } else {
+        newValue = numericValue + step
+      }
+
+      if (newValue < min) {
+        // 0
+        newValue = min // 0
+      }
+    }
+
+    if (newValue > max) {
+      newValue = max
+    }
+
+    return newValue
+  }
+
+  /**
+   * Decreases the numeric value extracted from the input string by a specified step,
+   * ensuring that the result stays within the provided minimum and maximum limits.
+   *
+   * @param value - The input value as a string (e.g., '10.5') or null. It can contain numeric and non-numeric characters.
+   * @param max - The maximum allowable value. If the calculated value exceeds this, the maximum value is returned.
+   * @param min - The minimum allowable value. If the calculated value is lower than this, the minimum value is returned.
+   * @param step - The amount by which to decrease the numeric value.
+   * @returns The new value, ensuring it is within the [min, max] range.
+   */
+  static decrementItemBySpinButton(
+    value: string | null,
+    max: number,
+    min: number,
+    step: number,
+  ): number {
+    let newValue
+    if (!value) {
+      newValue = min // 0
+    } else {
+      // extract only numbers, commas, and minus signs
+      const extractedValue = value.replace(/[^\d.-]/g, '')
+
+      const numericValue = parseFloat(extractedValue)
+
+      if (isNaN(numericValue)) {
+        newValue = min // 0
+      } else {
+        newValue = numericValue - step
+      }
+
+      if (newValue < min) {
+        newValue = min // 0
+      }
+
+      if (newValue > max) {
+        newValue = max
+      }
+    }
+
+    return newValue
   }
 }
