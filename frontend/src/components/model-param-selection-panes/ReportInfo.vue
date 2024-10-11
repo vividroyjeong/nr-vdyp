@@ -25,10 +25,10 @@
                   <v-text-field
                     label="Starting Age"
                     type="number"
-                    v-model="startingAge"
-                    min="0"
-                    max="500"
-                    step="10"
+                    v-model.number="startingAge"
+                    :min="NUM_INPUT_LIMITS.STARTING_AGE_MIN"
+                    :max="NUM_INPUT_LIMITS.STARTING_AGE_MAX"
+                    :step="NUM_INPUT_LIMITS.STARTING_AGE_STEP"
                     persistent-placeholder
                     placeholder=""
                     density="compact"
@@ -41,10 +41,10 @@
                   <v-text-field
                     label="Finishing Age"
                     type="number"
-                    v-model="finishingAge"
-                    min="1"
-                    max="450"
-                    step="10"
+                    v-model.number="finishingAge"
+                    :min="NUM_INPUT_LIMITS.FINISHING_AGE_MIN"
+                    :max="NUM_INPUT_LIMITS.FINISHING_AGE_MAX"
+                    :step="NUM_INPUT_LIMITS.FINISHING_AGE_STEP"
                     persistent-placeholder
                     placeholder=""
                     density="compact"
@@ -57,10 +57,10 @@
                   <v-text-field
                     label="Age Increment"
                     type="number"
-                    v-model="ageIncrement"
-                    min="1"
-                    max="350"
-                    step="5"
+                    v-model.number="ageIncrement"
+                    :min="NUM_INPUT_LIMITS.AGE_INC_MIN"
+                    :max="NUM_INPUT_LIMITS.AGE_INC_MAX"
+                    :step="NUM_INPUT_LIMITS.AGE_INC_STEP"
                     persistent-placeholder
                     placeholder=""
                     density="compact"
@@ -229,6 +229,7 @@ import {
   PANEL,
   MINIMUM_DBH_LIMITS,
   MODEL_PARAMETER_PANEL,
+  NUM_INPUT_LIMITS,
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 
@@ -289,10 +290,13 @@ const validateComparison = (): boolean => {
 // Validation to check the range of input values
 const validateRange = (): boolean => {
   if (startingAge.value !== null) {
-    if (startingAge.value < 0 || startingAge.value > 500) {
+    if (
+      startingAge.value < NUM_INPUT_LIMITS.STARTING_AGE_MIN ||
+      startingAge.value > NUM_INPUT_LIMITS.STARTING_AGE_MAX
+    ) {
       messageDialogStore.openDialog(
         'Invalid Input!',
-        "'Starting Age' must range from 0 and 500.",
+        `'Starting Age' must range from ${NUM_INPUT_LIMITS.STARTING_AGE_MIN} and ${NUM_INPUT_LIMITS.STARTING_AGE_MAX}`,
         { width: 400 },
       )
       return false
@@ -300,10 +304,13 @@ const validateRange = (): boolean => {
   }
 
   if (finishingAge.value !== null) {
-    if (finishingAge.value < 1 || finishingAge.value > 450) {
+    if (
+      finishingAge.value < NUM_INPUT_LIMITS.FINISHING_AGE_MIN ||
+      finishingAge.value > NUM_INPUT_LIMITS.FINISHING_AGE_MAX
+    ) {
       messageDialogStore.openDialog(
         'Invalid Input!',
-        "'Finishing Age' must range from 1 and 450.",
+        `'Finishing Age' must range from ${NUM_INPUT_LIMITS.FINISHING_AGE_MIN} and ${NUM_INPUT_LIMITS.FINISHING_AGE_MAX}`,
         { width: 400 },
       )
       return false
@@ -311,10 +318,13 @@ const validateRange = (): boolean => {
   }
 
   if (ageIncrement.value !== null) {
-    if (ageIncrement.value < 1 || ageIncrement.value > 350) {
+    if (
+      ageIncrement.value < NUM_INPUT_LIMITS.AGE_INC_MIN ||
+      ageIncrement.value > NUM_INPUT_LIMITS.AGE_INC_MAX
+    ) {
       messageDialogStore.openDialog(
         'Invalid Input!',
-        "'Age Increment' must range from 1 and 350.",
+        `'Age Increment' must range from ${NUM_INPUT_LIMITS.AGE_INC_MIN} and ${NUM_INPUT_LIMITS.AGE_INC_MAX}`,
         { width: 400 },
       )
       return false

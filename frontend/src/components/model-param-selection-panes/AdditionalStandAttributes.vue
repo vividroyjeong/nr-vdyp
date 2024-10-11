@@ -48,7 +48,7 @@
                   <v-text-field
                     label="Lorey Height - 7.5cm+ (meters)"
                     type="text"
-                    v-model="loreyHeight"
+                    v-model.number="loreyHeight"
                     persistent-placeholder
                     :placeholder="loreyHeightPlaceholder"
                     density="compact"
@@ -60,7 +60,7 @@
                 <v-col cols="5">
                   <v-text-field
                     type="text"
-                    v-model="wholeStemVolume75cm"
+                    v-model.number="wholeStemVolume75cm"
                     persistent-placeholder
                     :placeholder="wholeStemVolume75cmPlaceholder"
                     density="compact"
@@ -79,7 +79,7 @@
                 <v-col cols="5">
                   <v-text-field
                     type="text"
-                    v-model="basalArea125cm"
+                    v-model.number="basalArea125cm"
                     persistent-placeholder
                     :placeholder="basalArea125cmPlaceholder"
                     density="compact"
@@ -95,7 +95,7 @@
                 <v-col cols="5">
                   <v-text-field
                     type="text"
-                    v-model="wholeStemVolume125cm"
+                    v-model.number="wholeStemVolume125cm"
                     persistent-placeholder
                     :placeholder="wholeStemVolume125cmPlaceholder"
                     density="compact"
@@ -114,7 +114,7 @@
                 <v-col cols="5">
                   <v-text-field
                     type="text"
-                    v-model="closeUtilVolume"
+                    v-model.number="closeUtilVolume"
                     persistent-placeholder
                     :placeholder="closeUtilVolumePlaceholder"
                     density="compact"
@@ -130,7 +130,7 @@
                 <v-col cols="5">
                   <v-text-field
                     type="text"
-                    v-model="closeUtilNetDecayVolume"
+                    v-model.number="closeUtilNetDecayVolume"
                     persistent-placeholder
                     :placeholder="closeUtilNetDecayVolumePlaceholder"
                     density="compact"
@@ -150,7 +150,7 @@
                 <v-col cols="5">
                   <v-text-field
                     type="text"
-                    v-model="closeUtilNetDecayWasteVolume"
+                    v-model.number="closeUtilNetDecayWasteVolume"
                     persistent-placeholder
                     :placeholder="closeUtilNetDecayWasteVolumePlaceholder"
                     density="compact"
