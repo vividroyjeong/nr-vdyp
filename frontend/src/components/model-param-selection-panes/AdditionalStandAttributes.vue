@@ -47,11 +47,8 @@
                 <v-col cols="5">
                   <v-text-field
                     label="Lorey Height - 7.5cm+ (meters)"
-                    type="number"
+                    type="text"
                     v-model="loreyHeight"
-                    min="0.01"
-                    max="99.90"
-                    step="0.01"
                     persistent-placeholder
                     :placeholder="loreyHeightPlaceholder"
                     density="compact"
@@ -62,11 +59,8 @@
                 <v-col class="col-space-3" />
                 <v-col cols="5">
                   <v-text-field
-                    type="number"
+                    type="text"
                     v-model="wholeStemVolume75cm"
-                    min="0.1"
-                    max="2500.0"
-                    step="0.1"
                     persistent-placeholder
                     :placeholder="wholeStemVolume75cmPlaceholder"
                     density="compact"
@@ -84,11 +78,8 @@
               <v-row>
                 <v-col cols="5">
                   <v-text-field
-                    type="number"
+                    type="text"
                     v-model="basalArea125cm"
-                    min="0.1000"
-                    max="250.0000"
-                    step="0.0001"
                     persistent-placeholder
                     :placeholder="basalArea125cmPlaceholder"
                     density="compact"
@@ -103,11 +94,8 @@
                 <v-col class="col-space-3" />
                 <v-col cols="5">
                   <v-text-field
-                    type="number"
+                    type="text"
                     v-model="wholeStemVolume125cm"
-                    min="0.0"
-                    max="2500.0"
-                    step="0.1"
                     persistent-placeholder
                     :placeholder="wholeStemVolume125cmPlaceholder"
                     density="compact"
@@ -125,11 +113,8 @@
               <v-row>
                 <v-col cols="5">
                   <v-text-field
-                    type="number"
+                    type="text"
                     v-model="closeUtilVolume"
-                    min="0.0"
-                    max="2500.0"
-                    step="0.1"
                     persistent-placeholder
                     :placeholder="closeUtilVolumePlaceholder"
                     density="compact"
@@ -144,11 +129,8 @@
                 <v-col class="col-space-3" />
                 <v-col cols="5">
                   <v-text-field
-                    type="number"
+                    type="text"
                     v-model="closeUtilNetDecayVolume"
-                    min="0.0"
-                    max="2500.0"
-                    step="0.1"
                     persistent-placeholder
                     :placeholder="closeUtilNetDecayVolumePlaceholder"
                     density="compact"
@@ -167,11 +149,8 @@
               <v-row>
                 <v-col cols="5">
                   <v-text-field
-                    type="number"
+                    type="text"
                     v-model="closeUtilNetDecayWasteVolume"
-                    min="0.0"
-                    max="2500.0"
-                    step="0.1"
                     persistent-placeholder
                     :placeholder="closeUtilNetDecayWasteVolumePlaceholder"
                     density="compact"
@@ -229,6 +208,7 @@ import {
   COMPUTED_VALUES,
   NOT_AVAILABLE_INDI,
   MODEL_PARAMETER_PANEL,
+  NUM_INPUT_LIMITS,
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 
@@ -564,7 +544,8 @@ const validateComparison = (): boolean => {
 const validateRange = (): boolean => {
   if (
     loreyHeight.value !== null &&
-    (loreyHeight.value < 0.01 || loreyHeight.value > 99.9)
+    (loreyHeight.value < NUM_INPUT_LIMITS.LOREY_HEIGHT_MIN ||
+      loreyHeight.value > NUM_INPUT_LIMITS.LOREY_HEIGHT_MAX)
   ) {
     messageDialogStore.openDialog(
       'Invalid Input!',
@@ -576,7 +557,8 @@ const validateRange = (): boolean => {
 
   if (
     wholeStemVolume75cm.value !== null &&
-    (wholeStemVolume75cm.value < 0.1 || wholeStemVolume75cm.value > 2500.0)
+    (wholeStemVolume75cm.value < NUM_INPUT_LIMITS.WHOLE_STEM_VOL_75CM_MIN ||
+      wholeStemVolume75cm.value > NUM_INPUT_LIMITS.WHOLE_STEM_VOL_75CM_MAX)
   ) {
     messageDialogStore.openDialog(
       'Invalid Input!',
@@ -588,7 +570,8 @@ const validateRange = (): boolean => {
 
   if (
     basalArea125cm.value !== null &&
-    (basalArea125cm.value < 0.1 || basalArea125cm.value > 250.0)
+    (basalArea125cm.value < NUM_INPUT_LIMITS.BASAL_AREA_125CM_MIN ||
+      basalArea125cm.value > NUM_INPUT_LIMITS.BASAL_AREA_125CM_MAX)
   ) {
     messageDialogStore.openDialog(
       'Invalid Input!',
@@ -600,7 +583,8 @@ const validateRange = (): boolean => {
 
   if (
     wholeStemVolume125cm.value !== null &&
-    (wholeStemVolume125cm.value < 0.0 || wholeStemVolume125cm.value > 2500.0)
+    (wholeStemVolume125cm.value < NUM_INPUT_LIMITS.WHOLE_STEM_VOL_125CM_MIN ||
+      wholeStemVolume125cm.value > NUM_INPUT_LIMITS.WHOLE_STEM_VOL_125CM_MAX)
   ) {
     messageDialogStore.openDialog(
       'Invalid Input!',
@@ -612,7 +596,8 @@ const validateRange = (): boolean => {
 
   if (
     closeUtilVolume.value !== null &&
-    (closeUtilVolume.value < 0.0 || closeUtilVolume.value > 2500.0)
+    (closeUtilVolume.value < NUM_INPUT_LIMITS.CU_VOLUME_MIN ||
+      closeUtilVolume.value > NUM_INPUT_LIMITS.CU_VOLUME_MAX)
   ) {
     messageDialogStore.openDialog(
       'Invalid Input!',
@@ -624,8 +609,8 @@ const validateRange = (): boolean => {
 
   if (
     closeUtilNetDecayVolume.value !== null &&
-    (closeUtilNetDecayVolume.value < 0.0 ||
-      closeUtilNetDecayVolume.value > 2500.0)
+    (closeUtilNetDecayVolume.value < NUM_INPUT_LIMITS.CU_NET_DECAY_VOL_MIN ||
+      closeUtilNetDecayVolume.value > NUM_INPUT_LIMITS.CU_NET_DECAY_VOL_MAX)
   ) {
     messageDialogStore.openDialog(
       'Invalid Input!',
@@ -637,8 +622,10 @@ const validateRange = (): boolean => {
 
   if (
     closeUtilNetDecayWasteVolume.value !== null &&
-    (closeUtilNetDecayWasteVolume.value < 0.0 ||
-      closeUtilNetDecayWasteVolume.value > 2500.0)
+    (closeUtilNetDecayWasteVolume.value <
+      NUM_INPUT_LIMITS.CU_NET_DECAY_WASTE_VOL_MIN ||
+      closeUtilNetDecayWasteVolume.value >
+        NUM_INPUT_LIMITS.CU_NET_DECAY_WASTE_VOL_MAX)
   ) {
     messageDialogStore.openDialog(
       'Invalid Input!',
@@ -652,16 +639,11 @@ const validateRange = (): boolean => {
 }
 
 const onConfirm = () => {
-  const isAllFieldsValid = validateAllFields()
-  const isModificationValid = validateComputedValuesModification()
-  const isComparisonValid = validateComparison()
-  const isRangeValid = validateRange()
-
   if (
-    isAllFieldsValid &&
-    isModificationValid &&
-    isComparisonValid &&
-    isRangeValid
+    validateAllFields() &&
+    validateComputedValuesModification() &&
+    validateComparison() &&
+    validateRange()
   ) {
     form.value?.validate()
     // this panel is not in a confirmed state

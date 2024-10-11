@@ -324,10 +324,7 @@ const validateRange = (): boolean => {
   return true
 }
 const onConfirm = () => {
-  const isComparisonValid = validateComparison()
-  const isRangeValid = validateRange()
-
-  if (isComparisonValid && isRangeValid) {
+  if (validateComparison() && validateRange()) {
     form.value?.validate()
     // this panel is not in a confirmed state
     if (!isConfirmed.value) {

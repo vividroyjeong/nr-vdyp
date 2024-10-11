@@ -397,11 +397,11 @@ const validateRequiredFields = (): boolean => {
 }
 
 const onConfirm = () => {
-  const isDuplicateValid = validateDuplicateSpecies()
-  const isTotalPercentValid = validateTotalSpeciesPercent()
-  const isRequiredFieldsValid = validateRequiredFields()
-
-  if (isDuplicateValid && isTotalPercentValid && isRequiredFieldsValid) {
+  if (
+    validateDuplicateSpecies() &&
+    validateTotalSpeciesPercent() &&
+    validateRequiredFields()
+  ) {
     form.value?.validate()
     // this panel is not in a confirmed state
     if (!isConfirmed.value) {

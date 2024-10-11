@@ -726,10 +726,7 @@ const validateRequiredFields = (): boolean => {
 }
 
 const onConfirm = () => {
-  const isRequiredFieldsValid = validateRequiredFields()
-  const isRangeValid = validateRange()
-
-  if (isRequiredFieldsValid && isRangeValid) {
+  if (validateRequiredFields() && validateRange()) {
     form.value?.validate()
     // this panel is not in a confirmed state
     if (!isConfirmed.value) {
