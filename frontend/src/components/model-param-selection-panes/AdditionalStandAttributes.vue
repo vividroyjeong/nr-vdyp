@@ -388,15 +388,6 @@ const validateFieldPresenceAndValue = (
     return false
   }
 
-  if (Util.isZeroValue(fieldValue)) {
-    messageDialogStore.openDialog(
-      'Invalid Input!',
-      `${fieldName}: must be greater than 0.0`,
-      { width: 450 },
-    )
-    return false
-  }
-
   return true
 }
 
