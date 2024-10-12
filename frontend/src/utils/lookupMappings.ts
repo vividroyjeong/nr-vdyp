@@ -31,7 +31,7 @@ export function isCoastalZone(becZone: string): boolean {
 export function validateBasalAreaLimits(
   species: string,
   isCoastal: boolean,
-  basalArea: number,
+  basalArea: string,
   height: string,
 ): boolean {
   if (!(species in MAP.BA_LIMIT_COEFFICIENTS)) {
@@ -52,10 +52,18 @@ export function validateBasalAreaLimits(
 
   // Ensure these arguments are valid, handle invalid input
   const parsedHeight = parseFloat(height)
+  const parsedBasalArea = parseFloat(basalArea)
 
   if (isNaN(parsedHeight) || parsedHeight <= 0) {
     console.warn(
       `Invalid height value: ${height}. Unable to perform calculation.`,
+    )
+    return true
+  }
+
+  if (isNaN(parsedBasalArea) || parsedBasalArea <= 0) {
+    console.warn(
+      `Invalid basal area value: ${basalArea}. Unable to perform calculation.`,
     )
     return true
   }
@@ -68,7 +76,7 @@ export function validateBasalAreaLimits(
     Math.exp(coeffs.coeff2 / (parseFloat(height) - const2)) * coeffs.coeff1 +
     const1
 
-  return basalArea <= fBALimit
+  return parseFloat(basalArea) <= fBALimit
 }
 
 /**
@@ -88,8 +96,8 @@ export function validateBasalAreaLimits(
  * tph > tphMax: species = AC, coastal, height = 10.0, ba = 5.0, TPH = 4000
  */
 export function validateTreePerHectareLimits(
-  basalArea: number,
-  tph: number,
+  basalArea: string,
+  tph: string,
   height: string,
   species: string,
   coastal: boolean,
@@ -124,10 +132,26 @@ export function validateTreePerHectareLimits(
 
   // Ensure these input arguments are valid, handle invalid input
   const parsedHeight = parseFloat(height)
+  const parsedBasalArea = parseFloat(basalArea)
+  const parsedTph = parseFloat(tph)
 
   if (isNaN(parsedHeight) || parsedHeight <= 0) {
     console.warn(
       `Invalid height value: ${height}. Unable to perform calculation.`,
+    )
+    return null
+  }
+
+  if (isNaN(parsedBasalArea) || parsedBasalArea <= 0) {
+    console.warn(
+      `Invalid basal area value: ${basalArea}. Unable to perform calculation.`,
+    )
+    return null
+  }
+
+  if (isNaN(parsedTph) || parsedTph <= 0) {
+    console.warn(
+      `Invalid trees per hectare value: ${tph}. Unable to perform calculation.`,
     )
     return null
   }
@@ -155,7 +179,7 @@ export function validateTreePerHectareLimits(
     P90.b1 * (parseFloat(height) - const2) ** 2
 
   if (dqMax > 0) {
-    tphMin = basalArea / (const3 * dqMax ** 2)
+    tphMin = parseFloat(basalArea) / (const3 * dqMax ** 2)
   }
 
   // Maximum TPH calculation
@@ -166,7 +190,7 @@ export function validateTreePerHectareLimits(
     P10.b1 * (parseFloat(height) - const2) ** 2
 
   if (dqMin > 0) {
-    tphMax = basalArea / (const3 * dqMin ** 2)
+    tphMax = parseFloat(basalArea) / (const3 * dqMin ** 2)
   }
 
   // Minimum and maximum TPH values not calculated correctly
@@ -175,11 +199,11 @@ export function validateTreePerHectareLimits(
     return null
   }
 
-  if (tph < tphMin) {
+  if (parseFloat(tph) < tphMin) {
     return 'Trees/ha is less than a likely minimum for entered height. Do you wish to proceed?'
   }
 
-  if (tph > tphMax) {
+  if (parseFloat(tph) > tphMax) {
     return 'Trees/ha is above a likely maximum for entered height. Do you wish to proceed?'
   }
 
@@ -191,17 +215,17 @@ export function validateTreePerHectareLimits(
  * Validates the quadratic mean diameter based on the basal area, trees per hectare (TPH), and minimum DBH limit.
  * If the calculated quadratic diameter is less than the required minimum DBH limit, an error message is returned.
  *
- * @param {number} basalArea - The basal area in m²/ha.
- * @param {number} tph - Trees per hectare.
- * @param {string | null} minDBHLimit - The minimum DBH limit in cm, provided as a string.
- * @returns {string | null} - Returns an error message if the quadratic diameter is less than the minimum limit, otherwise null.
+ * @param basalArea - The basal area in m²/ha.
+ * @param tph - Trees per hectare.
+ * @param minDBHLimit - The minimum DBH limit in cm, provided as a string.
+ * @returns - Returns an error message if the quadratic diameter is less than the minimum limit, otherwise null.
  *
  * @example
  * basalArea: 4, tph: 1000, minDBHLimit: 7.5 cm+
  */
 export function validateQuadraticDiameter(
-  basalArea: number,
-  tph: number,
+  basalArea: string,
+  tph: string,
   minDBHLimit: string | null,
 ): string | null {
   if (!minDBHLimit) {
@@ -209,9 +233,26 @@ export function validateQuadraticDiameter(
     return null
   }
 
+  const parsedBasalArea = parseFloat(basalArea)
+  const parsedTph = parseFloat(tph)
+
+  if (isNaN(parsedBasalArea) || parsedBasalArea <= 0) {
+    console.warn(
+      `Invalid basal area value: ${basalArea}. Unable to perform calculation.`,
+    )
+    return null
+  }
+
+  if (isNaN(parsedTph) || parsedTph <= 0) {
+    console.warn(
+      `Invalid trees per hectare value: ${tph}. Unable to perform calculation.`,
+    )
+    return null
+  }
+
   let diam = 0
-  if (tph > 0) {
-    diam = Math.sqrt(basalArea / tph / 0.00007854)
+  if (parseFloat(tph) > 0) {
+    diam = Math.sqrt(parseFloat(basalArea) / parseFloat(tph) / 0.00007854)
   }
 
   if (diam < Util.extractNumeric(minDBHLimit)) {

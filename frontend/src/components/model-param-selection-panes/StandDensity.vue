@@ -26,12 +26,12 @@
                     label="% Stockable Area"
                     type="number"
                     v-model.number="percentStockableArea"
-                    max="100"
-                    min="0"
-                    step="5"
+                    :max="NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_MAX"
+                    :min="NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_MIN"
+                    :step="NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_STEP"
                     placeholder=""
                     persistent-placeholder
-                    hide-details="auto"
+                    hide-details
                     density="compact"
                     dense
                     :disabled="!isConfirmEnabled"
@@ -44,23 +44,53 @@
                 </v-col>
                 <v-col class="col-space-3" />
                 <v-col cols="3">
-                  <v-text-field
-                    type="number"
-                    v-model="basalArea"
-                    min="0.1000"
-                    max="250.0000"
-                    step="2.5"
-                    persistent-placeholder
-                    :placeholder="basalAreaPlaceholder"
-                    density="compact"
-                    dense
-                    :disabled="isBasalAreaDisabled || !isConfirmEnabled"
+                  <div
+                    style="position: relative; width: 100%; margin-top: 10px"
                   >
-                    <template v-slot:label>
-                      Basal Area (m<sup>2</sup>/ha)
-                    </template>
-                  </v-text-field></v-col
-                >
+                    <v-text-field
+                      type="text"
+                      v-model="basalArea"
+                      persistent-placeholder
+                      :placeholder="basalAreaPlaceholder"
+                      hide-details
+                      density="compact"
+                      dense
+                      style="padding-left: 15px"
+                      variant="plain"
+                      :disabled="isBasalAreaDisabled || !isConfirmEnabled"
+                    >
+                      <template v-slot:label>
+                        Basal Area (m<sup>2</sup>/ha)
+                      </template>
+                    </v-text-field>
+                    <!-- spin buttons -->
+                    <div class="spin-box">
+                      <div
+                        class="spin-up-arrow-button"
+                        @mousedown="startIncrementBasalArea"
+                        @mouseup="stopIncrementBasalArea"
+                        @mouseleave="stopIncrementBasalArea"
+                        :class="{
+                          disabled: isBasalAreaDisabled || !isConfirmEnabled,
+                        }"
+                      >
+                        {{ SPIN_BUTTON.UP }}
+                      </div>
+                      <div
+                        class="spin-down-arrow-button"
+                        @mousedown="startDecrementBasalArea"
+                        @mouseup="stopDecrementBasalArea"
+                        @mouseleave="stopDecrementBasalArea"
+                        :class="{
+                          disabled: isBasalAreaDisabled || !isConfirmEnabled,
+                        }"
+                      >
+                        {{ SPIN_BUTTON.DOWN }}
+                      </div>
+                    </div>
+                    <div class="spin-text-field-bottom-line"></div>
+                  </div>
+                </v-col>
                 <v-col cols="5" v-show="Util.isZeroValue(age)">
                   <span style="font-size: 12px"
                     >Density Measurements cannot be supplied without an
@@ -70,20 +100,52 @@
               </v-row>
               <v-row>
                 <v-col cols="3">
-                  <v-text-field
-                    label="Trees per Hectare (tree/ha)"
-                    type="number"
-                    v-model="treesPerHectare"
-                    min="0.10"
-                    max="9999.90"
-                    step="250.00"
-                    persistent-placeholder
-                    :placeholder="tphPlaceholder"
-                    density="compact"
-                    dense
-                    :disabled="isTreesPerHectareDisabled || !isConfirmEnabled"
+                  <div
+                    style="position: relative; width: 100%; margin-top: 10px"
                   >
-                  </v-text-field>
+                    <v-text-field
+                      label="Trees per Hectare (tree/ha)"
+                      type="text"
+                      v-model="treesPerHectare"
+                      persistent-placeholder
+                      :placeholder="tphPlaceholder"
+                      hide-details
+                      density="compact"
+                      dense
+                      style="padding-left: 15px"
+                      variant="plain"
+                      :disabled="isTreesPerHectareDisabled || !isConfirmEnabled"
+                    >
+                    </v-text-field>
+                    <!-- spin buttons -->
+                    <div class="spin-box">
+                      <div
+                        class="spin-up-arrow-button"
+                        @mousedown="startIncrementTPH"
+                        @mouseup="stopIncrementTPH"
+                        @mouseleave="stopIncrementTPH"
+                        :class="{
+                          disabled:
+                            isTreesPerHectareDisabled || !isConfirmEnabled,
+                        }"
+                      >
+                        {{ SPIN_BUTTON.UP }}
+                      </div>
+                      <div
+                        class="spin-down-arrow-button"
+                        @mousedown="startDecrementTPH"
+                        @mouseup="stopDecrementTPH"
+                        @mouseleave="stopDecrementTPH"
+                        :class="{
+                          disabled:
+                            isTreesPerHectareDisabled || !isConfirmEnabled,
+                        }"
+                      >
+                        {{ SPIN_BUTTON.DOWN }}
+                      </div>
+                    </div>
+                    <div class="spin-text-field-bottom-line"></div>
+                  </div>
                 </v-col>
                 <v-col class="col-space-3" />
                 <v-col cols="3">
@@ -108,12 +170,12 @@
                     label="Crown Closure (%)"
                     type="number"
                     v-model.number="percentCrownClosure"
-                    max="100"
-                    min="0"
-                    step="5"
+                    :max="NUM_INPUT_LIMITS.CROWN_CLOSURE_MAX"
+                    :min="NUM_INPUT_LIMITS.CROWN_CLOSURE_MIN"
+                    :step="NUM_INPUT_LIMITS.CROWN_CLOSURE_STEP"
                     persistent-placeholder
                     :placeholder="crownClosurePlaceholder"
-                    hide-details="auto"
+                    hide-details
                     density="compact"
                     dense
                     :disabled="
@@ -190,6 +252,9 @@ import {
   SITE_SPECIES_VALUES,
   NOT_AVAILABLE_INDI,
   MODEL_PARAMETER_PANEL,
+  NUM_INPUT_LIMITS,
+  SPIN_BUTTON,
+  CONTINUOUS_INC_DEC,
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 import {
@@ -237,6 +302,12 @@ const basalAreaPlaceholder = ref('')
 const tphPlaceholder = ref('')
 const crownClosurePlaceholder = ref('')
 
+// Interval references for continuous increment/decrement
+let basalAreaIncrementInterval: number | null = null
+let basalAreaDecrementInterval: number | null = null
+let tphIncrementInterval: number | null = null
+let tphDecrementInterval: number | null = null
+
 const updateBasalAreaState = (isEnabled: boolean, isAgeZero: boolean) => {
   isBasalAreaDisabled.value = !isEnabled || isAgeZero
 
@@ -245,7 +316,7 @@ const updateBasalAreaState = (isEnabled: boolean, isAgeZero: boolean) => {
     basalArea.value = null
   } else {
     basalAreaPlaceholder.value = ''
-    basalArea.value = 10.0
+    basalArea.value = DEFAULT_VALUES.BASAL_AREA
   }
 }
 
@@ -257,7 +328,7 @@ const updateTreesPerHectareState = (isEnabled: boolean, isAgeZero: boolean) => {
     treesPerHectare.value = null
   } else {
     tphPlaceholder.value = ''
-    treesPerHectare.value = 1000.0
+    treesPerHectare.value = DEFAULT_VALUES.TPH
   }
 }
 
@@ -300,6 +371,112 @@ watch(
   },
   { immediate: true },
 )
+
+const incrementBasalArea = () => {
+  const newValue = Util.increaseItemBySpinButton(
+    basalArea.value,
+    NUM_INPUT_LIMITS.BASAL_AREA_MAX,
+    NUM_INPUT_LIMITS.BASAL_AREA_MIN,
+    NUM_INPUT_LIMITS.BASAL_AREA_STEP,
+  )
+  // Format the value to ##0.0000
+  basalArea.value = newValue.toFixed(NUM_INPUT_LIMITS.BASAL_AREA_DECIMAL_NUM)
+}
+
+const decrementBasalArea = () => {
+  let newValue = Util.decrementItemBySpinButton(
+    basalArea.value,
+    NUM_INPUT_LIMITS.BASAL_AREA_MAX,
+    NUM_INPUT_LIMITS.BASAL_AREA_MIN,
+    NUM_INPUT_LIMITS.BASAL_AREA_STEP,
+  )
+  // Format the value to ##0.0000
+  basalArea.value = newValue.toFixed(NUM_INPUT_LIMITS.BASAL_AREA_DECIMAL_NUM)
+}
+
+const incrementTPH = () => {
+  const newValue = Util.increaseItemBySpinButton(
+    treesPerHectare.value,
+    NUM_INPUT_LIMITS.TPH_MAX,
+    NUM_INPUT_LIMITS.TPH_MIN,
+    NUM_INPUT_LIMITS.TPH_STEP,
+  )
+  // Format the value to ###0.00
+  treesPerHectare.value = newValue.toFixed(NUM_INPUT_LIMITS.TPH_DECIMAL_NUM)
+}
+
+const decrementTPH = () => {
+  let newValue = Util.decrementItemBySpinButton(
+    treesPerHectare.value,
+    NUM_INPUT_LIMITS.TPH_MAX,
+    NUM_INPUT_LIMITS.TPH_MIN,
+    NUM_INPUT_LIMITS.TPH_STEP,
+  )
+  // Format the value to ###0.00
+  treesPerHectare.value = newValue.toFixed(NUM_INPUT_LIMITS.TPH_DECIMAL_NUM)
+}
+
+// Methods to handle continuous increment/decrement for Basal Area
+const startIncrementBasalArea = () => {
+  incrementBasalArea()
+  basalAreaIncrementInterval = window.setInterval(
+    incrementBasalArea,
+    CONTINUOUS_INC_DEC.INTERVAL,
+  )
+}
+
+const stopIncrementBasalArea = () => {
+  if (basalAreaIncrementInterval !== null) {
+    clearInterval(basalAreaIncrementInterval)
+    basalAreaIncrementInterval = null
+  }
+}
+
+const startDecrementBasalArea = () => {
+  decrementBasalArea()
+  basalAreaDecrementInterval = window.setInterval(
+    decrementBasalArea,
+    CONTINUOUS_INC_DEC.INTERVAL,
+  )
+}
+
+const stopDecrementBasalArea = () => {
+  if (basalAreaDecrementInterval !== null) {
+    clearInterval(basalAreaDecrementInterval)
+    basalAreaDecrementInterval = null
+  }
+}
+
+// Methods to handle continuous increment/decrement for TPH
+const startIncrementTPH = () => {
+  incrementTPH()
+  tphIncrementInterval = window.setInterval(
+    incrementTPH,
+    CONTINUOUS_INC_DEC.INTERVAL,
+  )
+}
+
+const stopIncrementTPH = () => {
+  if (tphIncrementInterval !== null) {
+    clearInterval(tphIncrementInterval)
+    tphIncrementInterval = null
+  }
+}
+
+const startDecrementTPH = () => {
+  decrementTPH()
+  tphDecrementInterval = window.setInterval(
+    decrementTPH,
+    CONTINUOUS_INC_DEC.INTERVAL,
+  )
+}
+
+const stopDecrementTPH = () => {
+  if (tphDecrementInterval !== null) {
+    clearInterval(tphDecrementInterval)
+    tphDecrementInterval = null
+  }
+}
 
 const clear = () => {
   if (form.value) {

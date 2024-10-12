@@ -179,11 +179,11 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
 
   // stand density
   const percentStockableArea = ref<number | string | null>(null)
-  const basalArea = ref<number | null>(null)
-  const treesPerHectare = ref<number | null>(null)
+  const basalArea = ref<string | null>(null)
+  const treesPerHectare = ref<string | null>(null)
   const minimumDBHLimit = ref<string | null>(null)
+  const currentDiameter = ref<string | null>(null)
   const percentCrownClosure = ref<number | string | null>(null)
-  const currentDiameter = ref<number | null>(null)
 
   // additional stand attributes
   const computedValues = ref<string | null>(null)
