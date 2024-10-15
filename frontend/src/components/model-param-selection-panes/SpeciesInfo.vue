@@ -71,22 +71,45 @@
                         ></v-select>
                       </v-col>
                       <v-col cols="6">
-                        <v-text-field
-                          :label="`Species #${index + 1} Percent`"
-                          type="number"
-                          v-model="item.percent"
-                          max="100"
-                          min="0"
-                          step="5.0"
-                          :rules="[validatePercent]"
-                          persistent-placeholder
-                          placeholder="Select..."
-                          density="compact"
-                          dense
-                          @blur="triggerSpeciesSortByPercent"
-                          @input="handlePercentInput($event, index)"
-                          :disabled="!isConfirmEnabled"
-                        ></v-text-field>
+                        <div style="position: relative; width: 100%">
+                          <v-text-field
+                            :label="`Species #${index + 1} Percent`"
+                            type="text"
+                            v-model="item.percent"
+                            :max="NUM_INPUT_LIMITS.SPECIES_PERCENT_MAX"
+                            :min="NUM_INPUT_LIMITS.SPECIES_PERCENT_MIN"
+                            :step="NUM_INPUT_LIMITS.SPECIES_PERCENT_STEP"
+                            :rules="[validatePercent]"
+                            persistent-placeholder
+                            placeholder="Select..."
+                            density="compact"
+                            dense
+                            @blur="triggerSpeciesSortByPercent"
+                            @input="handlePercentInput($event, index)"
+                            :disabled="!isConfirmEnabled"
+                          ></v-text-field>
+                          <!-- Custom spin buttons -->
+                          <div class="spin-box">
+                            <div
+                              class="spin-up-arrow-button"
+                              @mousedown="startIncrementPercent(index)"
+                              @mouseup="stopIncrementPercent"
+                              @mouseleave="stopIncrementPercent"
+                              :class="{ disabled: !isConfirmEnabled }"
+                            >
+                              {{ SPIN_BUTTON.UP }}
+                            </div>
+                            <div
+                              class="spin-down-arrow-button"
+                              @mousedown="startDecrementPercent(index)"
+                              @mouseup="stopDecrementPercent"
+                              @mouseleave="stopDecrementPercent"
+                              :class="{ disabled: !isConfirmEnabled }"
+                            >
+                              {{ SPIN_BUTTON.DOWN }}
+                            </div>
+                          </div>
+                        </div>
                       </v-col>
                     </v-row>
                     <div class="hr-line mb-1"></div>
@@ -226,13 +249,19 @@
 </template>
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
+import { Util } from '@/utils/util'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
 import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
-
 import { storeToRefs } from 'pinia'
 import { derivedByOptions } from '@/constants/options'
-import { SPECIES_Map } from '@/constants/mappings'
-import { PANEL, MODEL_PARAMETER_PANEL } from '@/constants/constants'
+import { SPECIES_MAP } from '@/constants/mappings'
+import {
+  PANEL,
+  MODEL_PARAMETER_PANEL,
+  NUM_INPUT_LIMITS,
+  CONTINUOUS_INC_DEC,
+  SPIN_BUTTON,
+} from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 
 const form = ref<HTMLFormElement>()
@@ -260,13 +289,17 @@ const isConfirmed = computed(
 )
 
 const computedSpeciesOptions = computed(() =>
-  (Object.keys(SPECIES_Map) as Array<keyof typeof SPECIES_Map>).map((code) => ({
-    label: `${code} - ${SPECIES_Map[code]}`,
+  (Object.keys(SPECIES_MAP) as Array<keyof typeof SPECIES_MAP>).map((code) => ({
+    label: `${code} - ${SPECIES_MAP[code]}`,
     value: code,
   })),
 )
 
 const updateSpeciesGroup = modelParameterStore.updateSpeciesGroup
+
+// Interval references for continuous increment/decrement
+let percentIncrementInterval: number | null = null
+let percentDecrementInterval: number | null = null
 
 watch(
   speciesList,
@@ -275,6 +308,65 @@ watch(
   },
   { deep: true },
 )
+
+const incrementPercent = (index: number) => {
+  const newValue = Util.increaseItemBySpinButton(
+    speciesList.value[index].percent,
+    NUM_INPUT_LIMITS.SPECIES_PERCENT_MAX,
+    NUM_INPUT_LIMITS.SPECIES_PERCENT_MIN,
+    NUM_INPUT_LIMITS.SPECIES_PERCENT_STEP,
+  )
+  speciesList.value[index].percent = newValue.toFixed(
+    NUM_INPUT_LIMITS.SPECIES_PERCENT_DECIMAL_NUM,
+  )
+}
+
+const decrementPercent = (index: number) => {
+  const newValue = Util.decrementItemBySpinButton(
+    speciesList.value[index].percent,
+    NUM_INPUT_LIMITS.SPECIES_PERCENT_MAX,
+    NUM_INPUT_LIMITS.SPECIES_PERCENT_MIN,
+    NUM_INPUT_LIMITS.SPECIES_PERCENT_STEP,
+  )
+  speciesList.value[index].percent = newValue.toFixed(
+    NUM_INPUT_LIMITS.SPECIES_PERCENT_DECIMAL_NUM,
+  )
+
+  if (Util.isEmptyOrZero(newValue)) {
+    speciesList.value[index].species = null
+  }
+}
+
+// Continuous increment/decrement functions
+const startIncrementPercent = (index: number) => {
+  incrementPercent(index)
+  percentIncrementInterval = window.setInterval(
+    () => incrementPercent(index),
+    CONTINUOUS_INC_DEC.INTERVAL,
+  )
+}
+
+const stopIncrementPercent = () => {
+  if (percentIncrementInterval !== null) {
+    clearInterval(percentIncrementInterval)
+    percentIncrementInterval = null
+  }
+}
+
+const startDecrementPercent = (index: number) => {
+  decrementPercent(index)
+  percentDecrementInterval = window.setInterval(
+    () => decrementPercent(index),
+    CONTINUOUS_INC_DEC.INTERVAL,
+  )
+}
+
+const stopDecrementPercent = () => {
+  if (percentDecrementInterval !== null) {
+    clearInterval(percentDecrementInterval)
+    percentDecrementInterval = null
+  }
+}
 
 const validatePercent = (value: any) => {
   if (value === null || value === '') {
@@ -288,9 +380,7 @@ const validatePercent = (value: any) => {
 }
 
 const totalPercentError = computed(() => {
-  return isOverTotalPercent.value
-    ? ['Total Species Percent cannot exceed 100.']
-    : []
+  return isOverTotalPercent.value ? ['Species Percent do not total 100.0%'] : []
 })
 
 const validateTotalPercent = () => {
@@ -304,7 +394,7 @@ const triggerSpeciesSortByPercent = () => {
   speciesList.value.sort((a, b) => {
     if (a.percent === null) return 1
     if (b.percent === null) return -1
-    return b.percent - a.percent
+    return parseFloat(b.percent) - parseFloat(a.percent)
   })
 }
 
@@ -320,11 +410,9 @@ const handlePercentInput = (event: Event, index: number) => {
     }
   }
 
-  const parsedValue = parseFloat(value)
+  speciesList.value[index].percent = value
 
-  speciesList.value[index].percent = parsedValue
-
-  if (parsedValue === 0) {
+  if (Util.isEmptyOrZero(value)) {
     speciesList.value[index].species = null
   }
 }
@@ -360,12 +448,20 @@ const validateDuplicateSpecies = (): boolean => {
   })
 
   if (duplicateSpecies) {
-    messageDialogStore.openDialog(
-      'Data Duplicated!',
-      `Species '${duplicateSpecies}' already specified.`,
-    )
+    const speciesLabel = (
+      Object.keys(SPECIES_MAP) as Array<keyof typeof SPECIES_MAP>
+    ).find((key) => key === duplicateSpecies)
+      ? SPECIES_MAP[duplicateSpecies as keyof typeof SPECIES_MAP]
+      : ''
+
+    const message = speciesLabel
+      ? `Species '${duplicateSpecies} - ${speciesLabel}' already specified.`
+      : `Species '${duplicateSpecies}' already specified.`
+
+    messageDialogStore.openDialog('Data Duplicated!', message)
     return false
   }
+
   return true
 }
 
@@ -376,7 +472,7 @@ const validateTotalSpeciesPercent = (): boolean => {
   ) {
     messageDialogStore.openDialog(
       'Data Incomplete!',
-      'Species percentage must add up to a total of 100% in order to run a valid model.',
+      'Species percentage must add up to a total of 100.0% in order to run a valid model.',
       { width: 400 },
     )
     return false
@@ -431,5 +527,10 @@ const onEdit = () => {
   display: block;
   border-left: 1px dashed rgba(0, 0, 0, 0.12);
   height: 100%;
+}
+
+/* custom spin box and spin button beside text field */
+.spin-box {
+  top: 16px;
 }
 </style>

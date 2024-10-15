@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { PANEL, FLOATING, MODEL_PARAMETER_PANEL } from '@/constants/constants'
+import {
+  PANEL,
+  FLOATING,
+  MODEL_PARAMETER_PANEL,
+  NUM_INPUT_LIMITS,
+} from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 import type { PanelName, PanelState } from '@/types/types'
 
@@ -95,7 +100,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   // species info
   const derivedBy = ref<string | null>(null)
 
-  const speciesList = ref<{ species: string | null; percent: number | null }[]>(
+  const speciesList = ref<{ species: string | null; percent: string | null }[]>(
     [
       { species: null, percent: null },
       { species: null, percent: null },
@@ -125,8 +130,13 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     const totalPercent = speciesList.value.reduce((acc, item) => {
       return acc + (parseFloat(item.percent as any) || 0)
     }, 0)
-    // preserve to the first decimal place and truncate after that
-    return Math.floor(totalPercent * 10) / 10
+
+    // Preserve to the first decimal place and convert to string in '##0.0' format
+    const formattedPercent = (Math.floor(totalPercent * 10) / 10).toFixed(
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_DECIMAL_NUM,
+    )
+
+    return formattedPercent
   })
 
   const totalSpeciesGroupPercent = computed(() => {
@@ -136,7 +146,8 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   })
 
   const isOverTotalPercent = computed(() => {
-    return totalSpeciesPercent.value > 100
+    const numericTotalPercent = parseFloat(totalSpeciesPercent.value) || 0
+    return numericTotalPercent > 100
   })
 
   const updateSpeciesGroup = () => {
@@ -208,12 +219,12 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   const setDefaultValues = () => {
     derivedBy.value = DEFAULT_VALUES.DERIVED_BY
     speciesList.value = [
-      { species: 'PL', percent: 30 },
-      { species: 'AC', percent: 30 },
-      { species: 'H', percent: 30 },
-      { species: 'S', percent: 10 },
-      { species: null, percent: 0 },
-      { species: null, percent: 0 },
+      { species: 'PL', percent: '30.0' },
+      { species: 'AC', percent: '30.0' },
+      { species: 'H', percent: '30.0' },
+      { species: 'S', percent: '10.0' },
+      { species: null, percent: '0.0' },
+      { species: null, percent: '0.0' },
     ]
 
     updateSpeciesGroup()

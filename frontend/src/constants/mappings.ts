@@ -1,5 +1,5 @@
 // Mapping species code and species names
-export const SPECIES_Map = {
+export const SPECIES_MAP = {
   AC: 'Poplar',
   AT: 'Aspen',
   B: 'True Fir',
