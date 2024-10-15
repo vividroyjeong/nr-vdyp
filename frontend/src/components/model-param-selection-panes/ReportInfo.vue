@@ -278,7 +278,7 @@ const validateComparison = (): boolean => {
     if (finishingAge.value < startingAge.value) {
       messageDialogStore.openDialog(
         'Invalid Input!',
-        "'Finish Age' must be at least as great as the 'Start Age'.",
+        "'Finish Age' must be at least as great as the 'Start Age'",
         { width: 400 },
       )
       return false
@@ -333,8 +333,49 @@ const validateRange = (): boolean => {
 
   return true
 }
+
+const validateValues = (): boolean => {
+  if (
+    startingAge.value &&
+    (!Number.isInteger(startingAge.value) || startingAge.value < 0)
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Starting Age' must be a non-negative integer",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    finishingAge.value &&
+    (!Number.isInteger(finishingAge.value) || finishingAge.value < 0)
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Finishing Age' must be a non-negative integer",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    ageIncrement.value &&
+    (!Number.isInteger(ageIncrement.value) || ageIncrement.value < 0)
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Age Increment' must be a non-negative integer",
+      { width: 400 },
+    )
+    return false
+  }
+
+  return true
+}
+
 const onConfirm = () => {
-  if (validateComparison() && validateRange()) {
+  if (validateComparison() && validateRange() && validateValues()) {
     form.value?.validate()
     // this panel is not in a confirmed state
     if (!isConfirmed.value) {

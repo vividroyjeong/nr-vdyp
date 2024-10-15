@@ -37,7 +37,7 @@
                     :disabled="!isConfirmEnabled"
                   ></v-text-field>
                   <v-label
-                    v-show="Util.isEmptyOrZero(percentStockableArea)"
+                    v-show="Util.isZeroValue(percentStockableArea)"
                     style="font-size: 12px"
                     >A default will be computed when the model is run.</v-label
                   >
@@ -184,7 +184,7 @@
                   ></v-text-field>
                   <v-label
                     v-show="
-                      Util.isEmptyOrZero(percentCrownClosure) &&
+                      Util.isZeroValue(percentCrownClosure) &&
                       !isPercentCrownClosureDisabled
                     "
                     style="font-size: 12px"
@@ -335,16 +335,16 @@ const updateTreesPerHectareState = (isEnabled: boolean, isAgeZero: boolean) => {
 const updateCrownClosureState = (
   isVolume: boolean,
   isComputed: boolean,
-  isAgeEmptyOrZero: boolean,
+  isAgeZero: boolean,
 ) => {
-  isPercentCrownClosureDisabled.value =
-    !(isVolume && isComputed) || isAgeEmptyOrZero
+  isPercentCrownClosureDisabled.value = !(isVolume && isComputed) || isAgeZero
 
   if (isPercentCrownClosureDisabled.value) {
     crownClosurePlaceholder.value = NOT_AVAILABLE_INDI.NA
     percentCrownClosure.value = null
   } else {
     crownClosurePlaceholder.value = ''
+    percentCrownClosure.value = 0
   }
 }
 
@@ -356,12 +356,12 @@ const updateStates = (
   const isVolume = newDerivedBy === DERIVED_BY.VOLUME
   const isBasalArea = newDerivedBy === DERIVED_BY.BASAL_AREA
   const isComputed = newSiteSpeciesValues === SITE_SPECIES_VALUES.COMPUTED
-  const isAgeEmptyOrZero = Util.isEmptyOrZero(newAge)
+  const isAgeZero = Util.isZeroValue(newAge)
 
   // Update states using individual functions
-  updateBasalAreaState(isBasalArea && isComputed, isAgeEmptyOrZero)
-  updateTreesPerHectareState(isBasalArea && isComputed, isAgeEmptyOrZero)
-  updateCrownClosureState(isVolume, isComputed, isAgeEmptyOrZero)
+  updateBasalAreaState(isBasalArea && isComputed, isAgeZero)
+  updateTreesPerHectareState(isBasalArea && isComputed, isAgeZero)
+  updateCrownClosureState(isVolume, isComputed, isAgeZero)
 }
 
 watch(
@@ -486,13 +486,60 @@ const clear = () => {
   percentCrownClosure.value = DEFAULT_VALUES.PERCENT_CROWN_CLOSURE
 }
 
-// Validation to check the range of input values
+const validateValues = (): boolean => {
+  if (
+    percentStockableArea.value &&
+    (!Number.isInteger(percentStockableArea.value) ||
+      percentStockableArea.value < 0)
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'% Stockable Area' must be a non-negative integer",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    percentCrownClosure.value &&
+    (!Number.isInteger(percentCrownClosure.value) ||
+      percentCrownClosure.value < 0)
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Crown Closure' must be a non-negative integer",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (basalArea.value && !/^\d+(\.\d{4})?$/.test(basalArea.value)) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Basal Area' must be in the format ##0.0000",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (treesPerHectare.value && !/^\d+(\.\d{2})?$/.test(treesPerHectare.value)) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Trees per Hectare' must be in the format ####0.00",
+      { width: 400 },
+    )
+    return false
+  }
+
+  return true
+}
+
 const validateRange = (): boolean => {
   const psa = Util.toNumber(percentStockableArea.value)
   if (psa && (psa < 0 || psa > 100)) {
     messageDialogStore.openDialog(
       'Invalid Input!',
-      "'Percent Stockable Area' must range from 0 and 100.",
+      "'Percent Stockable Area' must range from 0 and 100",
       { width: 400 },
     )
     return false
@@ -502,7 +549,7 @@ const validateRange = (): boolean => {
   if (ba && (ba < 0.1 || ba > 250.0)) {
     messageDialogStore.openDialog(
       'Invalid Input!',
-      "'Basal Area' must range from 0.1000 and 250.0000.",
+      "'Basal Area' must range from 0.1000 and 250.0000",
       { width: 400 },
     )
     return false
@@ -512,7 +559,7 @@ const validateRange = (): boolean => {
   if (tph && (tph < 0.1 || tph > 9999.9)) {
     messageDialogStore.openDialog(
       'Invalid Input!',
-      "'Trees per Hectare' must range from 0.10 and 9999.90.",
+      "'Trees per Hectare' must range from 0.10 and 9999.90",
       { width: 400 },
     )
     return false
@@ -522,7 +569,7 @@ const validateRange = (): boolean => {
   if (pcc && (pcc < 0 || pcc > 100)) {
     messageDialogStore.openDialog(
       'Invalid Input!',
-      "'Crown Closure' must range from 0 and 100.",
+      "'Crown Closure' must range from 0 and 100",
       { width: 400 },
     )
     return false
@@ -583,7 +630,7 @@ function validateQuadDiameter(): string | null {
 }
 
 async function validateFormInputs(): Promise<boolean> {
-  if (!validateRange()) {
+  if (!validateRange() || !validateValues()) {
     return false
   }
 

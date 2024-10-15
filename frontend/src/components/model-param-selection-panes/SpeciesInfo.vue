@@ -455,8 +455,8 @@ const validateDuplicateSpecies = (): boolean => {
       : ''
 
     const message = speciesLabel
-      ? `Species '${duplicateSpecies} - ${speciesLabel}' already specified.`
-      : `Species '${duplicateSpecies}' already specified.`
+      ? `Species '${duplicateSpecies} - ${speciesLabel}' already specified`
+      : `Species '${duplicateSpecies}' already specified`
 
     messageDialogStore.openDialog('Data Duplicated!', message)
     return false
@@ -472,7 +472,7 @@ const validateTotalSpeciesPercent = (): boolean => {
   ) {
     messageDialogStore.openDialog(
       'Data Incomplete!',
-      'Species percentage must add up to a total of 100.0% in order to run a valid model.',
+      'Species percentage must add up to a total of 100.0% in order to run a valid model',
       { width: 400 },
     )
     return false

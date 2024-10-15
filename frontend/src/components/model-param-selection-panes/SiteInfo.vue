@@ -657,7 +657,37 @@ const clear = () => {
   )
 }
 
-// Validation to check the range of input values
+const validateValues = (): boolean => {
+  if (age.value && (!Number.isInteger(age.value) || age.value < 0)) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Age' must be a non-negative integer",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (height.value && !/^\d+(\.\d{2})?$/.test(height.value)) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Height' must be in the format ##0.00",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (bha50SiteIndex.value && !/^\d+(\.\d{2})?$/.test(bha50SiteIndex.value)) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'BHA 50 Site Index' must be in the format ##0.00",
+      { width: 400 },
+    )
+    return false
+  }
+
+  return true
+}
+
 const validateRange = (): boolean => {
   if (age.value !== null) {
     if (age.value < 0 || age.value > 500) {
@@ -706,7 +736,7 @@ const validateRequiredFields = (): boolean => {
     ) {
       messageDialogStore.openDialog(
         'Missing Information',
-        `The species '${selectedSiteSpecies.value}' must have Age/Height/BHA 50 Site Index values supplied.`,
+        `The species '${selectedSiteSpecies.value}' must have Age/Height/BHA 50 Site Index values supplied`,
         { width: 400 },
       )
       return false
@@ -715,7 +745,7 @@ const validateRequiredFields = (): boolean => {
     if (Util.isEmptyOrZero(bha50SiteIndex.value)) {
       messageDialogStore.openDialog(
         'Missing Information',
-        `The species '${selectedSiteSpecies.value}' must have an BHA 50 Site Index value supplied.`,
+        `The species '${selectedSiteSpecies.value}' must have an BHA 50 Site Index value supplied`,
         { width: 400 },
       )
       return false
@@ -726,7 +756,7 @@ const validateRequiredFields = (): boolean => {
 }
 
 const onConfirm = () => {
-  if (validateRequiredFields() && validateRange()) {
+  if (validateRequiredFields() && validateRange() && validateValues()) {
     form.value?.validate()
     // this panel is not in a confirmed state
     if (!isConfirmed.value) {

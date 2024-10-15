@@ -189,22 +189,22 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   const floating = ref<string | null>(null)
 
   // stand density
-  const percentStockableArea = ref<number | string | null>(null)
+  const percentStockableArea = ref<number | null>(null)
   const basalArea = ref<string | null>(null)
   const treesPerHectare = ref<string | null>(null)
   const minimumDBHLimit = ref<string | null>(null)
   const currentDiameter = ref<string | null>(null)
-  const percentCrownClosure = ref<number | string | null>(null)
+  const percentCrownClosure = ref<number | null>(null)
 
   // additional stand attributes
   const computedValues = ref<string | null>(null)
-  const loreyHeight = ref<number | null>(null)
-  const basalArea125cm = ref<number | null>(null)
-  const closeUtilVolume = ref<number | null>(null)
-  const closeUtilNetDecayWasteVolume = ref<number | null>(null)
-  const wholeStemVolume75cm = ref<number | null>(null)
-  const wholeStemVolume125cm = ref<number | null>(null)
-  const closeUtilNetDecayVolume = ref<number | null>(null)
+  const loreyHeight = ref<string | null>(null)
+  const basalArea125cm = ref<string | null>(null)
+  const closeUtilVolume = ref<string | null>(null)
+  const closeUtilNetDecayWasteVolume = ref<string | null>(null)
+  const wholeStemVolume75cm = ref<string | null>(null)
+  const wholeStemVolume125cm = ref<string | null>(null)
+  const closeUtilNetDecayVolume = ref<string | null>(null)
 
   // report info
   const startingAge = ref<number | null>(null)

@@ -258,13 +258,13 @@ const closeUtilVolumePlaceholder = ref('')
 const closeUtilNetDecayVolumePlaceholder = ref('')
 const closeUtilNetDecayWasteVolumePlaceholder = ref('')
 
-const loreyHeightOriginal = ref<number | null>(null)
-const wholeStemVolume75cmOriginal = ref<number | null>(null)
-const basalArea125cmOriginal = ref<number | null>(null)
-const wholeStemVolume125cmOriginal = ref<number | null>(null)
-const closeUtilVolumeOriginal = ref<number | null>(null)
-const closeUtilNetDecayVolumeOriginal = ref<number | null>(null)
-const closeUtilNetDecayWasteVolumeOriginal = ref<number | null>(null)
+const loreyHeightOriginal = ref<string | null>(null)
+const wholeStemVolume75cmOriginal = ref<string | null>(null)
+const basalArea125cmOriginal = ref<string | null>(null)
+const wholeStemVolume125cmOriginal = ref<string | null>(null)
+const closeUtilVolumeOriginal = ref<string | null>(null)
+const closeUtilNetDecayVolumeOriginal = ref<string | null>(null)
+const closeUtilNetDecayWasteVolumeOriginal = ref<string | null>(null)
 
 const updateComputedValuesState = (
   newDerivedBy: string | null,
@@ -376,7 +376,7 @@ const clear = () => {
 }
 
 const validateFieldPresenceAndValue = (
-  fieldValue: number | null,
+  fieldValue: string | null,
   fieldName: string,
 ): boolean => {
   if (Util.isBlank(fieldValue)) {
@@ -452,7 +452,7 @@ const validateComputedValuesModification = (): boolean => {
     if (!hasModification) {
       messageDialogStore.openDialog(
         'No Modifications!',
-        "At least one of the starting values must have been modified from the original computed values.\n\n Please modify at least one starting value or switch to 'Computed Values' mode.",
+        "At least one of the starting values must have been modified from the original computed values.\n\n Please modify at least one starting value or switch to 'Computed Values' mode",
         { width: 400 },
       )
       return false
@@ -461,12 +461,11 @@ const validateComputedValuesModification = (): boolean => {
   return true
 }
 
-// Validation by comparing entered values
 const validateComparison = (): boolean => {
   if (
     basalArea125cm.value !== null &&
     basalArea.value !== null &&
-    basalArea125cm.value > basalArea.value
+    parseFloat(basalArea125cm.value) > parseFloat(basalArea.value)
   ) {
     messageDialogStore.openDialog(
       'Invalid Input!',
@@ -535,8 +534,8 @@ const validateComparison = (): boolean => {
 const validateRange = (): boolean => {
   if (
     loreyHeight.value !== null &&
-    (loreyHeight.value < NUM_INPUT_LIMITS.LOREY_HEIGHT_MIN ||
-      loreyHeight.value > NUM_INPUT_LIMITS.LOREY_HEIGHT_MAX)
+    (parseFloat(loreyHeight.value) < NUM_INPUT_LIMITS.LOREY_HEIGHT_MIN ||
+      parseFloat(loreyHeight.value) > NUM_INPUT_LIMITS.LOREY_HEIGHT_MAX)
   ) {
     messageDialogStore.openDialog(
       'Invalid Input!',
@@ -548,8 +547,10 @@ const validateRange = (): boolean => {
 
   if (
     wholeStemVolume75cm.value !== null &&
-    (wholeStemVolume75cm.value < NUM_INPUT_LIMITS.WHOLE_STEM_VOL_75CM_MIN ||
-      wholeStemVolume75cm.value > NUM_INPUT_LIMITS.WHOLE_STEM_VOL_75CM_MAX)
+    (parseFloat(wholeStemVolume75cm.value) <
+      NUM_INPUT_LIMITS.WHOLE_STEM_VOL_75CM_MIN ||
+      parseFloat(wholeStemVolume75cm.value) >
+        NUM_INPUT_LIMITS.WHOLE_STEM_VOL_75CM_MAX)
   ) {
     messageDialogStore.openDialog(
       'Invalid Input!',
@@ -561,8 +562,8 @@ const validateRange = (): boolean => {
 
   if (
     basalArea125cm.value !== null &&
-    (basalArea125cm.value < NUM_INPUT_LIMITS.BASAL_AREA_125CM_MIN ||
-      basalArea125cm.value > NUM_INPUT_LIMITS.BASAL_AREA_125CM_MAX)
+    (parseFloat(basalArea125cm.value) < NUM_INPUT_LIMITS.BASAL_AREA_125CM_MIN ||
+      parseFloat(basalArea125cm.value) > NUM_INPUT_LIMITS.BASAL_AREA_125CM_MAX)
   ) {
     messageDialogStore.openDialog(
       'Invalid Input!',
@@ -574,8 +575,10 @@ const validateRange = (): boolean => {
 
   if (
     wholeStemVolume125cm.value !== null &&
-    (wholeStemVolume125cm.value < NUM_INPUT_LIMITS.WHOLE_STEM_VOL_125CM_MIN ||
-      wholeStemVolume125cm.value > NUM_INPUT_LIMITS.WHOLE_STEM_VOL_125CM_MAX)
+    (parseFloat(wholeStemVolume125cm.value) <
+      NUM_INPUT_LIMITS.WHOLE_STEM_VOL_125CM_MIN ||
+      parseFloat(wholeStemVolume125cm.value) >
+        NUM_INPUT_LIMITS.WHOLE_STEM_VOL_125CM_MAX)
   ) {
     messageDialogStore.openDialog(
       'Invalid Input!',
@@ -587,8 +590,8 @@ const validateRange = (): boolean => {
 
   if (
     closeUtilVolume.value !== null &&
-    (closeUtilVolume.value < NUM_INPUT_LIMITS.CU_VOLUME_MIN ||
-      closeUtilVolume.value > NUM_INPUT_LIMITS.CU_VOLUME_MAX)
+    (parseFloat(closeUtilVolume.value) < NUM_INPUT_LIMITS.CU_VOLUME_MIN ||
+      parseFloat(closeUtilVolume.value) > NUM_INPUT_LIMITS.CU_VOLUME_MAX)
   ) {
     messageDialogStore.openDialog(
       'Invalid Input!',
@@ -600,8 +603,10 @@ const validateRange = (): boolean => {
 
   if (
     closeUtilNetDecayVolume.value !== null &&
-    (closeUtilNetDecayVolume.value < NUM_INPUT_LIMITS.CU_NET_DECAY_VOL_MIN ||
-      closeUtilNetDecayVolume.value > NUM_INPUT_LIMITS.CU_NET_DECAY_VOL_MAX)
+    (parseFloat(closeUtilNetDecayVolume.value) <
+      NUM_INPUT_LIMITS.CU_NET_DECAY_VOL_MIN ||
+      parseFloat(closeUtilNetDecayVolume.value) >
+        NUM_INPUT_LIMITS.CU_NET_DECAY_VOL_MAX)
   ) {
     messageDialogStore.openDialog(
       'Invalid Input!',
@@ -613,9 +618,9 @@ const validateRange = (): boolean => {
 
   if (
     closeUtilNetDecayWasteVolume.value !== null &&
-    (closeUtilNetDecayWasteVolume.value <
+    (parseFloat(closeUtilNetDecayWasteVolume.value) <
       NUM_INPUT_LIMITS.CU_NET_DECAY_WASTE_VOL_MIN ||
-      closeUtilNetDecayWasteVolume.value >
+      parseFloat(closeUtilNetDecayWasteVolume.value) >
         NUM_INPUT_LIMITS.CU_NET_DECAY_WASTE_VOL_MAX)
   ) {
     messageDialogStore.openDialog(
@@ -629,12 +634,104 @@ const validateRange = (): boolean => {
   return true
 }
 
+const validateValues = (): boolean => {
+  if (loreyHeight.value && !/^\d+(\.\d{2})?$/.test(loreyHeight.value)) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Lorey Height - 7.5cm+' must be in the format ##0.00",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    wholeStemVolume75cm.value &&
+    !/^\d+(\.\d)?$/.test(wholeStemVolume75cm.value)
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Whole Stem Volume - 7.5cm+' must be in the format ####0.0",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (basalArea125cm.value && !/^\d+(\.\d{4})?$/.test(basalArea125cm.value)) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Basal Area - 12.5cm+' must be in the format ##0.0000",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    wholeStemVolume125cm.value &&
+    !/^\d+(\.\d)?$/.test(wholeStemVolume125cm.value)
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Whole Stem Volume - 12.5cm+' must be in the format ###0.0",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (closeUtilVolume.value && !/^\d+(\.\d)?$/.test(closeUtilVolume.value)) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Close Utilization Volume - 12.5cm+' must be in the format ###0.0",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    closeUtilNetDecayVolume.value &&
+    !/^\d+(\.\d)?$/.test(closeUtilNetDecayVolume.value)
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Close Utilization Net Decay Volume - 12.5cm+' must be in the format ###0.0",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    closeUtilNetDecayVolume.value &&
+    !/^\d+(\.\d)?$/.test(closeUtilNetDecayVolume.value)
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Close Utilization Net Decay Volume - 12.5cm+' must be in the format ###0.0",
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    closeUtilNetDecayWasteVolume.value &&
+    !/^\d+(\.\d)?$/.test(closeUtilNetDecayWasteVolume.value)
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Close Utilization Net Decay Waste Volume - 12.5cm+' must be in the format ###0.0",
+      { width: 400 },
+    )
+    return false
+  }
+
+  return true
+}
+
 const onConfirm = () => {
   if (
     validateAllFields() &&
     validateComputedValuesModification() &&
     validateComparison() &&
-    validateRange()
+    validateRange() &&
+    validateValues()
   ) {
     form.value?.validate()
     // this panel is not in a confirmed state
