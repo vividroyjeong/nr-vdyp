@@ -690,7 +690,10 @@ const validateValues = (): boolean => {
 
 const validateRange = (): boolean => {
   if (age.value !== null) {
-    if (age.value < 0 || age.value > 500) {
+    if (
+      age.value < NUM_INPUT_LIMITS.AGE_MIN ||
+      age.value > NUM_INPUT_LIMITS.AGE_MAX
+    ) {
       messageDialogStore.openDialog(
         'Invalid Input!',
         "'Stand Age' must range from 0 and 500",
@@ -702,7 +705,11 @@ const validateRange = (): boolean => {
 
   if (height.value !== null) {
     const numericHeight = parseFloat(height.value)
-    if (isNaN(numericHeight) || numericHeight < 0 || numericHeight > 99.9) {
+    if (
+      isNaN(numericHeight) ||
+      numericHeight < NUM_INPUT_LIMITS.HEIGHT_MIN ||
+      numericHeight > NUM_INPUT_LIMITS.HEIGHT_MAX
+    ) {
       messageDialogStore.openDialog(
         'Invalid Input!',
         "'Stand Height' must range from 0.00 and 99.90",
@@ -714,7 +721,11 @@ const validateRange = (): boolean => {
 
   if (height.value !== null) {
     const numericHeight = parseFloat(height.value)
-    if (isNaN(numericHeight) || numericHeight < 0 || numericHeight > 60) {
+    if (
+      isNaN(numericHeight) ||
+      numericHeight < NUM_INPUT_LIMITS.BHA50_SITE_INDEX_MIN ||
+      numericHeight > NUM_INPUT_LIMITS.BHA50_SITE_INDEX_MAX
+    ) {
       messageDialogStore.openDialog(
         'Invalid Input!',
         "'Site Index' must range from 0.00 and 60.00",

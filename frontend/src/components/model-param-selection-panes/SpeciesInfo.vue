@@ -373,8 +373,11 @@ const validatePercent = (value: any) => {
     return true
   }
   const numValue = Math.floor(parseFloat(value) * 10) / 10 // validate to the first decimal place only
-  if (numValue < 0 || numValue > 100) {
-    return 'Please enter a value between 0 and 100'
+  if (
+    numValue < NUM_INPUT_LIMITS.SPECIES_PERCENT_MIN ||
+    numValue > NUM_INPUT_LIMITS.SPECIES_PERCENT_MAX
+  ) {
+    return `Please enter a value between ${NUM_INPUT_LIMITS.SPECIES_PERCENT_MIN} and ${NUM_INPUT_LIMITS.SPECIES_PERCENT_MAX}`
   }
   return true
 }
@@ -467,7 +470,7 @@ const validateDuplicateSpecies = (): boolean => {
 
 const validateTotalSpeciesPercent = (): boolean => {
   if (
-    totalSpeciesGroupPercent.value !== 100 &&
+    totalSpeciesGroupPercent.value !== NUM_INPUT_LIMITS.TOTAL_SPECIES_PERCENT &&
     highestPercentSpecies !== null
   ) {
     messageDialogStore.openDialog(

@@ -147,7 +147,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
 
   const isOverTotalPercent = computed(() => {
     const numericTotalPercent = parseFloat(totalSpeciesPercent.value) || 0
-    return numericTotalPercent > 100
+    return numericTotalPercent > NUM_INPUT_LIMITS.TOTAL_SPECIES_PERCENT
   })
 
   const updateSpeciesGroup = () => {

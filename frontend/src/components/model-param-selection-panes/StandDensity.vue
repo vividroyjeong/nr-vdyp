@@ -536,7 +536,11 @@ const validateValues = (): boolean => {
 
 const validateRange = (): boolean => {
   const psa = Util.toNumber(percentStockableArea.value)
-  if (psa && (psa < 0 || psa > 100)) {
+  if (
+    psa &&
+    (psa < NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_MIN ||
+      psa > NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_MAX)
+  ) {
     messageDialogStore.openDialog(
       'Invalid Input!',
       "'Percent Stockable Area' must range from 0 and 100",
@@ -546,7 +550,11 @@ const validateRange = (): boolean => {
   }
 
   const ba = Util.toNumber(basalArea.value)
-  if (ba && (ba < 0.1 || ba > 250.0)) {
+  if (
+    ba &&
+    (ba < NUM_INPUT_LIMITS.BASAL_AREA_MIN ||
+      ba > NUM_INPUT_LIMITS.BASAL_AREA_MAX)
+  ) {
     messageDialogStore.openDialog(
       'Invalid Input!',
       "'Basal Area' must range from 0.1000 and 250.0000",
@@ -556,7 +564,10 @@ const validateRange = (): boolean => {
   }
 
   const tph = Util.toNumber(treesPerHectare.value)
-  if (tph && (tph < 0.1 || tph > 9999.9)) {
+  if (
+    tph &&
+    (tph < NUM_INPUT_LIMITS.TPH_MIN || tph > NUM_INPUT_LIMITS.TPH_MAX)
+  ) {
     messageDialogStore.openDialog(
       'Invalid Input!',
       "'Trees per Hectare' must range from 0.10 and 9999.90",
@@ -566,7 +577,11 @@ const validateRange = (): boolean => {
   }
 
   const pcc = Util.toNumber(percentCrownClosure.value)
-  if (pcc && (pcc < 0 || pcc > 100)) {
+  if (
+    pcc &&
+    (pcc < NUM_INPUT_LIMITS.CROWN_CLOSURE_MIN ||
+      pcc > NUM_INPUT_LIMITS.CROWN_CLOSURE_MAX)
+  ) {
     messageDialogStore.openDialog(
       'Invalid Input!',
       "'Crown Closure' must range from 0 and 100",
