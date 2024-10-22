@@ -9,8 +9,8 @@ interface MessageState {
   timeoutId: number | null
 }
 
-export const useMessageStore = defineStore({
-  id: 'messageStore',
+export const useSnackbarStore = defineStore({
+  id: 'snackbarStore',
   state: (): MessageState => ({
     isShow: false,
     message: '',

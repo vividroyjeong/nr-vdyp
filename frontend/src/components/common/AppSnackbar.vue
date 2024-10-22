@@ -24,16 +24,16 @@
 </template>
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { useMessageStore } from '@/stores/common/messageStore'
+import { useSnackbarStore } from '@/stores/common/snackbarStore'
 import type { MessageType } from '@/types/types'
 import { SNACKBAR } from '@/constants/constants'
 
-const messageStore = useMessageStore()
+const snackbarStore = useSnackbarStore()
 
-const { isShow, message, type } = storeToRefs(messageStore)
+const { isShow, message, type } = storeToRefs(snackbarStore)
 
 const closeMessage = () => {
-  messageStore.resetMessage()
+  snackbarStore.resetMessage()
 }
 
 const getIcon = (type: MessageType) => {
