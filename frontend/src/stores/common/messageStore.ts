@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
 import type { MessageType } from '@/types/types'
+import { SNACKBAR } from '@/constants/constants'
 
 interface MessageState {
   isShow: boolean
   message: string
   type: MessageType
+  timeoutId: number | null
 }
 
 export const useMessageStore = defineStore({
@@ -13,34 +15,39 @@ export const useMessageStore = defineStore({
     isShow: false,
     message: '',
     type: '',
+    timeoutId: null,
   }),
   getters: {},
   actions: {
-    showMessage(message: string) {
-      this.isShow = true
-      this.message = message
-      this.type = ''
+    resetMessage() {
+      this.isShow = false
+      if (this.timeoutId) {
+        clearTimeout(this.timeoutId)
+        this.timeoutId = null
+      }
     },
-
-    showErrorMessage(message: string) {
-      this.isShow = true
+    showMessage(message: string, type: MessageType = '') {
+      this.resetMessage()
       this.message = message
-      this.type = 'error'
+      this.type = type
+      this.isShow = true
+
+      // Automatically close messages after SNACKBAR.SHOW_TIME
+      this.timeoutId = setTimeout(() => {
+        this.isShow = false
+      }, SNACKBAR.SHOW_TIME) as unknown as number
     },
     showSuccessMessage(message: string) {
-      this.isShow = true
-      this.message = message
-      this.type = 'success'
+      this.showMessage(message, 'success')
+    },
+    showErrorMessage(message: string) {
+      this.showMessage(message, 'error')
     },
     showInfoMessage(message: string) {
-      this.isShow = true
-      this.message = message
-      this.type = 'info'
+      this.showMessage(message, 'info')
     },
     showWarningMessage(message: string) {
-      this.isShow = true
-      this.message = message
-      this.type = 'warning'
+      this.showMessage(message, 'warning')
     },
   },
 })
