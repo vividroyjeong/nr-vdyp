@@ -1,17 +1,11 @@
 import { defineStore } from 'pinia'
-import type { MessageType } from '@/types/types'
+import type { SnackbarType } from '@/types/types'
 import { SNACKBAR } from '@/constants/constants'
-
-interface MessageState {
-  isShow: boolean
-  message: string
-  type: MessageType
-  timeoutId: number | null
-}
+import type { SnackbarState } from '@/interfaces/interfaces'
 
 export const useSnackbarStore = defineStore({
   id: 'snackbarStore',
-  state: (): MessageState => ({
+  state: (): SnackbarState => ({
     isShow: false,
     message: '',
     type: '',
@@ -26,7 +20,7 @@ export const useSnackbarStore = defineStore({
         this.timeoutId = null
       }
     },
-    showMessage(message: string, type: MessageType = '') {
+    showMessage(message: string, type: SnackbarType = '') {
       this.resetMessage()
       this.message = message
       this.type = type

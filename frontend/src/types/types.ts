@@ -1,6 +1,8 @@
-import { PANEL, MODEL_PARAMETER_PANEL } from '@/constants/constants'
+import { PANEL, MODEL_PARAMETER_PANEL, SORT_ORDER } from '@/constants/constants'
 
-export type MessageType = '' | 'info' | 'success' | 'error' | 'warning'
+// Define a type for snackbar message
+export type SnackbarType = '' | 'info' | 'success' | 'error' | 'warning'
+
 // Define a type for the panel names
 export type PanelName =
   | typeof MODEL_PARAMETER_PANEL.SPECIES_INFO
@@ -11,3 +13,6 @@ export type PanelName =
 
 // Define a type for panel open states
 export type PanelState = typeof PANEL.OPEN | typeof PANEL.CLOSE
+
+// Define a type for sort order lowercase letters
+export type SortOrder = Lowercase<(typeof SORT_ORDER)[keyof typeof SORT_ORDER]>

@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { useSnackbarStore } from '@/stores/common/snackbarStore'
-import type { MessageType } from '@/types/types'
+import type { SnackbarType } from '@/types/types'
 import { SNACKBAR } from '@/constants/constants'
 
 const snackbarStore = useSnackbarStore()
@@ -36,8 +36,8 @@ const closeMessage = () => {
   snackbarStore.resetMessage()
 }
 
-const getIcon = (type: MessageType) => {
-  const icon: { [key in MessageType]: string } = {
+const getIcon = (type: SnackbarType) => {
+  const icon: { [key in SnackbarType]: string } = {
     '': '',
     info: 'mdi-information',
     success: 'mdi-check-circle',

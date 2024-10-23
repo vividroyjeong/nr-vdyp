@@ -138,7 +138,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import AppDateRangePicker from '@/components/common/AppDateRangePicker.vue'
-import type TableOptions from '@/interfaces/TableOptions'
+import type { TableOptions } from '@/interfaces/interfaces'
 import { SORT_ORDER } from '@/constants/constants'
 import { Util } from '@/utils/util'
 import { useRouter } from 'vue-router'
