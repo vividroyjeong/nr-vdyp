@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
 import type { MessageType } from '@/types/types'
-import { SNACKBAR, MESSAGE_TYPE } from '@/constants/constants'
-import type { SnackbarState } from '@/interfaces/interfaces'
+import { NOTIFICATION, MESSAGE_TYPE } from '@/constants/constants'
+import type { NotificationState } from '@/interfaces/interfaces'
 
-export const useSnackbarStore = defineStore({
-  id: 'snackbarStore',
-  state: (): SnackbarState => ({
+export const useNotificationStore = defineStore({
+  id: 'notificationStore',
+  state: (): NotificationState => ({
     isShow: false,
     message: '',
     type: '',
@@ -26,10 +26,10 @@ export const useSnackbarStore = defineStore({
       this.type = type
       this.isShow = true
 
-      // Automatically close messages after SNACKBAR.SHOW_TIME
+      // Automatically close messages after NOTIFICATION.SHOW_TIME
       this.timeoutId = setTimeout(() => {
         this.isShow = false
-      }, SNACKBAR.SHOW_TIME) as unknown as number
+      }, NOTIFICATION.SHOW_TIME) as unknown as number
     },
     showSuccessMessage(message: string) {
       this.showMessage(message, MESSAGE_TYPE.SUCCESS)

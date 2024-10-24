@@ -4,7 +4,7 @@
 
     <v-main id="main">
       <AppMessageDialog />
-      <AppSnackbar />
+      <AppNotification />
       <AppConfirmDialog />
       <AppProgressCircular />
       <AppDialogDragger />
@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import TheHeader from '@/components/layout/TheHeader.vue'
 import AppMessageDialog from '@/components/common/AppMessageDialog.vue'
-import AppSnackbar from '@/components/common/AppSnackbar.vue'
+import AppNotification from '@/components/common/AppNotification.vue'
 import AppConfirmDialog from '@/components/common/AppConfirmDialog.vue'
 import AppProgressCircular from '@/components/common/AppProgressCircular.vue'
 import AppDialogDragger from '@/components/common/AppDialogDragger.vue'

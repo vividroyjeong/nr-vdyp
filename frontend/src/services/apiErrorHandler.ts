@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import type { AxiosResponse } from 'axios'
 import { StatusCodes } from 'http-status-codes'
-import { useSnackbarStore } from '@/stores/common/snackbarStore'
+import { useNotificationStore } from '@/stores/common/notificationStore'
 import { getActivePinia } from 'pinia'
 import { SERVICE_ERR_MSG } from '@/constants/message'
 
@@ -12,10 +12,10 @@ import { SERVICE_ERR_MSG } from '@/constants/message'
  */
 export const handleApiError = (error: unknown, contextMessage?: string) => {
   const pinia = getActivePinia()
-  let snackbarStore
+  let notificationStore
 
   if (pinia) {
-    snackbarStore = useSnackbarStore(pinia)
+    notificationStore = useNotificationStore(pinia)
   } else {
     console.warn('Pinia is not active. Message will only be logged.')
   }
@@ -26,7 +26,7 @@ export const handleApiError = (error: unknown, contextMessage?: string) => {
   if (axios.isCancel(error)) {
     const message = prependMessage('Request was canceled.')
     console.warn(message, (error as AxiosError).message)
-    snackbarStore?.showInfoMessage(message)
+    notificationStore?.showInfoMessage(message)
     return
   }
 
@@ -45,7 +45,7 @@ export const handleApiError = (error: unknown, contextMessage?: string) => {
 
       const message = prependMessage(getErrorMessage(response.status))
 
-      snackbarStore?.showErrorMessage(message)
+      notificationStore?.showErrorMessage(message)
     } else if (axiosError.request) {
       /*
       Handles cases where the server fails to return a response.
@@ -54,7 +54,7 @@ export const handleApiError = (error: unknown, contextMessage?: string) => {
         `${SERVICE_ERR_MSG.DEFAULT} (Error: No Response)`,
       )
       console.error(message, axiosError.request)
-      snackbarStore?.showErrorMessage(message)
+      notificationStore?.showErrorMessage(message)
     } else {
       /*
       Handles cases where a configuration error occurs while sending a request.
@@ -64,7 +64,7 @@ export const handleApiError = (error: unknown, contextMessage?: string) => {
         `${SERVICE_ERR_MSG.DEFAULT} (Error: Configuration Issue)`,
       )
       console.error(message, axiosError.message)
-      snackbarStore?.showErrorMessage(message)
+      notificationStore?.showErrorMessage(message)
     }
 
     // Log additional error information for debugging
@@ -79,7 +79,7 @@ export const handleApiError = (error: unknown, contextMessage?: string) => {
       'The request could not be processed properly. Please try again.',
     )
     console.error(message, (error as Error).message)
-    snackbarStore?.showErrorMessage(message)
+    notificationStore?.showErrorMessage(message)
   }
 }
 

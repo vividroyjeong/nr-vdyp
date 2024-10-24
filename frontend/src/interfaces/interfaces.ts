@@ -5,7 +5,7 @@ export interface ProgressCircularState {
   message: string | undefined
 }
 
-export interface SnackbarState {
+export interface NotificationState {
   isShow: boolean
   message: string
   type: MessageType

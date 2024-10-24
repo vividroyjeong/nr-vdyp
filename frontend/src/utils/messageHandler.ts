@@ -1,9 +1,9 @@
-import { useSnackbarStore } from '@/stores/common/snackbarStore'
+import { useNotificationStore } from '@/stores/common/notificationStore'
 import type { MessageType } from '@/types/types'
 import { MESSAGE_TYPE } from '@/constants/constants'
 
 /**
- * Displays job success or failure messages to snackbar and/or console.
+ * Displays job success or failure messages to notification and/or console.
  * @param {boolean} isSuccess - Whether the operation succeeded.
  * @param {string} successMessage - Message for successful operation.
  * @param {string} failMessage - Message for failed operation.
@@ -15,33 +15,33 @@ export const messageResult = (
   failMessage: string,
   error: Error | null = null,
 ) => {
-  const snackbarStore = useSnackbarStore()
+  const notificationStore = useNotificationStore()
 
   if (isSuccess) {
     console.info(successMessage)
-    snackbarStore.showSuccessMessage(successMessage)
+    notificationStore.showSuccessMessage(successMessage)
   } else {
     console.warn(failMessage, error)
-    snackbarStore.showWarningMessage(failMessage)
+    notificationStore.showWarningMessage(failMessage)
   }
 }
 
 /**
- * Logs messages to both the console or/and snackbar with conditional control.
+ * Logs messages to both the console or/and notification with conditional control.
  * @param {string} message - The message to display.
  * @param {string} messageType - The type of message.
  * @param {string} [optionalMessage] - Optional detail message for console output.
  * @param {boolean} [disableConsole=false] - Whether to disable console logging.
- * @param {boolean} [disableSnackbar=false] - Whether to disable snackbar messages.
+ * @param {boolean} [disableNotification=false] - Whether to disable notification messages.
  */
 export const logMessage = (
   message: string,
   messageType: MessageType = MESSAGE_TYPE.INFO,
   optionalMessage?: string | null,
   disableConsole: boolean = false,
-  disableSnackbar: boolean = false,
+  disableNotification: boolean = false,
 ) => {
-  const snackbarStore = useSnackbarStore()
+  const notificationStore = useNotificationStore()
 
   const consoleMessage = optionalMessage
     ? `${message} (${optionalMessage})`
@@ -66,106 +66,106 @@ export const logMessage = (
     }
   }
 
-  if (!disableSnackbar) {
+  if (!disableNotification) {
     switch (messageType) {
       case MESSAGE_TYPE.ERROR:
-        snackbarStore.showErrorMessage(message)
+        notificationStore.showErrorMessage(message)
         break
       case MESSAGE_TYPE.WARNING:
-        snackbarStore.showWarningMessage(message)
+        notificationStore.showWarningMessage(message)
         break
       case MESSAGE_TYPE.INFO:
-        snackbarStore.showInfoMessage(message)
+        notificationStore.showInfoMessage(message)
         break
       case MESSAGE_TYPE.SUCCESS:
-        snackbarStore.showSuccessMessage(message)
+        notificationStore.showSuccessMessage(message)
         break
       default:
-        snackbarStore.showInfoMessage(message)
+        notificationStore.showInfoMessage(message)
     }
   }
 }
 
 /**
- * Logs info messages to both the console or/and snackbar with conditional control.
+ * Logs info messages to both the console or/and notification with conditional control.
  * @param {string} message - The message to display.
  * @param {string} [optionalMessage] - Optional detail message for console output.
  * @param {boolean} [disableConsole=false] - Whether to disable console logging.
- * @param {boolean} [disableSnackbar=false] - Whether to disable snackbar messages.
+ * @param {boolean} [disableNotification=false] - Whether to disable notification messages.
  */
 export const logInfoMessage = (
   message: string,
   optionalMessage?: string | null,
   disableConsole = false,
-  disableSnackbar = false,
+  disableNotification = false,
 ) =>
   logMessage(
     message,
     MESSAGE_TYPE.INFO,
     optionalMessage,
     disableConsole,
-    disableSnackbar,
+    disableNotification,
   )
 
 /**
- * Logs error messages to both the console or/and snackbar with conditional control.
+ * Logs error messages to both the console or/and notification with conditional control.
  * @param {string} message - The message to display.
  * @param {string} [optionalMessage] - Optional detail message for console output.
  * @param {boolean} [disableConsole=false] - Whether to disable console logging.
- * @param {boolean} [disableSnackbar=false] - Whether to disable snackbar messages.
+ * @param {boolean} [disableNotification=false] - Whether to disable notification messages.
  */
 export const logErrorMessage = (
   message: string,
   optionalMessage?: string | null,
   disableConsole = false,
-  disableSnackbar = false,
+  disableNotification = false,
 ) =>
   logMessage(
     message,
     MESSAGE_TYPE.ERROR,
     optionalMessage,
     disableConsole,
-    disableSnackbar,
+    disableNotification,
   )
 
 /**
- * Logs success messages to both the console or/and snackbar with conditional control.
+ * Logs success messages to both the console or/and notification with conditional control.
  * @param {string} message - The message to display.
  * @param {string} [optionalMessage] - Optional detail message for console output.
  * @param {boolean} [disableConsole=false] - Whether to disable console logging.
- * @param {boolean} [disableSnackbar=false] - Whether to disable snackbar messages.
+ * @param {boolean} [disableNotification=false] - Whether to disable notification messages.
  */
 export const logSuccessMessage = (
   message: string,
   optionalMessage?: string | null,
   disableConsole = false,
-  disableSnackbar = false,
+  disableNotification = false,
 ) =>
   logMessage(
     message,
     MESSAGE_TYPE.SUCCESS,
     optionalMessage,
     disableConsole,
-    disableSnackbar,
+    disableNotification,
   )
 
 /**
- * Logs warning messages to both the console or/and snackbar with conditional control.
+ * Logs warning messages to both the console or/and notification with conditional control.
  * @param {string} message - The message to display.
  * @param {string} [optionalMessage] - Optional detail message for console output.
  * @param {boolean} [disableConsole=false] - Whether to disable console logging.
- * @param {boolean} [disableSnackbar=false] - Whether to disable snackbar messages.
+ * @param {boolean} [disableNotification=false] - Whether to disable notification messages.
  */
 export const logWarningMessage = (
   message: string,
   optionalMessage?: string | null,
   disableConsole = false,
-  disableSnackbar = false,
+  disableNotification = false,
 ) =>
   logMessage(
     message,
     MESSAGE_TYPE.WARNING,
     optionalMessage,
     disableConsole,
-    disableSnackbar,
+    disableNotification,
   )

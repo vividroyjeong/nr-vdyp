@@ -2,7 +2,7 @@
   <div>
     <v-snackbar
       v-model="isShow"
-      :timeout="SNACKBAR.SHOW_TIME"
+      :timeout="NOTIFICATION.SHOW_TIME"
       :color="type"
       class="elevation-12"
       location="top"
@@ -23,16 +23,16 @@
 </template>
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { useSnackbarStore } from '@/stores/common/snackbarStore'
+import { useNotificationStore } from '@/stores/common/notificationStore'
 import type { MessageType } from '@/types/types'
-import { SNACKBAR } from '@/constants/constants'
+import { NOTIFICATION } from '@/constants/constants'
 
-const snackbarStore = useSnackbarStore()
+const notificationStore = useNotificationStore()
 
-const { isShow, message, type } = storeToRefs(snackbarStore)
+const { isShow, message, type } = storeToRefs(notificationStore)
 
 const closeMessage = () => {
-  snackbarStore.resetMessage()
+  notificationStore.resetMessage()
 }
 
 const getIcon = (type: MessageType) => {

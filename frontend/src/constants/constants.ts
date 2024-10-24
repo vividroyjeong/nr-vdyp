@@ -143,7 +143,7 @@ export const SPIN_BUTTON = Object.freeze({
   DOWN: '▼',
 })
 
-export const SNACKBAR = Object.freeze({
+export const NOTIFICATION = Object.freeze({
   SHOW_TIME: 5000, // in milliseconds (5 sec)
 })
 
