@@ -146,3 +146,16 @@ export const SPIN_BUTTON = Object.freeze({
 export const SNACKBAR = Object.freeze({
   SHOW_TIME: 5000, // in milliseconds (5 sec)
 })
+
+export const AXIOS = Object.freeze({
+  DEFAULT_TIMEOUT: 10000, // in milliseconds (10 sec)
+  ACCEPT: 'application/json',
+  CONTENT_TYPE: 'application/json',
+})
+
+export const MESSAGE_TYPE = Object.freeze({
+  INFO: 'info',
+  SUCCESS: 'success',
+  ERROR: 'error',
+  WARNING: 'warning',
+})

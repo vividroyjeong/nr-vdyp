@@ -1,6 +1,5 @@
 <template>
   <div>
-    {{ SNACKBAR.SHOW_TIME }}
     <v-snackbar
       v-model="isShow"
       :timeout="SNACKBAR.SHOW_TIME"
@@ -25,7 +24,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { useSnackbarStore } from '@/stores/common/snackbarStore'
-import type { SnackbarType } from '@/types/types'
+import type { MessageType } from '@/types/types'
 import { SNACKBAR } from '@/constants/constants'
 
 const snackbarStore = useSnackbarStore()
@@ -36,8 +35,8 @@ const closeMessage = () => {
   snackbarStore.resetMessage()
 }
 
-const getIcon = (type: SnackbarType) => {
-  const icon: { [key in SnackbarType]: string } = {
+const getIcon = (type: MessageType) => {
+  const icon: { [key in MessageType]: string } = {
     '': '',
     info: 'mdi-information',
     success: 'mdi-check-circle',

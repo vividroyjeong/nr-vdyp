@@ -1,4 +1,4 @@
-import type { SnackbarType, SortOrder } from '@/types/types'
+import type { MessageType, SortOrder } from '@/types/types'
 
 export interface ProgressCircularState {
   isShow: boolean
@@ -8,7 +8,7 @@ export interface ProgressCircularState {
 export interface SnackbarState {
   isShow: boolean
   message: string
-  type: SnackbarType
+  type: MessageType
   timeoutId: number | null
 }
 
@@ -21,6 +21,11 @@ export interface JobSearchParams {
   startDate?: string | null
   endDate?: string | null
   status?: string
+}
+
+export interface CodeSearchParams {
+  pageNumber: number
+  pageSize: number
 }
 
 export interface TableOptions {

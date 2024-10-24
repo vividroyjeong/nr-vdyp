@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import type { SnackbarType } from '@/types/types'
-import { SNACKBAR } from '@/constants/constants'
+import type { MessageType } from '@/types/types'
+import { SNACKBAR, MESSAGE_TYPE } from '@/constants/constants'
 import type { SnackbarState } from '@/interfaces/interfaces'
 
 export const useSnackbarStore = defineStore({
@@ -20,7 +20,7 @@ export const useSnackbarStore = defineStore({
         this.timeoutId = null
       }
     },
-    showMessage(message: string, type: SnackbarType = '') {
+    showMessage(message: string, type: MessageType = '') {
       this.resetMessage()
       this.message = message
       this.type = type
@@ -32,16 +32,16 @@ export const useSnackbarStore = defineStore({
       }, SNACKBAR.SHOW_TIME) as unknown as number
     },
     showSuccessMessage(message: string) {
-      this.showMessage(message, 'success')
+      this.showMessage(message, MESSAGE_TYPE.SUCCESS)
     },
     showErrorMessage(message: string) {
-      this.showMessage(message, 'error')
+      this.showMessage(message, MESSAGE_TYPE.ERROR)
     },
     showInfoMessage(message: string) {
-      this.showMessage(message, 'info')
+      this.showMessage(message, MESSAGE_TYPE.INFO)
     },
     showWarningMessage(message: string) {
-      this.showMessage(message, 'warning')
+      this.showMessage(message, MESSAGE_TYPE.WARNING)
     },
   },
 })
