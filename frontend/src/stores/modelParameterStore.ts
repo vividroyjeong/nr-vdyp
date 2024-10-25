@@ -183,13 +183,13 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   const siteIndexCurve = ref<string | null>(null)
   const siteSpeciesValues = ref<string | null>(null)
   const ageType = ref<string | null>(null)
+  const percentStockableArea = ref<number | null>(null)
   const age = ref<number | null>(null)
   const height = ref<string | null>(null)
   const bha50SiteIndex = ref<string | null>(null)
   const floating = ref<string | null>(null)
 
   // stand density
-  const percentStockableArea = ref<number | null>(null)
   const basalArea = ref<string | null>(null)
   const treesPerHectare = ref<string | null>(null)
   const minimumDBHLimit = ref<string | null>(null)
@@ -237,11 +237,11 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     becZone.value = DEFAULT_VALUES.BEC_ZONE
     siteSpeciesValues.value = DEFAULT_VALUES.SITE_SPECIES_VALUES
     ageType.value = DEFAULT_VALUES.AGE_TYPE
+    percentStockableArea.value = DEFAULT_VALUES.PERCENT_STOCKABLE_AREA
     age.value = DEFAULT_VALUES.AGE
     height.value = DEFAULT_VALUES.HEIGHT
     bha50SiteIndex.value = DEFAULT_VALUES.BHA50_SITE_INDEX
     floating.value = FLOATING.SITEINDEX
-    percentStockableArea.value = DEFAULT_VALUES.PERCENT_STOCKABLE_AREA
     minimumDBHLimit.value = DEFAULT_VALUES.MINIMUM_DBH_LIMIT
     currentDiameter.value = DEFAULT_VALUES.CURRENT_DIAMETER
     percentCrownClosure.value = DEFAULT_VALUES.PERCENT_CROWN_CLOSURE
@@ -287,12 +287,12 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     siteIndexCurve,
     siteSpeciesValues,
     ageType,
+    percentStockableArea,
     age,
     height,
     bha50SiteIndex,
     floating,
     // stand density
-    percentStockableArea,
     basalArea,
     treesPerHectare,
     minimumDBHLimit,

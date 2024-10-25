@@ -22,28 +22,6 @@
             <div>
               <v-row>
                 <v-col cols="3">
-                  <v-text-field
-                    label="% Stockable Area"
-                    type="number"
-                    v-model.number="percentStockableArea"
-                    :max="NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_MAX"
-                    :min="NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_MIN"
-                    :step="NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_STEP"
-                    placeholder=""
-                    persistent-placeholder
-                    hide-details
-                    density="compact"
-                    dense
-                    :disabled="!isConfirmEnabled"
-                  ></v-text-field>
-                  <v-label
-                    v-show="Util.isZeroValue(percentStockableArea)"
-                    style="font-size: 12px"
-                    >A default will be computed when the model is run.</v-label
-                  >
-                </v-col>
-                <v-col class="col-space-3" />
-                <v-col cols="3">
                   <div
                     style="position: relative; width: 100%; margin-top: 10px"
                   >
@@ -91,7 +69,8 @@
                     <div class="spin-text-field-bottom-line"></div>
                   </div>
                 </v-col>
-                <v-col cols="5" v-show="Util.isZeroValue(age)">
+                <v-col class="col-space-3" />
+                <v-col v-show="Util.isZeroValue(age)">
                   <span style="font-size: 12px"
                     >Density Measurements cannot be supplied without an
                     Age.</span
@@ -278,7 +257,6 @@ const {
   siteSpeciesValues,
   age,
   height,
-  percentStockableArea,
   basalArea,
   treesPerHectare,
   minimumDBHLimit,
@@ -488,19 +466,6 @@ const clear = () => {
 
 const validateValues = (): boolean => {
   if (
-    percentStockableArea.value &&
-    (!Number.isInteger(percentStockableArea.value) ||
-      percentStockableArea.value < 0)
-  ) {
-    messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'% Stockable Area' must be a non-negative integer",
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (
     percentCrownClosure.value &&
     (!Number.isInteger(percentCrownClosure.value) ||
       percentCrownClosure.value < 0)
@@ -535,20 +500,6 @@ const validateValues = (): boolean => {
 }
 
 const validateRange = (): boolean => {
-  const psa = Util.toNumber(percentStockableArea.value)
-  if (
-    psa &&
-    (psa < NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_MIN ||
-      psa > NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_MAX)
-  ) {
-    messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Percent Stockable Area' must range from 0 and 100",
-      { width: 400 },
-    )
-    return false
-  }
-
   const ba = Util.toNumber(basalArea.value)
   if (
     ba &&

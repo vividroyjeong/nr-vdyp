@@ -181,7 +181,28 @@
                     </v-col>
                   </v-row>
                   <v-row style="height: 70px !important">
-                    <v-col cols="6" />
+                    <v-col cols="6">
+                      <v-text-field
+                        label="% Stockable Area"
+                        type="number"
+                        v-model.number="percentStockableArea"
+                        :max="NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_MAX"
+                        :min="NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_MIN"
+                        :step="NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_STEP"
+                        placeholder=""
+                        persistent-placeholder
+                        hide-details
+                        density="compact"
+                        dense
+                        :disabled="!isConfirmEnabled"
+                      ></v-text-field>
+                      <v-label
+                        v-show="Util.isZeroValue(percentStockableArea)"
+                        style="font-size: 12px"
+                        >A default will be computed when the model is
+                        run.</v-label
+                      >
+                    </v-col>
                     <v-col class="col-space-6" />
                     <v-col>
                       <div style="position: relative; width: 100%">
@@ -380,6 +401,7 @@ const {
   siteIndexCurve,
   siteSpeciesValues,
   ageType,
+  percentStockableArea,
   age,
   height,
   bha50SiteIndex,
@@ -658,6 +680,19 @@ const clear = () => {
 }
 
 const validateValues = (): boolean => {
+  if (
+    percentStockableArea.value &&
+    (!Number.isInteger(percentStockableArea.value) ||
+      percentStockableArea.value < 0)
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'% Stockable Area' must be a non-negative integer",
+      { width: 400 },
+    )
+    return false
+  }
+
   if (age.value && (!Number.isInteger(age.value) || age.value < 0)) {
     messageDialogStore.openDialog(
       'Invalid Input!',
@@ -689,6 +724,20 @@ const validateValues = (): boolean => {
 }
 
 const validateRange = (): boolean => {
+  const psa = Util.toNumber(percentStockableArea.value)
+  if (
+    psa &&
+    (psa < NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_MIN ||
+      psa > NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_MAX)
+  ) {
+    messageDialogStore.openDialog(
+      'Invalid Input!',
+      "'Percent Stockable Area' must range from 0 and 100",
+      { width: 400 },
+    )
+    return false
+  }
+
   if (age.value !== null) {
     if (
       age.value < NUM_INPUT_LIMITS.AGE_MIN ||
