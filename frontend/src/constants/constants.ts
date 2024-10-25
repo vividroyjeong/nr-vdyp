@@ -5,7 +5,8 @@ export const KEYCLOAK = Object.freeze({
   // SILENT_CHECK_SSO_REDIRECT_PAGE: '/silent-check-sso.html',
   IDP_AZUR_IDIR: 'azureidir', // Identity Provider: IDIR with MFA
   MAX_SESSION_DURATION: 8 * 60 * 60 * 1000, // 8 hours (in milliseconds)
-  UPDATE_TOKEN_MIN_VALIDITY: 5, // if -1, forcibly refreshed (in minutes)
+  UPDATE_TOKEN_MIN_VALIDITY: 120, // 2 min, in seconds
+  IS_TOKEN_EXP_MIN_VALIDITY: 120, // 2 min, in seconds
   ENABLE_LOGGING: false,
 })
 
@@ -148,7 +149,7 @@ export const NOTIFICATION = Object.freeze({
 })
 
 export const AXIOS = Object.freeze({
-  DEFAULT_TIMEOUT: 10000, // in milliseconds (10 sec)
+  DEFAULT_TIMEOUT: 100000, // in milliseconds (100 sec)
   ACCEPT: 'application/json',
   CONTENT_TYPE: 'application/json',
 })
