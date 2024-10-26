@@ -20,8 +20,7 @@
         <v-expansion-panel-text class="expansion-panel-text mt-n2">
           <v-form ref="form">
             <div class="mb-2" style="font-size: 14px">
-              These additional Stand attributes require that a Stand Age and
-              Basal Area be supplied on the Site Index and the Density pages
+              {{ MDL_PRM_INPUT_HINT.ATTR_REQ_AGE_BSL_AREA }}
             </div>
             <div>
               <v-row>
@@ -211,6 +210,11 @@ import {
   NUM_INPUT_LIMITS,
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
+import {
+  MDL_PRM_INPUT_ERR,
+  MSG_DIALOG_TITLE,
+  MDL_PRM_INPUT_HINT,
+} from '@/constants/message'
 
 const form = ref<HTMLFormElement>()
 
@@ -381,8 +385,8 @@ const validateFieldPresenceAndValue = (
 ): boolean => {
   if (Util.isBlank(fieldValue)) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      `${fieldName}: is not a valid number`,
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_FLDS(fieldName),
       { width: 400 },
     )
     return false
@@ -451,8 +455,8 @@ const validateComputedValuesModification = (): boolean => {
 
     if (!hasModification) {
       messageDialogStore.openDialog(
-        'No Modifications!',
-        "At least one of the starting values must have been modified from the original computed values.\n\n Please modify at least one starting value or switch to 'Computed Values' mode",
+        MSG_DIALOG_TITLE.NO_MODIFY,
+        MDL_PRM_INPUT_ERR.ATTR_VLD_NO_MODIFY,
         { width: 400 },
       )
       return false
@@ -468,8 +472,8 @@ const validateComparison = (): boolean => {
     parseFloat(basalArea125cm.value) > parseFloat(basalArea.value)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      `'Basal Area - 12.5cm+' is greater than the Basal Area defined on the Stand Density Pane.\n\n 'Basal Area - 7.5cm+' on Stand Density Pane: ${basalArea.value}`,
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_COMP_BSL_AREA(basalArea.value),
       { width: 400 },
     )
     return false
@@ -481,8 +485,8 @@ const validateComparison = (): boolean => {
     wholeStemVolume125cm.value > wholeStemVolume75cm.value
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Whole Stem Volume - 12.5cm+': is greater than 'Whole Stem Volume - 7.5cm+'",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_COMP_WSV,
       { width: 400 },
     )
     return false
@@ -494,8 +498,8 @@ const validateComparison = (): boolean => {
     closeUtilVolume.value > wholeStemVolume125cm.value
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Close Utilization Volume - 12.5cm+': is greater than 'Whole Stem Volume - 12.5cm+'",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_COMP_CUV,
       { width: 400 },
     )
     return false
@@ -507,8 +511,8 @@ const validateComparison = (): boolean => {
     closeUtilNetDecayVolume.value > closeUtilVolume.value
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Close Utilization Net Decay Volume - 12.5cm+': is greater than 'Close Utilization Volume - 12.5cm+'",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_COMP_CUNDV,
       { width: 400 },
     )
     return false
@@ -520,8 +524,8 @@ const validateComparison = (): boolean => {
     closeUtilNetDecayWasteVolume.value > closeUtilNetDecayVolume.value
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Close Utilization Net Decay Waste Volume - 12.5cm+': is greater than 'Close Utilization Net Decay Volume - 12.5cm+'",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_COMP_CUNDWV,
       { width: 400 },
     )
     return false
@@ -538,8 +542,8 @@ const validateRange = (): boolean => {
       parseFloat(loreyHeight.value) > NUM_INPUT_LIMITS.LOREY_HEIGHT_MAX)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Lorey Height - 7.5cm+': must range from 0.01 and 99.90",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_LRY_HEIGHT_RNG,
       { width: 400 },
     )
     return false
@@ -553,8 +557,8 @@ const validateRange = (): boolean => {
         NUM_INPUT_LIMITS.WHOLE_STEM_VOL_75CM_MAX)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Whole Stem Volume - 7.5cm+': must range from 0.1 and 2500.0",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_WSV75_RNG,
       { width: 400 },
     )
     return false
@@ -566,8 +570,8 @@ const validateRange = (): boolean => {
       parseFloat(basalArea125cm.value) > NUM_INPUT_LIMITS.BASAL_AREA_125CM_MAX)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Basal Area - 12.5cm+': must range from 0.1000 and 250.0000",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_BSL_AREA_RNG,
       { width: 400 },
     )
     return false
@@ -581,8 +585,8 @@ const validateRange = (): boolean => {
         NUM_INPUT_LIMITS.WHOLE_STEM_VOL_125CM_MAX)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Whole Stem Volume - 12.5cm+': must range from 0.0 and 2500.0",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_WSV125_RNG,
       { width: 400 },
     )
     return false
@@ -594,8 +598,8 @@ const validateRange = (): boolean => {
       parseFloat(closeUtilVolume.value) > NUM_INPUT_LIMITS.CU_VOLUME_MAX)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Close Utilization Volume - 12.5cm+': must range from 0.0 and 2500.0",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_CUV_RNG,
       { width: 400 },
     )
     return false
@@ -609,8 +613,8 @@ const validateRange = (): boolean => {
         NUM_INPUT_LIMITS.CU_NET_DECAY_VOL_MAX)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Close Utilization Net Decay Volume - 12.5cm+': must range from 0.0 and 2500.0",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_CUNDV_RNG,
       { width: 400 },
     )
     return false
@@ -624,8 +628,8 @@ const validateRange = (): boolean => {
         NUM_INPUT_LIMITS.CU_NET_DECAY_WASTE_VOL_MAX)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Close Utilization Net Decay Waste Volume - 12.5cm+': must range from 0.0 and 2500.0",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_CUNDWV_RNG,
       { width: 400 },
     )
     return false
@@ -637,8 +641,8 @@ const validateRange = (): boolean => {
 const validateValues = (): boolean => {
   if (loreyHeight.value && !/^\d+(\.\d{2})?$/.test(loreyHeight.value)) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Lorey Height - 7.5cm+' must be in the format ##0.00",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_LRY_HEIGHT_FMT,
       { width: 400 },
     )
     return false
@@ -649,8 +653,8 @@ const validateValues = (): boolean => {
     !/^\d+(\.\d)?$/.test(wholeStemVolume75cm.value)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Whole Stem Volume - 7.5cm+' must be in the format ####0.0",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_WSV75_FMT,
       { width: 400 },
     )
     return false
@@ -658,8 +662,8 @@ const validateValues = (): boolean => {
 
   if (basalArea125cm.value && !/^\d+(\.\d{4})?$/.test(basalArea125cm.value)) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Basal Area - 12.5cm+' must be in the format ##0.0000",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_BSL_AREA_FMT,
       { width: 400 },
     )
     return false
@@ -670,8 +674,8 @@ const validateValues = (): boolean => {
     !/^\d+(\.\d)?$/.test(wholeStemVolume125cm.value)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Whole Stem Volume - 12.5cm+' must be in the format ###0.0",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_WSV125_FMT,
       { width: 400 },
     )
     return false
@@ -679,8 +683,8 @@ const validateValues = (): boolean => {
 
   if (closeUtilVolume.value && !/^\d+(\.\d)?$/.test(closeUtilVolume.value)) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Close Utilization Volume - 12.5cm+' must be in the format ###0.0",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_CUV125_FMT,
       { width: 400 },
     )
     return false
@@ -691,20 +695,8 @@ const validateValues = (): boolean => {
     !/^\d+(\.\d)?$/.test(closeUtilNetDecayVolume.value)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Close Utilization Net Decay Volume - 12.5cm+' must be in the format ###0.0",
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (
-    closeUtilNetDecayVolume.value &&
-    !/^\d+(\.\d)?$/.test(closeUtilNetDecayVolume.value)
-  ) {
-    messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Close Utilization Net Decay Volume - 12.5cm+' must be in the format ###0.0",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_CUNDV_FMT,
       { width: 400 },
     )
     return false
@@ -715,8 +707,8 @@ const validateValues = (): boolean => {
     !/^\d+(\.\d)?$/.test(closeUtilNetDecayWasteVolume.value)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Close Utilization Net Decay Waste Volume - 12.5cm+' must be in the format ###0.0",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_CUNDWV_FMT,
       { width: 400 },
     )
     return false

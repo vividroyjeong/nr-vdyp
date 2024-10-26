@@ -3,7 +3,7 @@ import type { AxiosResponse } from 'axios'
 import { StatusCodes } from 'http-status-codes'
 import { useNotificationStore } from '@/stores/common/notificationStore'
 import { getActivePinia } from 'pinia'
-import { SERVICE_ERR_MSG } from '@/constants/message'
+import { SVC_ERR } from '@/constants/message'
 
 /**
  * Handles API errors by logging relevant details based on the error type.
@@ -50,9 +50,7 @@ export const handleApiError = (error: unknown, contextMessage?: string) => {
       /*
       Handles cases where the server fails to return a response.
       This can be due to network issues or a failed connection to the server. */
-      const message = prependMessage(
-        `${SERVICE_ERR_MSG.DEFAULT} (Error: No Response)`,
-      )
+      const message = prependMessage(`${SVC_ERR.DEFAULT} (Error: No Response)`)
       console.error(message, axiosError.request)
       notificationStore?.showErrorMessage(message)
     } else {
@@ -61,7 +59,7 @@ export const handleApiError = (error: unknown, contextMessage?: string) => {
       For example, an invalid URL or header setting can cause an error.
       */
       const message = prependMessage(
-        `${SERVICE_ERR_MSG.DEFAULT} (Error: Configuration Issue)`,
+        `${SVC_ERR.DEFAULT} (Error: Configuration Issue)`,
       )
       console.error(message, axiosError.message)
       notificationStore?.showErrorMessage(message)
@@ -93,13 +91,13 @@ function getErrorMessage(status: number): string {
 
   switch (status) {
     case StatusCodes.REQUEST_TIMEOUT:
-      return SERVICE_ERR_MSG.REQUEST_TIMEOUT
+      return SVC_ERR.REQUEST_TIMEOUT
     case StatusCodes.SERVICE_UNAVAILABLE:
-      return SERVICE_ERR_MSG.SERVICE_UNAVAILABLE
+      return SVC_ERR.SERVICE_UNAVAILABLE
     case StatusCodes.GATEWAY_TIMEOUT:
-      return SERVICE_ERR_MSG.GATEWAY_TIMEOUT
+      return SVC_ERR.GATEWAY_TIMEOUT
     case StatusCodes.INTERNAL_SERVER_ERROR:
-      return SERVICE_ERR_MSG.INTERNAL_SERVER_ERROR
+      return SVC_ERR.INTERNAL_SERVER_ERROR
     case StatusCodes.BAD_REQUEST:
       logMessage = 'Bad Request: The server could not understand the request.'
       break
@@ -124,7 +122,7 @@ function getErrorMessage(status: number): string {
   }
 
   console.error(logMessage)
-  return `${SERVICE_ERR_MSG.DEFAULT} (Error Code: ${status})`
+  return `${SVC_ERR.DEFAULT} (Error Code: ${status})`
 }
 
 /**

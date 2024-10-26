@@ -176,7 +176,7 @@
                       <v-label
                         v-show="Util.isZeroValue(age)"
                         style="font-size: 12px"
-                        >A value of zero indicates not known.</v-label
+                        >{{ MDL_PRM_INPUT_HINT.SITE_ZERO_NOT_KNOW }}</v-label
                       >
                     </v-col>
                   </v-row>
@@ -199,8 +199,7 @@
                       <v-label
                         v-show="Util.isZeroValue(percentStockableArea)"
                         style="font-size: 12px"
-                        >A default will be computed when the model is
-                        run.</v-label
+                        >{{ MDL_PRM_INPUT_HINT.SITE_DFT_COMPUTED }}</v-label
                       >
                     </v-col>
                     <v-col class="col-space-6" />
@@ -250,7 +249,7 @@
                         v-show="Util.isZeroValue(height)"
                         style="font-size: 12px"
                       >
-                        A value of zero indicates not known.
+                        {{ MDL_PRM_INPUT_HINT.SITE_ZERO_NOT_KNOW }}
                       </v-label>
                     </v-col>
                   </v-row>
@@ -306,7 +305,7 @@
                       <v-label
                         v-show="Util.isZeroValue(bha50SiteIndex)"
                         style="font-size: 12px"
-                        >A value of zero indicates not known.</v-label
+                        >{{ MDL_PRM_INPUT_HINT.SITE_ZERO_NOT_KNOW }}</v-label
                       >
                     </v-col>
                   </v-row>
@@ -383,6 +382,11 @@ import {
   SPIN_BUTTON,
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
+import {
+  MDL_PRM_INPUT_ERR,
+  MSG_DIALOG_TITLE,
+  MDL_PRM_INPUT_HINT,
+} from '@/constants/message'
 
 const form = ref<HTMLFormElement>()
 
@@ -686,8 +690,8 @@ const validateValues = (): boolean => {
       percentStockableArea.value < 0)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'% Stockable Area' must be a non-negative integer",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.SITE_VLD_PCT_STCB_AREA_VAL,
       { width: 400 },
     )
     return false
@@ -695,8 +699,8 @@ const validateValues = (): boolean => {
 
   if (age.value && (!Number.isInteger(age.value) || age.value < 0)) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Age' must be a non-negative integer",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.SITE_VLD_AGE_VAL,
       { width: 400 },
     )
     return false
@@ -704,8 +708,8 @@ const validateValues = (): boolean => {
 
   if (height.value && !/^\d+(\.\d{2})?$/.test(height.value)) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Height' must be in the format ##0.00",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.SITE_VLD_HEIGHT_VAL,
       { width: 400 },
     )
     return false
@@ -713,8 +717,8 @@ const validateValues = (): boolean => {
 
   if (bha50SiteIndex.value && !/^\d+(\.\d{2})?$/.test(bha50SiteIndex.value)) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'BHA 50 Site Index' must be in the format ##0.00",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.SITE_VLD_SI_VAL,
       { width: 400 },
     )
     return false
@@ -731,8 +735,8 @@ const validateRange = (): boolean => {
       psa > NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_MAX)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Percent Stockable Area' must range from 0 and 100",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.SITE_VLD_PCT_STCB_AREA_RNG,
       { width: 400 },
     )
     return false
@@ -744,8 +748,8 @@ const validateRange = (): boolean => {
       age.value > NUM_INPUT_LIMITS.AGE_MAX
     ) {
       messageDialogStore.openDialog(
-        'Invalid Input!',
-        "'Stand Age' must range from 0 and 500",
+        MSG_DIALOG_TITLE.INVALID_INPUT,
+        MDL_PRM_INPUT_ERR.SITE_VLD_AGE_RNG,
         { width: 400 },
       )
       return false
@@ -760,8 +764,8 @@ const validateRange = (): boolean => {
       numericHeight > NUM_INPUT_LIMITS.HEIGHT_MAX
     ) {
       messageDialogStore.openDialog(
-        'Invalid Input!',
-        "'Stand Height' must range from 0.00 and 99.90",
+        MSG_DIALOG_TITLE.INVALID_INPUT,
+        MDL_PRM_INPUT_ERR.SITE_VLD_HIGHT_RNG,
         { width: 400 },
       )
       return false
@@ -776,8 +780,8 @@ const validateRange = (): boolean => {
       numericHeight > NUM_INPUT_LIMITS.BHA50_SITE_INDEX_MAX
     ) {
       messageDialogStore.openDialog(
-        'Invalid Input!',
-        "'Site Index' must range from 0.00 and 60.00",
+        MSG_DIALOG_TITLE.INVALID_INPUT,
+        MDL_PRM_INPUT_ERR.SITE_VLD_SI_RNG,
         { width: 400 },
       )
       return false
@@ -795,8 +799,8 @@ const validateRequiredFields = (): boolean => {
       Util.isEmptyOrZero(bha50SiteIndex.value)
     ) {
       messageDialogStore.openDialog(
-        'Missing Information',
-        `The species '${selectedSiteSpecies.value}' must have Age/Height/BHA 50 Site Index values supplied`,
+        MSG_DIALOG_TITLE.MISSING_INFO,
+        MDL_PRM_INPUT_ERR.SITE_VLD_SPCZ_REQ_VALS_SUP(selectedSiteSpecies.value),
         { width: 400 },
       )
       return false
@@ -804,8 +808,8 @@ const validateRequiredFields = (): boolean => {
   } else if (siteSpeciesValues.value === SITE_SPECIES_VALUES.SUPPLIED) {
     if (Util.isEmptyOrZero(bha50SiteIndex.value)) {
       messageDialogStore.openDialog(
-        'Missing Information',
-        `The species '${selectedSiteSpecies.value}' must have an BHA 50 Site Index value supplied`,
+        MSG_DIALOG_TITLE.MISSING_INFO,
+        MDL_PRM_INPUT_ERR.SITE_VLD_SPCZ_REQ_SI_VAL(selectedSiteSpecies.value),
         { width: 400 },
       )
       return false

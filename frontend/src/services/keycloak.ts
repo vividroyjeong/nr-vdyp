@@ -5,7 +5,7 @@ import { KEYCLOAK } from '@/constants/constants'
 import { Util } from '@/utils/util'
 import * as messageHandler from '@/utils/messageHandler'
 import { env } from '@/env'
-import { AUTH_ERR_MSG } from '@/constants/message'
+import { AUTH_ERR } from '@/constants/message'
 import { useNotificationStore } from '@/stores/common/notificationStore'
 import { getActivePinia } from 'pinia'
 
@@ -70,7 +70,7 @@ export const initializeKeycloak = async (): Promise<Keycloak | undefined> => {
       // Perform token validation
       if (!validateAccessToken(keycloakInstance.token)) {
         logErrorAndLogout(
-          AUTH_ERR_MSG.AUTH_001,
+          AUTH_ERR.AUTH_001,
           'Token validation failed (Error: AUTH_001).',
         )
         return undefined
@@ -93,7 +93,7 @@ export const initializeKeycloak = async (): Promise<Keycloak | undefined> => {
       // do validate the IDP in the JWT
       if (tokenParsed.identity_provider !== KEYCLOAK.IDP_AZUR_IDIR) {
         logErrorAndLogout(
-          AUTH_ERR_MSG.AUTH_002,
+          AUTH_ERR.AUTH_002,
           'Authentication failed: Invalid identity provider. (Error: AUTH_002).',
         )
         return undefined
@@ -102,7 +102,7 @@ export const initializeKeycloak = async (): Promise<Keycloak | undefined> => {
       // Perform token validation
       if (!validateAccessToken(keycloakInstance.token)) {
         logErrorAndLogout(
-          AUTH_ERR_MSG.AUTH_003,
+          AUTH_ERR.AUTH_003,
           'Token validation failed. (Error: AUTH_003).',
         )
         return undefined
@@ -119,7 +119,7 @@ export const initializeKeycloak = async (): Promise<Keycloak | undefined> => {
       keycloakInstance.login(loginOptions)
     }
   } catch (err) {
-    notificationStore?.showErrorMessage(AUTH_ERR_MSG.AUTH_004)
+    notificationStore?.showErrorMessage(AUTH_ERR.AUTH_004)
     console.error('Keycloak initialization failed (Error: AUTH_004):', err)
     keycloakInstance = null // Reset the instance on failure
     throw err
@@ -165,7 +165,7 @@ export const initializeKeycloakAndAuth = async (): Promise<boolean> => {
         !authStore.user?.idToken
       ) {
         logErrorAndLogout(
-          AUTH_ERR_MSG.AUTH_010,
+          AUTH_ERR.AUTH_010,
           'Auth load failed. (Error: AUTH_010).',
         )
         return false
@@ -179,7 +179,7 @@ export const initializeKeycloakAndAuth = async (): Promise<boolean> => {
 
       if (!auth || !keycloakInstance.token) {
         logErrorAndLogout(
-          AUTH_ERR_MSG.AUTH_011,
+          AUTH_ERR.AUTH_011,
           'Auth load failed. (Error: AUTH_011).',
         )
         return false
@@ -188,7 +188,7 @@ export const initializeKeycloakAndAuth = async (): Promise<boolean> => {
     return true
   } catch (err) {
     logErrorAndLogout(
-      AUTH_ERR_MSG.AUTH_012,
+      AUTH_ERR.AUTH_012,
       `Error initializing Keycloak and Auth (Error: AUTH_012): ${err}`,
     )
     return false
@@ -214,7 +214,7 @@ export const refreshToken = async (minValidity?: number): Promise<boolean> => {
     const initialized = await initializeKeycloakAndAuth()
     if (!initialized || !keycloakInstance) {
       logErrorAndLogout(
-        AUTH_ERR_MSG.AUTH_020,
+        AUTH_ERR.AUTH_020,
         'Keycloak initialization failed during refresh token (Error: AUTH_020)',
       )
       return false
@@ -238,7 +238,7 @@ export const refreshToken = async (minValidity?: number): Promise<boolean> => {
     }
   } catch (err) {
     logErrorAndLogout(
-      AUTH_ERR_MSG.AUTH_021,
+      AUTH_ERR.AUTH_021,
       `Failed to refresh the token, or the session has expired (Error: AUTH_021): ${err}`,
     )
     return false
@@ -254,7 +254,7 @@ export const handleTokenValidation = async (): Promise<void> => {
     const initialized = await initializeKeycloakAndAuth()
     if (!initialized || !keycloakInstance) {
       logErrorAndLogout(
-        AUTH_ERR_MSG.AUTH_030,
+        AUTH_ERR.AUTH_030,
         'Keycloak initialization failed during token validation (Error: AUTH_030)',
       )
       return
@@ -271,7 +271,7 @@ export const handleTokenValidation = async (): Promise<void> => {
     // force session logout when the maximum session time is exceeded
     if (sessionDuration > KEYCLOAK.MAX_SESSION_DURATION) {
       logErrorAndLogout(
-        AUTH_ERR_MSG.AUTH_031,
+        AUTH_ERR.AUTH_031,
         `Forced out due to maximum session timeout (Error: AUTH_031) => session-duration:${sessionDuration} > max:${KEYCLOAK.MAX_SESSION_DURATION}`,
       )
       return
@@ -297,7 +297,7 @@ export const handleTokenValidation = async (): Promise<void> => {
     )
   } catch (err) {
     logErrorAndLogout(
-      AUTH_ERR_MSG.AUTH_032,
+      AUTH_ERR.AUTH_032,
       `Error during token validation (Error: AUTH_032): ${err}`,
     )
     return

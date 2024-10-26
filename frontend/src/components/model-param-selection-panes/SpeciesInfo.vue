@@ -31,11 +31,6 @@
                       v-model="derivedBy"
                       inline
                       :disabled="!isConfirmEnabled"
-                      required
-                      :rules="[
-                        (v) =>
-                          !!v || '&quot;Species % derived by&quot; is required',
-                      ]"
                     >
                       <v-radio
                         v-for="option in derivedByOptions"
@@ -50,7 +45,6 @@
             </div>
             <div class="mt-n3">
               <v-row>
-                <!-- input -->
                 <v-col cols="5">
                   <div v-for="(item, index) in speciesList" :key="index">
                     <v-row>
@@ -263,6 +257,7 @@ import {
   SPIN_BUTTON,
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
+import { MDL_PRM_INPUT_ERR, MSG_DIALOG_TITLE } from '@/constants/message'
 
 const form = ref<HTMLFormElement>()
 
@@ -377,13 +372,18 @@ const validatePercent = (value: any) => {
     numValue < NUM_INPUT_LIMITS.SPECIES_PERCENT_MIN ||
     numValue > NUM_INPUT_LIMITS.SPECIES_PERCENT_MAX
   ) {
-    return `Please enter a value between ${NUM_INPUT_LIMITS.SPECIES_PERCENT_MIN} and ${NUM_INPUT_LIMITS.SPECIES_PERCENT_MAX}`
+    return MDL_PRM_INPUT_ERR.SPCZ_VLD_INPUT_RANGE(
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_MIN,
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_MAX,
+    )
   }
   return true
 }
 
 const totalPercentError = computed(() => {
-  return isOverTotalPercent.value ? ['Species Percent do not total 100.0%'] : []
+  return isOverTotalPercent.value
+    ? [MDL_PRM_INPUT_ERR.SPCZ_VLD_TOTAL_PCT_NOT_100]
+    : []
 })
 
 const validateTotalPercent = () => {
@@ -458,10 +458,10 @@ const validateDuplicateSpecies = (): boolean => {
       : ''
 
     const message = speciesLabel
-      ? `Species '${duplicateSpecies} - ${speciesLabel}' already specified`
-      : `Species '${duplicateSpecies}' already specified`
+      ? MDL_PRM_INPUT_ERR.SPCZ_VLD_DUP_W_LABEL(duplicateSpecies, speciesLabel)
+      : MDL_PRM_INPUT_ERR.SPCZ_VLD_DUP_WO_LABEL(duplicateSpecies)
 
-    messageDialogStore.openDialog('Data Duplicated!', message)
+    messageDialogStore.openDialog(MSG_DIALOG_TITLE.DATA_DUPLICATED, message)
     return false
   }
 
@@ -474,8 +474,8 @@ const validateTotalSpeciesPercent = (): boolean => {
     highestPercentSpecies !== null
   ) {
     messageDialogStore.openDialog(
-      'Data Incomplete!',
-      'Species percentage must add up to a total of 100.0% in order to run a valid model',
+      MSG_DIALOG_TITLE.DATA_INCOMPLETE,
+      MDL_PRM_INPUT_ERR.SPCZ_VLD_TOTAL_PCT,
       { width: 400 },
     )
     return false
@@ -486,8 +486,8 @@ const validateTotalSpeciesPercent = (): boolean => {
 const validateRequiredFields = (): boolean => {
   if (!derivedBy.value) {
     messageDialogStore.openDialog(
-      'Missing Information',
-      "Input field - 'Species % derived by' - is missing essential information which must be filled in order to confirm and continue",
+      MSG_DIALOG_TITLE.MISSING_INFO,
+      MDL_PRM_INPUT_ERR.SPCZ_VLD_MISSING_DERIVED_BY,
       { width: 400 },
     )
     return false

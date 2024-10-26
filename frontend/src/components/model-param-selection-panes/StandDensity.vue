@@ -71,10 +71,9 @@
                 </v-col>
                 <v-col class="col-space-3" />
                 <v-col v-show="Util.isZeroValue(age)">
-                  <span style="font-size: 12px"
-                    >Density Measurements cannot be supplied without an
-                    Age.</span
-                  >
+                  <span style="font-size: 12px">{{
+                    MDL_PRM_INPUT_HINT.DENSITY_WO_AGE
+                  }}</span>
                 </v-col>
               </v-row>
               <v-row>
@@ -167,7 +166,7 @@
                       !isPercentCrownClosureDisabled
                     "
                     style="font-size: 12px"
-                    >Applying Default of 50%</v-label
+                    >{{ MDL_PRM_INPUT_HINT.DENSITY_PCC_APPLY_DFT }}</v-label
                   >
                 </v-col>
                 <v-col class="col-space-3" />
@@ -236,6 +235,11 @@ import {
   CONTINUOUS_INC_DEC,
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
+import {
+  MDL_PRM_INPUT_ERR,
+  MSG_DIALOG_TITLE,
+  MDL_PRM_INPUT_HINT,
+} from '@/constants/message'
 import {
   isCoastalZone,
   validateBasalAreaLimits,
@@ -471,8 +475,8 @@ const validateValues = (): boolean => {
       percentCrownClosure.value < 0)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Crown Closure' must be a non-negative integer",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.DENSITY_VLD_PCC_VAL,
       { width: 400 },
     )
     return false
@@ -480,8 +484,8 @@ const validateValues = (): boolean => {
 
   if (basalArea.value && !/^\d+(\.\d{4})?$/.test(basalArea.value)) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Basal Area' must be in the format ##0.0000",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.DENSITY_VLD_BSL_AREA_FMT,
       { width: 400 },
     )
     return false
@@ -489,8 +493,8 @@ const validateValues = (): boolean => {
 
   if (treesPerHectare.value && !/^\d+(\.\d{2})?$/.test(treesPerHectare.value)) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Trees per Hectare' must be in the format ####0.00",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.DENSITY_VLD_TPH_FMT,
       { width: 400 },
     )
     return false
@@ -507,8 +511,8 @@ const validateRange = (): boolean => {
       ba > NUM_INPUT_LIMITS.BASAL_AREA_MAX)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Basal Area' must range from 0.1000 and 250.0000",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.DENSITY_VLD_BSL_AREA_RNG,
       { width: 400 },
     )
     return false
@@ -520,8 +524,8 @@ const validateRange = (): boolean => {
     (tph < NUM_INPUT_LIMITS.TPH_MIN || tph > NUM_INPUT_LIMITS.TPH_MAX)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Trees per Hectare' must range from 0.10 and 9999.90",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.DENSITY_VLD_TPH_RNG,
       { width: 400 },
     )
     return false
@@ -534,8 +538,8 @@ const validateRange = (): boolean => {
       pcc > NUM_INPUT_LIMITS.CROWN_CLOSURE_MAX)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Crown Closure' must range from 0 and 100",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.DENSITY_VLD_PCC_RNG,
       { width: 400 },
     )
     return false
@@ -603,8 +607,8 @@ async function validateFormInputs(): Promise<boolean> {
   const isBasalAreaValid = validateBALimits()
   if (!isBasalAreaValid) {
     const userResponse = await confirmDialogStore.openDialog(
-      'Confirm',
-      'Basal Area is above a likely maximum for the entered height. Do you wish to proceed?',
+      MSG_DIALOG_TITLE.CONFIRM,
+      MDL_PRM_INPUT_ERR.DENSITY_VLD_BSL_AREA_OVER_HEIGHT,
     )
 
     if (!userResponse) {
@@ -615,7 +619,7 @@ async function validateFormInputs(): Promise<boolean> {
   const validateTPHmessage = validateTPHLimits()
   if (validateTPHmessage) {
     const userResponse = await confirmDialogStore.openDialog(
-      'Confirm',
+      MSG_DIALOG_TITLE.CONFIRM,
       validateTPHmessage,
     )
 
@@ -627,7 +631,7 @@ async function validateFormInputs(): Promise<boolean> {
   const validateQuadDiamMessage = validateQuadDiameter()
   if (validateQuadDiamMessage) {
     const userResponse = await confirmDialogStore.openDialog(
-      'Confirm',
+      MSG_DIALOG_TITLE.CONFIRM,
       validateQuadDiamMessage,
     )
 

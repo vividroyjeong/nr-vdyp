@@ -114,7 +114,6 @@
                         :disabled="!isConfirmEnabled"
                       ></v-checkbox>
                     </v-col>
-
                     <v-col style="max-width: 20% !important">
                       <v-select
                         label="Projection Type"
@@ -232,6 +231,7 @@ import {
   NUM_INPUT_LIMITS,
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
+import { MDL_PRM_INPUT_ERR, MSG_DIALOG_TITLE } from '@/constants/message'
 
 const form = ref<HTMLFormElement>()
 
@@ -277,8 +277,8 @@ const validateComparison = (): boolean => {
   if (finishingAge.value !== null && startingAge.value !== null) {
     if (finishingAge.value < startingAge.value) {
       messageDialogStore.openDialog(
-        'Invalid Input!',
-        "'Finish Age' must be at least as great as the 'Start Age'",
+        MSG_DIALOG_TITLE.INVALID_INPUT,
+        MDL_PRM_INPUT_ERR.RPT_VLD_COMP_FNSH_AGE,
         { width: 400 },
       )
       return false
@@ -295,8 +295,11 @@ const validateRange = (): boolean => {
       startingAge.value > NUM_INPUT_LIMITS.STARTING_AGE_MAX
     ) {
       messageDialogStore.openDialog(
-        'Invalid Input!',
-        `'Starting Age' must range from ${NUM_INPUT_LIMITS.STARTING_AGE_MIN} and ${NUM_INPUT_LIMITS.STARTING_AGE_MAX}`,
+        MSG_DIALOG_TITLE.INVALID_INPUT,
+        MDL_PRM_INPUT_ERR.RPT_VLD_START_AGE_RNG(
+          NUM_INPUT_LIMITS.STARTING_AGE_MIN,
+          NUM_INPUT_LIMITS.STARTING_AGE_MAX,
+        ),
         { width: 400 },
       )
       return false
@@ -309,8 +312,11 @@ const validateRange = (): boolean => {
       finishingAge.value > NUM_INPUT_LIMITS.FINISHING_AGE_MAX
     ) {
       messageDialogStore.openDialog(
-        'Invalid Input!',
-        `'Finishing Age' must range from ${NUM_INPUT_LIMITS.FINISHING_AGE_MIN} and ${NUM_INPUT_LIMITS.FINISHING_AGE_MAX}`,
+        MSG_DIALOG_TITLE.INVALID_INPUT,
+        MDL_PRM_INPUT_ERR.RPT_VLD_START_FNSH_RNG(
+          NUM_INPUT_LIMITS.FINISHING_AGE_MIN,
+          NUM_INPUT_LIMITS.FINISHING_AGE_MAX,
+        ),
         { width: 400 },
       )
       return false
@@ -323,8 +329,11 @@ const validateRange = (): boolean => {
       ageIncrement.value > NUM_INPUT_LIMITS.AGE_INC_MAX
     ) {
       messageDialogStore.openDialog(
-        'Invalid Input!',
-        `'Age Increment' must range from ${NUM_INPUT_LIMITS.AGE_INC_MIN} and ${NUM_INPUT_LIMITS.AGE_INC_MAX}`,
+        MSG_DIALOG_TITLE.INVALID_INPUT,
+        MDL_PRM_INPUT_ERR.RPT_VLD_AGE_INC_RNG(
+          NUM_INPUT_LIMITS.AGE_INC_MIN,
+          NUM_INPUT_LIMITS.AGE_INC_MAX,
+        ),
         { width: 400 },
       )
       return false
@@ -340,8 +349,8 @@ const validateValues = (): boolean => {
     (!Number.isInteger(startingAge.value) || startingAge.value < 0)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Starting Age' must be a non-negative integer",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.RPT_VLD_START_AGE_VAL,
       { width: 400 },
     )
     return false
@@ -352,8 +361,8 @@ const validateValues = (): boolean => {
     (!Number.isInteger(finishingAge.value) || finishingAge.value < 0)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Finishing Age' must be a non-negative integer",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.RPT_VLD_FNSH_AGE_VAL,
       { width: 400 },
     )
     return false
@@ -364,8 +373,8 @@ const validateValues = (): boolean => {
     (!Number.isInteger(ageIncrement.value) || ageIncrement.value < 0)
   ) {
     messageDialogStore.openDialog(
-      'Invalid Input!',
-      "'Age Increment' must be a non-negative integer",
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.RPT_VLD_AGE_INC_VAL,
       { width: 400 },
     )
     return false
