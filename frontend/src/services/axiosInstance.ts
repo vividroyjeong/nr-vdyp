@@ -10,6 +10,7 @@ import { env } from '@/env'
 // import * as messageHandler from '@/utils/messageHandler'
 // import { StatusCodes } from 'http-status-codes'
 // import { handleTokenValidation, refreshToken } from '@/services/keycloak'
+// import createAuthRefreshInterceptor from 'axios-auth-refresh'
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: env.VITE_API_BASE_URL,
@@ -22,6 +23,8 @@ const axiosInstance: AxiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
+    // TODO - performance issues or network overhead issue?
+    // then consider timer-based refresh + refresh token on 401 error
     // await handleTokenValidation() // Ensure token is valid or refreshed
 
     const authStore = useAuthStore()
@@ -42,7 +45,6 @@ axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error) => {
     // TODO - 401 Unauthorized handling: Retry after token renewal
-    // TODO - Other alternatives => axios-auth-refresh npm package
     // const authStore = useAuthStore()
     // const { status, config } = error.response || {}
 
@@ -64,6 +66,7 @@ axiosInstance.interceptors.response.use(
     //     )
     //   }
     // }
+    // TODO - Other alternatives => axios-auth-refresh npm package
 
     return Promise.reject(convertToAxiosError(error))
   },
@@ -89,5 +92,42 @@ function convertToAxiosError(error: unknown): Error {
 
   return new Error(String(error))
 }
+
+// TODO - Other alternatives => axios-auth-refresh npm package
+/*
+// Setting up the axios-auth-refresh interceptor
+const refreshAuthLogic = async (failedRequest: any) => {
+  try {
+    const refreshed = await refreshToken(-1)
+    if (refreshed) {
+      const authStore = useAuthStore()
+      const newToken = authStore.user?.accessToken
+
+      if (newToken) {
+        failedRequest.response.config.headers['Authorization'] =
+          `Bearer ${newToken}`
+        return Promise.resolve()
+      }
+    }
+  } catch (error) {
+    console.error('Token refresh failed:', error)
+    return Promise.reject(convertToAxiosError(error))
+  }
+}
+
+// Setting up the axios-auth-refresh interceptor
+createAuthRefreshInterceptor(axiosInstance, refreshAuthLogic, {
+  statusCodes: [401, 403],
+})
+
+// Setting up the axios-auth-refresh interceptor
+axiosInstance.interceptors.response.use(
+  (response: AxiosResponse) => response,
+  (error) => {
+    console.error('Response error:', error)
+    return Promise.reject(convertToAxiosError(error))
+  },
+)
+*/
 
 export default axiosInstance

@@ -1,4 +1,3 @@
-// src/router/router.ts
 import { createRouter, createWebHistory } from 'vue-router'
 import { routes } from './routes'
 

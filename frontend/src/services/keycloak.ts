@@ -358,7 +358,7 @@ const getTokenExpirationDate = (token: string): Date | null => {
 
 //   refreshTimer = new Timer()
 
-//   const refreshInterval = 1000 * 60 * 1 // 4분 간격
+//   const refreshInterval = 1000 * 60 * 4 // 4-minute interval
 //   refreshTimer.start()
 
 //   setInterval(async () => {
