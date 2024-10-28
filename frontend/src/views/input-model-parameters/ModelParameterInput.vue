@@ -98,7 +98,7 @@ import { useModelParameterStore } from '@/stores/modelParameterStore'
 import JobTypeSelection from '@/components/JobTypeSelection.vue'
 
 import ModelParameterSelection from '@/views/input-model-parameters/ModelParameterSelection.vue'
-import Results from '@/views/input-model-parameters/SpeciesResults.vue'
+import ModelReport from '@/views/input-model-parameters/ModelReport.vue'
 import ViewLogFile from '@/views/input-model-parameters/ViewLogFile.vue'
 import ViewErrorMessages from '@/views/input-model-parameters/ViewErrorMessages.vue'
 
@@ -112,7 +112,7 @@ const modelParameterStore = useModelParameterStore()
 
 const tabs = [
   { label: 'Model Parameter Selection', component: ModelParameterSelection },
-  { label: 'Model Report', component: Results },
+  { label: 'Model Report', component: ModelReport },
   { label: 'View Log File', component: ViewLogFile },
   { label: 'View Error Messages', component: ViewErrorMessages },
 ]

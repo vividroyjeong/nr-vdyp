@@ -35,7 +35,7 @@ const download = () => {
   const content = 'Hello, this is your text file!'
   const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
 
-  saveAs(blob, 'view-log-file.txt')
+  saveAs(blob, 'model-report.txt')
 }
 
 const print = () => {

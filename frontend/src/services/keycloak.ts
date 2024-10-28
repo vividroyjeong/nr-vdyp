@@ -114,6 +114,9 @@ export const initializeKeycloak = async (): Promise<Keycloak | undefined> => {
         idToken: keycloakInstance.idToken,
       })
 
+      // TODO - need to set up periodic token refresh?
+      // setupTokenRefresh()
+
       return keycloakInstance
     } else {
       keycloakInstance.login(loginOptions)
@@ -307,6 +310,9 @@ export const handleTokenValidation = async (): Promise<void> => {
 export const logout = (): void => {
   const authStore = useAuthStore()
   authStore.clearUser()
+
+  // stopRefreshTimer()
+
   window.location.href = `https://logon7.gov.bc.ca/clp-cgi/logoff.cgi?retnow=1&returl=${encodeURIComponent(
     `${ssoAuthServerUrl}/realms/${ssoRealm}/protocol/openid-connect/logout?post_logout_redirect_uri=` +
       ssoRedirectUrl +
@@ -342,3 +348,26 @@ const getTokenExpirationDate = (token: string): Date | null => {
     return null
   }
 }
+
+// TODO - need to set up periodic token refresh?
+// import { Timer } from 'timer-node'
+// let refreshTimer: Timer | null = null
+
+// const setupTokenRefresh = () => {
+//   stopRefreshTimer()
+
+//   refreshTimer = new Timer()
+
+//   const refreshInterval = 1000 * 60 * 1 // 4분 간격
+//   refreshTimer.start()
+
+//   setInterval(async () => {
+//     console.log('Checking token expiration...')
+//     const refreshed = await refreshToken(KEYCLOAK.UPDATE_TOKEN_MIN_VALIDITY)
+//     console.log(`Token refreshed: ${refreshed}`)
+//   }, refreshInterval)
+// }
+
+// const stopRefreshTimer = () => {
+//   if (refreshTimer) refreshTimer.stop()
+// }
