@@ -13,10 +13,10 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   // panel open
   const panelOpenStates = ref<Record<PanelName, PanelState>>({
     speciesInfo: PANEL.OPEN,
-    siteInfo: PANEL.OPEN,
-    standDensity: PANEL.OPEN,
-    additionalStandAttributes: PANEL.OPEN,
-    reportInfo: PANEL.OPEN,
+    siteInfo: PANEL.CLOSE,
+    standDensity: PANEL.CLOSE,
+    additionalStandAttributes: PANEL.CLOSE,
+    reportInfo: PANEL.CLOSE,
   })
 
   // Panel states for confirming and editing
@@ -61,7 +61,9 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     ]
     const currentIndex = panelOrder.indexOf(panelName)
     if (currentIndex !== -1 && currentIndex < panelOrder.length - 1) {
+      // The next panel opens automatically, switching to the editable.
       const nextPanel = panelOrder[currentIndex + 1]
+      panelOpenStates.value[nextPanel] = PANEL.OPEN
       panelState.value[nextPanel].editable = true
     }
 
@@ -87,9 +89,11 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     const currentIndex = panelOrder.indexOf(panelName)
     if (currentIndex !== -1) {
       for (let i = currentIndex + 1; i < panelOrder.length; i++) {
+        // All of the next panels are automatically closed, uneditable, and unconfirmed
         const nextPanel = panelOrder[i]
         panelState.value[nextPanel].confirmed = false
         panelState.value[nextPanel].editable = false
+        panelOpenStates.value[nextPanel] = PANEL.CLOSE
       }
     }
 
