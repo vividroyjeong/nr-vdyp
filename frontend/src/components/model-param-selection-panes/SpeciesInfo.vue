@@ -298,7 +298,13 @@ let percentDecrementInterval: number | null = null
 
 watch(
   speciesList,
-  () => {
+  (newSpeciesList) => {
+    // Sort only if all items contain species
+    const shouldSort = newSpeciesList.every((item) => item.species)
+    if (shouldSort) {
+      triggerSpeciesSortByPercent()
+    }
+
     updateSpeciesGroup()
   },
   { deep: true },
@@ -314,6 +320,11 @@ const incrementPercent = (index: number) => {
   speciesList.value[index].percent = newValue.toFixed(
     NUM_INPUT_LIMITS.SPECIES_PERCENT_DECIMAL_NUM,
   )
+
+  // Sort only when species exists
+  if (speciesList.value[index].species) {
+    triggerSpeciesSortByPercent()
+  }
 }
 
 const decrementPercent = (index: number) => {
@@ -327,8 +338,11 @@ const decrementPercent = (index: number) => {
     NUM_INPUT_LIMITS.SPECIES_PERCENT_DECIMAL_NUM,
   )
 
+  // sort only when species is present, remove species if value is 0
   if (Util.isEmptyOrZero(newValue)) {
     speciesList.value[index].species = null
+  } else if (speciesList.value[index].species) {
+    triggerSpeciesSortByPercent()
   }
 }
 
@@ -395,9 +409,15 @@ const validateTotalPercent = () => {
 
 const triggerSpeciesSortByPercent = () => {
   speciesList.value.sort((a, b) => {
-    if (a.percent === null) return 1
-    if (b.percent === null) return -1
-    return parseFloat(b.percent) - parseFloat(a.percent)
+    const percentA = parseFloat(a.percent || '0')
+    const percentB = parseFloat(b.percent || '0')
+
+    // Empty species are sent backward in the sort
+    if (!a.species) return 1
+    if (!b.species) return -1
+
+    // Sort by percent in descending order
+    return percentB - percentA
   })
 }
 
@@ -415,8 +435,11 @@ const handlePercentInput = (event: Event, index: number) => {
 
   speciesList.value[index].percent = value
 
+  // sort only when species is present, remove species if value is 0
   if (Util.isEmptyOrZero(value)) {
     speciesList.value[index].species = null
+  } else if (speciesList.value[index].species) {
+    triggerSpeciesSortByPercent()
   }
 }
 
