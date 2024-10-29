@@ -8,13 +8,14 @@ import AuthInfo from '@/views/test/AuthInfo.vue'
 import APITest from '@/views/test/APITest.vue'
 
 export const routes: Array<RouteRecordRaw> = [
+  // {
+  //   path: '/',
+  //   name: 'Home',
+  //   component: JobList,
+  // },
   {
+    // path: '/input-model-parameters',
     path: '/',
-    name: 'Home',
-    component: JobList,
-  },
-  {
-    path: '/input-model-parameters',
     name: 'ModelParameterInput',
     component: ModelParameterInput,
     children: [
