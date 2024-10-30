@@ -54,7 +54,7 @@
       <v-spacer class="space"></v-spacer>
       <StandDensity />
       <v-spacer class="space"></v-spacer>
-      <AdditionalStandAttributes />
+      <AddtStandAttrs />
       <v-spacer class="space"></v-spacer>
       <ReportInfo />
 
@@ -104,7 +104,7 @@ import ViewErrorMessages from '@/views/input-model-parameters/ViewErrorMessages.
 
 import SiteInfo from '@/components/model-param-selection-panes/SiteInfo.vue'
 import StandDensity from '@/components/model-param-selection-panes/StandDensity.vue'
-import AdditionalStandAttributes from '@/components/model-param-selection-panes/AdditionalStandAttributes.vue'
+import AddtStandAttrs from '@/components/model-param-selection-panes/AddtStandAttrs.vue'
 import ReportInfo from '@/components/model-param-selection-panes/ReportInfo.vue'
 
 const tabStore = useInputModelParamTabStore()

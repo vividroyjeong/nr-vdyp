@@ -75,7 +75,7 @@ export const MODEL_PARAMETER_PANEL = Object.freeze({
   SPECIES_INFO: 'speciesInfo',
   SITE_INFO: 'siteInfo',
   STAND_DENSITY: 'standDensity',
-  ADDY_STAND_ATTR: 'additionalStandAttributes',
+  ADDT_STAND_ATTRS: 'addtStandAttrs',
   REPORT_INFO: 'reportInfo',
 })
 

@@ -1,13 +1,13 @@
 <template>
   <v-card class="elevation-4">
-    <v-expansion-panels v-model="panelOpenStates.additionalStandAttributes">
+    <v-expansion-panels v-model="panelOpenStates.addtStandAttrs">
       <v-expansion-panel hide-actions>
         <v-expansion-panel-title>
           <v-row no-gutters class="expander-header">
             <!-- Place an arrow icon to the left of the title -->
             <v-col cols="auto" class="expansion-panel-icon-col">
               <v-icon class="expansion-panel-icon">{{
-                panelOpenStates.additionalStandAttributes === PANEL.OPEN
+                panelOpenStates.addtStandAttrs === PANEL.OPEN
                   ? 'mdi-chevron-up'
                   : 'mdi-chevron-down'
               }}</v-icon>
@@ -32,7 +32,7 @@
                     :disabled="isComputedValuesDisabled || !isConfirmEnabled"
                   >
                     <v-radio
-                      v-for="option in additionalStandAttributesOptions"
+                      v-for="option in addtStandAttrsOptions"
                       :key="option.value"
                       :label="option.label"
                       :value="option.value"
@@ -192,7 +192,7 @@ import { Util } from '@/utils/util'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
 import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
 import { storeToRefs } from 'pinia'
-import { additionalStandAttributesOptions } from '@/constants/options'
+import { addtStandAttrsOptions } from '@/constants/options'
 import {
   PANEL,
   DERIVED_BY,
@@ -230,7 +230,7 @@ const {
   cuNetDecayVol,
 } = storeToRefs(modelParameterStore)
 
-const panelName = MODEL_PARAMETER_PANEL.ADDY_STAND_ATTR
+const panelName = MODEL_PARAMETER_PANEL.ADDT_STAND_ATTRS
 const isConfirmEnabled = computed(
   () => modelParameterStore.panelState[panelName].editable,
 )

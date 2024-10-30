@@ -15,7 +15,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     speciesInfo: PANEL.OPEN,
     siteInfo: PANEL.CLOSE,
     standDensity: PANEL.CLOSE,
-    additionalStandAttributes: PANEL.CLOSE,
+    addtStandAttrs: PANEL.CLOSE,
     reportInfo: PANEL.CLOSE,
   })
 
@@ -26,7 +26,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     speciesInfo: { confirmed: false, editable: true }, // Only speciesInfo is editable initially
     siteInfo: { confirmed: false, editable: false },
     standDensity: { confirmed: false, editable: false },
-    additionalStandAttributes: { confirmed: false, editable: false },
+    addtStandAttrs: { confirmed: false, editable: false },
     reportInfo: { confirmed: false, editable: false },
   })
 
@@ -56,7 +56,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
       MODEL_PARAMETER_PANEL.SPECIES_INFO,
       MODEL_PARAMETER_PANEL.SITE_INFO,
       MODEL_PARAMETER_PANEL.STAND_DENSITY,
-      MODEL_PARAMETER_PANEL.ADDY_STAND_ATTR,
+      MODEL_PARAMETER_PANEL.ADDT_STAND_ATTRS,
       MODEL_PARAMETER_PANEL.REPORT_INFO,
     ]
     const currentIndex = panelOrder.indexOf(panelName)
@@ -83,7 +83,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
       MODEL_PARAMETER_PANEL.SPECIES_INFO,
       MODEL_PARAMETER_PANEL.SITE_INFO,
       MODEL_PARAMETER_PANEL.STAND_DENSITY,
-      MODEL_PARAMETER_PANEL.ADDY_STAND_ATTR,
+      MODEL_PARAMETER_PANEL.ADDT_STAND_ATTRS,
       MODEL_PARAMETER_PANEL.REPORT_INFO,
     ]
     const currentIndex = panelOrder.indexOf(panelName)

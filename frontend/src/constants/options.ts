@@ -54,7 +54,7 @@ export const minimumDBHLimitsOptions = [
   { label: '22.5 cm+', value: CONSTANTS.MINIMUM_DBH_LIMITS.CM22_5 },
 ]
 
-export const additionalStandAttributesOptions = [
+export const addtStandAttrsOptions = [
   {
     label: 'Use Computed Values',
     value: CONSTANTS.COMPUTED_VALUES.USE,
