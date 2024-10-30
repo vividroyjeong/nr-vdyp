@@ -1,10 +1,10 @@
 <template>
   <v-container fluid>
-    <div class="top-project-year">
+    <div class="top-project-year mt-3">
       <h1 class="top-project">Projects</h1>
       <span class="top-year">Year: 2024/2025</span>
     </div>
-    <div>
+    <div class="mt-n1 mb-3">
       <h3>Model Parameter Selection</h3>
     </div>
 
@@ -22,7 +22,7 @@
       <JobTypeSelection />
     </v-card>
     <v-spacer class="space"></v-spacer>
-    <div class="hr-line"></div>
+    <div class="hr-line mb-5"></div>
     <v-spacer class="space"></v-spacer>
     <v-tabs
       v-model="tabStore.currentTab"
@@ -75,11 +75,11 @@
           text-align: end;
         "
       >
-        <v-card-actions class="pr-0">
+        <v-card-actions class="pr-0 mr-2">
           <v-spacer></v-spacer>
-          <v-btn class="white-btn mr-3" @click="cancel">Cancel</v-btn>
+          <v-btn class="white-btn" @click="cancel">Cancel</v-btn>
           <v-btn
-            class="blue-btn mr-2"
+            class="blue-btn ml-2"
             :disabled="!modelParameterStore.runModelEnabled"
             @click="runModel"
             >Run Model</v-btn

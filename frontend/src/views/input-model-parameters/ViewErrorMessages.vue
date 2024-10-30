@@ -8,19 +8,17 @@
         align-items: end;
         text-align: end;
       "
+      class="mr-2"
     >
       <v-card-actions class="pr-0">
         <v-spacer></v-spacer>
-        <v-btn class="white-btn mr-3" @click="download">Download</v-btn>
-        <v-btn class="blue-btn mr-2" @click="print">Print</v-btn>
+        <v-btn class="white-btn" @click="download">Download</v-btn>
+        <v-btn class="blue-btn ml-2" @click="print">Print</v-btn>
       </v-card-actions>
     </v-card>
-
-    <div>
-      <div id="print-area" ref="printAreaRef">
-        <h1>print content</h1>
-        <p>This will be printed.</p>
-      </div>
+    <div id="print-area" ref="printAreaRef" class="ml-2 mr-2">
+      <h1>print content</h1>
+      <p>This will be printed.</p>
     </div>
   </v-container>
 </template>

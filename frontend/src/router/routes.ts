@@ -1,6 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
 
-import JobList from '@/views/JobList.vue'
+// import JobList from '@/views/JobList.vue'
 import ModelParameterInput from '@/views/input-model-parameters/ModelParameterInput.vue'
 import ModelParameterSelection from '@/views/input-model-parameters/ModelParameterSelection.vue'
 import PageNotFound from '@/views/PageNotFound.vue'
