@@ -203,12 +203,12 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   // additional stand attributes
   const computedValues = ref<string | null>(null)
   const loreyHeight = ref<string | null>(null)
-  const basalArea125cm = ref<string | null>(null)
-  const closeUtilVolume = ref<string | null>(null)
-  const closeUtilNetDecayWasteVolume = ref<string | null>(null)
-  const wholeStemVolume75cm = ref<string | null>(null)
-  const wholeStemVolume125cm = ref<string | null>(null)
-  const closeUtilNetDecayVolume = ref<string | null>(null)
+  const wholeStemVol75 = ref<string | null>(null)
+  const basalArea125 = ref<string | null>(null)
+  const wholeStemVol125 = ref<string | null>(null)
+  const cuVol = ref<string | null>(null)
+  const cuNetDecayVol = ref<string | null>(null)
+  const cuNetDecayWasteVol = ref<string | null>(null)
 
   // report info
   const startingAge = ref<number | null>(null)
@@ -251,13 +251,12 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     percentCrownClosure.value = DEFAULT_VALUES.PERCENT_CROWN_CLOSURE
     computedValues.value = DEFAULT_VALUES.COMPUTED_VALUES
     loreyHeight.value = DEFAULT_VALUES.LOREY_HEIGHT
-    wholeStemVolume75cm.value = DEFAULT_VALUES.WHOLE_STEM_VOLUME
-    basalArea125cm.value = DEFAULT_VALUES.BASAL_AREA_125CM
-    wholeStemVolume125cm.value = DEFAULT_VALUES.WHOLE_STEM_VOLUME_125CM
-    closeUtilVolume.value = DEFAULT_VALUES.CLOSE_UTIL_VOLUME
-    closeUtilNetDecayVolume.value = DEFAULT_VALUES.CLOSE_UTIL_NET_DECAY_VOLUME
-    closeUtilNetDecayWasteVolume.value =
-      DEFAULT_VALUES.CLOSE_UTIL_NET_DECAY_WASTE_VOLUME
+    wholeStemVol75.value = DEFAULT_VALUES.WHOLE_STEM_VOL75
+    basalArea125.value = DEFAULT_VALUES.BASAL_AREA125
+    wholeStemVol125.value = DEFAULT_VALUES.WHOLE_STEM_VOL125
+    cuVol.value = DEFAULT_VALUES.CU_VOL
+    cuNetDecayVol.value = DEFAULT_VALUES.CU_NET_DECAY_VOL
+    cuNetDecayWasteVol.value = DEFAULT_VALUES.CU_NET_DECAY_WASTE_VOL
     startingAge.value = DEFAULT_VALUES.STARTING_AGE
     finishingAge.value = DEFAULT_VALUES.FINISHING_AGE
     ageIncrement.value = DEFAULT_VALUES.AGE_INCREMENT
@@ -305,12 +304,13 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     // additional stand attributes
     computedValues,
     loreyHeight,
-    basalArea125cm,
-    closeUtilVolume,
-    closeUtilNetDecayWasteVolume,
-    wholeStemVolume75cm,
-    wholeStemVolume125cm,
-    closeUtilNetDecayVolume,
+    wholeStemVol75,
+    basalArea125,
+    wholeStemVol125,
+    cuVol,
+    cuNetDecayVol,
+    cuNetDecayWasteVol,
+
     // report info
     startingAge,
     finishingAge,

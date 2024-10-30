@@ -59,14 +59,12 @@
                 <v-col cols="5">
                   <v-text-field
                     type="text"
-                    v-model.number="wholeStemVolume75cm"
+                    v-model.number="wholeStemVol75"
                     persistent-placeholder
-                    :placeholder="wholeStemVolume75cmPlaceholder"
+                    :placeholder="wholeStemVol75Placeholder"
                     density="compact"
                     dense
-                    :disabled="
-                      isWholeStemVolume75cmDisabled || !isConfirmEnabled
-                    "
+                    :disabled="isWholeStemVol75Disabled || !isConfirmEnabled"
                   >
                     <template v-slot:label>
                       Whole Stem Volume - 7.5cm+ (m<sup>3</sup>/ha)
@@ -78,12 +76,12 @@
                 <v-col cols="5">
                   <v-text-field
                     type="text"
-                    v-model.number="basalArea125cm"
+                    v-model.number="basalArea125"
                     persistent-placeholder
-                    :placeholder="basalArea125cmPlaceholder"
+                    :placeholder="basalArea125Placeholder"
                     density="compact"
                     dense
-                    :disabled="isBasalArea125cmDisabled || !isConfirmEnabled"
+                    :disabled="isBasalArea125Disabled || !isConfirmEnabled"
                   >
                     <template v-slot:label>
                       Basal Area - 12.5cm+ (m<sup>2</sup>/ha)
@@ -94,14 +92,12 @@
                 <v-col cols="5">
                   <v-text-field
                     type="text"
-                    v-model.number="wholeStemVolume125cm"
+                    v-model.number="wholeStemVol125"
                     persistent-placeholder
-                    :placeholder="wholeStemVolume125cmPlaceholder"
+                    :placeholder="wholeStemVol125Placeholder"
                     density="compact"
                     dense
-                    :disabled="
-                      isWholeStemVolume125cmDisabled || !isConfirmEnabled
-                    "
+                    :disabled="isWholeStemVol125Disabled || !isConfirmEnabled"
                   >
                     <template v-slot:label>
                       Whole Stem Volume - 12.5cm+ (m<sup>3</sup>/ha)
@@ -113,12 +109,12 @@
                 <v-col cols="5">
                   <v-text-field
                     type="text"
-                    v-model.number="closeUtilVolume"
+                    v-model.number="cuVol"
                     persistent-placeholder
-                    :placeholder="closeUtilVolumePlaceholder"
+                    :placeholder="cuVolPlaceholder"
                     density="compact"
                     dense
-                    :disabled="isCloseUtilVolumeDisabled || !isConfirmEnabled"
+                    :disabled="isCuVolDisabled || !isConfirmEnabled"
                   >
                     <template v-slot:label>
                       Close Utilization Volume - 12.5cm+ (m<sup>3</sup>/ha)
@@ -129,14 +125,12 @@
                 <v-col cols="5">
                   <v-text-field
                     type="text"
-                    v-model.number="closeUtilNetDecayVolume"
+                    v-model.number="cuNetDecayVol"
                     persistent-placeholder
-                    :placeholder="closeUtilNetDecayVolumePlaceholder"
+                    :placeholder="cuNetDecayVolPlaceholder"
                     density="compact"
                     dense
-                    :disabled="
-                      isCloseUtilNetDecayVolumeDisabled || !isConfirmEnabled
-                    "
+                    :disabled="isCuNetDecayVolDisabled || !isConfirmEnabled"
                   >
                     <template v-slot:label>
                       Close Utilization Net Decay Volume - 12.5cm+
@@ -149,14 +143,13 @@
                 <v-col cols="5">
                   <v-text-field
                     type="text"
-                    v-model.number="closeUtilNetDecayWasteVolume"
+                    v-model.number="cuNetDecayWasteVol"
                     persistent-placeholder
-                    :placeholder="closeUtilNetDecayWasteVolumePlaceholder"
+                    :placeholder="cuNetDecayWasteVolPlaceholder"
                     density="compact"
                     dense
                     :disabled="
-                      isCloseUtilNetDecayWasteVolumeDisabled ||
-                      !isConfirmEnabled
+                      isCuNetDecayWasteVolDisabled || !isConfirmEnabled
                     "
                   >
                     <template v-slot:label>
@@ -229,12 +222,12 @@ const {
   age,
   basalArea,
   loreyHeight,
-  basalArea125cm,
-  closeUtilVolume,
-  closeUtilNetDecayWasteVolume,
-  wholeStemVolume75cm,
-  wholeStemVolume125cm,
-  closeUtilNetDecayVolume,
+  basalArea125,
+  cuVol,
+  cuNetDecayWasteVol,
+  wholeStemVol75,
+  wholeStemVol125,
+  cuNetDecayVol,
 } = storeToRefs(modelParameterStore)
 
 const panelName = MODEL_PARAMETER_PANEL.ADDY_STAND_ATTR
@@ -247,28 +240,28 @@ const isConfirmed = computed(
 
 const isComputedValuesDisabled = ref(false)
 const isLoreyHeightDisabled = ref(false)
-const isWholeStemVolume75cmDisabled = ref(false)
-const isBasalArea125cmDisabled = ref(false)
-const isWholeStemVolume125cmDisabled = ref(false)
-const isCloseUtilVolumeDisabled = ref(false)
-const isCloseUtilNetDecayVolumeDisabled = ref(false)
-const isCloseUtilNetDecayWasteVolumeDisabled = ref(false)
+const isWholeStemVol75Disabled = ref(false)
+const isBasalArea125Disabled = ref(false)
+const isWholeStemVol125Disabled = ref(false)
+const isCuVolDisabled = ref(false)
+const isCuNetDecayVolDisabled = ref(false)
+const isCuNetDecayWasteVolDisabled = ref(false)
 
 const loreyHeightPlaceholder = ref('')
-const wholeStemVolume75cmPlaceholder = ref('')
-const basalArea125cmPlaceholder = ref('')
-const wholeStemVolume125cmPlaceholder = ref('')
-const closeUtilVolumePlaceholder = ref('')
-const closeUtilNetDecayVolumePlaceholder = ref('')
-const closeUtilNetDecayWasteVolumePlaceholder = ref('')
+const wholeStemVol75Placeholder = ref('')
+const basalArea125Placeholder = ref('')
+const wholeStemVol125Placeholder = ref('')
+const cuVolPlaceholder = ref('')
+const cuNetDecayVolPlaceholder = ref('')
+const cuNetDecayWasteVolPlaceholder = ref('')
 
 const loreyHeightOriginal = ref<string | null>(null)
-const wholeStemVolume75cmOriginal = ref<string | null>(null)
-const basalArea125cmOriginal = ref<string | null>(null)
-const wholeStemVolume125cmOriginal = ref<string | null>(null)
-const closeUtilVolumeOriginal = ref<string | null>(null)
-const closeUtilNetDecayVolumeOriginal = ref<string | null>(null)
-const closeUtilNetDecayWasteVolumeOriginal = ref<string | null>(null)
+const wholeStemVol75Original = ref<string | null>(null)
+const basalArea125Original = ref<string | null>(null)
+const wholeStemVol125Original = ref<string | null>(null)
+const cuVolOriginal = ref<string | null>(null)
+const cuNetDecayVolOriginal = ref<string | null>(null)
+const cuNetDecayWasteVolOriginal = ref<string | null>(null)
 
 const updateComputedValuesState = (
   newDerivedBy: string | null,
@@ -288,32 +281,32 @@ const updateFieldDisabledStates = (newComputedValues: string | null) => {
   const isDisabled = newComputedValues === COMPUTED_VALUES.USE
 
   isLoreyHeightDisabled.value = isDisabled
-  isWholeStemVolume75cmDisabled.value = isDisabled
-  isBasalArea125cmDisabled.value = isDisabled
-  isWholeStemVolume125cmDisabled.value = isDisabled
-  isCloseUtilVolumeDisabled.value = isDisabled
-  isCloseUtilNetDecayVolumeDisabled.value = isDisabled
-  isCloseUtilNetDecayWasteVolumeDisabled.value = isDisabled
+  isWholeStemVol75Disabled.value = isDisabled
+  isBasalArea125Disabled.value = isDisabled
+  isWholeStemVol125Disabled.value = isDisabled
+  isCuVolDisabled.value = isDisabled
+  isCuNetDecayVolDisabled.value = isDisabled
+  isCuNetDecayWasteVolDisabled.value = isDisabled
 }
 
 const updateFieldPlaceholderStates = (newAge: number | null) => {
   // TODO - Make sure that all fields are changed to not available indicator by Age.
   if (Util.isEmptyOrZero(newAge)) {
     loreyHeightPlaceholder.value = NOT_AVAILABLE_INDI.NA
-    wholeStemVolume75cmPlaceholder.value = NOT_AVAILABLE_INDI.NA
-    basalArea125cmPlaceholder.value = NOT_AVAILABLE_INDI.NA
-    wholeStemVolume125cmPlaceholder.value = NOT_AVAILABLE_INDI.NA
-    closeUtilVolumePlaceholder.value = NOT_AVAILABLE_INDI.NA
-    closeUtilNetDecayVolumePlaceholder.value = NOT_AVAILABLE_INDI.NA
-    closeUtilNetDecayWasteVolumePlaceholder.value = NOT_AVAILABLE_INDI.NA
+    wholeStemVol75Placeholder.value = NOT_AVAILABLE_INDI.NA
+    basalArea125Placeholder.value = NOT_AVAILABLE_INDI.NA
+    wholeStemVol125Placeholder.value = NOT_AVAILABLE_INDI.NA
+    cuVolPlaceholder.value = NOT_AVAILABLE_INDI.NA
+    cuNetDecayVolPlaceholder.value = NOT_AVAILABLE_INDI.NA
+    cuNetDecayWasteVolPlaceholder.value = NOT_AVAILABLE_INDI.NA
   } else {
     loreyHeightPlaceholder.value = ''
-    wholeStemVolume75cmPlaceholder.value = ''
-    basalArea125cmPlaceholder.value = ''
-    wholeStemVolume125cmPlaceholder.value = ''
-    closeUtilVolumePlaceholder.value = ''
-    closeUtilNetDecayVolumePlaceholder.value = ''
-    closeUtilNetDecayWasteVolumePlaceholder.value = ''
+    wholeStemVol75Placeholder.value = ''
+    basalArea125Placeholder.value = ''
+    wholeStemVol125Placeholder.value = ''
+    cuVolPlaceholder.value = ''
+    cuNetDecayVolPlaceholder.value = ''
+    cuNetDecayWasteVolPlaceholder.value = ''
   }
 }
 
@@ -321,25 +314,24 @@ const updateFieldValueStates = (newAge: number | null) => {
   // TODO - Make sure that all fields are changed to not available by Age.
   if (Util.isEmptyOrZero(newAge)) {
     loreyHeight.value = null
-    wholeStemVolume75cm.value = null
-    basalArea125cm.value = null
-    wholeStemVolume125cm.value = null
-    closeUtilVolume.value = null
-    closeUtilNetDecayVolume.value = null
-    closeUtilNetDecayWasteVolume.value = null
+    wholeStemVol75.value = null
+    basalArea125.value = null
+    wholeStemVol125.value = null
+    cuVol.value = null
+    cuNetDecayVol.value = null
+    cuNetDecayWasteVol.value = null
   }
 }
 
 const updateOriginalValues = () => {
   if (computedValues.value === COMPUTED_VALUES.MODIFY) {
     loreyHeightOriginal.value = loreyHeight.value
-    wholeStemVolume75cmOriginal.value = wholeStemVolume75cm.value
-    basalArea125cmOriginal.value = basalArea125cm.value
-    wholeStemVolume125cmOriginal.value = wholeStemVolume125cm.value
-    closeUtilVolumeOriginal.value = closeUtilVolume.value
-    closeUtilNetDecayVolumeOriginal.value = closeUtilNetDecayVolume.value
-    closeUtilNetDecayWasteVolumeOriginal.value =
-      closeUtilNetDecayWasteVolume.value
+    wholeStemVol75Original.value = wholeStemVol75.value
+    basalArea125Original.value = basalArea125.value
+    wholeStemVol125Original.value = wholeStemVol125.value
+    cuVolOriginal.value = cuVol.value
+    cuNetDecayVolOriginal.value = cuNetDecayVol.value
+    cuNetDecayWasteVolOriginal.value = cuNetDecayWasteVol.value
   }
 }
 
@@ -398,19 +390,19 @@ const validateFieldPresenceAndValue = (
 const validateAllFields = (): boolean => {
   const fieldsToValidate = [
     { value: loreyHeight.value, name: 'Lorey Height - 7.5cm+' },
-    { value: wholeStemVolume75cm.value, name: 'Whole Stem Volume - 7.5cm+' },
-    { value: basalArea125cm.value, name: 'Basal Area - 12.5cm+' },
-    { value: wholeStemVolume125cm.value, name: 'Whole Stem Volume - 12.5cm+' },
+    { value: wholeStemVol75.value, name: 'Whole Stem Volume - 7.5cm+' },
+    { value: basalArea125.value, name: 'Basal Area - 12.5cm+' },
+    { value: wholeStemVol125.value, name: 'Whole Stem Volume - 12.5cm+' },
     {
-      value: closeUtilVolume.value,
+      value: cuVol.value,
       name: 'Close Utilization Volume - 12.5cm+',
     },
     {
-      value: closeUtilNetDecayVolume.value,
+      value: cuNetDecayVol.value,
       name: 'Close Utilization Net Decay Volume - 12.5cm+',
     },
     {
-      value: closeUtilNetDecayWasteVolume.value,
+      value: cuNetDecayWasteVol.value,
       name: 'Close Utilization Net Decay Waste Volume - 12.5cm+',
     },
   ]
@@ -429,22 +421,22 @@ const validateComputedValuesModification = (): boolean => {
     const fields = [
       { original: loreyHeightOriginal, current: loreyHeight.value },
       {
-        original: wholeStemVolume75cmOriginal,
-        current: wholeStemVolume75cm.value,
+        original: wholeStemVol75Original,
+        current: wholeStemVol75.value,
       },
-      { original: basalArea125cmOriginal, current: basalArea125cm.value },
+      { original: basalArea125Original, current: basalArea125.value },
       {
-        original: wholeStemVolume125cmOriginal,
-        current: wholeStemVolume125cm.value,
+        original: wholeStemVol125Original,
+        current: wholeStemVol125.value,
       },
-      { original: closeUtilVolumeOriginal, current: closeUtilVolume.value },
+      { original: cuVolOriginal, current: cuVol.value },
       {
-        original: closeUtilNetDecayVolumeOriginal,
-        current: closeUtilNetDecayVolume.value,
+        original: cuNetDecayVolOriginal,
+        current: cuNetDecayVol.value,
       },
       {
-        original: closeUtilNetDecayWasteVolumeOriginal,
-        current: closeUtilNetDecayWasteVolume.value,
+        original: cuNetDecayWasteVolOriginal,
+        current: cuNetDecayWasteVol.value,
       },
     ]
 
@@ -467,9 +459,9 @@ const validateComputedValuesModification = (): boolean => {
 
 const validateComparison = (): boolean => {
   if (
-    basalArea125cm.value !== null &&
+    basalArea125.value !== null &&
     basalArea.value !== null &&
-    parseFloat(basalArea125cm.value) > parseFloat(basalArea.value)
+    parseFloat(basalArea125.value) > parseFloat(basalArea.value)
   ) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
@@ -480,9 +472,9 @@ const validateComparison = (): boolean => {
   }
 
   if (
-    wholeStemVolume125cm.value !== null &&
-    wholeStemVolume75cm.value !== null &&
-    wholeStemVolume125cm.value > wholeStemVolume75cm.value
+    wholeStemVol125.value !== null &&
+    wholeStemVol75.value !== null &&
+    wholeStemVol125.value > wholeStemVol75.value
   ) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
@@ -493,9 +485,9 @@ const validateComparison = (): boolean => {
   }
 
   if (
-    closeUtilVolume.value !== null &&
-    wholeStemVolume125cm.value !== null &&
-    closeUtilVolume.value > wholeStemVolume125cm.value
+    cuVol.value !== null &&
+    wholeStemVol125.value !== null &&
+    cuVol.value > wholeStemVol125.value
   ) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
@@ -506,9 +498,9 @@ const validateComparison = (): boolean => {
   }
 
   if (
-    closeUtilNetDecayVolume.value !== null &&
-    closeUtilVolume.value !== null &&
-    closeUtilNetDecayVolume.value > closeUtilVolume.value
+    cuNetDecayVol.value !== null &&
+    cuVol.value !== null &&
+    cuNetDecayVol.value > cuVol.value
   ) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
@@ -519,9 +511,9 @@ const validateComparison = (): boolean => {
   }
 
   if (
-    closeUtilNetDecayWasteVolume.value !== null &&
-    closeUtilNetDecayVolume.value !== null &&
-    closeUtilNetDecayWasteVolume.value > closeUtilNetDecayVolume.value
+    cuNetDecayWasteVol.value !== null &&
+    cuNetDecayVol.value !== null &&
+    cuNetDecayWasteVol.value > cuNetDecayVol.value
   ) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
@@ -550,11 +542,9 @@ const validateRange = (): boolean => {
   }
 
   if (
-    wholeStemVolume75cm.value !== null &&
-    (parseFloat(wholeStemVolume75cm.value) <
-      NUM_INPUT_LIMITS.WHOLE_STEM_VOL_75CM_MIN ||
-      parseFloat(wholeStemVolume75cm.value) >
-        NUM_INPUT_LIMITS.WHOLE_STEM_VOL_75CM_MAX)
+    wholeStemVol75.value !== null &&
+    (parseFloat(wholeStemVol75.value) < NUM_INPUT_LIMITS.WHOLE_STEM_VOL75_MIN ||
+      parseFloat(wholeStemVol75.value) > NUM_INPUT_LIMITS.WHOLE_STEM_VOL75_MAX)
   ) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
@@ -565,9 +555,9 @@ const validateRange = (): boolean => {
   }
 
   if (
-    basalArea125cm.value !== null &&
-    (parseFloat(basalArea125cm.value) < NUM_INPUT_LIMITS.BASAL_AREA_125CM_MIN ||
-      parseFloat(basalArea125cm.value) > NUM_INPUT_LIMITS.BASAL_AREA_125CM_MAX)
+    basalArea125.value !== null &&
+    (parseFloat(basalArea125.value) < NUM_INPUT_LIMITS.BASAL_AREA125_MIN ||
+      parseFloat(basalArea125.value) > NUM_INPUT_LIMITS.BASAL_AREA125_MAX)
   ) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
@@ -578,11 +568,11 @@ const validateRange = (): boolean => {
   }
 
   if (
-    wholeStemVolume125cm.value !== null &&
-    (parseFloat(wholeStemVolume125cm.value) <
-      NUM_INPUT_LIMITS.WHOLE_STEM_VOL_125CM_MIN ||
-      parseFloat(wholeStemVolume125cm.value) >
-        NUM_INPUT_LIMITS.WHOLE_STEM_VOL_125CM_MAX)
+    wholeStemVol125.value !== null &&
+    (parseFloat(wholeStemVol125.value) <
+      NUM_INPUT_LIMITS.WHOLE_STEM_VOL125_MIN ||
+      parseFloat(wholeStemVol125.value) >
+        NUM_INPUT_LIMITS.WHOLE_STEM_VOL125_MAX)
   ) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
@@ -593,9 +583,9 @@ const validateRange = (): boolean => {
   }
 
   if (
-    closeUtilVolume.value !== null &&
-    (parseFloat(closeUtilVolume.value) < NUM_INPUT_LIMITS.CU_VOLUME_MIN ||
-      parseFloat(closeUtilVolume.value) > NUM_INPUT_LIMITS.CU_VOLUME_MAX)
+    cuVol.value !== null &&
+    (parseFloat(cuVol.value) < NUM_INPUT_LIMITS.CU_VOL_MIN ||
+      parseFloat(cuVol.value) > NUM_INPUT_LIMITS.CU_VOL_MAX)
   ) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
@@ -606,11 +596,9 @@ const validateRange = (): boolean => {
   }
 
   if (
-    closeUtilNetDecayVolume.value !== null &&
-    (parseFloat(closeUtilNetDecayVolume.value) <
-      NUM_INPUT_LIMITS.CU_NET_DECAY_VOL_MIN ||
-      parseFloat(closeUtilNetDecayVolume.value) >
-        NUM_INPUT_LIMITS.CU_NET_DECAY_VOL_MAX)
+    cuNetDecayVol.value !== null &&
+    (parseFloat(cuNetDecayVol.value) < NUM_INPUT_LIMITS.CU_NET_DECAY_VOL_MIN ||
+      parseFloat(cuNetDecayVol.value) > NUM_INPUT_LIMITS.CU_NET_DECAY_VOL_MAX)
   ) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
@@ -621,10 +609,10 @@ const validateRange = (): boolean => {
   }
 
   if (
-    closeUtilNetDecayWasteVolume.value !== null &&
-    (parseFloat(closeUtilNetDecayWasteVolume.value) <
+    cuNetDecayWasteVol.value !== null &&
+    (parseFloat(cuNetDecayWasteVol.value) <
       NUM_INPUT_LIMITS.CU_NET_DECAY_WASTE_VOL_MIN ||
-      parseFloat(closeUtilNetDecayWasteVolume.value) >
+      parseFloat(cuNetDecayWasteVol.value) >
         NUM_INPUT_LIMITS.CU_NET_DECAY_WASTE_VOL_MAX)
   ) {
     messageDialogStore.openDialog(
@@ -648,10 +636,7 @@ const validateValues = (): boolean => {
     return false
   }
 
-  if (
-    wholeStemVolume75cm.value &&
-    !/^\d+(\.\d)?$/.test(wholeStemVolume75cm.value)
-  ) {
+  if (wholeStemVol75.value && !/^\d+(\.\d)?$/.test(wholeStemVol75.value)) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
       MDL_PRM_INPUT_ERR.ATTR_VLD_WSV75_FMT,
@@ -660,7 +645,7 @@ const validateValues = (): boolean => {
     return false
   }
 
-  if (basalArea125cm.value && !/^\d+(\.\d{4})?$/.test(basalArea125cm.value)) {
+  if (basalArea125.value && !/^\d+(\.\d{4})?$/.test(basalArea125.value)) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
       MDL_PRM_INPUT_ERR.ATTR_VLD_BSL_AREA_FMT,
@@ -669,10 +654,7 @@ const validateValues = (): boolean => {
     return false
   }
 
-  if (
-    wholeStemVolume125cm.value &&
-    !/^\d+(\.\d)?$/.test(wholeStemVolume125cm.value)
-  ) {
+  if (wholeStemVol125.value && !/^\d+(\.\d)?$/.test(wholeStemVol125.value)) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
       MDL_PRM_INPUT_ERR.ATTR_VLD_WSV125_FMT,
@@ -681,7 +663,7 @@ const validateValues = (): boolean => {
     return false
   }
 
-  if (closeUtilVolume.value && !/^\d+(\.\d)?$/.test(closeUtilVolume.value)) {
+  if (cuVol.value && !/^\d+(\.\d)?$/.test(cuVol.value)) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
       MDL_PRM_INPUT_ERR.ATTR_VLD_CUV125_FMT,
@@ -690,10 +672,7 @@ const validateValues = (): boolean => {
     return false
   }
 
-  if (
-    closeUtilNetDecayVolume.value &&
-    !/^\d+(\.\d)?$/.test(closeUtilNetDecayVolume.value)
-  ) {
+  if (cuNetDecayVol.value && !/^\d+(\.\d)?$/.test(cuNetDecayVol.value)) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
       MDL_PRM_INPUT_ERR.ATTR_VLD_CUNDV_FMT,
@@ -703,8 +682,8 @@ const validateValues = (): boolean => {
   }
 
   if (
-    closeUtilNetDecayWasteVolume.value &&
-    !/^\d+(\.\d)?$/.test(closeUtilNetDecayWasteVolume.value)
+    cuNetDecayWasteVol.value &&
+    !/^\d+(\.\d)?$/.test(cuNetDecayWasteVol.value)
   ) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
