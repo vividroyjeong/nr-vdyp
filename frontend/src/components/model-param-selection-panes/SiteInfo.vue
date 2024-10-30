@@ -375,7 +375,7 @@ import {
   DERIVED_BY,
   SITE_SPECIES_VALUES,
   FLOATING,
-  NOT_AVAILABLE_INDI,
+  SPECIAL_INDICATORS,
   MODEL_PARAMETER_PANEL,
   NUM_INPUT_LIMITS,
   CONTINUOUS_INC_DEC,
@@ -497,8 +497,8 @@ const handleSiteSpeciesValuesState = (
 
     age.value = null
     height.value = null
-    agePlaceholder.value = NOT_AVAILABLE_INDI.NA
-    heightPlaceholder.value = NOT_AVAILABLE_INDI.NA
+    agePlaceholder.value = SPECIAL_INDICATORS.NA
+    heightPlaceholder.value = SPECIAL_INDICATORS.NA
   }
 }
 

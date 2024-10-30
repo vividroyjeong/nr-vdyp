@@ -228,7 +228,7 @@ import {
   PANEL,
   DERIVED_BY,
   SITE_SPECIES_VALUES,
-  NOT_AVAILABLE_INDI,
+  SPECIAL_INDICATORS,
   MODEL_PARAMETER_PANEL,
   NUM_INPUT_LIMITS,
   SPIN_BUTTON,
@@ -294,7 +294,7 @@ const updateBasalAreaState = (isEnabled: boolean, isAgeZero: boolean) => {
   isBasalAreaDisabled.value = !isEnabled || isAgeZero
 
   if (isBasalAreaDisabled.value) {
-    basalAreaPlaceholder.value = NOT_AVAILABLE_INDI.NA
+    basalAreaPlaceholder.value = SPECIAL_INDICATORS.NA
     basalArea.value = null
   } else {
     basalAreaPlaceholder.value = ''
@@ -306,7 +306,7 @@ const updateTreesPerHectareState = (isEnabled: boolean, isAgeZero: boolean) => {
   isTreesPerHectareDisabled.value = !isEnabled || isAgeZero
 
   if (isTreesPerHectareDisabled.value) {
-    tphPlaceholder.value = NOT_AVAILABLE_INDI.NA
+    tphPlaceholder.value = SPECIAL_INDICATORS.NA
     treesPerHectare.value = null
   } else {
     tphPlaceholder.value = ''
@@ -322,7 +322,7 @@ const updateCrownClosureState = (
   isPercentCrownClosureDisabled.value = !(isVolume && isComputed) || isAgeZero
 
   if (isPercentCrownClosureDisabled.value) {
-    crownClosurePlaceholder.value = NOT_AVAILABLE_INDI.NA
+    crownClosurePlaceholder.value = SPECIAL_INDICATORS.NA
     percentCrownClosure.value = null
   } else {
     crownClosurePlaceholder.value = ''

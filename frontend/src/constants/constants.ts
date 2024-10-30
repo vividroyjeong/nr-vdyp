@@ -67,8 +67,9 @@ export const PROJECTION_TYPE = Object.freeze({
   CFS_BIOMASS: 'CFS Biomass',
 })
 
-export const NOT_AVAILABLE_INDI = Object.freeze({
+export const SPECIAL_INDICATORS = Object.freeze({
   NA: 'N/A',
+  NOT_USED: '<Not Used>',
 })
 
 export const MODEL_PARAMETER_PANEL = Object.freeze({

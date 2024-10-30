@@ -198,7 +198,7 @@ import {
   DERIVED_BY,
   SITE_SPECIES_VALUES,
   COMPUTED_VALUES,
-  NOT_AVAILABLE_INDI,
+  SPECIAL_INDICATORS,
   MODEL_PARAMETER_PANEL,
   NUM_INPUT_LIMITS,
 } from '@/constants/constants'
@@ -292,13 +292,13 @@ const updateFieldDisabledStates = (newComputedValues: string | null) => {
 const updateFieldPlaceholderStates = (newAge: number | null) => {
   // TODO - Make sure that all fields are changed to not available indicator by Age.
   if (Util.isEmptyOrZero(newAge)) {
-    loreyHeightPlaceholder.value = NOT_AVAILABLE_INDI.NA
-    wholeStemVol75Placeholder.value = NOT_AVAILABLE_INDI.NA
-    basalArea125Placeholder.value = NOT_AVAILABLE_INDI.NA
-    wholeStemVol125Placeholder.value = NOT_AVAILABLE_INDI.NA
-    cuVolPlaceholder.value = NOT_AVAILABLE_INDI.NA
-    cuNetDecayVolPlaceholder.value = NOT_AVAILABLE_INDI.NA
-    cuNetDecayWasteVolPlaceholder.value = NOT_AVAILABLE_INDI.NA
+    loreyHeightPlaceholder.value = SPECIAL_INDICATORS.NA
+    wholeStemVol75Placeholder.value = SPECIAL_INDICATORS.NA
+    basalArea125Placeholder.value = SPECIAL_INDICATORS.NA
+    wholeStemVol125Placeholder.value = SPECIAL_INDICATORS.NA
+    cuVolPlaceholder.value = SPECIAL_INDICATORS.NA
+    cuNetDecayVolPlaceholder.value = SPECIAL_INDICATORS.NA
+    cuNetDecayWasteVolPlaceholder.value = SPECIAL_INDICATORS.NA
   } else {
     loreyHeightPlaceholder.value = ''
     wholeStemVol75Placeholder.value = ''
