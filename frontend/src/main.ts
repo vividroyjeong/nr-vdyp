@@ -3,6 +3,9 @@ import { registerPlugins } from '@/plugins'
 import App from './App.vue'
 import { initializeKeycloak } from '@/services/keycloak'
 
+// import Auth from './auth'
+// import { useAuthStore } from '@/stores/common/authStore'
+
 import '@bcgov/bc-sans/css/BCSans.css'
 import '@/styles/style.scss'
 
@@ -13,9 +16,26 @@ const bootstrap = async () => {
 
   registerPlugins(app)
 
-  /**
-   * NOTE: Disabled user authentication for deploy testing.
-   */
+  // API test -------------------------------------------
+  // const auth = new Auth()
+  // const path = auth.authorize()
+  // if (path) {
+  //   const token = auth.getJWTfromStorage()
+
+  //   const authStore = useAuthStore()
+  //   if (token) {
+  //     authStore.setUser({
+  //       accessToken: token,
+  //       refToken: '',
+  //       idToken: '',
+  //     })
+
+  //     authStore.loadUserFromStorage()
+  //     console.log(authStore.user?.accessToken)
+  //   }
+  // }
+  // console.log(`path : ${path}`)
+  // API test end -------------------------------------------
 
   try {
     const keycloak = await initializeKeycloak()

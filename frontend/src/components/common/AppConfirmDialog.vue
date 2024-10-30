@@ -1,43 +1,31 @@
 <template>
-  <v-dialog
-    v-model="dialog"
-    :max-width="options.width"
-    :style="{ zIndex: options.zIndex }"
-    @keydown.esc="cancel"
-  >
+  <v-dialog v-model="dialog" persistent :max-width="options.width">
     <v-card>
-      <v-toolbar dense flat>
-        <v-toolbar-title
-          :style="options.titleStyle"
-          class="text-body-2 font-weight-bold grey--text"
-          >{{ title }}</v-toolbar-title
-        >
-      </v-toolbar>
-      <!-- eslint-disable vue/no-v-text-v-html-on-component -->
+      <v-card-title
+        style="font-weight: 300 !important; padding-left: 30px !important"
+        class="popup-header"
+        >{{ title }}</v-card-title
+      >
       <v-card-text
         v-show="!!message"
-        class="pa-4 black--text"
-        style="font-size: 14px"
-        v-html="message"
-      ></v-card-text>
-      <v-card-actions class="pt-3">
+        class="pa-4"
+        style="
+          font-size: 14px;
+          padding-left: 35px !important;
+          padding-right: 35px !important;
+          white-space: pre-line;
+        "
+        >{{ message }}</v-card-text
+      >
+      <v-card-actions
+        class="pt-3"
+        style="background-color: #f6f6f6; border-top: 1px solid #0000001f"
+      >
         <v-spacer></v-spacer>
-        <v-btn
-          v-if="!options.noconfirm"
-          color="grey"
-          class="body-2 font-weight-bold"
-          style="letter-spacing: 0.25px"
-          @click="cancel"
-          >Cancel</v-btn
+        <v-btn v-if="!options.noconfirm" class="white-btn" @click="cancel"
+          >No</v-btn
         >
-        <v-btn
-          color="primary"
-          variant="outlined"
-          class="body-2 font-weight-bold"
-          style="letter-spacing: 0.25px"
-          @click="agree"
-          >OK</v-btn
-        >
+        <v-btn class="blue-btn ml-2" @click="agree">Yes</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -64,11 +52,6 @@ const cancel = () => {
 </script>
 
 <style scoped>
-/* confirm dialog header whole box */
-header.v-toolbar.v-toolbar--flat.v-toolbar--density-default.v-theme--defaultTheme.v-locale--is-ltr {
-  height: 48px !important;
-}
-
 .v-card-text {
   padding: 1rem !important;
 }
