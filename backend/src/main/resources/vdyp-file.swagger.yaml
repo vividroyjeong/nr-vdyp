@@ -1,0 +1,248 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/MJUNKIN_1/VDYP-File/1.0.0
+info:
+  version: "1.0.0"
+  title: Variable Density Yield Projection
+  description: >-
+    API for the Variable Density Yield Projection service
+security:
+  - accessCode:
+      - read
+      - write
+paths:
+  /projection/dcsv:
+    post:
+      summary: 'Project the growth of one or more polygons to a given year.'
+      description: >-
+        Run a projection of polygons in the supplied DCSV formatted input file as 
+        controlled by the parameters in the supplied projection parameters file.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                projectionParameters:
+                  type: string
+                  format: binary
+                  description: 'a file containing the parameters defining the run.'
+                inputData:
+                  type: string
+                  format: binary
+                  description: 'a file containing the input data in DCSV format.'
+      responses:
+        '200':
+          description: OK
+          content:
+            multipart/form-data:
+              schema:
+                $ref: '#/components/schemas/projectionResponse'
+        '400':
+          description: 'Client Error. Response content is a list of one or more messages describing the error.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/messages'
+            
+  /projection/hcsv:
+    post:
+      summary: 'Project the growth of one or more polygons to a given year.'
+      description: >-
+        Run a projection of polygons in the supplied HCSV formatted input files as 
+        controlled by the parameters in the supplied projection parameters file.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                projectionParameters:
+                  type: string
+                  format: binary
+                  description: 'a file containing the parameters defining the run.'
+                polygonInputData:
+                  type: string
+                  format: binary
+                  description: 'a file containing the polygon input data in HCSV format.'
+                layerInputData:
+                  type: string
+                  format: binary
+                  description: 'a file containing the layer input data in HCSV format.'
+      responses:
+        '200':
+          description: OK
+          content:
+            multipart/form-data:
+              schema:
+                $ref: '#/components/schemas/projectionResponse'
+        '400':
+          description: 'Client Error. Response content is a list of one or more messages describing the error.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/messages'
+            
+  /projection/scsv:
+    post:
+      summary: 'Project the growth of one or more polygons to a given year.'
+      description: >-
+        Run a projection of polygons in the supplied SCSV formatted input files as 
+        controlled by the parameters in the supplied projection parameters file.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                projectionParameters:
+                  type: string
+                  format: binary
+                  description: 'a file containing the parameters defining the run.'
+                polygonInputData:
+                  type: string
+                  format: binary
+                  description: 'a file containing the polygon input data in HCSV format.'
+                layerInputData:
+                  type: string
+                  format: binary
+                  description: 'a file containing the layer input data in HCSV format.'
+                historyInputData:
+                  type: string
+                  format: binary
+                  description: 'a file containing the history input data in HCSV format.'
+                nonVegetationInputData:
+                  type: string
+                  format: binary
+                  description: 'a file containing the non-vegetation input data in HCSV format.'
+                otherVegetationInputData:
+                  type: string
+                  format: binary
+                  description: 'a file containing the non-tree vegetation input data in HCSV format.'
+                polygonIdInputData:
+                  type: string
+                  format: binary
+                  description: 'a file containing the polygon id input data in HCSV format.'
+                speciesInputData:
+                  type: string
+                  format: binary
+                  description: 'a file containing the species input data in HCSV format.'
+                vriAdjustInputData:
+                  type: string
+                  format: binary
+                  description: 'a file containing the VRI adjust input data in HCSV format.'
+      responses:
+        '200':
+          description: OK
+          content:
+            multipart/form-data:
+              schema:
+                $ref: '#/components/schemas/projectionResponse'
+        '400':
+          description: 'Client Error. Response content is a list of one or more messages describing the error.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/messages'
+  /ping:
+    get:
+      summary: Server heartbeat operation
+      description: >-
+        This operation shows how to override the global security defined above,
+        as we want to open it up for all users.
+      security: []
+      responses:
+        '200':
+          description: OK
+          
+  /enums/{enumNameWildcard}:
+    get:
+      summary: Retrieve all enumerations matching param
+      description:
+        Retrieve all the enumerations whose name matches the given wildcard string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/enumeration'
+        '404':
+          description: No such enumeration exists
+    parameters:
+      - name: enumNameWildcard
+        in: path
+        description: the wildcard expression
+        required: true
+        schema:
+          type: string
+
+components:
+  schemas:
+    projectionResponse:
+      type: object
+      properties:
+        yieldTable: 
+          type: string
+          format: binary
+        messages:
+          type: string
+          format: binary
+        logMessages:
+          type: string
+          format: binary
+    messages:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            description: "the message's unique identifier"
+          layerId:
+            type: string
+            description: 'the id of the layer to which the message applies. This value is null if this is a polygon level message and so does not apply to a specific layer'
+          standComponentId:
+            type: string
+            description: 'the id of the stand component to which the message applies. This value will be null if not known or applicable'
+          errorCode:
+            type: string
+            description: 'the element of the ReturnCode enumeration returned from the operation that resulted in this message being generated'
+          severity:
+            $ref: '#/components/schemas/enumSeverity'
+          messageCode:
+            type: string
+            description: 'the element of the MessageCode enumeration describing this message'
+          message:
+            type: string
+            description: 'the message contents'
+    enumSeverity:
+      description: 'Message severity codes'
+      enum:
+        - Information
+        - Status
+        - Warning
+        - Error
+        - FatalError
+    enumeration:
+      type: object
+      properties:
+        name:
+          type: string
+        values:
+          type: array
+          items:
+            type: string
+
+  securitySchemes:
+    accessCode:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'http://example.com/oauth/auth'
+          tokenUrl: 'http://example.com/oauth/token'
+          scopes:
+            write: allows modifying resources
+            read: allows reading resources
