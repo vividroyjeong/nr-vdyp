@@ -16,7 +16,7 @@
         <v-btn class="blue-btn ml-2" @click="print">Print</v-btn>
       </v-card-actions>
     </v-card>
-    <div id="print-area" ref="printAreaRef" class="ml-2 mr-2">
+    <div id="mdl-rpt-print-area" ref="mdlRptPrintAreaRef" class="ml-2 mr-2">
       <h3>Job ID 2024-04-07</h3>
       <p class="mt-3" style="font-size: 18px">
         Lodgepole Pine 30.0%, Poplar 30.0%, Hemlock 30.0%, Spruce 10.0%
@@ -70,7 +70,7 @@ import { ref } from 'vue'
 import printJS from 'print-js'
 import { saveAs } from 'file-saver'
 
-const printAreaRef = ref<HTMLElement | null>(null)
+const mdlRptPrintAreaRef = ref<HTMLElement | null>(null)
 
 const tableData = ref([
   {
@@ -181,11 +181,47 @@ const download = () => {
   saveAs(blob, 'model-report.txt')
 }
 
+const getStyles = () => {
+  let styles = ''
+  const styleSheets = document.styleSheets
+
+  Array.from(styleSheets).forEach((sheet) => {
+    if (!sheet.href || sheet.href.startsWith(window.location.origin)) {
+      try {
+        if (sheet.cssRules) {
+          Array.from(sheet.cssRules).forEach((rule) => {
+            styles += rule.cssText
+          })
+        }
+      } catch (e) {
+        console.warn('Could not access stylesheet:', sheet, e)
+      }
+    }
+  })
+
+  return styles
+}
+
 const print = () => {
-  if (printAreaRef.value) {
+  if (mdlRptPrintAreaRef.value) {
+    const styles =
+      getStyles() +
+      `
+      @page {
+        size: Letter portrait;
+        margin: 7mm;
+      }
+      .v-col-md-2 { flex: 0 0 16.6666666667%; max-width: 16.6666666667%; }
+      .readonly-label { font-size: 10px; }
+      .readonly-text { font-size: 10px; }
+      html, body { font-family: 'BCSans', 'Noto Sans', Verdana, Arial, sans-serif; font-size: 10px; font-weight: 400;}
+    `
+
     printJS({
-      printable: 'print-area',
+      printable: mdlRptPrintAreaRef.value.id,
       type: 'html',
+      scanStyles: false,
+      style: styles,
     })
   }
 }
@@ -220,5 +256,10 @@ const print = () => {
 .v-table > .v-table__wrapper > table > thead > tr > td,
 .v-table > .v-table__wrapper > table > tfoot > tr > td {
   height: 30px;
+}
+
+/* Make the line between thead and tbody bold */
+.styled-table tbody tr:first-child td {
+  border-top: 2px solid #dfdcdc !important;
 }
 </style>

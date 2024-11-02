@@ -340,6 +340,7 @@ const print = () => {
   border-bottom: 1px solid #dfdcdc;
 }
 
+/* table header */
 .v-table > .v-table__wrapper > table > tbody > tr > th,
 .v-table > .v-table__wrapper > table > thead > tr > th,
 .v-table > .v-table__wrapper > table > tfoot > tr > th {
@@ -361,5 +362,10 @@ const print = () => {
 .v-table > .v-table__wrapper > table > thead > tr > td,
 .v-table > .v-table__wrapper > table > tfoot > tr > td {
   height: 30px;
+}
+
+/* Make the line between thead and tbody bold */
+.v-table > .v-table__wrapper > table > thead tr th {
+  border-bottom: 2px solid #dfdcdc;
 }
 </style>
