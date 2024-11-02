@@ -4,8 +4,10 @@
       <v-col cols="3" sm="3" md="3">
         <span class="search-label">Model</span>
         <v-select
+          :items="modelTypeOptions"
           v-model="modelType"
-          :items="modelTypes"
+          item-title="label"
+          item-value="value"
           hide-details
           dense
           density="compact"
@@ -16,8 +18,10 @@
       <v-col cols="2" sm="2" md="2">
         <span class="search-label">Version</span>
         <v-select
-          v-model="modelName"
-          :items="modelNames"
+          :items="engineVersionOptions"
+          v-model="engineVersion"
+          item-title="label"
+          item-value="value"
           hide-details
           dense
           density="compact"
@@ -28,29 +32,25 @@
       <v-col cols="2" sm="2" md="2">
         <span class="search-label">Job ID</span>
         <v-text-field
-          v-model="jobName"
+          v-model="jobId"
           hide-details
-          placeholder="Search Job Name..."
           density="compact"
           dense
           variant="outlined"
           style="background-color: white !important"
+          disabled
         ></v-text-field>
       </v-col>
     </v-row>
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useJobTypeSelectionStore } from '@/stores/jobTypeSelectionStore'
+import { useAppStore } from '@/stores/appStore'
+import { storeToRefs } from 'pinia'
+import { modelTypeOptions, engineVersionOptions } from '@/constants/options'
 
-const jobTypeSelectionStore = useJobTypeSelectionStore()
-const modelType = ref(jobTypeSelectionStore.modelType)
-const modelName = ref(jobTypeSelectionStore.modelName)
-const jobName = ref(jobTypeSelectionStore.jobName)
-
-const modelTypes = ['File Upload', 'Input Model Parameters']
-const modelNames = ['VDYP 8', 'VDYP 9']
+const appStore = useAppStore()
+const { modelType, engineVersion, jobId } = storeToRefs(appStore)
 </script>
 
 <style scoped>

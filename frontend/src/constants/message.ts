@@ -43,6 +43,8 @@ export const MSG_DIALOG_TITLE = Object.freeze({
   INVALID_INPUT: 'Invalid Input!',
   CONFIRM: 'Confirm',
   NO_MODIFY: 'No Modifications!',
+  MISSING_FILE: 'Missing File',
+  INVALID_FILE: 'Invalid File!',
 })
 
 export const MDL_PRM_INPUT_HINT = Object.freeze({
@@ -143,4 +145,13 @@ export const MDL_PRM_INPUT_ERR = Object.freeze({
   RPT_VLD_START_AGE_VAL: "'Starting Age' must be a non-negative integer",
   RPT_VLD_FNSH_AGE_VAL: "'Finishing Age' must be a non-negative integer",
   RPT_VLD_AGE_INC_VAL: "'Age Increment' must be a non-negative integer",
+})
+
+export const FILE_UPLOAD_ERR = Object.freeze({
+  LAYER_FILE_MISSING: 'Please provide a layer file.',
+  POLYGON_FILE_MISSING: 'Please provide a polygon file.',
+  LAYER_FILE_NOT_CSV_FORMAT:
+    'The layer file is not in the correct CSV file format, please check and re-upload.',
+  POLYGON_FILE_NOT_CSV_FORMAT:
+    'The polygon file is not in the correct CSV file format, please check and re-upload.',
 })

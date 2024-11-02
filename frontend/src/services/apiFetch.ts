@@ -12,6 +12,11 @@ export const topLevel = async (): Promise<any> => {
   }
 }
 
+export const pingServer = async (): Promise<any> => {
+  const response = await get<any>('/ping')
+  return response.status === StatusCodes.OK ? response.data : null
+}
+
 export const code = async (
   codeTableName: string,
   codeName: string,

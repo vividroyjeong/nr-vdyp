@@ -260,7 +260,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     startingAge.value = DEFAULT_VALUES.STARTING_AGE
     finishingAge.value = DEFAULT_VALUES.FINISHING_AGE
     ageIncrement.value = DEFAULT_VALUES.AGE_INCREMENT
-    volumeReported.value = DEFAULT_VALUES.SELECTED_VOLUME_REPORTED
+    volumeReported.value = DEFAULT_VALUES.VOLUME_REPORTED
     projectionType.value = DEFAULT_VALUES.PROJECTION_TYPE
     reportTitle.value = DEFAULT_VALUES.REPORT_TITLE
   }
