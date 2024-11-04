@@ -387,8 +387,11 @@ import {
   MSG_DIALOG_TITLE,
   MDL_PRM_INPUT_HINT,
 } from '@/constants/message'
+import { SiteInfoValidation } from '@/validation/siteInfoValidation'
 
 const form = ref<HTMLFormElement>()
+
+const siteInfoValidator = new SiteInfoValidation()
 
 const modelParameterStore = useModelParameterStore()
 const messageDialogStore = useMessageDialogStore()
@@ -662,51 +665,8 @@ const stopDecrementBHA50SiteIndex = () => {
   }
 }
 
-const clear = () => {
-  if (form.value) {
-    form.value.reset()
-  }
-
-  selectedSiteSpecies.value = highestPercentSpecies.value
-  updateSiteIndexCurve(selectedSiteSpecies.value)
-
-  becZone.value = DEFAULT_VALUES.BEC_ZONE
-  siteSpeciesValues.value = DEFAULT_VALUES.SITE_SPECIES_VALUES
-  ageType.value = DEFAULT_VALUES.AGE_TYPE
-  floating.value = DEFAULT_VALUES.FLOATING
-
-  handleDerivedByChange(
-    derivedBy.value,
-    selectedSiteSpecies.value,
-    siteSpeciesValues.value,
-    floating.value,
-  )
-}
-
 const validateValues = (): boolean => {
-  if (
-    percentStockableArea.value &&
-    (!Number.isInteger(percentStockableArea.value) ||
-      percentStockableArea.value < 0)
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.SITE_VLD_PCT_STCB_AREA_VAL,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (age.value && (!Number.isInteger(age.value) || age.value < 0)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.SITE_VLD_AGE_VAL,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (height.value && !/^\d+(\.\d{2})?$/.test(height.value)) {
+  if (!siteInfoValidator.validateHeight(height.value)) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
       MDL_PRM_INPUT_ERR.SITE_VLD_HEIGHT_VAL,
@@ -715,7 +675,7 @@ const validateValues = (): boolean => {
     return false
   }
 
-  if (bha50SiteIndex.value && !/^\d+(\.\d{2})?$/.test(bha50SiteIndex.value)) {
+  if (!siteInfoValidator.validateBha50SiteIndex(bha50SiteIndex.value)) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
       MDL_PRM_INPUT_ERR.SITE_VLD_SI_VAL,
@@ -728,11 +688,10 @@ const validateValues = (): boolean => {
 }
 
 const validateRange = (): boolean => {
-  const psa = Util.toNumber(percentStockableArea.value)
   if (
-    psa &&
-    (psa < NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_MIN ||
-      psa > NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_MAX)
+    !siteInfoValidator.validatePercentStockableAreaRange(
+      percentStockableArea.value,
+    )
   ) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
@@ -742,78 +701,56 @@ const validateRange = (): boolean => {
     return false
   }
 
-  if (age.value !== null) {
-    if (
-      age.value < NUM_INPUT_LIMITS.AGE_MIN ||
-      age.value > NUM_INPUT_LIMITS.AGE_MAX
-    ) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.INVALID_INPUT,
-        MDL_PRM_INPUT_ERR.SITE_VLD_AGE_RNG,
-        { width: 400 },
-      )
-      return false
-    }
+  if (!siteInfoValidator.validateAgeRange(age.value)) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.SITE_VLD_AGE_RNG,
+      { width: 400 },
+    )
+    return false
   }
 
-  if (height.value !== null) {
-    const numericHeight = parseFloat(height.value)
-    if (
-      isNaN(numericHeight) ||
-      numericHeight < NUM_INPUT_LIMITS.HEIGHT_MIN ||
-      numericHeight > NUM_INPUT_LIMITS.HEIGHT_MAX
-    ) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.INVALID_INPUT,
-        MDL_PRM_INPUT_ERR.SITE_VLD_HIGHT_RNG,
-        { width: 400 },
-      )
-      return false
-    }
+  if (!siteInfoValidator.validateHeightRange(height.value)) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.SITE_VLD_HIGHT_RNG,
+      { width: 400 },
+    )
+    return false
   }
 
-  if (height.value !== null) {
-    const numericHeight = parseFloat(height.value)
-    if (
-      isNaN(numericHeight) ||
-      numericHeight < NUM_INPUT_LIMITS.BHA50_SITE_INDEX_MIN ||
-      numericHeight > NUM_INPUT_LIMITS.BHA50_SITE_INDEX_MAX
-    ) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.INVALID_INPUT,
-        MDL_PRM_INPUT_ERR.SITE_VLD_SI_RNG,
-        { width: 400 },
-      )
-      return false
-    }
+  if (!siteInfoValidator.validateBha50SiteIndexRange(bha50SiteIndex.value)) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.SITE_VLD_SI_RNG,
+      { width: 400 },
+    )
+    return false
   }
 
   return true
 }
 
 const validateRequiredFields = (): boolean => {
-  if (siteSpeciesValues.value === SITE_SPECIES_VALUES.COMPUTED) {
-    if (
-      Util.isEmptyOrZero(age.value) ||
-      Util.isEmptyOrZero(height.value) ||
-      Util.isEmptyOrZero(bha50SiteIndex.value)
-    ) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.MISSING_INFO,
-        MDL_PRM_INPUT_ERR.SITE_VLD_SPCZ_REQ_VALS_SUP(selectedSiteSpecies.value),
-        { width: 400 },
-      )
-      return false
-    }
-  } else if (siteSpeciesValues.value === SITE_SPECIES_VALUES.SUPPLIED) {
-    if (Util.isEmptyOrZero(bha50SiteIndex.value)) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.MISSING_INFO,
-        MDL_PRM_INPUT_ERR.SITE_VLD_SPCZ_REQ_SI_VAL(selectedSiteSpecies.value),
-        { width: 400 },
-      )
-      return false
-    }
+  if (
+    !siteInfoValidator.validateRequiredFields(
+      siteSpeciesValues.value,
+      age.value,
+      height.value,
+      bha50SiteIndex.value,
+    )
+  ) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.MISSING_INFO,
+      siteSpeciesValues.value === SITE_SPECIES_VALUES.COMPUTED
+        ? MDL_PRM_INPUT_ERR.SITE_VLD_SPCZ_REQ_VALS_SUP(
+            selectedSiteSpecies.value,
+          )
+        : MDL_PRM_INPUT_ERR.SITE_VLD_SPCZ_REQ_SI_VAL(selectedSiteSpecies.value),
+      { width: 400 },
+    )
+
+    return false
   }
 
   return true
@@ -834,6 +771,27 @@ const onEdit = () => {
   if (isConfirmed.value) {
     modelParameterStore.editPanel(panelName)
   }
+}
+
+const clear = () => {
+  if (form.value) {
+    form.value.reset()
+  }
+
+  selectedSiteSpecies.value = highestPercentSpecies.value
+  updateSiteIndexCurve(selectedSiteSpecies.value)
+
+  becZone.value = DEFAULT_VALUES.BEC_ZONE
+  siteSpeciesValues.value = DEFAULT_VALUES.SITE_SPECIES_VALUES
+  ageType.value = DEFAULT_VALUES.AGE_TYPE
+  floating.value = DEFAULT_VALUES.FLOATING
+
+  handleDerivedByChange(
+    derivedBy.value,
+    selectedSiteSpecies.value,
+    siteSpeciesValues.value,
+    floating.value,
+  )
 }
 </script>
 

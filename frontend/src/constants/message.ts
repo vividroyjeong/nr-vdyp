@@ -71,9 +71,6 @@ export const MDL_PRM_INPUT_ERR = Object.freeze({
   SPCZ_VLD_MISSING_DERIVED_BY:
     "Input field - 'Species % derived by' - is missing essential information which must be filled in order to confirm and continue",
   SPCZ_VLD_TOTAL_PCT_NOT_100: 'Species Percent do not total 100.0%',
-  SITE_VLD_PCT_STCB_AREA_VAL:
-    "'% Stockable Area' must be a non-negative integer",
-  SITE_VLD_AGE_VAL: "'Age' must be a non-negative integer",
   SITE_VLD_HEIGHT_VAL: "'Height' must be in the format ##0.00",
   SITE_VLD_SI_VAL: "'BHA 50 Site Index' must be in the format ##0.00",
   SITE_VLD_PCT_STCB_AREA_RNG:
