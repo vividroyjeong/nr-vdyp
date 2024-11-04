@@ -54,7 +54,7 @@ export const minimumDBHLimitsOptions = [
   { label: '22.5 cm+', value: CONSTANTS.MINIMUM_DBH_LIMITS.CM22_5 },
 ]
 
-export const additionalStandAttributesOptions = [
+export const addtStandAttrsOptions = [
   {
     label: 'Use Computed Values',
     value: CONSTANTS.COMPUTED_VALUES.USE,
@@ -85,4 +85,26 @@ export const includeInReportOptions = [
 export const projectionTypeOptions = [
   { label: 'Volume', value: CONSTANTS.PROJECTION_TYPE.VOLUME },
   { label: 'CFS Biomass', value: CONSTANTS.PROJECTION_TYPE.CFS_BIOMASS },
+]
+
+export const modelTypeOptions = [
+  {
+    label: 'File Upload',
+    value: CONSTANTS.MODEL_TYPE.FILE_UPLOAD,
+  },
+  {
+    label: 'Input Model Parameters',
+    value: CONSTANTS.MODEL_TYPE.INPUT_MODEL_PARAMETERS,
+  },
+]
+
+export const engineVersionOptions = [
+  {
+    label: 'VDYP 8',
+    value: CONSTANTS.ENGINE_VERSION.VDYP8,
+  },
+  {
+    label: 'VDYP 9',
+    value: CONSTANTS.ENGINE_VERSION.VDYP9,
+  },
 ]

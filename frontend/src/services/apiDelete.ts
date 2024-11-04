@@ -11,8 +11,5 @@ export const code = async (
     },
   }
 
-  return await del<any>(
-    `/codeTables/${codeTableName}/codes/${codeName}`,
-    config,
-  )
+  return del<any>(`/codeTables/${codeTableName}/codes/${codeName}`, config)
 }

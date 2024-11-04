@@ -1,5 +1,5 @@
 <template>
-  <div class="joblist-container">
+  <div class="joblist-container mt-3">
     <div class="top-project-year">
       <h1 class="top-project">Projects</h1>
       <span class="top-year">Year: 2024/2025</span>

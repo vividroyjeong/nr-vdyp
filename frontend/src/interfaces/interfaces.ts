@@ -34,3 +34,8 @@ export interface TableOptions {
   sortBy: string
   sortDesc: string
 }
+
+export interface SpeciesList {
+  species: string | null
+  percent: string | null
+}

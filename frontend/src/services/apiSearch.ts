@@ -19,7 +19,7 @@ export const code = async (param: CodeSearchParams): Promise<any> => {
     pageSize: param.pageSize >= 0 ? param.pageSize : undefined,
   })
 
-  return await get<any>(`/codeTables${queryString}`)
+  return get<any>(`/codeTables${queryString}`)
 }
 
 export const csvExport = async (): Promise<Blob> => {

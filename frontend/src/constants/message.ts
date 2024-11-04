@@ -43,6 +43,8 @@ export const MSG_DIALOG_TITLE = Object.freeze({
   INVALID_INPUT: 'Invalid Input!',
   CONFIRM: 'Confirm',
   NO_MODIFY: 'No Modifications!',
+  MISSING_FILE: 'Missing File',
+  INVALID_FILE: 'Invalid File!',
 })
 
 export const MDL_PRM_INPUT_HINT = Object.freeze({
@@ -69,11 +71,6 @@ export const MDL_PRM_INPUT_ERR = Object.freeze({
   SPCZ_VLD_MISSING_DERIVED_BY:
     "Input field - 'Species % derived by' - is missing essential information which must be filled in order to confirm and continue",
   SPCZ_VLD_TOTAL_PCT_NOT_100: 'Species Percent do not total 100.0%',
-  SITE_VLD_PCT_STCB_AREA_VAL:
-    "'% Stockable Area' must be a non-negative integer",
-  SITE_VLD_AGE_VAL: "'Age' must be a non-negative integer",
-  SITE_VLD_HEIGHT_VAL: "'Height' must be in the format ##0.00",
-  SITE_VLD_SI_VAL: "'BHA 50 Site Index' must be in the format ##0.00",
   SITE_VLD_PCT_STCB_AREA_RNG:
     "'Percent Stockable Area' must range from 0 and 100",
   SITE_VLD_AGE_RNG: "'Stand Age' must range from 0 and 500",
@@ -83,9 +80,6 @@ export const MDL_PRM_INPUT_ERR = Object.freeze({
     `The species '${selectedSiteSpeciesValue}' must have Age/Height/BHA 50 Site Index values supplied`,
   SITE_VLD_SPCZ_REQ_SI_VAL: (selectedSiteSpeciesValue: string | null) =>
     `The species '${selectedSiteSpeciesValue}' must have an BHA 50 Site Index value supplied`,
-  DENSITY_VLD_PCC_VAL: "'Crown Closure' must be a non-negative integer",
-  DENSITY_VLD_BSL_AREA_FMT: "'Basal Area' must be in the format ##0.0000",
-  DENSITY_VLD_TPH_FMT: "'Trees per Hectare' must be in the format ####0.00",
   DENSITY_VLD_BSL_AREA_RNG: "'Basal Area' must range from 0.1000 and 250.0000",
   DENSITY_VLD_TPH_RNG: "'Trees per Hectare' must range from 0.10 and 9999.90",
   DENSITY_VLD_PCC_RNG: "'Crown Closure' must range from 0 and 100",
@@ -118,20 +112,6 @@ export const MDL_PRM_INPUT_ERR = Object.freeze({
     "'Close Utilization Net Decay Volume - 12.5cm+': must range from 0.0 and 2500.0",
   ATTR_VLD_CUNDWV_RNG:
     "'Close Utilization Net Decay Waste Volume - 12.5cm+': must range from 0.0 and 2500.0",
-  ATTR_VLD_LRY_HEIGHT_FMT:
-    "'Lorey Height - 7.5cm+' must be in the format ##0.00",
-  ATTR_VLD_WSV75_FMT:
-    "'Whole Stem Volume - 7.5cm+' must be in the format ####0.0",
-  ATTR_VLD_BSL_AREA_FMT:
-    "'Basal Area - 12.5cm+' must be in the format ##0.0000",
-  ATTR_VLD_WSV125_FMT:
-    "'Whole Stem Volume - 12.5cm+' must be in the format ###0.0",
-  ATTR_VLD_CUV125_FMT:
-    "'Close Utilization Volume - 12.5cm+' must be in the format ###0.0",
-  ATTR_VLD_CUNDV_FMT:
-    "'Close Utilization Net Decay Volume - 12.5cm+' must be in the format ###0.0",
-  ATTR_VLD_CUNDWV_FMT:
-    "'Close Utilization Net Decay Waste Volume - 12.5cm+' must be in the format ###0.0",
   RPT_VLD_COMP_FNSH_AGE:
     "'Finish Age' must be at least as great as the 'Start Age'",
   RPT_VLD_START_AGE_RNG: (startAgeMin: number, startAgeMax: number) =>
@@ -140,7 +120,13 @@ export const MDL_PRM_INPUT_ERR = Object.freeze({
     `'Finishing Age' must range from ${fnshAgeMin} and ${fnshAgeMax}`,
   RPT_VLD_AGE_INC_RNG: (ageIncMin: number, ageIncMax: number) =>
     `'Age Increment' must range from ${ageIncMin} and ${ageIncMax}`,
-  RPT_VLD_START_AGE_VAL: "'Starting Age' must be a non-negative integer",
-  RPT_VLD_FNSH_AGE_VAL: "'Finishing Age' must be a non-negative integer",
-  RPT_VLD_AGE_INC_VAL: "'Age Increment' must be a non-negative integer",
+})
+
+export const FILE_UPLOAD_ERR = Object.freeze({
+  LAYER_FILE_MISSING: 'Please provide a layer file.',
+  POLYGON_FILE_MISSING: 'Please provide a polygon file.',
+  LAYER_FILE_NOT_CSV_FORMAT:
+    'The layer file is not in the correct CSV file format, please check and re-upload.',
+  POLYGON_FILE_NOT_CSV_FORMAT:
+    'The polygon file is not in the correct CSV file format, please check and re-upload.',
 })

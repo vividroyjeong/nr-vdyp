@@ -205,9 +205,8 @@
                           disabled
                           density="compact"
                           dense
-                          :rules="[validateTotalPercent]"
-                          :error-messages="totalPercentError"
                         ></v-text-field>
+                        <!-- :error-messages="totalPercentError" -->
                       </v-col>
                     </v-row>
                   </div>
@@ -258,8 +257,11 @@ import {
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 import { MDL_PRM_INPUT_ERR, MSG_DIALOG_TITLE } from '@/constants/message'
+import { SpeciesInfoValidation } from '@/validation/speciesInfoValidation'
 
 const form = ref<HTMLFormElement>()
+
+const speciesInfoValidator = new SpeciesInfoValidation()
 
 const modelParameterStore = useModelParameterStore()
 const messageDialogStore = useMessageDialogStore()
@@ -271,8 +273,6 @@ const {
   speciesGroups,
   totalSpeciesPercent,
   totalSpeciesGroupPercent,
-  isOverTotalPercent,
-  highestPercentSpecies,
 } = storeToRefs(modelParameterStore)
 
 const panelName = MODEL_PARAMETER_PANEL.SPECIES_INFO
@@ -377,36 +377,6 @@ const stopDecrementPercent = () => {
   }
 }
 
-const validatePercent = (value: any) => {
-  if (value === null || value === '') {
-    return true
-  }
-  const numValue = Math.floor(parseFloat(value) * 10) / 10 // validate to the first decimal place only
-  if (
-    numValue < NUM_INPUT_LIMITS.SPECIES_PERCENT_MIN ||
-    numValue > NUM_INPUT_LIMITS.SPECIES_PERCENT_MAX
-  ) {
-    return MDL_PRM_INPUT_ERR.SPCZ_VLD_INPUT_RANGE(
-      NUM_INPUT_LIMITS.SPECIES_PERCENT_MIN,
-      NUM_INPUT_LIMITS.SPECIES_PERCENT_MAX,
-    )
-  }
-  return true
-}
-
-const totalPercentError = computed(() => {
-  return isOverTotalPercent.value
-    ? [MDL_PRM_INPUT_ERR.SPCZ_VLD_TOTAL_PCT_NOT_100]
-    : []
-})
-
-const validateTotalPercent = () => {
-  if (isOverTotalPercent.value) {
-    return false
-  }
-  return true
-}
-
 const triggerSpeciesSortByPercent = () => {
   speciesList.value.sort((a, b) => {
     const percentA = parseFloat(a.percent || '0')
@@ -443,36 +413,21 @@ const handlePercentInput = (event: Event, index: number) => {
   }
 }
 
-const clear = () => {
-  speciesList.value.forEach((item) => {
-    item.species = null
-    item.percent = null
-  })
-
-  if (form.value) {
-    form.value.reset()
+const validatePercent = (percent: any) => {
+  const isValid = speciesInfoValidator.validatePercent(percent)
+  if (!isValid) {
+    return MDL_PRM_INPUT_ERR.SPCZ_VLD_INPUT_RANGE(
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_MIN,
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_MAX,
+    )
   }
-
-  derivedBy.value = DEFAULT_VALUES.DERIVED_BY
+  return true
 }
 
-const validateDuplicateSpecies = (): boolean => {
-  const speciesCount: { [key: string]: number } = {}
-  let duplicateSpecies = ''
-
-  speciesList.value.forEach((item) => {
-    if (item.species) {
-      if (!speciesCount[item.species]) {
-        speciesCount[item.species] = 0
-      }
-      speciesCount[item.species] += 1
-
-      if (speciesCount[item.species] > 1) {
-        duplicateSpecies = item.species
-      }
-    }
-  })
-
+const validateDuplicateSpecies = () => {
+  const duplicateSpecies = speciesInfoValidator.validateDuplicateSpecies(
+    speciesList.value,
+  )
   if (duplicateSpecies) {
     const speciesLabel = (
       Object.keys(SPECIES_MAP) as Array<keyof typeof SPECIES_MAP>
@@ -491,10 +446,12 @@ const validateDuplicateSpecies = (): boolean => {
   return true
 }
 
-const validateTotalSpeciesPercent = (): boolean => {
+const validateTotalSpeciesPercent = () => {
   if (
-    totalSpeciesGroupPercent.value !== NUM_INPUT_LIMITS.TOTAL_SPECIES_PERCENT &&
-    highestPercentSpecies !== null
+    !speciesInfoValidator.validateTotalSpeciesPercent(
+      totalSpeciesPercent.value,
+      totalSpeciesGroupPercent.value,
+    )
   ) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.DATA_INCOMPLETE,
@@ -506,8 +463,8 @@ const validateTotalSpeciesPercent = (): boolean => {
   return true
 }
 
-const validateRequiredFields = (): boolean => {
-  if (!derivedBy.value) {
+const validateRequired = () => {
+  if (!speciesInfoValidator.validateRequired(derivedBy.value)) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.MISSING_INFO,
       MDL_PRM_INPUT_ERR.SPCZ_VLD_MISSING_DERIVED_BY,
@@ -522,7 +479,7 @@ const onConfirm = () => {
   if (
     validateDuplicateSpecies() &&
     validateTotalSpeciesPercent() &&
-    validateRequiredFields()
+    validateRequired()
   ) {
     form.value?.validate()
     // this panel is not in a confirmed state
@@ -537,6 +494,19 @@ const onEdit = () => {
   if (isConfirmed.value) {
     modelParameterStore.editPanel(panelName)
   }
+}
+
+const clear = () => {
+  speciesList.value.forEach((item) => {
+    item.species = null
+    item.percent = null
+  })
+
+  if (form.value) {
+    form.value.reset()
+  }
+
+  derivedBy.value = DEFAULT_VALUES.DERIVED_BY
 }
 </script>
 

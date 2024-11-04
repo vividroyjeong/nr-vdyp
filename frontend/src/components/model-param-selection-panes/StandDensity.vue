@@ -228,7 +228,7 @@ import {
   PANEL,
   DERIVED_BY,
   SITE_SPECIES_VALUES,
-  NOT_AVAILABLE_INDI,
+  SPECIAL_INDICATORS,
   MODEL_PARAMETER_PANEL,
   NUM_INPUT_LIMITS,
   SPIN_BUTTON,
@@ -240,14 +240,11 @@ import {
   MSG_DIALOG_TITLE,
   MDL_PRM_INPUT_HINT,
 } from '@/constants/message'
-import {
-  isCoastalZone,
-  validateBasalAreaLimits,
-  validateTreePerHectareLimits,
-  validateQuadraticDiameter,
-} from '@/utils/lookupMappings'
+import { StandDensityValidation } from '@/validation/standDensityValidation'
 
 const form = ref<HTMLFormElement>()
+
+const standDensityValidator = new StandDensityValidation()
 
 const modelParameterStore = useModelParameterStore()
 const messageDialogStore = useMessageDialogStore()
@@ -294,7 +291,7 @@ const updateBasalAreaState = (isEnabled: boolean, isAgeZero: boolean) => {
   isBasalAreaDisabled.value = !isEnabled || isAgeZero
 
   if (isBasalAreaDisabled.value) {
-    basalAreaPlaceholder.value = NOT_AVAILABLE_INDI.NA
+    basalAreaPlaceholder.value = SPECIAL_INDICATORS.NA
     basalArea.value = null
   } else {
     basalAreaPlaceholder.value = ''
@@ -306,7 +303,7 @@ const updateTreesPerHectareState = (isEnabled: boolean, isAgeZero: boolean) => {
   isTreesPerHectareDisabled.value = !isEnabled || isAgeZero
 
   if (isTreesPerHectareDisabled.value) {
-    tphPlaceholder.value = NOT_AVAILABLE_INDI.NA
+    tphPlaceholder.value = SPECIAL_INDICATORS.NA
     treesPerHectare.value = null
   } else {
     tphPlaceholder.value = ''
@@ -322,7 +319,7 @@ const updateCrownClosureState = (
   isPercentCrownClosureDisabled.value = !(isVolume && isComputed) || isAgeZero
 
   if (isPercentCrownClosureDisabled.value) {
-    crownClosurePlaceholder.value = NOT_AVAILABLE_INDI.NA
+    crownClosurePlaceholder.value = SPECIAL_INDICATORS.NA
     percentCrownClosure.value = null
   } else {
     crownClosurePlaceholder.value = ''
@@ -460,56 +457,8 @@ const stopDecrementTPH = () => {
   }
 }
 
-const clear = () => {
-  if (form.value) {
-    form.value.reset()
-  }
-  minimumDBHLimit.value = DEFAULT_VALUES.MINIMUM_DBH_LIMIT
-  percentCrownClosure.value = DEFAULT_VALUES.PERCENT_CROWN_CLOSURE
-}
-
-const validateValues = (): boolean => {
-  if (
-    percentCrownClosure.value &&
-    (!Number.isInteger(percentCrownClosure.value) ||
-      percentCrownClosure.value < 0)
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.DENSITY_VLD_PCC_VAL,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (basalArea.value && !/^\d+(\.\d{4})?$/.test(basalArea.value)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.DENSITY_VLD_BSL_AREA_FMT,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (treesPerHectare.value && !/^\d+(\.\d{2})?$/.test(treesPerHectare.value)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.DENSITY_VLD_TPH_FMT,
-      { width: 400 },
-    )
-    return false
-  }
-
-  return true
-}
-
 const validateRange = (): boolean => {
-  const ba = Util.toNumber(basalArea.value)
-  if (
-    ba &&
-    (ba < NUM_INPUT_LIMITS.BASAL_AREA_MIN ||
-      ba > NUM_INPUT_LIMITS.BASAL_AREA_MAX)
-  ) {
+  if (!standDensityValidator.validateBasalAreaRange(basalArea.value)) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
       MDL_PRM_INPUT_ERR.DENSITY_VLD_BSL_AREA_RNG,
@@ -518,10 +467,8 @@ const validateRange = (): boolean => {
     return false
   }
 
-  const tph = Util.toNumber(treesPerHectare.value)
   if (
-    tph &&
-    (tph < NUM_INPUT_LIMITS.TPH_MIN || tph > NUM_INPUT_LIMITS.TPH_MAX)
+    !standDensityValidator.validateTreesPerHectareRange(treesPerHectare.value)
   ) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
@@ -531,11 +478,10 @@ const validateRange = (): boolean => {
     return false
   }
 
-  const pcc = Util.toNumber(percentCrownClosure.value)
   if (
-    pcc &&
-    (pcc < NUM_INPUT_LIMITS.CROWN_CLOSURE_MIN ||
-      pcc > NUM_INPUT_LIMITS.CROWN_CLOSURE_MAX)
+    !standDensityValidator.validatePercentCrownClosureRange(
+      percentCrownClosure.value,
+    )
   ) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
@@ -548,65 +494,20 @@ const validateRange = (): boolean => {
   return true
 }
 
-function validateBALimits(): boolean {
-  if (
-    selectedSiteSpecies.value &&
-    becZone.value &&
-    basalArea.value &&
-    height.value
-  ) {
-    const isValid = validateBasalAreaLimits(
-      selectedSiteSpecies.value,
-      isCoastalZone(becZone.value),
-      basalArea.value,
-      height.value,
-    )
-
-    return isValid
-  }
-  return true
-}
-
-function validateTPHLimits(): string | null {
-  if (
-    basalArea.value &&
-    treesPerHectare.value &&
-    height.value &&
-    selectedSiteSpecies.value &&
-    becZone.value
-  ) {
-    return validateTreePerHectareLimits(
-      basalArea.value,
-      treesPerHectare.value,
-      height.value,
-      selectedSiteSpecies.value,
-      isCoastalZone(becZone.value),
-    )
-  }
-
-  return null
-}
-
-function validateQuadDiameter(): string | null {
-  if (basalArea.value && treesPerHectare.value && minimumDBHLimit.value) {
-    return validateQuadraticDiameter(
-      basalArea.value,
-      treesPerHectare.value,
-      minimumDBHLimit.value,
-    )
-  }
-
-  return null
-}
-
-async function validateFormInputs(): Promise<boolean> {
-  if (!validateRange() || !validateValues()) {
+const validateFormInputs = async (): Promise<boolean> => {
+  if (!validateRange()) {
     return false
   }
 
-  const isBasalAreaValid = validateBALimits()
-  if (!isBasalAreaValid) {
-    const userResponse = await confirmDialogStore.openDialog(
+  if (
+    !standDensityValidator.validateBALimits(
+      selectedSiteSpecies.value,
+      becZone.value,
+      basalArea.value,
+      height.value,
+    )
+  ) {
+    const userResponse = confirmDialogStore.openDialog(
       MSG_DIALOG_TITLE.CONFIRM,
       MDL_PRM_INPUT_ERR.DENSITY_VLD_BSL_AREA_OVER_HEIGHT,
     )
@@ -616,7 +517,13 @@ async function validateFormInputs(): Promise<boolean> {
     }
   }
 
-  const validateTPHmessage = validateTPHLimits()
+  const validateTPHmessage = standDensityValidator.validateTPHLimits(
+    basalArea.value,
+    treesPerHectare.value,
+    height.value,
+    selectedSiteSpecies.value,
+    becZone.value,
+  )
   if (validateTPHmessage) {
     const userResponse = await confirmDialogStore.openDialog(
       MSG_DIALOG_TITLE.CONFIRM,
@@ -628,7 +535,11 @@ async function validateFormInputs(): Promise<boolean> {
     }
   }
 
-  const validateQuadDiamMessage = validateQuadDiameter()
+  const validateQuadDiamMessage = standDensityValidator.validateQuadDiameter(
+    basalArea.value,
+    treesPerHectare.value,
+    minimumDBHLimit.value,
+  )
   if (validateQuadDiamMessage) {
     const userResponse = await confirmDialogStore.openDialog(
       MSG_DIALOG_TITLE.CONFIRM,
@@ -643,6 +554,22 @@ async function validateFormInputs(): Promise<boolean> {
   return true
 }
 
+const formattingValues = (): void => {
+  if (basalArea.value) {
+    // Format the value to ##0.0000
+    basalArea.value = parseFloat(basalArea.value).toFixed(
+      NUM_INPUT_LIMITS.BASAL_AREA_DECIMAL_NUM,
+    )
+  }
+
+  if (treesPerHectare.value) {
+    // Format the value to ###0.00
+    treesPerHectare.value = parseFloat(treesPerHectare.value).toFixed(
+      NUM_INPUT_LIMITS.TPH_DECIMAL_NUM,
+    )
+  }
+}
+
 const onConfirm = async () => {
   const isFormValid = await validateFormInputs()
 
@@ -651,6 +578,8 @@ const onConfirm = async () => {
   }
 
   form.value?.validate()
+
+  formattingValues()
 
   // this panel is not in a confirmed state
   if (!isConfirmed.value) {
@@ -663,6 +592,14 @@ const onEdit = () => {
   if (isConfirmed.value) {
     modelParameterStore.editPanel(panelName)
   }
+}
+
+const clear = () => {
+  if (form.value) {
+    form.value.reset()
+  }
+  minimumDBHLimit.value = DEFAULT_VALUES.MINIMUM_DBH_LIMIT
+  percentCrownClosure.value = DEFAULT_VALUES.PERCENT_CROWN_CLOSURE
 }
 </script>
 

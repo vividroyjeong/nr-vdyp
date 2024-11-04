@@ -375,7 +375,7 @@ import {
   DERIVED_BY,
   SITE_SPECIES_VALUES,
   FLOATING,
-  NOT_AVAILABLE_INDI,
+  SPECIAL_INDICATORS,
   MODEL_PARAMETER_PANEL,
   NUM_INPUT_LIMITS,
   CONTINUOUS_INC_DEC,
@@ -387,8 +387,11 @@ import {
   MSG_DIALOG_TITLE,
   MDL_PRM_INPUT_HINT,
 } from '@/constants/message'
+import { SiteInfoValidation } from '@/validation/siteInfoValidation'
 
 const form = ref<HTMLFormElement>()
+
+const siteInfoValidator = new SiteInfoValidation()
 
 const modelParameterStore = useModelParameterStore()
 const messageDialogStore = useMessageDialogStore()
@@ -497,8 +500,8 @@ const handleSiteSpeciesValuesState = (
 
     age.value = null
     height.value = null
-    agePlaceholder.value = NOT_AVAILABLE_INDI.NA
-    heightPlaceholder.value = NOT_AVAILABLE_INDI.NA
+    agePlaceholder.value = SPECIAL_INDICATORS.NA
+    heightPlaceholder.value = SPECIAL_INDICATORS.NA
   }
 }
 
@@ -662,6 +665,110 @@ const stopDecrementBHA50SiteIndex = () => {
   }
 }
 
+const validateRange = (): boolean => {
+  if (
+    !siteInfoValidator.validatePercentStockableAreaRange(
+      percentStockableArea.value,
+    )
+  ) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.SITE_VLD_PCT_STCB_AREA_RNG,
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (!siteInfoValidator.validateAgeRange(age.value)) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.SITE_VLD_AGE_RNG,
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (!siteInfoValidator.validateHeightRange(height.value)) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.SITE_VLD_HIGHT_RNG,
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (!siteInfoValidator.validateBha50SiteIndexRange(bha50SiteIndex.value)) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.SITE_VLD_SI_RNG,
+      { width: 400 },
+    )
+    return false
+  }
+
+  return true
+}
+
+const validateRequiredFields = (): boolean => {
+  if (
+    !siteInfoValidator.validateRequiredFields(
+      siteSpeciesValues.value,
+      age.value,
+      height.value,
+      bha50SiteIndex.value,
+    )
+  ) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.MISSING_INFO,
+      siteSpeciesValues.value === SITE_SPECIES_VALUES.COMPUTED
+        ? MDL_PRM_INPUT_ERR.SITE_VLD_SPCZ_REQ_VALS_SUP(
+            selectedSiteSpecies.value,
+          )
+        : MDL_PRM_INPUT_ERR.SITE_VLD_SPCZ_REQ_SI_VAL(selectedSiteSpecies.value),
+      { width: 400 },
+    )
+    return false
+  }
+
+  return true
+}
+
+const formattingValues = (): void => {
+  if (height.value) {
+    // Format the value to ##0.00
+    height.value = parseFloat(height.value).toFixed(
+      NUM_INPUT_LIMITS.HEIGHT_DECIMAL_NUM,
+    )
+  }
+
+  if (bha50SiteIndex.value) {
+    // Format the value to ##0.00
+    bha50SiteIndex.value = parseFloat(bha50SiteIndex.value).toFixed(
+      NUM_INPUT_LIMITS.BHA50_SITE_INDEX_DECIMAL_NUM,
+    )
+  }
+}
+
+const onConfirm = () => {
+  if (validateRequiredFields() && validateRange()) {
+    form.value?.validate()
+
+    formattingValues()
+
+    // this panel is not in a confirmed state
+    if (!isConfirmed.value) {
+      modelParameterStore.confirmPanel(panelName)
+    }
+  }
+}
+
+const onEdit = () => {
+  // this panel has already been confirmed.
+  if (isConfirmed.value) {
+    modelParameterStore.editPanel(panelName)
+  }
+}
+
 const clear = () => {
   if (form.value) {
     form.value.reset()
@@ -681,159 +788,6 @@ const clear = () => {
     siteSpeciesValues.value,
     floating.value,
   )
-}
-
-const validateValues = (): boolean => {
-  if (
-    percentStockableArea.value &&
-    (!Number.isInteger(percentStockableArea.value) ||
-      percentStockableArea.value < 0)
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.SITE_VLD_PCT_STCB_AREA_VAL,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (age.value && (!Number.isInteger(age.value) || age.value < 0)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.SITE_VLD_AGE_VAL,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (height.value && !/^\d+(\.\d{2})?$/.test(height.value)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.SITE_VLD_HEIGHT_VAL,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (bha50SiteIndex.value && !/^\d+(\.\d{2})?$/.test(bha50SiteIndex.value)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.SITE_VLD_SI_VAL,
-      { width: 400 },
-    )
-    return false
-  }
-
-  return true
-}
-
-const validateRange = (): boolean => {
-  const psa = Util.toNumber(percentStockableArea.value)
-  if (
-    psa &&
-    (psa < NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_MIN ||
-      psa > NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_MAX)
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.SITE_VLD_PCT_STCB_AREA_RNG,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (age.value !== null) {
-    if (
-      age.value < NUM_INPUT_LIMITS.AGE_MIN ||
-      age.value > NUM_INPUT_LIMITS.AGE_MAX
-    ) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.INVALID_INPUT,
-        MDL_PRM_INPUT_ERR.SITE_VLD_AGE_RNG,
-        { width: 400 },
-      )
-      return false
-    }
-  }
-
-  if (height.value !== null) {
-    const numericHeight = parseFloat(height.value)
-    if (
-      isNaN(numericHeight) ||
-      numericHeight < NUM_INPUT_LIMITS.HEIGHT_MIN ||
-      numericHeight > NUM_INPUT_LIMITS.HEIGHT_MAX
-    ) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.INVALID_INPUT,
-        MDL_PRM_INPUT_ERR.SITE_VLD_HIGHT_RNG,
-        { width: 400 },
-      )
-      return false
-    }
-  }
-
-  if (height.value !== null) {
-    const numericHeight = parseFloat(height.value)
-    if (
-      isNaN(numericHeight) ||
-      numericHeight < NUM_INPUT_LIMITS.BHA50_SITE_INDEX_MIN ||
-      numericHeight > NUM_INPUT_LIMITS.BHA50_SITE_INDEX_MAX
-    ) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.INVALID_INPUT,
-        MDL_PRM_INPUT_ERR.SITE_VLD_SI_RNG,
-        { width: 400 },
-      )
-      return false
-    }
-  }
-
-  return true
-}
-
-const validateRequiredFields = (): boolean => {
-  if (siteSpeciesValues.value === SITE_SPECIES_VALUES.COMPUTED) {
-    if (
-      Util.isEmptyOrZero(age.value) ||
-      Util.isEmptyOrZero(height.value) ||
-      Util.isEmptyOrZero(bha50SiteIndex.value)
-    ) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.MISSING_INFO,
-        MDL_PRM_INPUT_ERR.SITE_VLD_SPCZ_REQ_VALS_SUP(selectedSiteSpecies.value),
-        { width: 400 },
-      )
-      return false
-    }
-  } else if (siteSpeciesValues.value === SITE_SPECIES_VALUES.SUPPLIED) {
-    if (Util.isEmptyOrZero(bha50SiteIndex.value)) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.MISSING_INFO,
-        MDL_PRM_INPUT_ERR.SITE_VLD_SPCZ_REQ_SI_VAL(selectedSiteSpecies.value),
-        { width: 400 },
-      )
-      return false
-    }
-  }
-
-  return true
-}
-
-const onConfirm = () => {
-  if (validateRequiredFields() && validateRange() && validateValues()) {
-    form.value?.validate()
-    // this panel is not in a confirmed state
-    if (!isConfirmed.value) {
-      modelParameterStore.confirmPanel(panelName)
-    }
-  }
-}
-
-const onEdit = () => {
-  // this panel has already been confirmed.
-  if (isConfirmed.value) {
-    modelParameterStore.editPanel(panelName)
-  }
 }
 </script>
 

@@ -1,99 +1,80 @@
 <template>
   <v-container fluid>
-    <div class="top-project-year">
+    <div class="top-project-year mt-3">
       <h1 class="top-project">Projects</h1>
       <span class="top-year">Year: 2024/2025</span>
     </div>
-    <div>
+    <div class="mt-n1 mb-3">
       <h3>Model Parameter Selection</h3>
     </div>
 
-    <v-card
-      class="pa-4"
-      elevation="0"
-      style="
-        padding-bottom: 16px !important;
-        background-color: #f6f6f6;
-        border-top: 1px solid #0000001f;
-        border-bottom: 1px solid #0000001f;
-        border-radius: 0px;
-      "
-    >
+    <v-card class="pa-4 job-type-sel-card" elevation="0">
       <JobTypeSelection />
     </v-card>
     <v-spacer class="space"></v-spacer>
-    <div class="hr-line"></div>
+    <div class="hr-line mb-5"></div>
     <v-spacer class="space"></v-spacer>
-    <v-tabs
-      v-model="tabStore.currentTab"
-      :hideSlider="true"
-      :centerActive="true"
-      :showArrows="true"
-      height="60px"
-    >
-      <v-tab
-        v-for="(tab, index) in tabs"
-        :key="index"
-        :class="{ 'first-tab': index === 0 }"
-        >{{ tab.label }}</v-tab
-      >
-    </v-tabs>
-    <v-tabs-window v-model="tabStore.currentTab">
-      <v-tabs-window-item
-        v-for="(tab, index) in tabs"
-        :key="index"
-        :value="index"
-      >
-        <component :is="tab.component"></component>
-      </v-tabs-window-item>
-    </v-tabs-window>
 
-    <template v-if="tabStore.currentTab === 0">
-      <v-spacer class="space"></v-spacer>
-      <SiteInfo />
-      <v-spacer class="space"></v-spacer>
-      <StandDensity />
-      <v-spacer class="space"></v-spacer>
-      <AdditionalStandAttributes />
-      <v-spacer class="space"></v-spacer>
-      <ReportInfo />
-
-      <v-card
-        class="mt-5 pa-4"
-        elevation="0"
-        style="
-          padding-bottom: 16px !important;
-          background-color: #f6f6f6;
-          border: 1px solid #0000001f;
-          border-top-left-radius: 0px;
-          border-top-right-radius: 0px;
-          border-bottom-left-radius: 10px;
-          border-bottom-right-radius: 10px;
-          display: flex;
-          justify-content: end;
-          align-items: end;
-          text-align: end;
-        "
+    <template v-if="modelType === MODEL_TYPE.INPUT_MODEL_PARAMETERS">
+      <v-tabs
+        v-model="currentTab"
+        :hideSlider="true"
+        :centerActive="true"
+        :showArrows="true"
+        height="60px"
       >
-        <v-card-actions class="pr-0">
-          <v-spacer></v-spacer>
-          <v-btn class="white-btn mr-3" @click="cancel">Cancel</v-btn>
-          <v-btn
-            class="blue-btn mr-2"
-            :disabled="!modelParameterStore.runModelEnabled"
-            @click="runModel"
-            >Run Model</v-btn
-          >
-        </v-card-actions>
-      </v-card>
+        <v-tab
+          v-for="(tab, index) in tabs"
+          :key="index"
+          :class="{ 'first-tab': index === 0 }"
+          >{{ tab.label }}</v-tab
+        >
+      </v-tabs>
+      <v-tabs-window v-model="currentTab">
+        <v-tabs-window-item
+          v-for="(tab, index) in tabs"
+          :key="index"
+          :value="index"
+        >
+          <component :is="tab.component"></component>
+        </v-tabs-window-item>
+      </v-tabs-window>
+
+      <template v-if="currentTab === MODEL_PARAM_TAB_IDX.MODEL_PARAM_SELECTION">
+        <v-spacer class="space"></v-spacer>
+        <SiteInfo />
+        <v-spacer class="space"></v-spacer>
+        <StandDensity />
+        <v-spacer class="space"></v-spacer>
+        <AddtStandAttrs />
+        <v-spacer class="space"></v-spacer>
+        <ReportInfo />
+
+        <v-card class="mt-5 pa-4 run-model-card" elevation="0">
+          <v-card-actions class="pr-0 mr-2">
+            <v-spacer></v-spacer>
+            <!-- <v-btn class="white-btn" @click="cancel">Cancel</v-btn> -->
+            <v-btn
+              class="blue-btn ml-2"
+              :disabled="!modelParameterStore.runModelEnabled"
+              @click="runModel"
+              >Run Model</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </template>
+    </template>
+    <template v-else>
+      <FileUpload />
     </template>
   </v-container>
 </template>
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { useInputModelParamTabStore } from '@/stores/inputModelParamTabStore'
+import { useAppStore } from '@/stores/appStore'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
+import { storeToRefs } from 'pinia'
 
 import JobTypeSelection from '@/components/JobTypeSelection.vue'
 
@@ -104,24 +85,40 @@ import ViewErrorMessages from '@/views/input-model-parameters/ViewErrorMessages.
 
 import SiteInfo from '@/components/model-param-selection-panes/SiteInfo.vue'
 import StandDensity from '@/components/model-param-selection-panes/StandDensity.vue'
-import AdditionalStandAttributes from '@/components/model-param-selection-panes/AdditionalStandAttributes.vue'
+import AddtStandAttrs from '@/components/model-param-selection-panes/AddtStandAttrs.vue'
 import ReportInfo from '@/components/model-param-selection-panes/ReportInfo.vue'
 
-const tabStore = useInputModelParamTabStore()
+import FileUpload from '@/views/input-model-parameters/FileUpload.vue'
+
+import {
+  MODEL_TYPE,
+  MODEL_PARAM_TAB_IDX,
+  MODEL_PARAM_TAB_NAME,
+} from '@/constants/constants'
+
+const appStore = useAppStore()
 const modelParameterStore = useModelParameterStore()
 
+const { currentTab, modelType } = storeToRefs(appStore)
+
 const tabs = [
-  { label: 'Model Parameter Selection', component: ModelParameterSelection },
-  { label: 'Model Report', component: ModelReport },
-  { label: 'View Log File', component: ViewLogFile },
-  { label: 'View Error Messages', component: ViewErrorMessages },
+  {
+    label: MODEL_PARAM_TAB_NAME.MODEL_PARAM_SELECTION,
+    component: ModelParameterSelection,
+  },
+  { label: MODEL_PARAM_TAB_NAME.MODEL_REPORT, component: ModelReport },
+  { label: MODEL_PARAM_TAB_NAME.VIEW_LOG_FILE, component: ViewLogFile },
+  {
+    label: MODEL_PARAM_TAB_NAME.VIEW_ERROR_MESSAGES,
+    component: ViewErrorMessages,
+  },
 ]
 
 onMounted(() => {
   modelParameterStore.setDefaultValues()
 })
 
-const cancel = () => {}
+// const cancel = () => {}
 
 const runModel = () => {}
 </script>
@@ -129,5 +126,27 @@ const runModel = () => {}
 <style>
 .space {
   margin-top: 10px;
+}
+
+.run-model-card {
+  padding-bottom: 16px !important;
+  background-color: #f6f6f6;
+  border: 1px solid #0000001f;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  display: flex;
+  justify-content: end;
+  align-items: end;
+  text-align: end;
+}
+
+.job-type-sel-card {
+  padding-bottom: 16px !important;
+  background-color: #f6f6f6;
+  border-top: 1px solid #0000001f;
+  border-bottom: 1px solid #0000001f;
+  border-radius: 0px;
 }
 </style>

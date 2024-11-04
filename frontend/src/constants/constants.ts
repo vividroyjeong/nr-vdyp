@@ -67,15 +67,16 @@ export const PROJECTION_TYPE = Object.freeze({
   CFS_BIOMASS: 'CFS Biomass',
 })
 
-export const NOT_AVAILABLE_INDI = Object.freeze({
+export const SPECIAL_INDICATORS = Object.freeze({
   NA: 'N/A',
+  NOT_USED: '<Not Used>',
 })
 
 export const MODEL_PARAMETER_PANEL = Object.freeze({
   SPECIES_INFO: 'speciesInfo',
   SITE_INFO: 'siteInfo',
   STAND_DENSITY: 'standDensity',
-  ADDY_STAND_ATTR: 'additionalStandAttributes',
+  ADDT_STAND_ATTRS: 'addtStandAttrs',
   REPORT_INFO: 'reportInfo',
 })
 
@@ -112,18 +113,25 @@ export const NUM_INPUT_LIMITS = Object.freeze({
   CROWN_CLOSURE_STEP: 5,
   LOREY_HEIGHT_MAX: 99.9,
   LOREY_HEIGHT_MIN: 0.01,
-  WHOLE_STEM_VOL_75CM_MAX: 2500,
-  WHOLE_STEM_VOL_75CM_MIN: 0.1,
-  BASAL_AREA_125CM_MAX: 250,
-  BASAL_AREA_125CM_MIN: 0.1,
-  WHOLE_STEM_VOL_125CM_MAX: 2500,
-  WHOLE_STEM_VOL_125CM_MIN: 0,
-  CU_VOLUME_MAX: 2500,
-  CU_VOLUME_MIN: 0,
+  LOREY_HEIGHT_DECIMAL_NUM: 2,
+  WHOLE_STEM_VOL75_MAX: 2500,
+  WHOLE_STEM_VOL75_MIN: 0.1,
+  WHOLE_STEM_VOL75_DECIMAL_NUM: 1,
+  BASAL_AREA125_MAX: 250,
+  BASAL_AREA125_MIN: 0.1,
+  BASAL_AREA125_DECIMAL_NUM: 4,
+  WHOLE_STEM_VOL125_MAX: 2500,
+  WHOLE_STEM_VOL125_MIN: 0,
+  WHOLE_STEM_VOL125_DECIMAL_NUM: 1,
+  CU_VOL_MAX: 2500,
+  CU_VOL_MIN: 0,
+  CU_VOL_DECIMAL_NUM: 1,
   CU_NET_DECAY_VOL_MAX: 2500,
   CU_NET_DECAY_VOL_MIN: 0,
+  CU_NET_DECAY_DECIMAL_NUM: 1,
   CU_NET_DECAY_WASTE_VOL_MAX: 2500,
   CU_NET_DECAY_WASTE_VOL_MIN: 0,
+  CU_NET_DECAY_WASTE_DECIMAL_NUM: 1,
   STARTING_AGE_MAX: 500,
   STARTING_AGE_MIN: 0,
   STARTING_AGE_STEP: 10,
@@ -159,4 +167,28 @@ export const MESSAGE_TYPE = Object.freeze({
   SUCCESS: 'success',
   ERROR: 'error',
   WARNING: 'warning',
+})
+
+export const MODEL_TYPE = Object.freeze({
+  FILE_UPLOAD: 'File Upload',
+  INPUT_MODEL_PARAMETERS: 'Input Model Parameters',
+})
+
+export const ENGINE_VERSION = Object.freeze({
+  VDYP8: 'VDYP 8',
+  VDYP9: 'VDYP 9',
+})
+
+export const MODEL_PARAM_TAB_IDX = Object.freeze({
+  MODEL_PARAM_SELECTION: 0,
+  MODEL_REPORT: 1,
+  VIEW_LOG_FILE: 2,
+  VIEW_ERROR_MESSAGES: 3,
+})
+
+export const MODEL_PARAM_TAB_NAME = Object.freeze({
+  MODEL_PARAM_SELECTION: 'Model Parameter Selection',
+  MODEL_REPORT: 'Model Report',
+  VIEW_LOG_FILE: 'View Log File',
+  VIEW_ERROR_MESSAGES: 'View Error Messages',
 })

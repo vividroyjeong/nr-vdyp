@@ -232,8 +232,11 @@ import {
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 import { MDL_PRM_INPUT_ERR, MSG_DIALOG_TITLE } from '@/constants/message'
+import { ReportInfoValidation } from '@/validation/reportInfoValidation'
 
 const form = ref<HTMLFormElement>()
+
+const reportInfoValidator = new ReportInfoValidation()
 
 const modelParameterStore = useModelParameterStore()
 const messageDialogStore = useMessageDialogStore()
@@ -258,123 +261,56 @@ const isConfirmed = computed(
   () => modelParameterStore.panelState[panelName].confirmed,
 )
 
-const clear = () => {
-  startingAge.value = null
-  finishingAge.value = null
-  ageIncrement.value = null
-  volumeReported.value = []
-  includeInReport.value = []
-  reportTitle.value = null
-
-  projectionType.value = DEFAULT_VALUES.PROJECTION_TYPE
-  speciesGroups.value = speciesGroups.value.map((group) => ({
-    ...group,
-    minimumDBHLimit: MINIMUM_DBH_LIMITS.CM4_0,
-  }))
-}
-// Validation by comparing entered values
 const validateComparison = (): boolean => {
-  if (finishingAge.value !== null && startingAge.value !== null) {
-    if (finishingAge.value < startingAge.value) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.INVALID_INPUT,
-        MDL_PRM_INPUT_ERR.RPT_VLD_COMP_FNSH_AGE,
-        { width: 400 },
-      )
-      return false
-    }
+  if (
+    !reportInfoValidator.validateAgeComparison(
+      finishingAge.value,
+      startingAge.value,
+    )
+  ) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.RPT_VLD_COMP_FNSH_AGE,
+      { width: 400 },
+    )
+    return false
   }
+
   return true
 }
 
-// Validation to check the range of input values
 const validateRange = (): boolean => {
-  if (startingAge.value !== null) {
-    if (
-      startingAge.value < NUM_INPUT_LIMITS.STARTING_AGE_MIN ||
-      startingAge.value > NUM_INPUT_LIMITS.STARTING_AGE_MAX
-    ) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.INVALID_INPUT,
-        MDL_PRM_INPUT_ERR.RPT_VLD_START_AGE_RNG(
-          NUM_INPUT_LIMITS.STARTING_AGE_MIN,
-          NUM_INPUT_LIMITS.STARTING_AGE_MAX,
-        ),
-        { width: 400 },
-      )
-      return false
-    }
-  }
-
-  if (finishingAge.value !== null) {
-    if (
-      finishingAge.value < NUM_INPUT_LIMITS.FINISHING_AGE_MIN ||
-      finishingAge.value > NUM_INPUT_LIMITS.FINISHING_AGE_MAX
-    ) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.INVALID_INPUT,
-        MDL_PRM_INPUT_ERR.RPT_VLD_START_FNSH_RNG(
-          NUM_INPUT_LIMITS.FINISHING_AGE_MIN,
-          NUM_INPUT_LIMITS.FINISHING_AGE_MAX,
-        ),
-        { width: 400 },
-      )
-      return false
-    }
-  }
-
-  if (ageIncrement.value !== null) {
-    if (
-      ageIncrement.value < NUM_INPUT_LIMITS.AGE_INC_MIN ||
-      ageIncrement.value > NUM_INPUT_LIMITS.AGE_INC_MAX
-    ) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.INVALID_INPUT,
-        MDL_PRM_INPUT_ERR.RPT_VLD_AGE_INC_RNG(
-          NUM_INPUT_LIMITS.AGE_INC_MIN,
-          NUM_INPUT_LIMITS.AGE_INC_MAX,
-        ),
-        { width: 400 },
-      )
-      return false
-    }
-  }
-
-  return true
-}
-
-const validateValues = (): boolean => {
-  if (
-    startingAge.value &&
-    (!Number.isInteger(startingAge.value) || startingAge.value < 0)
-  ) {
+  if (!reportInfoValidator.validateStartingAgeRange(startingAge.value)) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.RPT_VLD_START_AGE_VAL,
+      MDL_PRM_INPUT_ERR.RPT_VLD_START_AGE_RNG(
+        NUM_INPUT_LIMITS.STARTING_AGE_MIN,
+        NUM_INPUT_LIMITS.STARTING_AGE_MAX,
+      ),
       { width: 400 },
     )
     return false
   }
 
-  if (
-    finishingAge.value &&
-    (!Number.isInteger(finishingAge.value) || finishingAge.value < 0)
-  ) {
+  if (!reportInfoValidator.validateFinishingAgeRange(finishingAge.value)) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.RPT_VLD_FNSH_AGE_VAL,
+      MDL_PRM_INPUT_ERR.RPT_VLD_START_FNSH_RNG(
+        NUM_INPUT_LIMITS.FINISHING_AGE_MIN,
+        NUM_INPUT_LIMITS.FINISHING_AGE_MAX,
+      ),
       { width: 400 },
     )
     return false
   }
 
-  if (
-    ageIncrement.value &&
-    (!Number.isInteger(ageIncrement.value) || ageIncrement.value < 0)
-  ) {
+  if (!reportInfoValidator.validateAgeIncrementRange(ageIncrement.value)) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.RPT_VLD_AGE_INC_VAL,
+      MDL_PRM_INPUT_ERR.RPT_VLD_AGE_INC_RNG(
+        NUM_INPUT_LIMITS.AGE_INC_MIN,
+        NUM_INPUT_LIMITS.AGE_INC_MAX,
+      ),
       { width: 400 },
     )
     return false
@@ -384,7 +320,7 @@ const validateValues = (): boolean => {
 }
 
 const onConfirm = () => {
-  if (validateComparison() && validateRange() && validateValues()) {
+  if (validateComparison() && validateRange()) {
     form.value?.validate()
     // this panel is not in a confirmed state
     if (!isConfirmed.value) {
@@ -398,6 +334,21 @@ const onEdit = () => {
   if (isConfirmed.value) {
     modelParameterStore.editPanel(panelName)
   }
+}
+
+const clear = () => {
+  startingAge.value = null
+  finishingAge.value = null
+  ageIncrement.value = null
+  volumeReported.value = []
+  includeInReport.value = []
+  reportTitle.value = null
+
+  projectionType.value = DEFAULT_VALUES.PROJECTION_TYPE
+  speciesGroups.value = speciesGroups.value.map((group) => ({
+    ...group,
+    minimumDBHLimit: MINIMUM_DBH_LIMITS.CM4_0,
+  }))
 }
 </script>
 <style scoped></style>

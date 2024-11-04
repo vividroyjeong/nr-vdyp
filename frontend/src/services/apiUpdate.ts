@@ -8,7 +8,7 @@ export const code = async (code: Code, ifMatch: string): Promise<any> => {
     },
   }
 
-  return await put<Code>(
+  return put<Code>(
     `/codeTables/${code.codeTableName}/codes/${code.codeName}`,
     code,
     config,

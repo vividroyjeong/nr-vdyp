@@ -8,6 +8,7 @@ import {
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 import type { PanelName, PanelState } from '@/types/types'
+import type { SpeciesList } from '@/interfaces/interfaces'
 
 export const useModelParameterStore = defineStore('modelParameter', () => {
   // panel open
@@ -15,7 +16,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     speciesInfo: PANEL.OPEN,
     siteInfo: PANEL.CLOSE,
     standDensity: PANEL.CLOSE,
-    additionalStandAttributes: PANEL.CLOSE,
+    addtStandAttrs: PANEL.CLOSE,
     reportInfo: PANEL.CLOSE,
   })
 
@@ -26,7 +27,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     speciesInfo: { confirmed: false, editable: true }, // Only speciesInfo is editable initially
     siteInfo: { confirmed: false, editable: false },
     standDensity: { confirmed: false, editable: false },
-    additionalStandAttributes: { confirmed: false, editable: false },
+    addtStandAttrs: { confirmed: false, editable: false },
     reportInfo: { confirmed: false, editable: false },
   })
 
@@ -56,7 +57,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
       MODEL_PARAMETER_PANEL.SPECIES_INFO,
       MODEL_PARAMETER_PANEL.SITE_INFO,
       MODEL_PARAMETER_PANEL.STAND_DENSITY,
-      MODEL_PARAMETER_PANEL.ADDY_STAND_ATTR,
+      MODEL_PARAMETER_PANEL.ADDT_STAND_ATTRS,
       MODEL_PARAMETER_PANEL.REPORT_INFO,
     ]
     const currentIndex = panelOrder.indexOf(panelName)
@@ -83,7 +84,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
       MODEL_PARAMETER_PANEL.SPECIES_INFO,
       MODEL_PARAMETER_PANEL.SITE_INFO,
       MODEL_PARAMETER_PANEL.STAND_DENSITY,
-      MODEL_PARAMETER_PANEL.ADDY_STAND_ATTR,
+      MODEL_PARAMETER_PANEL.ADDT_STAND_ATTRS,
       MODEL_PARAMETER_PANEL.REPORT_INFO,
     ]
     const currentIndex = panelOrder.indexOf(panelName)
@@ -104,16 +105,14 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   // species info
   const derivedBy = ref<string | null>(null)
 
-  const speciesList = ref<{ species: string | null; percent: string | null }[]>(
-    [
-      { species: null, percent: null },
-      { species: null, percent: null },
-      { species: null, percent: null },
-      { species: null, percent: null },
-      { species: null, percent: null },
-      { species: null, percent: null },
-    ],
-  )
+  const speciesList = ref<SpeciesList[]>([
+    { species: null, percent: null },
+    { species: null, percent: null },
+    { species: null, percent: null },
+    { species: null, percent: null },
+    { species: null, percent: null },
+    { species: null, percent: null },
+  ])
 
   const speciesGroups = ref<
     {
@@ -147,11 +146,6 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     return speciesGroups.value.reduce((acc, group) => {
       return acc + group.percent
     }, 0)
-  })
-
-  const isOverTotalPercent = computed(() => {
-    const numericTotalPercent = parseFloat(totalSpeciesPercent.value) || 0
-    return numericTotalPercent > NUM_INPUT_LIMITS.TOTAL_SPECIES_PERCENT
   })
 
   const updateSpeciesGroup = () => {
@@ -203,12 +197,12 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   // additional stand attributes
   const computedValues = ref<string | null>(null)
   const loreyHeight = ref<string | null>(null)
-  const basalArea125cm = ref<string | null>(null)
-  const closeUtilVolume = ref<string | null>(null)
-  const closeUtilNetDecayWasteVolume = ref<string | null>(null)
-  const wholeStemVolume75cm = ref<string | null>(null)
-  const wholeStemVolume125cm = ref<string | null>(null)
-  const closeUtilNetDecayVolume = ref<string | null>(null)
+  const wholeStemVol75 = ref<string | null>(null)
+  const basalArea125 = ref<string | null>(null)
+  const wholeStemVol125 = ref<string | null>(null)
+  const cuVol = ref<string | null>(null)
+  const cuNetDecayVol = ref<string | null>(null)
+  const cuNetDecayWasteVol = ref<string | null>(null)
 
   // report info
   const startingAge = ref<number | null>(null)
@@ -251,17 +245,16 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     percentCrownClosure.value = DEFAULT_VALUES.PERCENT_CROWN_CLOSURE
     computedValues.value = DEFAULT_VALUES.COMPUTED_VALUES
     loreyHeight.value = DEFAULT_VALUES.LOREY_HEIGHT
-    wholeStemVolume75cm.value = DEFAULT_VALUES.WHOLE_STEM_VOLUME
-    basalArea125cm.value = DEFAULT_VALUES.BASAL_AREA_125CM
-    wholeStemVolume125cm.value = DEFAULT_VALUES.WHOLE_STEM_VOLUME_125CM
-    closeUtilVolume.value = DEFAULT_VALUES.CLOSE_UTIL_VOLUME
-    closeUtilNetDecayVolume.value = DEFAULT_VALUES.CLOSE_UTIL_NET_DECAY_VOLUME
-    closeUtilNetDecayWasteVolume.value =
-      DEFAULT_VALUES.CLOSE_UTIL_NET_DECAY_WASTE_VOLUME
+    wholeStemVol75.value = DEFAULT_VALUES.WHOLE_STEM_VOL75
+    basalArea125.value = DEFAULT_VALUES.BASAL_AREA125
+    wholeStemVol125.value = DEFAULT_VALUES.WHOLE_STEM_VOL125
+    cuVol.value = DEFAULT_VALUES.CU_VOL
+    cuNetDecayVol.value = DEFAULT_VALUES.CU_NET_DECAY_VOL
+    cuNetDecayWasteVol.value = DEFAULT_VALUES.CU_NET_DECAY_WASTE_VOL
     startingAge.value = DEFAULT_VALUES.STARTING_AGE
     finishingAge.value = DEFAULT_VALUES.FINISHING_AGE
     ageIncrement.value = DEFAULT_VALUES.AGE_INCREMENT
-    volumeReported.value = DEFAULT_VALUES.SELECTED_VOLUME_REPORTED
+    volumeReported.value = DEFAULT_VALUES.VOLUME_REPORTED
     projectionType.value = DEFAULT_VALUES.PROJECTION_TYPE
     reportTitle.value = DEFAULT_VALUES.REPORT_TITLE
   }
@@ -282,7 +275,6 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     selectedSiteSpecies,
     totalSpeciesPercent,
     totalSpeciesGroupPercent,
-    isOverTotalPercent,
     updateSpeciesGroup,
     // site info
     becZone,
@@ -305,12 +297,13 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     // additional stand attributes
     computedValues,
     loreyHeight,
-    basalArea125cm,
-    closeUtilVolume,
-    closeUtilNetDecayWasteVolume,
-    wholeStemVolume75cm,
-    wholeStemVolume125cm,
-    closeUtilNetDecayVolume,
+    wholeStemVol75,
+    basalArea125,
+    wholeStemVol125,
+    cuVol,
+    cuNetDecayVol,
+    cuNetDecayWasteVol,
+
     // report info
     startingAge,
     finishingAge,
