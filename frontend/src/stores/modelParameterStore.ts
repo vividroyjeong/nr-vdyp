@@ -8,6 +8,7 @@ import {
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 import type { PanelName, PanelState } from '@/types/types'
+import type { SpeciesList } from '@/interfaces/interfaces'
 
 export const useModelParameterStore = defineStore('modelParameter', () => {
   // panel open
@@ -104,16 +105,14 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   // species info
   const derivedBy = ref<string | null>(null)
 
-  const speciesList = ref<{ species: string | null; percent: string | null }[]>(
-    [
-      { species: null, percent: null },
-      { species: null, percent: null },
-      { species: null, percent: null },
-      { species: null, percent: null },
-      { species: null, percent: null },
-      { species: null, percent: null },
-    ],
-  )
+  const speciesList = ref<SpeciesList[]>([
+    { species: null, percent: null },
+    { species: null, percent: null },
+    { species: null, percent: null },
+    { species: null, percent: null },
+    { species: null, percent: null },
+    { species: null, percent: null },
+  ])
 
   const speciesGroups = ref<
     {
@@ -147,11 +146,6 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     return speciesGroups.value.reduce((acc, group) => {
       return acc + group.percent
     }, 0)
-  })
-
-  const isOverTotalPercent = computed(() => {
-    const numericTotalPercent = parseFloat(totalSpeciesPercent.value) || 0
-    return numericTotalPercent > NUM_INPUT_LIMITS.TOTAL_SPECIES_PERCENT
   })
 
   const updateSpeciesGroup = () => {
@@ -281,7 +275,6 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     selectedSiteSpecies,
     totalSpeciesPercent,
     totalSpeciesGroupPercent,
-    isOverTotalPercent,
     updateSpeciesGroup,
     // site info
     becZone,
