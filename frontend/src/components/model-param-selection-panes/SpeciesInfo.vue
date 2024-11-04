@@ -447,30 +447,32 @@ const validateDuplicateSpecies = () => {
 }
 
 const validateTotalSpeciesPercent = () => {
-  const isValid = speciesInfoValidator.validateTotalSpeciesPercent(
-    totalSpeciesPercent.value,
-    totalSpeciesGroupPercent.value,
-  )
-  if (!isValid) {
+  if (
+    !speciesInfoValidator.validateTotalSpeciesPercent(
+      totalSpeciesPercent.value,
+      totalSpeciesGroupPercent.value,
+    )
+  ) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.DATA_INCOMPLETE,
       MDL_PRM_INPUT_ERR.SPCZ_VLD_TOTAL_PCT,
       { width: 400 },
     )
+    return false
   }
-  return isValid
+  return true
 }
 
 const validateRequired = () => {
-  const isValid = speciesInfoValidator.validateRequired(derivedBy.value)
-  if (!isValid) {
+  if (!speciesInfoValidator.validateRequired(derivedBy.value)) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.MISSING_INFO,
       MDL_PRM_INPUT_ERR.SPCZ_VLD_MISSING_DERIVED_BY,
       { width: 400 },
     )
+    return false
   }
-  return isValid
+  return true
 }
 
 const onConfirm = () => {

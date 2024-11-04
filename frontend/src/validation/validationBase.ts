@@ -6,11 +6,4 @@ export class ValidationBase {
   public validateRequired(value: any): boolean {
     return !!value
   }
-
-  public validateDecimalandFormat(
-    value: string,
-    regex = /^\d+(\.\d{1,2})?$/,
-  ): boolean {
-    return regex.test(value)
-  }
 }

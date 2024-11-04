@@ -208,8 +208,11 @@ import {
   MSG_DIALOG_TITLE,
   MDL_PRM_INPUT_HINT,
 } from '@/constants/message'
+import { AddtStandAttrsValidation } from '@/validation/addtStandAttrsValidation'
 
 const form = ref<HTMLFormElement>()
+
+const addtStandAttrsValidator = new AddtStandAttrsValidation()
 
 const modelParameterStore = useModelParameterStore()
 const messageDialogStore = useMessageDialogStore()
@@ -371,32 +374,13 @@ const clear = () => {
   // TODO - set all text-fields on this screen with calculated values based on seleciton in the previous screen
 }
 
-const validateFieldPresenceAndValue = (
-  fieldValue: string | null,
-  fieldName: string,
-): boolean => {
-  if (Util.isBlank(fieldValue)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.ATTR_VLD_FLDS(fieldName),
-      { width: 400 },
-    )
-    return false
-  }
-
-  return true
-}
-
 const validateAllFields = (): boolean => {
   const fieldsToValidate = [
     { value: loreyHeight.value, name: 'Lorey Height - 7.5cm+' },
     { value: wholeStemVol75.value, name: 'Whole Stem Volume - 7.5cm+' },
     { value: basalArea125.value, name: 'Basal Area - 12.5cm+' },
     { value: wholeStemVol125.value, name: 'Whole Stem Volume - 12.5cm+' },
-    {
-      value: cuVol.value,
-      name: 'Close Utilization Volume - 12.5cm+',
-    },
+    { value: cuVol.value, name: 'Close Utilization Volume - 12.5cm+' },
     {
       value: cuNetDecayVol.value,
       name: 'Close Utilization Net Decay Volume - 12.5cm+',
@@ -407,9 +391,16 @@ const validateAllFields = (): boolean => {
     },
   ]
 
-  for (const field of fieldsToValidate) {
-    if (!validateFieldPresenceAndValue(field.value, field.name)) {
-      return false
+  if (!addtStandAttrsValidator.validateAllFields(fieldsToValidate)) {
+    for (const field of fieldsToValidate) {
+      if (!addtStandAttrsValidator.validateFieldPresence(field.value)) {
+        messageDialogStore.openDialog(
+          MSG_DIALOG_TITLE.INVALID_INPUT,
+          MDL_PRM_INPUT_ERR.ATTR_VLD_FLDS(field.name),
+          { width: 400 },
+        )
+        return false
+      }
     }
   }
 
@@ -417,107 +408,48 @@ const validateAllFields = (): boolean => {
 }
 
 const validateComputedValuesModification = (): boolean => {
-  if (computedValues.value === COMPUTED_VALUES.MODIFY) {
-    const fields = [
-      { original: loreyHeightOriginal, current: loreyHeight.value },
-      {
-        original: wholeStemVol75Original,
-        current: wholeStemVol75.value,
-      },
-      { original: basalArea125Original, current: basalArea125.value },
-      {
-        original: wholeStemVol125Original,
-        current: wholeStemVol125.value,
-      },
-      { original: cuVolOriginal, current: cuVol.value },
-      {
-        original: cuNetDecayVolOriginal,
-        current: cuNetDecayVol.value,
-      },
-      {
-        original: cuNetDecayWasteVolOriginal,
-        current: cuNetDecayWasteVol.value,
-      },
-    ]
+  const fields = [
+    { original: loreyHeightOriginal, current: loreyHeight.value },
+    { original: wholeStemVol75Original, current: wholeStemVol75.value },
+    { original: basalArea125Original, current: basalArea125.value },
+    { original: wholeStemVol125Original, current: wholeStemVol125.value },
+    { original: cuVolOriginal, current: cuVol.value },
+    { original: cuNetDecayVolOriginal, current: cuNetDecayVol.value },
+    { original: cuNetDecayWasteVolOriginal, current: cuNetDecayWasteVol.value },
+  ]
 
-    // Returns true if any element satisfies the condition, otherwise returns false.
-    const hasModification = fields.some((field) => {
-      return field.original.value !== field.current
-    })
+  const isModified = addtStandAttrsValidator.validateComputedValuesModification(
+    computedValues.value,
+    fields,
+  )
 
-    if (!hasModification) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.NO_MODIFY,
-        MDL_PRM_INPUT_ERR.ATTR_VLD_NO_MODIFY,
-        { width: 400 },
-      )
-      return false
-    }
+  if (!isModified) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.NO_MODIFY,
+      MDL_PRM_INPUT_ERR.ATTR_VLD_NO_MODIFY,
+      { width: 400 },
+    )
+    return false
   }
+
   return true
 }
 
 const validateComparison = (): boolean => {
-  if (
-    basalArea125.value !== null &&
-    basalArea.value !== null &&
-    parseFloat(basalArea125.value) > parseFloat(basalArea.value)
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.ATTR_VLD_COMP_BSL_AREA(basalArea.value),
-      { width: 400 },
-    )
-    return false
-  }
+  const errorMessage = addtStandAttrsValidator.validateComparison(
+    basalArea125.value,
+    basalArea.value,
+    wholeStemVol125.value,
+    wholeStemVol75.value,
+    cuVol.value,
+    cuNetDecayVol.value,
+    cuNetDecayWasteVol.value,
+  )
 
-  if (
-    wholeStemVol125.value !== null &&
-    wholeStemVol75.value !== null &&
-    wholeStemVol125.value > wholeStemVol75.value
-  ) {
+  if (errorMessage) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.ATTR_VLD_COMP_WSV,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (
-    cuVol.value !== null &&
-    wholeStemVol125.value !== null &&
-    cuVol.value > wholeStemVol125.value
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.ATTR_VLD_COMP_CUV,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (
-    cuNetDecayVol.value !== null &&
-    cuVol.value !== null &&
-    cuNetDecayVol.value > cuVol.value
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.ATTR_VLD_COMP_CUNDV,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (
-    cuNetDecayWasteVol.value !== null &&
-    cuNetDecayVol.value !== null &&
-    cuNetDecayWasteVol.value > cuNetDecayVol.value
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.ATTR_VLD_COMP_CUNDWV,
+      errorMessage,
       { width: 400 },
     )
     return false
@@ -526,98 +458,21 @@ const validateComparison = (): boolean => {
   return true
 }
 
-// Validation to check the range of input values
 const validateRange = (): boolean => {
-  if (
-    loreyHeight.value !== null &&
-    (parseFloat(loreyHeight.value) < NUM_INPUT_LIMITS.LOREY_HEIGHT_MIN ||
-      parseFloat(loreyHeight.value) > NUM_INPUT_LIMITS.LOREY_HEIGHT_MAX)
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.ATTR_VLD_LRY_HEIGHT_RNG,
-      { width: 400 },
-    )
-    return false
-  }
+  const errorMessage = addtStandAttrsValidator.validateValueRange(
+    loreyHeight.value,
+    wholeStemVol75.value,
+    basalArea125.value,
+    wholeStemVol125.value,
+    cuVol.value,
+    cuNetDecayVol.value,
+    cuNetDecayWasteVol.value,
+  )
 
-  if (
-    wholeStemVol75.value !== null &&
-    (parseFloat(wholeStemVol75.value) < NUM_INPUT_LIMITS.WHOLE_STEM_VOL75_MIN ||
-      parseFloat(wholeStemVol75.value) > NUM_INPUT_LIMITS.WHOLE_STEM_VOL75_MAX)
-  ) {
+  if (errorMessage) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.ATTR_VLD_WSV75_RNG,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (
-    basalArea125.value !== null &&
-    (parseFloat(basalArea125.value) < NUM_INPUT_LIMITS.BASAL_AREA125_MIN ||
-      parseFloat(basalArea125.value) > NUM_INPUT_LIMITS.BASAL_AREA125_MAX)
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.ATTR_VLD_BSL_AREA_RNG,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (
-    wholeStemVol125.value !== null &&
-    (parseFloat(wholeStemVol125.value) <
-      NUM_INPUT_LIMITS.WHOLE_STEM_VOL125_MIN ||
-      parseFloat(wholeStemVol125.value) >
-        NUM_INPUT_LIMITS.WHOLE_STEM_VOL125_MAX)
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.ATTR_VLD_WSV125_RNG,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (
-    cuVol.value !== null &&
-    (parseFloat(cuVol.value) < NUM_INPUT_LIMITS.CU_VOL_MIN ||
-      parseFloat(cuVol.value) > NUM_INPUT_LIMITS.CU_VOL_MAX)
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.ATTR_VLD_CUV_RNG,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (
-    cuNetDecayVol.value !== null &&
-    (parseFloat(cuNetDecayVol.value) < NUM_INPUT_LIMITS.CU_NET_DECAY_VOL_MIN ||
-      parseFloat(cuNetDecayVol.value) > NUM_INPUT_LIMITS.CU_NET_DECAY_VOL_MAX)
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.ATTR_VLD_CUNDV_RNG,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (
-    cuNetDecayWasteVol.value !== null &&
-    (parseFloat(cuNetDecayWasteVol.value) <
-      NUM_INPUT_LIMITS.CU_NET_DECAY_WASTE_VOL_MIN ||
-      parseFloat(cuNetDecayWasteVol.value) >
-        NUM_INPUT_LIMITS.CU_NET_DECAY_WASTE_VOL_MAX)
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.ATTR_VLD_CUNDWV_RNG,
+      errorMessage,
       { width: 400 },
     )
     return false
@@ -626,74 +481,55 @@ const validateRange = (): boolean => {
   return true
 }
 
-const validateValues = (): boolean => {
-  if (loreyHeight.value && !/^\d+(\.\d{2})?$/.test(loreyHeight.value)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.ATTR_VLD_LRY_HEIGHT_FMT,
-      { width: 400 },
+const formattingValues = (): void => {
+  if (loreyHeight.value) {
+    // Format the value to ##0.00
+    loreyHeight.value = parseFloat(loreyHeight.value).toFixed(
+      NUM_INPUT_LIMITS.LOREY_HEIGHT_DECIMAL_NUM,
     )
-    return false
   }
 
-  if (wholeStemVol75.value && !/^\d+(\.\d)?$/.test(wholeStemVol75.value)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.ATTR_VLD_WSV75_FMT,
-      { width: 400 },
+  if (wholeStemVol75.value) {
+    // Format the value to ####0.0
+    wholeStemVol75.value = parseFloat(wholeStemVol75.value).toFixed(
+      NUM_INPUT_LIMITS.WHOLE_STEM_VOL75_DECIMAL_NUM,
     )
-    return false
   }
 
-  if (basalArea125.value && !/^\d+(\.\d{4})?$/.test(basalArea125.value)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.ATTR_VLD_BSL_AREA_FMT,
-      { width: 400 },
+  if (basalArea125.value) {
+    // Format the value to ##0.0000
+    basalArea125.value = parseFloat(basalArea125.value).toFixed(
+      NUM_INPUT_LIMITS.BASAL_AREA125_DECIMAL_NUM,
     )
-    return false
   }
 
-  if (wholeStemVol125.value && !/^\d+(\.\d)?$/.test(wholeStemVol125.value)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.ATTR_VLD_WSV125_FMT,
-      { width: 400 },
+  if (wholeStemVol125.value) {
+    // Format the value to ###0.0
+    wholeStemVol125.value = parseFloat(wholeStemVol125.value).toFixed(
+      NUM_INPUT_LIMITS.WHOLE_STEM_VOL125_DECIMAL_NUM,
     )
-    return false
   }
 
-  if (cuVol.value && !/^\d+(\.\d)?$/.test(cuVol.value)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.ATTR_VLD_CUV125_FMT,
-      { width: 400 },
+  if (cuVol.value) {
+    // Format the value to ###0.0
+    cuVol.value = parseFloat(cuVol.value).toFixed(
+      NUM_INPUT_LIMITS.CU_VOL_DECIMAL_NUM,
     )
-    return false
   }
 
-  if (cuNetDecayVol.value && !/^\d+(\.\d)?$/.test(cuNetDecayVol.value)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.ATTR_VLD_CUNDV_FMT,
-      { width: 400 },
+  if (cuNetDecayVol.value) {
+    // Format the value to ###0.0
+    cuNetDecayVol.value = parseFloat(cuNetDecayVol.value).toFixed(
+      NUM_INPUT_LIMITS.CU_NET_DECAY_DECIMAL_NUM,
     )
-    return false
   }
 
-  if (
-    cuNetDecayWasteVol.value &&
-    !/^\d+(\.\d)?$/.test(cuNetDecayWasteVol.value)
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.ATTR_VLD_CUNDWV_FMT,
-      { width: 400 },
+  if (cuNetDecayWasteVol.value) {
+    // Format the value to ###0.0
+    cuNetDecayWasteVol.value = parseFloat(cuNetDecayWasteVol.value).toFixed(
+      NUM_INPUT_LIMITS.CU_NET_DECAY_WASTE_DECIMAL_NUM,
     )
-    return false
   }
-
-  return true
 }
 
 const onConfirm = () => {
@@ -701,10 +537,12 @@ const onConfirm = () => {
     validateAllFields() &&
     validateComputedValuesModification() &&
     validateComparison() &&
-    validateRange() &&
-    validateValues()
+    validateRange()
   ) {
     form.value?.validate()
+
+    formattingValues()
+
     // this panel is not in a confirmed state
     if (!isConfirmed.value) {
       modelParameterStore.confirmPanel(panelName)

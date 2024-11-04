@@ -22,11 +22,10 @@ export class SiteInfoValidation extends ValidationBase {
   }
 
   validatePercentStockableAreaRange(psa: number | null): boolean {
-    const numericPsa = Util.toNumber(psa)
-    if (!numericPsa) return true
+    if (!psa) return true
 
     return this.validateRange(
-      numericPsa,
+      psa,
       NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_MIN,
       NUM_INPUT_LIMITS.PERCENT_STOCKABLE_AREA_MAX,
     )
@@ -64,22 +63,5 @@ export class SiteInfoValidation extends ValidationBase {
       NUM_INPUT_LIMITS.BHA50_SITE_INDEX_MIN,
       NUM_INPUT_LIMITS.BHA50_SITE_INDEX_MAX,
     )
-  }
-  validateHeight(height: string | null): boolean {
-    if (!height) return true
-
-    const decimalPlaces = NUM_INPUT_LIMITS.HEIGHT_DECIMAL_NUM
-    const regex = new RegExp(`^\\d+(\\.\\d{1,${decimalPlaces}})?$`)
-
-    return this.validateDecimalandFormat(height, regex)
-  }
-
-  validateBha50SiteIndex(bha50SiteIndex: string | null): boolean {
-    if (!bha50SiteIndex) return true
-
-    const decimalPlaces = NUM_INPUT_LIMITS.BHA50_SITE_INDEX_DECIMAL_NUM
-    const regex = new RegExp(`^\\d+(\\.\\d{1,${decimalPlaces}})?$`)
-
-    return this.validateDecimalandFormat(bha50SiteIndex, regex)
   }
 }
