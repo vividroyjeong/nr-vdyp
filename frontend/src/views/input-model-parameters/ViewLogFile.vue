@@ -278,7 +278,6 @@ const addtStandAttrs = [
     cuNetDecayWasteVol: '23.4',
   }),
 ]
-// const addtStandAttrs: any[] = []
 
 const download = () => {
   const content = 'Hello, this is your text file!'

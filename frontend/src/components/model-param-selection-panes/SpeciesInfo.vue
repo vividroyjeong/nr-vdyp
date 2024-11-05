@@ -206,7 +206,6 @@
                           density="compact"
                           dense
                         ></v-text-field>
-                        <!-- :error-messages="totalPercentError" -->
                       </v-col>
                     </v-row>
                   </div>

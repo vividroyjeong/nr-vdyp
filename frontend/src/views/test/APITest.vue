@@ -114,12 +114,7 @@ const search = async () => {
     const response = await API.search.code(param)
 
     if (response.status === StatusCodes.OK && response?.data?.elements) {
-      // data.itemsLength = response.data.totalRowCount
       data.items = []
-
-      // for (const result of response.data.elements) {
-      //   data.items.push(new Job(result))
-      // }
 
       response.data.elements.forEach(
         (element: { codeTableName: string; codes: any[] }) => {

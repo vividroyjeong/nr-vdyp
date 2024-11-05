@@ -52,7 +52,6 @@
       <v-card class="mt-5 pa-4 run-model-card" elevation="0">
         <v-card-actions class="pr-0 mr-2">
           <v-spacer></v-spacer>
-          <!-- <v-btn class="white-btn" @click="cancel">Cancel</v-btn> -->
           <v-btn
             class="blue-btn ml-2"
             :disabled="!modelParameterStore.runModelEnabled"
@@ -124,8 +123,6 @@ const tabs = computed(() => {
 onMounted(() => {
   modelParameterStore.setDefaultValues()
 })
-
-// const cancel = () => {}
 
 const runModel = () => {}
 </script>

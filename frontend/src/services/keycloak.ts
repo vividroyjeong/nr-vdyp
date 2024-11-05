@@ -31,7 +31,6 @@ const initOptions: KeycloakInitOptions = {
   pkceMethod: KEYCLOAK.PKCE_METHOD,
   checkLoginIframe: KEYCLOAK.CHECK_LOGIN_IFRAME,
   onLoad: KEYCLOAK.ONLOAD,
-  // silentCheckSsoRedirectUri: `${location.origin}${KEYCLOAK.SILENT_CHECK_SSO_REDIRECT_PAGE}`,
   enableLogging: KEYCLOAK.ENABLE_LOGGING,
 }
 
@@ -115,7 +114,6 @@ export const initializeKeycloak = async (): Promise<Keycloak | undefined> => {
       })
 
       // TODO - need to set up periodic token refresh?
-      // setupTokenRefresh()
 
       return keycloakInstance
     } else {
@@ -211,7 +209,8 @@ const logErrorAndLogout = (
   logout()
 }
 
-// If the token expires within minValidity seconds (minValidity is optional, if not specified 5 is used) the token is refreshed. If -1 is passed as the minValidity, the token will be forcibly refreshed.
+// If the token expires within minValidity seconds (minValidity is optional, if not specified 5 is used) the token is refreshed.
+// If -1 is passed as the minValidity, the token will be forcibly refreshed.
 export const refreshToken = async (minValidity?: number): Promise<boolean> => {
   try {
     const initialized = await initializeKeycloakAndAuth()
@@ -311,8 +310,6 @@ export const logout = (): void => {
   const authStore = useAuthStore()
   authStore.clearUser()
 
-  // stopRefreshTimer()
-
   window.location.href = `https://logon7.gov.bc.ca/clp-cgi/logoff.cgi?retnow=1&returl=${encodeURIComponent(
     `${ssoAuthServerUrl}/realms/${ssoRealm}/protocol/openid-connect/logout?post_logout_redirect_uri=` +
       ssoRedirectUrl +
@@ -350,24 +347,3 @@ const getTokenExpirationDate = (token: string): Date | null => {
 }
 
 // TODO - need to set up periodic token refresh?
-// import { Timer } from 'timer-node'
-// let refreshTimer: Timer | null = null
-
-// const setupTokenRefresh = () => {
-//   stopRefreshTimer()
-
-//   refreshTimer = new Timer()
-
-//   const refreshInterval = 1000 * 60 * 4 // 4-minute interval
-//   refreshTimer.start()
-
-//   setInterval(async () => {
-//     console.log('Checking token expiration...')
-//     const refreshed = await refreshToken(KEYCLOAK.UPDATE_TOKEN_MIN_VALIDITY)
-//     console.log(`Token refreshed: ${refreshed}`)
-//   }, refreshInterval)
-// }
-
-// const stopRefreshTimer = () => {
-//   if (refreshTimer) refreshTimer.stop()
-// }

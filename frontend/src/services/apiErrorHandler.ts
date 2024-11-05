@@ -68,7 +68,7 @@ export const handleApiError = (error: unknown, contextMessage?: string) => {
     // Log additional error information for debugging
     console.error('Axios Config:', axiosError.config)
     if (axiosError.code) {
-      // Refer to Axios Error code - https://www.npmjs.com/package/axios
+      // Refer to Axios Error code
       console.error(`Axios Error Code: ${axiosError.code}`)
     }
   } else {
