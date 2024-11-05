@@ -31,7 +31,7 @@ export class SpeciesInfoValidation extends ValidationBase {
     const speciesCount: { [key: string]: number } = {}
     let duplicateSpecies = null
 
-    speciesList.forEach((item) => {
+    for (const item of speciesList) {
       if (item.species) {
         if (!speciesCount[item.species]) {
           speciesCount[item.species] = 0
@@ -42,7 +42,7 @@ export class SpeciesInfoValidation extends ValidationBase {
           duplicateSpecies = item.species
         }
       }
-    })
+    }
 
     return duplicateSpecies
   }

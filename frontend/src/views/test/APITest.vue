@@ -116,24 +116,22 @@ const search = async () => {
     if (response.status === StatusCodes.OK && response?.data?.elements) {
       data.items = []
 
-      response.data.elements.forEach(
-        (element: { codeTableName: string; codes: any[] }) => {
-          if (element.codeTableName === env.VITE_CODE_TB_NAME) {
-            element.codes.forEach((code) => {
-              data.items.push(
-                new Code({
-                  codeTableName: element.codeTableName,
-                  codeName: code.codeName,
-                  description: code.description,
-                  displayOrder: code.displayOrder,
-                  effectiveDate: new Date(code.effectiveDate).toLocaleString(),
-                  expiryDate: code.expiryDate,
-                }),
-              )
-            })
+      for (const element of response.data.elements) {
+        if (element.codeTableName === env.VITE_CODE_TB_NAME) {
+          for (const code of element.codes) {
+            data.items.push(
+              new Code({
+                codeTableName: element.codeTableName,
+                codeName: code.codeName,
+                description: code.description,
+                displayOrder: code.displayOrder,
+                effectiveDate: new Date(code.effectiveDate).toLocaleString(),
+                expiryDate: code.expiryDate,
+              }),
+            )
           }
-        },
-      )
+        }
+      }
     }
   } catch (err) {
     handleApiError(err, 'Failed to search Codes')
@@ -255,9 +253,11 @@ const fetchTopLevel = async (): Promise<void> => {
   try {
     const responseData = await API.fetch.topLevel()
     if (responseData?.links) {
-      responseData.links.forEach((e: any) => {
-        console.log(`method: ${e.method}, href: ${e.href}, rel: ${e.rel}`)
-      })
+      for (const link of responseData.links) {
+        console.log(
+          `method: ${link.method}, href: ${link.href}, rel: ${link.rel}`,
+        )
+      }
     } else {
       messageHandler.logWarningMessage(
         'Failed to fetch Code',

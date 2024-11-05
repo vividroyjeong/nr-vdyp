@@ -496,10 +496,10 @@ const onEdit = () => {
 }
 
 const clear = () => {
-  speciesList.value.forEach((item) => {
+  for (const item of speciesList.value) {
     item.species = null
     item.percent = null
-  })
+  }
 
   if (form.value) {
     form.value.reset()

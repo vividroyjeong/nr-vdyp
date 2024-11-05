@@ -69,6 +69,7 @@
 import { ref } from 'vue'
 import printJS from 'print-js'
 import { saveAs } from 'file-saver'
+import { Util } from '@/utils/util'
 
 const mdlRptPrintAreaRef = ref<HTMLElement | null>(null)
 
@@ -181,31 +182,10 @@ const download = () => {
   saveAs(blob, 'model-report.txt')
 }
 
-const getStyles = () => {
-  let styles = ''
-  const styleSheets = document.styleSheets
-
-  Array.from(styleSheets).forEach((sheet) => {
-    if (!sheet.href || sheet.href.startsWith(window.location.origin)) {
-      try {
-        if (sheet.cssRules) {
-          Array.from(sheet.cssRules).forEach((rule) => {
-            styles += rule.cssText
-          })
-        }
-      } catch (e) {
-        console.warn('Could not access stylesheet:', sheet, e)
-      }
-    }
-  })
-
-  return styles
-}
-
 const print = () => {
   if (mdlRptPrintAreaRef.value) {
     const styles =
-      getStyles() +
+      Util.extractStylesFromDocument(document.styleSheets) +
       `
       @page {
         size: Letter portrait;
