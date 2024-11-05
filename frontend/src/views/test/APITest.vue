@@ -67,6 +67,7 @@ import type { CodeSearchParams, TableOptions } from '@/interfaces/interfaces'
 import { SORT_ORDER } from '@/constants/constants'
 import Code from '@/models/code'
 import { env } from '@/env'
+import { SVC_ERR } from '@/constants/message'
 
 const loading = ref(false)
 
@@ -113,7 +114,13 @@ const search = async () => {
 
     const response = await API.search.code(param)
 
-    if (response.status === StatusCodes.OK && response?.data?.elements) {
+    if (
+      response &&
+      response.status &&
+      response.status === StatusCodes.OK &&
+      response.data &&
+      response.data.elements
+    ) {
       data.items = []
 
       for (const element of response.data.elements) {
@@ -132,6 +139,11 @@ const search = async () => {
           }
         }
       }
+    } else {
+      messageHandler.logWarningMessage(
+        SVC_ERR.DEFAULT,
+        'Unexpected response format',
+      )
     }
   } catch (err) {
     handleApiError(err, 'Failed to search Codes')
@@ -144,7 +156,9 @@ const validForm = ref(true)
 const codeForm = ref()
 
 const resetValidation = () => {
-  codeForm.value?.resetValidation()
+  if (codeForm.value) {
+    codeForm.value.resetValidation()
+  }
 }
 
 const createCode = async () => {
@@ -163,11 +177,18 @@ const createCode = async () => {
     try {
       const response = await API.create.code(newCode)
 
-      messageHandler.messageResult(
-        response?.status === StatusCodes.CREATED,
-        'Code Created!',
-        'Failed to create Code',
-      )
+      if (response && response.status) {
+        messageHandler.messageResult(
+          response.status === StatusCodes.CREATED,
+          'Code Created!',
+          'Failed to create Code',
+        )
+      } else {
+        messageHandler.logWarningMessage(
+          SVC_ERR.DEFAULT,
+          'Unexpected response format',
+        )
+      }
     } catch (err) {
       handleApiError(err, 'Failed to create Code')
     } finally {
@@ -194,11 +215,18 @@ const deleteCode = async (item: Code): Promise<void> => {
           ifMatch,
         )
 
-        messageHandler.messageResult(
-          deleteResult?.status === StatusCodes.NO_CONTENT,
-          'Code Deleted!',
-          'Failed to delete Code',
-        )
+        if (deleteResult && deleteResult.status) {
+          messageHandler.messageResult(
+            deleteResult.status === StatusCodes.NO_CONTENT,
+            'Code Deleted!',
+            'Failed to delete Code',
+          )
+        } else {
+          messageHandler.logWarningMessage(
+            SVC_ERR.DEFAULT,
+            'Unexpected response format',
+          )
+        }
       }
     } else {
       messageHandler.logWarningMessage(
@@ -214,7 +242,11 @@ const deleteCode = async (item: Code): Promise<void> => {
 }
 
 const validate = (): boolean => {
-  return codeForm.value?.validate()
+  if (codeForm.value) {
+    return codeForm.value.validate()
+  }
+  console.warn('codeForm is not initialized.')
+  return false
 }
 
 const updateCode = async (item: Code): Promise<void> => {
@@ -225,16 +257,21 @@ const updateCode = async (item: Code): Promise<void> => {
         item.codeName,
       )
       if (fetchResult) {
-        // TODO sync edits with actual
-
         const ifMatch = fetchResult.etag ? fetchResult.etag.toString() : '0'
         const updateResult = await API.update.code(fetchResult, ifMatch)
 
-        messageHandler.messageResult(
-          updateResult?.status === StatusCodes.OK,
-          'Code Updated!',
-          'Failed to update Code',
-        )
+        if (updateResult && updateResult.status) {
+          messageHandler.messageResult(
+            updateResult.status === StatusCodes.OK,
+            'Code Updated!',
+            'Failed to update Code',
+          )
+        } else {
+          messageHandler.logWarningMessage(
+            SVC_ERR.DEFAULT,
+            'Unexpected response format',
+          )
+        }
       } else {
         messageHandler.logWarningMessage(
           'Failed to update Code. Please try again.',
@@ -252,7 +289,8 @@ const updateCode = async (item: Code): Promise<void> => {
 const fetchTopLevel = async (): Promise<void> => {
   try {
     const responseData = await API.fetch.topLevel()
-    if (responseData?.links) {
+
+    if (responseData && responseData.links) {
       for (const link of responseData.links) {
         console.log(
           `method: ${link.method}, href: ${link.href}, rel: ${link.rel}`,

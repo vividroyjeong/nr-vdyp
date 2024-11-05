@@ -480,7 +480,9 @@ const onConfirm = () => {
     validateTotalSpeciesPercent() &&
     validateRequired()
   ) {
-    form.value?.validate()
+    if (form.value) {
+      form.value.validate()
+    }
     // this panel is not in a confirmed state
     if (!isConfirmed.value) {
       modelParameterStore.confirmPanel(panelName)

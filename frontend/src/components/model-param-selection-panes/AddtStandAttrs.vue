@@ -539,7 +539,9 @@ const onConfirm = () => {
     validateComparison() &&
     validateRange()
   ) {
-    form.value?.validate()
+    if (form.value) {
+      form.value.validate()
+    }
 
     formattingValues()
 

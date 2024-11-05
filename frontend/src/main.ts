@@ -13,10 +13,12 @@ const bootstrap = async () => {
   try {
     const keycloak = await initializeKeycloak()
 
-    if (keycloak?.authenticated) {
-      app.mount('#app')
-    } else {
-      keycloak?.login()
+    if (keycloak) {
+      if (keycloak.authenticated) {
+        app.mount('#app')
+      } else {
+        keycloak.login()
+      }
     }
   } catch (error) {
     console.error('Failed to initialize Keycloak:', error)

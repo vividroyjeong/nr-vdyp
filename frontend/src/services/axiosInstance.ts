@@ -24,11 +24,13 @@ axiosInstance.interceptors.request.use(
     // await handleTokenValidation() // Ensure token is valid or refreshed
 
     const authStore = useAuthStore()
-    const token = authStore.user?.accessToken
-
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`
+    if (authStore && authStore.user) {
+      const token = authStore.user.accessToken
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
     }
+
     return config
   },
   (error) => {

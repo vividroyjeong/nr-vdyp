@@ -751,7 +751,9 @@ const formattingValues = (): void => {
 
 const onConfirm = () => {
   if (validateRequiredFields() && validateRange()) {
-    form.value?.validate()
+    if (form.value) {
+      form.value.validate()
+    }
 
     formattingValues()
 

@@ -6,7 +6,8 @@
           <tr>
             <td class="field-column">auth_time</td>
             <td>
-              {{ userInfo?.auth_time || 'N/A' }} ({{ formattedAuthTime }})
+              {{ userInfo && userInfo.auth_time ? userInfo.auth_time : 'N/A' }}
+              ({{ formattedAuthTime }})
               <v-btn @click="validateAndRefreshToken"
                 >Validate And Refresh Token</v-btn
               >
@@ -14,49 +15,87 @@
           </tr>
           <tr>
             <td class="field-column">exp</td>
-            <td>{{ userInfo?.exp || 'N/A' }} ({{ formattedExpTime }})</td>
+            <td>
+              {{ userInfo && userInfo.exp ? userInfo.exp : 'N/A' }} ({{
+                formattedExpTime
+              }})
+            </td>
           </tr>
           <tr>
             <td class="field-column">client_roles</td>
             <td>
               {{
-                userInfo?.client_roles.length > 0
-                  ? userInfo?.client_roles.join(', ')
+                userInfo &&
+                userInfo.client_roles &&
+                userInfo.client_roles.length > 0
+                  ? userInfo.client_roles.join(', ')
                   : 'No roles assigned'
               }}
             </td>
           </tr>
           <tr>
             <td class="field-column">display_name</td>
-            <td>{{ userInfo?.display_name || 'N/A' }}</td>
+            <td>
+              {{
+                userInfo && userInfo.display_name
+                  ? userInfo.display_name
+                  : 'N/A'
+              }}
+            </td>
           </tr>
           <tr>
             <td class="field-column">email</td>
-            <td>{{ userInfo?.email || 'N/A' }}</td>
+            <td>{{ userInfo && userInfo.email ? userInfo.email : 'N/A' }}</td>
           </tr>
           <tr>
             <td class="field-column">family_name</td>
-            <td>{{ userInfo?.family_name || 'N/A' }}</td>
+            <td>
+              {{
+                userInfo && userInfo.family_name ? userInfo.family_name : 'N/A'
+              }}
+            </td>
           </tr>
           <tr>
             <td class="field-column">given_name</td>
-            <td>{{ userInfo?.given_name || 'N/A' }}</td>
+            <td>
+              {{
+                userInfo && userInfo.given_name ? userInfo.given_name : 'N/A'
+              }}
+            </td>
           </tr>
           <tr>
             <td class="field-column">idir_username</td>
-            <td>{{ userInfo?.idir_username || 'N/A' }}</td>
+            <td>
+              {{
+                userInfo && userInfo.idir_username
+                  ? userInfo.idir_username
+                  : 'N/A'
+              }}
+            </td>
           </tr>
           <tr>
             <td class="field-column">name</td>
-            <td>{{ userInfo?.name || 'N/A' }}</td>
+            <td>{{ userInfo && userInfo.name ? userInfo.name : 'N/A' }}</td>
           </tr>
           <tr>
             <td class="field-column">preferred_username</td>
-            <td>{{ userInfo?.preferred_username || 'N/A' }}</td>
+            <td>
+              {{
+                userInfo && userInfo.preferred_username
+                  ? userInfo.preferred_username
+                  : 'N/A'
+              }}
+            </td>
           </tr>
           <tr>
             <td class="field-column">user_principal_name</td>
-            <td>{{ userInfo?.user_principal_name || 'N/A' }}</td>
+            <td>
+              {{
+                userInfo && userInfo.user_principal_name
+                  ? userInfo.user_principal_name
+                  : 'N/A'
+              }}
+            </td>
           </tr>
 
           <tr>
@@ -86,20 +125,38 @@ import { handleTokenValidation } from '@/services/keycloak'
 const authStore = useAuthStore()
 
 const userInfo = computed(() => authStore.parseIdToken())
-const accessToken = computed(
-  () => authStore.user?.accessToken || 'No Access Token',
-)
-const idToken = computed(() => authStore.user?.idToken || 'No ID Token')
-const refToken = computed(() => authStore.user?.refToken || 'No Refresh Token')
 
-const formattedAuthTime = computed(() =>
-  Util.formatUnixTimestampToDate(userInfo.value?.auth_time),
-)
-const formattedExpTime = computed(() =>
-  Util.formatUnixTimestampToDate(userInfo.value?.exp),
-)
+const accessToken = computed(() => {
+  return authStore.user && authStore.user.accessToken
+    ? authStore.user.accessToken
+    : 'No Access Token'
+})
 
-async function validateAndRefreshToken() {
+const idToken = computed(() => {
+  return authStore.user && authStore.user.idToken
+    ? authStore.user.idToken
+    : 'No ID Token'
+})
+
+const refToken = computed(() => {
+  return authStore.user && authStore.user.refToken
+    ? authStore.user.refToken
+    : 'No Refresh Token'
+})
+
+const formattedAuthTime = computed(() => {
+  return userInfo.value && userInfo.value.auth_time
+    ? Util.formatUnixTimestampToDate(userInfo.value.auth_time)
+    : 'No Auth Time'
+})
+
+const formattedExpTime = computed(() => {
+  return userInfo.value && userInfo.value.exp
+    ? Util.formatUnixTimestampToDate(userInfo.value.exp)
+    : 'No Expiration Time'
+})
+
+const validateAndRefreshToken = async () => {
   await handleTokenValidation()
 }
 </script>

@@ -57,7 +57,8 @@ export const initializeKeycloak = async (): Promise<Keycloak | undefined> => {
     authStore.loadUserFromStorage()
     if (
       authStore.authenticated &&
-      authStore.user?.accessToken &&
+      authStore.user &&
+      authStore.user.accessToken &&
       authStore.user.refToken &&
       authStore.user.idToken
     ) {
@@ -120,7 +121,9 @@ export const initializeKeycloak = async (): Promise<Keycloak | undefined> => {
       keycloakInstance.login(loginOptions)
     }
   } catch (err) {
-    notificationStore?.showErrorMessage(AUTH_ERR.AUTH_004)
+    if (notificationStore) {
+      notificationStore.showErrorMessage(AUTH_ERR.AUTH_004)
+    }
     console.error('Keycloak initialization failed (Error: AUTH_004):', err)
     keycloakInstance = null // Reset the instance on failure
     throw err
@@ -160,11 +163,17 @@ export const initializeKeycloakAndAuth = async (): Promise<boolean> => {
 
     // not initialized, the token not be refreshed
     if (!keycloakInstance.clientId) {
-      if (
-        !authStore.user?.accessToken ||
-        !authStore.user?.refToken ||
-        !authStore.user?.idToken
-      ) {
+      if (!authStore || !authStore.user) {
+        logErrorAndLogout(
+          AUTH_ERR.AUTH_010,
+          'Auth load failed. (Error: AUTH_010).',
+        )
+        return false
+      }
+
+      const { accessToken, refToken, idToken } = authStore.user
+
+      if (!accessToken || !refToken || !idToken) {
         logErrorAndLogout(
           AUTH_ERR.AUTH_010,
           'Auth load failed. (Error: AUTH_010).',

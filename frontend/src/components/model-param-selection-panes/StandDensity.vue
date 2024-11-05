@@ -577,7 +577,9 @@ const onConfirm = async () => {
     return
   }
 
-  form.value?.validate()
+  if (form.value) {
+    form.value.validate()
+  }
 
   formattingValues()
 

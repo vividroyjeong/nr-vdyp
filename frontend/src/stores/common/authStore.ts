@@ -31,22 +31,30 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     parseIdToken() {
-      if (!this.user?.idToken) return null
+      if (!this.user || !this.user.idToken) return null
 
       try {
-        const idTokenParsed = JSON.parse(atob(this.user.idToken.split('.')[1]))
+        const idTokenParts = this.user.idToken.split('.')
+
+        if (idTokenParts.length !== 3) {
+          console.error('Invalid ID Token format')
+          return null
+        }
+
+        const idTokenParsed = JSON.parse(atob(idTokenParts[1]))
+
         return {
-          auth_time: idTokenParsed.auth_time,
-          client_roles: idTokenParsed.client_roles,
-          display_name: idTokenParsed.display_name,
-          email: idTokenParsed.email,
-          exp: idTokenParsed.exp,
-          family_name: idTokenParsed.family_name,
-          given_name: idTokenParsed.given_name,
-          idir_username: idTokenParsed.idir_username,
-          name: idTokenParsed.name,
-          preferred_username: idTokenParsed.preferred_username,
-          user_principal_name: idTokenParsed.user_principal_name,
+          auth_time: idTokenParsed.auth_time ?? null,
+          client_roles: idTokenParsed.client_roles ?? [],
+          display_name: idTokenParsed.display_name ?? null,
+          email: idTokenParsed.email ?? null,
+          exp: idTokenParsed.exp ?? null,
+          family_name: idTokenParsed.family_name ?? null,
+          given_name: idTokenParsed.given_name ?? null,
+          idir_username: idTokenParsed.idir_username ?? null,
+          name: idTokenParsed.name ?? null,
+          preferred_username: idTokenParsed.preferred_username ?? null,
+          user_principal_name: idTokenParsed.user_principal_name ?? null,
         }
       } catch (error) {
         console.error('Failed to parse ID Token:', error)
@@ -55,7 +63,11 @@ export const useAuthStore = defineStore('auth', {
     },
     getAllRoles(): string[] {
       const parsedToken = this.parseIdToken()
-      return parsedToken?.client_roles || []
+      if (parsedToken && Array.isArray(parsedToken.client_roles)) {
+        return parsedToken.client_roles
+      }
+
+      return []
     },
     hasRole(role: string): boolean {
       const roles = this.getAllRoles()

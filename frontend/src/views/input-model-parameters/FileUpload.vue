@@ -192,6 +192,7 @@ import {
   MDL_PRM_INPUT_ERR,
   MSG_DIALOG_TITLE,
   FILE_UPLOAD_ERR,
+  SVC_ERR,
 } from '@/constants/message'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 import Papa from 'papaparse'
@@ -337,7 +338,9 @@ const validateFiles = async () => {
 
 const runModel = async () => {
   if (validateComparison() && validateRange() && (await validateFiles())) {
-    form.value?.validate()
+    if (form.value) {
+      form.value.validate()
+    }
 
     const projectionParameters = {
       startingAge: startingAge.value,
@@ -357,11 +360,18 @@ const runModel = async () => {
         polygonFile.value!,
       )
 
-      messageHandler.messageResult(
-        response?.status === StatusCodes.CREATED,
-        'Model ran successfully!',
-        'Failed to run Model',
-      )
+      if (response && response.status) {
+        messageHandler.messageResult(
+          response.status === StatusCodes.CREATED,
+          'Model ran successfully!',
+          'Failed to run Model',
+        )
+      } else {
+        messageHandler.logWarningMessage(
+          SVC_ERR.DEFAULT,
+          'Unexpected response format',
+        )
+      }
     } catch (err) {
       handleApiError(err, 'Failed to run Model')
     }
