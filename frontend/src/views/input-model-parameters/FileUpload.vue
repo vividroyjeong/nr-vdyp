@@ -281,46 +281,6 @@ const validateRange = (): boolean => {
   return true
 }
 
-const validateValues = (): boolean => {
-  if (
-    startingAge.value &&
-    (!Number.isInteger(startingAge.value) || startingAge.value < 0)
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.RPT_VLD_START_AGE_VAL,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (
-    finishingAge.value &&
-    (!Number.isInteger(finishingAge.value) || finishingAge.value < 0)
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.RPT_VLD_FNSH_AGE_VAL,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (
-    ageIncrement.value &&
-    (!Number.isInteger(ageIncrement.value) || ageIncrement.value < 0)
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.RPT_VLD_AGE_INC_VAL,
-      { width: 400 },
-    )
-    return false
-  }
-
-  return true
-}
-
 const isCSVFile = async (file: File): Promise<boolean> => {
   return new Promise((resolve) => {
     Papa.parse(file, {
@@ -376,12 +336,7 @@ const validateFiles = async () => {
 }
 
 const runModel = async () => {
-  if (
-    validateComparison() &&
-    validateRange() &&
-    validateValues() &&
-    (await validateFiles())
-  ) {
+  if (validateComparison() && validateRange() && (await validateFiles())) {
     form.value?.validate()
 
     const projectionParameters = {
