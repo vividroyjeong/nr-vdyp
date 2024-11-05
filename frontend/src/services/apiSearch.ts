@@ -22,7 +22,7 @@ export const code = async (param: CodeSearchParams): Promise<any> => {
   return get<any>(`/codeTables${queryString}`)
 }
 
-export const csvExport = async (): Promise<Blob> => {
+export const csvExport = async (): Promise<Blob | null> => {
   const response = await get<Blob>(`/contactsExport?exportOption=All`, {
     headers: {
       Accept: 'text/csv',
@@ -30,6 +30,11 @@ export const csvExport = async (): Promise<Blob> => {
     responseType: 'blob',
     timeout: 5000,
   })
+
+  if (!response || !response.data) {
+    console.warn('Unexpected response format')
+    return null
+  }
 
   return response.data
 }

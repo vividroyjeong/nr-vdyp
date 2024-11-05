@@ -21,7 +21,7 @@ axiosInstance.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     // TODO - performance issues or network overhead issue?
     // then consider timer-based refresh + refresh token on 401 error
-    // await handleTokenValidation() // Ensure token is valid or refreshed
+    // Ensure token is valid or refreshed
 
     const authStore = useAuthStore()
     if (authStore && authStore.user) {

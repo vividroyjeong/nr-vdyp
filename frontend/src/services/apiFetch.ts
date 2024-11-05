@@ -5,6 +5,11 @@ import Code from '@/models/code'
 export const topLevel = async (): Promise<any> => {
   const response = await get<any>('/')
 
+  if (!response || !response.status || !response.data) {
+    console.warn('Unexpected response format or status')
+    return null
+  }
+
   if (response.status === StatusCodes.OK) {
     return response.data
   } else {
@@ -14,6 +19,12 @@ export const topLevel = async (): Promise<any> => {
 
 export const pingServer = async (): Promise<any> => {
   const response = await get<any>('/ping')
+
+  if (!response || !response.status || !response.data) {
+    console.warn('Unexpected response format or status')
+    return null
+  }
+
   return response.status === StatusCodes.OK ? response.data : null
 }
 
@@ -24,6 +35,11 @@ export const code = async (
   const response = await get<any>(
     `/codeTables/${codeTableName}/codes/${codeName}`,
   )
+
+  if (!response || !response.status || !response.data || !response.headers) {
+    console.warn('Unexpected response format or status')
+    return null
+  }
 
   if (response.status === StatusCodes.OK) {
     const codeJson = response.data
