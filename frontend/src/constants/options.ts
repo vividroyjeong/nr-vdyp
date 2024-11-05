@@ -90,11 +90,11 @@ export const projectionTypeOptions = [
 export const modelTypeOptions = [
   {
     label: 'File Upload',
-    value: CONSTANTS.MODEL_TYPE.FILE_UPLOAD,
+    value: CONSTANTS.MODEL_SELECTION.FILE_UPLOAD,
   },
   {
     label: 'Input Model Parameters',
-    value: CONSTANTS.MODEL_TYPE.INPUT_MODEL_PARAMETERS,
+    value: CONSTANTS.MODEL_SELECTION.INPUT_MODEL_PARAMETERS,
   },
 ]
 

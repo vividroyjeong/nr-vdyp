@@ -169,7 +169,7 @@ export const MESSAGE_TYPE = Object.freeze({
   WARNING: 'warning',
 })
 
-export const MODEL_TYPE = Object.freeze({
+export const MODEL_SELECTION = Object.freeze({
   FILE_UPLOAD: 'File Upload',
   INPUT_MODEL_PARAMETERS: 'Input Model Parameters',
 })
@@ -179,15 +179,9 @@ export const ENGINE_VERSION = Object.freeze({
   VDYP9: 'VDYP 9',
 })
 
-export const MODEL_PARAM_TAB_IDX = Object.freeze({
-  MODEL_PARAM_SELECTION: 0,
-  MODEL_REPORT: 1,
-  VIEW_LOG_FILE: 2,
-  VIEW_ERROR_MESSAGES: 3,
-})
-
 export const MODEL_PARAM_TAB_NAME = Object.freeze({
   MODEL_PARAM_SELECTION: 'Model Parameter Selection',
+  FILE_UPLOAD: 'File Upload',
   MODEL_REPORT: 'Model Report',
   VIEW_LOG_FILE: 'View Log File',
   VIEW_ERROR_MESSAGES: 'View Error Messages',
