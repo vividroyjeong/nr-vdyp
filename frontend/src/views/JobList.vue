@@ -27,7 +27,6 @@
             @update:startDate="startDate = $event"
             @update:endDate="endDate = $event"
           />
-          <!-- <p>Selected Start Date: {{ startDate }}</p> <p>Selected End Date: {{ endDate }}</p> -->
         </v-col>
         <v-col cols="12" md="2" style="padding-top: 9px">
           <span class="search-label">Job Status</span>

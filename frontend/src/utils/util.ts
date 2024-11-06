@@ -230,6 +230,32 @@ export class Util {
   }
 
   /**
+   * Extracts all CSS styles from the provided style sheets that are either inline or belong to the same origin.
+   * This function iterates through each style sheet and retrieves the CSS rules, appending them to a single string.
+   *
+   * @param {StyleSheetList} styleSheets - The list of style sheets from the document to extract CSS from.
+   * @returns {string} A concatenated string of all CSS rules from the provided style sheets.
+   */
+  static extractStylesFromDocument(styleSheets: StyleSheetList): string {
+    let styles = ''
+    for (const sheet of Array.from(styleSheets)) {
+      if (!sheet.href || sheet.href.startsWith(window.location.origin)) {
+        try {
+          if (sheet.cssRules) {
+            for (const rule of Array.from(sheet.cssRules)) {
+              styles += rule.cssText
+            }
+          }
+        } catch (e) {
+          console.warn('Could not access stylesheet:', sheet, e)
+        }
+      }
+    }
+
+    return styles
+  }
+
+  /**
    * SPLITING
    */
   static splitStringByCharCamelCase(inString: string): string {

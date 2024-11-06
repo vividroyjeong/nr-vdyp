@@ -21,7 +21,6 @@
           <template v-slot:[`item.effectiveDate`]="{ item }">
             {{ item.effectiveDate }}
           </template>
-
           <template v-slot:[`item.actions`]="{ item }">
             <v-tooltip bottom>
               <template v-slot:activator="{ props }">
@@ -35,7 +34,6 @@
               </template>
               <span>Edit</span>
             </v-tooltip>
-
             <v-tooltip bottom>
               <template v-slot:activator="{ props }">
                 <v-icon
@@ -67,6 +65,7 @@ import type { CodeSearchParams, TableOptions } from '@/interfaces/interfaces'
 import { SORT_ORDER } from '@/constants/constants'
 import Code from '@/models/code'
 import { env } from '@/env'
+import { SVC_ERR } from '@/constants/message'
 
 const loading = ref(false)
 
@@ -113,32 +112,38 @@ const search = async () => {
 
     const response = await API.search.code(param)
 
-    if (response.status === StatusCodes.OK && response?.data?.elements) {
-      // data.itemsLength = response.data.totalRowCount
+    if (
+      !(response && response.status) ||
+      !(response.data && response.data.elements)
+    ) {
+      messageHandler.logWarningMessage(
+        SVC_ERR.DEFAULT,
+        'Unexpected response format or status',
+      )
+      return
+    }
+
+    if (response.status === StatusCodes.OK) {
       data.items = []
 
-      // for (const result of response.data.elements) {
-      //   data.items.push(new Job(result))
-      // }
-
-      response.data.elements.forEach(
-        (element: { codeTableName: string; codes: any[] }) => {
-          if (element.codeTableName === env.VITE_CODE_TB_NAME) {
-            element.codes.forEach((code) => {
-              data.items.push(
-                new Code({
-                  codeTableName: element.codeTableName,
-                  codeName: code.codeName,
-                  description: code.description,
-                  displayOrder: code.displayOrder,
-                  effectiveDate: new Date(code.effectiveDate).toLocaleString(),
-                  expiryDate: code.expiryDate,
-                }),
-              )
-            })
+      for (const element of response.data.elements) {
+        if (element.codeTableName === env.VITE_CODE_TB_NAME) {
+          for (const code of element.codes) {
+            data.items.push(
+              new Code({
+                codeTableName: element.codeTableName,
+                codeName: code.codeName,
+                description: code.description,
+                displayOrder: code.displayOrder,
+                effectiveDate: new Date(code.effectiveDate).toLocaleString(),
+                expiryDate: code.expiryDate,
+              }),
+            )
           }
-        },
-      )
+        }
+      }
+    } else {
+      messageHandler.logWarningMessage(SVC_ERR.DEFAULT, 'Failed to fetch Code.')
     }
   } catch (err) {
     handleApiError(err, 'Failed to search Codes')
@@ -151,7 +156,9 @@ const validForm = ref(true)
 const codeForm = ref()
 
 const resetValidation = () => {
-  codeForm.value?.resetValidation()
+  if (codeForm.value) {
+    codeForm.value.resetValidation()
+  }
 }
 
 const createCode = async () => {
@@ -170,8 +177,16 @@ const createCode = async () => {
     try {
       const response = await API.create.code(newCode)
 
+      if (!response || !response.status) {
+        messageHandler.logWarningMessage(
+          SVC_ERR.DEFAULT,
+          'Unexpected response format or status',
+        )
+        return
+      }
+
       messageHandler.messageResult(
-        response?.status === StatusCodes.CREATED,
+        response.status === StatusCodes.CREATED,
         'Code Created!',
         'Failed to create Code',
       )
@@ -186,33 +201,49 @@ const createCode = async () => {
 const deleteCode = async (item: Code): Promise<void> => {
   try {
     const fetchResult = await API.fetch.code(item.codeTableName, item.codeName)
-    if (fetchResult) {
-      const ifMatch = fetchResult.etag ? fetchResult.etag.toString() : '0'
 
-      const isConfirmed = await confirmDialogStore.openDialog(
-        'Confirm',
-        'Are you sure you want to delete this Code?',
-      )
-
-      if (isConfirmed) {
-        const deleteResult = await API.delete.code(
-          item.codeTableName,
-          item.codeName,
-          ifMatch,
-        )
-
-        messageHandler.messageResult(
-          deleteResult?.status === StatusCodes.NO_CONTENT,
-          'Code Deleted!',
-          'Failed to delete Code',
-        )
-      }
-    } else {
+    if (!fetchResult) {
       messageHandler.logWarningMessage(
         'Failed to delete Code. Please try again.',
-        'Failed to fetch Code',
+        'Failed to fetch Code.',
       )
+      return
     }
+
+    const ifMatch = fetchResult.etag ? fetchResult.etag.toString() : '0'
+
+    const isConfirmed = await confirmDialogStore.openDialog(
+      'Confirm',
+      'Are you sure you want to delete this Code?',
+    )
+
+    if (!isConfirmed) {
+      messageHandler.logInfoMessage(
+        'Deletion canceled by user.',
+        'Code Deletion Canceled',
+      )
+      return
+    }
+
+    const deleteResult = await API.delete.code(
+      item.codeTableName,
+      item.codeName,
+      ifMatch,
+    )
+
+    if (!deleteResult || !deleteResult.status) {
+      messageHandler.logWarningMessage(
+        SVC_ERR.DEFAULT,
+        'Unexpected response format or status',
+      )
+      return
+    }
+
+    messageHandler.messageResult(
+      deleteResult.status === StatusCodes.NO_CONTENT,
+      'Code Deleted!',
+      'Failed to delete Code',
+    )
   } catch (err) {
     handleApiError(err, 'Failed to delete Code')
   } finally {
@@ -221,7 +252,11 @@ const deleteCode = async (item: Code): Promise<void> => {
 }
 
 const validate = (): boolean => {
-  return codeForm.value?.validate()
+  if (codeForm.value) {
+    return codeForm.value.validate()
+  }
+  console.warn('codeForm is not initialized.')
+  return false
 }
 
 const updateCode = async (item: Code): Promise<void> => {
@@ -231,23 +266,31 @@ const updateCode = async (item: Code): Promise<void> => {
         item.codeTableName,
         item.codeName,
       )
-      if (fetchResult) {
-        // TODO sync edits with actual
 
-        const ifMatch = fetchResult.etag ? fetchResult.etag.toString() : '0'
-        const updateResult = await API.update.code(fetchResult, ifMatch)
-
-        messageHandler.messageResult(
-          updateResult?.status === StatusCodes.OK,
-          'Code Updated!',
-          'Failed to update Code',
-        )
-      } else {
+      if (!fetchResult) {
         messageHandler.logWarningMessage(
           'Failed to update Code. Please try again.',
-          'Failed to fetch Code',
+          'Failed to fetch Code.',
         )
+        return
       }
+
+      const ifMatch = fetchResult.etag ? fetchResult.etag.toString() : '0'
+      const updateResult = await API.update.code(fetchResult, ifMatch)
+
+      if (!updateResult || !updateResult.status) {
+        messageHandler.logWarningMessage(
+          SVC_ERR.DEFAULT,
+          'Unexpected response format or status',
+        )
+        return
+      }
+
+      messageHandler.messageResult(
+        updateResult.status === StatusCodes.OK,
+        'Code Updated!',
+        'Failed to update Code',
+      )
     }
   } catch (err) {
     handleApiError(err, 'Failed to update Code')
@@ -259,16 +302,20 @@ const updateCode = async (item: Code): Promise<void> => {
 const fetchTopLevel = async (): Promise<void> => {
   try {
     const responseData = await API.fetch.topLevel()
-    if (responseData?.links) {
-      responseData.links.forEach((e: any) => {
-        console.log(`method: ${e.method}, href: ${e.href}, rel: ${e.rel}`)
-      })
-    } else {
+
+    if (!responseData || !responseData.links) {
       messageHandler.logWarningMessage(
         'Failed to fetch Code',
         null,
         false,
         true,
+      )
+      return
+    }
+
+    for (const link of responseData.links) {
+      console.log(
+        `method: ${link.method}, href: ${link.href}, rel: ${link.rel}`,
       )
     }
   } catch (err) {
@@ -282,20 +329,21 @@ const csvExport = async (): Promise<void> => {
   try {
     const blob = await API.search.csvExport()
 
-    if (blob) {
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.style.display = 'none'
-      a.href = url
-      a.download = 'export.csv'
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-
-      messageHandler.logSuccessMessage('CSV exported successfully!')
-    } else {
+    if (!blob) {
       messageHandler.logWarningMessage('Failed to export CSV')
+      return
     }
+
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.style.display = 'none'
+    a.href = url
+    a.download = 'export.csv'
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(url)
+
+    messageHandler.logSuccessMessage('CSV exported successfully!')
   } catch (err) {
     handleApiError(err, 'Failed to export CSV')
   } finally {

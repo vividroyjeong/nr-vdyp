@@ -26,7 +26,9 @@ export const handleApiError = (error: unknown, contextMessage?: string) => {
   if (axios.isCancel(error)) {
     const message = prependMessage('Request was canceled.')
     console.warn(message, (error as AxiosError).message)
-    notificationStore?.showInfoMessage(message)
+    if (notificationStore) {
+      notificationStore.showInfoMessage(message)
+    }
     return
   }
 
@@ -45,14 +47,18 @@ export const handleApiError = (error: unknown, contextMessage?: string) => {
 
       const message = prependMessage(getErrorMessage(response.status))
 
-      notificationStore?.showErrorMessage(message)
+      if (notificationStore) {
+        notificationStore.showErrorMessage(message)
+      }
     } else if (axiosError.request) {
       /*
       Handles cases where the server fails to return a response.
       This can be due to network issues or a failed connection to the server. */
       const message = prependMessage(`${SVC_ERR.DEFAULT} (Error: No Response)`)
       console.error(message, axiosError.request)
-      notificationStore?.showErrorMessage(message)
+      if (notificationStore) {
+        notificationStore.showErrorMessage(message)
+      }
     } else {
       /*
       Handles cases where a configuration error occurs while sending a request.
@@ -62,13 +68,15 @@ export const handleApiError = (error: unknown, contextMessage?: string) => {
         `${SVC_ERR.DEFAULT} (Error: Configuration Issue)`,
       )
       console.error(message, axiosError.message)
-      notificationStore?.showErrorMessage(message)
+      if (notificationStore) {
+        notificationStore.showErrorMessage(message)
+      }
     }
 
     // Log additional error information for debugging
     console.error('Axios Config:', axiosError.config)
     if (axiosError.code) {
-      // Refer to Axios Error code - https://www.npmjs.com/package/axios
+      // Refer to Axios Error code
       console.error(`Axios Error Code: ${axiosError.code}`)
     }
   } else {
@@ -77,7 +85,9 @@ export const handleApiError = (error: unknown, contextMessage?: string) => {
       'The request could not be processed properly. Please try again.',
     )
     console.error(message, (error as Error).message)
-    notificationStore?.showErrorMessage(message)
+    if (notificationStore) {
+      notificationStore.showErrorMessage(message)
+    }
   }
 }
 

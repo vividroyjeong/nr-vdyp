@@ -15,14 +15,26 @@ function buildQueryString(params: Record<string, any>): string {
 
 export const code = async (param: CodeSearchParams): Promise<any> => {
   const queryString = buildQueryString({
-    pageNumber: param.pageNumber >= 0 ? param.pageNumber : undefined,
-    pageSize: param.pageSize >= 0 ? param.pageSize : undefined,
+    pageNumber:
+      typeof param.pageNumber === 'number' && param.pageNumber >= 0
+        ? param.pageNumber
+        : 0,
+    pageSize:
+      typeof param.pageSize === 'number' && param.pageSize >= 0
+        ? param.pageSize
+        : 10,
   })
 
-  return get<any>(`/codeTables${queryString}`)
+  const response = await get<any>(`/codeTables${queryString}`)
+  if (!response || !response.data) {
+    console.warn('Unexpected response format')
+    return null
+  }
+
+  return response.data
 }
 
-export const csvExport = async (): Promise<Blob> => {
+export const csvExport = async (): Promise<Blob | null> => {
   const response = await get<Blob>(`/contactsExport?exportOption=All`, {
     headers: {
       Accept: 'text/csv',
@@ -30,6 +42,11 @@ export const csvExport = async (): Promise<Blob> => {
     responseType: 'blob',
     timeout: 5000,
   })
+
+  if (!response || !response.data) {
+    console.warn('Unexpected response format')
+    return null
+  }
 
   return response.data
 }

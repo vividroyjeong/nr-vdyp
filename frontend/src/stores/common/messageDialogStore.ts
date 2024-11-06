@@ -46,7 +46,7 @@ export const useMessageDialogStore = defineStore('messageDialog', {
       if (newOptions) {
         this.options = { ...this.options, ...newOptions }
       }
-      this.btnLabel = newBtnLabel || 'Continue Editing'
+      this.btnLabel = newBtnLabel ?? 'Continue Editing'
     },
 
     agree() {

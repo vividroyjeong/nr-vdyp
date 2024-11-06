@@ -52,11 +52,20 @@ export const useConfirmDialogStore = defineStore('confirmDialog', {
     agree() {
       if (this.resolve) this.resolve(true)
       this.dialog = false
+      this.resetState()
     },
 
     cancel() {
       if (this.resolve) this.resolve(false)
       this.dialog = false
+      this.resetState()
+    },
+
+    resetState() {
+      this.resolve = null
+      this.title = ''
+      this.message = ''
+      this.options = { width: 400, noconfirm: false }
     },
   },
 })

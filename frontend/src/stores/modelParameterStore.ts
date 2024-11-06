@@ -151,14 +151,14 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
   const updateSpeciesGroup = () => {
     const groupMap: { [key: string]: number } = {}
 
-    speciesList.value.forEach((item) => {
+    for (const item of speciesList.value) {
       if (item.species && item.percent !== null) {
         if (!groupMap[item.species]) {
           groupMap[item.species] = 0
         }
         groupMap[item.species] += parseFloat(item.percent as any) || 0
       }
-    })
+    }
 
     speciesGroups.value = Object.keys(groupMap).map((key) => ({
       group: key,

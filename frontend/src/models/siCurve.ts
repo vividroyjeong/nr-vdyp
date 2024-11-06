@@ -4,8 +4,8 @@ export default class SICurve {
   public curveName: string
 
   constructor(blob: any) {
-    this.ageRange = blob.ageRange || ''
-    this.species = blob.species || ''
-    this.curveName = blob.curveName || ''
+    this.ageRange = blob && blob.ageRange ? blob.ageRange.toString() : ''
+    this.species = blob && blob.species ? blob.species.toString() : ''
+    this.curveName = blob && blob.curveName ? blob.curveName.toString() : ''
   }
 }

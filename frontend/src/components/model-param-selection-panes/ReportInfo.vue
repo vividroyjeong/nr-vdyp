@@ -4,7 +4,6 @@
       <v-expansion-panel hide-actions>
         <v-expansion-panel-title>
           <v-row no-gutters class="expander-header">
-            <!-- Place an arrow icon to the left of the title -->
             <v-col cols="auto" class="expansion-panel-icon-col">
               <v-icon class="expansion-panel-icon">{{
                 panelOpenStates.reportInfo === PANEL.OPEN
@@ -321,7 +320,9 @@ const validateRange = (): boolean => {
 
 const onConfirm = () => {
   if (validateComparison() && validateRange()) {
-    form.value?.validate()
+    if (form.value) {
+      form.value.validate()
+    }
     // this panel is not in a confirmed state
     if (!isConfirmed.value) {
       modelParameterStore.confirmPanel(panelName)

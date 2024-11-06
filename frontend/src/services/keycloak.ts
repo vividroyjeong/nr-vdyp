@@ -31,7 +31,6 @@ const initOptions: KeycloakInitOptions = {
   pkceMethod: KEYCLOAK.PKCE_METHOD,
   checkLoginIframe: KEYCLOAK.CHECK_LOGIN_IFRAME,
   onLoad: KEYCLOAK.ONLOAD,
-  // silentCheckSsoRedirectUri: `${location.origin}${KEYCLOAK.SILENT_CHECK_SSO_REDIRECT_PAGE}`,
   enableLogging: KEYCLOAK.ENABLE_LOGGING,
 }
 
@@ -41,11 +40,9 @@ const loginOptions = {
 
 export const initializeKeycloak = async (): Promise<Keycloak | undefined> => {
   const pinia = getActivePinia()
-  let notificationStore
+  const notificationStore = pinia ? useNotificationStore(pinia) : null
 
-  if (pinia) {
-    notificationStore = useNotificationStore(pinia)
-  } else {
+  if (!pinia) {
     console.warn('Pinia is not active. Message will only be logged.')
   }
 
@@ -58,7 +55,8 @@ export const initializeKeycloak = async (): Promise<Keycloak | undefined> => {
     authStore.loadUserFromStorage()
     if (
       authStore.authenticated &&
-      authStore.user?.accessToken &&
+      authStore.user &&
+      authStore.user.accessToken &&
       authStore.user.refToken &&
       authStore.user.idToken
     ) {
@@ -115,14 +113,15 @@ export const initializeKeycloak = async (): Promise<Keycloak | undefined> => {
       })
 
       // TODO - need to set up periodic token refresh?
-      // setupTokenRefresh()
 
       return keycloakInstance
     } else {
       keycloakInstance.login(loginOptions)
     }
   } catch (err) {
-    notificationStore?.showErrorMessage(AUTH_ERR.AUTH_004)
+    if (notificationStore) {
+      notificationStore.showErrorMessage(AUTH_ERR.AUTH_004)
+    }
     console.error('Keycloak initialization failed (Error: AUTH_004):', err)
     keycloakInstance = null // Reset the instance on failure
     throw err
@@ -162,11 +161,17 @@ export const initializeKeycloakAndAuth = async (): Promise<boolean> => {
 
     // not initialized, the token not be refreshed
     if (!keycloakInstance.clientId) {
-      if (
-        !authStore.user?.accessToken ||
-        !authStore.user?.refToken ||
-        !authStore.user?.idToken
-      ) {
+      if (!authStore || !authStore.user) {
+        logErrorAndLogout(
+          AUTH_ERR.AUTH_010,
+          'Auth load failed. (Error: AUTH_010).',
+        )
+        return false
+      }
+
+      const { accessToken, refToken, idToken } = authStore.user
+
+      if (!accessToken || !refToken || !idToken) {
         logErrorAndLogout(
           AUTH_ERR.AUTH_010,
           'Auth load failed. (Error: AUTH_010).',
@@ -211,7 +216,8 @@ const logErrorAndLogout = (
   logout()
 }
 
-// If the token expires within minValidity seconds (minValidity is optional, if not specified 5 is used) the token is refreshed. If -1 is passed as the minValidity, the token will be forcibly refreshed.
+// If the token expires within minValidity seconds (minValidity is optional, if not specified 5 is used) the token is refreshed.
+// If -1 is passed as the minValidity, the token will be forcibly refreshed.
 export const refreshToken = async (minValidity?: number): Promise<boolean> => {
   try {
     const initialized = await initializeKeycloakAndAuth()
@@ -311,8 +317,6 @@ export const logout = (): void => {
   const authStore = useAuthStore()
   authStore.clearUser()
 
-  // stopRefreshTimer()
-
   window.location.href = `https://logon7.gov.bc.ca/clp-cgi/logoff.cgi?retnow=1&returl=${encodeURIComponent(
     `${ssoAuthServerUrl}/realms/${ssoRealm}/protocol/openid-connect/logout?post_logout_redirect_uri=` +
       ssoRedirectUrl +
@@ -350,24 +354,3 @@ const getTokenExpirationDate = (token: string): Date | null => {
 }
 
 // TODO - need to set up periodic token refresh?
-// import { Timer } from 'timer-node'
-// let refreshTimer: Timer | null = null
-
-// const setupTokenRefresh = () => {
-//   stopRefreshTimer()
-
-//   refreshTimer = new Timer()
-
-//   const refreshInterval = 1000 * 60 * 4 // 4-minute interval
-//   refreshTimer.start()
-
-//   setInterval(async () => {
-//     console.log('Checking token expiration...')
-//     const refreshed = await refreshToken(KEYCLOAK.UPDATE_TOKEN_MIN_VALIDITY)
-//     console.log(`Token refreshed: ${refreshed}`)
-//   }, refreshInterval)
-// }
-
-// const stopRefreshTimer = () => {
-//   if (refreshTimer) refreshTimer.stop()
-// }

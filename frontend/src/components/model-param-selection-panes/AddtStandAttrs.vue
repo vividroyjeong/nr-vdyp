@@ -4,7 +4,6 @@
       <v-expansion-panel hide-actions>
         <v-expansion-panel-title>
           <v-row no-gutters class="expander-header">
-            <!-- Place an arrow icon to the left of the title -->
             <v-col cols="auto" class="expansion-panel-icon-col">
               <v-icon class="expansion-panel-icon">{{
                 panelOpenStates.addtStandAttrs === PANEL.OPEN
@@ -483,49 +482,42 @@ const validateRange = (): boolean => {
 
 const formattingValues = (): void => {
   if (loreyHeight.value) {
-    // Format the value to ##0.00
     loreyHeight.value = parseFloat(loreyHeight.value).toFixed(
       NUM_INPUT_LIMITS.LOREY_HEIGHT_DECIMAL_NUM,
     )
   }
 
   if (wholeStemVol75.value) {
-    // Format the value to ####0.0
     wholeStemVol75.value = parseFloat(wholeStemVol75.value).toFixed(
       NUM_INPUT_LIMITS.WHOLE_STEM_VOL75_DECIMAL_NUM,
     )
   }
 
   if (basalArea125.value) {
-    // Format the value to ##0.0000
     basalArea125.value = parseFloat(basalArea125.value).toFixed(
       NUM_INPUT_LIMITS.BASAL_AREA125_DECIMAL_NUM,
     )
   }
 
   if (wholeStemVol125.value) {
-    // Format the value to ###0.0
     wholeStemVol125.value = parseFloat(wholeStemVol125.value).toFixed(
       NUM_INPUT_LIMITS.WHOLE_STEM_VOL125_DECIMAL_NUM,
     )
   }
 
   if (cuVol.value) {
-    // Format the value to ###0.0
     cuVol.value = parseFloat(cuVol.value).toFixed(
       NUM_INPUT_LIMITS.CU_VOL_DECIMAL_NUM,
     )
   }
 
   if (cuNetDecayVol.value) {
-    // Format the value to ###0.0
     cuNetDecayVol.value = parseFloat(cuNetDecayVol.value).toFixed(
       NUM_INPUT_LIMITS.CU_NET_DECAY_DECIMAL_NUM,
     )
   }
 
   if (cuNetDecayWasteVol.value) {
-    // Format the value to ###0.0
     cuNetDecayWasteVol.value = parseFloat(cuNetDecayWasteVol.value).toFixed(
       NUM_INPUT_LIMITS.CU_NET_DECAY_WASTE_DECIMAL_NUM,
     )
@@ -539,7 +531,9 @@ const onConfirm = () => {
     validateComparison() &&
     validateRange()
   ) {
-    form.value?.validate()
+    if (form.value) {
+      form.value.validate()
+    }
 
     formattingValues()
 

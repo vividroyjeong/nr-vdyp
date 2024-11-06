@@ -9,6 +9,12 @@ export const uploadDcsvProjection = (
   projectionParameters: File,
   inputData: File,
 ) => {
+  if (!projectionParameters || !inputData) {
+    throw new Error(
+      'Invalid file input for projection parameters or input data.',
+    )
+  }
+
   const formData = new FormData()
   formData.append('projectionParameters', projectionParameters)
   formData.append('inputData', inputData)
@@ -23,6 +29,10 @@ export const uploadHcsvProjection = (
   layerFile: File,
   polygonFile: File,
 ) => {
+  if (!projectionParameters || !layerFile || !polygonFile) {
+    throw new Error('Invalid input for projection parameters or files.')
+  }
+
   const formData = new FormData()
   formData.append('projectionParameters', JSON.stringify(projectionParameters))
   formData.append('layerFile', layerFile)
@@ -43,6 +53,24 @@ export const uploadScsvProjection = (
   speciesInputData: File,
   vriAdjustInputData: File,
 ) => {
+  const files = [
+    projectionParameters,
+    polygonInputData,
+    layerInputData,
+    historyInputData,
+    nonVegetationInputData,
+    otherVegetationInputData,
+    polygonIdInputData,
+    speciesInputData,
+    vriAdjustInputData,
+  ]
+
+  for (const file of files) {
+    if (!file) {
+      throw new Error('One or more required files are missing.')
+    }
+  }
+
   const formData = new FormData()
   formData.append('projectionParameters', projectionParameters)
   formData.append('polygonInputData', polygonInputData)

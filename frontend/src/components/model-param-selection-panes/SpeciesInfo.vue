@@ -206,7 +206,6 @@
                           density="compact"
                           dense
                         ></v-text-field>
-                        <!-- :error-messages="totalPercentError" -->
                       </v-col>
                     </v-row>
                   </div>
@@ -311,38 +310,42 @@ watch(
 )
 
 const incrementPercent = (index: number) => {
-  const newValue = Util.increaseItemBySpinButton(
-    speciesList.value[index].percent,
-    NUM_INPUT_LIMITS.SPECIES_PERCENT_MAX,
-    NUM_INPUT_LIMITS.SPECIES_PERCENT_MIN,
-    NUM_INPUT_LIMITS.SPECIES_PERCENT_STEP,
-  )
-  speciesList.value[index].percent = newValue.toFixed(
-    NUM_INPUT_LIMITS.SPECIES_PERCENT_DECIMAL_NUM,
-  )
+  if (speciesList.value[index]) {
+    const newValue = Util.increaseItemBySpinButton(
+      speciesList.value[index].percent,
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_MAX,
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_MIN,
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_STEP,
+    )
+    speciesList.value[index].percent = newValue.toFixed(
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_DECIMAL_NUM,
+    )
 
-  // Sort only when species exists
-  if (speciesList.value[index].species) {
-    triggerSpeciesSortByPercent()
+    // Sort only when species exists
+    if (speciesList.value[index].species) {
+      triggerSpeciesSortByPercent()
+    }
   }
 }
 
 const decrementPercent = (index: number) => {
-  const newValue = Util.decrementItemBySpinButton(
-    speciesList.value[index].percent,
-    NUM_INPUT_LIMITS.SPECIES_PERCENT_MAX,
-    NUM_INPUT_LIMITS.SPECIES_PERCENT_MIN,
-    NUM_INPUT_LIMITS.SPECIES_PERCENT_STEP,
-  )
-  speciesList.value[index].percent = newValue.toFixed(
-    NUM_INPUT_LIMITS.SPECIES_PERCENT_DECIMAL_NUM,
-  )
+  if (speciesList.value[index]) {
+    const newValue = Util.decrementItemBySpinButton(
+      speciesList.value[index].percent,
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_MAX,
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_MIN,
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_STEP,
+    )
+    speciesList.value[index].percent = newValue.toFixed(
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_DECIMAL_NUM,
+    )
 
-  // sort only when species is present, remove species if value is 0
-  if (Util.isEmptyOrZero(newValue)) {
-    speciesList.value[index].species = null
-  } else if (speciesList.value[index].species) {
-    triggerSpeciesSortByPercent()
+    // sort only when species is present, remove species if value is 0
+    if (Util.isEmptyOrZero(newValue)) {
+      speciesList.value[index].species = null
+    } else if (speciesList.value[index].species) {
+      triggerSpeciesSortByPercent()
+    }
   }
 }
 
@@ -481,7 +484,9 @@ const onConfirm = () => {
     validateTotalSpeciesPercent() &&
     validateRequired()
   ) {
-    form.value?.validate()
+    if (form.value) {
+      form.value.validate()
+    }
     // this panel is not in a confirmed state
     if (!isConfirmed.value) {
       modelParameterStore.confirmPanel(panelName)
@@ -497,10 +502,10 @@ const onEdit = () => {
 }
 
 const clear = () => {
-  speciesList.value.forEach((item) => {
+  for (const item of speciesList.value) {
     item.species = null
     item.percent = null
-  })
+  }
 
   if (form.value) {
     form.value.reset()
