@@ -352,47 +352,51 @@ watch(
 )
 
 const incrementBasalArea = () => {
-  const newValue = Util.increaseItemBySpinButton(
-    basalArea.value,
-    NUM_INPUT_LIMITS.BASAL_AREA_MAX,
-    NUM_INPUT_LIMITS.BASAL_AREA_MIN,
-    NUM_INPUT_LIMITS.BASAL_AREA_STEP,
-  )
-  // Format the value to ##0.0000
-  basalArea.value = newValue.toFixed(NUM_INPUT_LIMITS.BASAL_AREA_DECIMAL_NUM)
+  if (basalArea.value !== null && basalArea.value !== undefined) {
+    const newValue = Util.increaseItemBySpinButton(
+      basalArea.value,
+      NUM_INPUT_LIMITS.BASAL_AREA_MAX,
+      NUM_INPUT_LIMITS.BASAL_AREA_MIN,
+      NUM_INPUT_LIMITS.BASAL_AREA_STEP,
+    )
+    basalArea.value = newValue.toFixed(NUM_INPUT_LIMITS.BASAL_AREA_DECIMAL_NUM)
+  }
 }
 
 const decrementBasalArea = () => {
-  let newValue = Util.decrementItemBySpinButton(
-    basalArea.value,
-    NUM_INPUT_LIMITS.BASAL_AREA_MAX,
-    NUM_INPUT_LIMITS.BASAL_AREA_MIN,
-    NUM_INPUT_LIMITS.BASAL_AREA_STEP,
-  )
-  // Format the value to ##0.0000
-  basalArea.value = newValue.toFixed(NUM_INPUT_LIMITS.BASAL_AREA_DECIMAL_NUM)
+  if (basalArea.value !== null && basalArea.value !== undefined) {
+    let newValue = Util.decrementItemBySpinButton(
+      basalArea.value,
+      NUM_INPUT_LIMITS.BASAL_AREA_MAX,
+      NUM_INPUT_LIMITS.BASAL_AREA_MIN,
+      NUM_INPUT_LIMITS.BASAL_AREA_STEP,
+    )
+    basalArea.value = newValue.toFixed(NUM_INPUT_LIMITS.BASAL_AREA_DECIMAL_NUM)
+  }
 }
 
 const incrementTPH = () => {
-  const newValue = Util.increaseItemBySpinButton(
-    treesPerHectare.value,
-    NUM_INPUT_LIMITS.TPH_MAX,
-    NUM_INPUT_LIMITS.TPH_MIN,
-    NUM_INPUT_LIMITS.TPH_STEP,
-  )
-  // Format the value to ###0.00
-  treesPerHectare.value = newValue.toFixed(NUM_INPUT_LIMITS.TPH_DECIMAL_NUM)
+  if (treesPerHectare.value !== null && treesPerHectare.value !== undefined) {
+    const newValue = Util.increaseItemBySpinButton(
+      treesPerHectare.value,
+      NUM_INPUT_LIMITS.TPH_MAX,
+      NUM_INPUT_LIMITS.TPH_MIN,
+      NUM_INPUT_LIMITS.TPH_STEP,
+    )
+    treesPerHectare.value = newValue.toFixed(NUM_INPUT_LIMITS.TPH_DECIMAL_NUM)
+  }
 }
 
 const decrementTPH = () => {
-  let newValue = Util.decrementItemBySpinButton(
-    treesPerHectare.value,
-    NUM_INPUT_LIMITS.TPH_MAX,
-    NUM_INPUT_LIMITS.TPH_MIN,
-    NUM_INPUT_LIMITS.TPH_STEP,
-  )
-  // Format the value to ###0.00
-  treesPerHectare.value = newValue.toFixed(NUM_INPUT_LIMITS.TPH_DECIMAL_NUM)
+  if (treesPerHectare.value !== null && treesPerHectare.value !== undefined) {
+    let newValue = Util.decrementItemBySpinButton(
+      treesPerHectare.value,
+      NUM_INPUT_LIMITS.TPH_MAX,
+      NUM_INPUT_LIMITS.TPH_MIN,
+      NUM_INPUT_LIMITS.TPH_STEP,
+    )
+    treesPerHectare.value = newValue.toFixed(NUM_INPUT_LIMITS.TPH_DECIMAL_NUM)
+  }
 }
 
 // Methods to handle continuous increment/decrement for Basal Area
@@ -556,14 +560,12 @@ const validateFormInputs = async (): Promise<boolean> => {
 
 const formattingValues = (): void => {
   if (basalArea.value) {
-    // Format the value to ##0.0000
     basalArea.value = parseFloat(basalArea.value).toFixed(
       NUM_INPUT_LIMITS.BASAL_AREA_DECIMAL_NUM,
     )
   }
 
   if (treesPerHectare.value) {
-    // Format the value to ###0.00
     treesPerHectare.value = parseFloat(treesPerHectare.value).toFixed(
       NUM_INPUT_LIMITS.TPH_DECIMAL_NUM,
     )

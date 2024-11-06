@@ -24,11 +24,13 @@ axiosInstance.interceptors.request.use(
     // Ensure token is valid or refreshed
 
     const authStore = useAuthStore()
-    if (authStore && authStore.user) {
+    if (authStore && authStore.user && authStore.user.accessToken) {
       const token = authStore.user.accessToken
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`
       }
+    } else {
+      console.warn('Authorization token or authStore is not available.')
     }
 
     return config
@@ -52,7 +54,7 @@ axiosInstance.interceptors.response.use(
 // TODO - If don't need 401 Unauthorized handling in interceptors.response, use the following
 
 // convert an error object to AxiosError
-function convertToAxiosError(error: unknown): Error {
+const convertToAxiosError = (error: unknown): Error => {
   if (error instanceof Error) {
     return error
   }

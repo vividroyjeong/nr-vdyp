@@ -40,11 +40,9 @@ const loginOptions = {
 
 export const initializeKeycloak = async (): Promise<Keycloak | undefined> => {
   const pinia = getActivePinia()
-  let notificationStore
+  const notificationStore = pinia ? useNotificationStore(pinia) : null
 
-  if (pinia) {
-    notificationStore = useNotificationStore(pinia)
-  } else {
+  if (!pinia) {
     console.warn('Pinia is not active. Message will only be logged.')
   }
 

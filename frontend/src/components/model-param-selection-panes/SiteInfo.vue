@@ -4,7 +4,6 @@
       <v-expansion-panel hide-actions>
         <v-expansion-panel-title>
           <v-row no-gutters class="expander-header">
-            <!-- Place an arrow icon to the left of the title -->
             <v-col cols="auto" class="expansion-panel-icon-col">
               <v-icon class="expansion-panel-icon">{{
                 panelOpenStates.siteInfo === PANEL.OPEN
@@ -562,7 +561,7 @@ const incrementHeight = () => {
     NUM_INPUT_LIMITS.HEIGHT_MIN,
     NUM_INPUT_LIMITS.HEIGHT_STEP,
   )
-  // Format the value to ##0.00
+
   height.value = newValue.toFixed(NUM_INPUT_LIMITS.HEIGHT_DECIMAL_NUM)
 }
 
@@ -573,7 +572,7 @@ const decrementHeight = () => {
     NUM_INPUT_LIMITS.HEIGHT_MIN,
     NUM_INPUT_LIMITS.HEIGHT_STEP,
   )
-  // Format the value to ##0.00
+
   height.value = newValue.toFixed(NUM_INPUT_LIMITS.HEIGHT_DECIMAL_NUM)
 }
 
@@ -584,7 +583,7 @@ const incrementBHA50SiteIndex = () => {
     NUM_INPUT_LIMITS.BHA50_SITE_INDEX_MIN,
     NUM_INPUT_LIMITS.BHA50_SITE_INDEX_STEP,
   )
-  // Format the value to ##0.00
+
   bha50SiteIndex.value = newValue.toFixed(
     NUM_INPUT_LIMITS.BHA50_SITE_INDEX_DECIMAL_NUM,
   )
@@ -597,7 +596,7 @@ const decrementBHA50SiteIndex = () => {
     NUM_INPUT_LIMITS.BHA50_SITE_INDEX_MIN,
     NUM_INPUT_LIMITS.BHA50_SITE_INDEX_STEP,
   )
-  // Format the value to ##0.00
+
   bha50SiteIndex.value = newValue.toFixed(
     NUM_INPUT_LIMITS.BHA50_SITE_INDEX_DECIMAL_NUM,
   )
@@ -735,14 +734,12 @@ const validateRequiredFields = (): boolean => {
 
 const formattingValues = (): void => {
   if (height.value) {
-    // Format the value to ##0.00
     height.value = parseFloat(height.value).toFixed(
       NUM_INPUT_LIMITS.HEIGHT_DECIMAL_NUM,
     )
   }
 
   if (bha50SiteIndex.value) {
-    // Format the value to ##0.00
     bha50SiteIndex.value = parseFloat(bha50SiteIndex.value).toFixed(
       NUM_INPUT_LIMITS.BHA50_SITE_INDEX_DECIMAL_NUM,
     )

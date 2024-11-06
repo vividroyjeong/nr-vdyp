@@ -26,8 +26,25 @@ export const useAuthStore = defineStore('auth', {
     loadUserFromStorage() {
       const user = sessionStorage.getItem('authUser')
       if (user) {
-        this.user = JSON.parse(user)
-        this.authenticated = true
+        try {
+          const parsedUser = JSON.parse(user)
+          if (
+            parsedUser &&
+            typeof parsedUser === 'object' &&
+            parsedUser.accessToken &&
+            parsedUser.refToken &&
+            parsedUser.idToken
+          ) {
+            this.user = parsedUser
+            this.authenticated = true
+          } else {
+            console.warn('Invalid user data in sessionStorage')
+            this.clearUser()
+          }
+        } catch (error) {
+          console.error('Failed to parse user from sessionStorage:', error)
+          this.clearUser()
+        }
       }
     },
     parseIdToken() {

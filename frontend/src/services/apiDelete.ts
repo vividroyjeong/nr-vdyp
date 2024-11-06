@@ -5,6 +5,18 @@ export const code = async (
   codeName: string,
   ifMatch: string,
 ): Promise<any> => {
+  if (!codeTableName) {
+    throw new Error('codeTableName is required.')
+  }
+
+  if (!codeName) {
+    throw new Error('codeName is required.')
+  }
+
+  if (!ifMatch) {
+    throw new Error('ifMatch is required.')
+  }
+
   const config = {
     headers: {
       'If-Match': `"${ifMatch}"`,

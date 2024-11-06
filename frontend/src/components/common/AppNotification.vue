@@ -3,14 +3,14 @@
     <v-snackbar
       v-model="isShow"
       :timeout="NOTIFICATION.SHOW_TIME"
-      :color="type"
+      :color="type || 'info'"
       class="elevation-12"
       location="top"
       @click:outside="closeMessage"
     >
       <div class="d-flex align-center">
         <v-icon class="mr-2">{{ getIcon(type) }}</v-icon>
-        <span> {{ message }}</span>
+        <span> {{ message || 'Notification message' }}</span>
       </div>
 
       <template #actions>
@@ -44,6 +44,6 @@ const getIcon = (type: MessageType) => {
     warning: 'mdi-alert',
   }
 
-  return icon[type]
+  return icon[type] || 'mdi-information'
 }
 </script>

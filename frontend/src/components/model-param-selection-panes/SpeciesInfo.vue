@@ -310,38 +310,42 @@ watch(
 )
 
 const incrementPercent = (index: number) => {
-  const newValue = Util.increaseItemBySpinButton(
-    speciesList.value[index].percent,
-    NUM_INPUT_LIMITS.SPECIES_PERCENT_MAX,
-    NUM_INPUT_LIMITS.SPECIES_PERCENT_MIN,
-    NUM_INPUT_LIMITS.SPECIES_PERCENT_STEP,
-  )
-  speciesList.value[index].percent = newValue.toFixed(
-    NUM_INPUT_LIMITS.SPECIES_PERCENT_DECIMAL_NUM,
-  )
+  if (speciesList.value[index]) {
+    const newValue = Util.increaseItemBySpinButton(
+      speciesList.value[index].percent,
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_MAX,
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_MIN,
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_STEP,
+    )
+    speciesList.value[index].percent = newValue.toFixed(
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_DECIMAL_NUM,
+    )
 
-  // Sort only when species exists
-  if (speciesList.value[index].species) {
-    triggerSpeciesSortByPercent()
+    // Sort only when species exists
+    if (speciesList.value[index].species) {
+      triggerSpeciesSortByPercent()
+    }
   }
 }
 
 const decrementPercent = (index: number) => {
-  const newValue = Util.decrementItemBySpinButton(
-    speciesList.value[index].percent,
-    NUM_INPUT_LIMITS.SPECIES_PERCENT_MAX,
-    NUM_INPUT_LIMITS.SPECIES_PERCENT_MIN,
-    NUM_INPUT_LIMITS.SPECIES_PERCENT_STEP,
-  )
-  speciesList.value[index].percent = newValue.toFixed(
-    NUM_INPUT_LIMITS.SPECIES_PERCENT_DECIMAL_NUM,
-  )
+  if (speciesList.value[index]) {
+    const newValue = Util.decrementItemBySpinButton(
+      speciesList.value[index].percent,
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_MAX,
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_MIN,
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_STEP,
+    )
+    speciesList.value[index].percent = newValue.toFixed(
+      NUM_INPUT_LIMITS.SPECIES_PERCENT_DECIMAL_NUM,
+    )
 
-  // sort only when species is present, remove species if value is 0
-  if (Util.isEmptyOrZero(newValue)) {
-    speciesList.value[index].species = null
-  } else if (speciesList.value[index].species) {
-    triggerSpeciesSortByPercent()
+    // sort only when species is present, remove species if value is 0
+    if (Util.isEmptyOrZero(newValue)) {
+      speciesList.value[index].species = null
+    } else if (speciesList.value[index].species) {
+      triggerSpeciesSortByPercent()
+    }
   }
 }
 

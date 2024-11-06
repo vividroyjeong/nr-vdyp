@@ -7,11 +7,12 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  const hash = to.hash || ''
   if (
-    to.hash.includes('code=') &&
-    to.hash.includes('state=') &&
-    to.hash.includes('session_state=') &&
-    to.hash.includes('iss=')
+    hash.includes('code=') &&
+    hash.includes('state=') &&
+    hash.includes('session_state=') &&
+    hash.includes('iss=')
   ) {
     const hashParams = new URLSearchParams(to.hash.slice(1))
     hashParams.delete('code')
