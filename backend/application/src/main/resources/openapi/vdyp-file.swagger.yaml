@@ -35,7 +35,7 @@ paths:
         '201':
           description: OK
           content:
-            application/json:
+            application/octet-stream:
               schema:
                 $ref: '#/components/schemas/projectionResponse'
         '400':
@@ -71,7 +71,7 @@ paths:
         '200':
           description: OK
           content:
-            application/json:
+            multipart/form-data:
               schema:
                 $ref: '#/components/schemas/projectionResponse'
         '400':
