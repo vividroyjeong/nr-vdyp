@@ -3,7 +3,7 @@ package ca.bc.gov.nrs.vdyp.backend.v1.api;
 import java.util.ArrayList;
 import java.util.List;
 
-import ca.bc.gov.nrs.vdyp.backend.v1.model.ParameterDetailsMessage;
+import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ParameterDetailsMessage;
 import ca.bc.gov.nrs.vdyp.backend.v1.model.ParameterDetailsMessageBuilder;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
