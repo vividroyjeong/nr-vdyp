@@ -6,19 +6,16 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.DateFormat;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.jboss.logmanager.ExtLogRecord.FormatStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.bc.gov.nrs.vdyp.backend.v1.model.ProjectionDcsvPostRequest;
-import ca.bc.gov.nrs.vdyp.backend.v1.model.ProjectionHcsvPostRequest;
-import ca.bc.gov.nrs.vdyp.backend.v1.model.ProjectionScsvPostRequest;
+import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ProjectionDcsvPostRequest;
+import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ProjectionHcsvPostRequest;
+import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ProjectionScsvPostRequest;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
