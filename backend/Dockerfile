@@ -3,9 +3,10 @@
 
 # "Provides the native-image executable. Used by the Maven and Gradle plugin from Quarkus to build linux64 executables"
 FROM quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:jdk-21 AS build
+ARG CONTEXT="./backend"
 
 # Image defaults to /project; copy controlled by .dockerignore
-COPY --chown=quarkus:quarkus ./backend ./
+COPY --chown=quarkus:quarkus ${CONTEXT} ./
 COPY ./pom.xml ./parent-pom.xml
 RUN chmod +x ./mvnw && ./mvnw package -Pnative -DskipTests
 
