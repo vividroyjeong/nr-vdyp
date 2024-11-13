@@ -4,7 +4,7 @@ FROM node:20.17.0-bullseye-slim AS build
 ARG CONTEXT="./frontend"
 # Install packages, build and keep only prod packages
 WORKDIR /app
-COPY ${CONTEXT}/*.json *.ts index.html ./
+COPY ${CONTEXT}/*.json ${CONTEXT}/*.ts ${CONTEXT}/index.html ./
 COPY ${CONTEXT}/public ./public
 COPY ${CONTEXT}/src ./src
 RUN npm ci --ignore-scripts --no-update-notifier --omit=dev && \
