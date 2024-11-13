@@ -19,6 +19,7 @@ RUN apk add --no-cache ca-certificates && \
     chown -R 1001:1001 /config/caddy /data/caddy
 
 # Copy static files and run formatting
+ARG CONTEXT="./frontend"
 COPY --from=build /app/dist /srv
 COPY ${CONTEXT}/Caddyfile /etc/caddy/Caddyfile
 RUN caddy fmt --overwrite /etc/caddy/Caddyfile
