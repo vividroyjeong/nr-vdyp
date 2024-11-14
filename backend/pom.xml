@@ -329,6 +329,7 @@
               <groupId>ca.bc.gov.nrs.vdyp</groupId>
               <artifactId>vdyp-buildtools</artifactId>
               <version>${project.version}</version>
+							<scope>system</scope>
 							<systemPath>buildtools/target/vdyp-buildtools-${project-version}.jar</systemPath>
             </dependency>
           </dependencies>
