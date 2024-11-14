@@ -9,8 +9,8 @@ ARG CONTEXT="./backend"
 COPY --chown=quarkus:quarkus ${CONTEXT} ./
 COPY ./pom.xml ./parent-pom.xml
 COPY ./buildtools ./buildtools
-RUN cd buildtools && ./mvnw install -Pnative -DskipTests && cd ..
-RUN chmod +x ./mvnw && ./mvnw package -Pnative -DskipTests
+RUN chmod +x ./mvnw && cd buildtools && ../mvnw install -Pnative -DskipTests && cd ..
+RUN ./mvnw package -Pnative -DskipTests
 
 # "A base image to run Quarkus native application using UBI Micro"
 FROM quay.io/quarkus/quarkus-micro-image:2.0
