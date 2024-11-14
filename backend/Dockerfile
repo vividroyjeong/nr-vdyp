@@ -8,6 +8,8 @@ ARG CONTEXT="./backend"
 # Image defaults to /project; copy controlled by .dockerignore
 COPY --chown=quarkus:quarkus ${CONTEXT} ./
 COPY ./pom.xml ./parent-pom.xml
+COPY ./buildtools ./buildtools
+RUN cd buildtools && ./mvnw install -Pnative -DskipTests && cd ..
 RUN chmod +x ./mvnw && ./mvnw package -Pnative -DskipTests
 
 # "A base image to run Quarkus native application using UBI Micro"
