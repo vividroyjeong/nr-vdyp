@@ -7,8 +7,8 @@ ARG CONTEXT="./backend"
 
 # Image defaults to /project; copy controlled by .dockerignore
 COPY --chown=quarkus:quarkus ${CONTEXT} ./
+COPY --chown=quarkus:quarkus ./buildtools ./buildtools
 COPY ./pom.xml ./parent-pom.xml
-COPY ./buildtools ./buildtools
 RUN chmod +x ./mvnw && cd buildtools && ../mvnw install -Pnative -DskipTests && cd ..
 RUN ./mvnw package -Pnative -DskipTests
 
