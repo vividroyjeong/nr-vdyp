@@ -39,7 +39,7 @@
       </v-tabs-window-item>
     </v-tabs-window>
 
-    <template v-if="modelType === MODEL_SELECTION.INPUT_MODEL_PARAMETERS">
+    <template v-if="isModelParameterPanelsVisible">
       <v-spacer class="space"></v-spacer>
       <SiteInfo />
       <v-spacer class="space"></v-spacer>
@@ -118,6 +118,13 @@ const tabs = computed(() => {
       component: ViewErrorMessages,
     },
   ]
+})
+
+const isModelParameterPanelsVisible = computed(() => {
+  return (
+    modelType.value === MODEL_SELECTION.INPUT_MODEL_PARAMETERS &&
+    currentTab.value === 0
+  )
 })
 
 onMounted(() => {
