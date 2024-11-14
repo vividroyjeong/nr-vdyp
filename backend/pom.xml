@@ -330,7 +330,7 @@
               <artifactId>vdyp-buildtools</artifactId>
               <version>${project.version}</version>
 							<scope>system</scope>
-							<systemPath>buildtools/target/vdyp-buildtools-${project-version}.jar</systemPath>
+							<systemPath>/project/buildtools/target/vdyp-buildtools-${project-version}.jar</systemPath>
             </dependency>
           </dependencies>
         </plugin>
