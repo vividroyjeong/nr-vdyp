@@ -1,8 +1,8 @@
 <template>
   <div>
-    <v-form ref="form" @submit.prevent="runModel">
-      <v-card class="elevation-4 pl-16 pt-10 pr-10 pb-15">
-        <div>
+    <v-form ref="form" @submit.prevent="fileUploadRunModel">
+      <v-card class="elevation-4">
+        <div class="pl-16 pt-10">
           <v-row>
             <v-col cols="3">
               <v-text-field
@@ -50,126 +50,129 @@
             </v-col>
           </v-row>
         </div>
-        <div class="ml-4 mt-5">
-          <div class="ml-n4 mt-n5">
-            <span class="text-h7">Volume Reported</span>
+        <div class="pl-16 pr-16 pb-5">
+          <div class="ml-4 mt-5">
+            <div class="ml-n4 mt-n5">
+              <span class="text-h7">Volume Reported</span>
+            </div>
+            <v-row class="ml-n6">
+              <v-col cols="12" style="padding-top: 0px">
+                <v-row>
+                  <v-col
+                    v-for="(option, index) in volumeReportedOptions"
+                    :key="index"
+                    :style="{ 'max-width': index < 4 ? '20%' : 'auto' }"
+                  >
+                    <v-checkbox
+                      v-model="volumeReported"
+                      :label="option.label"
+                      :value="option.value"
+                      hide-details
+                    ></v-checkbox>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
           </div>
-          <v-row class="ml-n6">
-            <v-col cols="12" style="padding-top: 0px">
-              <v-row>
-                <v-col
-                  v-for="(option, index) in volumeReportedOptions"
-                  :key="index"
-                  :style="{ 'max-width': index < 4 ? '20%' : 'auto' }"
-                >
-                  <v-checkbox
-                    v-model="volumeReported"
-                    :label="option.label"
-                    :value="option.value"
-                    hide-details
-                  ></v-checkbox>
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row>
-        </div>
-        <div class="ml-4 mt-5">
-          <div class="ml-n4 mt-n5">
-            <span class="text-h7">Include in Report</span>
+          <div class="ml-4 mt-5">
+            <div class="ml-n4 mt-n5">
+              <span class="text-h7">Include in Report</span>
+            </div>
+            <v-row class="ml-n6">
+              <v-col cols="12" style="padding-top: 0px">
+                <v-row>
+                  <v-col
+                    v-for="(option, index) in includeInReportOptions"
+                    :key="index"
+                    :style="{ 'max-width': index < 4 ? '20%' : 'auto' }"
+                  >
+                    <v-checkbox
+                      v-model="includeInReport"
+                      :label="option.label"
+                      :value="option.value"
+                      hide-details
+                    ></v-checkbox>
+                  </v-col>
+                  <v-col style="max-width: 20% !important">
+                    <v-select
+                      label="Projection Type"
+                      :items="projectionTypeOptions"
+                      v-model="projectionType"
+                      item-title="label"
+                      item-value="value"
+                      hide-details="auto"
+                      persistent-placeholder
+                      placeholder="Select..."
+                      density="compact"
+                      dense
+                      style="max-width: 70% !important"
+                    ></v-select>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
           </div>
-          <v-row class="ml-n6">
-            <v-col cols="12" style="padding-top: 0px">
-              <v-row>
-                <v-col
-                  v-for="(option, index) in includeInReportOptions"
-                  :key="index"
-                  :style="{ 'max-width': index < 4 ? '20%' : 'auto' }"
-                >
-                  <v-checkbox
-                    v-model="includeInReport"
-                    :label="option.label"
-                    :value="option.value"
-                    hide-details
-                  ></v-checkbox>
-                </v-col>
-                <v-col style="max-width: 20% !important">
-                  <v-select
-                    label="Projection Type"
-                    :items="projectionTypeOptions"
-                    v-model="projectionType"
-                    item-title="label"
-                    item-value="value"
-                    hide-details="auto"
-                    persistent-placeholder
-                    placeholder="Select..."
-                    density="compact"
-                    dense
-                    style="max-width: 70% !important"
-                  ></v-select>
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row>
-        </div>
-        <div class="ml-4 mt-5">
-          <div class="ml-n4 mt-n5">
-            <span class="text-h7">Report Title</span>
+          <div class="ml-4 mt-5">
+            <div class="ml-n4 mt-n5">
+              <span class="text-h9">Report Title</span>
+            </div>
+            <v-row>
+              <v-col cols="12">
+                <v-text-field
+                  type="string"
+                  v-model="reportTitle"
+                  hide-details="auto"
+                  persistent-placeholder
+                  placeholder="Enter a report title..."
+                  density="compact"
+                  dense
+                  style="max-width: 41% !important"
+                ></v-text-field>
+              </v-col>
+            </v-row>
           </div>
-          <v-row>
-            <v-col cols="12">
-              <v-text-field
-                type="string"
-                v-model="reportTitle"
-                hide-details="auto"
-                persistent-placeholder
-                placeholder="Enter a report title..."
-                density="compact"
-                dense
-                style="max-width: 50% !important"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-        </div>
-        <div class="ml-4 mt-10">
-          <div class="ml-n4 mt-n5">
-            <span class="text-h7">Upload Files</span>
+          <div class="ml-4 mt-10">
+            <div class="ml-n4 mt-n5">
+              <span class="text-h7">Attachments</span>
+            </div>
+            <v-row class="mb-n10">
+              <v-col cols="5">
+                <v-file-input
+                  label="Layer File"
+                  v-model="layerFile"
+                  show-size
+                  chips
+                  clearable
+                  flat
+                  persistent-placeholder
+                  placeholder="Select Eco Zone"
+                  density="compact"
+                  accept=".csv"
+                />
+              </v-col>
+              <v-col class="col-space-3" />
+              <v-col cols="5">
+                <v-file-input
+                  label="Polygon File"
+                  v-model="polygonFile"
+                  show-size
+                  chips
+                  clearable
+                  density="compact"
+                  accept=".csv"
+                />
+              </v-col>
+            </v-row>
           </div>
-          <v-row class="mb-n10">
-            <v-col cols="4">
-              <v-file-input
-                label="Layer File"
-                v-model="layerFile"
-                show-size
-                chips
-                clearable
-                flat
-                persistent-placeholder
-                placeholder="Select Eco Zone"
-                density="compact"
-                accept=".csv"
-              />
-            </v-col>
-            <v-col class="col-space-3" />
-            <v-col cols="4">
-              <v-file-input
-                label="Polygon File"
-                v-model="polygonFile"
-                show-size
-                chips
-                clearable
-                density="compact"
-                accept=".csv"
-              />
-            </v-col>
-          </v-row>
         </div>
-      </v-card>
-
-      <v-card class="mt-5 pa-4 run-model-card" elevation="0">
-        <v-card-actions class="pr-0 mr-2">
-          <v-spacer></v-spacer>
-          <v-btn class="blue-btn ml-2" @click="runModel">Run Model</v-btn>
-        </v-card-actions>
+        <v-card class="mt-5 pa-4 file-upload-run-model-card" elevation="0">
+          <v-card-actions class="pr-0 mr-2">
+            <v-spacer></v-spacer>
+            <v-btn class="blue-btn ml-2" @click="fileUploadRunModel"
+              >Run Model</v-btn
+            >
+          </v-card-actions>
+        </v-card>
       </v-card>
     </v-form>
   </div>
@@ -177,7 +180,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { API } from '@/services/apiModules'
+import { projectionHcsvPost } from '@/services/apiActions'
 import { StatusCodes } from 'http-status-codes'
 import { handleApiError } from '@/services/apiErrorHandler'
 import * as messageHandler from '@/utils/messageHandler'
@@ -336,7 +339,7 @@ const validateFiles = async () => {
   return true
 }
 
-const runModel = async () => {
+const fileUploadRunModel = async () => {
   if (validateComparison() && validateRange() && (await validateFiles())) {
     if (form.value) {
       form.value.validate()
@@ -354,7 +357,7 @@ const runModel = async () => {
     console.log(JSON.stringify(projectionParameters))
 
     try {
-      const response = await API.create.uploadHcsvProjection(
+      const response = await projectionHcsvPost(
         projectionParameters,
         layerFile.value!,
         polygonFile.value!,
@@ -379,4 +382,18 @@ const runModel = async () => {
 }
 </script>
 
-<style scoped />
+<style scoped>
+.file-upload-run-model-card {
+  padding-bottom: 16px !important;
+  background-color: #f6f6f6;
+  border-top: 1px solid #0000001f;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  display: flex;
+  justify-content: end;
+  align-items: end;
+  text-align: end;
+}
+</style>

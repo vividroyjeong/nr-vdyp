@@ -39,7 +39,7 @@
       </v-tabs-window-item>
     </v-tabs-window>
 
-    <template v-if="modelType === MODEL_SELECTION.INPUT_MODEL_PARAMETERS">
+    <template v-if="isModelParameterPanelsVisible">
       <v-spacer class="space"></v-spacer>
       <SiteInfo />
       <v-spacer class="space"></v-spacer>
@@ -91,33 +91,34 @@ const modelParameterStore = useModelParameterStore()
 
 const { currentTab, modelType } = storeToRefs(appStore)
 
+const commonTabs = [
+  { label: MODEL_PARAM_TAB_NAME.MODEL_REPORT, component: ModelReport },
+  { label: MODEL_PARAM_TAB_NAME.VIEW_LOG_FILE, component: ViewLogFile },
+  {
+    label: MODEL_PARAM_TAB_NAME.VIEW_ERROR_MESSAGES,
+    component: ViewErrorMessages,
+  },
+]
+
 const tabs = computed(() => {
-  if (modelType.value === MODEL_SELECTION.FILE_UPLOAD) {
-    return [
-      {
-        label: MODEL_PARAM_TAB_NAME.FILE_UPLOAD,
-        component: FileUpload,
-      },
-      { label: MODEL_PARAM_TAB_NAME.MODEL_REPORT, component: ModelReport },
-      { label: MODEL_PARAM_TAB_NAME.VIEW_LOG_FILE, component: ViewLogFile },
-      {
-        label: MODEL_PARAM_TAB_NAME.VIEW_ERROR_MESSAGES,
-        component: ViewErrorMessages,
-      },
-    ]
-  }
-  return [
-    {
-      label: MODEL_PARAM_TAB_NAME.MODEL_PARAM_SELECTION,
-      component: ModelParameterSelection,
-    },
-    { label: MODEL_PARAM_TAB_NAME.MODEL_REPORT, component: ModelReport },
-    { label: MODEL_PARAM_TAB_NAME.VIEW_LOG_FILE, component: ViewLogFile },
-    {
-      label: MODEL_PARAM_TAB_NAME.VIEW_ERROR_MESSAGES,
-      component: ViewErrorMessages,
-    },
-  ]
+  const specificTabs =
+    modelType.value === MODEL_SELECTION.FILE_UPLOAD
+      ? [{ label: MODEL_PARAM_TAB_NAME.FILE_UPLOAD, component: FileUpload }]
+      : [
+          {
+            label: MODEL_PARAM_TAB_NAME.MODEL_PARAM_SELECTION,
+            component: ModelParameterSelection,
+          },
+        ]
+
+  return [...specificTabs, ...commonTabs]
+})
+
+const isModelParameterPanelsVisible = computed(() => {
+  return (
+    modelType.value === MODEL_SELECTION.INPUT_MODEL_PARAMETERS &&
+    currentTab.value === 0
+  )
 })
 
 onMounted(() => {
@@ -127,7 +128,7 @@ onMounted(() => {
 const runModel = () => {}
 </script>
 
-<style>
+<style scoped>
 .space {
   margin-top: 10px;
 }
