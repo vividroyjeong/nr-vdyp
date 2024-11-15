@@ -180,7 +180,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { API } from '@/services/apiModules'
+import { projectionHcsvPost } from '@/services/apiActions'
 import { StatusCodes } from 'http-status-codes'
 import { handleApiError } from '@/services/apiErrorHandler'
 import * as messageHandler from '@/utils/messageHandler'
@@ -357,7 +357,7 @@ const fileUploadRunModel = async () => {
     console.log(JSON.stringify(projectionParameters))
 
     try {
-      const response = await API.create.uploadHcsvProjection(
+      const response = await projectionHcsvPost(
         projectionParameters,
         layerFile.value!,
         polygonFile.value!,
