@@ -128,7 +128,7 @@ onMounted(() => {
 const runModel = () => {}
 </script>
 
-<style>
+<style scoped>
 .space {
   margin-top: 10px;
 }
