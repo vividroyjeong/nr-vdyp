@@ -50,7 +50,7 @@ public class ProjectionApi {
 	@jakarta.ws.rs.POST
 	@Path("/dcsv")
 	@Consumes({ "application/json" })
-	@Produces({ "application/octet-stream", "application/json" })
+	@Produces({ "multipart/form-data", "application/json" })
 	@io.swagger.annotations.ApiOperation(
 			value = "Project the growth of one or more polygons to a given year.", notes = "Run a projection of polygons in the supplied DCSV formatted input file as  controlled by the parameters in the supplied projection parameters file.", response = ProjectionResponse.class, authorizations = {
 					@io.swagger.annotations.Authorization(
@@ -99,7 +99,7 @@ public class ProjectionApi {
 	@jakarta.ws.rs.POST
 	@Path("/scsv")
 	@Consumes({ "application/json" })
-	@Produces({ "application/json" })
+	@Produces({ "multipart/form-data", "application/json" })
 	@io.swagger.annotations.ApiOperation(
 			value = "Project the growth of one or more polygons to a given year.", notes = "Run a projection of polygons in the supplied SCSV formatted input files as  controlled by the parameters in the supplied projection parameters file.", response = ProjectionResponse.class, authorizations = {
 					@io.swagger.annotations.Authorization(
