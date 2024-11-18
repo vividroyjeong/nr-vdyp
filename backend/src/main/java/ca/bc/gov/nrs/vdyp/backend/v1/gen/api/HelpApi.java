@@ -21,17 +21,11 @@ public class HelpApi {
 		HelpApiService delegate = null;
 
 		/*
-		if (servletContext != null) {
-			String implClass = servletContext.getInitParameter("HelpApi.implementation");
-			if (implClass != null && !"".equals(implClass.trim())) {
-				try {
-					delegate = (HelpApiService) Class.forName(implClass).getDeclaredConstructor().newInstance();
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-		}
-		*/
+		 * if (servletContext != null) { String implClass = servletContext.getInitParameter("HelpApi.implementation");
+		 * if (implClass != null && !"".equals(implClass.trim())) { try { delegate = (HelpApiService)
+		 * Class.forName(implClass).getDeclaredConstructor().newInstance(); } catch (Exception e) { throw new
+		 * RuntimeException(e); } } }
+		 */
 
 		if (delegate == null) {
 			delegate = HelpApiServiceFactory.getHelpApi();
