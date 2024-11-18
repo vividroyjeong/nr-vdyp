@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.vdyp.backend.v1.api;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -27,8 +28,7 @@ public class ProjectionApiService {
 	public Response projectionDcsvPost(
 			@Valid ProjectionDcsvPostRequest projectionDcsvPostRequest, SecurityContext securityContext
 	) throws NotFoundException {
-		// TODO Auto-generated method stub
-		return null;
+		return Response.serverError().entity("Not supported").build();
 	}
 
 	public Response projectionHcsvPost(
@@ -42,18 +42,18 @@ public class ProjectionApiService {
 
 			ZipEntry yieldTableZipEntry = new ZipEntry("Output_YldTbl.csv");
 			zipOut.putNextEntry(yieldTableZipEntry);
-			var yieldTablePath = getResourceFile("Output_YldTbl.csv");
-			zipOut.write(Files.readAllBytes(yieldTablePath));
+			var yieldTable = getResourceFile("Output_YldTbl.csv");
+			zipOut.write(yieldTable.readAllBytes());
 
 			ZipEntry logOutputEntry = new ZipEntry("Output_Log.txt");
 			zipOut.putNextEntry(logOutputEntry);
-			var logFilePath = getResourceFile("Output_Log.txt");
-			zipOut.write(Files.readAllBytes(logFilePath));
+			var logFile = getResourceFile("Output_Log.txt");
+			zipOut.write(logFile.readAllBytes());
 
 			ZipEntry errorOutputZipEntry = new ZipEntry("Output_Error.txt");
 			zipOut.putNextEntry(errorOutputZipEntry);
-			var errorFilePath = getResourceFile("Output_Error.txt");
-			zipOut.write(Files.readAllBytes(errorFilePath));
+			var errorFile = getResourceFile("Output_Error.txt");
+			zipOut.write(errorFile.readAllBytes());
 
 			zipOut.close();
 
@@ -76,13 +76,11 @@ public class ProjectionApiService {
 	public Response projectionScsvPost(
 			@Valid ProjectionScsvPostRequest projectionScsvPostRequest, SecurityContext securityContext
 	) throws NotFoundException {
-		// TODO Auto-generated method stub
-		return null;
+		return Response.serverError().entity("Not supported").build();
 	}
 
-	private Path getResourceFile(String fileName) throws URISyntaxException {
+	private InputStream getResourceFile(String fileName) throws URISyntaxException {
 		String resourceFilePath = "VDYP7Console-sample-files/hcsv/vdyp-240/" + fileName;
-		URL resourceUrl = getClass().getClassLoader().getResource(resourceFilePath);
-		return Path.of(resourceUrl.toURI());
+		return getClass().getClassLoader().getResourceAsStream(resourceFilePath);
 	}
 }

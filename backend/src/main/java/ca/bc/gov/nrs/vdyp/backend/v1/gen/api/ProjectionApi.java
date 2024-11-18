@@ -87,9 +87,9 @@ public class ProjectionApi {
 			), @io.swagger.annotations.ApiResponse(code = 400, message = "Client Error. Response content is a list of one or more messages describing the error.", response = MessagesInner.class, responseContainer = "List") }
 	)
 	public Response projectionHcsvPost(
-		//
+			//
 			@ApiParam(value = "") @Valid ProjectionHcsvPostRequest projectionHcsvPostRequest //
-		// , @Context SecurityContext securityContext
+	// , @Context SecurityContext securityContext
 	) throws NotFoundException {
 		return delegate.projectionHcsvPost(projectionHcsvPostRequest, null /* securityContext */);
 	}
@@ -114,7 +114,7 @@ public class ProjectionApi {
 	public Response projectionScsvPost(
 			//
 			@ApiParam(value = "") @Valid ProjectionScsvPostRequest projectionScsvPostRequest //
-			// , @Context SecurityContext securityContext
+	// , @Context SecurityContext securityContext
 	) throws NotFoundException {
 		return delegate.projectionScsvPost(projectionScsvPostRequest, null /* securityContext */);
 	}
