@@ -194,11 +194,11 @@ import { NUM_INPUT_LIMITS } from '@/constants/constants'
 import {
   MDL_PRM_INPUT_ERR,
   MSG_DIALOG_TITLE,
-  FILE_UPLOAD_ERR,
   SVC_ERR,
 } from '@/constants/message'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 import { FileUploadValidation } from '@/validation/fileUploadValidation'
+import Papa from 'papaparse'
 
 const form = ref<HTMLFormElement>()
 
@@ -275,96 +275,8 @@ const validateRange = (): boolean => {
   return true
 }
 
-const validateFiles = async () => {
-  if (!layerFile.value) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.MISSING_FILE,
-      FILE_UPLOAD_ERR.LAYER_FILE_MISSING,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (!polygonFile.value) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.MISSING_FILE,
-      FILE_UPLOAD_ERR.POLYGON_FILE_MISSING,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (!(await fileUploadValidator.isCSVFile(layerFile.value))) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_FILE,
-      FILE_UPLOAD_ERR.LAYER_FILE_NOT_CSV_FORMAT,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (!(await fileUploadValidator.isCSVFile(polygonFile.value))) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_FILE,
-      FILE_UPLOAD_ERR.POLYGON_FILE_NOT_CSV_FORMAT,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (!(await fileUploadValidator.validateLayerFileHeaders(layerFile.value))) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_FILE,
-      FILE_UPLOAD_ERR.LAYER_FILE_INVALID_HEADERS,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (
-    !(await fileUploadValidator.validatePolygonFileHeaders(polygonFile.value))
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_FILE,
-      FILE_UPLOAD_ERR.POLYGON_FILE_INVALID_HEADERS,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (
-    !(await fileUploadValidator.validateDataRowCounts(
-      layerFile.value,
-      fileUploadValidator.expectedLayerHeaders.length,
-    ))
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_FILE,
-      FILE_UPLOAD_ERR.LAYER_FILE_INVALID_ROW_COUNTS,
-      { width: 400 },
-    )
-    return false
-  }
-
-  if (
-    !(await fileUploadValidator.validateDataRowCounts(
-      polygonFile.value,
-      fileUploadValidator.expectedPolygonHeaders.length,
-    ))
-  ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_FILE,
-      FILE_UPLOAD_ERR.POLYGON_FILE_INVALID_ROW_COUNTS,
-      { width: 400 },
-    )
-    return false
-  }
-
-  return true
-}
-
 const fileUploadRunModel = async () => {
-  if (validateComparison() && validateRange() && (await validateFiles())) {
+  if (validateComparison() && validateRange()) {
     if (form.value) {
       form.value.validate()
     }
