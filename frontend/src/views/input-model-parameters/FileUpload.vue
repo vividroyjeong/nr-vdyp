@@ -198,9 +198,11 @@ import {
   SVC_ERR,
 } from '@/constants/message'
 import { DEFAULT_VALUES } from '@/constants/defaults'
-import Papa from 'papaparse'
+import { FileUploadValidation } from '@/validation/fileUploadValidation'
 
 const form = ref<HTMLFormElement>()
+
+const fileUploadValidator = new FileUploadValidation()
 
 const startingAge = ref<number | null>(DEFAULT_VALUES.STARTING_AGE)
 const finishingAge = ref<number | null>(DEFAULT_VALUES.FINISHING_AGE)
@@ -216,84 +218,61 @@ const polygonFile = ref<File | null>(null)
 const messageDialogStore = useMessageDialogStore()
 
 const validateComparison = (): boolean => {
-  if (finishingAge.value !== null && startingAge.value !== null) {
-    if (finishingAge.value < startingAge.value) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.INVALID_INPUT,
-        MDL_PRM_INPUT_ERR.RPT_VLD_COMP_FNSH_AGE,
-        { width: 400 },
-      )
-      return false
-    }
+  if (
+    !fileUploadValidator.validateAgeComparison(
+      finishingAge.value,
+      startingAge.value,
+    )
+  ) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.RPT_VLD_COMP_FNSH_AGE,
+      { width: 400 },
+    )
+    return false
   }
+
   return true
 }
 
-// Validation to check the range of input values
 const validateRange = (): boolean => {
-  if (startingAge.value !== null) {
-    if (
-      startingAge.value < NUM_INPUT_LIMITS.STARTING_AGE_MIN ||
-      startingAge.value > NUM_INPUT_LIMITS.STARTING_AGE_MAX
-    ) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.INVALID_INPUT,
-        MDL_PRM_INPUT_ERR.RPT_VLD_START_AGE_RNG(
-          NUM_INPUT_LIMITS.STARTING_AGE_MIN,
-          NUM_INPUT_LIMITS.STARTING_AGE_MAX,
-        ),
-        { width: 400 },
-      )
-      return false
-    }
+  if (!fileUploadValidator.validateStartingAgeRange(startingAge.value)) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.RPT_VLD_START_AGE_RNG(
+        NUM_INPUT_LIMITS.STARTING_AGE_MIN,
+        NUM_INPUT_LIMITS.STARTING_AGE_MAX,
+      ),
+      { width: 400 },
+    )
+    return false
   }
 
-  if (finishingAge.value !== null) {
-    if (
-      finishingAge.value < NUM_INPUT_LIMITS.FINISHING_AGE_MIN ||
-      finishingAge.value > NUM_INPUT_LIMITS.FINISHING_AGE_MAX
-    ) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.INVALID_INPUT,
-        MDL_PRM_INPUT_ERR.RPT_VLD_START_FNSH_RNG(
-          NUM_INPUT_LIMITS.FINISHING_AGE_MIN,
-          NUM_INPUT_LIMITS.FINISHING_AGE_MAX,
-        ),
-        { width: 400 },
-      )
-      return false
-    }
+  if (!fileUploadValidator.validateFinishingAgeRange(finishingAge.value)) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.RPT_VLD_START_FNSH_RNG(
+        NUM_INPUT_LIMITS.FINISHING_AGE_MIN,
+        NUM_INPUT_LIMITS.FINISHING_AGE_MAX,
+      ),
+      { width: 400 },
+    )
+    return false
   }
 
-  if (ageIncrement.value !== null) {
-    if (
-      ageIncrement.value < NUM_INPUT_LIMITS.AGE_INC_MIN ||
-      ageIncrement.value > NUM_INPUT_LIMITS.AGE_INC_MAX
-    ) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.INVALID_INPUT,
-        MDL_PRM_INPUT_ERR.RPT_VLD_AGE_INC_RNG(
-          NUM_INPUT_LIMITS.AGE_INC_MIN,
-          NUM_INPUT_LIMITS.AGE_INC_MAX,
-        ),
-        { width: 400 },
-      )
-      return false
-    }
+  if (!fileUploadValidator.validateAgeIncrementRange(ageIncrement.value)) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.RPT_VLD_AGE_INC_RNG(
+        NUM_INPUT_LIMITS.AGE_INC_MIN,
+        NUM_INPUT_LIMITS.AGE_INC_MAX,
+      ),
+      { width: 400 },
+    )
+    return false
   }
 
   return true
-}
-
-const isCSVFile = async (file: File): Promise<boolean> => {
-  return new Promise((resolve) => {
-    Papa.parse(file, {
-      complete: (results: any) => {
-        resolve(results.errors.length === 0)
-      },
-      error: () => resolve(false),
-    })
-  })
 }
 
 const validateFiles = async () => {
@@ -315,10 +294,7 @@ const validateFiles = async () => {
     return false
   }
 
-  const isLayerCSV = await isCSVFile(layerFile.value)
-  const isPolygonCSV = await isCSVFile(polygonFile.value)
-
-  if (!isLayerCSV) {
+  if (!(await fileUploadValidator.isCSVFile(layerFile.value))) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_FILE,
       FILE_UPLOAD_ERR.LAYER_FILE_NOT_CSV_FORMAT,
@@ -327,10 +303,28 @@ const validateFiles = async () => {
     return false
   }
 
-  if (!isPolygonCSV) {
+  if (!(await fileUploadValidator.isCSVFile(polygonFile.value))) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_FILE,
       FILE_UPLOAD_ERR.POLYGON_FILE_NOT_CSV_FORMAT,
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (!(await fileUploadValidator.validateLayerFile(layerFile.value))) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_FILE,
+      FILE_UPLOAD_ERR.LAYER_FILE_INVALID_HEADERS,
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (!(await fileUploadValidator.validatePolygonFile(polygonFile.value))) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_FILE,
+      FILE_UPLOAD_ERR.POLYGON_FILE_INVALID_HEADERS,
       { width: 400 },
     )
     return false
@@ -349,12 +343,7 @@ const fileUploadRunModel = async () => {
       startingAge: startingAge.value,
       finishingAge: finishingAge.value,
       ageIncrement: ageIncrement.value,
-      volumeReported: volumeReported.value,
-      includeInReport: includeInReport.value,
-      projectionType: projectionType.value,
-      reportTitle: reportTitle.value,
     }
-    console.log(JSON.stringify(projectionParameters))
 
     try {
       const response = await projectionHcsvPost(

@@ -123,10 +123,15 @@ export const MDL_PRM_INPUT_ERR = Object.freeze({
 })
 
 export const FILE_UPLOAD_ERR = Object.freeze({
-  LAYER_FILE_MISSING: 'Please provide a layer file.',
-  POLYGON_FILE_MISSING: 'Please provide a polygon file.',
+  LAYER_FILE_MISSING: 'Layer file is missing. Please upload the required file.',
+  POLYGON_FILE_MISSING:
+    'Polygon file is missing. Please upload the required file.',
   LAYER_FILE_NOT_CSV_FORMAT:
-    'The layer file is not in the correct CSV file format, please check and re-upload.',
+    'The uploaded Layer file is not in CSV format. Please upload a valid CSV file.',
   POLYGON_FILE_NOT_CSV_FORMAT:
-    'The polygon file is not in the correct CSV file format, please check and re-upload.',
+    'The uploaded Polygon file is not in CSV format. Please upload a valid CSV file.',
+  LAYER_FILE_INVALID_HEADERS:
+    'The Layer file headers are invalid. Please upload a file with the correct format.',
+  POLYGON_FILE_INVALID_HEADERS:
+    'The Polygon file headers are invalid. Please upload a file with the correct format.',
 })
