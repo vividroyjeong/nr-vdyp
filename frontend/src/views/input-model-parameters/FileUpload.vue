@@ -312,7 +312,7 @@ const validateFiles = async () => {
     return false
   }
 
-  if (!(await fileUploadValidator.validateLayerFile(layerFile.value))) {
+  if (!(await fileUploadValidator.validateLayerFileHeaders(layerFile.value))) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_FILE,
       FILE_UPLOAD_ERR.LAYER_FILE_INVALID_HEADERS,
@@ -321,10 +321,40 @@ const validateFiles = async () => {
     return false
   }
 
-  if (!(await fileUploadValidator.validatePolygonFile(polygonFile.value))) {
+  if (
+    !(await fileUploadValidator.validatePolygonFileHeaders(polygonFile.value))
+  ) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_FILE,
       FILE_UPLOAD_ERR.POLYGON_FILE_INVALID_HEADERS,
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    !(await fileUploadValidator.validateDataRowCounts(
+      layerFile.value,
+      fileUploadValidator.expectedLayerHeaders.length,
+    ))
+  ) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_FILE,
+      FILE_UPLOAD_ERR.LAYER_FILE_INVALID_ROW_COUNTS,
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    !(await fileUploadValidator.validateDataRowCounts(
+      polygonFile.value,
+      fileUploadValidator.expectedPolygonHeaders.length,
+    ))
+  ) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_FILE,
+      FILE_UPLOAD_ERR.POLYGON_FILE_INVALID_ROW_COUNTS,
       { width: 400 },
     )
     return false

@@ -134,4 +134,8 @@ export const FILE_UPLOAD_ERR = Object.freeze({
     'The Layer file headers are invalid. Please upload a file with the correct format.',
   POLYGON_FILE_INVALID_HEADERS:
     'The Polygon file headers are invalid. Please upload a file with the correct format.',
+  LAYER_FILE_INVALID_ROW_COUNTS:
+    'The Layer file contains rows with an incorrect number of columns. Please ensure all rows match the header structure.',
+  POLYGON_FILE_INVALID_ROW_COUNTS:
+    'The Polygon file contains rows with an incorrect number of columns. Please ensure all rows match the header structure.',
 })
