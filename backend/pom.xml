@@ -256,46 +256,49 @@
 	</dependencies>
 	<build>
 		<plugins>
-			<!--plugin>
-        <groupId>org.openapitools</groupId>
-        <artifactId>openapi-generator-maven-plugin</artifactId>
-        <version>7.9.0</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-            <configuration>
-              <inputSpec>${project.basedir}/src/main/resources/openapi/vdyp-file.swagger.yaml</inputSpec>
-              <generatorName>jaxrs-spec</generatorName>
-              <templateDirectory>${project.basedir}/src/main/resources/openapi/templates</templateDirectory>
-              <verbose>true</verbose>
-              <configOptions>
-                <library>quarkus</library>
-	            <supportAsync>true</supportAsync>
-	            <interfaceOnly>true</interfaceOnly>
-	            <dateLibrary>java8</dateLibrary>
-	            <useTags>false</useTags>
-                <useSwaggerAnnotations>false</useSwaggerAnnotations>
-                <addCompileSourceRoot>true</addCompileSourceRoot>
-                <apiPackage>ca.bc.gov.nrs.vdyp.backend.v1.api</apiPackage>
-                <modelPackage>ca.bc.gov.nrs.vdyp.backend.v1.model</modelPackage>
-                <artifactId>vdyp-resource-layer</artifactId>
-                <artifactVersion>${project.version}</artifactVersion>
-                <disallowAdditionalPropertiesIfNotPresent>false</disallowAdditionalPropertiesIfNotPresent>
-                <groupId>${project.groupId}</groupId>
-                <parentGroupId>ca.bc.gov.nrs.vdyp.api.v1</parentGroupId>
-                <parentArtifactId>vdyp-backend</parentArtifactId>
-                <parentVersion>0.0.1-SNAPSHOT</parentVersion>
-                <title>VDYP Resource Layer</title>
-                <useJakartaEe>true</useJakartaEe>
-                <useMicroProfileOpenAPIAnnotations>true</useMicroProfileOpenAPIAnnotations>
-                <useMutiny>true</useMutiny>
-              </configOptions>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin-->
+			<!-- plugin>
+				<groupId>org.openapitools</groupId>
+				<artifactId>openapi-generator-maven-plugin</artifactId>
+				<version>7.9.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>
+								${project.basedir}/src/main/resources/openapi/vdyp-file.swagger.yaml</inputSpec>
+							<generatorName>jaxrs-spec</generatorName>
+							<templateDirectory>
+								${project.basedir}/src/main/resources/openapi/templates</templateDirectory>
+							<verbose>true</verbose>
+							<configOptions>
+								<library>quarkus</library>
+								<supportAsync>true</supportAsync>
+								<interfaceOnly>true</interfaceOnly>
+								<dateLibrary>java8</dateLibrary>
+								<useTags>false</useTags>
+								<useSwaggerAnnotations>false</useSwaggerAnnotations>
+								<addCompileSourceRoot>true</addCompileSourceRoot>
+								<apiPackage>ca.bc.gov.nrs.vdyp.backend.v1.api</apiPackage>
+								<modelPackage>
+									ca.bc.gov.nrs.vdyp.backend.v1.model</modelPackage>
+								<artifactId>vdyp-resource-layer</artifactId>
+								<artifactVersion>${project.version}</artifactVersion>
+								<disallowAdditionalPropertiesIfNotPresent>false</disallowAdditionalPropertiesIfNotPresent>
+								<groupId>${project.groupId}</groupId>
+								<parentGroupId>ca.bc.gov.nrs.vdyp.api.v1</parentGroupId>
+								<parentArtifactId>vdyp-backend</parentArtifactId>
+								<parentVersion>0.0.1-SNAPSHOT</parentVersion>
+								<title>VDYP Resource Layer</title>
+								<useJakartaEe>true</useJakartaEe>
+								<useMicroProfileOpenAPIAnnotations>true</useMicroProfileOpenAPIAnnotations>
+								<useMutiny>true</useMutiny>
+							</configOptions>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin-->
 			<plugin>
 				<groupId>${quarkus.platform.group-id}</groupId>
 				<artifactId>quarkus-maven-plugin</artifactId>
@@ -342,24 +345,25 @@
 				</executions>
 			</plugin>
 			<!--plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.2.0</version>
-        <executions>
-          <execution>
-            <id>add-source</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>add-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>${project.build.directory}/generated-sources/openapi/src/gen/java</source>
-              </sources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin-->
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>
+									${project.build.directory}/generated-sources/openapi/src/gen/java</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin-->
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -371,6 +375,9 @@
 							<groupId>ca.bc.gov.nrs.vdyp</groupId>
 							<artifactId>vdyp-buildtools</artifactId>
 							<version>${project.version}</version>
+							<scope>system</scope>
+							<systemPath>
+								/project/buildtools/target/vdyp-buildtools-0.0.1-SNAPSHOT.jar</systemPath>
 						</dependency>
 					</dependencies>
 				</plugin>
