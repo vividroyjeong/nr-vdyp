@@ -6,11 +6,11 @@ FROM quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:jdk-21 AS build
 ARG CONTEXT="./backend"
 
 # Image defaults to /project; copy controlled by .dockerignore
-COPY --chown=quarkus:quarkus ${CONTEXT} ./
+COPY --chown=quarkus:quarkus ${CONTEXT} ./${CONTEXT}
 COPY --chown=quarkus:quarkus ./buildtools ./buildtools
-COPY ./pom.xml ../pom.xml
+COPY ./pom.xml ./pom.xml
 RUN chmod +x ./mvnw && cd buildtools && ../mvnw clean install -Pnative -DskipTests && cd ..
-RUN ./mvnw clean package -Pnative -DskipTests
+RUN cd ${CONTEXT} && ./mvnw clean package -Pnative -DskipTests
 
 # "A base image to run Quarkus native application using UBI Micro"
 FROM quay.io/quarkus/quarkus-micro-image:2.0
@@ -20,6 +20,7 @@ EXPOSE 3000
 HEALTHCHECK --interval=300s --timeout=3s CMD curl -f http://localhost:3000/ || exit 1
 
 # Startup
-COPY --chown=1001:root --from=build /project/target/*-runner /app
+ARG CONTEXT="./backend"
+COPY --chown=1001:root --from=build /project/${CONTEXT}/target/*-runner /app
 USER 1001
 CMD ["/app", "-Dquarkus.http.host=0.0.0.0"]
