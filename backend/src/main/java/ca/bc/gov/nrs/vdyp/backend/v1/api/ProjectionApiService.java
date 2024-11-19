@@ -16,6 +16,7 @@ import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ProjectionHcsvPostRequest;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ProjectionScsvPostRequest;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.SecurityContext;
 
 public class ProjectionApiService {
@@ -60,7 +61,7 @@ public class ProjectionApiService {
 
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss");
 			var outputFileName = "vdyp-output-" + java.time.LocalDateTime.now().format(formatter);
-			return Response.ok(resultingByteArray)
+			return Response.ok(resultingByteArray).status(Status.CREATED)
 					.header("content-disposition", "attachment;filename=\"" + outputFileName + "\"").build();
 
 		} catch (IOException | URISyntaxException e) {
