@@ -27,10 +27,10 @@ import type {
   ProjectionScsvBody,
 } from '../models'
 /**
- * DefaultApi - axios parameter creator
+ * VdypApi - axios parameter creator
  * @export
  */
-export const DefaultApiAxiosParamCreator = function (
+export const VdypApiAxiosParamCreator = function (
   configuration?: Configuration,
 ) {
   return {
@@ -297,10 +297,10 @@ export const DefaultApiAxiosParamCreator = function (
 }
 
 /**
- * DefaultApi - functional programming interface
+ * VdypApi - functional programming interface
  * @export
  */
-export const DefaultApiFp = function (configuration?: Configuration) {
+export const VdypApiFp = function (configuration?: Configuration) {
   return {
     /**
      *
@@ -317,7 +317,7 @@ export const DefaultApiFp = function (configuration?: Configuration) {
       ) => Promise<AxiosResponse<Array<ParameterDetailsMessage>>>
     > {
       const localVarAxiosArgs =
-        await DefaultApiAxiosParamCreator(configuration).helpGet(options)
+        await VdypApiAxiosParamCreator(configuration).helpGet(options)
       return (
         axios: AxiosInstance = globalAxios,
         basePath: string = BASE_PATH,
@@ -342,7 +342,7 @@ export const DefaultApiFp = function (configuration?: Configuration) {
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<void>>
     > {
-      const localVarAxiosArgs = await DefaultApiAxiosParamCreator(
+      const localVarAxiosArgs = await VdypApiAxiosParamCreator(
         configuration,
       ).projectionDcsvPost(body, options)
       return (
@@ -369,7 +369,7 @@ export const DefaultApiFp = function (configuration?: Configuration) {
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Blob>>
     > {
-      const localVarAxiosArgs = await DefaultApiAxiosParamCreator(
+      const localVarAxiosArgs = await VdypApiAxiosParamCreator(
         configuration,
       ).projectionHcsvPost(body, options)
       return (
@@ -396,7 +396,7 @@ export const DefaultApiFp = function (configuration?: Configuration) {
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<void>>
     > {
-      const localVarAxiosArgs = await DefaultApiAxiosParamCreator(
+      const localVarAxiosArgs = await VdypApiAxiosParamCreator(
         configuration,
       ).projectionScsvPost(body, options)
       return (
@@ -414,10 +414,10 @@ export const DefaultApiFp = function (configuration?: Configuration) {
 }
 
 /**
- * DefaultApi - factory interface
+ * VdypApi - factory interface
  * @export
  */
-export const DefaultApiFactory = function (
+export const VdypApiFactory = function (
   configuration?: Configuration,
   basePath?: string,
   axios?: AxiosInstance,
@@ -432,7 +432,7 @@ export const DefaultApiFactory = function (
     async helpGet(
       options?: AxiosRequestConfig,
     ): Promise<AxiosResponse<Array<ParameterDetailsMessage>>> {
-      return DefaultApiFp(configuration)
+      return VdypApiFp(configuration)
         .helpGet(options)
         .then((request) => request(axios, basePath))
     },
@@ -447,7 +447,7 @@ export const DefaultApiFactory = function (
       body?: ProjectionDcsvBody,
       options?: AxiosRequestConfig,
     ): Promise<AxiosResponse<void>> {
-      return DefaultApiFp(configuration)
+      return VdypApiFp(configuration)
         .projectionDcsvPost(body, options)
         .then((request) => request(axios, basePath))
     },
@@ -462,7 +462,7 @@ export const DefaultApiFactory = function (
       body?: ProjectionHcsvBody,
       options?: AxiosRequestConfig,
     ): Promise<AxiosResponse<Blob>> {
-      return DefaultApiFp(configuration)
+      return VdypApiFp(configuration)
         .projectionHcsvPost(body, options)
         .then((request) => request(axios, basePath))
     },
@@ -477,7 +477,7 @@ export const DefaultApiFactory = function (
       body?: ProjectionScsvBody,
       options?: AxiosRequestConfig,
     ): Promise<AxiosResponse<void>> {
-      return DefaultApiFp(configuration)
+      return VdypApiFp(configuration)
         .projectionScsvPost(body, options)
         .then((request) => request(axios, basePath))
     },
@@ -485,23 +485,23 @@ export const DefaultApiFactory = function (
 }
 
 /**
- * DefaultApi - object-oriented interface
+ * VdypApi - object-oriented interface
  * @export
- * @class DefaultApi
+ * @class VdypApi
  * @extends {BaseAPI}
  */
-export class DefaultApi extends BaseAPI {
+export class VdypApi extends BaseAPI {
   /**
    *
    * @summary returns a detailed description of the parameters available when executing a projection.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
-   * @memberof DefaultApi
+   * @memberof VdypApi
    */
   public async helpGet(
     options?: AxiosRequestConfig,
   ): Promise<AxiosResponse<Array<ParameterDetailsMessage>>> {
-    return DefaultApiFp(this.configuration)
+    return VdypApiFp(this.configuration)
       .helpGet(options)
       .then((request) => request(this.axios, this.basePath))
   }
@@ -511,13 +511,13 @@ export class DefaultApi extends BaseAPI {
    * @param {ProjectionDcsvBody} [body]
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
-   * @memberof DefaultApi
+   * @memberof VdypApi
    */
   public async projectionDcsvPost(
     body?: ProjectionDcsvBody,
     options?: AxiosRequestConfig,
   ): Promise<AxiosResponse<void>> {
-    return DefaultApiFp(this.configuration)
+    return VdypApiFp(this.configuration)
       .projectionDcsvPost(body, options)
       .then((request) => request(this.axios, this.basePath))
   }
@@ -527,13 +527,13 @@ export class DefaultApi extends BaseAPI {
    * @param {ProjectionHcsvBody} [body]
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
-   * @memberof DefaultApi
+   * @memberof VdypApi
    */
   public async projectionHcsvPost(
     body?: ProjectionHcsvBody,
     options?: AxiosRequestConfig,
   ): Promise<AxiosResponse<Blob>> {
-    return DefaultApiFp(this.configuration)
+    return VdypApiFp(this.configuration)
       .projectionHcsvPost(body, options)
       .then((request) => request(this.axios, this.basePath))
   }
@@ -543,13 +543,13 @@ export class DefaultApi extends BaseAPI {
    * @param {ProjectionScsvBody} [body]
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
-   * @memberof DefaultApi
+   * @memberof VdypApi
    */
   public async projectionScsvPost(
     body?: ProjectionScsvBody,
     options?: AxiosRequestConfig,
   ): Promise<AxiosResponse<void>> {
-    return DefaultApiFp(this.configuration)
+    return VdypApiFp(this.configuration)
       .projectionScsvPost(body, options)
       .then((request) => request(this.axios, this.basePath))
   }
