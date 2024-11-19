@@ -1,13 +1,15 @@
 <template>
   <v-card class="elevation-4">
-    <v-expansion-panels v-model="panelOpen">
+    <v-expansion-panels v-model="panelOpenStates.standDensity">
       <v-expansion-panel hide-actions>
         <v-expansion-panel-title>
           <v-row no-gutters class="expander-header">
             <!-- Place an arrow icon to the left of the title -->
             <v-col cols="auto" class="expansion-panel-icon-col">
               <v-icon class="expansion-panel-icon">{{
-                panelOpen === 0 ? 'mdi-chevron-up' : 'mdi-chevron-down'
+                panelOpenStates.standDensity === PANEL.OPEN
+                  ? 'mdi-chevron-up'
+                  : 'mdi-chevron-down'
               }}</v-icon>
             </v-col>
             <v-col>
@@ -16,105 +18,198 @@
           </v-row>
         </v-expansion-panel-title>
         <v-expansion-panel-text class="expansion-panel-text mt-n2">
-          <div>
-            <v-row>
-              <v-col cols="3">
-                <v-text-field
-                  label="Percent Stockable Area"
-                  type="number"
-                  v-model="percentStockableArea"
-                  max="100"
-                  min="0"
-                  step="5"
-                  :rules="[validatePercentStockableArea]"
-                  :error-messages="percentStockableAreaError"
-                  placeholder="Select..."
-                  persistent-placeholder
-                  density="compact"
-                  dense
-                ></v-text-field
-              ></v-col>
-              <v-col class="col-space-3" />
-              <v-col cols="3">
-                <v-text-field
-                  type="number"
-                  v-model="basalArea"
-                  min="0"
-                  step="0.0001"
-                  :rules="[validateMinimum]"
-                  :error-messages="basalAreaError"
-                  persistent-placeholder
-                  placeholder="N/A"
-                  density="compact"
-                  dense
-                  :disabled="isBasalAreaDisabled"
+          <v-form ref="form">
+            <div>
+              <v-row>
+                <v-col cols="3">
+                  <div
+                    style="position: relative; width: 100%; margin-top: 10px"
+                  >
+                    <v-text-field
+                      type="text"
+                      v-model="basalArea"
+                      persistent-placeholder
+                      :placeholder="basalAreaPlaceholder"
+                      hide-details
+                      density="compact"
+                      dense
+                      style="padding-left: 15px"
+                      variant="plain"
+                      :disabled="isBasalAreaDisabled || !isConfirmEnabled"
+                    >
+                      <template v-slot:label>
+                        Basal Area (m<sup>2</sup>/ha)
+                      </template>
+                    </v-text-field>
+                    <!-- spin buttons -->
+                    <div class="spin-box">
+                      <div
+                        class="spin-up-arrow-button"
+                        @mousedown="startIncrementBasalArea"
+                        @mouseup="stopIncrementBasalArea"
+                        @mouseleave="stopIncrementBasalArea"
+                        :class="{
+                          disabled: isBasalAreaDisabled || !isConfirmEnabled,
+                        }"
+                      >
+                        {{ SPIN_BUTTON.UP }}
+                      </div>
+                      <div
+                        class="spin-down-arrow-button"
+                        @mousedown="startDecrementBasalArea"
+                        @mouseup="stopDecrementBasalArea"
+                        @mouseleave="stopDecrementBasalArea"
+                        :class="{
+                          disabled: isBasalAreaDisabled || !isConfirmEnabled,
+                        }"
+                      >
+                        {{ SPIN_BUTTON.DOWN }}
+                      </div>
+                    </div>
+                    <div class="spin-text-field-bottom-line"></div>
+                  </div>
+                </v-col>
+                <v-col class="col-space-3" />
+                <v-col v-show="Util.isZeroValue(age)">
+                  <span style="font-size: 12px">{{
+                    MDL_PRM_INPUT_HINT.DENSITY_WO_AGE
+                  }}</span>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="3">
+                  <div
+                    style="position: relative; width: 100%; margin-top: 10px"
+                  >
+                    <v-text-field
+                      label="Trees per Hectare (tree/ha)"
+                      type="text"
+                      v-model="treesPerHectare"
+                      persistent-placeholder
+                      :placeholder="tphPlaceholder"
+                      hide-details
+                      density="compact"
+                      dense
+                      style="padding-left: 15px"
+                      variant="plain"
+                      :disabled="isTreesPerHectareDisabled || !isConfirmEnabled"
+                    >
+                    </v-text-field>
+                    <!-- spin buttons -->
+                    <div class="spin-box">
+                      <div
+                        class="spin-up-arrow-button"
+                        @mousedown="startIncrementTPH"
+                        @mouseup="stopIncrementTPH"
+                        @mouseleave="stopIncrementTPH"
+                        :class="{
+                          disabled:
+                            isTreesPerHectareDisabled || !isConfirmEnabled,
+                        }"
+                      >
+                        {{ SPIN_BUTTON.UP }}
+                      </div>
+                      <div
+                        class="spin-down-arrow-button"
+                        @mousedown="startDecrementTPH"
+                        @mouseup="stopDecrementTPH"
+                        @mouseleave="stopDecrementTPH"
+                        :class="{
+                          disabled:
+                            isTreesPerHectareDisabled || !isConfirmEnabled,
+                        }"
+                      >
+                        {{ SPIN_BUTTON.DOWN }}
+                      </div>
+                    </div>
+                    <div class="spin-text-field-bottom-line"></div>
+                  </div>
+                </v-col>
+                <v-col class="col-space-3" />
+                <v-col cols="3">
+                  <v-select
+                    label="Minimum DBH Limit"
+                    :items="minimumDBHLimitsOptions"
+                    v-model="minimumDBHLimit"
+                    item-title="label"
+                    item-value="value"
+                    hide-details
+                    persistent-placeholder
+                    placeholder=""
+                    density="compact"
+                    dense
+                    disabled
+                  ></v-select>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="3">
+                  <v-text-field
+                    label="Crown Closure (%)"
+                    type="number"
+                    v-model.number="percentCrownClosure"
+                    :max="NUM_INPUT_LIMITS.CROWN_CLOSURE_MAX"
+                    :min="NUM_INPUT_LIMITS.CROWN_CLOSURE_MIN"
+                    :step="NUM_INPUT_LIMITS.CROWN_CLOSURE_STEP"
+                    persistent-placeholder
+                    :placeholder="crownClosurePlaceholder"
+                    hide-details
+                    density="compact"
+                    dense
+                    :disabled="
+                      isPercentCrownClosureDisabled || !isConfirmEnabled
+                    "
+                  ></v-text-field>
+                  <v-label
+                    v-show="
+                      Util.isZeroValue(percentCrownClosure) &&
+                      !isPercentCrownClosureDisabled
+                    "
+                    style="font-size: 12px"
+                    >{{ MDL_PRM_INPUT_HINT.DENSITY_PCC_APPLY_DFT }}</v-label
+                  >
+                </v-col>
+                <v-col class="col-space-3" />
+                <v-col
+                  cols="3"
+                  v-show="
+                    derivedBy === DERIVED_BY.BASAL_AREA &&
+                    siteSpeciesValues === SITE_SPECIES_VALUES.COMPUTED
+                  "
                 >
-                  <template v-slot:label>
-                    Basal Area (m<sup>2</sup>/ha)
-                  </template>
-                </v-text-field></v-col
+                  <v-text-field
+                    label="Current Diameter (cm)"
+                    v-model="currentDiameter"
+                    persistent-placeholder
+                    placeholder=""
+                    hide-details
+                    density="compact"
+                    dense
+                    disabled
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </div>
+            <v-card-actions class="mt-5 pr-0">
+              <v-spacer></v-spacer>
+              <v-btn
+                class="white-btn"
+                :disabled="!isConfirmEnabled"
+                @click="clear"
+                >Clear</v-btn
               >
-            </v-row>
-            <v-row>
-              <v-col cols="3">
-                <v-text-field
-                  label="Trees per Hectare"
-                  type="number"
-                  v-model="treesPerHectare"
-                  min="0"
-                  step="0.01"
-                  :rules="[validateMinimum]"
-                  :error-messages="treesPerHectareError"
-                  persistent-placeholder
-                  placeholder="N/A"
-                  density="compact"
-                  dense
-                  :disabled="isTreesPerHectareDisabled"
-                ></v-text-field>
-              </v-col>
-              <v-col class="col-space-3" />
-              <v-col cols="3">
-                <v-select
-                  label="Minimum DBH Limit"
-                  :items="minimumDBHLimitsOptions"
-                  v-model="minimumDBHLimit"
-                  item-title="label"
-                  item-value="value"
-                  clearable
-                  hide-details
-                  persistent-placeholder
-                  placeholder="Select..."
-                  density="compact"
-                  dense
-                  disabled
-                ></v-select>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="3">
-                <v-text-field
-                  label="Percent Crown Closure"
-                  type="number"
-                  v-model="percentCrownClosure"
-                  max="100"
-                  min="0"
-                  step="0.1"
-                  :rules="[validatePercentCrownClosure]"
-                  :error-messages="percentCrownClosureError"
-                  persistent-placeholder
-                  placeholder="N/A"
-                  density="compact"
-                  dense
-                  :disabled="isPercentCrownClosureDisabled"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </div>
-          <v-card-actions class="mt-5 pr-0">
-            <v-spacer></v-spacer>
-            <v-btn class="white-btn" @click="clear">Clear</v-btn>
-            <v-btn class="blue-btn ml-2" @click="confirm">Confirm</v-btn>
-          </v-card-actions>
+              <v-btn
+                v-show="!isConfirmed"
+                class="blue-btn ml-2"
+                :disabled="!isConfirmEnabled"
+                @click="onConfirm"
+                >Confirm</v-btn
+              >
+              <v-btn v-show="isConfirmed" class="blue-btn ml-2" @click="onEdit"
+                >Edit</v-btn
+              >
+            </v-card-actions>
+          </v-form>
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
@@ -123,111 +218,393 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { Util } from '@/utils/util'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
+import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
+import { useConfirmDialogStore } from '@/stores/common/confirmDialogStore'
 import { storeToRefs } from 'pinia'
 import { minimumDBHLimitsOptions } from '@/constants/options'
-import { DERIVED_BY, SITE_SPECIES_VALUES } from '@/constants/constants'
+import {
+  PANEL,
+  DERIVED_BY,
+  SITE_SPECIES_VALUES,
+  SPECIAL_INDICATORS,
+  MODEL_PARAMETER_PANEL,
+  NUM_INPUT_LIMITS,
+  SPIN_BUTTON,
+  CONTINUOUS_INC_DEC,
+} from '@/constants/constants'
+import { DEFAULT_VALUES } from '@/constants/defaults'
+import {
+  MDL_PRM_INPUT_ERR,
+  MSG_DIALOG_TITLE,
+  MDL_PRM_INPUT_HINT,
+} from '@/constants/message'
+import { StandDensityValidation } from '@/validation/standDensityValidation'
 
-const panelOpen = ref(0)
+const form = ref<HTMLFormElement>()
+
+const standDensityValidator = new StandDensityValidation()
 
 const modelParameterStore = useModelParameterStore()
+const messageDialogStore = useMessageDialogStore()
+const confirmDialogStore = useConfirmDialogStore()
+
 const {
+  panelOpenStates,
   derivedBy,
+  becZone,
+  selectedSiteSpecies,
   siteSpeciesValues,
-  percentStockableArea,
+  age,
+  height,
   basalArea,
   treesPerHectare,
   minimumDBHLimit,
+  currentDiameter,
   percentCrownClosure,
 } = storeToRefs(modelParameterStore)
+
+const panelName = MODEL_PARAMETER_PANEL.STAND_DENSITY
+const isConfirmEnabled = computed(
+  () => modelParameterStore.panelState[panelName].editable,
+)
+const isConfirmed = computed(
+  () => modelParameterStore.panelState[panelName].confirmed,
+)
 
 const isPercentCrownClosureDisabled = ref(false)
 const isBasalAreaDisabled = ref(false)
 const isTreesPerHectareDisabled = ref(false)
 
-const updatePercentCrownClosureState = (
-  newDerivedBy: string | null,
-  newSiteSpeciesValues: string | null,
-) => {
-  isPercentCrownClosureDisabled.value = !(
-    newDerivedBy === DERIVED_BY.VOLUME &&
-    newSiteSpeciesValues === SITE_SPECIES_VALUES.COMPUTED
-  )
+const basalAreaPlaceholder = ref('')
+const tphPlaceholder = ref('')
+const crownClosurePlaceholder = ref('')
+
+// Interval references for continuous increment/decrement
+let basalAreaIncrementInterval: number | null = null
+let basalAreaDecrementInterval: number | null = null
+let tphIncrementInterval: number | null = null
+let tphDecrementInterval: number | null = null
+
+const updateBasalAreaState = (isEnabled: boolean, isAgeZero: boolean) => {
+  isBasalAreaDisabled.value = !isEnabled || isAgeZero
+
+  if (isBasalAreaDisabled.value) {
+    basalAreaPlaceholder.value = SPECIAL_INDICATORS.NA
+    basalArea.value = null
+  } else {
+    basalAreaPlaceholder.value = ''
+    basalArea.value = DEFAULT_VALUES.BASAL_AREA
+  }
 }
 
-const updateBasalAreaAndTreesState = (
+const updateTreesPerHectareState = (isEnabled: boolean, isAgeZero: boolean) => {
+  isTreesPerHectareDisabled.value = !isEnabled || isAgeZero
+
+  if (isTreesPerHectareDisabled.value) {
+    tphPlaceholder.value = SPECIAL_INDICATORS.NA
+    treesPerHectare.value = null
+  } else {
+    tphPlaceholder.value = ''
+    treesPerHectare.value = DEFAULT_VALUES.TPH
+  }
+}
+
+const updateCrownClosureState = (
+  isVolume: boolean,
+  isComputed: boolean,
+  isAgeZero: boolean,
+) => {
+  isPercentCrownClosureDisabled.value = !(isVolume && isComputed) || isAgeZero
+
+  if (isPercentCrownClosureDisabled.value) {
+    crownClosurePlaceholder.value = SPECIAL_INDICATORS.NA
+    percentCrownClosure.value = null
+  } else {
+    crownClosurePlaceholder.value = ''
+    percentCrownClosure.value = 0
+  }
+}
+
+const updateStates = (
   newDerivedBy: string | null,
   newSiteSpeciesValues: string | null,
+  newAge: number | null,
 ) => {
-  const isBasalAreaEnabled =
-    newDerivedBy === DERIVED_BY.BASAL_AREA &&
-    newSiteSpeciesValues === SITE_SPECIES_VALUES.COMPUTED
+  const isVolume = newDerivedBy === DERIVED_BY.VOLUME
+  const isBasalArea = newDerivedBy === DERIVED_BY.BASAL_AREA
+  const isComputed = newSiteSpeciesValues === SITE_SPECIES_VALUES.COMPUTED
+  const isAgeZero = Util.isZeroValue(newAge)
 
-  isBasalAreaDisabled.value = !isBasalAreaEnabled
-  isTreesPerHectareDisabled.value = !isBasalAreaEnabled
+  // Update states using individual functions
+  updateBasalAreaState(isBasalArea && isComputed, isAgeZero)
+  updateTreesPerHectareState(isBasalArea && isComputed, isAgeZero)
+  updateCrownClosureState(isVolume, isComputed, isAgeZero)
 }
 
 watch(
-  [derivedBy, siteSpeciesValues],
-  ([newDerivedBy, newSiteSpeciesValues]) => {
-    updatePercentCrownClosureState(newDerivedBy, newSiteSpeciesValues)
-    updateBasalAreaAndTreesState(newDerivedBy, newSiteSpeciesValues)
+  [derivedBy, siteSpeciesValues, age],
+  ([newDerivedBy, newSiteSpeciesValues, newAge]) => {
+    updateStates(newDerivedBy, newSiteSpeciesValues, newAge)
   },
   { immediate: true },
 )
 
-const validatePercentStockableArea = (value: any) => {
-  if (value === null || value === '') {
-    return 'Percent Stockable Area is required'
+const incrementBasalArea = () => {
+  if (basalArea.value !== null && basalArea.value !== undefined) {
+    const newValue = Util.increaseItemBySpinButton(
+      basalArea.value,
+      NUM_INPUT_LIMITS.BASAL_AREA_MAX,
+      NUM_INPUT_LIMITS.BASAL_AREA_MIN,
+      NUM_INPUT_LIMITS.BASAL_AREA_STEP,
+    )
+    basalArea.value = newValue.toFixed(NUM_INPUT_LIMITS.BASAL_AREA_DECIMAL_NUM)
   }
-  if (value < 0 || value > 100) {
-    return 'Please enter a value between 0 and 100'
+}
+
+const decrementBasalArea = () => {
+  if (basalArea.value !== null && basalArea.value !== undefined) {
+    let newValue = Util.decrementItemBySpinButton(
+      basalArea.value,
+      NUM_INPUT_LIMITS.BASAL_AREA_MAX,
+      NUM_INPUT_LIMITS.BASAL_AREA_MIN,
+      NUM_INPUT_LIMITS.BASAL_AREA_STEP,
+    )
+    basalArea.value = newValue.toFixed(NUM_INPUT_LIMITS.BASAL_AREA_DECIMAL_NUM)
   }
+}
+
+const incrementTPH = () => {
+  if (treesPerHectare.value !== null && treesPerHectare.value !== undefined) {
+    const newValue = Util.increaseItemBySpinButton(
+      treesPerHectare.value,
+      NUM_INPUT_LIMITS.TPH_MAX,
+      NUM_INPUT_LIMITS.TPH_MIN,
+      NUM_INPUT_LIMITS.TPH_STEP,
+    )
+    treesPerHectare.value = newValue.toFixed(NUM_INPUT_LIMITS.TPH_DECIMAL_NUM)
+  }
+}
+
+const decrementTPH = () => {
+  if (treesPerHectare.value !== null && treesPerHectare.value !== undefined) {
+    let newValue = Util.decrementItemBySpinButton(
+      treesPerHectare.value,
+      NUM_INPUT_LIMITS.TPH_MAX,
+      NUM_INPUT_LIMITS.TPH_MIN,
+      NUM_INPUT_LIMITS.TPH_STEP,
+    )
+    treesPerHectare.value = newValue.toFixed(NUM_INPUT_LIMITS.TPH_DECIMAL_NUM)
+  }
+}
+
+// Methods to handle continuous increment/decrement for Basal Area
+const startIncrementBasalArea = () => {
+  incrementBasalArea()
+  basalAreaIncrementInterval = window.setInterval(
+    incrementBasalArea,
+    CONTINUOUS_INC_DEC.INTERVAL,
+  )
+}
+
+const stopIncrementBasalArea = () => {
+  if (basalAreaIncrementInterval !== null) {
+    clearInterval(basalAreaIncrementInterval)
+    basalAreaIncrementInterval = null
+  }
+}
+
+const startDecrementBasalArea = () => {
+  decrementBasalArea()
+  basalAreaDecrementInterval = window.setInterval(
+    decrementBasalArea,
+    CONTINUOUS_INC_DEC.INTERVAL,
+  )
+}
+
+const stopDecrementBasalArea = () => {
+  if (basalAreaDecrementInterval !== null) {
+    clearInterval(basalAreaDecrementInterval)
+    basalAreaDecrementInterval = null
+  }
+}
+
+// Methods to handle continuous increment/decrement for TPH
+const startIncrementTPH = () => {
+  incrementTPH()
+  tphIncrementInterval = window.setInterval(
+    incrementTPH,
+    CONTINUOUS_INC_DEC.INTERVAL,
+  )
+}
+
+const stopIncrementTPH = () => {
+  if (tphIncrementInterval !== null) {
+    clearInterval(tphIncrementInterval)
+    tphIncrementInterval = null
+  }
+}
+
+const startDecrementTPH = () => {
+  decrementTPH()
+  tphDecrementInterval = window.setInterval(
+    decrementTPH,
+    CONTINUOUS_INC_DEC.INTERVAL,
+  )
+}
+
+const stopDecrementTPH = () => {
+  if (tphDecrementInterval !== null) {
+    clearInterval(tphDecrementInterval)
+    tphDecrementInterval = null
+  }
+}
+
+const validateRange = (): boolean => {
+  if (!standDensityValidator.validateBasalAreaRange(basalArea.value)) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.DENSITY_VLD_BSL_AREA_RNG,
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    !standDensityValidator.validateTreesPerHectareRange(treesPerHectare.value)
+  ) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.DENSITY_VLD_TPH_RNG,
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (
+    !standDensityValidator.validatePercentCrownClosureRange(
+      percentCrownClosure.value,
+    )
+  ) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.DENSITY_VLD_PCC_RNG,
+      { width: 400 },
+    )
+    return false
+  }
+
   return true
 }
 
-const validatePercentCrownClosure = (value: any) => {
-  if (value === null || value === '') {
-    return true
+const validateFormInputs = async (): Promise<boolean> => {
+  if (!validateRange()) {
+    return false
   }
-  if (value < 0 || value > 100) {
-    return 'Please enter a value between 0 and 100'
+
+  if (
+    !standDensityValidator.validateBALimits(
+      selectedSiteSpecies.value,
+      becZone.value,
+      basalArea.value,
+      height.value,
+    )
+  ) {
+    const userResponse = confirmDialogStore.openDialog(
+      MSG_DIALOG_TITLE.CONFIRM,
+      MDL_PRM_INPUT_ERR.DENSITY_VLD_BSL_AREA_OVER_HEIGHT,
+    )
+
+    if (!userResponse) {
+      return false
+    }
   }
+
+  const validateTPHmessage = standDensityValidator.validateTPHLimits(
+    basalArea.value,
+    treesPerHectare.value,
+    height.value,
+    selectedSiteSpecies.value,
+    becZone.value,
+  )
+  if (validateTPHmessage) {
+    const userResponse = await confirmDialogStore.openDialog(
+      MSG_DIALOG_TITLE.CONFIRM,
+      validateTPHmessage,
+    )
+
+    if (!userResponse) {
+      return false
+    }
+  }
+
+  const validateQuadDiamMessage = standDensityValidator.validateQuadDiameter(
+    basalArea.value,
+    treesPerHectare.value,
+    minimumDBHLimit.value,
+  )
+  if (validateQuadDiamMessage) {
+    const userResponse = await confirmDialogStore.openDialog(
+      MSG_DIALOG_TITLE.CONFIRM,
+      validateQuadDiamMessage,
+    )
+
+    if (!userResponse) {
+      return false
+    }
+  }
+
   return true
 }
 
-const validateMinimum = (value: any) => {
-  if (value === null || value === '') {
-    return true
+const formattingValues = (): void => {
+  if (basalArea.value) {
+    basalArea.value = parseFloat(basalArea.value).toFixed(
+      NUM_INPUT_LIMITS.BASAL_AREA_DECIMAL_NUM,
+    )
   }
-  if (value < 0) {
-    return 'Please enter a value greater than 0'
+
+  if (treesPerHectare.value) {
+    treesPerHectare.value = parseFloat(treesPerHectare.value).toFixed(
+      NUM_INPUT_LIMITS.TPH_DECIMAL_NUM,
+    )
   }
-  return true
 }
 
-const percentStockableAreaError = computed(() => {
-  const error = validatePercentStockableArea(percentStockableArea.value)
-  return error === true ? [] : [error]
-})
+const onConfirm = async () => {
+  const isFormValid = await validateFormInputs()
 
-const percentCrownClosureError = computed(() => {
-  const error = validatePercentCrownClosure(percentCrownClosure.value)
-  return error === true ? [] : [error]
-})
+  if (!isFormValid) {
+    return
+  }
 
-const basalAreaError = computed(() => {
-  const error = validateMinimum(basalArea.value)
-  return error === true ? [] : [error]
-})
+  if (form.value) {
+    form.value.validate()
+  }
 
-const treesPerHectareError = computed(() => {
-  const error = validateMinimum(treesPerHectare.value)
-  return error === true ? [] : [error]
-})
+  formattingValues()
 
-const clear = () => {}
-const confirm = () => {}
+  // this panel is not in a confirmed state
+  if (!isConfirmed.value) {
+    modelParameterStore.confirmPanel(panelName)
+  }
+}
+
+const onEdit = () => {
+  // this panel has already been confirmed.
+  if (isConfirmed.value) {
+    modelParameterStore.editPanel(panelName)
+  }
+}
+
+const clear = () => {
+  if (form.value) {
+    form.value.reset()
+  }
+  minimumDBHLimit.value = DEFAULT_VALUES.MINIMUM_DBH_LIMIT
+  percentCrownClosure.value = DEFAULT_VALUES.PERCENT_CROWN_CLOSURE
+}
 </script>
 
 <style scoped></style>
