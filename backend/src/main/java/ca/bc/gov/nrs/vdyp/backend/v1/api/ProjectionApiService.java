@@ -25,13 +25,13 @@ public class ProjectionApiService {
 
 	public Response projectionDcsvPost(
 			@Valid ProjectionDcsvPostRequest projectionDcsvPostRequest, SecurityContext securityContext
-	) throws NotFoundException {
+	) {
 		return Response.serverError().entity("Not supported").build();
 	}
 
 	public Response projectionHcsvPost(
 			@Valid ProjectionHcsvPostRequest projectionHcsvPostRequest, SecurityContext securityContext
-	) throws NotFoundException {
+	) {
 		try {
 			logger.info("<projectionHcsvPost");
 
@@ -73,7 +73,7 @@ public class ProjectionApiService {
 
 	public Response projectionScsvPost(
 			@Valid ProjectionScsvPostRequest projectionScsvPostRequest, SecurityContext securityContext
-	) throws NotFoundException {
+	) {
 		return Response.serverError().entity("Not supported").build();
 	}
 

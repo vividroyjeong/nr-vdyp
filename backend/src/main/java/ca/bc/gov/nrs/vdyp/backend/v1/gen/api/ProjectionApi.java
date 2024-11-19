@@ -65,7 +65,7 @@ public class ProjectionApi {
 	public Response projectionDcsvPost(@ApiParam(value = "") @Valid ProjectionDcsvPostRequest projectionDcsvPostRequest
 	/* , @Context SecurityContext securityContext */
 
-	) throws NotFoundException {
+	) {
 		return delegate.projectionDcsvPost(projectionDcsvPostRequest, null /* securityContext */);
 	}
 
@@ -90,7 +90,7 @@ public class ProjectionApi {
 			//
 			@ApiParam(value = "") @Valid ProjectionHcsvPostRequest projectionHcsvPostRequest //
 	// , @Context SecurityContext securityContext
-	) throws NotFoundException {
+	) {
 		return delegate.projectionHcsvPost(projectionHcsvPostRequest, null /* securityContext */);
 	}
 
@@ -115,7 +115,7 @@ public class ProjectionApi {
 			//
 			@ApiParam(value = "") @Valid ProjectionScsvPostRequest projectionScsvPostRequest //
 	// , @Context SecurityContext securityContext
-	) throws NotFoundException {
+	) {
 		return delegate.projectionScsvPost(projectionScsvPostRequest, null /* securityContext */);
 	}
 }
