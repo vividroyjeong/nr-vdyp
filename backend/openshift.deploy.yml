@@ -23,6 +23,9 @@ parameters:
     value: "75m"
   - name: MEMORY_LIMIT
     value: "150Mi"
+  - name: "LISTEN_PORT"
+    description: "Port to listen on"
+    value: 8080
   - name: MIN_REPLICAS
     description: The minimum amount of replicas for the horizontal pod autoscaler.
     value: "3"
@@ -107,7 +110,7 @@ objects:
                       key: database-user
 
               ports:
-                - containerPort: 3000
+                - containerPort: "${LISTEN_PORT}"
                   protocol: TCP
               resources:
                 requests:
@@ -119,7 +122,7 @@ objects:
               readinessProbe:
                 httpGet:
                   path: /
-                  port: 3000
+                  port: ${LISTEN_PORT}
                   scheme: HTTP
                 initialDelaySeconds: 5
                 periodSeconds: 2
@@ -131,7 +134,7 @@ objects:
                 failureThreshold: 3
                 httpGet:
                   path: /
-                  port: 3000
+                  port: ${LISTEN_PORT}
                   scheme: HTTP
                 initialDelaySeconds: 60
                 periodSeconds: 30
@@ -145,10 +148,10 @@ objects:
       name: "${NAME}-${ZONE}-${COMPONENT}"
     spec:
       ports:
-        - name: 3000-tcp
+        - name: ${LISTEN_PORT}-tcp
           protocol: TCP
           port: 80
-          targetPort: 3000
+          targetPort: ${LISTEN_PORT}
       selector:
         deploymentconfig: "${NAME}-${ZONE}-${COMPONENT}"
   - apiVersion: route.openshift.io/v1
@@ -160,7 +163,7 @@ objects:
     spec:
       host: "${NAME}-${ZONE}-${COMPONENT}.${DOMAIN}"
       port:
-        targetPort: 3000-tcp
+        targetPort: ${LISTEN_PORT}-tcp
       to:
         kind: Service
         name: "${NAME}-${ZONE}-${COMPONENT}"
