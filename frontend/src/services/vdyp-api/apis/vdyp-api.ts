@@ -367,7 +367,7 @@ export const DefaultApiFp = function (configuration?: Configuration) {
       body?: ProjectionHcsvBody,
       options?: AxiosRequestConfig,
     ): Promise<
-      (axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<void>>
+      (axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Blob>>
     > {
       const localVarAxiosArgs = await DefaultApiAxiosParamCreator(
         configuration,
@@ -461,7 +461,7 @@ export const DefaultApiFactory = function (
     async projectionHcsvPost(
       body?: ProjectionHcsvBody,
       options?: AxiosRequestConfig,
-    ): Promise<AxiosResponse<void>> {
+    ): Promise<AxiosResponse<Blob>> {
       return DefaultApiFp(configuration)
         .projectionHcsvPost(body, options)
         .then((request) => request(axios, basePath))
@@ -532,7 +532,7 @@ export class DefaultApi extends BaseAPI {
   public async projectionHcsvPost(
     body?: ProjectionHcsvBody,
     options?: AxiosRequestConfig,
-  ): Promise<AxiosResponse<void>> {
+  ): Promise<AxiosResponse<Blob>> {
     return DefaultApiFp(this.configuration)
       .projectionHcsvPost(body, options)
       .then((request) => request(this.axios, this.basePath))
