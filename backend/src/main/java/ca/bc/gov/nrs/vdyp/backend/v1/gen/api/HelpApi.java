@@ -1,12 +1,13 @@
 package ca.bc.gov.nrs.vdyp.backend.v1.gen.api;
 
+import java.util.List;
+
 import ca.bc.gov.nrs.vdyp.backend.v1.api.HelpApiService;
 import ca.bc.gov.nrs.vdyp.backend.v1.api.NotFoundException;
 import ca.bc.gov.nrs.vdyp.backend.v1.api.factories.HelpApiServiceFactory;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ParameterDetailsMessage;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Response;
 
 @Path("/v1/help")
 
@@ -54,7 +55,8 @@ public class HelpApi {
 					code = 200, message = "OK", response = ParameterDetailsMessage.class, responseContainer = "List"
 			) }
 	)
-	public Response helpGet(/* @Context SecurityContext securityContext */) throws NotFoundException {
+	public List<ParameterDetailsMessage> helpGet(/* @Context SecurityContext securityContext */)
+			throws NotFoundException {
 		return delegate.helpGet(null /* securityContext */);
 	}
 }

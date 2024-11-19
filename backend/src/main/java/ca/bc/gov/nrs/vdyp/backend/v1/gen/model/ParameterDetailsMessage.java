@@ -12,6 +12,7 @@
 
 package ca.bc.gov.nrs.vdyp.backend.v1.gen.model;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -30,7 +31,10 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @jakarta.annotation.Generated(
 		value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2024-11-12T09:52:55.097945-08:00[America/Vancouver]", comments = "Generator version: 7.9.0"
 )
-public class ParameterDetailsMessage {
+public class ParameterDetailsMessage implements Serializable {
+
+	private static final long serialVersionUID = -4514646435523721853L;
+
 	public static final String JSON_PROPERTY_FIELD = "field";
 	@JsonProperty(JSON_PROPERTY_FIELD)
 	private String field;
@@ -77,7 +81,7 @@ public class ParameterDetailsMessage {
 	}
 
 	/**
-	 * a brief description of the parameter&#39;s purpose
+	 * a brief description of the parameter's purpose
 	 *
 	 * @return shortDescription
 	 **/
