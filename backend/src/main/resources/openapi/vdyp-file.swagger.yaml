@@ -13,6 +13,14 @@ security:
       - read
       - write
 paths:
+  /:
+    get:
+      summary: 'Return the top level resource of this service'
+      description: >-
+        Returns the top level resource of the service, including links to all other top level resources.
+      responses:
+        200:
+          description: OK
   /projection/dcsv:
     post:
       summary: 'Project the growth of one or more polygons to a given year.'
@@ -35,7 +43,9 @@ paths:
         '201':
           description: OK
           content:
-            multipart/form-data: {}
+            multipart/form-data:
+              schema:
+                $ref: '#/components/schemas/projectionResponse'
         '400':
           description: 'Client Error. Response content is a list of one or more messages describing the error.'
           content:
@@ -69,7 +79,9 @@ paths:
         '200':
           description: OK
           content:
-            multipart/form-data: {}
+            multipart/form-data:
+              schema:
+                $ref: '#/components/schemas/projectionResponse'
         '400':
           description: 'Client Error. Response content is a list of one or more messages describing the error.'
           content:
@@ -127,7 +139,9 @@ paths:
         '200':
           description: OK
           content:
-            multipart/form-data: {}
+            multipart/form-data:
+              schema:
+                $ref: '#/components/schemas/projectionResponse'
         '400':
           description: 'Client Error. Response content is a list of one or more messages describing the error.'
           content:
@@ -146,6 +160,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/parameterDetailsMessage'       
+
 components:
   schemas:
     parameters:
@@ -160,25 +175,34 @@ components:
             - DCSV
         selectedExecutionOptions:
           $ref: '#/components/schemas/executionOptions'
+        doEnableProgressLogging: 
+          description: 'Progress logging is enabled iff this value is true. If false, progressMessages in the response will be empty.'
+          type: boolean
+        doEnableErrorLogging: 
+          description: 'Error logging is enabled iff this value is true. If false, errorMessages in the response will be empty.'
+          type: boolean
+        doEnableDebugLogging: 
+          description: 'Debug logging is enabled iff this value is true. If false, debugMessages in the response will be empty.'
+          type: boolean
         selectedDebugOptions:
           $ref: '#/components/schemas/debugOptions'
         ageStart:
           description: 'The starting age value for the Age Range for generated yield tables.'
           type: integer
         minAgeStart:
-          description: 'The minimum value ageStart may have.'
+          description: 'The minimum value for ageStart.'
           type: integer
         maxAgeStart:
-          description: 'The maximum value ageStart may have.'
+          description: 'The maximum value for ageStart.'
           type: integer
         ageEnd:
           description: 'The ending age value for the Age Range for generated yield tables.'
           type: integer
         minAgeEnd:
-          description: 'The minimum value ageEnd may have.'
+          description: 'The minimum value for ageEnd.'
           type: integer
         maxAgeEnd:
-          description: 'The maximum value ageEnd may have.'
+          description: 'The maximum value for ageEnd.'
           type: integer
         yearStart:
           description: 'The starting year for the Year Range for generated yield tables.'
@@ -193,10 +217,10 @@ components:
           description: 'The number of years to increment the current value for the Age and Year ranges.'
           type: integer
         minAgeIncrement:
-          description: 'The minimum value ageIncrement may have.'
+          description: 'The minimum value for ageIncrement.'
           type: integer
         maxAgeIncrement:
-          description: 'The maximum value ageIncrement may have.'
+          description: 'The maximum value for ageIncrement.'
           type: integer
         combineAgeYearRange:
           description: 'Determines how the Age Range and Year Range are to be combined when producing yield tables.'
@@ -258,8 +282,8 @@ components:
           - doSummarizeProjectionByPolygon
           - doSummarizeProjectionByLayer
           - doIncludeSpeciesProjection
-          - doIncludeProjectedMoFVolumes
-          - doIncludeProjectedMoFBiomass
+          - doIncludeProjectedMOFVolumes
+          - doIncludeProjectedMOFBiomass
           - doIncludeProjectedCFSBiomass
           - doIncludeColumnHeadersInYieldTable
           - doAllowBasalAreaAndTreesPerHectareValueSubstitution
@@ -282,10 +306,10 @@ components:
           description: only those polygons with the specified mapsheet will be considered for inclusion in the output
           type: string
         polygon: 
-          description: only the polygon with the specified polygon number will be considered for inclusion in the output
+          description: only those polygons with the specified polygon number will be considered for inclusion in the output
           type: string
         polygonId: 
-          description: only the polygon with the specified polygon id will be considered for inclusion in the output
+          description: only those polygons with the specified polygon id will be considered for inclusion in the output
           type: string
     projectionResponse:
       type: object
@@ -293,10 +317,10 @@ components:
         yieldTable: 
           type: string
           format: binary
-        messages:
+        errorMessages:
           type: string
           format: binary
-        logMessages:
+        progressMessages:
           type: string
           format: binary
         debugMessages:
