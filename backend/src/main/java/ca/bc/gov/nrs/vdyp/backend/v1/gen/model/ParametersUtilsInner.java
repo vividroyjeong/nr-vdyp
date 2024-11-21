@@ -19,6 +19,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
 /**
  * ParametersUtilsInner
  */
@@ -26,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @jakarta.annotation.Generated(
 		value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2024-11-12T09:52:55.097945-08:00[America/Vancouver]", comments = "Generator version: 7.9.0"
 )
+@RegisterForReflection
 public class ParametersUtilsInner {
 	public static final String JSON_PROPERTY_SPECIES_NAME = "speciesName";
 	@JsonProperty(JSON_PROPERTY_SPECIES_NAME)

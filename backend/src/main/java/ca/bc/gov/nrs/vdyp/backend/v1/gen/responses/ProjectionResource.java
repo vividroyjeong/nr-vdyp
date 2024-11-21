@@ -10,25 +10,38 @@
  * Do not edit the class manually.
  */
 
-package ca.bc.gov.nrs.vdyp.backend.v1.gen.model;
+package ca.bc.gov.nrs.vdyp.backend.v1.gen.responses;
 
 import java.io.File;
 import java.util.Objects;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+
+import io.quarkus.runtime.annotations.RegisterForReflection;
 
 /**
  * ProjectionResponse
  */
 @JsonPropertyOrder(
-	{ ProjectionResponse.JSON_PROPERTY_YIELD_TABLE, ProjectionResponse.JSON_PROPERTY_MESSAGES,
-			ProjectionResponse.JSON_PROPERTY_LOG_MESSAGES, ProjectionResponse.JSON_PROPERTY_DEBUG_MESSAGES }
+	{ //
+			ProjectionResource.JSON_PROPERTY_LINKS, //
+			ProjectionResource.JSON_PROPERTY_YIELD_TABLE, //
+			ProjectionResource.JSON_PROPERTY_MESSAGES, //
+			ProjectionResource.JSON_PROPERTY_LOG_MESSAGES, //
+			ProjectionResource.JSON_PROPERTY_DEBUG_MESSAGES //
+	}
 )
-@jakarta.annotation.Generated(
-		value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2024-11-12T09:52:55.097945-08:00[America/Vancouver]", comments = "Generator version: 7.9.0"
+@RegisterForReflection
+@JsonSubTypes({ @Type(value = RootResource.class, name = ResourceTypes.PROJECTION_RESOURCE) })
+@JsonTypeInfo(
+		use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type", defaultImpl = ProjectionResource.class
 )
-public class ProjectionResponse {
+public class ProjectionResource extends VdypApiResource {
 	public static final String JSON_PROPERTY_YIELD_TABLE = "yieldTable";
 	@JsonProperty(JSON_PROPERTY_YIELD_TABLE)
 	private File yieldTable;
@@ -45,7 +58,18 @@ public class ProjectionResponse {
 	@JsonProperty(JSON_PROPERTY_DEBUG_MESSAGES)
 	private File debugMessages;
 
-	public ProjectionResponse yieldTable(File yieldTable) {
+	private ProjectionResource() {
+		super(Set.of());
+	}
+
+	public static ProjectionResource of(File yieldTable, File messages, File logMessages, File debugMessages) {
+		return new ProjectionResource().yieldTable(yieldTable) //
+				.messages(messages) //
+				.logMessages(logMessages) //
+				.debugMessages(debugMessages);
+	}
+
+	public ProjectionResource yieldTable(File yieldTable) {
 		this.yieldTable = yieldTable;
 		return this;
 	}
@@ -65,7 +89,7 @@ public class ProjectionResponse {
 		this.yieldTable = yieldTable;
 	}
 
-	public ProjectionResponse messages(File messages) {
+	public ProjectionResource messages(File messages) {
 		this.messages = messages;
 		return this;
 	}
@@ -85,7 +109,7 @@ public class ProjectionResponse {
 		this.messages = messages;
 	}
 
-	public ProjectionResponse logMessages(File logMessages) {
+	public ProjectionResource logMessages(File logMessages) {
 		this.logMessages = logMessages;
 		return this;
 	}
@@ -105,7 +129,7 @@ public class ProjectionResponse {
 		this.logMessages = logMessages;
 	}
 
-	public ProjectionResponse debugMessages(File debugMessages) {
+	public ProjectionResource debugMessages(File debugMessages) {
 		this.debugMessages = debugMessages;
 		return this;
 	}
@@ -133,7 +157,7 @@ public class ProjectionResponse {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		ProjectionResponse projectionResponse = (ProjectionResponse) o;
+		ProjectionResource projectionResponse = (ProjectionResource) o;
 		return Objects.equals(this.yieldTable, projectionResponse.yieldTable)
 				&& Objects.equals(this.messages, projectionResponse.messages)
 				&& Objects.equals(this.logMessages, projectionResponse.logMessages)
