@@ -35,9 +35,7 @@ paths:
         '201':
           description: OK
           content:
-            application/octet-stream:
-              schema:
-                $ref: '#/components/schemas/projectionResponse'
+            multipart/form-data: {}
         '400':
           description: 'Client Error. Response content is a list of one or more messages describing the error.'
           content:
@@ -71,9 +69,7 @@ paths:
         '200':
           description: OK
           content:
-            multipart/form-data:
-              schema:
-                $ref: '#/components/schemas/projectionResponse'
+            multipart/form-data: {}
         '400':
           description: 'Client Error. Response content is a list of one or more messages describing the error.'
           content:
@@ -131,9 +127,7 @@ paths:
         '200':
           description: OK
           content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/projectionResponse'
+            multipart/form-data: {}
         '400':
           description: 'Client Error. Response content is a list of one or more messages describing the error.'
           content:
