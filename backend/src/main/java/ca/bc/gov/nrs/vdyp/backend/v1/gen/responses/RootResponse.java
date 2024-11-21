@@ -40,9 +40,9 @@ public class RootResponse extends VdypApiResponse {
 				Set.of(
 						Link.getSelfLink(RootResourceApi.class, uriInfo), //
 						Link.getLink(HelpResourceApi.class, uriInfo, "GET"), //
-						Link.getLink(ProjectionResourceApi.class, "hcsv", uriInfo, "GET"), //
-						Link.getLink(ProjectionResourceApi.class, "scsv", uriInfo, "GET"), //
-						Link.getLink(ProjectionResourceApi.class, "dcsv", uriInfo, "GET") //
+						Link.getLink(ProjectionResourceApi.class, "hcsv", uriInfo, "POST"), //
+						Link.getLink(ProjectionResourceApi.class, "scsv", uriInfo, "POST"), //
+						Link.getLink(ProjectionResourceApi.class, "dcsv", uriInfo, "POST") //
 				)
 		);
 	}
