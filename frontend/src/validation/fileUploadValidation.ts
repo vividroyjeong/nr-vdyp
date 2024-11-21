@@ -1,7 +1,18 @@
 import { ValidationBase } from './validationBase'
 import { NUM_INPUT_LIMITS } from '@/constants/constants'
+import Papa from 'papaparse'
 
 export class FileUploadValidation extends ValidationBase {
+  validateRequiredFields(
+    startingAge: number | null,
+    finishingAge: number | null,
+    ageIncrement: number | null,
+  ): boolean {
+    return (
+      startingAge !== null && finishingAge !== null && ageIncrement !== null
+    )
+  }
+
   validateAgeComparison(
     finishingAge: number | null,
     startingAge: number | null,
@@ -40,5 +51,16 @@ export class FileUploadValidation extends ValidationBase {
       )
     }
     return true
+  }
+
+  async isCSVFile(file: File): Promise<boolean> {
+    return new Promise((resolve) => {
+      Papa.parse(file, {
+        complete: (results: any) => {
+          resolve(results.errors.length === 0)
+        },
+        error: () => resolve(false),
+      })
+    })
   }
 }

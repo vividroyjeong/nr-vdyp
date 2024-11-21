@@ -121,3 +121,15 @@ export const MDL_PRM_INPUT_ERR = Object.freeze({
   RPT_VLD_AGE_INC_RNG: (ageIncMin: number, ageIncMax: number) =>
     `'Age Increment' must range from ${ageIncMin} and ${ageIncMax}`,
 })
+
+export const FILE_UPLOAD_ERR = Object.freeze({
+  LAYER_FILE_MISSING: 'Layer file is missing. Please upload the required file.',
+  POLYGON_FILE_MISSING:
+    'Polygon file is missing. Please upload the required file.',
+  LAYER_FILE_NOT_CSV_FORMAT:
+    'The uploaded Layer file is not in CSV format. Please upload a valid CSV file.',
+  POLYGON_FILE_NOT_CSV_FORMAT:
+    'The uploaded Polygon file is not in CSV format. Please upload a valid CSV file.',
+  RPT_VLD_REQUIRED_FIELDS:
+    'All required fields (Starting Age, Finishing Age, Age Increment) must be filled.',
+})
