@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import ca.bc.gov.nrs.api.helpers.TestHelper;
-import ca.bc.gov.nrs.vdyp.backend.v1.model.ParameterDetailsMessageBuilder;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import net.datafaker.Faker;
@@ -30,14 +29,14 @@ class HelpEndpointTest {
 	@Test
 	void testGetHelp_shouldReturnStatusOK() {
 
-		given().basePath("/v1").when().get("/help").then().statusCode(200).and().contentType("application/json").and()
+		given().basePath("/v8").when().get("/help").then().statusCode(200).and().contentType("application/json").and()
 				.body(Matchers.containsString("outputFormat"), Matchers.containsString("Output Data Format"));
 	}
 
 //   @Test
 //   void testGetUserById_givenValidID_shouldReturnTheUserAndStatusOK() {
-//     given()
-//       .basePath("/api/v1")
+//     given()r
+//       .basePath("/api/v8")
 //       .pathParam("id", userEntity.getId())
 //       .when().get("/users/{id}")
 //       .then()
@@ -49,7 +48,7 @@ class HelpEndpointTest {
 //   @Test
 //   void testGetUserById_givenRandomID_shouldReturnTheUserAndStatusOK() {
 //     given()
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .pathParam("id", 20000)
 //       .when().get("/users/{id}")
 //       .then()
@@ -62,7 +61,7 @@ class HelpEndpointTest {
 //     var email = faker.internet().emailAddress();
 //     User user = new User(null, name, email);
 //     given()
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .contentType(ContentType.JSON)
 //       .body(user)
 //       .when().post("/users")
@@ -78,7 +77,7 @@ class HelpEndpointTest {
 //     var email = faker.internet().domainName();
 //     User user = new User(null, name, email);
 //     given()
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .contentType(ContentType.JSON)
 //       .body(user)
 //       .when().post("/users")
@@ -92,7 +91,7 @@ class HelpEndpointTest {
 //     var email = faker.internet().emailAddress();
 //     User user = new User(userEntity.getId(), name, email);
 //     given()
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .contentType(ContentType.JSON)
 //       .pathParam("id", userEntity.getId())
 //       .body(user)
@@ -106,7 +105,7 @@ class HelpEndpointTest {
 //   @Test
 //   void testDeleteUser_givenValidID_shouldReturnStatusNoContent() {
 //     given()
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .pathParam("id", userEntity.getId())
 //       .when().delete("/users/{id}")
 //       .then()
@@ -116,7 +115,7 @@ class HelpEndpointTest {
 //   @Test
 //   void testDeleteUser_givenInvalidID_shouldReturnStatusNotFound() {
 //     given()
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .pathParam("id", 100003330)
 //       .when().delete("/users/{id}")
 //       .then()
@@ -126,7 +125,7 @@ class HelpEndpointTest {
 //   @Test
 //   void testGetUserAddresses_noCondition_shouldReturnAllUsersAddressesAndStatusOK() {
 //     given()
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .pathParam("id", userEntity.getId())
 //       .when().get("/users/{id}/addresses")
 //       .then()
@@ -142,7 +141,7 @@ class HelpEndpointTest {
 //     var zipCode= faker.address().zipCode();
 //     UserAddress userAddress = new UserAddress(null, street, city, state, zipCode, userEntity.getId());
 //     given()
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .contentType(ContentType.JSON)
 //       .pathParam("id", userEntity.getId())
 //       .body(userAddress)
@@ -163,7 +162,7 @@ class HelpEndpointTest {
 //     var zipCode= faker.address().zipCode();
 //     UserAddress userAddress = new UserAddress(addressEntity.getId(), street, city, state, zipCode, userEntity.getId());
 //     given()
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .contentType(ContentType.JSON)
 //       .pathParam("id", userEntity.getId())
 //       .pathParam("addressId", addressEntity.getId())
@@ -180,7 +179,7 @@ class HelpEndpointTest {
 //   @Test
 //   void testDeleteUserAddress_givenValidPayload_shouldDeleteTheUserAddressAndReturnStatusNoContent() {
 //     given()
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .pathParam("id", userEntity.getId())
 //       .pathParam("addressId", addressEntity.getId())
 //       .when().delete("/users/{id}/addresses/{addressId}")

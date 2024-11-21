@@ -1,49 +1,28 @@
 package ca.bc.gov.nrs.vdyp.backend.v1.gen.api;
 
-import ca.bc.gov.nrs.vdyp.backend.v1.api.NotFoundException;
 import ca.bc.gov.nrs.vdyp.backend.v1.api.ProjectionApiService;
-import ca.bc.gov.nrs.vdyp.backend.v1.api.factories.ProjectionApiServiceFactory;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.MessagesInner;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ProjectionDcsvPostRequest;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ProjectionHcsvPostRequest;
-import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ProjectionResponse;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ProjectionScsvPostRequest;
+import ca.bc.gov.nrs.vdyp.backend.v1.gen.responses.ProjectionResponse;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Response;
 
-@Path("/v1/projection")
-
+@Path("/v8/projection")
 @io.swagger.annotations.Api(description = "the projection API")
 @jakarta.annotation.Generated(
 		value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2024-11-12T09:52:55.097945-08:00[America/Vancouver]", comments = "Generator version: 7.9.0"
 )
-public class ProjectionApi {
-	private final ProjectionApiService delegate;
+public class ProjectionResourceApi implements ResourceApi {
 
-	public ProjectionApi(/* @Context ServletConfig servletContext */) {
-		ProjectionApiService delegate = null;
-
-//		if (servletContext != null) {
-//			String implClass = servletContext.getInitParameter("ProjectionApi.implementation");
-//			if (implClass != null && !"".equals(implClass.trim())) {
-//				try {
-//					delegate = (ProjectionApiService) Class.forName(implClass).getDeclaredConstructor().newInstance();
-//				} catch (Exception e) {
-//					throw new RuntimeException(e);
-//				}
-//			}
-//		}
-
-		if (delegate == null) {
-			delegate = ProjectionApiServiceFactory.getProjectionApi();
-		}
-
-		this.delegate = delegate;
-	}
+	@Inject
+	private ProjectionApiService projectionService;
 
 	@jakarta.ws.rs.POST
 	@Path("/dcsv")
@@ -66,7 +45,7 @@ public class ProjectionApi {
 	/* , @Context SecurityContext securityContext */
 
 	) {
-		return delegate.projectionDcsvPost(projectionDcsvPostRequest, null /* securityContext */);
+		return projectionService.projectionDcsvPost(projectionDcsvPostRequest, null /* securityContext */);
 	}
 
 	@jakarta.ws.rs.POST
@@ -91,7 +70,7 @@ public class ProjectionApi {
 			@ApiParam(value = "") @Valid ProjectionHcsvPostRequest projectionHcsvPostRequest //
 	// , @Context SecurityContext securityContext
 	) {
-		return delegate.projectionHcsvPost(projectionHcsvPostRequest, null /* securityContext */);
+		return projectionService.projectionHcsvPost(projectionHcsvPostRequest, null /* securityContext */);
 	}
 
 	@jakarta.ws.rs.POST
@@ -116,6 +95,11 @@ public class ProjectionApi {
 			@ApiParam(value = "") @Valid ProjectionScsvPostRequest projectionScsvPostRequest //
 	// , @Context SecurityContext securityContext
 	) {
-		return delegate.projectionScsvPost(projectionScsvPostRequest, null /* securityContext */);
+		return projectionService.projectionScsvPost(projectionScsvPostRequest, null /* securityContext */);
+	}
+
+	@Override
+	public String getPath() {
+		return "/v8/help";
 	}
 }

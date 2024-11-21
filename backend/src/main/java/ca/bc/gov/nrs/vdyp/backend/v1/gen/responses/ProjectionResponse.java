@@ -10,10 +10,11 @@
  * Do not edit the class manually.
  */
 
-package ca.bc.gov.nrs.vdyp.backend.v1.gen.model;
+package ca.bc.gov.nrs.vdyp.backend.v1.gen.responses;
 
 import java.io.File;
 import java.util.Objects;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -22,13 +23,18 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * ProjectionResponse
  */
 @JsonPropertyOrder(
-	{ ProjectionResponse.JSON_PROPERTY_YIELD_TABLE, ProjectionResponse.JSON_PROPERTY_MESSAGES,
-			ProjectionResponse.JSON_PROPERTY_LOG_MESSAGES, ProjectionResponse.JSON_PROPERTY_DEBUG_MESSAGES }
+	{ //
+			ProjectionResponse.JSON_PROPERTY_LINKS, //
+			ProjectionResponse.JSON_PROPERTY_YIELD_TABLE, //
+			ProjectionResponse.JSON_PROPERTY_MESSAGES, //
+			ProjectionResponse.JSON_PROPERTY_LOG_MESSAGES, //
+			ProjectionResponse.JSON_PROPERTY_DEBUG_MESSAGES //
+	}
 )
 @jakarta.annotation.Generated(
 		value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2024-11-12T09:52:55.097945-08:00[America/Vancouver]", comments = "Generator version: 7.9.0"
 )
-public class ProjectionResponse {
+public class ProjectionResponse extends VdypApiResponse {
 	public static final String JSON_PROPERTY_YIELD_TABLE = "yieldTable";
 	@JsonProperty(JSON_PROPERTY_YIELD_TABLE)
 	private File yieldTable;
@@ -44,6 +50,17 @@ public class ProjectionResponse {
 	public static final String JSON_PROPERTY_DEBUG_MESSAGES = "debugMessages";
 	@JsonProperty(JSON_PROPERTY_DEBUG_MESSAGES)
 	private File debugMessages;
+
+	private ProjectionResponse() {
+		super(Set.of());
+	}
+
+	public static ProjectionResponse of(File yieldTable, File messages, File logMessages, File debugMessages) {
+		return new ProjectionResponse().yieldTable(yieldTable) //
+				.messages(messages) //
+				.logMessages(logMessages) //
+				.debugMessages(debugMessages);
+	}
 
 	public ProjectionResponse yieldTable(File yieldTable) {
 		this.yieldTable = yieldTable;

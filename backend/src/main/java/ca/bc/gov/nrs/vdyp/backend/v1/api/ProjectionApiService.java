@@ -14,11 +14,17 @@ import org.slf4j.LoggerFactory;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ProjectionDcsvPostRequest;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ProjectionHcsvPostRequest;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ProjectionScsvPostRequest;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.SecurityContext;
 
+@ApplicationScoped
+/**
+ * Implements the projection endpoints. These methods return Responses rather than Response objects because these
+ * responses are not JSON objects and contain no links.
+ */
 public class ProjectionApiService {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProjectionApiService.class);
@@ -26,7 +32,7 @@ public class ProjectionApiService {
 	public Response projectionDcsvPost(
 			@Valid ProjectionDcsvPostRequest projectionDcsvPostRequest, SecurityContext securityContext
 	) {
-		return Response.serverError().entity("Not supported").build();
+		return Response.serverError().status(501).build();
 	}
 
 	public Response projectionHcsvPost(
@@ -34,6 +40,10 @@ public class ProjectionApiService {
 	) {
 		try {
 			logger.info("<projectionHcsvPost");
+
+			var projectionParameters = projectionHcsvPostRequest.getProjectionParameters();
+			var selectedDebugOptions = projectionParameters.getSelectedDebugOptions();
+			logger.info(selectedDebugOptions.toString());
 
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ZipOutputStream zipOut = new ZipOutputStream(baos);
@@ -67,14 +77,17 @@ public class ProjectionApiService {
 		} catch (IOException | URISyntaxException e) {
 			logger.error(">projectionHcsvPost failure of type {0}", e.getMessage());
 
-			return Response.serverError().entity("Unable to load canned output file(s)").build();
+			return Response.serverError().status(500)
+					.entity(
+							"Unable to load canned output file(s)" + e.getMessage() != null ? "; " + e.getMessage() : ""
+					).build();
 		}
 	}
 
 	public Response projectionScsvPost(
 			@Valid ProjectionScsvPostRequest projectionScsvPostRequest, SecurityContext securityContext
 	) {
-		return Response.serverError().entity("Not supported").build();
+		return Response.serverError().status(501).build();
 	}
 
 	private InputStream getResourceFile(String fileName) throws URISyntaxException {

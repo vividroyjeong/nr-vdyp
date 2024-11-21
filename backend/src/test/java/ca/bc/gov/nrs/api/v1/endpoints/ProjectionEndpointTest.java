@@ -40,12 +40,13 @@ class ProjectionEndpointTest {
 	@Test
 	void testProjectionHscv_shouldReturnStatusOK() throws IOException {
 
-        ProjectionHcsvPostRequest request = new ProjectionHcsvPostRequest();
-        request.setLayerInputData(buildTestFile());
-        request.setPolygonInputData(buildTestFile());
-        request.setProjectionParameters(new Parameters());
+		ProjectionHcsvPostRequest request = new ProjectionHcsvPostRequest();
+		request.setLayerInputData(buildTestFile());
+		request.setPolygonInputData(buildTestFile());
+		request.setProjectionParameters(new Parameters());
 
-		given().basePath("/v1").when().body(request).contentType("application/json").post("/projection/hcsv").then().statusCode(201).and().contentType("multipart/form-data").and()
+		given().basePath("/v8").when().body(request).contentType("application/json").post("/projection/hcsv").then()
+				.statusCode(201).and().contentType("multipart/form-data").and()
 				.header("content-disposition", Matchers.startsWith("attachment;filename=\"vdyp-output-"))
 				.body(Matchers.not(Matchers.empty()));
 	}
@@ -54,44 +55,44 @@ class ProjectionEndpointTest {
 	void testProjectionSscv_shouldThrow() throws IOException {
 
 		ProjectionScsvPostRequest request = new ProjectionScsvPostRequest();
-        request.setLayerInputData(buildTestFile());
-        request.setPolygonInputData(buildTestFile());
-        request.setProjectionParameters(new Parameters());
-        request.setHistoryInputData(buildTestFile());
-        request.setNonVegetationInputData(buildTestFile());
-        request.setOtherVegetationInputData(buildTestFile());
-        request.setPolygonIdInputData(buildTestFile());
-        request.setSpeciesInputData(buildTestFile());
-        request.setVriAdjustInputData(buildTestFile());
+		request.setLayerInputData(buildTestFile());
+		request.setPolygonInputData(buildTestFile());
+		request.setProjectionParameters(new Parameters());
+		request.setHistoryInputData(buildTestFile());
+		request.setNonVegetationInputData(buildTestFile());
+		request.setOtherVegetationInputData(buildTestFile());
+		request.setPolygonIdInputData(buildTestFile());
+		request.setSpeciesInputData(buildTestFile());
+		request.setVriAdjustInputData(buildTestFile());
 
-		given().basePath("/v1").when().body(request).contentType("application/json").post("/projection/scsv").then().statusCode(500)
-		.body(Matchers.containsString("Not supported"));
+		given().basePath("/v8").when().body(request).contentType("application/json").post("/projection/scsv").then()
+				.statusCode(500).body(Matchers.containsString("Not supported"));
 	}
-	
+
 	@Test
 	void testProjectionDscv_shouldThrow() throws IOException {
 
 		ProjectionDcsvPostRequest request = new ProjectionDcsvPostRequest();
-        request.setProjectionParameters(new Parameters());
-        request.setInputData(buildTestFile());
+		request.setProjectionParameters(new Parameters());
+		request.setInputData(buildTestFile());
 
-		given().basePath("/v1").when().body(request).contentType("application/json").post("/projection/dcsv").then().statusCode(500)
-		.body(Matchers.containsString("Not supported"));
+		given().basePath("/v8").when().body(request).contentType("application/json").post("/projection/dcsv").then()
+				.statusCode(500).body(Matchers.containsString("Not supported"));
 	}
 
 	private File buildTestFile() throws IOException {
-        Path tmpFile = Files.createTempFile("ProjectionEndpointTest", ".csv");
-        
-        OutputStream os = new ByteArrayOutputStream();
-        os.write("Test data".getBytes());
-        
-        return tmpFile.toFile();
-    }
+		Path tmpFile = Files.createTempFile("ProjectionEndpointTest", ".csv");
+
+		OutputStream os = new ByteArrayOutputStream();
+		os.write("Test data".getBytes());
+
+		return tmpFile.toFile();
+	}
 
 //   @Test
 //   void testGetUserById_givenValidID_shouldReturnTheUserAndStatusOK() {
 //     given()r
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .pathParam("id", userEntity.getId())
 //       .when().get("/users/{id}")
 //       .then()
@@ -103,7 +104,7 @@ class ProjectionEndpointTest {
 //   @Test
 //   void testGetUserById_givenRandomID_shouldReturnTheUserAndStatusOK() {
 //     given()
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .pathParam("id", 20000)
 //       .when().get("/users/{id}")
 //       .then()
@@ -116,7 +117,7 @@ class ProjectionEndpointTest {
 //     var email = faker.internet().emailAddress();
 //     User user = new User(null, name, email);
 //     given()
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .contentType(ContentType.JSON)
 //       .body(user)
 //       .when().post("/users")
@@ -132,7 +133,7 @@ class ProjectionEndpointTest {
 //     var email = faker.internet().domainName();
 //     User user = new User(null, name, email);
 //     given()
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .contentType(ContentType.JSON)
 //       .body(user)
 //       .when().post("/users")
@@ -146,7 +147,7 @@ class ProjectionEndpointTest {
 //     var email = faker.internet().emailAddress();
 //     User user = new User(userEntity.getId(), name, email);
 //     given()
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .contentType(ContentType.JSON)
 //       .pathParam("id", userEntity.getId())
 //       .body(user)
@@ -160,7 +161,7 @@ class ProjectionEndpointTest {
 //   @Test
 //   void testDeleteUser_givenValidID_shouldReturnStatusNoContent() {
 //     given()
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .pathParam("id", userEntity.getId())
 //       .when().delete("/users/{id}")
 //       .then()
@@ -170,7 +171,7 @@ class ProjectionEndpointTest {
 //   @Test
 //   void testDeleteUser_givenInvalidID_shouldReturnStatusNotFound() {
 //     given()
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .pathParam("id", 100003330)
 //       .when().delete("/users/{id}")
 //       .then()
@@ -180,7 +181,7 @@ class ProjectionEndpointTest {
 //   @Test
 //   void testGetUserAddresses_noCondition_shouldReturnAllUsersAddressesAndStatusOK() {
 //     given()
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .pathParam("id", userEntity.getId())
 //       .when().get("/users/{id}/addresses")
 //       .then()
@@ -196,7 +197,7 @@ class ProjectionEndpointTest {
 //     var zipCode= faker.address().zipCode();
 //     UserAddress userAddress = new UserAddress(null, street, city, state, zipCode, userEntity.getId());
 //     given()
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .contentType(ContentType.JSON)
 //       .pathParam("id", userEntity.getId())
 //       .body(userAddress)
@@ -217,7 +218,7 @@ class ProjectionEndpointTest {
 //     var zipCode= faker.address().zipCode();
 //     UserAddress userAddress = new UserAddress(addressEntity.getId(), street, city, state, zipCode, userEntity.getId());
 //     given()
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .contentType(ContentType.JSON)
 //       .pathParam("id", userEntity.getId())
 //       .pathParam("addressId", addressEntity.getId())
@@ -234,7 +235,7 @@ class ProjectionEndpointTest {
 //   @Test
 //   void testDeleteUserAddress_givenValidPayload_shouldDeleteTheUserAddressAndReturnStatusNoContent() {
 //     given()
-//       .basePath("/api/v1")
+//       .basePath("/api/v8")
 //       .pathParam("id", userEntity.getId())
 //       .pathParam("addressId", addressEntity.getId())
 //       .when().delete("/users/{id}/addresses/{addressId}")

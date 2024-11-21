@@ -7,14 +7,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ParameterDetailsMessage;
+import ca.bc.gov.nrs.vdyp.backend.v1.gen.responses.HelpResponse;
 import ca.bc.gov.nrs.vdyp.backend.v1.model.ParameterDetailsMessageBuilder;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.core.UriInfo;
 
+@ApplicationScoped
 public class HelpApiService {
 
 	private static final Logger logger = LoggerFactory.getLogger(HelpApiService.class);
 
-	public List<ParameterDetailsMessage> helpGet(SecurityContext securityContext) throws NotFoundException {
+	public HelpResponse helpGet(UriInfo uriInfo, SecurityContext securityContext) throws NotFoundException {
 
 		logger.info("<helpGet");
 
@@ -483,6 +487,8 @@ public class HelpApiService {
 				)
 		);
 
-		return messageList;
+		logger.info(">helpGet");
+
+		return HelpResponse.of(uriInfo, messageList);
 	}
 }
