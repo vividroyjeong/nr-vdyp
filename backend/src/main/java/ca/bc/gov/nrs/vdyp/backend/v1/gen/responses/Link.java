@@ -1,27 +1,32 @@
 package ca.bc.gov.nrs.vdyp.backend.v1.gen.responses;
 
-import ca.bc.gov.nrs.vdyp.backend.v1.gen.api.ResourceApi;
+import java.lang.reflect.Method;
+
+import ca.bc.gov.nrs.vdyp.backend.v1.gen.api.HelpEndpoint;
+import ca.bc.gov.nrs.vdyp.backend.v1.gen.api.ProjectionEndpoint;
+import io.quarkus.runtime.annotations.RegisterForReflection;
+import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
 
+@RegisterForReflection
 public record Link(String rel, String href, String method) {
 
-	public static Link getSelfLink(Class<? extends ResourceApi> clazz, UriInfo uriInfo) {
-		String rel = clazz.getName();
+	public static Link getSelfLink(UriInfo uriInfo) {
 		String href = uriInfo.getAbsolutePath().toString();
-		String method = "GET";
-		return new Link(rel, href, method);
+		return new Link("self", href, "GET");
 	}
 
-	public static Link getLink(Class<? extends ResourceApi> clazz, UriInfo uriInfo, String method) {
-		String rel = clazz.getName();
+	public static Link getLink(UriInfo uriInfo, String rel, String method, Class<HelpEndpoint> clazz) {
 		String href = UriBuilder.fromUri(uriInfo.getBaseUri()).path(clazz).build().toString();
 		return new Link(rel, href, method);
 	}
 
-	public static Link getLink(Class<? extends ResourceApi> clazz, String methodPath, UriInfo uriInfo, String method) {
-		String rel = clazz.getName() + "+" + methodPath;
-		String href = UriBuilder.fromUri(uriInfo.getBaseUri()).path(clazz).path(methodPath).build().toString();
+	public static Link getLink(
+			UriInfo uriInfo, String rel, String method, Class<ProjectionEndpoint> clazz, String methodName,
+			Class<?>... parameterTypes
+	) {
+		String href = UriBuilder.fromUri(uriInfo.getBaseUri()).path(clazz).path(clazz, methodName).build().toString();
 		return new Link(rel, href, method);
 	}
 }

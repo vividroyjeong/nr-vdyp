@@ -18,9 +18,12 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 
-import ca.bc.gov.nrs.vdyp.backend.v1.gen.api.HelpResourceApi;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ParameterDetailsMessage;
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.ws.rs.core.UriInfo;
 
 /**
@@ -28,26 +31,28 @@ import jakarta.ws.rs.core.UriInfo;
  */
 @JsonPropertyOrder(
 	{ //
-			HelpResponse.JSON_PROPERTY_LINKS, //
-			HelpResponse.JSON_PROPERTY_HELP_MESSAGES //
+			HelpResource.JSON_PROPERTY_LINKS, //
+			HelpResource.JSON_PROPERTY_HELP_MESSAGES //
 	}
 )
-@jakarta.annotation.Generated(
-		value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2024-11-12T09:52:55.097945-08:00[America/Vancouver]", comments = "Generator version: 7.9.0"
+@RegisterForReflection
+@JsonSubTypes({ @Type(value = RootResource.class, name = ResourceTypes.HELP_RESOURCE) })
+@JsonTypeInfo(
+		use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type", defaultImpl = HelpResource.class
 )
-public class HelpResponse extends VdypApiResponse {
+public class HelpResource extends VdypApiResource {
 
 	public static final String JSON_PROPERTY_HELP_MESSAGES = "helpMessages";
 	@JsonProperty(JSON_PROPERTY_HELP_MESSAGES)
 	private List<ParameterDetailsMessage> helpMessages;
 
-	public HelpResponse(UriInfo uriInfo, List<ParameterDetailsMessage> helpMessages) {
-		super(Set.of(Link.getSelfLink(HelpResourceApi.class, uriInfo)));
+	public HelpResource(UriInfo uriInfo, List<ParameterDetailsMessage> helpMessages) {
+		super(Set.of(Link.getSelfLink(uriInfo)));
 		this.helpMessages = helpMessages;
 	}
 
-	public static HelpResponse of(UriInfo uriInfo, List<ParameterDetailsMessage> helpMessages) {
-		return new HelpResponse(uriInfo, helpMessages);
+	public static HelpResource of(UriInfo uriInfo, List<ParameterDetailsMessage> helpMessages) {
+		return new HelpResource(uriInfo, helpMessages);
 	}
 
 	/**
@@ -69,7 +74,7 @@ public class HelpResponse extends VdypApiResponse {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		HelpResponse helpResponse = (HelpResponse) o;
+		HelpResource helpResponse = (HelpResource) o;
 		return Objects.equals(this.helpMessages, helpResponse.helpMessages);
 	}
 

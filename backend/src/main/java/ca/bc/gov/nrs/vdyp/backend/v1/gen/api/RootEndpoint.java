@@ -1,7 +1,8 @@
 package ca.bc.gov.nrs.vdyp.backend.v1.gen.api;
 
 import ca.bc.gov.nrs.vdyp.backend.v1.api.NotFoundException;
-import ca.bc.gov.nrs.vdyp.backend.v1.api.RootResourceService;
+import ca.bc.gov.nrs.vdyp.backend.v1.api.RootService;
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Context;
@@ -13,12 +14,13 @@ import jakarta.ws.rs.core.UriInfo;
 @jakarta.annotation.Generated(
 		value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2024-11-20T10:20:18.043409-08:00[America/Vancouver]", comments = "Generator version: 7.9.0"
 )
-public class RootResourceApi implements ResourceApi {
+@RegisterForReflection
+public class RootEndpoint implements Endpoint {
 
 	@Inject
-	private RootResourceService rootResourceApi;
+	private RootService rootResourceApi;
 
-	public RootResourceApi() {
+	public RootEndpoint() {
 	}
 
 	@jakarta.ws.rs.GET
@@ -41,10 +43,5 @@ public class RootResourceApi implements ResourceApi {
 	public Response rootGet(@Context UriInfo uriInfo /* , @Context SecurityContext securityContext */)
 			throws NotFoundException {
 		return Response.ok(rootResourceApi.rootGet(uriInfo, null)).build();
-	}
-
-	@Override
-	public String getPath() {
-		return "";
 	}
 }

@@ -1,8 +1,9 @@
 package ca.bc.gov.nrs.vdyp.backend.v1.gen.api;
 
-import ca.bc.gov.nrs.vdyp.backend.v1.api.HelpApiService;
+import ca.bc.gov.nrs.vdyp.backend.v1.api.HelpService;
 import ca.bc.gov.nrs.vdyp.backend.v1.api.NotFoundException;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ParameterDetailsMessage;
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -15,10 +16,11 @@ import jakarta.ws.rs.core.UriInfo;
 @jakarta.annotation.Generated(
 		value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2024-11-12T09:52:55.097945-08:00[America/Vancouver]", comments = "Generator version: 7.9.0"
 )
-public class HelpResourceApi implements ResourceApi {
+@RegisterForReflection
+public class HelpEndpoint implements Endpoint {
 
 	@Inject
-	private HelpApiService helpService;
+	private HelpService helpService;
 
 	@jakarta.ws.rs.GET
 	@Produces({ "application/json" })
@@ -42,10 +44,5 @@ public class HelpResourceApi implements ResourceApi {
 	public Response helpGet(@Context UriInfo uriInfo /* , @Context SecurityContext securityContext */)
 			throws NotFoundException {
 		return Response.ok(helpService.helpGet(uriInfo, null /* securityContext */)).build();
-	}
-
-	@Override
-	public String getPath() {
-		return "/v8/help";
 	}
 }

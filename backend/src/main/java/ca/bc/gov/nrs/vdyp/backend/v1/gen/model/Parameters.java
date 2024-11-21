@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.validation.Valid;
 
 /**
@@ -43,6 +44,7 @@ import jakarta.validation.Valid;
 @jakarta.annotation.Generated(
 		value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2024-11-19T17:38:05.300985-08:00[America/Vancouver]", comments = "Generator version: 7.9.0"
 )
+@RegisterForReflection
 public class Parameters {
 	/**
 	 * Identifies the output file format. Default: YieldTable

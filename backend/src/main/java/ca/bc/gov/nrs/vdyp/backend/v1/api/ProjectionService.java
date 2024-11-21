@@ -25,9 +25,9 @@ import jakarta.ws.rs.core.SecurityContext;
  * Implements the projection endpoints. These methods return Responses rather than Response objects because these
  * responses are not JSON objects and contain no links.
  */
-public class ProjectionApiService {
+public class ProjectionService {
 
-	private static final Logger logger = LoggerFactory.getLogger(ProjectionApiService.class);
+	private static final Logger logger = LoggerFactory.getLogger(ProjectionService.class);
 
 	public Response projectionDcsvPost(
 			@Valid ProjectionDcsvPostRequest projectionDcsvPostRequest, SecurityContext securityContext

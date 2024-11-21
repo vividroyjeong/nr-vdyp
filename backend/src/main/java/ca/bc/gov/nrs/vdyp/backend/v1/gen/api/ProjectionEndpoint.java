@@ -1,11 +1,14 @@
 package ca.bc.gov.nrs.vdyp.backend.v1.gen.api;
 
-import ca.bc.gov.nrs.vdyp.backend.v1.api.ProjectionApiService;
+import java.text.MessageFormat;
+
+import ca.bc.gov.nrs.vdyp.backend.v1.api.ProjectionService;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.MessagesInner;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ProjectionDcsvPostRequest;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ProjectionHcsvPostRequest;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ProjectionScsvPostRequest;
-import ca.bc.gov.nrs.vdyp.backend.v1.gen.responses.ProjectionResponse;
+import ca.bc.gov.nrs.vdyp.backend.v1.gen.responses.ProjectionResource;
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -19,17 +22,18 @@ import jakarta.ws.rs.core.Response;
 @jakarta.annotation.Generated(
 		value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2024-11-12T09:52:55.097945-08:00[America/Vancouver]", comments = "Generator version: 7.9.0"
 )
-public class ProjectionResourceApi implements ResourceApi {
+@RegisterForReflection
+public class ProjectionEndpoint implements Endpoint {
 
 	@Inject
-	private ProjectionApiService projectionService;
+	private ProjectionService projectionService;
 
 	@jakarta.ws.rs.POST
 	@Path("/dcsv")
 	@Consumes({ "application/json" })
 	@Produces({ "multipart/form-data", "application/json" })
 	@io.swagger.annotations.ApiOperation(
-			value = "Project the growth of one or more polygons to a given year.", notes = "Run a projection of polygons in the supplied DCSV formatted input file as  controlled by the parameters in the supplied projection parameters file.", response = ProjectionResponse.class, authorizations = {
+			value = "Project the growth of one or more polygons to a given year.", notes = "Run a projection of polygons in the supplied DCSV formatted input file as  controlled by the parameters in the supplied projection parameters file.", response = ProjectionResource.class, authorizations = {
 					@io.swagger.annotations.Authorization(
 							value = "accessCode", scopes = { @io.swagger.annotations.AuthorizationScope(
 									scope = "read", description = "allows reading resources"
@@ -38,7 +42,7 @@ public class ProjectionResourceApi implements ResourceApi {
 	)
 	@io.swagger.annotations.ApiResponses(
 			value = { @io.swagger.annotations.ApiResponse(
-					code = 201, message = "OK", response = ProjectionResponse.class
+					code = 201, message = "OK", response = ProjectionResource.class
 			), @io.swagger.annotations.ApiResponse(code = 400, message = "Client Error. Response content is a list of one or more messages describing the error.", response = MessagesInner.class, responseContainer = "List") }
 	)
 	public Response projectionDcsvPost(@ApiParam(value = "") @Valid ProjectionDcsvPostRequest projectionDcsvPostRequest
@@ -53,7 +57,7 @@ public class ProjectionResourceApi implements ResourceApi {
 	@Consumes({ "application/json" })
 	@Produces({ "multipart/form-data", "application/json" })
 	@io.swagger.annotations.ApiOperation(
-			value = "Project the growth of one or more polygons to a given year.", notes = "Run a projection of polygons in the supplied HCSV formatted input files as  controlled by the parameters in the supplied projection parameters file.", response = ProjectionResponse.class, authorizations = {
+			value = "Project the growth of one or more polygons to a given year.", notes = "Run a projection of polygons in the supplied HCSV formatted input files as  controlled by the parameters in the supplied projection parameters file.", response = ProjectionResource.class, authorizations = {
 					@io.swagger.annotations.Authorization(
 							value = "accessCode", scopes = { @io.swagger.annotations.AuthorizationScope(
 									scope = "read", description = "allows reading resources"
@@ -62,7 +66,7 @@ public class ProjectionResourceApi implements ResourceApi {
 	)
 	@io.swagger.annotations.ApiResponses(
 			value = { @io.swagger.annotations.ApiResponse(
-					code = 200, message = "OK", response = ProjectionResponse.class
+					code = 200, message = "OK", response = ProjectionResource.class
 			), @io.swagger.annotations.ApiResponse(code = 400, message = "Client Error. Response content is a list of one or more messages describing the error.", response = MessagesInner.class, responseContainer = "List") }
 	)
 	public Response projectionHcsvPost(
@@ -78,7 +82,7 @@ public class ProjectionResourceApi implements ResourceApi {
 	@Consumes({ "application/json" })
 	@Produces({ "multipart/form-data", "application/json" })
 	@io.swagger.annotations.ApiOperation(
-			value = "Project the growth of one or more polygons to a given year.", notes = "Run a projection of polygons in the supplied SCSV formatted input files as  controlled by the parameters in the supplied projection parameters file.", response = ProjectionResponse.class, authorizations = {
+			value = "Project the growth of one or more polygons to a given year.", notes = "Run a projection of polygons in the supplied SCSV formatted input files as  controlled by the parameters in the supplied projection parameters file.", response = ProjectionResource.class, authorizations = {
 					@io.swagger.annotations.Authorization(
 							value = "accessCode", scopes = { @io.swagger.annotations.AuthorizationScope(
 									scope = "read", description = "allows reading resources"
@@ -87,7 +91,7 @@ public class ProjectionResourceApi implements ResourceApi {
 	)
 	@io.swagger.annotations.ApiResponses(
 			value = { @io.swagger.annotations.ApiResponse(
-					code = 200, message = "OK", response = ProjectionResponse.class
+					code = 200, message = "OK", response = ProjectionResource.class
 			), @io.swagger.annotations.ApiResponse(code = 400, message = "Client Error. Response content is a list of one or more messages describing the error.", response = MessagesInner.class, responseContainer = "List") }
 	)
 	public Response projectionScsvPost(
@@ -96,10 +100,5 @@ public class ProjectionResourceApi implements ResourceApi {
 	// , @Context SecurityContext securityContext
 	) {
 		return projectionService.projectionScsvPost(projectionScsvPostRequest, null /* securityContext */);
-	}
-
-	@Override
-	public String getPath() {
-		return "/v8/help";
 	}
 }
