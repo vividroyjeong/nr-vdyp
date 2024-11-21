@@ -171,6 +171,21 @@
             <v-btn class="blue-btn ml-2" @click="fileUploadRunModel"
               >Run Model</v-btn
             >
+            <v-btn class="blue-btn ml-2" @click="projectionHcsvAxios"
+              >Run Projection (Axios)</v-btn
+            >
+            <v-btn class="blue-btn ml-2" @click="projectionHcsvDirect"
+              >Run Projection (Direct)</v-btn
+            >
+            <v-btn class="blue-btn ml-2" @click="fetchHelpDetails"
+              >Get Help</v-btn
+            >
+            <v-btn class="blue-btn ml-2" @click="apiFetchHelpAxios"
+              >Get Help axios</v-btn
+            >
+            <v-btn class="blue-btn ml-2" @click="apiFetchHelpDirect"
+              >Get Help direct</v-btn
+            >
           </v-card-actions>
         </v-card>
       </v-card>
@@ -180,7 +195,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { projectionHcsvPost } from '@/services/apiActions'
+import ApiFetchDirect from '@/services/apiFetchDirect'
+import ApiFetchAxios from '@/services/apiFetchAxios'
+import { projectionHcsvPost, helpGet } from '@/services/apiActions'
 import { StatusCodes } from 'http-status-codes'
 import { handleApiError } from '@/services/apiErrorHandler'
 import * as messageHandler from '@/utils/messageHandler'
@@ -194,10 +211,12 @@ import { NUM_INPUT_LIMITS } from '@/constants/constants'
 import {
   MDL_PRM_INPUT_ERR,
   MSG_DIALOG_TITLE,
+  FILE_UPLOAD_ERR,
   SVC_ERR,
 } from '@/constants/message'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 import { FileUploadValidation } from '@/validation/fileUploadValidation'
+import type { Parameters } from '@/services/vdyp-api/models/parameters'
 import Papa from 'papaparse'
 
 const form = ref<HTMLFormElement>()
@@ -275,40 +294,159 @@ const validateRange = (): boolean => {
   return true
 }
 
+const validateFiles = async () => {
+  if (!layerFile.value) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.MISSING_FILE,
+      FILE_UPLOAD_ERR.LAYER_FILE_MISSING,
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (!polygonFile.value) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.MISSING_FILE,
+      FILE_UPLOAD_ERR.POLYGON_FILE_MISSING,
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (!(await fileUploadValidator.isCSVFile(layerFile.value))) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_FILE,
+      FILE_UPLOAD_ERR.LAYER_FILE_NOT_CSV_FORMAT,
+      { width: 400 },
+    )
+    return false
+  }
+
+  if (!(await fileUploadValidator.isCSVFile(polygonFile.value))) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_FILE,
+      FILE_UPLOAD_ERR.POLYGON_FILE_NOT_CSV_FORMAT,
+      { width: 400 },
+    )
+    return false
+  }
+
+  return true
+}
+
+const validateRequiredFields = (): boolean => {
+  if (
+    !fileUploadValidator.validateRequiredFields(
+      startingAge.value,
+      finishingAge.value,
+      ageIncrement.value,
+    )
+  ) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      FILE_UPLOAD_ERR.RPT_VLD_REQUIRED_FIELDS,
+      { width: 400 },
+    )
+    return false
+  }
+  return true
+}
+
 const fileUploadRunModel = async () => {
-  if (validateComparison() && validateRange()) {
+  if (
+    validateRequiredFields() &&
+    validateComparison() &&
+    validateRange() &&
+    (await validateFiles())
+  ) {
     if (form.value) {
       form.value.validate()
     }
 
-    const projectionParameters = {
-      startingAge: startingAge.value,
-      finishingAge: finishingAge.value,
-      ageIncrement: ageIncrement.value,
+    const parameters: Parameters = {
+      ageStart: startingAge.value!,
+      ageEnd: finishingAge.value!,
+      ageIncrement: ageIncrement.value!,
     }
 
     try {
-      const response = await projectionHcsvPost(
-        projectionParameters,
+      const result = await projectionHcsvPost(
+        parameters,
         layerFile.value!,
         polygonFile.value!,
       )
 
-      if (response && response.status) {
-        messageHandler.messageResult(
-          response.status === StatusCodes.CREATED,
-          'Model ran successfully!',
-          'Failed to run Model',
-        )
-      } else {
-        messageHandler.logWarningMessage(
-          SVC_ERR.DEFAULT,
-          'Unexpected response format',
-        )
-      }
-    } catch (err) {
-      handleApiError(err, 'Failed to run Model')
+      const url = window.URL.createObjectURL(result)
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', 'vdyp-output.zip')
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+    } catch (error) {
+      handleApiError(error, 'Failed to run Projection (Axios)')
     }
+  }
+}
+
+const fetchHelpDetails = async () => {
+  try {
+    const details = await helpGet()
+    console.log(details)
+  } catch (error) {
+    handleApiError(error, 'Failed to fetch help details')
+  }
+}
+
+const apiFetchHelpAxios = async () => {
+  try {
+    const results = await ApiFetchAxios.getHelp()
+    console.log(results)
+  } catch (error) {
+    handleApiError(error, 'Failed to fetch Help')
+  }
+}
+
+const apiFetchHelpDirect = async () => {
+  try {
+    const results = await ApiFetchDirect.prototype.getHelp()
+    console.log(results)
+  } catch (error) {
+    console.error('Failed to fetch Help:', error)
+  }
+}
+
+const projectionHcsvDirect = async () => {
+  try {
+    const apiFetch = new ApiFetchDirect()
+    const result = await apiFetch.projectionHcsvPost()
+    console.log('Projection result:', result)
+
+    const url = window.URL.createObjectURL(result)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', 'vdyp-output.zip')
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+  } catch (error) {
+    console.error('Failed to fetch Help:', error)
+  }
+}
+
+const projectionHcsvAxios = async () => {
+  try {
+    const result = await ApiFetchAxios.projectionHcsvPost()
+
+    const url = window.URL.createObjectURL(result)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', 'vdyp-output.zip')
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+  } catch (error) {
+    handleApiError(error, 'Failed to run Projection (Axios)')
   }
 }
 </script>

@@ -1,7 +1,9 @@
-import { DefaultApi } from '@/services/vdyp-api/'
+import { VdypApi } from '@/services/vdyp-api/'
 import axiosInstance from '@/services/axiosInstance'
+import type { AxiosResponse } from 'axios'
+import type { ProjectionHcsvBody } from '@/services/vdyp-api/models'
 
-const apiInstance = new DefaultApi(undefined, undefined, axiosInstance)
+const apiInstance = new VdypApi(undefined, undefined, axiosInstance)
 
 export const apiClient = {
   /**
@@ -17,30 +19,13 @@ export const apiClient = {
    * Forecast yields by year using an input file in HCSV format.
    * @param body Request data of type ProjectionHcsvBody
    * @param options Axios request options
-   * @returns AxiosResponse<void>
+   * @returns AxiosResponse<Blob>
    */
-  projectionHcsvPost: (body?: any, options?: any) => {
+  projectionHcsvPost: async (
+    body?: ProjectionHcsvBody,
+    options?: any,
+  ): Promise<AxiosResponse<Blob>> => {
     return apiInstance.projectionHcsvPost(body, options)
-  },
-
-  /**
-   * Forecast yields by year using an input file in HCSV format.
-   * @param body Request data of type ProjectionDcsvBody
-   * @param options Axios request options
-   * @returns AxiosResponse<void>
-   */
-  projectionDcsvPost: (body?: any, options?: any) => {
-    return apiInstance.projectionDcsvPost(body, options)
-  },
-
-  /**
-   * Forecast yields by year using input files in SCSV format.
-   * @param body Request data of type ProjectionScsvBody
-   * @param options Axios request options
-   * @returns AxiosResponse<void>
-   */
-  projectionScsvPost: (body?: any, options?: any) => {
-    return apiInstance.projectionScsvPost(body, options)
   },
 }
 

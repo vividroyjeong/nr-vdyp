@@ -41,7 +41,7 @@ export const VdypApiAxiosParamCreator = function (
      * @throws {RequiredError}
      */
     helpGet: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-      const localVarPath = `/help`
+      const localVarPath = `/api/help`
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, 'https://example.com')
       let baseOptions
@@ -100,7 +100,7 @@ export const VdypApiAxiosParamCreator = function (
       body?: ProjectionDcsvBody,
       options: AxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
-      const localVarPath = `/projection/dcsv`
+      const localVarPath = `/api/projection/dcsv`
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, 'https://example.com')
       let baseOptions
@@ -168,7 +168,7 @@ export const VdypApiAxiosParamCreator = function (
       body?: ProjectionHcsvBody,
       options: AxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
-      const localVarPath = `/projection/hcsv`
+      const localVarPath = `/api/projection/hcsv`
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, 'https://example.com')
       let baseOptions
@@ -179,6 +179,7 @@ export const VdypApiAxiosParamCreator = function (
         method: 'POST',
         ...baseOptions,
         ...options,
+        responseType: 'blob',
       }
       const localVarHeaderParameter = {} as any
       const localVarQueryParameter = {} as any
@@ -236,7 +237,7 @@ export const VdypApiAxiosParamCreator = function (
       body?: ProjectionScsvBody,
       options: AxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
-      const localVarPath = `/projection/scsv`
+      const localVarPath = `/api/projection/scsv`
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, 'https://example.com')
       let baseOptions
@@ -324,7 +325,7 @@ export const VdypApiFp = function (configuration?: Configuration) {
       ) => {
         const axiosRequestArgs: AxiosRequestConfig = {
           ...localVarAxiosArgs.options,
-          url: basePath + localVarAxiosArgs.url,
+          url: localVarAxiosArgs.url,
         }
         return axios.request(axiosRequestArgs)
       }
@@ -351,7 +352,7 @@ export const VdypApiFp = function (configuration?: Configuration) {
       ) => {
         const axiosRequestArgs: AxiosRequestConfig = {
           ...localVarAxiosArgs.options,
-          url: basePath + localVarAxiosArgs.url,
+          url: localVarAxiosArgs.url,
         }
         return axios.request(axiosRequestArgs)
       }
@@ -378,7 +379,7 @@ export const VdypApiFp = function (configuration?: Configuration) {
       ) => {
         const axiosRequestArgs: AxiosRequestConfig = {
           ...localVarAxiosArgs.options,
-          url: basePath + localVarAxiosArgs.url,
+          url: localVarAxiosArgs.url,
         }
         return axios.request(axiosRequestArgs)
       }
@@ -405,7 +406,7 @@ export const VdypApiFp = function (configuration?: Configuration) {
       ) => {
         const axiosRequestArgs: AxiosRequestConfig = {
           ...localVarAxiosArgs.options,
-          url: basePath + localVarAxiosArgs.url,
+          url: localVarAxiosArgs.url,
         }
         return axios.request(axiosRequestArgs)
       }
@@ -503,7 +504,7 @@ export class VdypApi extends BaseAPI {
   ): Promise<AxiosResponse<Array<ParameterDetailsMessage>>> {
     return VdypApiFp(this.configuration)
       .helpGet(options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios))
   }
   /**
    * Run a projection of polygons in the supplied DCSV formatted input file as  controlled by the parameters in the supplied projection parameters file.
@@ -519,7 +520,7 @@ export class VdypApi extends BaseAPI {
   ): Promise<AxiosResponse<void>> {
     return VdypApiFp(this.configuration)
       .projectionDcsvPost(body, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios))
   }
   /**
    * Run a projection of polygons in the supplied HCSV formatted input files as  controlled by the parameters in the supplied projection parameters file.
@@ -535,7 +536,7 @@ export class VdypApi extends BaseAPI {
   ): Promise<AxiosResponse<Blob>> {
     return VdypApiFp(this.configuration)
       .projectionHcsvPost(body, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios))
   }
   /**
    * Run a projection of polygons in the supplied SCSV formatted input files as  controlled by the parameters in the supplied projection parameters file.
@@ -551,6 +552,6 @@ export class VdypApi extends BaseAPI {
   ): Promise<AxiosResponse<void>> {
     return VdypApiFp(this.configuration)
       .projectionScsvPost(body, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios))
   }
 }
