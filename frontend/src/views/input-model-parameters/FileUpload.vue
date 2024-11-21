@@ -171,6 +171,21 @@
             <v-btn class="blue-btn ml-2" @click="fileUploadRunModel"
               >Run Model</v-btn
             >
+            <v-btn class="blue-btn ml-2" @click="projectionHcsvAxios"
+              >Run Projection (Axios)</v-btn
+            >
+            <v-btn class="blue-btn ml-2" @click="projectionHcsvDirect"
+              >Run Projection (Direct)</v-btn
+            >
+            <v-btn class="blue-btn ml-2" @click="fetchHelpDetails"
+              >Get Help</v-btn
+            >
+            <v-btn class="blue-btn ml-2" @click="apiFetchHelpAxios"
+              >Get Help axios</v-btn
+            >
+            <v-btn class="blue-btn ml-2" @click="apiFetchHelpDirect"
+              >Get Help direct</v-btn
+            >
           </v-card-actions>
         </v-card>
       </v-card>
@@ -180,7 +195,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { projectionHcsvPost } from '@/services/apiActions'
+import ApiFetchDirect from '@/services/apiFetchDirect'
+import ApiFetchAxios from '@/services/apiFetchAxios'
+import { projectionHcsvPost, helpGet } from '@/services/apiActions'
 import { StatusCodes } from 'http-status-codes'
 import { handleApiError } from '@/services/apiErrorHandler'
 import * as messageHandler from '@/utils/messageHandler'
@@ -198,9 +215,13 @@ import {
   SVC_ERR,
 } from '@/constants/message'
 import { DEFAULT_VALUES } from '@/constants/defaults'
+import { FileUploadValidation } from '@/validation/fileUploadValidation'
+import type { Parameters } from '@/services/vdyp-api/models/parameters'
 import Papa from 'papaparse'
 
 const form = ref<HTMLFormElement>()
+
+const fileUploadValidator = new FileUploadValidation()
 
 const startingAge = ref<number | null>(DEFAULT_VALUES.STARTING_AGE)
 const finishingAge = ref<number | null>(DEFAULT_VALUES.FINISHING_AGE)
@@ -216,84 +237,61 @@ const polygonFile = ref<File | null>(null)
 const messageDialogStore = useMessageDialogStore()
 
 const validateComparison = (): boolean => {
-  if (finishingAge.value !== null && startingAge.value !== null) {
-    if (finishingAge.value < startingAge.value) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.INVALID_INPUT,
-        MDL_PRM_INPUT_ERR.RPT_VLD_COMP_FNSH_AGE,
-        { width: 400 },
-      )
-      return false
-    }
+  if (
+    !fileUploadValidator.validateAgeComparison(
+      finishingAge.value,
+      startingAge.value,
+    )
+  ) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.RPT_VLD_COMP_FNSH_AGE,
+      { width: 400 },
+    )
+    return false
   }
+
   return true
 }
 
-// Validation to check the range of input values
 const validateRange = (): boolean => {
-  if (startingAge.value !== null) {
-    if (
-      startingAge.value < NUM_INPUT_LIMITS.STARTING_AGE_MIN ||
-      startingAge.value > NUM_INPUT_LIMITS.STARTING_AGE_MAX
-    ) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.INVALID_INPUT,
-        MDL_PRM_INPUT_ERR.RPT_VLD_START_AGE_RNG(
-          NUM_INPUT_LIMITS.STARTING_AGE_MIN,
-          NUM_INPUT_LIMITS.STARTING_AGE_MAX,
-        ),
-        { width: 400 },
-      )
-      return false
-    }
+  if (!fileUploadValidator.validateStartingAgeRange(startingAge.value)) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.RPT_VLD_START_AGE_RNG(
+        NUM_INPUT_LIMITS.STARTING_AGE_MIN,
+        NUM_INPUT_LIMITS.STARTING_AGE_MAX,
+      ),
+      { width: 400 },
+    )
+    return false
   }
 
-  if (finishingAge.value !== null) {
-    if (
-      finishingAge.value < NUM_INPUT_LIMITS.FINISHING_AGE_MIN ||
-      finishingAge.value > NUM_INPUT_LIMITS.FINISHING_AGE_MAX
-    ) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.INVALID_INPUT,
-        MDL_PRM_INPUT_ERR.RPT_VLD_START_FNSH_RNG(
-          NUM_INPUT_LIMITS.FINISHING_AGE_MIN,
-          NUM_INPUT_LIMITS.FINISHING_AGE_MAX,
-        ),
-        { width: 400 },
-      )
-      return false
-    }
+  if (!fileUploadValidator.validateFinishingAgeRange(finishingAge.value)) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.RPT_VLD_START_FNSH_RNG(
+        NUM_INPUT_LIMITS.FINISHING_AGE_MIN,
+        NUM_INPUT_LIMITS.FINISHING_AGE_MAX,
+      ),
+      { width: 400 },
+    )
+    return false
   }
 
-  if (ageIncrement.value !== null) {
-    if (
-      ageIncrement.value < NUM_INPUT_LIMITS.AGE_INC_MIN ||
-      ageIncrement.value > NUM_INPUT_LIMITS.AGE_INC_MAX
-    ) {
-      messageDialogStore.openDialog(
-        MSG_DIALOG_TITLE.INVALID_INPUT,
-        MDL_PRM_INPUT_ERR.RPT_VLD_AGE_INC_RNG(
-          NUM_INPUT_LIMITS.AGE_INC_MIN,
-          NUM_INPUT_LIMITS.AGE_INC_MAX,
-        ),
-        { width: 400 },
-      )
-      return false
-    }
+  if (!fileUploadValidator.validateAgeIncrementRange(ageIncrement.value)) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      MDL_PRM_INPUT_ERR.RPT_VLD_AGE_INC_RNG(
+        NUM_INPUT_LIMITS.AGE_INC_MIN,
+        NUM_INPUT_LIMITS.AGE_INC_MAX,
+      ),
+      { width: 400 },
+    )
+    return false
   }
 
   return true
-}
-
-const isCSVFile = async (file: File): Promise<boolean> => {
-  return new Promise((resolve) => {
-    Papa.parse(file, {
-      complete: (results: any) => {
-        resolve(results.errors.length === 0)
-      },
-      error: () => resolve(false),
-    })
-  })
 }
 
 const validateFiles = async () => {
@@ -315,10 +313,7 @@ const validateFiles = async () => {
     return false
   }
 
-  const isLayerCSV = await isCSVFile(layerFile.value)
-  const isPolygonCSV = await isCSVFile(polygonFile.value)
-
-  if (!isLayerCSV) {
+  if (!(await fileUploadValidator.isCSVFile(layerFile.value))) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_FILE,
       FILE_UPLOAD_ERR.LAYER_FILE_NOT_CSV_FORMAT,
@@ -327,7 +322,7 @@ const validateFiles = async () => {
     return false
   }
 
-  if (!isPolygonCSV) {
+  if (!(await fileUploadValidator.isCSVFile(polygonFile.value))) {
     messageDialogStore.openDialog(
       MSG_DIALOG_TITLE.INVALID_FILE,
       FILE_UPLOAD_ERR.POLYGON_FILE_NOT_CSV_FORMAT,
@@ -339,45 +334,119 @@ const validateFiles = async () => {
   return true
 }
 
+const validateRequiredFields = (): boolean => {
+  if (
+    !fileUploadValidator.validateRequiredFields(
+      startingAge.value,
+      finishingAge.value,
+      ageIncrement.value,
+    )
+  ) {
+    messageDialogStore.openDialog(
+      MSG_DIALOG_TITLE.INVALID_INPUT,
+      FILE_UPLOAD_ERR.RPT_VLD_REQUIRED_FIELDS,
+      { width: 400 },
+    )
+    return false
+  }
+  return true
+}
+
 const fileUploadRunModel = async () => {
-  if (validateComparison() && validateRange() && (await validateFiles())) {
+  if (
+    validateRequiredFields() &&
+    validateComparison() &&
+    validateRange() &&
+    (await validateFiles())
+  ) {
     if (form.value) {
       form.value.validate()
     }
 
-    const projectionParameters = {
-      startingAge: startingAge.value,
-      finishingAge: finishingAge.value,
-      ageIncrement: ageIncrement.value,
-      volumeReported: volumeReported.value,
-      includeInReport: includeInReport.value,
-      projectionType: projectionType.value,
-      reportTitle: reportTitle.value,
+    const parameters: Parameters = {
+      ageStart: startingAge.value!,
+      ageEnd: finishingAge.value!,
+      ageIncrement: ageIncrement.value!,
     }
-    console.log(JSON.stringify(projectionParameters))
 
     try {
-      const response = await projectionHcsvPost(
-        projectionParameters,
+      const result = await projectionHcsvPost(
+        parameters,
         layerFile.value!,
         polygonFile.value!,
       )
 
-      if (response && response.status) {
-        messageHandler.messageResult(
-          response.status === StatusCodes.CREATED,
-          'Model ran successfully!',
-          'Failed to run Model',
-        )
-      } else {
-        messageHandler.logWarningMessage(
-          SVC_ERR.DEFAULT,
-          'Unexpected response format',
-        )
-      }
-    } catch (err) {
-      handleApiError(err, 'Failed to run Model')
+      const url = window.URL.createObjectURL(result)
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', 'vdyp-output.zip')
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+    } catch (error) {
+      handleApiError(error, 'Failed to run Projection (Axios)')
     }
+  }
+}
+
+const fetchHelpDetails = async () => {
+  try {
+    const details = await helpGet()
+    console.log(details)
+  } catch (error) {
+    handleApiError(error, 'Failed to fetch help details')
+  }
+}
+
+const apiFetchHelpAxios = async () => {
+  try {
+    const results = await ApiFetchAxios.getHelp()
+    console.log(results)
+  } catch (error) {
+    handleApiError(error, 'Failed to fetch Help')
+  }
+}
+
+const apiFetchHelpDirect = async () => {
+  try {
+    const results = await ApiFetchDirect.prototype.getHelp()
+    console.log(results)
+  } catch (error) {
+    console.error('Failed to fetch Help:', error)
+  }
+}
+
+const projectionHcsvDirect = async () => {
+  try {
+    const apiFetch = new ApiFetchDirect()
+    const result = await apiFetch.projectionHcsvPost()
+    console.log('Projection result:', result)
+
+    const url = window.URL.createObjectURL(result)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', 'vdyp-output.zip')
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+  } catch (error) {
+    console.error('Failed to fetch Help:', error)
+  }
+}
+
+const projectionHcsvAxios = async () => {
+  try {
+    const result = await ApiFetchAxios.projectionHcsvPost()
+
+    const url = window.URL.createObjectURL(result)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', 'vdyp-output.zip')
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+  } catch (error) {
+    handleApiError(error, 'Failed to run Projection (Axios)')
   }
 }
 </script>

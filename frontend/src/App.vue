@@ -23,6 +23,7 @@ import AppConfirmDialog from '@/components/common/AppConfirmDialog.vue'
 import AppProgressCircular from '@/components/common/AppProgressCircular.vue'
 import AppDialogDragger from '@/components/common/AppDialogDragger.vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
+console.log(`VITE_API_URL: ${process.env.VITE_API_URL}`)
 </script>
 <style lang="scss" scoped>
 #main {

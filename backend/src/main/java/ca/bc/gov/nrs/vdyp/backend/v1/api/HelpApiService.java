@@ -3,14 +3,20 @@ package ca.bc.gov.nrs.vdyp.backend.v1.api;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ParameterDetailsMessage;
 import ca.bc.gov.nrs.vdyp.backend.v1.model.ParameterDetailsMessageBuilder;
-import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 
 public class HelpApiService {
 
-	public Response helpGet(SecurityContext securityContext) throws NotFoundException {
+	private static final Logger logger = LoggerFactory.getLogger(HelpApiService.class);
+
+	public List<ParameterDetailsMessage> helpGet(SecurityContext securityContext) throws NotFoundException {
+
+		logger.info("<helpGet");
 
 		List<ParameterDetailsMessage> messageList = new ArrayList<>();
 
@@ -477,6 +483,6 @@ public class HelpApiService {
 				)
 		);
 
-		return Response.ok().entity(messageList).build();
+		return messageList;
 	}
 }

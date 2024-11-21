@@ -39,12 +39,14 @@
   </v-container>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useProjectionStore } from '@/stores/projectionStore'
 import printJS from 'print-js'
 import { saveAs } from 'file-saver'
 import { Util } from '@/utils/util'
 
-const items = ref(Array.from({ length: 1000 }, (_, i) => `Item ${i + 1}`))
+const projectionStore = useProjectionStore()
+const items = computed(() => projectionStore.errorMessages)
 
 const errMsgRsltPrintAreaRef = ref<HTMLElement | null>(null)
 

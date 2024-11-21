@@ -27,19 +27,17 @@ public class ProjectionApi {
 	public ProjectionApi(/* @Context ServletConfig servletContext */) {
 		ProjectionApiService delegate = null;
 
-		/*
-		if (servletContext != null) {
-			String implClass = servletContext.getInitParameter("ProjectionApi.implementation");
-			if (implClass != null && !"".equals(implClass.trim())) {
-				try {
-					delegate = (ProjectionApiService) Class.forName(implClass).getDeclaredConstructor().newInstance();
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-		}
-		*/
-		
+//		if (servletContext != null) {
+//			String implClass = servletContext.getInitParameter("ProjectionApi.implementation");
+//			if (implClass != null && !"".equals(implClass.trim())) {
+//				try {
+//					delegate = (ProjectionApiService) Class.forName(implClass).getDeclaredConstructor().newInstance();
+//				} catch (Exception e) {
+//					throw new RuntimeException(e);
+//				}
+//			}
+//		}
+
 		if (delegate == null) {
 			delegate = ProjectionApiServiceFactory.getProjectionApi();
 		}
@@ -50,7 +48,7 @@ public class ProjectionApi {
 	@jakarta.ws.rs.POST
 	@Path("/dcsv")
 	@Consumes({ "application/json" })
-	@Produces({ "application/octet-stream", "application/json" })
+	@Produces({ "multipart/form-data", "application/json" })
 	@io.swagger.annotations.ApiOperation(
 			value = "Project the growth of one or more polygons to a given year.", notes = "Run a projection of polygons in the supplied DCSV formatted input file as  controlled by the parameters in the supplied projection parameters file.", response = ProjectionResponse.class, authorizations = {
 					@io.swagger.annotations.Authorization(
@@ -64,11 +62,10 @@ public class ProjectionApi {
 					code = 201, message = "OK", response = ProjectionResponse.class
 			), @io.swagger.annotations.ApiResponse(code = 400, message = "Client Error. Response content is a list of one or more messages describing the error.", response = MessagesInner.class, responseContainer = "List") }
 	)
-	public Response projectionDcsvPost(
-			@ApiParam(value = "") @Valid ProjectionDcsvPostRequest projectionDcsvPostRequest 
-            /* , @Context SecurityContext securityContext */
+	public Response projectionDcsvPost(@ApiParam(value = "") @Valid ProjectionDcsvPostRequest projectionDcsvPostRequest
+	/* , @Context SecurityContext securityContext */
 
-	) throws NotFoundException {
+	) {
 		return delegate.projectionDcsvPost(projectionDcsvPostRequest, null /* securityContext */);
 	}
 
@@ -90,16 +87,17 @@ public class ProjectionApi {
 			), @io.swagger.annotations.ApiResponse(code = 400, message = "Client Error. Response content is a list of one or more messages describing the error.", response = MessagesInner.class, responseContainer = "List") }
 	)
 	public Response projectionHcsvPost(
-			@ApiParam(value = "") @Valid ProjectionHcsvPostRequest projectionHcsvPostRequest 
-            /* , @Context SecurityContext securityContext */
-	) throws NotFoundException {
+			//
+			@ApiParam(value = "") @Valid ProjectionHcsvPostRequest projectionHcsvPostRequest //
+	// , @Context SecurityContext securityContext
+	) {
 		return delegate.projectionHcsvPost(projectionHcsvPostRequest, null /* securityContext */);
 	}
 
 	@jakarta.ws.rs.POST
 	@Path("/scsv")
 	@Consumes({ "application/json" })
-	@Produces({ "application/json" })
+	@Produces({ "multipart/form-data", "application/json" })
 	@io.swagger.annotations.ApiOperation(
 			value = "Project the growth of one or more polygons to a given year.", notes = "Run a projection of polygons in the supplied SCSV formatted input files as  controlled by the parameters in the supplied projection parameters file.", response = ProjectionResponse.class, authorizations = {
 					@io.swagger.annotations.Authorization(
@@ -114,9 +112,10 @@ public class ProjectionApi {
 			), @io.swagger.annotations.ApiResponse(code = 400, message = "Client Error. Response content is a list of one or more messages describing the error.", response = MessagesInner.class, responseContainer = "List") }
 	)
 	public Response projectionScsvPost(
-			@ApiParam(value = "") @Valid ProjectionScsvPostRequest projectionScsvPostRequest 
-            /* , @Context SecurityContext securityContext */
-	) throws NotFoundException {
+			//
+			@ApiParam(value = "") @Valid ProjectionScsvPostRequest projectionScsvPostRequest //
+	// , @Context SecurityContext securityContext
+	) {
 		return delegate.projectionScsvPost(projectionScsvPostRequest, null /* securityContext */);
 	}
 }

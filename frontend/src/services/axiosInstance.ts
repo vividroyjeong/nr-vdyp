@@ -6,10 +6,8 @@ import type {
 } from 'axios'
 import { useAuthStore } from '@/stores/common/authStore'
 import { AXIOS } from '@/constants/constants'
-import { env } from '@/env'
 
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: env.VITE_API_BASE_URL,
   headers: {
     Accept: AXIOS.ACCEPT,
     'Content-Type': AXIOS.CONTENT_TYPE,
@@ -32,6 +30,8 @@ axiosInstance.interceptors.request.use(
     } else {
       console.warn('Authorization token or authStore is not available.')
     }
+
+    console.log(`AxiosRequestConfig: ${JSON.stringify(config)}`)
 
     return config
   },
