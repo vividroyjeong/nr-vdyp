@@ -18,6 +18,8 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
 /**
  * provides details about one parameter
  */
@@ -31,6 +33,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @jakarta.annotation.Generated(
 		value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2024-11-12T09:52:55.097945-08:00[America/Vancouver]", comments = "Generator version: 7.9.0"
 )
+@RegisterForReflection
 public class ParameterDetailsMessage implements Serializable {
 
 	private static final long serialVersionUID = -4514646435523721853L;

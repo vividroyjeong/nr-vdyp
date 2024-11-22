@@ -186,6 +186,9 @@
             <v-btn class="blue-btn ml-2" @click="apiFetchHelpDirect"
               >Get Help direct</v-btn
             >
+            <v-btn class="blue-btn ml-2" @click="fetchRootDetails"
+              >Fetch Root Details</v-btn
+            >
           </v-card-actions>
         </v-card>
       </v-card>
@@ -197,7 +200,7 @@
 import { ref } from 'vue'
 import ApiFetchDirect from '@/services/apiFetchDirect'
 import ApiFetchAxios from '@/services/apiFetchAxios'
-import { projectionHcsvPost, helpGet } from '@/services/apiActions'
+import { projectionHcsvPost, helpGet, rootGet } from '@/services/apiActions'
 import { StatusCodes } from 'http-status-codes'
 import { handleApiError } from '@/services/apiErrorHandler'
 import * as messageHandler from '@/utils/messageHandler'
@@ -363,20 +366,24 @@ const fileUploadRunModel = async () => {
       form.value.validate()
     }
 
-    const parameters: Parameters = {
-      ageStart: startingAge.value!,
-      ageEnd: finishingAge.value!,
-      ageIncrement: ageIncrement.value!,
+    const body = {
+      projectionParameters: {
+        ageStart: startingAge.value!,
+        ageEnd: finishingAge.value!,
+        ageIncrement: ageIncrement.value!,
+        volumeReported: volumeReported.value,
+        includeInReport: includeInReport.value,
+        projectionType: projectionType.value,
+        reportTitle: reportTitle.value,
+      },
+      layerInputData: null, // Set to null for now
+      polygonInputData: null, // Set to null for now
     }
 
     try {
-      const result = await projectionHcsvPost(
-        parameters,
-        layerFile.value!,
-        polygonFile.value!,
-      )
+      const result = await projectionHcsvPost(body)
 
-      const url = window.URL.createObjectURL(result)
+      const url = window.URL.createObjectURL(new Blob([result]))
       const link = document.createElement('a')
       link.href = url
       link.setAttribute('download', 'vdyp-output.zip')
@@ -447,6 +454,15 @@ const projectionHcsvAxios = async () => {
     link.remove()
   } catch (error) {
     handleApiError(error, 'Failed to run Projection (Axios)')
+  }
+}
+
+const fetchRootDetails = async () => {
+  try {
+    const result = await rootGet()
+    console.log('Root Details:', result)
+  } catch (error) {
+    console.error('Failed to fetch root details:', error)
   }
 }
 </script>
