@@ -28,7 +28,7 @@ export default class ApiFetchDirect {
   }
 
   async getHelp(): Promise<any> {
-    const apiUrl = '/api/help'
+    const apiUrl = '/api/v8/help'
     const authStore = useAuthStore()
     let token
     if (authStore && authStore.user && authStore.user.accessToken) {
@@ -51,7 +51,7 @@ export default class ApiFetchDirect {
   }
 
   async projectionHcsvPost(): Promise<any> {
-    const apiUrl = '/api/projection/hcsv'
+    const apiUrl = '/api/v8/projection/hcsv'
     const authStore = useAuthStore()
     let token
 

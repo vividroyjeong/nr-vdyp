@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 
 export default class ApiFetchAxios {
   static async getHelp(): Promise<any> {
-    const response = await axiosInstance.get<any>('/api/help')
+    const response = await axiosInstance.get<any>('/api/v8/help')
 
     if (!response || !response.status || !response.data) {
       console.warn('Unexpected response format or status')
@@ -25,7 +25,7 @@ export default class ApiFetchAxios {
     }
 
     const response = await axiosInstance.post<Blob>(
-      '/api/projection/hcsv',
+      '/api/v8/projection/hcsv',
       body,
       {
         headers: {
