@@ -43,9 +43,11 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       proxy: {
+        // Proxy API requests to the backend
         '/api': {
           target: env.VITE_API_URL,
           changeOrigin: true,
+          secure: false,
           rewrite: (path) => path.replace(/^\/api/, ''),
         },
       },
