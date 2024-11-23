@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
-    "build-only": "VITE_API_URL=$VITE_API_URL vite build",
+    "build-only": "VITE_API_URL=https://nr-vdyp-dev-backend.apps.silver.devops.gov.bc.ca vite build",
     "type-check": "vue-tsc --build --force",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "format": "prettier --write src/"
