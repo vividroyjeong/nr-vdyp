@@ -46,7 +46,8 @@ export default defineConfig(({ mode }) => {
         // Proxy API requests to the backend
         '/api': {
           // target: process.env.VITE_API_URL,
-          target: env.VITE_API_URL,
+          // target: env.VITE_API_URL,
+          target: 'https://nr-vdyp-dev-backend.apps.silver.devops.gov.bc.ca',
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(/^\/api/, ''),
