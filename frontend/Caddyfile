@@ -35,6 +35,7 @@
 		header_up Host {http.reverse_proxy.upstream.hostport}
 		header_up X-Real-IP {remote_host}
 		header_up X-Forwarded-For {remote_host}
+		rewrite * {http.matchers.path.regexp:/api/(.*)} {http.matchers.path.1}
 	}
 	header {
 		X-Frame-Options "SAMEORIGIN"
