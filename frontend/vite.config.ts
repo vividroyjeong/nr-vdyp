@@ -6,8 +6,8 @@ import packageVersion from 'vite-plugin-package-version'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  process.env = { ...process.env, ...loadEnv(mode, process.cwd()) }
-  console.log('Loaded VITE_API_URL:', process.env.VITE_API_URL)
+  // process.env = { ...process.env, ...loadEnv(mode, process.cwd()) }
+  // console.log('Loaded VITE_API_URL:', process.env.VITE_API_URL)
 
   return {
     plugins: [
@@ -40,19 +40,19 @@ export default defineConfig(({ mode }) => {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
-    server: {
-      proxy: {
-        // Proxy API requests to the backend
-        '/api': {
-          target: process.env.VITE_API_URL,
-          changeOrigin: true,
-          secure: false,
-          rewrite: (path) => path.replace(/^\/api/, ''),
-        },
-      },
-    },
-    define: {
-      'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL),
-    },
+    // server: {
+    //   proxy: {
+    //     // Proxy API requests to the backend
+    //     '/api': {
+    //       target: process.env.VITE_API_URL,
+    //       changeOrigin: true,
+    //       secure: false,
+    //       rewrite: (path) => path.replace(/^\/api/, ''),
+    //     },
+    //   },
+    // },
+    // define: {
+    //   'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL),
+    // },
   }
 })

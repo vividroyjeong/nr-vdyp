@@ -28,7 +28,9 @@ export default class ApiFetchDirect {
   }
 
   async getHelp(): Promise<any> {
-    const apiUrl = '/api/v8/help'
+    // const apiUrl = '/api/v8/help'
+    const apiUrl =
+      'https://nr-vdyp-dev-backend.apps.silver.devops.gov.bc.ca/v8/help'
     const authStore = useAuthStore()
     let token
     if (authStore && authStore.user && authStore.user.accessToken) {
