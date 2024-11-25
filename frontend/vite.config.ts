@@ -40,19 +40,19 @@ export default defineConfig(({ mode }) => {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
-    // server: {
-    //   proxy: {
-    //     // Proxy API requests to the backend
-    //     '/api': {
-    //       target: process.env.VITE_API_URL,
-    //       changeOrigin: true,
-    //       secure: false,
-    //       rewrite: (path) => path.replace(/^\/api/, ''),
-    //     },
-    //   },
-    // },
-    // define: {
-    //   'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL),
-    // },
+    server: {
+      proxy: {
+        // Proxy API requests to the backend
+        '/api': {
+          // target: process.env.VITE_API_URL,
+          target: 'https://nr-vdyp-dev-backend.apps.silver.devops.gov.bc.ca',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, ''),
+        },
+      },
+    },
+    define: {
+      'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL),
+    },
   }
 })

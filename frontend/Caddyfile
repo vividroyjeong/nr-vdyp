@@ -31,10 +31,14 @@
 	}
 	rewrite @spa_router {http.matchers.file.relative}
 	# Proxy requests to API service
-	reverse_proxy /api/* {$BACKEND_URL} {
+	# reverse_proxy /api/* {$BACKEND_URL} {
+  reverse_proxy /api/* https://nr-vdyp-dev-backend.apps.silver.devops.gov.bc.ca {
 		header_up Host {http.reverse_proxy.upstream.hostport}
 		header_up X-Real-IP {remote_host}
 		header_up X-Forwarded-For {remote_host}
+    header_down Access-Control-Allow-Origin "*"
+    header_down Access-Control-Allow-Methods "GET, POST, DELETE, PUT, OPTIONS"
+    header_down Access-Control-Allow-Headers "Authorization, Content-Type"
 	}
 	header {
 		X-Frame-Options "SAMEORIGIN"
