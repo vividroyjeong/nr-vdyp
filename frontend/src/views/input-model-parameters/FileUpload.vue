@@ -171,20 +171,8 @@
             <v-btn class="blue-btn ml-2" @click="fileUploadRunModel"
               >Run Model</v-btn
             >
-            <v-btn class="blue-btn ml-2" @click="projectionHcsvAxios"
-              >Run Projection (Axios)</v-btn
-            >
-            <v-btn class="blue-btn ml-2" @click="projectionHcsvDirect"
-              >Run Projection (Direct)</v-btn
-            >
             <v-btn class="blue-btn ml-2" @click="fetchHelpDetails"
               >Get Help</v-btn
-            >
-            <v-btn class="blue-btn ml-2" @click="apiFetchHelpAxios"
-              >Get Help axios</v-btn
-            >
-            <v-btn class="blue-btn ml-2" @click="apiFetchHelpDirect"
-              >Get Help direct</v-btn
             >
             <v-btn class="blue-btn ml-2" @click="fetchRootDetails"
               >Fetch Root Details</v-btn
