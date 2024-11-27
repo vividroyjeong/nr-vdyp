@@ -30,12 +30,11 @@ import jakarta.validation.Valid;
 
 @JsonPropertyOrder(
 	{ Parameters.JSON_PROPERTY_OUTPUT_FORMAT, Parameters.JSON_PROPERTY_SELECTED_EXECUTION_OPTIONS,
-			Parameters.JSON_PROPERTY_DO_ENABLE_PROGRESS_LOGGING, Parameters.JSON_PROPERTY_DO_ENABLE_ERROR_LOGGING,
-			Parameters.JSON_PROPERTY_DO_ENABLE_DEBUG_LOGGING, Parameters.JSON_PROPERTY_SELECTED_DEBUG_OPTIONS,
-			Parameters.JSON_PROPERTY_AGE_START, Parameters.JSON_PROPERTY_MIN_AGE_START,
-			Parameters.JSON_PROPERTY_MAX_AGE_START, Parameters.JSON_PROPERTY_AGE_END,
-			Parameters.JSON_PROPERTY_MIN_AGE_END, Parameters.JSON_PROPERTY_MAX_AGE_END,
-			Parameters.JSON_PROPERTY_YEAR_START, Parameters.JSON_PROPERTY_YEAR_END, Parameters.JSON_PROPERTY_FORCE_YEAR,
+			Parameters.JSON_PROPERTY_SELECTED_DEBUG_OPTIONS, Parameters.JSON_PROPERTY_AGE_START,
+			Parameters.JSON_PROPERTY_MIN_AGE_START, Parameters.JSON_PROPERTY_MAX_AGE_START,
+			Parameters.JSON_PROPERTY_AGE_END, Parameters.JSON_PROPERTY_MIN_AGE_END,
+			Parameters.JSON_PROPERTY_MAX_AGE_END, Parameters.JSON_PROPERTY_YEAR_START,
+			Parameters.JSON_PROPERTY_YEAR_END, Parameters.JSON_PROPERTY_FORCE_YEAR,
 			Parameters.JSON_PROPERTY_AGE_INCREMENT, Parameters.JSON_PROPERTY_MIN_AGE_INCREMENT,
 			Parameters.JSON_PROPERTY_MAX_AGE_INCREMENT, Parameters.JSON_PROPERTY_COMBINE_AGE_YEAR_RANGE,
 			Parameters.JSON_PROPERTY_PROGRESS_FREQUENCY, Parameters.JSON_PROPERTY_METADATA_TO_OUTPUT,
@@ -129,7 +128,13 @@ public class Parameters {
 
 		DO_INCLUDE_SECONDARY_SPECIES_DOMINANT_HEIGHT_IN_YIELD_TABLE(
 				"doIncludeSecondarySpeciesDominantHeightInYieldTable"
-		);
+		),
+
+		DO_ENABLE_PROGRESS_LOGGING("doEnableProgressLogging"),
+
+		DO_ENABLE_ERROR_LOGGING("doEnableErrorLogging"),
+
+		DO_ENABLE_DEBUG_LOGGING("doEnableDebugLogging");
 
 		private String value;
 
@@ -157,16 +162,6 @@ public class Parameters {
 	public static final String JSON_PROPERTY_SELECTED_EXECUTION_OPTIONS = "selectedExecutionOptions";
 	@JsonProperty(JSON_PROPERTY_SELECTED_EXECUTION_OPTIONS)
 	private List<SelectedExecutionOptionsEnum> selectedExecutionOptions = new ArrayList<>();
-
-	public static final String JSON_PROPERTY_DO_ENABLE_PROGRESS_LOGGING = "doEnableProgressLogging";
-	@JsonProperty(JSON_PROPERTY_DO_ENABLE_PROGRESS_LOGGING)
-	private Boolean doEnableProgressLogging;
-	public static final String JSON_PROPERTY_DO_ENABLE_ERROR_LOGGING = "doEnableErrorLogging";
-	@JsonProperty(JSON_PROPERTY_DO_ENABLE_ERROR_LOGGING)
-	private Boolean doEnableErrorLogging;
-	public static final String JSON_PROPERTY_DO_ENABLE_DEBUG_LOGGING = "doEnableDebugLogging";
-	@JsonProperty(JSON_PROPERTY_DO_ENABLE_DEBUG_LOGGING)
-	private Boolean doEnableDebugLogging;
 
 	/**
 	 * Gets or Sets selectedDebugOptions
@@ -391,48 +386,6 @@ public class Parameters {
 
 	public void setSelectedExecutionOptions(List<SelectedExecutionOptionsEnum> selectedExecutionOptions) {
 		this.selectedExecutionOptions = selectedExecutionOptions;
-	}
-
-	public Parameters doEnableProgressLogging(Boolean doEnableProgressLogging) {
-		this.doEnableProgressLogging = doEnableProgressLogging;
-		return this;
-	}
-
-	@JsonProperty(value = "doEnableProgressLogging")
-	public Boolean getDoEnableProgressLogging() {
-		return doEnableProgressLogging;
-	}
-
-	public void setDoEnableProgressLogging(Boolean doEnableProgressLogging) {
-		this.doEnableProgressLogging = doEnableProgressLogging;
-	}
-
-	public Parameters doEnableErrorLogging(Boolean doEnableErrorLogging) {
-		this.doEnableErrorLogging = doEnableErrorLogging;
-		return this;
-	}
-
-	@JsonProperty(value = "doEnableErrorLogging")
-	public Boolean getDoEnableErrorLogging() {
-		return doEnableErrorLogging;
-	}
-
-	public void setDoEnableErrorLogging(Boolean doEnableErrorLogging) {
-		this.doEnableErrorLogging = doEnableErrorLogging;
-	}
-
-	public Parameters doEnableDebugLogging(Boolean doEnableDebugLogging) {
-		this.doEnableDebugLogging = doEnableDebugLogging;
-		return this;
-	}
-
-	@JsonProperty(value = "doEnableDebugLogging")
-	public Boolean getDoEnableDebugLogging() {
-		return doEnableDebugLogging;
-	}
-
-	public void setDoEnableDebugLogging(Boolean doEnableDebugLogging) {
-		this.doEnableDebugLogging = doEnableDebugLogging;
 	}
 
 	public Parameters selectedDebugOptions(List<SelectedDebugOptionsEnum> selectedDebugOptions) {
@@ -822,9 +775,6 @@ public class Parameters {
 		Parameters parameters = (Parameters) o;
 		return Objects.equals(this.outputFormat, parameters.outputFormat)
 				&& Objects.equals(this.selectedExecutionOptions, parameters.selectedExecutionOptions)
-				&& Objects.equals(this.doEnableProgressLogging, parameters.doEnableProgressLogging)
-				&& Objects.equals(this.doEnableErrorLogging, parameters.doEnableErrorLogging)
-				&& Objects.equals(this.doEnableDebugLogging, parameters.doEnableDebugLogging)
 				&& Objects.equals(this.selectedDebugOptions, parameters.selectedDebugOptions)
 				&& Objects.equals(this.ageStart, parameters.ageStart)
 				&& Objects.equals(this.minAgeStart, parameters.minAgeStart)
@@ -847,10 +797,9 @@ public class Parameters {
 	@Override
 	public int hashCode() {
 		return Objects.hash(
-				outputFormat, selectedExecutionOptions, doEnableProgressLogging, doEnableErrorLogging,
-				doEnableDebugLogging, selectedDebugOptions, ageStart, minAgeStart, maxAgeStart, ageEnd, minAgeEnd,
-				maxAgeEnd, yearStart, yearEnd, forceYear, ageIncrement, minAgeIncrement, maxAgeIncrement,
-				combineAgeYearRange, progressFrequency, metadataToOutput, filters, utils
+				outputFormat, selectedExecutionOptions, selectedDebugOptions, ageStart, minAgeStart, maxAgeStart,
+				ageEnd, minAgeEnd, maxAgeEnd, yearStart, yearEnd, forceYear, ageIncrement, minAgeIncrement,
+				maxAgeIncrement, combineAgeYearRange, progressFrequency, metadataToOutput, filters, utils
 		);
 	}
 
@@ -861,9 +810,6 @@ public class Parameters {
 
 		sb.append("    outputFormat: ").append(toIndentedString(outputFormat)).append("\n");
 		sb.append("    selectedExecutionOptions: ").append(toIndentedString(selectedExecutionOptions)).append("\n");
-		sb.append("    doEnableProgressLogging: ").append(toIndentedString(doEnableProgressLogging)).append("\n");
-		sb.append("    doEnableErrorLogging: ").append(toIndentedString(doEnableErrorLogging)).append("\n");
-		sb.append("    doEnableDebugLogging: ").append(toIndentedString(doEnableDebugLogging)).append("\n");
 		sb.append("    selectedDebugOptions: ").append(toIndentedString(selectedDebugOptions)).append("\n");
 		sb.append("    ageStart: ").append(toIndentedString(ageStart)).append("\n");
 		sb.append("    minAgeStart: ").append(toIndentedString(minAgeStart)).append("\n");
