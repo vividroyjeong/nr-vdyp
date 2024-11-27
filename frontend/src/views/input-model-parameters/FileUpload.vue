@@ -171,12 +171,6 @@
             <v-btn class="blue-btn ml-2" @click="fileUploadRunModel"
               >Run Model</v-btn
             >
-            <v-btn class="blue-btn ml-2" @click="fetchHelpDetails"
-              >Get Help</v-btn
-            >
-            <v-btn class="blue-btn ml-2" @click="fetchRootDetails"
-              >Fetch Root Details</v-btn
-            >
           </v-card-actions>
         </v-card>
       </v-card>
@@ -186,12 +180,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import ApiFetchDirect from '@/services/apiFetchDirect'
-import ApiFetchAxios from '@/services/apiFetchAxios'
-import { projectionHcsvPost, helpGet, rootGet } from '@/services/apiActions'
-import { StatusCodes } from 'http-status-codes'
+import { projectionHcsvPost } from '@/services/apiActions'
 import { handleApiError } from '@/services/apiErrorHandler'
-import * as messageHandler from '@/utils/messageHandler'
 import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
 import {
   volumeReportedOptions,
@@ -203,12 +193,9 @@ import {
   MDL_PRM_INPUT_ERR,
   MSG_DIALOG_TITLE,
   FILE_UPLOAD_ERR,
-  SVC_ERR,
 } from '@/constants/message'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 import { FileUploadValidation } from '@/validation/fileUploadValidation'
-import type { Parameters } from '@/services/vdyp-api/models/parameters'
-import Papa from 'papaparse'
 
 const form = ref<HTMLFormElement>()
 
@@ -383,78 +370,7 @@ const fileUploadRunModel = async () => {
     }
   }
 }
-
-const fetchHelpDetails = async () => {
-  try {
-    const details = await helpGet()
-    console.log(details)
-  } catch (error) {
-    handleApiError(error, 'Failed to fetch help details')
-  }
-}
-
-const apiFetchHelpAxios = async () => {
-  try {
-    const results = await ApiFetchAxios.getHelp()
-    console.log(results)
-  } catch (error) {
-    handleApiError(error, 'Failed to fetch Help')
-  }
-}
-
-const apiFetchHelpDirect = async () => {
-  try {
-    const results = await ApiFetchDirect.prototype.getHelp()
-    console.log(results)
-  } catch (error) {
-    console.error('Failed to fetch Help:', error)
-  }
-}
-
-const projectionHcsvDirect = async () => {
-  try {
-    const apiFetch = new ApiFetchDirect()
-    const result = await apiFetch.projectionHcsvPost()
-    console.log('Projection result:', result)
-
-    const url = window.URL.createObjectURL(result)
-    const link = document.createElement('a')
-    link.href = url
-    link.setAttribute('download', 'vdyp-output.zip')
-    document.body.appendChild(link)
-    link.click()
-    link.remove()
-  } catch (error) {
-    console.error('Failed to fetch Help:', error)
-  }
-}
-
-const projectionHcsvAxios = async () => {
-  try {
-    const result = await ApiFetchAxios.projectionHcsvPost()
-
-    const url = window.URL.createObjectURL(result)
-    const link = document.createElement('a')
-    link.href = url
-    link.setAttribute('download', 'vdyp-output.zip')
-    document.body.appendChild(link)
-    link.click()
-    link.remove()
-  } catch (error) {
-    handleApiError(error, 'Failed to run Projection (Axios)')
-  }
-}
-
-const fetchRootDetails = async () => {
-  try {
-    const result = await rootGet()
-    console.log('Root Details:', result)
-  } catch (error) {
-    console.error('Failed to fetch root details:', error)
-  }
-}
 </script>
-
 <style scoped>
 .file-upload-run-model-card {
   padding-bottom: 16px !important;
