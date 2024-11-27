@@ -51,10 +51,9 @@ const items = computed(() => projectionStore.errorMessages)
 const errMsgRsltPrintAreaRef = ref<HTMLElement | null>(null)
 
 const download = () => {
-  const content = 'Hello, this is your text file!'
+  const content = items.value.join('\n')
   const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
-
-  saveAs(blob, 'OUTPUT_ERRMSG.txt')
+  saveAs(blob, 'Output_Error.txt')
 }
 
 const print = () => {
@@ -73,7 +72,7 @@ const print = () => {
     container.appendChild(header)
 
     // traverse the v-virtual-scroll item directly and add it to the DOM
-    items.value.forEach((item) => {
+    items.value.forEach((item: any) => {
       const itemDiv = document.createElement('div')
       itemDiv.style.padding = '4px 16px'
       itemDiv.style.height = '30px'
