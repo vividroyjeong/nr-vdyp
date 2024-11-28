@@ -1,11 +1,5 @@
 <configuration>
 
-  <turboFilter class="ch.qos.logback.classic.turbo.MDCFilter">
-    <MDCKey>projectionId</MDCKey>
-    <Value>not-request-specific</Value>
-    <OnMatch>DENY</OnMatch>
-  </turboFilter>
-
   <appender name="sifter" class="ch.qos.logback.classic.sift.SiftingAppender">
     <!-- in the absence of the class attribute, it is assumed that the
          desired discriminator type is
@@ -20,7 +14,7 @@
  	    <immediateFlush>true</immediateFlush>
         <append>false</append>
         <layout class="ch.qos.logback.classic.PatternLayout">
-          <pattern>%d [%thread] %level %mdc %logger{35} -%kvp -%msg%n</pattern>
+          <pattern>%d [%thread] %-5level %logger{35}: %msg%n</pattern>
         </layout>
       </appender>
     </sift>
@@ -30,7 +24,7 @@
     <!-- encoders are assigned the type
          ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
     <encoder>
-      <pattern>%-4relative [%thread] %-5level %logger{35} -%kvp- %msg %n</pattern>
+      <pattern>%-4relative [%thread] %-5level %logger{35}: %msg%n</pattern>
     </encoder>
   </appender>
 

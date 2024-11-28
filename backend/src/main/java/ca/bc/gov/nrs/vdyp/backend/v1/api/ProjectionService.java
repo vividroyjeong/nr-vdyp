@@ -26,6 +26,7 @@ import ca.bc.gov.nrs.vdyp.backend.v1.api.impl.exceptions.ProjectionException;
 import ca.bc.gov.nrs.vdyp.backend.v1.api.projection.IProjectionRunner;
 import ca.bc.gov.nrs.vdyp.backend.v1.api.projection.ProjectionRunner;
 import ca.bc.gov.nrs.vdyp.backend.v1.api.projection.StubProjectionRunner;
+import ca.bc.gov.nrs.vdyp.backend.v1.gen.api.ParameterNames;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.Parameters;
 import ca.bc.gov.nrs.vdyp.backend.v1.utils.FileHelper;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -50,9 +51,7 @@ public class ProjectionService {
 			FileUpload layersFileStream, //
 			SecurityContext securityContext
 	) {
-		if (trialRun == null) {
-			trialRun = false;
-		}
+		Response response;
 
 		Map<String, InputStream> inputStreams = new HashMap<>();
 
@@ -62,27 +61,37 @@ public class ProjectionService {
 
 			if (trialRun) {
 				if (polyStream.available() == 0) {
+					polyStream.close();
 					polyStream = FileHelper.getStubResourceFile("VDYP7_INPUT_POLY.csv");
 				}
 
 				if (layersStream.available() == 0) {
+					layersStream.close();
 					layersStream = FileHelper.getStubResourceFile("VDYP7_INPUT_LAYER.csv");
 				}
 			}
 
-			inputStreams.put("polygon", polyStream);
-			inputStreams.put("layers", layersStream);
+			response = runProjection("hcsv", inputStreams, trialRun, parameters, securityContext);
+
+			inputStreams.put(ParameterNames.POLYGON_INPUT_DATA, polyStream);
+			inputStreams.put(ParameterNames.LAYERS_INPUT_DATA, layersStream);
 		} catch (IOException e) {
 			String message = Exceptions.getMessage(e, "Projection, when opening input files,");
 
 			logger.error(message);
 
-			return Response.serverError().status(500).entity(message).build();
+			response = Response.serverError().status(500).entity(message).build();
 		} finally {
-			logger.info(FINALIZE_SESSION_MARKER, ">projectionHcsvPost");
+			for (var entry : inputStreams.entrySet()) {
+				try {
+					entry.getValue().close();
+				} catch (IOException e) {
+					logger.warn("Unable to close {}; reason: {}", entry.getKey(), e.getMessage());
+				}
+			}
 		}
 
-		return runProjection("hcsv", inputStreams, trialRun, parameters, securityContext);
+		return response;
 	}
 
 	public Response projectionDcsvPost(
@@ -103,11 +112,9 @@ public class ProjectionService {
 			String projectionType, Map<String, InputStream> inputStreams, Boolean trialRun, Parameters params,
 			SecurityContext securityContext
 	) {
-		if (trialRun == null) {
-			trialRun = false;
-		}
-
 		String projectionId = ProjectionService.buildId(projectionType);
+
+		logger.info("<runProjection {} {}", projectionType, projectionId);
 
 		boolean debugLoggingEnabled = params.getSelectedExecutionOptions()
 				.contains(Parameters.SelectedExecutionOptionsEnum.DO_ENABLE_DEBUG_LOGGING);
@@ -115,40 +122,43 @@ public class ProjectionService {
 			MDC.put("projectionId", projectionId);
 		}
 
-		IProjectionRunner runner;
-
-		logger.info("<projectionHcsvPost {}", projectionId);
-
-		if (trialRun) {
-			runner = new StubProjectionRunner(projectionId, params);
-		} else {
-			runner = new ProjectionRunner(projectionId, params);
-		}
-
-		runner.run(inputStreams);
-
 		/* this is known from logback.xml */
 		Path debugLogPath = Path.of("logs", projectionId + ".log");
 
-		InputStream debugLogStream;
+		Response response = Response.serverError().status(500).build();
+
 		try {
-			if (debugLoggingEnabled) {
-				debugLogStream = FileHelper.get(debugLogPath);
+			IProjectionRunner runner;
+
+			logger.info("Running {} projection {}", projectionType, projectionId);
+
+			if (trialRun) {
+				runner = new StubProjectionRunner(projectionId, params);
 			} else {
-				debugLogStream = new ByteArrayInputStream(new byte[0]);
+				runner = new ProjectionRunner(projectionId, params);
 			}
-		} catch (IOException e) {
-			String message = Exceptions.getMessage(e, "Projection, when opening input files,");
 
-			logger.error(message);
+			runner.run(inputStreams);
 
-			return Response.serverError().status(500).entity(message).build();
-		}
+			InputStream debugLogStream = new ByteArrayInputStream(new byte[0]);
+			try {
+				if (debugLoggingEnabled) {
+					debugLogStream = FileHelper.get(debugLogPath);
+				}
+			} catch (IOException e) {
+				String message = Exceptions.getMessage(e, "Projection, when opening input files,");
+				logger.warn(message);
+			}
 
-		Response response = buildOutputZipFile(runner, debugLogStream);
+			response = buildOutputZipFile(runner, debugLogStream);
 
-		if (debugLoggingEnabled) {
-			FileHelper.delete(debugLogPath);
+		} finally {
+			logger.info(FINALIZE_SESSION_MARKER, ">runProjection {} {}", projectionType, projectionId);
+
+			if (debugLoggingEnabled) {
+				MDC.remove("projectionId");
+				// FileHelper.delete(debugLogPath);
+			}
 		}
 
 		return response;

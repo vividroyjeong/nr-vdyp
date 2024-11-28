@@ -6,9 +6,7 @@ import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.multipart.FileUpload;
 
 import ca.bc.gov.nrs.vdyp.backend.v1.api.ProjectionService;
-import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.MessagesInner;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.Parameters;
-import ca.bc.gov.nrs.vdyp.backend.v1.gen.responses.ProjectionResource;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
