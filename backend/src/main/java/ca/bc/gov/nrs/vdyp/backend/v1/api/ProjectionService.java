@@ -22,12 +22,14 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import ca.bc.gov.nrs.vdyp.backend.v1.api.impl.exceptions.Exceptions;
-import ca.bc.gov.nrs.vdyp.backend.v1.api.impl.exceptions.ProjectionException;
+import ca.bc.gov.nrs.vdyp.backend.v1.api.impl.exceptions.ProjectionExecutionException;
+import ca.bc.gov.nrs.vdyp.backend.v1.api.impl.exceptions.ProjectionRequestValidationException;
 import ca.bc.gov.nrs.vdyp.backend.v1.api.projection.IProjectionRunner;
 import ca.bc.gov.nrs.vdyp.backend.v1.api.projection.ProjectionRunner;
 import ca.bc.gov.nrs.vdyp.backend.v1.api.projection.StubProjectionRunner;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.api.ParameterNames;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.Parameters;
+import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ProjectionRequestKind;
 import ca.bc.gov.nrs.vdyp.backend.v1.utils.FileHelper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.validation.Valid;
@@ -50,7 +52,7 @@ public class ProjectionService {
 			FileUpload polygonFileStream, //
 			FileUpload layersFileStream, //
 			SecurityContext securityContext
-	) {
+	) throws ProjectionRequestValidationException, ProjectionExecutionException {
 		Response response;
 
 		Map<String, InputStream> inputStreams = new HashMap<>();
@@ -70,11 +72,11 @@ public class ProjectionService {
 					layersStream = FileHelper.getStubResourceFile("VDYP7_INPUT_LAYER.csv");
 				}
 			}
-
-			response = runProjection("hcsv", inputStreams, trialRun, parameters, securityContext);
-
+			
 			inputStreams.put(ParameterNames.POLYGON_INPUT_DATA, polyStream);
 			inputStreams.put(ParameterNames.LAYERS_INPUT_DATA, layersStream);
+
+			response = runProjection(ProjectionRequestKind.HCSV, inputStreams, trialRun, parameters, securityContext);
 		} catch (IOException e) {
 			String message = Exceptions.getMessage(e, "Projection, when opening input files,");
 
@@ -96,7 +98,7 @@ public class ProjectionService {
 
 	public Response projectionDcsvPost(
 			@Valid Parameters parameters, FileUpload dcsvDataStream, Boolean trialRun, SecurityContext securityContext
-	) {
+	) throws ProjectionRequestValidationException, ProjectionExecutionException {
 		return Response.serverError().status(501).build();
 	}
 
@@ -104,17 +106,17 @@ public class ProjectionService {
 			Boolean trialRun, Parameters parameters, FileUpload polygonDataStream, FileUpload layersDataStream,
 			FileUpload historyDataStream, FileUpload nonVegetationDataStream, FileUpload otherVegetationDataStream,
 			FileUpload polygonIdDataStream, FileUpload speciesDataStream, FileUpload vriAdjustDataStream, Object object
-	) {
+	) throws ProjectionRequestValidationException, ProjectionExecutionException {
 		return Response.serverError().status(501).build();
 	}
 
 	private Response runProjection(
-			String projectionType, Map<String, InputStream> inputStreams, Boolean trialRun, Parameters params,
+			ProjectionRequestKind kind, Map<String, InputStream> inputStreams, Boolean trialRun, Parameters params,
 			SecurityContext securityContext
-	) {
-		String projectionId = ProjectionService.buildId(projectionType);
+	) throws ProjectionRequestValidationException, ProjectionExecutionException {
+		String projectionId = ProjectionService.buildId(kind);
 
-		logger.info("<runProjection {} {}", projectionType, projectionId);
+		logger.info("<runProjection {} {}", kind, projectionId);
 
 		boolean debugLoggingEnabled = params.getSelectedExecutionOptions()
 				.contains(Parameters.SelectedExecutionOptionsEnum.DO_ENABLE_DEBUG_LOGGING);
@@ -130,12 +132,12 @@ public class ProjectionService {
 		try {
 			IProjectionRunner runner;
 
-			logger.info("Running {} projection {}", projectionType, projectionId);
+			logger.info("Running {} projection {}", kind, projectionId);
 
 			if (trialRun) {
-				runner = new StubProjectionRunner(projectionId, params);
+				runner = new StubProjectionRunner(ProjectionRequestKind.HCSV, projectionId, params);
 			} else {
-				runner = new ProjectionRunner(projectionId, params);
+				runner = new ProjectionRunner(ProjectionRequestKind.HCSV, projectionId, params);
 			}
 
 			runner.run(inputStreams);
@@ -153,10 +155,11 @@ public class ProjectionService {
 			response = buildOutputZipFile(runner, debugLogStream);
 
 		} finally {
-			logger.info(FINALIZE_SESSION_MARKER, ">runProjection {} {}", projectionType, projectionId);
+			logger.info(FINALIZE_SESSION_MARKER, ">runProjection {} {}", kind, projectionId);
 
 			if (debugLoggingEnabled) {
 				MDC.remove("projectionId");
+				// TODO: uncomment once mechanism is validated
 				// FileHelper.delete(debugLogPath);
 			}
 		}
@@ -164,14 +167,14 @@ public class ProjectionService {
 		return response;
 	}
 
-	private static final DateTimeFormatter dateTimeFormatterForFilenames_ms = DateTimeFormatter
-			.ofPattern("YYYY$MM$dd$HH$mm$ss$SSSS");
-	private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("YYYY-MM-dd-HH:mm:ss");
+	private static final DateTimeFormatter dateTimeFormatterForFilenames = DateTimeFormatter
+			.ofPattern("yyyy$MM$dd$HH$mm$ss$SSSS");
+	private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm:ss");
 
-	public static String buildId(String projectionKind) {
+	public static String buildId(ProjectionRequestKind projectionKind) {
 		StringBuilder sb = new StringBuilder("projection-");
 		sb.append(projectionKind).append("-");
-		sb.append(dateTimeFormatterForFilenames_ms.format(LocalDateTime.now()));
+		sb.append(dateTimeFormatterForFilenames.format(LocalDateTime.now()));
 		return sb.toString();
 	}
 
@@ -215,7 +218,7 @@ public class ProjectionService {
 			return Response.ok(resultingByteArray).status(Status.CREATED)
 					.header("content-disposition", "attachment;filename=\"" + outputFileName + "\"").build();
 
-		} catch (ProjectionException | IOException e) {
+		} catch (ProjectionExecutionException | IOException e) {
 			String message = Exceptions.getMessage(e, "Projection, when creating output zip,");
 			logger.error(message);
 

@@ -6,20 +6,23 @@ import ca.bc.gov.nrs.vdyp.backend.v1.api.impl.messaging.IMessageLog;
 import ca.bc.gov.nrs.vdyp.backend.v1.api.impl.messaging.MessageLog;
 import ca.bc.gov.nrs.vdyp.backend.v1.api.impl.messaging.NullMessageLog;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.Parameters;
+import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ProjectionRequestKind;
 import jakarta.validation.Valid;
 
 public class ProjectionState {
 
 	private final String projectionId;
 	private final Parameters params;
+	private final ProjectionRequestKind kind;
 
 	private final IMessageLog progressLog;
 	private final IMessageLog errorLog;
 
-	public ProjectionState(String projectionId, @Valid Parameters params) {
+	public ProjectionState(ProjectionRequestKind kind, String projectionId, @Valid Parameters params) {
 
 		this.projectionId = projectionId;
 		this.params = params;
+		this.kind = kind;
 
 		boolean errorLoggingEnabled = this.params.getSelectedExecutionOptions()
 				.contains(Parameters.SelectedExecutionOptionsEnum.DO_ENABLE_ERROR_LOGGING);
@@ -41,6 +44,10 @@ public class ProjectionState {
 
 	public String getProjectionId() {
 		return projectionId;
+	}
+
+	public ProjectionRequestKind getKind() {
+		return kind;
 	}
 
 	public IMessageLog getProgressLog() {

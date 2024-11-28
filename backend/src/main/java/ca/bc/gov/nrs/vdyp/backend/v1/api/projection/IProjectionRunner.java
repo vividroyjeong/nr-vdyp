@@ -3,19 +3,19 @@ package ca.bc.gov.nrs.vdyp.backend.v1.api.projection;
 import java.io.InputStream;
 import java.util.Map;
 
-import ca.bc.gov.nrs.vdyp.backend.v1.api.impl.exceptions.ProjectionException;
-import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.Parameters;
+import ca.bc.gov.nrs.vdyp.backend.v1.api.impl.exceptions.ProjectionExecutionException;
+import ca.bc.gov.nrs.vdyp.backend.v1.api.impl.exceptions.ProjectionRequestValidationException;
 
 public interface IProjectionRunner {
 
-	void run(Map<String, InputStream> inputStreams);
+	void run(Map<String, InputStream> inputStreams) throws ProjectionRequestValidationException, ProjectionExecutionException;
 
-	Parameters getParameters();
+	ProjectionState getState();
 
-	InputStream getYieldTable() throws ProjectionException;
+	InputStream getYieldTable() throws ProjectionExecutionException;
 
-	InputStream getProgressStream() throws ProjectionException;
+	InputStream getProgressStream() throws ProjectionExecutionException;
 
-	InputStream getErrorStream() throws ProjectionException;
+	InputStream getErrorStream() throws ProjectionExecutionException;
 
 }

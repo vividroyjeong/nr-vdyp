@@ -6,6 +6,8 @@ import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.multipart.FileUpload;
 
 import ca.bc.gov.nrs.vdyp.backend.v1.api.ProjectionService;
+import ca.bc.gov.nrs.vdyp.backend.v1.api.impl.exceptions.ProjectionExecutionException;
+import ca.bc.gov.nrs.vdyp.backend.v1.api.impl.exceptions.ProjectionRequestValidationException;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.Parameters;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.inject.Inject;
@@ -17,6 +19,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 @Path("/api/v8/projection")
 @io.swagger.annotations.Api(description = "the projection API")
@@ -42,9 +45,15 @@ public class ProjectionEndpoint implements Endpoint {
 			/* , @Context SecurityContext securityContext */
 
 	) {
-		return projectionService.projectionDcsvPost(
-				parameters, dcsvDataStream, true /* trialRun */, null /* securityContext */
-		);
+		try {
+			return projectionService.projectionDcsvPost(
+					parameters, dcsvDataStream, true /* trialRun */, null /* securityContext */
+			);
+		} catch (ProjectionRequestValidationException e) {
+			return Response.status(Status.BAD_REQUEST).entity(e).build();
+		} catch (ProjectionExecutionException e) {
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e).build();
+		}
 	}
 
 	@jakarta.ws.rs.POST
@@ -63,9 +72,15 @@ public class ProjectionEndpoint implements Endpoint {
 			@FormParam(value = ParameterNames.LAYERS_INPUT_DATA) FileUpload layersDataStream //
 			// , @Context SecurityContext securityContext
 	) {
-		return projectionService.projectionHcsvPost(
-				trialRun, parameters, polygonDataStream, layersDataStream, null /* securityContext */
-		);
+		try {
+			return projectionService.projectionHcsvPost(
+					trialRun, parameters, polygonDataStream, layersDataStream, null /* securityContext */
+			);
+		} catch (ProjectionRequestValidationException e) {
+			return Response.status(Status.BAD_REQUEST).entity(e).build();
+		} catch (ProjectionExecutionException e) {
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e).build();
+		}
 	}
 
 	@jakarta.ws.rs.POST
@@ -90,11 +105,17 @@ public class ProjectionEndpoint implements Endpoint {
 			@FormParam(value = ParameterNames.VRI_ADJUST_INPUT_DATA) FileUpload vriAdjustDataStream //
 			// , @Context SecurityContext securityContext
 	) {
-		return projectionService
-				.projectionScsvPost(
-						trialRun, parameters, polygonDataStream, layersDataStream, historyDataStream,
-						nonVegetationDataStream, otherVegetationDataStream, polygonIdDataStream, speciesDataStream,
-						vriAdjustDataStream, null /* securityContext */
-				);
+		try {
+			return projectionService
+					.projectionScsvPost(
+							trialRun, parameters, polygonDataStream, layersDataStream, historyDataStream,
+							nonVegetationDataStream, otherVegetationDataStream, polygonIdDataStream, speciesDataStream,
+							vriAdjustDataStream, null /* securityContext */
+					);
+		} catch (ProjectionRequestValidationException e) {
+			return Response.status(Status.BAD_REQUEST).entity(e).build();
+		} catch (ProjectionExecutionException e) {
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e).build();
+		}
 	}
 }

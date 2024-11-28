@@ -40,9 +40,6 @@ import jakarta.validation.Valid;
 			Parameters.JSON_PROPERTY_PROGRESS_FREQUENCY, Parameters.JSON_PROPERTY_METADATA_TO_OUTPUT,
 			Parameters.JSON_PROPERTY_FILTERS, Parameters.JSON_PROPERTY_UTILS }
 )
-@jakarta.annotation.Generated(
-		value = "org.openapitools.codegen.languages.JavaJAXRSSpecServerCodegen", date = "2024-11-19T17:38:05.300985-08:00[America/Vancouver]", comments = "Generator version: 7.9.0"
-)
 @RegisterForReflection
 public class Parameters {
 	/**
@@ -289,7 +286,7 @@ public class Parameters {
 
 	public static final String JSON_PROPERTY_PROGRESS_FREQUENCY = "progressFrequency";
 	@JsonProperty(JSON_PROPERTY_PROGRESS_FREQUENCY)
-	private ParametersProgressFrequency progressFrequency;
+	private ProgressFrequency progressFrequency;
 
 	/**
 	 * Controls how much metadata is displayed in the Output and Error Logs.
@@ -338,7 +335,7 @@ public class Parameters {
 
 	public static final String JSON_PROPERTY_UTILS = "utils";
 	@JsonProperty(JSON_PROPERTY_UTILS)
-	private List<@Valid ParametersUtilsInner> utils = new ArrayList<>();
+	private List<@Valid UtilizationParameter> utils = new ArrayList<>();
 
 	public Parameters outputFormat(OutputFormatEnum outputFormat) {
 		this.outputFormat = outputFormat;
@@ -676,7 +673,7 @@ public class Parameters {
 		this.combineAgeYearRange = combineAgeYearRange;
 	}
 
-	public Parameters progressFrequency(ParametersProgressFrequency progressFrequency) {
+	public Parameters progressFrequency(ProgressFrequency progressFrequency) {
 		this.progressFrequency = progressFrequency;
 		return this;
 	}
@@ -688,11 +685,11 @@ public class Parameters {
 	 **/
 	@JsonProperty(value = "progressFrequency")
 	@Valid
-	public ParametersProgressFrequency getProgressFrequency() {
+	public ProgressFrequency getProgressFrequency() {
 		return progressFrequency;
 	}
 
-	public void setProgressFrequency(ParametersProgressFrequency progressFrequency) {
+	public void setProgressFrequency(ProgressFrequency progressFrequency) {
 		this.progressFrequency = progressFrequency;
 	}
 
@@ -736,12 +733,12 @@ public class Parameters {
 		this.filters = filters;
 	}
 
-	public Parameters utils(List<@Valid ParametersUtilsInner> utils) {
+	public Parameters utils(List<@Valid UtilizationParameter> utils) {
 		this.utils = utils;
 		return this;
 	}
 
-	public Parameters addUtilsItem(ParametersUtilsInner utilsItem) {
+	public Parameters addUtilsItem(UtilizationParameter utilsItem) {
 		if (this.utils == null) {
 			this.utils = new ArrayList<>();
 		}
@@ -756,11 +753,11 @@ public class Parameters {
 	 **/
 	@JsonProperty(value = "utils")
 	@Valid
-	public List<@Valid ParametersUtilsInner> getUtils() {
+	public List<@Valid UtilizationParameter> getUtils() {
 		return utils;
 	}
 
-	public void setUtils(List<@Valid ParametersUtilsInner> utils) {
+	public void setUtils(List<@Valid UtilizationParameter> utils) {
 		this.utils = utils;
 	}
 
@@ -791,7 +788,8 @@ public class Parameters {
 				&& Objects.equals(this.combineAgeYearRange, parameters.combineAgeYearRange)
 				&& Objects.equals(this.progressFrequency, parameters.progressFrequency)
 				&& Objects.equals(this.metadataToOutput, parameters.metadataToOutput)
-				&& Objects.equals(this.filters, parameters.filters) && Objects.equals(this.utils, parameters.utils);
+				&& Objects.equals(this.filters, parameters.filters) 
+				&& Objects.equals(this.utils, parameters.utils);
 	}
 
 	@Override

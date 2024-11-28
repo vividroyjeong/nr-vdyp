@@ -4,40 +4,38 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-import ca.bc.gov.nrs.vdyp.backend.v1.api.impl.exceptions.ProjectionException;
+import ca.bc.gov.nrs.vdyp.backend.v1.api.impl.exceptions.ProjectionExecutionException;
+import ca.bc.gov.nrs.vdyp.backend.v1.api.impl.exceptions.ProjectionRequestValidationException;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.Parameters;
+import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ProjectionRequestKind;
 import ca.bc.gov.nrs.vdyp.backend.v1.utils.FileHelper;
 import jakarta.validation.Valid;
 
 public class ProjectionRunner implements IProjectionRunner {
 
 	private final ProjectionState state;
-	private final Parameters parameters;
 
-	public ProjectionRunner(String projectionId, @Valid Parameters parameters) {
-		this.state = new ProjectionState(projectionId, parameters);
-		this.parameters = parameters;
+	public ProjectionRunner(ProjectionRequestKind kind, String projectionId, @Valid Parameters parameters) {
+		this.state = new ProjectionState(kind, projectionId, parameters);
 	}
 
 	@Override
-	public void run(Map<String, InputStream> streams) {
+	public void run(Map<String, InputStream> streams) throws ProjectionRequestValidationException {
 		state.getProgressLog().addMessage("Running Projection");
 
-		validate();
+		ProjectionRequestValidator.validate(state, streams);
+		
 		createInputStream(streams.get("polygon"), streams.get("layers"));
+		
 		project();
 	}
 
 	@Override
-	public Parameters getParameters() {
-		return parameters;
+	public ProjectionState getState() {
+		return state;
 	}
 
 	private void createInputStream(InputStream polyStream, InputStream layersStream) {
-		// TODO Auto-generated method stub
-	}
-
-	private void validate() {
 		// TODO Auto-generated method stub
 	}
 
@@ -46,12 +44,12 @@ public class ProjectionRunner implements IProjectionRunner {
 	}
 
 	@Override
-	public InputStream getYieldTable() throws ProjectionException {
+	public InputStream getYieldTable() throws ProjectionExecutionException {
 		// TODO: For now...
 		try {
 			return FileHelper.getStubResourceFile("Output_YldTbl.csv");
 		} catch (IOException e) {
-			throw new ProjectionException(e);
+			throw new ProjectionExecutionException(e);
 		}
 	}
 

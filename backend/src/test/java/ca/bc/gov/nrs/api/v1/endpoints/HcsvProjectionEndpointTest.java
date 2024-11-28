@@ -17,8 +17,6 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import ca.bc.gov.nrs.api.helpers.TestHelper;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.api.ParameterNames;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.Parameters;
