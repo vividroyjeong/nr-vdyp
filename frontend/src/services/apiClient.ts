@@ -4,6 +4,8 @@ import {
   RootEndpointApi,
 } from '@/services/vdyp-api/'
 import axiosInstance from '@/services/axiosInstance'
+import type { ProjectionHcsvPostRequest } from '@/services/vdyp-api'
+import type { AxiosRequestConfig } from 'axios'
 
 const helpApiInstance = new HelpEndpointApi(undefined, undefined, axiosInstance)
 const projectionApiInstance = new ProjectionEndpointApi(
@@ -14,15 +16,18 @@ const projectionApiInstance = new ProjectionEndpointApi(
 const rootApiInstance = new RootEndpointApi(undefined, undefined, axiosInstance)
 
 export const apiClient = {
-  helpGet: (options?: any) => {
+  helpGet: (options?: AxiosRequestConfig) => {
     return helpApiInstance.v8HelpGet(options)
   },
 
-  projectionHcsvPost: (body?: any, options?: any) => {
+  projectionHcsvPost: (
+    body?: ProjectionHcsvPostRequest,
+    options?: AxiosRequestConfig,
+  ) => {
     return projectionApiInstance.v8ProjectionHcsvPost(body, options)
   },
 
-  rootGet: (options?: any) => {
+  rootGet: (options?: AxiosRequestConfig) => {
     return rootApiInstance.v8Get(options)
   },
 }

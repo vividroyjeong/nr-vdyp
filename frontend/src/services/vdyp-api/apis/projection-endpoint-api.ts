@@ -5,7 +5,7 @@ import type { AxiosResponse, AxiosInstance, AxiosRequestConfig } from 'axios'
 import { Configuration } from '../configuration'
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from '../base'
+import { BASE_PATH, BaseAPI, RequiredError } from '../base'
 import type { RequestArgs } from '../base'
 import type {
   ProjectionDcsvPostRequest,
@@ -68,7 +68,7 @@ export const ProjectionEndpointApiAxiosParamCreator = function (
         (localVarRequestOptions.headers &&
           localVarRequestOptions.headers['Content-Type'] === 'application/json')
       localVarRequestOptions.data = needsSerialization
-        ? JSON.stringify(body !== undefined ? body : {})
+        ? JSON.stringify(body ?? {})
         : body || ''
 
       return {
@@ -125,7 +125,7 @@ export const ProjectionEndpointApiAxiosParamCreator = function (
         (localVarRequestOptions.headers &&
           localVarRequestOptions.headers['Content-Type'] === 'application/json')
       localVarRequestOptions.data = needsSerialization
-        ? JSON.stringify(body !== undefined ? body : {})
+        ? JSON.stringify(body ?? {})
         : body || ''
 
       return {
@@ -181,7 +181,7 @@ export const ProjectionEndpointApiAxiosParamCreator = function (
         (localVarRequestOptions.headers &&
           localVarRequestOptions.headers['Content-Type'] === 'application/json')
       localVarRequestOptions.data = needsSerialization
-        ? JSON.stringify(body !== undefined ? body : {})
+        ? JSON.stringify(body ?? {})
         : body || ''
 
       return {

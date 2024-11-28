@@ -5,8 +5,10 @@ import type { AxiosResponse, AxiosInstance, AxiosRequestConfig } from 'axios'
 import { Configuration } from '../configuration'
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from '../base'
+import { BASE_PATH, BaseAPI, RequiredError } from '../base'
 import type { RequestArgs } from '../base'
+import type { RootResource } from '../models'
+
 /**
  * RootEndpointApi - axios parameter creator
  * @export
@@ -75,7 +77,10 @@ export const RootEndpointApiFp = function (configuration?: Configuration) {
     async v8Get(
       options?: AxiosRequestConfig,
     ): Promise<
-      (axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<void>>
+      (
+        axios?: AxiosInstance,
+        basePath?: string,
+      ) => Promise<AxiosResponse<RootResource>>
     > {
       const localVarAxiosArgs =
         await RootEndpointApiAxiosParamCreator(configuration).v8Get(options)
@@ -108,7 +113,9 @@ export const RootEndpointApiFactory = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async v8Get(options?: AxiosRequestConfig): Promise<AxiosResponse<void>> {
+    async v8Get(
+      options?: AxiosRequestConfig,
+    ): Promise<AxiosResponse<RootResource>> {
       return RootEndpointApiFp(configuration)
         .v8Get(options)
         .then((request) => request(axios /* edited */))
@@ -131,7 +138,7 @@ export class RootEndpointApi extends BaseAPI {
    */
   public async v8Get(
     options?: AxiosRequestConfig,
-  ): Promise<AxiosResponse<void>> {
+  ): Promise<AxiosResponse<RootResource>> {
     return RootEndpointApiFp(this.configuration)
       .v8Get(options)
       .then((request) => request(this.axios /* edited */))

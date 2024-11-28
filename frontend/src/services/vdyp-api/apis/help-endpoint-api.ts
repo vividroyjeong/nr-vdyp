@@ -5,7 +5,7 @@ import type { AxiosResponse, AxiosInstance, AxiosRequestConfig } from 'axios'
 import { Configuration } from '../configuration'
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from '../base'
+import { BASE_PATH, BaseAPI, RequiredError } from '../base'
 import type { RequestArgs } from '../base'
 import type { ParameterDetailsMessage } from '../models'
 

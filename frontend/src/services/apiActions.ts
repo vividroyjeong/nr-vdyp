@@ -1,6 +1,11 @@
 import apiClient from '@/services/apiClient'
+import type {
+  ProjectionHcsvPostRequest,
+  ParameterDetailsMessage,
+  RootResource,
+} from '@/services/vdyp-api'
 
-export const helpGet = async (): Promise<any> => {
+export const helpGet = async (): Promise<ParameterDetailsMessage[]> => {
   try {
     const response = await apiClient.helpGet()
     return response.data
@@ -10,7 +15,9 @@ export const helpGet = async (): Promise<any> => {
   }
 }
 
-export const projectionHcsvPost = async (body: any): Promise<Blob> => {
+export const projectionHcsvPost = async (
+  body: ProjectionHcsvPostRequest,
+): Promise<Blob> => {
   try {
     const response = await apiClient.projectionHcsvPost(body)
     return response.data
@@ -20,7 +27,7 @@ export const projectionHcsvPost = async (body: any): Promise<Blob> => {
   }
 }
 
-export const rootGet = async (): Promise<any> => {
+export const rootGet = async (): Promise<RootResource> => {
   try {
     const response = await apiClient.rootGet()
     return response.data
