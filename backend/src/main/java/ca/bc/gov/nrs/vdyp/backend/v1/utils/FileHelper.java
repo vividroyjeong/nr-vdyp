@@ -18,7 +18,7 @@ public class FileHelper {
 		return FileHelper.class.getClassLoader().getResourceAsStream(resourceFilePath);
 	}
 
-	public static InputStream get(Path filePath) throws IOException {
+	public static InputStream getForReading(Path filePath) throws IOException {
 
 		return Files.newInputStream(filePath, StandardOpenOption.READ);
 	}

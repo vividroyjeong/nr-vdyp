@@ -145,7 +145,7 @@ public class ProjectionService {
 			InputStream debugLogStream = new ByteArrayInputStream(new byte[0]);
 			try {
 				if (debugLoggingEnabled) {
-					debugLogStream = FileHelper.get(debugLogPath);
+					debugLogStream = FileHelper.getForReading(debugLogPath);
 				}
 			} catch (IOException e) {
 				String message = Exceptions.getMessage(e, "Projection, when opening input files,");

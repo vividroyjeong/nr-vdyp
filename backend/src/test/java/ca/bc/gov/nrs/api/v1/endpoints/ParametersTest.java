@@ -3,6 +3,7 @@ package ca.bc.gov.nrs.api.v1.endpoints;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,13 +20,10 @@ import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ProgressFrequency;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.ProgressFrequency.EnumValue;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.UtilizationParameter;
 import ca.bc.gov.nrs.vdyp.backend.v1.gen.model.UtilizationParameter.ValueEnum;
-import io.quarkus.test.junit.QuarkusTest;
-import io.smallrye.common.constraint.Assert;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 
-@QuarkusTest
-public class ParametersProviderTest {
+public class ParametersTest {
 
 	@Test
 	public void testParametersProvider() throws WebApplicationException, IOException {
@@ -104,14 +102,60 @@ public class ParametersProviderTest {
 		ParametersProvider provider = new ParametersProvider();
 		
 		Assert.assertTrue(provider.isReadable(Parameters.class, Parameters.class, null, MediaType.APPLICATION_JSON_TYPE));
-		
+
 		Parameters np = provider.readFrom(Parameters.class, Parameters.class, null, MediaType.APPLICATION_JSON_TYPE, null
 				, new ByteArrayInputStream(json));
 		
 		Assert.assertTrue(op.equals(np));
 		
+		Assert.assertFalse(provider.isReadable(Object.class, null, null, MediaType.APPLICATION_JSON_TYPE));
+		Assert.assertFalse(provider.isReadable(Parameters.class, null, null, MediaType.APPLICATION_OCTET_STREAM_TYPE));
+		
 		np.getProgressFrequency().setEnumValue(EnumValue.POLYGON);
 
 		Assert.assertFalse(op.equals(np));
+	}
+	
+	@Test
+	void testProgressFrequency() {
+		
+		Assert.assertNull(new ProgressFrequency().getIntValue());
+		Assert.assertNull(new ProgressFrequency().getEnumValue());
+		Assert.assertEquals(Integer.valueOf(12), new ProgressFrequency(12).getIntValue());
+		Assert.assertNull(new ProgressFrequency(12).getEnumValue());
+		Assert.assertNull(new ProgressFrequency(ProgressFrequency.EnumValue.MAPSHEET).getIntValue());
+		Assert.assertEquals(ProgressFrequency.EnumValue.MAPSHEET, new ProgressFrequency(ProgressFrequency.EnumValue.MAPSHEET).getEnumValue());
+	
+		Assert.assertThrows(IllegalArgumentException.class, () -> ProgressFrequency.EnumValue.fromValue("not a value"));
+
+		ProgressFrequency pf1 = new ProgressFrequency(12);
+		ProgressFrequency pf2 = new ProgressFrequency(ProgressFrequency.EnumValue.MAPSHEET);
+		Assert.assertEquals(pf1, pf1);
+		Assert.assertEquals(Integer.valueOf(12).hashCode(), pf1.hashCode());
+		Assert.assertEquals(ProgressFrequency.EnumValue.MAPSHEET.hashCode(), pf2.hashCode());
+		Assert.assertEquals(17, new ProgressFrequency().hashCode());
+		
+		Assert.assertTrue(pf1.toString().indexOf("12") != -1);
+		Assert.assertTrue(pf2.toString().indexOf("mapsheet") != -1);
+	}
+	
+	@Test
+	void testUtilizationParameter() {
+		Assert.assertEquals("AL", new UtilizationParameter().speciesName("AL").value(ValueEnum._12_5).getSpeciesName());
+		Assert.assertEquals(ValueEnum._17_5, new UtilizationParameter().speciesName("AL").value(ValueEnum._17_5).getValue());
+		
+		Assert.assertThrows(IllegalArgumentException.class, () -> UtilizationParameter.ValueEnum.fromValue("ZZZ"));
+		
+		var up1 = new UtilizationParameter().speciesName("AL").value(ValueEnum._12_5);
+		var up2 = new UtilizationParameter().speciesName("C").value(ValueEnum._12_5);
+		var up3 = new UtilizationParameter().speciesName("C").value(ValueEnum._22_5);
+		
+		Assert.assertEquals(up1, up1);
+		Assert.assertTrue(up1.hashCode() == up1.hashCode());
+		Assert.assertNotEquals(up2, up3);
+		Assert.assertNotEquals(up2, "C");
+		
+		Assert.assertTrue(up1.toString().indexOf("speciesName: AL") != -1);
+		Assert.assertTrue(up1.toString().indexOf("value: 12.5") != -1);
 	}
 }

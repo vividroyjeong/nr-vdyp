@@ -7,6 +7,13 @@ public class Exceptions {
 	public static String getMessage(Throwable t, String context) {
 
 		String message;
+
+		if (context == null) {
+			context = "";
+		} else {
+			context = context.stripTrailing();
+		}
+		
 		if (t.getCause() != null) {
 
 			message = MessageFormat.format(

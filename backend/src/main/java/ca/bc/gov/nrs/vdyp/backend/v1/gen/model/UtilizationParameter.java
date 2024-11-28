@@ -122,9 +122,9 @@ public class UtilizationParameter {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		UtilizationParameter parametersUtilsInner = (UtilizationParameter) o;
-		return Objects.equals(this.speciesName, parametersUtilsInner.speciesName)
-				&& Objects.equals(this.value, parametersUtilsInner.value);
+		UtilizationParameter up = (UtilizationParameter) o;
+		return Objects.equals(this.speciesName, up.speciesName)
+				&& Objects.equals(this.value, up.value);
 	}
 
 	@Override
@@ -135,9 +135,9 @@ public class UtilizationParameter {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("class ParametersUtilsInner {\n");
-
-		sb.append("    speciesName: ").append(toIndentedString(speciesName)).append("\n");
+		sb.append("class ");
+		sb.append(UtilizationParameter.class.getSimpleName());
+		sb.append(" {\n    speciesName: ").append(toIndentedString(speciesName)).append("\n");
 		sb.append("    value: ").append(toIndentedString(value)).append("\n");
 		sb.append("}");
 		return sb.toString();
