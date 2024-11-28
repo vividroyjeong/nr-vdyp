@@ -31,7 +31,6 @@
 		<module>lib</module>
 		<module>buildtools</module>
 		<module>backend</module>
-		<module>backend-logging-filters</module>
 	</modules>
 
 	<dependencyManagement>
