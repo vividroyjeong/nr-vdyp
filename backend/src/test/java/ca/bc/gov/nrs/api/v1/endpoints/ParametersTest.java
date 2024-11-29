@@ -130,7 +130,7 @@ public class ParametersTest {
 
 		ProgressFrequency pf1 = new ProgressFrequency(12);
 		ProgressFrequency pf2 = new ProgressFrequency(ProgressFrequency.EnumValue.MAPSHEET);
-		Assert.assertEquals(pf1, pf1);
+		Assert.assertTrue(pf1.equals(pf1));
 		Assert.assertEquals(Integer.valueOf(12).hashCode(), pf1.hashCode());
 		Assert.assertEquals(ProgressFrequency.EnumValue.MAPSHEET.hashCode(), pf2.hashCode());
 		Assert.assertEquals(17, new ProgressFrequency().hashCode());
@@ -139,6 +139,7 @@ public class ParametersTest {
 		Assert.assertTrue(pf2.toString().indexOf("mapsheet") != -1);
 	}
 	
+	@SuppressWarnings("unlikely-arg-type")
 	@Test
 	void testUtilizationParameter() {
 		Assert.assertEquals("AL", new UtilizationParameter().speciesName("AL").value(ValueEnum._12_5).getSpeciesName());
@@ -150,10 +151,10 @@ public class ParametersTest {
 		var up2 = new UtilizationParameter().speciesName("C").value(ValueEnum._12_5);
 		var up3 = new UtilizationParameter().speciesName("C").value(ValueEnum._22_5);
 		
-		Assert.assertEquals(up1, up1);
+		Assert.assertTrue(up1.equals(up1));
 		Assert.assertTrue(up1.hashCode() == up1.hashCode());
-		Assert.assertNotEquals(up2, up3);
-		Assert.assertNotEquals(up2, "C");
+		Assert.assertFalse(up2.equals(up3));
+		Assert.assertFalse(up2.equals("C"));
 		
 		Assert.assertTrue(up1.toString().indexOf("speciesName: AL") != -1);
 		Assert.assertTrue(up1.toString().indexOf("value: 12.5") != -1);

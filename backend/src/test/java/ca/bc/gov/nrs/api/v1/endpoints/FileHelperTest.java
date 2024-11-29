@@ -29,5 +29,7 @@ public class FileHelperTest {
 		FileHelper.delete(tempFilePath);
 
 		Assert.assertThrows(NoSuchFileException.class, () -> FileHelper.getForReading(tempFilePath));
+
+		Assert.assertThrows(IllegalStateException.class, () -> FileHelper.delete(tempFilePath));
 	}
 }
