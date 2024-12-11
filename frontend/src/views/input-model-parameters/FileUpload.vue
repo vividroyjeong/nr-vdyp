@@ -180,7 +180,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { ProjectionHcsvPostRequest } from '@/services/vdyp-api'
+import { SelectedExecutionOptionsEnum } from '@/services/vdyp-api'
 import { projectionHcsvPost } from '@/services/apiActions'
 import { handleApiError } from '@/services/apiErrorHandler'
 import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
@@ -356,17 +356,31 @@ const fileUploadRunModel = async () => {
         console.warn('Form reference is null. Validation skipped.')
       }
 
-      const body: ProjectionHcsvPostRequest = {
-        projectionParameters: {
-          ageStart: startingAge.value!,
-          ageEnd: finishingAge.value!,
-          ageIncrement: ageIncrement.value!,
-        },
-        layerInputData: undefined, // Set to undefined for now
-        polygonInputData: undefined, // Set to undefined for now
+      const formData = new FormData()
+
+      const selectedExecutionOptions = [
+        SelectedExecutionOptionsEnum.DoEnableProgressLogging,
+        SelectedExecutionOptionsEnum.DoEnableErrorLogging,
+        SelectedExecutionOptionsEnum.DoEnableDebugLogging,
+      ]
+
+      const projectionParameters = {
+        ageStart: startingAge.value,
+        ageEnd: finishingAge.value,
+        ageIncrement: ageIncrement.value,
+        selectedExecutionOptions: selectedExecutionOptions,
       }
 
-      const result = await projectionHcsvPost(body)
+      formData.append(
+        'projectionParameters',
+        new Blob([JSON.stringify(projectionParameters)], {
+          type: 'application/json',
+        }),
+      )
+      formData.append('polygonInputData', polygonFile.value as Blob)
+      formData.append('layersInputData', layerFile.value as Blob)
+
+      const result = await projectionHcsvPost(formData, false)
 
       const url = window.URL.createObjectURL(new Blob([result]))
       const link = document.createElement('a')

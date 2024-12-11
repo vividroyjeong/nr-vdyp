@@ -1,34 +1,40 @@
 import {
-  HelpEndpointApi,
-  ProjectionEndpointApi,
-  RootEndpointApi,
+  GetHelpApi,
+  GetRootApi,
+  RunHCSVProjectionApi,
 } from '@/services/vdyp-api/'
 import axiosInstance from '@/services/axiosInstance'
-import type { ProjectionHcsvPostRequest } from '@/services/vdyp-api'
 import type { AxiosRequestConfig } from 'axios'
 
-const helpApiInstance = new HelpEndpointApi(undefined, undefined, axiosInstance)
-const projectionApiInstance = new ProjectionEndpointApi(
+const helpApiInstance = new GetHelpApi(undefined, undefined, axiosInstance)
+const rootApiInstance = new GetRootApi(undefined, undefined, axiosInstance)
+const projectionApiInstance = new RunHCSVProjectionApi(
   undefined,
   undefined,
   axiosInstance,
 )
-const rootApiInstance = new RootEndpointApi(undefined, undefined, axiosInstance)
 
 export const apiClient = {
   helpGet: (options?: AxiosRequestConfig) => {
-    return helpApiInstance.v8HelpGet(options)
+    return helpApiInstance.helpGet(options)
   },
 
   projectionHcsvPost: (
-    body?: ProjectionHcsvPostRequest,
+    formData: FormData,
+    trialRun: boolean,
     options?: AxiosRequestConfig,
   ) => {
-    return projectionApiInstance.v8ProjectionHcsvPost(body, options)
+    return projectionApiInstance.projectionHcsvPostForm(
+      formData.get('polygonInputData') as File,
+      formData.get('layersInputData') as File,
+      formData.get('projectionParameters') as any,
+      trialRun,
+      options,
+    )
   },
 
   rootGet: (options?: AxiosRequestConfig) => {
-    return rootApiInstance.v8Get(options)
+    return rootApiInstance.rootGet(options)
   },
 }
 

@@ -1,9 +1,5 @@
 import apiClient from '@/services/apiClient'
-import type {
-  ProjectionHcsvPostRequest,
-  ParameterDetailsMessage,
-  RootResource,
-} from '@/services/vdyp-api'
+import type { ParameterDetailsMessage, RootResource } from '@/services/vdyp-api'
 
 export const helpGet = async (): Promise<ParameterDetailsMessage[]> => {
   try {
@@ -16,10 +12,11 @@ export const helpGet = async (): Promise<ParameterDetailsMessage[]> => {
 }
 
 export const projectionHcsvPost = async (
-  body: ProjectionHcsvPostRequest,
+  formData: FormData,
+  trialRun: boolean = false,
 ): Promise<Blob> => {
   try {
-    const response = await apiClient.projectionHcsvPost(body)
+    const response = await apiClient.projectionHcsvPost(formData, trialRun)
     return response.data
   } catch (error) {
     console.error('Error running projection:', error)
