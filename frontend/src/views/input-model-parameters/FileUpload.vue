@@ -339,59 +339,61 @@ const validateRequiredFields = (): boolean => {
 }
 
 const fileUploadRunModel = async () => {
-  progressCircularStore.showProgress(PROGRESS_MSG.RUNNING_MODEL)
-
   try {
-    await Util.delay(1000)
-
-    if (
+    const isValidationSuccessful =
       validateRequiredFields() &&
       validateComparison() &&
       validateRange() &&
       (await validateFiles())
-    ) {
-      if (form.value) {
-        form.value.validate()
-      } else {
-        console.warn('Form reference is null. Validation skipped.')
-      }
 
-      const formData = new FormData()
-
-      const selectedExecutionOptions = [
-        SelectedExecutionOptionsEnum.DoEnableProgressLogging,
-        SelectedExecutionOptionsEnum.DoEnableErrorLogging,
-        SelectedExecutionOptionsEnum.DoEnableDebugLogging,
-      ]
-
-      const projectionParameters = {
-        ageStart: startingAge.value,
-        ageEnd: finishingAge.value,
-        ageIncrement: ageIncrement.value,
-        selectedExecutionOptions: selectedExecutionOptions,
-      }
-
-      formData.append(
-        'projectionParameters',
-        new Blob([JSON.stringify(projectionParameters)], {
-          type: 'application/json',
-        }),
-      )
-      formData.append('polygonInputData', polygonFile.value as Blob)
-      formData.append('layersInputData', layerFile.value as Blob)
-
-      const result = await projectionHcsvPost(formData, false)
-
-      const url = window.URL.createObjectURL(new Blob([result]))
-      const link = document.createElement('a')
-      link.href = url
-      link.setAttribute('download', DOWNLOAD_FILE_NAME.MULTI_POLYGON_OUTPUT)
-      document.body.appendChild(link)
-      link.click()
-      link.remove()
-
-      logSuccessMessage(SUCESS_MSG.FILE_UPLOAD_RUN_MODEL_RESULT)
+    if (!isValidationSuccessful) {
+      return
     }
+
+    if (form.value) {
+      form.value.validate()
+    } else {
+      console.warn('Form reference is null. Validation skipped.')
+    }
+
+    progressCircularStore.showProgress(PROGRESS_MSG.RUNNING_MODEL)
+    await Util.delay(1000)
+
+    const formData = new FormData()
+
+    const selectedExecutionOptions = [
+      SelectedExecutionOptionsEnum.DoEnableProgressLogging,
+      SelectedExecutionOptionsEnum.DoEnableErrorLogging,
+      SelectedExecutionOptionsEnum.DoEnableDebugLogging,
+    ]
+
+    const projectionParameters = {
+      ageStart: startingAge.value,
+      ageEnd: finishingAge.value,
+      ageIncrement: ageIncrement.value,
+      selectedExecutionOptions: selectedExecutionOptions,
+    }
+
+    formData.append(
+      'projectionParameters',
+      new Blob([JSON.stringify(projectionParameters)], {
+        type: 'application/json',
+      }),
+    )
+    formData.append('polygonInputData', polygonFile.value as Blob)
+    formData.append('layersInputData', layerFile.value as Blob)
+
+    const result = await projectionHcsvPost(formData, false)
+
+    const url = window.URL.createObjectURL(new Blob([result]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', DOWNLOAD_FILE_NAME.MULTI_POLYGON_OUTPUT)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+
+    logSuccessMessage(SUCESS_MSG.FILE_UPLOAD_RUN_MODEL_RESULT)
   } catch (error) {
     handleApiError(error, FILE_UPLOAD_ERR.FAIL_RUN_MODEL)
   } finally {
