@@ -1,13 +1,10 @@
-/* tslint:disable */
-/* eslint-disable */
 import globalAxios from 'axios'
 import type { AxiosResponse, AxiosInstance, AxiosRequestConfig } from 'axios'
 import { Configuration } from '../configuration'
-// Some imports not used depending on template conditions
-// @ts-ignore
-import { BASE_PATH, BaseAPI, RequiredError } from '../base'
+import { BASE_PATH, BaseAPI } from '../base'
 import type { RequestArgs } from '../base'
 import type { FileUpload, Parameters } from '../models'
+import { env } from '@/env'
 
 export const RunHCSVProjectionApiAxiosParamCreator = function (
   configuration?: Configuration,
@@ -21,7 +18,7 @@ export const RunHCSVProjectionApiAxiosParamCreator = function (
       options: AxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       const localVarPath = `/api/v8/projection/hcsv`
-      const localVarUrlObj = new URL(localVarPath, 'https://example.com')
+      const localVarUrlObj = new URL(localVarPath, env.VITE_API_URL)
       let baseOptions
       if (configuration) {
         baseOptions = configuration.baseOptions
@@ -31,7 +28,7 @@ export const RunHCSVProjectionApiAxiosParamCreator = function (
         headers: {
           Accept: 'application/octet-stream',
           'Content-Type': 'multipart/form-data',
-        } /* edited */,
+        },
         ...baseOptions,
         ...options,
       }
@@ -67,7 +64,7 @@ export const RunHCSVProjectionApiAxiosParamCreator = function (
         query.set(key, options.params[key])
       }
       localVarUrlObj.search = new URLSearchParams(query).toString()
-      let headersFromBaseOptions =
+      const headersFromBaseOptions =
         baseOptions && baseOptions.headers ? baseOptions.headers : {}
       localVarRequestOptions.headers = {
         ...localVarHeaderParameter,
@@ -94,10 +91,7 @@ export const RunHCSVProjectionApiFp = function (configuration?: Configuration) {
       trialRun?: boolean,
       options?: AxiosRequestConfig,
     ): Promise<
-      (
-        axios?: AxiosInstance,
-        basePath?: string,
-      ) => Promise<AxiosResponse<Blob>> /* edited */
+      (axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Blob>>
     > {
       const localVarAxiosArgs = await RunHCSVProjectionApiAxiosParamCreator(
         configuration,
@@ -114,8 +108,8 @@ export const RunHCSVProjectionApiFp = function (configuration?: Configuration) {
       ) => {
         const axiosRequestArgs: AxiosRequestConfig = {
           ...localVarAxiosArgs.options,
-          url: localVarAxiosArgs.url,
-          responseType: 'blob' /* edited */,
+          url: basePath + localVarAxiosArgs.url,
+          responseType: 'blob',
         }
         return axios.request(axiosRequestArgs)
       }
@@ -135,7 +129,7 @@ export const RunHCSVProjectionApiFactory = function (
       projectionParameters?: Parameters,
       trialRun?: boolean,
       options?: AxiosRequestConfig,
-    ): Promise<AxiosResponse<Blob>> /* edited */ {
+    ): Promise<AxiosResponse<Blob>> {
       return RunHCSVProjectionApiFp(configuration)
         .projectionHcsvPostForm(
           polygonInputData,
@@ -156,7 +150,7 @@ export class RunHCSVProjectionApi extends BaseAPI {
     projectionParameters?: Parameters,
     trialRun?: boolean,
     options?: AxiosRequestConfig,
-  ): Promise<AxiosResponse<Blob>> /* edited */ {
+  ): Promise<AxiosResponse<Blob>> {
     return RunHCSVProjectionApiFp(this.configuration)
       .projectionHcsvPostForm(
         polygonInputData,

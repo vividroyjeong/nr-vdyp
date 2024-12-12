@@ -1,31 +1,18 @@
-/* tslint:disable */
-/* eslint-disable */
 import globalAxios from 'axios'
 import type { AxiosResponse, AxiosInstance, AxiosRequestConfig } from 'axios'
 import { Configuration } from '../configuration'
-// Some imports not used depending on template conditions
-// @ts-ignore
-import { BASE_PATH, BaseAPI, RequiredError } from '../base'
+import { BASE_PATH, BaseAPI } from '../base'
 import type { RequestArgs } from '../base'
 import type { RootResource } from '../models'
+import { env } from '@/env'
 
-/**
- * GetRootApi - axios parameter creator
- * @export
- */
 export const GetRootApiAxiosParamCreator = function (
   configuration?: Configuration,
 ) {
   return {
-    /**
-     *
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
     rootGet: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
       const localVarPath = `/api/v8`
-      // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, 'https://example.com')
+      const localVarUrlObj = new URL(localVarPath, env.VITE_API_URL)
       let baseOptions
       if (configuration) {
         baseOptions = configuration.baseOptions
@@ -46,7 +33,7 @@ export const GetRootApiAxiosParamCreator = function (
         query.set(key, options.params[key])
       }
       localVarUrlObj.search = new URLSearchParams(query).toString()
-      let headersFromBaseOptions =
+      const headersFromBaseOptions =
         baseOptions && baseOptions.headers ? baseOptions.headers : {}
       localVarRequestOptions.headers = {
         ...localVarHeaderParameter,
@@ -63,24 +50,15 @@ export const GetRootApiAxiosParamCreator = function (
   }
 }
 
-/**
- * GetRootApi - functional programming interface
- * @export
- */
 export const GetRootApiFp = function (configuration?: Configuration) {
   return {
-    /**
-     *
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
     async rootGet(
       options?: AxiosRequestConfig,
     ): Promise<
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => Promise<AxiosResponse<RootResource>> /* edited */
+      ) => Promise<AxiosResponse<RootResource>>
     > {
       const localVarAxiosArgs =
         await GetRootApiAxiosParamCreator(configuration).rootGet(options)
@@ -98,24 +76,15 @@ export const GetRootApiFp = function (configuration?: Configuration) {
   }
 }
 
-/**
- * GetRootApi - factory interface
- * @export
- */
 export const GetRootApiFactory = function (
   configuration?: Configuration,
   basePath?: string,
   axios?: AxiosInstance,
 ) {
   return {
-    /**
-     *
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
     async rootGet(
       options?: AxiosRequestConfig,
-    ): Promise<AxiosResponse<RootResource>> /* edited */ {
+    ): Promise<AxiosResponse<RootResource>> {
       return GetRootApiFp(configuration)
         .rootGet(options)
         .then((request) => request(axios, basePath))
@@ -123,22 +92,10 @@ export const GetRootApiFactory = function (
   }
 }
 
-/**
- * GetRootApi - object-oriented interface
- * @export
- * @class GetRootApi
- * @extends {BaseAPI}
- */
 export class GetRootApi extends BaseAPI {
-  /**
-   *
-   * @param {*} [options] Override http request option.
-   * @throws {RequiredError}
-   * @memberof GetRootApi
-   */
   public async rootGet(
     options?: AxiosRequestConfig,
-  ): Promise<AxiosResponse<RootResource>> /* edited */ {
+  ): Promise<AxiosResponse<RootResource>> {
     return GetRootApiFp(this.configuration)
       .rootGet(options)
       .then((request) => request(this.axios, this.basePath))
