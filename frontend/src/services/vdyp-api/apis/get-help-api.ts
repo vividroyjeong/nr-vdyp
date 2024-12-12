@@ -1,30 +1,18 @@
-/* tslint:disable */
-/* eslint-disable */
 import globalAxios from 'axios'
 import type { AxiosResponse, AxiosInstance, AxiosRequestConfig } from 'axios'
 import { Configuration } from '../configuration'
-// Some imports not used depending on template conditions
-// @ts-ignore
-import { BASE_PATH, BaseAPI, RequiredError } from '../base'
+import { BASE_PATH, BaseAPI } from '../base'
 import type { RequestArgs } from '../base'
 import type { ParameterDetailsMessage } from '../models'
-/**
- * GetHelpApi - axios parameter creator
- * @export
- */
+import { env } from '@/env'
+
 export const GetHelpApiAxiosParamCreator = function (
   configuration?: Configuration,
 ) {
   return {
-    /**
-     *
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
     helpGet: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
       const localVarPath = `/api/v8/help`
-      // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, 'https://example.com')
+      const localVarUrlObj = new URL(localVarPath, env.VITE_API_URL)
       let baseOptions
       if (configuration) {
         baseOptions = configuration.baseOptions
@@ -45,7 +33,7 @@ export const GetHelpApiAxiosParamCreator = function (
         query.set(key, options.params[key])
       }
       localVarUrlObj.search = new URLSearchParams(query).toString()
-      let headersFromBaseOptions =
+      const headersFromBaseOptions =
         baseOptions && baseOptions.headers ? baseOptions.headers : {}
       localVarRequestOptions.headers = {
         ...localVarHeaderParameter,
@@ -62,24 +50,15 @@ export const GetHelpApiAxiosParamCreator = function (
   }
 }
 
-/**
- * GetHelpApi - functional programming interface
- * @export
- */
 export const GetHelpApiFp = function (configuration?: Configuration) {
   return {
-    /**
-     *
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
     async helpGet(
       options?: AxiosRequestConfig,
     ): Promise<
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => Promise<AxiosResponse<ParameterDetailsMessage[] /* edited */>>
+      ) => Promise<AxiosResponse<ParameterDetailsMessage[]>>
     > {
       const localVarAxiosArgs =
         await GetHelpApiAxiosParamCreator(configuration).helpGet(options)
@@ -97,24 +76,15 @@ export const GetHelpApiFp = function (configuration?: Configuration) {
   }
 }
 
-/**
- * GetHelpApi - factory interface
- * @export
- */
 export const GetHelpApiFactory = function (
   configuration?: Configuration,
   basePath?: string,
   axios?: AxiosInstance,
 ) {
   return {
-    /**
-     *
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
     async helpGet(
       options?: AxiosRequestConfig,
-    ): Promise<AxiosResponse<ParameterDetailsMessage[] /* edited */>> {
+    ): Promise<AxiosResponse<ParameterDetailsMessage[]>> {
       return GetHelpApiFp(configuration)
         .helpGet(options)
         .then((request) => request(axios, basePath))
@@ -122,22 +92,10 @@ export const GetHelpApiFactory = function (
   }
 }
 
-/**
- * GetHelpApi - object-oriented interface
- * @export
- * @class GetHelpApi
- * @extends {BaseAPI}
- */
 export class GetHelpApi extends BaseAPI {
-  /**
-   *
-   * @param {*} [options] Override http request option.
-   * @throws {RequiredError}
-   * @memberof GetHelpApi
-   */
   public async helpGet(
     options?: AxiosRequestConfig,
-  ): Promise<AxiosResponse<ParameterDetailsMessage[] /* edited */>> {
+  ): Promise<AxiosResponse<ParameterDetailsMessage[]>> {
     return GetHelpApiFp(this.configuration)
       .helpGet(options)
       .then((request) => request(this.axios, this.basePath))
