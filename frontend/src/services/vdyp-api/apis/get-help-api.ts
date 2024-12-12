@@ -58,7 +58,7 @@ export const GetHelpApiFp = function (configuration?: Configuration) {
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => Promise<AxiosResponse<ParameterDetailsMessage[] /* edited */>>
+      ) => Promise<AxiosResponse<ParameterDetailsMessage[]>>
     > {
       const localVarAxiosArgs =
         await GetHelpApiAxiosParamCreator(configuration).helpGet(options)
@@ -84,7 +84,7 @@ export const GetHelpApiFactory = function (
   return {
     async helpGet(
       options?: AxiosRequestConfig,
-    ): Promise<AxiosResponse<ParameterDetailsMessage[] /* edited */>> {
+    ): Promise<AxiosResponse<ParameterDetailsMessage[]>> {
       return GetHelpApiFp(configuration)
         .helpGet(options)
         .then((request) => request(axios, basePath))
@@ -95,7 +95,7 @@ export const GetHelpApiFactory = function (
 export class GetHelpApi extends BaseAPI {
   public async helpGet(
     options?: AxiosRequestConfig,
-  ): Promise<AxiosResponse<ParameterDetailsMessage[] /* edited */>> {
+  ): Promise<AxiosResponse<ParameterDetailsMessage[]>> {
     return GetHelpApiFp(this.configuration)
       .helpGet(options)
       .then((request) => request(this.axios, this.basePath))

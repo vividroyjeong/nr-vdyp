@@ -58,7 +58,7 @@ export const GetRootApiFp = function (configuration?: Configuration) {
       (
         axios?: AxiosInstance,
         basePath?: string,
-      ) => Promise<AxiosResponse<RootResource>> /* edited */
+      ) => Promise<AxiosResponse<RootResource>>
     > {
       const localVarAxiosArgs =
         await GetRootApiAxiosParamCreator(configuration).rootGet(options)
@@ -84,7 +84,7 @@ export const GetRootApiFactory = function (
   return {
     async rootGet(
       options?: AxiosRequestConfig,
-    ): Promise<AxiosResponse<RootResource>> /* edited */ {
+    ): Promise<AxiosResponse<RootResource>> {
       return GetRootApiFp(configuration)
         .rootGet(options)
         .then((request) => request(axios, basePath))
@@ -95,7 +95,7 @@ export const GetRootApiFactory = function (
 export class GetRootApi extends BaseAPI {
   public async rootGet(
     options?: AxiosRequestConfig,
-  ): Promise<AxiosResponse<RootResource>> /* edited */ {
+  ): Promise<AxiosResponse<RootResource>> {
     return GetRootApiFp(this.configuration)
       .rootGet(options)
       .then((request) => request(this.axios, this.basePath))

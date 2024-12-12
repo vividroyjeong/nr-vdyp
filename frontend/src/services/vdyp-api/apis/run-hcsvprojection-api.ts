@@ -28,7 +28,7 @@ export const RunHCSVProjectionApiAxiosParamCreator = function (
         headers: {
           Accept: 'application/octet-stream',
           'Content-Type': 'multipart/form-data',
-        } /* edited */,
+        },
         ...baseOptions,
         ...options,
       }
@@ -91,10 +91,7 @@ export const RunHCSVProjectionApiFp = function (configuration?: Configuration) {
       trialRun?: boolean,
       options?: AxiosRequestConfig,
     ): Promise<
-      (
-        axios?: AxiosInstance,
-        basePath?: string,
-      ) => Promise<AxiosResponse<Blob>> /* edited */
+      (axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Blob>>
     > {
       const localVarAxiosArgs = await RunHCSVProjectionApiAxiosParamCreator(
         configuration,
@@ -112,7 +109,7 @@ export const RunHCSVProjectionApiFp = function (configuration?: Configuration) {
         const axiosRequestArgs: AxiosRequestConfig = {
           ...localVarAxiosArgs.options,
           url: basePath + localVarAxiosArgs.url,
-          responseType: 'blob' /* edited */,
+          responseType: 'blob',
         }
         return axios.request(axiosRequestArgs)
       }
@@ -132,7 +129,7 @@ export const RunHCSVProjectionApiFactory = function (
       projectionParameters?: Parameters,
       trialRun?: boolean,
       options?: AxiosRequestConfig,
-    ): Promise<AxiosResponse<Blob>> /* edited */ {
+    ): Promise<AxiosResponse<Blob>> {
       return RunHCSVProjectionApiFp(configuration)
         .projectionHcsvPostForm(
           polygonInputData,
@@ -153,7 +150,7 @@ export class RunHCSVProjectionApi extends BaseAPI {
     projectionParameters?: Parameters,
     trialRun?: boolean,
     options?: AxiosRequestConfig,
-  ): Promise<AxiosResponse<Blob>> /* edited */ {
+  ): Promise<AxiosResponse<Blob>> {
     return RunHCSVProjectionApiFp(this.configuration)
       .projectionHcsvPostForm(
         polygonInputData,
