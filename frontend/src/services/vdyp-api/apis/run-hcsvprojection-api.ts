@@ -1,11 +1,10 @@
 import globalAxios from 'axios'
 import type { AxiosResponse, AxiosInstance, AxiosRequestConfig } from 'axios'
 import { Configuration } from '../configuration'
-// Some imports not used depending on template conditions
-// @ts-ignore
-import { BASE_PATH, BaseAPI, RequiredError } from '../base'
+import { BASE_PATH, BaseAPI } from '../base'
 import type { RequestArgs } from '../base'
 import type { FileUpload, Parameters } from '../models'
+import { env } from '@/env'
 
 export const RunHCSVProjectionApiAxiosParamCreator = function (
   configuration?: Configuration,
@@ -19,7 +18,7 @@ export const RunHCSVProjectionApiAxiosParamCreator = function (
       options: AxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       const localVarPath = `/api/v8/projection/hcsv`
-      const localVarUrlObj = new URL(localVarPath, 'https://example.com')
+      const localVarUrlObj = new URL(localVarPath, env.VITE_API_URL)
       let baseOptions
       if (configuration) {
         baseOptions = configuration.baseOptions
@@ -112,7 +111,7 @@ export const RunHCSVProjectionApiFp = function (configuration?: Configuration) {
       ) => {
         const axiosRequestArgs: AxiosRequestConfig = {
           ...localVarAxiosArgs.options,
-          url: localVarAxiosArgs.url,
+          url: basePath + localVarAxiosArgs.url,
           responseType: 'blob' /* edited */,
         }
         return axios.request(axiosRequestArgs)

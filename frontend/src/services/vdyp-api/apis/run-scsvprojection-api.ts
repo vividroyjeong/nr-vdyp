@@ -1,31 +1,15 @@
 import globalAxios from 'axios'
 import type { AxiosResponse, AxiosInstance, AxiosRequestConfig } from 'axios'
 import { Configuration } from '../configuration'
-// Some imports not used depending on template conditions
-// @ts-ignore
-import { BASE_PATH, BaseAPI, RequiredError } from '../base'
+import { BASE_PATH, BaseAPI } from '../base'
 import type { RequestArgs } from '../base'
 import type { FileUpload, Parameters } from '../models'
+import { env } from '@/env'
 
 export const RunSCSVProjectionApiAxiosParamCreator = function (
   configuration?: Configuration,
 ) {
   return {
-    /**
-     *
-     * @param {FileUpload} [polygonInputData]
-     * @param {FileUpload} [layersInputData]
-     * @param {FileUpload} [historyInputData]
-     * @param {FileUpload} [nonVegetationInputData]
-     * @param {FileUpload} [otherVegetationInputData]
-     * @param {FileUpload} [polygonIdInputData]
-     * @param {FileUpload} [speciesInputData]
-     * @param {FileUpload} [vriAdjustInputData]
-     * @param {Parameters} [projectionParameters]
-     * @param {boolean} [trialRun]
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
     projectionScsvPostForm: async (
       polygonInputData?: FileUpload,
       layersInputData?: FileUpload,
@@ -40,8 +24,7 @@ export const RunSCSVProjectionApiAxiosParamCreator = function (
       options: AxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       const localVarPath = `/api/v8/projection/scsv`
-      // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, 'https://example.com')
+      const localVarUrlObj = new URL(localVarPath, env.VITE_API_URL)
       let baseOptions
       if (configuration) {
         baseOptions = configuration.baseOptions
@@ -139,21 +122,6 @@ export const RunSCSVProjectionApiAxiosParamCreator = function (
 
 export const RunSCSVProjectionApiFp = function (configuration?: Configuration) {
   return {
-    /**
-     *
-     * @param {FileUpload} [polygonInputData]
-     * @param {FileUpload} [layersInputData]
-     * @param {FileUpload} [historyInputData]
-     * @param {FileUpload} [nonVegetationInputData]
-     * @param {FileUpload} [otherVegetationInputData]
-     * @param {FileUpload} [polygonIdInputData]
-     * @param {FileUpload} [speciesInputData]
-     * @param {FileUpload} [vriAdjustInputData]
-     * @param {Parameters} [projectionParameters]
-     * @param {boolean} [trialRun]
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
     async projectionScsvPostForm(
       polygonInputData?: FileUpload,
       layersInputData?: FileUpload,
@@ -204,21 +172,6 @@ export const RunSCSVProjectionApiFactory = function (
   axios?: AxiosInstance,
 ) {
   return {
-    /**
-     *
-     * @param {FileUpload} [polygonInputData]
-     * @param {FileUpload} [layersInputData]
-     * @param {FileUpload} [historyInputData]
-     * @param {FileUpload} [nonVegetationInputData]
-     * @param {FileUpload} [otherVegetationInputData]
-     * @param {FileUpload} [polygonIdInputData]
-     * @param {FileUpload} [speciesInputData]
-     * @param {FileUpload} [vriAdjustInputData]
-     * @param {Parameters} [projectionParameters]
-     * @param {boolean} [trialRun]
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
     async projectionScsvPostForm(
       polygonInputData?: FileUpload,
       layersInputData?: FileUpload,
@@ -252,22 +205,6 @@ export const RunSCSVProjectionApiFactory = function (
 }
 
 export class RunSCSVProjectionApi extends BaseAPI {
-  /**
-   *
-   * @param {FileUpload} [polygonInputData]
-   * @param {FileUpload} [layersInputData]
-   * @param {FileUpload} [historyInputData]
-   * @param {FileUpload} [nonVegetationInputData]
-   * @param {FileUpload} [otherVegetationInputData]
-   * @param {FileUpload} [polygonIdInputData]
-   * @param {FileUpload} [speciesInputData]
-   * @param {FileUpload} [vriAdjustInputData]
-   * @param {Parameters} [projectionParameters]
-   * @param {boolean} [trialRun]
-   * @param {*} [options] Override http request option.
-   * @throws {RequiredError}
-   * @memberof RunSCSVProjectionApi
-   */
   public async projectionScsvPostForm(
     polygonInputData?: FileUpload,
     layersInputData?: FileUpload,

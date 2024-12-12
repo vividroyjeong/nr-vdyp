@@ -1,11 +1,10 @@
 import globalAxios from 'axios'
 import type { AxiosResponse, AxiosInstance, AxiosRequestConfig } from 'axios'
 import { Configuration } from '../configuration'
-// Some imports not used depending on template conditions
-// @ts-ignore
-import { BASE_PATH, BaseAPI, RequiredError } from '../base'
+import { BASE_PATH, BaseAPI } from '../base'
 import type { RequestArgs } from '../base'
 import type { FileUpload, Parameters } from '../models'
+import { env } from '@/env'
 
 export const RunDCSVProjectionApiAxiosParamCreator = function (
   configuration?: Configuration,
@@ -18,8 +17,7 @@ export const RunDCSVProjectionApiAxiosParamCreator = function (
       options: AxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       const localVarPath = `/api/v8/projection/dcsv`
-      // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, 'https://example.com')
+      const localVarUrlObj = new URL(localVarPath, env.VITE_API_URL)
       let baseOptions
       if (configuration) {
         baseOptions = configuration.baseOptions
