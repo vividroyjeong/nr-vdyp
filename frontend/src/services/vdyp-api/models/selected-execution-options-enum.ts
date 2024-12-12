@@ -1,5 +1,3 @@
-/* tslint:disable */
-/* eslint-disable */
 export enum SelectedExecutionOptionsEnum {
   BackGrowEnabled = 'backGrowEnabled',
   ForwardGrowEnabled = 'forwardGrowEnabled',

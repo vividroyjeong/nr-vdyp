@@ -1,5 +1,3 @@
-/* tslint:disable */
-/* eslint-disable */
 import { CombineAgeYearRangeEnum } from './combine-age-year-range-enum'
 import type { Filters } from './filters'
 import { MetadataToOutputEnum } from './metadata-to-output-enum'

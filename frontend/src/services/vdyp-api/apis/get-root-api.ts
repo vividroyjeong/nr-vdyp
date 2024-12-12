@@ -1,5 +1,3 @@
-/* tslint:disable */
-/* eslint-disable */
 import globalAxios from 'axios'
 import type { AxiosResponse, AxiosInstance, AxiosRequestConfig } from 'axios'
 import { Configuration } from '../configuration'
@@ -46,7 +44,7 @@ export const GetRootApiAxiosParamCreator = function (
         query.set(key, options.params[key])
       }
       localVarUrlObj.search = new URLSearchParams(query).toString()
-      let headersFromBaseOptions =
+      const headersFromBaseOptions =
         baseOptions && baseOptions.headers ? baseOptions.headers : {}
       localVarRequestOptions.headers = {
         ...localVarHeaderParameter,

@@ -1,5 +1,3 @@
-/* tslint:disable */
-/* eslint-disable */
 export interface ParameterDetailsMessage {
   /**
    * the parameter name

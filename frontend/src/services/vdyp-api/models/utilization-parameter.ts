@@ -1,5 +1,3 @@
-/* tslint:disable */
-/* eslint-disable */
 import { ValueEnum } from './value-enum'
 export interface UtilizationParameter {
   /**

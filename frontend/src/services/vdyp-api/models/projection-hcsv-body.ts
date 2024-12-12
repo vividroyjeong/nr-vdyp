@@ -1,5 +1,3 @@
-/* tslint:disable */
-/* eslint-disable */
 import type { FileUpload } from './file-upload'
 import type { Parameters } from './parameters'
 export interface ProjectionHcsvBody {

@@ -1,5 +1,3 @@
-/* tslint:disable */
-/* eslint-disable */
 import { EnumValue } from './enum-value'
 export interface ProgressFrequency {
   /**
