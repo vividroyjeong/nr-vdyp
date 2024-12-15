@@ -196,6 +196,7 @@ import {
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 import { MDL_PRM_INPUT_ERR, MSG_DIALOG_TITLE } from '@/constants/message'
+import type { SpeciesGroup } from '@/interfaces/interfaces'
 import { ReportInfoValidation } from '@/validation/reportInfoValidation'
 
 const form = ref<HTMLFormElement>()
@@ -314,7 +315,7 @@ const clear = () => {
   reportTitle.value = null
 
   projectionType.value = DEFAULT_VALUES.PROJECTION_TYPE
-  speciesGroups.value = speciesGroups.value.map((group) => ({
+  speciesGroups.value = speciesGroups.value.map((group: SpeciesGroup) => ({
     ...group,
   }))
 }

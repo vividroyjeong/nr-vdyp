@@ -256,6 +256,7 @@ import {
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 import { MDL_PRM_INPUT_ERR, MSG_DIALOG_TITLE } from '@/constants/message'
+import type { SpeciesList } from '@/interfaces/interfaces'
 import { SpeciesInfoValidation } from '@/validation/speciesInfoValidation'
 
 const form = ref<HTMLFormElement>()
@@ -299,7 +300,7 @@ watch(
   speciesList,
   (newSpeciesList) => {
     // Sort only if all items contain species
-    const shouldSort = newSpeciesList.every((item) => item.species)
+    const shouldSort = newSpeciesList.every((item: SpeciesList) => item.species)
     if (shouldSort) {
       triggerSpeciesSortByPercent()
     }
@@ -381,7 +382,7 @@ const stopDecrementPercent = () => {
 }
 
 const triggerSpeciesSortByPercent = () => {
-  speciesList.value.sort((a, b) => {
+  speciesList.value.sort((a: SpeciesList, b: SpeciesList) => {
     const percentA = parseFloat(a.percent || '0')
     const percentB = parseFloat(b.percent || '0')
 
