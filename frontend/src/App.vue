@@ -6,7 +6,6 @@
       <AppMessageDialog />
       <AppNotification />
       <AppConfirmDialog />
-      <AppProgressCircular />
       <AppDialogDragger />
 
       <DefaultLayout>
@@ -20,7 +19,6 @@ import TheHeader from '@/components/layout/TheHeader.vue'
 import AppMessageDialog from '@/components/common/AppMessageDialog.vue'
 import AppNotification from '@/components/common/AppNotification.vue'
 import AppConfirmDialog from '@/components/common/AppConfirmDialog.vue'
-import AppProgressCircular from '@/components/common/AppProgressCircular.vue'
 import AppDialogDragger from '@/components/common/AppDialogDragger.vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 </script>

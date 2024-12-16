@@ -1,5 +1,17 @@
 <template>
   <div>
+    <AppProgressCircular
+      :isShow="isProgressVisible"
+      :showMessage="true"
+      :message="progressMessage"
+      :circleSize="70"
+      :circleWidth="5"
+      :circleColor="'primary'"
+      :backgroundColor="'rgba(255, 255, 255, 0.8)'"
+      :hasBackground="true"
+      :padding="20"
+      :borderRadius="10"
+    />
     <v-form ref="form" @submit.prevent="fileUploadRunModel">
       <v-card class="elevation-4">
         <div class="pl-16 pt-10">
@@ -184,7 +196,7 @@ import { SelectedExecutionOptionsEnum } from '@/services/vdyp-api'
 import { projectionHcsvPost } from '@/services/apiActions'
 import { handleApiError } from '@/services/apiErrorHandler'
 import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
-import { useProgressCircularStore } from '@/stores/common/progressCircularStore'
+import AppProgressCircular from '@/components/common/AppProgressCircular.vue'
 import {
   volumeReportedOptions,
   includeInReportOptions,
@@ -205,7 +217,8 @@ import { logSuccessMessage } from '@/utils/messageHandler'
 
 const form = ref<HTMLFormElement>()
 
-const progressCircularStore = useProgressCircularStore()
+const isProgressVisible = ref(false)
+const progressMessage = ref('')
 
 const fileUploadValidator = new FileUploadValidation()
 
@@ -356,7 +369,9 @@ const fileUploadRunModel = async () => {
       console.warn('Form reference is null. Validation skipped.')
     }
 
-    progressCircularStore.showProgress(PROGRESS_MSG.RUNNING_MODEL)
+    isProgressVisible.value = true
+    progressMessage.value = PROGRESS_MSG.RUNNING_MODEL
+
     await Util.delay(1000)
 
     const formData = new FormData()
@@ -397,7 +412,7 @@ const fileUploadRunModel = async () => {
   } catch (error) {
     handleApiError(error, FILE_UPLOAD_ERR.FAIL_RUN_MODEL)
   } finally {
-    progressCircularStore.hideProgress()
+    isProgressVisible.value = false
   }
 }
 </script>

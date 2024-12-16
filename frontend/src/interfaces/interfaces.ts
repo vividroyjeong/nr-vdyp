@@ -1,14 +1,5 @@
 import type { MessageType, SortOrder } from '@/types/types'
 
-export interface ProgressCircularState {
-  isShow: boolean
-  message: string | undefined
-  circleSize: number
-  circleWidth: number
-  circleColor: string
-  backgroundColor: string
-}
-
 export interface NotificationState {
   isShow: boolean
   message: string
