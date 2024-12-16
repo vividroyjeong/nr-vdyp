@@ -229,6 +229,7 @@ import {
   MSG_DIALOG_TITLE,
   MDL_PRM_INPUT_HINT,
 } from '@/constants/message'
+import type { SpeciesGroup } from '@/interfaces/interfaces'
 import { SiteInfoValidation } from '@/validation/siteInfoValidation'
 
 const form = ref<HTMLFormElement>()
@@ -260,7 +261,7 @@ const isConfirmed = computed(
 )
 
 const siteSpeciesOptions = computed(() =>
-  speciesGroups.value.map((group) => ({
+  speciesGroups.value.map((group: SpeciesGroup) => ({
     label: group.siteSpecies,
     value: group.siteSpecies,
   })),

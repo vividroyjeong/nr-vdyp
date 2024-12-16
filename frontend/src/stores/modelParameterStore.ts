@@ -7,7 +7,7 @@ import {
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 import type { PanelName, PanelState } from '@/types/types'
-import type { SpeciesList } from '@/interfaces/interfaces'
+import type { SpeciesList, SpeciesGroup } from '@/interfaces/interfaces'
 
 export const useModelParameterStore = defineStore('modelParameter', () => {
   // panel open
@@ -108,13 +108,7 @@ export const useModelParameterStore = defineStore('modelParameter', () => {
     { species: null, percent: null },
   ])
 
-  const speciesGroups = ref<
-    {
-      group: string
-      percent: number
-      siteSpecies: string
-    }[]
-  >([])
+  const speciesGroups = ref<SpeciesGroup[]>([])
 
   // determined in Species Information
   const highestPercentSpecies = ref<string | null>(null)

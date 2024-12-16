@@ -1,10 +1,5 @@
 import type { MessageType, SortOrder } from '@/types/types'
 
-export interface ProgressCircularState {
-  isShow: boolean
-  message: string | undefined
-}
-
 export interface NotificationState {
   isShow: boolean
   message: string
@@ -38,4 +33,10 @@ export interface TableOptions {
 export interface SpeciesList {
   species: string | null
   percent: string | null
+}
+
+export interface SpeciesGroup {
+  group: string
+  percent: number
+  siteSpecies: string
 }
