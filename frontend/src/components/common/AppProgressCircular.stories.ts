@@ -71,11 +71,3 @@ export const NoBackground: Story = {
     hasBackground: false,
   },
 }
-
-export const LargeCircle: Story = {
-  args: {
-    ...Primary.args,
-    circleSize: 150,
-    circleWidth: 10,
-  },
-}

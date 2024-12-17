@@ -3,6 +3,8 @@ import { setup } from '@storybook/vue3'
 import { registerPlugins } from '../src/plugins'
 import { withVuetifyTheme } from './withVeutifyTheme.decorator'
 import type { App } from 'vue'
+import '@bcgov/bc-sans/css/BCSans.css'
+import '../src/styles/style.scss'
 
 const preview: Preview = {
   parameters: {
@@ -28,7 +30,17 @@ const preview: Preview = {
       },
     },
   },
-  decorators: [withVuetifyTheme],
+  decorators: [
+    withVuetifyTheme,
+    (story) => ({
+      components: { story },
+      template: `
+        <div style="font-family: 'BCSans', 'Noto Sans', Verdana, Arial, sans-serif;">
+          <story />
+        </div>
+      `,
+    }),
+  ],
 }
 
 export default preview

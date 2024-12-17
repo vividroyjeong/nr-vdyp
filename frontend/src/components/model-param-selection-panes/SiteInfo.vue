@@ -1,5 +1,14 @@
 <template>
   <v-card class="elevation-4">
+    <AppMessageDialog
+      :dialog="messageDialog.dialog"
+      :title="messageDialog.title"
+      :message="messageDialog.message"
+      :dialogWidth="messageDialog.dialogWidth"
+      :btnLabel="messageDialog.btnLabel"
+      @update:dialog="(value) => (messageDialog.dialog = value)"
+      @close="handleDialogClose"
+    />
     <v-expansion-panels v-model="panelOpenStates.siteInfo">
       <v-expansion-panel hide-actions>
         <v-expansion-panel-title>
@@ -208,7 +217,7 @@
 import { ref, computed, watch } from 'vue'
 import { Util } from '@/utils/util'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
-import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
+import AppMessageDialog from '@/components/common/AppMessageDialog.vue'
 import { storeToRefs } from 'pinia'
 import {
   becZoneOptions,
@@ -222,6 +231,7 @@ import {
   NUM_INPUT_LIMITS,
   CONTINUOUS_INC_DEC,
   SPIN_BUTTON,
+  BUTTON_LABEL,
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 import {
@@ -229,7 +239,7 @@ import {
   MSG_DIALOG_TITLE,
   MDL_PRM_INPUT_HINT,
 } from '@/constants/message'
-import type { SpeciesGroup } from '@/interfaces/interfaces'
+import type { SpeciesGroup, MessageDialog } from '@/interfaces/interfaces'
 import { SiteInfoValidation } from '@/validation/siteInfoValidation'
 
 const form = ref<HTMLFormElement>()
@@ -237,7 +247,12 @@ const form = ref<HTMLFormElement>()
 const siteInfoValidator = new SiteInfoValidation()
 
 const modelParameterStore = useModelParameterStore()
-const messageDialogStore = useMessageDialogStore()
+
+const messageDialog = ref<MessageDialog>({
+  dialog: false,
+  title: '',
+  message: '',
+})
 
 const {
   panelOpenStates,
@@ -359,11 +374,13 @@ const stopDecrementBHA50SiteIndex = () => {
 
 const validateRange = (): boolean => {
   if (!siteInfoValidator.validateBha50SiteIndexRange(bha50SiteIndex.value)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.SITE_VLD_SI_RNG,
-      { width: 400 },
-    )
+    messageDialog.value = {
+      dialog: true,
+      title: MSG_DIALOG_TITLE.INVALID_INPUT,
+      message: MDL_PRM_INPUT_ERR.SITE_VLD_SI_RNG,
+      btnLabel: BUTTON_LABEL.CONT_EDIT,
+    }
+
     return false
   }
 
@@ -372,11 +389,15 @@ const validateRange = (): boolean => {
 
 const validateRequiredFields = (): boolean => {
   if (!siteInfoValidator.validateRequiredFields(bha50SiteIndex.value)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.MISSING_INFO,
-      MDL_PRM_INPUT_ERR.SITE_VLD_SPCZ_REQ_SI_VAL(selectedSiteSpecies.value),
-      { width: 400 },
-    )
+    messageDialog.value = {
+      dialog: true,
+      title: MSG_DIALOG_TITLE.MISSING_INFO,
+      message: MDL_PRM_INPUT_ERR.SITE_VLD_SPCZ_REQ_SI_VAL(
+        selectedSiteSpecies.value,
+      ),
+      btnLabel: BUTTON_LABEL.CONT_EDIT,
+    }
+
     return false
   }
 
@@ -427,6 +448,8 @@ const clear = () => {
 
   handleDerivedByChange(derivedBy.value, selectedSiteSpecies.value)
 }
+
+const handleDialogClose = () => {}
 </script>
 
 <style scoped></style>

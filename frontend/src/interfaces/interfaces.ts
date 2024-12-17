@@ -7,6 +7,14 @@ export interface NotificationState {
   timeoutId: number | null
 }
 
+export interface MessageDialog {
+  dialog: boolean
+  title: string
+  message: string
+  dialogWidth?: number
+  btnLabel?: string
+}
+
 export interface JobSearchParams {
   pageNumber: number
   pageSize: number

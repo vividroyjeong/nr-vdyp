@@ -12,6 +12,15 @@
       :padding="20"
       :borderRadius="10"
     />
+    <AppMessageDialog
+      :dialog="messageDialog.dialog"
+      :title="messageDialog.title"
+      :message="messageDialog.message"
+      :dialogWidth="messageDialog.dialogWidth"
+      :btnLabel="messageDialog.btnLabel"
+      @update:dialog="(value) => (messageDialog.dialog = value)"
+      @close="handleDialogClose"
+    />
     <v-form ref="form" @submit.prevent="fileUploadRunModel">
       <v-card class="elevation-4">
         <div class="pl-16 pt-10">
@@ -195,14 +204,18 @@ import { ref } from 'vue'
 import { SelectedExecutionOptionsEnum } from '@/services/vdyp-api'
 import { projectionHcsvPost } from '@/services/apiActions'
 import { handleApiError } from '@/services/apiErrorHandler'
-import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
+import AppMessageDialog from '@/components/common/AppMessageDialog.vue'
 import AppProgressCircular from '@/components/common/AppProgressCircular.vue'
 import {
   volumeReportedOptions,
   includeInReportOptions,
   projectionTypeOptions,
 } from '@/constants/options'
-import { NUM_INPUT_LIMITS, DOWNLOAD_FILE_NAME } from '@/constants/constants'
+import {
+  NUM_INPUT_LIMITS,
+  DOWNLOAD_FILE_NAME,
+  BUTTON_LABEL,
+} from '@/constants/constants'
 import {
   MDL_PRM_INPUT_ERR,
   MSG_DIALOG_TITLE,
@@ -210,6 +223,7 @@ import {
   PROGRESS_MSG,
   SUCESS_MSG,
 } from '@/constants/message'
+import type { MessageDialog } from '@/interfaces/interfaces'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 import { FileUploadValidation } from '@/validation/fileUploadValidation'
 import { Util } from '@/utils/util'
@@ -233,7 +247,11 @@ const reportTitle = ref<string | null>(DEFAULT_VALUES.REPORT_TITLE)
 const layerFile = ref<File | null>(null)
 const polygonFile = ref<File | null>(null)
 
-const messageDialogStore = useMessageDialogStore()
+const messageDialog = ref<MessageDialog>({
+  dialog: false,
+  title: '',
+  message: '',
+})
 
 const validateComparison = (): boolean => {
   if (
@@ -242,11 +260,12 @@ const validateComparison = (): boolean => {
       startingAge.value,
     )
   ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.RPT_VLD_COMP_FNSH_AGE,
-      { width: 400 },
-    )
+    messageDialog.value = {
+      dialog: true,
+      title: MSG_DIALOG_TITLE.INVALID_INPUT,
+      message: MDL_PRM_INPUT_ERR.RPT_VLD_COMP_FNSH_AGE,
+      btnLabel: BUTTON_LABEL.CONT_EDIT,
+    }
     return false
   }
 
@@ -255,38 +274,41 @@ const validateComparison = (): boolean => {
 
 const validateRange = (): boolean => {
   if (!fileUploadValidator.validateStartingAgeRange(startingAge.value)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.RPT_VLD_START_AGE_RNG(
+    messageDialog.value = {
+      dialog: true,
+      title: MSG_DIALOG_TITLE.INVALID_INPUT,
+      message: MDL_PRM_INPUT_ERR.RPT_VLD_START_AGE_RNG(
         NUM_INPUT_LIMITS.STARTING_AGE_MIN,
         NUM_INPUT_LIMITS.STARTING_AGE_MAX,
       ),
-      { width: 400 },
-    )
+      btnLabel: BUTTON_LABEL.CONT_EDIT,
+    }
     return false
   }
 
   if (!fileUploadValidator.validateFinishingAgeRange(finishingAge.value)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.RPT_VLD_START_FNSH_RNG(
+    messageDialog.value = {
+      dialog: true,
+      title: MSG_DIALOG_TITLE.INVALID_INPUT,
+      message: MDL_PRM_INPUT_ERR.RPT_VLD_START_FNSH_RNG(
         NUM_INPUT_LIMITS.FINISHING_AGE_MIN,
         NUM_INPUT_LIMITS.FINISHING_AGE_MAX,
       ),
-      { width: 400 },
-    )
+      btnLabel: BUTTON_LABEL.CONT_EDIT,
+    }
     return false
   }
 
   if (!fileUploadValidator.validateAgeIncrementRange(ageIncrement.value)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.RPT_VLD_AGE_INC_RNG(
+    messageDialog.value = {
+      dialog: true,
+      title: MSG_DIALOG_TITLE.INVALID_INPUT,
+      message: MDL_PRM_INPUT_ERR.RPT_VLD_AGE_INC_RNG(
         NUM_INPUT_LIMITS.AGE_INC_MIN,
         NUM_INPUT_LIMITS.AGE_INC_MAX,
       ),
-      { width: 400 },
-    )
+      btnLabel: BUTTON_LABEL.CONT_EDIT,
+    }
     return false
   }
 
@@ -295,38 +317,42 @@ const validateRange = (): boolean => {
 
 const validateFiles = async () => {
   if (!layerFile.value) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.MISSING_FILE,
-      FILE_UPLOAD_ERR.LAYER_FILE_MISSING,
-      { width: 400 },
-    )
+    messageDialog.value = {
+      dialog: true,
+      title: MSG_DIALOG_TITLE.MISSING_FILE,
+      message: FILE_UPLOAD_ERR.LAYER_FILE_MISSING,
+      btnLabel: BUTTON_LABEL.CONT_EDIT,
+    }
     return false
   }
 
   if (!polygonFile.value) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.MISSING_FILE,
-      FILE_UPLOAD_ERR.POLYGON_FILE_MISSING,
-      { width: 400 },
-    )
+    messageDialog.value = {
+      dialog: true,
+      title: MSG_DIALOG_TITLE.MISSING_FILE,
+      message: FILE_UPLOAD_ERR.POLYGON_FILE_MISSING,
+      btnLabel: BUTTON_LABEL.CONT_EDIT,
+    }
     return false
   }
 
   if (!(await fileUploadValidator.isCSVFile(layerFile.value))) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_FILE,
-      FILE_UPLOAD_ERR.LAYER_FILE_NOT_CSV_FORMAT,
-      { width: 400 },
-    )
+    messageDialog.value = {
+      dialog: true,
+      title: MSG_DIALOG_TITLE.INVALID_FILE,
+      message: FILE_UPLOAD_ERR.LAYER_FILE_NOT_CSV_FORMAT,
+      btnLabel: BUTTON_LABEL.CONT_EDIT,
+    }
     return false
   }
 
   if (!(await fileUploadValidator.isCSVFile(polygonFile.value))) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_FILE,
-      FILE_UPLOAD_ERR.POLYGON_FILE_NOT_CSV_FORMAT,
-      { width: 400 },
-    )
+    messageDialog.value = {
+      dialog: true,
+      title: MSG_DIALOG_TITLE.INVALID_FILE,
+      message: FILE_UPLOAD_ERR.POLYGON_FILE_NOT_CSV_FORMAT,
+      btnLabel: BUTTON_LABEL.CONT_EDIT,
+    }
     return false
   }
 
@@ -341,11 +367,12 @@ const validateRequiredFields = (): boolean => {
       ageIncrement.value,
     )
   ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      FILE_UPLOAD_ERR.RPT_VLD_REQUIRED_FIELDS,
-      { width: 400 },
-    )
+    messageDialog.value = {
+      dialog: true,
+      title: MSG_DIALOG_TITLE.INVALID_INPUT,
+      message: FILE_UPLOAD_ERR.RPT_VLD_REQUIRED_FIELDS,
+      btnLabel: BUTTON_LABEL.CONT_EDIT,
+    }
     return false
   }
   return true
@@ -415,6 +442,8 @@ const fileUploadRunModel = async () => {
     isProgressVisible.value = false
   }
 }
+
+const handleDialogClose = () => {}
 </script>
 <style scoped>
 .file-upload-run-model-card {
