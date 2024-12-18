@@ -1,5 +1,14 @@
 <template>
   <v-card class="elevation-4">
+    <AppMessageDialog
+      :dialog="messageDialog.dialog"
+      :title="messageDialog.title"
+      :message="messageDialog.message"
+      :dialogWidth="messageDialog.dialogWidth"
+      :btnLabel="messageDialog.btnLabel"
+      @update:dialog="(value) => (messageDialog.dialog = value)"
+      @close="handleDialogClose"
+    />
     <v-expansion-panels v-model="panelOpenStates.reportInfo">
       <v-expansion-panel hide-actions>
         <v-expansion-panel-title>
@@ -182,7 +191,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
-import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
+import AppMessageDialog from '@/components/common/AppMessageDialog.vue'
 import { storeToRefs } from 'pinia'
 import {
   volumeReportedOptions,
@@ -193,9 +202,11 @@ import {
   PANEL,
   MODEL_PARAMETER_PANEL,
   NUM_INPUT_LIMITS,
+  BUTTON_LABEL,
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 import { MDL_PRM_INPUT_ERR, MSG_DIALOG_TITLE } from '@/constants/message'
+import type { SpeciesGroup, MessageDialog } from '@/interfaces/interfaces'
 import { ReportInfoValidation } from '@/validation/reportInfoValidation'
 
 const form = ref<HTMLFormElement>()
@@ -203,7 +214,12 @@ const form = ref<HTMLFormElement>()
 const reportInfoValidator = new ReportInfoValidation()
 
 const modelParameterStore = useModelParameterStore()
-const messageDialogStore = useMessageDialogStore()
+
+const messageDialog = ref<MessageDialog>({
+  dialog: false,
+  title: '',
+  message: '',
+})
 
 const {
   panelOpenStates,
@@ -232,11 +248,13 @@ const validateComparison = (): boolean => {
       startingAge.value,
     )
   ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.RPT_VLD_COMP_FNSH_AGE,
-      { width: 400 },
-    )
+    messageDialog.value = {
+      dialog: true,
+      title: MSG_DIALOG_TITLE.INVALID_INPUT,
+      message: MDL_PRM_INPUT_ERR.RPT_VLD_COMP_FNSH_AGE,
+      btnLabel: BUTTON_LABEL.CONT_EDIT,
+    }
+
     return false
   }
 
@@ -245,38 +263,41 @@ const validateComparison = (): boolean => {
 
 const validateRange = (): boolean => {
   if (!reportInfoValidator.validateStartingAgeRange(startingAge.value)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.RPT_VLD_START_AGE_RNG(
+    messageDialog.value = {
+      dialog: true,
+      title: MSG_DIALOG_TITLE.INVALID_INPUT,
+      message: MDL_PRM_INPUT_ERR.RPT_VLD_START_AGE_RNG(
         NUM_INPUT_LIMITS.STARTING_AGE_MIN,
         NUM_INPUT_LIMITS.STARTING_AGE_MAX,
       ),
-      { width: 400 },
-    )
+      btnLabel: BUTTON_LABEL.CONT_EDIT,
+    }
     return false
   }
 
   if (!reportInfoValidator.validateFinishingAgeRange(finishingAge.value)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.RPT_VLD_START_FNSH_RNG(
+    messageDialog.value = {
+      dialog: true,
+      title: MSG_DIALOG_TITLE.INVALID_INPUT,
+      message: MDL_PRM_INPUT_ERR.RPT_VLD_START_FNSH_RNG(
         NUM_INPUT_LIMITS.FINISHING_AGE_MIN,
         NUM_INPUT_LIMITS.FINISHING_AGE_MAX,
       ),
-      { width: 400 },
-    )
+      btnLabel: BUTTON_LABEL.CONT_EDIT,
+    }
     return false
   }
 
   if (!reportInfoValidator.validateAgeIncrementRange(ageIncrement.value)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.RPT_VLD_AGE_INC_RNG(
+    messageDialog.value = {
+      dialog: true,
+      title: MSG_DIALOG_TITLE.INVALID_INPUT,
+      message: MDL_PRM_INPUT_ERR.RPT_VLD_AGE_INC_RNG(
         NUM_INPUT_LIMITS.AGE_INC_MIN,
         NUM_INPUT_LIMITS.AGE_INC_MAX,
       ),
-      { width: 400 },
-    )
+      btnLabel: BUTTON_LABEL.CONT_EDIT,
+    }
     return false
   }
 
@@ -314,9 +335,11 @@ const clear = () => {
   reportTitle.value = null
 
   projectionType.value = DEFAULT_VALUES.PROJECTION_TYPE
-  speciesGroups.value = speciesGroups.value.map((group) => ({
+  speciesGroups.value = speciesGroups.value.map((group: SpeciesGroup) => ({
     ...group,
   }))
 }
+
+const handleDialogClose = () => {}
 </script>
 <style scoped></style>
