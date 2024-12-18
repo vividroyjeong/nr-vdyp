@@ -4,7 +4,16 @@ export interface NotificationState {
   isShow: boolean
   message: string
   type: MessageType
+  color: MessageType
   timeoutId: number | null
+}
+
+export interface MessageDialog {
+  dialog: boolean
+  title: string
+  message: string
+  dialogWidth?: number
+  btnLabel?: string
 }
 
 export interface JobSearchParams {

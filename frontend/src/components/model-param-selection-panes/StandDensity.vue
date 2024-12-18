@@ -1,5 +1,14 @@
 <template>
   <v-card class="elevation-4">
+    <AppMessageDialog
+      :dialog="messageDialog.dialog"
+      :title="messageDialog.title"
+      :message="messageDialog.message"
+      :dialogWidth="messageDialog.dialogWidth"
+      :btnLabel="messageDialog.btnLabel"
+      @update:dialog="(value) => (messageDialog.dialog = value)"
+      @close="handleDialogClose"
+    />
     <v-expansion-panels v-model="panelOpenStates.standDensity">
       <v-expansion-panel hide-actions>
         <v-expansion-panel-title>
@@ -72,18 +81,20 @@
 import { ref, computed } from 'vue'
 import { Util } from '@/utils/util'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
-import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
+import AppMessageDialog from '@/components/common/AppMessageDialog.vue'
 import { storeToRefs } from 'pinia'
 import {
   PANEL,
   MODEL_PARAMETER_PANEL,
   NUM_INPUT_LIMITS,
+  BUTTON_LABEL,
 } from '@/constants/constants'
 import {
   MDL_PRM_INPUT_ERR,
   MSG_DIALOG_TITLE,
   MDL_PRM_INPUT_HINT,
 } from '@/constants/message'
+import type { MessageDialog } from '@/interfaces/interfaces'
 import { StandDensityValidation } from '@/validation/standDensityValidation'
 
 const form = ref<HTMLFormElement>()
@@ -91,7 +102,12 @@ const form = ref<HTMLFormElement>()
 const standDensityValidator = new StandDensityValidation()
 
 const modelParameterStore = useModelParameterStore()
-const messageDialogStore = useMessageDialogStore()
+
+const messageDialog = ref<MessageDialog>({
+  dialog: false,
+  title: '',
+  message: '',
+})
 
 const { panelOpenStates, percentStockableArea } =
   storeToRefs(modelParameterStore)
@@ -110,11 +126,12 @@ const validateRange = (): boolean => {
       percentStockableArea.value,
     )
   ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.INVALID_INPUT,
-      MDL_PRM_INPUT_ERR.DENSITY_VLD_PCT_STCB_AREA_RNG,
-      { width: 400 },
-    )
+    messageDialog.value = {
+      dialog: true,
+      title: MSG_DIALOG_TITLE.INVALID_INPUT,
+      message: MDL_PRM_INPUT_ERR.DENSITY_VLD_PCT_STCB_AREA_RNG,
+      btnLabel: BUTTON_LABEL.CONT_EDIT,
+    }
     return false
   }
 
@@ -160,6 +177,8 @@ const clear = () => {
     form.value.reset()
   }
 }
+
+const handleDialogClose = () => {}
 </script>
 
 <style scoped></style>

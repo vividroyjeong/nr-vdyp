@@ -1,5 +1,14 @@
 <template>
   <v-card class="elevation-4">
+    <AppMessageDialog
+      :dialog="messageDialog.dialog"
+      :title="messageDialog.title"
+      :message="messageDialog.message"
+      :dialogWidth="messageDialog.dialogWidth"
+      :btnLabel="messageDialog.btnLabel"
+      @update:dialog="(value) => (messageDialog.dialog = value)"
+      @close="handleDialogClose"
+    />
     <v-expansion-panels v-model="panelOpenStates.speciesInfo">
       <v-expansion-panel hide-actions>
         <v-expansion-panel-title>
@@ -243,7 +252,7 @@
 import { ref, watch, computed } from 'vue'
 import { Util } from '@/utils/util'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
-import { useMessageDialogStore } from '@/stores/common/messageDialogStore'
+import AppMessageDialog from '@/components/common/AppMessageDialog.vue'
 import { storeToRefs } from 'pinia'
 import { derivedByOptions } from '@/constants/options'
 import { SPECIES_MAP } from '@/constants/mappings'
@@ -253,10 +262,11 @@ import {
   NUM_INPUT_LIMITS,
   CONTINUOUS_INC_DEC,
   SPIN_BUTTON,
+  BUTTON_LABEL,
 } from '@/constants/constants'
 import { DEFAULT_VALUES } from '@/constants/defaults'
 import { MDL_PRM_INPUT_ERR, MSG_DIALOG_TITLE } from '@/constants/message'
-import type { SpeciesList } from '@/interfaces/interfaces'
+import type { SpeciesList, MessageDialog } from '@/interfaces/interfaces'
 import { SpeciesInfoValidation } from '@/validation/speciesInfoValidation'
 
 const form = ref<HTMLFormElement>()
@@ -264,7 +274,12 @@ const form = ref<HTMLFormElement>()
 const speciesInfoValidator = new SpeciesInfoValidation()
 
 const modelParameterStore = useModelParameterStore()
-const messageDialogStore = useMessageDialogStore()
+
+const messageDialog = ref<MessageDialog>({
+  dialog: false,
+  title: '',
+  message: '',
+})
 
 const {
   panelOpenStates,
@@ -443,7 +458,13 @@ const validateDuplicateSpecies = () => {
       ? MDL_PRM_INPUT_ERR.SPCZ_VLD_DUP_W_LABEL(duplicateSpecies, speciesLabel)
       : MDL_PRM_INPUT_ERR.SPCZ_VLD_DUP_WO_LABEL(duplicateSpecies)
 
-    messageDialogStore.openDialog(MSG_DIALOG_TITLE.DATA_DUPLICATED, message)
+    messageDialog.value = {
+      dialog: true,
+      title: MSG_DIALOG_TITLE.DATA_DUPLICATED,
+      message: message,
+      btnLabel: BUTTON_LABEL.CONT_EDIT,
+    }
+
     return false
   }
 
@@ -457,11 +478,13 @@ const validateTotalSpeciesPercent = () => {
       totalSpeciesGroupPercent.value,
     )
   ) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.DATA_INCOMPLETE,
-      MDL_PRM_INPUT_ERR.SPCZ_VLD_TOTAL_PCT,
-      { width: 400 },
-    )
+    messageDialog.value = {
+      dialog: true,
+      title: MSG_DIALOG_TITLE.DATA_INCOMPLETE,
+      message: MDL_PRM_INPUT_ERR.SPCZ_VLD_TOTAL_PCT,
+      btnLabel: BUTTON_LABEL.CONT_EDIT,
+    }
+
     return false
   }
   return true
@@ -469,11 +492,13 @@ const validateTotalSpeciesPercent = () => {
 
 const validateRequired = () => {
   if (!speciesInfoValidator.validateRequired(derivedBy.value)) {
-    messageDialogStore.openDialog(
-      MSG_DIALOG_TITLE.MISSING_INFO,
-      MDL_PRM_INPUT_ERR.SPCZ_VLD_MISSING_DERIVED_BY,
-      { width: 400 },
-    )
+    messageDialog.value = {
+      dialog: true,
+      title: MSG_DIALOG_TITLE.MISSING_INFO,
+      message: MDL_PRM_INPUT_ERR.SPCZ_VLD_MISSING_DERIVED_BY,
+      btnLabel: BUTTON_LABEL.CONT_EDIT,
+    }
+
     return false
   }
   return true
@@ -517,6 +542,8 @@ const clear = () => {
 
   derivedBy.value = DEFAULT_VALUES.DERIVED_BY
 }
+
+const handleDialogClose = () => {}
 </script>
 
 <style scoped>
