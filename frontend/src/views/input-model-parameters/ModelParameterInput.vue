@@ -3,13 +3,7 @@
     :isShow="isProgressVisible"
     :showMessage="true"
     :message="progressMessage"
-    :circleSize="70"
-    :circleWidth="5"
-    :circleColor="'primary'"
-    :backgroundColor="'rgba(255, 255, 255, 0.8)'"
     :hasBackground="true"
-    :padding="20"
-    :borderRadius="10"
   />
   <v-container fluid>
     <div class="top-project-year mt-3">
@@ -93,6 +87,7 @@ import SiteInfo from '@/components/model-param-selection-panes/SiteInfo.vue'
 import StandDensity from '@/components/model-param-selection-panes/StandDensity.vue'
 import ReportInfo from '@/components/model-param-selection-panes/ReportInfo.vue'
 import FileUpload from '@/views/input-model-parameters/FileUpload.vue'
+import AppProgressCircular from '@/components/common/AppProgressCircular.vue'
 import {
   MODEL_SELECTION,
   MODEL_PARAM_TAB_NAME,

@@ -4,13 +4,7 @@
       :isShow="isProgressVisible"
       :showMessage="true"
       :message="progressMessage"
-      :circleSize="70"
-      :circleWidth="5"
-      :circleColor="'primary'"
-      :backgroundColor="'rgba(255, 255, 255, 0.8)'"
       :hasBackground="true"
-      :padding="20"
-      :borderRadius="10"
     />
     <AppMessageDialog
       :dialog="messageDialog.dialog"
