@@ -122,3 +122,8 @@ export const DOWNLOAD_FILE_NAME = Object.freeze({
 export const BUTTON_LABEL = Object.freeze({
   CONT_EDIT: 'Continue Editing',
 })
+
+export const INVENTORY_CODES = Object.freeze({
+  FIP: 'F',
+  VRI: 'V',
+})

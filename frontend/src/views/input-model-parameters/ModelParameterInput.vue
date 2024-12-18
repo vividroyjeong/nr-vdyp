@@ -1,4 +1,16 @@
 <template>
+  <AppProgressCircular
+    :isShow="isProgressVisible"
+    :showMessage="true"
+    :message="progressMessage"
+    :circleSize="70"
+    :circleWidth="5"
+    :circleColor="'primary'"
+    :backgroundColor="'rgba(255, 255, 255, 0.8)'"
+    :hasBackground="true"
+    :padding="20"
+    :borderRadius="10"
+  />
   <v-container fluid>
     <div class="top-project-year mt-3">
       <h1 class="top-project">Projects</h1>
@@ -68,26 +80,38 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useAppStore } from '@/stores/appStore'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
 import { storeToRefs } from 'pinia'
-
 import JobTypeSelection from '@/components/JobTypeSelection.vue'
-
 import ModelParameterSelection from '@/views/input-model-parameters/ModelParameterSelection.vue'
 import ModelReport from '@/views/input-model-parameters/ModelReport.vue'
 import ViewLogFile from '@/views/input-model-parameters/ViewLogFile.vue'
 import ViewErrorMessages from '@/views/input-model-parameters/ViewErrorMessages.vue'
-
 import SiteInfo from '@/components/model-param-selection-panes/SiteInfo.vue'
 import StandDensity from '@/components/model-param-selection-panes/StandDensity.vue'
 import ReportInfo from '@/components/model-param-selection-panes/ReportInfo.vue'
-
 import FileUpload from '@/views/input-model-parameters/FileUpload.vue'
-
-import { MODEL_SELECTION, MODEL_PARAM_TAB_NAME } from '@/constants/constants'
+import {
+  MODEL_SELECTION,
+  MODEL_PARAM_TAB_NAME,
+  INVENTORY_CODES,
+  DERIVED_BY,
+  DOWNLOAD_FILE_NAME,
+} from '@/constants/constants'
+import { projectionHcsvPost } from '@/services/apiActions'
+import { handleApiError } from '@/services/apiErrorHandler'
+import { SelectedExecutionOptionsEnum } from '@/services/vdyp-api'
+import { Util } from '@/utils/util'
+import { logSuccessMessage } from '@/utils/messageHandler'
+import { SUCESS_MSG, FILE_UPLOAD_ERR, PROGRESS_MSG } from '@/constants/message'
+import { POLYGON_HEADERS, LAYER_HEADERS } from '@/constants/csvHeaders'
+import type { CSVRowType } from '@/types/types'
 import { saveAs } from 'file-saver'
+
+const isProgressVisible = ref(false)
+const progressMessage = ref('')
 
 const appStore = useAppStore()
 const modelParameterStore = useModelParameterStore()
@@ -118,98 +142,16 @@ onMounted(() => {
   modelParameterStore.setDefaultValues()
 })
 
-const runModel = () => {
-  const modelParameterStore = useModelParameterStore()
+const createCSVFiles = () => {
+  const derivedByCode =
+    modelParameterStore.derivedBy === DERIVED_BY.VOLUME
+      ? INVENTORY_CODES.FIP
+      : modelParameterStore.derivedBy === DERIVED_BY.BASAL_AREA
+        ? INVENTORY_CODES.VRI
+        : ''
 
-  const polygonHeaders = [
-    'FEATURE_ID',
-    'MAP_ID',
-    'POLYGON_NUMBER',
-    'ORG_UNIT',
-    'TSA_NAME',
-    'TFL_NAME',
-    'INVENTORY_STANDARD_CODE',
-    'TSA_NUMBER',
-    'SHRUB_HEIGHT',
-    'SHRUB_CROWN_CLOSURE',
-    'SHRUB_COVER_PATTERN',
-    'HERB_COVER_TYPE_CODE',
-    'HERB_COVER_PCT',
-    'HERB_COVER_PATTERN_CODE',
-    'BRYOID_COVER_PCT',
-    'BEC_ZONE_CODE',
-    'CFS_ECOZONE',
-    'PRE_DISTURBANCE_STOCKABILITY',
-    'YIELD_FACTOR',
-    'NON_PRODUCTIVE_DESCRIPTOR_CD',
-    'BCLCS_LEVEL1_CODE',
-    'BCLCS_LEVEL2_CODE',
-    'BCLCS_LEVEL3_CODE',
-    'BCLCS_LEVEL4_CODE',
-    'BCLCS_LEVEL5_CODE',
-    'PHOTO_ESTIMATION_BASE_YEAR',
-    'REFERENCE_YEAR',
-    'PCT_DEAD',
-    'NON_VEG_COVER_TYPE_1',
-    'NON_VEG_COVER_PCT_1',
-    'NON_VEG_COVER_PATTERN_1',
-    'NON_VEG_COVER_TYPE_2',
-    'NON_VEG_COVER_PCT_2',
-    'NON_VEG_COVER_PATTERN_2',
-    'NON_VEG_COVER_TYPE_3',
-    'NON_VEG_COVER_PCT_3',
-    'NON_VEG_COVER_PATTERN_3',
-    'LAND_COVER_CLASS_CD_1',
-    'LAND_COVER_PCT_1',
-    'LAND_COVER_CLASS_CD_2',
-    'LAND_COVER_PCT_2',
-    'LAND_COVER_CLASS_CD_3',
-    'LAND_COVER_PCT_3',
-  ]
-
-  const layerHeaders = [
-    'FEATURE_ID',
-    'TREE_COVER_LAYER_ESTIMATED_ID',
-    'MAP_ID',
-    'POLYGON_NUMBER',
-    'LAYER_LEVEL_CODE',
-    'VDYP7_LAYER_CD',
-    'LAYER_STOCKABILITY',
-    'FOREST_COVER_RANK_CODE',
-    'NON_FOREST_DESCRIPTOR_CODE',
-    'EST_SITE_INDEX_SPECIES_CD',
-    'ESTIMATED_SITE_INDEX',
-    'CROWN_CLOSURE',
-    'BASAL_AREA_75',
-    'STEMS_PER_HA_75',
-    'SPECIES_CD_1',
-    'SPECIES_PCT_1',
-    'SPECIES_CD_2',
-    'SPECIES_PCT_2',
-    'SPECIES_CD_3',
-    'SPECIES_PCT_3',
-    'SPECIES_CD_4',
-    'SPECIES_PCT_4',
-    'SPECIES_CD_5',
-    'SPECIES_PCT_5',
-    'SPECIES_CD_6',
-    'SPECIES_PCT_6',
-    'EST_AGE_SPP1',
-    'EST_HEIGHT_SPP1',
-    'EST_AGE_SPP2',
-    'EST_HEIGHT_SPP2',
-    'ADJ_IND',
-    'LOREY_HEIGHT_75',
-    'BASAL_AREA_125',
-    'WS_VOL_PER_HA_75',
-    'WS_VOL_PER_HA_125',
-    'CU_VOL_PER_HA_125',
-    'D_VOL_PER_HA_125',
-    'DW_VOL_PER_HA_125',
-  ]
-
-  const polygonData: (string | number | null)[][] = [
-    polygonHeaders,
+  const polygonData: CSVRowType = [
+    POLYGON_HEADERS,
     [
       'FEATURE_ID',
       'MAP_ID',
@@ -217,7 +159,7 @@ const runModel = () => {
       'ORG_UNIT',
       'TSA_NAME',
       'TFL_NAME',
-      'INVENTORY_STANDARD_CODE',
+      derivedByCode || '', // 'INVENTORY_STANDARD_CODE'
       'TSA_NUMBER',
       'SHRUB_HEIGHT',
       'SHRUB_CROWN_CLOSURE',
@@ -257,8 +199,8 @@ const runModel = () => {
     ],
   ]
 
-  const layerData: (string | number | null)[][] = [
-    layerHeaders,
+  const layerData: CSVRowType = [
+    LAYER_HEADERS,
     [
       'FEATURE_ID',
       'TREE_COVER_LAYER_ESTIMATED_ID',
@@ -299,16 +241,9 @@ const runModel = () => {
       '', // 'D_VOL_PER_HA_125',
       '', // 'DW_VOL_PER_HA_125',
     ],
-    // [
-    //   modelParameterStore.startingAge,
-    //   modelParameterStore.finishingAge,
-    //   modelParameterStore.ageIncrement,
-    //   modelParameterStore.volumeReported.join(','),
-    //   modelParameterStore.includeInReport.join(','),
-    // ],
   ]
 
-  const convertToCSV = (data: (string | number | null)[][]): string => {
+  const convertToCSV = (data: CSVRowType): string => {
     return data
       .map((row) =>
         row
@@ -328,8 +263,70 @@ const runModel = () => {
   })
   const blobLayer = new Blob([layerCSV], { type: 'text/csv;charset=utf-8;' })
 
-  saveAs(blobPolygon, 'VDYP7_INPUT_POLY.csv')
-  saveAs(blobLayer, 'VDYP7_INPUT_LAYER.csv')
+  // saveAs(blobPolygon, 'VDYP7_INPUT_POLY.csv')
+  // saveAs(blobLayer, 'VDYP7_INPUT_LAYER.csv')
+
+  return { blobPolygon, blobLayer }
+}
+
+const runModel = async () => {
+  try {
+    isProgressVisible.value = true
+    progressMessage.value = PROGRESS_MSG.RUNNING_MODEL
+
+    await Util.delay(1000)
+
+    const modelParameterStore = useModelParameterStore()
+
+    const { blobPolygon, blobLayer } = createCSVFiles()
+
+    const formData = new FormData()
+
+    const selectedExecutionOptions = [
+      SelectedExecutionOptionsEnum.DoEnableProgressLogging,
+      SelectedExecutionOptionsEnum.DoEnableErrorLogging,
+      SelectedExecutionOptionsEnum.DoEnableDebugLogging,
+    ]
+
+    if (modelParameterStore.incSecondaryHeight) {
+      selectedExecutionOptions.push(
+        SelectedExecutionOptionsEnum.DoIncludeSecondarySpeciesDominantHeightInYieldTable,
+      )
+    }
+
+    const projectionParameters = {
+      ageStart: modelParameterStore.startingAge,
+      ageEnd: modelParameterStore.finishingAge,
+      ageIncrement: modelParameterStore.ageIncrement,
+      selectedExecutionOptions: selectedExecutionOptions,
+    }
+
+    formData.append(
+      'projectionParameters',
+      new Blob([JSON.stringify(projectionParameters)], {
+        type: 'application/json',
+      }),
+    )
+
+    formData.append('polygonInputData', blobPolygon, 'VDYP7_INPUT_POLY.csv')
+    formData.append('layersInputData', blobLayer, 'VDYP7_INPUT_LAYER.csv')
+
+    const result = await projectionHcsvPost(formData, false)
+
+    const url = window.URL.createObjectURL(new Blob([result]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', DOWNLOAD_FILE_NAME.MULTI_POLYGON_OUTPUT)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+
+    logSuccessMessage(SUCESS_MSG.FILE_UPLOAD_RUN_MODEL_RESULT)
+  } catch (error) {
+    handleApiError(error, FILE_UPLOAD_ERR.FAIL_RUN_MODEL)
+  } finally {
+    isProgressVisible.value = false
+  }
 }
 </script>
 
