@@ -63,18 +63,16 @@ const computedBtnLabel = computed(
   () => props.btnLabel ?? BUTTON_LABEL.CONT_EDIT,
 )
 
-const computedHeaderStyle = computed(() => {
-  return {
-    fontWeight: '300 !important',
-    paddingLeft: '30px !important',
-    padding: '1rem !important',
-    background: props.headerBackground ?? '#003366 !important',
-    color: props.headerColor ?? '#ffffff !important',
-  }
-})
+const computedHeaderStyle = computed(() => ({
+  fontWeight: '300',
+  paddingLeft: '30px',
+  padding: '1rem',
+  background: props.headerBackground ?? '#003366',
+  color: props.headerColor ?? '#ffffff',
+}))
 
 const computedActionsBackground = computed(
-  () => props.actionsBackground ?? '#f6f6f6 !important;',
+  () => props.actionsBackground ?? '#f6f6f6',
 )
 
 const computedDialogStyle = computed(() => {
