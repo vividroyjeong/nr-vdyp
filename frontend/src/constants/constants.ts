@@ -118,3 +118,7 @@ export const MODEL_PARAM_TAB_NAME = Object.freeze({
 export const DOWNLOAD_FILE_NAME = Object.freeze({
   MULTI_POLYGON_OUTPUT: 'vdyp-output.zip',
 })
+
+export const BUTTON_LABEL = Object.freeze({
+  CONT_EDIT: 'Continue Editing',
+})
