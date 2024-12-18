@@ -4,7 +4,6 @@
 
     <v-main id="main">
       <AppNotification />
-      <AppConfirmDialog />
       <AppDialogDragger />
 
       <DefaultLayout>
@@ -16,7 +15,6 @@
 <script setup lang="ts">
 import TheHeader from '@/components/layout/TheHeader.vue'
 import AppNotification from '@/components/common/AppNotification.vue'
-import AppConfirmDialog from '@/components/common/AppConfirmDialog.vue'
 import AppDialogDragger from '@/components/common/AppDialogDragger.vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 </script>

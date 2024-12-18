@@ -4,6 +4,7 @@ export interface NotificationState {
   isShow: boolean
   message: string
   type: MessageType
+  color: MessageType
   timeoutId: number | null
 }
 
