@@ -263,7 +263,6 @@ input[type='number']::-webkit-outer-spin-button {
   align-items: center;
   margin-bottom: 10px;
   padding-bottom: 60px;
-  border-bottom: 2px solid #dfdcdc;
 }
 
 .top-project {
@@ -300,6 +299,10 @@ input[type='number']::-webkit-outer-spin-button {
 
 .hr-line {
   border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.hr-line-2 {
+  border-top: 2px solid rgba(0, 0, 0, 0.12);
 }
 
 .col-space-3 {
