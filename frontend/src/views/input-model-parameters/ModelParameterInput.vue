@@ -11,13 +11,14 @@
       <span class="top-year">Year: 2024/2025</span>
     </div>
 
-    <template v-if="modelSelection === MODEL_SELECTION.INPUT_MODEL_PARAMETERS">
-      <div class="hr-line-2 mb-4"></div>
-      <v-spacer class="space"></v-spacer>
-      <div class="mt-n1 mb-3">
-        <h3>Model Parameter Selection</h3>
-      </div>
-    </template>
+    <div class="hr-line-2 mb-4"></div>
+    <v-spacer class="space"></v-spacer>
+    <div class="mt-n1 mb-3">
+      <h3 v-if="modelSelection === MODEL_SELECTION.INPUT_MODEL_PARAMETERS">
+        Model Parameter Selection
+      </h3>
+      <h3 v-else>File upload</h3>
+    </div>
 
     <v-card class="pa-4 job-type-sel-card" elevation="0">
       <JobTypeSelection />
