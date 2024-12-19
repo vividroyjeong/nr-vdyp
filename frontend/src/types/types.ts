@@ -22,3 +22,5 @@ export type PanelState = typeof PANEL.OPEN | typeof PANEL.CLOSE
 
 // Define a type for sort order lowercase letters
 export type SortOrder = Lowercase<(typeof SORT_ORDER)[keyof typeof SORT_ORDER]>
+
+export type CSVRowType = (string | number | null)[][]
