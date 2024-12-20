@@ -36,15 +36,11 @@
   </v-container>
 </template>
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useProjectionStore } from '@/stores/projectionStore'
 import { FILE_NAME } from '@/constants/constants'
 import printJS from 'print-js'
 import { saveAs } from 'file-saver'
-
-onMounted(async () => {
-  await projectionStore.loadSampleData()
-})
 
 const projectionStore = useProjectionStore()
 const items = computed(() => projectionStore.errorMessages)
