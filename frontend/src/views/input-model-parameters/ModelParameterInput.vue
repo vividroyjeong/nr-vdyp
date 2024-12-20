@@ -84,6 +84,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useAppStore } from '@/stores/appStore'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
+import { useProjectionStore } from '@/stores/projectionStore'
 import { storeToRefs } from 'pinia'
 import JobTypeSelection from '@/components/JobTypeSelection.vue'
 import ModelParameterSelection from '@/views/input-model-parameters/ModelParameterSelection.vue'
@@ -100,7 +101,7 @@ import {
   MODEL_PARAM_TAB_NAME,
   INVENTORY_CODES,
   DERIVED_BY,
-  DOWNLOAD_FILE_NAME,
+  FILE_NAME,
 } from '@/constants/constants'
 import { projectionHcsvPost } from '@/services/apiActions'
 import { handleApiError } from '@/services/apiErrorHandler'
@@ -117,6 +118,7 @@ const progressMessage = ref('')
 
 const appStore = useAppStore()
 const modelParameterStore = useModelParameterStore()
+const projectionStore = useProjectionStore()
 
 const { currentTab, modelSelection } = storeToRefs(appStore)
 
@@ -315,13 +317,15 @@ const runModel = async () => {
 
     const result = await projectionHcsvPost(formData, false)
 
-    const url = window.URL.createObjectURL(new Blob([result]))
-    const link = document.createElement('a')
-    link.href = url
-    link.setAttribute('download', DOWNLOAD_FILE_NAME.MULTI_POLYGON_OUTPUT)
-    document.body.appendChild(link)
-    link.click()
-    link.remove()
+    await projectionStore.handleZipResponse(result)
+
+    // const url = window.URL.createObjectURL(new Blob([result]))
+    // const link = document.createElement('a')
+    // link.href = url
+    // link.setAttribute('download', FILE_NAME.PROJECTION_RESULT_ZIP)
+    // document.body.appendChild(link)
+    // link.click()
+    // link.remove()
 
     logSuccessMessage(SUCESS_MSG.FILE_UPLOAD_RUN_MODEL_RESULT)
   } catch (error) {

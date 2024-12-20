@@ -1,21 +1,38 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import * as JSZip from 'jszip'
 import { messageResult } from '@/utils/messageHandler'
 import { FILE_UPLOAD_ERR } from '@/constants/message'
+import { FILE_NAME } from '@/constants/constants'
 
 export const useProjectionStore = defineStore('projectionStore', () => {
   const errorMessages = ref<string[]>([])
   const logMessages = ref<string[]>([])
-  const yieldTable = ref<string>('')
+  const yieldTable = ref<string>('') // raw CSV
+
+  const yieldTableArray = computed(() => {
+    if (!yieldTable.value) {
+      console.error('Error: yieldTable is null or undefined.')
+      return [] // Return an empty array to avoid errors
+    }
+    // Convert CSV data to an array
+    return yieldTable.value.split(/\r?\n/).filter((line) => line.trim() !== '') // Remove blank lines
+  })
 
   const handleZipResponse = async (zipData: Blob) => {
     try {
       const zip = await JSZip.loadAsync(zipData)
+
+      // Print all file names in the ZIP file
+      console.log('Files in ZIP archive:')
+      for (const relativePath of Object.keys(zip.files)) {
+        console.log(`- ${relativePath}`)
+      }
+
       const requiredFiles = {
-        error: 'Output_Error.txt',
-        log: 'Output_Log.txt',
-        yield: 'Output_YldTbl.csv',
+        error: FILE_NAME.ERROR_TXT,
+        log: FILE_NAME.LOG_TXT,
+        yield: FILE_NAME.YIELD_TABLE_CSV,
       }
 
       const errorFile = zip.file(requiredFiles.error)
@@ -44,10 +61,28 @@ export const useProjectionStore = defineStore('projectionStore', () => {
     }
   }
 
+  const loadSampleData = async () => {
+    try {
+      const sampleZipPath = '/test-data/vdyp-output.zip'
+      const response = await fetch(sampleZipPath)
+      if (!response.ok) {
+        throw new Error(
+          `Failed to load sample ZIP file: ${response.statusText}`,
+        )
+      }
+      const zipBlob = await response.blob()
+      await handleZipResponse(zipBlob)
+    } catch (error) {
+      console.error('Error loading sample data:', error)
+    }
+  }
+
   return {
     errorMessages,
     logMessages,
     yieldTable,
+    yieldTableArray,
     handleZipResponse,
+    loadSampleData,
   }
 })

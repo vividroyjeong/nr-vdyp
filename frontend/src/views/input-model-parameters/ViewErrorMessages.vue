@@ -17,96 +17,72 @@
       </v-card-actions>
     </v-card>
     <div
-      id="err-msg-rslt-print-area"
-      ref="errMsgRsltPrintAreaRef"
       class="ml-2 mr-2"
+      style="
+        white-space: pre;
+        font-family: 'Courier New', Courier, monospace;
+        overflow-y: scroll;
+        height: 420px;
+        font-size: 14px;
+        line-height: 1.5;
+        overflow-x: auto;
+        border: 1px solid #ccc;
+        padding: 10px;
+        background-color: #f9f9f9;
+      "
     >
-      <v-virtual-scroll :items="items" :item-height="50" height="430px">
-        <template #default="{ item }">
-          <div
-            style="
-              display: flex;
-              align-items: center;
-              height: 30px;
-              padding: 0 16px;
-            "
-          >
-            {{ item }}
-          </div>
-        </template>
-      </v-virtual-scroll>
+      {{ formattedText }}
     </div>
   </v-container>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useProjectionStore } from '@/stores/projectionStore'
+import { FILE_NAME } from '@/constants/constants'
 import printJS from 'print-js'
 import { saveAs } from 'file-saver'
-import { Util } from '@/utils/util'
+
+onMounted(async () => {
+  await projectionStore.loadSampleData()
+})
 
 const projectionStore = useProjectionStore()
 const items = computed(() => projectionStore.errorMessages)
 
-const errMsgRsltPrintAreaRef = ref<HTMLElement | null>(null)
+const formattedText = computed(() => items.value.join('\n'))
 
 const download = () => {
   const content = items.value.join('\n')
   const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
-  saveAs(blob, 'Output_Error.txt')
+  saveAs(blob, FILE_NAME.ERROR_TXT)
 }
 
 const print = () => {
-  if (errMsgRsltPrintAreaRef.value) {
-    // Create a temporary DOM
-    const container = document.createElement('div')
-    container.style.fontFamily =
-      "'BCSans', 'Noto Sans', Verdana, Arial, sans-serif"
-    container.style.fontSize = '12px'
+  const container = document.createElement('div')
+  container.style.fontFamily = "'Courier New', Courier, monospace"
+  container.style.fontSize = '10px'
+  container.style.whiteSpace = 'pre'
+  container.style.lineHeight = '1.5'
+  container.textContent = formattedText.value
 
-    // Add a print-only header
-    const header = document.createElement('h2')
-    header.style.textAlign = 'center'
-    header.style.marginBottom = '20px'
-    header.textContent = 'View Error Message Results'
-    container.appendChild(header)
+  const printStyles = `
+    @page {
+      size: A4 landscape;
+      margin: 10mm;
+    }
+    body {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 10px;
+      white-space: pre;
+      line-height: 1.5;
+    }
+  `
 
-    // traverse the v-virtual-scroll item directly and add it to the DOM
-    items.value.forEach((item: any) => {
-      const itemDiv = document.createElement('div')
-      itemDiv.style.padding = '4px 16px'
-      itemDiv.style.height = '30px'
-      itemDiv.style.display = 'flex'
-      itemDiv.style.alignItems = 'center'
-      itemDiv.style.border = 'none'
-      itemDiv.textContent = item
-      container.appendChild(itemDiv)
-    })
-
-    // Define a print style
-    const styles =
-      Util.extractStylesFromDocument(document.styleSheets) +
-      `
-      @page {
-        size: Letter portrait;
-        margin: 7mm;
-      }
-      h2 {
-        font-size: 16px;
-        margin-bottom: 10px;
-      }
-      div {
-        font-size: 12px;
-      }
-    `
-
-    // Print a temporary DOM
-    printJS({
-      printable: container.innerHTML,
-      type: 'raw-html',
-      style: styles,
-    })
-  }
+  printJS({
+    printable: container.innerHTML,
+    type: 'raw-html',
+    style: printStyles,
+  })
 }
 </script>
 <style scoped></style>
