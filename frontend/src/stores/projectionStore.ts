@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import * as JSZip from 'jszip'
+import JSZip from 'jszip'
 import { messageResult } from '@/utils/messageHandler'
 import { FILE_UPLOAD_ERR } from '@/constants/message'
 import { FILE_NAME } from '@/constants/constants'
@@ -63,17 +63,35 @@ export const useProjectionStore = defineStore('projectionStore', () => {
 
   const loadSampleData = async () => {
     try {
-      const sampleZipPath = '/test-data/vdyp-output.zip'
-      const response = await fetch(sampleZipPath)
-      if (!response.ok) {
-        throw new Error(
-          `Failed to load sample ZIP file: ${response.statusText}`,
-        )
+      const filePaths = [
+        '/test-data/ErrorLog.txt',
+        '/test-data/ProgressLog.txt',
+        '/test-data/YieldTable.csv',
+      ]
+
+      const zip = new JSZip()
+
+      for (const filePath of filePaths) {
+        const response = await fetch(filePath)
+        if (!response.ok) {
+          throw new Error(`Failed to load file: ${filePath}`)
+        }
+        const fileContent = await response.text()
+        const fileName = filePath.split('/').pop() // Extract file name
+        if (fileName) {
+          zip.file(fileName, fileContent)
+        }
       }
-      const zipBlob = await response.blob()
+
+      // Generate the ZIP file
+      const zipBlob = await zip.generateAsync({ type: 'blob' })
+
+      console.log('ZIP file created: vdyp-output.zip')
+
+      // Handle the ZIP file
       await handleZipResponse(zipBlob)
     } catch (error) {
-      console.error('Error loading sample data:', error)
+      console.error('Error creating ZIP file:', error)
     }
   }
 
