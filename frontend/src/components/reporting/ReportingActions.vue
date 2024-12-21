@@ -11,19 +11,25 @@
   >
     <v-card-actions class="pr-0">
       <v-spacer></v-spacer>
-      <PrintButton :isDisabled="isButtonDisabled" @print="handlePrint" />
-      <v-spacer></v-spacer>
-      <DownloadButton
+      <AppButton
+        label="Print"
         :isDisabled="isButtonDisabled"
-        @download="handleDownload"
+        buttonClass="blue-btn"
+        @click="handlePrint"
+      />
+      <v-spacer></v-spacer>
+      <AppButton
+        label="Download"
+        :isDisabled="isButtonDisabled"
+        buttonClass="white-btn"
+        @click="handleDownload"
       />
     </v-card-actions>
   </v-card>
 </template>
 
 <script setup lang="ts">
-import PrintButton from '@/components/common/core/PrintButton.vue'
-import DownloadButton from '@/components/common/core/DownloadButton.vue'
+import AppButton from '@/components/common/AppButton.vue'
 
 const props = defineProps({
   onPrint: {
