@@ -12,8 +12,7 @@ export const useProjectionStore = defineStore('projectionStore', () => {
 
   const yieldTableArray = computed(() => {
     if (!yieldTable.value) {
-      console.error('Error: yieldTable is null or undefined.')
-      return [] // Return an empty array to avoid errors
+      return []
     }
     // Convert CSV data to an array
     return yieldTable.value.split(/\r?\n/).filter((line) => line.trim() !== '') // Remove blank lines

@@ -104,6 +104,14 @@ export const FILE_UPLOAD_ERR = Object.freeze({
   FAIL_RUN_MODEL: 'Failed to run the projection model.',
 })
 
+export const FILE_DOWNLOAD_ERR = Object.freeze({
+  NO_DATA: 'No data available to download.',
+})
+
+export const PRINT_ERR = Object.freeze({
+  NO_DATA: 'No data available to download.',
+})
+
 export const PROGRESS_MSG = Object.freeze({
   RUNNING_MODEL: 'Running Model...',
 })

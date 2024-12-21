@@ -49,7 +49,7 @@
           :key="index"
           :value="index"
         >
-          <component :is="tab.component"></component>
+          <component :is="tab.component" :type="tab.type" />
         </v-tabs-window-item>
       </v-tabs-window>
 
@@ -88,9 +88,7 @@ import { useProjectionStore } from '@/stores/projectionStore'
 import { storeToRefs } from 'pinia'
 import JobTypeSelection from '@/components/JobTypeSelection.vue'
 import ModelParameterSelection from '@/views/input-model-parameters/ModelParameterSelection.vue'
-import ModelReport from '@/views/input-model-parameters/ModelReport.vue'
-import ViewLogFile from '@/views/input-model-parameters/ViewLogFile.vue'
-import ViewErrorMessages from '@/views/input-model-parameters/ViewErrorMessages.vue'
+import ReportingContainer from '@/components/reporting/ReportingContainer.vue'
 import SiteInfo from '@/components/model-param-selection-panes/SiteInfo.vue'
 import StandDensity from '@/components/model-param-selection-panes/StandDensity.vue'
 import ReportInfo from '@/components/model-param-selection-panes/ReportInfo.vue'
@@ -101,7 +99,7 @@ import {
   MODEL_PARAM_TAB_NAME,
   INVENTORY_CODES,
   DERIVED_BY,
-  FILE_NAME,
+  REPORTING_TAB,
 } from '@/constants/constants'
 import { projectionHcsvPost } from '@/services/apiActions'
 import { handleApiError } from '@/services/apiErrorHandler'
@@ -111,7 +109,6 @@ import { logSuccessMessage } from '@/utils/messageHandler'
 import { SUCESS_MSG, FILE_UPLOAD_ERR, PROGRESS_MSG } from '@/constants/message'
 import { POLYGON_HEADERS, LAYER_HEADERS } from '@/constants/csvHeaders'
 import type { CSVRowType } from '@/types/types'
-import { saveAs } from 'file-saver'
 
 const isProgressVisible = ref(false)
 const progressMessage = ref('')
@@ -126,12 +123,22 @@ const tabs = [
   {
     label: MODEL_PARAM_TAB_NAME.MODEL_PARAM_SELECTION,
     component: ModelParameterSelection,
+    type: null,
   },
-  { label: MODEL_PARAM_TAB_NAME.MODEL_REPORT, component: ModelReport },
-  { label: MODEL_PARAM_TAB_NAME.VIEW_LOG_FILE, component: ViewLogFile },
+  {
+    label: MODEL_PARAM_TAB_NAME.MODEL_REPORT,
+    component: ReportingContainer,
+    type: REPORTING_TAB.MODEL_REPORT,
+  },
+  {
+    label: MODEL_PARAM_TAB_NAME.VIEW_LOG_FILE,
+    component: ReportingContainer,
+    type: REPORTING_TAB.VIEW_LOG_FILE,
+  },
   {
     label: MODEL_PARAM_TAB_NAME.VIEW_ERROR_MESSAGES,
-    component: ViewErrorMessages,
+    component: ReportingContainer,
+    type: REPORTING_TAB.VIEW_ERR_MSG,
   },
 ]
 
@@ -267,9 +274,6 @@ const createCSVFiles = () => {
   })
   const blobLayer = new Blob([layerCSV], { type: 'text/csv;charset=utf-8;' })
 
-  // saveAs(blobPolygon, 'VDYP7_INPUT_POLY.csv')
-  // saveAs(blobLayer, 'VDYP7_INPUT_LAYER.csv')
-
   return { blobPolygon, blobLayer }
 }
 
@@ -318,14 +322,6 @@ const runModel = async () => {
     const result = await projectionHcsvPost(formData, false)
 
     await projectionStore.handleZipResponse(result)
-
-    // const url = window.URL.createObjectURL(new Blob([result]))
-    // const link = document.createElement('a')
-    // link.href = url
-    // link.setAttribute('download', FILE_NAME.PROJECTION_RESULT_ZIP)
-    // document.body.appendChild(link)
-    // link.click()
-    // link.remove()
 
     logSuccessMessage(SUCESS_MSG.FILE_UPLOAD_RUN_MODEL_RESULT)
   } catch (error) {
