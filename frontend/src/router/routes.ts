@@ -1,5 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
-import ModelParameterInput from '@/views/input-model-parameters/ModelParameterInput.vue'
+import ModelParameterInput from '@/views/ModelParameterInput.vue'
 import PageNotFound from '@/views/PageNotFound.vue'
 import AuthInfo from '@/views/test/AuthInfo.vue'
 import ParameterDetail from '@/views/test/ParameterDetail.vue'

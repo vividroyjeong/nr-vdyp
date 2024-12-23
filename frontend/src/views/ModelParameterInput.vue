@@ -86,14 +86,14 @@ import { useAppStore } from '@/stores/appStore'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
 import { useProjectionStore } from '@/stores/projectionStore'
 import { storeToRefs } from 'pinia'
+import AppProgressCircular from '@/components/common/AppProgressCircular.vue'
 import JobTypeSelection from '@/components/JobTypeSelection.vue'
-import ModelParameterSelection from '@/views/input-model-parameters/ModelParameterSelection.vue'
 import ReportingContainer from '@/components/reporting/ReportingContainer.vue'
 import SiteInfo from '@/components/model-param-selection-panes/SiteInfo.vue'
 import StandDensity from '@/components/model-param-selection-panes/StandDensity.vue'
 import ReportInfo from '@/components/model-param-selection-panes/ReportInfo.vue'
-import FileUpload from '@/views/input-model-parameters/FileUpload.vue'
-import AppProgressCircular from '@/components/common/AppProgressCircular.vue'
+import ModelParameterSelection from '@/views/ModelParameterSelection.vue'
+import FileUpload from '@/views/FileUpload.vue'
 import {
   MODEL_SELECTION,
   MODEL_PARAM_TAB_NAME,
