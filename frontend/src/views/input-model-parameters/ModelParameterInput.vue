@@ -323,7 +323,7 @@ const runModel = async () => {
 
     await projectionStore.handleZipResponse(result)
 
-    logSuccessMessage(SUCESS_MSG.FILE_UPLOAD_RUN_MODEL_RESULT)
+    logSuccessMessage(SUCESS_MSG.INPUT_MODEL_PARAM_RUN_RESULT)
   } catch (error) {
     handleApiError(error, FILE_UPLOAD_ERR.FAIL_RUN_MODEL)
   } finally {

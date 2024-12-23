@@ -8,8 +8,8 @@ import { PRINT_ERR, FILE_DOWNLOAD_ERR } from '@/constants/message'
  * @param {string} fileName - Name of the output file.
  */
 export const downloadTextFile = (data: string[], fileName: string) => {
-  if (!data || data.length === 0) {
-    messageHandler.logErrorMessage(FILE_DOWNLOAD_ERR.NO_DATA)
+  if (!data || data.length === 0 || data.every((item) => item.trim() === '')) {
+    messageHandler.logWarningMessage(FILE_DOWNLOAD_ERR.NO_DATA)
     return
   }
 
@@ -24,8 +24,8 @@ export const downloadTextFile = (data: string[], fileName: string) => {
  * @param {string} fileName - Name of the output file.
  */
 export const downloadCSVFile = (data: string[], fileName: string) => {
-  if (!data || data.length === 0) {
-    messageHandler.logErrorMessage(FILE_DOWNLOAD_ERR.NO_DATA)
+  if (!data || data.length === 0 || data.every((item) => item.trim() === '')) {
+    messageHandler.logWarningMessage(FILE_DOWNLOAD_ERR.NO_DATA)
     return
   }
 
@@ -39,8 +39,8 @@ export const downloadCSVFile = (data: string[], fileName: string) => {
  * @param {string[]} data - Array of strings to be printed.
  */
 export const printReport = (data: string[]) => {
-  if (!data || data.length === 0) {
-    messageHandler.logErrorMessage(PRINT_ERR.NO_DATA)
+  if (!data || data.length === 0 || data.every((item) => item.trim() === '')) {
+    messageHandler.logWarningMessage(PRINT_ERR.NO_DATA)
     return
   }
 

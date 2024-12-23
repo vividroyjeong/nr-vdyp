@@ -117,5 +117,7 @@ export const PROGRESS_MSG = Object.freeze({
 })
 
 export const SUCESS_MSG = Object.freeze({
-  FILE_UPLOAD_RUN_MODEL_RESULT: 'File successfully downloaded.',
+  FILE_UPLOAD_RUN_RESULT: 'File successfully downloaded.',
+  INPUT_MODEL_PARAM_RUN_RESULT:
+    'Projection completed successfully. Please check the results in the report tabs.',
 })

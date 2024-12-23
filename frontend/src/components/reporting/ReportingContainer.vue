@@ -2,8 +2,8 @@
   <v-container>
     <ReportingActions
       :isButtonDisabled="isButtonDisabled"
-      :onPrint="handlePrint"
-      :onDownload="handleDownload"
+      @print="handlePrint"
+      @download="handleDownload"
     />
     <ReportingOutput :data="data" />
   </v-container>

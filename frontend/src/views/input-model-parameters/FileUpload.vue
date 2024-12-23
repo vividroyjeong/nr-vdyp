@@ -429,7 +429,7 @@ const fileUploadRunModel = async () => {
     link.click()
     link.remove()
 
-    logSuccessMessage(SUCESS_MSG.FILE_UPLOAD_RUN_MODEL_RESULT)
+    logSuccessMessage(SUCESS_MSG.FILE_UPLOAD_RUN_RESULT)
   } catch (error) {
     handleApiError(error, FILE_UPLOAD_ERR.FAIL_RUN_MODEL)
   } finally {
