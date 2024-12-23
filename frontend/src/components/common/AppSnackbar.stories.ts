@@ -4,6 +4,7 @@ import AppSnackbar from './AppSnackbar.vue'
 const meta: Meta<typeof AppSnackbar> = {
   title: 'components/common/AppSnackbar',
   component: AppSnackbar,
+  tags: ['autodocs'],
   argTypes: {
     isVisible: {
       control: 'boolean',
@@ -62,7 +63,7 @@ type Story = StoryObj<typeof AppSnackbar>
 export const InfoNotification: Story = {
   args: {
     isVisible: true,
-    autoTimeout: false,
+    autoTimeout: true,
     showTimer: false,
     message: 'This is an informational message.',
     type: 'info',

@@ -115,10 +115,24 @@ export const MODEL_PARAM_TAB_NAME = Object.freeze({
   VIEW_ERROR_MESSAGES: 'View Error Messages',
 })
 
-export const DOWNLOAD_FILE_NAME = Object.freeze({
-  MULTI_POLYGON_OUTPUT: 'vdyp-output.zip',
+export const FILE_NAME = Object.freeze({
+  PROJECTION_RESULT_ZIP: 'vdyp-output.zip',
+  ERROR_TXT: 'ErrorLog.txt',
+  LOG_TXT: 'ProgressLog.txt',
+  YIELD_TABLE_CSV: 'YieldTable.csv',
 })
 
 export const BUTTON_LABEL = Object.freeze({
   CONT_EDIT: 'Continue Editing',
+})
+
+export const INVENTORY_CODES = Object.freeze({
+  FIP: 'F',
+  VRI: 'V',
+})
+
+export const REPORTING_TAB = Object.freeze({
+  MODEL_REPORT: 'ModelReport',
+  VIEW_ERR_MSG: 'ViewErrorMessages',
+  VIEW_LOG_FILE: 'ViewLogFile',
 })
