@@ -14,14 +14,14 @@
       <AppButton
         label="Print"
         :isDisabled="isButtonDisabled"
-        buttonClass="blue-btn"
+        :primary="true"
         @click="handlePrint"
       />
       <v-spacer></v-spacer>
       <AppButton
         label="Download"
         :isDisabled="isButtonDisabled"
-        buttonClass="white-btn"
+        :primary="false"
         @click="handleDownload"
       />
     </v-card-actions>
@@ -31,26 +31,20 @@
 <script setup lang="ts">
 import AppButton from '@/components/common/AppButton.vue'
 
-const props = defineProps({
-  onPrint: {
-    type: Function,
-    required: true,
-  },
-  onDownload: {
-    type: Function,
-    required: true,
-  },
+defineProps({
   isButtonDisabled: {
     type: Boolean,
     required: true,
   },
 })
 
+const emit = defineEmits<(e: 'print' | 'download') => void>()
+
 const handlePrint = () => {
-  props.onPrint()
+  emit('print')
 }
 
 const handleDownload = () => {
-  props.onDownload()
+  emit('download')
 }
 </script>

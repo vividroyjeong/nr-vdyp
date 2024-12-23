@@ -20,6 +20,8 @@ import {
 } from '@/services/reportService'
 import { useProjectionStore } from '@/stores/projectionStore'
 import { FILE_NAME, REPORTING_TAB } from '@/constants/constants'
+import { FILE_DOWNLOAD_ERR } from '@/constants/message'
+import * as messageHandler from '@/utils/messageHandler'
 
 const props = defineProps({
   type: {
@@ -46,7 +48,7 @@ const isButtonDisabled = computed(() => !data.value || data.value.length === 0)
 
 const handleDownload = () => {
   if (!data.value || data.value.length === 0) {
-    alert('No data available to download.')
+    messageHandler.logErrorMessage(FILE_DOWNLOAD_ERR.NO_DATA)
     return
   }
 

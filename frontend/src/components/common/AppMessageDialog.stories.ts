@@ -4,6 +4,7 @@ import AppMessageDialog from '@/components/common/AppMessageDialog.vue'
 const meta: Meta<typeof AppMessageDialog> = {
   title: 'components/common/AppMessageDialog',
   component: AppMessageDialog,
+  tags: ['autodocs'],
   argTypes: {
     dialog: {
       control: 'boolean',

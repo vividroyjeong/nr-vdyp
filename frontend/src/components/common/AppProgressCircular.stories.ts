@@ -4,6 +4,7 @@ import AppProgressCircular from '@/components/common/AppProgressCircular.vue'
 const meta: Meta<typeof AppProgressCircular> = {
   title: 'components/common/AppProgressCircular',
   component: AppProgressCircular,
+  tags: ['autodocs'],
   argTypes: {
     isShow: { control: { type: 'boolean' }, defaultValue: true },
     showMessage: { control: { type: 'boolean' }, defaultValue: true },
