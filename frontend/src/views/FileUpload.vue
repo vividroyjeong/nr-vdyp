@@ -4,13 +4,7 @@
       :isShow="isProgressVisible"
       :showMessage="true"
       :message="progressMessage"
-      :circleSize="70"
-      :circleWidth="5"
-      :circleColor="'primary'"
-      :backgroundColor="'rgba(255, 255, 255, 0.8)'"
       :hasBackground="true"
-      :padding="20"
-      :borderRadius="10"
     />
     <AppMessageDialog
       :dialog="messageDialog.dialog"
@@ -213,7 +207,7 @@ import {
 } from '@/constants/options'
 import {
   NUM_INPUT_LIMITS,
-  DOWNLOAD_FILE_NAME,
+  FILE_NAME,
   BUTTON_LABEL,
 } from '@/constants/constants'
 import {
@@ -430,12 +424,12 @@ const fileUploadRunModel = async () => {
     const url = window.URL.createObjectURL(new Blob([result]))
     const link = document.createElement('a')
     link.href = url
-    link.setAttribute('download', DOWNLOAD_FILE_NAME.MULTI_POLYGON_OUTPUT)
+    link.setAttribute('download', FILE_NAME.PROJECTION_RESULT_ZIP)
     document.body.appendChild(link)
     link.click()
     link.remove()
 
-    logSuccessMessage(SUCESS_MSG.FILE_UPLOAD_RUN_MODEL_RESULT)
+    logSuccessMessage(SUCESS_MSG.FILE_UPLOAD_RUN_RESULT)
   } catch (error) {
     handleApiError(error, FILE_UPLOAD_ERR.FAIL_RUN_MODEL)
   } finally {
