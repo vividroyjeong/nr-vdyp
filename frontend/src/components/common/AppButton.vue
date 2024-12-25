@@ -43,9 +43,14 @@ const computedStyle = computed(() => {
   }
 })
 
-const onClick = () => {
+const onClick = (event: Event) => {
   if (!props.isDisabled) {
+    event.preventDefault() // preventing default behavior
+    event.stopPropagation() // preventing event propagation
+    console.log('onClick event triggered')
     emit('click', 1)
+  } else {
+    console.log('Button is disabled, onClick event not triggered')
   }
 }
 </script>

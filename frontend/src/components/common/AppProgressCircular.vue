@@ -1,58 +1,41 @@
 <template>
   <div
     class="centered-progress progress-wrapper"
-    v-show="computedIsShow"
+    v-if="isShow"
     :style="{
-      backgroundColor: computedHasBackground
-        ? computedBackgroundColor
-        : 'transparent',
-      boxShadow: computedHasBackground
-        ? '0 2px 4px rgba(0, 0, 0, 0.1)'
-        : 'none',
-      borderRadius: `${computedBorderRadius}px`,
-      padding: `${computedPadding}px`,
+      backgroundColor: hasBackground ? backgroundColor : 'transparent',
+      boxShadow: hasBackground ? '0 2px 4px rgba(0, 0, 0, 0.1)' : 'none',
+      borderRadius: `${borderRadius}px`,
+      padding: `${padding}px`,
     }"
   >
     <v-progress-circular
       indeterminate
-      :size="computedCircleSize"
-      :width="computedCircleWidth"
-      :color="computedCircleColor"
+      :size="circleSize"
+      :width="circleWidth"
+      :color="circleColor"
     ></v-progress-circular>
-    <div v-show="computedShowMessage" class="message">
-      {{ computedMessage }}
+    <div v-if="showMessage" class="message">
+      {{ message }}
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps } from 'vue'
+import { defineProps } from 'vue'
 
-const props = defineProps<{
-  isShow?: boolean
-  showMessage?: boolean
-  message?: string
-  circleSize?: number
-  circleWidth?: number
-  circleColor?: string
-  backgroundColor?: string
-  hasBackground?: boolean
-  padding?: number
-  borderRadius?: number
-}>()
-
-const computedIsShow = computed(() => props.isShow ?? false)
-const computedShowMessage = computed(() => props.showMessage ?? true)
-const computedMessage = computed(() => props.message ?? 'Loading...')
-const computedCircleSize = computed(() => props.circleSize ?? 70)
-const computedCircleWidth = computed(() => props.circleWidth ?? 5)
-const computedCircleColor = computed(() => props.circleColor ?? 'primary')
-const computedBackgroundColor = computed(
-  () => props.backgroundColor ?? 'rgba(255, 255, 255, 0.8)',
-)
-const computedHasBackground = computed(() => props.hasBackground ?? true)
-const computedPadding = computed(() => props.padding ?? 20)
-const computedBorderRadius = computed(() => props.borderRadius ?? 10)
+defineProps({
+  isShow: { type: Boolean, default: false },
+  showMessage: { type: Boolean, default: true },
+  message: { type: String, default: 'Loading...' },
+  circleSize: { type: Number, default: 70 },
+  circleWidth: { type: Number, default: 5 },
+  circleColor: { type: String, default: 'primary' },
+  backgroundColor: { type: String, default: 'rgba(255, 255, 255, 0.8)' },
+  hasBackground: { type: Boolean, default: true },
+  padding: { type: Number, default: 20 },
+  borderRadius: { type: Number, default: 10 },
+})
 </script>
 
 <style scoped>
