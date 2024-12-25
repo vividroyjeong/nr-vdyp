@@ -16,9 +16,31 @@
 // Import commands.js using ES2015 syntax:
 import './commands'
 
+import vuetify from '../../src/plugins/vuetify'
+import { VApp } from 'vuetify/components'
 import { mount } from 'cypress/vue'
+import { h } from 'vue'
+import { createPinia } from 'pinia'
 
-Cypress.Commands.add('mount', mount)
+import 'vuetify/styles'
+import '@mdi/font/css/materialdesignicons.css'
+import '@bcgov/bc-sans/css/BCSans.css'
+import '../../src/styles/style.scss'
 
-// Example use:
-// cy.mount(MyComponent)
+const pinia = createPinia()
+
+Cypress.Commands.add('mount', (component, options = {}) => {
+  options.global = options.global || {}
+  options.global.plugins = options.global.plugins || []
+  options.global.plugins.push(vuetify)
+  options.global.plugins.push(pinia)
+
+  return mount(
+    {
+      render() {
+        return h(VApp, {}, [h(component, options.props)])
+      },
+    },
+    options,
+  )
+})

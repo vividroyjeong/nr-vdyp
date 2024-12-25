@@ -41,6 +41,8 @@
   },
   "devDependencies": {
     "@chromatic-com/storybook": "3.2.2",
+    "@cypress/vite-dev-server": "5.2.1",
+    "@cypress/vue": "6.0.1",
     "@rushstack/eslint-patch": "1.8.0",
     "@storybook/addon-essentials": "8.4.7",
     "@storybook/addon-interactions": "8.4.7",
@@ -54,6 +56,7 @@
     "@vue/eslint-config-typescript": "13.0.0",
     "cypress": "13.17.0",
     "eslint": "8.57.0",
+    "eslint-plugin-cypress": "3.6.0",
     "eslint-plugin-storybook": "0.11.1",
     "npm-run-all2": "6.2.0",
     "prettier": "3.3.3",
