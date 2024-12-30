@@ -1,6 +1,30 @@
 import AppButton from './AppButton.vue'
 
 describe('<AppButton />', () => {
+  beforeEach(() => {
+    cy.viewport(1024, 768)
+
+    // Add custom styles to override Vuetify's styles
+    cy.document().then((doc) => {
+      const style = doc.createElement('style')
+      style.innerHTML = `
+        .v-btn {
+          position: relative !important;
+          display: inline-block !important;
+          margin: auto !important;
+        }
+
+        .v-btn-container {
+          display: flex !important;
+          justify-content: center !important;
+          align-items: center !important;
+          height: 100vh !important; /* Center vertically */
+        }
+      `
+      doc.head.appendChild(style)
+    })
+  })
+
   const defaultProps = {
     label: 'Button',
     isDisabled: false,

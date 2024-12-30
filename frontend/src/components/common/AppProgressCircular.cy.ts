@@ -1,6 +1,10 @@
 import AppProgressCircular from './AppProgressCircular.vue'
 
 describe('<AppProgressCircular />', () => {
+  beforeEach(() => {
+    cy.viewport(1024, 768)
+  })
+
   const defaultProps = {
     isShow: true,
     showMessage: true,
