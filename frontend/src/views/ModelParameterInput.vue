@@ -49,7 +49,7 @@
           :key="index"
           :value="index"
         >
-          <component :is="tab.component" :type="tab.type" />
+          <component :is="tab.component" :tabname="tab.tabname" />
         </v-tabs-window-item>
       </v-tabs-window>
 
@@ -123,22 +123,22 @@ const tabs = [
   {
     label: MODEL_PARAM_TAB_NAME.MODEL_PARAM_SELECTION,
     component: ModelParameterSelection,
-    type: null,
+    tabname: null,
   },
   {
     label: MODEL_PARAM_TAB_NAME.MODEL_REPORT,
     component: ReportingContainer,
-    type: REPORTING_TAB.MODEL_REPORT,
+    tabname: REPORTING_TAB.MODEL_REPORT,
   },
   {
     label: MODEL_PARAM_TAB_NAME.VIEW_LOG_FILE,
     component: ReportingContainer,
-    type: REPORTING_TAB.VIEW_LOG_FILE,
+    tabname: REPORTING_TAB.VIEW_LOG_FILE,
   },
   {
     label: MODEL_PARAM_TAB_NAME.VIEW_ERROR_MESSAGES,
     component: ReportingContainer,
-    type: REPORTING_TAB.VIEW_ERR_MSG,
+    tabname: REPORTING_TAB.VIEW_ERR_MSG,
   },
 ]
 
@@ -151,6 +151,7 @@ const isModelParameterPanelsVisible = computed(() => {
 
 onMounted(() => {
   modelParameterStore.setDefaultValues()
+  projectionStore.loadSampleData()
 })
 
 const createCSVFiles = () => {

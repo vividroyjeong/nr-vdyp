@@ -6,11 +6,13 @@ export default defineConfig({
   //     // implement node event listeners here
   //   },
   // },
-
+  fixturesFolder: 'cypress/fixtures',
   component: {
     devServer: {
       framework: 'vue',
       bundler: 'vite',
     },
+    // supportFile: 'cypress/support/component.js',
+    supportFile: 'cypress/support/component.ts',
   },
 })

@@ -3,6 +3,7 @@ import {
   MODEL_PARAMETER_PANEL,
   SORT_ORDER,
   MESSAGE_TYPE,
+  REPORTING_TAB,
 } from '@/constants/constants'
 
 export type MessageType =
@@ -24,3 +25,8 @@ export type PanelState = typeof PANEL.OPEN | typeof PANEL.CLOSE
 export type SortOrder = Lowercase<(typeof SORT_ORDER)[keyof typeof SORT_ORDER]>
 
 export type CSVRowType = (string | number | null)[][]
+
+export type ReportingTab =
+  | typeof REPORTING_TAB.MODEL_REPORT
+  | typeof REPORTING_TAB.VIEW_ERR_MSG
+  | typeof REPORTING_TAB.VIEW_LOG_FILE
