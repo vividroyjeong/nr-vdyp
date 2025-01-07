@@ -1,48 +1,26 @@
 <template>
-  <v-btn
-    :class="primary ? 'blue-btn' : 'white-btn'"
-    :disabled="isDisabled"
-    :style="{ ...defaultStyles, ...computedStyle }"
-    @click="onClick"
-  >
+  <v-btn :class="customClass" :disabled="isDisabled" @click="onClick">
     {{ label }}
   </v-btn>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-
 const props = defineProps({
   label: {
     type: String,
     required: true,
   },
+  customClass: {
+    type: String,
+    default: '',
+  },
   isDisabled: {
     type: Boolean,
     default: false,
   },
-  primary: {
-    type: Boolean,
-    default: true,
-  },
-  backgroundColor: {
-    type: String,
-    default: null,
-  },
 })
 
 const emit = defineEmits<(e: 'click', id: number) => void>()
-
-const defaultStyles = {
-  background: undefined,
-}
-
-const computedStyle = computed(() => {
-  return {
-    background: props.backgroundColor || undefined,
-  }
-})
-
 const onClick = (event: Event) => {
   if (!props.isDisabled) {
     event.preventDefault() // preventing default behavior

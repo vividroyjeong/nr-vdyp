@@ -64,12 +64,12 @@
         <v-card class="mt-5 pa-4 run-model-card" elevation="0">
           <v-card-actions class="pr-0 mr-2">
             <v-spacer></v-spacer>
-            <v-btn
-              class="blue-btn ml-2"
-              :disabled="!modelParameterStore.runModelEnabled"
+            <AppButton
+              label="Run Model"
+              customClass="blue-btn ml-2"
+              :isDisabled="!modelParameterStore.runModelEnabled"
               @click="runModel"
-              >Run Model</v-btn
-            >
+            />
           </v-card-actions>
         </v-card>
       </template>
@@ -86,7 +86,8 @@ import { useAppStore } from '@/stores/appStore'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
 import { useProjectionStore } from '@/stores/projectionStore'
 import { storeToRefs } from 'pinia'
-import AppProgressCircular from '@/components/common/AppProgressCircular.vue'
+import AppButton from '@/components/core/AppButton.vue'
+import AppProgressCircular from '@/components/core/AppProgressCircular.vue'
 import JobTypeSelection from '@/components/JobTypeSelection.vue'
 import ReportingContainer from '@/components/reporting/ReportingContainer.vue'
 import SiteInfo from '@/components/model-param-selection-panes/SiteInfo.vue'
@@ -151,7 +152,6 @@ const isModelParameterPanelsVisible = computed(() => {
 
 onMounted(() => {
   modelParameterStore.setDefaultValues()
-  projectionStore.loadSampleData()
 })
 
 const createCSVFiles = () => {

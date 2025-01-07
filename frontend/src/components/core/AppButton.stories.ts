@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-import AppButton from './AppButton.vue'
+import AppButton from '../core/AppButton.vue'
 
 const meta: Meta<typeof AppButton> = {
-  title: 'components/common/AppButton',
+  title: 'components/core/AppButton',
   component: AppButton,
   tags: ['autodocs'],
   argTypes: {
@@ -16,15 +16,10 @@ const meta: Meta<typeof AppButton> = {
       description: 'Disables the button if true',
       defaultValue: false,
     },
-    primary: {
-      control: 'boolean',
-      description:
-        'Determines the button style: primary (blue) or secondary (white)',
+    customClass: {
+      control: 'text',
+      description: 'Determines the button style',
       defaultValue: true,
-    },
-    backgroundColor: {
-      control: 'color',
-      description: 'Background color',
     },
     onClick: {
       action: 'click',
@@ -40,7 +35,7 @@ export const Primary: Story = {
   args: {
     label: 'Button',
     isDisabled: false,
-    primary: true,
+    customClass: 'blue-btn',
   },
 }
 
@@ -48,6 +43,6 @@ export const Secondary: Story = {
   args: {
     label: 'Button',
     isDisabled: false,
-    primary: false,
+    customClass: 'white-btn',
   },
 }

@@ -1,4 +1,4 @@
-import AppProgressCircular from './AppProgressCircular.vue'
+import AppProgressCircular from '../core/AppProgressCircular.vue'
 
 describe('<AppProgressCircular />', () => {
   beforeEach(() => {

@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-import AppProgressCircular from '@/components/common/AppProgressCircular.vue'
+import AppProgressCircular from '@/components/core/AppProgressCircular.vue'
 
 const meta: Meta<typeof AppProgressCircular> = {
-  title: 'components/common/AppProgressCircular',
+  title: 'components/core/AppProgressCircular',
   component: AppProgressCircular,
   tags: ['autodocs'],
   argTypes: {

@@ -189,22 +189,25 @@
             </div>
             <v-card-actions class="mt-5 pr-0">
               <v-spacer></v-spacer>
-              <v-btn
-                class="white-btn"
-                :disabled="!isConfirmEnabled"
+              <AppButton
+                label="Clear"
+                customClass="white-btn"
+                :isDisabled="!isConfirmEnabled"
                 @click="clear"
-                >Clear</v-btn
-              >
-              <v-btn
+              />
+              <AppButton
+                label="Confirm"
                 v-show="!isConfirmed"
-                class="blue-btn ml-2"
-                :disabled="!isConfirmEnabled"
+                customClass="blue-btn ml-2"
+                :isDisabled="!isConfirmEnabled"
                 @click="onConfirm"
-                >Confirm</v-btn
-              >
-              <v-btn v-show="isConfirmed" class="blue-btn ml-2" @click="onEdit"
-                >Edit</v-btn
-              >
+              />
+              <AppButton
+                label="Edit"
+                v-show="isConfirmed"
+                customClass="blue-btn ml-2"
+                @click="onEdit"
+              />
             </v-card-actions>
           </v-form>
         </v-expansion-panel-text>
@@ -217,6 +220,7 @@
 import { ref, computed, watch } from 'vue'
 import { Util } from '@/utils/util'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
+import AppButton from '@/components/core/AppButton.vue'
 import AppMessageDialog from '@/components/common/AppMessageDialog.vue'
 import { storeToRefs } from 'pinia'
 import {

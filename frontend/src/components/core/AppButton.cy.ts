@@ -1,4 +1,4 @@
-import AppButton from './AppButton.vue'
+import AppButton from '../core/AppButton.vue'
 
 describe('<AppButton />', () => {
   beforeEach(() => {
@@ -28,7 +28,7 @@ describe('<AppButton />', () => {
   const defaultProps = {
     label: 'Button',
     isDisabled: false,
-    primary: true,
+    customClass: 'blue-btn',
   }
 
   it('renders with default props', () => {
@@ -48,7 +48,7 @@ describe('<AppButton />', () => {
     cy.mount(AppButton, {
       props: {
         ...defaultProps,
-        primary: false,
+        customClass: 'white-btn',
       },
     })
 
@@ -102,14 +102,16 @@ describe('<AppButton />', () => {
   it('handles missing optional props', () => {
     cy.mount(AppButton, {
       props: {
+        ...defaultProps,
         label: 'Test Button',
+        customClass: 'white-btn',
       },
     })
 
     // Verify the button renders with minimal props
     cy.get('button').should('contain', 'Test Button')
     cy.get('button').should('not.be.disabled')
-    cy.get('button').should('have.class', 'blue-btn') // Default to primary style
+    cy.get('button').should('have.class', 'white-btn')
   })
 
   it('renders with default props', () => {

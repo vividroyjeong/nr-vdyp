@@ -183,9 +183,11 @@
         <v-card class="mt-5 pa-4 file-upload-run-model-card" elevation="0">
           <v-card-actions class="pr-0 mr-2">
             <v-spacer></v-spacer>
-            <v-btn class="blue-btn ml-2" @click="fileUploadRunModel"
-              >Run Model</v-btn
-            >
+            <AppButton
+              label="Run Model"
+              customClass="blue-btn ml-2"
+              @click="fileUploadRunModel"
+            />
           </v-card-actions>
         </v-card>
       </v-card>
@@ -198,8 +200,9 @@ import { ref } from 'vue'
 import { SelectedExecutionOptionsEnum } from '@/services/vdyp-api'
 import { projectionHcsvPost } from '@/services/apiActions'
 import { handleApiError } from '@/services/apiErrorHandler'
+import AppButton from '@/components/core/AppButton.vue'
 import AppMessageDialog from '@/components/common/AppMessageDialog.vue'
-import AppProgressCircular from '@/components/common/AppProgressCircular.vue'
+import AppProgressCircular from '@/components/core/AppProgressCircular.vue'
 import {
   volumeReportedOptions,
   includeInReportOptions,
