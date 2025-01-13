@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { useNotificationStore } from '@/stores/common/notificationStore'
-import AppSnackbar from './AppSnackbar.vue'
+import AppSnackbar from '../core/AppSnackbar.vue'
 import { NOTIFICATION } from '@/constants/constants'
 
 const notificationStore = useNotificationStore()

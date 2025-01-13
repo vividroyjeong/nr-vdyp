@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import AppSnackbar from './AppSnackbar.vue'
 
 const meta: Meta<typeof AppSnackbar> = {
-  title: 'components/common/AppSnackbar',
+  title: 'components/core/AppSnackbar',
   component: AppSnackbar,
   tags: ['autodocs'],
   argTypes: {

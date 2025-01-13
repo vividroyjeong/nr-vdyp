@@ -14,14 +14,14 @@
       <AppButton
         label="Print"
         :isDisabled="isButtonDisabled"
-        :primary="true"
+        customClass="blue-btn"
         @click="handlePrint"
       />
       <v-spacer></v-spacer>
       <AppButton
         label="Download"
         :isDisabled="isButtonDisabled"
-        :primary="false"
+        customClass="white-btn"
         @click="handleDownload"
       />
     </v-card-actions>
@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import AppButton from '@/components/common/AppButton.vue'
+import AppButton from '@/components/core/AppButton.vue'
 
 defineProps({
   isButtonDisabled: {
