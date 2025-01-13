@@ -15,7 +15,7 @@
           <v-row no-gutters class="expander-header">
             <v-col cols="auto" class="expansion-panel-icon-col">
               <v-icon class="expansion-panel-icon">{{
-                panelOpenStates.reportInfo === PANEL.OPEN
+                panelOpenStates.reportInfo === CONSTANTS.PANEL.OPEN
                   ? 'mdi-chevron-up'
                   : 'mdi-chevron-down'
               }}</v-icon>
@@ -27,190 +27,47 @@
         </v-expansion-panel-title>
         <v-expansion-panel-text class="expansion-panel-text mt-n2">
           <v-form ref="form">
-            <div>
-              <v-row>
-                <v-col cols="3">
-                  <v-text-field
-                    label="Starting Age"
-                    type="number"
-                    v-model.number="startingAge"
-                    :min="NUM_INPUT_LIMITS.STARTING_AGE_MIN"
-                    :max="NUM_INPUT_LIMITS.STARTING_AGE_MAX"
-                    :step="NUM_INPUT_LIMITS.STARTING_AGE_STEP"
-                    persistent-placeholder
-                    placeholder=""
-                    density="compact"
-                    dense
-                    :disabled="!isConfirmEnabled"
-                  ></v-text-field>
-                </v-col>
-                <v-col class="col-space-3" />
-                <v-col cols="3">
-                  <v-text-field
-                    label="Finishing Age"
-                    type="number"
-                    v-model.number="finishingAge"
-                    :min="NUM_INPUT_LIMITS.FINISHING_AGE_MIN"
-                    :max="NUM_INPUT_LIMITS.FINISHING_AGE_MAX"
-                    :step="NUM_INPUT_LIMITS.FINISHING_AGE_STEP"
-                    persistent-placeholder
-                    placeholder=""
-                    density="compact"
-                    dense
-                    :disabled="!isConfirmEnabled"
-                  ></v-text-field>
-                </v-col>
-                <v-col class="col-space-3" />
-                <v-col cols="3">
-                  <v-text-field
-                    label="Age Increment"
-                    type="number"
-                    v-model.number="ageIncrement"
-                    :min="NUM_INPUT_LIMITS.AGE_INC_MIN"
-                    :max="NUM_INPUT_LIMITS.AGE_INC_MAX"
-                    :step="NUM_INPUT_LIMITS.AGE_INC_STEP"
-                    persistent-placeholder
-                    placeholder=""
-                    density="compact"
-                    dense
-                    :disabled="!isConfirmEnabled"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-            </div>
-            <div class="ml-4 mt-5">
-              <div class="ml-n4 mt-n5">
-                <span class="text-h7">Volume Reported</span>
-              </div>
-              <v-row class="ml-n6">
-                <v-col cols="12" style="padding-top: 0px">
-                  <v-row>
-                    <v-col
-                      v-for="(option, index) in volumeReportedOptions"
-                      :key="index"
-                      :style="{ 'max-width': index < 4 ? '20%' : 'auto' }"
-                    >
-                      <v-checkbox
-                        v-model="volumeReported"
-                        :label="option.label"
-                        :value="option.value"
-                        hide-details
-                        :disabled="!isConfirmEnabled"
-                      ></v-checkbox>
-                    </v-col>
-                  </v-row>
-                </v-col>
-              </v-row>
-            </div>
-            <div class="ml-4 mt-5">
-              <div class="ml-n4 mt-n5">
-                <span class="text-h7">Include in Report</span>
-              </div>
-              <v-row class="ml-n6">
-                <v-col cols="12" style="padding-top: 0px">
-                  <v-row>
-                    <v-col
-                      v-for="(option, index) in includeInReportOptions"
-                      :key="index"
-                      :style="{ 'max-width': index < 4 ? '20%' : 'auto' }"
-                    >
-                      <v-checkbox
-                        v-model="includeInReport"
-                        :label="option.label"
-                        :value="option.value"
-                        hide-details
-                        :disabled="!isConfirmEnabled"
-                      ></v-checkbox>
-                    </v-col>
-                    <v-col style="max-width: 20% !important">
-                      <v-select
-                        label="Projection Type"
-                        :items="projectionTypeOptions"
-                        v-model="projectionType"
-                        item-title="label"
-                        item-value="value"
-                        hide-details="auto"
-                        persistent-placeholder
-                        placeholder="Select..."
-                        density="compact"
-                        dense
-                        style="max-width: 70% !important"
-                        :disabled="!isConfirmEnabled"
-                      ></v-select>
-                    </v-col>
-                  </v-row>
-                </v-col>
-              </v-row>
-            </div>
-            <div class="ml-4 mt-5">
-              <div class="ml-n4 mt-n5">
-                <span class="text-h7">Report Title</span>
-              </div>
-              <v-row>
-                <v-col cols="6">
-                  <v-text-field
-                    type="string"
-                    v-model="reportTitle"
-                    hide-details="auto"
-                    persistent-placeholder
-                    placeholder="Enter a report title..."
-                    density="compact"
-                    dense
-                    style="max-width: 50% !important"
-                    :disabled="!isConfirmEnabled"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-            </div>
-            <v-card-actions class="mt-5 pr-0">
-              <v-spacer></v-spacer>
-              <AppButton
-                label="Clear"
-                customClass="white-btn"
-                :isDisabled="!isConfirmEnabled"
-                @click="clear"
-              />
-              <AppButton
-                label="Confirm"
-                v-show="!isConfirmed"
-                customClass="blue-btn ml-2"
-                :isDisabled="!isConfirmEnabled"
-                @click="onConfirm"
-              />
-              <AppButton
-                label="Edit"
-                v-show="isConfirmed"
-                customClass="blue-btn ml-2"
-                @click="onEdit"
-              />
-            </v-card-actions>
+            <ReportConfiguration
+              :startingAge="startingAge"
+              :finishingAge="finishingAge"
+              :ageIncrement="ageIncrement"
+              :volumeReported="volumeReported"
+              :includeInReport="includeInReport"
+              :projectionType="projectionType"
+              :reportTitle="reportTitle"
+              :isDisabled="!isConfirmEnabled"
+              @update:startingAge="handleStartingAgeUpdate"
+              @update:finishingAge="handleFinishingAgeUpdate"
+              @update:ageIncrement="handleAgeIncrementUpdate"
+              @update:volumeReported="handleVolumeReportedUpdate"
+              @update:includeInReport="handleIncludeInReportUpdate"
+              @update:projectionType="handleProjectionTypeUpdate"
+              @update:reportTitle="handleReportTitleUpdate"
+            />
+            <AppPanelActions
+              :isConfirmEnabled="isConfirmEnabled"
+              :isConfirmed="isConfirmed"
+              @clear="onClear"
+              @confirm="onConfirm"
+              @edit="onEdit"
+            />
           </v-form>
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
   </v-card>
 </template>
-
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useModelParameterStore } from '@/stores/modelParameterStore'
-import AppButton from '@/components/core/AppButton.vue'
-import AppMessageDialog from '@/components/common/AppMessageDialog.vue'
 import { storeToRefs } from 'pinia'
+import { useModelParameterStore } from '@/stores/modelParameterStore'
 import {
-  volumeReportedOptions,
-  includeInReportOptions,
-  projectionTypeOptions,
-} from '@/constants/options'
-import {
-  PANEL,
-  MODEL_PARAMETER_PANEL,
-  NUM_INPUT_LIMITS,
-  BUTTON_LABEL,
-} from '@/constants/constants'
-import { DEFAULT_VALUES } from '@/constants/defaults'
-import { MDL_PRM_INPUT_ERR, MSG_DIALOG_TITLE } from '@/constants/message'
-import type { SpeciesGroup, MessageDialog } from '@/interfaces/interfaces'
+  AppMessageDialog,
+  AppPanelActions,
+  ReportConfiguration,
+} from '@/components'
+import { CONSTANTS, DEFAULTS, MESSAGE } from '@/constants'
+import type { MessageDialog } from '@/interfaces/interfaces'
 import { ReportInfoValidation } from '@/validation/reportInfoValidation'
 
 const form = ref<HTMLFormElement>()
@@ -227,7 +84,6 @@ const messageDialog = ref<MessageDialog>({
 
 const {
   panelOpenStates,
-  speciesGroups,
   startingAge,
   finishingAge,
   ageIncrement,
@@ -237,13 +93,41 @@ const {
   reportTitle,
 } = storeToRefs(modelParameterStore)
 
-const panelName = MODEL_PARAMETER_PANEL.REPORT_INFO
+const panelName = CONSTANTS.MODEL_PARAMETER_PANEL.REPORT_INFO
 const isConfirmEnabled = computed(
   () => modelParameterStore.panelState[panelName].editable,
 )
 const isConfirmed = computed(
   () => modelParameterStore.panelState[panelName].confirmed,
 )
+
+const handleStartingAgeUpdate = (value: number | null) => {
+  startingAge.value = value
+}
+
+const handleFinishingAgeUpdate = (value: number | null) => {
+  finishingAge.value = value
+}
+
+const handleAgeIncrementUpdate = (value: number | null) => {
+  ageIncrement.value = value
+}
+
+const handleVolumeReportedUpdate = (value: string[]) => {
+  volumeReported.value = [...value]
+}
+
+const handleIncludeInReportUpdate = (value: string[]) => {
+  includeInReport.value = [...value]
+}
+
+const handleProjectionTypeUpdate = (value: string | null) => {
+  projectionType.value = value
+}
+
+const handleReportTitleUpdate = (value: string | null) => {
+  reportTitle.value = value
+}
 
 const validateComparison = (): boolean => {
   if (
@@ -254,9 +138,9 @@ const validateComparison = (): boolean => {
   ) {
     messageDialog.value = {
       dialog: true,
-      title: MSG_DIALOG_TITLE.INVALID_INPUT,
-      message: MDL_PRM_INPUT_ERR.RPT_VLD_COMP_FNSH_AGE,
-      btnLabel: BUTTON_LABEL.CONT_EDIT,
+      title: MESSAGE.MSG_DIALOG_TITLE.INVALID_INPUT,
+      message: MESSAGE.MDL_PRM_INPUT_ERR.RPT_VLD_COMP_FNSH_AGE,
+      btnLabel: CONSTANTS.BUTTON_LABEL.CONT_EDIT,
     }
 
     return false
@@ -269,12 +153,12 @@ const validateRange = (): boolean => {
   if (!reportInfoValidator.validateStartingAgeRange(startingAge.value)) {
     messageDialog.value = {
       dialog: true,
-      title: MSG_DIALOG_TITLE.INVALID_INPUT,
-      message: MDL_PRM_INPUT_ERR.RPT_VLD_START_AGE_RNG(
-        NUM_INPUT_LIMITS.STARTING_AGE_MIN,
-        NUM_INPUT_LIMITS.STARTING_AGE_MAX,
+      title: MESSAGE.MSG_DIALOG_TITLE.INVALID_INPUT,
+      message: MESSAGE.MDL_PRM_INPUT_ERR.RPT_VLD_START_AGE_RNG(
+        CONSTANTS.NUM_INPUT_LIMITS.STARTING_AGE_MIN,
+        CONSTANTS.NUM_INPUT_LIMITS.STARTING_AGE_MAX,
       ),
-      btnLabel: BUTTON_LABEL.CONT_EDIT,
+      btnLabel: CONSTANTS.BUTTON_LABEL.CONT_EDIT,
     }
     return false
   }
@@ -282,12 +166,12 @@ const validateRange = (): boolean => {
   if (!reportInfoValidator.validateFinishingAgeRange(finishingAge.value)) {
     messageDialog.value = {
       dialog: true,
-      title: MSG_DIALOG_TITLE.INVALID_INPUT,
-      message: MDL_PRM_INPUT_ERR.RPT_VLD_START_FNSH_RNG(
-        NUM_INPUT_LIMITS.FINISHING_AGE_MIN,
-        NUM_INPUT_LIMITS.FINISHING_AGE_MAX,
+      title: MESSAGE.MSG_DIALOG_TITLE.INVALID_INPUT,
+      message: MESSAGE.MDL_PRM_INPUT_ERR.RPT_VLD_START_FNSH_RNG(
+        CONSTANTS.NUM_INPUT_LIMITS.FINISHING_AGE_MIN,
+        CONSTANTS.NUM_INPUT_LIMITS.FINISHING_AGE_MAX,
       ),
-      btnLabel: BUTTON_LABEL.CONT_EDIT,
+      btnLabel: CONSTANTS.BUTTON_LABEL.CONT_EDIT,
     }
     return false
   }
@@ -295,12 +179,12 @@ const validateRange = (): boolean => {
   if (!reportInfoValidator.validateAgeIncrementRange(ageIncrement.value)) {
     messageDialog.value = {
       dialog: true,
-      title: MSG_DIALOG_TITLE.INVALID_INPUT,
-      message: MDL_PRM_INPUT_ERR.RPT_VLD_AGE_INC_RNG(
-        NUM_INPUT_LIMITS.AGE_INC_MIN,
-        NUM_INPUT_LIMITS.AGE_INC_MAX,
+      title: MESSAGE.MSG_DIALOG_TITLE.INVALID_INPUT,
+      message: MESSAGE.MDL_PRM_INPUT_ERR.RPT_VLD_AGE_INC_RNG(
+        CONSTANTS.NUM_INPUT_LIMITS.AGE_INC_MIN,
+        CONSTANTS.NUM_INPUT_LIMITS.AGE_INC_MAX,
       ),
-      btnLabel: BUTTON_LABEL.CONT_EDIT,
+      btnLabel: CONSTANTS.BUTTON_LABEL.CONT_EDIT,
     }
     return false
   }
@@ -330,18 +214,14 @@ const onEdit = () => {
   }
 }
 
-const clear = () => {
+const onClear = () => {
   startingAge.value = null
   finishingAge.value = null
   ageIncrement.value = null
   volumeReported.value = []
   includeInReport.value = []
   reportTitle.value = null
-
-  projectionType.value = DEFAULT_VALUES.PROJECTION_TYPE
-  speciesGroups.value = speciesGroups.value.map((group: SpeciesGroup) => ({
-    ...group,
-  }))
+  projectionType.value = DEFAULTS.DEFAULT_VALUES.PROJECTION_TYPE
 }
 
 const handleDialogClose = () => {}

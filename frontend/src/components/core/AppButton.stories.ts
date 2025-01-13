@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-import AppButton from '../core/AppButton.vue'
+import AppButton from './AppButton.vue'
 
 const meta: Meta<typeof AppButton> = {
   title: 'components/core/AppButton',

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-import AppProgressCircular from '@/components/core/AppProgressCircular.vue'
+import AppProgressCircular from './AppProgressCircular.vue'
 
 const meta: Meta<typeof AppProgressCircular> = {
   title: 'components/core/AppProgressCircular',

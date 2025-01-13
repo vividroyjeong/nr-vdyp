@@ -51,28 +51,13 @@
                 >
               </v-col>
             </v-row>
-            <v-card-actions class="mt-5 pr-0">
-              <v-spacer></v-spacer>
-              <AppButton
-                label="Clear"
-                customClass="white-btn"
-                :isDisabled="!isConfirmEnabled"
-                @click="clear"
-              />
-              <AppButton
-                label="Confirm"
-                v-show="!isConfirmed"
-                customClass="blue-btn ml-2"
-                :isDisabled="!isConfirmEnabled"
-                @click="onConfirm"
-              />
-              <AppButton
-                label="Edit"
-                v-show="isConfirmed"
-                customClass="blue-btn ml-2"
-                @click="onEdit"
-              />
-            </v-card-actions>
+            <AppPanelActions
+              :isConfirmEnabled="isConfirmEnabled"
+              :isConfirmed="isConfirmed"
+              @clear="onClear"
+              @confirm="onConfirm"
+              @edit="onEdit"
+            />
           </v-form>
         </v-expansion-panel-text>
       </v-expansion-panel>
@@ -84,8 +69,7 @@
 import { ref, computed } from 'vue'
 import { Util } from '@/utils/util'
 import { useModelParameterStore } from '@/stores/modelParameterStore'
-import AppButton from '@/components/core/AppButton.vue'
-import AppMessageDialog from '@/components/common/AppMessageDialog.vue'
+import { AppMessageDialog, AppPanelActions } from '@/components'
 import { storeToRefs } from 'pinia'
 import {
   PANEL,
@@ -176,7 +160,7 @@ const onEdit = () => {
   }
 }
 
-const clear = () => {
+const onClear = () => {
   if (form.value) {
     form.value.reset()
   }

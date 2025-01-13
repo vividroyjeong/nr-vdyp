@@ -46,6 +46,12 @@ export interface SpeciesList {
 
 export interface SpeciesGroup {
   group: string
-  percent: number
+  percent: string
   siteSpecies: string
+}
+
+export interface Tab {
+  label: string
+  component: string | object // Component name or an actual component
+  tabname: string | null // Optional tabname
 }

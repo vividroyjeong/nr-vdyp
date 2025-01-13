@@ -30,3 +30,14 @@ export type ReportingTab =
   | typeof REPORTING_TAB.MODEL_REPORT
   | typeof REPORTING_TAB.VIEW_ERR_MSG
   | typeof REPORTING_TAB.VIEW_LOG_FILE
+
+export type Density = 'default' | 'comfortable' | 'compact'
+
+export type Variant =
+  | 'outlined'
+  | 'plain'
+  | 'underlined'
+  | 'filled'
+  | 'solo'
+  | 'solo-inverted'
+  | 'solo-filled'

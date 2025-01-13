@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-import AppSnackbar from '../core/AppSnackbar.vue'
+import AppSnackbar from './AppSnackbar.vue'
 
 const meta: Meta<typeof AppSnackbar> = {
   title: 'components/core/AppSnackbar',
