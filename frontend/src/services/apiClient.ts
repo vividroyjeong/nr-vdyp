@@ -24,6 +24,12 @@ export const apiClient = {
     trialRun: boolean,
     options?: AxiosRequestConfig,
   ) => {
+    console.info('API Client FormData:', formData)
+    console.info('API Client Options:', options)
+
+    formData.forEach((value, key) => {
+      console.info(`${key}:`, value)
+    })
     return projectionApiInstance.projectionHcsvPostForm(
       formData.get('polygonInputData') as File,
       formData.get('layersInputData') as File,

@@ -35,7 +35,7 @@ axiosInstance.interceptors.request.use(
         'Authorization token or authStore is not available.',
       )
     }
-
+    console.info(`axios instance config:${JSON.stringify(config)} `)
     return config
   },
   (error) => {
