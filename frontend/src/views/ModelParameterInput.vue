@@ -7,7 +7,7 @@
   />
   <v-container fluid>
     <div class="top-project-year mt-3">
-      <h1 class="top-project">Projects</h1>
+      <h1 class="top-project">Projectss</h1>
       <span class="top-year">Year: 2024/2025</span>
     </div>
 
