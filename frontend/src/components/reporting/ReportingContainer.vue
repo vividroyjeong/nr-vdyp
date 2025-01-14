@@ -11,6 +11,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { PropType } from 'vue'
 import ReportingActions from '@/components/reporting/ReportingActions.vue'
 import ReportingOutput from '@/components/reporting/ReportingOutput.vue'
 import {
@@ -21,24 +22,25 @@ import {
 import { useProjectionStore } from '@/stores/projectionStore'
 import { FILE_NAME, REPORTING_TAB } from '@/constants/constants'
 import { FILE_DOWNLOAD_ERR } from '@/constants/message'
+import type { ReportingTab } from '@/types/types'
 import * as messageHandler from '@/utils/messageHandler'
 
 const props = defineProps({
-  type: {
-    type: String,
+  tabname: {
+    type: String as PropType<ReportingTab>,
     required: true,
   },
 })
 
 const projectionStore = useProjectionStore()
 const data = computed(() => {
-  switch (props.type) {
+  switch (props.tabname) {
     case REPORTING_TAB.MODEL_REPORT:
-      return projectionStore.yieldTableArray || []
+      return [...projectionStore.yieldTableArray]
     case REPORTING_TAB.VIEW_ERR_MSG:
-      return projectionStore.errorMessages || []
+      return [...projectionStore.errorMessages]
     case REPORTING_TAB.VIEW_LOG_FILE:
-      return projectionStore.logMessages || []
+      return [...projectionStore.logMessages]
     default:
       return []
   }
@@ -51,8 +53,7 @@ const handleDownload = () => {
     messageHandler.logErrorMessage(FILE_DOWNLOAD_ERR.NO_DATA)
     return
   }
-
-  switch (props.type) {
+  switch (props.tabname) {
     case REPORTING_TAB.MODEL_REPORT:
       downloadCSVFile(data.value, FILE_NAME.YIELD_TABLE_CSV)
       break

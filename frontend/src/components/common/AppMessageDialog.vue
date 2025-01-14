@@ -29,16 +29,19 @@
         }"
       >
         <v-spacer></v-spacer>
-        <v-btn class="blue-btn ml-2" @click="agree">{{
-          computedBtnLabel
-        }}</v-btn>
+        <AppButton
+          :label="computedBtnLabel"
+          customClass="blue-btn ml-2"
+          @click="agree"
+        />
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, computed } from 'vue'
+import { computed } from 'vue'
+import AppButton from '@/components/core/AppButton.vue'
 import { BUTTON_LABEL } from '@/constants/constants'
 
 const props = defineProps<{

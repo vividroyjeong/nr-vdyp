@@ -36,6 +36,12 @@ export const VOLUME_REPORTED = Object.freeze({
   NET_DECAY_WASTE_BREAKAGE: 'Net Decay, Waste and Breakage',
 })
 
+export const INCLUDE_IN_REPORT = Object.freeze({
+  COMPUTED_MAI: 'Computed MAI',
+  SPECIES_COMPOSITION: 'Species Composition',
+  CULMINATION_VALUES: 'Culmination Values',
+})
+
 export const PROJECTION_TYPE = Object.freeze({
   VOLUME: 'Volume',
   CFS_BIOMASS: 'CFS Biomass',
@@ -101,6 +107,11 @@ export const MESSAGE_TYPE = Object.freeze({
   SUCCESS: 'success',
   ERROR: 'error',
   WARNING: 'warning',
+})
+
+export const HEADER_SELECTION = Object.freeze({
+  MODEL_PARAMETER_SELECTION: 'Model Parameter Selection',
+  FILE_UPLOAD: 'File upload',
 })
 
 export const MODEL_SELECTION = Object.freeze({
