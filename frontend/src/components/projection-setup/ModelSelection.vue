@@ -5,7 +5,7 @@
         <span class="search-label">Model</span>
         <v-select
           :items="modelSelectionOptions"
-          v-model="modelSelection"
+          v-model="selectedModel"
           item-title="label"
           item-value="value"
           hide-details
@@ -19,12 +19,17 @@
   </div>
 </template>
 <script setup lang="ts">
-import { useAppStore } from '@/stores/appStore'
-import { storeToRefs } from 'pinia'
+import { ref, watch } from 'vue'
 import { modelSelectionOptions } from '@/constants/options'
+import { MODEL_SELECTION } from '@/constants/constants'
 
-const appStore = useAppStore()
-const { modelSelection } = storeToRefs(appStore)
+const emit = defineEmits(['update:modelSelection'])
+
+const selectedModel = ref<string>(MODEL_SELECTION.FILE_UPLOAD)
+
+watch(selectedModel, (newValue) => {
+  emit('update:modelSelection', newValue)
+})
 </script>
 
 <style scoped>

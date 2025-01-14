@@ -15,138 +15,27 @@
       @update:dialog="(value) => (messageDialog.dialog = value)"
       @close="handleDialogClose"
     />
-    <v-form ref="form" @submit.prevent="fileUploadRunModel">
+    <v-form ref="form" @submit.prevent="runModelHandler">
       <v-card class="elevation-4">
         <div class="pl-16 pt-10">
-          <v-row>
-            <v-col cols="3">
-              <v-text-field
-                label="Starting Age"
-                type="number"
-                v-model.number="startingAge"
-                :min="NUM_INPUT_LIMITS.STARTING_AGE_MIN"
-                :max="NUM_INPUT_LIMITS.STARTING_AGE_MAX"
-                :step="NUM_INPUT_LIMITS.STARTING_AGE_STEP"
-                persistent-placeholder
-                placeholder=""
-                density="compact"
-                dense
-              ></v-text-field>
-            </v-col>
-            <v-col class="col-space-3" />
-            <v-col cols="3">
-              <v-text-field
-                label="Finishing Age"
-                type="number"
-                v-model.number="finishingAge"
-                :min="NUM_INPUT_LIMITS.FINISHING_AGE_MIN"
-                :max="NUM_INPUT_LIMITS.FINISHING_AGE_MAX"
-                :step="NUM_INPUT_LIMITS.FINISHING_AGE_STEP"
-                persistent-placeholder
-                placeholder=""
-                density="compact"
-                dense
-              ></v-text-field>
-            </v-col>
-            <v-col class="col-space-3" />
-            <v-col cols="3">
-              <v-text-field
-                label="Age Increment"
-                type="number"
-                v-model.number="ageIncrement"
-                :min="NUM_INPUT_LIMITS.AGE_INC_MIN"
-                :max="NUM_INPUT_LIMITS.AGE_INC_MAX"
-                :step="NUM_INPUT_LIMITS.AGE_INC_STEP"
-                persistent-placeholder
-                placeholder=""
-                density="compact"
-                dense
-              ></v-text-field>
-            </v-col>
-          </v-row>
-        </div>
-        <div class="pl-16 pr-16 pb-5">
-          <div class="ml-4 mt-5">
-            <div class="ml-n4 mt-n5">
-              <span class="text-h7">Volume Reported</span>
-            </div>
-            <v-row class="ml-n6">
-              <v-col cols="12" style="padding-top: 0px">
-                <v-row>
-                  <v-col
-                    v-for="(option, index) in volumeReportedOptions"
-                    :key="index"
-                    :style="{ 'max-width': index < 4 ? '20%' : 'auto' }"
-                  >
-                    <v-checkbox
-                      v-model="volumeReported"
-                      :label="option.label"
-                      :value="option.value"
-                      hide-details
-                    ></v-checkbox>
-                  </v-col>
-                </v-row>
-              </v-col>
-            </v-row>
-          </div>
-          <div class="ml-4 mt-5">
-            <div class="ml-n4 mt-n5">
-              <span class="text-h7">Include in Report</span>
-            </div>
-            <v-row class="ml-n6">
-              <v-col cols="12" style="padding-top: 0px">
-                <v-row>
-                  <v-col
-                    v-for="(option, index) in includeInReportOptions"
-                    :key="index"
-                    :style="{ 'max-width': index < 4 ? '20%' : 'auto' }"
-                  >
-                    <v-checkbox
-                      v-model="includeInReport"
-                      :label="option.label"
-                      :value="option.value"
-                      hide-details
-                    ></v-checkbox>
-                  </v-col>
-                  <v-col style="max-width: 20% !important">
-                    <v-select
-                      label="Projection Type"
-                      :items="projectionTypeOptions"
-                      v-model="projectionType"
-                      item-title="label"
-                      item-value="value"
-                      hide-details="auto"
-                      persistent-placeholder
-                      placeholder="Select..."
-                      density="compact"
-                      dense
-                      style="max-width: 70% !important"
-                    ></v-select>
-                  </v-col>
-                </v-row>
-              </v-col>
-            </v-row>
-          </div>
-          <div class="ml-4 mt-5">
-            <div class="ml-n4 mt-n5">
-              <span class="text-h9">Report Title</span>
-            </div>
-            <v-row>
-              <v-col cols="12">
-                <v-text-field
-                  type="string"
-                  v-model="reportTitle"
-                  hide-details="auto"
-                  persistent-placeholder
-                  placeholder="Enter a report title..."
-                  density="compact"
-                  dense
-                  style="max-width: 41% !important"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </div>
-          <div class="ml-4 mt-10">
+          <ReportConfiguration
+            :startingAge="startingAge"
+            :finishingAge="finishingAge"
+            :ageIncrement="ageIncrement"
+            :volumeReported="volumeReported"
+            :includeInReport="includeInReport"
+            :projectionType="projectionType"
+            :reportTitle="reportTitle"
+            :isDisabled="false"
+            @update:startingAge="handleStartingAgeUpdate"
+            @update:finishingAge="handleFinishingAgeUpdate"
+            @update:ageIncrement="handleAgeIncrementUpdate"
+            @update:volumeReported="handleVolumeReportedUpdate"
+            @update:includeInReport="handleIncludeInReportUpdate"
+            @update:projectionType="handleProjectionTypeUpdate"
+            @update:reportTitle="handleReportTitleUpdate"
+          />
+          <div class="ml-4 mt-10 mb-10">
             <div class="ml-n4 mt-n5">
               <span class="text-h7">Attachments</span>
             </div>
@@ -180,14 +69,12 @@
             </v-row>
           </div>
         </div>
-        <v-card class="mt-5 pa-4 file-upload-run-model-card" elevation="0">
-          <v-card-actions class="pr-0 mr-2">
-            <v-spacer></v-spacer>
-            <v-btn class="blue-btn ml-2" @click="fileUploadRunModel"
-              >Run Model</v-btn
-            >
-          </v-card-actions>
-        </v-card>
+        <AppRunModelButton
+          :isDisabled="false"
+          cardClass="file-upload-run-model-card"
+          cardActionsClass="card-actions"
+          @runModel="runModelHandler"
+        />
       </v-card>
     </v-form>
   </div>
@@ -198,27 +85,14 @@ import { ref } from 'vue'
 import { SelectedExecutionOptionsEnum } from '@/services/vdyp-api'
 import { projectionHcsvPost } from '@/services/apiActions'
 import { handleApiError } from '@/services/apiErrorHandler'
-import AppMessageDialog from '@/components/common/AppMessageDialog.vue'
-import AppProgressCircular from '@/components/common/AppProgressCircular.vue'
 import {
-  volumeReportedOptions,
-  includeInReportOptions,
-  projectionTypeOptions,
-} from '@/constants/options'
-import {
-  NUM_INPUT_LIMITS,
-  FILE_NAME,
-  BUTTON_LABEL,
-} from '@/constants/constants'
-import {
-  MDL_PRM_INPUT_ERR,
-  MSG_DIALOG_TITLE,
-  FILE_UPLOAD_ERR,
-  PROGRESS_MSG,
-  SUCESS_MSG,
-} from '@/constants/message'
+  AppRunModelButton,
+  AppProgressCircular,
+  AppMessageDialog,
+  ReportConfiguration,
+} from '@/components'
 import type { MessageDialog } from '@/interfaces/interfaces'
-import { DEFAULT_VALUES } from '@/constants/defaults'
+import { CONSTANTS, MESSAGE, DEFAULTS } from '@/constants'
 import { FileUploadValidation } from '@/validation/fileUploadValidation'
 import { Util } from '@/utils/util'
 import { logSuccessMessage } from '@/utils/messageHandler'
@@ -230,13 +104,15 @@ const progressMessage = ref('')
 
 const fileUploadValidator = new FileUploadValidation()
 
-const startingAge = ref<number | null>(DEFAULT_VALUES.STARTING_AGE)
-const finishingAge = ref<number | null>(DEFAULT_VALUES.FINISHING_AGE)
-const ageIncrement = ref<number | null>(DEFAULT_VALUES.AGE_INCREMENT)
-const volumeReported = ref<string[]>(DEFAULT_VALUES.VOLUME_REPORTED)
+const startingAge = ref<number | null>(DEFAULTS.DEFAULT_VALUES.STARTING_AGE)
+const finishingAge = ref<number | null>(DEFAULTS.DEFAULT_VALUES.FINISHING_AGE)
+const ageIncrement = ref<number | null>(DEFAULTS.DEFAULT_VALUES.AGE_INCREMENT)
+const volumeReported = ref<string[]>(DEFAULTS.DEFAULT_VALUES.VOLUME_REPORTED)
 const includeInReport = ref<string[]>([])
-const projectionType = ref<string | null>(DEFAULT_VALUES.PROJECTION_TYPE)
-const reportTitle = ref<string | null>(DEFAULT_VALUES.REPORT_TITLE)
+const projectionType = ref<string | null>(
+  DEFAULTS.DEFAULT_VALUES.PROJECTION_TYPE,
+)
+const reportTitle = ref<string | null>(DEFAULTS.DEFAULT_VALUES.REPORT_TITLE)
 
 const layerFile = ref<File | null>(null)
 const polygonFile = ref<File | null>(null)
@@ -247,6 +123,34 @@ const messageDialog = ref<MessageDialog>({
   message: '',
 })
 
+const handleStartingAgeUpdate = (value: number | null) => {
+  startingAge.value = value
+}
+
+const handleFinishingAgeUpdate = (value: number | null) => {
+  finishingAge.value = value
+}
+
+const handleAgeIncrementUpdate = (value: number | null) => {
+  ageIncrement.value = value
+}
+
+const handleVolumeReportedUpdate = (value: string[]) => {
+  volumeReported.value = [...value]
+}
+
+const handleIncludeInReportUpdate = (value: string[]) => {
+  includeInReport.value = [...value]
+}
+
+const handleProjectionTypeUpdate = (value: string | null) => {
+  projectionType.value = value
+}
+
+const handleReportTitleUpdate = (value: string | null) => {
+  reportTitle.value = value
+}
+
 const validateComparison = (): boolean => {
   if (
     !fileUploadValidator.validateAgeComparison(
@@ -256,9 +160,9 @@ const validateComparison = (): boolean => {
   ) {
     messageDialog.value = {
       dialog: true,
-      title: MSG_DIALOG_TITLE.INVALID_INPUT,
-      message: MDL_PRM_INPUT_ERR.RPT_VLD_COMP_FNSH_AGE,
-      btnLabel: BUTTON_LABEL.CONT_EDIT,
+      title: MESSAGE.MSG_DIALOG_TITLE.INVALID_INPUT,
+      message: MESSAGE.MDL_PRM_INPUT_ERR.RPT_VLD_COMP_FNSH_AGE,
+      btnLabel: CONSTANTS.BUTTON_LABEL.CONT_EDIT,
     }
     return false
   }
@@ -270,12 +174,12 @@ const validateRange = (): boolean => {
   if (!fileUploadValidator.validateStartingAgeRange(startingAge.value)) {
     messageDialog.value = {
       dialog: true,
-      title: MSG_DIALOG_TITLE.INVALID_INPUT,
-      message: MDL_PRM_INPUT_ERR.RPT_VLD_START_AGE_RNG(
-        NUM_INPUT_LIMITS.STARTING_AGE_MIN,
-        NUM_INPUT_LIMITS.STARTING_AGE_MAX,
+      title: MESSAGE.MSG_DIALOG_TITLE.INVALID_INPUT,
+      message: MESSAGE.MDL_PRM_INPUT_ERR.RPT_VLD_START_AGE_RNG(
+        CONSTANTS.NUM_INPUT_LIMITS.STARTING_AGE_MIN,
+        CONSTANTS.NUM_INPUT_LIMITS.STARTING_AGE_MAX,
       ),
-      btnLabel: BUTTON_LABEL.CONT_EDIT,
+      btnLabel: CONSTANTS.BUTTON_LABEL.CONT_EDIT,
     }
     return false
   }
@@ -283,12 +187,12 @@ const validateRange = (): boolean => {
   if (!fileUploadValidator.validateFinishingAgeRange(finishingAge.value)) {
     messageDialog.value = {
       dialog: true,
-      title: MSG_DIALOG_TITLE.INVALID_INPUT,
-      message: MDL_PRM_INPUT_ERR.RPT_VLD_START_FNSH_RNG(
-        NUM_INPUT_LIMITS.FINISHING_AGE_MIN,
-        NUM_INPUT_LIMITS.FINISHING_AGE_MAX,
+      title: MESSAGE.MSG_DIALOG_TITLE.INVALID_INPUT,
+      message: MESSAGE.MDL_PRM_INPUT_ERR.RPT_VLD_START_FNSH_RNG(
+        CONSTANTS.NUM_INPUT_LIMITS.FINISHING_AGE_MIN,
+        CONSTANTS.NUM_INPUT_LIMITS.FINISHING_AGE_MAX,
       ),
-      btnLabel: BUTTON_LABEL.CONT_EDIT,
+      btnLabel: CONSTANTS.BUTTON_LABEL.CONT_EDIT,
     }
     return false
   }
@@ -296,12 +200,12 @@ const validateRange = (): boolean => {
   if (!fileUploadValidator.validateAgeIncrementRange(ageIncrement.value)) {
     messageDialog.value = {
       dialog: true,
-      title: MSG_DIALOG_TITLE.INVALID_INPUT,
-      message: MDL_PRM_INPUT_ERR.RPT_VLD_AGE_INC_RNG(
-        NUM_INPUT_LIMITS.AGE_INC_MIN,
-        NUM_INPUT_LIMITS.AGE_INC_MAX,
+      title: MESSAGE.MSG_DIALOG_TITLE.INVALID_INPUT,
+      message: MESSAGE.MDL_PRM_INPUT_ERR.RPT_VLD_AGE_INC_RNG(
+        CONSTANTS.NUM_INPUT_LIMITS.AGE_INC_MIN,
+        CONSTANTS.NUM_INPUT_LIMITS.AGE_INC_MAX,
       ),
-      btnLabel: BUTTON_LABEL.CONT_EDIT,
+      btnLabel: CONSTANTS.BUTTON_LABEL.CONT_EDIT,
     }
     return false
   }
@@ -313,9 +217,9 @@ const validateFiles = async () => {
   if (!layerFile.value) {
     messageDialog.value = {
       dialog: true,
-      title: MSG_DIALOG_TITLE.MISSING_FILE,
-      message: FILE_UPLOAD_ERR.LAYER_FILE_MISSING,
-      btnLabel: BUTTON_LABEL.CONT_EDIT,
+      title: MESSAGE.MSG_DIALOG_TITLE.MISSING_FILE,
+      message: MESSAGE.FILE_UPLOAD_ERR.LAYER_FILE_MISSING,
+      btnLabel: CONSTANTS.BUTTON_LABEL.CONT_EDIT,
     }
     return false
   }
@@ -323,9 +227,9 @@ const validateFiles = async () => {
   if (!polygonFile.value) {
     messageDialog.value = {
       dialog: true,
-      title: MSG_DIALOG_TITLE.MISSING_FILE,
-      message: FILE_UPLOAD_ERR.POLYGON_FILE_MISSING,
-      btnLabel: BUTTON_LABEL.CONT_EDIT,
+      title: MESSAGE.MSG_DIALOG_TITLE.MISSING_FILE,
+      message: MESSAGE.FILE_UPLOAD_ERR.POLYGON_FILE_MISSING,
+      btnLabel: CONSTANTS.BUTTON_LABEL.CONT_EDIT,
     }
     return false
   }
@@ -333,9 +237,9 @@ const validateFiles = async () => {
   if (!(await fileUploadValidator.isCSVFile(layerFile.value))) {
     messageDialog.value = {
       dialog: true,
-      title: MSG_DIALOG_TITLE.INVALID_FILE,
-      message: FILE_UPLOAD_ERR.LAYER_FILE_NOT_CSV_FORMAT,
-      btnLabel: BUTTON_LABEL.CONT_EDIT,
+      title: MESSAGE.MSG_DIALOG_TITLE.INVALID_FILE,
+      message: MESSAGE.FILE_UPLOAD_ERR.LAYER_FILE_NOT_CSV_FORMAT,
+      btnLabel: CONSTANTS.BUTTON_LABEL.CONT_EDIT,
     }
     return false
   }
@@ -343,9 +247,9 @@ const validateFiles = async () => {
   if (!(await fileUploadValidator.isCSVFile(polygonFile.value))) {
     messageDialog.value = {
       dialog: true,
-      title: MSG_DIALOG_TITLE.INVALID_FILE,
-      message: FILE_UPLOAD_ERR.POLYGON_FILE_NOT_CSV_FORMAT,
-      btnLabel: BUTTON_LABEL.CONT_EDIT,
+      title: MESSAGE.MSG_DIALOG_TITLE.INVALID_FILE,
+      message: MESSAGE.FILE_UPLOAD_ERR.POLYGON_FILE_NOT_CSV_FORMAT,
+      btnLabel: CONSTANTS.BUTTON_LABEL.CONT_EDIT,
     }
     return false
   }
@@ -363,16 +267,16 @@ const validateRequiredFields = (): boolean => {
   ) {
     messageDialog.value = {
       dialog: true,
-      title: MSG_DIALOG_TITLE.INVALID_INPUT,
-      message: FILE_UPLOAD_ERR.RPT_VLD_REQUIRED_FIELDS,
-      btnLabel: BUTTON_LABEL.CONT_EDIT,
+      title: MESSAGE.MSG_DIALOG_TITLE.INVALID_INPUT,
+      message: MESSAGE.FILE_UPLOAD_ERR.RPT_VLD_REQUIRED_FIELDS,
+      btnLabel: CONSTANTS.BUTTON_LABEL.CONT_EDIT,
     }
     return false
   }
   return true
 }
 
-const fileUploadRunModel = async () => {
+const runModelHandler = async () => {
   try {
     const isValidationSuccessful =
       validateRequiredFields() &&
@@ -391,7 +295,7 @@ const fileUploadRunModel = async () => {
     }
 
     isProgressVisible.value = true
-    progressMessage.value = PROGRESS_MSG.RUNNING_MODEL
+    progressMessage.value = MESSAGE.PROGRESS_MSG.RUNNING_MODEL
 
     await Util.delay(1000)
 
@@ -437,14 +341,14 @@ const fileUploadRunModel = async () => {
     const url = window.URL.createObjectURL(new Blob([result]))
     const link = document.createElement('a')
     link.href = url
-    link.setAttribute('download', FILE_NAME.PROJECTION_RESULT_ZIP)
+    link.setAttribute('download', CONSTANTS.FILE_NAME.PROJECTION_RESULT_ZIP)
     document.body.appendChild(link)
     link.click()
     link.remove()
 
-    logSuccessMessage(SUCESS_MSG.FILE_UPLOAD_RUN_RESULT)
+    logSuccessMessage(MESSAGE.SUCESS_MSG.FILE_UPLOAD_RUN_RESULT)
   } catch (error) {
-    handleApiError(error, FILE_UPLOAD_ERR.FAIL_RUN_MODEL)
+    handleApiError(error, MESSAGE.FILE_UPLOAD_ERR.FAIL_RUN_MODEL)
   } finally {
     isProgressVisible.value = false
   }
@@ -452,18 +356,4 @@ const fileUploadRunModel = async () => {
 
 const handleDialogClose = () => {}
 </script>
-<style scoped>
-.file-upload-run-model-card {
-  padding-bottom: 16px !important;
-  background-color: #f6f6f6;
-  border-top: 1px solid #0000001f;
-  border-top-left-radius: 0px;
-  border-top-right-radius: 0px;
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
-  display: flex;
-  justify-content: end;
-  align-items: end;
-  text-align: end;
-}
-</style>
+<style scoped></style>

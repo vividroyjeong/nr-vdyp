@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import JSZip from 'jszip'
 import { messageResult } from '@/utils/messageHandler'
 import { FILE_UPLOAD_ERR } from '@/constants/message'
@@ -9,14 +9,7 @@ export const useProjectionStore = defineStore('projectionStore', () => {
   const errorMessages = ref<string[]>([])
   const logMessages = ref<string[]>([])
   const yieldTable = ref<string>('') // raw CSV
-
-  const yieldTableArray = computed(() => {
-    if (!yieldTable.value) {
-      return []
-    }
-    // Convert CSV data to an array
-    return yieldTable.value.split(/\r?\n/).filter((line) => line.trim() !== '') // Remove blank lines
-  })
+  const yieldTableArray = ref<string[]>([]) // Array of CSV lines
 
   const handleZipResponse = async (zipData: Blob) => {
     try {
@@ -53,6 +46,14 @@ export const useProjectionStore = defineStore('projectionStore', () => {
       errorMessages.value = (await errorFile.async('string')).split(/\r?\n/)
       logMessages.value = (await logFile.async('string')).split(/\r?\n/)
       yieldTable.value = await yieldFile.async('string')
+
+      if (yieldTable.value) {
+        yieldTableArray.value = yieldTable.value
+          .split(/\r?\n/)
+          .filter((line) => line.trim() !== '') // Remove blank lines
+      } else {
+        yieldTableArray.value = []
+      }
     } catch (error) {
       console.error('Error processing ZIP file:', error)
       messageResult(false, '', FILE_UPLOAD_ERR.INVALID_RESPONSED_FILE)
@@ -84,8 +85,6 @@ export const useProjectionStore = defineStore('projectionStore', () => {
 
       // Generate the ZIP file
       const zipBlob = await zip.generateAsync({ type: 'blob' })
-
-      console.log('ZIP file created: vdyp-output.zip')
 
       // Handle the ZIP file
       await handleZipResponse(zipBlob)

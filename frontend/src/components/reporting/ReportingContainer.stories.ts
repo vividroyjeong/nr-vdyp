@@ -28,7 +28,7 @@ const meta: Meta<typeof ReportingContainer> = {
   ],
   tags: ['autodocs'],
   argTypes: {
-    type: {
+    tabname: {
       control: 'select',
       options: Object.keys(REPORTING_TAB),
       description: 'Determines the type of data to display',
@@ -43,18 +43,18 @@ type Story = StoryObj<typeof ReportingContainer>
 
 export const ModelReport: Story = {
   args: {
-    type: REPORTING_TAB.MODEL_REPORT,
+    tabname: REPORTING_TAB.MODEL_REPORT,
   },
 }
 
 export const ViewErrorMessages: Story = {
   args: {
-    type: REPORTING_TAB.VIEW_ERR_MSG,
+    tabname: REPORTING_TAB.VIEW_ERR_MSG,
   },
 }
 
 export const ViewLogFile: Story = {
   args: {
-    type: REPORTING_TAB.VIEW_LOG_FILE,
+    tabname: REPORTING_TAB.VIEW_LOG_FILE,
   },
 }
