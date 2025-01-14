@@ -4,7 +4,7 @@
       <v-table class="bordered-table">
         <tbody>
           <tr>
-            <td class="field-column">auth_time</td>
+            <td class="field-column">auth_time - test</td>
             <td>
               {{ userInfo && userInfo.auth_time ? userInfo.auth_time : 'N/A' }}
               ({{ formattedAuthTime }})
